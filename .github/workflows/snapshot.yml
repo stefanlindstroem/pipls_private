@@ -1,0 +1,17 @@
+name: Snapshot smoke test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y rsync
+      - run: .llm/snapshot.sh /tmp/pipls-snapshot.tar.gz
+      - run: '! tar -tzf /tmp/pipls-snapshot.tar.gz | grep -E "(^|/)(\.git|__pycache__|\.pytest_cache)(/|$)|\.pyc$"'
