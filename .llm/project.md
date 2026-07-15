@@ -8,8 +8,8 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-This increment contains repository infrastructure only. There is no estimator yet.
-Do not invent a provisional implementation in unrelated changes.
+Phase B1 implements the private fixed-parameter numerical core in `src/pipls/_core.py`.
+There is still no public estimator, automatic rank selection, dataset API, or plotting layer.
 
 ## Planned responsibilities
 

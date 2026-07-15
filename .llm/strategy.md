@@ -70,9 +70,8 @@ Acceptance conditions:
 - snapshot members are rooted at repository root;
 - no provisional estimator exists.
 
-Current status: **in progress**. This patch simplifies the local workflow by removing patch-
-application and commit wrappers in favor of explicit Git commands. Phase A is complete when the
-resulting tests and workflow checks pass and the change is committed.
+Current status: **complete**. The repository foundation, contracts, snapshot layout, direct-Git
+workflow, and workflow tests are established.
 
 ### Phase B1: fixed-parameter private core
 
@@ -89,6 +88,8 @@ Required outputs:
 
 Do not add the public estimator, automatic rank selection, datasets, or plotting in this
 increment.
+
+Current status: **implemented by this patch**, subject to acceptance tests and commit.
 
 ### Phase B2: fixed-rank public estimator
 
@@ -136,10 +137,10 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-After this workflow patch is committed and a clean snapshot is produced, the next patch should be
-**Phase B1: fixed-parameter private core**. It should use the supplied trusted implementations as
-oracles and should remain limited to `_core.py`, focused tests, and the mathematical/numerical
-contracts needed to describe that core.
+After the Phase B1 core patch is committed and a clean snapshot is produced, the next patch should
+be **Phase B2: fixed-rank public estimator**. It should expose only explicit integer
+`predictor_rank`, use the private core without duplicating its algebra, and remain separate from
+automatic rank selection.
 
 ## Maintenance protocol
 

@@ -26,8 +26,20 @@ The intended fixed-parameter construction is:
 5. factor $\mathbf{W}=\mathbf{M}\mathbf{D}\mathbf{N}^{\mathsf{T}}$;
 6. set $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ and $\mathbf{Q}=\mathbf{C}\mathbf{N}$.
 
-Admissibility requires $1\le h\le\min(r_\pi,q)$ and $r_\pi\le\min(n,p)$, with the
-centered matrix rank handled explicitly.
+Admissibility requires $1\le h\le\min(r_\pi,q)$ and $r_\pi\le\min(n,p)$. The
+private core additionally requires $r_\pi$ not to exceed the numerical rank of the supplied
+predictor matrix. For the thin SVD singular values $s_i$, numerical rank is determined by
+$s_i > \tau_X$, where $\tau_X = \max(n,p)\,\epsilon_{64}\,s_1$.
+
+The centered/scaled regression map is
+
+\begin{equation}
+\mathbf{B}_{\mathrm{cs}}=\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf{T}}
+=\mathbf{\Pi}\mathbf{W}\mathbf{C}^{\mathsf{T}},
+\end{equation}
+
+so fitted values may be computed equivalently as $\mathbf{X}_{\mathrm{cs}}\mathbf{B}_{\mathrm{cs}}$
+or $\mathbf{Z}\mathbf{W}\mathbf{C}^{\mathsf{T}}$.
 
 Repeated or nearly repeated singular values identify invariant subspaces, not intrinsically
 numbered basis vectors. Tests must compare projection matrices, principal angles, singular
