@@ -8,6 +8,7 @@ cross-validation, or preprocessing policy.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -128,7 +129,8 @@ def fit_pipls_core(
         )
 
     _, x_singular_values, x_vt = np.linalg.svd(X_array, full_matrices=False)
-    rank_tolerance = _svd_rank_tolerance(X_array.shape, x_singular_values)
+    x_shape = (X_array.shape[0], X_array.shape[1])
+    rank_tolerance = _svd_rank_tolerance(x_shape, x_singular_values)
     x_rank = int(np.count_nonzero(x_singular_values > rank_tolerance))
     if r_pi > x_rank:
         raise ValueError(
@@ -145,8 +147,8 @@ def fit_pipls_core(
     C = np.asarray(cross_vt[:h, :].T, dtype=np.float64)
 
     Y_C = Y_array @ C
-    W, _, _, _ = np.linalg.lstsq(Z, Y_C, rcond=None)
-    W = np.asarray(W, dtype=np.float64)
+    W_raw, _, _, _ = np.linalg.lstsq(Z, Y_C, rcond=None)
+    W = cast(FloatArray, np.asarray(W_raw, dtype=np.float64))
 
     M, dilation, N_t = np.linalg.svd(W, full_matrices=False)
     M = np.asarray(M[:, :h], dtype=np.float64)
