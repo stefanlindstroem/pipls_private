@@ -16,4 +16,4 @@ if grep -E '^(---|\+\+\+) (/[[:graph:]]+|[ab]/\.\./|\.\./)' "$patch" >/dev/null;
 fi
 git apply --check "$patch"
 git apply "$patch"
-printf 'Applied %s\nRun: make check\n' "$patch"
+printf 'Applied %s\nRun: make check, inspect git diff, then commit with .llm/commit.sh \"MESSAGE\"\n' "$patch"

@@ -221,6 +221,8 @@ pipls/
 │   ├── snapshot.sh
 │   ├── apply_patch.sh
 │   ├── create_patch.sh
+│   ├── commit.sh
+│   ├── strategy.md
 │   ├── prompts/
 │   │   ├── bugfix.md
 │   │   ├── feature.md
@@ -372,6 +374,7 @@ The `.llm/` directory is part of the tracked repository but is not part of the i
 
 The following files should have distinct responsibilities:
 
+- `.llm/strategy.md`: LLM-maintained operational phase plan, next increment, acceptance conditions, ownership boundaries, and maintenance protocol;
 - `.llm/project.md`: concise repository map, public entry points, module responsibilities, test locations, generated-file boundaries, and the preferred commands for validation;
 - `.llm/mathematics.md`: notation, dimensions, defining equations, model identities, admissibility conditions, equivalences to established methods, and the distinction between mathematical identities and implementation conventions;
 - `.llm/numerical_contracts.md`: policies for SVD and eigenproblems, rank tolerances, pseudoinverses, degeneracy, repeated eigenvalues, projection-based comparisons, sign indeterminacy, finite-value checks, and avoidance of unnecessarily large matrices;
@@ -444,7 +447,7 @@ They must not contain absolute paths, temporary extraction prefixes, or archive-
 6. apply the patch only after all checks pass;
 7. print the recommended validation commands.
 
-An explicit `--allow-dirty` mode may exist for advanced use, but it must not be the default. `.llm/create_patch.sh` should create a root-relative patch from the current working tree and verify that it can be applied to the recorded base commit.
+An explicit `--allow-dirty` mode may exist for advanced use, but it must not be the default. `.llm/create_patch.sh` should create a root-relative patch from the current working tree and verify that it can be applied to the recorded base commit. `.llm/commit.sh` should remain a separate, explicit post-review action: it runs repository validation, checks whitespace, stages the accepted changes, displays the staged summary, and commits with a user-supplied message. Patch application itself must never commit.
 
 ### 5.5 Request and review templates
 
@@ -490,7 +493,8 @@ The intended workflow is:
 4. receive one root-relative unified patch plus a concise validation report;
 5. save the patch locally and run `.llm/apply_patch.sh proposed-change.patch`;
 6. run the Makefile validation targets;
-7. inspect and commit through the ordinary Git workflow.
+7. inspect the changes and commit explicitly, either through ordinary Git commands or `.llm/commit.sh "MESSAGE"`;
+8. create the next clean snapshot only after the commit succeeds.
 
 The `.llm` layer standardizes communication; it does not replace code review, tests, Git history, release notes, or scientific review.
 

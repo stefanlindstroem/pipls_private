@@ -23,6 +23,8 @@ def test_required_llm_contracts_exist() -> None:
         ".llm/snapshot.sh",
         ".llm/apply_patch.sh",
         ".llm/create_patch.sh",
+        ".llm/commit.sh",
+        ".llm/strategy.md",
     }
     missing = sorted(path for path in required if not (root / path).is_file())
     assert not missing, f"Missing repository contracts: {missing}"
@@ -51,3 +53,25 @@ def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> Non
     assert "README.md" in names
     assert ".llm/SNAPSHOT_INFO" in names
     assert not any(name.startswith(f"{root.name}/") for name in names)
+
+
+def test_llm_workflow_scripts_are_executable() -> None:
+    root = Path(__file__).resolve().parents[1]
+    scripts = [
+        root / ".llm" / "snapshot.sh",
+        root / ".llm" / "apply_patch.sh",
+        root / ".llm" / "create_patch.sh",
+        root / ".llm" / "commit.sh",
+    ]
+    assert all(path.stat().st_mode & 0o111 for path in scripts)
+
+
+def test_strategy_declares_ownership_and_next_increment() -> None:
+    root = Path(__file__).resolve().parents[1]
+    strategy = (root / ".llm" / "strategy.md").read_text(encoding="utf-8")
+    readme = (root / ".llm" / "README.md").read_text(encoding="utf-8")
+
+    assert "The LLM maintainer owns" in strategy
+    assert "Phase B1: fixed-parameter private core" in strategy
+    assert "The LLM maintainer updates this file" in readme
+    assert '.llm/commit.sh "Describe the completed increment"' in readme
