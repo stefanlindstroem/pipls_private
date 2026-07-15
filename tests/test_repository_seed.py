@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import subprocess
+import tarfile
 from pathlib import Path
 
 import pipls
@@ -29,3 +31,23 @@ def test_required_llm_contracts_exist() -> None:
 def test_llm_layer_is_outside_installable_package() -> None:
     package_root = Path(pipls.__file__).resolve().parent
     assert ".llm" not in {part.name for part in package_root.parents}
+
+
+def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> None:
+    root = Path(__file__).resolve().parents[1]
+    archive = tmp_path / "snapshot.tar.gz"
+
+    subprocess.run(
+        [str(root / ".llm" / "snapshot.sh"), str(archive)],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    with tarfile.open(archive, "r:gz") as handle:
+        names = {name.removeprefix("./") for name in handle.getnames()}
+
+    assert "README.md" in names
+    assert ".llm/SNAPSHOT_INFO" in names
+    assert not any(name.startswith(f"{root.name}/") for name in names)

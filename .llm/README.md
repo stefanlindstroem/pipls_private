@@ -12,10 +12,13 @@ For each change, read in this order:
 5. `development.md`
 6. the relevant source and test files
 
+Snapshots contain the contents of the repository root, without an enclosing project-name directory. Extract them into an existing empty project directory so archive paths and Git patch paths coincide.
+
 Normal exchange:
 
 ```bash
 make snapshot
+# inspect with: tar -tzf ../pipls-snapshot.tar.gz | head
 # upload the generated tarball and request one root-relative unified Git patch
 .llm/apply_patch.sh proposed-change.patch
 make check

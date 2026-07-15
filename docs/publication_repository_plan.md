@@ -398,7 +398,7 @@ These commands should delegate to the same tools used in CI. The `.llm` instruct
 
 ### 5.3 Snapshot contract
 
-`.llm/snapshot.sh` should create a deterministic repository tarball suitable for upload. The archive should contain the repository directory itself, including `.llm`, but exclude at least:
+`.llm/snapshot.sh` should create a deterministic repository tarball suitable for upload. The archive should contain the contents of the repository root, including `.llm`, but no enclosing project-name directory. This keeps archive member paths identical to root-relative Git paths and permits extraction directly into an existing project directory. It should exclude at least:
 
 ```text
 .git/

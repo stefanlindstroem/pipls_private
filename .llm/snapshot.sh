@@ -27,7 +27,7 @@ python: $(python3 --version 2>&1)
 package_version: $version
 META
 
-mkdir -p "$staging/$project_name/.llm"
+mkdir -p "$staging/.llm"
 rsync -a \
   --exclude='.git/' --exclude='.venv/' --exclude='venv/' \
   --exclude='__pycache__/' --exclude='*.pyc' --exclude='.pytest_cache/' \
@@ -35,9 +35,17 @@ rsync -a \
   --exclude='coverage.xml' --exclude='htmlcov/' --exclude='build/' --exclude='dist/' \
   --exclude='*.egg-info/' --exclude='docs/_build/' --exclude='.ipynb_checkpoints/' \
   --exclude='.DS_Store' --exclude='._*' --exclude='*~' --exclude='*.patch' \
-  --exclude='*-snapshot.tar.gz' "$root/" "$staging/$project_name/"
-cp "$metadata" "$staging/$project_name/.llm/SNAPSHOT_INFO"
+  --exclude='*-snapshot.tar.gz' "$root/" "$staging/"
+cp "$metadata" "$staging/.llm/SNAPSHOT_INFO"
 
-tar --sort=name --mtime='UTC 2020-01-01' --owner=0 --group=0 --numeric-owner \
-    -czf "$output" -C "$staging" "$project_name"
+# Archive the contents of the repository root, not an enclosing project directory.
+# This keeps archive paths identical to Git paths and allows extraction directly
+# into an existing checkout directory.
+(
+    cd "$staging"
+    find . -mindepth 1 -print0 | LC_ALL=C sort -z | \
+        tar --null --no-recursion --mtime='UTC 2020-01-01' \
+            --owner=0 --group=0 --numeric-owner --transform='s|^\./||' \
+            -czf "$output" -T -
+)
 printf 'Created %s\n' "$output"
