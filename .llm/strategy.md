@@ -35,7 +35,9 @@ resolve the discrepancy explicitly rather than silently choosing one.
 7. Keep paper-specific orchestration explicit and separate from general estimator defaults.
 8. Update the relevant `.llm` contract and user-facing documentation when a contract changes.
 9. Return one root-relative Git patch per increment with an explicit validation report.
-10. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
+10. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
+    for patch application or committing.
+11. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
     one patch unless the dependency cannot be separated.
 
 ## Fixed architectural decisions
@@ -52,6 +54,7 @@ resolve the discrepancy explicitly rather than silently choosing one.
 - Custom learned preprocessing is searched around the complete pipeline.
 - Paper-specific rank rules and LOO reporting conventions are explicit reproduction inputs.
 - `.llm/` is tracked repository infrastructure and is excluded from the installable package.
+- Patch application and commits use ordinary Git commands rather than project wrapper scripts.
 - Snapshots contain repository-root contents without an enclosing project directory.
 - Patches are unified Git patches relative to repository root.
 
@@ -62,14 +65,14 @@ resolve the discrepancy explicitly rather than silently choosing one.
 Acceptance conditions:
 
 - repository skeleton, packaging metadata, Makefile, and CI exist;
-- `.llm` contracts, snapshot, patch creation, patch application, commit helper, and navigation
-  are tested;
+- `.llm` contracts, snapshot creation, optional patch export, direct-Git workflow, and
+  navigation are tested;
 - snapshot members are rooted at repository root;
 - no provisional estimator exists.
 
-Current status: **in progress**. This patch completes the strategy ownership and local commit
-workflow. Phase A is complete when the resulting tests and workflow checks pass and the change
-is committed.
+Current status: **in progress**. This patch simplifies the local workflow by removing patch-
+application and commit wrappers in favor of explicit Git commands. Phase A is complete when the
+resulting tests and workflow checks pass and the change is committed.
 
 ### Phase B1: fixed-parameter private core
 
@@ -148,4 +151,5 @@ For every patch, the LLM maintainer should:
 4. update `Current status` and `Current next increment` when phase state changes;
 5. update fixed decisions only after an explicit owner decision;
 6. run and report each applicable Makefile validation target;
-7. return a root-relative patch, leaving application and commit under user control.
+7. return a root-relative patch and provide the exact direct Git commands for checking, applying,
+   inspecting, staging, and committing it.

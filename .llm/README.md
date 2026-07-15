@@ -50,44 +50,68 @@ The snapshot contains the contents of the repository root, without an enclosing 
 directory. Archive paths therefore match root-relative Git patch paths.
 
 Request one small, testable increment. The response should provide one root-relative unified Git
-patch and a validation report. Save the patch, normally under `~/Downloads`, and apply it from the
-repository root:
+patch and a validation report. Save the patch, normally under `~/Downloads`.
+
+From the repository root, check and apply it directly with Git:
 
 ```bash
-.llm/apply_patch.sh ~/Downloads/proposed-change.patch
+git status --short
+git apply --check ~/Downloads/proposed-change.patch
+git apply ~/Downloads/proposed-change.patch
 ```
 
-Then validate and inspect:
+The first command should normally print nothing. The applicability check and application are
+silent on success. Then inspect and validate:
 
 ```bash
-make check
-git diff
 git status
+git diff --check
+git diff
+make check
 ```
 
-When satisfied, commit explicitly:
+When satisfied, stage and inspect exactly what will be committed:
 
 ```bash
-.llm/commit.sh "Describe the completed increment"
+git add -A
+git diff --cached --check
+git diff --cached --stat
+git diff --cached
 ```
 
-`commit.sh` runs `make check`, rejects whitespace errors, stages all repository changes, displays
-the staged summary, and commits with the supplied message. It does not create a snapshot. After a
-successful commit, create the next snapshot with `make snapshot`.
+Commit only after reviewing the staged diff:
+
+```bash
+git commit -m "Describe the completed increment"
+git status
+make snapshot
+```
+
+To discard an uncommitted applied patch, use Git rather than a helper script:
+
+```bash
+git restore --staged .
+git restore .
+git clean -nd   # preview untracked files that would be removed
+git clean -fd   # remove them only after reviewing the preview
+```
 
 The complete exchange cycle is therefore:
 
 ```text
-commit clean state -> make snapshot -> upload -> receive patch -> apply patch
--> inspect and validate -> commit -> make next snapshot
+commit clean state -> make snapshot -> upload -> receive patch -> git apply --check
+-> git apply -> inspect and validate -> git add -> inspect staged diff -> git commit
+-> make next snapshot
 ```
 
 ## Helper scripts
 
 - `snapshot.sh [OUTPUT]`: create a clean deterministic upload tarball.
-- `apply_patch.sh [--allow-dirty] PATCH`: validate and apply a root-relative patch; never commits.
-- `create_patch.sh [OUTPUT]`: export current unstaged changes as a root-relative patch.
-- `commit.sh COMMIT_MESSAGE`: validate, stage, and commit the accepted increment.
+- `create_patch.sh [OUTPUT]`: optionally export current unstaged changes as a root-relative patch.
+
+Patch application and committing deliberately use ordinary Git commands. This keeps behavior
+visible, avoids hidden staging or commit actions, and makes troubleshooting independent of project
+shell wrappers.
 
 Git and tests remain authoritative. The `.llm` layer standardizes communication and maintenance;
 it does not replace scientific review, code review, release notes, or ordinary Git inspection.

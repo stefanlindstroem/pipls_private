@@ -219,9 +219,7 @@ pipls/
 │   ├── development.md
 │   ├── public_api.md
 │   ├── snapshot.sh
-│   ├── apply_patch.sh
 │   ├── create_patch.sh
-│   ├── commit.sh
 │   ├── strategy.md
 │   ├── prompts/
 │   │   ├── bugfix.md
@@ -437,17 +435,21 @@ diff --git a/src/pipls/regression.py b/src/pipls/regression.py
 
 They must not contain absolute paths, temporary extraction prefixes, or archive-specific directory names.
 
-`.llm/apply_patch.sh` should:
+Patch application and commits should use direct Git commands from the repository root rather than project wrapper scripts. The documented sequence is:
 
-1. verify that the argument is a readable patch;
-2. refuse a dirty tracked worktree by default;
-3. run `git apply --check`;
-4. reject path traversal and paths outside the repository;
-5. optionally enforce whitespace policy;
-6. apply the patch only after all checks pass;
-7. print the recommended validation commands.
+```bash
+git status --short
+git apply --check ~/Downloads/proposed-change.patch
+git apply ~/Downloads/proposed-change.patch
+make check
+git diff
+git add -A
+git diff --cached --check
+git diff --cached
+git commit -m "Describe the completed increment"
+```
 
-An explicit `--allow-dirty` mode may exist for advanced use, but it must not be the default. `.llm/create_patch.sh` should create a root-relative patch from the current working tree and verify that it can be applied to the recorded base commit. `.llm/commit.sh` should remain a separate, explicit post-review action: it runs repository validation, checks whitespace, stages the accepted changes, displays the staged summary, and commits with a user-supplied message. Patch application itself must never commit.
+The worktree should normally be clean before application. `git apply --check` must succeed before `git apply` is run. The user reviews both the unstaged and staged diffs; no project script applies, stages, or commits changes implicitly. `.llm/create_patch.sh` may remain as an optional convenience for exporting local changes, but it is not required for accepting an LLM-produced patch.
 
 ### 5.5 Request and review templates
 
@@ -491,9 +493,9 @@ The intended workflow is:
 2. upload the tarball with a request based on `.llm/templates/PATCH_REQUEST.md`;
 3. require inspection of the relevant `.llm` contracts before source modification;
 4. receive one root-relative unified patch plus a concise validation report;
-5. save the patch locally and run `.llm/apply_patch.sh proposed-change.patch`;
-6. run the Makefile validation targets;
-7. inspect the changes and commit explicitly, either through ordinary Git commands or `.llm/commit.sh "MESSAGE"`;
+5. save the patch locally and run `git apply --check proposed-change.patch` followed by `git apply proposed-change.patch`;
+6. run the Makefile validation targets and inspect `git diff`;
+7. stage with `git add -A`, inspect `git diff --cached`, and commit with `git commit -m "MESSAGE"`;
 8. create the next clean snapshot only after the commit succeeds.
 
 The `.llm` layer standardizes communication; it does not replace code review, tests, Git history, release notes, or scientific review.
@@ -1837,7 +1839,7 @@ The paper repository is ready to publish only when all of the following are true
 - `.llm/project.md`, `.llm/mathematics.md`, `.llm/numerical_contracts.md`, `.llm/development.md`, and `.llm/public_api.md` agree with the implementation and public documentation;
 - `.llm` is excluded from the wheel and is never imported by runtime package code;
 - `make snapshot` produces a clean archive with repository-state metadata and no Git history, caches, compiled files, generated documentation, or forbidden result artifacts;
-- `.llm/apply_patch.sh` checks root-relative paths, patch applicability, and dirty-worktree policy before applying a patch;
+- the documented direct-Git workflow checks patch applicability before application and requires review before staging and committing;
 - every LLM-assisted patch records which validation targets passed, failed, or were not run;
 - `PiPLSRegression(n_components=k)` is the principal documented call;
 - every estimator parameter has one documented meaning;
