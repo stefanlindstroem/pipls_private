@@ -98,7 +98,8 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert "Current status: **complete**. `PiPLSDataset` validates" in strategy
     assert "Phase E2: transparent real-data input contract" in strategy
     assert "Current status: **complete**. `.llm/data_io.md`" in strategy
-    assert "The next implementation patch should be **Phase E3" in strategy
+    assert "Current status: **underway**. The first integration is Linnerud" in strategy
+    assert "The next implementation patch should remain in **Phase E3**" in strategy
     assert (root / "docs" / "decisions" / "0005-leave-one-out-protocol.md").is_file()
     assert (root / "docs" / "decisions" / "0007-predictor-rank-search-policies.md").is_file()
     assert (root / "docs" / "decisions" / "0008-predictor-svd-policy.md").is_file()
@@ -109,6 +110,7 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert (root / "docs" / "decisions" / "0014-validation-metadata-scope.md").is_file()
     assert (root / "docs" / "decisions" / "0015-dataset-and-synthetic-api.md").is_file()
     assert (root / "docs" / "decisions" / "0016-transparent-data-ingestion.md").is_file()
+    assert (root / "docs" / "decisions" / "0017-first-real-dataset.md").is_file()
     assert (root / "docs" / "path_analysis.md").is_file()
     assert (root / "docs" / "cross_validation.md").is_file()
     assert "The LLM maintainer updates this file" in readme
@@ -156,7 +158,8 @@ def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
     decisions = (root / ".llm" / "decisions.md").read_text(encoding="utf-8")
 
     assert "Phases A through E2 are complete" in state
-    assert "Phase E3: first real-dataset integration" in state
+    assert "Phase E3 is underway" in state
+    assert "Linnerud" in state
     assert "no required metadata file, registry, or package-owned loader" in state
     assert "deterministic synthetic" in state
     assert (
@@ -166,7 +169,7 @@ def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
     assert "direct `PiPLSRegression` or `Pipeline`" in state
     assert "Routine work should not require re-uploading the manuscript" in state
 
-    assert "The next increment is Phase E3" in project
+    assert "The next increment remains Phase E3" in project
     assert "transparent" in project
     assert "`.llm/state.md`: current handoff" in project
 
@@ -188,9 +191,29 @@ def test_llm_data_io_contract_is_transparent() -> None:
     assert "model = PiPLSRegression().fit(X, Y)" in data_io
     assert "must not require a registry, metadata file" in data_io
     assert "Do not hide these steps behind a package utility" in data_io
-    assert "Phase E3: first real-dataset integration" in strategy
+    assert "### Phase E3: real dataset integrations" in strategy
+    assert "Current status: **underway**" in strategy
     assert not (root / "datasets" / "registry.yaml").exists()
 
+
+
+def test_linnerud_is_repository_data_not_runtime_api() -> None:
+    root = Path(__file__).resolve().parents[1]
+    manifest = (root / "MANIFEST.in").read_text(encoding="utf-8")
+    data_readme = (root / "datasets" / "linnerud" / "README.md").read_text(
+        encoding="utf-8"
+    )
+    example = (root / "examples" / "09_linnerud_real_data.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "recursive-include datasets" in manifest
+    assert "recursive-include examples" in manifest
+    assert "read `X`, read `Y`" in data_readme
+    assert "pd.read_csv(DATA_DIR / \"exercise.csv\"" in example
+    assert "pd.read_csv(DATA_DIR / \"physiological.csv\"" in example
+    assert "load_dataset" not in example
+    assert "linnerud" not in pipls.__all__
 
 
 def test_llm_prompts_bootstrap_from_repository_state() -> None:

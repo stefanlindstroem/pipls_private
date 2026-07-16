@@ -295,7 +295,9 @@ policy. Keep preparation deterministic, but make the analysis example read `X` a
 with ordinary NumPy or pandas code. Do not introduce a generic registry or loader. Defer Corn
 reconstruction until its preprocessing choices are explicitly fixed.
 
-Current status: **next**.
+Current status: **underway**. The first integration is Linnerud: two verbatim BSD-licensed
+scikit-learn tables, repository provenance and hashes, and an example that reads `X` and `Y`
+directly with pandas. No runtime loader or metadata requirement was added.
 
 ### Phase E4: benchmark fixtures
 
@@ -326,11 +328,12 @@ Current status: **planned**.
 
 ## Current next increment
 
-The next implementation patch should be **Phase E3: first real-dataset integration**. Select one
-dataset with resolved source and licensing, add deterministic preparation only where required, and
-add an example that visibly reads predictor `X` and response `Y` before fitting. Do not add a
-public registry, generic loader, required metadata file, implicit download, or hidden example I/O
-utility. Corn remains deferred until its preprocessing choices are resolved.
+The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
+dataset. Linnerud is the completed transparent reference integration. A manuscript dataset may
+follow only when source, citation, licensing, redistribution, row alignment, and scientific
+preparation are resolved. Do not add a public registry, generic loader, required metadata file,
+implicit download, or hidden example I/O utility. Corn remains deferred until its preprocessing
+choices are resolved.
 
 ## Maintenance protocol
 

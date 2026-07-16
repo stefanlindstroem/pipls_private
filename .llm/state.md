@@ -91,9 +91,13 @@ Additional fixed decisions:
 
 ## Current next increment
 
-The next implementation patch is **Phase E3: first real-dataset integration**.
+Phase E3 is underway. The first integration is the small BSD-licensed Linnerud dataset, whose
+separate predictor and response tables are read explicitly in `examples/09_linnerud_real_data.py`.
 
-E3 is performed one dataset at a time. Each dataset patch must:
+The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
+dataset. Prefer a manuscript dataset only after its source, citation, license, redistribution, and
+scientific preparation choices are resolved. E3 is performed one dataset at a time. Each dataset
+patch must:
 
 1. establish source, citation, license, redistribution status, and preparation choices;
 2. add deterministic preparation under `scripts/prepare_data/` when conversion is needed;
@@ -105,8 +109,8 @@ E3 is performed one dataset at a time. Each dataset patch must:
 7. avoid a public registry, generic loader, required metadata sidecar, implicit download, or hidden
    preprocessing utility.
 
-Do not begin with the Corn reconstruction until its unresolved preprocessing choices are fixed.
-Choose a dataset whose source and license permit a complete, reviewable first migration.
+Do not begin the Corn reconstruction until its unresolved preprocessing choices are fixed. Do not
+claim manuscript reproduction from the Linnerud reference example.
 
 ## Subsequent roadmap
 

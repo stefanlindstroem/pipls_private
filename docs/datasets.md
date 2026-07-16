@@ -118,3 +118,15 @@ Real-data reading remains user-owned. Examples and reproduction scripts must sho
 are read and formed directly using ordinary NumPy, pandas, or domain-specific code. The project may
 track preparation scripts, provenance, licenses, and checksums for its own datasets, but no public
 registry, generic loader, or required metadata sidecar is part of the runtime API.
+
+
+## Transparent real-data example
+
+The repository's first real-data integration is the Linnerud physical-exercise dataset under
+`datasets/linnerud/`. It contains separate predictor and response tables with 20 rows and three
+columns each. The analysis script `examples/09_linnerud_real_data.py` reads both files directly
+with pandas, checks their columns, numeric dtypes, row counts, and missingness, then calls
+`PiPLSRegression.fit(X, Y)`.
+
+The dataset integration adds no public loader. Provenance, the copied BSD license, and integrity
+hashes are repository assets and are not required inputs to the estimator.
