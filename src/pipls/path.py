@@ -8,21 +8,30 @@ from typing import Any, Literal, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from sklearn.base import BaseEstimator, clone
+from sklearn.base import (
+    BaseEstimator,
+    MetaEstimatorMixin,
+    MultiOutputMixin,
+    RegressorMixin,
+    TransformerMixin,
+    clone,
+)
 from sklearn.metrics import get_scorer
-from sklearn.utils import _safe_indexing
-from sklearn.utils.validation import check_is_fitted, check_X_y
+from sklearn.utils import _safe_indexing, indexable
+from sklearn.utils.validation import check_is_fitted
 
 from ._cv_engine import (
     _evaluate_candidate_batch,
     _PiPLSCandidate,
     _PiPLSCandidateResult,
 )
+from ._sklearn_compat import _validate_estimator_data
 from .exceptions import StatisticalSupportWarning
 from .model_selection import (
     _as_positive_float,
     _materialize_cv_splits,
     _max_predictor_rank,
+    _rank_test_scores,
     _search_predictor_ranks,
     _validate_positive_int,
 )
@@ -38,7 +47,13 @@ _SELECTION_RTOL = 1e-12
 _SELECTION_ATOL = 1e-15
 
 
-class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
+class PiPLSPathCV(
+    TransformerMixin,  # type: ignore[misc]
+    RegressorMixin,  # type: ignore[misc]
+    MultiOutputMixin,  # type: ignore[misc]
+    MetaEstimatorMixin,  # type: ignore[misc]
+    BaseEstimator,  # type: ignore[misc]
+):
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
     The default ``search_method="auto"`` applies the same deterministic logarithmic
@@ -117,19 +132,24 @@ class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
         """Evaluate the path and optionally refit the globally selected pair."""
 
         self._validate_constructor_parameters()
-        X_checked, y_checked = check_X_y(
+        validated = _validate_estimator_data(
+            self,
             X,
             y,
+            reset=True,
             accept_sparse=False,
             dtype=np.float64,
             multi_output=True,
             y_numeric=True,
+            ensure_min_samples=2,
+            copy=True,
         )
+        X_checked, y_checked = cast(tuple[Any, Any], validated)
         X_array = np.asarray(X_checked, dtype=np.float64)
-        y_array = np.asarray(y_checked, dtype=np.float64)
+        y_array = np.array(y_checked, dtype=np.float64, copy=True)
         y_2d = y_array.reshape(-1, 1) if y_array.ndim == 1 else y_array
-        self.n_features_in_ = int(X_array.shape[1])
         self.n_targets_ = int(y_2d.shape[1])
+        X_indexable, y_indexable = indexable(X, y)
 
         template = PiPLSRegression() if self.estimator is None else self.estimator
         self.pipls_param_prefix_ = _resolve_pipls_param_prefix(
@@ -146,8 +166,8 @@ class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
         fold_feature_limit = _fold_safe_feature_limit(
             template=template,
             prefix=self.pipls_param_prefix_,
-            X=X_array,
-            y=y_array,
+            X=X_indexable,
+            y=y_indexable,
             splits=materialized.splits,
         )
         algebraic_limit = min(fold_feature_limit, materialized.n_train_min)
@@ -198,8 +218,8 @@ class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
                 predictor_rank_key=predictor_rank_key,
                 scorer=scorer,
                 scoring=self.scoring,
-                X=X_array,
-                y=y_array,
+                X=X_indexable,
+                y=y_indexable,
                 splits=materialized.splits,
                 n_jobs=self.n_jobs,
             )
@@ -223,8 +243,8 @@ class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
                     predictor_rank_key=predictor_rank_key,
                     scorer=scorer,
                     scoring=self.scoring,
-                    X=X_array,
-                    y=y_array,
+                    X=X_indexable,
+                    y=y_indexable,
                     splits=materialized.splits,
                     n_jobs=self.n_jobs,
                 )
@@ -290,32 +310,111 @@ class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
             self.cv_results_["mean_test_score"],
         )
 
+        self.best_pipls_params_ = {
+            "n_components": self.best_n_components_,
+            "predictor_rank": self.best_predictor_rank_,
+        }
         if self.refit:
             self.best_estimator_ = clone(template).set_params(**self.best_params_)
-            self.best_estimator_.fit(X_array, y_array)
-        elif hasattr(self, "best_estimator_"):
-            delattr(self, "best_estimator_")
+            self.best_estimator_.fit(X_indexable, y_indexable)
+            self.best_pipls_ = _extract_fitted_pipls(
+                self.best_estimator_,
+                self.pipls_param_prefix_,
+            )
+        else:
+            for name in ("best_estimator_", "best_pipls_"):
+                if hasattr(self, name):
+                    delattr(self, name)
         return self
 
-    def predict(self, X: ArrayLike) -> FloatArray:
+    def predict(self, X: ArrayLike, copy: bool = True) -> FloatArray:
         """Predict with the refitted globally selected estimator."""
 
         estimator = self._refitted_estimator()
+        if isinstance(estimator, PiPLSRegression):
+            return estimator.predict(X, copy=copy)
         return cast(FloatArray, estimator.predict(X))
 
-    def transform(self, X: ArrayLike, y: ArrayLike | None = None) -> Any:
+    def transform(
+        self,
+        X: ArrayLike,
+        y: ArrayLike | None = None,
+        copy: bool = True,
+    ) -> Any:
         """Transform with the refitted globally selected estimator."""
 
         estimator = self._refitted_estimator()
-        if y is None:
-            return estimator.transform(X)
-        return estimator.transform(X, y)
+        if isinstance(estimator, PiPLSRegression):
+            return estimator.transform(X, y, copy=copy)
+        if y is not None:
+            raise ValueError(
+                "transform(X, y) is available when the refitted estimator is a direct "
+                "PiPLSRegression. For composite estimators, use best_pipls_ with data "
+                "transformed by the preceding pipeline steps."
+            )
+        return estimator.transform(X)
 
-    def score(self, X: ArrayLike, y: ArrayLike) -> float:
-        """Score with the refitted globally selected estimator."""
+    def fit_transform(
+        self,
+        X: ArrayLike,
+        y: ArrayLike | None = None,
+        *,
+        groups: ArrayLike | None = None,
+        **fit_params: Any,
+    ) -> tuple[FloatArray, FloatArray]:
+        """Fit the path search and return selected predictor and response scores."""
+
+        if fit_params:
+            names = ", ".join(sorted(fit_params))
+            raise TypeError(f"Unexpected fit parameters: {names}.")
+        if y is None:
+            raise ValueError("y is required to fit PiPLSPathCV.")
+        self.fit(X, y, groups=groups)
+        transformed = self.transform(X, y)
+        return cast(tuple[FloatArray, FloatArray], transformed)
+
+    def score(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        sample_weight: ArrayLike | None = None,
+    ) -> float:
+        """Return the selected estimator's uniformly averaged :math:`R^2`."""
 
         estimator = self._refitted_estimator()
-        return float(estimator.score(X, y))
+        if sample_weight is None:
+            return float(estimator.score(X, y))
+        return float(estimator.score(X, y, sample_weight=sample_weight))
+
+    def get_feature_names_out(
+        self,
+        input_features: ArrayLike | None = None,
+    ) -> NDArray[np.object_]:
+        """Return names for the selected latent predictor scores."""
+
+        estimator = self._refitted_estimator()
+        method = getattr(estimator, "get_feature_names_out", None)
+        if method is not None:
+            return cast(NDArray[np.object_], method(input_features))
+        return cast(NDArray[np.object_], self.best_pipls_.get_feature_names_out(input_features))
+
+    def _more_tags(self) -> dict[str, bool]:
+        """Legacy scikit-learn tags for releases before the Tags dataclasses."""
+
+        return {"multioutput": True, "poor_score": True}
+
+    def __sklearn_tags__(self) -> Any:
+        """Declare a multi-output regression meta-estimator and transformer."""
+
+        parent = getattr(super(), "__sklearn_tags__", None)
+        if parent is None:  # pragma: no cover - scikit-learn 1.4/1.5
+            return self._more_tags()
+        tags = parent()
+        tags.target_tags.multi_output = True
+        tags.target_tags.single_output = True
+        if tags.regressor_tags is not None:
+            tags.regressor_tags.poor_score = True
+        return tags
 
     def _refitted_estimator(self) -> Any:
         check_is_fitted(self, attributes=["best_params_"])
@@ -415,12 +514,12 @@ def _fold_safe_feature_limit(
     *,
     template: Any,
     prefix: str,
-    X: FloatArray,
-    y: FloatArray,
+    X: ArrayLike,
+    y: ArrayLike,
     splits: tuple[tuple[IntArray, IntArray], ...],
 ) -> int:
     if prefix == "" and isinstance(template, PiPLSRegression):
-        return int(X.shape[1])
+        return int(np.asarray(X).shape[1])
     n_key, r_key = _pipls_parameter_keys(prefix)
     feature_counts: list[int] = []
     for train, _ in splits:
@@ -439,8 +538,8 @@ def _evaluate_path_batch(
     predictor_rank_key: str,
     scorer: Scorer | None,
     scoring: str | Scorer,
-    X: FloatArray,
-    y: FloatArray,
+    X: ArrayLike,
+    y: ArrayLike,
     splits: tuple[tuple[IntArray, IntArray], ...],
     n_jobs: int | None,
 ) -> tuple[int, ...]:
@@ -473,8 +572,8 @@ def _adaptive_path_search(
     predictor_rank_key: str,
     scorer: Scorer | None,
     scoring: str | Scorer,
-    X: FloatArray,
-    y: FloatArray,
+    X: ArrayLike,
+    y: ArrayLike,
     splits: tuple[tuple[IntArray, IntArray], ...],
     n_jobs: int | None,
 ) -> tuple[tuple[int, ...], ...]:
@@ -553,10 +652,7 @@ def _path_cv_results(
         "mean_response_standardized_mse": np.mean(split_mse, axis=1),
         "std_response_standardized_mse": np.std(split_mse, axis=1),
     }
-    order = np.lexsort((predictor_rank, n_components, -mean_scores))
-    rank_values = np.empty(order.size, dtype=np.intp)
-    rank_values[order] = np.arange(1, order.size + 1, dtype=np.intp)
-    results["rank_test_score"] = rank_values
+    results["rank_test_score"] = _rank_test_scores(mean_scores)
     for split_index in range(split_scores.shape[1]):
         results[f"split{split_index}_test_score"] = split_scores[:, split_index].copy()
         results[f"split{split_index}_response_standardized_mse"] = split_mse[

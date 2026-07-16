@@ -13,6 +13,7 @@ Current navigation:
 - `preprocessing.md`: preprocessing semantics;
 - `decisions/0010-path-analysis-api.md`: accepted `PiPLSPathCV` boundary;
 - `decisions/0011-shared-selection-engine.md`: shared private search/evaluation architecture;
+- `decisions/0012-sklearn-api-alignment.md`: PLS-style estimator and path API contracts;
 - `decisions/0007-predictor-rank-search-policies.md`: accepted `"optimal"` versus adaptive
   `"auto"` semantics and the separate randomized-SVD policy;
 - `publication_repository_plan.md`: detailed revision-5 architecture, subject to later accepted

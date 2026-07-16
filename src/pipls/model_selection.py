@@ -275,6 +275,32 @@ def _response_standardized_mse(
     return float(np.mean(np.square(standardized_residual)))
 
 
+
+def _rank_test_scores(
+    mean_scores: ArrayLike,
+    *,
+    rtol: float = _SELECTION_RTOL,
+    atol: float = _SELECTION_ATOL,
+) -> IntArray:
+    """Return scikit-learn-style minimum ranks with tolerant score ties."""
+
+    scores = np.asarray(mean_scores, dtype=np.float64)
+    if scores.ndim != 1 or scores.size == 0 or not np.all(np.isfinite(scores)):
+        raise ValueError("mean_scores must be a nonempty finite one-dimensional array.")
+    order = np.argsort(-scores, kind="mergesort")
+    ranks = np.empty(scores.size, dtype=np.intp)
+    group_start = 0
+    for position, index in enumerate(order):
+        if position > 0 and not np.isclose(
+            scores[index],
+            scores[order[position - 1]],
+            rtol=rtol,
+            atol=atol,
+        ):
+            group_start = position
+        ranks[index] = group_start + 1
+    return ranks
+
 def _select_predictor_rank(
     predictor_ranks: ArrayLike,
     mean_losses: ArrayLike,

@@ -262,3 +262,10 @@ def test_adaptive_refinement_interval_respects_lower_rank_ties() -> None:
     )
 
     assert interval == (2, 4)
+
+
+def test_rank_test_scores_assigns_minimum_rank_to_ties() -> None:
+    from pipls.model_selection import _rank_test_scores
+
+    ranks = _rank_test_scores(np.array([0.5, 0.5, 0.2, 0.1, 0.2]))
+    np.testing.assert_array_equal(ranks, np.array([1, 1, 3, 5, 3]))

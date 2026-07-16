@@ -8,9 +8,15 @@ from typing import Any, Literal, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
+from sklearn.base import (
+    BaseEstimator,
+    ClassNamePrefixFeaturesOutMixin,
+    MultiOutputMixin,
+    RegressorMixin,
+    TransformerMixin,
+)
 from sklearn.metrics import get_scorer, r2_score
-from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._core import ResolvedSVDSolver, SVDSolver, fit_pipls_core
 from ._cv_engine import (
@@ -18,12 +24,15 @@ from ._cv_engine import (
     _PiPLSCandidate,
     _PiPLSCandidateResult,
 )
+from ._sklearn_compat import _validate_estimator_data
+from .decomposition import PiPLSDecomposition
 from .exceptions import StatisticalSupportWarning
 from .model_selection import (
     _as_positive_float,
     _materialize_cv_splits,
     _max_predictor_rank,
     _predictor_rank_values,
+    _rank_test_scores,
     _search_predictor_ranks,
     _select_predictor_rank,
     _training_response_scale,
@@ -37,7 +46,13 @@ _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
 
 
-class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type: ignore[misc]
+class PiPLSRegression(
+    ClassNamePrefixFeaturesOutMixin,  # type: ignore[misc]
+    TransformerMixin,  # type: ignore[misc]
+    RegressorMixin,  # type: ignore[misc]
+    MultiOutputMixin,  # type: ignore[misc]
+    BaseEstimator,  # type: ignore[misc]
+):
     r"""Pi-PLS regression with fixed, rule-derived, exhaustive, or adaptive rank.
 
     Parameters
@@ -109,23 +124,23 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         """Fit the Pi-PLS model and select predictor rank when requested."""
 
         self._validate_constructor_parameters()
-        X_checked, y_checked = check_X_y(
+        validated = _validate_estimator_data(
+            self,
             X,
             y,
+            reset=True,
             accept_sparse=False,
             dtype=np.float64,
             multi_output=True,
             y_numeric=True,
-        )
-        self.n_features_in_ = int(X_checked.shape[1])
-        X_array = np.array(X_checked, dtype=np.float64, copy=self.copy)
-        y_array_raw = np.asarray(y_checked, dtype=np.float64)
-        self._y_was_1d = y_array_raw.ndim == 1
-        y_array = np.array(
-            y_array_raw.reshape(-1, 1) if self._y_was_1d else y_array_raw,
-            dtype=np.float64,
+            ensure_min_samples=2,
             copy=self.copy,
         )
+        X_checked, y_checked = cast(tuple[Any, Any], validated)
+        X_array = np.asarray(X_checked, dtype=np.float64)
+        y_array_raw = np.array(y_checked, dtype=np.float64, copy=self.copy)
+        self._y_was_1d = y_array_raw.ndim == 1
+        y_array = y_array_raw.reshape(-1, 1) if self._y_was_1d else y_array_raw
 
         self.n_targets_ = int(y_array.shape[1])
         if self.n_components > self.n_targets_:
@@ -165,11 +180,30 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         )
         return self
 
-    def predict(self, X: ArrayLike) -> FloatArray:
-        """Predict responses in their original units."""
+    def predict(self, X: ArrayLike, copy: bool = True) -> FloatArray:
+        """Predict responses in their original units.
+
+        Parameters
+        ----------
+        X:
+            Predictor matrix.
+        copy:
+            Whether validation may copy ``X``. This mirrors
+            :class:`sklearn.cross_decomposition.PLSRegression`.
+        """
 
         check_is_fitted(self, attributes=["coef_", "intercept_"])
-        X_checked = _check_predictor_matrix(X, n_features=self.n_features_in_)
+        X_checked = cast(
+            FloatArray,
+            _validate_estimator_data(
+                self,
+                X,
+                reset=False,
+                accept_sparse=False,
+                dtype=np.float64,
+                copy=copy,
+            ),
+        )
         prediction = cast(
             FloatArray,
             np.asarray(X_checked, dtype=np.float64) @ self.coef_.T + self.intercept_,
@@ -182,11 +216,22 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self,
         X: ArrayLike,
         y: ArrayLike | None = None,
+        copy: bool = True,
     ) -> FloatArray | tuple[FloatArray, FloatArray]:
         """Transform predictors, and optionally responses, to latent scores."""
 
         check_is_fitted(self, attributes=["P_", "Q_", "x_mean_", "y_mean_"])
-        X_checked = _check_predictor_matrix(X, n_features=self.n_features_in_)
+        X_checked = cast(
+            FloatArray,
+            _validate_estimator_data(
+                self,
+                X,
+                reset=False,
+                accept_sparse=False,
+                dtype=np.float64,
+                copy=copy,
+            ),
+        )
         X_cs = (np.asarray(X_checked, dtype=np.float64) - self.x_mean_) / self.x_scale_
         x_scores = cast(FloatArray, X_cs @ self.P_)
         if y is None:
@@ -197,6 +242,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             ensure_2d=False,
             dtype=np.float64,
             ensure_min_samples=X_cs.shape[0],
+            copy=copy,
         )
         y_array = np.asarray(y_checked, dtype=np.float64)
         if y_array.ndim == 1:
@@ -215,6 +261,22 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         y_scores = cast(FloatArray, y_cs @ self.Q_)
         return x_scores, y_scores
 
+    def fit_transform(
+        self,
+        X: ArrayLike,
+        y: ArrayLike | None = None,
+    ) -> tuple[FloatArray, FloatArray]:
+        """Fit the model and return predictor and response scores.
+
+        As for scikit-learn's ``PLSRegression``, supplying ``y`` returns the
+        pair ``(x_scores, y_scores)``.
+        """
+
+        if y is None:
+            raise ValueError("y is required to fit PiPLSRegression.")
+        self.fit(X, y)
+        return self.x_scores_.copy(), self.y_scores_.copy()
+
     def score(self, X: ArrayLike, y: ArrayLike, sample_weight: ArrayLike | None = None) -> float:
         """Return uniformly averaged $R^2$ in original response units."""
 
@@ -226,6 +288,24 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
                 multioutput="uniform_average",
             )
         )
+
+    def _more_tags(self) -> dict[str, bool]:
+        """Legacy scikit-learn tags for releases before the Tags dataclasses."""
+
+        return {"multioutput": True, "poor_score": True}
+
+    def __sklearn_tags__(self) -> Any:
+        """Declare multi-output regression and PLS-like score expectations."""
+
+        parent = getattr(super(), "__sklearn_tags__", None)
+        if parent is None:  # pragma: no cover - scikit-learn 1.4/1.5
+            return self._more_tags()
+        tags = parent()
+        tags.target_tags.multi_output = True
+        tags.target_tags.single_output = True
+        if tags.regressor_tags is not None:
+            tags.regressor_tags.poor_score = True
+        return tags
 
     def _select_cross_validated_rank(
         self,
@@ -330,11 +410,13 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self.predictor_rank_cv_svd_solvers_ = {
             result.predictor_rank: result.split_svd_solvers for result in evaluations
         }
-        self.predictor_rank_cv_results_ = _cv_results_dictionary(
+        self.cv_results_ = _cv_results_dictionary(
+            n_components=self.n_components,
             predictor_rank_values=predictor_rank_values,
             split_scores=split_scores,
             split_response_standardized_mse=split_mse,
         )
+        self.predictor_rank_cv_results_ = self.cv_results_
         self.predictor_rank_search_method_ = search_method
         self.predictor_rank_search_interval_ = np.asarray(
             search.final_interval,
@@ -348,6 +430,11 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self.predictor_rank_search_exhaustive_ = (
             self.n_predictor_rank_evaluated_ == self.n_predictor_rank_candidates_
         )
+        self.best_index_ = selected_index
+        self.best_params_ = {
+            "n_components": self.n_components,
+            "predictor_rank": selected_rank,
+        }
         self.best_score_ = float(mean_scores[selected_index])
         self.best_response_standardized_mse_ = float(mean_mse[selected_index])
         self.n_splits_ = len(materialized.splits)
@@ -364,19 +451,21 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
     ) -> None:
         self.x_mean_ = np.mean(X, axis=0)
         self.y_mean_ = np.mean(y, axis=0)
-        X_centered = X - self.x_mean_
-        y_centered = y - self.y_mean_
+        self.response_scale_for_scoring_ = _training_response_scale(y)
+        X -= self.x_mean_
+        y -= self.y_mean_
 
         if self.scale:
-            self.x_scale_ = _safe_sample_scale(X_centered)
-            self.y_scale_ = _safe_sample_scale(y_centered)
+            self.x_scale_ = _safe_sample_scale(X)
+            self.y_scale_ = _safe_sample_scale(y)
+            X /= self.x_scale_
+            y /= self.y_scale_
         else:
             self.x_scale_ = np.ones(X.shape[1], dtype=np.float64)
             self.y_scale_ = np.ones(y.shape[1], dtype=np.float64)
-        self.response_scale_for_scoring_ = _training_response_scale(y)
 
-        X_cs = X_centered / self.x_scale_
-        y_cs = y_centered / self.y_scale_
+        X_cs = X
+        y_cs = y
         result = fit_pipls_core(
             X_cs,
             y_cs,
@@ -395,8 +484,12 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self.D_ = result.D
         self.dilation_ = np.diag(result.D).copy()
         self.Q_ = result.Q
+        self.decomposition_ = PiPLSDecomposition._from_core_result(result)
         self.x_rotations_ = self.P_
         self.y_rotations_ = self.Q_
+        self.x_weights_ = self.P_
+        self.y_weights_ = self.Q_
+        self._n_features_out = self.n_components
         self.x_rank_ = result.x_rank
         self.x_rank_is_exact_ = result.x_rank_is_exact
         self.rank_tolerance_ = result.rank_tolerance
@@ -407,6 +500,10 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self.intercept_ = self.y_mean_ - self.x_mean_ @ self.coef_matrix_
         self.x_scores_ = X_cs @ self.P_
         self.y_scores_ = y_cs @ self.Q_
+        x_loadings, _, _, _ = np.linalg.lstsq(self.x_scores_, X_cs, rcond=None)
+        y_loadings, _, _, _ = np.linalg.lstsq(self.y_scores_, y_cs, rcond=None)
+        self.x_loadings_ = np.asarray(x_loadings.T, dtype=np.float64)
+        self.y_loadings_ = np.asarray(y_loadings.T, dtype=np.float64)
 
     def _validate_constructor_parameters(self) -> None:
         _validate_positive_int(self.n_components, name="n_components")
@@ -469,6 +566,9 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         for name in (
             "predictor_rank_values_",
             "predictor_rank_cv_results_",
+            "cv_results_",
+            "best_index_",
+            "best_params_",
             "predictor_rank_cv_svd_solvers_",
             "best_score_",
             "best_response_standardized_mse_",
@@ -501,13 +601,24 @@ def _uses_default_scoring(scoring: str | Scorer) -> bool:
 
 def _cv_results_dictionary(
     *,
+    n_components: int,
     predictor_rank_values: NDArray[np.intp],
     split_scores: FloatArray,
     split_response_standardized_mse: FloatArray,
-) -> dict[str, FloatArray | NDArray[np.intp]]:
-    results: dict[str, FloatArray | NDArray[np.intp]] = {
+) -> dict[str, Any]:
+    n_candidates = predictor_rank_values.size
+    n_components_values = np.full(n_candidates, n_components, dtype=np.intp)
+    mean_scores = np.mean(split_scores, axis=1)
+    results: dict[str, Any] = {
+        "params": [
+            {"n_components": n_components, "predictor_rank": int(rank)}
+            for rank in predictor_rank_values
+        ],
+        "n_components": n_components_values,
         "predictor_rank": predictor_rank_values.copy(),
-        "mean_test_score": np.mean(split_scores, axis=1),
+        "param_n_components": n_components_values.copy(),
+        "param_predictor_rank": predictor_rank_values.copy(),
+        "mean_test_score": mean_scores,
         "std_test_score": np.std(split_scores, axis=1),
         "mean_response_standardized_mse": np.mean(
             split_response_standardized_mse,
@@ -518,11 +629,12 @@ def _cv_results_dictionary(
             axis=1,
         ),
     }
+    results["rank_test_score"] = _rank_test_scores(mean_scores)
     for split_index in range(split_scores.shape[1]):
         results[f"split{split_index}_test_score"] = split_scores[:, split_index].copy()
-        results[f"split{split_index}_response_standardized_mse"] = split_response_standardized_mse[
-            :, split_index
-        ].copy()
+        results[f"split{split_index}_response_standardized_mse"] = (
+            split_response_standardized_mse[:, split_index].copy()
+        )
     return results
 
 
@@ -593,17 +705,6 @@ def _validate_random_state(random_state: int | None, *, svd_solver: SVDSolver) -
             "random_state must be None or an integer between 0 and "
             f"{_MAX_RANDOM_STATE}; got {random_state!r}."
         )
-
-
-def _check_predictor_matrix(X: ArrayLike, *, n_features: int) -> FloatArray:
-    checked = check_array(X, accept_sparse=False, dtype=np.float64)
-    array = np.asarray(checked, dtype=np.float64)
-    if array.shape[1] != n_features:
-        raise ValueError(
-            "X has an incompatible number of features: "
-            f"expected {n_features}, got {array.shape[1]}."
-        )
-    return array
 
 
 def _safe_sample_scale(centered: FloatArray) -> FloatArray:

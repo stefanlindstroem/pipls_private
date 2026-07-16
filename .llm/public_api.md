@@ -125,10 +125,13 @@ The negative version is suitable for scikit-learn search APIs, where larger scor
 
 ## Fitted estimator behavior
 
-The estimator provides `fit`, `predict`, `transform`, and scalar `score`. It exposes
-`predictor_rank_`, `max_predictor_rank_`, preprocessing statistics, Pi-PLS factorization arrays,
-latent scores, `coef_` in scikit-learn orientation, `coef_matrix_` in manuscript orientation, and
-`intercept_`.
+The estimator provides PLS-style `fit`, `predict(X, copy=True)`,
+`transform(X, y=None, copy=True)`, tuple-valued `fit_transform(X, y)`, and scalar R2 `score`. It
+supports `n_features_in_`, `feature_names_in_`, `get_feature_names_out`, and `set_output`. Standard
+fitted attributes include weights, least-squares loadings, scores, rotations, `coef_` in
+scikit-learn orientation, and `intercept_`. Pi-PLS factorization and numerical diagnostics are
+canonicalized in the public frozen `PiPLSDecomposition` instance at `decomposition_`; direct
+`Pi_`, `C_`, `W_`, `P_`, `D_`, and `Q_` attributes remain available.
 
 Every fitted estimator exposes `svd_solver_`, the predictor solver actually used, and
 `x_rank_is_exact_`. Under full SVD, `x_rank_` is the complete numerical rank; under randomized
@@ -138,7 +141,8 @@ Cross-validated modes additionally expose:
 
 - `predictor_rank_values_`;
 - `predictor_rank_cv_svd_solvers_`, mapping each evaluated rank to its fold-level solvers;
-- `predictor_rank_cv_results_` with split and mean scores plus response-standardized MSE;
+- standard `cv_results_`, `best_params_`, and `best_index_`;
+- `predictor_rank_cv_results_` as an alias for `cv_results_`;
 - `best_score_`;
 - `best_response_standardized_mse_` for the selected rank;
 - `n_splits_`;
@@ -174,5 +178,8 @@ by the smallest fold-safe algebraic dimension. The default `"rule"` mode uses th
 training-fold size and the smallest predictor dimension reaching the Pi-PLS step.
 
 Public fitted attributes include standard search attributes (`cv_results_`, `best_params_`,
-`best_score_`, `best_estimator_`) plus conditional-path, surface, candidate-count, and search-
-method diagnostics documented in `docs/path_analysis.md`.
+`best_score_`, `best_estimator_`), the selected nested estimator (`best_pipls_` and
+`best_pipls_params_`), plus conditional-path, surface, candidate-count, and search-method
+diagnostics documented in `docs/path_analysis.md`. Input containers are preserved within folds so
+name-based pandas and `ColumnTransformer` workflows remain valid. The path `score` method returns
+R2 like `PiPLSRegression`; `best_score_` remains the configured selection score.

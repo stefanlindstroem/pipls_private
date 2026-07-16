@@ -208,6 +208,19 @@ caching, and optional solver diagnostics are centralized in `_cv_engine.py`; exh
 adaptive rank refinement are centralized in `model_selection.py`; and public equivalence tests
 protect the shared behavior.
 
+### Phase D1b: scikit-learn and PLS-style API alignment
+
+Align both public classes with estimator-aware validation, feature-name and output-container
+contracts, PLS-style score/weight/loading attributes, standard search-result names, and a public
+structured decomposition result. Preserve pandas and other indexable containers through complete-
+pipeline path folds and expose the selected nested estimator without flattening coefficients.
+
+Current status: **complete**. Both public classes pass all applicable common estimator checks;
+only the tuple-valued cross-decomposition transformer checks are declared as expected failures,
+matching the special behavior of PLS estimators. `PiPLSDecomposition`, `best_pipls_`, standard CV
+result aliases, fit-time copy semantics, feature names, pandas output, and container-preserving
+path folds are implemented and tested.
+
 ### Phase D2: LOO and advanced split protocols
 
 Add ordered out-of-fold predictions, the documented LOO protocol, grouped and temporal examples,

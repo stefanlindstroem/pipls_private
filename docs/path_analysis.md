@@ -23,6 +23,7 @@ search = PiPLSPathCV(
 search.fit(X, Y)
 
 print(search.best_params_)
+print(search.best_pipls_params_)
 print(search.best_predictor_rank_by_n_components_)
 Y_pred = search.predict(X_new)
 ```
@@ -67,8 +68,10 @@ search = PiPLSPathCV(
 search.fit(X, Y)
 ```
 
-The path estimator clones and fits the entire pipeline separately for every fold and
-candidate. It infers a unique nested `PiPLSRegression` step. For deeper composites, use
+The path estimator preserves indexable input containers, then clones and fits the entire pipeline
+separately for every fold and candidate. This permits pandas column names and name-based
+`ColumnTransformer` selectors to remain available inside every fold. It infers a unique nested
+`PiPLSRegression` step. For deeper composites, use
 `pipls_param_prefix`, for example `"regressor__regression"`.
 
 ## Selection and diagnostics
@@ -80,6 +83,7 @@ Conditional ties for fixed `n_components` prefer smaller predictor rank.
 Important fitted attributes include:
 
 - `cv_results_`, `best_params_`, `best_score_`, and `best_estimator_`;
+- `best_pipls_`, the selected fitted nested `PiPLSRegression`, and `best_pipls_params_`;
 - `best_n_components_` and `best_predictor_rank_`;
 - `best_predictor_rank_by_n_components_` and `best_score_by_n_components_`;
 - `response_standardized_mse_path_` and `score_path_`;
@@ -88,6 +92,10 @@ Important fitted attributes include:
   `n_path_candidates_skipped_`;
 - `path_search_method_`, `path_search_history_`, and `path_search_exhaustive_`.
 
-When `refit=True`, the selected complete estimator is fitted once on all supplied data.
+When `refit=True`, the selected complete estimator is fitted once on all supplied data. Standard
+`predict`, `transform`, `fit_transform`, feature-name, pandas-output, and R2 `score` behavior then
+mirrors `PiPLSRegression`. `best_score_` remains the configured selection score and can differ
+from the R2 returned by `score`.
+
 With `refit=False`, path diagnostics remain available but `predict`, `transform`, and
 `score` are disabled.

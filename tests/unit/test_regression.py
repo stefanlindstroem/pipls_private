@@ -77,7 +77,7 @@ def test_wrong_feature_count_is_rejected_at_prediction() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
 
-    with pytest.raises(ValueError, match="incompatible number of features"):
+    with pytest.raises(ValueError, match="expecting 8 features"):
         model.predict(X[:, :-1])
 
 

@@ -42,7 +42,9 @@ model = PiPLSRegression(
 )
 model.fit(X_train, Y_train)
 Y_pred = model.predict(X_test)
+X_scores, Y_scores = model.transform(X_train, Y_train)
 print(model.predictor_rank_)
+print(model.decomposition_.D)
 ```
 
 For the complete two-parameter surface or custom learned preprocessing:
@@ -53,7 +55,12 @@ from pipls import PiPLSPathCV
 search = PiPLSPathCV(cv=5)
 search.fit(X_train, Y_train)
 print(search.best_params_)
+print(search.best_pipls_.coef_)
 ```
+
+The estimator follows scikit-learn and `PLSRegression` conventions for coefficient orientation,
+latent-score transforms, feature names, pandas output containers, and fitted weights/loadings.
+Pi-PLS-specific factorization output is grouped in the public read-only `decomposition_` result.
 
 `samples_per_predictor_rank` defaults to 10. Rule-based values below 5 are allowed but emit
 `StatisticalSupportWarning` because the resulting rank bound may lack sufficient statistical

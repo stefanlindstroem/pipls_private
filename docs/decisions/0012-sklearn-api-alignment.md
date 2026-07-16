@@ -1,0 +1,58 @@
+# Decision 0012: scikit-learn and PLS-style public API alignment
+
+## Status
+
+Accepted and implemented.
+
+## Context
+
+Pi-PLS has a fixed-model estimator and a pipeline-aware path meta-estimator. Programming users
+should be able to apply ordinary scikit-learn expectations and transfer familiar
+`PLSRegression` workflows without learning a second set of method, feature-name, coefficient, or
+selection-result conventions. Pi-PLS also exposes factorization matrices that have no direct
+`PLSRegression` counterpart.
+
+## Decision
+
+`PiPLSRegression` is a multi-output regressor and transformer. It uses estimator-aware data
+validation, records `n_features_in_` and `feature_names_in_`, supports `get_feature_names_out` and
+`set_output`, and mirrors the PLS-style `predict(X, copy=True)`, `transform(X, y=None, copy=True)`,
+and tuple-valued `fit_transform(X, y)` behavior.
+
+The standard fitted surface includes `x_weights_`, `y_weights_`, `x_loadings_`, `y_loadings_`,
+`x_scores_`, `y_scores_`, `x_rotations_`, `y_rotations_`, `coef_`, and `intercept_`. In Pi-PLS,
+`P_` and `Q_` are the direct orthogonal score maps, so weights and rotations coincide. Loadings
+are separately computed least-squares reconstruction coefficients; they are not aliases for
+`P_` and `Q_`. `n_iter_` is omitted because Pi-PLS uses a closed-form SVD construction rather
+than an iterative NIPALS loop.
+
+Pi-PLS-specific factorization and numerical diagnostics are canonicalized in the public frozen
+`PiPLSDecomposition` object exposed as `decomposition_`. Existing matrix attributes remain direct
+fitted attributes for mathematical convenience and pre-1.0 compatibility.
+
+Cross-validated `PiPLSRegression` modes expose the standard `cv_results_`, `best_params_`,
+`best_index_`, and `best_score_` names. `predictor_rank_cv_results_` remains an alias.
+`rank_test_score` uses minimum ranks for tied scores, while the explicit Pi-PLS complexity rule
+selects the smaller admissible model among score ties.
+
+`PiPLSPathCV` is a regressor, transformer, and meta-estimator. It preserves indexable input
+containers inside folds so pandas column names and column-selecting pipelines continue to work.
+It exposes the complete selected estimator as `best_estimator_` and the fitted nested
+`PiPLSRegression` as `best_pipls_`, with direct Pi-PLS parameter values in
+`best_pipls_params_`. It does not flatten nested coefficients onto the path object because those
+coefficients may be defined after learned preprocessing.
+
+Both public classes return uniformly averaged R2 from `score`. `best_score_` remains the
+cross-validation selection score and may therefore use a different metric.
+
+## Consequences
+
+- Direct estimator and path workflows share prediction, transformation, scoring, feature-name,
+  decomposition, and selected-model access patterns.
+- `copy=False` now has the same observable fit-time in-place preprocessing semantics expected by
+  PLS users for writable floating NumPy arrays.
+- Generic scikit-learn transformer checks do not recognize third-party cross-decomposition class
+  names when `fit_transform(X, y)` returns both X and y scores. Tests declare only those
+  tuple-contract checks as expected failures; all remaining common estimator checks pass.
+- Composite path users access fitted Pi-PLS internals through `best_pipls_`, avoiding misleading
+  top-level coefficient aliases.

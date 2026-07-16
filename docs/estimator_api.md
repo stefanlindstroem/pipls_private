@@ -31,12 +31,32 @@ SVD only for large matrices and low retained-rank fractions; the fitted choice i
 deviations with `ddof=1`. `scale=False` centers without division. Constant columns use scale 1.
 Every learned preprocessing statistic is fitted independently inside selection folds.
 
-Important fitted attributes include `predictor_rank_`, `max_predictor_rank_`, `svd_solver_`,
-`x_rank_is_exact_`, `x_mean_`,
-`x_scale_`, `y_mean_`, `y_scale_`, `response_scale_for_scoring_`, the Pi-PLS factorization arrays,
-`coef_`, `coef_matrix_`, and `intercept_`. Cross-validated modes also expose candidate scores,
-evaluation order, search batches, the final refinement interval, candidate counts, whether the
-search was exhaustive, the selected score, and the fold-safe training-size bound.
+## PLS-style estimator surface
+
+`predict(X, copy=True)`, `transform(X, y=None, copy=True)`, and `fit_transform(X, y)` mirror the
+corresponding `PLSRegression` conventions. `transform(X)` returns predictor scores; supplying `y`
+returns `(x_scores, y_scores)`. The estimator supports `feature_names_in_`,
+`get_feature_names_out()`, and `set_output(transform="pandas")`.
+
+Standard fitted attributes are `x_weights_`, `y_weights_`, `x_loadings_`, `y_loadings_`,
+`x_scores_`, `y_scores_`, `x_rotations_`, `y_rotations_`, `coef_`, and `intercept_`. Because Pi-PLS
+uses direct orthogonal score maps rather than iterative deflation, weights and rotations coincide.
+Loadings are separate least-squares reconstruction coefficients. `n_iter_` is deliberately absent.
+
+Pi-PLS-specific factorization output is available through the public frozen
+`PiPLSDecomposition` instance at `decomposition_`. It contains `Pi`, `C`, `W`, `P`, `D`, `Q`, the
+dilation vector, numerical-rank diagnostics, and the resolved predictor SVD solver. The existing
+`Pi_`, `C_`, `W_`, `P_`, `D_`, `Q_`, and related fitted attributes remain convenience aliases.
+
+Important additional fitted attributes include `predictor_rank_`, `max_predictor_rank_`,
+`svd_solver_`, `x_rank_is_exact_`, `x_mean_`, `x_scale_`, `y_mean_`, `y_scale_`, and
+`response_scale_for_scoring_`. Cross-validated modes expose standard `cv_results_`, `best_params_`,
+`best_index_`, and `best_score_` attributes plus candidate scores, evaluation order, search
+batches, the final refinement interval, candidate counts, whether the search was exhaustive, and
+the fold-safe training-size bound. `predictor_rank_cv_results_` is an alias for `cv_results_`.
+
+The constructor `copy` controls fit-time preprocessing. For writable floating NumPy arrays,
+`copy=False` permits in-place centering and scaling, matching the familiar PLS contract.
 
 
 ## Parameter validation
