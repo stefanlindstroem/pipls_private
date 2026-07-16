@@ -1,7 +1,8 @@
 # Mathematical contract
 
-This file records the intended method before implementation. Source code and tests must
-be kept consistent with it.
+This file is the concise normative mathematical contract for implementation. Source code and
+tests must be kept consistent with it. Read `.llm/theory.md` for the fuller derivation,
+interpretation, limiting cases, rank roles, and theory-to-implementation consequences.
 
 ## Core notation
 

@@ -5,7 +5,7 @@ The current authoritative development specification is the tracked `.llm/` layer
 
 Current navigation:
 
-- `theory.md`: user-facing theory documentation, presently a placeholder;
+- `theory.md`: user-facing theory overview and navigation to the persistent LLM theory reference;
 - `parameter_selection.md`: implemented predictor-rank selection and accepted search-policy
   roadmap;
 - `estimator_api.md`: current `PiPLSRegression` interface;

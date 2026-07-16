@@ -14,11 +14,13 @@ The principal navigation documents are:
 1. `strategy.md` — current implementation phase, next increment, acceptance conditions, and
    maintenance ownership. The LLM maintainer updates this file when strategy state changes.
 2. `project.md` — concise map of the repository and current implemented scope.
-3. `mathematics.md` — defining equations, notation, dimensions, and mathematical invariants.
-4. `numerical_contracts.md` — numerical algorithms, tolerances, degeneracy, and comparison rules.
-5. `public_api.md` — intended constructor parameters, fitted attributes, shapes, and exclusions.
-6. `development.md` — coding, testing, documentation, dependency, and patch requirements.
-7. `docs/publication_repository_plan.md` — detailed design record and publication architecture.
+3. `theory.md` — persistent conceptual derivation, interpretation, limiting cases, and
+   theory-to-implementation consequences.
+4. `mathematics.md` — normative equations, notation, dimensions, and mathematical invariants.
+5. `numerical_contracts.md` — numerical algorithms, tolerances, degeneracy, and comparison rules.
+6. `public_api.md` — intended constructor parameters, fitted attributes, shapes, and exclusions.
+7. `development.md` — coding, testing, documentation, dependency, and patch requirements.
+8. `docs/publication_repository_plan.md` — detailed design record and publication architecture.
 
 Git history, tests, and implemented behavior are evidence of what currently exists. Strategy and
 plans describe intended work. A conflict must be surfaced and resolved explicitly.
@@ -30,8 +32,9 @@ Read:
 1. this file;
 2. `strategy.md`;
 3. `project.md`;
-4. the contracts relevant to the requested change;
-5. the affected source, tests, and user-facing documentation.
+4. `theory.md` for mathematical or model-selection work;
+5. the normative contracts relevant to the requested change;
+6. the affected source, tests, and user-facing documentation.
 
 Do not implement work assigned to a later strategy phase unless the project owner explicitly
 changes the sequence.

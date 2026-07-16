@@ -16,6 +16,7 @@ def test_required_llm_contracts_exist() -> None:
     required = {
         ".llm/README.md",
         ".llm/project.md",
+        ".llm/theory.md",
         ".llm/mathematics.md",
         ".llm/numerical_contracts.md",
         ".llm/development.md",
@@ -79,3 +80,29 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert 'git commit -m "Describe the completed increment"' in readme
     assert not (root / '.llm' / 'apply_patch.sh').exists()
     assert not (root / '.llm' / 'commit.sh').exists()
+
+
+def test_theory_reference_is_navigable_and_contains_core_identities() -> None:
+    root = Path(__file__).resolve().parents[1]
+    llm_readme = (root / ".llm" / "README.md").read_text(encoding="utf-8")
+    theory = (root / ".llm" / "theory.md").read_text(encoding="utf-8")
+    mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
+    docs_index = (root / "docs" / "index.md").read_text(encoding="utf-8")
+    docs_theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+
+    assert "`theory.md` — persistent conceptual derivation" in llm_readme
+    assert "`.llm/theory.md`" in mathematics
+    assert "theory.md" in docs_index
+    assert "../.llm/theory.md" in docs_theory
+
+    required_theory_fragments = {
+        "\\mathbf{Z}=\\mathbf{X}\\mathbf{\\Pi}",
+        "\\mathbf{W}=\\mathbf{Z}^{+}\\mathbf{Y}\\mathbf{C}",
+        "\\mathbf{P}=\\mathbf{\\Pi}\\mathbf{M}",
+        "\\mathbf{Q}=\\mathbf{C}\\mathbf{N}",
+        "\\mathbf{B}_{\\mathrm{cs}}",
+        "predictor_rank=\"optimal\"",
+        "predictor_rank=\"auto\"",
+    }
+    missing = sorted(fragment for fragment in required_theory_fragments if fragment not in theory)
+    assert not missing, f"Theory reference is missing core fragments: {missing}"

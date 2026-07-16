@@ -41,5 +41,8 @@ Y_pred = model.predict(X_test)
 print(model.predictor_rank_)
 ```
 
+Theory navigation starts at `docs/theory.md`; the persistent LLM-facing derivation is in
+`.llm/theory.md`, and the concise normative equations are in `.llm/mathematics.md`.
+
 Read `.llm/README.md` before preparing an LLM-assisted change. Create a repository snapshot with
 `make snapshot`.

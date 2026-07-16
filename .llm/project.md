@@ -28,6 +28,8 @@ coarse-to-fine rank search. Randomized SVD is a later, separate numerical-policy
 - `tests/invariants/`: mathematical identities and subspace properties.
 - `tests/integration/`: estimator composition and leakage boundaries.
 - `tests/regression/`: frozen comparisons with trusted implementations.
+- `.llm/theory.md`: persistent conceptual reference derived from the Pi-PLS manuscript.
+- `.llm/mathematics.md`: concise normative mathematical contract.
 - `.llm/`: repository communication contracts and workflow scripts.
 
 ## Invariants
