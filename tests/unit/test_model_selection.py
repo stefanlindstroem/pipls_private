@@ -5,6 +5,8 @@ import pytest
 from sklearn.model_selection import KFold
 
 from pipls.model_selection import (
+    _adaptive_refinement_interval,
+    _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
     _max_predictor_rank,
     _predictor_rank_values,
@@ -226,3 +228,37 @@ def test_select_predictor_rank_rejects_invalid_surfaces(
 ) -> None:
     with pytest.raises(ValueError):
         _select_predictor_rank(ranks, losses)
+
+
+def test_logarithmic_predictor_rank_values_are_deterministic_and_include_endpoints() -> None:
+    values = _logarithmic_predictor_rank_values(lower=2, upper=100)
+
+    np.testing.assert_array_equal(values, np.array([2, 4, 7, 14, 27, 52, 100]))
+    assert values[0] == 2
+    assert values[-1] == 100
+    assert np.all(np.diff(values) > 0)
+
+
+def test_logarithmic_predictor_rank_values_handle_small_intervals() -> None:
+    np.testing.assert_array_equal(
+        _logarithmic_predictor_rank_values(lower=4, upper=4),
+        np.array([4]),
+    )
+
+
+def test_adaptive_refinement_interval_uses_neighbors_around_best_rank() -> None:
+    interval = _adaptive_refinement_interval(
+        np.array([2, 4, 8, 16, 32]),
+        np.array([5.0, 3.0, 1.0, 2.0, 4.0]),
+    )
+
+    assert interval == (4, 16)
+
+
+def test_adaptive_refinement_interval_respects_lower_rank_ties() -> None:
+    interval = _adaptive_refinement_interval(
+        np.array([2, 4, 8, 16]),
+        np.array([1.0, 1.0, 2.0, 3.0]),
+    )
+
+    assert interval == (2, 4)

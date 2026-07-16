@@ -1,6 +1,6 @@
 # Decision: 0007-predictor-rank-search-policies
 
-Status: accepted; implementation pending Phase C2c.
+Status: accepted and implemented in Phase C2c.
 
 ## Context
 
@@ -50,9 +50,9 @@ adaptive search must:
 8. return the best rank among all evaluated candidates;
 9. expose diagnostics sufficient to reconstruct the search path.
 
-The first implementation may use private deterministic constants for the number of logarithmic
-points and the exhaustive-switch threshold. These should not become public constructor parameters
-until benchmark evidence demonstrates a stable need.
+The implementation uses private deterministic constants of seven logarithmic points and an
+exhaustive-switch threshold of 10 ranks. These are not public constructor parameters and should
+remain private until benchmark evidence demonstrates a stable need.
 
 ## Required diagnostics
 

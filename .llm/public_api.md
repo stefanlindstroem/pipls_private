@@ -30,34 +30,29 @@ Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 
 ## Predictor-rank modes
 
-The estimator supports all three fixed public modes:
+The estimator supports four public modes:
 
 ```python
 PiPLSRegression(n_components=2, predictor_rank=4)
 PiPLSRegression(n_components=2, predictor_rank="max")
+PiPLSRegression(n_components=2, predictor_rank="optimal")
 PiPLSRegression(n_components=2, predictor_rank="auto")
 ```
 
-The default is `predictor_rank="auto"`. Automatic mode materializes one CV split set, computes
-its smallest training-fold size, searches every integer rank from `n_components` through the
-fold-safe upper bound, selects the largest scikit-learn score with deterministic low-rank
-tie-breaking, and refits the selected fixed-rank model on all data passed to `fit()`.
+The default is `predictor_rank="auto"`.
 
-## Accepted search-policy transition
+- A positive integer fixes the predictor rank directly.
+- `"max"` uses the rule-derived upper bound without CV search.
+- `"optimal"` exhaustively evaluates every admissible integer rank and returns the CV optimum for
+  the fixed split set, scorer, and low-rank tie rule.
+- `"auto"` performs deterministic logarithmic coarse-to-fine exploration, caches all evaluated
+  candidates, refines the interval around the best observed rank, and exhaustively finishes when
+  the remaining interval contains at most 10 ranks. It is approximate for arbitrary non-unimodal
+  CV curves.
 
-The exhaustive behavior above is the currently implemented Phase C2b behavior, but its public
-name is provisional. Decision 0007 establishes the target semantics for the next implementation
-increment:
-
-- `predictor_rank="optimal"` will perform the exhaustive scan currently called `"auto"`;
-- `predictor_rank="auto"` will perform a deterministic adaptive coarse-to-fine search and may
-  evaluate only a subset of admissible ranks;
-- `predictor_rank="max"` and explicit integer ranks remain unchanged.
-
-Until Phase C2c is implemented, source code and tests remain authoritative for runtime behavior.
-The adaptive mode must expose which ranks were evaluated and whether its result was exhaustive.
-Randomized SVD is not part of the rank-mode meaning and will be governed by a separate solver
-parameter in a later increment.
+Both CV modes materialize one split set, use fold-local preprocessing, select the largest
+scikit-learn score with deterministic low-rank tie-breaking, and refit the selected fixed-rank
+model on all data passed to `fit()`. Randomized SVD remains a separate future solver policy.
 
 The upper bound is
 
@@ -73,7 +68,7 @@ n_{\mathrm{train,min}},
 \right].
 \end{equation}
 
-For `"auto"`, `n_train_min` is derived from the materialized internal-CV splits. For `"max"`,
+For `"auto"` and `"optimal"`, `n_train_min` is derived from the materialized internal-CV splits. For `"max"`,
 the samples supplied to `fit()` are the training data. An explicit integer bypasses the
 rule-derived bound but remains subject to the core numerical-rank and dimensional checks.
 
@@ -96,14 +91,21 @@ The estimator provides `fit`, `predict`, `transform`, and scalar `score`. It exp
 latent scores, `coef_` in scikit-learn orientation, `coef_matrix_` in manuscript orientation, and
 `intercept_`.
 
-Automatic mode additionally exposes:
+Cross-validated modes additionally expose:
 
 - `predictor_rank_values_`;
 - `predictor_rank_cv_results_` with split and mean scores plus response-standardized MSE;
 - `best_score_`;
 - `best_response_standardized_mse_` for the selected rank;
 - `n_splits_`;
-- `cv_n_train_min_`.
+- `cv_n_train_min_`;
+- `predictor_rank_evaluation_order_`;
+- `predictor_rank_search_history_`;
+- `predictor_rank_search_method_`;
+- `predictor_rank_search_interval_`;
+- `n_predictor_rank_candidates_`, `n_predictor_rank_evaluated_`, and
+  `n_predictor_rank_skipped_`;
+- `predictor_rank_search_exhaustive_`.
 
 `response_scale_for_scoring_` is estimated from the data used to fit each estimator with
 `ddof=1`, independently of whether `scale` is true or false.

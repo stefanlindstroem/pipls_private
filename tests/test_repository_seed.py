@@ -70,16 +70,17 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
 
     assert "The LLM maintainer owns" in strategy
     assert 'Phase C2b: `predictor_rank="auto"`' in strategy
-    assert "Current status: **complete**. Automatic mode" in strategy
     assert "Phase C2c: split exhaustive and adaptive rank-search semantics" in strategy
+    assert "Current status: **complete**. Exhaustive search" in strategy
     assert "Phase C2d: scalable linear-algebra policy" in strategy
+    assert "Current status: **planned and next**" in strategy
     assert "Phase D1: complete path analysis" in strategy
     assert (root / "docs" / "decisions" / "0007-predictor-rank-search-policies.md").is_file()
     assert "The LLM maintainer updates this file" in readme
-    assert 'git apply --check ~/Downloads/proposed-change.patch' in readme
+    assert "git apply --check ~/Downloads/proposed-change.patch" in readme
     assert 'git commit -m "Describe the completed increment"' in readme
-    assert not (root / '.llm' / 'apply_patch.sh').exists()
-    assert not (root / '.llm' / 'commit.sh').exists()
+    assert not (root / ".llm" / "apply_patch.sh").exists()
+    assert not (root / ".llm" / "commit.sh").exists()
 
 
 def test_theory_reference_is_navigable_and_contains_core_identities() -> None:
@@ -101,8 +102,8 @@ def test_theory_reference_is_navigable_and_contains_core_identities() -> None:
         "\\mathbf{P}=\\mathbf{\\Pi}\\mathbf{M}",
         "\\mathbf{Q}=\\mathbf{C}\\mathbf{N}",
         "\\mathbf{B}_{\\mathrm{cs}}",
-        "predictor_rank=\"optimal\"",
-        "predictor_rank=\"auto\"",
+        'predictor_rank="optimal"',
+        'predictor_rank="auto"',
     }
     missing = sorted(fragment for fragment in required_theory_fragments if fragment not in theory)
     assert not missing, f"Theory reference is missing core fragments: {missing}"

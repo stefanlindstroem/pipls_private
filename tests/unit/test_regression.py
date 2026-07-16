@@ -159,6 +159,11 @@ def test_auto_rank_mode_exposes_diagnostics() -> None:
     ).fit(X, Y)
 
     assert model.max_predictor_rank_ == 4
+    assert model.predictor_rank_search_method_ == "auto"
+    assert model.predictor_rank_search_exhaustive_
+    assert model.n_predictor_rank_candidates_ == 3
+    assert model.n_predictor_rank_evaluated_ == 3
+    assert model.n_predictor_rank_skipped_ == 0
     np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4]))
     assert model.predictor_rank_ in model.predictor_rank_values_
     assert model.n_splits_ == 4
@@ -229,13 +234,11 @@ def test_auto_rank_uses_fold_local_preprocessing() -> None:
         Y[:8],
     )
     response_scale = np.std(Y[:8], axis=0, ddof=1)
-    expected = np.mean(
-        ((Y[8:12] - manual.predict(X[8:12])) / response_scale[None, :]) ** 2
-    )
+    expected = np.mean(((Y[8:12] - manual.predict(X[8:12])) / response_scale[None, :]) ** 2)
 
-    assert automatic.predictor_rank_cv_results_[
-        "split0_response_standardized_mse"
-    ][0] == pytest.approx(expected)
+    assert automatic.predictor_rank_cv_results_["split0_response_standardized_mse"][
+        0
+    ] == pytest.approx(expected)
 
 
 def test_auto_rank_uses_smallest_rank_for_equal_scores() -> None:
@@ -296,3 +299,91 @@ def test_auto_rank_accepts_sklearn_scorer_and_parallel_candidates() -> None:
     assert model.predictor_rank_ in model.predictor_rank_values_
     assert np.isfinite(model.best_score_)
     assert np.isfinite(model.best_response_standardized_mse_)
+
+
+def test_optimal_rank_mode_exhaustively_evaluates_all_candidates() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank="optimal",
+        samples_per_predictor_rank=8,
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4]))
+    np.testing.assert_array_equal(model.predictor_rank_evaluation_order_, np.array([2, 3, 4]))
+    assert model.predictor_rank_search_method_ == "optimal"
+    assert model.predictor_rank_search_exhaustive_
+    assert model.n_predictor_rank_candidates_ == 3
+    assert model.n_predictor_rank_evaluated_ == 3
+    assert model.n_predictor_rank_skipped_ == 0
+    np.testing.assert_array_equal(model.predictor_rank_search_interval_, np.array([2, 4]))
+
+
+def test_auto_rank_reduces_candidates_and_matches_optimal_on_synthetic_data() -> None:
+    rng = np.random.default_rng(123)
+    X = rng.normal(size=(45, 24))
+    coefficient = rng.normal(size=(24, 3))
+    Y = X @ coefficient + 0.2 * rng.normal(size=(45, 3))
+
+    automatic = PiPLSRegression(
+        n_components=2,
+        predictor_rank="auto",
+        samples_per_predictor_rank=1,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+    optimal = PiPLSRegression(
+        n_components=2,
+        predictor_rank="optimal",
+        samples_per_predictor_rank=1,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert automatic.predictor_rank_ == optimal.predictor_rank_
+    assert automatic.n_predictor_rank_evaluated_ < automatic.n_predictor_rank_candidates_
+    assert automatic.n_predictor_rank_skipped_ > 0
+    assert not automatic.predictor_rank_search_exhaustive_
+    assert optimal.predictor_rank_search_exhaustive_
+    assert len(np.unique(automatic.predictor_rank_evaluation_order_)) == (
+        automatic.n_predictor_rank_evaluated_
+    )
+    flattened_history = np.concatenate(automatic.predictor_rank_search_history_)
+    np.testing.assert_array_equal(
+        flattened_history,
+        automatic.predictor_rank_evaluation_order_,
+    )
+
+
+def test_auto_rank_search_is_deterministic() -> None:
+    rng = np.random.default_rng(321)
+    X = rng.normal(size=(45, 20))
+    Y = rng.normal(size=(45, 3))
+    parameters = dict(
+        n_components=2,
+        predictor_rank="auto",
+        samples_per_predictor_rank=1,
+        cv=3,
+        n_jobs=1,
+    )
+
+    first = PiPLSRegression(**parameters).fit(X, Y)
+    second = PiPLSRegression(**parameters).fit(X, Y)
+
+    assert first.predictor_rank_ == second.predictor_rank_
+    np.testing.assert_array_equal(
+        first.predictor_rank_evaluation_order_,
+        second.predictor_rank_evaluation_order_,
+    )
+    np.testing.assert_allclose(
+        first.predictor_rank_cv_results_["mean_test_score"],
+        second.predictor_rank_cv_results_["mean_test_score"],
+    )
+
+
+def test_invalid_legacy_auto_alias_is_not_needed() -> None:
+    X, Y = _data()
+    with pytest.raises(ValueError, match="positive integer"):
+        PiPLSRegression(predictor_rank="exhaustive").fit(X, Y)  # type: ignore[arg-type]

@@ -8,14 +8,14 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase C2b is implemented: the estimator can exhaustively evaluate the fold-safe predictor-rank
-grid with fold-local preprocessing, reusable splits, standard scorer orientation, diagnostics,
-and full-data refitting. That exhaustive behavior is still exposed under the provisional name
-`predictor_rank="auto"` in the current source.
+Phase C2c is implemented. `predictor_rank="optimal"` exhaustively evaluates the admissible rank
+set, while the default `predictor_rank="auto"` performs deterministic logarithmic coarse-to-fine
+search with cached candidates, a final exhaustive local interval, and explicit search
+diagnostics.
 
-The accepted next increment is Phase C2c. It will rename exhaustive search to
-`predictor_rank="optimal"` and reserve `predictor_rank="auto"` for deterministic adaptive
-coarse-to-fine rank search. Randomized SVD is a later, separate numerical-policy increment.
+The next increment is Phase C2d: an explicit scalable linear-algebra policy with full,
+randomized, and automatic SVD solver choices. Predictor-rank search approximation and
+linear-algebra approximation remain separate contracts.
 
 ## Planned responsibilities
 

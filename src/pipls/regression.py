@@ -1,4 +1,4 @@
-"""Public Pi-PLS estimator with fixed and automatically selected rank modes."""
+"""Public Pi-PLS estimator with fixed, exhaustive, and adaptive rank modes."""
 
 from __future__ import annotations
 
@@ -16,7 +16,10 @@ from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 from ._core import fit_pipls_core
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
+    _ADAPTIVE_EXHAUSTIVE_THRESHOLD,
+    _adaptive_refinement_interval,
     _as_positive_float,
+    _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
     _max_predictor_rank,
     _predictor_rank_values,
@@ -26,6 +29,7 @@ from .model_selection import (
 )
 
 FloatArray = NDArray[np.float64]
+IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 _DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
 
@@ -40,7 +44,7 @@ class _CandidateCVResult:
 
 
 class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type: ignore[misc]
-    r"""Pi-PLS regression with fixed, rule-derived, or automatic predictor rank.
+    r"""Pi-PLS regression with fixed, rule-derived, exhaustive, or adaptive rank.
 
     Parameters
     ----------
@@ -53,20 +57,22 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         If true, copy input arrays before preprocessing.
     predictor_rank:
         Predictor truncation rank $r_\pi$. An integer fixes the rank explicitly,
-        ``"max"`` uses the rule-derived upper bound directly, and ``"auto"``
-        selects among all admissible ranks by internal cross-validation.
+        ``"max"`` uses the rule-derived upper bound directly, ``"optimal"``
+        exhaustively searches all admissible ranks, and ``"auto"`` uses a
+        deterministic adaptive coarse-to-fine search.
     samples_per_predictor_rank:
         Positive rule parameter $c$ used to derive the upper predictor rank.
         It does not constrain an explicitly supplied integer rank.
     cv:
         Cross-validation splitter, split count, or iterable of train-validation
-        index pairs used only when ``predictor_rank="auto"``.
+        index pairs used when ``predictor_rank`` is ``"auto"`` or ``"optimal"``.
     scoring:
-        Scikit-learn scorer name or callable used only in automatic mode. The
-        default is negative response-standardized mean squared error.
+        Scikit-learn scorer name or callable used only in cross-validated modes.
+        The default is negative response-standardized mean squared error.
     n_jobs:
-        Number of predictor-rank candidates evaluated concurrently in automatic
-        mode. ``None`` uses joblib's default and ``-1`` uses all processors.
+        Number of predictor-rank candidates evaluated concurrently in
+        cross-validated modes. ``None`` uses joblib's default and ``-1`` uses all
+        processors.
     """
 
     def __init__(
@@ -75,7 +81,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         *,
         scale: bool = True,
         copy: bool = True,
-        predictor_rank: int | Literal["max", "auto"] = "auto",
+        predictor_rank: int | Literal["max", "optimal", "auto"] = "auto",
         samples_per_predictor_rank: float = 10.0,
         cv: object = 5,
         scoring: str | Scorer = _DEFAULT_SCORING,
@@ -118,12 +124,13 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
                 "n_components must not exceed the number of response columns: "
                 f"got n_components={self.n_components}, n_targets={self.n_targets_}."
             )
-        self._clear_automatic_selection_attributes()
+        self._clear_selection_attributes()
 
-        if self.predictor_rank == "auto":
-            predictor_rank, max_predictor_rank = self._select_automatic_rank(
+        if self.predictor_rank in ("auto", "optimal"):
+            predictor_rank, max_predictor_rank = self._select_cross_validated_rank(
                 X_array,
                 y_array_raw,
+                search_method=self.predictor_rank,
             )
         else:
             max_predictor_rank = _max_predictor_rank(
@@ -211,10 +218,12 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             )
         )
 
-    def _select_automatic_rank(
+    def _select_cross_validated_rank(
         self,
         X: FloatArray,
         y: FloatArray,
+        *,
+        search_method: Literal["auto", "optimal"],
     ) -> tuple[int, int]:
         materialized = _materialize_cv_splits(self.cv, X, y)
         max_predictor_rank = _max_predictor_rank(
@@ -222,34 +231,94 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             n_train_min=materialized.n_train_min,
             samples_per_predictor_rank=self.samples_per_predictor_rank,
         )
-        predictor_rank_values = _predictor_rank_values(
+        admissible_ranks = _predictor_rank_values(
             n_components=self.n_components,
             max_predictor_rank=max_predictor_rank,
         )
         scorer = _resolve_scorer(self.scoring)
+        cache: dict[int, _CandidateCVResult] = {}
+        evaluation_order: list[int] = []
+        search_history: list[IntArray] = []
 
-        evaluations = cast(
-            list[_CandidateCVResult],
-            Parallel(n_jobs=self.n_jobs, prefer="threads")(
-                delayed(_evaluate_predictor_rank)(
-                    predictor_rank=int(predictor_rank),
-                    n_components=self.n_components,
-                    scale=bool(self.scale),
-                    copy=bool(self.copy),
-                    samples_per_predictor_rank=self.samples_per_predictor_rank,
-                    scorer=scorer,
-                    X=X,
-                    y=y,
-                    splits=materialized.splits,
+        def evaluate(ranks: IntArray) -> None:
+            pending = np.asarray(
+                sorted({int(rank) for rank in ranks if int(rank) not in cache}),
+                dtype=np.intp,
+            )
+            if pending.size == 0:
+                return
+            evaluations = _evaluate_predictor_ranks(
+                predictor_ranks=pending,
+                n_components=self.n_components,
+                scale=bool(self.scale),
+                copy=bool(self.copy),
+                samples_per_predictor_rank=self.samples_per_predictor_rank,
+                scorer=scorer,
+                X=X,
+                y=y,
+                splits=materialized.splits,
+                n_jobs=self.n_jobs,
+            )
+            for result in evaluations:
+                cache[result.predictor_rank] = result
+                evaluation_order.append(result.predictor_rank)
+            search_history.append(pending.copy())
+
+        lower = int(admissible_ranks[0])
+        upper = int(admissible_ranks[-1])
+        if search_method == "optimal" or admissible_ranks.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+            evaluate(admissible_ranks)
+            final_interval = (lower, upper)
+        else:
+            evaluate(
+                _logarithmic_predictor_rank_values(
+                    lower=lower,
+                    upper=upper,
                 )
-                for predictor_rank in predictor_rank_values
-            ),
-        )
+            )
+            while True:
+                evaluated_ranks, mean_scores = _cached_mean_scores(cache)
+                interval_lower, interval_upper = _adaptive_refinement_interval(
+                    evaluated_ranks,
+                    -mean_scores,
+                )
+                interval_values = np.arange(
+                    interval_lower,
+                    interval_upper + 1,
+                    dtype=np.intp,
+                )
+                missing = np.asarray(
+                    [rank for rank in interval_values if int(rank) not in cache],
+                    dtype=np.intp,
+                )
+                if interval_values.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+                    evaluate(missing)
+                    final_interval = (interval_lower, interval_upper)
+                    break
 
+                proposed = _logarithmic_predictor_rank_values(
+                    lower=interval_lower,
+                    upper=interval_upper,
+                )
+                missing = np.asarray(
+                    [rank for rank in proposed if int(rank) not in cache],
+                    dtype=np.intp,
+                )
+                if missing.size == 0:
+                    unevaluated = np.asarray(
+                        [rank for rank in interval_values if int(rank) not in cache],
+                        dtype=np.intp,
+                    )
+                    if unevaluated.size == 0:
+                        final_interval = (interval_lower, interval_upper)
+                        break
+                    missing = unevaluated[unevaluated.size // 2 : unevaluated.size // 2 + 1]
+                evaluate(missing)
+
+        predictor_rank_values = np.asarray(sorted(cache), dtype=np.intp)
+        evaluations = [cache[int(rank)] for rank in predictor_rank_values]
         split_scores = np.vstack([result.split_scores for result in evaluations])
-        split_mse = np.vstack(
-            [result.split_response_standardized_mse for result in evaluations]
-        )
+        split_mse = np.vstack([result.split_response_standardized_mse for result in evaluations])
         mean_scores = np.mean(split_scores, axis=1)
         mean_mse = np.mean(split_mse, axis=1)
         selected_rank, _ = _select_predictor_rank(
@@ -259,10 +328,28 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         selected_index = int(np.flatnonzero(predictor_rank_values == selected_rank)[0])
 
         self.predictor_rank_values_ = predictor_rank_values.copy()
+        self.predictor_rank_evaluation_order_ = np.asarray(
+            evaluation_order,
+            dtype=np.intp,
+        )
+        self.predictor_rank_search_history_ = tuple(batch.copy() for batch in search_history)
         self.predictor_rank_cv_results_ = _cv_results_dictionary(
             predictor_rank_values=predictor_rank_values,
             split_scores=split_scores,
             split_response_standardized_mse=split_mse,
+        )
+        self.predictor_rank_search_method_ = search_method
+        self.predictor_rank_search_interval_ = np.asarray(
+            final_interval,
+            dtype=np.intp,
+        )
+        self.n_predictor_rank_candidates_ = int(admissible_ranks.size)
+        self.n_predictor_rank_evaluated_ = int(predictor_rank_values.size)
+        self.n_predictor_rank_skipped_ = (
+            self.n_predictor_rank_candidates_ - self.n_predictor_rank_evaluated_
+        )
+        self.predictor_rank_search_exhaustive_ = (
+            self.n_predictor_rank_evaluated_ == self.n_predictor_rank_candidates_
         )
         self.best_score_ = float(mean_scores[selected_index])
         self.best_response_standardized_mse_ = float(mean_mse[selected_index])
@@ -314,9 +401,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self.x_rank_ = result.x_rank
         self.rank_tolerance_ = result.rank_tolerance
 
-        self.coef_matrix_ = (
-            result.regression_map * self.y_scale_[None, :] / self.x_scale_[:, None]
-        )
+        self.coef_matrix_ = result.regression_map * self.y_scale_[None, :] / self.x_scale_[:, None]
         self.coef_ = self.coef_matrix_.T
         self.intercept_ = self.y_mean_ - self.x_mean_ @ self.coef_matrix_
         self.x_scores_ = X_cs @ self.P_
@@ -324,7 +409,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
 
     def _validate_constructor_parameters(self) -> None:
         _validate_positive_int(self.n_components, name="n_components")
-        if self.predictor_rank in ("max", "auto"):
+        if self.predictor_rank in ("max", "optimal", "auto"):
             pass
         elif isinstance(self.predictor_rank, (int, np.integer)) and not isinstance(
             self.predictor_rank,
@@ -339,7 +424,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
                 )
         else:
             raise ValueError(
-                'predictor_rank must be a positive integer, "max", or "auto"; '
+                'predictor_rank must be a positive integer, "max", "optimal", or "auto"; '
                 f"got {self.predictor_rank!r}."
             )
         _as_positive_float(
@@ -350,11 +435,11 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             raise ValueError(f"scale must be boolean; got {self.scale!r}.")
         if not isinstance(self.copy, (bool, np.bool_)):
             raise ValueError(f"copy must be boolean; got {self.copy!r}.")
-        if self.predictor_rank == "auto":
+        if self.predictor_rank in ("auto", "optimal"):
             _validate_n_jobs(self.n_jobs)
             _resolve_scorer(self.scoring)
 
-    def _clear_automatic_selection_attributes(self) -> None:
+    def _clear_selection_attributes(self) -> None:
         for name in (
             "predictor_rank_values_",
             "predictor_rank_cv_results_",
@@ -362,9 +447,60 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             "best_response_standardized_mse_",
             "n_splits_",
             "cv_n_train_min_",
+            "predictor_rank_evaluation_order_",
+            "predictor_rank_search_history_",
+            "predictor_rank_search_method_",
+            "predictor_rank_search_interval_",
+            "n_predictor_rank_candidates_",
+            "n_predictor_rank_evaluated_",
+            "n_predictor_rank_skipped_",
+            "predictor_rank_search_exhaustive_",
         ):
             if hasattr(self, name):
                 delattr(self, name)
+
+
+def _evaluate_predictor_ranks(
+    *,
+    predictor_ranks: IntArray,
+    n_components: int,
+    scale: bool,
+    copy: bool,
+    samples_per_predictor_rank: float,
+    scorer: Scorer,
+    X: FloatArray,
+    y: FloatArray,
+    splits: tuple[tuple[IntArray, IntArray], ...],
+    n_jobs: int | None,
+) -> list[_CandidateCVResult]:
+    return cast(
+        list[_CandidateCVResult],
+        Parallel(n_jobs=n_jobs, prefer="threads")(
+            delayed(_evaluate_predictor_rank)(
+                predictor_rank=int(predictor_rank),
+                n_components=n_components,
+                scale=scale,
+                copy=copy,
+                samples_per_predictor_rank=samples_per_predictor_rank,
+                scorer=scorer,
+                X=X,
+                y=y,
+                splits=splits,
+            )
+            for predictor_rank in predictor_ranks
+        ),
+    )
+
+
+def _cached_mean_scores(
+    cache: dict[int, _CandidateCVResult],
+) -> tuple[IntArray, FloatArray]:
+    ranks = np.asarray(sorted(cache), dtype=np.intp)
+    scores = np.asarray(
+        [np.mean(cache[int(rank)].split_scores) for rank in ranks],
+        dtype=np.float64,
+    )
+    return ranks, scores
 
 
 def _evaluate_predictor_rank(
@@ -377,7 +513,7 @@ def _evaluate_predictor_rank(
     scorer: Scorer,
     X: FloatArray,
     y: FloatArray,
-    splits: tuple[tuple[NDArray[np.intp], NDArray[np.intp]], ...],
+    splits: tuple[tuple[IntArray, IntArray], ...],
 ) -> _CandidateCVResult:
     split_scores = np.empty(len(splits), dtype=np.float64)
     split_mse = np.empty(len(splits), dtype=np.float64)
@@ -432,9 +568,9 @@ def _cv_results_dictionary(
     }
     for split_index in range(split_scores.shape[1]):
         results[f"split{split_index}_test_score"] = split_scores[:, split_index].copy()
-        results[f"split{split_index}_response_standardized_mse"] = (
-            split_response_standardized_mse[:, split_index].copy()
-        )
+        results[f"split{split_index}_response_standardized_mse"] = split_response_standardized_mse[
+            :, split_index
+        ].copy()
     return results
 
 
@@ -448,10 +584,7 @@ def _resolve_scorer(scoring: str | Scorer) -> Scorer:
             raise ValueError(f"Unknown scoring value {scoring!r}.") from error
     if callable(scoring):
         return scoring
-    raise ValueError(
-        "scoring must be a scikit-learn scorer name or callable; "
-        f"got {scoring!r}."
-    )
+    raise ValueError(f"scoring must be a scikit-learn scorer name or callable; got {scoring!r}.")
 
 
 def _validate_n_jobs(n_jobs: int | None) -> None:

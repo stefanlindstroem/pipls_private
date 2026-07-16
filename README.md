@@ -3,9 +3,9 @@
 Development repository for Pi-PLS, a PLS-family method for multivariate regression.
 
 The repository contains the fixed-parameter numerical core and a scikit-learn-style
-`PiPLSRegression` estimator with automatic, rule-derived `"max"`, and explicit integer
-predictor-rank modes. Complete path analysis, datasets, and paper reproduction remain later
-increments.
+`PiPLSRegression` estimator with adaptive `"auto"`, exhaustive `"optimal"`, rule-derived
+`"max"`, and explicit integer predictor-rank modes. Complete path analysis, datasets, and paper
+reproduction remain later increments.
 
 ## Development setup
 

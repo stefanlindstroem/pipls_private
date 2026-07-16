@@ -17,6 +17,8 @@ CVSplit = tuple[IntArray, IntArray]
 
 _SELECTION_RTOL = 1e-12
 _SELECTION_ATOL = 1e-15
+_ADAPTIVE_INITIAL_POINTS = 7
+_ADAPTIVE_EXHAUSTIVE_THRESHOLD = 10
 
 
 @dataclass(frozen=True)
@@ -94,9 +96,7 @@ def _materialize_cv_splits(
             n_samples=n_samples,
         )
         if np.intersect1d(train_index, validation_index).size:
-            raise ValueError(
-                f"Training and validation indices overlap in split {split_index}."
-            )
+            raise ValueError(f"Training and validation indices overlap in split {split_index}.")
         splits.append((train_index.copy(), validation_index.copy()))
 
     if not splits:
@@ -118,6 +118,53 @@ def _predictor_rank_values(*, n_components: int, max_predictor_rank: int) -> Int
             f"got {n_components} and {max_predictor_rank}."
         )
     return np.arange(n_components, max_predictor_rank + 1, dtype=np.intp)
+
+
+def _logarithmic_predictor_rank_values(
+    *,
+    lower: int,
+    upper: int,
+    n_values: int = _ADAPTIVE_INITIAL_POINTS,
+) -> IntArray:
+    """Return deterministic approximately logarithmic integer ranks including endpoints."""
+
+    _validate_positive_int(lower, name="lower")
+    _validate_positive_int(upper, name="upper")
+    _validate_positive_int(n_values, name="n_values")
+    if lower > upper:
+        raise ValueError(f"lower must not exceed upper: got {lower} and {upper}.")
+    if lower == upper:
+        return np.asarray([lower], dtype=np.intp)
+
+    values = np.exp(np.linspace(math.log(lower), math.log(upper), n_values))
+    rounded = np.rint(values).astype(np.intp)
+    unique_values: IntArray = np.unique(
+        np.concatenate(
+            (
+                np.asarray([lower], dtype=np.intp),
+                rounded,
+                np.asarray([upper], dtype=np.intp),
+            )
+        )
+    )
+    return unique_values
+
+
+def _adaptive_refinement_interval(
+    predictor_ranks: ArrayLike,
+    mean_losses: ArrayLike,
+) -> tuple[int, int]:
+    """Return the evaluated-neighbor interval around the current best rank."""
+
+    ranks = np.asarray(predictor_ranks)
+    losses = np.asarray(mean_losses, dtype=np.float64)
+    selected_rank, _ = _select_predictor_rank(ranks, losses)
+    order = np.argsort(ranks)
+    sorted_ranks = ranks[order]
+    selected_index = int(np.flatnonzero(sorted_ranks == selected_rank)[0])
+    lower_index = max(0, selected_index - 1)
+    upper_index = min(sorted_ranks.size - 1, selected_index + 1)
+    return int(sorted_ranks[lower_index]), int(sorted_ranks[upper_index])
 
 
 def _training_response_scale(y_train: ArrayLike) -> FloatArray:
@@ -174,9 +221,7 @@ def _select_predictor_rank(
     if np.unique(ranks).size != ranks.size:
         raise ValueError("predictor_ranks must not contain duplicates.")
     if losses.ndim != 1 or losses.shape != ranks.shape:
-        raise ValueError(
-            "mean_losses must be one-dimensional with one value per predictor rank."
-        )
+        raise ValueError("mean_losses must be one-dimensional with one value per predictor rank.")
     if not np.all(np.isfinite(losses)):
         raise ValueError("mean_losses must contain only finite values.")
     if not np.isfinite(rtol) or rtol < 0.0 or not np.isfinite(atol) or atol < 0.0:

@@ -469,15 +469,15 @@ This bound is an API and regularization policy, not a theorem of Pi-PLS. For int
 $n_{\mathrm{train,min}}$ is the smallest materialized training-fold size. This prevents candidate
 ranks from depending on validation samples or from being invalid in smaller folds.
 
-The accepted target rank-mode semantics are:
+The implemented rank-mode semantics are:
 
 - an integer: fixed $r_\pi$;
 - `predictor_rank="max"`: use the rule-derived upper bound without rank CV;
 - `predictor_rank="optimal"`: exhaustively evaluate every admissible integer rank;
 - `predictor_rank="auto"`: use deterministic adaptive coarse-to-fine search and permit an approximate optimum.
 
-Until the relevant implementation phase is complete, source code and tests remain authoritative
-for current runtime naming. Search approximation and linear-algebra approximation are separate:
+Adaptive search reports every evaluated rank and does not guarantee the exhaustive optimum for
+an arbitrary non-unimodal CV curve. Search approximation and linear-algebra approximation are separate:
 randomized SVD must be controlled by an explicit solver policy rather than being hidden inside the
 meaning of `predictor_rank`.
 

@@ -154,8 +154,9 @@ guaranteed to recover the exhaustive optimum on an arbitrary non-unimodal CV cur
 package is pre-alpha, the old exhaustive `"auto"` behavior is renamed without a compatibility
 alias.
 
-Current status: **planned and next**. The scientific naming and search-policy decision is recorded
-in decision 0007; implementation has not yet changed.
+Current status: **complete**. Exhaustive search is exposed as `"optimal"`; adaptive `"auto"`
+uses deterministic logarithmic batches, cached evaluations, neighbor-bracket refinement, a final
+exhaustive interval of at most 10 ranks, and reconstructable diagnostics.
 
 ### Phase C2d: scalable linear-algebra policy
 
@@ -164,7 +165,7 @@ with a deterministic `random_state` contract and fitted solver diagnostics. Keep
 from predictor-rank search semantics so users can distinguish exhaustive versus adaptive search
 from exact versus approximate SVD.
 
-Current status: **planned after Phase C2c**.
+Current status: **planned and next**.
 
 ### Phase D1: complete path analysis
 
@@ -191,16 +192,14 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-The next implementation patch should be **Phase C2c: split exhaustive and adaptive rank-search
-semantics**. It should rename the current exhaustive mode to `predictor_rank="optimal"` and
-implement `predictor_rank="auto"` as a deterministic adaptive coarse-to-fine search over integer
-ranks. The adaptive search should begin with logarithmically spaced ranks, refine the interval
-around the best evaluated rank and its neighbors, switch to exhaustive evaluation when the
-remaining interval contains at most a small fixed number of ranks, cache every evaluated rank,
-reuse one materialized split set, and expose search diagnostics. It must not yet add randomized
-SVD or `PiPLSPathCV`.
+The next implementation patch should be **Phase C2d: scalable linear-algebra policy**. It should
+add an explicit `svd_solver` contract with `"full"`, `"randomized"`, and `"auto"` choices,
+introduce a deterministic `random_state` parameter where approximation is used, preserve the
+current exact solver as the reference path, and expose fitted solver diagnostics. The patch must
+not yet add `PiPLSPathCV`.
 
-After C2c, add the separate scalable-SVD policy in C2d, then proceed to D1 path analysis.
+After C2d, proceed to D1 path analysis using the established `"optimal"` and `"auto"` search
+vocabulary.
 
 ## Maintenance protocol
 
