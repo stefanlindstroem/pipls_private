@@ -51,7 +51,7 @@ class _PathCandidateResult:
 class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
-    The default ``search_method="optimal"`` evaluates the complete triangular
+    The default ``search_method="auto"`` evaluates the complete triangular
     grid. ``search_method="auto"`` applies the same deterministic logarithmic
     coarse-to-fine predictor-rank search used by :class:`PiPLSRegression`
     independently for each value of ``n_components``.
@@ -99,7 +99,7 @@ class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
         n_components_values: Sequence[int] | None = None,
         predictor_rank_values: Sequence[int] | None = None,
         max_predictor_rank: int | Literal["rule"] = "rule",
-        search_method: SearchMethod = "optimal",
+        search_method: SearchMethod = "auto",
         samples_per_predictor_rank: float = 10.0,
         cv: object = 5,
         scoring: str | Scorer = _DEFAULT_SCORING,
