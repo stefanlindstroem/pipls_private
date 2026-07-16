@@ -34,6 +34,9 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+filterwarnings = [
+  "error::pipls.exceptions.StatisticalSupportWarning",
+]
 
 [tool.ruff]
 line-length = 100

@@ -54,8 +54,11 @@ def _max_predictor_rank(
         samples_per_predictor_rank,
         name="samples_per_predictor_rank",
     )
+    algebraic_limit = min(n_features, n_train_min)
+    if samples_per_rank <= n_train_min / algebraic_limit:
+        return algebraic_limit
     rule_limit = math.ceil(n_train_min / samples_per_rank)
-    return min(n_features, n_train_min, rule_limit)
+    return min(algebraic_limit, rule_limit)
 
 
 def _materialize_cv_splits(

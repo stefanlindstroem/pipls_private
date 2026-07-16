@@ -10,3 +10,4 @@
 - Add automatic predictor-rank selection with fold-local preprocessing, diagnostics, public scoring utilities, and full-data refitting.
 - Implement exhaustive `"optimal"` rank search and deterministic adaptive coarse-to-fine `"auto"` search, with cached evaluations and search diagnostics.
 - Add full, randomized, and conservative automatic predictor-SVD policies with reproducible seeds and fitted solver diagnostics.
+- Harden public parameter validation and warn when rule-based predictor-rank bounds use fewer than five samples per retained direction.

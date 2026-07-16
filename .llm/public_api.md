@@ -28,6 +28,25 @@ from pipls.metrics import (
 
 Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 
+
+## Public validation and warning contract
+
+Validation occurs at the start of `fit()` before copying arrays or invoking NumPy, joblib, or
+scikit-learn internals.
+
+- `n_components` and integer `predictor_rank` are positive Python or NumPy integers; booleans and
+  integral-valued floats are invalid.
+- Integer `cv` is at least 2; splitter objects and explicit split iterables remain valid.
+- `n_jobs` is `None` or a nonzero integer.
+- `random_state` lies in $[0, 2^{32}-1]$. It may be `None` only with
+  `svd_solver="full"`; `svd_solver="auto"` may randomize and therefore requires a seed.
+- `scale` and `copy` are Python or NumPy booleans.
+
+`StatisticalSupportWarning` is public from `pipls`. A rule-based fit emits it once when
+`samples_per_predictor_rank < 5`, because the resulting upper rank bound may not have sufficient
+statistical support to be trusted without external validation. Explicit integer ranks do not emit
+this warning because they bypass the $c$-based bound.
+
 ## Predictor-rank modes
 
 The estimator supports four public modes:

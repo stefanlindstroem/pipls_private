@@ -37,3 +37,19 @@ Important fitted attributes include `predictor_rank_`, `max_predictor_rank_`, `s
 `coef_`, `coef_matrix_`, and `intercept_`. Cross-validated modes also expose candidate scores,
 evaluation order, search batches, the final refinement interval, candidate counts, whether the
 search was exhaustive, the selected score, and the fold-safe training-size bound.
+
+
+## Parameter validation
+
+Integer controls are strict. `n_components` and an integer `predictor_rank` must be positive
+integers; integer `cv` must be at least 2; `n_jobs` must be `None` or nonzero; and
+`random_state` must lie in the unsigned 32-bit interval. Booleans are not accepted as integers,
+and integral-valued floats are not silently converted. NumPy integer scalars are accepted.
+
+`random_state=None` is valid only with `svd_solver="full"`. The automatic solver may choose
+randomized SVD and therefore requires a reproducible seed.
+
+For rule-based rank modes, `samples_per_predictor_rank < 5` emits
+`pipls.StatisticalSupportWarning`. Such settings are permitted, but the resulting rank bound may
+not have sufficient statistical support to be trusted without external validation. An explicit
+integer rank bypasses this rule and does not emit the warning.

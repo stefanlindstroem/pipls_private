@@ -28,6 +28,14 @@ rank is refitted once on all data supplied to `fit()`.
 The default scorer is negative response-standardized MSE. Fold response scales are training-fold
 sample standard deviations with `ddof=1`; zero scales and singleton-fold scales become 1.
 
+## Statistical-support warning
+
+The default is $c=10$. Values below 5 remain legal for exploratory work but emit
+`pipls.StatisticalSupportWarning` in `"max"`, `"optimal"`, and `"auto"` modes. Fewer than five
+training samples per retained predictor-rank direction provide insufficient statistical support
+for the resulting rank bound to be trusted without external validation. Explicit integer ranks
+bypass the $c$ rule and do not emit this warning.
+
 ## Adaptive `"auto"` mode
 
 ```python
@@ -87,5 +95,3 @@ are:
 
 A positive integer fixes the predictor rank and bypasses the rule-derived bound, while remaining
 subject to dimensional and numerical-rank validation in the fixed core.
-
-Randomized SVD is a separate future linear-algebra policy and is not implied by `"auto"`.

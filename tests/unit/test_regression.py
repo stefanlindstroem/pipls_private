@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pipls import PiPLSRegression
+from pipls import PiPLSRegression, StatisticalSupportWarning
 
 
 def _data() -> tuple[np.ndarray, np.ndarray]:
@@ -203,13 +203,14 @@ def test_auto_rank_uses_smallest_materialized_training_fold() -> None:
         (np.arange(8), np.arange(8, 12)),
         (np.arange(6), np.arange(12, 16)),
     ]
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=2,
-        cv=splits,
-        n_jobs=1,
-    ).fit(X[:16], Y[:16])
+    with pytest.warns(StatisticalSupportWarning):
+        model = PiPLSRegression(
+            n_components=2,
+            predictor_rank="auto",
+            samples_per_predictor_rank=2,
+            cv=splits,
+            n_jobs=1,
+        ).fit(X[:16], Y[:16])
 
     assert model.cv_n_train_min_ == 6
     assert model.max_predictor_rank_ == 3
@@ -222,13 +223,14 @@ def test_auto_rank_uses_fold_local_preprocessing() -> None:
         (np.arange(8), np.arange(8, 12)),
         (np.arange(4, 12), np.arange(0, 4)),
     ]
-    automatic = PiPLSRegression(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=4,
-        cv=splits,
-        n_jobs=1,
-    ).fit(X[:12], Y[:12])
+    with pytest.warns(StatisticalSupportWarning):
+        automatic = PiPLSRegression(
+            n_components=2,
+            predictor_rank="auto",
+            samples_per_predictor_rank=4,
+            cv=splits,
+            n_jobs=1,
+        ).fit(X[:12], Y[:12])
     manual = PiPLSRegression(n_components=2, predictor_rank=2).fit(
         X[:8],
         Y[:8],
@@ -327,20 +329,22 @@ def test_auto_rank_reduces_candidates_and_matches_optimal_on_synthetic_data() ->
     coefficient = rng.normal(size=(24, 3))
     Y = X @ coefficient + 0.2 * rng.normal(size=(45, 3))
 
-    automatic = PiPLSRegression(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=1,
-        cv=3,
-        n_jobs=1,
-    ).fit(X, Y)
-    optimal = PiPLSRegression(
-        n_components=2,
-        predictor_rank="optimal",
-        samples_per_predictor_rank=1,
-        cv=3,
-        n_jobs=1,
-    ).fit(X, Y)
+    with pytest.warns(StatisticalSupportWarning):
+        automatic = PiPLSRegression(
+            n_components=2,
+            predictor_rank="auto",
+            samples_per_predictor_rank=1,
+            cv=3,
+            n_jobs=1,
+        ).fit(X, Y)
+    with pytest.warns(StatisticalSupportWarning):
+        optimal = PiPLSRegression(
+            n_components=2,
+            predictor_rank="optimal",
+            samples_per_predictor_rank=1,
+            cv=3,
+            n_jobs=1,
+        ).fit(X, Y)
 
     assert automatic.predictor_rank_ == optimal.predictor_rank_
     assert automatic.n_predictor_rank_evaluated_ < automatic.n_predictor_rank_candidates_
@@ -369,8 +373,10 @@ def test_auto_rank_search_is_deterministic() -> None:
         n_jobs=1,
     )
 
-    first = PiPLSRegression(**parameters).fit(X, Y)
-    second = PiPLSRegression(**parameters).fit(X, Y)
+    with pytest.warns(StatisticalSupportWarning):
+        first = PiPLSRegression(**parameters).fit(X, Y)
+    with pytest.warns(StatisticalSupportWarning):
+        second = PiPLSRegression(**parameters).fit(X, Y)
 
     assert first.predictor_rank_ == second.predictor_rank_
     np.testing.assert_array_equal(

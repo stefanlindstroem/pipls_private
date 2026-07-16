@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Literal, cast
@@ -14,6 +15,7 @@ from sklearn.metrics import get_scorer, r2_score
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 from ._core import ResolvedSVDSolver, SVDSolver, fit_pipls_core
+from .exceptions import StatisticalSupportWarning
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
     _ADAPTIVE_EXHAUSTIVE_THRESHOLD,
@@ -32,6 +34,8 @@ FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 _DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
+_MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
+_MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
 
 
 @dataclass(frozen=True)
@@ -63,25 +67,28 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         deterministic adaptive coarse-to-fine search.
     samples_per_predictor_rank:
         Positive rule parameter $c$ used to derive the upper predictor rank.
-        It does not constrain an explicitly supplied integer rank.
+        Rule-based values below 5 emit ``StatisticalSupportWarning``. It does
+        not constrain an explicitly supplied integer rank.
     cv:
-        Cross-validation splitter, split count, or iterable of train-validation
-        index pairs used when ``predictor_rank`` is ``"auto"`` or ``"optimal"``.
+        Cross-validation splitter, integer split count of at least 2, or iterable
+        of train-validation index pairs used when ``predictor_rank`` is ``"auto"``
+        or ``"optimal"``.
     scoring:
         Scikit-learn scorer name or callable used only in cross-validated modes.
         The default is negative response-standardized mean squared error.
     n_jobs:
-        Number of predictor-rank candidates evaluated concurrently in
-        cross-validated modes. ``None`` uses joblib's default and ``-1`` uses all
-        processors.
+        Nonzero integer number of predictor-rank candidates evaluated concurrently
+        in cross-validated modes. ``None`` uses joblib's default and ``-1`` uses
+        all processors.
     svd_solver:
         Predictor SVD policy. ``"full"`` uses the exact thin SVD,
         ``"randomized"`` always uses randomized truncated SVD, and ``"auto"``
         uses randomized SVD only for sufficiently large matrices and low retained
         rank. The response-side and coupling SVDs always remain exact.
     random_state:
-        Nonnegative integer seed used by randomized SVD. The default makes
-        ``"auto"`` and ``"randomized"`` reproducible.
+        Integer seed in $[0, 2^{32}-1]$ used by randomized SVD. The default makes
+        ``"auto"`` and ``"randomized"`` reproducible. ``None`` is accepted only
+        with ``svd_solver="full"``.
     """
 
     def __init__(
@@ -112,6 +119,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
     def fit(self, X: ArrayLike, y: ArrayLike) -> PiPLSRegression:
         """Fit the Pi-PLS model and select predictor rank when requested."""
 
+        self._validate_constructor_parameters()
         X_checked, y_checked = check_X_y(
             X,
             y,
@@ -130,7 +138,6 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             copy=self.copy,
         )
 
-        self._validate_constructor_parameters()
         self.n_targets_ = int(y_array.shape[1])
         if self.n_components > self.n_targets_:
             raise ValueError(
@@ -139,7 +146,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             )
         self._clear_selection_attributes()
 
-        if self.predictor_rank in ("auto", "optimal"):
+        if isinstance(self.predictor_rank, str) and self.predictor_rank in ("auto", "optimal"):
             predictor_rank, max_predictor_rank = self._select_cross_validated_rank(
                 X_array,
                 y_array_raw,
@@ -238,7 +245,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         *,
         search_method: Literal["auto", "optimal"],
     ) -> tuple[int, int]:
-        materialized = _materialize_cv_splits(self.cv, X, y)
+        materialized = _materialize_cv_splits(_validated_cv(self.cv), X, y)
         max_predictor_rank = _max_predictor_rank(
             n_features=self.n_features_in_,
             n_train_min=materialized.n_train_min,
@@ -431,7 +438,12 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
 
     def _validate_constructor_parameters(self) -> None:
         _validate_positive_int(self.n_components, name="n_components")
-        if self.predictor_rank in ("max", "optimal", "auto"):
+        uses_rank_rule = isinstance(self.predictor_rank, str) and self.predictor_rank in (
+            "max",
+            "optimal",
+            "auto",
+        )
+        if uses_rank_rule:
             pass
         elif isinstance(self.predictor_rank, (int, np.integer)) and not isinstance(
             self.predictor_rank,
@@ -449,7 +461,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
                 'predictor_rank must be a positive integer, "max", "optimal", or "auto"; '
                 f"got {self.predictor_rank!r}."
             )
-        _as_positive_float(
+        samples_per_rank = _as_positive_float(
             self.samples_per_predictor_rank,
             name="samples_per_predictor_rank",
         )
@@ -457,15 +469,29 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             raise ValueError(f"scale must be boolean; got {self.scale!r}.")
         if not isinstance(self.copy, (bool, np.bool_)):
             raise ValueError(f"copy must be boolean; got {self.copy!r}.")
-        if self.svd_solver not in ("full", "randomized", "auto"):
+        if not isinstance(self.svd_solver, str) or self.svd_solver not in (
+            "full",
+            "randomized",
+            "auto",
+        ):
             raise ValueError(
                 'svd_solver must be "full", "randomized", or "auto"; '
                 f"got {self.svd_solver!r}."
             )
+        _validated_cv(self.cv)
+        _validate_n_jobs(self.n_jobs)
         _validate_random_state(self.random_state, svd_solver=self.svd_solver)
         if self.predictor_rank in ("auto", "optimal"):
-            _validate_n_jobs(self.n_jobs)
             _resolve_scorer(self.scoring)
+        if uses_rank_rule and samples_per_rank < _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK:
+            warnings.warn(
+                f"samples_per_predictor_rank={samples_per_rank:g} is below 5. "
+                "This permits fewer than five training samples per retained predictor-rank "
+                "direction, so the resulting rank bound may not have sufficient statistical "
+                "support to be trusted without external validation.",
+                StatisticalSupportWarning,
+                stacklevel=3,
+            )
 
     def _clear_selection_attributes(self) -> None:
         for name in (
@@ -615,9 +641,9 @@ def _cv_results_dictionary(
 
 
 def _resolve_scorer(scoring: str | Scorer) -> Scorer:
-    if scoring == _DEFAULT_SCORING:
-        return neg_response_standardized_mean_squared_error
     if isinstance(scoring, str):
+        if scoring == _DEFAULT_SCORING:
+            return neg_response_standardized_mean_squared_error
         try:
             return cast(Scorer, get_scorer(scoring))
         except ValueError as error:
@@ -625,6 +651,28 @@ def _resolve_scorer(scoring: str | Scorer) -> Scorer:
     if callable(scoring):
         return scoring
     raise ValueError(f"scoring must be a scikit-learn scorer name or callable; got {scoring!r}.")
+
+
+def _validated_cv(cv: object) -> object:
+    if isinstance(cv, (bool, np.bool_)):
+        raise ValueError(
+            "cv must be an integer at least 2, a cross-validation splitter, "
+            f"or an iterable of splits; got {cv!r}."
+        )
+    if isinstance(cv, (int, np.integer)):
+        n_splits = int(cv)
+        if n_splits < 2:
+            raise ValueError(f"cv must be at least 2 when supplied as an integer; got {cv!r}.")
+        return n_splits
+    if cv is None or isinstance(
+        cv,
+        (float, np.floating, complex, np.complexfloating, str, bytes),
+    ):
+        raise ValueError(
+            "cv must be an integer at least 2, a cross-validation splitter, "
+            f"or an iterable of splits; got {cv!r}."
+        )
+    return cv
 
 
 def _validate_n_jobs(n_jobs: int | None) -> None:
@@ -639,9 +687,10 @@ def _validate_n_jobs(n_jobs: int | None) -> None:
 
 def _validate_random_state(random_state: int | None, *, svd_solver: SVDSolver) -> None:
     if random_state is None:
-        if svd_solver == "randomized":
+        if svd_solver in ("randomized", "auto"):
             raise ValueError(
-                "random_state must be a nonnegative integer when svd_solver='randomized'."
+                "random_state must be an integer between 0 and "
+                f"{_MAX_RANDOM_STATE} when svd_solver={svd_solver!r}."
             )
         return
     if isinstance(random_state, (bool, np.bool_)) or not isinstance(
@@ -649,13 +698,14 @@ def _validate_random_state(random_state: int | None, *, svd_solver: SVDSolver) -
         (int, np.integer),
     ):
         raise ValueError(
-            "random_state must be None or a nonnegative integer; "
-            f"got {random_state!r}."
+            "random_state must be None or an integer between 0 and "
+            f"{_MAX_RANDOM_STATE}; got {random_state!r}."
         )
-    if int(random_state) < 0:
+    seed = int(random_state)
+    if seed < 0 or seed > _MAX_RANDOM_STATE:
         raise ValueError(
-            "random_state must be None or a nonnegative integer; "
-            f"got {random_state!r}."
+            "random_state must be None or an integer between 0 and "
+            f"{_MAX_RANDOM_STATE}; got {random_state!r}."
         )
 
 
@@ -681,4 +731,4 @@ def _validate_positive_int(value: Any, *, name: str) -> None:
     if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
         raise ValueError(f"{name} must be a positive integer; got {value!r}.")
     if int(value) < 1:
-        raise ValueError(f"{name} must be at least 1; got {value!r}.")
+        raise ValueError(f"{name} must be a positive integer; got {value!r}.")

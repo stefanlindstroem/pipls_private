@@ -21,6 +21,7 @@ ResolvedSVDSolver = Literal["full", "randomized"]
 _AUTO_RANDOMIZED_MIN_DIMENSION = 500
 _AUTO_RANDOMIZED_MIN_ENTRIES = 1_000_000
 _AUTO_RANDOMIZED_MAX_RANK_FRACTION = 0.2
+_MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
 
 
 @dataclass(frozen=True)
@@ -264,10 +265,10 @@ def _validate_random_state(random_state: int | None, *, required: bool) -> int |
             f"got {random_state!r}."
         )
     seed = int(random_state)
-    if seed < 0:
+    if seed < 0 or seed > _MAX_RANDOM_STATE:
         raise ValueError(
-            "random_state must be None or a nonnegative integer; "
-            f"got {random_state!r}."
+            "random_state must be None or an integer between 0 and "
+            f"{_MAX_RANDOM_STATE}; got {random_state!r}."
         )
     return seed
 

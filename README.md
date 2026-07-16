@@ -44,6 +44,10 @@ Y_pred = model.predict(X_test)
 print(model.predictor_rank_)
 ```
 
+`samples_per_predictor_rank` defaults to 10. Rule-based values below 5 are allowed but emit
+`StatisticalSupportWarning` because the resulting rank bound may lack sufficient statistical
+support.
+
 Theory navigation starts at `docs/theory.md`; the persistent LLM-facing derivation is in
 `.llm/theory.md`, and the concise normative equations are in `.llm/mathematics.md`.
 

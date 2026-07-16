@@ -170,6 +170,18 @@ Current status: **complete**. The estimator now exposes `svd_solver={"full", "ra
 retained-rank rule, only the predictor SVD may be randomized, and fitted plus CV-fold solver
 diagnostics are available.
 
+### Phase C2e: public parameter-validation hardening
+
+Audit exposed constructor controls at the estimator boundary. Reject invalid and degenerate
+integer-like values consistently, preserve deliberate NumPy-scalar support, define the public
+random-seed range, warn when the rule parameter supplies fewer than five training samples per
+retained predictor-rank direction, and add exhaustive API-level tests.
+
+Current status: **complete**. Constructor validation now runs before dependency calls; integer,
+boolean, CV, job-count, seed, solver, scorer, and extreme rank-bound cases have API-level tests;
+`StatisticalSupportWarning` is public; and extremely small positive rule parameters saturate
+safely without overflow.
+
 ### Phase D1: complete path analysis
 
 Add `PiPLSPathCV` with the admissible triangular grid, shared materialized splits, standard
