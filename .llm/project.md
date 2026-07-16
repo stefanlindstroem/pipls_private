@@ -11,11 +11,13 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through E1 are implemented. The current public surface includes `PiPLSRegression`,
+Phases A through E2 are implemented. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics, and
 `StatisticalSupportWarning`.
 
-The next increment is Phase E2: the dataset registry and generic loader. No real dataset migration, implicit download, or paper reproduction belongs in E2.
+The next increment is Phase E3: the first real-dataset integration. It must use transparent,
+ordinary code to read `X` and `Y`; no public registry, generic loader, or required metadata
+file is part of the plan.
 
 ## Runtime ownership
 
@@ -24,7 +26,8 @@ The next increment is Phase E2: the dataset registry and generic loader. No real
   OOF refitting support.
 - `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation and tags.
 - `src/pipls/decomposition.py`: immutable public Pi-PLS factorization result.
-- `src/pipls/datasets.py`: immutable dataset container and deterministic synthetic generators.
+- `src/pipls/datasets.py`: optional immutable dataset container and deterministic synthetic
+  generators; it is not required for user-supplied real data.
 - `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `src/pipls/model_selection.py`: rank limits, split materialization, and shared rank-search
@@ -47,11 +50,13 @@ The next increment is Phase E2: the dataset registry and generic loader. No real
 
 ## Dataset and reproduction ownership
 
-- `datasets/registry.yaml`: E2 registry source; entries must be schema-validated before use.
-- `datasets/`: dataset descriptions and committed redistributable artifacts only.
-- `scripts/prepare_data/`: deterministic converters and download/verification orchestration.
-- `scripts/reproduce_paper/`: explicit paper-specific analysis workflows.
-- `examples/`: small executable API demonstrations, not publication pipelines.
+- `datasets/`: dataset descriptions and committed redistributable analysis files only. No
+  generic runtime registry is required.
+- `scripts/prepare_data/`: deterministic dataset-specific preparation and verification.
+- `scripts/reproduce_paper/`: explicit paper-specific analysis workflows that read `X` and
+  `Y` visibly.
+- `examples/`: small executable API demonstrations with transparent data reading, not hidden
+  loader utilities or publication pipelines.
 - `paper/`: manuscript-facing metadata and reproduction entry points.
 
 ## Contract and documentation ownership
@@ -63,6 +68,7 @@ The next increment is Phase E2: the dataset registry and generic loader. No real
 - `.llm/mathematics.md`: concise normative mathematical contract.
 - `.llm/numerical_contracts.md`: numerical policy and degeneracy behavior.
 - `.llm/public_api.md`: public constructors, methods, outputs, defaults, and exclusions.
+- `.llm/data_io.md`: transparent real-data reading, example, and repository-dataset policy.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
 - `docs/decisions/`: accepted design records.
 - `docs/publication_repository_plan.md`: broad historical architecture and publication rationale;
@@ -72,6 +78,8 @@ The next increment is Phase E2: the dataset registry and generic loader. No real
 
 - Runtime code does not import from `.llm`, tests, examples, docs, scripts, datasets, or paper.
 - The fixed numerical core does not own preprocessing, CV, datasets, or paper policy.
+- Real-data input remains user-owned: examples and reproduction scripts form `X` and `Y`
+  explicitly without a required registry or generic loader.
 - `PiPLSRegression` and `PiPLSPathCV` do not wrap each other; both use shared private machinery.
 - Learned preprocessing is fitted inside the corresponding training fold.
 - Public behavior changes include focused tests and contract/documentation updates.

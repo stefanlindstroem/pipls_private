@@ -35,12 +35,14 @@ resolve the discrepancy explicitly rather than silently choosing one.
 6. Compare subspaces, regression maps, and predictions rather than raw singular-vector signs.
 7. Fit every learned preprocessing operation inside the corresponding training fold.
 8. Keep paper-specific orchestration explicit and separate from general estimator defaults.
-9. Update `.llm/state.md`, the relevant `.llm` contracts, and user-facing documentation when a
+9. Keep real-data input transparent: examples read `X` and `Y` explicitly and do not depend on
+   a public registry, generic loader, or required metadata sidecar.
+10. Update `.llm/state.md`, the relevant `.llm` contracts, and user-facing documentation when a
    phase, roadmap, architecture, or public contract changes.
-10. Return one root-relative Git patch per increment with an explicit validation report.
-11. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
+11. Return one root-relative Git patch per increment with an explicit validation report.
+12. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
     for patch application or committing.
-12. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
+13. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
     one patch unless the dependency cannot be separated.
 
 ## Fixed architectural decisions
@@ -65,6 +67,8 @@ resolve the discrepancy explicitly rather than silently choosing one.
 - Paper-specific rank rules and LOO reporting conventions are explicit reproduction inputs.
 - D2 metadata support is deliberately limited to `groups` for splitters. Weighted fitting,
   `sample_weight`, and general-purpose metadata routing are out of scope.
+- Real-data users supply `X` and `Y` directly. No public registry, generic loader, required
+  metadata sidecar, or hidden example I/O utility is part of the accepted architecture.
 - `.llm/` is tracked repository infrastructure and is excluded from the installable package.
 - Patch application and commits use ordinary Git commands rather than project wrapper scripts.
 - Snapshots contain repository-root contents without an enclosing project directory.
@@ -265,20 +269,33 @@ Acceptance conditions:
 
 Current status: **complete**. `PiPLSDataset` validates and freezes arrays, names, sample IDs, provenance, metadata, and optional truth. `make_pipls_regression` and `make_pipls_train_test` provide local seeded generation with configurable latent roles, strengths, distributions, scales, and noise. Unit, API, invariant, and reproducibility tests cover the boundary. No real dataset or network access was added.
 
-### Phase E2: dataset registry and generic loader
+### Phase E2: transparent real-data input contract
 
-Add the registry schema, loader, checksum/provenance/license validation, and converter contract.
-The loader must not silently download or transform data.
+Fix the programming-user and example contract before migrating real datasets.
 
-Current status: **next**.
+Acceptance conditions:
 
-### Phase E3: real dataset migrations
+- plain arrays or data frames supplied as `X` and `Y` remain the primary real-data interface;
+- `PiPLSDataset` is optional and no metadata sidecar is required for fitting;
+- no public registry or generic real-data loader is planned;
+- examples and reproduction scripts show ordinary reading, alignment, column selection, and matrix
+  construction directly rather than hiding them behind utilities;
+- repository-specific provenance and preparation information may be tracked for reproducibility
+  without becoming runtime requirements for external users;
+- the revised contract is navigable from a fresh snapshot.
 
-Migrate and validate one dataset per coherent increment. Record redistribution decisions,
-checksums, source URLs, converter versions, shapes, names, and expected preprocessing. Defer Corn
+Current status: **complete**. `.llm/data_io.md` defines the transparent input and example policy,
+and the roadmap now proceeds directly to one explicit real-dataset integration per patch.
+
+### Phase E3: real dataset integrations
+
+Migrate and validate one dataset per coherent increment. Record source, citation, license,
+redistribution decision, preparation choices, shapes, columns, row ordering, and missing-value
+policy. Keep preparation deterministic, but make the analysis example read `X` and `Y` directly
+with ordinary NumPy or pandas code. Do not introduce a generic registry or loader. Defer Corn
 reconstruction until its preprocessing choices are explicitly fixed.
 
-Current status: **planned**.
+Current status: **next**.
 
 ### Phase E4: benchmark fixtures
 
@@ -309,10 +326,11 @@ Current status: **planned**.
 
 ## Current next increment
 
-The next implementation patch should be **Phase E2: dataset registry and generic loader**. It
-should define and validate registry entries, resolve local paths, verify checksums and provenance,
-and return `PiPLSDataset` without silently downloading, filtering, imputing, centering, scaling,
-or otherwise transforming model data. Converter execution and real dataset migration remain E3.
+The next implementation patch should be **Phase E3: first real-dataset integration**. Select one
+dataset with resolved source and licensing, add deterministic preparation only where required, and
+add an example that visibly reads predictor `X` and response `Y` before fitting. Do not add a
+public registry, generic loader, required metadata file, implicit download, or hidden example I/O
+utility. Corn remains deferred until its preprocessing choices are resolved.
 
 ## Maintenance protocol
 

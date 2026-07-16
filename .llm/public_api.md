@@ -237,7 +237,9 @@ from pipls.datasets import (
 )
 ```
 
-`PiPLSDataset` is the common immutable in-memory boundary. It stores read-only `float64` `X` and
+`PiPLSDataset` is an optional immutable in-memory container, primarily useful for package-owned
+synthetic data and structured experiments. Plain arrays and data frames passed directly to
+`fit(X, Y)` remain the primary real-data interface. The container stores read-only `float64` `X` and
 2D `Y`, unique feature/target/sample names, required provenance, recursively frozen metadata, and
 optional synthetic truth. `data` and `target` are scikit-learn-style aliases. Required provenance
 keys are `source`, `license`, `citation`, and `version`.
@@ -256,5 +258,6 @@ block does not depend on the requested test size.
 `PiPLSSyntheticTruth` exposes read-only latent scores, loading blocks, signal/noise matrices,
 strengths, and scales. Loading blocks that are structurally absent are explicit zeros.
 
-Registry lookup, file loading, checksums, conversion, downloading, and real-data migration are not
-part of E1. They belong to E2 and E3.
+No metadata file, registry lookup, or package-owned loader is required for real-data fitting.
+Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Repository examples
+must show these steps directly rather than hiding them behind convenience utilities.

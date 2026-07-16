@@ -23,6 +23,11 @@
 - Do not broaden supported estimator composition or metadata routing implicitly.
 - Weighted fitting and `sample_weight` propagation during fitting are out of scope unless the
   project owner explicitly reverses that decision.
+- For real-data examples and reproduction scripts, read and form `X` and `Y` explicitly in the
+  script. Do not introduce a public registry, generic loader, required metadata sidecar, or
+  helper function that obscures the data-reading steps.
+- Keep dataset-specific conversion under `scripts/prepare_data/`; keep analysis-time reading
+  simple, visible, and representative of normal user code.
 
 ## Tests and documentation
 
@@ -32,6 +37,8 @@
 - Numerical changes update `.llm/numerical_contracts.md` and include deterministic boundary tests.
 - Public API changes update `.llm/public_api.md`, user documentation, and applicable estimator/API
   tests.
+- Dataset, example, or paper-I/O changes update `.llm/data_io.md` and include a review of whether
+  `X` and `Y` construction remains transparent.
 - Phase, roadmap, ownership, default, or supported-scope changes update `.llm/state.md` and
   `.llm/strategy.md` in the same patch.
 - New accepted architectural or public-API decisions receive a numbered record under

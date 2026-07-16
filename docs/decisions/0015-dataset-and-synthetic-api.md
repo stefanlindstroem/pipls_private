@@ -21,8 +21,8 @@ structure without changing NumPy's global random state.
   truth.
 - `data` and `target` are scikit-learn-style aliases for `X` and `Y`.
 - `Y` is normalized to a two-dimensional array, including single-response datasets.
-- Required provenance keys are `source`, `license`, `citation`, and `version`. Registry-specific
-  checksums and file locations are deferred to E2.
+- Required provenance keys are `source`, `license`, `citation`, and `version` when the optional
+  container is used. They are not prerequisites for fitting plain user-supplied `X` and `Y`.
 - All model arrays and array-valued metadata are copied and made read-only. Nested metadata is
   recursively frozen and unsupported mutable/object values are rejected.
 - `make_pipls_regression` uses a local seeded `numpy.random.Generator` and returns one
@@ -44,6 +44,7 @@ structure without changing NumPy's global random state.
 - Synthetic estimator tests can use one package-owned generator rather than ad hoc local formulas.
 - Train/test demonstrations can share a true model without fitting transformations across the
   boundary.
-- E2 can build registry and loader behavior around a fixed in-memory object.
-- E3 migrations must populate the same names, identifiers, provenance, and metadata fields rather
-  than defining dataset-specific return types.
+- Real-data examples may use plain arrays or data frames and are not required to construct this
+  container.
+- Dataset migrations must keep their reading and matrix-construction steps explicit rather than
+  adding a generic runtime loader.

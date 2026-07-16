@@ -33,6 +33,7 @@ def test_required_llm_contracts_exist() -> None:
         ".llm/numerical_contracts.md",
         ".llm/development.md",
         ".llm/public_api.md",
+        ".llm/data_io.md",
         ".llm/snapshot.sh",
         ".llm/create_patch.sh",
         ".llm/strategy.md",
@@ -95,7 +96,9 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert "Current status: **complete**. `PiPLSPathCV` is public" in strategy
     assert "Phase E1: dataset schema and deterministic synthetic generator" in strategy
     assert "Current status: **complete**. `PiPLSDataset` validates" in strategy
-    assert "The next implementation patch should be **Phase E2" in strategy
+    assert "Phase E2: transparent real-data input contract" in strategy
+    assert "Current status: **complete**. `.llm/data_io.md`" in strategy
+    assert "The next implementation patch should be **Phase E3" in strategy
     assert (root / "docs" / "decisions" / "0005-leave-one-out-protocol.md").is_file()
     assert (root / "docs" / "decisions" / "0007-predictor-rank-search-policies.md").is_file()
     assert (root / "docs" / "decisions" / "0008-predictor-svd-policy.md").is_file()
@@ -105,6 +108,7 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert (root / "docs" / "decisions" / "0012-sklearn-api-alignment.md").is_file()
     assert (root / "docs" / "decisions" / "0014-validation-metadata-scope.md").is_file()
     assert (root / "docs" / "decisions" / "0015-dataset-and-synthetic-api.md").is_file()
+    assert (root / "docs" / "decisions" / "0016-transparent-data-ingestion.md").is_file()
     assert (root / "docs" / "path_analysis.md").is_file()
     assert (root / "docs" / "cross_validation.md").is_file()
     assert "The LLM maintainer updates this file" in readme
@@ -151,8 +155,9 @@ def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
     public_api = (root / ".llm" / "public_api.md").read_text(encoding="utf-8")
     decisions = (root / ".llm" / "decisions.md").read_text(encoding="utf-8")
 
-    assert "Phases A through E1 are complete" in state
-    assert "Phase E2: dataset registry" in state
+    assert "Phases A through E2 are complete" in state
+    assert "Phase E3: first real-dataset integration" in state
+    assert "no required metadata file, registry, or package-owned loader" in state
     assert "deterministic synthetic" in state
     assert (
         "weighted fitting and general sample-weight routing are intentionally out of scope"
@@ -161,16 +166,31 @@ def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
     assert "direct `PiPLSRegression` or `Pipeline`" in state
     assert "Routine work should not require re-uploading the manuscript" in state
 
-    assert "The next increment is Phase E2" in project
+    assert "The next increment is Phase E3" in project
+    assert "transparent" in project
     assert "`.llm/state.md`: current handoff" in project
 
     assert "Arbitrary nested meta-estimators are rejected" in public_api
     assert "Weighted fitting" in public_api
     assert "composite estimator containing one" not in public_api
+    assert "Plain arrays and data frames" in public_api
 
     decision_files = sorted(path.name for path in (root / "docs" / "decisions").glob("*.md"))
     missing = [name for name in decision_files if f"`{name}`" not in decisions]
     assert not missing, f"Decision index is missing records: {missing}"
+
+
+def test_llm_data_io_contract_is_transparent() -> None:
+    root = Path(__file__).resolve().parents[1]
+    data_io = (root / ".llm" / "data_io.md").read_text(encoding="utf-8")
+    strategy = (root / ".llm" / "strategy.md").read_text(encoding="utf-8")
+
+    assert "model = PiPLSRegression().fit(X, Y)" in data_io
+    assert "must not require a registry, metadata file" in data_io
+    assert "Do not hide these steps behind a package utility" in data_io
+    assert "Phase E3: first real-dataset integration" in strategy
+    assert not (root / "datasets" / "registry.yaml").exists()
+
 
 
 def test_llm_prompts_bootstrap_from_repository_state() -> None:

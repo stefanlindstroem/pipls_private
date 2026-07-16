@@ -24,8 +24,9 @@ The principal navigation documents are:
 7. `numerical_contracts.md` — numerical algorithms, tolerances, degeneracy, and comparison rules.
 8. `public_api.md` — constructor parameters, fitted attributes, shapes, supported composition,
    dataset interfaces, and explicit exclusions.
-9. `development.md` — coding, testing, documentation, dependency, and patch requirements.
-10. `docs/publication_repository_plan.md` — broad historical design and publication architecture;
+9. `data_io.md` — transparent real-data input, example, and repository-dataset contract.
+10. `development.md` — coding, testing, documentation, dependency, and patch requirements.
+11. `docs/publication_repository_plan.md` — broad historical design and publication architecture;
     consult current state and accepted decisions before treating a proposal there as active.
 
 Git history, tests, and implemented behavior are evidence of what currently exists. Strategy and
@@ -42,8 +43,9 @@ First inspect `.llm/SNAPSHOT_INFO`, then read:
 4. `project.md`;
 5. `decisions.md` and the relevant full decision records;
 6. `theory.md` for mathematical or model-selection work;
-7. the normative contracts relevant to the requested change;
-8. the affected source, tests, and user-facing documentation.
+7. `data_io.md` for real-data, example, dataset, or reproduction work;
+8. the normative contracts relevant to the requested change;
+9. the affected source, tests, and user-facing documentation.
 
 Confirm that source and tests agree with the claimed state. Do not silently rely on remembered
 chat context, old patch descriptions, or proposals in the publication plan that were later

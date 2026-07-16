@@ -12,7 +12,7 @@ from an earlier conversation, an old patch, or the historical publication plan a
 
 ## Implemented boundary
 
-Phases A through E1 are complete and committed:
+Phases A through E2 are complete and committed:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -29,7 +29,9 @@ Phases A through E1 are complete and committed:
 - optional ordered OOF predictions and immutable `PiPLSValidationReport` with explicit
   fixed-parameter versus selection-conditioned labeling;
 - immutable validated `PiPLSDataset` and deterministic synthetic generators with shared,
-  predictor-specific, and response-specific latent structure.
+  predictor-specific, and response-specific latent structure;
+- a transparent real-data input contract: users and examples read `X` and `Y` explicitly,
+  with no required metadata file, registry, or package-owned loader.
 
 The current top-level package exports are:
 
@@ -68,7 +70,8 @@ from pipls.datasets import (
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | keyword-only `groups` routed to group-aware splitters |
 | OOF output | opt-in through `return_oof_predictions=True` |
-| Dataset namespace | immutable container and seeded generators under `pipls.datasets` |
+| Dataset namespace | optional immutable container and seeded generators under `pipls.datasets` |
+| Real-data input | user-owned explicit reading of `X` and `Y`; no required registry, metadata, or loader |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 
 Additional fixed decisions:
@@ -88,32 +91,31 @@ Additional fixed decisions:
 
 ## Current next increment
 
-The next implementation patch is **Phase E2: dataset registry and generic loader**.
+The next implementation patch is **Phase E3: first real-dataset integration**.
 
-E2 acceptance conditions:
+E3 is performed one dataset at a time. Each dataset patch must:
 
-1. define one versioned registry-entry schema for names, local paths, shapes, names, checksums,
-   provenance, licensing, and preparation metadata;
-2. validate the tracked `datasets/registry.yaml` before resolving any entry;
-3. provide a loader that returns `PiPLSDataset` and supports an explicit alternate data root or
-   direct path;
-4. verify sample alignment, numeric model columns, finite values, names, provenance, and checksums;
-5. perform no implicit download, converter execution, row filtering, imputation, centering,
-   scaling, or feature engineering;
-6. keep dataset preparation under `scripts/prepare_data/`, outside the installed runtime loader;
-7. add schema, invalid-entry, checksum, path-resolution, and no-transformation tests without
-   migrating a real research dataset.
+1. establish source, citation, license, redistribution status, and preparation choices;
+2. add deterministic preparation under `scripts/prepare_data/` when conversion is needed;
+3. produce simple analysis-facing file or files;
+4. add an example or reproduction script that reads predictors `X` and response `Y` explicitly
+   using ordinary NumPy or pandas code;
+5. show row alignment, selected columns, dtype handling, and missing-value policy directly;
+6. fit the public estimator from those visible `X` and `Y` objects;
+7. avoid a public registry, generic loader, required metadata sidecar, implicit download, or hidden
+   preprocessing utility.
 
-Do not begin real dataset conversion, downloading, or paper reproduction in E2.
+Do not begin with the Corn reconstruction until its unresolved preprocessing choices are fixed.
+Choose a dataset whose source and license permit a complete, reviewable first migration.
 
 ## Subsequent roadmap
 
-- **E3 — real dataset migrations:** migrate and validate one dataset per coherent increment,
-  including the Corn reconstruction only after preprocessing choices are fixed.
-- **E4 — benchmark fixtures:** deterministic benchmark manifests and regression tolerances linking
-  synthetic and migrated datasets to estimator/path behavior.
+- **E3 — real dataset integrations:** migrate one dataset per coherent patch using transparent
+  analysis-time reading and dataset-specific preparation where required.
+- **E4 — benchmark fixtures:** deterministic benchmark expectations and regression tolerances
+  linking synthetic and migrated datasets to estimator/path behavior.
 - **F1 — paper reproduction:** scripts and manifests for figures, tables, and paper-specific rank
-  and validation rules.
+  and validation rules; scripts still read `X` and `Y` visibly.
 - **F2 — release hardening:** clean-install/build tests, frozen reproduction tolerances, metadata,
   licensing audit, and release documentation.
 - **F3 — archival release:** tagged release, DOI/archive workflow, and manuscript repository
@@ -127,7 +129,8 @@ Use this order when sources disagree:
 
 1. explicit decisions from the project owner in the current request;
 2. accepted decision records under `docs/decisions/`;
-3. normative `.llm/mathematics.md`, `.llm/numerical_contracts.md`, and `.llm/public_api.md`;
+3. normative `.llm/mathematics.md`, `.llm/numerical_contracts.md`, `.llm/public_api.md`, and
+   `.llm/data_io.md`;
 4. source and tests as evidence of implemented behavior;
 5. this current-state handoff and `.llm/strategy.md`;
 6. `docs/publication_repository_plan.md` as the broad historical architecture and rationale.
@@ -146,9 +149,10 @@ From an uploaded snapshot, a maintainer should:
 3. read `.llm/decisions.md` and the decision records relevant to the requested increment;
 4. read the applicable mathematical, numerical, API, and development contracts;
 5. inspect the affected source and tests rather than trusting document claims alone;
-6. verify that the requested work is the current increment or that the owner explicitly changed
+6. read `.llm/data_io.md` for dataset, real-data, example, or reproduction work;
+7. verify that the requested work is the current increment or that the owner explicitly changed
    the order;
-7. return one root-relative unified Git patch, validation results, and exact direct Git commands.
+8. return one root-relative unified Git patch, validation results, and exact direct Git commands.
 
 Routine work should not require re-uploading the manuscript. Request external scientific material
 only when the repository contracts identify a genuine unresolved scientific choice.

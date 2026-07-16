@@ -17,7 +17,8 @@ Current navigation:
 - `decisions/0010-path-analysis-api.md`: accepted `PiPLSPathCV` boundary;
 - `decisions/0011-shared-selection-engine.md`: shared private search/evaluation architecture;
 - `decisions/0012-sklearn-api-alignment.md`: PLS-style estimator and path API contracts;
-- `decisions/0015-dataset-and-synthetic-api.md`: immutable dataset and synthetic-generator boundary;
+- `decisions/0015-dataset-and-synthetic-api.md`: optional dataset and synthetic-generator boundary;
+- `decisions/0016-transparent-data-ingestion.md`: explicit `X`/`Y` reading and no-loader boundary;
 - `decisions/0007-predictor-rank-search-policies.md`: accepted `"optimal"` versus adaptive
   `"auto"` semantics and the separate randomized-SVD policy;
 - `publication_repository_plan.md`: detailed revision-5 architecture, subject to later accepted

@@ -17,7 +17,7 @@
 - `.llm/strategy.md`
 - `.llm/project.md`
 - `.llm/decisions.md` and relevant full decision records
-- [relevant mathematical, numerical, API, and development contracts]
+- [relevant mathematical, numerical, API, data-I/O, and development contracts]
 - [relevant source, tests, and user-facing documentation]
 
 ## Acceptance criteria

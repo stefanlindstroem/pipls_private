@@ -20,7 +20,8 @@ This index is navigation, not a substitute for those records.
 | `0012-sklearn-api-alignment.md` | estimator and PLS compatibility | standard fitted surface plus structured Pi-PLS decomposition output |
 | `0013-sklearn-cleanup-boundary.md` | final pre-D2 scope | direct estimator or terminal-pipeline support and conditional delegation |
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
-| `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | immutable validated datasets plus local seeded latent-structure generation |
+| `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional immutable datasets plus local seeded latent-structure generation |
+| `0016-transparent-data-ingestion.md` | real-data and example boundary | users and examples read `X` and `Y` explicitly; no required registry or generic loader |
 
 ## Accepted clarifications after the original publication plan
 
@@ -39,7 +40,11 @@ plan contains an earlier or more general proposal:
 - repeated and partial-coverage OOF predictions are a documented Pi-PLS extension rather than a
   claim of exact `cross_val_predict` equivalence;
 - selection-conditioned validation reports are descriptive diagnostics, not unbiased nested-CV or
-  external-test estimates.
+  external-test estimates;
+- real-data users supply `X` and `Y` directly; metadata files, registry lookup, generic loaders,
+  and `PiPLSDataset` are not prerequisites for fitting;
+- examples and reproduction scripts show their data-reading and matrix-construction code rather
+  than relying on hidden utility functions.
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

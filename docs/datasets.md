@@ -1,7 +1,8 @@
 # Dataset interface and synthetic generator
 
-Phase E1 introduces the common in-memory dataset boundary. It does not download, convert, or
-bundle any research dataset.
+Phase E1 introduces an optional structured in-memory dataset boundary for package-owned
+synthetic data and experiments. Real-data users may pass ordinary arrays or data frames directly
+to `fit(X, Y)`; no container or metadata file is required.
 
 ## Validated dataset container
 
@@ -111,7 +112,9 @@ latent scores and noise are independent draws. No centering, standardization, im
 selection, or other fitted preprocessing is applied across the train/test boundary. The training
 block is unchanged when only `n_test` changes.
 
-## Scope boundary
+## Real-data boundary
 
-Phase E1 provides only in-memory validation and synthetic generation. Registry lookup, checksums,
-file loading, converters, downloads, and real-data migrations belong to Phases E2 and E3.
+Real-data reading remains user-owned. Examples and reproduction scripts must show how `X` and `Y`
+are read and formed directly using ordinary NumPy, pandas, or domain-specific code. The project may
+track preparation scripts, provenance, licenses, and checksums for its own datasets, but no public
+registry, generic loader, or required metadata sidecar is part of the runtime API.
