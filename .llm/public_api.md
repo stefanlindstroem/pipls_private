@@ -3,10 +3,12 @@
 ## Current top-level API
 
 ```python
-from pipls import PiPLSRegression
+from pipls import PiPLSPathCV, PiPLSRegression
 ```
 
-`PiPLSPathCV` is planned for a later phase and is not currently exported. Public scoring
+`PiPLSRegression` selects predictor rank for one fixed component count. `PiPLSPathCV` searches
+the admissible two-parameter surface and is the required route for arbitrary learned
+preprocessing inside the CV boundary. Public scoring
 callables are available from `pipls.metrics`:
 
 ```python
@@ -151,3 +153,26 @@ Cross-validated modes additionally expose:
 
 `response_scale_for_scoring_` is estimated from the data used to fit each estimator with
 `ddof=1`, independently of whether `scale` is true or false.
+
+
+## Path-analysis API
+
+`PiPLSPathCV` defaults to exhaustive `search_method="optimal"`. Adaptive
+`search_method="auto"` applies coarse-to-fine predictor-rank search independently for each
+`n_components` value. The admissible grid satisfies
+
+\[
+1 \le h \le \min(q,r_{\pi,\max}), \qquad h \le r_\pi \le r_{\pi,\max}.
+\]
+
+The class accepts a direct estimator or a composite estimator containing one
+`PiPLSRegression`. It clones and fits the complete estimator inside every fold and candidate. A
+unique nested Pi-PLS step is inferred; deeper composites use `pipls_param_prefix`.
+
+An explicit integer `max_predictor_rank` bypasses the samples-per-rank rule but remains capped
+by the smallest fold-safe algebraic dimension. The default `"rule"` mode uses the smallest
+training-fold size and the smallest predictor dimension reaching the Pi-PLS step.
+
+Public fitted attributes include standard search attributes (`cv_results_`, `best_params_`,
+`best_score_`, `best_estimator_`) plus conditional-path, surface, candidate-count, and search-
+method diagnostics documented in `docs/path_analysis.md`.

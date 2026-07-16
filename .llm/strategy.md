@@ -189,6 +189,11 @@ scikit-learn scorer orientation, and complete-pipeline cloning. Its search-polic
 mirror the established `"optimal"` and `"auto"` distinction rather than inventing a second set of
 meanings.
 
+Current status: **complete**. `PiPLSPathCV` is public, evaluates exhaustive or adaptive
+triangular paths, clones complete pipelines inside every fold, infers or validates the nested
+Pi-PLS parameter prefix, exposes standard and Pi-PLS-specific diagnostics, and refits the globally
+selected complete estimator.
+
 ### Phase D2: LOO and advanced split protocols
 
 Add ordered out-of-fold predictions, the documented LOO protocol, grouped and temporal examples,
@@ -207,10 +212,10 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-The next implementation patch should be **Phase D1: complete path analysis**. It should add
-`PiPLSPathCV` over the admissible triangular $(h,r_\pi)$ surface, reuse one materialized split set,
-fit preprocessing inside each training fold, mirror the established `"optimal"` and `"auto"`
-search vocabulary, and expose a refitted best estimator plus reconstructable path diagnostics.
+The next implementation patch should be **Phase D2: LOO and advanced split protocols**. It should
+add ordered out-of-fold predictions for the selected parameterization, explicit
+selection-conditioned LOO reporting, and tested grouped, repeated, predefined, and temporal split
+workflows without changing the Phase D1 selection contracts.
 
 ## Maintenance protocol
 

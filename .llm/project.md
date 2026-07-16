@@ -8,21 +8,21 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase C2d is implemented. `PiPLSRegression` now separates predictor-rank search policy from
-predictor linear algebra through `svd_solver={"full", "randomized", "auto"}` and a reproducible
-`random_state` contract. The automatic solver applies a conservative matrix-size and retained-rank
-rule, while the response-side and coupling SVDs remain exact.
+Phase D1 is implemented. `PiPLSPathCV` evaluates the admissible triangular
+`(n_components, predictor_rank)` surface, clones complete pipelines inside every fold, mirrors
+the established `"optimal"` and `"auto"` search policies, and exposes refitted best-estimator
+plus reconstructable path diagnostics.
 
-The next increment is Phase D1: `PiPLSPathCV` for the admissible triangular
-$(n_components, predictor_rank)$ surface using the established `"optimal"` and `"auto"` search
-vocabulary.
+The next increment is Phase D2: ordered out-of-fold predictions, Leave-One-Out reporting, and
+advanced split protocols.
 
 ## Planned responsibilities
 
 - `src/pipls/_core.py`: fixed-$(h,r_\pi)$ numerical core.
 - `src/pipls/_validation.py`: common parameter and array validation.
 - `src/pipls/regression.py`: `PiPLSRegression`.
-- `src/pipls/model_selection.py`: rank limits, private CV-selection primitives, and later `PiPLSPathCV`.
+- `src/pipls/model_selection.py`: rank limits and private CV-selection primitives.
+- `src/pipls/path.py`: pipeline-aware `PiPLSPathCV`.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `tests/unit/`: local behavior.
 - `tests/invariants/`: mathematical identities and subspace properties.

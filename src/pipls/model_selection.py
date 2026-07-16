@@ -65,6 +65,8 @@ def _materialize_cv_splits(
     cv: object,
     X: ArrayLike,
     y: ArrayLike,
+    *,
+    groups: ArrayLike | None = None,
 ) -> _MaterializedCV:
     """Materialize one validated set of CV splits for reuse by all candidates."""
 
@@ -83,7 +85,7 @@ def _materialize_cv_splits(
     splitter = check_cv(cv=cv, y=y_array, classifier=False)
     raw_splits = cast(
         Iterable[tuple[ArrayLike, ArrayLike]],
-        splitter.split(X_array, y_array),
+        splitter.split(X_array, y_array, groups),
     )
     splits: list[CVSplit] = []
     n_samples = int(X_array.shape[0])
