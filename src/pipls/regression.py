@@ -14,6 +14,7 @@ from sklearn.base import (
     MultiOutputMixin,
     RegressorMixin,
     TransformerMixin,
+    clone,
 )
 from sklearn.metrics import check_scoring, get_scorer, r2_score
 from sklearn.utils.validation import check_array, check_is_fitted
@@ -21,6 +22,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ._core import ResolvedSVDSolver, SVDSolver, fit_pipls_core
 from ._cv_engine import (
     _evaluate_candidate_batch,
+    _ordered_oof_predictions,
     _PiPLSCandidate,
     _PiPLSCandidateResult,
 )
@@ -30,14 +32,19 @@ from .exceptions import StatisticalSupportWarning
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
     _as_positive_float,
+    _is_leave_one_out_splits,
     _materialize_cv_splits,
+    _MaterializedCV,
     _max_predictor_rank,
+    _pooled_oof_r2,
     _predictor_rank_values,
     _rank_test_scores,
     _search_predictor_ranks,
     _select_predictor_rank,
     _training_response_scale,
+    _validate_singleton_fold_scoring,
 )
+from .validation import PiPLSValidationReport
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -95,6 +102,10 @@ class PiPLSRegression(
         Integer seed in $[0, 2^{32}-1]$ used by randomized SVD. The default makes
         ``"auto"`` and ``"randomized"`` reproducible. ``None`` is accepted only
         with ``svd_solver="full"``.
+    return_oof_predictions:
+        If true, refit the selected fixed parameterization on every CV training
+        fold and retain row-ordered validation predictions. Repeated validation
+        predictions are averaged and uncovered rows are marked with NaN.
     """
 
     def __init__(
@@ -110,6 +121,7 @@ class PiPLSRegression(
         n_jobs: int | None = None,
         svd_solver: SVDSolver = "auto",
         random_state: int | None = 0,
+        return_oof_predictions: bool = False,
     ) -> None:
         self.n_components = n_components
         self.scale = scale
@@ -121,8 +133,15 @@ class PiPLSRegression(
         self.n_jobs = n_jobs
         self.svd_solver = svd_solver
         self.random_state = random_state
+        self.return_oof_predictions = return_oof_predictions
 
-    def fit(self, X: ArrayLike, y: ArrayLike) -> PiPLSRegression:
+    def fit(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        *,
+        groups: ArrayLike | None = None,
+    ) -> PiPLSRegression:
         """Fit the Pi-PLS model and select predictor rank when requested."""
 
         self._validate_constructor_parameters()
@@ -151,13 +170,23 @@ class PiPLSRegression(
                 f"got n_components={self.n_components}, n_targets={self.n_targets_}."
             )
         self._clear_selection_attributes()
+        self._clear_validation_attributes()
 
-        if isinstance(self.predictor_rank, str) and self.predictor_rank in ("auto", "optimal"):
-            predictor_rank, max_predictor_rank = self._select_cross_validated_rank(
-                X_array,
-                y_array_raw,
-                search_method=self.predictor_rank,
+        materialized: _MaterializedCV | None = None
+        selection_conditioned = False
+        if isinstance(self.predictor_rank, str) and self.predictor_rank in (
+            "auto",
+            "optimal",
+        ):
+            predictor_rank, max_predictor_rank, materialized = (
+                self._select_cross_validated_rank(
+                    X_array,
+                    y_array_raw,
+                    search_method=self.predictor_rank,
+                    groups=groups,
+                )
             )
+            selection_conditioned = True
         else:
             max_predictor_rank = _max_predictor_rank(
                 n_features=self.n_features_in_,
@@ -165,13 +194,48 @@ class PiPLSRegression(
                 samples_per_predictor_rank=self.samples_per_predictor_rank,
             )
             predictor_rank = (
-                max_predictor_rank if self.predictor_rank == "max" else int(self.predictor_rank)
+                max_predictor_rank
+                if self.predictor_rank == "max"
+                else int(self.predictor_rank)
             )
 
         if self.n_components > predictor_rank:
             raise ValueError(
                 "n_components must satisfy n_components <= predictor_rank_; "
                 f"got n_components={self.n_components}, predictor_rank_={predictor_rank}."
+            )
+
+        if self.return_oof_predictions:
+            if materialized is None:
+                materialized = _materialize_cv_splits(
+                    _validated_cv(self.cv),
+                    X_array,
+                    y_array_raw,
+                    groups=groups,
+                )
+                _validate_singleton_fold_scoring(self.scoring, materialized.splits)
+            if predictor_rank > min(self.n_features_in_, materialized.n_train_min):
+                raise ValueError(
+                    "The selected fixed predictor rank is not algebraically valid in every "
+                    "CV training fold. Reduce predictor_rank or use a splitter with larger "
+                    "training folds."
+                )
+            self._store_validation_report(
+                X=X,
+                y=y,
+                materialized=materialized,
+                predictor_rank=predictor_rank,
+                selection_conditioned=selection_conditioned,
+                include_oof=True,
+            )
+        elif materialized is not None:
+            self._store_validation_report(
+                X=X,
+                y=y,
+                materialized=materialized,
+                predictor_rank=predictor_rank,
+                selection_conditioned=True,
+                include_oof=False,
             )
 
         self._fit_fixed_rank(
@@ -356,8 +420,15 @@ class PiPLSRegression(
         y: FloatArray,
         *,
         search_method: Literal["auto", "optimal"],
-    ) -> tuple[int, int]:
-        materialized = _materialize_cv_splits(_validated_cv(self.cv), X, y)
+        groups: ArrayLike | None,
+    ) -> tuple[int, int, _MaterializedCV]:
+        materialized = _materialize_cv_splits(
+            _validated_cv(self.cv),
+            X,
+            y,
+            groups=groups,
+        )
+        _validate_singleton_fold_scoring(self.scoring, materialized.splits)
         max_predictor_rank = _max_predictor_rank(
             n_features=self.n_features_in_,
             n_train_min=materialized.n_train_min,
@@ -491,7 +562,87 @@ class PiPLSRegression(
         self.best_response_standardized_mse_ = float(mean_mse[selected_index])
         self.n_splits_ = len(materialized.splits)
         self.cv_n_train_min_ = materialized.n_train_min
-        return selected_rank, max_predictor_rank
+        return selected_rank, max_predictor_rank, materialized
+
+    def _store_validation_report(
+        self,
+        *,
+        X: ArrayLike,
+        y: ArrayLike,
+        materialized: _MaterializedCV,
+        predictor_rank: int,
+        selection_conditioned: bool,
+        include_oof: bool,
+    ) -> None:
+        scorer = _resolve_scorer(self.scoring, self)
+        self.scorer_ = (
+            neg_response_standardized_mean_squared_error
+            if _uses_default_scoring(self.scoring)
+            else scorer
+        )
+        predictions: FloatArray | None = None
+        counts: IntArray | None = None
+        pooled_r2: float | None = None
+        if include_oof:
+            template = clone(self).set_params(return_oof_predictions=False)
+            oof = _ordered_oof_predictions(
+                candidate=_PiPLSCandidate(
+                    n_components=self.n_components,
+                    predictor_rank=predictor_rank,
+                ),
+                template=template,
+                n_components_key="n_components",
+                predictor_rank_key="predictor_rank",
+                scorer=scorer,
+                use_default_scoring=_uses_default_scoring(self.scoring),
+                X=X,
+                y=y,
+                splits=materialized.splits,
+                n_jobs=self.n_jobs,
+                parallel_preference="threads",
+            )
+            predictions = oof.predictions[:, 0] if self._y_was_1d else oof.predictions
+            counts = oof.prediction_counts
+            pooled_r2 = _pooled_oof_r2(y, predictions, counts)
+
+        if selection_conditioned:
+            mean_score = self.best_score_
+            mean_mse = self.best_response_standardized_mse_
+            estimate_kind: Literal[
+                "selection-conditioned",
+                "fixed-parameter",
+            ] = "selection-conditioned"
+        else:
+            assert include_oof
+            mean_score = float(np.mean(oof.split_scores))
+            mean_mse = float(np.mean(oof.split_response_standardized_mse))
+            estimate_kind = "fixed-parameter"
+
+        self.validation_report_ = PiPLSValidationReport(
+            n_components=self.n_components,
+            predictor_rank=predictor_rank,
+            n_splits=len(materialized.splits),
+            mean_test_score=mean_score,
+            mean_response_standardized_mse=mean_mse,
+            estimate_kind=estimate_kind,
+            is_leave_one_out=_is_leave_one_out_splits(
+                materialized.splits,
+                n_samples=int(np.asarray(y).shape[0]),
+            ),
+            oof_predictions=predictions,
+            oof_prediction_counts=counts,
+            pooled_oof_r2=pooled_r2,
+        )
+        if include_oof:
+            assert self.validation_report_.oof_predictions is not None
+            assert self.validation_report_.oof_prediction_counts is not None
+            self.oof_predictions_ = self.validation_report_.oof_predictions
+            self.oof_prediction_counts_ = self.validation_report_.oof_prediction_counts
+            self.pooled_oof_r2_ = self.validation_report_.pooled_oof_r2
+            self.oof_params_ = {
+                "n_components": self.n_components,
+                "predictor_rank": predictor_rank,
+            }
 
     def _fit_fixed_rank(
         self,
@@ -602,7 +753,12 @@ class PiPLSRegression(
         _validated_cv(self.cv)
         _validate_n_jobs(self.n_jobs)
         _validate_random_state(self.random_state, svd_solver=self.svd_solver)
-        if self.predictor_rank in ("auto", "optimal"):
+        if not isinstance(self.return_oof_predictions, (bool, np.bool_)):
+            raise ValueError(
+                "return_oof_predictions must be boolean; "
+                f"got {self.return_oof_predictions!r}."
+            )
+        if self.predictor_rank in ("auto", "optimal") or self.return_oof_predictions:
             _resolve_scorer(self.scoring, self)
         if uses_rank_rule and samples_per_rank < _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK:
             warnings.warn(
@@ -613,6 +769,17 @@ class PiPLSRegression(
                 StatisticalSupportWarning,
                 stacklevel=3,
             )
+
+    def _clear_validation_attributes(self) -> None:
+        for name in (
+            "validation_report_",
+            "oof_predictions_",
+            "oof_prediction_counts_",
+            "pooled_oof_r2_",
+            "oof_params_",
+        ):
+            if hasattr(self, name):
+                delattr(self, name)
 
     def _clear_selection_attributes(self) -> None:
         for name in (

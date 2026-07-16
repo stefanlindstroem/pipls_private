@@ -9,6 +9,7 @@ from typing import Any, Literal, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from sklearn.metrics import r2_score
 from sklearn.model_selection import check_cv
 
 FloatArray = NDArray[np.float64]
@@ -111,6 +112,63 @@ def _materialize_cv_splits(
         n_train_min=min(train.size for train, _ in splits),
     )
 
+
+
+def _is_leave_one_out_splits(
+    splits: tuple[CVSplit, ...],
+    *,
+    n_samples: int,
+) -> bool:
+    """Return whether splits form an ordered leave-one-out partition."""
+
+    if len(splits) != n_samples or any(validation.size != 1 for _, validation in splits):
+        return False
+    counts = np.zeros(n_samples, dtype=np.intp)
+    for _, validation in splits:
+        counts[validation] += 1
+    return bool(np.all(counts == 1))
+
+
+def _validate_singleton_fold_scoring(
+    scoring: object,
+    splits: tuple[CVSplit, ...],
+) -> None:
+    """Reject ordinary R2 scoring when any validation fold is a singleton."""
+
+    if not any(validation.size == 1 for _, validation in splits):
+        return
+    score_func = getattr(scoring, "_score_func", None)
+    if scoring is None or scoring == "r2" or score_func is r2_score:
+        raise ValueError(
+            "R2 scoring is undefined for singleton validation folds. Use "
+            "neg_response_standardized_mean_squared_error or another "
+            "singleton-safe scorer, and compute pooled OOF R2 only as a "
+            "secondary diagnostic."
+        )
+
+
+def _pooled_oof_r2(
+    y: ArrayLike,
+    predictions: ArrayLike,
+    counts: ArrayLike,
+) -> float | None:
+    """Return pooled R2 on rows with OOF coverage, or None if unavailable."""
+
+    y_array = np.asarray(y, dtype=np.float64)
+    prediction_array = np.asarray(predictions, dtype=np.float64)
+    count_array = np.asarray(counts, dtype=np.intp)
+    covered = count_array > 0
+    if int(np.sum(covered)) < 2:
+        return None
+    if y_array.ndim == 1 and prediction_array.ndim == 2:
+        prediction_array = prediction_array[:, 0]
+    return float(
+        r2_score(
+            y_array[covered],
+            prediction_array[covered],
+            multioutput="uniform_average",
+        )
+    )
 
 def _predictor_rank_values(*, n_components: int, max_predictor_rank: int) -> IntArray:
     """Return every admissible predictor rank for one fixed component count."""

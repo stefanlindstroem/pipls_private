@@ -8,20 +8,19 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase D1, the shared-selection refactor, and the public API-alignment increment are implemented.
-`PiPLSRegression` now follows PLS-style scikit-learn method, feature-name, output-container, and
-fitted-attribute conventions; `PiPLSPathCV` exposes the selected nested estimator and preserves
-indexable containers inside pipeline folds. Both selection interfaces reuse one private
-candidate-evaluation engine and one adaptive rank-search engine.
+Phase D2 is implemented. Both public interfaces accept grouped and other ordinary scikit-learn
+splitters, expose optional row-ordered OOF predictions with repeat counts and partial-coverage
+markers, reject foldwise R2 for singleton validation folds, and attach an immutable validation
+report that explicitly labels selection-conditioned estimates.
 
-The next increment is Phase D2: ordered out-of-fold predictions, Leave-One-Out reporting, and
-advanced split protocols.
+The next increment is Phase E: common-format datasets and the deterministic synthetic generator.
 
 ## Planned responsibilities
 
 - `src/pipls/_core.py`: fixed-$(h,r_\pi)$ numerical core.
 - `src/pipls/_cv_engine.py`: shared fold-local candidate evaluation and caching.
 - `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation.
+- `src/pipls/validation.py`: immutable CV and OOF reporting.
 - `src/pipls/decomposition.py`: public immutable Pi-PLS factorization result.
 - `src/pipls/regression.py`: `PiPLSRegression`.
 - `src/pipls/model_selection.py`: rank limits and shared rank-search orchestration.

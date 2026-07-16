@@ -60,6 +60,18 @@ class _PiPLSCandidateResult:
         return self.candidate.predictor_rank
 
 
+
+
+@dataclass(frozen=True)
+class _OOFResult:
+    """Ordered out-of-fold predictions for one fixed candidate."""
+
+    predictions: FloatArray
+    prediction_counts: NDArray[np.intp]
+    split_scores: FloatArray
+    split_response_standardized_mse: FloatArray
+
+
 CandidateCache = dict[tuple[int, int], _PiPLSCandidateResult]
 
 
@@ -183,3 +195,110 @@ def _evaluate_candidate(
         split_score_times=split_score_times,
         split_svd_solvers=tuple(split_svd_solvers),
     )
+
+def _ordered_oof_predictions(
+    *,
+    candidate: _PiPLSCandidate,
+    template: Any,
+    n_components_key: str,
+    predictor_rank_key: str,
+    scorer: Scorer | None,
+    use_default_scoring: bool,
+    X: ArrayLike,
+    y: ArrayLike,
+    splits: tuple[CVSplit, ...],
+    n_jobs: int | None,
+    parallel_preference: ParallelPreference = None,
+) -> _OOFResult:
+    """Fit one fixed candidate on each split and return row-ordered predictions.
+
+    Rows validated more than once are averaged. Rows never used for validation are
+    filled with NaN and have a zero entry in ``prediction_counts``.
+    """
+
+    params = {
+        n_components_key: candidate.n_components,
+        predictor_rank_key: candidate.predictor_rank,
+    }
+    split_results = cast(
+        list[tuple[NDArray[np.intp], FloatArray, float, float]],
+        Parallel(n_jobs=n_jobs, prefer=parallel_preference)(
+            delayed(_fit_predict_split)(
+                template=template,
+                params=params,
+                scorer=scorer,
+                use_default_scoring=use_default_scoring,
+                X=X,
+                y=y,
+                train=train,
+                validation=validation,
+            )
+            for train, validation in splits
+        ),
+    )
+
+    y_array = np.asarray(y)
+    n_samples = int(y_array.shape[0])
+    n_targets = 1 if y_array.ndim == 1 else int(y_array.shape[1])
+    prediction_sum = np.zeros((n_samples, n_targets), dtype=np.float64)
+    prediction_counts = np.zeros(n_samples, dtype=np.intp)
+    split_scores = np.empty(len(split_results), dtype=np.float64)
+    split_mse = np.empty(len(split_results), dtype=np.float64)
+
+    for split_index, (validation, prediction, score, mse) in enumerate(split_results):
+        prediction_sum[validation] += prediction
+        prediction_counts[validation] += 1
+        split_scores[split_index] = score
+        split_mse[split_index] = mse
+
+    predictions = np.full((n_samples, n_targets), np.nan, dtype=np.float64)
+    covered = prediction_counts > 0
+    predictions[covered] = (
+        prediction_sum[covered] / prediction_counts[covered, None]
+    )
+    return _OOFResult(
+        predictions=predictions,
+        prediction_counts=prediction_counts,
+        split_scores=split_scores,
+        split_response_standardized_mse=split_mse,
+    )
+
+
+def _fit_predict_split(
+    *,
+    template: Any,
+    params: dict[str, int],
+    scorer: Scorer | None,
+    use_default_scoring: bool,
+    X: ArrayLike,
+    y: ArrayLike,
+    train: NDArray[np.intp],
+    validation: NDArray[np.intp],
+) -> tuple[NDArray[np.intp], FloatArray, float, float]:
+    """Fit and predict one split for ordered OOF aggregation."""
+
+    estimator = clone(template).set_params(**params)
+    X_train = _safe_indexing(X, train)
+    y_train = _safe_indexing(y, train)
+    X_validation = _safe_indexing(X, validation)
+    y_validation = _safe_indexing(y, validation)
+    estimator.fit(X_train, y_train)
+    prediction = np.asarray(estimator.predict(X_validation), dtype=np.float64)
+    if prediction.ndim == 1:
+        prediction = prediction.reshape(-1, 1)
+    mse = _response_standardized_mse(
+        y_validation,
+        prediction,
+        _training_response_scale(y_train),
+    )
+    if use_default_scoring:
+        score = -mse
+    else:
+        assert scorer is not None
+        score = float(scorer(estimator, X_validation, y_validation))
+        if not np.isfinite(score):
+            raise ValueError(
+                "The scoring callable returned a nonfinite value while generating "
+                "out-of-fold predictions."
+            )
+    return validation.copy(), prediction, score, mse

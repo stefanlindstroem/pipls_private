@@ -95,3 +95,12 @@ are:
 
 A positive integer fixes the predictor rank and bypasses the rule-derived bound, while remaining
 subject to dimensional and numerical-rank validation in the fixed core.
+
+
+## Groups, OOF predictions, and validation reports
+
+`PiPLSRegression.fit(X, y, groups=groups)` passes groups to its internal splitter. With
+`return_oof_predictions=True`, the selected fixed rank is refitted on the same materialized
+training folds and produces row-ordered `oof_predictions_` plus per-row counts. Automatic and
+optimal rank reports are labeled selection-conditioned; explicit integer and rule-fixed ranks are
+labeled fixed-parameter. Singleton validation folds reject ordinary R2 scoring.

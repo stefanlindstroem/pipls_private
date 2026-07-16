@@ -10,7 +10,9 @@ Current navigation:
   roadmap;
 - `estimator_api.md`: current `PiPLSRegression` interface;
 - `path_analysis.md`: pipeline-aware joint path search and diagnostics;
+- `cross_validation.md`: grouped, repeated, predefined, temporal, LOO, and OOF contracts;
 - `preprocessing.md`: preprocessing semantics;
+- `decisions/0005-leave-one-out-protocol.md`: implemented LOO and OOF reporting contract;
 - `decisions/0010-path-analysis-api.md`: accepted `PiPLSPathCV` boundary;
 - `decisions/0011-shared-selection-engine.md`: shared private search/evaluation architecture;
 - `decisions/0012-sklearn-api-alignment.md`: PLS-style estimator and path API contracts;

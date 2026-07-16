@@ -79,3 +79,11 @@ For rule-based rank modes, `samples_per_predictor_rank < 5` emits
 `pipls.StatisticalSupportWarning`. Such settings are permitted, but the resulting rank bound may
 not have sufficient statistical support to be trusted without external validation. An explicit
 integer rank bypasses this rule and does not emit the warning.
+
+
+## Cross-validation metadata and reporting
+
+The fit signature accepts keyword-only `groups` for group-aware internal CV.
+`return_oof_predictions=True` requests an additional fixed-parameter OOF pass after selection and
+attaches `PiPLSValidationReport` at `validation_report_`. For repeated splitters, predictions are
+averaged; for partial-coverage splitters, uncovered rows contain NaN.

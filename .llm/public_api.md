@@ -3,7 +3,7 @@
 ## Current top-level API
 
 ```python
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSPathCV, PiPLSRegression, PiPLSValidationReport
 ```
 
 `PiPLSRegression` selects predictor rank for one fixed component count. `PiPLSPathCV` searches
@@ -192,3 +192,21 @@ factorization arrays exposed directly on the estimator are read-only identity al
 `decomposition_`. Cross-validated modes accept `cv=None` and `scoring=None`, expose `scorer_`, and
 report standard fit/score timings. `PiPLSPathCV` supports a direct estimator or a `Pipeline` ending
 in `PiPLSRegression`; delegated transformer methods are conditional on the selected estimator.
+
+
+## D2 advanced validation contract
+
+Both public `fit` methods accept keyword-only `groups`, which is consumed by group-aware splitters
+and participates in scikit-learn metadata routing. Split policy is supplied through ordinary
+`RepeatedKFold`, `PredefinedSplit`, `GroupKFold`, `TimeSeriesSplit`, `LeaveOneOut`, or explicit
+indices; the numerical core has no special split branch.
+
+`return_oof_predictions=False` is the default. When true, the selected fixed parameterization is
+refitted on every materialized training fold. `oof_predictions_` retains original row order,
+`oof_prediction_counts_` records repeated or absent validation, `oof_params_` identifies the
+parameterization, and `pooled_oof_r2_` is a secondary diagnostic on covered rows. Uncovered rows
+contain NaN.
+
+`validation_report_` is an immutable `PiPLSValidationReport`. Automatic/optimal regression and all
+path results use `estimate_kind="selection-conditioned"`; fixed/rule-derived regression OOF
+results use `"fixed-parameter"`. Foldwise R2 is rejected whenever a validation fold has one row.

@@ -25,6 +25,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._cv_engine import (
     _evaluate_candidate_batch,
+    _ordered_oof_predictions,
     _PiPLSCandidate,
     _PiPLSCandidateResult,
 )
@@ -33,13 +34,17 @@ from .exceptions import StatisticalSupportWarning
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
     _as_positive_float,
+    _is_leave_one_out_splits,
     _materialize_cv_splits,
     _max_predictor_rank,
+    _pooled_oof_r2,
     _rank_test_scores,
     _search_predictor_ranks,
     _validate_positive_int,
+    _validate_singleton_fold_scoring,
 )
 from .regression import PiPLSRegression
+from .validation import PiPLSValidationReport
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -114,6 +119,10 @@ class PiPLSPathCV(
         Refit the globally selected pair on all supplied data.
     n_jobs:
         Joblib parallelism across candidate pairs within each evaluation batch.
+    return_oof_predictions:
+        If true, fit the selected fixed parameterization on every training fold
+        and retain row-ordered validation predictions. Repeated predictions are
+        averaged and rows never validated are marked with NaN.
     """
 
     def __init__(
@@ -130,6 +139,7 @@ class PiPLSPathCV(
         scoring: Scoring = _DEFAULT_SCORING,
         refit: bool = True,
         n_jobs: int | None = None,
+        return_oof_predictions: bool = False,
     ) -> None:
         self.estimator = estimator
         self.pipls_param_prefix = pipls_param_prefix
@@ -142,6 +152,7 @@ class PiPLSPathCV(
         self.scoring = scoring
         self.refit = refit
         self.n_jobs = n_jobs
+        self.return_oof_predictions = return_oof_predictions
 
     def fit(
         self,
@@ -153,6 +164,7 @@ class PiPLSPathCV(
         """Evaluate the path and optionally refit the globally selected pair."""
 
         self._validate_constructor_parameters()
+        self._clear_validation_attributes()
         validated = _validate_estimator_data(
             self,
             X,
@@ -180,7 +192,13 @@ class PiPLSPathCV(
         n_components_key, predictor_rank_key = _pipls_parameter_keys(
             self.pipls_param_prefix_
         )
+        return_oof_key = _pipls_parameter_key(
+            self.pipls_param_prefix_,
+            "return_oof_predictions",
+        )
+        template = clone(template).set_params(**{return_oof_key: False})
         materialized = _materialize_cv_splits(self.cv, X_array, y_array, groups=groups)
+        _validate_singleton_fold_scoring(self.scoring, materialized.splits)
         self.n_splits_ = len(materialized.splits)
         self.cv_n_train_min_ = materialized.n_train_min
 
@@ -340,6 +358,52 @@ class PiPLSPathCV(
             "n_components": self.best_n_components_,
             "predictor_rank": self.best_predictor_rank_,
         }
+        predictions: FloatArray | None = None
+        counts: IntArray | None = None
+        pooled_r2: float | None = None
+        if self.return_oof_predictions:
+            oof = _ordered_oof_predictions(
+                candidate=_PiPLSCandidate(
+                    n_components=self.best_n_components_,
+                    predictor_rank=self.best_predictor_rank_,
+                ),
+                template=template,
+                n_components_key=n_components_key,
+                predictor_rank_key=predictor_rank_key,
+                scorer=scorer,
+                use_default_scoring=_uses_default_path_scoring(self.scoring),
+                X=X_indexable,
+                y=y_indexable,
+                splits=materialized.splits,
+                n_jobs=self.n_jobs,
+            )
+            predictions = oof.predictions[:, 0] if y_array.ndim == 1 else oof.predictions
+            counts = oof.prediction_counts
+            pooled_r2 = _pooled_oof_r2(y_indexable, predictions, counts)
+
+        self.validation_report_ = PiPLSValidationReport(
+            n_components=self.best_n_components_,
+            predictor_rank=self.best_predictor_rank_,
+            n_splits=self.n_splits_,
+            mean_test_score=self.best_score_,
+            mean_response_standardized_mse=self.best_response_standardized_mse_,
+            estimate_kind="selection-conditioned",
+            is_leave_one_out=_is_leave_one_out_splits(
+                materialized.splits,
+                n_samples=int(y_array.shape[0]),
+            ),
+            oof_predictions=predictions,
+            oof_prediction_counts=counts,
+            pooled_oof_r2=pooled_r2,
+        )
+        if self.return_oof_predictions:
+            assert self.validation_report_.oof_predictions is not None
+            assert self.validation_report_.oof_prediction_counts is not None
+            self.oof_predictions_ = self.validation_report_.oof_predictions
+            self.oof_prediction_counts_ = self.validation_report_.oof_prediction_counts
+            self.pooled_oof_r2_ = self.validation_report_.pooled_oof_r2
+            self.oof_params_ = self.best_params_.copy()
+
         if self.refit:
             refit_started = perf_counter()
             self.best_estimator_ = clone(template).set_params(**self.best_params_)
@@ -475,6 +539,17 @@ class PiPLSPathCV(
             )
         return self.best_estimator_
 
+    def _clear_validation_attributes(self) -> None:
+        for name in (
+            "validation_report_",
+            "oof_predictions_",
+            "oof_prediction_counts_",
+            "pooled_oof_r2_",
+            "oof_params_",
+        ):
+            if hasattr(self, name):
+                delattr(self, name)
+
     def _validate_constructor_parameters(self) -> None:
         if self.estimator is not None:
             _validate_supported_estimator(self.estimator)
@@ -486,6 +561,11 @@ class PiPLSPathCV(
             raise ValueError('search_method must be "optimal" or "auto".')
         if not isinstance(self.refit, (bool, np.bool_)):
             raise ValueError(f"refit must be boolean; got {self.refit!r}.")
+        if not isinstance(self.return_oof_predictions, (bool, np.bool_)):
+            raise ValueError(
+                "return_oof_predictions must be boolean; "
+                f"got {self.return_oof_predictions!r}."
+            )
         samples_per_rank = _as_positive_float(
             self.samples_per_predictor_rank,
             name="samples_per_predictor_rank",
@@ -564,6 +644,11 @@ def _pipls_parameter_keys(prefix: str) -> tuple[str, str]:
         f"{prefix}{separator}n_components",
         f"{prefix}{separator}predictor_rank",
     )
+
+
+def _pipls_parameter_key(prefix: str, parameter: str) -> str:
+    separator = "__" if prefix else ""
+    return f"{prefix}{separator}{parameter}"
 
 
 def _extract_fitted_pipls(estimator: Any, prefix: str) -> PiPLSRegression:

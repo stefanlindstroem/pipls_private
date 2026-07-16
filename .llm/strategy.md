@@ -226,6 +226,11 @@ path folds are implemented and tested.
 Add ordered out-of-fold predictions, the documented LOO protocol, grouped and temporal examples,
 and explicit selection-conditioned reporting.
 
+Current status: **complete**. Both public interfaces support group metadata, ordinary repeated,
+predefined, temporal, and LOO splitters, optional row-ordered OOF predictions with repeat counts
+and partial coverage, singleton-safe scoring rules, pooled OOF R2 diagnostics, and immutable
+selection-conditioned validation reports.
+
 ### Phase E: datasets and synthetic generator
 
 Add the common dataset schema, generic loader, deterministic converters, provenance and licensing
@@ -239,10 +244,9 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-The next implementation patch should be **Phase D2: LOO and advanced split protocols**. It should
-add ordered out-of-fold predictions for the selected parameterization, explicit
-selection-conditioned LOO reporting, and tested grouped, repeated, predefined, and temporal split
-workflows without changing the Phase D1 selection contracts.
+The next implementation patch should be **Phase E1: common dataset schema and synthetic
+generator**. It should introduce the generic loader/schema boundary and a deterministic,
+side-effect-free synthetic generator before migrating real datasets.
 
 ## Maintenance protocol
 

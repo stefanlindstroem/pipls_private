@@ -105,3 +105,13 @@ differ from the R2 returned by `score`. `cv=None` requests standard five-fold re
 
 With `refit=False`, path diagnostics remain available but `predict`, `transform`, and
 `score` are disabled.
+
+
+## Advanced splitters and OOF output
+
+`fit(X, y, groups=groups)` supports group-aware splitters. Repeated, predefined, temporal, and
+leave-one-out protocols use their ordinary scikit-learn splitter objects. Set
+`return_oof_predictions=True` to expose `oof_predictions_`, `oof_prediction_counts_`,
+`oof_params_`, `pooled_oof_r2_`, and the immutable `validation_report_`. Repeated predictions are
+averaged; uncovered rows remain NaN. Path validation reports are explicitly
+`selection-conditioned`. See `cross_validation.md`.
