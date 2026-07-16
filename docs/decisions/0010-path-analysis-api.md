@@ -6,9 +6,9 @@ Accepted and implemented.
 
 ## Decision
 
-`PiPLSPathCV` is the public two-parameter search layer. Its default `"optimal"` mode
-evaluates the complete admissible triangular surface. Its `"auto"` mode applies the
-established adaptive predictor-rank search independently for each component count.
+`PiPLSPathCV` is the public two-parameter search layer. Its default `"auto"` mode
+applies the established adaptive predictor-rank search independently for each component count. Its `"optimal"` mode evaluates the complete
+admissible triangular surface.
 
 The complete estimator or pipeline is cloned inside every training fold and candidate fit.
 A unique nested `PiPLSRegression` is inferred, while deeper composites use an explicit

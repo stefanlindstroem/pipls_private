@@ -4,28 +4,27 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable
-from dataclasses import dataclass
 from typing import Any, Literal, cast
 
 import numpy as np
-from joblib import Parallel, delayed
 from numpy.typing import ArrayLike, NDArray
 from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
 from sklearn.metrics import get_scorer, r2_score
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 from ._core import ResolvedSVDSolver, SVDSolver, fit_pipls_core
+from ._cv_engine import (
+    _evaluate_candidate_batch,
+    _PiPLSCandidate,
+    _PiPLSCandidateResult,
+)
 from .exceptions import StatisticalSupportWarning
-from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
-    _ADAPTIVE_EXHAUSTIVE_THRESHOLD,
-    _adaptive_refinement_interval,
     _as_positive_float,
-    _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
     _max_predictor_rank,
     _predictor_rank_values,
-    _response_standardized_mse,
+    _search_predictor_ranks,
     _select_predictor_rank,
     _training_response_scale,
 )
@@ -36,16 +35,6 @@ Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 _DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
-
-
-@dataclass(frozen=True)
-class _CandidateCVResult:
-    """Cross-validation results for one predictor-rank candidate."""
-
-    predictor_rank: int
-    split_scores: FloatArray
-    split_response_standardized_mse: FloatArray
-    split_svd_solvers: tuple[ResolvedSVDSolver, ...]
 
 
 class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type: ignore[misc]
@@ -256,92 +245,73 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             max_predictor_rank=max_predictor_rank,
         )
         scorer = _resolve_scorer(self.scoring)
-        cache: dict[int, _CandidateCVResult] = {}
+        cache: dict[tuple[int, int], _PiPLSCandidateResult] = {}
         evaluation_order: list[int] = []
-        search_history: list[IntArray] = []
 
-        def evaluate(ranks: IntArray) -> None:
-            pending = np.asarray(
-                sorted({int(rank) for rank in ranks if int(rank) not in cache}),
-                dtype=np.intp,
+        def evaluate(ranks: IntArray) -> IntArray:
+            candidates = tuple(
+                _PiPLSCandidate(
+                    n_components=self.n_components,
+                    predictor_rank=int(rank),
+                )
+                for rank in ranks
             )
-            if pending.size == 0:
-                return
-            evaluations = _evaluate_predictor_ranks(
-                predictor_ranks=pending,
-                n_components=self.n_components,
-                scale=bool(self.scale),
-                copy=bool(self.copy),
-                samples_per_predictor_rank=self.samples_per_predictor_rank,
+            evaluated = _evaluate_candidate_batch(
+                candidates=candidates,
+                cache=cache,
+                template=self,
+                n_components_key="n_components",
+                predictor_rank_key="predictor_rank",
                 scorer=scorer,
+                use_default_scoring=_uses_default_scoring(self.scoring),
                 X=X,
                 y=y,
                 splits=materialized.splits,
                 n_jobs=self.n_jobs,
-                svd_solver=self.svd_solver,
-                random_state=self.random_state,
+                solver_getter=_regression_solver,
+                parallel_preference="threads",
             )
-            for result in evaluations:
-                cache[result.predictor_rank] = result
-                evaluation_order.append(result.predictor_rank)
-            search_history.append(pending.copy())
-
-        lower = int(admissible_ranks[0])
-        upper = int(admissible_ranks[-1])
-        if search_method == "optimal" or admissible_ranks.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
-            evaluate(admissible_ranks)
-            final_interval = (lower, upper)
-        else:
-            evaluate(
-                _logarithmic_predictor_rank_values(
-                    lower=lower,
-                    upper=upper,
-                )
+            evaluated_ranks = np.asarray(
+                [candidate.predictor_rank for candidate in evaluated],
+                dtype=np.intp,
             )
-            while True:
-                evaluated_ranks, mean_scores = _cached_mean_scores(cache)
-                interval_lower, interval_upper = _adaptive_refinement_interval(
-                    evaluated_ranks,
-                    -mean_scores,
-                )
-                interval_values = np.arange(
-                    interval_lower,
-                    interval_upper + 1,
-                    dtype=np.intp,
-                )
-                missing = np.asarray(
-                    [rank for rank in interval_values if int(rank) not in cache],
-                    dtype=np.intp,
-                )
-                if interval_values.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
-                    evaluate(missing)
-                    final_interval = (interval_lower, interval_upper)
-                    break
+            evaluation_order.extend(int(rank) for rank in evaluated_ranks)
+            return evaluated_ranks
 
-                proposed = _logarithmic_predictor_rank_values(
-                    lower=interval_lower,
-                    upper=interval_upper,
-                )
-                missing = np.asarray(
-                    [rank for rank in proposed if int(rank) not in cache],
-                    dtype=np.intp,
-                )
-                if missing.size == 0:
-                    unevaluated = np.asarray(
-                        [rank for rank in interval_values if int(rank) not in cache],
-                        dtype=np.intp,
-                    )
-                    if unevaluated.size == 0:
-                        final_interval = (interval_lower, interval_upper)
-                        break
-                    missing = unevaluated[unevaluated.size // 2 : unevaluated.size // 2 + 1]
-                evaluate(missing)
+        def evaluated_scores() -> tuple[IntArray, FloatArray]:
+            ranks = np.asarray(
+                sorted(
+                    predictor_rank
+                    for n_components, predictor_rank in cache
+                    if n_components == self.n_components
+                ),
+                dtype=np.intp,
+            )
+            scores = np.asarray(
+                [
+                    np.mean(cache[(self.n_components, int(rank))].split_scores)
+                    for rank in ranks
+                ],
+                dtype=np.float64,
+            )
+            return ranks, scores
 
-        predictor_rank_values = np.asarray(sorted(cache), dtype=np.intp)
-        evaluations = [cache[int(rank)] for rank in predictor_rank_values]
+        search = _search_predictor_ranks(
+            allowed_ranks=admissible_ranks,
+            search_method=search_method,
+            evaluate=evaluate,
+            evaluated_scores=evaluated_scores,
+        )
+
+        predictor_rank_values, mean_scores = evaluated_scores()
+        evaluations = [
+            cache[(self.n_components, int(rank))]
+            for rank in predictor_rank_values
+        ]
         split_scores = np.vstack([result.split_scores for result in evaluations])
-        split_mse = np.vstack([result.split_response_standardized_mse for result in evaluations])
-        mean_scores = np.mean(split_scores, axis=1)
+        split_mse = np.vstack(
+            [result.split_response_standardized_mse for result in evaluations]
+        )
         mean_mse = np.mean(split_mse, axis=1)
         selected_rank, _ = _select_predictor_rank(
             predictor_rank_values,
@@ -354,7 +324,9 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             evaluation_order,
             dtype=np.intp,
         )
-        self.predictor_rank_search_history_ = tuple(batch.copy() for batch in search_history)
+        self.predictor_rank_search_history_ = tuple(
+            batch.copy() for batch in search.history
+        )
         self.predictor_rank_cv_svd_solvers_ = {
             result.predictor_rank: result.split_svd_solvers for result in evaluations
         }
@@ -365,7 +337,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         )
         self.predictor_rank_search_method_ = search_method
         self.predictor_rank_search_interval_ = np.asarray(
-            final_interval,
+            search.final_interval,
             dtype=np.intp,
         )
         self.n_predictor_rank_candidates_ = int(admissible_ranks.size)
@@ -515,102 +487,16 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
                 delattr(self, name)
 
 
-def _evaluate_predictor_ranks(
-    *,
-    predictor_ranks: IntArray,
-    n_components: int,
-    scale: bool,
-    copy: bool,
-    samples_per_predictor_rank: float,
-    scorer: Scorer,
-    X: FloatArray,
-    y: FloatArray,
-    splits: tuple[tuple[IntArray, IntArray], ...],
-    n_jobs: int | None,
-    svd_solver: SVDSolver,
-    random_state: int | None,
-) -> list[_CandidateCVResult]:
-    return cast(
-        list[_CandidateCVResult],
-        Parallel(n_jobs=n_jobs, prefer="threads")(
-            delayed(_evaluate_predictor_rank)(
-                predictor_rank=int(predictor_rank),
-                n_components=n_components,
-                scale=scale,
-                copy=copy,
-                samples_per_predictor_rank=samples_per_predictor_rank,
-                scorer=scorer,
-                X=X,
-                y=y,
-                splits=splits,
-                svd_solver=svd_solver,
-                random_state=random_state,
-            )
-            for predictor_rank in predictor_ranks
-        ),
-    )
+def _regression_solver(estimator: Any) -> ResolvedSVDSolver:
+    """Return the resolved predictor solver from a fitted Pi-PLS estimator."""
+
+    return cast(ResolvedSVDSolver, estimator.svd_solver_)
 
 
-def _cached_mean_scores(
-    cache: dict[int, _CandidateCVResult],
-) -> tuple[IntArray, FloatArray]:
-    ranks = np.asarray(sorted(cache), dtype=np.intp)
-    scores = np.asarray(
-        [np.mean(cache[int(rank)].split_scores) for rank in ranks],
-        dtype=np.float64,
-    )
-    return ranks, scores
+def _uses_default_scoring(scoring: str | Scorer) -> bool:
+    """Return whether the shared default response-standardized scorer is requested."""
 
-
-def _evaluate_predictor_rank(
-    *,
-    predictor_rank: int,
-    n_components: int,
-    scale: bool,
-    copy: bool,
-    samples_per_predictor_rank: float,
-    scorer: Scorer,
-    X: FloatArray,
-    y: FloatArray,
-    splits: tuple[tuple[IntArray, IntArray], ...],
-    svd_solver: SVDSolver,
-    random_state: int | None,
-) -> _CandidateCVResult:
-    split_scores = np.empty(len(splits), dtype=np.float64)
-    split_mse = np.empty(len(splits), dtype=np.float64)
-    split_svd_solvers: list[ResolvedSVDSolver] = []
-    for split_index, (train, validation) in enumerate(splits):
-        model = PiPLSRegression(
-            n_components=n_components,
-            scale=scale,
-            copy=copy,
-            predictor_rank=predictor_rank,
-            samples_per_predictor_rank=samples_per_predictor_rank,
-            svd_solver=svd_solver,
-            random_state=random_state,
-        )
-        y_train = y[train]
-        model.fit(X[train], y_train)
-        y_prediction = model.predict(X[validation])
-        split_svd_solvers.append(model.svd_solver_)
-        score = float(scorer(model, X[validation], y[validation]))
-        if not np.isfinite(score):
-            raise ValueError(
-                "The scoring callable returned a nonfinite value for "
-                f"predictor_rank={predictor_rank}, split={split_index}."
-            )
-        split_scores[split_index] = score
-        split_mse[split_index] = _response_standardized_mse(
-            y[validation],
-            y_prediction,
-            _training_response_scale(y_train),
-        )
-    return _CandidateCVResult(
-        predictor_rank=predictor_rank,
-        split_scores=split_scores,
-        split_response_standardized_mse=split_mse,
-        split_svd_solvers=tuple(split_svd_solvers),
-    )
+    return isinstance(scoring, str) and scoring == _DEFAULT_SCORING
 
 
 def _cv_results_dictionary(
@@ -640,10 +526,10 @@ def _cv_results_dictionary(
     return results
 
 
-def _resolve_scorer(scoring: str | Scorer) -> Scorer:
+def _resolve_scorer(scoring: str | Scorer) -> Scorer | None:
     if isinstance(scoring, str):
         if scoring == _DEFAULT_SCORING:
-            return neg_response_standardized_mean_squared_error
+            return None
         try:
             return cast(Scorer, get_scorer(scoring))
         except ValueError as error:

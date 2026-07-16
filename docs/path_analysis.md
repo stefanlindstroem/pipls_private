@@ -18,7 +18,6 @@ from pipls import PiPLSPathCV
 search = PiPLSPathCV(
     samples_per_predictor_rank=10,
     cv=5,
-    search_method="optimal",
     n_jobs=-1,
 )
 search.fit(X, Y)
@@ -28,7 +27,8 @@ print(search.best_predictor_rank_by_n_components_)
 Y_pred = search.predict(X_new)
 ```
 
-`search_method="optimal"` is the default and evaluates every admissible pair.
+`search_method="auto"` is the default and performs adaptive search. Set
+`search_method="optimal"` to evaluate every admissible pair.
 `search_method="auto"` performs deterministic logarithmic coarse-to-fine predictor-rank
 search independently for each `n_components` value and may skip candidates.
 

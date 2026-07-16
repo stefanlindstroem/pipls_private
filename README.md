@@ -50,7 +50,7 @@ For the complete two-parameter surface or custom learned preprocessing:
 ```python
 from pipls import PiPLSPathCV
 
-search = PiPLSPathCV(cv=5, search_method="optimal")
+search = PiPLSPathCV(cv=5)
 search.fit(X_train, Y_train)
 print(search.best_params_)
 ```

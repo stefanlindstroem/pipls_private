@@ -29,15 +29,17 @@ resolve the discrepancy explicitly rather than silently choosing one.
 1. Work in small increments that can be tested and committed independently.
 2. Port trusted behavior before adding convenience features.
 3. Keep the fixed-parameter numerical core separate from estimator and model-selection layers.
-4. Add focused tests with every behavioral change.
-5. Compare subspaces, regression maps, and predictions rather than raw singular-vector signs.
-6. Fit every learned preprocessing operation inside the corresponding training fold.
-7. Keep paper-specific orchestration explicit and separate from general estimator defaults.
-8. Update the relevant `.llm` contract and user-facing documentation when a contract changes.
-9. Return one root-relative Git patch per increment with an explicit validation report.
-10. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
+4. Route public rank and path searches through shared private candidate-evaluation and
+   rank-search engines.
+5. Add focused tests with every behavioral change.
+6. Compare subspaces, regression maps, and predictions rather than raw singular-vector signs.
+7. Fit every learned preprocessing operation inside the corresponding training fold.
+8. Keep paper-specific orchestration explicit and separate from general estimator defaults.
+9. Update the relevant `.llm` contract and user-facing documentation when a contract changes.
+10. Return one root-relative Git patch per increment with an explicit validation report.
+11. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
     for patch application or committing.
-11. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
+12. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
     one patch unless the dependency cannot be separated.
 
 ## Fixed architectural decisions
@@ -193,6 +195,18 @@ Current status: **complete**. `PiPLSPathCV` is public, evaluates exhaustive or a
 triangular paths, clones complete pipelines inside every fold, infers or validates the nested
 Pi-PLS parameter prefix, exposes standard and Pi-PLS-specific diagnostics, and refits the globally
 selected complete estimator.
+
+### Phase D1a: shared private selection engine
+
+Extract fold-level candidate evaluation and one-dimensional rank-search orchestration so
+`PiPLSRegression` and `PiPLSPathCV` share the same private machinery without making either
+public class wrap the other. Add equivalence tests showing that one fixed path row matches the
+corresponding estimator rank search.
+
+Current status: **complete**. Candidate cloning, fold-local fitting, scoring, standardized loss,
+caching, and optional solver diagnostics are centralized in `_cv_engine.py`; exhaustive and
+adaptive rank refinement are centralized in `model_selection.py`; and public equivalence tests
+protect the shared behavior.
 
 ### Phase D2: LOO and advanced split protocols
 

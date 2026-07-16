@@ -8,10 +8,9 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase D1 is implemented. `PiPLSPathCV` evaluates the admissible triangular
-`(n_components, predictor_rank)` surface, clones complete pipelines inside every fold, mirrors
-the established `"optimal"` and `"auto"` search policies, and exposes refitted best-estimator
-plus reconstructable path diagnostics.
+Phase D1 and the shared-selection refactor are implemented. `PiPLSPathCV` evaluates the
+admissible triangular `(n_components, predictor_rank)` surface, while both public selection
+interfaces reuse one private candidate-evaluation engine and one adaptive rank-search engine.
 
 The next increment is Phase D2: ordered out-of-fold predictions, Leave-One-Out reporting, and
 advanced split protocols.
@@ -19,9 +18,10 @@ advanced split protocols.
 ## Planned responsibilities
 
 - `src/pipls/_core.py`: fixed-$(h,r_\pi)$ numerical core.
+- `src/pipls/_cv_engine.py`: shared fold-local candidate evaluation and caching.
 - `src/pipls/_validation.py`: common parameter and array validation.
 - `src/pipls/regression.py`: `PiPLSRegression`.
-- `src/pipls/model_selection.py`: rank limits and private CV-selection primitives.
+- `src/pipls/model_selection.py`: rank limits and shared rank-search orchestration.
 - `src/pipls/path.py`: pipeline-aware `PiPLSPathCV`.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `tests/unit/`: local behavior.

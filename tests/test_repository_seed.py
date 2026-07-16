@@ -77,12 +77,14 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert "Phase C2e: public parameter-validation hardening" in strategy
     assert "Current status: **complete**. Constructor validation" in strategy
     assert "Phase D1: complete path analysis" in strategy
+    assert "Phase D1a: shared private selection engine" in strategy
     assert "Current status: **complete**. `PiPLSPathCV` is public" in strategy
     assert "The next implementation patch should be **Phase D2" in strategy
     assert (root / "docs" / "decisions" / "0007-predictor-rank-search-policies.md").is_file()
     assert (root / "docs" / "decisions" / "0008-predictor-svd-policy.md").is_file()
     assert (root / "docs" / "decisions" / "0009-public-parameter-validation.md").is_file()
     assert (root / "docs" / "decisions" / "0010-path-analysis-api.md").is_file()
+    assert (root / "docs" / "decisions" / "0011-shared-selection-engine.md").is_file()
     assert (root / "docs" / "path_analysis.md").is_file()
     assert "The LLM maintainer updates this file" in readme
     assert "git apply --check ~/Downloads/proposed-change.patch" in readme

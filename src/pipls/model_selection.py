@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -171,6 +171,73 @@ def _adaptive_refinement_interval(
     upper_index = min(sorted_ranks.size - 1, selected_index + 1)
     return int(sorted_ranks[lower_index]), int(sorted_ranks[upper_index])
 
+
+
+@dataclass(frozen=True)
+class _RankSearchResult:
+    """Trace of one exhaustive or adaptive predictor-rank search."""
+
+    history: tuple[IntArray, ...]
+    final_interval: tuple[int, int]
+
+
+def _search_predictor_ranks(
+    *,
+    allowed_ranks: ArrayLike,
+    search_method: Literal["optimal", "auto"],
+    evaluate: Callable[[IntArray], IntArray],
+    evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
+) -> _RankSearchResult:
+    """Run the shared exhaustive or adaptive one-dimensional rank search."""
+
+    allowed = np.asarray(allowed_ranks)
+    if allowed.ndim != 1 or allowed.size == 0 or allowed.dtype.kind not in "iu":
+        raise ValueError("allowed_ranks must be a nonempty one-dimensional integer array.")
+    allowed = np.asarray(np.unique(allowed), dtype=np.intp)
+    if np.any(allowed < 1):
+        raise ValueError("allowed_ranks must contain positive integers.")
+    if search_method not in ("optimal", "auto"):
+        raise ValueError('search_method must be "optimal" or "auto".')
+
+    history: list[IntArray] = []
+    interval = allowed
+    while True:
+        if search_method == "optimal" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+            proposed = interval
+        else:
+            logarithmic = _logarithmic_predictor_rank_values(
+                lower=int(interval[0]),
+                upper=int(interval[-1]),
+            )
+            indices = np.abs(interval[:, None] - logarithmic[None, :]).argmin(axis=0)
+            proposed = np.asarray(np.unique(interval[indices]), dtype=np.intp)
+
+        evaluated = evaluate(proposed)
+        if evaluated.size:
+            history.append(evaluated.copy())
+
+        if search_method == "optimal" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+            break
+
+        ranks, scores = evaluated_scores()
+        lower, upper = _adaptive_refinement_interval(ranks, -scores)
+        refined = allowed[(allowed >= lower) & (allowed <= upper)]
+        if np.array_equal(refined, interval):
+            evaluated_set = {int(rank) for rank in ranks}
+            remaining = np.asarray(
+                [rank for rank in interval if int(rank) not in evaluated_set],
+                dtype=np.intp,
+            )
+            evaluated = evaluate(remaining)
+            if evaluated.size:
+                history.append(evaluated.copy())
+            break
+        interval = refined
+
+    return _RankSearchResult(
+        history=tuple(history),
+        final_interval=(int(interval[0]), int(interval[-1])),
+    )
 
 def _training_response_scale(y_train: ArrayLike) -> FloatArray:
     """Return fold-local response scales using ``ddof=1`` and unit zero scales."""

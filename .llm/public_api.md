@@ -157,9 +157,9 @@ Cross-validated modes additionally expose:
 
 ## Path-analysis API
 
-`PiPLSPathCV` defaults to exhaustive `search_method="optimal"`. Adaptive
-`search_method="auto"` applies coarse-to-fine predictor-rank search independently for each
-`n_components` value. The admissible grid satisfies
+`PiPLSPathCV` defaults to adaptive `search_method="auto"`, which applies coarse-to-fine
+predictor-rank search independently for each `n_components` value. Exhaustive
+`search_method="optimal"` evaluates every admissible pair. The admissible grid satisfies
 
 \[
 1 \le h \le \min(q,r_{\pi,\max}), \qquad h \le r_\pi \le r_{\pi,\max}.

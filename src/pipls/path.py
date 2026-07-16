@@ -4,26 +4,26 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Iterable, Sequence
-from dataclasses import dataclass
 from typing import Any, Literal, cast
 
 import numpy as np
-from joblib import Parallel, delayed
 from numpy.typing import ArrayLike, NDArray
 from sklearn.base import BaseEstimator, clone
 from sklearn.metrics import get_scorer
 from sklearn.utils import _safe_indexing
 from sklearn.utils.validation import check_is_fitted, check_X_y
 
+from ._cv_engine import (
+    _evaluate_candidate_batch,
+    _PiPLSCandidate,
+    _PiPLSCandidateResult,
+)
 from .exceptions import StatisticalSupportWarning
 from .model_selection import (
-    _ADAPTIVE_EXHAUSTIVE_THRESHOLD,
     _as_positive_float,
-    _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
     _max_predictor_rank,
-    _response_standardized_mse,
-    _training_response_scale,
+    _search_predictor_ranks,
     _validate_positive_int,
 )
 from .regression import PiPLSRegression
@@ -38,21 +38,10 @@ _SELECTION_RTOL = 1e-12
 _SELECTION_ATOL = 1e-15
 
 
-@dataclass(frozen=True)
-class _PathCandidateResult:
-    """Cross-validation result for one admissible ``(h, r_pi)`` pair."""
-
-    n_components: int
-    predictor_rank: int
-    split_scores: FloatArray
-    split_response_standardized_mse: FloatArray
-
-
 class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
-    The default ``search_method="auto"`` evaluates the complete triangular
-    grid. ``search_method="auto"`` applies the same deterministic logarithmic
+    The default ``search_method="auto"`` applies the same deterministic logarithmic
     coarse-to-fine predictor-rank search used by :class:`PiPLSRegression`
     independently for each value of ``n_components``.
 
@@ -198,7 +187,7 @@ class PiPLSPathCV(BaseEstimator):  # type: ignore[misc]
         self.n_path_candidates_ = len(admissible)
 
         scorer = _resolve_path_scorer(self.scoring)
-        cache: dict[tuple[int, int], _PathCandidateResult] = {}
+        cache: dict[tuple[int, int], _PiPLSCandidateResult] = {}
         history: dict[int, tuple[tuple[int, ...], ...]] = {}
         if self.search_method == "optimal":
             _evaluate_path_batch(
@@ -444,7 +433,7 @@ def _fold_safe_feature_limit(
 def _evaluate_path_batch(
     *,
     pairs: Iterable[tuple[int, int]],
-    cache: dict[tuple[int, int], _PathCandidateResult],
+    cache: dict[tuple[int, int], _PiPLSCandidateResult],
     template: Any,
     n_components_key: str,
     predictor_rank_key: str,
@@ -455,87 +444,30 @@ def _evaluate_path_batch(
     splits: tuple[tuple[IntArray, IntArray], ...],
     n_jobs: int | None,
 ) -> tuple[int, ...]:
-    new_pairs = tuple(pair for pair in pairs if pair not in cache)
-    if not new_pairs:
-        return ()
-    results = Parallel(n_jobs=n_jobs)(
-        delayed(_evaluate_path_candidate)(
-            n_components=h,
-            predictor_rank=r,
-            template=template,
-            n_components_key=n_components_key,
-            predictor_rank_key=predictor_rank_key,
-            scorer=scorer,
-            scoring=scoring,
-            X=X,
-            y=y,
-            splits=splits,
-        )
-        for h, r in new_pairs
+    candidates = tuple(
+        _PiPLSCandidate(n_components=h, predictor_rank=r) for h, r in pairs
     )
-    for result in results:
-        cache[(result.n_components, result.predictor_rank)] = result
-    return tuple(r for _, r in new_pairs)
-
-
-def _evaluate_path_candidate(
-    *,
-    n_components: int,
-    predictor_rank: int,
-    template: Any,
-    n_components_key: str,
-    predictor_rank_key: str,
-    scorer: Scorer | None,
-    scoring: str | Scorer,
-    X: FloatArray,
-    y: FloatArray,
-    splits: tuple[tuple[IntArray, IntArray], ...],
-) -> _PathCandidateResult:
-    split_scores = np.empty(len(splits), dtype=np.float64)
-    split_mse = np.empty(len(splits), dtype=np.float64)
-    params = {
-        n_components_key: n_components,
-        predictor_rank_key: predictor_rank,
-    }
-    for split_index, (train, validation) in enumerate(splits):
-        estimator = clone(template).set_params(**params)
-        X_train = _safe_indexing(X, train)
-        y_train = _safe_indexing(y, train)
-        X_validation = _safe_indexing(X, validation)
-        y_validation = _safe_indexing(y, validation)
-        estimator.fit(X_train, y_train)
-        prediction = estimator.predict(X_validation)
-        mse = _response_standardized_mse(
-            y_validation,
-            prediction,
-            _training_response_scale(y_train),
-        )
-        split_mse[split_index] = mse
-        if scoring == _DEFAULT_SCORING:
-            split_scores[split_index] = -mse
-        else:
-            assert scorer is not None
-            score = float(scorer(estimator, X_validation, y_validation))
-            if not np.isfinite(score):
-                raise ValueError(
-                    "The scoring callable returned a nonfinite value for "
-                    f"n_components={n_components}, predictor_rank={predictor_rank}, "
-                    f"split={split_index}."
-                )
-            split_scores[split_index] = score
-    return _PathCandidateResult(
-        n_components=n_components,
-        predictor_rank=predictor_rank,
-        split_scores=split_scores,
-        split_response_standardized_mse=split_mse,
+    evaluated = _evaluate_candidate_batch(
+        candidates=candidates,
+        cache=cache,
+        template=template,
+        n_components_key=n_components_key,
+        predictor_rank_key=predictor_rank_key,
+        scorer=scorer,
+        use_default_scoring=_uses_default_path_scoring(scoring),
+        X=X,
+        y=y,
+        splits=splits,
+        n_jobs=n_jobs,
     )
+    return tuple(candidate.predictor_rank for candidate in evaluated)
 
 
 def _adaptive_path_search(
     *,
     n_components: int,
     allowed_ranks: IntArray,
-    cache: dict[tuple[int, int], _PathCandidateResult],
+    cache: dict[tuple[int, int], _PiPLSCandidateResult],
     template: Any,
     n_components_key: str,
     predictor_rank_key: str,
@@ -546,18 +478,7 @@ def _adaptive_path_search(
     splits: tuple[tuple[IntArray, IntArray], ...],
     n_jobs: int | None,
 ) -> tuple[tuple[int, ...], ...]:
-    history: list[tuple[int, ...]] = []
-    interval = allowed_ranks
-    while True:
-        if interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
-            ranks = interval
-        else:
-            proposed = _logarithmic_predictor_rank_values(
-                lower=int(interval[0]),
-                upper=int(interval[-1]),
-            )
-            indices = np.abs(interval[:, None] - proposed[None, :]).argmin(axis=0)
-            ranks = np.unique(interval[indices])
+    def evaluate(ranks: IntArray) -> IntArray:
         evaluated = _evaluate_path_batch(
             pairs=((n_components, int(rank)) for rank in ranks),
             cache=cache,
@@ -571,60 +492,42 @@ def _adaptive_path_search(
             splits=splits,
             n_jobs=n_jobs,
         )
-        if evaluated:
-            history.append(evaluated)
-        if interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
-            break
-        evaluated_ranks = np.asarray(
+        return np.asarray(evaluated, dtype=np.intp)
+
+    def evaluated_scores() -> tuple[IntArray, FloatArray]:
+        ranks = np.asarray(
             sorted(r for h, r in cache if h == n_components),
             dtype=np.intp,
         )
         scores = np.asarray(
             [
                 np.mean(cache[(n_components, int(rank))].split_scores)
-                for rank in evaluated_ranks
+                for rank in ranks
             ],
             dtype=np.float64,
         )
-        best_rank = _best_rank(evaluated_ranks, scores)
-        best_index = int(np.flatnonzero(evaluated_ranks == best_rank)[0])
-        lower = int(evaluated_ranks[max(0, best_index - 1)])
-        upper = int(evaluated_ranks[min(evaluated_ranks.size - 1, best_index + 1)])
-        refined = allowed_ranks[(allowed_ranks >= lower) & (allowed_ranks <= upper)]
-        if np.array_equal(refined, interval):
-            remaining = np.asarray(
-                [r for r in interval if (n_components, int(r)) not in cache],
-                dtype=np.intp,
-            )
-            if remaining.size:
-                _evaluate_path_batch(
-                    pairs=((n_components, int(rank)) for rank in remaining),
-                    cache=cache,
-                    template=template,
-                    n_components_key=n_components_key,
-                    predictor_rank_key=predictor_rank_key,
-                    scorer=scorer,
-                    scoring=scoring,
-                    X=X,
-                    y=y,
-                    splits=splits,
-                    n_jobs=n_jobs,
-                )
-                history.append(tuple(int(rank) for rank in remaining))
-            break
-        interval = refined
-    return tuple(history)
+        return ranks, scores
+
+    search = _search_predictor_ranks(
+        allowed_ranks=allowed_ranks,
+        search_method="auto",
+        evaluate=evaluate,
+        evaluated_scores=evaluated_scores,
+    )
+    return tuple(
+        tuple(int(rank) for rank in batch) for batch in search.history
+    )
 
 
-def _best_rank(ranks: IntArray, scores: FloatArray) -> int:
-    maximum = float(np.max(scores))
-    tied = np.isclose(scores, maximum, rtol=_SELECTION_RTOL, atol=_SELECTION_ATOL)
-    return int(np.min(ranks[tied]))
+def _uses_default_path_scoring(scoring: str | Scorer) -> bool:
+    """Return whether the shared default response-standardized scorer is requested."""
+
+    return isinstance(scoring, str) and scoring == _DEFAULT_SCORING
 
 
 def _path_cv_results(
     *,
-    cache: dict[tuple[int, int], _PathCandidateResult],
+    cache: dict[tuple[int, int], _PiPLSCandidateResult],
     evaluated_pairs: tuple[tuple[int, int], ...],
     n_components_key: str,
     predictor_rank_key: str,
