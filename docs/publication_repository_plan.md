@@ -4,6 +4,13 @@
 **Primary inputs reviewed:** `pipls.tar.gz`, `PiPLSR_v0.1.tar.gz`, and `pipls.tex`  
 **Recommended release scope:** the basic Pi-PLS method described in the manuscript, a PLS-style scikit-learn estimator with automatic predictor-rank selection, fold-safe cross-validation bounds, response-standardized model selection, leave-one-out performance reporting, common-format datasets, and paper-reproduction scripts
 
+**Post-plan decision:** decision 0007 refines the predictor-rank search vocabulary. Exhaustive
+conditional CV search is now targeted as `predictor_rank="optimal"`; `predictor_rank="auto"` is
+reserved for deterministic adaptive coarse-to-fine search. Where revision 5 describes exhaustive
+search under the name `"auto"`, decision 0007 supersedes the name while preserving the fold-safe
+bound, fold-local preprocessing, scoring, and tie-breaking contracts. Randomized SVD is governed
+by a separate future solver policy.
+
 ## 1. Executive recommendation
 
 Create a clean repository rather than publishing either supplied archive directly. The new repository should combine:

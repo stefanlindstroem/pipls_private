@@ -73,3 +73,21 @@ model = PiPLSRegression(n_components=2, predictor_rank=4)
 
 An explicit integer fixes the predictor rank and bypasses the rule-derived bound. It remains
 subject to dimensional and numerical-rank validation in the fixed core.
+
+
+## Accepted search-policy roadmap
+
+The exhaustive scan described above is the current Phase C2b implementation. The accepted target
+interface separates exact search coverage from adaptive computational shortcuts:
+
+- `predictor_rank="optimal"` will evaluate every admissible integer rank and therefore return the
+  CV optimum for the fixed split set and scoring rule;
+- `predictor_rank="auto"` will use deterministic logarithmic coarse-to-fine exploration, cache all
+  evaluated candidates, refine around the best observed region, and switch to exhaustive search
+  once the remaining integer interval is small;
+- `predictor_rank="max"` and explicit integer ranks retain their present meanings.
+
+Adaptive search is approximate because a discrete CV-loss curve need not be unimodal. It must use
+the same folds, fold-local preprocessing, scorer, and low-rank tie rule as exhaustive search, and
+it must report all evaluated ranks and the final refinement interval. Randomized SVD is a separate
+future numerical policy rather than an implicit consequence of choosing `"auto"`.

@@ -48,9 +48,14 @@ resolve the discrepancy explicitly rather than silently choosing one.
   `samples_per_predictor_rank`; no public aliases `h`, `r_pi`, or `c`.
 - Standard response subspace for the paper release: leading right singular vectors of
   `Z.T @ Y`.
-- Predictor-rank modes: integer, `"max"`, and `"auto"`.
-- General automatic rank bound uses the smallest training-fold size.
-- Automatic selection uses fold-local response-standardized MSE.
+- Predictor-rank modes target four semantics: integer, `"max"`, `"optimal"`, and `"auto"`.
+- `"optimal"` means exhaustive CV evaluation of every admissible predictor rank.
+- `"auto"` means deterministic adaptive coarse-to-fine search and is explicitly approximate.
+- General search bounds use the smallest training-fold size.
+- All CV-based selection uses fold-local response-standardized MSE.
+- Search approximation and linear-algebra approximation are separate policies. Randomized SVD
+  must be introduced through an explicit solver contract and diagnostics, not hidden inside the
+  meaning of `predictor_rank`.
 - Custom learned preprocessing is searched around the complete pipeline.
 - Paper-specific rank rules and LOO reporting conventions are explicit reproduction inputs.
 - `.llm/` is tracked repository infrastructure and is excluded from the installable package.
@@ -133,10 +138,40 @@ Current status: **complete**. Automatic mode is the estimator default, uses the 
 materialized training fold for its candidate bound, stores split and mean diagnostics, and refits
 the selected fixed-rank model on all supplied data.
 
+### Phase C2c: split exhaustive and adaptive rank-search semantics
+
+Replace the provisional exhaustive meaning of `predictor_rank="auto"` with the accepted public
+search-policy split:
+
+- `predictor_rank="optimal"`: exhaustive evaluation of every admissible rank;
+- `predictor_rank="auto"`: deterministic adaptive logarithmic coarse-to-fine evaluation with a
+  final exhaustive search over a small integer interval;
+- integer and `"max"`: unchanged.
+
+The implementation must cache candidate results, reuse one materialized split set, preserve
+fold-local preprocessing, expose evaluated-rank diagnostics, and document that `"auto"` is not
+guaranteed to recover the exhaustive optimum on an arbitrary non-unimodal CV curve. Because the
+package is pre-alpha, the old exhaustive `"auto"` behavior is renamed without a compatibility
+alias.
+
+Current status: **planned and next**. The scientific naming and search-policy decision is recorded
+in decision 0007; implementation has not yet changed.
+
+### Phase C2d: scalable linear-algebra policy
+
+Add an explicit `svd_solver` policy, initially supporting `"full"`, `"randomized"`, and `"auto"`,
+with a deterministic `random_state` contract and fitted solver diagnostics. Keep this independent
+from predictor-rank search semantics so users can distinguish exhaustive versus adaptive search
+from exact versus approximate SVD.
+
+Current status: **planned after Phase C2c**.
+
 ### Phase D1: complete path analysis
 
 Add `PiPLSPathCV` with the admissible triangular grid, shared materialized splits, standard
-scikit-learn scorer orientation, and complete-pipeline cloning.
+scikit-learn scorer orientation, and complete-pipeline cloning. Its search-policy interface must
+mirror the established `"optimal"` and `"auto"` distinction rather than inventing a second set of
+meanings.
 
 ### Phase D2: LOO and advanced split protocols
 
@@ -156,11 +191,16 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-After the Phase C2b patch is committed and a clean snapshot is produced, the next patch should
-be **Phase D1: complete path analysis**. It should add `PiPLSPathCV` over the admissible triangular
-$(h,r_\pi)$ grid, reuse one materialized split set for every pair, fit the complete searched
-estimator or pipeline inside every fold, expose scikit-learn-style search diagnostics, and refit
-the selected pair. It must not yet add paper datasets or paper-specific LOO reporting.
+The next implementation patch should be **Phase C2c: split exhaustive and adaptive rank-search
+semantics**. It should rename the current exhaustive mode to `predictor_rank="optimal"` and
+implement `predictor_rank="auto"` as a deterministic adaptive coarse-to-fine search over integer
+ranks. The adaptive search should begin with logarithmically spaced ranks, refine the interval
+around the best evaluated rank and its neighbors, switch to exhaustive evaluation when the
+remaining interval contains at most a small fixed number of ranks, cache every evaluated rank,
+reuse one materialized split set, and expose search diagnostics. It must not yet add randomized
+SVD or `PiPLSPathCV`.
+
+After C2c, add the separate scalable-SVD policy in C2d, then proceed to D1 path analysis.
 
 ## Maintenance protocol
 

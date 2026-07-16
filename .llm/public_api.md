@@ -43,6 +43,22 @@ its smallest training-fold size, searches every integer rank from `n_components`
 fold-safe upper bound, selects the largest scikit-learn score with deterministic low-rank
 tie-breaking, and refits the selected fixed-rank model on all data passed to `fit()`.
 
+## Accepted search-policy transition
+
+The exhaustive behavior above is the currently implemented Phase C2b behavior, but its public
+name is provisional. Decision 0007 establishes the target semantics for the next implementation
+increment:
+
+- `predictor_rank="optimal"` will perform the exhaustive scan currently called `"auto"`;
+- `predictor_rank="auto"` will perform a deterministic adaptive coarse-to-fine search and may
+  evaluate only a subset of admissible ranks;
+- `predictor_rank="max"` and explicit integer ranks remain unchanged.
+
+Until Phase C2c is implemented, source code and tests remain authoritative for runtime behavior.
+The adaptive mode must expose which ranks were evaluated and whether its result was exhaustive.
+Randomized SVD is not part of the rank-mode meaning and will be governed by a separate solver
+parameter in a later increment.
+
 The upper bound is
 
 \begin{equation}

@@ -8,10 +8,14 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase C2b integrates automatic conditional predictor-rank selection into `PiPLSRegression`.
-Automatic mode materializes reusable CV splits, derives a fold-safe rank grid, fits preprocessing
-inside every training fold, supports standard scorer orientation and optional parallel candidate
-evaluation, stores diagnostics, and refits the selected rank on all supplied data.
+Phase C2b is implemented: the estimator can exhaustively evaluate the fold-safe predictor-rank
+grid with fold-local preprocessing, reusable splits, standard scorer orientation, diagnostics,
+and full-data refitting. That exhaustive behavior is still exposed under the provisional name
+`predictor_rank="auto"` in the current source.
+
+The accepted next increment is Phase C2c. It will rename exhaustive search to
+`predictor_rank="optimal"` and reserve `predictor_rank="auto"` for deterministic adaptive
+coarse-to-fine rank search. Randomized SVD is a later, separate numerical-policy increment.
 
 ## Planned responsibilities
 

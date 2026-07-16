@@ -1,6 +1,7 @@
 # Decision: 0003-predictor-rank-selection
 
-Status: implemented for explicit, rule-fixed, and automatic conditional selection.
+Status: implemented for explicit, rule-fixed, and exhaustive conditional selection; naming
+and adaptive-search semantics are refined by decision 0007.
 
 For a supplied smallest training-set size $n_{\mathrm{train,min}}$, predictor count $p$, and
 positive numeric `samples_per_predictor_rank` value $c$, the shared upper-bound helper returns
@@ -31,3 +32,11 @@ all data supplied to `fit()`.
 An explicit integer `predictor_rank` bypasses the rule-derived upper bound. It remains subject to
 the fixed-core numerical-rank and dimensional checks. `max_predictor_rank_` records the
 rule-derived bound even when an explicit integer rank is used.
+
+
+## Refinement
+
+Decision 0007 supersedes the provisional name `predictor_rank="auto"` for the exhaustive scan.
+The exhaustive algorithm remains scientifically unchanged but will be exposed as
+`predictor_rank="optimal"`. The name `"auto"` is reserved for an adaptive approximate search that
+uses the same admissible bound and CV contracts while evaluating fewer candidates.
