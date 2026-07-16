@@ -477,9 +477,11 @@ The implemented rank-mode semantics are:
 - `predictor_rank="auto"`: use deterministic adaptive coarse-to-fine search and permit an approximate optimum.
 
 Adaptive search reports every evaluated rank and does not guarantee the exhaustive optimum for
-an arbitrary non-unimodal CV curve. Search approximation and linear-algebra approximation are separate:
-randomized SVD must be controlled by an explicit solver policy rather than being hidden inside the
-meaning of `predictor_rank`.
+an arbitrary non-unimodal CV curve. Search approximation and linear-algebra approximation are
+separate. The implemented `svd_solver` policy permits randomized approximation only for the first
+predictor-matrix SVD; the response-subspace and coupling SVDs remain exact. Automatic solver
+selection is conservative and depends on matrix dimensions and retained-rank fraction, while
+explicit `"full"` remains the reference path.
 
 ## Cross-validation consequences
 

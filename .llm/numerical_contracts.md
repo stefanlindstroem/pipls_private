@@ -16,3 +16,13 @@
 - Response-standardized MSE uniformly averages squared residuals over validation samples and response columns after division by the matching fold-local response scales.
 - Conditional predictor-rank ties use `numpy.isclose` with `rtol=1e-12` and `atol=1e-15`, then choose the smallest tied predictor rank.
 - CV splits are materialized once, validated, copied, and reused for every candidate; the rank bound uses the smallest materialized training-fold size.
+
+- Predictor SVD policy is independent of rank-search policy. `"full"` is the exact reference,
+  `"randomized"` is explicit approximation, and `"auto"` randomizes only when
+  `min(n, p) >= 500`, `n * p >= 1_000_000`, and
+  `predictor_rank <= 0.2 * min(n, p)`.
+- Only the predictor-matrix SVD may be randomized; the response cross-product and coupling SVDs
+  remain exact.
+- Randomized SVD requires a nonnegative integer seed. With randomized truncated SVD, `x_rank` is
+  a verified retained-rank lower bound rather than the complete numerical rank; diagnostics must
+  expose this distinction.

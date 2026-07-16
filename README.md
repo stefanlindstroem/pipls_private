@@ -4,8 +4,9 @@ Development repository for Pi-PLS, a PLS-family method for multivariate regressi
 
 The repository contains the fixed-parameter numerical core and a scikit-learn-style
 `PiPLSRegression` estimator with adaptive `"auto"`, exhaustive `"optimal"`, rule-derived
-`"max"`, and explicit integer predictor-rank modes. Complete path analysis, datasets, and paper
-reproduction remain later increments.
+`"max"`, and explicit integer predictor-rank modes. Predictor linear algebra independently supports
+full, randomized, and conservative automatic SVD policies. Complete path analysis, datasets, and
+paper reproduction remain later increments.
 
 ## Development setup
 
@@ -35,6 +36,8 @@ model = PiPLSRegression(
     predictor_rank="auto",
     samples_per_predictor_rank=10,
     cv=5,
+    svd_solver="auto",
+    random_state=0,
 )
 model.fit(X_train, Y_train)
 Y_pred = model.predict(X_test)

@@ -387,3 +387,92 @@ def test_invalid_legacy_auto_alias_is_not_needed() -> None:
     X, Y = _data()
     with pytest.raises(ValueError, match="positive integer"):
         PiPLSRegression(predictor_rank="exhaustive").fit(X, Y)  # type: ignore[arg-type]
+
+
+def test_small_auto_svd_uses_full_solver_and_reports_exact_rank() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank=3,
+        svd_solver="auto",
+    ).fit(X, Y)
+
+    assert model.svd_solver_ == "full"
+    assert model.x_rank_is_exact_
+
+
+def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
+    rng = np.random.default_rng(817)
+    left, _ = np.linalg.qr(rng.normal(size=(100, 14)))
+    right, _ = np.linalg.qr(rng.normal(size=(70, 14)))
+    values = np.array([35.0, 28.0, 21.0, 16.0, 12.0, 9.0, 6.0, 4.0, 3.0, 2.0, 1.0, 0.5, 0.2, 0.1])
+    X = left @ np.diag(values) @ right.T
+    Y = X @ rng.normal(size=(70, 3)) + 0.01 * rng.normal(size=(100, 3))
+
+    full = PiPLSRegression(
+        n_components=2,
+        predictor_rank=6,
+        svd_solver="full",
+    ).fit(X, Y)
+    first = PiPLSRegression(
+        n_components=2,
+        predictor_rank=6,
+        svd_solver="randomized",
+        random_state=23,
+    ).fit(X, Y)
+    second = PiPLSRegression(
+        n_components=2,
+        predictor_rank=6,
+        svd_solver="randomized",
+        random_state=23,
+    ).fit(X, Y)
+
+    assert first.svd_solver_ == "randomized"
+    assert not first.x_rank_is_exact_
+    np.testing.assert_allclose(first.coef_, second.coef_)
+    np.testing.assert_allclose(first.predict(X), second.predict(X))
+    np.testing.assert_allclose(first.predict(X), full.predict(X), rtol=1e-6, atol=1e-8)
+
+
+@pytest.mark.parametrize("value", ["invalid", 1, None])
+def test_rejects_invalid_svd_solver(value: object) -> None:
+    X, Y = _data()
+    with pytest.raises(ValueError, match="svd_solver"):
+        PiPLSRegression(svd_solver=value).fit(X, Y)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("value", [-1, True, 1.5, "seed"])
+def test_rejects_invalid_random_state(value: object) -> None:
+    X, Y = _data()
+    with pytest.raises(ValueError, match="random_state"):
+        PiPLSRegression(random_state=value).fit(X, Y)  # type: ignore[arg-type]
+
+
+def test_randomized_svd_rejects_missing_random_state() -> None:
+    X, Y = _data()
+    with pytest.raises(ValueError, match="random_state"):
+        PiPLSRegression(
+            predictor_rank=3,
+            svd_solver="randomized",
+            random_state=None,
+        ).fit(X, Y)
+
+
+def test_cross_validated_mode_records_fold_solver_diagnostics() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank="optimal",
+        samples_per_predictor_rank=8,
+        cv=3,
+        n_jobs=1,
+        svd_solver="randomized",
+        random_state=29,
+    ).fit(X, Y)
+
+    assert model.svd_solver_ == "randomized"
+    assert set(model.predictor_rank_cv_svd_solvers_) == set(model.predictor_rank_values_)
+    assert all(
+        solvers == ("randomized", "randomized", "randomized")
+        for solvers in model.predictor_rank_cv_svd_solvers_.values()
+    )

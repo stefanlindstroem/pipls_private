@@ -165,7 +165,10 @@ with a deterministic `random_state` contract and fitted solver diagnostics. Keep
 from predictor-rank search semantics so users can distinguish exhaustive versus adaptive search
 from exact versus approximate SVD.
 
-Current status: **planned and next**.
+Current status: **complete**. The estimator now exposes `svd_solver={"full", "randomized",
+"auto"}` and `random_state`; automatic selection follows the conservative matrix-size and
+retained-rank rule, only the predictor SVD may be randomized, and fitted plus CV-fold solver
+diagnostics are available.
 
 ### Phase D1: complete path analysis
 
@@ -192,14 +195,10 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-The next implementation patch should be **Phase C2d: scalable linear-algebra policy**. It should
-add an explicit `svd_solver` contract with `"full"`, `"randomized"`, and `"auto"` choices,
-introduce a deterministic `random_state` parameter where approximation is used, preserve the
-current exact solver as the reference path, and expose fitted solver diagnostics. The patch must
-not yet add `PiPLSPathCV`.
-
-After C2d, proceed to D1 path analysis using the established `"optimal"` and `"auto"` search
-vocabulary.
+The next implementation patch should be **Phase D1: complete path analysis**. It should add
+`PiPLSPathCV` over the admissible triangular $(h,r_\pi)$ surface, reuse one materialized split set,
+fit preprocessing inside each training fold, mirror the established `"optimal"` and `"auto"`
+search vocabulary, and expose a refitted best estimator plus reconstructable path diagnostics.
 
 ## Maintenance protocol
 

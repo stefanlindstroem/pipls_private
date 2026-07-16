@@ -52,3 +52,117 @@ def test_core_handles_rank_deficiency_explicitly() -> None:
 
     with pytest.raises(ValueError, match="numerical rank"):
         fit_pipls_core(X, Y, predictor_rank=3, n_components=2)
+
+
+def test_predictor_svd_auto_rule_is_conservative() -> None:
+    from pipls._core import _resolve_predictor_svd_solver
+
+    assert (
+        _resolve_predictor_svd_solver(
+            shape=(500, 2000),
+            predictor_rank=100,
+            svd_solver="auto",
+        )
+        == "randomized"
+    )
+    assert (
+        _resolve_predictor_svd_solver(
+            shape=(500, 2000),
+            predictor_rank=101,
+            svd_solver="auto",
+        )
+        == "full"
+    )
+    assert (
+        _resolve_predictor_svd_solver(
+            shape=(499, 3000),
+            predictor_rank=20,
+            svd_solver="auto",
+        )
+        == "full"
+    )
+    assert (
+        _resolve_predictor_svd_solver(
+            shape=(500, 1999),
+            predictor_rank=20,
+            svd_solver="auto",
+        )
+        == "full"
+    )
+
+
+def test_explicit_predictor_svd_solver_overrides_auto_rule() -> None:
+    from pipls._core import _resolve_predictor_svd_solver
+
+    assert (
+        _resolve_predictor_svd_solver(
+            shape=(20, 10),
+            predictor_rank=2,
+            svd_solver="randomized",
+        )
+        == "randomized"
+    )
+    assert (
+        _resolve_predictor_svd_solver(
+            shape=(1000, 2000),
+            predictor_rank=20,
+            svd_solver="full",
+        )
+        == "full"
+    )
+
+
+def test_randomized_predictor_svd_is_reproducible_and_close_to_full() -> None:
+    rng = np.random.default_rng(731)
+    left, _ = np.linalg.qr(rng.normal(size=(90, 12)))
+    right, _ = np.linalg.qr(rng.normal(size=(60, 12)))
+    singular_values = np.array([30.0, 24.0, 19.0, 15.0, 12.0, 9.0, 5.0, 3.0, 2.0, 1.0, 0.5, 0.2])
+    X = left @ np.diag(singular_values) @ right.T
+    Y = X @ rng.normal(size=(60, 3)) + 0.01 * rng.normal(size=(90, 3))
+
+    full = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=2,
+        svd_solver="full",
+    )
+    first = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=2,
+        svd_solver="randomized",
+        random_state=17,
+    )
+    second = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=2,
+        svd_solver="randomized",
+        random_state=17,
+    )
+
+    assert full.predictor_svd_solver == "full"
+    assert full.x_rank_is_exact
+    assert first.predictor_svd_solver == "randomized"
+    assert not first.x_rank_is_exact
+    np.testing.assert_allclose(first.Pi, second.Pi)
+    np.testing.assert_allclose(first.regression_map, second.regression_map)
+    np.testing.assert_allclose(first.regression_map, full.regression_map, rtol=1e-6, atol=1e-8)
+
+
+def test_randomized_predictor_svd_requires_seed() -> None:
+    rng = np.random.default_rng(91)
+    X = _center(rng.normal(size=(20, 8)))
+    Y = _center(rng.normal(size=(20, 3)))
+    with pytest.raises(ValueError, match="random_state"):
+        fit_pipls_core(
+            X,
+            Y,
+            predictor_rank=3,
+            n_components=2,
+            svd_solver="randomized",
+            random_state=None,
+        )

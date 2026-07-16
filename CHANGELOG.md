@@ -9,4 +9,4 @@
 - Add private cross-validation selection primitives for reusable splits, response-standardized loss, and deterministic rank tie-breaking.
 - Add automatic predictor-rank selection with fold-local preprocessing, diagnostics, public scoring utilities, and full-data refitting.
 - Implement exhaustive `"optimal"` rank search and deterministic adaptive coarse-to-fine `"auto"` search, with cached evaluations and search diagnostics.
-- Reserve randomized SVD for a separate solver policy.
+- Add full, randomized, and conservative automatic predictor-SVD policies with reproducible seeds and fitted solver diagnostics.

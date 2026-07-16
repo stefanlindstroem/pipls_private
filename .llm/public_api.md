@@ -52,7 +52,25 @@ The default is `predictor_rank="auto"`.
 
 Both CV modes materialize one split set, use fold-local preprocessing, select the largest
 scikit-learn score with deterministic low-rank tie-breaking, and refit the selected fixed-rank
-model on all data passed to `fit()`. Randomized SVD remains a separate future solver policy.
+model on all data passed to `fit()`.
+
+## Predictor SVD policy
+
+`svd_solver` accepts `"full"`, `"randomized"`, or `"auto"`; the default is `"auto"`.
+`random_state=0` makes randomized decomposition reproducible. Only the first SVD of the
+centered/scaled predictor matrix may be randomized. The response-subspace and coupling SVDs remain
+exact.
+
+The automatic solver selects randomized SVD only when all of the following hold:
+
+```python
+min(n_samples, n_features) >= 500
+n_samples * n_features >= 1_000_000
+predictor_rank <= 0.2 * min(n_samples, n_features)
+```
+
+Explicit `"full"` and `"randomized"` choices override this rule. Internal-CV candidate fits reuse
+the same solver policy and seed.
 
 The upper bound is
 
@@ -91,9 +109,14 @@ The estimator provides `fit`, `predict`, `transform`, and scalar `score`. It exp
 latent scores, `coef_` in scikit-learn orientation, `coef_matrix_` in manuscript orientation, and
 `intercept_`.
 
+Every fitted estimator exposes `svd_solver_`, the predictor solver actually used, and
+`x_rank_is_exact_`. Under full SVD, `x_rank_` is the complete numerical rank; under randomized
+truncated SVD it is a verified lower bound for the retained subspace.
+
 Cross-validated modes additionally expose:
 
 - `predictor_rank_values_`;
+- `predictor_rank_cv_svd_solvers_`, mapping each evaluated rank to its fold-level solvers;
 - `predictor_rank_cv_results_` with split and mean scores plus response-standardized MSE;
 - `best_score_`;
 - `best_response_standardized_mse_` for the selected rank;

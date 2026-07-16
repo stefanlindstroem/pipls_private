@@ -13,7 +13,7 @@ from sklearn.base import BaseEstimator, RegressorMixin, TransformerMixin
 from sklearn.metrics import get_scorer, r2_score
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
-from ._core import fit_pipls_core
+from ._core import ResolvedSVDSolver, SVDSolver, fit_pipls_core
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
     _ADAPTIVE_EXHAUSTIVE_THRESHOLD,
@@ -41,6 +41,7 @@ class _CandidateCVResult:
     predictor_rank: int
     split_scores: FloatArray
     split_response_standardized_mse: FloatArray
+    split_svd_solvers: tuple[ResolvedSVDSolver, ...]
 
 
 class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type: ignore[misc]
@@ -73,6 +74,14 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         Number of predictor-rank candidates evaluated concurrently in
         cross-validated modes. ``None`` uses joblib's default and ``-1`` uses all
         processors.
+    svd_solver:
+        Predictor SVD policy. ``"full"`` uses the exact thin SVD,
+        ``"randomized"`` always uses randomized truncated SVD, and ``"auto"``
+        uses randomized SVD only for sufficiently large matrices and low retained
+        rank. The response-side and coupling SVDs always remain exact.
+    random_state:
+        Nonnegative integer seed used by randomized SVD. The default makes
+        ``"auto"`` and ``"randomized"`` reproducible.
     """
 
     def __init__(
@@ -86,6 +95,8 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         cv: object = 5,
         scoring: str | Scorer = _DEFAULT_SCORING,
         n_jobs: int | None = None,
+        svd_solver: SVDSolver = "auto",
+        random_state: int | None = 0,
     ) -> None:
         self.n_components = n_components
         self.scale = scale
@@ -95,6 +106,8 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self.cv = cv
         self.scoring = scoring
         self.n_jobs = n_jobs
+        self.svd_solver = svd_solver
+        self.random_state = random_state
 
     def fit(self, X: ArrayLike, y: ArrayLike) -> PiPLSRegression:
         """Fit the Pi-PLS model and select predictor rank when requested."""
@@ -258,6 +271,8 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
                 y=y,
                 splits=materialized.splits,
                 n_jobs=self.n_jobs,
+                svd_solver=self.svd_solver,
+                random_state=self.random_state,
             )
             for result in evaluations:
                 cache[result.predictor_rank] = result
@@ -333,6 +348,9 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             dtype=np.intp,
         )
         self.predictor_rank_search_history_ = tuple(batch.copy() for batch in search_history)
+        self.predictor_rank_cv_svd_solvers_ = {
+            result.predictor_rank: result.split_svd_solvers for result in evaluations
+        }
         self.predictor_rank_cv_results_ = _cv_results_dictionary(
             predictor_rank_values=predictor_rank_values,
             split_scores=split_scores,
@@ -385,6 +403,8 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             y_cs,
             predictor_rank=predictor_rank,
             n_components=self.n_components,
+            svd_solver=self.svd_solver,
+            random_state=self.random_state,
         )
 
         self.predictor_rank_ = predictor_rank
@@ -399,7 +419,9 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         self.x_rotations_ = self.P_
         self.y_rotations_ = self.Q_
         self.x_rank_ = result.x_rank
+        self.x_rank_is_exact_ = result.x_rank_is_exact
         self.rank_tolerance_ = result.rank_tolerance
+        self.svd_solver_ = result.predictor_svd_solver
 
         self.coef_matrix_ = result.regression_map * self.y_scale_[None, :] / self.x_scale_[:, None]
         self.coef_ = self.coef_matrix_.T
@@ -435,6 +457,12 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
             raise ValueError(f"scale must be boolean; got {self.scale!r}.")
         if not isinstance(self.copy, (bool, np.bool_)):
             raise ValueError(f"copy must be boolean; got {self.copy!r}.")
+        if self.svd_solver not in ("full", "randomized", "auto"):
+            raise ValueError(
+                'svd_solver must be "full", "randomized", or "auto"; '
+                f"got {self.svd_solver!r}."
+            )
+        _validate_random_state(self.random_state, svd_solver=self.svd_solver)
         if self.predictor_rank in ("auto", "optimal"):
             _validate_n_jobs(self.n_jobs)
             _resolve_scorer(self.scoring)
@@ -443,6 +471,7 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         for name in (
             "predictor_rank_values_",
             "predictor_rank_cv_results_",
+            "predictor_rank_cv_svd_solvers_",
             "best_score_",
             "best_response_standardized_mse_",
             "n_splits_",
@@ -472,6 +501,8 @@ def _evaluate_predictor_ranks(
     y: FloatArray,
     splits: tuple[tuple[IntArray, IntArray], ...],
     n_jobs: int | None,
+    svd_solver: SVDSolver,
+    random_state: int | None,
 ) -> list[_CandidateCVResult]:
     return cast(
         list[_CandidateCVResult],
@@ -486,6 +517,8 @@ def _evaluate_predictor_ranks(
                 X=X,
                 y=y,
                 splits=splits,
+                svd_solver=svd_solver,
+                random_state=random_state,
             )
             for predictor_rank in predictor_ranks
         ),
@@ -514,9 +547,12 @@ def _evaluate_predictor_rank(
     X: FloatArray,
     y: FloatArray,
     splits: tuple[tuple[IntArray, IntArray], ...],
+    svd_solver: SVDSolver,
+    random_state: int | None,
 ) -> _CandidateCVResult:
     split_scores = np.empty(len(splits), dtype=np.float64)
     split_mse = np.empty(len(splits), dtype=np.float64)
+    split_svd_solvers: list[ResolvedSVDSolver] = []
     for split_index, (train, validation) in enumerate(splits):
         model = PiPLSRegression(
             n_components=n_components,
@@ -524,10 +560,13 @@ def _evaluate_predictor_rank(
             copy=copy,
             predictor_rank=predictor_rank,
             samples_per_predictor_rank=samples_per_predictor_rank,
+            svd_solver=svd_solver,
+            random_state=random_state,
         )
         y_train = y[train]
         model.fit(X[train], y_train)
         y_prediction = model.predict(X[validation])
+        split_svd_solvers.append(model.svd_solver_)
         score = float(scorer(model, X[validation], y[validation]))
         if not np.isfinite(score):
             raise ValueError(
@@ -544,6 +583,7 @@ def _evaluate_predictor_rank(
         predictor_rank=predictor_rank,
         split_scores=split_scores,
         split_response_standardized_mse=split_mse,
+        split_svd_solvers=tuple(split_svd_solvers),
     )
 
 
@@ -594,6 +634,29 @@ def _validate_n_jobs(n_jobs: int | None) -> None:
         raise ValueError(f"n_jobs must be None or a nonzero integer; got {n_jobs!r}.")
     if int(n_jobs) == 0:
         raise ValueError("n_jobs must not be zero.")
+
+
+
+def _validate_random_state(random_state: int | None, *, svd_solver: SVDSolver) -> None:
+    if random_state is None:
+        if svd_solver == "randomized":
+            raise ValueError(
+                "random_state must be a nonnegative integer when svd_solver='randomized'."
+            )
+        return
+    if isinstance(random_state, (bool, np.bool_)) or not isinstance(
+        random_state,
+        (int, np.integer),
+    ):
+        raise ValueError(
+            "random_state must be None or a nonnegative integer; "
+            f"got {random_state!r}."
+        )
+    if int(random_state) < 0:
+        raise ValueError(
+            "random_state must be None or a nonnegative integer; "
+            f"got {random_state!r}."
+        )
 
 
 def _check_predictor_matrix(X: ArrayLike, *, n_features: int) -> FloatArray:

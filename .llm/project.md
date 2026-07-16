@@ -8,14 +8,14 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase C2c is implemented. `predictor_rank="optimal"` exhaustively evaluates the admissible rank
-set, while the default `predictor_rank="auto"` performs deterministic logarithmic coarse-to-fine
-search with cached candidates, a final exhaustive local interval, and explicit search
-diagnostics.
+Phase C2d is implemented. `PiPLSRegression` now separates predictor-rank search policy from
+predictor linear algebra through `svd_solver={"full", "randomized", "auto"}` and a reproducible
+`random_state` contract. The automatic solver applies a conservative matrix-size and retained-rank
+rule, while the response-side and coupling SVDs remain exact.
 
-The next increment is Phase C2d: an explicit scalable linear-algebra policy with full,
-randomized, and automatic SVD solver choices. Predictor-rank search approximation and
-linear-algebra approximation remain separate contracts.
+The next increment is Phase D1: `PiPLSPathCV` for the admissible triangular
+$(n_components, predictor_rank)$ surface using the established `"optimal"` and `"auto"` search
+vocabulary.
 
 ## Planned responsibilities
 

@@ -13,8 +13,8 @@ print(model.predictor_rank_)
 ```
 
 Constructor parameters are `n_components`, `scale`, `copy`, `predictor_rank`,
-`samples_per_predictor_rank`, `cv`, `scoring`, and `n_jobs`. `predictor_rank` accepts `"auto"`,
-`"optimal"`, `"max"`, or a positive integer.
+`samples_per_predictor_rank`, `cv`, `scoring`, `n_jobs`, `svd_solver`, and `random_state`.
+`predictor_rank` accepts `"auto"`, `"optimal"`, `"max"`, or a positive integer.
 
 `"optimal"` exhaustively evaluates every admissible rank. `"auto"` uses deterministic
 logarithmic coarse-to-fine search and may skip ranks; it becomes exhaustive when the admissible or
@@ -22,11 +22,17 @@ final refinement interval contains at most 10 ranks. Both modes reuse one materi
 set, fit preprocessing inside each training fold, apply identical scoring and low-rank tie rules,
 and refit the selected rank on all data.
 
+`svd_solver="full"` uses the exact thin predictor SVD. `svd_solver="randomized"` uses a
+reproducible randomized truncated predictor SVD. The default `svd_solver="auto"` chooses randomized
+SVD only for large matrices and low retained-rank fractions; the fitted choice is available as
+`svd_solver_`. Only the predictor SVD may be randomized.
+
 `scale=True` centers and divides predictor and response columns by training-sample standard
 deviations with `ddof=1`. `scale=False` centers without division. Constant columns use scale 1.
 Every learned preprocessing statistic is fitted independently inside selection folds.
 
-Important fitted attributes include `predictor_rank_`, `max_predictor_rank_`, `x_mean_`,
+Important fitted attributes include `predictor_rank_`, `max_predictor_rank_`, `svd_solver_`,
+`x_rank_is_exact_`, `x_mean_`,
 `x_scale_`, `y_mean_`, `y_scale_`, `response_scale_for_scoring_`, the Pi-PLS factorization arrays,
 `coef_`, `coef_matrix_`, and `intercept_`. Cross-validated modes also expose candidate scores,
 evaluation order, search batches, the final refinement interval, candidate counts, whether the

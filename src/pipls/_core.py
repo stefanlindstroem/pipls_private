@@ -8,12 +8,19 @@ cross-validation, or preprocessing policy.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast
+from typing import Literal, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from sklearn.utils.extmath import randomized_svd
 
 FloatArray = NDArray[np.float64]
+SVDSolver = Literal["full", "randomized", "auto"]
+ResolvedSVDSolver = Literal["full", "randomized"]
+
+_AUTO_RANDOMIZED_MIN_DIMENSION = 500
+_AUTO_RANDOMIZED_MIN_ENTRIES = 1_000_000
+_AUTO_RANDOMIZED_MAX_RANK_FRACTION = 0.2
 
 
 @dataclass(frozen=True)
@@ -35,9 +42,17 @@ class PiPLSCoreResult:
     Q:
         Orthogonal response rotations with shape ``(q, h)``.
     x_rank:
-        Numerical rank of the supplied predictor matrix.
+        Numerical rank of the supplied predictor matrix for full SVD, or a
+        verified lower bound equal to the number of retained nonzero singular
+        values for randomized SVD.
+    x_rank_is_exact:
+        Whether ``x_rank`` is the complete numerical rank rather than a lower
+        bound from a truncated randomized decomposition.
     rank_tolerance:
-        Relative-scale tolerance used to determine ``x_rank``.
+        Relative-scale tolerance used to assess retained predictor singular
+        values.
+    predictor_svd_solver:
+        Predictor decomposition actually used: ``"full"`` or ``"randomized"``.
     """
 
     Pi: FloatArray
@@ -47,7 +62,9 @@ class PiPLSCoreResult:
     D: FloatArray
     Q: FloatArray
     x_rank: int
+    x_rank_is_exact: bool
     rank_tolerance: float
+    predictor_svd_solver: ResolvedSVDSolver
 
     @property
     def regression_map(self) -> FloatArray:
@@ -74,6 +91,8 @@ def fit_pipls_core(
     *,
     predictor_rank: int,
     n_components: int,
+    svd_solver: SVDSolver = "full",
+    random_state: int | None = 0,
 ) -> PiPLSCoreResult:
     r"""Fit the fixed-parameter Pi-PLS core to preprocessed matrices.
 
@@ -87,6 +106,12 @@ def fit_pipls_core(
         Predictor truncation rank $r_\pi$.
     n_components:
         Response-side latent dimension $h$.
+    svd_solver:
+        Predictor decomposition policy. ``"full"`` uses NumPy's exact thin SVD,
+        ``"randomized"`` uses scikit-learn's randomized truncated SVD, and
+        ``"auto"`` applies the package's conservative size/rank rule.
+    random_state:
+        Nonnegative integer seed required whenever randomized SVD is selected.
 
     Returns
     -------
@@ -97,7 +122,8 @@ def fit_pipls_core(
     ------
     ValueError
         If arrays are nonfinite or incompatible, dimensions are inadmissible,
-        or ``predictor_rank`` exceeds the numerical rank of ``X``.
+        the requested predictor rank exceeds the verified numerical rank, or
+        the SVD policy is invalid.
     """
 
     X_array = _as_finite_matrix(X, name="X")
@@ -129,14 +155,36 @@ def fit_pipls_core(
             f"got n_components={h}, predictor_rank={r_pi}, n_targets={n_targets}."
         )
 
-    _, x_singular_values, x_vt = np.linalg.svd(X_array, full_matrices=False)
+    resolved_solver = _resolve_predictor_svd_solver(
+        shape=(n_samples, n_features),
+        predictor_rank=r_pi,
+        svd_solver=svd_solver,
+    )
+    seed = _validate_random_state(random_state, required=resolved_solver == "randomized")
+
+    if resolved_solver == "full":
+        _, x_singular_values, x_vt = np.linalg.svd(X_array, full_matrices=False)
+        x_rank_is_exact = True
+    else:
+        _, x_singular_values, x_vt = randomized_svd(
+            X_array,
+            n_components=r_pi,
+            n_iter="auto",
+            random_state=seed,
+            flip_sign=True,
+        )
+        x_singular_values = np.asarray(x_singular_values, dtype=np.float64)
+        x_vt = np.asarray(x_vt, dtype=np.float64)
+        x_rank_is_exact = False
+
     x_shape = (X_array.shape[0], X_array.shape[1])
     rank_tolerance = _svd_rank_tolerance(x_shape, x_singular_values)
     x_rank = int(np.count_nonzero(x_singular_values > rank_tolerance))
     if r_pi > x_rank:
+        rank_description = "numerical rank" if x_rank_is_exact else "verified retained rank"
         raise ValueError(
-            "predictor_rank exceeds the numerical rank of X: "
-            f"predictor_rank={r_pi}, numerical_rank={x_rank}, "
+            f"predictor_rank exceeds the {rank_description} of X: "
+            f"predictor_rank={r_pi}, {rank_description.replace(' ', '_')}={x_rank}, "
             f"tolerance={rank_tolerance:.6g}."
         )
 
@@ -168,8 +216,60 @@ def fit_pipls_core(
         D=D,
         Q=Q,
         x_rank=x_rank,
+        x_rank_is_exact=x_rank_is_exact,
         rank_tolerance=rank_tolerance,
+        predictor_svd_solver=resolved_solver,
     )
+
+
+def _resolve_predictor_svd_solver(
+    *,
+    shape: tuple[int, int],
+    predictor_rank: int,
+    svd_solver: SVDSolver,
+) -> ResolvedSVDSolver:
+    """Resolve the predictor SVD policy using the conservative auto rule."""
+
+    if svd_solver not in ("full", "randomized", "auto"):
+        raise ValueError(
+            'svd_solver must be "full", "randomized", or "auto"; '
+            f"got {svd_solver!r}."
+        )
+    if svd_solver != "auto":
+        return svd_solver
+
+    n_samples, n_features = shape
+    min_dimension = min(n_samples, n_features)
+    use_randomized = (
+        min_dimension >= _AUTO_RANDOMIZED_MIN_DIMENSION
+        and n_samples * n_features >= _AUTO_RANDOMIZED_MIN_ENTRIES
+        and predictor_rank <= _AUTO_RANDOMIZED_MAX_RANK_FRACTION * min_dimension
+    )
+    return "randomized" if use_randomized else "full"
+
+
+def _validate_random_state(random_state: int | None, *, required: bool) -> int | None:
+    if random_state is None:
+        if required:
+            raise ValueError(
+                "random_state must be a nonnegative integer when randomized SVD is selected."
+            )
+        return None
+    if isinstance(random_state, (bool, np.bool_)) or not isinstance(
+        random_state,
+        (int, np.integer),
+    ):
+        raise ValueError(
+            "random_state must be None or a nonnegative integer; "
+            f"got {random_state!r}."
+        )
+    seed = int(random_state)
+    if seed < 0:
+        raise ValueError(
+            "random_state must be None or a nonnegative integer; "
+            f"got {random_state!r}."
+        )
+    return seed
 
 
 def _as_finite_matrix(value: ArrayLike, *, name: str) -> FloatArray:

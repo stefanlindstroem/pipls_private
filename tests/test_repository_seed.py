@@ -73,9 +73,11 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert "Phase C2c: split exhaustive and adaptive rank-search semantics" in strategy
     assert "Current status: **complete**. Exhaustive search" in strategy
     assert "Phase C2d: scalable linear-algebra policy" in strategy
-    assert "Current status: **planned and next**" in strategy
+    assert 'Current status: **complete**. The estimator now exposes `svd_solver=' in strategy
     assert "Phase D1: complete path analysis" in strategy
+    assert "The next implementation patch should be **Phase D1" in strategy
     assert (root / "docs" / "decisions" / "0007-predictor-rank-search-policies.md").is_file()
+    assert (root / "docs" / "decisions" / "0008-predictor-svd-policy.md").is_file()
     assert "The LLM maintainer updates this file" in readme
     assert "git apply --check ~/Downloads/proposed-change.patch" in readme
     assert 'git commit -m "Describe the completed increment"' in readme

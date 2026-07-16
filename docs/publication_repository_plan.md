@@ -8,8 +8,9 @@
 conditional CV search is now targeted as `predictor_rank="optimal"`; `predictor_rank="auto"` is
 reserved for deterministic adaptive coarse-to-fine search. Where revision 5 describes exhaustive
 search under the name `"auto"`, decision 0007 supersedes the name while preserving the fold-safe
-bound, fold-local preprocessing, scoring, and tie-breaking contracts. Randomized SVD is governed
-by a separate future solver policy.
+bound, fold-local preprocessing, scoring, and tie-breaking contracts. Decision 0008 implements
+randomized SVD as a separate predictor-decomposition policy with a conservative automatic rule and
+reproducible seed, leaving the response-side and coupling SVDs exact.
 
 ## 1. Executive recommendation
 
