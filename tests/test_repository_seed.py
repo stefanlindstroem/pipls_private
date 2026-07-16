@@ -11,6 +11,16 @@ def test_package_imports() -> None:
     assert pipls.__version__ == "0.0.0"
 
 
+def test_packaging_uses_pep639_license_metadata() -> None:
+    root = Path(__file__).resolve().parents[1]
+    pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
+
+    assert 'requires = ["setuptools>=77.0.3", "wheel"]' in pyproject
+    assert 'license = "BSD-3-Clause"' in pyproject
+    assert 'license-files = ["LICENSE"]' in pyproject
+    assert 'license = {file = "LICENSE"}' not in pyproject
+
+
 def test_required_llm_contracts_exist() -> None:
     root = Path(__file__).resolve().parents[1]
     required = {
