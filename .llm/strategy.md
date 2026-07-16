@@ -112,16 +112,21 @@ package export, pipeline smoke tests, and strict typing boundary are committed.
 Add one tested fold-safe rank-bound helper and the rule-fixed estimator mode. Do not add internal
 cross-validation in the same increment.
 
-Current status: **implemented by this patch**, subject to acceptance tests and commit. The helper
-accepts an explicit smallest training-set size. In the non-CV `"max"` mode, the estimator passes
-the number of samples supplied to `fit`; Phase C2 will pass the smallest materialized internal-CV
-training-fold size.
+Current status: **complete**. The shared ceiling-based bound and the non-CV `"max"` estimator mode
+are committed and tested.
 
-### Phase C2: `predictor_rank="auto"`
+### Phase C2a: private CV-selection primitives
 
-Add conditional predictor-rank selection for one fixed `n_components`, including fold-local
-preprocessing, response-standardized MSE, deterministic tie-breaking, diagnostics, and full-data
-refitting.
+Freeze the reusable split, candidate-grid, fold-local response-scale, response-standardized loss,
+and deterministic tie-breaking contracts before changing public estimator behavior.
+
+Current status: **implemented by this patch**, subject to acceptance tests and commit. This phase
+adds no public constructor parameters and does not accept `predictor_rank="auto"` yet.
+
+### Phase C2b: `predictor_rank="auto"`
+
+Integrate the Phase C2a primitives into `PiPLSRegression` for one fixed `n_components`, including
+fold-local preprocessing, diagnostics, and full-data refitting.
 
 ### Phase D1: complete path analysis
 
@@ -146,11 +151,11 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-After the Phase C1 patch is committed and a clean snapshot is produced, the next patch should be
-**Phase C2: `predictor_rank="auto"`** for one fixed `n_components`. It must materialize and reuse
-the supplied CV splits, derive the bound from the smallest training fold, fit preprocessing inside
-each fold, select by response-standardized MSE with deterministic tie-breaking, store diagnostics,
-and refit the selected fixed-rank model on all supplied data.
+After the Phase C2a patch is committed and a clean snapshot is produced, the next patch should
+be **Phase C2b: `predictor_rank="auto"`** for one fixed `n_components`. It must reuse the private
+materialized splits, derive the bound from their smallest training fold, fit preprocessing inside
+each fold, select by response-standardized MSE, store diagnostics, and refit the selected
+fixed-rank model on all supplied data.
 
 ## Maintenance protocol
 

@@ -26,3 +26,12 @@ from the materialized internal-CV splits.
 An explicit integer `predictor_rank` bypasses this rule-derived upper bound. It remains subject to
 the fixed-core numerical-rank and dimensional checks. `max_predictor_rank_` records the
 rule-derived bound even when an explicit integer rank is used.
+
+Automatic-selection staging now fixes the following private contracts before estimator integration:
+
+- materialize and copy one CV split set for reuse by every candidate;
+- derive `n_train_min` from that materialized set;
+- scan every integer rank from `n_components` through the fold-safe upper bound;
+- when mean losses are equal within `rtol=1e-12` and `atol=1e-15`, select the smaller rank.
+
+The public `"auto"` mode remains pending until these primitives are integrated with fold-local estimator fitting.

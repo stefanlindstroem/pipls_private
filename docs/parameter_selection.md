@@ -39,3 +39,10 @@ actually used. Explicit integer ranks are not clamped to the rule-derived bound.
 `predictor_rank="auto"` is not implemented yet. Its later implementation will materialize CV
 splits, pass the smallest training-fold size to the same bound helper, evaluate all admissible
 ranks for the fixed `n_components`, and refit on the complete input data.
+
+## Automatic-selection implementation boundary
+
+The repository now contains private, tested primitives for reusable CV splits, fold-safe rank
+candidates, fold-local response scales, response-standardized MSE, and deterministic low-rank
+tie-breaking. These functions are not public API. `predictor_rank="auto"` remains rejected until
+the next increment integrates them with fold-local model fitting and full-data refitting.

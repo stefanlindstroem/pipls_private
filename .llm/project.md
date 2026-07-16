@@ -8,17 +8,18 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase C1 adds the shared ceiling-based predictor-rank bound and the
-`PiPLSRegression(predictor_rank="max")` rule-fixed mode. The fixed core and explicit-integer public
-estimator are already implemented. Automatic rank selection, path analysis, dataset APIs, and
-plotting remain pending.
+Phase C2a adds private, independently tested primitives for materializing reusable CV splits,
+constructing the conditional predictor-rank grid, computing fold-local response scales and
+response-standardized MSE, and applying deterministic low-rank tie-breaking. The public estimator
+still supports only integer and `"max"` predictor-rank modes; automatic selection remains the next
+increment.
 
 ## Planned responsibilities
 
 - `src/pipls/_core.py`: fixed-$(h,r_\pi)$ numerical core.
 - `src/pipls/_validation.py`: common parameter and array validation.
 - `src/pipls/regression.py`: `PiPLSRegression`.
-- `src/pipls/model_selection.py`: rank limits and `PiPLSPathCV`.
+- `src/pipls/model_selection.py`: rank limits, private CV-selection primitives, and later `PiPLSPathCV`.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `tests/unit/`: local behavior.
 - `tests/invariants/`: mathematical identities and subspace properties.
