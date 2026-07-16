@@ -1,4 +1,4 @@
-"""Fit Pi-PLS after explicitly reading the Linnerud predictor and response tables."""
+"""Fit Pi-PLS after explicitly reading the Linnerud X and Y tables."""
 
 from pathlib import Path
 
@@ -10,8 +10,9 @@ from pipls import PiPLSRegression
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "linnerud"
 
 # Read predictors X and responses Y exactly as an ordinary programming user would.
-X = pd.read_csv(DATA_DIR / "exercise.csv", sep=r"\s+")
-Y = pd.read_csv(DATA_DIR / "physiological.csv", sep=r"\s+")
+# metadata.yaml documents the repository dataset but is not needed for model use.
+X = pd.read_csv(DATA_DIR / "X.csv")
+Y = pd.read_csv(DATA_DIR / "Y.csv")
 
 expected_predictors = ["Chins", "Situps", "Jumps"]
 expected_responses = ["Weight", "Waist", "Pulse"]

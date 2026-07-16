@@ -14,13 +14,16 @@ and missing-value properties.
 ## Decision
 
 - The Linnerud physical-exercise dataset is the first repository real-data integration.
-- The two analysis-facing files are copied verbatim from scikit-learn 1.8.0 and redistributed under
-  its BSD 3-Clause license.
-- Predictor and response tables remain separate and preserve their documented common row order.
+- The values originate from scikit-learn 1.8.0 and are redistributed under its BSD 3-Clause
+  license.
+- Predictor and response tables remain separate, preserve their documented common row order, and
+  are normalized to the repository-wide `X.csv` and `Y.csv` names and comma-delimited format.
+- `metadata.yaml` records source, license, dimensions, variables, alignment, preparation, and
+  integrity without becoming a runtime requirement.
 - The example reads both tables directly with pandas, validates columns, numeric dtypes, row counts,
   and missingness, then fits `PiPLSRegression`.
-- No package loader, registry, required metadata sidecar, automatic download, or hidden example
-  helper is added.
+- No package loader, registry, metadata-driven runtime path, automatic download, or hidden
+  example helper is added.
 - Integrity hashes and provenance documentation are repository assets only; they are not runtime
   requirements.
 - Repository datasets and examples are included in the source distribution but not in the wheel.

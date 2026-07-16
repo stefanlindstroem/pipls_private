@@ -34,6 +34,7 @@ def test_required_llm_contracts_exist() -> None:
         ".llm/development.md",
         ".llm/public_api.md",
         ".llm/data_io.md",
+        ".llm/dataset_layout.md",
         ".llm/snapshot.sh",
         ".llm/create_patch.sh",
         ".llm/strategy.md",
@@ -111,6 +112,7 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert (root / "docs" / "decisions" / "0015-dataset-and-synthetic-api.md").is_file()
     assert (root / "docs" / "decisions" / "0016-transparent-data-ingestion.md").is_file()
     assert (root / "docs" / "decisions" / "0017-first-real-dataset.md").is_file()
+    assert (root / "docs" / "decisions" / "0018-repository-dataset-layout.md").is_file()
     assert (root / "docs" / "path_analysis.md").is_file()
     assert (root / "docs" / "cross_validation.md").is_file()
     assert "The LLM maintainer updates this file" in readme
@@ -160,7 +162,8 @@ def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
     assert "Phases A through E2 are complete" in state
     assert "Phase E3 is underway" in state
     assert "Linnerud" in state
-    assert "no required metadata file, registry, or package-owned loader" in state
+    assert "no metadata, registry, or package-owned loader required for fitting" in state
+    assert "comma-delimited `X.csv`, `Y.csv`, and documentary" in state
     assert "deterministic synthetic" in state
     assert (
         "weighted fitting and general sample-weight routing are intentionally out of scope"
@@ -186,11 +189,18 @@ def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
 def test_llm_data_io_contract_is_transparent() -> None:
     root = Path(__file__).resolve().parents[1]
     data_io = (root / ".llm" / "data_io.md").read_text(encoding="utf-8")
+    dataset_layout = (root / ".llm" / "dataset_layout.md").read_text(encoding="utf-8")
     strategy = (root / ".llm" / "strategy.md").read_text(encoding="utf-8")
 
     assert "model = PiPLSRegression().fit(X, Y)" in data_io
     assert "must not require a registry, metadata file" in data_io
     assert "Do not hide these steps behind a package utility" in data_io
+    assert "Every committed real dataset directory" in dataset_layout
+    assert "`X.csv`: predictor matrix" in dataset_layout
+    assert "`Y.csv`: response matrix" in dataset_layout
+    assert "`metadata.yaml`: repository description" in dataset_layout
+    assert "use a comma as delimiter" in dataset_layout
+    assert "not a runtime input" in dataset_layout
     assert "### Phase E3: real dataset integrations" in strategy
     assert "Current status: **underway**" in strategy
     assert not (root / "datasets" / "registry.yaml").exists()
@@ -209,9 +219,12 @@ def test_linnerud_is_repository_data_not_runtime_api() -> None:
 
     assert "recursive-include datasets" in manifest
     assert "recursive-include examples" in manifest
-    assert "read `X`, read `Y`" in data_readme
-    assert "pd.read_csv(DATA_DIR / \"exercise.csv\"" in example
-    assert "pd.read_csv(DATA_DIR / \"physiological.csv\"" in example
+    assert "`X.csv` and `Y.csv`" in data_readme
+    assert "pd.read_csv(DATA_DIR / \"X.csv\")" in example
+    assert "pd.read_csv(DATA_DIR / \"Y.csv\")" in example
+    assert "metadata.yaml" in example
+    assert "import yaml" not in example
+    assert "yaml.safe_load" not in example
     assert "load_dataset" not in example
     assert "linnerud" not in pipls.__all__
 

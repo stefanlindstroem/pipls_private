@@ -31,7 +31,9 @@ Phases A through E2 are complete and committed:
 - immutable validated `PiPLSDataset` and deterministic synthetic generators with shared,
   predictor-specific, and response-specific latent structure;
 - a transparent real-data input contract: users and examples read `X` and `Y` explicitly,
-  with no required metadata file, registry, or package-owned loader.
+  with no metadata, registry, or package-owned loader required for fitting;
+- a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
+  `metadata.yaml`.
 
 The current top-level package exports are:
 
@@ -71,7 +73,8 @@ from pipls.datasets import (
 | Group handling | keyword-only `groups` routed to group-aware splitters |
 | OOF output | opt-in through `return_oof_predictions=True` |
 | Dataset namespace | optional immutable container and seeded generators under `pipls.datasets` |
-| Real-data input | user-owned explicit reading of `X` and `Y`; no required registry, metadata, or loader |
+| Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or loader required for fitting |
+| Repository datasets | comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 
 Additional fixed decisions:
@@ -91,8 +94,9 @@ Additional fixed decisions:
 
 ## Current next increment
 
-Phase E3 is underway. The first integration is the small BSD-licensed Linnerud dataset, whose
-separate predictor and response tables are read explicitly in `examples/09_linnerud_real_data.py`.
+Phase E3 is underway. The first integration is the small BSD-licensed Linnerud dataset. It now
+uses the repository-wide `X.csv`, `Y.csv`, and `metadata.yaml` layout; the example reads only the
+two comma-delimited model tables explicitly.
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
 dataset. Prefer a manuscript dataset only after its source, citation, license, redistribution, and
@@ -101,13 +105,13 @@ patch must:
 
 1. establish source, citation, license, redistribution status, and preparation choices;
 2. add deterministic preparation under `scripts/prepare_data/` when conversion is needed;
-3. produce simple analysis-facing file or files;
+3. produce comma-delimited `X.csv`, `Y.csv`, and a conforming `metadata.yaml`;
 4. add an example or reproduction script that reads predictors `X` and response `Y` explicitly
    using ordinary NumPy or pandas code;
 5. show row alignment, selected columns, dtype handling, and missing-value policy directly;
 6. fit the public estimator from those visible `X` and `Y` objects;
-7. avoid a public registry, generic loader, required metadata sidecar, implicit download, or hidden
-   preprocessing utility.
+7. avoid a public registry, generic loader, metadata-driven runtime path, implicit download, or
+   hidden preprocessing utility.
 
 Do not begin the Corn reconstruction until its unresolved preprocessing choices are fixed. Do not
 claim manuscript reproduction from the Linnerud reference example.
@@ -133,8 +137,8 @@ Use this order when sources disagree:
 
 1. explicit decisions from the project owner in the current request;
 2. accepted decision records under `docs/decisions/`;
-3. normative `.llm/mathematics.md`, `.llm/numerical_contracts.md`, `.llm/public_api.md`, and
-   `.llm/data_io.md`;
+3. normative `.llm/mathematics.md`, `.llm/numerical_contracts.md`, `.llm/public_api.md`,
+   `.llm/data_io.md`, and `.llm/dataset_layout.md`;
 4. source and tests as evidence of implemented behavior;
 5. this current-state handoff and `.llm/strategy.md`;
 6. `docs/publication_repository_plan.md` as the broad historical architecture and rationale.
@@ -153,7 +157,8 @@ From an uploaded snapshot, a maintainer should:
 3. read `.llm/decisions.md` and the decision records relevant to the requested increment;
 4. read the applicable mathematical, numerical, API, and development contracts;
 5. inspect the affected source and tests rather than trusting document claims alone;
-6. read `.llm/data_io.md` for dataset, real-data, example, or reproduction work;
+6. read `.llm/data_io.md` and `.llm/dataset_layout.md` for dataset, real-data, example, or
+   reproduction work;
 7. verify that the requested work is the current increment or that the owner explicitly changed
    the order;
 8. return one root-relative unified Git patch, validation results, and exact direct Git commands.

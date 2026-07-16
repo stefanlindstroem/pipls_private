@@ -24,8 +24,10 @@
 - Weighted fitting and `sample_weight` propagation during fitting are out of scope unless the
   project owner explicitly reverses that decision.
 - For real-data examples and reproduction scripts, read and form `X` and `Y` explicitly in the
-  script. Do not introduce a public registry, generic loader, required metadata sidecar, or
+  script. Do not introduce a public registry, generic loader, metadata-driven runtime path, or
   helper function that obscures the data-reading steps.
+- Every committed real dataset follows `.llm/dataset_layout.md`: comma-delimited `X.csv`,
+  comma-delimited `Y.csv`, and documentary `metadata.yaml`.
 - Keep dataset-specific conversion under `scripts/prepare_data/`; keep analysis-time reading
   simple, visible, and representative of normal user code.
 

@@ -16,8 +16,9 @@ Phases A through E2 are implemented, and Phase E3 is underway with the first tra
 `StatisticalSupportWarning`.
 
 The next increment remains Phase E3: migrate the next reviewable real dataset. Linnerud now
-provides the small transparent reference integration. A manuscript dataset should follow only when
-its source, license, redistribution, and scientific preparation choices are resolved.
+provides both the transparent I/O example and the standard repository layout reference. A
+manuscript dataset should follow only when its source, license, redistribution, and scientific
+preparation choices are resolved.
 
 ## Runtime ownership
 
@@ -50,8 +51,8 @@ its source, license, redistribution, and scientific preparation choices are reso
 
 ## Dataset and reproduction ownership
 
-- `datasets/`: dataset descriptions and committed redistributable analysis files only. No
-  generic runtime registry is required.
+- `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`,
+  and `metadata.yaml` layout. No generic runtime registry is required.
 - `scripts/prepare_data/`: deterministic dataset-specific preparation and verification.
 - `scripts/reproduce_paper/`: explicit paper-specific analysis workflows that read `X` and
   `Y` visibly.
@@ -68,7 +69,8 @@ its source, license, redistribution, and scientific preparation choices are reso
 - `.llm/mathematics.md`: concise normative mathematical contract.
 - `.llm/numerical_contracts.md`: numerical policy and degeneracy behavior.
 - `.llm/public_api.md`: public constructors, methods, outputs, defaults, and exclusions.
-- `.llm/data_io.md`: transparent real-data reading, example, and repository-dataset policy.
+- `.llm/data_io.md`: transparent real-data reading and example policy.
+- `.llm/dataset_layout.md`: normative committed-dataset file and metadata convention.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
 - `docs/decisions/`: accepted design records.
 - `docs/publication_repository_plan.md`: broad historical architecture and publication rationale;

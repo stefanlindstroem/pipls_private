@@ -2,7 +2,8 @@
 
 Phase E1 introduces an optional structured in-memory dataset boundary for package-owned
 synthetic data and experiments. Real-data users may pass ordinary arrays or data frames directly
-to `fit(X, Y)`; no container or metadata file is required.
+to `fit(X, Y)`; no container or metadata file is required for model fitting. Repository-included
+real datasets nevertheless use a consistent documentary `metadata.yaml`.
 
 ## Validated dataset container
 
@@ -123,10 +124,10 @@ registry, generic loader, or required metadata sidecar is part of the runtime AP
 ## Transparent real-data example
 
 The repository's first real-data integration is the Linnerud physical-exercise dataset under
-`datasets/linnerud/`. It contains separate predictor and response tables with 20 rows and three
-columns each. The analysis script `examples/09_linnerud_real_data.py` reads both files directly
-with pandas, checks their columns, numeric dtypes, row counts, and missingness, then calls
-`PiPLSRegression.fit(X, Y)`.
+`datasets/linnerud/`. It uses the repository convention `X.csv`, `Y.csv`, and `metadata.yaml`; both
+model tables are comma-delimited and contain 20 rows and three columns. The analysis script
+`examples/09_linnerud_real_data.py` reads `X.csv` and `Y.csv` directly with pandas, checks columns,
+numeric dtypes, row counts, and missingness, then calls `PiPLSRegression.fit(X, Y)`.
 
-The dataset integration adds no public loader. Provenance, the copied BSD license, and integrity
-hashes are repository assets and are not required inputs to the estimator.
+The metadata file documents source, license, variables, row alignment, preparation, and integrity.
+It is not parsed by the example or required by the estimator.

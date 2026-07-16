@@ -1,2 +1,2 @@
-recursive-include datasets *.csv *.md *.txt *.sha256
+recursive-include datasets *.csv *.md *.txt *.yaml
 recursive-include examples *.py *.md

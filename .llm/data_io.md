@@ -3,8 +3,8 @@
 ## Purpose
 
 This document defines how Pi-PLS examples, repository datasets, and paper-reproduction scripts
-must obtain real predictor and response matrices. It protects a deliberately small user contract:
-the programming user reads their own data into `X` and `Y`, then calls the estimator.
+obtain real predictor and response matrices. It protects a deliberately small user contract: the
+programming user reads their own data into `X` and `Y`, then calls the estimator.
 
 The package must not require a registry, metadata file, checksum manifest, dataset container, or
 package-owned loader before a model can be fitted.
@@ -35,87 +35,56 @@ to behave:
 
 1. read the predictor file or columns explicitly;
 2. read the response file or columns explicitly;
-3. show any row alignment, column selection, dtype conversion, or missing-value policy in the
-   example itself;
+3. show row alignment, column selection, dtype conversion, and missing-value policy in the script;
 4. form `X` and `Y` visibly;
 5. call `fit(X, Y)`.
 
 Do not hide these steps behind a package utility such as `load_dataset`, an example helper module,
-a registry resolver, or an implicit converter. A reader should be able to inspect one script and
-see exactly how the model matrices were formed.
+a registry resolver, metadata parser, or an implicit converter.
 
-Ordinary, recognizable I/O is preferred. For example:
-
-```python
-import numpy as np
-
-X = np.loadtxt("data/X.csv", delimiter=",", skiprows=1)
-Y = np.loadtxt("data/Y.csv", delimiter=",", skiprows=1)
-```
-
-or, when column names matter:
+For repository datasets, the preferred visible pattern is:
 
 ```python
 import pandas as pd
 
-frame = pd.read_csv("data/measurements.csv")
-X = frame.loc[:, predictor_columns]
-Y = frame.loc[:, response_columns]
+X = pd.read_csv("datasets/example/X.csv")
+Y = pd.read_csv("datasets/example/Y.csv")
+model = PiPLSRegression().fit(X, Y)
 ```
 
-The exact code may vary by dataset. Consistency across repository examples is desirable, but it
-must not be achieved by concealing the I/O contract.
+The example must not need to parse `metadata.yaml`; that file documents the repository asset.
 
 ## Repository dataset policy
 
-Repository-owned datasets may include human-readable descriptions, citations, licenses,
-preparation notes, source checksums, and deterministic preparation scripts where needed for
-scientific reproducibility. These are repository and publication assets, not runtime inputs that
-external users must reproduce.
+Every committed real dataset follows `.llm/dataset_layout.md`:
 
-For each migrated dataset:
+- predictors are stored in UTF-8, comma-delimited `X.csv` with a header;
+- responses are stored in UTF-8, comma-delimited `Y.csv` with a header;
+- `metadata.yaml` records a consistent description, source, license, dimensions, variables,
+  alignment, preparation, missing-value policy, and integrity hashes;
+- the metadata file is mandatory for repository inclusion but optional and irrelevant for model
+  fitting by external users;
+- human-readable descriptions and license files may accompany the standard files;
+- deterministic source-to-analysis conversion belongs under `scripts/prepare_data/` when needed.
 
-- document the source, license, citation, redistribution decision, and preparation choices;
-- keep preparation code under `scripts/prepare_data/` when raw-to-analysis conversion is needed;
-- keep the analysis-facing files simple enough to read explicitly in the example or reproduction
-  script;
-- state shapes, predictor columns, response columns, row ordering, and missing-value handling;
-- preserve deterministic preparation and checksums where they are scientifically useful;
-- do not expose a generic registry or loader API merely to support repository examples.
-
-A metadata file may be used internally when a particular preparation workflow benefits from it,
-but it must be optional for model use and must not become a prerequisite for reading `X` and `Y`.
+Repository metadata standardizes scientific assets; it does not create a public registry or loader.
 
 ## Separation of responsibilities
 
-The boundaries are:
+- **Programming user:** reads and prepares `X` and `Y` from their own source.
+- **Estimator API:** validates supplied model matrices and fits Pi-PLS.
+- **Repository dataset integration:** provides consistently named analysis files plus documentary
+  metadata and provenance.
+- **Examples and reproduction scripts:** visibly read `X.csv` and `Y.csv` and show all analytical
+  choices that form the matrices.
 
-- **Programming user:** reads and prepares `X` and `Y` according to their domain and data source.
-- **Pi-PLS estimators:** validate model inputs, fit, transform, predict, score, and report results.
-- **Repository preparation scripts:** reproducibly convert specific research sources into simple
-  analysis-facing files.
-- **Examples and reproduction scripts:** show the actual reading and matrix construction steps
-  directly.
-- **Synthetic API:** may return `PiPLSDataset` because the package itself generates all arrays and
-  latent truth.
+## Prohibited directions
 
-## Explicit exclusions
+Do not introduce merely for repository examples:
 
-Do not add, unless the project owner reverses this decision:
-
-- a required metadata sidecar for fitting;
 - a public dataset registry;
-- a generic package loader for arbitrary real datasets;
-- automatic download or converter execution from estimator or example code;
-- hidden row filtering, imputation, centering, scaling, or feature engineering;
-- example-only helper functions that obscure how `X` and `Y` were read.
-
-## Review questions
-
-For any real-data or example patch, verify:
-
-- Can a reader see exactly how `X` and `Y` are obtained?
-- Could the same estimator code accept arrays loaded another way?
-- Is all dataset-specific handling outside the estimator API?
-- Are preparation and analysis-time reading clearly separated?
-- Is optional provenance documentation being mistaken for required runtime metadata?
+- a generic real-data loader;
+- automatic downloading;
+- runtime dependence on `metadata.yaml`;
+- hidden example helpers that conceal how `X` and `Y` were formed;
+- preprocessing learned across train/test or cross-validation boundaries.

@@ -22,7 +22,8 @@ This index is navigation, not a substitute for those records.
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
 | `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional immutable datasets plus local seeded latent-structure generation |
 | `0016-transparent-data-ingestion.md` | real-data and example boundary | users and examples read `X` and `Y` explicitly; no required registry or generic loader |
-| `0017-first-real-dataset.md` | first transparent real-data integration | Linnerud files are read explicitly; provenance/checksums remain repository-only assets |
+| `0017-first-real-dataset.md` | first transparent real-data integration | Linnerud files are read explicitly; provenance remains repository-only |
+| `0018-repository-dataset-layout.md` | committed real-dataset file convention | every dataset uses comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
 
 ## Accepted clarifications after the original publication plan
 
@@ -45,7 +46,9 @@ plan contains an earlier or more general proposal:
 - real-data users supply `X` and `Y` directly; metadata files, registry lookup, generic loaders,
   and `PiPLSDataset` are not prerequisites for fitting;
 - examples and reproduction scripts show their data-reading and matrix-construction code rather
-  than relying on hidden utility functions.
+  than relying on hidden utility functions;
+- committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
+  external users remain free to use any data source or file organization;
 - the first real-data integration is Linnerud; it is repository example data, not a new runtime loader or a manuscript-result claim;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision

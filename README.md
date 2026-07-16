@@ -76,8 +76,8 @@ For a transparent real-data workflow, see `examples/09_linnerud_real_data.py`. I
 predictor and response tables directly with pandas, verifies their alignment, and then fits:
 
 ```python
-X = pd.read_csv("datasets/linnerud/exercise.csv", sep=r"\s+")
-Y = pd.read_csv("datasets/linnerud/physiological.csv", sep=r"\s+")
+X = pd.read_csv("datasets/linnerud/X.csv")
+Y = pd.read_csv("datasets/linnerud/Y.csv")
 model = PiPLSRegression(n_components=2).fit(X, Y)
 ```
 

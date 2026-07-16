@@ -289,15 +289,18 @@ and the roadmap now proceeds directly to one explicit real-dataset integration p
 
 ### Phase E3: real dataset integrations
 
-Migrate and validate one dataset per coherent increment. Record source, citation, license,
-redistribution decision, preparation choices, shapes, columns, row ordering, and missing-value
-policy. Keep preparation deterministic, but make the analysis example read `X` and `Y` directly
-with ordinary NumPy or pandas code. Do not introduce a generic registry or loader. Defer Corn
+Migrate and validate one dataset per coherent increment. Every committed dataset uses
+comma-delimited `X.csv`, comma-delimited `Y.csv`, and a consistent documentary `metadata.yaml` as
+defined in `.llm/dataset_layout.md`. Record source, citation, license, redistribution decision,
+preparation choices, shapes, columns, row ordering, missing-value policy, and integrity hashes.
+Keep preparation deterministic, but make the analysis example read `X` and `Y` directly with
+ordinary NumPy or pandas code. Do not introduce a generic registry or loader. Defer Corn
 reconstruction until its preprocessing choices are explicitly fixed.
 
-Current status: **underway**. The first integration is Linnerud: two verbatim BSD-licensed
-scikit-learn tables, repository provenance and hashes, and an example that reads `X` and `Y`
-directly with pandas. No runtime loader or metadata requirement was added.
+Current status: **underway**. The first integration is Linnerud: upstream values from the
+BSD-licensed scikit-learn tables normalized to comma-delimited `X.csv` and `Y.csv`, a conforming
+`metadata.yaml`, and an example that reads only the two model tables directly with pandas. No
+runtime loader or metadata requirement for model fitting was added.
 
 ### Phase E4: benchmark fixtures
 
@@ -329,10 +332,11 @@ Current status: **planned**.
 ## Current next increment
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
-dataset. Linnerud is the completed transparent reference integration. A manuscript dataset may
-follow only when source, citation, licensing, redistribution, row alignment, and scientific
-preparation are resolved. Do not add a public registry, generic loader, required metadata file,
-implicit download, or hidden example I/O utility. Corn remains deferred until its preprocessing
+dataset. Linnerud is the completed transparent reference integration and the file-layout
+reference. A manuscript dataset may follow only when source, citation, licensing, redistribution,
+row alignment, and scientific preparation are resolved. Require the standard repository metadata
+file, but do not add a public registry, generic loader, metadata-driven runtime path, implicit
+download, or hidden example I/O utility. Corn remains deferred until its preprocessing
 choices are resolved.
 
 ## Maintenance protocol
