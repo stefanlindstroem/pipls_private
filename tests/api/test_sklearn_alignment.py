@@ -5,6 +5,7 @@ from dataclasses import FrozenInstanceError
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import pytest
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
@@ -127,7 +128,6 @@ def test_copy_parameter_matches_pls_fit_semantics() -> None:
 
 
 def test_feature_names_and_set_output_match_sklearn_transformers() -> None:
-    pd = pytest.importorskip("pandas")
     X, Y = _data()
     columns = [f"feature_{index}" for index in range(X.shape[1])]
     X_frame = pd.DataFrame(X, columns=columns)
@@ -238,7 +238,6 @@ def test_path_score_accepts_sample_weight_like_regression() -> None:
 
 
 def test_path_feature_names_delegate_to_refitted_estimator() -> None:
-    pd = pytest.importorskip("pandas")
     X, Y = _data()
     columns = [f"feature_{index}" for index in range(X.shape[1])]
     X_frame = pd.DataFrame(X, columns=columns)
@@ -258,7 +257,6 @@ def test_path_feature_names_delegate_to_refitted_estimator() -> None:
 
 
 def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
-    pd = pytest.importorskip("pandas")
     X, Y = _data()
     columns = [f"feature_{index}" for index in range(X.shape[1])]
     X_frame = pd.DataFrame(X, columns=columns)

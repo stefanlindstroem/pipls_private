@@ -13,3 +13,4 @@
 - Harden public parameter validation and warn when rule-based predictor-rank bounds use fewer than five samples per retained direction.
 - Add pipeline-aware `PiPLSPathCV` with exhaustive and adaptive triangular path search, fold-safe bounds, diagnostics, and full-data refitting.
 - Align the public estimators with scikit-learn and `PLSRegression` conventions, including estimator-aware validation, feature names, pandas output, weights/loadings, standard CV results, `PiPLSDecomposition`, `best_pipls_`, and container-preserving path folds.
+- Make pandas a required development dependency so pandas API-alignment tests run rather than skip.
