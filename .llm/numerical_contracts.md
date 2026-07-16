@@ -4,6 +4,7 @@
 - Use `numpy.linalg.eigh` only for symmetric matrices, after explicit symmetrization.
 - Do not form explicit inverses. Use solves, least squares, SVDs, or documented pseudoinverses.
 - The fixed core uses $\tau_X=\max(n,p)\,\epsilon_{64}\,s_1$ for predictor numerical rank; requested predictor rank above that numerical rank raises `ValueError`.
+- The shared rule-derived upper predictor rank is `min(p, n_train_min, ceil(n_train_min / c))`; `c` must be positive and finite, and the ceiling operation is normative.
 - Constant columns, rank deficiency, $p\gg n$, and nearly repeated singular values require deterministic behavior.
 - Singular/eigenvector signs are not identifiers.
 - Basis equality is not required when only the spanned subspace is identifiable.

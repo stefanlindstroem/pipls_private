@@ -89,7 +89,8 @@ Required outputs:
 Do not add the public estimator, automatic rank selection, datasets, or plotting in this
 increment.
 
-Current status: **implemented by this patch**, subject to acceptance tests and commit.
+Current status: **complete**. The fixed-parameter private core and its reference, invariant, and
+boundary tests are committed.
 
 ### Phase B2: fixed-rank public estimator
 
@@ -103,10 +104,18 @@ Required outputs:
 - coefficient orientation and fitted attributes consistent with `.llm/public_api.md`;
 - estimator-contract and pipeline smoke tests.
 
+Current status: **complete**. The public explicit-integer estimator, preprocessing semantics,
+package export, pipeline smoke tests, and strict typing boundary are committed.
+
 ### Phase C1: rank-bound helper and `predictor_rank="max"`
 
 Add one tested fold-safe rank-bound helper and the rule-fixed estimator mode. Do not add internal
 cross-validation in the same increment.
+
+Current status: **implemented by this patch**, subject to acceptance tests and commit. The helper
+accepts an explicit smallest training-set size. In the non-CV `"max"` mode, the estimator passes
+the number of samples supplied to `fit`; Phase C2 will pass the smallest materialized internal-CV
+training-fold size.
 
 ### Phase C2: `predictor_rank="auto"`
 
@@ -137,10 +146,11 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-After the Phase B1 core patch is committed and a clean snapshot is produced, the next patch should
-be **Phase B2: fixed-rank public estimator**. It should expose only explicit integer
-`predictor_rank`, use the private core without duplicating its algebra, and remain separate from
-automatic rank selection.
+After the Phase C1 patch is committed and a clean snapshot is produced, the next patch should be
+**Phase C2: `predictor_rank="auto"`** for one fixed `n_components`. It must materialize and reuse
+the supplied CV splits, derive the bound from the smallest training fold, fit preprocessing inside
+each fold, select by response-standardized MSE with deterministic tie-breaking, store diagnostics,
+and refit the selected fixed-rank model on all supplied data.
 
 ## Maintenance protocol
 

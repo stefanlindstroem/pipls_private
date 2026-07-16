@@ -1,8 +1,8 @@
-"""Public fixed-rank Pi-PLS estimator."""
+"""Public Pi-PLS estimator with fixed and rule-derived rank modes."""
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -11,12 +11,13 @@ from sklearn.metrics import r2_score
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 
 from ._core import fit_pipls_core
+from .model_selection import _as_positive_float, _max_predictor_rank
 
 FloatArray = NDArray[np.float64]
 
 
 class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type: ignore[misc]
-    r"""Pi-PLS regression with an explicitly fixed predictor rank.
+    r"""Pi-PLS regression with a fixed or rule-derived predictor rank.
 
     Parameters
     ----------
@@ -28,8 +29,12 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
     copy:
         If true, copy input arrays before preprocessing.
     predictor_rank:
-        Explicit predictor truncation rank $r_\pi$. Only integer values are
-        supported in this implementation phase.
+        Predictor truncation rank $r_\pi$. An integer fixes the rank explicitly.
+        ``"max"`` uses the rule-derived upper bound for the samples supplied to
+        :meth:`fit`.
+    samples_per_predictor_rank:
+        Positive rule parameter $c$ used to derive the upper predictor rank.
+        It does not constrain an explicitly supplied integer rank.
     """
 
     def __init__(
@@ -38,15 +43,17 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         *,
         scale: bool = True,
         copy: bool = True,
-        predictor_rank: int = 2,
+        predictor_rank: int | Literal["max"] = 2,
+        samples_per_predictor_rank: float = 10.0,
     ) -> None:
         self.n_components = n_components
         self.scale = scale
         self.copy = copy
         self.predictor_rank = predictor_rank
+        self.samples_per_predictor_rank = samples_per_predictor_rank
 
     def fit(self, X: ArrayLike, y: ArrayLike) -> PiPLSRegression:
-        """Fit the fixed-rank Pi-PLS model."""
+        """Fit the Pi-PLS model."""
 
         X_checked, y_checked = check_X_y(
             X,
@@ -84,14 +91,29 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
         X_cs = X_centered / self.x_scale_
         y_cs = y_centered / self.y_scale_
 
+        max_predictor_rank = _max_predictor_rank(
+            n_features=self.n_features_in_,
+            n_train_min=int(X_array.shape[0]),
+            samples_per_predictor_rank=self.samples_per_predictor_rank,
+        )
+        predictor_rank = (
+            max_predictor_rank if self.predictor_rank == "max" else int(self.predictor_rank)
+        )
+        if self.n_components > predictor_rank:
+            raise ValueError(
+                "n_components must satisfy n_components <= predictor_rank_; "
+                f"got n_components={self.n_components}, predictor_rank_={predictor_rank}."
+            )
+
         result = fit_pipls_core(
             X_cs,
             y_cs,
-            predictor_rank=self.predictor_rank,
+            predictor_rank=predictor_rank,
             n_components=self.n_components,
         )
 
-        self.predictor_rank_ = int(self.predictor_rank)
+        self.predictor_rank_ = predictor_rank
+        self.max_predictor_rank_ = max_predictor_rank
         self.Pi_ = result.Pi
         self.C_ = result.C
         self.W_ = result.W
@@ -178,12 +200,28 @@ class PiPLSRegression(TransformerMixin, RegressorMixin, BaseEstimator):  # type:
 
     def _validate_constructor_parameters(self) -> None:
         _validate_positive_int(self.n_components, name="n_components")
-        _validate_positive_int(self.predictor_rank, name="predictor_rank")
-        if self.n_components > self.predictor_rank:
+        if self.predictor_rank == "max":
+            pass
+        elif isinstance(self.predictor_rank, (int, np.integer)) and not isinstance(
+            self.predictor_rank,
+            (bool, np.bool_),
+        ):
+            _validate_positive_int(self.predictor_rank, name="predictor_rank")
+            if self.n_components > self.predictor_rank:
+                raise ValueError(
+                    "n_components must satisfy n_components <= predictor_rank; "
+                    f"got n_components={self.n_components}, "
+                    f"predictor_rank={self.predictor_rank}."
+                )
+        else:
             raise ValueError(
-                "n_components must satisfy n_components <= predictor_rank; "
-                f"got n_components={self.n_components}, predictor_rank={self.predictor_rank}."
+                'predictor_rank must be a positive integer or "max"; '
+                f"got {self.predictor_rank!r}."
             )
+        _as_positive_float(
+            self.samples_per_predictor_rank,
+            name="samples_per_predictor_rank",
+        )
         if not isinstance(self.scale, (bool, np.bool_)):
             raise ValueError(f"scale must be boolean; got {self.scale!r}.")
         if not isinstance(self.copy, (bool, np.bool_)):

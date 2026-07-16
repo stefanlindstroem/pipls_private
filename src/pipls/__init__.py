@@ -1,8 +1,7 @@
-"""Pi-PLS package.
+"""Pi-PLS multivariate regression."""
 
-The public estimator is introduced in a subsequent implementation increment.
-"""
+from .regression import PiPLSRegression
 
-__all__ = ["__version__"]
+__all__ = ["PiPLSRegression", "__version__"]
 
 __version__ = "0.0.0"

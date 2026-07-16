@@ -8,8 +8,10 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase B1 implements the private fixed-parameter numerical core in `src/pipls/_core.py`.
-There is still no public estimator, automatic rank selection, dataset API, or plotting layer.
+Phase C1 adds the shared ceiling-based predictor-rank bound and the
+`PiPLSRegression(predictor_rank="max")` rule-fixed mode. The fixed core and explicit-integer public
+estimator are already implemented. Automatic rank selection, path analysis, dataset APIs, and
+plotting remain pending.
 
 ## Planned responsibilities
 
