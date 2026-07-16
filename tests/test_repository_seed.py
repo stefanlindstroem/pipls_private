@@ -16,6 +16,8 @@ def test_required_llm_contracts_exist() -> None:
     required = {
         ".llm/README.md",
         ".llm/project.md",
+        ".llm/state.md",
+        ".llm/decisions.md",
         ".llm/theory.md",
         ".llm/mathematics.md",
         ".llm/numerical_contracts.md",
@@ -79,7 +81,9 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert "Phase D1: complete path analysis" in strategy
     assert "Phase D1a: shared private selection engine" in strategy
     assert "Phase D1b: scikit-learn and PLS-style API alignment" in strategy
+    assert "Phase D1c: final scikit-learn cleanup boundary" in strategy
     assert "Current status: **complete**. `PiPLSPathCV` is public" in strategy
+    assert "Phase E1: dataset schema and deterministic synthetic generator" in strategy
     assert "The next implementation patch should be **Phase E1" in strategy
     assert (root / "docs" / "decisions" / "0005-leave-one-out-protocol.md").is_file()
     assert (root / "docs" / "decisions" / "0007-predictor-rank-search-policies.md").is_file()
@@ -88,9 +92,14 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert (root / "docs" / "decisions" / "0010-path-analysis-api.md").is_file()
     assert (root / "docs" / "decisions" / "0011-shared-selection-engine.md").is_file()
     assert (root / "docs" / "decisions" / "0012-sklearn-api-alignment.md").is_file()
+    assert (root / "docs" / "decisions" / "0014-validation-metadata-scope.md").is_file()
     assert (root / "docs" / "path_analysis.md").is_file()
     assert (root / "docs" / "cross_validation.md").is_file()
     assert "The LLM maintainer updates this file" in readme
+    assert "## Fresh-chat bootstrap" in readme
+    assert "`.llm/SNAPSHOT_INFO`" in readme
+    assert "`state.md`" in readme
+    assert "`decisions.md`" in readme
     assert "git apply --check ~/Downloads/proposed-change.patch" in readme
     assert 'git commit -m "Describe the completed increment"' in readme
     assert not (root / ".llm" / "apply_patch.sh").exists()
@@ -121,3 +130,43 @@ def test_theory_reference_is_navigable_and_contains_core_identities() -> None:
     }
     missing = sorted(fragment for fragment in required_theory_fragments if fragment not in theory)
     assert not missing, f"Theory reference is missing core fragments: {missing}"
+
+
+def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
+    root = Path(__file__).resolve().parents[1]
+    state = (root / ".llm" / "state.md").read_text(encoding="utf-8")
+    project = (root / ".llm" / "project.md").read_text(encoding="utf-8")
+    public_api = (root / ".llm" / "public_api.md").read_text(encoding="utf-8")
+    decisions = (root / ".llm" / "decisions.md").read_text(encoding="utf-8")
+
+    assert "Phases A through D2 are complete" in state
+    assert "Phase E1: dataset schema" in state
+    assert "deterministic synthetic" in state
+    assert (
+        "weighted fitting and general sample-weight routing are intentionally out of scope"
+        in state
+    )
+    assert "direct `PiPLSRegression` or `Pipeline`" in state
+    assert "Routine work should not require re-uploading the manuscript" in state
+
+    assert "The next increment is Phase E1" in project
+    assert "`.llm/state.md`: current handoff" in project
+
+    assert "Arbitrary nested meta-estimators are rejected" in public_api
+    assert "Weighted fitting" in public_api
+    assert "composite estimator containing one" not in public_api
+
+    decision_files = sorted(path.name for path in (root / "docs" / "decisions").glob("*.md"))
+    missing = [name for name in decision_files if f"`{name}`" not in decisions]
+    assert not missing, f"Decision index is missing records: {missing}"
+
+
+def test_llm_prompts_bootstrap_from_repository_state() -> None:
+    root = Path(__file__).resolve().parents[1]
+    for path in sorted((root / ".llm" / "prompts").glob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        normalized = " ".join(text.split())
+        assert ".llm/" in text
+        assert "root-relative" in normalized
+        assert "unified Git patch" in normalized
+        assert "validation results" in normalized

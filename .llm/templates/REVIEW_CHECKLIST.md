@@ -1,9 +1,14 @@
 # Review checklist
 
-- Scope is one coherent increment.
-- Patch paths are repository-relative.
+- Scope is one coherent increment and follows `.llm/state.md` or an explicit owner reordering.
+- Patch paths are repository-relative and apply cleanly to the uploaded snapshot.
+- Source/tests agree with the claimed implemented state.
 - Mathematical dimensions and invariants remain consistent.
 - Numerical tolerances are scale-relative and tested.
-- Public API names and array orientations match the contract.
-- No generated files, caches, or unverified data are included.
-- Validation report is complete.
+- Public API names, defaults, supported composition, and array orientations match the contract.
+- Learned preprocessing remains inside the correct CV boundary.
+- Weighted fitting or unsupported metadata/composite behavior was not introduced implicitly.
+- Phase/default/roadmap changes update `.llm/state.md` and `.llm/strategy.md`.
+- New accepted decisions have a numbered record and `.llm/decisions.md` entry.
+- No generated files, caches, archive clutter, or unverified data are included.
+- Validation report is complete and distinguishes passed, failed, and not-run targets.

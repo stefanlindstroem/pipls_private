@@ -35,7 +35,8 @@ resolve the discrepancy explicitly rather than silently choosing one.
 6. Compare subspaces, regression maps, and predictions rather than raw singular-vector signs.
 7. Fit every learned preprocessing operation inside the corresponding training fold.
 8. Keep paper-specific orchestration explicit and separate from general estimator defaults.
-9. Update the relevant `.llm` contract and user-facing documentation when a contract changes.
+9. Update `.llm/state.md`, the relevant `.llm` contracts, and user-facing documentation when a
+   phase, roadmap, architecture, or public contract changes.
 10. Return one root-relative Git patch per increment with an explicit validation report.
 11. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
     for patch application or committing.
@@ -58,8 +59,12 @@ resolve the discrepancy explicitly rather than silently choosing one.
 - Search approximation and linear-algebra approximation are separate policies. Randomized SVD
   must be introduced through an explicit solver contract and diagnostics, not hidden inside the
   meaning of `predictor_rank`.
-- Custom learned preprocessing is searched around the complete pipeline.
+- Custom learned preprocessing is searched around the complete supported estimator boundary.
+- `PiPLSPathCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
+  `PiPLSRegression`; arbitrary nested meta-estimators are not implied.
 - Paper-specific rank rules and LOO reporting conventions are explicit reproduction inputs.
+- D2 metadata support is deliberately limited to `groups` for splitters. Weighted fitting,
+  `sample_weight`, and general-purpose metadata routing are out of scope.
 - `.llm/` is tracked repository infrastructure and is excluded from the installable package.
 - Patch application and commits use ordinary Git commands rather than project wrapper scripts.
 - Snapshots contain repository-root contents without an enclosing project directory.
@@ -221,32 +226,92 @@ matching the special behavior of PLS estimators. `PiPLSDecomposition`, `best_pip
 result aliases, fit-time copy semantics, feature names, pandas output, and container-preserving
 path folds are implemented and tested.
 
+### Phase D1c: final scikit-learn cleanup boundary
+
+Complete the remaining pre-validation compatibility work: inverse reconstruction, canonical
+read-only decomposition arrays, standard CV sentinels and timings, conditional path delegation,
+an explicit supported estimator boundary, and minimum-version CI.
+
+Current status: **complete**. `PiPLSRegression.inverse_transform`, canonical decomposition aliases,
+`cv=None`, `scoring=None`, `scorer_`, timing diagnostics, conditional delegated methods, direct or
+terminal-pipeline path support, and minimum-version scikit-learn CI are implemented and tested.
+
 ### Phase D2: LOO and advanced split protocols
 
 Add ordered out-of-fold predictions, the documented LOO protocol, grouped and temporal examples,
-and explicit selection-conditioned reporting.
+and explicit selection-conditioned reporting. Use ordinary scikit-learn splitters and preserve a
+narrow metadata contract: explicit `groups` only, with no weighted fitting or general sample
+metadata routing.
 
-Current status: **complete**. Both public interfaces support group metadata, ordinary repeated,
-predefined, temporal, and LOO splitters, optional row-ordered OOF predictions with repeat counts
-and partial coverage, singleton-safe scoring rules, pooled OOF R2 diagnostics, and immutable
-selection-conditioned validation reports.
+Current status: **complete**. Both public interfaces support explicit group metadata, ordinary
+repeated, predefined, temporal, and LOO splitters, optional row-ordered OOF predictions with
+repeat counts and partial coverage, singleton-safe scoring rules, pooled OOF R2 diagnostics, and
+immutable selection-conditioned validation reports. Weighted fitting is not supported.
 
-### Phase E: datasets and synthetic generator
+### Phase E1: dataset schema and deterministic synthetic generator
 
-Add the common dataset schema, generic loader, deterministic converters, provenance and licensing
-checks, and the side-effect-free synthetic generator. Migrate one dataset per increment where
-practical.
+Introduce the dataset boundary before any real-data migration.
 
-### Phase F: paper reproduction and release
+Acceptance conditions:
 
-Add paper scripts, frozen result tolerances, build/install smoke tests, release metadata, DOI
-workflow, and a clean tagged paper release.
+- one validated dataset container for arrays, names, sample identifiers, and metadata;
+- explicit shape, dtype, finite-value, naming, and provenance rules;
+- a side-effect-free seeded synthetic generator;
+- configurable shared, predictor-specific, and response-specific latent structure;
+- configurable ranks, strengths, scales, distributions, and noise;
+- deterministic train/test generation without preprocessing leakage;
+- focused invalid-input, invariant, and reproducibility tests;
+- no real dataset migration or network access in this increment.
+
+Current status: **next**.
+
+### Phase E2: dataset registry and generic loader
+
+Add the registry schema, loader, checksum/provenance/license validation, and converter contract.
+The loader must not silently download or transform data.
+
+Current status: **planned**.
+
+### Phase E3: real dataset migrations
+
+Migrate and validate one dataset per coherent increment. Record redistribution decisions,
+checksums, source URLs, converter versions, shapes, names, and expected preprocessing. Defer Corn
+reconstruction until its preprocessing choices are explicitly fixed.
+
+Current status: **planned**.
+
+### Phase E4: benchmark fixtures
+
+Add deterministic benchmark manifests and frozen tolerances linking synthetic and migrated
+datasets to estimator/path behavior. Keep benchmark fixtures distinct from paper result claims.
+
+Current status: **planned**.
+
+### Phase F1: paper reproduction
+
+Add explicit scripts and manifests for every paper figure and table, including paper-specific rank
+rules, splitters, seeds, and selection-conditioned reporting labels.
+
+Current status: **planned**.
+
+### Phase F2: release hardening
+
+Add clean-install and build smoke tests, frozen reproduction tolerances, licensing audit, release
+metadata, and final user/developer documentation.
+
+Current status: **planned**.
+
+### Phase F3: archival release
+
+Create the clean tagged release, archive/DOI workflow, and manuscript repository reference.
+
+Current status: **planned**.
 
 ## Current next increment
 
-The next implementation patch should be **Phase E1: common dataset schema and synthetic
-generator**. It should introduce the generic loader/schema boundary and a deterministic,
-side-effect-free synthetic generator before migrating real datasets.
+The next implementation patch should be **Phase E1: dataset schema and deterministic synthetic
+generator**. It should implement only the container/validation boundary and seeded synthetic
+generation described above. The registry/loader is E2; real dataset migration is E3.
 
 ## Maintenance protocol
 
@@ -255,7 +320,7 @@ For every patch, the LLM maintainer should:
 1. read `.llm/README.md`, this file, and the relevant contracts;
 2. identify the current phase and avoid work assigned to later phases;
 3. state which acceptance conditions the patch addresses;
-4. update `Current status` and `Current next increment` when phase state changes;
+4. update `.llm/state.md`, `Current status`, and `Current next increment` when phase state changes;
 5. update fixed decisions only after an explicit owner decision;
 6. run and report each applicable Makefile validation target;
 7. return a root-relative patch and provide the exact direct Git commands for checking, applying,

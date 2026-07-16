@@ -3,7 +3,13 @@
 ## Current top-level API
 
 ```python
-from pipls import PiPLSPathCV, PiPLSRegression, PiPLSValidationReport
+from pipls import (
+    PiPLSDecomposition,
+    PiPLSPathCV,
+    PiPLSRegression,
+    PiPLSValidationReport,
+    StatisticalSupportWarning,
+)
 ```
 
 `PiPLSRegression` selects predictor rank for one fixed component count. `PiPLSPathCV` searches
@@ -169,9 +175,10 @@ predictor-rank search independently for each `n_components` value. Exhaustive
 1 \le h \le \min(q,r_{\pi,\max}), \qquad h \le r_\pi \le r_{\pi,\max}.
 \]
 
-The class accepts a direct estimator or a composite estimator containing one
-`PiPLSRegression`. It clones and fits the complete estimator inside every fold and candidate. A
-unique nested Pi-PLS step is inferred; deeper composites use `pipls_param_prefix`.
+The class accepts either a direct `PiPLSRegression` or a scikit-learn `Pipeline` whose final
+step is `PiPLSRegression`. It clones and fits the complete supported estimator inside every fold
+and candidate. The terminal pipeline step is inferred, while `pipls_param_prefix` may name that
+step explicitly. Arbitrary nested meta-estimators are rejected until deliberately supported.
 
 An explicit integer `max_predictor_rank` bypasses the samples-per-rank rule but remains capped
 by the smallest fold-safe algebraic dimension. The default `"rule"` mode uses the smallest
@@ -197,7 +204,8 @@ in `PiPLSRegression`; delegated transformer methods are conditional on the selec
 ## D2 advanced validation contract
 
 Both public `fit` methods accept keyword-only `groups`, which is consumed by group-aware splitters
-and participates in scikit-learn metadata routing. Split policy is supplied through ordinary
+and can participate in scikit-learn metadata routing for that specific purpose. This is a narrow
+groups-only contract, not general metadata forwarding. Split policy is supplied through ordinary
 `RepeatedKFold`, `PredefinedSplit`, `GroupKFold`, `TimeSeriesSplit`, `LeaveOneOut`, or explicit
 indices; the numerical core has no special split branch.
 
@@ -210,3 +218,7 @@ contain NaN.
 `validation_report_` is an immutable `PiPLSValidationReport`. Automatic/optimal regression and all
 path results use `estimate_kind="selection-conditioned"`; fixed/rule-derived regression OOF
 results use `"fixed-parameter"`. Foldwise R2 is rejected whenever a validation fold has one row.
+
+Weighted fitting, `sample_weight` propagation during fitting, and general-purpose metadata routing
+are intentionally unsupported. The scalar `score(..., sample_weight=...)` compatibility argument
+does not imply weighted model fitting or weighted candidate selection.

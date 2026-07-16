@@ -2,44 +2,82 @@
 
 ## Purpose
 
-Pi-PLS is a PLS-family method for multivariate regression. The publication repository will
-provide a theory-faithful numerical core, a scikit-learn estimator API, model-selection
-utilities, reproducible datasets, and paper-reproduction scripts.
+Pi-PLS is a PLS-family method for multivariate regression. The repository provides a
+scientifically explicit numerical core, scikit-learn-compatible public estimators, model-selection
+and validation utilities, reproducible datasets, and paper-reproduction infrastructure.
 
-## Current increment
+For a fresh-chat handoff, read `.llm/state.md` before using this map. That file records the current
+implemented boundary and next increment; this file records where responsibilities live.
 
-Phase D2 is implemented. Both public interfaces accept grouped and other ordinary scikit-learn
-splitters, expose optional row-ordered OOF predictions with repeat counts and partial-coverage
-markers, reject foldwise R2 for singleton validation folds, and attach an immutable validation
-report that explicitly labels selection-conditioned estimates.
+## Current state
 
-The next increment is Phase E: common-format datasets and the deterministic synthetic generator.
+Phases A through D2 are implemented. The current public surface includes `PiPLSRegression`,
+`PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics, and
+`StatisticalSupportWarning`.
 
-## Planned responsibilities
+The next increment is Phase E1: the common dataset schema and deterministic synthetic generator.
+No real dataset migration, download, or paper reproduction belongs in E1.
 
-- `src/pipls/_core.py`: fixed-$(h,r_\pi)$ numerical core.
-- `src/pipls/_cv_engine.py`: shared fold-local candidate evaluation and caching.
-- `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation.
-- `src/pipls/validation.py`: immutable CV and OOF reporting.
-- `src/pipls/decomposition.py`: public immutable Pi-PLS factorization result.
-- `src/pipls/regression.py`: `PiPLSRegression`.
-- `src/pipls/model_selection.py`: rank limits and shared rank-search orchestration.
-- `src/pipls/path.py`: pipeline-aware `PiPLSPathCV`.
+## Runtime ownership
+
+- `src/pipls/_core.py`: fixed-`(n_components, predictor_rank)` numerical core.
+- `src/pipls/_cv_engine.py`: shared fold-local candidate evaluation, scoring, timing, caching, and
+  OOF refitting support.
+- `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation and tags.
+- `src/pipls/decomposition.py`: immutable public Pi-PLS factorization result.
+- `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
-- `tests/unit/`: local behavior.
-- `tests/invariants/`: mathematical identities and subspace properties.
-- `tests/integration/`: estimator composition and leakage boundaries.
-- `tests/regression/`: frozen comparisons with trusted implementations.
-- `.llm/theory.md`: persistent conceptual reference derived from the Pi-PLS manuscript.
-- `.llm/mathematics.md`: concise normative mathematical contract.
-- `.llm/`: repository communication contracts and workflow scripts.
+- `src/pipls/model_selection.py`: rank limits, split materialization, and shared rank-search
+  orchestration.
+- `src/pipls/path.py`: pipeline-aware `PiPLSPathCV` meta-estimator.
+- `src/pipls/regression.py`: `PiPLSRegression` fixed-model estimator and conditional rank search.
+- `src/pipls/validation.py`: immutable validation and OOF reporting.
+- `src/pipls/__init__.py`: deliberate top-level public exports.
 
-## Invariants
+## Test ownership
+
+- `tests/unit/`: local behavior and boundary conditions.
+- `tests/invariants/`: mathematical identities, dimensions, orthogonality, and subspace properties.
+- `tests/integration/`: estimator composition, leakage boundaries, and shared-engine equivalence.
+- `tests/api/`: exposed parameter validation, scikit-learn/PLS compatibility, and validation
+  protocols.
+- `tests/estimator_checks/`: applicable scikit-learn common estimator checks.
+- `tests/regression/`: frozen comparisons with trusted implementations.
+- `tests/test_repository_seed.py`: `.llm` navigation, snapshot layout, and workflow invariants.
+
+## Dataset and reproduction ownership
+
+- `datasets/registry.yaml`: future dataset registry; do not treat placeholder entries as verified
+  data.
+- `datasets/`: dataset descriptions and committed redistributable artifacts only.
+- `scripts/prepare_data/`: deterministic converters and download/verification orchestration.
+- `scripts/reproduce_paper/`: explicit paper-specific analysis workflows.
+- `examples/`: small executable API demonstrations, not publication pipelines.
+- `paper/`: manuscript-facing metadata and reproduction entry points.
+
+## Contract and documentation ownership
+
+- `.llm/state.md`: current handoff, accepted scope, and revised roadmap.
+- `.llm/strategy.md`: phase history, acceptance conditions, and maintenance protocol.
+- `.llm/decisions.md`: navigation for accepted decision records.
+- `.llm/theory.md`: persistent conceptual derivation based on the manuscript.
+- `.llm/mathematics.md`: concise normative mathematical contract.
+- `.llm/numerical_contracts.md`: numerical policy and degeneracy behavior.
+- `.llm/public_api.md`: public constructors, methods, outputs, defaults, and exclusions.
+- `.llm/development.md`: implementation, testing, patch, and documentation rules.
+- `docs/decisions/`: accepted design records.
+- `docs/publication_repository_plan.md`: broad historical architecture and publication rationale;
+  current accepted decisions may narrow older proposals.
+
+## Architectural invariants
 
 - Runtime code does not import from `.llm`, tests, examples, docs, scripts, datasets, or paper.
-- Changes are small, testable, and root-relative.
-- Public behavior changes include tests and documentation.
-- Generated files and unverified datasets are not committed.
+- The fixed numerical core does not own preprocessing, CV, datasets, or paper policy.
+- `PiPLSRegression` and `PiPLSPathCV` do not wrap each other; both use shared private machinery.
+- Learned preprocessing is fitted inside the corresponding training fold.
+- Public behavior changes include focused tests and contract/documentation updates.
+- Generated files, archive clutter, and unverified datasets are not committed.
+- Changes are small, testable, and returned as root-relative unified Git patches.
 
 ## Validation
 
@@ -48,4 +86,5 @@ make check
 make build
 ```
 
-- D1c completed: final scikit-learn cleanup, conditional path delegation, inverse reconstruction, canonical decomposition arrays, standard sentinels/timings, and minimum-version CI.
+Use `make build` whenever packaging, dependencies, public modules, or included data files change.
+Record each validation target as passed, failed, or not run.
