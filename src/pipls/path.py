@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Iterable, Sequence
+from time import perf_counter
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -16,8 +17,10 @@ from sklearn.base import (
     TransformerMixin,
     clone,
 )
-from sklearn.metrics import get_scorer
+from sklearn.metrics import check_scoring, get_scorer
+from sklearn.pipeline import Pipeline
 from sklearn.utils import _safe_indexing, indexable
+from sklearn.utils.metaestimators import available_if
 from sklearn.utils.validation import check_is_fitted
 
 from ._cv_engine import (
@@ -27,6 +30,7 @@ from ._cv_engine import (
 )
 from ._sklearn_compat import _validate_estimator_data
 from .exceptions import StatisticalSupportWarning
+from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
     _as_positive_float,
     _materialize_cv_splits,
@@ -40,11 +44,26 @@ from .regression import PiPLSRegression
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
+Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
 _DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _SELECTION_RTOL = 1e-12
 _SELECTION_ATOL = 1e-15
+
+
+def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
+    def check(search: Any) -> bool:
+        if hasattr(search, "best_params_") and not hasattr(search, "best_estimator_"):
+            return False
+        estimator = (
+            search.best_estimator_
+            if hasattr(search, "best_estimator_")
+            else (PiPLSRegression() if search.estimator is None else search.estimator)
+        )
+        return hasattr(estimator, method_name)
+
+    return check
 
 
 class PiPLSPathCV(
@@ -63,12 +82,13 @@ class PiPLSPathCV(
     Parameters
     ----------
     estimator:
-        Estimator or composite estimator containing exactly one
-        :class:`PiPLSRegression`. ``None`` creates a default estimator template.
+        A direct :class:`PiPLSRegression` or a scikit-learn :class:`Pipeline`
+        whose final step is :class:`PiPLSRegression`. ``None`` creates a default
+        direct estimator template.
     pipls_param_prefix:
-        Nested parameter prefix locating the Pi-PLS estimator, for example
-        ``"regression"`` or ``"regressor__regression"``. It is inferred when
-        exactly one nested Pi-PLS estimator is present.
+        Optional final pipeline-step name locating Pi-PLS. It is inferred for
+        supported pipelines and retained for explicitness and nested parameter
+        compatibility.
     n_components_values:
         Positive component counts to evaluate. ``None`` uses every value from 1
         through ``min(n_targets, max_predictor_rank_)``.
@@ -85,10 +105,11 @@ class PiPLSPathCV(
         Positive rank-bound parameter $c$. Values below 5 issue
         :class:`StatisticalSupportWarning`.
     cv:
-        Integer split count, splitter, or iterable of train-validation pairs.
+        Integer split count, splitter, iterable of train-validation pairs, or
+        ``None`` for the standard five-fold regression split.
     scoring:
-        Scikit-learn scorer name or callable. The default is negative
-        response-standardized MSE.
+        Scikit-learn scorer name, callable, or ``None`` to use estimator ``score``.
+        The default is negative response-standardized MSE.
     refit:
         Refit the globally selected pair on all supplied data.
     n_jobs:
@@ -106,7 +127,7 @@ class PiPLSPathCV(
         search_method: SearchMethod = "auto",
         samples_per_predictor_rank: float = 10.0,
         cv: object = 5,
-        scoring: str | Scorer = _DEFAULT_SCORING,
+        scoring: Scoring = _DEFAULT_SCORING,
         refit: bool = True,
         n_jobs: int | None = None,
     ) -> None:
@@ -206,7 +227,12 @@ class PiPLSPathCV(
             )
         self.n_path_candidates_ = len(admissible)
 
-        scorer = _resolve_path_scorer(self.scoring)
+        scorer = _resolve_path_scorer(self.scoring, template)
+        self.scorer_ = (
+            neg_response_standardized_mean_squared_error
+            if _uses_default_path_scoring(self.scoring)
+            else scorer
+        )
         cache: dict[tuple[int, int], _PiPLSCandidateResult] = {}
         history: dict[int, tuple[tuple[int, ...], ...]] = {}
         if self.search_method == "optimal":
@@ -315,14 +341,16 @@ class PiPLSPathCV(
             "predictor_rank": self.best_predictor_rank_,
         }
         if self.refit:
+            refit_started = perf_counter()
             self.best_estimator_ = clone(template).set_params(**self.best_params_)
             self.best_estimator_.fit(X_indexable, y_indexable)
+            self.refit_time_ = perf_counter() - refit_started
             self.best_pipls_ = _extract_fitted_pipls(
                 self.best_estimator_,
                 self.pipls_param_prefix_,
             )
         else:
-            for name in ("best_estimator_", "best_pipls_"):
+            for name in ("best_estimator_", "best_pipls_", "refit_time_"):
                 if hasattr(self, name):
                     delattr(self, name)
         return self
@@ -335,6 +363,7 @@ class PiPLSPathCV(
             return estimator.predict(X, copy=copy)
         return cast(FloatArray, estimator.predict(X))
 
+    @available_if(_estimator_supports("transform"))  # type: ignore[untyped-decorator]
     def transform(
         self,
         X: ArrayLike,
@@ -354,6 +383,7 @@ class PiPLSPathCV(
             )
         return estimator.transform(X)
 
+    @available_if(_estimator_supports("transform"))  # type: ignore[untyped-decorator]
     def fit_transform(
         self,
         X: ArrayLike,
@@ -361,8 +391,8 @@ class PiPLSPathCV(
         *,
         groups: ArrayLike | None = None,
         **fit_params: Any,
-    ) -> tuple[FloatArray, FloatArray]:
-        """Fit the path search and return selected predictor and response scores."""
+    ) -> Any:
+        """Fit the path search and delegate transformation to the selected estimator."""
 
         if fit_params:
             names = ", ".join(sorted(fit_params))
@@ -370,8 +400,27 @@ class PiPLSPathCV(
         if y is None:
             raise ValueError("y is required to fit PiPLSPathCV.")
         self.fit(X, y, groups=groups)
-        transformed = self.transform(X, y)
-        return cast(tuple[FloatArray, FloatArray], transformed)
+        if isinstance(self.best_estimator_, PiPLSRegression):
+            return cast(tuple[FloatArray, FloatArray], self.transform(X, y))
+        return cast(Any, self.transform(X))
+
+    @available_if(_estimator_supports("inverse_transform"))  # type: ignore[untyped-decorator]
+    def inverse_transform(
+        self,
+        X: ArrayLike,
+        y: ArrayLike | None = None,
+    ) -> Any:
+        """Delegate inverse transformation to the refitted selected estimator."""
+
+        estimator = self._refitted_estimator()
+        if isinstance(estimator, PiPLSRegression):
+            return estimator.inverse_transform(X, y)
+        if y is not None:
+            raise ValueError(
+                "inverse_transform(X, y) is available when the refitted estimator "
+                "is a direct PiPLSRegression. Composite estimators reconstruct X only."
+            )
+        return estimator.inverse_transform(X)
 
     def score(
         self,
@@ -386,6 +435,7 @@ class PiPLSPathCV(
             return float(estimator.score(X, y))
         return float(estimator.score(X, y, sample_weight=sample_weight))
 
+    @available_if(_estimator_supports("get_feature_names_out"))  # type: ignore[untyped-decorator]
     def get_feature_names_out(
         self,
         input_features: ArrayLike | None = None,
@@ -426,8 +476,8 @@ class PiPLSPathCV(
         return self.best_estimator_
 
     def _validate_constructor_parameters(self) -> None:
-        if self.estimator is not None and not hasattr(self.estimator, "get_params"):
-            raise ValueError("estimator must implement the scikit-learn estimator interface.")
+        if self.estimator is not None:
+            _validate_supported_estimator(self.estimator)
         if self.pipls_param_prefix is not None and not isinstance(
             self.pipls_param_prefix, str
         ):
@@ -464,31 +514,48 @@ class PiPLSPathCV(
         )
         _validate_n_jobs(self.n_jobs)
         _validate_cv(self.cv)
-        _resolve_path_scorer(self.scoring)
+        scorer_template = (
+            PiPLSRegression() if self.estimator is None else self.estimator
+        )
+        _resolve_path_scorer(self.scoring, scorer_template)
+
+
+def _validate_supported_estimator(estimator: Any) -> None:
+    if isinstance(estimator, PiPLSRegression):
+        return
+    if isinstance(estimator, Pipeline):
+        if not estimator.steps or not isinstance(estimator.steps[-1][1], PiPLSRegression):
+            raise ValueError(
+                "estimator pipelines must end with a PiPLSRegression step."
+            )
+        return
+    raise ValueError(
+        "estimator must be PiPLSRegression or a sklearn Pipeline whose final "
+        "step is PiPLSRegression."
+    )
 
 
 def _resolve_pipls_param_prefix(template: Any, supplied: str | None) -> str:
-    params = template.get_params(deep=True)
-    if supplied is not None:
-        prefix = supplied.removesuffix("__")
-        n_key, r_key = _pipls_parameter_keys(prefix)
-        if n_key not in params or r_key not in params:
-            raise ValueError(
-                f"pipls_param_prefix={supplied!r} does not locate n_components and "
-                "predictor_rank parameters in estimator."
-            )
-        return prefix
+    _validate_supported_estimator(template)
     if isinstance(template, PiPLSRegression):
+        if supplied not in (None, ""):
+            raise ValueError(
+                "pipls_param_prefix must be None or an empty string for a direct "
+                "PiPLSRegression estimator."
+            )
         return ""
-    matches = sorted(
-        key for key, value in params.items() if isinstance(value, PiPLSRegression)
-    )
-    if len(matches) != 1:
+
+    assert isinstance(template, Pipeline)
+    final_name = template.steps[-1][0]
+    if supplied is None:
+        return cast(str, final_name)
+    prefix = supplied.removesuffix("__")
+    if prefix != final_name:
         raise ValueError(
-            "Could not infer a unique PiPLSRegression parameter location; supply "
-            "pipls_param_prefix explicitly."
+            f"pipls_param_prefix={supplied!r} does not locate the final "
+            f"PiPLSRegression pipeline step {final_name!r}."
         )
-    return cast(str, matches[0])
+    return prefix
 
 
 def _pipls_parameter_keys(prefix: str) -> tuple[str, str]:
@@ -500,14 +567,18 @@ def _pipls_parameter_keys(prefix: str) -> tuple[str, str]:
 
 
 def _extract_fitted_pipls(estimator: Any, prefix: str) -> PiPLSRegression:
-    if prefix == "":
-        if not isinstance(estimator, PiPLSRegression):
-            raise ValueError("The resolved estimator is not PiPLSRegression.")
+    if isinstance(estimator, PiPLSRegression):
+        if prefix != "":
+            raise ValueError("A direct fitted PiPLSRegression requires an empty prefix.")
         return estimator
-    value = estimator.get_params(deep=True).get(prefix)
-    if not isinstance(value, PiPLSRegression):
-        raise ValueError(f"Fitted parameter prefix {prefix!r} no longer locates PiPLSRegression.")
-    return value
+    if isinstance(estimator, Pipeline):
+        value = estimator.named_steps.get(prefix)
+        if isinstance(value, PiPLSRegression) and estimator.steps[-1][0] == prefix:
+            return value
+    raise ValueError(
+        f"Fitted parameter prefix {prefix!r} no longer locates the final "
+        "PiPLSRegression step."
+    )
 
 
 def _fold_safe_feature_limit(
@@ -537,7 +608,7 @@ def _evaluate_path_batch(
     n_components_key: str,
     predictor_rank_key: str,
     scorer: Scorer | None,
-    scoring: str | Scorer,
+    scoring: Scoring,
     X: ArrayLike,
     y: ArrayLike,
     splits: tuple[tuple[IntArray, IntArray], ...],
@@ -571,7 +642,7 @@ def _adaptive_path_search(
     n_components_key: str,
     predictor_rank_key: str,
     scorer: Scorer | None,
-    scoring: str | Scorer,
+    scoring: Scoring,
     X: ArrayLike,
     y: ArrayLike,
     splits: tuple[tuple[IntArray, IntArray], ...],
@@ -618,7 +689,7 @@ def _adaptive_path_search(
     )
 
 
-def _uses_default_path_scoring(scoring: str | Scorer) -> bool:
+def _uses_default_path_scoring(scoring: Scoring) -> bool:
     """Return whether the shared default response-standardized scorer is requested."""
 
     return isinstance(scoring, str) and scoring == _DEFAULT_SCORING
@@ -637,6 +708,8 @@ def _path_cv_results(
     split_mse = np.vstack(
         [cache[pair].split_response_standardized_mse for pair in evaluated_pairs]
     )
+    split_fit_times = np.vstack([cache[pair].split_fit_times for pair in evaluated_pairs])
+    split_score_times = np.vstack([cache[pair].split_score_times for pair in evaluated_pairs])
     mean_scores = np.mean(split_scores, axis=1)
     results: dict[str, Any] = {
         "params": [
@@ -649,6 +722,10 @@ def _path_cv_results(
         f"param_{predictor_rank_key}": predictor_rank.copy(),
         "mean_test_score": mean_scores,
         "std_test_score": np.std(split_scores, axis=1),
+        "mean_fit_time": np.mean(split_fit_times, axis=1),
+        "std_fit_time": np.std(split_fit_times, axis=1),
+        "mean_score_time": np.mean(split_score_times, axis=1),
+        "std_score_time": np.std(split_score_times, axis=1),
         "mean_response_standardized_mse": np.mean(split_mse, axis=1),
         "std_response_standardized_mse": np.std(split_mse, axis=1),
     }
@@ -733,7 +810,7 @@ def _validate_optional_integer_sequence(values: object, *, name: str) -> None:
         _validate_positive_int(value, name=name)
 
 
-def _resolve_path_scorer(scoring: str | Scorer) -> Scorer | None:
+def _resolve_path_scorer(scoring: Scoring, estimator: Any) -> Scorer | None:
     if isinstance(scoring, str):
         if scoring == _DEFAULT_SCORING:
             return None
@@ -741,9 +818,14 @@ def _resolve_path_scorer(scoring: str | Scorer) -> Scorer | None:
             return cast(Scorer, get_scorer(scoring))
         except ValueError as error:
             raise ValueError(f"Unknown scoring value {scoring!r}.") from error
+    if scoring is None:
+        return cast(Scorer, check_scoring(estimator, scoring=None))
     if callable(scoring):
         return scoring
-    raise ValueError(f"scoring must be a scikit-learn scorer name or callable; got {scoring!r}.")
+    raise ValueError(
+        "scoring must be None, a scikit-learn scorer name, or callable; "
+        f"got {scoring!r}."
+    )
 
 
 def _validate_n_jobs(n_jobs: int | None) -> None:
@@ -760,5 +842,7 @@ def _validate_cv(cv: object) -> None:
         raise ValueError("cv must be an integer at least 2, a splitter, or an iterable of splits.")
     if isinstance(cv, (int, np.integer)) and int(cv) < 2:
         raise ValueError("cv must be at least 2 when supplied as an integer.")
-    if cv is None or isinstance(cv, (float, np.floating, str, bytes)):
+    if cv is None:
+        return
+    if isinstance(cv, (float, np.floating, str, bytes)):
         raise ValueError("cv must be an integer at least 2, a splitter, or an iterable of splits.")

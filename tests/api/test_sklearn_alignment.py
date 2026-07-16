@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.base import clone
-from sklearn.compose import ColumnTransformer
+from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
@@ -293,6 +293,7 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
 
     assert path.best_pipls_.n_features_in_ == len(selected)
     assert path.predict(X_frame).shape == Y.shape
+    assert np.isfinite(path.scorer_(path.best_estimator_, X_frame, Y))
 
 
 @pytest.mark.parametrize(
@@ -340,3 +341,114 @@ def test_sklearn_common_checks_except_cross_decomposition_tuple_contract(
         },
         on_skip=None,
     )
+
+
+def test_inverse_transform_matches_documented_least_squares_reconstruction() -> None:
+    X, Y = _data()
+    model = _fixed_estimator().fit(X, Y)
+
+    x_scores, y_scores = model.transform(X, Y)
+    X_reconstructed, Y_reconstructed = model.inverse_transform(x_scores, y_scores)
+
+    expected_X = (x_scores @ model.x_loadings_.T) * model.x_scale_ + model.x_mean_
+    expected_Y = (y_scores @ model.y_loadings_.T) * model.y_scale_ + model.y_mean_
+    np.testing.assert_allclose(X_reconstructed, expected_X)
+    np.testing.assert_allclose(Y_reconstructed, expected_Y)
+
+
+def test_decomposition_is_single_source_of_truth_for_factorization_arrays() -> None:
+    X, Y = _data()
+    model = _fixed_estimator().fit(X, Y)
+
+    assert model.Pi_ is model.decomposition_.Pi
+    assert model.C_ is model.decomposition_.C
+    assert model.W_ is model.decomposition_.W
+    assert model.P_ is model.decomposition_.P
+    assert model.D_ is model.decomposition_.D
+    assert model.Q_ is model.decomposition_.Q
+    assert model.dilation_ is model.decomposition_.dilation
+    assert not model.P_.flags.writeable
+
+
+def test_standard_cv_and_scoring_sentinels_are_accepted() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=1,
+        predictor_rank="optimal",
+        samples_per_predictor_rank=12,
+        cv=None,
+        scoring=None,
+        n_jobs=1,
+        svd_solver="full",
+        random_state=None,
+    ).fit(X, Y)
+
+    assert model.n_splits_ == 5
+    assert callable(model.scorer_)
+    assert {
+        "mean_fit_time",
+        "std_fit_time",
+        "mean_score_time",
+        "std_score_time",
+    } <= model.cv_results_.keys()
+
+
+def test_path_restricts_estimator_scope_to_direct_or_final_pipeline_pipls() -> None:
+    X, Y = _data()
+    unsupported = TransformedTargetRegressor(regressor=_fixed_estimator())
+
+    with pytest.raises(ValueError, match="PiPLSRegression or a sklearn Pipeline"):
+        PiPLSPathCV(estimator=unsupported).fit(X, Y)
+
+    invalid_pipeline = Pipeline(
+        [("pipls", _fixed_estimator()), ("scale", StandardScaler())]
+    )
+    with pytest.raises(ValueError, match="pipelines must end"):
+        PiPLSPathCV(estimator=invalid_pipeline).fit(X, Y)
+
+
+def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> None:
+    X, Y = _data()
+    search = PiPLSPathCV(
+        estimator=_fixed_estimator(),
+        n_components_values=[2],
+        predictor_rank_values=[3],
+        max_predictor_rank=3,
+        cv=None,
+        scoring=None,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.n_splits_ == 5
+    assert callable(search.scorer_)
+    assert search.refit_time_ >= 0.0
+    assert {
+        "mean_fit_time",
+        "std_fit_time",
+        "mean_score_time",
+        "std_score_time",
+    } <= search.cv_results_.keys()
+    x_scores, y_scores = search.transform(X, Y)
+    X_reconstructed, Y_reconstructed = search.inverse_transform(x_scores, y_scores)
+    direct_X, direct_Y = search.best_pipls_.inverse_transform(x_scores, y_scores)
+    np.testing.assert_allclose(X_reconstructed, direct_X)
+    np.testing.assert_allclose(Y_reconstructed, direct_Y)
+
+
+def test_path_inverse_transform_is_conditionally_available_for_pipeline() -> None:
+    pipeline = Pipeline(
+        [
+            (
+                "columns",
+                ColumnTransformer(
+                    [("selected", StandardScaler(), [0, 1, 2, 3])],
+                    remainder="drop",
+                ),
+            ),
+            ("regression", _fixed_estimator()),
+        ]
+    )
+    search = PiPLSPathCV(estimator=pipeline)
+
+    assert hasattr(search, "transform")
+    assert not hasattr(search, "inverse_transform")

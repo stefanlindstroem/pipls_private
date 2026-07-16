@@ -33,10 +33,13 @@ Every learned preprocessing statistic is fitted independently inside selection f
 
 ## PLS-style estimator surface
 
-`predict(X, copy=True)`, `transform(X, y=None, copy=True)`, and `fit_transform(X, y)` mirror the
-corresponding `PLSRegression` conventions. `transform(X)` returns predictor scores; supplying `y`
-returns `(x_scores, y_scores)`. The estimator supports `feature_names_in_`,
-`get_feature_names_out()`, and `set_output(transform="pandas")`.
+`predict(X, copy=True)`, `transform(X, y=None, copy=True)`, `fit_transform(X, y)`, and
+`inverse_transform(X, y=None)` mirror the corresponding `PLSRegression` conventions.
+`transform(X)` returns predictor scores; supplying `y` returns `(x_scores, y_scores)`.
+`inverse_transform` reconstructs original-unit predictors and, when supplied, responses through the
+least-squares loading matrices; reconstruction is approximate unless the retained spaces span the
+centered/scaled data. The estimator supports `feature_names_in_`, `get_feature_names_out()`, and
+`set_output(transform="pandas")`.
 
 Standard fitted attributes are `x_weights_`, `y_weights_`, `x_loadings_`, `y_loadings_`,
 `x_scores_`, `y_scores_`, `x_rotations_`, `y_rotations_`, `coef_`, and `intercept_`. Because Pi-PLS
@@ -46,12 +49,14 @@ Loadings are separate least-squares reconstruction coefficients. `n_iter_` is de
 Pi-PLS-specific factorization output is available through the public frozen
 `PiPLSDecomposition` instance at `decomposition_`. It contains `Pi`, `C`, `W`, `P`, `D`, `Q`, the
 dilation vector, numerical-rank diagnostics, and the resolved predictor SVD solver. The existing
-`Pi_`, `C_`, `W_`, `P_`, `D_`, `Q_`, and related fitted attributes remain convenience aliases.
+`Pi_`, `C_`, `W_`, `P_`, `D_`, `Q_`, and `dilation_` are read-only identity aliases to the
+canonical arrays stored in `decomposition_`, preventing divergent factorization state.
 
 Important additional fitted attributes include `predictor_rank_`, `max_predictor_rank_`,
 `svd_solver_`, `x_rank_is_exact_`, `x_mean_`, `x_scale_`, `y_mean_`, `y_scale_`, and
 `response_scale_for_scoring_`. Cross-validated modes expose standard `cv_results_`, `best_params_`,
-`best_index_`, and `best_score_` attributes plus candidate scores, evaluation order, search
+`best_index_`, `best_score_`, and `scorer_` attributes plus candidate scores, standard fit/score
+timing columns, evaluation order, search
 batches, the final refinement interval, candidate counts, whether the search was exhaustive, and
 the fold-safe training-size bound. `predictor_rank_cv_results_` is an alias for `cv_results_`.
 
@@ -62,7 +67,8 @@ The constructor `copy` controls fit-time preprocessing. For writable floating Nu
 ## Parameter validation
 
 Integer controls are strict. `n_components` and an integer `predictor_rank` must be positive
-integers; integer `cv` must be at least 2; `n_jobs` must be `None` or nonzero; and
+integers; integer `cv` must be at least 2, while `cv=None` requests standard five-fold regression
+CV; `scoring=None` uses estimator `score`; `n_jobs` must be `None` or nonzero; and
 `random_state` must lie in the unsigned 32-bit interval. Booleans are not accepted as integers,
 and integral-valued floats are not silently converted. NumPy integer scalars are accepted.
 

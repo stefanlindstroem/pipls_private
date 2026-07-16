@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from numpy.typing import ArrayLike
 from sklearn.utils.validation import check_is_fitted
@@ -23,11 +23,11 @@ def response_standardized_mean_squared_error(
     response scaling.
     """
 
-    check_is_fitted(estimator, attributes=["response_scale_for_scoring_"])
+    response_scale = _response_scale_for_scoring(estimator)
     return _response_standardized_mse(
         y,
         estimator.predict(X),
-        estimator.response_scale_for_scoring_,
+        response_scale,
     )
 
 
@@ -39,3 +39,19 @@ def neg_response_standardized_mean_squared_error(
     """Return negative response-standardized MSE for scorer maximization."""
 
     return -response_standardized_mean_squared_error(estimator, X, y)
+
+
+def _response_scale_for_scoring(estimator: Any) -> ArrayLike:
+    """Return the fitted response scale from a direct estimator or final pipeline step."""
+
+    if hasattr(estimator, "response_scale_for_scoring_"):
+        check_is_fitted(estimator, attributes=["response_scale_for_scoring_"])
+        return cast(ArrayLike, estimator.response_scale_for_scoring_)
+    steps = getattr(estimator, "steps", None)
+    if steps:
+        final_estimator = steps[-1][1]
+        check_is_fitted(final_estimator, attributes=["response_scale_for_scoring_"])
+        return cast(ArrayLike, final_estimator.response_scale_for_scoring_)
+    raise ValueError(
+        "The estimator does not expose a fitted Pi-PLS response scale for scoring."
+    )

@@ -183,3 +183,12 @@ Public fitted attributes include standard search attributes (`cv_results_`, `bes
 diagnostics documented in `docs/path_analysis.md`. Input containers are preserved within folds so
 name-based pandas and `ColumnTransformer` workflows remain valid. The path `score` method returns
 R2 like `PiPLSRegression`; `best_score_` remains the configured selection score.
+
+
+## D1c scikit-learn cleanup
+
+`PiPLSRegression.inverse_transform` performs documented least-squares reconstruction. The
+factorization arrays exposed directly on the estimator are read-only identity aliases to
+`decomposition_`. Cross-validated modes accept `cv=None` and `scoring=None`, expose `scorer_`, and
+report standard fit/score timings. `PiPLSPathCV` supports a direct estimator or a `Pipeline` ending
+in `PiPLSRegression`; delegated transformer methods are conditional on the selected estimator.

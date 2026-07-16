@@ -18,3 +18,5 @@ Current navigation:
   `"auto"` semantics and the separate randomized-SVD policy;
 - `publication_repository_plan.md`: detailed revision-5 architecture, subject to later accepted
   decision records where explicitly noted.
+
+- [Decision 0013: final scikit-learn cleanup boundary](decisions/0013-sklearn-cleanup-boundary.md)

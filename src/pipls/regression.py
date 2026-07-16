@@ -15,7 +15,7 @@ from sklearn.base import (
     RegressorMixin,
     TransformerMixin,
 )
-from sklearn.metrics import get_scorer, r2_score
+from sklearn.metrics import check_scoring, get_scorer, r2_score
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._core import ResolvedSVDSolver, SVDSolver, fit_pipls_core
@@ -27,6 +27,7 @@ from ._cv_engine import (
 from ._sklearn_compat import _validate_estimator_data
 from .decomposition import PiPLSDecomposition
 from .exceptions import StatisticalSupportWarning
+from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
     _as_positive_float,
     _materialize_cv_splits,
@@ -41,6 +42,7 @@ from .model_selection import (
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
+Scoring = str | Scorer | None
 _DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
@@ -74,11 +76,11 @@ class PiPLSRegression(
         Rule-based values below 5 emit ``StatisticalSupportWarning``. It does
         not constrain an explicitly supplied integer rank.
     cv:
-        Cross-validation splitter, integer split count of at least 2, or iterable
-        of train-validation index pairs used when ``predictor_rank`` is ``"auto"``
-        or ``"optimal"``.
+        Cross-validation splitter, integer split count of at least 2, iterable
+        of train-validation index pairs, or ``None`` for the standard five-fold
+        regression split, used when ``predictor_rank`` is ``"auto"`` or ``"optimal"``.
     scoring:
-        Scikit-learn scorer name or callable used only in cross-validated modes.
+        Scikit-learn scorer name, callable, or ``None`` to use estimator ``score``.
         The default is negative response-standardized mean squared error.
     n_jobs:
         Nonzero integer number of predictor-rank candidates evaluated concurrently
@@ -104,7 +106,7 @@ class PiPLSRegression(
         predictor_rank: int | Literal["max", "optimal", "auto"] = "auto",
         samples_per_predictor_rank: float = 10.0,
         cv: object = 5,
-        scoring: str | Scorer = _DEFAULT_SCORING,
+        scoring: Scoring = _DEFAULT_SCORING,
         n_jobs: int | None = None,
         svd_solver: SVDSolver = "auto",
         random_state: int | None = 0,
@@ -277,6 +279,47 @@ class PiPLSRegression(
         self.fit(X, y)
         return self.x_scores_.copy(), self.y_scores_.copy()
 
+    def inverse_transform(
+        self,
+        X: ArrayLike,
+        y: ArrayLike | None = None,
+    ) -> FloatArray | tuple[FloatArray, FloatArray]:
+        """Reconstruct predictors, and optionally responses, from latent scores.
+
+        Reconstruction is least-squares and is exact only when the retained
+        latent spaces span the corresponding centered/scaled data spaces.
+        """
+
+        check_is_fitted(self, attributes=["x_loadings_", "y_loadings_"])
+        x_scores = check_array(X, ensure_2d=True, dtype=np.float64)
+        if x_scores.shape[1] != self.n_components:
+            raise ValueError(
+                "X has an incompatible number of latent components: "
+                f"expected {self.n_components}, got {x_scores.shape[1]}."
+            )
+        X_original = (x_scores @ self.x_loadings_.T) * self.x_scale_ + self.x_mean_
+        if y is None:
+            return np.asarray(X_original, dtype=np.float64)
+
+        y_scores = check_array(y, ensure_2d=False, dtype=np.float64)
+        if y_scores.ndim == 1:
+            y_scores = y_scores.reshape(-1, 1)
+        if y_scores.shape[0] != x_scores.shape[0]:
+            raise ValueError(
+                "X and y scores must contain the same number of samples: "
+                f"got {x_scores.shape[0]} and {y_scores.shape[0]}."
+            )
+        if y_scores.shape[1] != self.n_components:
+            raise ValueError(
+                "y has an incompatible number of latent components: "
+                f"expected {self.n_components}, got {y_scores.shape[1]}."
+            )
+        y_original = (y_scores @ self.y_loadings_.T) * self.y_scale_ + self.y_mean_
+        return (
+            np.asarray(X_original, dtype=np.float64),
+            np.asarray(y_original, dtype=np.float64),
+        )
+
     def score(self, X: ArrayLike, y: ArrayLike, sample_weight: ArrayLike | None = None) -> float:
         """Return uniformly averaged $R^2$ in original response units."""
 
@@ -324,7 +367,12 @@ class PiPLSRegression(
             n_components=self.n_components,
             max_predictor_rank=max_predictor_rank,
         )
-        scorer = _resolve_scorer(self.scoring)
+        scorer = _resolve_scorer(self.scoring, self)
+        self.scorer_ = (
+            neg_response_standardized_mean_squared_error
+            if _uses_default_scoring(self.scoring)
+            else scorer
+        )
         cache: dict[tuple[int, int], _PiPLSCandidateResult] = {}
         evaluation_order: list[int] = []
 
@@ -392,6 +440,8 @@ class PiPLSRegression(
         split_mse = np.vstack(
             [result.split_response_standardized_mse for result in evaluations]
         )
+        split_fit_times = np.vstack([result.split_fit_times for result in evaluations])
+        split_score_times = np.vstack([result.split_score_times for result in evaluations])
         mean_mse = np.mean(split_mse, axis=1)
         selected_rank, _ = _select_predictor_rank(
             predictor_rank_values,
@@ -415,6 +465,8 @@ class PiPLSRegression(
             predictor_rank_values=predictor_rank_values,
             split_scores=split_scores,
             split_response_standardized_mse=split_mse,
+            split_fit_times=split_fit_times,
+            split_score_times=split_score_times,
         )
         self.predictor_rank_cv_results_ = self.cv_results_
         self.predictor_rank_search_method_ = search_method
@@ -477,14 +529,14 @@ class PiPLSRegression(
 
         self.predictor_rank_ = predictor_rank
         self.max_predictor_rank_ = max_predictor_rank
-        self.Pi_ = result.Pi
-        self.C_ = result.C
-        self.W_ = result.W
-        self.P_ = result.P
-        self.D_ = result.D
-        self.dilation_ = np.diag(result.D).copy()
-        self.Q_ = result.Q
         self.decomposition_ = PiPLSDecomposition._from_core_result(result)
+        self.Pi_ = self.decomposition_.Pi
+        self.C_ = self.decomposition_.C
+        self.W_ = self.decomposition_.W
+        self.P_ = self.decomposition_.P
+        self.D_ = self.decomposition_.D
+        self.dilation_ = self.decomposition_.dilation
+        self.Q_ = self.decomposition_.Q
         self.x_rotations_ = self.P_
         self.y_rotations_ = self.Q_
         self.x_weights_ = self.P_
@@ -551,7 +603,7 @@ class PiPLSRegression(
         _validate_n_jobs(self.n_jobs)
         _validate_random_state(self.random_state, svd_solver=self.svd_solver)
         if self.predictor_rank in ("auto", "optimal"):
-            _resolve_scorer(self.scoring)
+            _resolve_scorer(self.scoring, self)
         if uses_rank_rule and samples_per_rank < _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK:
             warnings.warn(
                 f"samples_per_predictor_rank={samples_per_rank:g} is below 5. "
@@ -565,6 +617,7 @@ class PiPLSRegression(
     def _clear_selection_attributes(self) -> None:
         for name in (
             "predictor_rank_values_",
+            "scorer_",
             "predictor_rank_cv_results_",
             "cv_results_",
             "best_index_",
@@ -593,7 +646,7 @@ def _regression_solver(estimator: Any) -> ResolvedSVDSolver:
     return cast(ResolvedSVDSolver, estimator.svd_solver_)
 
 
-def _uses_default_scoring(scoring: str | Scorer) -> bool:
+def _uses_default_scoring(scoring: Scoring) -> bool:
     """Return whether the shared default response-standardized scorer is requested."""
 
     return isinstance(scoring, str) and scoring == _DEFAULT_SCORING
@@ -605,6 +658,8 @@ def _cv_results_dictionary(
     predictor_rank_values: NDArray[np.intp],
     split_scores: FloatArray,
     split_response_standardized_mse: FloatArray,
+    split_fit_times: FloatArray,
+    split_score_times: FloatArray,
 ) -> dict[str, Any]:
     n_candidates = predictor_rank_values.size
     n_components_values = np.full(n_candidates, n_components, dtype=np.intp)
@@ -620,6 +675,10 @@ def _cv_results_dictionary(
         "param_predictor_rank": predictor_rank_values.copy(),
         "mean_test_score": mean_scores,
         "std_test_score": np.std(split_scores, axis=1),
+        "mean_fit_time": np.mean(split_fit_times, axis=1),
+        "std_fit_time": np.std(split_fit_times, axis=1),
+        "mean_score_time": np.mean(split_score_times, axis=1),
+        "std_score_time": np.std(split_score_times, axis=1),
         "mean_response_standardized_mse": np.mean(
             split_response_standardized_mse,
             axis=1,
@@ -638,7 +697,7 @@ def _cv_results_dictionary(
     return results
 
 
-def _resolve_scorer(scoring: str | Scorer) -> Scorer | None:
+def _resolve_scorer(scoring: Scoring, estimator: Any) -> Scorer | None:
     if isinstance(scoring, str):
         if scoring == _DEFAULT_SCORING:
             return None
@@ -646,9 +705,14 @@ def _resolve_scorer(scoring: str | Scorer) -> Scorer | None:
             return cast(Scorer, get_scorer(scoring))
         except ValueError as error:
             raise ValueError(f"Unknown scoring value {scoring!r}.") from error
+    if scoring is None:
+        return cast(Scorer, check_scoring(estimator, scoring=None))
     if callable(scoring):
         return scoring
-    raise ValueError(f"scoring must be a scikit-learn scorer name or callable; got {scoring!r}.")
+    raise ValueError(
+        "scoring must be None, a scikit-learn scorer name, or callable; "
+        f"got {scoring!r}."
+    )
 
 
 def _validated_cv(cv: object) -> object:
@@ -662,7 +726,9 @@ def _validated_cv(cv: object) -> object:
         if n_splits < 2:
             raise ValueError(f"cv must be at least 2 when supplied as an integer; got {cv!r}.")
         return n_splits
-    if cv is None or isinstance(
+    if cv is None:
+        return None
+    if isinstance(
         cv,
         (float, np.floating, complex, np.complexfloating, str, bytes),
     ):

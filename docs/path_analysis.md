@@ -68,11 +68,13 @@ search = PiPLSPathCV(
 search.fit(X, Y)
 ```
 
-The path estimator preserves indexable input containers, then clones and fits the entire pipeline
-separately for every fold and candidate. This permits pandas column names and name-based
-`ColumnTransformer` selectors to remain available inside every fold. It infers a unique nested
-`PiPLSRegression` step. For deeper composites, use
-`pipls_param_prefix`, for example `"regressor__regression"`.
+The supported estimator forms are deliberately explicit: either a direct `PiPLSRegression`, or a
+scikit-learn `Pipeline` whose final step is `PiPLSRegression`. The path estimator preserves
+indexable input containers, then clones and fits the entire supported pipeline separately for every
+fold and candidate. This permits pandas column names and name-based `ColumnTransformer` selectors
+to remain available inside every fold. `pipls_param_prefix` may name the final Pi-PLS pipeline step;
+it is otherwise inferred. Arbitrary nested meta-estimators are rejected rather than partially
+supported.
 
 ## Selection and diagnostics
 
@@ -82,7 +84,9 @@ Conditional ties for fixed `n_components` prefer smaller predictor rank.
 
 Important fitted attributes include:
 
-- `cv_results_`, `best_params_`, `best_score_`, and `best_estimator_`;
+- `cv_results_`, `best_params_`, `best_score_`, `scorer_`, and `best_estimator_`;
+- standard `mean_fit_time`, `std_fit_time`, `mean_score_time`, and `std_score_time` columns;
+- `refit_time_` when `refit=True`;
 - `best_pipls_`, the selected fitted nested `PiPLSRegression`, and `best_pipls_params_`;
 - `best_n_components_` and `best_predictor_rank_`;
 - `best_predictor_rank_by_n_components_` and `best_score_by_n_components_`;
@@ -93,9 +97,11 @@ Important fitted attributes include:
 - `path_search_method_`, `path_search_history_`, and `path_search_exhaustive_`.
 
 When `refit=True`, the selected complete estimator is fitted once on all supplied data. Standard
-`predict`, `transform`, `fit_transform`, feature-name, pandas-output, and R2 `score` behavior then
-mirrors `PiPLSRegression`. `best_score_` remains the configured selection score and can differ
-from the R2 returned by `score`.
+`predict`, conditional `transform`/`fit_transform`/`inverse_transform`, feature-name, pandas-output,
+and R2 `score` behavior delegates to the selected estimator. Methods are exposed only when the
+selected estimator supports them. `best_score_` remains the configured selection score and can
+differ from the R2 returned by `score`. `cv=None` requests standard five-fold regression CV and
+`scoring=None` uses the estimator's own `score` method.
 
 With `refit=False`, path diagnostics remain available but `predict`, `transform`, and
 `score` are disabled.

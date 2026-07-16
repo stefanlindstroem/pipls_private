@@ -71,3 +71,6 @@ Theory navigation starts at `docs/theory.md`; the persistent LLM-facing derivati
 
 Read `.llm/README.md` before preparing an LLM-assisted change. Create a repository snapshot with
 `make snapshot`.
+
+
+The public estimator mirrors scikit-learn PLS conventions, including latent transforms, least-squares inverse reconstruction, standard search diagnostics, and pipeline-aware path selection.

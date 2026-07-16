@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
+from time import perf_counter
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -42,6 +43,8 @@ class _PiPLSCandidateResult:
     candidate: _PiPLSCandidate
     split_scores: FloatArray
     split_response_standardized_mse: FloatArray
+    split_fit_times: FloatArray
+    split_score_times: FloatArray
     split_svd_solvers: tuple[ResolvedSVDSolver, ...]
 
     @property
@@ -128,6 +131,8 @@ def _evaluate_candidate(
 
     split_scores = np.empty(len(splits), dtype=np.float64)
     split_mse = np.empty(len(splits), dtype=np.float64)
+    split_fit_times = np.empty(len(splits), dtype=np.float64)
+    split_score_times = np.empty(len(splits), dtype=np.float64)
     split_svd_solvers: list[ResolvedSVDSolver] = []
     params = {
         n_components_key: candidate.n_components,
@@ -140,7 +145,11 @@ def _evaluate_candidate(
         y_train = _safe_indexing(y, train)
         X_validation = _safe_indexing(X, validation)
         y_validation = _safe_indexing(y, validation)
+        fit_started = perf_counter()
         estimator.fit(X_train, y_train)
+        split_fit_times[split_index] = perf_counter() - fit_started
+
+        score_started = perf_counter()
         prediction = estimator.predict(X_validation)
         mse = _response_standardized_mse(
             y_validation,
@@ -161,6 +170,7 @@ def _evaluate_candidate(
                     f"predictor_rank={candidate.predictor_rank}, split={split_index}."
                 )
             split_scores[split_index] = score
+        split_score_times[split_index] = perf_counter() - score_started
 
         if solver_getter is not None:
             split_svd_solvers.append(solver_getter(estimator))
@@ -169,5 +179,7 @@ def _evaluate_candidate(
         candidate=candidate,
         split_scores=split_scores,
         split_response_standardized_mse=split_mse,
+        split_fit_times=split_fit_times,
+        split_score_times=split_score_times,
         split_svd_solvers=tuple(split_svd_solvers),
     )

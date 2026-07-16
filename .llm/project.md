@@ -48,3 +48,5 @@ advanced split protocols.
 make check
 make build
 ```
+
+- D1c completed: final scikit-learn cleanup, conditional path delegation, inverse reconstruction, canonical decomposition arrays, standard sentinels/timings, and minimum-version CI.

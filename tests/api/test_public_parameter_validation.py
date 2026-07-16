@@ -200,7 +200,7 @@ def test_extremely_large_samples_per_predictor_rank_gives_rank_one() -> None:
 
 @pytest.mark.parametrize(
     "value",
-    [True, np.bool_(False), 0, 1, -1, 2.0, np.float64(2.0), np.nan, np.inf, "5", None],
+    [True, np.bool_(False), 0, 1, -1, 2.0, np.float64(2.0), np.nan, np.inf, "5"],
 )
 def test_cv_rejects_invalid_scalar_values(value: object) -> None:
     X, Y = _data()
@@ -365,7 +365,7 @@ def test_svd_solver_rejects_nonstring_values_cleanly(value: object) -> None:
         ).fit(X, Y)
 
 
-@pytest.mark.parametrize("value", [None, 1, [], np.asarray(["neg_mean_squared_error"])])
+@pytest.mark.parametrize("value", [1, [], np.asarray(["neg_mean_squared_error"])])
 def test_scoring_rejects_nonstring_noncallable_values_cleanly(value: object) -> None:
     X, Y = _data()
     with pytest.raises(ValueError, match="scoring"):
