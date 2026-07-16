@@ -8,11 +8,10 @@ utilities, reproducible datasets, and paper-reproduction scripts.
 
 ## Current increment
 
-Phase C2a adds private, independently tested primitives for materializing reusable CV splits,
-constructing the conditional predictor-rank grid, computing fold-local response scales and
-response-standardized MSE, and applying deterministic low-rank tie-breaking. The public estimator
-still supports only integer and `"max"` predictor-rank modes; automatic selection remains the next
-increment.
+Phase C2b integrates automatic conditional predictor-rank selection into `PiPLSRegression`.
+Automatic mode materializes reusable CV splits, derives a fold-safe rank grid, fits preprocessing
+inside every training fold, supports standard scorer orientation and optional parallel candidate
+evaluation, stores diagnostics, and refits the selected rank on all supplied data.
 
 ## Planned responsibilities
 

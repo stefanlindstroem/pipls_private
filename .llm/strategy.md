@@ -120,13 +120,18 @@ are committed and tested.
 Freeze the reusable split, candidate-grid, fold-local response-scale, response-standardized loss,
 and deterministic tie-breaking contracts before changing public estimator behavior.
 
-Current status: **implemented by this patch**, subject to acceptance tests and commit. This phase
-adds no public constructor parameters and does not accept `predictor_rank="auto"` yet.
+Current status: **complete**. The reusable split, candidate-grid, fold-local response-scale,
+response-standardized loss, and deterministic tie-breaking primitives are committed and tested.
 
 ### Phase C2b: `predictor_rank="auto"`
 
 Integrate the Phase C2a primitives into `PiPLSRegression` for one fixed `n_components`, including
-fold-local preprocessing, diagnostics, and full-data refitting.
+fold-local preprocessing, diagnostics, standard scorer orientation, optional parallel candidate
+evaluation, and full-data refitting.
+
+Current status: **complete**. Automatic mode is the estimator default, uses the smallest
+materialized training fold for its candidate bound, stores split and mean diagnostics, and refits
+the selected fixed-rank model on all supplied data.
 
 ### Phase D1: complete path analysis
 
@@ -151,11 +156,11 @@ workflow, and a clean tagged paper release.
 
 ## Current next increment
 
-After the Phase C2a patch is committed and a clean snapshot is produced, the next patch should
-be **Phase C2b: `predictor_rank="auto"`** for one fixed `n_components`. It must reuse the private
-materialized splits, derive the bound from their smallest training fold, fit preprocessing inside
-each fold, select by response-standardized MSE, store diagnostics, and refit the selected
-fixed-rank model on all supplied data.
+After the Phase C2b patch is committed and a clean snapshot is produced, the next patch should
+be **Phase D1: complete path analysis**. It should add `PiPLSPathCV` over the admissible triangular
+$(h,r_\pi)$ grid, reuse one materialized split set for every pair, fit the complete searched
+estimator or pipeline inside every fold, expose scikit-learn-style search diagnostics, and refit
+the selected pair. It must not yet add paper datasets or paper-specific LOO reporting.
 
 ## Maintenance protocol
 

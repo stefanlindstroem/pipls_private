@@ -6,7 +6,15 @@
 from pipls import PiPLSRegression
 ```
 
-`PiPLSPathCV` is planned for a later phase and is not currently exported.
+`PiPLSPathCV` is planned for a later phase and is not currently exported. Public scoring
+callables are available from `pipls.metrics`:
+
+```python
+from pipls.metrics import (
+    neg_response_standardized_mean_squared_error,
+    response_standardized_mean_squared_error,
+)
+```
 
 ## Public names
 
@@ -20,42 +28,50 @@ from pipls import PiPLSRegression
 
 Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 
-## Current rank modes
+## Predictor-rank modes
 
-The currently implemented constructor supports an explicit positive integer and the rule-fixed
-mode:
+The estimator supports all three fixed public modes:
 
 ```python
 PiPLSRegression(n_components=2, predictor_rank=4)
-PiPLSRegression(
-    n_components=2,
-    predictor_rank="max",
-    samples_per_predictor_rank=10,
-)
+PiPLSRegression(n_components=2, predictor_rank="max")
+PiPLSRegression(n_components=2, predictor_rank="auto")
 ```
 
-For `predictor_rank="max"`, fitting on $n_{\mathrm{train}}$ samples and $p$ predictor columns
-uses
+The default is `predictor_rank="auto"`. Automatic mode materializes one CV split set, computes
+its smallest training-fold size, searches every integer rank from `n_components` through the
+fold-safe upper bound, selects the largest scikit-learn score with deterministic low-rank
+tie-breaking, and refits the selected fixed-rank model on all data passed to `fit()`.
+
+The upper bound is
 
 \begin{equation}
 r_{\pi,\max}
 =
 \min\left[
 p,
-n_{\mathrm{train}},
+n_{\mathrm{train,min}},
 \left\lceil
-\frac{n_{\mathrm{train}}}{\texttt{samples\_per\_predictor\_rank}}
+\frac{n_{\mathrm{train,min}}}{\texttt{samples\_per\_predictor\_rank}}
 \right\rceil
 \right].
 \end{equation}
 
-The data passed to `fit()` are the training data for this non-CV mode. A later automatic-selection
-phase will use the same helper with the smallest materialized internal-CV training-fold size.
-An explicit integer rank bypasses the rule-derived bound but remains subject to the core numerical
-rank and dimensional admissibility checks.
+For `"auto"`, `n_train_min` is derived from the materialized internal-CV splits. For `"max"`,
+the samples supplied to `fit()` are the training data. An explicit integer bypasses the
+rule-derived bound but remains subject to the core numerical-rank and dimensional checks.
 
-`predictor_rank="auto"` remains planned and must not be accepted until fold-local automatic
-selection is implemented.
+## Internal search parameters
+
+- `cv` accepts an integer, a scikit-learn splitter, or an iterable of `(train, validation)` pairs.
+  The default `cv=5` is deterministic, unshuffled regression K-fold splitting through
+  scikit-learn's `check_cv` behavior.
+- `scoring` accepts a scikit-learn scorer name or scorer callable. The default is
+  `"neg_response_standardized_mean_squared_error"`.
+- `n_jobs` controls parallel evaluation across predictor-rank candidates through joblib.
+
+The positive response-standardized utility follows the scorer signature `(estimator, X, y)`.
+The negative version is suitable for scikit-learn search APIs, where larger scores are better.
 
 ## Fitted estimator behavior
 
@@ -63,3 +79,15 @@ The estimator provides `fit`, `predict`, `transform`, and scalar `score`. It exp
 `predictor_rank_`, `max_predictor_rank_`, preprocessing statistics, Pi-PLS factorization arrays,
 latent scores, `coef_` in scikit-learn orientation, `coef_matrix_` in manuscript orientation, and
 `intercept_`.
+
+Automatic mode additionally exposes:
+
+- `predictor_rank_values_`;
+- `predictor_rank_cv_results_` with split and mean scores plus response-standardized MSE;
+- `best_score_`;
+- `best_response_standardized_mse_` for the selected rank;
+- `n_splits_`;
+- `cv_n_train_min_`.
+
+`response_scale_for_scoring_` is estimated from the data used to fit each estimator with
+`ddof=1`, independently of whether `scale` is true or false.

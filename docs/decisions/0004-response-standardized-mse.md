@@ -1,7 +1,6 @@
 # Decision: 0004-response-standardized-mse
 
-Status: private metric and fold-scale primitives implemented; public scorer and automatic
-selection integration remain pending.
+Status: implemented as public scorer callables and as automatic-selection diagnostics.
 
 For validation fold $k$, let $s_{k,j}$ be the sample standard deviation (`ddof=1`) of response
 column $j$ estimated from that fold's training observations. A zero scale, or every scale from a
@@ -20,5 +19,9 @@ singleton training fold, is replaced by 1.0. For validation index set $\mathcal{
 
 The implementation computes this quantity in original response units after prediction. It never
 concatenates responses transformed under different fold-specific scalers. Responses receive
-uniform weight. Phase C2b will average these fold losses across the materialized splits for each
-candidate predictor rank.
+uniform weight. Candidate losses are the unweighted mean of split losses.
+
+`response_standardized_mean_squared_error` returns the positive loss and
+`neg_response_standardized_mean_squared_error` returns its negative for scikit-learn scorer
+maximization. Both follow the `(estimator, X, y)` scorer signature and use the estimator's
+training-derived `response_scale_for_scoring_`.

@@ -1,14 +1,58 @@
-# Predictor-rank modes
+# Predictor-rank selection
 
-`PiPLSRegression` currently supports two predictor-rank modes for a fixed `n_components`.
+`PiPLSRegression` supports automatic, rule-fixed, and explicit predictor ranks for a fixed
+`n_components`.
 
-An explicit integer fixes the predictor rank directly:
+## Automatic mode
+
+Automatic mode is the default:
 
 ```python
-model = PiPLSRegression(n_components=2, predictor_rank=4)
+model = PiPLSRegression(
+    n_components=2,
+    predictor_rank="auto",
+    samples_per_predictor_rank=10,
+    cv=5,
+    scoring="neg_response_standardized_mean_squared_error",
+    n_jobs=None,
+)
+model.fit(X, Y)
 ```
 
-The rule-fixed mode derives the upper rank and uses it directly:
+The estimator materializes the CV splits once. If the smallest training fold contains
+$n_{\mathrm{train,min}}$ samples and the input has $p$ predictor columns, the upper rank is
+
+\begin{equation}
+r_{\pi,\max}
+=
+\min\left[
+p,
+n_{\mathrm{train,min}},
+\left\lceil
+n_{\mathrm{train,min}} / \texttt{samples\_per\_predictor\_rank}
+\right\rceil
+\right].
+\end{equation}
+
+Every integer rank in
+
+\begin{equation}
+\{\texttt{n\_components},\ldots,r_{\pi,\max}\}
+\end{equation}
+
+is evaluated on the same splits. Each candidate estimator fits centering and optional scaling
+only on the corresponding training fold. Scores use standard scikit-learn orientation: larger is
+better. Equal mean scores within `rtol=1e-12` and `atol=1e-15` are resolved in favor of the
+smaller predictor rank. The selected rank is then refitted once on all data supplied to `fit()`.
+
+The default scorer is negative response-standardized MSE. For each validation fold, response
+scales are sample standard deviations estimated from that fold's training responses with
+`ddof=1`; zero scales and singleton-fold scales are replaced by 1.
+
+Automatic-mode diagnostics include `predictor_rank_values_`, `predictor_rank_cv_results_`,
+`best_score_`, `best_response_standardized_mse_`, `n_splits_`, and `cv_n_train_min_`.
+
+## Rule-fixed mode
 
 ```python
 model = PiPLSRegression(
@@ -18,31 +62,14 @@ model = PiPLSRegression(
 )
 ```
 
-For data passed to `fit()` with $n_{\mathrm{train}}$ rows and $p$ predictor columns, the current
-rule-fixed mode uses
+This uses the same rule directly without scanning ranks. Here the data supplied to `fit()` are
+the training data used in the bound.
 
-\begin{equation}
-r_{\pi,\max}
-=
-\min\left[
-p,
-n_{\mathrm{train}},
-\left\lceil
-n_{\mathrm{train}} / \texttt{samples\_per\_predictor\_rank}
-\right\rceil
-\right].
-\end{equation}
+## Explicit mode
 
-After fitting, `max_predictor_rank_` stores this bound and `predictor_rank_` stores the rank
-actually used. Explicit integer ranks are not clamped to the rule-derived bound.
+```python
+model = PiPLSRegression(n_components=2, predictor_rank=4)
+```
 
-`predictor_rank="auto"` is not implemented yet. Its later implementation will materialize CV
-splits, pass the smallest training-fold size to the same bound helper, evaluate all admissible
-ranks for the fixed `n_components`, and refit on the complete input data.
-
-## Automatic-selection implementation boundary
-
-The repository now contains private, tested primitives for reusable CV splits, fold-safe rank
-candidates, fold-local response scales, response-standardized MSE, and deterministic low-rank
-tie-breaking. These functions are not public API. `predictor_rank="auto"` remains rejected until
-the next increment integrates them with fold-local model fitting and full-data refitting.
+An explicit integer fixes the predictor rank and bypasses the rule-derived bound. It remains
+subject to dimensional and numerical-rank validation in the fixed core.

@@ -13,6 +13,7 @@ authors = [{name = "Pi-PLS authors"}]
 dependencies = [
   "numpy>=1.26",
   "scikit-learn>=1.4",
+  "joblib>=1.2",
 ]
 
 [project.optional-dependencies]
@@ -47,5 +48,5 @@ packages = ["pipls"]
 strict = true
 
 [[tool.mypy.overrides]]
-module = ["sklearn", "sklearn.*"]
+module = ["joblib", "sklearn", "sklearn.*"]
 ignore_missing_imports = true

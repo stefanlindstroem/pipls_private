@@ -53,7 +53,8 @@ class PiPLSCoreResult:
     def regression_map(self) -> FloatArray:
         """Return the centered/scaled regression map with shape ``(p, q)``."""
 
-        return self.P @ self.D @ self.Q.T
+        regression_map: FloatArray = self.P @ self.D @ self.Q.T
+        return regression_map
 
     def predict(self, X: ArrayLike) -> FloatArray:
         """Predict centered/scaled responses from a compatible predictor matrix."""

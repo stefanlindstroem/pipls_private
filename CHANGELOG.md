@@ -7,3 +7,4 @@
 - Add the public fixed-rank `PiPLSRegression` estimator.
 - Add the ceiling-based predictor-rank bound and `predictor_rank="max"` mode.
 - Add private cross-validation selection primitives for reusable splits, response-standardized loss, and deterministic rank tie-breaking.
+- Add automatic predictor-rank selection with fold-local preprocessing, diagnostics, public scoring utilities, and full-data refitting.

@@ -68,8 +68,9 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     readme = (root / ".llm" / "README.md").read_text(encoding="utf-8")
 
     assert "The LLM maintainer owns" in strategy
-    assert 'Phase C2a: private CV-selection primitives' in strategy
     assert 'Phase C2b: `predictor_rank="auto"`' in strategy
+    assert "Current status: **complete**. Automatic mode" in strategy
+    assert "Phase D1: complete path analysis" in strategy
     assert "The LLM maintainer updates this file" in readme
     assert 'git apply --check ~/Downloads/proposed-change.patch' in readme
     assert 'git commit -m "Describe the completed increment"' in readme
