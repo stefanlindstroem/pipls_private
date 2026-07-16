@@ -20,6 +20,7 @@ This index is navigation, not a substitute for those records.
 | `0012-sklearn-api-alignment.md` | estimator and PLS compatibility | standard fitted surface plus structured Pi-PLS decomposition output |
 | `0013-sklearn-cleanup-boundary.md` | final pre-D2 scope | direct estimator or terminal-pipeline support and conditional delegation |
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
+| `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | immutable validated datasets plus local seeded latent-structure generation |
 
 ## Accepted clarifications after the original publication plan
 

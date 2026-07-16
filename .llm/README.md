@@ -23,7 +23,7 @@ The principal navigation documents are:
 6. `mathematics.md` — normative equations, notation, dimensions, and mathematical invariants.
 7. `numerical_contracts.md` — numerical algorithms, tolerances, degeneracy, and comparison rules.
 8. `public_api.md` — constructor parameters, fitted attributes, shapes, supported composition,
-   and explicit exclusions.
+   dataset interfaces, and explicit exclusions.
 9. `development.md` — coding, testing, documentation, dependency, and patch requirements.
 10. `docs/publication_repository_plan.md` — broad historical design and publication architecture;
     consult current state and accepted decisions before treating a proposal there as active.

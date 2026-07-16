@@ -1,0 +1,871 @@
+"""Validated dataset containers and deterministic synthetic Pi-PLS data."""
+
+from __future__ import annotations
+
+from collections.abc import Iterator, Mapping, Sequence
+from dataclasses import dataclass, field
+from typing import Generic, Literal, TypeAlias, TypeVar
+
+import numpy as np
+from numpy.typing import NDArray
+
+FloatArray = NDArray[np.float64]
+IntArray = NDArray[np.intp]
+Distribution: TypeAlias = Literal["normal", "uniform"]
+NumericSpec: TypeAlias = float | Sequence[float]
+NoiseSpec: TypeAlias = float | tuple[float, float]
+
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class _FrozenMapping(Mapping[K, V], Generic[K, V]):
+    """Small immutable and pickleable mapping used by public dataset objects."""
+
+    __slots__ = ("_data",)
+
+    def __init__(self, values: Mapping[K, V]) -> None:
+        self._data = dict(values)
+
+    def __getitem__(self, key: K) -> V:
+        return self._data[key]
+
+    def __iter__(self) -> Iterator[K]:
+        return iter(self._data)
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __reduce__(self) -> tuple[object, tuple[dict[K, V]]]:
+        return (_FrozenMapping, (self._data,))
+
+
+_REQUIRED_PROVENANCE_KEYS = ("source", "license", "citation", "version")
+_UINT32_MAX = 2**32 - 1
+
+
+@dataclass(frozen=True)
+class PiPLSSyntheticTruth:
+    """Immutable latent structure used to generate a synthetic dataset.
+
+    All arrays are read-only copies. Loading blocks that cannot affect one side
+    of the regression problem are represented explicitly as zero-width or zero
+    arrays rather than being omitted.
+    """
+
+    shared_scores: FloatArray
+    predictor_specific_scores: FloatArray
+    response_specific_scores: FloatArray
+    x_shared_loadings: FloatArray
+    x_predictor_specific_loadings: FloatArray
+    x_response_specific_loadings: FloatArray
+    y_shared_loadings: FloatArray
+    y_predictor_specific_loadings: FloatArray
+    y_response_specific_loadings: FloatArray
+    x_signal: FloatArray
+    y_signal: FloatArray
+    x_noise: FloatArray
+    y_noise: FloatArray
+    feature_scale: FloatArray
+    target_scale: FloatArray
+    shared_strengths: FloatArray
+    predictor_specific_strengths: FloatArray
+    response_specific_strengths: FloatArray
+
+    def __post_init__(self) -> None:
+        for name in self.__dataclass_fields__:
+            value = getattr(self, name)
+            object.__setattr__(self, name, _read_only_float_array(value, name=name))
+
+    @property
+    def n_shared(self) -> int:
+        """Number of latent directions shared by predictors and responses."""
+
+        return int(self.shared_scores.shape[1])
+
+    @property
+    def n_predictor_specific(self) -> int:
+        """Number of latent directions appearing only in predictors."""
+
+        return int(self.predictor_specific_scores.shape[1])
+
+    @property
+    def n_response_specific(self) -> int:
+        """Number of latent directions appearing only in responses."""
+
+        return int(self.response_specific_scores.shape[1])
+
+
+@dataclass(frozen=True)
+class PiPLSDataset:
+    """Immutable validated multivariate regression dataset.
+
+    Parameters
+    ----------
+    X, Y:
+        Numeric predictor and response arrays. ``X`` must be two-dimensional.
+        A one-dimensional ``Y`` is accepted and stored as one response column.
+    feature_names, target_names, sample_ids:
+        Unique non-empty names aligned with the corresponding array axes.
+    provenance:
+        Mapping containing non-empty ``source``, ``license``, ``citation``, and
+        ``version`` strings.
+    metadata:
+        Dataset-level metadata composed of immutable scalar, sequence, mapping,
+        and NumPy-array values. Arrays are copied and made read-only.
+    truth:
+        Optional synthetic latent structure.
+    """
+
+    X: FloatArray
+    Y: FloatArray
+    feature_names: Sequence[str]
+    target_names: Sequence[str]
+    sample_ids: Sequence[str]
+    provenance: Mapping[str, str]
+    metadata: Mapping[str, object] = field(default_factory=dict)
+    truth: PiPLSSyntheticTruth | None = None
+
+    def __post_init__(self) -> None:
+        X = _validated_matrix(self.X, name="X", allow_vector=False)
+        Y = _validated_matrix(self.Y, name="Y", allow_vector=True)
+        if X.shape[0] != Y.shape[0]:
+            raise ValueError("X and Y must contain the same number of samples.")
+        if X.shape[0] == 0 or X.shape[1] == 0 or Y.shape[1] == 0:
+            raise ValueError("X and Y must contain at least one sample and one column.")
+
+        feature_names = _validated_names(
+            self.feature_names,
+            expected=X.shape[1],
+            name="feature_names",
+        )
+        target_names = _validated_names(
+            self.target_names,
+            expected=Y.shape[1],
+            name="target_names",
+        )
+        sample_ids = _validated_names(
+            self.sample_ids,
+            expected=X.shape[0],
+            name="sample_ids",
+        )
+        provenance = _validated_provenance(self.provenance)
+        metadata = _freeze_mapping(self.metadata, name="metadata")
+
+        if self.truth is not None:
+            _validate_truth(
+                self.truth,
+                n_samples=X.shape[0],
+                n_features=X.shape[1],
+                n_targets=Y.shape[1],
+            )
+            if not np.allclose(X, self.truth.x_signal + self.truth.x_noise):
+                raise ValueError("X must equal truth.x_signal + truth.x_noise.")
+            if not np.allclose(Y, self.truth.y_signal + self.truth.y_noise):
+                raise ValueError("Y must equal truth.y_signal + truth.y_noise.")
+
+        object.__setattr__(self, "X", X)
+        object.__setattr__(self, "Y", Y)
+        object.__setattr__(self, "feature_names", feature_names)
+        object.__setattr__(self, "target_names", target_names)
+        object.__setattr__(self, "sample_ids", sample_ids)
+        object.__setattr__(self, "provenance", provenance)
+        object.__setattr__(self, "metadata", metadata)
+
+    @property
+    def data(self) -> FloatArray:
+        """Scikit-learn-style alias for :attr:`X`."""
+
+        return self.X
+
+    @property
+    def target(self) -> FloatArray:
+        """Scikit-learn-style alias for :attr:`Y`."""
+
+        return self.Y
+
+    @property
+    def n_samples(self) -> int:
+        """Number of aligned observations."""
+
+        return int(self.X.shape[0])
+
+    @property
+    def n_features(self) -> int:
+        """Number of predictor columns."""
+
+        return int(self.X.shape[1])
+
+    @property
+    def n_targets(self) -> int:
+        """Number of response columns."""
+
+        return int(self.Y.shape[1])
+
+
+@dataclass(frozen=True)
+class _SyntheticModel:
+    x_shared_loadings: FloatArray
+    x_predictor_specific_loadings: FloatArray
+    y_shared_loadings: FloatArray
+    y_response_specific_loadings: FloatArray
+    feature_scale: FloatArray
+    target_scale: FloatArray
+    shared_strengths: FloatArray
+    predictor_specific_strengths: FloatArray
+    response_specific_strengths: FloatArray
+
+
+@dataclass(frozen=True)
+class _SyntheticConfig:
+    n_features: int
+    n_targets: int
+    n_shared: int
+    n_predictor_specific: int
+    n_response_specific: int
+    shared_strengths: FloatArray
+    predictor_specific_strengths: FloatArray
+    response_specific_strengths: FloatArray
+    shared_distribution: Distribution
+    predictor_specific_distribution: Distribution
+    response_specific_distribution: Distribution
+    feature_scale: FloatArray
+    target_scale: FloatArray
+    x_noise: float
+    y_noise: float
+    random_state: int
+
+
+def make_pipls_regression(
+    *,
+    n_samples: int,
+    n_features: int,
+    n_targets: int,
+    n_shared: int,
+    n_predictor_specific: int = 0,
+    n_response_specific: int = 0,
+    shared_strength: NumericSpec = 1.0,
+    predictor_specific_strength: NumericSpec = 1.0,
+    response_specific_strength: NumericSpec = 1.0,
+    shared_distribution: Distribution = "normal",
+    predictor_specific_distribution: Distribution = "normal",
+    response_specific_distribution: Distribution = "normal",
+    feature_scale: NumericSpec = 1.0,
+    target_scale: NumericSpec = 1.0,
+    noise: NoiseSpec = 0.1,
+    random_state: int = 0,
+) -> PiPLSDataset:
+    """Generate one deterministic Pi-PLS latent-structure dataset.
+
+    Shared latent scores affect both ``X`` and ``Y``. Predictor-specific scores
+    affect only ``X`` and response-specific scores affect only ``Y``. A scalar
+    ``noise`` applies to both blocks; a two-tuple specifies predictor and
+    response noise separately.
+    """
+
+    n_samples = _positive_integer(n_samples, name="n_samples", minimum=2)
+    config = _validated_synthetic_config(
+        n_features=n_features,
+        n_targets=n_targets,
+        n_shared=n_shared,
+        n_predictor_specific=n_predictor_specific,
+        n_response_specific=n_response_specific,
+        shared_strength=shared_strength,
+        predictor_specific_strength=predictor_specific_strength,
+        response_specific_strength=response_specific_strength,
+        shared_distribution=shared_distribution,
+        predictor_specific_distribution=predictor_specific_distribution,
+        response_specific_distribution=response_specific_distribution,
+        feature_scale=feature_scale,
+        target_scale=target_scale,
+        noise=noise,
+        random_state=random_state,
+    )
+    _validate_sample_capacity(n_samples, config, name="n_samples")
+    rng = np.random.default_rng(config.random_state)
+    model = _draw_synthetic_model(rng, config)
+    return _draw_dataset_block(
+        rng,
+        config,
+        model,
+        n_samples=n_samples,
+        sample_prefix="sample",
+        split_role="full",
+        generator_name="make_pipls_regression",
+    )
+
+
+def make_pipls_train_test(
+    *,
+    n_train: int,
+    n_test: int,
+    n_features: int,
+    n_targets: int,
+    n_shared: int,
+    n_predictor_specific: int = 0,
+    n_response_specific: int = 0,
+    shared_strength: NumericSpec = 1.0,
+    predictor_specific_strength: NumericSpec = 1.0,
+    response_specific_strength: NumericSpec = 1.0,
+    shared_distribution: Distribution = "normal",
+    predictor_specific_distribution: Distribution = "normal",
+    response_specific_distribution: Distribution = "normal",
+    feature_scale: NumericSpec = 1.0,
+    target_scale: NumericSpec = 1.0,
+    noise: NoiseSpec = 0.1,
+    random_state: int = 0,
+) -> tuple[PiPLSDataset, PiPLSDataset]:
+    """Generate deterministic train and test datasets from one latent model.
+
+    Loadings, strengths, and observed-variable scales are shared. Latent scores
+    and noise are generated independently for the two blocks. No centering,
+    scaling, imputation, or other fitted preprocessing is performed.
+    """
+
+    n_train = _positive_integer(n_train, name="n_train", minimum=2)
+    n_test = _positive_integer(n_test, name="n_test", minimum=2)
+    config = _validated_synthetic_config(
+        n_features=n_features,
+        n_targets=n_targets,
+        n_shared=n_shared,
+        n_predictor_specific=n_predictor_specific,
+        n_response_specific=n_response_specific,
+        shared_strength=shared_strength,
+        predictor_specific_strength=predictor_specific_strength,
+        response_specific_strength=response_specific_strength,
+        shared_distribution=shared_distribution,
+        predictor_specific_distribution=predictor_specific_distribution,
+        response_specific_distribution=response_specific_distribution,
+        feature_scale=feature_scale,
+        target_scale=target_scale,
+        noise=noise,
+        random_state=random_state,
+    )
+    _validate_sample_capacity(n_train, config, name="n_train")
+    _validate_sample_capacity(n_test, config, name="n_test")
+    rng = np.random.default_rng(config.random_state)
+    model = _draw_synthetic_model(rng, config)
+    train = _draw_dataset_block(
+        rng,
+        config,
+        model,
+        n_samples=n_train,
+        sample_prefix="train",
+        split_role="train",
+        generator_name="make_pipls_train_test",
+    )
+    test = _draw_dataset_block(
+        rng,
+        config,
+        model,
+        n_samples=n_test,
+        sample_prefix="test",
+        split_role="test",
+        generator_name="make_pipls_train_test",
+    )
+    return train, test
+
+
+def _validated_synthetic_config(
+    *,
+    n_features: int,
+    n_targets: int,
+    n_shared: int,
+    n_predictor_specific: int,
+    n_response_specific: int,
+    shared_strength: NumericSpec,
+    predictor_specific_strength: NumericSpec,
+    response_specific_strength: NumericSpec,
+    shared_distribution: Distribution,
+    predictor_specific_distribution: Distribution,
+    response_specific_distribution: Distribution,
+    feature_scale: NumericSpec,
+    target_scale: NumericSpec,
+    noise: NoiseSpec,
+    random_state: int,
+) -> _SyntheticConfig:
+    n_features = _positive_integer(n_features, name="n_features")
+    n_targets = _positive_integer(n_targets, name="n_targets")
+    n_shared = _nonnegative_integer(n_shared, name="n_shared")
+    n_predictor_specific = _nonnegative_integer(
+        n_predictor_specific,
+        name="n_predictor_specific",
+    )
+    n_response_specific = _nonnegative_integer(
+        n_response_specific,
+        name="n_response_specific",
+    )
+    if n_shared + n_predictor_specific > n_features:
+        raise ValueError(
+            "n_shared + n_predictor_specific must not exceed n_features."
+        )
+    if n_shared + n_response_specific > n_targets:
+        raise ValueError(
+            "n_shared + n_response_specific must not exceed n_targets."
+        )
+
+    distributions = (
+        ("shared_distribution", shared_distribution),
+        ("predictor_specific_distribution", predictor_specific_distribution),
+        ("response_specific_distribution", response_specific_distribution),
+    )
+    for name, value in distributions:
+        if value not in ("normal", "uniform"):
+            raise ValueError(f"{name} must be 'normal' or 'uniform'.")
+
+    x_noise, y_noise = _resolve_noise(noise)
+    return _SyntheticConfig(
+        n_features=n_features,
+        n_targets=n_targets,
+        n_shared=n_shared,
+        n_predictor_specific=n_predictor_specific,
+        n_response_specific=n_response_specific,
+        shared_strengths=_resolve_positive_vector(
+            shared_strength,
+            length=n_shared,
+            name="shared_strength",
+        ),
+        predictor_specific_strengths=_resolve_positive_vector(
+            predictor_specific_strength,
+            length=n_predictor_specific,
+            name="predictor_specific_strength",
+        ),
+        response_specific_strengths=_resolve_positive_vector(
+            response_specific_strength,
+            length=n_response_specific,
+            name="response_specific_strength",
+        ),
+        shared_distribution=shared_distribution,
+        predictor_specific_distribution=predictor_specific_distribution,
+        response_specific_distribution=response_specific_distribution,
+        feature_scale=_resolve_positive_vector(
+            feature_scale,
+            length=n_features,
+            name="feature_scale",
+        ),
+        target_scale=_resolve_positive_vector(
+            target_scale,
+            length=n_targets,
+            name="target_scale",
+        ),
+        x_noise=x_noise,
+        y_noise=y_noise,
+        random_state=_validated_seed(random_state),
+    )
+
+
+def _validate_sample_capacity(
+    n_samples: int,
+    config: _SyntheticConfig,
+    *,
+    name: str,
+) -> None:
+    required_rank = max(
+        config.n_shared + config.n_predictor_specific,
+        config.n_shared + config.n_response_specific,
+    )
+    if n_samples <= required_rank:
+        raise ValueError(
+            f"{name} must exceed the largest declared centered latent rank "
+            f"({required_rank})."
+        )
+
+
+def _draw_synthetic_model(
+    rng: np.random.Generator,
+    config: _SyntheticConfig,
+) -> _SyntheticModel:
+    x_basis = _orthonormal_columns(
+        rng,
+        n_rows=config.n_features,
+        n_columns=config.n_shared + config.n_predictor_specific,
+    )
+    y_basis = _orthonormal_columns(
+        rng,
+        n_rows=config.n_targets,
+        n_columns=config.n_shared + config.n_response_specific,
+    )
+    return _SyntheticModel(
+        x_shared_loadings=x_basis[:, : config.n_shared],
+        x_predictor_specific_loadings=x_basis[:, config.n_shared :],
+        y_shared_loadings=y_basis[:, : config.n_shared],
+        y_response_specific_loadings=y_basis[:, config.n_shared :],
+        feature_scale=config.feature_scale,
+        target_scale=config.target_scale,
+        shared_strengths=config.shared_strengths,
+        predictor_specific_strengths=config.predictor_specific_strengths,
+        response_specific_strengths=config.response_specific_strengths,
+    )
+
+
+def _draw_dataset_block(
+    rng: np.random.Generator,
+    config: _SyntheticConfig,
+    model: _SyntheticModel,
+    *,
+    n_samples: int,
+    sample_prefix: str,
+    split_role: str,
+    generator_name: str,
+) -> PiPLSDataset:
+    shared_scores = _draw_standardized_scores(
+        rng,
+        n_samples=n_samples,
+        n_components=config.n_shared,
+        distribution=config.shared_distribution,
+    )
+    predictor_specific_scores = _draw_standardized_scores(
+        rng,
+        n_samples=n_samples,
+        n_components=config.n_predictor_specific,
+        distribution=config.predictor_specific_distribution,
+    )
+    response_specific_scores = _draw_standardized_scores(
+        rng,
+        n_samples=n_samples,
+        n_components=config.n_response_specific,
+        distribution=config.response_specific_distribution,
+    )
+
+    x_signal_unscaled = _signal_block(
+        shared_scores,
+        model.shared_strengths,
+        model.x_shared_loadings,
+    ) + _signal_block(
+        predictor_specific_scores,
+        model.predictor_specific_strengths,
+        model.x_predictor_specific_loadings,
+    )
+    y_signal_unscaled = _signal_block(
+        shared_scores,
+        model.shared_strengths,
+        model.y_shared_loadings,
+    ) + _signal_block(
+        response_specific_scores,
+        model.response_specific_strengths,
+        model.y_response_specific_loadings,
+    )
+
+    x_noise = rng.normal(scale=config.x_noise, size=(n_samples, config.n_features))
+    y_noise = rng.normal(scale=config.y_noise, size=(n_samples, config.n_targets))
+    x_signal = x_signal_unscaled * model.feature_scale
+    y_signal = y_signal_unscaled * model.target_scale
+    x_noise = x_noise * model.feature_scale
+    y_noise = y_noise * model.target_scale
+    X = x_signal + x_noise
+    Y = y_signal + y_noise
+
+    truth = PiPLSSyntheticTruth(
+        shared_scores=shared_scores,
+        predictor_specific_scores=predictor_specific_scores,
+        response_specific_scores=response_specific_scores,
+        x_shared_loadings=model.x_shared_loadings,
+        x_predictor_specific_loadings=model.x_predictor_specific_loadings,
+        x_response_specific_loadings=np.zeros(
+            (config.n_features, config.n_response_specific),
+            dtype=np.float64,
+        ),
+        y_shared_loadings=model.y_shared_loadings,
+        y_predictor_specific_loadings=np.zeros(
+            (config.n_targets, config.n_predictor_specific),
+            dtype=np.float64,
+        ),
+        y_response_specific_loadings=model.y_response_specific_loadings,
+        x_signal=x_signal,
+        y_signal=y_signal,
+        x_noise=x_noise,
+        y_noise=y_noise,
+        feature_scale=model.feature_scale,
+        target_scale=model.target_scale,
+        shared_strengths=model.shared_strengths,
+        predictor_specific_strengths=model.predictor_specific_strengths,
+        response_specific_strengths=model.response_specific_strengths,
+    )
+    metadata: Mapping[str, object] = {
+        "schema_version": 1,
+        "generator": generator_name,
+        "split_role": split_role,
+        "random_state": config.random_state,
+        "latent_dimensions": {
+            "shared": config.n_shared,
+            "predictor_specific": config.n_predictor_specific,
+            "response_specific": config.n_response_specific,
+        },
+        "distributions": {
+            "shared": config.shared_distribution,
+            "predictor_specific": config.predictor_specific_distribution,
+            "response_specific": config.response_specific_distribution,
+        },
+        "noise": {"X": config.x_noise, "Y": config.y_noise},
+    }
+    provenance = {
+        "source": f"generated:pipls.datasets.{generator_name}",
+        "license": "BSD-3-Clause",
+        "citation": "Pi-PLS Python package deterministic synthetic generator",
+        "version": "1",
+    }
+    return PiPLSDataset(
+        X=X,
+        Y=Y,
+        feature_names=tuple(f"x_{index:03d}" for index in range(config.n_features)),
+        target_names=tuple(f"y_{index:03d}" for index in range(config.n_targets)),
+        sample_ids=tuple(f"{sample_prefix}_{index:04d}" for index in range(n_samples)),
+        provenance=provenance,
+        metadata=metadata,
+        truth=truth,
+    )
+
+
+def _signal_block(
+    scores: FloatArray,
+    strengths: FloatArray,
+    loadings: FloatArray,
+) -> FloatArray:
+    if strengths.size == 0:
+        return np.zeros((scores.shape[0], loadings.shape[0]), dtype=np.float64)
+    return np.asarray((scores * strengths) @ loadings.T, dtype=np.float64)
+
+
+def _draw_standardized_scores(
+    rng: np.random.Generator,
+    *,
+    n_samples: int,
+    n_components: int,
+    distribution: Distribution,
+) -> FloatArray:
+    if n_components == 0:
+        return np.empty((n_samples, 0), dtype=np.float64)
+    if distribution == "normal":
+        scores = rng.normal(size=(n_samples, n_components))
+    else:
+        scores = rng.uniform(-np.sqrt(3.0), np.sqrt(3.0), size=(n_samples, n_components))
+    scores -= scores.mean(axis=0, keepdims=True)
+    scales = scores.std(axis=0, ddof=1)
+    if np.any(scales == 0.0):
+        raise RuntimeError("Synthetic latent score generation produced a zero-variance column.")
+    scores /= scales
+    return np.asarray(scores, dtype=np.float64)
+
+
+def _orthonormal_columns(
+    rng: np.random.Generator,
+    *,
+    n_rows: int,
+    n_columns: int,
+) -> FloatArray:
+    if n_columns == 0:
+        return np.empty((n_rows, 0), dtype=np.float64)
+    basis, triangular = np.linalg.qr(
+        rng.normal(size=(n_rows, n_columns)),
+        mode="reduced",
+    )
+    signs = np.where(np.diag(triangular) < 0.0, -1.0, 1.0)
+    return np.asarray(basis * signs, dtype=np.float64)
+
+
+def _validated_matrix(
+    value: object,
+    *,
+    name: str,
+    allow_vector: bool,
+) -> FloatArray:
+    raw = np.asarray(value)
+    if raw.dtype.kind not in "iuf":
+        raise TypeError(f"{name} must contain real numeric values.")
+    if allow_vector and raw.ndim == 1:
+        raw = raw.reshape(-1, 1)
+    if raw.ndim != 2:
+        expected = "one or two dimensions" if allow_vector else "two dimensions"
+        raise ValueError(f"{name} must have {expected}.")
+    array = np.array(raw, dtype=np.float64, copy=True)
+    if not np.all(np.isfinite(array)):
+        raise ValueError(f"{name} must contain only finite values.")
+    array.setflags(write=False)
+    return array
+
+
+def _validated_names(
+    values: Sequence[str],
+    *,
+    expected: int,
+    name: str,
+) -> tuple[str, ...]:
+    result = tuple(values)
+    if len(result) != expected:
+        raise ValueError(f"{name} must contain exactly {expected} values.")
+    if any(not isinstance(value, str) or not value.strip() for value in result):
+        raise TypeError(f"{name} must contain non-empty strings.")
+    if len(set(result)) != len(result):
+        raise ValueError(f"{name} must contain unique values.")
+    return result
+
+
+def _validated_provenance(values: Mapping[str, str]) -> Mapping[str, str]:
+    if not isinstance(values, Mapping):
+        raise TypeError("provenance must be a mapping.")
+    copied: dict[str, str] = {}
+    for key, value in values.items():
+        if not isinstance(key, str) or not key.strip():
+            raise TypeError("provenance keys must be non-empty strings.")
+        if not isinstance(value, str) or not value.strip():
+            raise TypeError("provenance values must be non-empty strings.")
+        copied[key] = value
+    missing = [key for key in _REQUIRED_PROVENANCE_KEYS if key not in copied]
+    if missing:
+        raise ValueError(f"provenance is missing required keys: {missing}.")
+    return _FrozenMapping(copied)
+
+
+def _freeze_mapping(values: Mapping[str, object], *, name: str) -> Mapping[str, object]:
+    if not isinstance(values, Mapping):
+        raise TypeError(f"{name} must be a mapping.")
+    result: dict[str, object] = {}
+    for key, value in values.items():
+        if not isinstance(key, str) or not key.strip():
+            raise TypeError(f"{name} keys must be non-empty strings.")
+        result[key] = _freeze_metadata_value(value, path=f"{name}[{key!r}]")
+    return _FrozenMapping(result)
+
+
+def _freeze_metadata_value(value: object, *, path: str) -> object:
+    if value is None or isinstance(value, (str, bool, int, float)):
+        if isinstance(value, float) and not np.isfinite(value):
+            raise ValueError(f"{path} must be finite.")
+        return value
+    if isinstance(value, np.ndarray):
+        array = np.array(value, copy=True)
+        if array.dtype.kind in "fci" and not np.all(np.isfinite(array)):
+            raise ValueError(f"{path} must contain only finite values.")
+        array.setflags(write=False)
+        return array
+    if isinstance(value, Mapping):
+        return _freeze_mapping(value, name=path)
+    if isinstance(value, (list, tuple)):
+        return tuple(
+            _freeze_metadata_value(item, path=f"{path}[{index}]")
+            for index, item in enumerate(value)
+        )
+    raise TypeError(
+        f"{path} has unsupported type {type(value).__name__}; use immutable scalars, "
+        "sequences, mappings, or NumPy arrays."
+    )
+
+
+def _validate_truth(
+    truth: PiPLSSyntheticTruth,
+    *,
+    n_samples: int,
+    n_features: int,
+    n_targets: int,
+) -> None:
+    n_shared = truth.n_shared
+    n_predictor_specific = truth.n_predictor_specific
+    n_response_specific = truth.n_response_specific
+    expected_shapes = {
+        "shared_scores": (n_samples, n_shared),
+        "predictor_specific_scores": (n_samples, n_predictor_specific),
+        "response_specific_scores": (n_samples, n_response_specific),
+        "x_shared_loadings": (n_features, n_shared),
+        "x_predictor_specific_loadings": (n_features, n_predictor_specific),
+        "x_response_specific_loadings": (n_features, n_response_specific),
+        "y_shared_loadings": (n_targets, n_shared),
+        "y_predictor_specific_loadings": (n_targets, n_predictor_specific),
+        "y_response_specific_loadings": (n_targets, n_response_specific),
+        "x_signal": (n_samples, n_features),
+        "y_signal": (n_samples, n_targets),
+        "x_noise": (n_samples, n_features),
+        "y_noise": (n_samples, n_targets),
+        "feature_scale": (n_features,),
+        "target_scale": (n_targets,),
+        "shared_strengths": (n_shared,),
+        "predictor_specific_strengths": (n_predictor_specific,),
+        "response_specific_strengths": (n_response_specific,),
+    }
+    for name, expected in expected_shapes.items():
+        if getattr(truth, name).shape != expected:
+            raise ValueError(f"truth.{name} must have shape {expected}.")
+    if np.any(truth.x_response_specific_loadings != 0.0):
+        raise ValueError("truth.x_response_specific_loadings must be zero.")
+    if np.any(truth.y_predictor_specific_loadings != 0.0):
+        raise ValueError("truth.y_predictor_specific_loadings must be zero.")
+    if np.any(truth.feature_scale <= 0.0) or np.any(truth.target_scale <= 0.0):
+        raise ValueError("truth observed-variable scales must be positive.")
+    strength_arrays = (
+        truth.shared_strengths,
+        truth.predictor_specific_strengths,
+        truth.response_specific_strengths,
+    )
+    if any(np.any(strengths <= 0.0) for strengths in strength_arrays):
+        raise ValueError("truth latent strengths must be positive.")
+
+
+def _read_only_float_array(value: object, *, name: str) -> FloatArray:
+    raw = np.asarray(value)
+    if raw.dtype.kind not in "iuf":
+        raise TypeError(f"{name} must contain real numeric values.")
+    array = np.array(raw, dtype=np.float64, copy=True)
+    if not np.all(np.isfinite(array)):
+        raise ValueError(f"{name} must contain only finite values.")
+    array.setflags(write=False)
+    return array
+
+
+def _positive_integer(value: object, *, name: str, minimum: int = 1) -> int:
+    if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
+        raise TypeError(f"{name} must be an integer.")
+    result = int(value)
+    if result < minimum:
+        raise ValueError(f"{name} must be at least {minimum}.")
+    return result
+
+
+def _nonnegative_integer(value: object, *, name: str) -> int:
+    if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
+        raise TypeError(f"{name} must be an integer.")
+    result = int(value)
+    if result < 0:
+        raise ValueError(f"{name} must be nonnegative.")
+    return result
+
+
+def _resolve_positive_vector(value: NumericSpec, *, length: int, name: str) -> FloatArray:
+    if length == 0:
+        if np.isscalar(value):
+            return np.empty(0, dtype=np.float64)
+        array = np.asarray(value, dtype=np.float64)
+        if array.size != 0:
+            raise ValueError(f"{name} must be empty when its latent rank is zero.")
+        return np.empty(0, dtype=np.float64)
+    if np.isscalar(value):
+        array = np.full(length, value, dtype=np.float64)
+    else:
+        array = np.asarray(value, dtype=np.float64)
+        if array.ndim != 1 or array.shape[0] != length:
+            raise ValueError(f"{name} must be a scalar or contain exactly {length} values.")
+    if not np.all(np.isfinite(array)) or np.any(array <= 0.0):
+        raise ValueError(f"{name} values must be positive and finite.")
+    return np.asarray(array, dtype=np.float64)
+
+
+def _resolve_noise(value: NoiseSpec) -> tuple[float, float]:
+    if isinstance(value, tuple):
+        if len(value) != 2:
+            raise ValueError("noise must be a scalar or a two-tuple (x_noise, y_noise).")
+        x_noise, y_noise = (float(value[0]), float(value[1]))
+    else:
+        x_noise = y_noise = float(value)
+    if not np.isfinite(x_noise) or not np.isfinite(y_noise):
+        raise ValueError("noise values must be finite.")
+    if x_noise < 0.0 or y_noise < 0.0:
+        raise ValueError("noise values must be nonnegative.")
+    return x_noise, y_noise
+
+
+def _validated_seed(value: object) -> int:
+    if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
+        raise TypeError("random_state must be an integer.")
+    seed = int(value)
+    if seed < 0 or seed > _UINT32_MAX:
+        raise ValueError(f"random_state must lie in [0, {_UINT32_MAX}].")
+    return seed

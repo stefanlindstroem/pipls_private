@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Modernize package license metadata to the PEP 639 SPDX form and require a compatible setuptools build backend.
+- Add the validated immutable dataset container and deterministic shared/predictor-specific/response-specific synthetic generators with leakage-free train/test construction.
 - Establish repository skeleton and LLM-assisted snapshot/patch workflow.
 - Add the fixed-parameter Pi-PLS numerical core.
 - Add the public fixed-rank `PiPLSRegression` estimator.

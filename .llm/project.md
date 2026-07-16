@@ -11,12 +11,11 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through D2 are implemented. The current public surface includes `PiPLSRegression`,
+Phases A through E1 are implemented. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics, and
 `StatisticalSupportWarning`.
 
-The next increment is Phase E1: the common dataset schema and deterministic synthetic generator.
-No real dataset migration, download, or paper reproduction belongs in E1.
+The next increment is Phase E2: the dataset registry and generic loader. No real dataset migration, implicit download, or paper reproduction belongs in E2.
 
 ## Runtime ownership
 
@@ -25,6 +24,7 @@ No real dataset migration, download, or paper reproduction belongs in E1.
   OOF refitting support.
 - `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation and tags.
 - `src/pipls/decomposition.py`: immutable public Pi-PLS factorization result.
+- `src/pipls/datasets.py`: immutable dataset container and deterministic synthetic generators.
 - `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `src/pipls/model_selection.py`: rank limits, split materialization, and shared rank-search
@@ -47,8 +47,7 @@ No real dataset migration, download, or paper reproduction belongs in E1.
 
 ## Dataset and reproduction ownership
 
-- `datasets/registry.yaml`: future dataset registry; do not treat placeholder entries as verified
-  data.
+- `datasets/registry.yaml`: E2 registry source; entries must be schema-validated before use.
 - `datasets/`: dataset descriptions and committed redistributable artifacts only.
 - `scripts/prepare_data/`: deterministic converters and download/verification orchestration.
 - `scripts/reproduce_paper/`: explicit paper-specific analysis workflows.

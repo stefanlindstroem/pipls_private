@@ -222,3 +222,39 @@ results use `"fixed-parameter"`. Foldwise R2 is rejected whenever a validation f
 Weighted fitting, `sample_weight` propagation during fitting, and general-purpose metadata routing
 are intentionally unsupported. The scalar `score(..., sample_weight=...)` compatibility argument
 does not imply weighted model fitting or weighted candidate selection.
+
+
+## E1 dataset and synthetic-data API
+
+Dataset functionality is public from the dedicated `pipls.datasets` namespace:
+
+```python
+from pipls.datasets import (
+    PiPLSDataset,
+    PiPLSSyntheticTruth,
+    make_pipls_regression,
+    make_pipls_train_test,
+)
+```
+
+`PiPLSDataset` is the common immutable in-memory boundary. It stores read-only `float64` `X` and
+2D `Y`, unique feature/target/sample names, required provenance, recursively frozen metadata, and
+optional synthetic truth. `data` and `target` are scikit-learn-style aliases. Required provenance
+keys are `source`, `license`, `citation`, and `version`.
+
+`make_pipls_regression` creates one side-effect-free dataset with local seeded random generation.
+It supports shared, predictor-specific, and response-specific latent ranks; scalar or per-direction
+strengths; normal or uniform source distributions; scalar or per-variable observed scales; and
+scalar or separate predictor/response noise. `random_state=0` is the deterministic default and
+must be an unsigned 32-bit integer. Each sample block must contain more rows than the larger
+centered latent rank requested for `X` or `Y`.
+
+`make_pipls_train_test` creates two datasets from one shared loading/strength/scale model and
+independent train/test score and noise draws. It performs no fitted preprocessing and the training
+block does not depend on the requested test size.
+
+`PiPLSSyntheticTruth` exposes read-only latent scores, loading blocks, signal/noise matrices,
+strengths, and scales. Loading blocks that are structurally absent are explicit zeros.
+
+Registry lookup, file loading, checksums, conversion, downloading, and real-data migration are not
+part of E1. They belong to E2 and E3.

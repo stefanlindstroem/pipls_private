@@ -8,7 +8,7 @@ The repository contains the fixed-parameter numerical core and a scikit-learn-st
 full, randomized, and conservative automatic SVD policies. `PiPLSPathCV` provides pipeline-aware
 joint path analysis over `n_components` and `predictor_rank`. Both interfaces support ordinary
 scikit-learn grouped, repeated, predefined, temporal, and leave-one-out splitters, with optional
-ordered out-of-fold reporting. Datasets and paper reproduction remain later increments.
+ordered out-of-fold reporting. A validated dataset container and deterministic synthetic latent-structure generator are available under `pipls.datasets`; real dataset migration and paper reproduction remain later increments.
 
 ## Development setup
 
@@ -70,6 +70,25 @@ search = PiPLSPathCV(
 ).fit(X_train, Y_train)
 print(search.validation_report_)
 print(search.oof_predictions_)
+```
+
+For deterministic synthetic train/test data:
+
+```python
+from pipls.datasets import make_pipls_train_test
+
+train, test = make_pipls_train_test(
+    n_train=120,
+    n_test=40,
+    n_features=20,
+    n_targets=5,
+    n_shared=2,
+    n_predictor_specific=2,
+    n_response_specific=1,
+    random_state=0,
+)
+model.fit(train.X, train.Y)
+print(model.score(test.X, test.Y))
 ```
 
 The estimator follows scikit-learn and `PLSRegression` conventions for coefficient orientation,

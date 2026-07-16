@@ -263,14 +263,14 @@ Acceptance conditions:
 - focused invalid-input, invariant, and reproducibility tests;
 - no real dataset migration or network access in this increment.
 
-Current status: **next**.
+Current status: **complete**. `PiPLSDataset` validates and freezes arrays, names, sample IDs, provenance, metadata, and optional truth. `make_pipls_regression` and `make_pipls_train_test` provide local seeded generation with configurable latent roles, strengths, distributions, scales, and noise. Unit, API, invariant, and reproducibility tests cover the boundary. No real dataset or network access was added.
 
 ### Phase E2: dataset registry and generic loader
 
 Add the registry schema, loader, checksum/provenance/license validation, and converter contract.
 The loader must not silently download or transform data.
 
-Current status: **planned**.
+Current status: **next**.
 
 ### Phase E3: real dataset migrations
 
@@ -309,9 +309,10 @@ Current status: **planned**.
 
 ## Current next increment
 
-The next implementation patch should be **Phase E1: dataset schema and deterministic synthetic
-generator**. It should implement only the container/validation boundary and seeded synthetic
-generation described above. The registry/loader is E2; real dataset migration is E3.
+The next implementation patch should be **Phase E2: dataset registry and generic loader**. It
+should define and validate registry entries, resolve local paths, verify checksums and provenance,
+and return `PiPLSDataset` without silently downloading, filtering, imputing, centering, scaling,
+or otherwise transforming model data. Converter execution and real dataset migration remain E3.
 
 ## Maintenance protocol
 

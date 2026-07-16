@@ -12,7 +12,7 @@ from an earlier conversation, an old patch, or the historical publication plan a
 
 ## Implemented boundary
 
-Phases A through D2 are complete and committed:
+Phases A through E1 are complete and committed:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -27,7 +27,9 @@ Phases A through D2 are complete and committed:
   immutable `PiPLSDecomposition`;
 - grouped, repeated, predefined, temporal, and leave-one-out split workflows;
 - optional ordered OOF predictions and immutable `PiPLSValidationReport` with explicit
-  fixed-parameter versus selection-conditioned labeling.
+  fixed-parameter versus selection-conditioned labeling;
+- immutable validated `PiPLSDataset` and deterministic synthetic generators with shared,
+  predictor-specific, and response-specific latent structure.
 
 The current top-level package exports are:
 
@@ -38,6 +40,17 @@ from pipls import (
     PiPLSRegression,
     PiPLSValidationReport,
     StatisticalSupportWarning,
+)
+```
+
+Dataset functionality is public from `pipls.datasets`:
+
+```python
+from pipls.datasets import (
+    PiPLSDataset,
+    PiPLSSyntheticTruth,
+    make_pipls_regression,
+    make_pipls_train_test,
 )
 ```
 
@@ -55,6 +68,7 @@ from pipls import (
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | keyword-only `groups` routed to group-aware splitters |
 | OOF output | opt-in through `return_oof_predictions=True` |
+| Dataset namespace | immutable container and seeded generators under `pipls.datasets` |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 
 Additional fixed decisions:
@@ -74,29 +88,26 @@ Additional fixed decisions:
 
 ## Current next increment
 
-The next implementation patch is **Phase E1: dataset schema and deterministic synthetic
-generator**.
+The next implementation patch is **Phase E2: dataset registry and generic loader**.
 
-E1 acceptance conditions:
+E2 acceptance conditions:
 
-1. introduce one immutable or validation-controlled dataset container for `X`, `Y`, feature names,
-   target names, sample identifiers, and metadata;
-2. define shape, dtype, finite-value, naming, and provenance validation independently of any one
-   real dataset;
-3. add a side-effect-free synthetic generator with an explicit random seed;
-4. represent shared, predictor-specific, and response-specific latent structure, with configurable
-   ranks, signal strengths, scales, distributions, and noise;
-5. support deterministic train/test generation without fitting preprocessing across the boundary;
-6. add focused unit, invariant, reproducibility, and invalid-input tests;
-7. update `.llm` contracts and user-facing dataset documentation without migrating a real dataset
-   in the same patch.
+1. define one versioned registry-entry schema for names, local paths, shapes, names, checksums,
+   provenance, licensing, and preparation metadata;
+2. validate the tracked `datasets/registry.yaml` before resolving any entry;
+3. provide a loader that returns `PiPLSDataset` and supports an explicit alternate data root or
+   direct path;
+4. verify sample alignment, numeric model columns, finite values, names, provenance, and checksums;
+5. perform no implicit download, converter execution, row filtering, imputation, centering,
+   scaling, or feature engineering;
+6. keep dataset preparation under `scripts/prepare_data/`, outside the installed runtime loader;
+7. add schema, invalid-entry, checksum, path-resolution, and no-transformation tests without
+   migrating a real research dataset.
 
-Do not begin dataset conversion, downloading, or paper reproduction in E1.
+Do not begin real dataset conversion, downloading, or paper reproduction in E2.
 
 ## Subsequent roadmap
 
-- **E2 — registry and loader:** generic dataset registry, loader, checksums, provenance, licensing,
-  and converter contract.
 - **E3 — real dataset migrations:** migrate and validate one dataset per coherent increment,
   including the Corn reconstruction only after preprocessing choices are fixed.
 - **E4 — benchmark fixtures:** deterministic benchmark manifests and regression tolerances linking
