@@ -156,37 +156,29 @@ in `.llm/benchmarking.md` and contains four independent questions:
 3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
 4. full-versus-randomized solver consistency.
 
-Each benchmark owns one readable script and one minimal CSV output. Fixed-structure recovery,
-adaptive rank selection, and predictor-nuisance comparison with ordinary PLS are implemented in
-`benchmarks/fixed_structure_recovery.py`, `benchmarks/rank_selection.py`, and
-`benchmarks/predictor_nuisance_comparison.py`. Their generated CSV files remain ignored and are
-excluded from snapshots. Software versions, execution controls, timings, and unrelated metrics are
-omitted unless they answer that benchmark's explicit question. OLS, CCA, publication grids, and
-figure generation remain outside the repository.
+Each benchmark owns one readable script and one minimal CSV output. All four are implemented
+in `benchmarks/fixed_structure_recovery.py`, `benchmarks/rank_selection.py`,
+`benchmarks/predictor_nuisance_comparison.py`, and `benchmarks/solver_consistency.py`. Their
+generated CSV files remain ignored and are excluded from snapshots. Software versions, execution
+controls, timings, and unrelated metrics are omitted unless they answer that benchmark's explicit
+question. OLS, CCA, publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Implement only the fourth focused benchmark: **full-versus-randomized solver consistency**.
-
-The next patch should:
-
-- compare fixed `PiPLSRegression` fits with `svd_solver="full"` and
-  `svd_solver="randomized"` on identical deterministic high-dimensional synthetic problems;
-- keep model ranks, generated data, and random seed paired across solvers;
-- write `benchmarks/results/solver_consistency.csv`;
-- report only `scenario`, `seed`, `prediction_relative_difference`, and
-  `coefficient_relative_difference`;
-- avoid timing analysis, rank selection, ordinary PLS, software metadata, universal orchestration,
-  figures, or block-aware scaling APIs.
+Begin the separately reviewed **representative real-data smoke-check** phase. The next patch must
+first define one package-user question for one existing transparent dataset and a minimal output
+contract; it must not combine datasets, methods, timings, or publication reporting in a universal
+runner. No real-data benchmark question or result schema is accepted merely by completion of the
+synthetic sequence.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **Focused synthetic benchmarks:** implement solver consistency next in a separate patch.
-2. **Representative real-data smoke checks:** add only after the synthetic questions are stable and
-   under separate review.
+1. **Focused synthetic benchmarks:** complete.
+2. **Representative real-data smoke checks:** next, one separately reviewed package-level question
+   at a time.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 4. **Future product development:** additional estimators, validation tools, datasets, and—only after

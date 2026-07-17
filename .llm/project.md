@@ -22,9 +22,10 @@ Phases A through E3 are implemented. The current public surface includes `PiPLSR
 The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
 navigation now describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
-The benchmark layer now implements fixed-structure recovery, adaptive rank selection, and the paired
-predictor-nuisance comparison with ordinary PLS as question-specific scripts; solver consistency is
-next. No block-aware scaling API is designed or scheduled.
+The benchmark layer now implements all four focused synthetic questions as separate scripts:
+fixed-structure recovery, adaptive rank selection, paired predictor-nuisance comparison with ordinary
+PLS, and full-versus-randomized solver consistency. Representative real-data smoke checks are next
+under separate review. No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
 

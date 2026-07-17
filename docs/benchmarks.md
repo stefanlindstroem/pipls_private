@@ -171,10 +171,68 @@ The benchmark is descriptive. It does not define a superiority threshold, aggreg
 select ranks, compare SVD solvers, measure runtime, record software or environment metadata, or
 produce figures. OLS and CCA remain outside the package benchmark.
 
-## Planned separate benchmark
+## Full-versus-randomized solver consistency
 
-The remaining benchmark is full-versus-randomized predictor-SVD consistency. It will receive its own
-script and minimal CSV output in a separate patch.
+The implemented solver-consistency benchmark asks:
+
+> For a fixed high-dimensional Pi-PLS model, how different are predictions and coefficients when
+> only the predictor decomposition changes from full to randomized SVD?
+
+Run it from the repository root after installing the package:
+
+```bash
+python benchmarks/solver_consistency.py
+```
+
+The paired models use `scale=True`, the generator-declared shared rank, and the complete declared
+predictor-signal rank. One fit uses `svd_solver="full"` and the other uses
+`svd_solver="randomized"`. Generated data, model ranks, and seed are identical within each pair.
+The three scenarios keep the training predictor matrix at 36,864 entries while changing its
+geometry:
+
+- `wide_n96_p384`, with 96 training samples and 384 predictors;
+- `square_n192_p192`, with 192 training samples and 192 predictors;
+- `tall_n384_p96`, with 384 training samples and 96 predictors.
+
+All scenarios use 96 test samples, eight responses, three shared directions of strengths `(3.0,
+2.0, 1.5)`, five predictor-specific directions of strengths `(2.5, 2.0, 1.5, 1.0, 0.75)`, no
+response-specific directions, noise `(0.3, 0.2)`, and seeds 1729, 2718, and 3141.
+
+The output is `benchmarks/results/solver_consistency.csv` with exactly these columns:
+
+```text
+scenario
+seed
+prediction_relative_difference
+coefficient_relative_difference
+```
+
+With the full-SVD result as reference, the metrics are
+
+\begin{equation}
+ d_{\mathrm{prediction}}
+ =
+ \frac{\lVert \widehat{Y}_{\mathrm{randomized}} - \widehat{Y}_{\mathrm{full}} \rVert_{\mathrm{F}}}
+ {\max(\lVert \widehat{Y}_{\mathrm{full}} \rVert_{\mathrm{F}}, \epsilon)},
+\end{equation}
+
+and
+
+\begin{equation}
+ d_{\mathrm{coefficient}}
+ =
+ \frac{\lVert B_{\mathrm{randomized}} - B_{\mathrm{full}} \rVert_{\mathrm{F}}}
+ {\max(\lVert B_{\mathrm{full}} \rVert_{\mathrm{F}}, \epsilon)},
+\end{equation}
+
+where $\epsilon$ is machine epsilon. Predictions and coefficients are in original response units.
+The benchmark is descriptive: it does not define a universal pass threshold, compare prediction
+accuracy, select ranks, measure runtime or memory, or record software and environment metadata.
+
+## Focused synthetic sequence status
+
+All four planned focused synthetic benchmarks are implemented. Representative real-data smoke
+checks, if added, will be designed and reviewed separately rather than appended to these tables.
 
 ## Interpretation boundary
 

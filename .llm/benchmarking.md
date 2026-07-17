@@ -197,7 +197,33 @@ CCA.
 **Question:** For a fixed high-dimensional Pi-PLS model, are full and randomized predictor SVD
 numerically consistent for the same generated data and seed?
 
-**Methods:** fixed Pi-PLS with `svd_solver="full"` and `svd_solver="randomized"`.
+**Methods:** paired fixed `PiPLSRegression` fits with `scale=True`, generator-declared shared and
+complete predictor-signal ranks, and respectively `svd_solver="full"` and
+`svd_solver="randomized"`. The generated training block, independent test block, fitted model
+ranks, and seed are identical within each pair. Only the first predictor decomposition differs;
+response and coupling decompositions remain exact in both fits.
+
+**Implemented scenarios:**
+
+- `wide_n96_p384`: 96 training samples and 384 predictors;
+- `square_n192_p192`: 192 training samples and 192 predictors;
+- `tall_n384_p96`: 384 training samples and 96 predictors.
+
+Each training predictor matrix contains 36,864 entries. All scenarios use 96 independent test
+samples, eight responses, three shared directions of strengths `(3.0, 2.0, 1.5)`, five
+predictor-specific directions of strengths `(2.5, 2.0, 1.5, 1.0, 0.75)`, no response-specific
+directions, noise `(0.3, 0.2)`, and seeds 1729, 2718, and 3141.
+
+**Metrics:**
+
+- `prediction_relative_difference` is the Frobenius norm of the difference between randomized- and
+  full-SVD predictions on the independent test block, divided by the Frobenius norm of the full-SVD
+  predictions;
+- `coefficient_relative_difference` is the corresponding relative Frobenius difference between the
+  fitted `coef_` arrays in original response units.
+
+The full-SVD result is the reference path. A machine-epsilon denominator floor handles a
+zero-reference edge case without adding another output field.
 
 **Output:** `benchmarks/results/solver_consistency.csv`.
 
@@ -208,8 +234,10 @@ Required columns:
 - `prediction_relative_difference`;
 - `coefficient_relative_difference`.
 
-Timing does not belong in this benchmark. A future runtime benchmark must be designed separately
-with an explicit hardware and measurement question.
+The benchmark is implemented by `benchmarks/solver_consistency.py`. It records numerical
+consistency without defining a universal pass threshold. Timing, memory, rank selection, ordinary
+PLS, software metadata, environment metadata, figures, and generic orchestration do not belong in
+this table. A future runtime benchmark requires a separate hardware and measurement question.
 
 ## Output and reproducibility policy
 
@@ -235,7 +263,8 @@ Implement the benchmarks one at a time in this order:
 1. fixed-structure recovery — implemented;
 2. rank selection — implemented;
 3. predictor-nuisance comparison with PLS — implemented;
-4. solver consistency — next.
+4. solver consistency — implemented.
 
-Each implementation patch must remain question-specific. Do not recreate the removed universal
+The focused synthetic sequence is complete. Any additional synthetic or real-data benchmark must
+remain question-specific and receive separate review. Do not recreate the removed universal
 manifest, universal schema, or broad CI runner.

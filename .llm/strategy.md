@@ -370,13 +370,9 @@ architecture and establishes one question, one script, and one minimal CSV outpu
 Implement the accepted benchmarks one at a time so each patch remains scientifically and
 operationally reviewable.
 
-Current status: **in progress**. Fixed-structure recovery is implemented with fixed oracle-rank
-Pi-PLS, deterministic public synthetic train/test data, test MSE, and three coordinate-correct
-subspace-capture metrics. Adaptive rank selection is implemented with generator-declared reference
-ranks, full-training refit, independent-test MSE, and a dedicated seven-column CSV. The paired
-predictor-nuisance comparison is implemented with fixed declared ranks, ordinary `PLSRegression`,
-independent-test MSE, and a dedicated five-column CSV. Solver consistency is the next separate
-benchmark.
+Current status: **complete**. Fixed-structure recovery, adaptive rank selection, paired
+predictor-nuisance comparison with ordinary `PLSRegression`, and full-versus-randomized solver
+consistency are implemented as independent scripts with minimal question-specific CSV outputs.
 
 ### Product documentation and release hardening
 
@@ -406,11 +402,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the solver-consistency benchmark only. Compare paired fixed Pi-PLS fits using full and
-randomized predictor SVD on the same deterministic high-dimensional synthetic problems, keep ranks
-fixed, and write the dedicated four-column CSV. Do not add timing analysis, rank selection, ordinary
-PLS, software metadata, a generic manifest, a universal schema, real-data benchmark outputs,
-figures, OLS/CCA comparisons, or block-aware scaling APIs.
+Begin representative real-data smoke checks under separate review. Before implementation, define
+one package-user question for one existing transparent dataset and its minimal result columns. Do
+not create a multi-dataset runner, universal schema, timing table, publication result, hidden data
+loader, OLS/CCA comparison, or block-aware scaling API.
 
 Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
 and preprocessing must be public and explicit.

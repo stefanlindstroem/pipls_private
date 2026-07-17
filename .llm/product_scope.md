@@ -119,7 +119,8 @@ contains paper-reproduction placeholders or promises to implement manuscript wor
 
 The first universal synthetic manifest, result schema, and broad CI runner were removed after owner
 review because they combined unrelated questions and produced an unnecessarily wide table. The
-focused sequence now includes implemented fixed-structure recovery, rank-selection, and paired
-predictor-nuisance benchmarks and proceeds next to solver consistency, with one minimal per-question
-CSV output. None of this includes a block-aware standardization API design; future block-aware
-variants remain deferred for months or until the project owner explicitly starts a separate phase.
+focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
+paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
+output. Representative real-data smoke checks are the next separately reviewed benchmark phase.
+None of this includes a block-aware standardization API design; future block-aware variants remain
+deferred for months or until the project owner explicitly starts a separate phase.

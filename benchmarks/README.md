@@ -100,9 +100,43 @@ pipls_minus_pls_mse
 The final column is the paired difference `pipls_test_mse - pls_test_mse`. The benchmark records the
 comparison for each generated problem; it does not assert that either method must win.
 
-## Remaining sequence
+## Full-versus-randomized solver consistency
 
-The next separately reviewed benchmark is full-versus-randomized solver consistency.
+`solver_consistency.py` asks whether fixed Pi-PLS predictions and coefficients remain numerically
+consistent when only the predictor SVD changes from exact full SVD to randomized truncated SVD. The
+models use identical generated data, generator-declared ranks, training-fitted standardization, and
+seed.
+
+The three scenarios keep `n_train * n_features = 36864` while changing matrix geometry:
+
+- `wide_n96_p384`;
+- `square_n192_p192`;
+- `tall_n384_p96`.
+
+Run it from the repository root after installing the package:
+
+```bash
+python benchmarks/solver_consistency.py
+```
+
+It writes `benchmarks/results/solver_consistency.csv` with exactly these columns:
+
+```text
+scenario
+seed
+prediction_relative_difference
+coefficient_relative_difference
+```
+
+Both quantities are Frobenius-norm differences relative to the corresponding full-SVD result. The
+benchmark records consistency without defining a universal numerical pass threshold and does not
+measure runtime.
+
+## Sequence status
+
+The four focused synthetic benchmarks are implemented. Any additional benchmark must receive its
+own package-level question, script, and minimal output contract; representative real-data smoke
+checks are the next separately reviewed benchmark phase.
 
 Generated outputs under `benchmarks/results/` remain ignored by Git and are excluded from repository
 snapshots. Software versions, parallel settings, and timings are included only in a benchmark whose
