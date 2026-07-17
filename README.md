@@ -26,6 +26,18 @@ git status
 make check
 ```
 
+After pulling a change that adds dependencies, refresh the active development environment with:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+For an examples-only environment, install the data-reading and plotting dependencies with:
+
+```bash
+python -m pip install -e ".[examples]"
+```
+
 ## Basic model
 
 ```python
@@ -128,7 +140,7 @@ path = pd.DataFrame(search.component_path_results_)
 
 The Pulp and Sugarcane examples write canonical component-path CSV files, generate PDFs by reading
 those CSV files, and then fit a separate fixed model using a visible component-count choice. Install
-the `data` and `plot` extras to run them. See [`examples/README.md`](examples/README.md) and
+the `examples` extra to run them. See [`examples/README.md`](examples/README.md) and
 [`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks

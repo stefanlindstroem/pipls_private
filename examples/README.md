@@ -16,7 +16,7 @@ or publication-result workflows.
 Install the data and plotting dependencies before running the real-data path examples:
 
 ```bash
-python -m pip install -e ".[data,plot]"
+python -m pip install -e ".[examples]"
 ```
 
 The Pulp and Sugarcane examples deliberately separate two stages:

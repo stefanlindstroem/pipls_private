@@ -52,6 +52,14 @@ def test_packaging_uses_pep639_license_metadata() -> None:
     assert 'license = {file = "LICENSE"}' not in pyproject
 
 
+def test_examples_extra_declares_data_and_plotting_dependencies() -> None:
+    pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
+
+    assert 'examples = ["pandas>=2.0", "matplotlib>=3.8"]' in pyproject
+    assert '"pandas>=2.0"' in pyproject.split("dev = [", 1)[1].split("]", 1)[0]
+    assert '"matplotlib>=3.8"' in pyproject.split("dev = [", 1)[1].split("]", 1)[0]
+
+
 def test_required_llm_contracts_exist_and_are_formatted() -> None:
     root = _repository_root()
     missing = sorted(path for path in _REQUIRED_LLM_CONTRACTS if not (root / path).is_file())

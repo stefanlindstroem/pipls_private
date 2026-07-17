@@ -67,6 +67,7 @@ is designed or scheduled.
   `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
   utilities or publication pipelines.
+  Their pandas and Matplotlib requirements are grouped in the `examples` optional dependency extra.
 - `benchmarks/`: focused lightweight package-validation plans and, incrementally, one readable
   repository-local script per benchmark. Generated CSV outputs are ignored; synthetic validation is
   primary.

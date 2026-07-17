@@ -23,6 +23,7 @@
   candidate training fold and refit them on the complete training set after selection.
 - Fit every additional learned preprocessing operation inside its matching training fold.
 - Add dependencies only when a short, stable NumPy/scikit-learn implementation is insufficient.
+- Keep executable example dependencies under the `examples` extra; the `dev` extra must include them so repository validation does not skip example artifacts.
 - Do not broaden supported estimator composition or metadata routing implicitly.
 - Weighted fitting and `sample_weight` propagation during fitting are out of scope unless the
   project owner explicitly reverses that decision.

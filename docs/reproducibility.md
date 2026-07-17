@@ -19,6 +19,15 @@ Tests cover the numerical core, estimator API, model selection, cross-validation
 scikit-learn compatibility, datasets, examples, and repository structure. Randomized numerical
 paths and synthetic generators expose explicit random seeds.
 
+The executable real-data examples require pandas and Matplotlib. Install their dedicated extra with:
+
+```bash
+python -m pip install -e ".[examples]"
+```
+
+The development extra already includes these packages. Re-run `python -m pip install -e ".[dev]"`
+after pulling dependency changes into an existing virtual environment.
+
 ## Model-fitting reproducibility
 
 Centering and optional scaling are integral to `PiPLSRegression.fit`. During cross-validation,

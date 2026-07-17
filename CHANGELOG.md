@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add a dedicated `examples` dependency extra containing pandas and Matplotlib, and document how to refresh an existing development virtual environment after dependency changes.
 - Present real-data model development as a two-stage component-path workflow: add the public
   `component_path_results_` table, explicit optimized/fixed/maximum predictor-rank policies,
   four-row Pulp and Sugarcane benchmark CSVs with fold SD, CSV-derived example PDFs, and separate
