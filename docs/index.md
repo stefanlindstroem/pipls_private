@@ -18,6 +18,8 @@ user guide.
 - [`preprocessing.md`](preprocessing.md): model-internal centering and scaling, fold-local fitting,
   and leakage boundaries;
 - [`datasets.md`](datasets.md): optional dataset containers and deterministic synthetic generation;
+- [`benchmarks.md`](benchmarks.md): versioned lightweight synthetic validation contract and result
+  policy;
 - [`../examples/README.md`](../examples/README.md): executable synthetic and real-data examples;
 - [`../datasets/README.md`](../datasets/README.md): committed reference-dataset layout and provenance.
 

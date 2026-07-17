@@ -18,3 +18,5 @@ notebooks/.ipynb_checkpoints/
 *~
 *.patch
 *-snapshot.tar.gz
+benchmarks/results/
+benchmarks/.cache/

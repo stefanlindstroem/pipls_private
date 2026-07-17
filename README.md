@@ -110,6 +110,15 @@ model = PiPLSRegression(n_components=2).fit(X, Y)
 
 See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).
 
+## Lightweight benchmarks
+
+The repository defines a versioned synthetic package-validation contract covering prediction,
+Pi-PLS rank selection, latent-subspace recovery, solver consistency, and representative runtime.
+Ordinary PLS is the sole external comparator in version 1; publication-scale OLS/CCA comparisons
+and figure generation remain outside this repository. No broad benchmark results are committed.
+
+See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).
+
 ## Documentation
 
 - [Documentation index](docs/index.md)
@@ -119,6 +128,7 @@ See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datase
 - [Cross-validation and OOF reporting](docs/cross_validation.md)
 - [Model-internal preprocessing](docs/preprocessing.md)
 - [Datasets and synthetic generation](docs/datasets.md)
+- [Lightweight validation benchmarks](docs/benchmarks.md)
 - [Theory](docs/theory.md)
 - [Reproducibility and validation](docs/reproducibility.md)
 
@@ -136,6 +146,7 @@ support.
 - `docs/`: user and developer documentation;
 - `examples/`: concise executable workflows;
 - `datasets/`: transparent redistributable reference datasets;
+- `benchmarks/`: versioned package-validation manifests and result schemas;
 - `tests/`: numerical, API, integration, and repository tests;
 - `.llm/`: tracked maintenance contracts for LLM-assisted development, excluded from the package.
 

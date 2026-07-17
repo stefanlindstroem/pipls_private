@@ -1,0 +1,269 @@
+schema_version: 1
+suite_id: pipls-synthetic-v1
+purpose: Lightweight package validation for Pi-PLS prediction, selection, recovery, and numerical behavior.
+
+generation:
+  function: pipls.datasets.make_pipls_train_test
+  alignment: train and test share latent loadings, strengths, and observed-variable scales
+  preprocessing: none before estimator fitting
+  split_policy: independent generated train and test sample realizations
+
+seeds:
+  ci: [1729]
+  standard: [1729, 2718, 3141, 5772, 8119]
+  performance: [1729, 3141, 8119]
+
+cross_validation:
+  splitter: sklearn.model_selection.KFold
+  n_splits: 5
+  shuffle: true
+  random_state: benchmark_seed
+  scoring: response_standardized_mean_squared_error
+
+methods:
+  - id: pipls_fixed_full
+    kind: pipls_fixed
+    description: Fixed Pi-PLS at the declared shared and predictor-signal ranks.
+    parameters:
+      n_components: truth.n_shared
+      predictor_rank: truth.n_shared_plus_predictor_specific
+      scale: true
+      svd_solver: full
+      random_state: benchmark_seed
+
+  - id: pipls_fixed_randomized
+    kind: pipls_fixed
+    description: Fixed Pi-PLS using the deterministic randomized predictor SVD.
+    parameters:
+      n_components: truth.n_shared
+      predictor_rank: truth.n_shared_plus_predictor_specific
+      scale: true
+      svd_solver: randomized
+      random_state: benchmark_seed
+
+  - id: pipls_path_auto
+    kind: pipls_path
+    description: Joint adaptive Pi-PLS path selection on the generated training block.
+    parameters:
+      search_method: auto
+      max_predictor_rank: rule
+      samples_per_predictor_rank: 10.0
+      scale: true
+      svd_solver: auto
+      random_state: benchmark_seed
+
+  - id: pls_fixed
+    kind: sklearn_pls
+    description: Ordinary PLSRegression at the declared shared latent dimension.
+    parameters:
+      n_components: truth.n_shared
+      scale: true
+
+scenarios:
+  - id: shared_baseline
+    purpose: Baseline recovery when all structured variation is shared between X and Y.
+    generator:
+      n_train: 120
+      n_test: 400
+      n_features: 40
+      n_targets: 6
+      n_shared: 2
+      n_predictor_specific: 0
+      n_response_specific: 0
+      shared_strength: [2.5, 1.25]
+      predictor_specific_strength: 1.0
+      response_specific_strength: 1.0
+      shared_distribution: normal
+      predictor_specific_distribution: normal
+      response_specific_distribution: normal
+      feature_scale: {kind: constant, value: 1.0}
+      target_scale: {kind: constant, value: 1.0}
+      noise: [0.15, 0.15]
+
+  - id: predictor_specific_nuisance
+    purpose: Test retention and prediction when strong predictor variation is unrelated to Y.
+    generator:
+      n_train: 120
+      n_test: 400
+      n_features: 60
+      n_targets: 6
+      n_shared: 2
+      n_predictor_specific: 6
+      n_response_specific: 0
+      shared_strength: [2.5, 1.25]
+      predictor_specific_strength: [3.0, 2.5, 2.0, 1.5, 1.0, 0.75]
+      response_specific_strength: 1.0
+      shared_distribution: normal
+      predictor_specific_distribution: normal
+      response_specific_distribution: normal
+      feature_scale: {kind: constant, value: 1.0}
+      target_scale: {kind: constant, value: 1.0}
+      noise: [0.15, 0.15]
+
+  - id: response_specific_nuisance
+    purpose: Test prediction when Y contains structured variation that X cannot explain.
+    generator:
+      n_train: 150
+      n_test: 400
+      n_features: 50
+      n_targets: 10
+      n_shared: 2
+      n_predictor_specific: 2
+      n_response_specific: 4
+      shared_strength: [2.5, 1.25]
+      predictor_specific_strength: [1.5, 0.75]
+      response_specific_strength: [2.0, 1.5, 1.0, 0.5]
+      shared_distribution: normal
+      predictor_specific_distribution: normal
+      response_specific_distribution: normal
+      feature_scale: {kind: constant, value: 1.0}
+      target_scale: {kind: constant, value: 1.0}
+      noise: [0.15, 0.15]
+
+  - id: rule_limited_low_sample
+    purpose: Expose the public rank-bound tradeoff when sample support is limited.
+    generator:
+      n_train: 60
+      n_test: 400
+      n_features: 80
+      n_targets: 8
+      n_shared: 2
+      n_predictor_specific: 6
+      n_response_specific: 2
+      shared_strength: [2.0, 1.0]
+      predictor_specific_strength: [2.5, 2.0, 1.5, 1.0, 0.75, 0.5]
+      response_specific_strength: [1.25, 0.75]
+      shared_distribution: normal
+      predictor_specific_distribution: normal
+      response_specific_distribution: normal
+      feature_scale: {kind: constant, value: 1.0}
+      target_scale: {kind: constant, value: 1.0}
+      noise: [0.25, 0.25]
+
+  - id: weak_shared_signal
+    purpose: Measure predictive degradation and selection stability at low signal-to-noise ratio.
+    generator:
+      n_train: 200
+      n_test: 500
+      n_features: 60
+      n_targets: 8
+      n_shared: 2
+      n_predictor_specific: 4
+      n_response_specific: 2
+      shared_strength: [0.75, 0.4]
+      predictor_specific_strength: [1.5, 1.25, 1.0, 0.75]
+      response_specific_strength: [1.25, 0.75]
+      shared_distribution: normal
+      predictor_specific_distribution: normal
+      response_specific_distribution: normal
+      feature_scale: {kind: constant, value: 1.0}
+      target_scale: {kind: constant, value: 1.0}
+      noise: [0.4, 0.4]
+
+  - id: heterogeneous_scale
+    purpose: Protect model-internal fold-local scaling under strongly unequal variable scales.
+    generator:
+      n_train: 150
+      n_test: 400
+      n_features: 40
+      n_targets: 6
+      n_shared: 2
+      n_predictor_specific: 4
+      n_response_specific: 2
+      shared_strength: [2.5, 1.25]
+      predictor_specific_strength: [2.0, 1.5, 1.0, 0.5]
+      response_specific_strength: [1.5, 0.75]
+      shared_distribution: uniform
+      predictor_specific_distribution: normal
+      response_specific_distribution: uniform
+      feature_scale: {kind: logspace, start: 0.1, stop: 10.0}
+      target_scale: {kind: logspace, start: 0.25, stop: 4.0}
+      noise: [0.15, 0.15]
+
+  - id: high_dimensional_solver
+    purpose: Exercise scalable predictor SVD behavior when p is much larger than the retained rank.
+    generator:
+      n_train: 120
+      n_test: 300
+      n_features: 500
+      n_targets: 8
+      n_shared: 3
+      n_predictor_specific: 12
+      n_response_specific: 2
+      shared_strength: [3.0, 1.8, 1.0]
+      predictor_specific_strength: [3.5, 3.0, 2.5, 2.0, 1.8, 1.6, 1.4, 1.2, 1.0, 0.8, 0.6, 0.4]
+      response_specific_strength: [1.5, 0.75]
+      shared_distribution: normal
+      predictor_specific_distribution: normal
+      response_specific_distribution: normal
+      feature_scale: {kind: constant, value: 1.0}
+      target_scale: {kind: constant, value: 1.0}
+      noise: [0.2, 0.2]
+
+tiers:
+  ci:
+    purpose: Fast deterministic behavior and contract validation on every supported Python version.
+    scenarios: [shared_baseline, predictor_specific_nuisance, heterogeneous_scale]
+    methods: [pipls_fixed_full, pipls_path_auto, pls_fixed]
+    seed_set: ci
+    timing_gate: false
+    expected_runtime_seconds: 60
+
+  standard:
+    purpose: Local or scheduled package-validation run covering all scientific scenario families.
+    scenarios:
+      - shared_baseline
+      - predictor_specific_nuisance
+      - response_specific_nuisance
+      - rule_limited_low_sample
+      - weak_shared_signal
+      - heterogeneous_scale
+      - high_dimensional_solver
+    methods: [pipls_fixed_full, pipls_path_auto, pls_fixed]
+    seed_set: standard
+    timing_gate: false
+    expected_runtime_seconds: 600
+
+  performance:
+    purpose: Opt-in solver timing, memory, and full-versus-randomized consistency measurements.
+    scenarios: [high_dimensional_solver]
+    methods: [pipls_fixed_full, pipls_fixed_randomized]
+    seed_set: performance
+    timing_gate: false
+    expected_runtime_seconds: 600
+
+metrics:
+  prediction:
+    - response_standardized_mse
+    - r2_uniform_average
+  selection:
+    - selected_n_components
+    - selected_predictor_rank
+    - n_components_absolute_error_from_declared_shared_rank
+    - predictor_rank_absolute_error_from_declared_signal_rank
+  subspace:
+    - predictor_shared_capture
+    - predictor_signal_capture
+    - response_shared_capture
+  numerical:
+    - prediction_relative_difference
+    - coefficient_relative_difference
+  resources:
+    - fit_time_seconds
+    - predict_time_seconds
+    - peak_rss_bytes_optional
+
+tolerances:
+  generated_data_repeatability: exact_array_equality
+  deterministic_fit_repeatability: {relative: 1.0e-12, absolute: 1.0e-12}
+  bounded_capture_metrics: {minimum: 0.0, maximum: 1.0, slack: 1.0e-12}
+  finite_metrics_required: true
+  predictive_and_selection_thresholds: not_frozen_in_contract_v1
+  full_vs_randomized_thresholds: calibration_required_before_ci_gate
+
+results:
+  format: jsonl
+  schema: benchmarks/schema/result-v1.schema.json
+  generated_directory: benchmarks/results
+  committed_by_default: false
+  one_record_per: [suite_id, tier, scenario_id, seed, method_id]

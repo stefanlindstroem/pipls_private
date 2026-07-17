@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Define the version-1 synthetic package-benchmark contract with seven controlled scenarios, fixed
+  Pi-PLS and ordinary PLS roles, adaptive Pi-PLS selection validation, deterministic runtime tiers,
+  subspace and prediction metrics, a JSON Lines result schema, and conservative fixture rules.
+
 - Remove paper-reproduction placeholders and reorganize public navigation around the installable package, user documentation, concise examples, transparent datasets, and lightweight validation responsibilities.
 
 - Add the CC BY 4.0 tobacco FT-NIR dataset as the fourth transparent real-data integration, with public sample-ID alignment, 1,557 raw spectral predictors, 13 chemical responses, no spectral preprocessing, and direct pandas I/O.

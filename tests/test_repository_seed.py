@@ -20,6 +20,7 @@ _REQUIRED_LLM_CONTRACTS = {
     ".llm/public_api.md",
     ".llm/data_io.md",
     ".llm/dataset_layout.md",
+    ".llm/benchmarking.md",
     ".llm/testing.md",
     ".llm/snapshot.sh",
     ".llm/create_patch.sh",

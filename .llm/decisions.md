@@ -32,6 +32,7 @@ This index is navigation, not a substitute for those records.
 | `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction stays downstream; future block-aware API design is deferred |
 | `0025-model-internal-standardization-boundary.md` | current versus future scaling | estimator centering/scaling is current and fold-local; only future block-aware variants are deferred |
 | `0026-package-navigation-cleanup.md` | public repository navigation | remove paper placeholders and organize entry points around the installable software product |
+| `0027-synthetic-benchmark-contract.md` | lightweight package validation | versioned synthetic scenarios, PLS comparison, metrics, tiers, result schema, and conservative tolerance policy |
 
 ## Accepted clarifications after earlier proposals
 
@@ -70,6 +71,9 @@ plan contains an earlier or more general proposal:
   each training fold during selection, and are refitted on all supplied training data;
 - future block-aware scaling remains a valid direction, but only its API design and schedule are
   deferred until the owner starts a dedicated phase;
+- the version-1 synthetic package benchmark uses ordinary PLS as its sole external comparator,
+  separates oracle model validation from Pi-PLS selection validation, and freezes no predictive or
+  performance claim before calibration;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

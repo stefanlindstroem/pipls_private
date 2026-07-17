@@ -21,7 +21,8 @@ Phases A through E3 are implemented. The current public surface includes `PiPLSR
 
 The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
 navigation now describes the installable package, API, examples, datasets, validation, and releases.
-The next increment is the synthetic benchmark contract; it introduces no block-aware scaling API.
+The versioned synthetic benchmark contract is defined under `benchmarks/`; the next increment is the
+small CI runner and fixture layer. No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
 
@@ -50,6 +51,8 @@ The next increment is the synthetic benchmark contract; it introduces no block-a
   protocols.
 - `tests/estimator_checks/`: applicable scikit-learn common estimator checks.
 - `tests/regression/`: frozen comparisons with trusted implementations.
+- `tests/benchmarks/`: versioned manifest and result-schema contract validation, followed by runner
+  behavior and narrow fixtures.
 - `tests/test_repository_seed.py`: `.llm` navigation, snapshot layout, and workflow invariants.
 
 ## Product-asset ownership
@@ -58,8 +61,9 @@ The next increment is the synthetic benchmark contract; it introduces no block-a
   `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
   utilities or publication pipelines.
-- `benchmarks/`: future lightweight package-validation manifests, runners, and documented generated
-  outputs. Synthetic validation is primary; real datasets provide representative smoke checks.
+- `benchmarks/`: versioned lightweight package-validation manifests and result schemas, followed by
+  runners and documented generated outputs. Synthetic validation is primary; real datasets may later
+  provide representative smoke checks.
 - `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,
   and accepted decision records.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
@@ -77,6 +81,8 @@ The next increment is the synthetic benchmark contract; it introduces no block-a
 - `.llm/public_api.md`: public constructors, methods, outputs, defaults, and exclusions.
 - `.llm/data_io.md`: transparent real-data reading and example policy.
 - `.llm/dataset_layout.md`: normative committed-dataset file and metadata convention.
+- `.llm/benchmarking.md`: normative benchmark scenarios, metrics, runtime tiers, results, and update
+  policy.
 - `.llm/testing.md`: durable testing boundary.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
 - `docs/decisions/`: accepted design records.

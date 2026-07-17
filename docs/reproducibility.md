@@ -28,9 +28,10 @@ on the complete supplied training set. Learned scaling must not be fitted global
 ## Synthetic validation
 
 `pipls.datasets` provides deterministic latent-structure generators with known shared,
-predictor-specific, and response-specific components. Lightweight package benchmarks should use
-these generators to validate prediction, rank selection, subspace behavior, numerical consistency,
-and user-relevant runtime characteristics. They are validation fixtures, not paper-result archives.
+predictor-specific, and response-specific components. The accepted version-1 package benchmark
+contract is documented in [`benchmarks.md`](benchmarks.md) and stored under `benchmarks/`. It
+defines prediction, rank-selection, subspace, numerical-consistency, and resource metrics without
+freezing publication claims or broad result files.
 
 ## Reference datasets
 

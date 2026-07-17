@@ -13,7 +13,7 @@ material alone.
 
 ## Implemented boundary
 
-Phases A through E3 are complete and committed:
+Phases A through E3 and the E4a benchmark contract are complete and committed:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -98,6 +98,7 @@ case, or public behavior.
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Publication assets | downstream repositories pin released `pipls` versions |
+| Synthetic benchmark contract | versioned manifest/schema under `benchmarks/`; ordinary PLS is the sole external comparator in version 1 |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
 
@@ -144,30 +145,47 @@ Until the owner starts a dedicated phase:
 - require every future learned scaling rule to fit inside its corresponding training fold and the
   final full-training refit.
 
+## Synthetic benchmark contract
+
+Phase E4a is complete. The accepted version-1 contract is documented in `.llm/benchmarking.md` and
+implemented as machine-readable assets under `benchmarks/`:
+
+- seven named scenario families spanning sample size, predictor and response dimensions, latent
+  ranks, nuisance structure, signal strength, noise, scale heterogeneity, and scalable SVD;
+- deterministic CI, standard, and performance seed/runtime tiers;
+- fixed oracle Pi-PLS and ordinary PLS comparison plus separate adaptive Pi-PLS path validation;
+- prediction, selection, subspace-capture, numerical-consistency, timing, and optional memory
+  metrics;
+- JSON Lines result records with a versioned schema;
+- strict repeatability and metric-domain tolerances, while predictive, selection, solver-agreement,
+  and timing thresholds remain deliberately unfrozen.
+
+The contract preserves estimator-owned fold-local centering/scaling and excludes OLS, CCA,
+publication grids, and figure generation.
+
 ## Current next increment
 
-The next patch should define the **synthetic benchmark contract** without yet freezing broad result
-fixtures. It should specify:
+Implement **Phase E4b's CI benchmark runner only**:
 
-- controlled synthetic scenarios and their scientific purpose;
-- prediction, rank-selection, subspace, numerical-consistency, and runtime metrics;
-- deterministic seeds and identical train/test or CV splits across methods;
-- ordinary PLS as the primary user-relevant comparator;
-- runtime tiers, result schema, tolerances, and fixture-update policy;
-- a strict boundary excluding paper-scale grids, OLS/CCA paper comparisons, and figure generation.
+- consume `benchmarks/manifests/synthetic-v1.yaml` rather than duplicating scenario values in code;
+- expand constant and log-spaced scale specifications deterministically;
+- run the CI tier with its declared seed, scenarios, and methods;
+- write schema-conforming in-memory or temporary JSON Lines records;
+- test repeatability, finite metrics, capture bounds, and executable runner behavior;
+- do not freeze predictive superiority, exact rank recovery, timing limits, or broad result files.
 
-The contract must preserve model-internal fold-local standardization and must not design a future
-block-aware scaling API.
+Do not add the standard/performance runners, real-data benchmark results, OLS/CCA comparators,
+figures, or block-aware scaling APIs in that patch.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **Synthetic benchmark contract:** define scenarios, metrics, seeds, tolerances, runtime tiers,
-   result schema, and update policy without turning the repository into a paper experiment system.
-2. **Lightweight benchmark implementation:** deterministic synthetic fixtures first, followed by
-   representative real-dataset smoke checks.
+1. **CI benchmark runner:** implement the small deterministic synthetic tier from the accepted
+   version-1 contract without broad frozen result files.
+2. **Extended lightweight benchmarks:** add opt-in standard/performance execution and later
+   representative real-dataset smoke checks under separate review.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 4. **Future product development:** additional estimators, validation tools, datasets, and—only after
@@ -183,7 +201,8 @@ Use this order when sources disagree:
 1. explicit decisions from the project owner in the current request;
 2. accepted decision records under `docs/decisions/`;
 3. normative `.llm/product_scope.md`, `.llm/mathematics.md`, `.llm/numerical_contracts.md`,
-   `.llm/public_api.md`, `.llm/data_io.md`, and `.llm/dataset_layout.md`;
+   `.llm/public_api.md`, `.llm/data_io.md`, `.llm/dataset_layout.md`, and
+   `.llm/benchmarking.md`;
 4. source and tests as evidence of implemented behavior;
 5. this current-state handoff and `.llm/strategy.md`.
 
@@ -201,10 +220,11 @@ From an uploaded snapshot, a maintainer should:
 4. read the applicable mathematical, numerical, API, and development contracts;
 5. inspect the affected source and tests rather than trusting document claims alone;
 6. read `.llm/data_io.md` and `.llm/dataset_layout.md` for dataset, real-data, or example work;
-7. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
-8. verify that the requested work is the current increment or that the owner explicitly changed
+7. read `.llm/benchmarking.md` for benchmark manifests, runners, metrics, or fixtures;
+8. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
+9. verify that the requested work is the current increment or that the owner explicitly changed
    the order;
-9. return one root-relative unified Git patch, validation results, and exact direct Git commands.
+10. return one root-relative unified Git patch, validation results, and exact direct Git commands.
 
 Routine package work should not require re-uploading a manuscript. Request external scientific
 material only when the repository contracts identify a genuine unresolved scientific choice.

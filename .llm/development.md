@@ -49,6 +49,9 @@
   structural consistency over phrase matching or copied field values.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
+- Benchmark runners must consume versioned manifests, emit schema-conforming records, preserve
+  fold-local standardization, and keep generated outputs out of Git unless a decision explicitly
+  freezes a narrow fixture.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

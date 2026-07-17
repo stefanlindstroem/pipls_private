@@ -45,6 +45,11 @@ technical readability, not exact scientific values, row examples, column lists, 
 metadata checksums. Git history, review, public provenance, and the dataset documentation remain
 the source of record for those contents.
 
+Package benchmark manifests and result schemas are executable, versioned contracts rather than
+living documentary metadata. Tests may therefore validate their required fields, references, rank
+constraints, metric domains, and schema structure when an accepted benchmark decision defines
+those semantics.
+
 Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
 assertions require an explicit decision record describing why the value is stable, what software
 behavior it protects, and what tolerance or update procedure applies. Publication-result fixtures

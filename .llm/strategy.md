@@ -360,7 +360,10 @@ Acceptance conditions:
 - seeds, runtime tiers, result schema, tolerances, and fixture-update rules are explicit;
 - full publication grids and figure generation remain outside the repository.
 
-Current status: **planned**.
+Current status: **complete**. The version-1 manifest defines seven synthetic scenario families,
+three deterministic runtime tiers, fixed Pi-PLS and ordinary PLS comparison roles, separate Pi-PLS
+path-selection validation, metrics, result schema, tolerance policy, and fixture-update rules. No
+broad result files or publication claims are frozen.
 
 ### Phase E4b: lightweight benchmark implementation
 
@@ -398,14 +401,14 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-The next patch should implement **Phase E4a** only: define the synthetic benchmark contract without
-freezing broad benchmark results. Specify scenarios, metrics, seeds, runtime tiers, result schema,
-tolerances, and update rules. Ordinary PLS is the primary comparator; paper-scale OLS/CCA
-comparisons and figure generation remain downstream.
+The next patch should implement only the **Phase E4b CI runner** from the accepted version-1
+contract. It must consume the manifest, execute the declared CI tier, produce schema-conforming
+records, and test repeatability, finite metrics, capture bounds, and runner behavior.
 
-Do not change estimator behavior or design block-aware scaling APIs in that patch. Corn remains
-deferred until its preprocessing choices are resolved; its eventual raw-data reading and
-preprocessing must be public and explicit.
+Do not freeze predictive superiority, exact selection rates, timing limits, broad result files,
+standard/performance tiers, real-data benchmark outputs, OLS/CCA comparisons, figures, or
+block-aware scaling APIs in that patch. Corn remains deferred until its preprocessing choices are
+resolved; its eventual raw-data reading and preprocessing must be public and explicit.
 
 ## Maintenance protocol
 
