@@ -21,8 +21,8 @@ Phases A through E3 are implemented. The current public surface includes `PiPLSR
 
 The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. The next
 implementation increment is a repository-product cleanup: remove paper-oriented placeholders and
-rewrite public navigation around package users. Runtime behavior and preprocessing APIs are not
-part of that cleanup.
+rewrite public navigation around package users. Runtime behavior and new block-aware scaling APIs
+are not part of that cleanup.
 
 ## Runtime ownership
 
@@ -95,9 +95,12 @@ behavior.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required
   registry or generic loader.
 - `PiPLSRegression` and `PiPLSPathCV` do not wrap each other; both use shared private machinery.
-- Learned preprocessing is fitted inside the corresponding training fold.
-- Future standardization or block scaling is valid product scope but currently has no accepted API,
-  names, schedule, or implementation plan.
+- `PiPLSRegression` owns current centering and optional scaling: every candidate fit learns its
+  statistics from the corresponding training fold, and the selected model refits them on all
+  supplied training data.
+- Future block-aware variants of that standardization are valid product scope but currently have no
+  accepted API, names, schedule, or implementation plan. They must preserve the same fold-local and
+  full-training-refit boundary.
 - Public behavior changes include focused tests and contract/documentation updates.
 - Paper-specific figures, complete comparison grids, and reporting workflows belong in downstream
   repositories that pin tagged `pipls` releases.

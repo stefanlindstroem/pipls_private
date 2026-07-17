@@ -98,7 +98,8 @@ case, or public behavior.
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Publication assets | downstream repositories pin released `pipls` versions |
-| Future preprocessing | valid long-term product scope, but no accepted API or current implementation phase |
+| Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
+| Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
 
 Additional fixed decisions:
 
@@ -117,18 +118,31 @@ Additional fixed decisions:
 - Repository tests follow `.llm/testing.md`: living handoff, roadmap, and dataset metadata contents
   are reviewed but are not mirrored as fixed phrase or field-value assertions.
 
-## Explicitly deferred preprocessing direction
+## Current standardization boundary and deferred block-aware direction
 
-Future development may add standardization pipelines and block-scaling functionality. The direction
-is preserved, but it is expected months from now and has no current API design.
+`PiPLSRegression` currently owns leakage-safe model standardization. Every fit centers `X` and `Y`;
+`scale=True` also divides both blocks by safe training-sample standard deviations, while
+`scale=False` retains centering. Candidate estimators learn these statistics independently in each
+training fold. After rank or path selection, the chosen estimator learns them again from the full
+training set supplied to `fit()`. Prediction uses the stored statistics and returns responses in
+original units.
+
+This existing behavior is not a future preprocessing feature and must not be externalized into a
+one-time transform fitted before cross-validation.
+
+Future development may add block-aware variants of model standardization inside the supported
+estimator/model-pipeline fitting boundary. Their exact public placement is not decided. The
+direction is preserved, but it is expected months from now and has no current API design.
 
 Until the owner starts a dedicated phase:
 
-- do not add provisional preprocessing classes or public names;
+- do not add provisional block-scaling classes or public names;
 - do not reserve constructor parameters or block semantics;
 - do not refactor current code in anticipation of a speculative API;
-- keep the fixed numerical core independent from preprocessing;
-- fit any existing learned preprocessing inside its corresponding training fold.
+- keep the fixed numerical core independent from preprocessing while retaining standardization in
+  the estimator/model-selection layer;
+- require every future learned scaling rule to fit inside its corresponding training fold and the
+  final full-training refit.
 
 ## Current next increment
 
@@ -139,7 +153,7 @@ The next patch is a **repository-product cleanup**, not a runtime feature patch.
 - remove remaining promises that paper figures, complete comparison grids, or manuscript
   orchestration will be implemented inside `pipls`;
 - retain historical scientific context and accepted algorithm decisions where they remain useful;
-- make no estimator, dataset, benchmark-result, or preprocessing API change.
+- make no estimator, dataset, benchmark-result, or new block-aware scaling API change.
 
 After that cleanup, the next implementation phase should define a lightweight **synthetic benchmark
 contract** before freezing numerical results. Synthetic validation should use known latent truth and
@@ -160,7 +174,7 @@ expose its public raw-data reading and analysis-relevant preprocessing directly.
 4. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 5. **Future product development:** additional estimators, validation tools, datasets, and—only after
-   a separate owner decision—preprocessing, standardization, or block scaling.
+   a separate owner decision—block-aware variants of the existing model-internal standardization.
 
 Paper-reproduction repositories are outside this roadmap. They may be created independently for one
 or several publications and should depend on specific tagged `pipls` releases.

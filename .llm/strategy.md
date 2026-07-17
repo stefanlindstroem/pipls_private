@@ -48,8 +48,9 @@ tagged `pipls` versions.
     repository-product cleanup in one patch unless the dependency cannot be separated.
 14. Keep repository tests durable: verify behavior and file structure, not current roadmap prose
     or documentary metadata values.
-15. Do not design or anticipate future preprocessing, standardization, or block-scaling APIs until
-    the project owner starts a dedicated design phase.
+15. Preserve the implemented estimator-internal, fold-local centering/scaling contract. Do not
+    design or anticipate future block-aware standardization APIs until the project owner starts a
+    dedicated design phase.
 
 ## Fixed architectural decisions
 
@@ -67,6 +68,10 @@ tagged `pipls` versions.
 - Search approximation and linear-algebra approximation are separate policies. Randomized SVD
   must be introduced through an explicit solver contract and diagnostics, not hidden inside the
   meaning of `predictor_rank`.
+- `PiPLSRegression` always centers `X` and `Y`; with `scale=True` it also divides both blocks by
+  safe training-sample standard deviations, while `scale=False` retains centering.
+- Every candidate fit learns those statistics from its own training fold, and the selected model
+  refits them on the complete training set supplied to `fit()`.
 - Custom learned preprocessing is searched around the complete supported estimator boundary.
 - `PiPLSPathCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
   `PiPLSRegression`; arbitrary nested meta-estimators are not implied.
@@ -84,8 +89,9 @@ tagged `pipls` versions.
   phrase or field-value assertions in the test suite.
 - `pipls` is a long-lived software-product repository rather than a manuscript-reproduction
   repository.
-- Future standardization and block scaling remain valid product directions, but no public API,
-  naming, scheduling, or implementation is accepted yet.
+- Future block-aware standardization remains a valid product direction, but only its API, block
+  semantics, naming, scheduling, and implementation are deferred. Current estimator-internal
+  centering/scaling is implemented and normative.
 
 ## Increment sequence
 
@@ -332,7 +338,7 @@ Acceptance conditions:
   datasets, validation, and releases;
 - publication-specific reproduction is described only as downstream work that pins a tagged
   `pipls` version;
-- no synthetic benchmark result or preprocessing API is introduced in the same patch.
+- no synthetic benchmark result or new block-aware scaling API is introduced in the same patch.
 
 Current status: **planned**.
 
@@ -370,20 +376,29 @@ product responsibilities rather than the final steps of one publication.
 
 Current status: **planned and ongoing**.
 
-### Deferred future preprocessing
+### Current standardization and deferred block-aware variants
 
-Future standardization pipelines and block-scaling functionality remain valid product directions,
-but they are expected months from now. This strategy deliberately defines no class names,
-constructor parameters, block semantics, schedule, or implementation sequence. A separate owner
-decision and design phase are required before work begins.
+Estimator-internal standardization is implemented now and is part of the model-fitting contract.
+Each `PiPLSRegression` fit centers `X` and `Y`; `scale=True` additionally uses safe sample standard
+deviations estimated from that fit's training observations. Cross-validation clones and fits the
+complete estimator inside each training fold, and the selected model refits on all supplied
+training data. This behavior mirrors the leakage-safe role of standardization in
+`PLSRegression`.
 
-Current status: **deferred; no API design accepted**.
+Future block-aware standardization remains a valid product direction expected months from now.
+Only that extension is deferred. This strategy deliberately defines neither whether it is
+estimator-owned or represented in a supported model pipeline, nor any class names, constructor
+parameters, block semantics, schedule, or implementation sequence. Any future variant must learn
+its scaling statistics inside each training-fold fit and the final full-training refit; it must
+never be prefit globally before cross-validation.
+
+Current status: **current estimator standardization complete; block-aware API design deferred**.
 
 ## Current next increment
 
 The next patch should implement **Product transition P1** only: remove publication placeholders and
 rewrite public navigation around package users. Do not change estimator behavior, add benchmark
-results, or design preprocessing/block-scaling APIs in that patch.
+results, or design block-aware scaling APIs in that patch.
 
 After the cleanup, begin **Phase E4a** with a synthetic benchmark contract. Corn remains deferred
 until its preprocessing choices are resolved; its eventual raw-data reading and preprocessing must

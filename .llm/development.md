@@ -19,7 +19,9 @@
 - Keep the fixed numerical core independent from preprocessing, CV, datasets, benchmark policy,
   and publication-specific workflows.
 - Reuse the shared private evaluation/search machinery rather than adding a second fold loop.
-- Fit every learned preprocessing operation inside its matching training fold.
+- Preserve current estimator-internal centering/scaling: fit its statistics inside every
+  candidate training fold and refit them on the complete training set after selection.
+- Fit every additional learned preprocessing operation inside its matching training fold.
 - Add dependencies only when a short, stable NumPy/scikit-learn implementation is insufficient.
 - Do not broaden supported estimator composition or metadata routing implicitly.
 - Weighted fitting and `sample_weight` propagation during fitting are out of scope unless the
@@ -35,8 +37,9 @@
   obtainable raw data and exposes analysis-relevant choices that users should follow.
 - Do not add paper-figure, manuscript-table, publication-grid, or paper-only comparator workflows
   to this repository. Downstream reproduction repositories should pin tagged `pipls` releases.
-- Do not introduce provisional standardization or block-scaling classes, public names, constructor
-  parameters, or internal abstractions until the owner starts a dedicated future design phase.
+- Do not introduce provisional block-aware scaling classes, public names, constructor parameters,
+  or internal abstractions until the owner starts a dedicated future design phase. This restriction
+  does not defer or weaken the existing `PiPLSRegression` centering/scaling contract.
 
 ## Tests and documentation
 

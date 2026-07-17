@@ -55,6 +55,28 @@ scikit-learn internals.
 statistical support to be trusted without external validation. Explicit integer ranks do not emit
 this warning because they bypass the $c$-based bound.
 
+## Model-internal standardization contract
+
+`PiPLSRegression` performs centering and optional scaling as an integral part of each model fit,
+following the public behavior of scikit-learn's `PLSRegression` rather than requiring users to
+prefit a scaler.
+
+- Every fit estimates `x_mean_` and `y_mean_` from the observations supplied to that fit.
+- `scale=True` estimates safe sample-standard-deviation vectors `x_scale_` and `y_scale_` with
+  `ddof=1` and standardizes both blocks.
+- `scale=False` still centers both blocks and stores unit scale vectors.
+- Each internal-CV candidate is a fresh estimator fit on one training fold, so validation data do
+  not influence means or scales.
+- After selection, the chosen fixed-rank model is refitted on all training data supplied to
+  `fit()`, including re-estimation of its centering and scaling statistics.
+- `predict()` applies the stored training statistics and returns `Y` in its original units.
+
+This contract is current behavior. Only possible future block-aware alternatives to these scaling
+rules are deferred. Whether such an alternative is estimator-owned or represented in a supported
+model pipeline remains undecided. In either case, the complete candidate must fit it inside the
+training fold and refit it on the complete training set; globally fitting it before
+cross-validation would be data leakage.
+
 ## Predictor-rank modes
 
 The estimator supports four public modes:

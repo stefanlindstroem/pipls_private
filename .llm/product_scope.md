@@ -63,22 +63,41 @@ Benchmarks should protect such questions as:
 
 Large experiment grids, final paper numbers, and manuscript plotting stay outside this repository.
 
-## Future preprocessing
+## Current model standardization and deferred block-aware variants
 
-Future package development may add general preprocessing capabilities, including standardization
-pipelines and block-scaling functionality. That direction remains valid, but no preprocessing or
-block-scaling API is designed, scheduled, or implied by the current roadmap.
+Model-internal centering and scaling are current, required estimator behavior; they are not deferred
+product scope. `PiPLSRegression` mirrors the preprocessing contract of scikit-learn's
+`PLSRegression`:
+
+- every fit centers `X` and `Y` using statistics estimated from the data supplied to that fit;
+- `scale=True` additionally divides both blocks by safe training-sample standard deviations;
+- `scale=False` retains centering and uses unit scale vectors;
+- every cross-validation candidate is a fresh estimator fit on one training fold, so validation
+  observations never influence fold means or scales;
+- after model selection, the chosen model is refitted and standardized on the complete training set
+  supplied to `fit()`;
+- prediction applies the stored training statistics and returns responses in their original units.
+
+The fixed numerical core remains independent from preprocessing because it receives already
+centered or centered-and-scaled matrices from the estimator layer. This separation does not make
+standardization optional or external to model fitting.
+
+Future development may add block-aware variants of model standardization. Their eventual public
+placement—inside the estimator or as part of a supported model pipeline—is not designed yet. Only
+the future API and block semantics are deferred. Regardless of placement, the complete model must
+fit the scaling statistics inside each training fold and again during the final full-training
+refit. They must not be fitted once to the complete dataset before cross-validation.
 
 Until the project owner starts a dedicated design phase:
 
-- the fixed Pi-PLS numerical core remains independent from preprocessing;
-- learned preprocessing remains fold-local when composed around supported estimators;
 - no provisional public names, classes, constructor parameters, or block semantics are reserved;
-- documentation should describe the future area only as deferred product scope;
-- implementation work must not anticipate the future API through hidden abstractions.
+- documentation must not imply that current centering/scaling is deferred;
+- implementation work must not anticipate a future block-scaling API through hidden abstractions;
+- ordinary model fitting and validation continue to use the implemented estimator-internal
+  standardization contract.
 
-A future preprocessing design requires a separate owner decision, explicit contracts, and its own
-small reviewable increments.
+A future block-aware standardization design requires a separate owner decision, explicit contracts,
+and its own small reviewable increments.
 
 ## Near-term transition
 
@@ -90,5 +109,5 @@ initial publication plan. The accepted near-term sequence is:
    product;
 3. define the lightweight synthetic benchmark contract before freezing benchmark results.
 
-The third step does not include a preprocessing or block-scaling API design. That work remains
+The third step does not include a block-aware standardization API design. That work remains
 deferred for months or until the project owner explicitly starts it.

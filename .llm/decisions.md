@@ -29,7 +29,8 @@ This index is navigation, not a substitute for those records.
 | `0021-durable-repository-tests.md` | repository test stability | test behavior and structural format without pinning living prose or documentary field values |
 | `0022-sugarcane-dataset-integration.md` | third transparent real-data integration | public LabSpec spectra, explicit row and wavelength selection, and compact regular-axis metadata |
 | `0023-tobacco-dataset-integration.md` | fourth transparent real-data integration | public raw FT-NIR spectra, explicit ID alignment, metadata-column exclusion, and no spectral preprocessing |
-| `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction stays in downstream repositories; preprocessing API design is deferred |
+| `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction stays downstream; future block-aware API design is deferred |
+| `0025-model-internal-standardization-boundary.md` | current versus future scaling | estimator centering/scaling is current and fold-local; only future block-aware variants are deferred |
 
 ## Accepted clarifications after earlier proposals
 
@@ -64,8 +65,10 @@ plan contains an earlier or more general proposal:
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only
   OLS/CCA comparisons, cached results, and publication environments belong downstream;
-- future standardization and block scaling remain valid directions, but no API design or schedule
-  is accepted until the owner starts a dedicated phase;
+- current estimator centering and optional scaling are integral to every fit, are learned inside
+  each training fold during selection, and are refitted on all supplied training data;
+- future block-aware scaling remains a valid direction, but only its API design and schedule are
+  deferred until the owner starts a dedicated phase;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.
