@@ -1,3 +1,3 @@
 recursive-include datasets *.csv *.md *.txt *.yaml
 recursive-include examples *.py *.md
-include benchmarks/README.md
+recursive-include benchmarks *.py *.md

@@ -22,9 +22,8 @@ Phases A through E3 are implemented. The current public surface includes `PiPLSR
 The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
 navigation now describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
-The benchmark layer now has an accepted focused plan: implement one question-specific benchmark at
-a time, beginning with fixed-structure recovery. No block-aware scaling API is designed or
-scheduled.
+The benchmark layer now implements fixed-structure recovery as its first question-specific script;
+rank selection is next. No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
 

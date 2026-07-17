@@ -51,9 +51,34 @@ remain outside this repository.
 **Question:** When the true shared dimension and predictor-signal rank are supplied, does fixed
 Pi-PLS recover the intended latent subspaces and predict independent responses?
 
-**Method:** fixed `PiPLSRegression` only.
+**Method:** fixed `PiPLSRegression` only, with `scale=True`, `svd_solver="full"`,
+`n_components` equal to the generator-declared shared rank, and `predictor_rank` equal to the
+complete generator-declared predictor-signal rank. No cross-validation is performed.
 
-**Initial scenarios:** shared-only signal and predictor-specific nuisance signal.
+**Implemented scenarios:**
+
+- `shared_only`: two shared directions and no predictor-specific directions;
+- `predictor_specific_nuisance`: the same sample sizes, observed dimensions, shared strengths,
+  response structure, and noise level, plus four predictor-only directions.
+
+Both scenarios use 160 training samples, 160 test samples, 24 predictors, six responses, no
+response-specific directions, shared strengths `(2.5, 1.5)`, noise `(0.2, 0.2)`, and seeds 1729,
+2718, and 3141. The nuisance strengths are `(3.0, 2.5, 2.0, 1.5)`.
+
+**Metrics:**
+
+- `test_mse` is the mean squared residual over all test samples and responses in original response
+  units;
+- `predictor_shared_capture` compares the true predictor-shared subspace with fitted $P$;
+- `predictor_signal_capture` compares the complete true predictor-signal subspace with fitted
+  $\Pi$;
+- `response_shared_capture` compares the true response-shared subspace with fitted $Q$.
+
+For true basis $A$ and estimated basis $B$, with orthonormal column bases $Q_A$ and $Q_B$, capture
+is $\lVert Q_A^{\mathsf{T}} Q_B \rVert_{\mathrm{F}}^2 / \dim[\mathrm{col}(A)]$. Generator
+loadings are mapped into the estimator coordinates using `truth.feature_scale / model.x_scale_` for
+predictors and `truth.target_scale / model.y_scale_` for responses. Learned scales therefore come
+only from the benchmark training block.
 
 **Output:** `benchmarks/results/fixed_structure_recovery.csv`.
 
@@ -66,7 +91,9 @@ Required columns:
 - `predictor_signal_capture`;
 - `response_shared_capture`.
 
-No selected-rank fields, software versions, or timings belong in this table.
+The benchmark is implemented by `benchmarks/fixed_structure_recovery.py`. No selected-rank fields,
+software versions, timings, ordinary PLS comparison, solver comparison, or figures belong in this
+table.
 
 ### 2. Rank selection
 
@@ -136,8 +163,9 @@ Each benchmark owns its own script, scenario constants, tests, and CSV header. P
 ordinary Python over generic orchestration. A small configuration file is acceptable only when it
 makes that benchmark clearer to both humans and machines.
 
-Generated results remain under `benchmarks/results/` and are ignored by Git unless a later decision
-freezes a small package-validation fixture with a stated meaning, tolerance, and update procedure.
+Generated results remain under `benchmarks/results/`, are ignored by Git, and are excluded from
+repository snapshots unless a later decision freezes a small package-validation fixture with a
+stated meaning, tolerance, and update procedure.
 The source commit, benchmark script, explicit seed, and package dependencies provide reproducibility;
 routine result tables need not repeat software versions or execution controls when those fields do
 not answer the benchmark question.
@@ -150,10 +178,10 @@ rank selection is exact until a separate calibrated acceptance decision exists.
 
 Implement the benchmarks one at a time in this order:
 
-1. fixed-structure recovery;
-2. rank selection;
+1. fixed-structure recovery — implemented;
+2. rank selection — next;
 3. predictor-nuisance comparison with PLS;
 4. solver consistency.
 
-The first implementation patch must contain only fixed-structure recovery. Do not recreate the
-removed universal manifest, universal schema, or broad CI runner.
+Each implementation patch must remain question-specific. Do not recreate the removed universal
+manifest, universal schema, or broad CI runner.

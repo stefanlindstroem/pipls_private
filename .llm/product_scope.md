@@ -119,7 +119,7 @@ contains paper-reproduction placeholders or promises to implement manuscript wor
 
 The first universal synthetic manifest, result schema, and broad CI runner were removed after owner
 review because they combined unrelated questions and produced an unnecessarily wide table. The
-accepted next direction is a sequence of focused benchmarks with minimal per-question CSV outputs,
-beginning with fixed-structure recovery. None of this includes a block-aware standardization API
-design; future block-aware variants remain deferred for months or until the project owner explicitly
-starts a separate phase.
+focused sequence now begins with an implemented fixed-structure recovery benchmark and proceeds next
+to rank selection, with one minimal per-question CSV output. None of this includes a block-aware
+standardization API design; future block-aware variants remain deferred for months or until the
+project owner explicitly starts a separate phase.

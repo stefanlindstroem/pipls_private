@@ -112,10 +112,11 @@ See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datase
 
 ## Lightweight benchmarks
 
-The repository plans a small sequence of focused synthetic benchmarks. Each benchmark answers one
-programming-user question and writes one minimal CSV table: fixed-structure recovery, rank
-selection, Pi-PLS versus ordinary PLS under predictor-specific nuisance, and full-versus-randomized
-solver consistency. Publication-scale OLS/CCA comparisons and figure generation remain outside this
+The repository uses a small sequence of focused synthetic benchmarks. Fixed-structure recovery is
+implemented and writes one six-column CSV table from fixed oracle-rank Pi-PLS fits. Run it with
+`python benchmarks/fixed_structure_recovery.py`. Rank selection, Pi-PLS versus ordinary PLS under
+predictor-specific nuisance, and full-versus-randomized solver consistency remain separate planned
+benchmarks. Publication-scale OLS/CCA comparisons and figure generation remain outside this
 repository.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).

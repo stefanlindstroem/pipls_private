@@ -156,34 +156,34 @@ in `.llm/benchmarking.md` and contains four independent questions:
 3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
 4. full-versus-randomized solver consistency.
 
-Each benchmark owns one readable script and one minimal CSV output. Software versions, execution
-controls, timings, and unrelated metrics are omitted unless they answer that benchmark's explicit
-question. Generated outputs remain ignored. OLS, CCA, publication grids, and figure generation
-remain outside the repository.
+Each benchmark owns one readable script and one minimal CSV output. Fixed-structure recovery is
+implemented in `benchmarks/fixed_structure_recovery.py`; its generated CSV remains ignored and is
+excluded from snapshots. Software versions, execution controls, timings, and unrelated metrics are
+omitted unless they answer that benchmark's explicit question. OLS, CCA, publication grids, and
+figure generation remain outside the repository.
 
 ## Current next increment
 
-Implement only the first focused benchmark: **fixed-structure recovery**.
+Implement only the second focused benchmark: **rank selection**.
 
-The patch should:
+The next patch should:
 
-- use fixed `PiPLSRegression` with generator-declared `n_components` and predictor-signal rank;
-- cover a shared-only scenario and a predictor-specific nuisance scenario;
-- write `benchmarks/results/fixed_structure_recovery.csv`;
-- report only `scenario`, `seed`, `test_mse`, `predictor_shared_capture`,
-  `predictor_signal_capture`, and `response_shared_capture`;
-- include focused tests for deterministic generation, finite bounded metrics, exact CSV header, and
-  scientific-value repeatability;
-- avoid a generic manifest, universal schema, broad runner, software-version columns, timings,
-  PLS comparison, path selection, figures, or block-aware scaling APIs.
+- use `PiPLSPathCV(search_method="auto")` with fold-local estimator centering and scaling;
+- use deterministic public synthetic train/test data with declared shared and predictor-signal
+  ranks;
+- write `benchmarks/results/rank_selection.csv`;
+- report only `scenario`, `seed`, `true_n_components`, `selected_n_components`,
+  `true_predictor_rank`, `selected_predictor_rank`, and `test_mse`;
+- avoid ordinary PLS comparison, solver comparison, timings, software metadata, universal
+  orchestration, figures, or block-aware scaling APIs.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **Focused synthetic benchmarks:** implement rank selection, predictor-nuisance comparison, and
-   solver consistency in separate patches after fixed-structure recovery.
+1. **Focused synthetic benchmarks:** implement rank selection next, then predictor-nuisance
+   comparison and solver consistency in separate patches.
 2. **Representative real-data smoke checks:** add only after the synthetic questions are stable and
    under separate review.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility

@@ -9,44 +9,88 @@ Each benchmark answers one question and writes one small CSV file containing onl
 for that question. The package does not use a universal experiment table with columns for every
 method, metric, software version, execution control, and timing measurement.
 
-The planned benchmark sequence is:
+## Fixed-structure recovery
 
-### Fixed-structure recovery
+The implemented fixed-structure benchmark asks:
 
-Does fixed Pi-PLS recover known predictor and response subspaces and predict independent synthetic
-responses when the true model dimensions are supplied?
+> When the true shared dimension and predictor-signal rank are supplied, does fixed Pi-PLS recover
+> the intended latent subspaces and predict independent responses?
 
-The table will contain scenario, seed, test MSE, and three subspace-capture metrics.
+Run it from the repository root after installing the package:
 
-### Rank selection
+```bash
+python benchmarks/fixed_structure_recovery.py
+```
 
-Does adaptive `PiPLSPathCV` choose reasonable shared and predictor ranks when the generator declares
-the truth?
+The script uses `make_pipls_train_test` with 160 training samples, 160 test samples, 24 predictors,
+six responses, two shared directions, no response-specific directions, shared strengths `(2.5,
+1.5)`, block noise `(0.2, 0.2)`, and seeds 1729, 2718, and 3141. The scenarios are:
 
-The table will contain scenario, seed, true ranks, selected ranks, and test MSE.
+- `shared_only`, with no predictor-specific directions;
+- `predictor_specific_nuisance`, with four predictor-only directions of strengths `(3.0, 2.5,
+  2.0, 1.5)`.
 
-### Predictor-nuisance comparison
+For each generated problem, `PiPLSRegression` uses `scale=True`, exact predictor SVD, and fixed oracle
+ranks: `n_components` equals the declared shared rank, and `predictor_rank` equals the complete
+declared predictor-signal rank. No cross-validation is performed.
 
-As predictor-specific nuisance variation increases, how does fixed Pi-PLS prediction compare with
-ordinary fixed-component `PLSRegression`?
+The output is `benchmarks/results/fixed_structure_recovery.csv` with exactly these columns:
 
-The table will contain paired Pi-PLS and PLS test MSE values and their difference.
+```text
+scenario
+seed
+test_mse
+predictor_shared_capture
+predictor_signal_capture
+response_shared_capture
+```
 
-### Solver consistency
+`test_mse` is the arithmetic mean of squared test residuals over all samples and responses in the
+original generated response units.
 
-For a fixed high-dimensional model, how closely do full and randomized predictor SVD agree?
+For a true basis $A$ and estimated basis $B$, let $Q_A$ and $Q_B$ be orthonormal bases for their
+column spaces. Every capture metric is
 
-The table will contain only prediction and coefficient relative differences.
+egin{equation}
+\mathrm{capture}(A, B) = \frac{\lVert Q_A^{\mathsf{T}} Q_B \rVert_{\mathrm{F}}^2}{\dim[\mathrm{col}(A)]}.
+\end{equation}
+
+It is the mean squared canonical correlation and lies in $[0, 1]$. The three applications are:
+
+- `predictor_shared_capture`: true predictor-shared loadings against fitted $P$;
+- `predictor_signal_capture`: concatenated true shared and predictor-specific loadings against
+  fitted $\Pi$;
+- `response_shared_capture`: true response-shared loadings against fitted $Q$.
+
+The generator loadings precede observed-variable scaling, whereas the fitted bases use model
+standardization. Before comparison, predictor truth loadings are multiplied row-wise by
+`truth.feature_scale / model.x_scale_`, and response truth loadings by
+`truth.target_scale / model.y_scale_`. Thus each comparison uses the fitted model coordinates, and
+all learned scales come only from the benchmark training block.
+
+The benchmark does not perform rank selection, compare against ordinary PLS, compare SVD solvers,
+measure runtime, record software or environment metadata, or create figures.
+
+## Planned separate benchmarks
+
+The remaining benchmark sequence is:
+
+1. adaptive rank selection;
+2. predictor-specific nuisance comparison between fixed Pi-PLS and ordinary PLS;
+3. full-versus-randomized predictor-SVD consistency.
+
+Each will receive its own script and minimal CSV output in a separate patch.
 
 ## Interpretation boundary
 
 Synthetic train and test blocks are generated independently from shared latent parameters. Models
-learn centering and optional scaling only from their training data; cross-validation learns those
-statistics independently within each fold.
+learn centering and optional scaling only from their training data; any future cross-validation
+benchmark must learn those statistics independently within each fold.
 
-Ordinary PLS is the nearest package-user comparator. OLS, CCA, publication-scale simulations,
-figures, and scientific superiority claims remain outside this repository.
+Ordinary PLS is the nearest package-user comparator where a comparison is the stated question. OLS,
+CCA, publication-scale simulations, figures, and scientific superiority claims remain outside this
+repository.
 
-Generated CSV files live under `benchmarks/results/` and are ignored by Git. Timings and software
-versions are not included automatically; they belong only in a separately designed benchmark whose
-question concerns runtime or compatibility.
+Generated CSV files live under `benchmarks/results/`, are ignored by Git, and are excluded from
+repository snapshots. Timings and software versions are not included automatically; they belong
+only in a separately designed benchmark whose question concerns runtime or compatibility.

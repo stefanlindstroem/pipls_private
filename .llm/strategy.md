@@ -370,10 +370,10 @@ architecture and establishes one question, one script, and one minimal CSV outpu
 Implement the accepted benchmarks one at a time so each patch remains scientifically and
 operationally reviewable.
 
-Current status: **planned**. The first patch is fixed-structure recovery only. It will use fixed
-Pi-PLS with generator-declared ranks and report scenario, seed, test MSE, and the three relevant
-subspace-capture metrics. Rank selection, PLS comparison, solver consistency, timings, and software
-metadata do not belong in that first output.
+Current status: **in progress**. Fixed-structure recovery is implemented with fixed oracle-rank
+Pi-PLS, deterministic public synthetic train/test data, test MSE, and three coordinate-correct
+subspace-capture metrics. Its dedicated CSV has six columns and no selection, comparison, solver,
+timing, software, or environment fields. Rank selection is the next separate benchmark.
 
 ### Product documentation and release hardening
 
@@ -403,11 +403,12 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the fixed-structure recovery benchmark only. Use fixed Pi-PLS with known generator ranks,
-write one minimal CSV table, and test deterministic scientific metrics. Do not add rank selection,
-ordinary PLS comparison, solver consistency, timings, software metadata, a generic manifest, a
-universal schema, real-data benchmark outputs, figures, OLS/CCA comparisons, or block-aware scaling
-APIs.
+Implement the rank-selection benchmark only. Use adaptive `PiPLSPathCV(search_method="auto")`,
+retain fold-local learned centering and scaling, write its dedicated minimal CSV, and test
+deterministic selected ranks and finite prediction metrics without asserting exact recovery as a
+scientific claim. Do not add ordinary PLS comparison, solver consistency, timings, software
+metadata, a generic manifest, a universal schema, real-data benchmark outputs, figures, OLS/CCA
+comparisons, or block-aware scaling APIs.
 
 Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
 and preprocessing must be public and explicit.

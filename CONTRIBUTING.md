@@ -17,6 +17,7 @@ make check
 Run `make build` when changing packaging, dependencies, included data, or public modules.
 
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
-Benchmark changes must follow `.llm/benchmarking.md`, consume versioned manifests, prefer flat CSV
-for tabular outputs, and avoid committing generated result files without an explicit fixture decision. Generated files, datasets
-without verified redistribution terms, and archive clutter must not be committed.
+Benchmark changes must follow `.llm/benchmarking.md`: one question, one readable script, and one
+minimal CSV output. Do not introduce a universal manifest or result schema, and do not commit
+generated result files without an explicit fixture decision. Generated files, datasets without
+verified redistribution terms, and archive clutter must not be committed.
