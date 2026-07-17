@@ -16,9 +16,9 @@ is given, a link to the license is supplied, and modifications are indicated.
 
 Changes made for this repository:
 
-- selected the 14 fiber-property columns used as predictors by the supplied PiPLSR_v0.1 analysis;
-- selected Canadian Standard Freeness and seven handsheet-property columns as responses;
-- excluded refiner controls, specific refining energy, and the unused `k` column;
+- selected 14 named fiber-property variables as predictors for the Pi-PLS example;
+- selected Canadian Standard Freeness and seven named handsheet-property variables as responses;
+- excluded refiner controls, specific refining energy, and the final `k` variable;
 - split the selected columns into comma-delimited `X.csv` and `Y.csv` files;
 - preserved numeric values, column order, and row order;
 - added repository metadata and integrity hashes.

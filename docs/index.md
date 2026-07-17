@@ -1,7 +1,7 @@
 # Pi-PLS documentation
 
 The current authoritative development specification is the tracked `.llm/` layer together with
-`docs/publication_repository_plan.md` and the accepted decision records.
+the accepted decision records.
 
 Current navigation:
 
@@ -21,7 +21,6 @@ Current navigation:
 - `decisions/0016-transparent-data-ingestion.md`: explicit `X`/`Y` reading and no-loader boundary;
 - `decisions/0007-predictor-rank-search-policies.md`: accepted `"optimal"` versus adaptive
   `"auto"` semantics and the separate randomized-SVD policy;
-- `publication_repository_plan.md`: detailed revision-5 architecture, subject to later accepted
-  decision records where explicitly noted.
-
 - [Decision 0013: final scikit-learn cleanup boundary](decisions/0013-sklearn-cleanup-boundary.md)
+
+- [Decision 0020: public dataset provenance boundary](decisions/0020-public-dataset-provenance-boundary.md)

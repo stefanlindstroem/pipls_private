@@ -12,10 +12,10 @@ Every committed real dataset directory under `datasets/<dataset-id>/` must conta
 
 - `X.csv`: predictor matrix;
 - `Y.csv`: response matrix;
-- `metadata.yaml`: repository description and provenance.
+- `metadata.yaml`: public repository description and provenance.
 
 Additional human-readable files such as `README.md` and license files may be included when needed.
-Preparation scripts belong under `scripts/prepare_data/`, not in runtime package code.
+Do not add internal conversion scripts or references to private development inputs.
 
 ## CSV contract
 
@@ -44,13 +44,38 @@ use `schema_version: 1` and contain these top-level fields:
 - `responses`: ordered names and non-empty descriptions;
 - `sample_alignment`: row-alignment method and explanation;
 - `missing_values`: declared policy for predictors and responses;
-- `source`: provider, upstream files or references, and citation;
+- `source`: public publication, repository, archive, or included-raw-data references;
 - `license`: identifier, local license file when applicable, and redistribution status;
-- `preparation`: transparent account of transformations from source to analysis files;
+- `preparation`: transparent analysis-facing transformations from public source material to the
+  committed model tables;
 - `integrity`: SHA-256 hashes for the analysis files and relevant license assets.
 
 The metadata may contain additional dataset-specific fields, but the required fields and meanings
 must remain stable across datasets.
+
+## Public-facing provenance rule
+
+Dataset assets must stand on their own for a programming user who sees only the public repository.
+Do not include:
+
+- personal delivery details or contributor-specific source paths;
+- private archive names;
+- inaccessible local filenames presented as upstream sources;
+- checksums for source files that are not publicly available or included;
+- references to internal preparation scripts.
+
+When committed `X.csv` and `Y.csv` are adapted from public supplementary material, cite that public
+material and describe the named selections or transformations directly. Development-only lineage
+must not leak into repository metadata.
+
+## Reconstruction and preprocessing code
+
+Do not commit preparation-only code merely to document how private development files were split.
+Public reconstruction code is allowed only when it operates on included or publicly obtainable raw
+data and represents analysis-relevant work that users should see.
+
+Corn is explicitly reserved for this second case: the raw data and the necessary reading and
+preprocessing choices must be exposed transparently to programming users.
 
 ## Separation from the programming-user contract
 

@@ -101,6 +101,7 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert "Current status: **complete**. `.llm/data_io.md`" in strategy
     assert "Current status: **underway**. Linnerud establishes" in strategy
     assert "Pulp is the second" in strategy
+    assert "private-source references" in strategy
     assert "The next implementation patch should remain in **Phase E3**" in strategy
     assert (root / "docs" / "decisions" / "0005-leave-one-out-protocol.md").is_file()
     assert (root / "docs" / "decisions" / "0007-predictor-rank-search-policies.md").is_file()
@@ -115,6 +116,7 @@ def test_strategy_declares_ownership_and_next_increment() -> None:
     assert (root / "docs" / "decisions" / "0017-first-real-dataset.md").is_file()
     assert (root / "docs" / "decisions" / "0018-repository-dataset-layout.md").is_file()
     assert (root / "docs" / "decisions" / "0019-pulp-dataset-integration.md").is_file()
+    assert (root / "docs" / "decisions" / "0020-public-dataset-provenance-boundary.md").is_file()
     assert (root / "docs" / "path_analysis.md").is_file()
     assert (root / "docs" / "cross_validation.md").is_file()
     assert "The LLM maintainer updates this file" in readme
@@ -174,6 +176,7 @@ def test_llm_fresh_chat_handoff_is_current_and_navigable() -> None:
     )
     assert "direct `PiPLSRegression` or `Pipeline`" in state
     assert "Routine work should not require re-uploading the manuscript" in state
+    assert "adapted from public" in state
 
     assert "The next increment remains Phase E3" in project
     assert "transparent" in project
@@ -201,12 +204,15 @@ def test_llm_data_io_contract_is_transparent() -> None:
     assert "Every committed real dataset directory" in dataset_layout
     assert "`X.csv`: predictor matrix" in dataset_layout
     assert "`Y.csv`: response matrix" in dataset_layout
-    assert "`metadata.yaml`: repository description" in dataset_layout
+    assert "`metadata.yaml`: public repository description" in dataset_layout
     assert "use a comma as delimiter" in dataset_layout
     assert "not a runtime input" in dataset_layout
     assert "### Phase E3: real dataset integrations" in strategy
     assert "Current status: **underway**" in strategy
     assert not (root / "datasets" / "registry.yaml").exists()
+    assert "private archive" in data_io
+    assert "Corn is the planned special case" in data_io
+    assert "Do not include:" in dataset_layout
 
 
 
@@ -237,18 +243,17 @@ def test_pulp_is_repository_data_not_runtime_api() -> None:
     root = Path(__file__).resolve().parents[1]
     data_readme = (root / "datasets" / "pulp" / "README.md").read_text(encoding="utf-8")
     example = (root / "examples" / "10_pulp_real_data.py").read_text(encoding="utf-8")
-    preparation = (root / "scripts" / "prepare_data" / "prepare_pulp.py").read_text(
-        encoding="utf-8"
-    )
-
     assert "14 fiber-description predictors" in data_readme
     assert 'pd.read_csv(DATA_DIR / "X.csv")' in example
     assert 'pd.read_csv(DATA_DIR / "Y.csv")' in example
     assert "metadata.yaml" in example
     assert "import yaml" not in example
     assert "load_dataset" not in example
-    assert "PREDICTOR_COLUMNS = SOURCE_COLUMNS[6:20]" in preparation
-    assert "RESPONSE_COLUMNS = SOURCE_COLUMNS[20:28]" in preparation
+    metadata = (root / "datasets" / "pulp" / "metadata.yaml").read_text(encoding="utf-8")
+    assert "10.1016/j.compchemeng.2025.109143" in metadata
+    assert "PiPLSR_v0.1" not in metadata
+    assert "scripts/prepare_data" not in metadata
+    assert not (root / "scripts" / "prepare_data" / "prepare_pulp.py").exists()
     assert "pulp" not in pipls.__all__
 
 def test_llm_prompts_bootstrap_from_repository_state() -> None:

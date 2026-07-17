@@ -28,8 +28,10 @@
   helper function that obscures the data-reading steps.
 - Every committed real dataset follows `.llm/dataset_layout.md`: comma-delimited `X.csv`,
   comma-delimited `Y.csv`, and documentary `metadata.yaml`.
-- Keep dataset-specific conversion under `scripts/prepare_data/`; keep analysis-time reading
-  simple, visible, and representative of normal user code.
+- Treat every committed dataset asset as public-facing. Cite only public or included sources;
+  do not commit private archive paths, inaccessible source checksums, or preparation-only scripts.
+- Add public reconstruction or preprocessing code only when it operates on included or publicly
+  obtainable raw data and exposes analysis-relevant choices that users should follow.
 
 ## Tests and documentation
 

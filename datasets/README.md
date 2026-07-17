@@ -1,7 +1,8 @@
 # Datasets
 
 Repository real datasets are added one at a time after source, citation, licensing, redistribution,
-row-order, missing-value, and preparation choices are reviewed. Every dataset directory uses
+row-order, missing-value, public-provenance, and preparation choices are reviewed. Every dataset
+directory uses
 comma-delimited `X.csv`, comma-delimited `Y.csv`, and a documentary `metadata.yaml`.
 
 Available integrations:
@@ -15,8 +16,9 @@ synthetic generator under `pipls.datasets`; see `docs/datasets.md`. Synthetic da
 at runtime and are not committed as dataset files.
 
 Real-data examples read `X.csv` and `Y.csv` explicitly and form `X` and `Y` without a generic
-package loader. `metadata.yaml` standardizes repository descriptions and provenance, but it is not
-read by the estimator and is not required for external users fitting their own data.
+package loader. `metadata.yaml` standardizes public repository descriptions and provenance, but it
+is not read by the estimator and is not required for external users fitting their own data.
+Private development paths and preparation-only scripts are not part of dataset integrations.
 
 ## Included datasets
 

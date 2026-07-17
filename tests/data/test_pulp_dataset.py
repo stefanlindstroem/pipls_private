@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import runpy
 from pathlib import Path
 from typing import Any
@@ -14,7 +13,7 @@ import yaml
 EXPECTED_CHECKSUMS = {
     "X.csv": "b26d1639339c406bf91070e2ad8ceb8df59d3ad1f90ece7c5cd5b18264d63b45",
     "Y.csv": "b600264d2319efce3500c6d7adbf5490b62e6d42a1e32af7df62709b1975ce93",
-    "LICENSE.txt": "4e5cfb9cbb9214bfa8fb55ef52735799dddd4206749e5386e0d6a12ce965891d",
+    "LICENSE.txt": "e21d8674cbe4b64a371cd530a0ea8fa4727c1de7005dc707e86b55ea8e6f14d7",
 }
 
 
@@ -57,7 +56,7 @@ def test_pulp_tables_are_aligned_numeric_and_complete() -> None:
     assert Y.iloc[0].tolist() == pytest.approx([253.0, 313.0, 28.2, 1.77, 0.33, 2.97, 6.9, 41.7])
 
 
-def test_pulp_metadata_records_selection_provenance_and_license() -> None:
+def test_pulp_metadata_uses_only_public_provenance() -> None:
     metadata = _metadata()
     assert metadata["schema_version"] == 1
     assert metadata["dataset"]["id"] == "pulp"
@@ -66,13 +65,23 @@ def test_pulp_metadata_records_selection_provenance_and_license() -> None:
         "n_predictors": 14,
         "n_responses": 8,
     }
-    assert metadata["source"]["upstream_file"] == "data/pulp.csv"
-    assert metadata["source"]["upstream_sha256"].startswith("e5aeb8da")
+    assert metadata["source"]["type"] == "publication-supplement"
     assert metadata["source"]["publication"]["doi"] == "10.1016/j.compchemeng.2025.109143"
     assert metadata["license"]["identifier"] == "CC-BY-4.0"
     assert metadata["sample_alignment"]["method"] == "positional"
     assert metadata["missing_values"] == {"predictors": "none", "responses": "none"}
-    assert "final k column" in metadata["preparation"]["description"]
+    assert "final k variable" in metadata["preparation"]["description"]
+    assert "script" not in metadata["preparation"]
+
+    serialized = yaml.safe_dump(metadata, sort_keys=True).lower()
+    for forbidden in (
+        "piplsr_v0.1",
+        "vishal agrawal",
+        "research archive",
+        "upstream_file",
+        "scripts/prepare_data",
+    ):
+        assert forbidden not in serialized
 
 
 def test_pulp_repository_files_match_metadata_checksums() -> None:
@@ -81,29 +90,6 @@ def test_pulp_repository_files_match_metadata_checksums() -> None:
     for filename, expected in EXPECTED_CHECKSUMS.items():
         actual = hashlib.sha256((_dataset_dir() / filename).read_bytes()).hexdigest()
         assert actual == expected
-
-
-def test_pulp_preparation_script_recreates_tables_from_source_shape(tmp_path: Path) -> None:
-    script = _root() / "scripts" / "prepare_data" / "prepare_pulp.py"
-    spec = importlib.util.spec_from_file_location("prepare_pulp", script)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-
-    X = pd.read_csv(_dataset_dir() / "X.csv")
-    Y = pd.read_csv(_dataset_dir() / "Y.csv")
-    source = pd.DataFrame(index=range(46), columns=module.SOURCE_COLUMNS, dtype=float)
-    source.iloc[:, :6] = 0.0
-    source.loc[:, module.PREDICTOR_COLUMNS] = X.to_numpy()
-    source.loc[:, module.RESPONSE_COLUMNS] = Y.to_numpy()
-    source.loc[:, "k"] = 0.0
-    source_path = tmp_path / "pulp.csv"
-    source.to_csv(source_path, index=False)
-
-    output_dir = tmp_path / "prepared"
-    module.prepare_pulp(source_path, output_dir, verify_source=False)
-    pd.testing.assert_frame_equal(pd.read_csv(output_dir / "X.csv"), X)
-    pd.testing.assert_frame_equal(pd.read_csv(output_dir / "Y.csv"), Y)
 
 
 def test_pulp_example_reads_files_and_fits(capsys: pytest.CaptureFixture[str]) -> None:

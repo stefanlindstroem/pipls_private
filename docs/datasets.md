@@ -116,9 +116,10 @@ block is unchanged when only `n_test` changes.
 ## Real-data boundary
 
 Real-data reading remains user-owned. Examples and reproduction scripts must show how `X` and `Y`
-are read and formed directly using ordinary NumPy, pandas, or domain-specific code. The project may
-track preparation scripts, provenance, licenses, and checksums for its own datasets, but no public
-registry, generic loader, or required metadata sidecar is part of the runtime API.
+are read and formed directly using ordinary NumPy, pandas, or domain-specific code. The project
+tracks public provenance, licenses, and analysis-facing transformations for its own datasets, but
+no public registry, generic loader, preparation-only script, or required metadata sidecar is part
+of the runtime API.
 
 
 ## Transparent real-data example
@@ -134,4 +135,8 @@ It is not parsed by the example or required by the estimator.
 
 ## Pulp real-data integration
 
-`datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses. The analysis-facing matrices are selected transparently from the supplied `PiPLSR_v0.1/data/pulp.csv` source table. `examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly, validates columns, numeric dtypes, row alignment, and missingness, then runs `PiPLSPathCV`. The example does not parse `metadata.yaml` or call a package loader.
+`datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses adapted
+from the public supplementary material identified by DOI `10.1016/j.compchemeng.2025.109143`.
+`examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly, validates columns, numeric
+dtypes, row alignment, and missingness, then runs `PiPLSPathCV`. The example does not parse
+`metadata.yaml` or call a package loader.

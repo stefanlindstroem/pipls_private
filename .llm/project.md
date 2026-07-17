@@ -52,8 +52,7 @@ preparation choices are resolved.
 ## Dataset and reproduction ownership
 
 - `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`,
-  and `metadata.yaml` layout. No generic runtime registry is required.
-- `scripts/prepare_data/`: deterministic dataset-specific preparation and verification.
+  and `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
 - `scripts/reproduce_paper/`: explicit paper-specific analysis workflows that read `X` and
   `Y` visibly.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden
@@ -73,8 +72,6 @@ preparation choices are resolved.
 - `.llm/dataset_layout.md`: normative committed-dataset file and metadata convention.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
 - `docs/decisions/`: accepted design records.
-- `docs/publication_repository_plan.md`: broad historical architecture and publication rationale;
-  current accepted decisions may narrow older proposals.
 
 ## Architectural invariants
 

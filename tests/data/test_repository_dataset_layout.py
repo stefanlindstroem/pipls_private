@@ -71,3 +71,20 @@ def test_all_repository_dataset_integrity_hashes_are_current() -> None:
         for filename, expected in checksums.items():
             actual = hashlib.sha256((data_dir / filename).read_bytes()).hexdigest()
             assert actual == expected
+
+
+def test_repository_dataset_assets_do_not_expose_private_sources() -> None:
+    forbidden = (
+        "piplsr_v0.1",
+        "vishal agrawal",
+        "research archive",
+        "scripts/prepare_data",
+    )
+    for data_dir in _dataset_directories():
+        for filename in ("metadata.yaml", "README.md", "LICENSE.txt"):
+            path = data_dir / filename
+            if not path.exists():
+                continue
+            text = path.read_text(encoding="utf-8").lower()
+            for fragment in forbidden:
+                assert fragment not in text, f"{path} exposes private source detail: {fragment}"

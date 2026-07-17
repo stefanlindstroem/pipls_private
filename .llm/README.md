@@ -27,8 +27,6 @@ The principal navigation documents are:
 9. `data_io.md` — transparent real-data input and example contract.
 10. `dataset_layout.md` — normative `X.csv`/`Y.csv`/`metadata.yaml` convention for committed real datasets.
 11. `development.md` — coding, testing, documentation, dependency, and patch requirements.
-12. `docs/publication_repository_plan.md` — broad historical design and publication architecture;
-    consult current state and accepted decisions before treating a proposal there as active.
 
 Git history, tests, and implemented behavior are evidence of what currently exists. Strategy and
 plans describe intended work. A conflict must be surfaced and resolved explicitly.
@@ -49,8 +47,7 @@ First inspect `.llm/SNAPSHOT_INFO`, then read:
 9. the affected source, tests, and user-facing documentation.
 
 Confirm that source and tests agree with the claimed state. Do not silently rely on remembered
-chat context, old patch descriptions, or proposals in the publication plan that were later
-narrowed. Surface any conflict before implementation.
+chat context or old patch descriptions. Surface any conflict before implementation.
 
 Do not implement work assigned to a later strategy phase unless the project owner explicitly
 changes the sequence. Routine work should not require the manuscript because `theory.md` and the

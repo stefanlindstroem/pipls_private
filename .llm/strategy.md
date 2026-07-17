@@ -2,14 +2,10 @@
 
 ## Status and purpose
 
-This is the operational implementation strategy for the repository. It converts the detailed
-publication plan in `docs/publication_repository_plan.md` into small, testable increments that
-can be maintained during LLM-assisted development.
-
-The detailed publication plan records the complete intended architecture and scientific
-rationale. This file records the current phase, the next admissible increment, and the
-maintenance rules used for day-to-day development. When the two documents disagree, stop and
-resolve the discrepancy explicitly rather than silently choosing one.
+This is the operational implementation strategy for the repository. It records the accepted
+architecture as small, testable increments that can be maintained during LLM-assisted
+development. Current decision records and normative `.llm` contracts replace private or historical
+planning materials as the maintained source of project intent.
 
 ## Ownership
 
@@ -291,16 +287,17 @@ and the roadmap now proceeds directly to one explicit real-dataset integration p
 
 Migrate and validate one dataset per coherent increment. Every committed dataset uses
 comma-delimited `X.csv`, comma-delimited `Y.csv`, and a consistent documentary `metadata.yaml` as
-defined in `.llm/dataset_layout.md`. Record source, citation, license, redistribution decision,
-preparation choices, shapes, columns, row ordering, missing-value policy, and integrity hashes.
-Keep preparation deterministic, but make the analysis example read `X` and `Y` directly with
-ordinary NumPy or pandas code. Do not introduce a generic registry or loader. Defer Corn
-reconstruction until its preprocessing choices are explicitly fixed.
+defined in `.llm/dataset_layout.md`. Record only public or included sources, citation, license,
+redistribution decision, preparation choices, shapes, columns, row ordering, missing-value policy,
+and integrity hashes. Make the analysis example read `X` and `Y` directly with ordinary NumPy or
+pandas code. Do not introduce a generic registry or loader, private-source references, or
+preparation-only scripts. Defer Corn reconstruction until its preprocessing choices are explicitly
+fixed; Corn will expose its public raw-data reading and analysis-relevant preprocessing.
 
 Current status: **underway**. Linnerud establishes the layout reference. Pulp is the second
-integration: 14 fiber-property predictors and eight responses selected explicitly from the supplied
-PiPLSR_v0.1 source table, documented under CC BY 4.0, and read directly by a path-search example.
-No runtime loader or metadata requirement for model fitting was added.
+integration: 14 fiber-property predictors and eight responses adapted from public supplementary
+material, documented under CC BY 4.0, and read directly by a path-search example. No runtime loader,
+metadata requirement, private archive reference, or internal preparation script is exposed.
 
 ### Phase E4: benchmark fixtures
 
@@ -333,11 +330,12 @@ Current status: **planned**.
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
 dataset. Linnerud and pulp are completed transparent reference integrations and file-layout
-examples. A manuscript dataset may follow only when source, citation, licensing, redistribution,
-row alignment, and scientific preparation are resolved. Require the standard repository metadata
-file, but do not add a public registry, generic loader, metadata-driven runtime path, implicit
-download, or hidden example I/O utility. Corn remains deferred until its preprocessing
-choices are resolved.
+examples. A manuscript dataset may follow only when public source, citation, licensing,
+redistribution, row alignment, and scientific preparation are resolved. Require the standard
+repository metadata file, but do not add a public registry, generic loader, metadata-driven runtime
+path, implicit download, hidden example I/O utility, private source reference, or preparation-only
+script. Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data
+reading and preprocessing must be public and explicit.
 
 ## Maintenance protocol
 

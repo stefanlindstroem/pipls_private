@@ -8,7 +8,7 @@ scope, and next admissible increment. Update it whenever a patch changes a phase
 supported composition boundary, or roadmap order.
 
 A new chat should read this file before proposing implementation work. Do not infer current state
-from an earlier conversation, an old patch, or the historical publication plan alone.
+from an earlier conversation, an old patch, or superseded planning material alone.
 
 ## Implemented boundary
 
@@ -95,8 +95,8 @@ Additional fixed decisions:
 ## Current next increment
 
 Phase E3 is underway. The repository now contains two transparent integrations: the small
-BSD-licensed Linnerud reference dataset and the CC BY 4.0 pulp dataset from the supplied
-PiPLSR_v0.1 archive. Both use `X.csv`, `Y.csv`, and `metadata.yaml`; their examples read only the
+BSD-licensed Linnerud reference dataset and the CC BY 4.0 pulp dataset adapted from public
+supplementary material. Both use `X.csv`, `Y.csv`, and `metadata.yaml`; their examples read only the
 two comma-delimited model tables explicitly.
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
@@ -104,8 +104,10 @@ dataset after its source, citation, license, redistribution, and scientific prep
 are resolved. Linnerud and pulp are the current layout and transparency references. E3 is performed one dataset at a time. Each dataset
 patch must:
 
-1. establish source, citation, license, redistribution status, and preparation choices;
-2. add deterministic preparation under `scripts/prepare_data/` when conversion is needed;
+1. establish a public or included source, citation, license, redistribution status, and
+   preparation choices;
+2. exclude private archive names, inaccessible paths, and preparation-only scripts from committed
+   materials;
 3. produce comma-delimited `X.csv`, `Y.csv`, and a conforming `metadata.yaml`;
 4. add an example or reproduction script that reads predictors `X` and response `Y` explicitly
    using ordinary NumPy or pandas code;
@@ -114,8 +116,9 @@ patch must:
 7. avoid a public registry, generic loader, metadata-driven runtime path, implicit download, or
    hidden preprocessing utility.
 
-Do not begin the Corn reconstruction until its unresolved preprocessing choices are fixed. Do not
-claim manuscript reproduction from the Linnerud reference example.
+Do not begin the Corn reconstruction until its unresolved preprocessing choices are fixed. When
+Corn is added, expose its public raw-data reading and analysis-relevant preprocessing to users. Do
+not claim manuscript reproduction from the Linnerud reference example.
 
 ## Subsequent roadmap
 
@@ -141,13 +144,10 @@ Use this order when sources disagree:
 3. normative `.llm/mathematics.md`, `.llm/numerical_contracts.md`, `.llm/public_api.md`,
    `.llm/data_io.md`, and `.llm/dataset_layout.md`;
 4. source and tests as evidence of implemented behavior;
-5. this current-state handoff and `.llm/strategy.md`;
-6. `docs/publication_repository_plan.md` as the broad historical architecture and rationale.
+5. this current-state handoff and `.llm/strategy.md`.
 
-The publication plan contains proposals that were narrowed or superseded during implementation.
-Do not revive them without checking this file and the accepted decisions. When documentation,
-tests, and implementation conflict, stop, identify the exact conflict, and resolve it in the same
-patch or ask the project owner for a scientific/public-API decision.
+When documentation, tests, and implementation conflict, stop, identify the exact conflict, and
+resolve it in the same patch or ask the project owner for a scientific/public-API decision.
 
 ## Fresh-chat startup checklist
 

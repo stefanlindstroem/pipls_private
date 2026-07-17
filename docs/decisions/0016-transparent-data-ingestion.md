@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted before the first real-dataset migration.
+Accepted before the first real-dataset migration; clarified by Decision 0020.
 
 ## Context
 
@@ -20,9 +20,9 @@ contract and expanding the package into general data-management infrastructure.
 - Examples and paper-reproduction scripts read data, align rows, select columns, and form `X` and
   `Y` explicitly in the script using ordinary NumPy, pandas, or domain-specific user code.
 - Package or example helper functions must not hide analysis-time data reading.
-- Dataset-specific deterministic preparation may live under `scripts/prepare_data/` and may use
-  provenance files or checksums for repository reproducibility.
 - Repository provenance assets do not become runtime requirements for external users.
+- Committed dataset documentation uses only public or included sources; private development
+  lineage and preparation-only scripts remain outside the public repository.
 - No generic public registry or real-data loader is planned.
 
 ## Consequences
@@ -31,4 +31,5 @@ contract and expanding the package into general data-management infrastructure.
   system.
 - Examples teach the same transparent workflow users are expected to follow.
 - Real-dataset patches remain dataset-specific and reviewable.
-- Preparation reproducibility and analysis-time simplicity are maintained as separate concerns.
+- Public provenance and analysis-time simplicity are maintained without exposing internal project
+  inputs.
