@@ -158,9 +158,11 @@ implemented independently:
 
 The first separately reviewed real-data smoke check is also implemented in
 `benchmarks/pulp_path_smoke.py`. It reads `datasets/pulp/X.csv` and `Y.csv` directly with pandas,
-fits the ordinary public `PiPLSPathCV` workflow, verifies complete ordered five-fold OOF output, and
-writes one row containing selected ranks plus explicitly named selection-conditioned diagnostics.
-Those diagnostics are not described as independent-test or unbiased post-selection performance.
+fits the public `PiPLSPathCV` workflow with the complete 14-rank predictor interval made explicit,
+verifies complete ordered five-fold OOF output, and writes one row containing selected ranks plus
+explicitly named selection-conditioned diagnostics. The explicit maximum avoids applying the
+conservative default rank rule to this small real dataset. Those diagnostics are not described as
+independent-test or unbiased post-selection performance.
 
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
 ignored and are excluded from snapshots. Software versions, execution controls, timings, and

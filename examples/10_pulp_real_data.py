@@ -53,8 +53,12 @@ if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in X.dtypes):
 if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
     raise TypeError("All response columns must be numeric.")
 
+# Pulp has only 14 predictors, so search the complete predictor-rank range.
+# The default samples-per-rank rule is intentionally conservative and would cap
+# this small-data search at rank 4.
 search = PiPLSPathCV(
     n_components_values=[1, 2, 3, 4],
+    max_predictor_rank=X.shape[1],
     search_method="auto",
     cv=5,
     return_oof_predictions=True,

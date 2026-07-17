@@ -250,6 +250,7 @@ X = pd.read_csv("datasets/pulp/X.csv")
 Y = pd.read_csv("datasets/pulp/Y.csv")
 search = PiPLSPathCV(
     n_components_values=[1, 2, 3, 4],
+    max_predictor_rank=X.shape[1],
     search_method="auto",
     cv=5,
     return_oof_predictions=True,
@@ -258,8 +259,11 @@ search = PiPLSPathCV(
 ```
 
 No loader, metadata parser, external preprocessing, method comparison, or artificial train/test
-split is added. Model centering and scaling are learned separately in every candidate training
-fold, and the selected estimator is refitted on all supplied rows.
+split is added. Pulp has only 14 predictors, so the example explicitly sets the maximum searched
+predictor rank to `X.shape[1]`. This avoids the conservative default samples-per-rank rule, which
+would restrict this five-fold small-data search to rank 4 and would not represent the intended Pulp
+path. Model centering and scaling are learned separately in every candidate training fold, and the
+selected estimator is refitted on all supplied rows.
 
 The output is `benchmarks/results/pulp_path_smoke.csv` with one row and exactly these columns:
 

@@ -134,9 +134,11 @@ measure runtime.
 
 ## Pulp path-selection smoke check
 
-`pulp_path_smoke.py` follows the ordinary package-user workflow: it reads the public Pulp `X.csv`
-and `Y.csv` tables directly with pandas and fits adaptive `PiPLSPathCV` over component counts 1
-through 4 with five-fold CV and ordered OOF predictions.
+`pulp_path_smoke.py` follows an explicit package-user workflow: it reads the public Pulp
+`X.csv` and `Y.csv` tables directly with pandas and fits adaptive `PiPLSPathCV` over component
+counts 1 through 4 with five-fold CV and ordered OOF predictions. Because Pulp has only 14
+predictors, the script sets `max_predictor_rank=X.shape[1]` so the adaptive search can examine the
+complete predictor-rank interval rather than the conservative default rank bound.
 
 Run it from the repository root after installing the data dependencies:
 

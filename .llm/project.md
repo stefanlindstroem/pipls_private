@@ -23,8 +23,9 @@ The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, a
 navigation now describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts and the
-first separately reviewed real-data smoke check for the Pulp path-selection workflow. Its one-row
-CSV uses explicit `selection_conditioned_` diagnostic names. A high-dimensional real-data question
+first separately reviewed real-data smoke check for the Pulp path-selection workflow. It makes
+the complete 14-rank predictor interval explicit, and its one-row CSV uses
+`selection_conditioned_` diagnostic names. A high-dimensional real-data question
 is next under separate review. No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership

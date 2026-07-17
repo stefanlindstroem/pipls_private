@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Correct the Pulp example and smoke check to make all 14 predictor ranks available explicitly;
+  the conservative default samples-per-rank rule restricted the previous small-data search to rank
+  4 and produced a misleading validation result.
 - Add the transparent Pulp path-selection smoke check using direct pandas `X.csv`/`Y.csv` reading,
   the ordinary public `PiPLSPathCV` workflow, complete ordered five-fold OOF reporting, and a
   one-row CSV whose validation diagnostics are explicitly labeled selection-conditioned.

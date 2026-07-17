@@ -54,6 +54,7 @@ def test_path_search_uses_public_selection_and_complete_ordered_oof_output() -> 
         search = BENCHMARK.fit_search(X, Y)
 
     report = search.validation_report_
+    assert search.max_predictor_rank_ == X.shape[1]
     assert search.best_n_components_ == search.best_params_["n_components"]
     assert search.best_predictor_rank_ == search.best_params_["predictor_rank"]
     assert search.best_n_components_ == search.best_pipls_.n_components
