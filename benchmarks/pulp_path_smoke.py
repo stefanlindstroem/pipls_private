@@ -43,6 +43,7 @@ def fit_search(X: pd.DataFrame, Y: pd.DataFrame) -> PiPLSPathCV:
 
     return PiPLSPathCV(
         n_components_values=N_COMPONENTS_VALUES,
+        samples_per_predictor_rank=4.0,
         return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)
