@@ -32,9 +32,10 @@ This index is navigation, not a substitute for those records.
 | `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction stays downstream; future block-aware API design is deferred |
 | `0025-model-internal-standardization-boundary.md` | current versus future scaling | estimator centering/scaling is current and fold-local; only future block-aware variants are deferred |
 | `0026-package-navigation-cleanup.md` | public repository navigation | remove paper placeholders and organize entry points around the installable software product |
-| `0027-synthetic-benchmark-contract.md` | lightweight package validation | versioned synthetic scenarios, PLS comparison, metrics, tiers, result schema, and conservative tolerance policy |
-| `0028-synthetic-ci-benchmark-runner.md` | executable lightweight validation | manifest-driven CI runner, deterministic metric checks, and bounded parallel execution |
-| `0029-human-and-machine-readable-results.md` | benchmark result usability | flat UTF-8 CSV for tabular outputs, explicit column schema, and no nested output without demonstrated need |
+| `0027-synthetic-benchmark-contract.md` | earlier broad synthetic benchmark contract | historical manifest/schema design superseded by Decision 0030 |
+| `0028-synthetic-ci-benchmark-runner.md` | earlier broad CI runner | historical implementation removed by Decision 0030 |
+| `0029-human-and-machine-readable-results.md` | benchmark result usability | CSV principle retained; universal wide schema superseded by Decision 0030 |
+| `0030-focused-benchmark-design.md` | focused benchmark questions | one question, one script, and one minimal CSV output per benchmark |
 
 ## Accepted clarifications after earlier proposals
 
@@ -76,9 +77,8 @@ plan contains an earlier or more general proposal:
 - the version-1 synthetic package benchmark uses ordinary PLS as its sole external comparator,
   separates oracle model validation from Pi-PLS selection validation, and freezes no predictive or
   performance claim before calibration;
-- the CI benchmark runner is repository-local, manifest-driven, schema-valid, and repeatable apart
-  from descriptive resource timings; its primary output is flat CSV for direct human and machine use;
-  standard and performance tiers remain unimplemented;
+- the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
+  benchmarks now use one readable script and one minimal CSV output per user-facing question;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

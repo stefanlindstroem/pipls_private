@@ -21,9 +21,10 @@ Phases A through E3 are implemented. The current public surface includes `PiPLSR
 
 The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
 navigation now describes the installable package, API, examples, datasets, validation, and releases.
-The versioned synthetic benchmark contract and its small deterministic CI runner are implemented
-under `benchmarks/`. Standard/performance execution and any frozen fixtures remain later work. No
-block-aware scaling API is designed or scheduled.
+The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
+The benchmark layer now has an accepted focused plan: implement one question-specific benchmark at
+a time, beginning with fixed-structure recovery. No block-aware scaling API is designed or
+scheduled.
 
 ## Runtime ownership
 
@@ -52,8 +53,8 @@ block-aware scaling API is designed or scheduled.
   protocols.
 - `tests/estimator_checks/`: applicable scikit-learn common estimator checks.
 - `tests/regression/`: frozen comparisons with trusted implementations.
-- `tests/benchmarks/`: versioned manifest/schema validation plus CI runner behavior and numerical
-  repeatability checks; future frozen fixtures require separate review.
+- `tests/benchmarks/`: focused benchmark behavior and output-contract tests after each benchmark is
+  implemented; future frozen fixtures require separate review.
 - `tests/test_repository_seed.py`: `.llm` navigation, snapshot layout, and workflow invariants.
 
 ## Product-asset ownership
@@ -62,8 +63,9 @@ block-aware scaling API is designed or scheduled.
   `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
   utilities or publication pipelines.
-- `benchmarks/`: versioned lightweight package-validation manifests, flat CSV result schemas, and
-  repository-local runners. Generated outputs are ignored; synthetic validation is primary.
+- `benchmarks/`: focused lightweight package-validation plans and, incrementally, one readable
+  repository-local script per benchmark. Generated CSV outputs are ignored; synthetic validation is
+  primary.
 - `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,
   and accepted decision records.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
@@ -81,8 +83,8 @@ block-aware scaling API is designed or scheduled.
 - `.llm/public_api.md`: public constructors, methods, outputs, defaults, and exclusions.
 - `.llm/data_io.md`: transparent real-data reading and example policy.
 - `.llm/dataset_layout.md`: normative committed-dataset file and metadata convention.
-- `.llm/benchmarking.md`: normative benchmark scenarios, metrics, runtime tiers, results, and update
-  policy.
+- `.llm/benchmarking.md`: normative benchmark questions, minimal outputs, interpretation boundaries,
+  and implementation order.
 - `.llm/testing.md`: durable testing boundary.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
 - `docs/decisions/`: accepted design records.

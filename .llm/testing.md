@@ -45,10 +45,10 @@ technical readability, not exact scientific values, row examples, column lists, 
 metadata checksums. Git history, review, public provenance, and the dataset documentation remain
 the source of record for those contents.
 
-Package benchmark manifests and result schemas are executable, versioned contracts rather than
-living documentary metadata. Tests may therefore validate their required fields, references, rank
-constraints, metric domains, schema structure, CSV header order, and typed round-trip behavior when
-an accepted benchmark decision defines those semantics.
+Focused package benchmarks are executable contracts once implemented. Tests may validate the
+question-specific script, deterministic generation, finite metrics, metric domains, exact minimal
+CSV header, and repeatability of scientific values. Do not require a universal manifest, universal
+schema, or shared wide result row across unrelated benchmarks.
 
 Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
 assertions require an explicit decision record describing why the value is stable, what software

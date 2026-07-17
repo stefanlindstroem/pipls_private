@@ -1,6 +1,7 @@
 # Decision 0028: Synthetic CI benchmark runner
+> Status: superseded in its universal manifest/runner/schema consequences by Decision 0030.
 
-Status: accepted and implemented.
+Historical status: accepted and implemented before Decision 0030.
 
 ## Context
 

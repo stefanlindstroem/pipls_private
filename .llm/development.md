@@ -49,11 +49,12 @@
   structural consistency over phrase matching or copied field values.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
-- Benchmark runners must consume versioned manifests, emit schema-conforming records, preserve
-  fold-local standardization, and keep generated outputs out of Git unless a decision explicitly
-  freezes a narrow fixture.
-- Design files and command outputs for both humans and machines. When records are naturally tabular,
-  prefer flat UTF-8 CSV with an explicit versioned column schema over nested serialization.
+- Design each benchmark around one explicit user-facing question. Give it one readable script and
+  one minimal CSV header; do not recreate a universal manifest, universal schema, or broad runner.
+- Preserve fold-local standardization and keep generated outputs out of Git unless a decision
+  explicitly freezes a narrow fixture.
+- Design files and command outputs for both humans and machines. When results are naturally tabular,
+  prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

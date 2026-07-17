@@ -112,12 +112,11 @@ See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datase
 
 ## Lightweight benchmarks
 
-The repository defines a versioned synthetic package-validation contract covering prediction,
-Pi-PLS rank selection, latent-subspace recovery, solver consistency, and representative runtime.
-Ordinary PLS is the sole external comparator in version 1; publication-scale OLS/CCA comparisons
-and figure generation remain outside this repository. The deterministic CI tier can be run with
-`make benchmark-ci`; generated flat CSV results remain ignored and no broad benchmark results are
-committed.
+The repository plans a small sequence of focused synthetic benchmarks. Each benchmark answers one
+programming-user question and writes one minimal CSV table: fixed-structure recovery, rank
+selection, Pi-PLS versus ordinary PLS under predictor-specific nuisance, and full-versus-randomized
+solver consistency. Publication-scale OLS/CCA comparisons and figure generation remain outside this
+repository.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).
 
@@ -148,7 +147,7 @@ support.
 - `docs/`: user and developer documentation;
 - `examples/`: concise executable workflows;
 - `datasets/`: transparent redistributable reference datasets;
-- `benchmarks/`: versioned package-validation manifests, schemas, and repository-local runners;
+- `benchmarks/`: focused package-validation plans, scripts, and ignored CSV outputs;
 - `tests/`: numerical, API, integration, and repository tests;
 - `.llm/`: tracked maintenance contracts for LLM-assisted development, excluded from the package.
 

@@ -65,15 +65,16 @@ Package benchmarks are lightweight validation assets, not publication claims. Sy
 should be primary because ranks, latent structure, signal strengths, noise, and subspaces are known.
 Reference real datasets provide representative smoke checks and usage validation.
 
-Benchmarks should protect such questions as:
+Benchmarks should protect one question at a time, such as:
 
-- recovery of known synthetic structure;
-- prediction and rank-selection behavior;
-- consistency between exact and randomized numerical paths;
-- comparison with ordinary PLS under controlled conditions;
-- runtime and memory regressions relevant to package users.
+- recovery of known synthetic structure by a fixed Pi-PLS model;
+- Pi-PLS rank-selection behavior;
+- paired prediction comparison with ordinary PLS under predictor-specific nuisance;
+- consistency between exact and randomized numerical paths.
 
-Large experiment grids, final paper numbers, and manuscript plotting stay outside this repository.
+Each question receives its own small script and minimal CSV output. Runtime and memory are separate
+questions and are not added to scientific result tables by default. Large experiment grids, final
+paper numbers, and manuscript plotting stay outside this repository.
 
 ## Current model standardization and deferred block-aware variants
 
@@ -116,8 +117,9 @@ and its own small reviewable increments.
 The package-product boundary and public navigation cleanup are complete. The repository no longer
 contains paper-reproduction placeholders or promises to implement manuscript workflows.
 
-The versioned lightweight synthetic benchmark contract and its deterministic CI runner are now
-implemented without broad frozen results or publication claims. The next benchmark work may add
-opt-in standard/performance execution under separate review. None of this includes a block-aware
-standardization API design; future block-aware variants remain deferred for months or until the
-project owner explicitly starts a separate phase.
+The first universal synthetic manifest, result schema, and broad CI runner were removed after owner
+review because they combined unrelated questions and produced an unnecessarily wide table. The
+accepted next direction is a sequence of focused benchmarks with minimal per-question CSV outputs,
+beginning with fixed-structure recovery. None of this includes a block-aware standardization API
+design; future block-aware variants remain deferred for months or until the project owner explicitly
+starts a separate phase.

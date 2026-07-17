@@ -2,161 +2,158 @@
 
 ## Purpose
 
-Package benchmarks protect the long-lived `pipls` software product. They are smaller and more
-stable than publication experiments and answer questions relevant to programming users: prediction,
-selection behavior, recovery of known structure, numerical consistency, and representative
-resource use.
+Package benchmarks must answer narrow questions that matter to programming users. A benchmark is
+not a general experiment runner, publication simulation grid, or infrastructure exercise. Each
+benchmark must have one stated question, one controlled setup, and one small result table whose
+columns are needed to answer that question.
 
-This file is normative for benchmark design. The machine-readable suite contract is
-`benchmarks/manifests/synthetic-v1.yaml`; generated record structure is defined by
-`benchmarks/schema/result-v2.schema.json`.
+This file is normative for benchmark design. No benchmark implementation should be added until its
+question, comparison, metrics, output columns, and interpretation are accepted separately.
 
-## Scope boundary
+## Design rule: one benchmark, one question
 
-The package benchmark layer may contain:
+Every benchmark must define:
 
-- controlled deterministic synthetic scenarios;
-- ordinary PLS as the nearest practical comparator;
-- small real-data smoke checks after the synthetic layer is established;
-- versioned manifests, runners, schemas, and narrowly frozen package-validation fixtures;
-- opt-in timing and memory measurements.
+1. the user-facing question;
+2. the synthetic structure varied and held fixed;
+3. the fitted method or paired methods;
+4. the minimum metrics needed to answer the question;
+5. one dedicated CSV output with no unrelated columns;
+6. how the result should and should not be interpreted.
 
-It must not contain:
+Do not create a universal row schema, a universal manifest, or a single runner that combines
+prediction, rank selection, subspace recovery, solver consistency, software versions, parallelism,
+and timings. Those are different questions and must remain separate.
 
-- complete publication simulation grids;
-- manuscript figures or tables;
-- paper-only OLS or CCA comparison programs;
-- cached publication outputs;
-- claims of scientific superiority inferred from a small package fixture.
+CSV remains the default for tabular output. Column names must be explicit, values must be directly
+readable with pandas, R, spreadsheet software, or a text editor, and empty columns must not be added
+for metrics that do not apply.
 
-OLS or CCA may enter only through a separate decision when a narrowly defined package-level identity
-or limiting case cannot be protected otherwise.
+## Common scientific boundary
 
-## Data generation and leakage boundary
+Use `pipls.datasets.make_pipls_train_test` for controlled synthetic data. Training and test blocks
+share latent loadings, strengths, and observed-variable scales but have independent scores and
+noise. A seed identifies the generated problem.
 
-Use `pipls.datasets.make_pipls_train_test`. The generated train and test blocks share latent
-loadings, strengths, and observed-variable scales, while their scores and noise realizations are
-independent. A benchmark seed determines the complete generated problem.
+Do not fit centering, scaling, or another learned transform before model fitting. Pi-PLS and
+ordinary PLS learn their statistics from the training data supplied to each fit. Any inner
+cross-validation must fit the complete candidate separately within each training fold and refit the
+selected candidate on the complete generated training block.
 
-Do not center, scale, or otherwise learn a transform before model fitting. Pi-PLS and ordinary PLS
-fit their own training means and scales. Inner cross-validation must clone and fit the complete
-candidate within every training fold, then refit the selected candidate on the complete generated
-training block. Future block-aware scaling variants must obey the same boundary but are not designed
-by this benchmark contract.
+Ordinary `PLSRegression` is the only planned external comparator because it is the nearest
+programming-user baseline. OLS, CCA, publication grids, figure generation, and manuscript claims
+remain outside this repository.
 
-## Benchmark tracks
+## Planned focused benchmarks
 
-### Fixed-parameter comparison
+### 1. Fixed-structure recovery
 
-Use synthetic truth to set:
+**Question:** When the true shared dimension and predictor-signal rank are supplied, does fixed
+Pi-PLS recover the intended latent subspaces and predict independent responses?
 
-- `n_components = n_shared` for Pi-PLS and ordinary PLS;
-- `predictor_rank = n_shared + n_predictor_specific` for fixed Pi-PLS.
+**Method:** fixed `PiPLSRegression` only.
 
-This oracle track isolates model and numerical behavior. It is not a real-data tuning prescription.
+**Initial scenarios:** shared-only signal and predictor-specific nuisance signal.
 
-### Pi-PLS selection validation
+**Output:** `benchmarks/results/fixed_structure_recovery.csv`.
 
-Use `PiPLSPathCV(search_method="auto")` with the public rank rule, five shuffled K-fold splits, and a
-seeded splitter. Record selected dimensions and external-test prediction. Compare selected ranks
-with declared ranks descriptively; finite noisy samples and the support rule need not recover them
-exactly.
+Required columns:
 
-### Solver consistency and resources
+- `scenario`;
+- `seed`;
+- `test_mse`;
+- `predictor_shared_capture`;
+- `predictor_signal_capture`;
+- `response_shared_capture`.
 
-Compare fixed full and randomized predictor SVD only in the opt-in performance tier. Same-seed
-randomized runs must be deterministic. Full-versus-randomized differences are recorded but do not
-become CI gates until separately calibrated.
+No selected-rank fields, software versions, or timings belong in this table.
 
-## Metrics
+### 2. Rank selection
 
-Prediction metrics:
+**Question:** Does `PiPLSPathCV(search_method="auto")` select reasonable shared and predictor ranks
+when those ranks are known from the generator?
 
-- external-test response-standardized MSE using response scales learned from the generated training
-  block;
-- uniform-average external-test R².
+**Method:** adaptive Pi-PLS path selection only.
 
-Selection metrics:
+**Output:** `benchmarks/results/rank_selection.csv`.
 
-- selected `n_components` and `predictor_rank`;
-- absolute deviation from `n_shared` and from
-  `n_shared + n_predictor_specific`.
+Required columns:
 
-Subspace metrics use projection overlap
+- `scenario`;
+- `seed`;
+- `true_n_components`;
+- `selected_n_components`;
+- `true_predictor_rank`;
+- `selected_predictor_rank`;
+- `test_mse`.
 
-$$
-\operatorname{capture}(U, V)
-= \frac{\lVert U^{\mathsf T}V\rVert_F^2}{\operatorname{rank}(U)},
-$$
+Subspace metrics, software versions, and timings are not part of this benchmark unless a later
+question specifically requires them.
 
-where `U` and `V` have orthonormal columns. Values lie in `[0, 1]` and are invariant to signs and
-within-subspace rotations.
+### 3. Predictor-nuisance comparison with PLS
 
-For a fitted estimator, transform raw synthetic predictor loadings `L_X` into core coordinates with
-`diag(feature_scale / x_scale_) @ L_X`; transform response loadings analogously with
-`diag(target_scale / y_scale_) @ L_Y`. Orthonormalize these transformed bases before comparing:
+**Question:** When predictor-specific variation increases, how does fixed Pi-PLS prediction compare
+with ordinary fixed-component PLS on the same generated train/test problem?
 
-- shared predictor truth with `decomposition_.P`;
-- complete predictor-signal truth with `decomposition_.Pi`;
-- shared response truth with `decomposition_.Q`.
+**Methods:** paired fixed Pi-PLS and `PLSRegression`, using the declared shared dimension. The Pi-PLS
+predictor rank uses the declared complete predictor-signal rank.
 
-Resource metrics are wall-clock fit and prediction time. Peak resident memory is optional and must
-be marked missing rather than estimated when unavailable.
+**Output:** `benchmarks/results/predictor_nuisance_comparison.csv`.
 
-## Runtime tiers
+Required columns:
 
-- **CI:** one seed and a small scenario subset; deterministic correctness only; no timing gate.
-- **Standard:** every scientific scenario across five fixed seeds; local or scheduled validation;
-  no cross-machine timing gate.
-- **Performance:** high-dimensional solver scenario across three seeds; hardware metadata required
-  when results are retained; no timing threshold without a hardware-specific policy.
+- `scenario`;
+- `seed`;
+- `pipls_test_mse`;
+- `pls_test_mse`;
+- `pipls_minus_pls_mse`.
 
-The expected runtime values in the manifest are planning budgets, not pass/fail assertions.
+Use a wide paired table because the comparison itself is the question. Do not add one row per method
+or unrelated latent metrics.
 
-## Implemented CI runner
+### 4. Solver consistency
 
-`benchmarks/run_synthetic.py` implements only the `ci` tier. It must consume the manifest, produce
-schema-valid flat CSV rows, and remain outside the public `pipls` namespace.
+**Question:** For a fixed high-dimensional Pi-PLS model, are full and randomized predictor SVD
+numerically consistent for the same generated data and seed?
 
-For adaptive path evaluation, use joblib threading across independent candidates and limit native
-linear-algebra libraries to one thread per candidate. Record these execution controls in resolved
-parameters. This prevents nested oversubscription without changing model semantics.
+**Methods:** fixed Pi-PLS with `svd_solver="full"` and `svd_solver="randomized"`.
 
-`make benchmark-ci` writes `benchmarks/results/synthetic-ci.csv`, which remains ignored. Tests may
-compare deterministic metrics across repeated runs, but must exclude fit time, prediction time, and
-optional memory. Standard and performance tiers remain unimplemented until separately reviewed.
+**Output:** `benchmarks/results/solver_consistency.csv`.
 
-## Result and tolerance policy
+Required columns:
 
-Write one flat CSV row per suite, tier, scenario, seed, and method. Record package versions,
-resolved parameters, metrics, status, and optional messages in named columns. Use empty cells for
-non-applicable or unavailable values. Generated results live under `benchmarks/results/` and are
-ignored by default.
+- `scenario`;
+- `seed`;
+- `prediction_relative_difference`;
+- `coefficient_relative_difference`.
 
-Tabular benchmark outputs must use a format that is comfortable for both humans and machines. CSV
-is the default because it opens directly in pandas, R, spreadsheet software, and text editors. A
-versioned machine-readable schema must define column order, types, null representation, and schema
-version. Nested JSON output requires a separately documented need that cannot be represented
-cleanly as a table.
+Timing does not belong in this benchmark. A future runtime benchmark must be designed separately
+with an explicit hardware and measurement question.
 
-The synthetic suite remains version 1; flat result-schema version 2 freezes only:
+## Output and reproducibility policy
 
-- exact same-seed synthetic array generation;
-- deterministic fit repeatability at `rtol=1e-12`, `atol=1e-12`;
-- finite required metrics;
-- subspace-capture range with `1e-12` numerical slack.
+Each benchmark owns its own script, scenario constants, tests, and CSV header. Prefer readable
+ordinary Python over generic orchestration. A small configuration file is acceptable only when it
+makes that benchmark clearer to both humans and machines.
 
-Prediction thresholds, rank-recovery rates, Pi-PLS-versus-PLS differences, timing expectations, and
-full-versus-randomized agreement are not frozen. A later fixture may freeze a value only with a
-decision record that states its meaning, tolerance, supported environments, and update procedure.
+Generated results remain under `benchmarks/results/` and are ignored by Git unless a later decision
+freezes a small package-validation fixture with a stated meaning, tolerance, and update procedure.
+The source commit, benchmark script, explicit seed, and package dependencies provide reproducibility;
+routine result tables need not repeat software versions or execution controls when those fields do
+not answer the benchmark question.
 
-## Versioning and updates
+Tests may verify deterministic generation, finite metrics, metric domains, exact CSV headers, and
+repeatability of scientific values. They must not freeze a claim that Pi-PLS outperforms PLS or that
+rank selection is exact until a separate calibrated acceptance decision exists.
 
-Treat manifests and result schemas as executable, versioned contracts rather than living narrative
-metadata. Compatible clarifications may update documentation. Any change to scenario definitions,
-seed sets, method semantics, metric formulas, or result fields requires either a new suite/schema
-version or an explicit compatibility decision.
+## Implementation sequence
 
-Never replace a benchmark fixture solely because a new result looks preferable. Recompute and
-review after an intentional algorithm, dependency, tolerance, or platform-policy change; record why
-an accepted frozen fixture changed.
+Implement the benchmarks one at a time in this order:
+
+1. fixed-structure recovery;
+2. rank selection;
+3. predictor-nuisance comparison with PLS;
+4. solver consistency.
+
+The first implementation patch must contain only fixed-structure recovery. Do not recreate the
+removed universal manifest, universal schema, or broad CI runner.

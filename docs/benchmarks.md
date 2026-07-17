@@ -1,103 +1,52 @@
 # Lightweight validation benchmarks
 
-`pipls` maintains small validation benchmarks for the software product. Their purpose is to make
-important numerical and user-facing behavior reviewable across releases, not to reproduce any one
-paper.
+`pipls` uses small synthetic benchmarks to make selected package behavior understandable across
+releases. They are designed for programming users, not for reproducing a scientific paper.
 
-## Synthetic benchmark contract
+## Focused design
 
-The versioned contract is stored in
-[`../benchmarks/manifests/synthetic-v1.yaml`](../benchmarks/manifests/synthetic-v1.yaml). It uses
-`pipls.datasets.make_pipls_train_test` so training and test observations share the same latent
-loadings and strengths but have independent score and noise realizations.
+Each benchmark answers one question and writes one small CSV file containing only the columns needed
+for that question. The package does not use a universal experiment table with columns for every
+method, metric, software version, execution control, and timing measurement.
 
-The named scenarios cover:
+The planned benchmark sequence is:
 
-- shared-only structure;
-- strong predictor-specific nuisance variation;
-- response-specific variation that cannot be predicted from `X`;
-- low-sample rank-bound behavior;
-- weak shared signal;
-- heterogeneous feature and response scales;
-- high-dimensional predictor-SVD behavior.
+### Fixed-structure recovery
 
-The contract defines three runtime tiers. The CI tier is small and deterministic. The standard tier
-covers all scenario families across several seeds. The performance tier is opt-in and records
-solver timing, optional memory use, and full-versus-randomized consistency without imposing
-cross-machine timing thresholds.
+Does fixed Pi-PLS recover known predictor and response subspaces and predict independent synthetic
+responses when the true model dimensions are supplied?
 
-## Running the CI tier
+The table will contain scenario, seed, test MSE, and three subspace-capture metrics.
 
-Install development dependencies and run:
+### Rank selection
 
-```bash
-make benchmark-ci
-```
+Does adaptive `PiPLSPathCV` choose reasonable shared and predictor ranks when the generator declares
+the truth?
 
-The repository-local runner reads the versioned manifest and writes
-`benchmarks/results/synthetic-ci.csv`. The file is ignored by Git. Each flat row is validated against
-the versioned result schema. The command currently implements only the CI tier; standard and
-performance execution remain later, opt-in work.
+The table will contain scenario, seed, true ranks, selected ranks, and test MSE.
 
-The runner parallelizes independent Pi-PLS path candidates with joblib threads and limits native
-linear-algebra work to one thread per candidate. This is an execution policy, not a fitted-model
-parameter or a timing guarantee.
+### Predictor-nuisance comparison
 
-## Methods and interpretation
+As predictor-specific nuisance variation increases, how does fixed Pi-PLS prediction compare with
+ordinary fixed-component `PLSRegression`?
 
-Fixed-parameter Pi-PLS and ordinary `PLSRegression` use the declared shared latent dimension. The
-fixed Pi-PLS diagnostic also uses the declared complete predictor-signal rank. This is an oracle
-validation setting: it isolates model behavior when synthetic truth is known and is not a claim
-that those parameters are available for real data.
+The table will contain paired Pi-PLS and PLS test MSE values and their difference.
 
-`PiPLSPathCV(search_method="auto")` is evaluated separately for package rank-selection behavior.
-Its selected dimensions are compared descriptively with the declared synthetic ranks. Exact rank
-recovery is not assumed for every finite noisy sample, especially when the public sample-support
-rank rule deliberately limits the admissible path.
+### Solver consistency
 
-Ordinary PLS is the only external comparator in contract version 1. OLS and CCA are not part of the
-package benchmark suite.
+For a fixed high-dimensional model, how closely do full and randomized predictor SVD agree?
 
-## Metrics
+The table will contain only prediction and coefficient relative differences.
 
-The contract records:
+## Interpretation boundary
 
-- test response-standardized mean squared error and uniform-average R²;
-- selected Pi-PLS dimensions and absolute deviations from declared ranks;
-- sign- and rotation-invariant capture of shared predictor, complete predictor-signal, and shared
-  response subspaces;
-- deterministic and full-versus-randomized numerical differences;
-- fit time, prediction time, and optional peak resident memory.
+Synthetic train and test blocks are generated independently from shared latent parameters. Models
+learn centering and optional scaling only from their training data; cross-validation learns those
+statistics independently within each fold.
 
-Subspace capture is computed in the fitted estimator's centered/scaled coordinates. Synthetic
-loading matrices are transformed by the observed-variable generator scales divided by the fitted
-training scales, orthonormalized, and compared through squared projection overlap. This preserves
-the current model-internal standardization contract.
+Ordinary PLS is the nearest package-user comparator. OLS, CCA, publication-scale simulations,
+figures, and scientific superiority claims remain outside this repository.
 
-## Reading the results
-
-The output is ordinary UTF-8 CSV with a header row. It can be opened directly in spreadsheet
-software or read without custom parsing:
-
-```python
-import pandas as pd
-
-results = pd.read_csv("benchmarks/results/synthetic-ci.csv")
-print(results.to_string(index=False))
-```
-
-The flat columns include identifiers, software versions, resolved model and CV parameters, metrics,
-status, and an optional message. Empty cells represent non-applicable or unavailable values.
-
-## Results and tolerances
-
-Generated records use CSV and the schema at
-[`../benchmarks/schema/result-v2.schema.json`](../benchmarks/schema/result-v2.schema.json). The
-schema fixes column order, types, null representation, and the result-schema version. Result files
-are not committed by default.
-
-Contract version 1 freezes exact generator repeatability, strict deterministic-fit repeatability,
-finite metric requirements, and the `[0, 1]` range of subspace-capture metrics. It does not freeze
-predictive superiority, exact selection rates, timing limits, or full-versus-randomized agreement
-thresholds. Those values require empirical calibration and a separate decision before becoming CI
-gates.
+Generated CSV files live under `benchmarks/results/` and are ignored by Git. Timings and software
+versions are not included automatically; they belong only in a separately designed benchmark whose
+question concerns runtime or compatibility.

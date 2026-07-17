@@ -344,37 +344,36 @@ Current status: **complete**. The paper-reproduction placeholders have been remo
 navigation now describes the installable package, user documentation, examples, datasets,
 validation, and release responsibilities.
 
-### Phase E4a: synthetic benchmark contract
+### Phase E4a: focused synthetic benchmark design
 
-Define lightweight package-validation scenarios using the deterministic synthetic generator before
-freezing numerical results.
+Define package benchmarks as separate user-facing questions rather than a universal experiment
+framework.
 
 Acceptance conditions:
 
-- controlled scenarios cover sample size, predictor dimension, response dimension, shared rank,
-  predictor-specific rank, response-specific rank, signal strengths, and noise;
-- metrics distinguish prediction, rank-selection behavior, subspace recovery, numerical
-  consistency, runtime, and memory where practical;
-- Pi-PLS is compared primarily with ordinary PLS under identical splits and preprocessing;
-- OLS or CCA appear only when they protect a package-level identity or limiting case;
-- seeds, runtime tiers, result schema, tolerances, and fixture-update rules are explicit;
-- full publication grids and figure generation remain outside the repository.
+- every benchmark states one question, controlled setup, method role, minimal metrics, dedicated CSV
+  output, and interpretation boundary;
+- fixed-structure recovery, rank selection, predictor-nuisance comparison with ordinary PLS, and
+  solver consistency remain separate benchmarks;
+- result columns are included only when they answer the benchmark question;
+- software versions, execution controls, timing, and memory are omitted unless the benchmark is
+  explicitly about compatibility or resources;
+- ordinary PLS is the sole planned external comparator;
+- OLS, CCA, publication grids, and figure generation remain outside the repository;
+- no universal manifest, universal schema, or broad runner is introduced.
 
-Current status: **complete**. The version-1 manifest defines seven synthetic scenario families,
-three deterministic runtime tiers, fixed Pi-PLS and ordinary PLS comparison roles, separate Pi-PLS
-path-selection validation, metrics, result schema, tolerance policy, and fixture-update rules. No
-broad result files or publication claims are frozen.
+Current status: **complete**. Decision 0030 removes the earlier universal manifest/schema/runner
+architecture and establishes one question, one script, and one minimal CSV output per benchmark.
 
-### Phase E4b: lightweight benchmark implementation
+### Phase E4b: focused benchmark implementation
 
-Implement a small deterministic CI tier from the accepted synthetic contract, then add
-representative real-dataset smoke checks. Store only package-validation expectations with documented
-update rules; do not convert the benchmark layer into a publication-result archive.
+Implement the accepted benchmarks one at a time so each patch remains scientifically and
+operationally reviewable.
 
-Current status: **underway**. The manifest-driven CI runner is implemented with deterministic
-scale expansion, schema-valid flat CSV records, fixed and adaptive Pi-PLS execution, ordinary PLS
-comparison, subspace metrics, bounded parallelism, and repeatability tests. Standard/performance
-tiers and frozen fixtures remain unimplemented.
+Current status: **planned**. The first patch is fixed-structure recovery only. It will use fixed
+Pi-PLS with generator-declared ranks and report scenario, seed, test MSE, and the three relevant
+subspace-capture metrics. Rank selection, PLS comparison, solver consistency, timings, and software
+metadata do not belong in that first output.
 
 ### Product documentation and release hardening
 
@@ -404,14 +403,14 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-The next benchmark patch may extend the existing runner to the opt-in `standard` and `performance`
-tiers, but only after reviewing runtime, hardware metadata, and full-versus-randomized comparison
-semantics. Keep generated outputs ignored and do not create cross-machine timing gates or freeze
-predictive claims.
+Implement the fixed-structure recovery benchmark only. Use fixed Pi-PLS with known generator ranks,
+write one minimal CSV table, and test deterministic scientific metrics. Do not add rank selection,
+ordinary PLS comparison, solver consistency, timings, software metadata, a generic manifest, a
+universal schema, real-data benchmark outputs, figures, OLS/CCA comparisons, or block-aware scaling
+APIs.
 
-Do not add real-data benchmark outputs, OLS/CCA comparisons, figures, or block-aware scaling APIs in
-that patch. Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data
-reading and preprocessing must be public and explicit.
+Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
+and preprocessing must be public and explicit.
 
 ## Maintenance protocol
 

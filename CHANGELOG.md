@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Replace the over-general synthetic benchmark manifest, universal schema, and broad CI runner with a focused benchmark plan: one user question and one minimal CSV output per benchmark.
 - Replace nested JSON Lines benchmark output with schema-versioned flat CSV so results are directly readable by humans and standard analysis tools while retaining a machine-validated column contract.
 - Add the manifest-driven synthetic CI benchmark runner with schema-valid JSON Lines output, deterministic scale expansion, fixed Pi-PLS and ordinary PLS comparison, adaptive path validation, subspace metrics, and repeatability tests.
 

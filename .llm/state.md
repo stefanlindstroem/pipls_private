@@ -13,7 +13,7 @@ material alone.
 
 ## Implemented boundary
 
-Phases A through E3, the E4a benchmark contract, and the E4b CI runner are complete and committed:
+Phases A through E3 are complete and committed. The first broad E4 benchmark implementation has been removed and replaced by an accepted focused benchmark plan:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -98,7 +98,7 @@ case, or public behavior.
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Publication assets | downstream repositories pin released `pipls` versions |
-| Synthetic benchmark contract | versioned manifest/schema under `benchmarks/`; ordinary PLS is the sole external comparator in version 1 |
+| Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
 
@@ -145,49 +145,50 @@ Until the owner starts a dedicated phase:
 - require every future learned scaling rule to fit inside its corresponding training fold and the
   final full-training refit.
 
-## Synthetic benchmark contract
+## Focused synthetic benchmark plan
 
-Phase E4a is complete. The accepted version-1 contract is documented in `.llm/benchmarking.md` and
-implemented as machine-readable assets under `benchmarks/`:
+Decision 0030 supersedes the earlier universal manifest, universal result schema, and broad CI
+runner. Those implementation assets have been removed. The accepted benchmark plan is documented
+in `.llm/benchmarking.md` and contains four independent questions:
 
-- seven named scenario families spanning sample size, predictor and response dimensions, latent
-  ranks, nuisance structure, signal strength, noise, scale heterogeneity, and scalable SVD;
-- deterministic CI, standard, and performance seed/runtime tiers;
-- fixed oracle Pi-PLS and ordinary PLS comparison plus separate adaptive Pi-PLS path validation;
-- prediction, selection, subspace-capture, numerical-consistency, timing, and optional memory
-  metrics;
-- flat UTF-8 CSV result rows with versioned column schema 2;
-- strict repeatability and metric-domain tolerances, while predictive, selection, solver-agreement,
-  and timing thresholds remain deliberately unfrozen.
+1. fixed-structure recovery by fixed Pi-PLS;
+2. adaptive Pi-PLS rank selection;
+3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
+4. full-versus-randomized solver consistency.
 
-The contract preserves estimator-owned fold-local centering/scaling and excludes OLS, CCA,
-publication grids, and figure generation.
+Each benchmark owns one readable script and one minimal CSV output. Software versions, execution
+controls, timings, and unrelated metrics are omitted unless they answer that benchmark's explicit
+question. Generated outputs remain ignored. OLS, CCA, publication grids, and figure generation
+remain outside the repository.
 
 ## Current next increment
 
-Plan the next **Phase E4b opt-in benchmark execution increment**:
+Implement only the first focused benchmark: **fixed-structure recovery**.
 
-- extend the existing manifest-driven runner to the `standard` and `performance` tiers only after
-  confirming their runtime and output policy;
-- preserve the flat CSV schema and ignored generated-result boundary;
-- keep timing descriptive and hardware-aware rather than a cross-machine CI gate;
-- calibrate full-versus-randomized comparison fields before considering any frozen tolerance;
-- do not add real-data benchmark claims, OLS/CCA comparators, figures, or block-aware scaling APIs.
+The patch should:
 
-The CI runner is already complete: it executes nine manifest-defined records, writes directly
-inspectable `synthetic-ci.csv`, validates the flat schema, checks deterministic numerical metrics,
-and excludes resource timings from repeatability gates.
+- use fixed `PiPLSRegression` with generator-declared `n_components` and predictor-signal rank;
+- cover a shared-only scenario and a predictor-specific nuisance scenario;
+- write `benchmarks/results/fixed_structure_recovery.csv`;
+- report only `scenario`, `seed`, `test_mse`, `predictor_shared_capture`,
+  `predictor_signal_capture`, and `response_shared_capture`;
+- include focused tests for deterministic generation, finite bounded metrics, exact CSV header, and
+  scientific-value repeatability;
+- avoid a generic manifest, universal schema, broad runner, software-version columns, timings,
+  PLS comparison, path selection, figures, or block-aware scaling APIs.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **Extended lightweight benchmarks:** add opt-in standard/performance execution and later
-   representative real-dataset smoke checks under separate review.
-2. **User documentation and release hardening:** buildable user guide, API reference, compatibility
+1. **Focused synthetic benchmarks:** implement rank selection, predictor-nuisance comparison, and
+   solver consistency in separate patches after fixed-structure recovery.
+2. **Representative real-data smoke checks:** add only after the synthetic questions are stable and
+   under separate review.
+3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
-3. **Future product development:** additional estimators, validation tools, datasets, and—only after
+4. **Future product development:** additional estimators, validation tools, datasets, and—only after
    a separate owner decision—block-aware variants of the existing model-internal standardization.
 
 The repository-product cleanup is complete. Paper-reproduction repositories remain outside this
@@ -219,7 +220,7 @@ From an uploaded snapshot, a maintainer should:
 4. read the applicable mathematical, numerical, API, and development contracts;
 5. inspect the affected source and tests rather than trusting document claims alone;
 6. read `.llm/data_io.md` and `.llm/dataset_layout.md` for dataset, real-data, or example work;
-7. read `.llm/benchmarking.md` for benchmark manifests, runners, metrics, or fixtures;
+7. read `.llm/benchmarking.md` for benchmark questions, scripts, metrics, outputs, or fixtures;
 8. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
 9. verify that the requested work is the current increment or that the owner explicitly changed
    the order;

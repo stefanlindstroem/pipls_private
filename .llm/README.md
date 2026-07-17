@@ -29,8 +29,8 @@ The principal navigation documents are:
 10. `data_io.md` — transparent real-data input and example contract.
 11. `dataset_layout.md` — normative `X.csv`/`Y.csv`/`metadata.yaml` convention for committed real
     datasets.
-12. `benchmarking.md` — versioned package-benchmark scenarios, metrics, tiers, flat CSV result schema,
-    tolerances, and update rules.
+12. `benchmarking.md` — focused package-benchmark questions, minimal per-benchmark CSV outputs,
+    interpretation boundaries, and implementation order.
 13. `testing.md` — durable test boundaries for behavior, shipped-file structure, and living
     documents.
 14. `development.md` — coding, testing, documentation, dependency, and patch requirements.
@@ -51,7 +51,7 @@ First inspect `.llm/SNAPSHOT_INFO`, then read:
 6. `decisions.md` and the relevant full decision records;
 7. `theory.md` for mathematical or model-selection work;
 8. `data_io.md` and `dataset_layout.md` for real-data, example, or dataset work;
-9. `benchmarking.md` for benchmark manifests, runners, metrics, fixtures, or performance work;
+9. `benchmarking.md` for benchmark questions, scripts, outputs, fixtures, or performance work;
 10. `testing.md` before changing repository-document, metadata, or fixture tests;
 11. the normative contracts relevant to the requested change;
 12. the affected source, tests, and user-facing documentation.

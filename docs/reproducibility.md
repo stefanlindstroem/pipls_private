@@ -28,10 +28,9 @@ on the complete supplied training set. Learned scaling must not be fitted global
 ## Synthetic validation
 
 `pipls.datasets` provides deterministic latent-structure generators with known shared,
-predictor-specific, and response-specific components. The accepted version-1 package benchmark
-contract is documented in [`benchmarks.md`](benchmarks.md) and stored under `benchmarks/`. It
-defines prediction, rank-selection, subspace, numerical-consistency, and resource metrics without
-freezing publication claims or broad result files.
+predictor-specific, and response-specific components. The package benchmark plan is documented in
+[`benchmarks.md`](benchmarks.md). Each benchmark answers one question and writes one minimal CSV
+output; unrelated metrics, software metadata, and timings are not combined into a universal table.
 
 ## Reference datasets
 
