@@ -25,5 +25,6 @@ Private development paths and preparation-only scripts are not part of dataset i
 - `linnerud/`: small BSD-licensed physical-exercise reference dataset.
 - `pulp/`: CC BY 4.0 thermomechanical-pulp fiber-property and handsheet dataset.
 - `sugarcane/`: CC BY 4.0 LabSpec absorbance spectra with four sugarcane quality responses.
+- `tobacco/`: CC BY 4.0 raw FT-NIR spectra with 13 tobacco chemical responses.
 
 Each example reads `X.csv` and `Y.csv` directly. `metadata.yaml` documents the repository asset but is not a runtime model input.

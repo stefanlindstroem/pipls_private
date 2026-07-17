@@ -298,11 +298,11 @@ pandas code. Do not introduce a generic registry or loader, private-source refer
 preparation-only scripts. Defer Corn reconstruction until its preprocessing choices are explicitly
 fixed; Corn will expose its public raw-data reading and analysis-relevant preprocessing.
 
-Current status: **underway**. Linnerud establishes the layout reference. Pulp is the second
-integration. Sugarcane is the third: 57 samples with a regular 780--2500 nm LabSpec predictor grid
-and four responses, adapted from a public CC BY 4.0 dataset with explicit row matching, missing-row
-exclusion, wavelength selection, and no spectral preprocessing. No runtime loader, metadata
-requirement, private archive reference, or internal preparation script is exposed.
+Current status: **complete for the initial reference suite**. Linnerud establishes the compact
+layout reference; pulp adds named multivariate process variables; sugarcane adds a 1,721-column
+regular wavelength grid; and tobacco adds 347 samples, 1,557 raw FT-NIR predictors, and 13
+responses. Every integration uses public provenance, direct `X.csv`/`Y.csv` reading, documentary
+metadata, and no runtime loader or hidden preparation utility.
 
 ### Phase E4: benchmark fixtures
 
@@ -333,14 +333,13 @@ Current status: **planned**.
 
 ## Current next increment
 
-The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
-dataset. Linnerud, pulp, and sugarcane are completed transparent reference integrations and
-file-layout examples. A manuscript dataset may follow only when public source, citation, licensing,
-redistribution, row alignment, and scientific preparation are resolved. Require the standard
-repository metadata file, but do not add a public registry, generic loader, metadata-driven runtime
-path, implicit download, hidden example I/O utility, private source reference, or preparation-only
-script. Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data
-reading and preprocessing must be public and explicit.
+The next implementation patch should begin **Phase E4** and define benchmark-fixture policy and a
+small deterministic manifest across Linnerud, pulp, sugarcane, and tobacco. Specify fixed estimator
+configurations, metrics, tolerances, runtime expectations, and fixture-update rules before storing
+numerical expectations. Benchmark fixtures must remain distinct from paper reproduction and must
+not pin living metadata prose. Do not add another dataset in the same increment. Corn remains
+deferred until its preprocessing choices are resolved; its eventual raw-data reading and
+preprocessing must be public and explicit.
 
 ## Maintenance protocol
 

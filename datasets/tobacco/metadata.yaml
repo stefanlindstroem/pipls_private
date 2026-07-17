@@ -1,0 +1,112 @@
+schema_version: 1
+dataset:
+  id: tobacco
+  title: Tobacco leaf FT-NIR chemical-composition regression dataset
+  version: "1"
+  summary: >-
+    Three hundred forty-seven tobacco leaf samples with raw Fourier-transform near-infrared
+    spectra and quantitative reference values for 13 chemical components.
+files:
+  predictors: X.csv
+  responses: Y.csv
+format:
+  type: csv
+  delimiter: ","
+  encoding: utf-8
+  header: true
+dimensions:
+  n_samples: 347
+  n_predictors: 1557
+  n_responses: 13
+predictors:
+  representation: regular_spectral_axis
+  quantity: absorbance
+  description: >-
+    Raw FT-NIR absorbance values supplied by the public source dataset. No smoothing,
+    derivatives, scatter correction, centering, scaling, or other spectral preprocessing is
+    applied to the committed matrix.
+  axis:
+    name: wavenumber
+    unit: cm^-1
+    start: 10001.0283203125
+    stop: 3999.63989257813
+    step: -3.856933436849431
+    ordering: decreasing
+  columns: >-
+    X.csv contains 1,557 predictor columns in the source order. Each CSV header is the decimal
+    wavenumber value supplied by the source workbook, decreasing from approximately 10,001 to
+    4,000 cm^-1.
+responses:
+  - name: Total Alkaloids
+    description: Quantitative total-alkaloids reference value; source units retained.
+  - name: Reducing Sugars
+    description: Quantitative reducing-sugars reference value; source units retained.
+  - name: Total Sugars
+    description: Quantitative total-sugars reference value; source units retained.
+  - name: Total Nitrogen
+    description: Quantitative total-nitrogen reference value; source units retained.
+  - name: K
+    description: Quantitative potassium reference value; source units retained.
+  - name: cl
+    description: Quantitative chlorine reference value; source column spelling and units retained.
+  - name: pH
+    description: Measured pH reference value.
+  - name: Starch
+    description: Quantitative starch reference value; source units retained.
+  - name: Neochlorogenic Acid
+    description: Quantitative neochlorogenic-acid reference value; source units retained.
+  - name: Chlorogenic Acid
+    description: Quantitative chlorogenic-acid reference value; source units retained.
+  - name: Cryptochlorogenic Acid
+    description: Quantitative cryptochlorogenic-acid reference value; source units retained.
+  - name: Scopoletin
+    description: Quantitative scopoletin reference value; source units retained.
+  - name: Rutin
+    description: Quantitative rutin reference value; source units retained.
+sample_alignment:
+  method: public_identifier_merge_then_positional
+  description: >-
+    The public spectra and chemistry tables were matched one-to-one by their shared sample ID and
+    ordered by that identifier. All 347 identifiers match. The identifier and the cultivation-year,
+    origin, and duplicate spectrum-index metadata columns are excluded from X.csv and Y.csv. Row i
+    in the two committed files therefore refers to the same tobacco sample.
+missing_values:
+  predictors: none
+  responses: none
+source:
+  type: public-data-repository
+  dataset:
+    citation: >-
+      Chen, H., Guo, J., Wang, H., and Zhao, L. (2025). A Near-Infrared Spectroscopy Dataset for
+      Chemical Composition Prediction and Origin Identification of Tobacco Leaves. Mendeley Data,
+      Version 1.
+    doi: 10.17632/9z7dgdtggk.1
+    repository: Mendeley Data
+    public_assets:
+      predictors: Raw-nir-spectra-data workbook
+      responses: 13-Chemical-Components-data workbook
+  related_publication:
+    citation: >-
+      Chen, H., Guo, J., Wang, H., and Zhao, L. (2026). A dataset for geographical origin
+      identification of tobacco leaves from multiple countries using near-infrared spectroscopy
+      and chemometric analysis. Data in Brief, 60, 112418.
+    doi: 10.1016/j.dib.2025.112418
+  access_note: >-
+    The Mendeley Data DOI resolves to the public workbooks. The committed X.csv and Y.csv files are
+    the complete analysis-facing regression matrices described below.
+license:
+  identifier: CC-BY-4.0
+  file: LICENSE.txt
+  redistribution: permitted with attribution
+preparation:
+  description: >-
+    Read the two public workbooks, match all rows one-to-one by the shared sample ID, order the
+    matched rows by that ID, retain the 1,557 spectral columns as predictors, and retain all 13
+    chemical-component columns as responses. Remove the identifier and the cultivation-year,
+    geographical-origin, and duplicate spectrum-index metadata columns from the model matrices.
+    Preserve source numeric values and column order. Apply no imputation or spectral preprocessing.
+integrity:
+  sha256:
+    X.csv: 41d4196bed498971b811dd1824a5af7f13bbcd0c1e421e065d1cd272a80067bf
+    Y.csv: 225b6bcabc73003f69bff6977a3ea8d94189626b60e8baa720273842fa83b6d6
+    LICENSE.txt: 4a052472a6f2a041c62eb1530b571f104ea587b662830410e57cfb134ccbe2df

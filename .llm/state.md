@@ -12,7 +12,7 @@ from an earlier conversation, an old patch, or superseded planning material alon
 
 ## Implemented boundary
 
-Phases A through E2 are complete and committed:
+Phases A through E3 are complete and committed:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -97,36 +97,26 @@ Additional fixed decisions:
 
 ## Current next increment
 
-Phase E3 is underway. The repository now contains three transparent integrations: the small
-BSD-licensed Linnerud reference dataset, the CC BY 4.0 pulp dataset, and the CC BY 4.0 sugarcane
-LabSpec dataset. All use `X.csv`, `Y.csv`, and `metadata.yaml`; their examples read only the two
-comma-delimited model tables explicitly.
+Phase E3 is complete for the initial reference suite. The repository contains four transparent
+integrations: BSD-licensed Linnerud and CC BY 4.0 pulp, sugarcane, and tobacco. All use `X.csv`,
+`Y.csv`, and `metadata.yaml`; their examples read only the two comma-delimited model tables
+explicitly. Tobacco contributes 347 samples, 1,557 raw FT-NIR predictors, and 13 responses with
+public ID alignment and no spectral preprocessing.
 
-The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
-dataset after its source, citation, license, redistribution, and scientific preparation choices
-are resolved. Linnerud, pulp, and sugarcane are the current layout and transparency references.
-E3 is performed one dataset at a time. Each dataset patch must:
+The next implementation patch should begin **Phase E4: benchmark fixtures**. Define a small,
+deterministic, reviewable benchmark manifest spanning the four integrated datasets and fixed public
+estimator configurations. Keep benchmark expectations separate from manuscript-result claims and
+from living dataset metadata. Establish update rules, tolerances, runtime limits, and the exact
+metrics before freezing any numerical fixture. Do not add another dataset in the same increment.
 
-1. establish a public or included source, citation, license, redistribution status, and
-   preparation choices;
-2. exclude private archive names, inaccessible paths, and preparation-only scripts from committed
-   materials;
-3. produce comma-delimited `X.csv`, `Y.csv`, and a conforming `metadata.yaml`;
-4. add an example or reproduction script that reads predictors `X` and response `Y` explicitly
-   using ordinary NumPy or pandas code;
-5. show row alignment, selected columns, dtype handling, and missing-value policy directly;
-6. fit the public estimator from those visible `X` and `Y` objects;
-7. avoid a public registry, generic loader, metadata-driven runtime path, implicit download, or
-   hidden preprocessing utility.
-
-Do not begin the Corn reconstruction until its unresolved preprocessing choices are fixed. When
-Corn is added, expose its public raw-data reading and analysis-relevant preprocessing to users. Do
-not claim manuscript reproduction from the Linnerud reference example.
+Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
+expose its public raw-data reading and analysis-relevant preprocessing directly. Do not claim
+manuscript reproduction from the current reference examples.
 
 ## Subsequent roadmap
 
-- **E3 — real dataset integrations:** migrate one dataset per coherent patch using transparent
-  analysis-time reading and dataset-specific preparation where required.
+- **E3 — real dataset integrations:** complete for the initial Linnerud, pulp, sugarcane, and
+  tobacco reference suite.
 - **E4 — benchmark fixtures:** deterministic benchmark expectations and regression tolerances
   linking synthetic and migrated datasets to estimator/path behavior.
 - **F1 — paper reproduction:** scripts and manifests for figures, tables, and paper-specific rank

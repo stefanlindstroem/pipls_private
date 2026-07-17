@@ -153,3 +153,15 @@ rows whose total-sugar response is missing, and applies no imputation or spectra
 `examples/11_sugarcane_real_data.py` reads `X.csv` and `Y.csv` directly and fits a fixed Pi-PLS
 model. The compact spectral-axis description in `metadata.yaml` avoids repeating 1,721 equivalent
 per-wavelength descriptions while still defining every predictor column exactly.
+
+## Tobacco spectral integration
+
+`datasets/tobacco/` contains 347 samples, 1,557 raw FT-NIR absorbance predictors spanning
+approximately 10,001 through 4,000 `cm^-1`, and 13 chemical-component responses. The public source
+is Mendeley Data DOI `10.17632/9z7dgdtggk.1`, licensed CC BY 4.0.
+
+The repository adaptation matches the public spectra and chemistry tables one-to-one by sample ID,
+orders rows by that identifier, and excludes only source metadata columns from the model matrices.
+All samples and chemical responses are retained. No imputation, smoothing, derivatives, scatter
+correction, centering, scaling, or other spectral preprocessing is applied.
+`examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly and fits a fixed Pi-PLS model.

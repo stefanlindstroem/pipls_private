@@ -7,6 +7,7 @@ Examples are introduced with their corresponding tested API increments.
 - `09_linnerud_real_data.py`: explicit pandas reading of the Linnerud `X.csv` and `Y.csv`.
 - `10_pulp_real_data.py`: explicit pandas reading and path selection for the pulp `X.csv` and `Y.csv`.
 - `11_sugarcane_real_data.py`: explicit pandas reading of high-dimensional LabSpec sugarcane spectra and four responses.
+- `12_tobacco_real_data.py`: explicit pandas reading of raw FT-NIR tobacco spectra and 13 chemical responses.
 
 
 Real-data examples must show the ordinary I/O used to create `X` and `Y` in the example itself.

@@ -28,6 +28,7 @@ This index is navigation, not a substitute for those records.
 | `0020-public-dataset-provenance-boundary.md` | public versus internal dataset materials | public-only provenance; no private paths or preparation-only scripts; Corn preprocessing remains user-facing |
 | `0021-durable-repository-tests.md` | repository test stability | test behavior and structural format without pinning living prose or documentary field values |
 | `0022-sugarcane-dataset-integration.md` | third transparent real-data integration | public LabSpec spectra, explicit row and wavelength selection, and compact regular-axis metadata |
+| `0023-tobacco-dataset-integration.md` | fourth transparent real-data integration | public raw FT-NIR spectra, explicit ID alignment, metadata-column exclusion, and no spectral preprocessing |
 
 ## Accepted clarifications after earlier proposals
 
@@ -53,7 +54,7 @@ plan contains an earlier or more general proposal:
   than relying on hidden utility functions;
 - committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
   external users remain free to use any data source or file organization;
-- the first real-data integration is Linnerud, the second is pulp, and the third is sugarcane; all are repository example data, not runtime loaders or manuscript-result claims;
+- the initial real-data integration suite is Linnerud, pulp, sugarcane, and tobacco; all are repository example data, not runtime loaders or manuscript-result claims;
 - committed dataset assets use public or included provenance only; private archive references and preparation-only scripts stay outside the repository, while Corn raw-data preprocessing will be explicit and user-facing;
 - repository tests validate executable behavior and durable file structure rather than pinning living roadmap prose or documentary metadata values;
 
