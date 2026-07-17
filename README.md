@@ -1,16 +1,14 @@
 # Pi-PLS
 
-Development repository for Pi-PLS, a PLS-family method for multivariate regression.
+`pipls` is an installable Python package for Pi-PLS, a PLS-family method for multivariate
+regression. Its public interfaces follow scikit-learn conventions and provide fixed, rule-derived,
+adaptive, and exhaustive predictor-rank selection, pipeline-aware path analysis, advanced
+cross-validation, ordered out-of-fold diagnostics, deterministic synthetic data generation, and
+transparent reference datasets.
 
-The repository contains the fixed-parameter numerical core and a scikit-learn-style
-`PiPLSRegression` estimator with adaptive `"auto"`, exhaustive `"optimal"`, rule-derived
-`"max"`, and explicit integer predictor-rank modes. Predictor linear algebra independently supports
-full, randomized, and conservative automatic SVD policies. `PiPLSPathCV` provides pipeline-aware
-joint path analysis over `n_components` and `predictor_rank`. Both interfaces support ordinary
-scikit-learn grouped, repeated, predefined, temporal, and leave-one-out splitters, with optional
-ordered out-of-fold reporting. A validated dataset container and deterministic synthetic latent-structure generator are available under `pipls.datasets`. The repository also includes transparent real-data examples for the Linnerud, pulp, and sugarcane multi-output regression tables; further manuscript dataset migration and paper reproduction remain later increments.
+## Installation
 
-## Development setup
+For development from a source checkout:
 
 ```bash
 python3 -m venv .venv
@@ -28,7 +26,7 @@ git status
 make check
 ```
 
-## Current estimator
+## Basic model
 
 ```python
 from pipls import PiPLSRegression
@@ -48,7 +46,11 @@ print(model.predictor_rank_)
 print(model.decomposition_.D)
 ```
 
-For the complete two-parameter surface or custom learned preprocessing:
+`PiPLSRegression` centers `X` and `Y` during fitting. With `scale=True`, it also learns their
+training-sample standard deviations. During rank selection, these statistics are fitted separately
+inside every training fold and are refitted on the complete training set after selection.
+
+## Joint path analysis
 
 ```python
 from pipls import PiPLSPathCV
@@ -72,17 +74,7 @@ print(search.validation_report_)
 print(search.oof_predictions_)
 ```
 
-For transparent real-data workflows, see `examples/09_linnerud_real_data.py`,
-`examples/10_pulp_real_data.py`, and `examples/11_sugarcane_real_data.py`. Each reads predictor
-and response tables directly with pandas, verifies their alignment, and then fits:
-
-```python
-X = pd.read_csv("datasets/linnerud/X.csv")
-Y = pd.read_csv("datasets/linnerud/Y.csv")
-model = PiPLSRegression(n_components=2).fit(X, Y)
-```
-
-For deterministic synthetic train/test data:
+## Synthetic data
 
 ```python
 from pipls.datasets import make_pipls_train_test
@@ -97,9 +89,38 @@ train, test = make_pipls_train_test(
     n_response_specific=1,
     random_state=0,
 )
+
 model.fit(train.X, train.Y)
 print(model.score(test.X, test.Y))
 ```
+
+## Reference datasets and examples
+
+The repository includes transparent examples for Linnerud, pulp, sugarcane, and tobacco. Each
+example reads comma-delimited `X.csv` and `Y.csv` files directly with pandas and shows all
+analysis-facing matrix construction in ordinary user code.
+
+```python
+import pandas as pd
+
+X = pd.read_csv("datasets/linnerud/X.csv")
+Y = pd.read_csv("datasets/linnerud/Y.csv")
+model = PiPLSRegression(n_components=2).fit(X, Y)
+```
+
+See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).
+
+## Documentation
+
+- [Documentation index](docs/index.md)
+- [Estimator API](docs/estimator_api.md)
+- [Parameter selection](docs/parameter_selection.md)
+- [Path analysis](docs/path_analysis.md)
+- [Cross-validation and OOF reporting](docs/cross_validation.md)
+- [Model-internal preprocessing](docs/preprocessing.md)
+- [Datasets and synthetic generation](docs/datasets.md)
+- [Theory](docs/theory.md)
+- [Reproducibility and validation](docs/reproducibility.md)
 
 The estimator follows scikit-learn and `PLSRegression` conventions for coefficient orientation,
 latent-score transforms, feature names, pandas output containers, and fitted weights/loadings.
@@ -109,11 +130,14 @@ Pi-PLS-specific factorization output is grouped in the public read-only `decompo
 `StatisticalSupportWarning` because the resulting rank bound may lack sufficient statistical
 support.
 
-Theory navigation starts at `docs/theory.md`; the persistent LLM-facing derivation is in
-`.llm/theory.md`, and the concise normative equations are in `.llm/mathematics.md`.
+## Repository map
 
-Read `.llm/README.md` before preparing an LLM-assisted change. Create a repository snapshot with
-`make snapshot`.
+- `src/pipls/`: installable package and public API;
+- `docs/`: user and developer documentation;
+- `examples/`: concise executable workflows;
+- `datasets/`: transparent redistributable reference datasets;
+- `tests/`: numerical, API, integration, and repository tests;
+- `.llm/`: tracked maintenance contracts for LLM-assisted development, excluded from the package.
 
-
-The public estimator mirrors scikit-learn PLS conventions, including latent transforms, least-squares inverse reconstruction, standard search diagnostics, and pipeline-aware path selection.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before preparing a change. For LLM-assisted maintenance,
+read [`.llm/README.md`](.llm/README.md) and create a clean snapshot with `make snapshot`.

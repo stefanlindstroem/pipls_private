@@ -1,17 +1,53 @@
 # Reproducibility
 
-## Real-data integrations
+The `pipls` repository treats reproducibility as a software-product responsibility: released code,
+numerical contracts, deterministic synthetic generation, transparent example data, executable
+examples, and lightweight validation benchmarks should be reviewable independently of any one
+scientific paper.
 
-Each repository dataset records its source, citation, redistribution terms, analysis-facing files,
-row-order contract, missing-value policy, and integrity hashes when appropriate. These assets
-support repository review; they do not become runtime requirements for fitting user-supplied
-`X` and `Y`.
+## Software reproducibility
 
-The first integration is `datasets/linnerud/`. Its upstream values come from scikit-learn 1.8.0
-and are stored as comma-delimited `X.csv` and `Y.csv`. `metadata.yaml` records the conversion,
-source, license, dimensions, variables, row alignment, missingness, and SHA-256 hashes. The
-executable example reads only the two model tables directly rather than calling a package loader
-or metadata parser.
+A clean source checkout should support:
 
-Manuscript-specific datasets will be migrated separately after their source, licensing, and
-scientific preparation choices are resolved.
+```bash
+python -m pip install -e ".[dev]"
+make check
+make build
+```
+
+Tests cover the numerical core, estimator API, model selection, cross-validation boundaries,
+scikit-learn compatibility, datasets, examples, and repository structure. Randomized numerical
+paths and synthetic generators expose explicit random seeds.
+
+## Model-fitting reproducibility
+
+Centering and optional scaling are integral to `PiPLSRegression.fit`. During cross-validation,
+statistics are learned only from each training fold. After selection, the chosen model is refitted
+on the complete supplied training set. Learned scaling must not be fitted globally before CV.
+
+## Synthetic validation
+
+`pipls.datasets` provides deterministic latent-structure generators with known shared,
+predictor-specific, and response-specific components. Lightweight package benchmarks should use
+these generators to validate prediction, rank selection, subspace behavior, numerical consistency,
+and user-relevant runtime characteristics. They are validation fixtures, not paper-result archives.
+
+## Reference datasets
+
+Each committed real dataset uses `X.csv`, `Y.csv`, and documentary `metadata.yaml`, together with
+public provenance and redistribution terms. Current integrations are:
+
+- Linnerud;
+- pulp;
+- sugarcane LabSpec spectroscopy;
+- tobacco FT-NIR spectroscopy.
+
+Examples read `X.csv` and `Y.csv` directly. Metadata supports repository review but is not required
+by the runtime API. Dataset-specific transformations that matter to users are described publicly;
+private preparation archives and inaccessible paths are not part of the repository.
+
+## Publication reproduction
+
+A publication may depend on a tagged `pipls` release and maintain its own complete simulations,
+comparators, cached results, tables, and figure-generation environment. Such downstream artifacts
+are separate from package validation and do not determine this repository's public surface.

@@ -10,6 +10,7 @@ import pipls
 _REQUIRED_LLM_CONTRACTS = {
     ".llm/README.md",
     ".llm/project.md",
+    ".llm/product_scope.md",
     ".llm/state.md",
     ".llm/decisions.md",
     ".llm/theory.md",
@@ -124,3 +125,12 @@ def test_repository_datasets_are_not_top_level_runtime_exports() -> None:
     datasets_root = _repository_root() / "datasets"
     dataset_names = {path.name for path in datasets_root.iterdir() if path.is_dir()}
     assert dataset_names.isdisjoint(pipls.__all__)
+
+
+def test_repository_has_no_paper_reproduction_scaffolding() -> None:
+    root = _repository_root()
+    retired_paths = [
+        root / "paper",
+        root / "scripts" / "reproduce_paper",
+    ]
+    assert not any(path.exists() for path in retired_paths)

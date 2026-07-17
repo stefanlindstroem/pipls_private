@@ -340,7 +340,9 @@ Acceptance conditions:
   `pipls` version;
 - no synthetic benchmark result or new block-aware scaling API is introduced in the same patch.
 
-Current status: **planned**.
+Current status: **complete**. The paper-reproduction placeholders have been removed, and public
+navigation now describes the installable package, user documentation, examples, datasets,
+validation, and release responsibilities.
 
 ### Phase E4a: synthetic benchmark contract
 
@@ -396,13 +398,14 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-The next patch should implement **Product transition P1** only: remove publication placeholders and
-rewrite public navigation around package users. Do not change estimator behavior, add benchmark
-results, or design block-aware scaling APIs in that patch.
+The next patch should implement **Phase E4a** only: define the synthetic benchmark contract without
+freezing broad benchmark results. Specify scenarios, metrics, seeds, runtime tiers, result schema,
+tolerances, and update rules. Ordinary PLS is the primary comparator; paper-scale OLS/CCA
+comparisons and figure generation remain downstream.
 
-After the cleanup, begin **Phase E4a** with a synthetic benchmark contract. Corn remains deferred
-until its preprocessing choices are resolved; its eventual raw-data reading and preprocessing must
-be public and explicit.
+Do not change estimator behavior or design block-aware scaling APIs in that patch. Corn remains
+deferred until its preprocessing choices are resolved; its eventual raw-data reading and
+preprocessing must be public and explicit.
 
 ## Maintenance protocol
 

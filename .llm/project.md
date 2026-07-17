@@ -19,10 +19,9 @@ Phases A through E3 are implemented. The current public surface includes `PiPLSR
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, and deterministic synthetic dataset generation.
 
-The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. The next
-implementation increment is a repository-product cleanup: remove paper-oriented placeholders and
-rewrite public navigation around package users. Runtime behavior and new block-aware scaling APIs
-are not part of that cleanup.
+The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
+navigation now describes the installable package, API, examples, datasets, validation, and releases.
+The next increment is the synthetic benchmark contract; it introduces no block-aware scaling API.
 
 ## Runtime ownership
 
@@ -65,11 +64,6 @@ are not part of that cleanup.
   and accepted decision records.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
   and release automation.
-
-The current `paper/` and `scripts/reproduce_paper/` directories are transitional placeholders from
-an earlier publication-oriented plan. Decision 0024 rejects them as future package responsibilities;
-the next cleanup patch should remove them and adjust public navigation without changing runtime
-behavior.
 
 ## Contract and documentation ownership
 

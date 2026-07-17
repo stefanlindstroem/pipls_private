@@ -146,38 +146,35 @@ Until the owner starts a dedicated phase:
 
 ## Current next increment
 
-The next patch is a **repository-product cleanup**, not a runtime feature patch. It should:
+The next patch should define the **synthetic benchmark contract** without yet freezing broad result
+fixtures. It should specify:
 
-- remove the transitional `paper/` and `scripts/reproduce_paper/` placeholders;
-- rewrite public repository navigation around package users rather than one publication;
-- remove remaining promises that paper figures, complete comparison grids, or manuscript
-  orchestration will be implemented inside `pipls`;
-- retain historical scientific context and accepted algorithm decisions where they remain useful;
-- make no estimator, dataset, benchmark-result, or new block-aware scaling API change.
+- controlled synthetic scenarios and their scientific purpose;
+- prediction, rank-selection, subspace, numerical-consistency, and runtime metrics;
+- deterministic seeds and identical train/test or CV splits across methods;
+- ordinary PLS as the primary user-relevant comparator;
+- runtime tiers, result schema, tolerances, and fixture-update policy;
+- a strict boundary excluding paper-scale grids, OLS/CCA paper comparisons, and figure generation.
 
-After that cleanup, the next implementation phase should define a lightweight **synthetic benchmark
-contract** before freezing numerical results. Synthetic validation should use known latent truth and
-compare Pi-PLS primarily with ordinary PLS under controlled structures. Real-data validation comes
-after the synthetic contract.
+The contract must preserve model-internal fold-local standardization and must not design a future
+block-aware scaling API.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **Repository-product cleanup:** remove publication placeholders and rewrite public navigation.
-2. **Synthetic benchmark contract:** define scenarios, metrics, seeds, tolerances, runtime tiers,
-   result schema, and update policy without yet turning the repository into a paper experiment
-   system.
-3. **Lightweight benchmark implementation:** deterministic synthetic fixtures first, followed by
+1. **Synthetic benchmark contract:** define scenarios, metrics, seeds, tolerances, runtime tiers,
+   result schema, and update policy without turning the repository into a paper experiment system.
+2. **Lightweight benchmark implementation:** deterministic synthetic fixtures first, followed by
    representative real-dataset smoke checks.
-4. **User documentation and release hardening:** buildable user guide, API reference, compatibility
+3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
-5. **Future product development:** additional estimators, validation tools, datasets, and—only after
+4. **Future product development:** additional estimators, validation tools, datasets, and—only after
    a separate owner decision—block-aware variants of the existing model-internal standardization.
 
-Paper-reproduction repositories are outside this roadmap. They may be created independently for one
-or several publications and should depend on specific tagged `pipls` releases.
+The repository-product cleanup is complete. Paper-reproduction repositories remain outside this
+roadmap and may independently depend on specific tagged `pipls` releases.
 
 ## Authority and drift handling
 

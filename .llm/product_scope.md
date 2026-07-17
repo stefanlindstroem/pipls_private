@@ -99,15 +99,12 @@ Until the project owner starts a dedicated design phase:
 A future block-aware standardization design requires a separate owner decision, explicit contracts,
 and its own small reviewable increments.
 
-## Near-term transition
+## Current transition state
 
-The current repository still contains paper-oriented placeholders and language inherited from its
-initial publication plan. The accepted near-term sequence is:
+The package-product boundary and public navigation cleanup are complete. The repository no longer
+contains paper-reproduction placeholders or promises to implement manuscript workflows.
 
-1. update the `.llm` guide layer to establish this package-product boundary;
-2. remove publication placeholders and rewrite public repository navigation around the software
-   product;
-3. define the lightweight synthetic benchmark contract before freezing benchmark results.
-
-The third step does not include a block-aware standardization API design. That work remains
-deferred for months or until the project owner explicitly starts it.
+The next product increment is to define the lightweight synthetic benchmark contract before
+freezing benchmark results. That work does not include a block-aware standardization API design;
+future block-aware variants remain deferred for months or until the project owner explicitly starts
+a separate phase.

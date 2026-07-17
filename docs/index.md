@@ -1,26 +1,33 @@
 # Pi-PLS documentation
 
-The current authoritative development specification is the tracked `.llm/` layer together with
-the accepted decision records.
+This documentation describes the installable `pipls` package and its supported user workflows.
+The tracked `.llm/` layer contains maintainer contracts and roadmap state; it is not the primary
+user guide.
 
-Current navigation:
+## Start here
 
-- `theory.md`: user-facing theory overview and navigation to the persistent LLM theory reference;
-- `parameter_selection.md`: implemented predictor-rank selection and accepted search-policy
-  roadmap;
-- `estimator_api.md`: current `PiPLSRegression` interface;
-- `path_analysis.md`: pipeline-aware joint path search and diagnostics;
-- `cross_validation.md`: grouped, repeated, predefined, temporal, LOO, and OOF contracts;
-- `preprocessing.md`: preprocessing semantics;
-- `datasets.md`: validated in-memory datasets and deterministic synthetic generation;
-- `decisions/0005-leave-one-out-protocol.md`: implemented LOO and OOF reporting contract;
-- `decisions/0010-path-analysis-api.md`: accepted `PiPLSPathCV` boundary;
-- `decisions/0011-shared-selection-engine.md`: shared private search/evaluation architecture;
-- `decisions/0012-sklearn-api-alignment.md`: PLS-style estimator and path API contracts;
-- `decisions/0015-dataset-and-synthetic-api.md`: optional dataset and synthetic-generator boundary;
-- `decisions/0016-transparent-data-ingestion.md`: explicit `X`/`Y` reading and no-loader boundary;
-- `decisions/0007-predictor-rank-search-policies.md`: accepted `"optimal"` versus adaptive
-  `"auto"` semantics and the separate randomized-SVD policy;
-- [Decision 0013: final scikit-learn cleanup boundary](decisions/0013-sklearn-cleanup-boundary.md)
+- [`../README.md`](../README.md): installation, first model, datasets, and repository map;
+- [`estimator_api.md`](estimator_api.md): `PiPLSRegression` interface and fitted attributes;
+- [`parameter_selection.md`](parameter_selection.md): predictor-rank modes and selection policy;
+- [`path_analysis.md`](path_analysis.md): joint `n_components` and `predictor_rank` search;
+- [`cross_validation.md`](cross_validation.md): splitters, groups, repeated CV, OOF predictions, and
+  validation reports.
 
-- [Decision 0020: public dataset provenance boundary](decisions/0020-public-dataset-provenance-boundary.md)
+## Data and model fitting
+
+- [`preprocessing.md`](preprocessing.md): model-internal centering and scaling, fold-local fitting,
+  and leakage boundaries;
+- [`datasets.md`](datasets.md): optional dataset containers and deterministic synthetic generation;
+- [`../examples/README.md`](../examples/README.md): executable synthetic and real-data examples;
+- [`../datasets/README.md`](../datasets/README.md): committed reference-dataset layout and provenance.
+
+## Scientific and numerical background
+
+- [`theory.md`](theory.md): user-facing theory overview;
+- [`reproducibility.md`](reproducibility.md): software, dataset, and lightweight validation
+  reproducibility.
+
+## Development records
+
+Accepted design decisions are stored under [`decisions/`](decisions/). They explain why public
+contracts exist, but historical publication context does not define the package roadmap.
