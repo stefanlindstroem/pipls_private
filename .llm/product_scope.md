@@ -104,7 +104,8 @@ and its own small reviewable increments.
 The package-product boundary and public navigation cleanup are complete. The repository no longer
 contains paper-reproduction placeholders or promises to implement manuscript workflows.
 
-The versioned lightweight synthetic benchmark contract is now defined. The next product
-increment is its small deterministic CI runner, without broad frozen results or publication claims.
-That work does not include a block-aware standardization API design; future block-aware variants
-remain deferred for months or until the project owner explicitly starts a separate phase.
+The versioned lightweight synthetic benchmark contract and its deterministic CI runner are now
+implemented without broad frozen results or publication claims. The next benchmark work may add
+opt-in standard/performance execution under separate review. None of this includes a block-aware
+standardization API design; future block-aware variants remain deferred for months or until the
+project owner explicitly starts a separate phase.

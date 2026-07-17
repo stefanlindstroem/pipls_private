@@ -13,7 +13,7 @@ material alone.
 
 ## Implemented boundary
 
-Phases A through E3 and the E4a benchmark contract are complete and committed:
+Phases A through E3, the E4a benchmark contract, and the E4b CI runner are complete and committed:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -165,30 +165,28 @@ publication grids, and figure generation.
 
 ## Current next increment
 
-Implement **Phase E4b's CI benchmark runner only**:
+Plan the next **Phase E4b opt-in benchmark execution increment**:
 
-- consume `benchmarks/manifests/synthetic-v1.yaml` rather than duplicating scenario values in code;
-- expand constant and log-spaced scale specifications deterministically;
-- run the CI tier with its declared seed, scenarios, and methods;
-- write schema-conforming in-memory or temporary JSON Lines records;
-- test repeatability, finite metrics, capture bounds, and executable runner behavior;
-- do not freeze predictive superiority, exact rank recovery, timing limits, or broad result files.
+- extend the existing manifest-driven runner to the `standard` and `performance` tiers only after
+  confirming their runtime and output policy;
+- preserve the current JSON Lines schema and ignored generated-result boundary;
+- keep timing descriptive and hardware-aware rather than a cross-machine CI gate;
+- calibrate full-versus-randomized comparison fields before considering any frozen tolerance;
+- do not add real-data benchmark claims, OLS/CCA comparators, figures, or block-aware scaling APIs.
 
-Do not add the standard/performance runners, real-data benchmark results, OLS/CCA comparators,
-figures, or block-aware scaling APIs in that patch.
+The CI runner is already complete: it executes nine manifest-defined records, validates the schema,
+checks deterministic numerical metrics, and excludes resource timings from repeatability gates.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **CI benchmark runner:** implement the small deterministic synthetic tier from the accepted
-   version-1 contract without broad frozen result files.
-2. **Extended lightweight benchmarks:** add opt-in standard/performance execution and later
+1. **Extended lightweight benchmarks:** add opt-in standard/performance execution and later
    representative real-dataset smoke checks under separate review.
-3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
+2. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
-4. **Future product development:** additional estimators, validation tools, datasets, and—only after
+3. **Future product development:** additional estimators, validation tools, datasets, and—only after
    a separate owner decision—block-aware variants of the existing model-internal standardization.
 
 The repository-product cleanup is complete. Paper-reproduction repositories remain outside this

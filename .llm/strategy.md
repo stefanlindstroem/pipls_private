@@ -371,7 +371,10 @@ Implement a small deterministic CI tier from the accepted synthetic contract, th
 representative real-dataset smoke checks. Store only package-validation expectations with documented
 update rules; do not convert the benchmark layer into a publication-result archive.
 
-Current status: **planned**.
+Current status: **underway**. The manifest-driven CI runner is implemented with deterministic
+scale expansion, schema-valid JSON Lines records, fixed and adaptive Pi-PLS execution, ordinary PLS
+comparison, subspace metrics, bounded parallelism, and repeatability tests. Standard/performance
+tiers and frozen fixtures remain unimplemented.
 
 ### Product documentation and release hardening
 
@@ -401,14 +404,14 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-The next patch should implement only the **Phase E4b CI runner** from the accepted version-1
-contract. It must consume the manifest, execute the declared CI tier, produce schema-conforming
-records, and test repeatability, finite metrics, capture bounds, and runner behavior.
+The next benchmark patch may extend the existing runner to the opt-in `standard` and `performance`
+tiers, but only after reviewing runtime, hardware metadata, and full-versus-randomized comparison
+semantics. Keep generated outputs ignored and do not create cross-machine timing gates or freeze
+predictive claims.
 
-Do not freeze predictive superiority, exact selection rates, timing limits, broad result files,
-standard/performance tiers, real-data benchmark outputs, OLS/CCA comparisons, figures, or
-block-aware scaling APIs in that patch. Corn remains deferred until its preprocessing choices are
-resolved; its eventual raw-data reading and preprocessing must be public and explicit.
+Do not add real-data benchmark outputs, OLS/CCA comparisons, figures, or block-aware scaling APIs in
+that patch. Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data
+reading and preprocessing must be public and explicit.
 
 ## Maintenance protocol
 

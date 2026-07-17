@@ -33,6 +33,7 @@ This index is navigation, not a substitute for those records.
 | `0025-model-internal-standardization-boundary.md` | current versus future scaling | estimator centering/scaling is current and fold-local; only future block-aware variants are deferred |
 | `0026-package-navigation-cleanup.md` | public repository navigation | remove paper placeholders and organize entry points around the installable software product |
 | `0027-synthetic-benchmark-contract.md` | lightweight package validation | versioned synthetic scenarios, PLS comparison, metrics, tiers, result schema, and conservative tolerance policy |
+| `0028-synthetic-ci-benchmark-runner.md` | executable lightweight validation | manifest-driven CI runner, schema-valid JSONL, deterministic metric checks, and bounded parallel execution |
 
 ## Accepted clarifications after earlier proposals
 
@@ -74,6 +75,8 @@ plan contains an earlier or more general proposal:
 - the version-1 synthetic package benchmark uses ordinary PLS as its sole external comparator,
   separates oracle model validation from Pi-PLS selection validation, and freezes no predictive or
   performance claim before calibration;
+- the CI benchmark runner is repository-local, manifest-driven, schema-valid, and repeatable apart
+  from descriptive resource timings; standard and performance tiers remain unimplemented;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

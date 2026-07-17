@@ -26,6 +26,23 @@ covers all scenario families across several seeds. The performance tier is opt-i
 solver timing, optional memory use, and full-versus-randomized consistency without imposing
 cross-machine timing thresholds.
 
+## Running the CI tier
+
+Install development dependencies and run:
+
+```bash
+make benchmark-ci
+```
+
+The repository-local runner reads the versioned manifest and writes
+`benchmarks/results/synthetic-ci.jsonl`. The file is ignored by Git. Each record is validated against
+the versioned result schema. The command currently implements only the CI tier; standard and
+performance execution remain later, opt-in work.
+
+The runner parallelizes independent Pi-PLS path candidates with joblib threads and limits native
+linear-algebra work to one thread per candidate. This is an execution policy, not a fitted-model
+parameter or a timing guarantee.
+
 ## Methods and interpretation
 
 Fixed-parameter Pi-PLS and ordinary `PLSRegression` use the declared shared latent dimension. The

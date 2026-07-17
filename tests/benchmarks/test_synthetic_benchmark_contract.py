@@ -179,6 +179,6 @@ def test_result_schema_is_valid_json_and_matches_manifest_version() -> None:
     } <= set(schema["required"])
 
 
-def test_generated_benchmark_results_are_not_committed() -> None:
-    results_root = _repository_root() / "benchmarks" / "results"
-    assert not results_root.exists() or not any(results_root.rglob("*"))
+def test_generated_benchmark_results_are_ignored() -> None:
+    ignored = (_repository_root() / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert "benchmarks/results/" in ignored

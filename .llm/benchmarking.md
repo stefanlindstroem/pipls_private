@@ -113,6 +113,19 @@ be marked missing rather than estimated when unavailable.
 
 The expected runtime values in the manifest are planning budgets, not pass/fail assertions.
 
+## Implemented CI runner
+
+`benchmarks/run_synthetic.py` implements only the `ci` tier. It must consume the manifest, produce
+schema-valid JSON Lines records, and remain outside the public `pipls` namespace.
+
+For adaptive path evaluation, use joblib threading across independent candidates and limit native
+linear-algebra libraries to one thread per candidate. Record these execution controls in resolved
+parameters. This prevents nested oversubscription without changing model semantics.
+
+`make benchmark-ci` writes `benchmarks/results/synthetic-ci.jsonl`, which remains ignored. Tests may
+compare deterministic metrics across repeated runs, but must exclude fit time, prediction time, and
+optional memory. Standard and performance tiers remain unimplemented until separately reviewed.
+
 ## Result and tolerance policy
 
 Write one JSON Lines record per suite, tier, scenario, seed, and method. Record package versions,

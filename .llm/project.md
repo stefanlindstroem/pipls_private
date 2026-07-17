@@ -21,8 +21,9 @@ Phases A through E3 are implemented. The current public surface includes `PiPLSR
 
 The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
 navigation now describes the installable package, API, examples, datasets, validation, and releases.
-The versioned synthetic benchmark contract is defined under `benchmarks/`; the next increment is the
-small CI runner and fixture layer. No block-aware scaling API is designed or scheduled.
+The versioned synthetic benchmark contract and its small deterministic CI runner are implemented
+under `benchmarks/`. Standard/performance execution and any frozen fixtures remain later work. No
+block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
 
@@ -51,8 +52,8 @@ small CI runner and fixture layer. No block-aware scaling API is designed or sch
   protocols.
 - `tests/estimator_checks/`: applicable scikit-learn common estimator checks.
 - `tests/regression/`: frozen comparisons with trusted implementations.
-- `tests/benchmarks/`: versioned manifest and result-schema contract validation, followed by runner
-  behavior and narrow fixtures.
+- `tests/benchmarks/`: versioned manifest/schema validation plus CI runner behavior and numerical
+  repeatability checks; future frozen fixtures require separate review.
 - `tests/test_repository_seed.py`: `.llm` navigation, snapshot layout, and workflow invariants.
 
 ## Product-asset ownership
@@ -61,9 +62,8 @@ small CI runner and fixture layer. No block-aware scaling API is designed or sch
   `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
   utilities or publication pipelines.
-- `benchmarks/`: versioned lightweight package-validation manifests and result schemas, followed by
-  runners and documented generated outputs. Synthetic validation is primary; real datasets may later
-  provide representative smoke checks.
+- `benchmarks/`: versioned lightweight package-validation manifests, result schemas, and
+  repository-local runners. Generated outputs are ignored; synthetic validation is primary.
 - `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,
   and accepted decision records.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,

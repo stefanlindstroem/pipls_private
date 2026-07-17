@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add the manifest-driven synthetic CI benchmark runner with schema-valid JSON Lines output, deterministic scale expansion, fixed Pi-PLS and ordinary PLS comparison, adaptive path validation, subspace metrics, and repeatability tests.
+
 - Define the version-1 synthetic package-benchmark contract with seven controlled scenarios, fixed
   Pi-PLS and ordinary PLS roles, adaptive Pi-PLS selection validation, deterministic runtime tiers,
   subspace and prediction metrics, a JSON Lines result schema, and conservative fixture rules.

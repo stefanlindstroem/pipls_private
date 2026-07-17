@@ -9,10 +9,15 @@ controlled synthetic scenarios, deterministic seeds, method roles, runtime tiers
 tolerance policy, and generated-result format. The result record schema is
 [`schema/result-v1.schema.json`](schema/result-v1.schema.json).
 
-No benchmark runner or numerical result fixture is introduced by the contract patch. The next
-increment may implement the CI tier against this versioned manifest. Generated outputs belong under
-`benchmarks/results/` and are ignored by Git unless a later decision explicitly freezes a small
-package-validation fixture with documented meaning and tolerances.
+The CI tier is implemented by [`run_synthetic.py`](run_synthetic.py). Run it through:
+
+```bash
+make benchmark-ci
+```
+
+This writes `benchmarks/results/synthetic-ci.jsonl`. Generated outputs are ignored by Git unless a
+later decision explicitly freezes a small package-validation fixture with documented meaning and
+tolerances. The standard and performance tiers remain unimplemented.
 
 ## Scope
 
@@ -34,3 +39,11 @@ Neither generated block is standardized before model fitting. Pi-PLS and ordinar
 own centering and scaling from the training observations. Any inner cross-validation learns those
 statistics separately within each training fold and refits them on the complete generated training
 block after selection.
+
+
+## Execution boundary
+
+The runner is repository-local and is not exported from `pipls`. It consumes the manifest rather
+than duplicating scenario values. Adaptive path candidates use joblib threads with one native
+linear-algebra thread per candidate so the CI tier stays small and avoids nested oversubscription.
+Resource timings are descriptive and are excluded from repeatability comparisons.

@@ -115,7 +115,9 @@ See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datase
 The repository defines a versioned synthetic package-validation contract covering prediction,
 Pi-PLS rank selection, latent-subspace recovery, solver consistency, and representative runtime.
 Ordinary PLS is the sole external comparator in version 1; publication-scale OLS/CCA comparisons
-and figure generation remain outside this repository. No broad benchmark results are committed.
+and figure generation remain outside this repository. The deterministic CI tier can be run with
+`make benchmark-ci`; generated JSON Lines remain ignored and no broad benchmark results are
+committed.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).
 
@@ -146,7 +148,7 @@ support.
 - `docs/`: user and developer documentation;
 - `examples/`: concise executable workflows;
 - `datasets/`: transparent redistributable reference datasets;
-- `benchmarks/`: versioned package-validation manifests and result schemas;
+- `benchmarks/`: versioned package-validation manifests, schemas, and repository-local runners;
 - `tests/`: numerical, API, integration, and repository tests;
 - `.llm/`: tracked maintenance contracts for LLM-assisted development, excluded from the package.
 

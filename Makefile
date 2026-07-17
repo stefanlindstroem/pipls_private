@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: install test lint format typecheck docs build check snapshot clean
+.PHONY: install test lint format typecheck docs build check benchmark-ci snapshot clean
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -9,10 +9,10 @@ test:
 	PYTHONPATH=src $(PYTHON) -m pytest -q
 
 lint:
-	$(PYTHON) -m ruff check src tests
+	$(PYTHON) -m ruff check src tests benchmarks
 
 format:
-	$(PYTHON) -m ruff format src tests
+	$(PYTHON) -m ruff format src tests benchmarks
 
 typecheck:
 	$(PYTHON) -m mypy src
@@ -24,6 +24,9 @@ build:
 	$(PYTHON) -m build
 
 check: test lint typecheck
+
+benchmark-ci:
+	PYTHONPATH=src $(PYTHON) benchmarks/run_synthetic.py --tier ci --output benchmarks/results/synthetic-ci.jsonl
 
 snapshot:
 	./.llm/snapshot.sh
