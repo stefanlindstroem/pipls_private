@@ -33,32 +33,45 @@ class _MaterializedCV:
 def _max_predictor_rank(
     *,
     n_features: int,
+    n_samples: int,
     n_train_min: int,
     samples_per_predictor_rank: float,
 ) -> int:
-    r"""Return the fold-safe upper predictor-rank bound.
+    r"""Return the full-sample-supported, fold-feasible predictor-rank bound.
 
     The bound is
 
     .. math::
 
-        \min\left(p, n_{\mathrm{train,min}},
-        \left\lceil n_{\mathrm{train,min}} / c \right\rceil\right),
+        \min\left(p, n_{\mathrm{train,min}} - 1,
+        \left\lceil n / c \right\rceil\right),
 
-    where ``p`` is ``n_features`` and ``c`` is
-    ``samples_per_predictor_rank``.
+    where ``p`` is ``n_features``, ``n`` is ``n_samples``, and ``c`` is
+    ``samples_per_predictor_rank``. The smallest training-fold size remains a
+    hard feasibility cap, but it does not define the statistical-support term.
     """
 
     _validate_positive_int(n_features, name="n_features")
+    _validate_positive_int(n_samples, name="n_samples")
     _validate_positive_int(n_train_min, name="n_train_min")
+    if n_train_min > n_samples:
+        raise ValueError(
+            "n_train_min must not exceed n_samples: "
+            f"got n_train_min={n_train_min}, n_samples={n_samples}."
+        )
+    if n_train_min < 2:
+        raise ValueError(
+            "n_train_min must be at least 2 because PiPLSRegression centers each "
+            f"training fold; got {n_train_min}."
+        )
     samples_per_rank = _as_positive_float(
         samples_per_predictor_rank,
         name="samples_per_predictor_rank",
     )
-    algebraic_limit = min(n_features, n_train_min)
-    if samples_per_rank <= n_train_min / algebraic_limit:
+    algebraic_limit = min(n_features, n_train_min - 1)
+    if samples_per_rank <= n_samples / algebraic_limit:
         return algebraic_limit
-    rule_limit = math.ceil(n_train_min / samples_per_rank)
+    rule_limit = math.ceil(n_samples / samples_per_rank)
     return min(algebraic_limit, rule_limit)
 
 

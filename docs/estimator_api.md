@@ -21,7 +21,8 @@ selection defaults are `samples_per_predictor_rank=5` and `cv=5`.
 logarithmic coarse-to-fine search and may skip ranks; it becomes exhaustive when the admissible or
 final refinement interval contains at most 10 ranks. Both modes reuse one materialized CV split
 set, fit preprocessing inside each training fold, apply identical scoring and low-rank tie rules,
-and refit the selected rank on all data.
+derive the samples-per-rank support term from all supplied observations, and refit the selected
+rank on all data. Smaller centered training folds remain hard feasibility caps.
 
 `svd_solver="full"` uses the exact thin predictor SVD. `svd_solver="randomized"` uses a
 reproducible randomized truncated predictor SVD. The default `svd_solver="auto"` chooses randomized
@@ -59,7 +60,8 @@ Important additional fitted attributes include `predictor_rank_`, `max_predictor
 `best_index_`, `best_score_`, and `scorer_` attributes plus candidate scores, standard fit/score
 timing columns, evaluation order, search
 batches, the final refinement interval, candidate counts, whether the search was exhaustive, and
-the fold-safe training-size bound. `predictor_rank_cv_results_` is an alias for `cv_results_`.
+the minimum CV training-fold size used for feasibility. `predictor_rank_cv_results_` is an alias
+for `cv_results_`.
 
 The constructor `copy` controls fit-time preprocessing. For writable floating NumPy arrays,
 `copy=False` permits in-place centering and scaling, matching the familiar PLS contract.

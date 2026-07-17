@@ -450,24 +450,27 @@ predictor-response coupling. It reports that under-specification causes irrevers
 moderate over-specification often lies on a broad predictive plateau. It also discusses
 sample-size heuristics and exhaustive CV as practical selection approaches.
 
-The repository API uses the fold-safe upper bound
+The repository API uses the full-sample-supported, fold-feasible upper bound
 
 $$
 r_{\pi,\max}
 =
 \min\left(
  p,
- n_{\mathrm{train,min}},
+ n_{\mathrm{train,min}}-1,
  \left\lceil
- \frac{n_{\mathrm{train,min}}}
+ \frac{n}
  {\texttt{samples\_per\_predictor\_rank}}
  \right\rceil
 \right).
 $$
 
-This bound is an API and regularization policy, not a theorem of Pi-PLS. For internal CV,
-$n_{\mathrm{train,min}}$ is the smallest materialized training-fold size. This prevents candidate
-ranks from depending on validation samples or from being invalid in smaller folds.
+This bound is an API and regularization policy, not a theorem of Pi-PLS. The total supplied sample
+count $n$ defines statistical support for the final model, which is refitted on all supplied rows.
+For internal CV, $n_{\mathrm{train,min}}$ is the smallest materialized training-fold size. Because
+each candidate centers its training predictors, $n_{\mathrm{train,min}}-1$ is a hard feasibility
+cap. Using the public sample count in the support term does not fit any quantity from $X$ or $Y$
+outside the training folds.
 
 The implemented rank-mode semantics are:
 
@@ -491,7 +494,8 @@ Any CV-based selection of $r_\pi$ or $h$ must obey the following theoretical sep
 2. derive predictor and response subspaces only from the training fold;
 3. predict the validation fold using that fold-trained model;
 4. reuse the same materialized split set for every candidate being compared;
-5. derive admissible rank bounds from the smallest training fold;
+5. derive the samples-per-rank support term from total supplied $n$, then cap candidates by every
+   centered training fold's feasible dimensions;
 6. refit the selected fixed-parameter model once on all data supplied to `fit()`.
 
 Response-standardized MSE is used so response columns with different physical scales contribute

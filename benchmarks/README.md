@@ -137,7 +137,9 @@ measure runtime.
 `pulp_path_smoke.py` follows an explicit package-user workflow: it reads the public Pulp
 `X.csv` and `Y.csv` tables directly with pandas and fits adaptive `PiPLSPathCV` over component
 counts 1 through 4 with ordered OOF predictions. The script relies on the ordinary
-`samples_per_predictor_rank=5` and `cv=5` defaults and does not set a predictor-rank ceiling.
+`samples_per_predictor_rank=5` and `cv=5` defaults and does not set a predictor-rank ceiling. The
+support term uses all 46 supplied observations, while the five-fold training sizes remain
+feasibility caps.
 
 Run it from the repository root after installing the data dependencies:
 

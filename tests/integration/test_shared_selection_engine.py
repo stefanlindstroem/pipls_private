@@ -41,8 +41,7 @@ def test_fixed_component_path_matches_regression_rank_search(search_method: str)
             random_state=None,
         ),
         n_components_values=[1],
-        predictor_rank_values=list(range(1, 13)),
-        max_predictor_rank=12,
+        samples_per_predictor_rank=5,
         search_method=search_method,  # type: ignore[arg-type]
         cv=splits,
         refit=False,
@@ -78,8 +77,7 @@ def test_adaptive_fixed_component_search_has_identical_history() -> None:
     path = PiPLSPathCV(
         estimator=PiPLSRegression(svd_solver="full", random_state=None),
         n_components_values=[1],
-        predictor_rank_values=list(range(1, 13)),
-        max_predictor_rank=12,
+        samples_per_predictor_rank=5,
         search_method="auto",
         cv=splits,
         refit=False,

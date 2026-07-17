@@ -258,8 +258,9 @@ search = PiPLSPathCV(
 No loader, metadata parser, external preprocessing, method comparison, or artificial train/test
 split is added. The call relies on the ordinary adaptive defaults
 `samples_per_predictor_rank=5` and `cv=5`; no predictor-rank ceiling is supplied by the example.
-Model centering and scaling are learned separately in every candidate training fold, and the
-selected estimator is refitted on all supplied rows.
+The support term uses all 46 supplied rows, while each five-fold training size remains a
+feasibility cap. Model centering and scaling are learned separately in every candidate training
+fold, and the selected estimator is refitted on all supplied rows.
 
 The output is `benchmarks/results/pulp_path_smoke.csv` with one row and exactly these columns:
 

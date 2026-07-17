@@ -158,19 +158,19 @@ def test_auto_rank_mode_exposes_diagnostics() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    assert model.max_predictor_rank_ == 4
+    assert model.max_predictor_rank_ == 5
     assert model.predictor_rank_search_method_ == "auto"
     assert model.predictor_rank_search_exhaustive_
-    assert model.n_predictor_rank_candidates_ == 3
-    assert model.n_predictor_rank_evaluated_ == 3
+    assert model.n_predictor_rank_candidates_ == 4
+    assert model.n_predictor_rank_evaluated_ == 4
     assert model.n_predictor_rank_skipped_ == 0
-    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4]))
+    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4, 5]))
     assert model.predictor_rank_ in model.predictor_rank_values_
     assert model.n_splits_ == 4
     assert model.cv_n_train_min_ == 30
     results = model.predictor_rank_cv_results_
-    assert results["mean_test_score"].shape == (3,)
-    assert results["mean_response_standardized_mse"].shape == (3,)
+    assert results["mean_test_score"].shape == (4,)
+    assert results["mean_response_standardized_mse"].shape == (4,)
     selected_index = int(np.flatnonzero(model.predictor_rank_values_ == model.predictor_rank_)[0])
     assert model.best_score_ == pytest.approx(results["mean_test_score"][selected_index])
     assert model.best_response_standardized_mse_ == pytest.approx(
@@ -197,7 +197,7 @@ def test_auto_rank_refits_selected_rank_on_all_data() -> None:
     np.testing.assert_allclose(automatic.predict(X), explicit.predict(X))
 
 
-def test_auto_rank_uses_smallest_materialized_training_fold() -> None:
+def test_auto_rank_uses_full_sample_support_and_fold_feasibility_cap() -> None:
     X, Y = _data()
     splits = [
         (np.arange(8), np.arange(8, 12)),
@@ -213,8 +213,8 @@ def test_auto_rank_uses_smallest_materialized_training_fold() -> None:
         ).fit(X[:16], Y[:16])
 
     assert model.cv_n_train_min_ == 6
-    assert model.max_predictor_rank_ == 3
-    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3]))
+    assert model.max_predictor_rank_ == 5
+    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4, 5]))
 
 
 def test_auto_rank_uses_fold_local_preprocessing() -> None:
@@ -313,14 +313,16 @@ def test_optimal_rank_mode_exhaustively_evaluates_all_candidates() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4]))
-    np.testing.assert_array_equal(model.predictor_rank_evaluation_order_, np.array([2, 3, 4]))
+    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4, 5]))
+    np.testing.assert_array_equal(
+        model.predictor_rank_evaluation_order_, np.array([2, 3, 4, 5])
+    )
     assert model.predictor_rank_search_method_ == "optimal"
     assert model.predictor_rank_search_exhaustive_
-    assert model.n_predictor_rank_candidates_ == 3
-    assert model.n_predictor_rank_evaluated_ == 3
+    assert model.n_predictor_rank_candidates_ == 4
+    assert model.n_predictor_rank_evaluated_ == 4
     assert model.n_predictor_rank_skipped_ == 0
-    np.testing.assert_array_equal(model.predictor_rank_search_interval_, np.array([2, 4]))
+    np.testing.assert_array_equal(model.predictor_rank_search_interval_, np.array([2, 5]))
 
 
 def test_auto_rank_reduces_candidates_and_matches_optimal_on_synthetic_data() -> None:

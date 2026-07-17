@@ -1,27 +1,31 @@
 # Decision: 0003-predictor-rank-selection
 
 Status: implemented for explicit, rule-fixed, exhaustive, and adaptive conditional selection;
-search semantics are refined by decision 0007.
+search semantics are refined by Decision 0007 and the rank-support term is refined by Decision
+0032.
 
-For a supplied smallest training-set size $n_{\mathrm{train,min}}$, predictor count $p$, and
-positive numeric `samples_per_predictor_rank` value $c$, the shared upper-bound helper returns
+For total supplied sample count $n$, smallest training-set size $n_{\mathrm{train,min}}$,
+predictor count $p$, and positive numeric `samples_per_predictor_rank` value $c$, the shared
+upper-bound helper returns
 
 \begin{equation}
 r_{\pi,\max}
 =
 \min\left[
 p,
-n_{\mathrm{train,min}},
-\left\lceil\frac{n_{\mathrm{train,min}}}{c}\right\rceil
+n_{\mathrm{train,min}}-1,
+\left\lceil\frac{n}{c}\right\rceil
 \right].
 \end{equation}
 
 The ceiling operation and all three caps are normative. The helper rejects nonpositive,
 nonfinite, or boolean values of $c$.
 
-In `predictor_rank="max"` mode there is no internal cross-validation, so the sample count supplied
-to `fit()` is used as $n_{\mathrm{train,min}}$. In both CV modes, the estimator materializes and copies one CV split set, derives the smallest
-training-fold size from it, and reuses the same splits for every evaluated candidate.
+In `predictor_rank="max"` mode there is no internal cross-validation, so
+$n_{\mathrm{train,min}}=n$. In both CV modes, the estimator materializes and copies one CV split
+set, derives the smallest training-fold size from it as a feasibility cap, and reuses the same
+splits for every evaluated candidate. The statistical-support term continues to use the full $n$
+because the selected model is refitted on all supplied observations.
 
 `predictor_rank="optimal"` scans every integer rank from `n_components` through the fold-safe
 upper bound. `predictor_rank="auto"` uses the adaptive policy in decision 0007 and may evaluate

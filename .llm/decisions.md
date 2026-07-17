@@ -8,7 +8,7 @@ This index is navigation, not a substitute for those records.
 |---|---|---|
 | `0001-core-definition.md` | fixed Pi-PLS construction | SVD/least-squares core with explicit `(h, r_pi)` admissibility |
 | `0002-preprocessing-semantics.md` | centering and scaling | preprocessing remains outside the fixed numerical core |
-| `0003-predictor-rank-selection.md` | rank bound and conditional selection | fold-safe ceiling rule, materialized splits, deterministic low-rank ties |
+| `0003-predictor-rank-selection.md` | rank bound and conditional selection | ceiling rule, materialized splits, deterministic low-rank ties; sample-count convention refined by 0032 |
 | `0004-response-standardized-mse.md` | selection loss | fold-local response scales and uniform response weighting |
 | `0005-leave-one-out-protocol.md` | advanced validation | ordinary splitters, singleton-safe scoring, ordered OOF reporting |
 | `0006-paper-versus-api-rank-rule.md` | publication versus general API | publication-specific rules remain external to estimator defaults |
@@ -37,6 +37,7 @@ This index is navigation, not a substitute for those records.
 | `0029-human-and-machine-readable-results.md` | benchmark result usability | CSV principle retained; universal wide schema superseded by Decision 0030 |
 | `0030-focused-benchmark-design.md` | focused benchmark questions | one question, one script, and one minimal CSV output per benchmark |
 | `0031-default-selection-support.md` | ordinary rank-selection defaults | five samples per retained predictor direction and five-fold CV by default |
+| `0032-full-sample-rank-support.md` | rank-support sample-count convention | full supplied $n$ defines support; centered training folds impose feasibility caps |
 
 ## Accepted clarifications after earlier proposals
 
@@ -45,6 +46,8 @@ plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
 - both public selection interfaces default to `samples_per_predictor_rank=5` and `cv=5`;
+- the samples-per-rank support term uses the total number of observations supplied to `fit()`,
+  while centered training-fold dimensions remain hard candidate-feasibility caps;
 - randomized SVD is controlled independently and follows the same policy inside regression and
   path candidate fits;
 - `PiPLSRegression` is not implemented as a wrapper around `PiPLSPathCV`; both use private shared

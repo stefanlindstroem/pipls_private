@@ -7,8 +7,9 @@ Accepted and implemented in Phase D2.
 ## Decision
 
 Leave-one-out is represented by the ordinary scikit-learn `LeaveOneOut()` splitter. The numerical
-core has no LOO branch or Boolean mode. The fold-safe rank bound uses the smallest training fold;
-for LOO this is `n - 1` in both the algebraic cap and samples-per-rank term.
+core has no LOO branch or Boolean mode. Under Decision 0032, the samples-per-rank term uses the
+full $n$, while LOO contributes the centered-fold feasibility cap
+$n_{\mathrm{train,min}}-1=n-2$.
 
 The default performance criterion is response-standardized MSE using response scales estimated
 from each matching training fold with `ddof=1`. Ordinary R2 scoring is rejected for singleton

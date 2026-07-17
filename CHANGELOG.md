@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Derive the rule-based predictor-rank support term from the total number of observations supplied
+  to `fit()`, while retaining centered training-fold dimensions as hard feasibility caps; keep the
+  public defaults at `samples_per_predictor_rank=5` and `cv=5` and remove the temporary Pulp
+  `samples_per_predictor_rank=4` override.
 - Set the public rank-selection defaults to `samples_per_predictor_rank=5` and `cv=5` in both
   `PiPLSRegression` and `PiPLSPathCV`, and simplify the Pulp example and smoke check to use the
   ordinary rule-derived predictor-rank bound without an explicit maximum.

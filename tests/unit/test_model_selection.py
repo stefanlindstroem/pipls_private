@@ -20,6 +20,7 @@ def test_max_predictor_rank_uses_ceiling_rule() -> None:
     assert (
         _max_predictor_rank(
             n_features=100,
+            n_samples=51,
             n_train_min=51,
             samples_per_predictor_rank=10,
         )
@@ -31,6 +32,7 @@ def test_max_predictor_rank_respects_feature_and_training_caps() -> None:
     assert (
         _max_predictor_rank(
             n_features=3,
+            n_samples=100,
             n_train_min=100,
             samples_per_predictor_rank=10,
         )
@@ -39,33 +41,44 @@ def test_max_predictor_rank_respects_feature_and_training_caps() -> None:
     assert (
         _max_predictor_rank(
             n_features=100,
+            n_samples=100,
             n_train_min=4,
             samples_per_predictor_rank=0.1,
         )
-        == 4
+        == 3
     )
 
 
-def test_smaller_training_fold_cannot_increase_rank_bound() -> None:
+def test_support_term_uses_total_samples_while_fold_size_caps_feasibility() -> None:
     complete_data_bound = _max_predictor_rank(
         n_features=30,
+        n_samples=50,
         n_train_min=50,
         samples_per_predictor_rank=10,
     )
     fold_bound = _max_predictor_rank(
         n_features=30,
+        n_samples=50,
         n_train_min=39,
+        samples_per_predictor_rank=10,
+    )
+    feasibility_capped = _max_predictor_rank(
+        n_features=30,
+        n_samples=50,
+        n_train_min=4,
         samples_per_predictor_rank=10,
     )
 
     assert complete_data_bound == 5
-    assert fold_bound == 4
+    assert fold_bound == 5
+    assert feasibility_capped == 3
 
 
 @pytest.mark.parametrize(
     ("argument", "value"),
     [
         ("n_features", 0),
+        ("n_samples", 0),
         ("n_train_min", 0),
         ("samples_per_predictor_rank", 0.0),
         ("samples_per_predictor_rank", np.inf),
@@ -75,6 +88,7 @@ def test_smaller_training_fold_cannot_increase_rank_bound() -> None:
 def test_max_predictor_rank_rejects_invalid_inputs(argument: str, value: object) -> None:
     kwargs: dict[str, object] = {
         "n_features": 10,
+        "n_samples": 20,
         "n_train_min": 20,
         "samples_per_predictor_rank": 10,
     }
@@ -82,6 +96,26 @@ def test_max_predictor_rank_rejects_invalid_inputs(argument: str, value: object)
 
     with pytest.raises(ValueError, match=argument):
         _max_predictor_rank(**kwargs)  # type: ignore[arg-type]
+
+
+def test_max_predictor_rank_rejects_training_fold_larger_than_full_data() -> None:
+    with pytest.raises(ValueError, match="n_train_min must not exceed n_samples"):
+        _max_predictor_rank(
+            n_features=10,
+            n_samples=19,
+            n_train_min=20,
+            samples_per_predictor_rank=5,
+        )
+
+
+def test_max_predictor_rank_rejects_singleton_training_folds() -> None:
+    with pytest.raises(ValueError, match="at least 2"):
+        _max_predictor_rank(
+            n_features=10,
+            n_samples=20,
+            n_train_min=1,
+            samples_per_predictor_rank=5,
+        )
 
 
 def test_materialize_cv_splits_reuses_one_concrete_split_set() -> None:

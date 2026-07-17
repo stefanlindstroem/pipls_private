@@ -57,7 +57,6 @@ if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
 # direction and five-fold CV.
 search = PiPLSPathCV(
     n_components_values=[1, 2, 3, 4],
-    samples_per_predictor_rank=4.0,
     return_oof_predictions=True,
 ).fit(X, Y)
 

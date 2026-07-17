@@ -125,7 +125,8 @@ focused synthetic sequence now includes implemented fixed-structure recovery, ra
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
 output. The first separately reviewed real-data smoke check uses the Pulp tables and a public
 `PiPLSPathCV` workflow with the ordinary `samples_per_predictor_rank=5` and `cv=5` defaults;
-it does not set a predictor-rank ceiling. Its output labels both validation diagnostics as
+the support term uses all 46 supplied observations and no explicit predictor-rank ceiling is set.
+Its output labels both validation diagnostics as
 selection-conditioned, so they cannot be mistaken for independent-test results. Further real-data
 checks remain separately reviewed. None of this includes a block-aware standardization API design;
 future block-aware variants remain deferred for months or until the project owner explicitly starts

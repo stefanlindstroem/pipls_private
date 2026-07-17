@@ -253,7 +253,8 @@ adaptive Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporti
 **Method:** read `datasets/pulp/X.csv` and `datasets/pulp/Y.csv` directly with pandas, then fit
 `PiPLSPathCV(n_components_values=[1, 2, 3, 4], return_oof_predictions=True, n_jobs=1)`. The call
 uses the ordinary adaptive defaults `samples_per_predictor_rank=5` and `cv=5`; the benchmark does
-not supply a predictor-rank ceiling. No package loader, metadata parser, external
+not supply a predictor-rank ceiling. The support term therefore uses all 46 supplied rows, while
+the five-fold training sizes remain feasibility caps. No package loader, metadata parser, external
 preprocessing, comparator, or held-out test set is introduced. Every candidate learns model
 centering and scaling within its training fold, and the selected model refits on all 46 rows.
 

@@ -3,24 +3,27 @@
 `PiPLSRegression` supports adaptive, exhaustive, rule-fixed, and explicit predictor ranks for a
 fixed `n_components`.
 
-## Shared CV bound
+## Shared rank bound
 
-For both CV modes, the estimator materializes one split set. If the smallest training fold has
-$n_{\mathrm{train,min}}$ samples and the input has $p$ predictors, then
+Let $n$ be the total number of observations supplied to `fit()`. For both CV modes, the estimator
+materializes one split set. If the smallest training fold has $n_{\mathrm{train,min}}$ samples and
+the input has $p$ predictors, then
 
 \begin{equation}
 r_{\pi,\max}
 =
 \min\left[
 p,
-n_{\mathrm{train,min}},
+n_{\mathrm{train,min}}-1,
 \left\lceil
-n_{\mathrm{train,min}} / \texttt{samples\_per\_predictor\_rank}
+n / \texttt{samples\_per\_predictor\_rank}
 \right\rceil
 \right].
 \end{equation}
 
-Every evaluated candidate uses the same splits and fold-local centering and scaling. Scores use
+The samples-per-rank term describes support for the final model, which is refitted on all $n$
+observations. The centered-fold term and predictor count are hard feasibility caps. Every
+evaluated candidate uses the same splits and fold-local centering and scaling. Scores use
 standard scikit-learn orientation, where larger is better. Equal mean scores within
 `rtol=1e-12` and `atol=1e-15` are resolved in favor of the smaller predictor rank. The selected
 rank is refitted once on all data supplied to `fit()`.
@@ -32,9 +35,9 @@ sample standard deviations with `ddof=1`; zero scales and singleton-fold scales 
 
 The default is $c=5$. Values below 5 remain legal for exploratory work but emit
 `pipls.StatisticalSupportWarning` in `"max"`, `"optimal"`, and `"auto"` modes. Fewer than five
-training samples per retained predictor-rank direction provide insufficient statistical support
-for the resulting rank bound to be trusted without external validation. Explicit integer ranks
-bypass the $c$ rule and do not emit this warning.
+supplied observations per retained predictor-rank direction may provide insufficient statistical
+support for the resulting rank bound without external validation. Explicit integer ranks bypass
+the $c$ rule and do not emit this warning.
 
 ## Adaptive `"auto"` mode
 
@@ -83,8 +86,8 @@ are:
 
 ## Rule-fixed `"max"` mode
 
-`predictor_rank="max"` uses the same rule directly without rank CV. Here the data supplied to
-`fit()` determine the training-size term.
+`predictor_rank="max"` uses the same rule directly without rank CV. Here
+$n_{\mathrm{train,min}}=n$, so the centered-data feasibility cap is $n-1$.
 
 ## Explicit integer mode
 

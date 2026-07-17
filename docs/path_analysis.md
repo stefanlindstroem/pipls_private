@@ -30,17 +30,18 @@ settings. Set
 `search_method="auto"` performs deterministic logarithmic coarse-to-fine predictor-rank
 search independently for each `n_components` value and may skip candidates.
 
-The default fold-safe upper rank is
+The default full-sample-supported, fold-feasible upper rank is
 
 \[
-r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}},
-\left\lceil\frac{n_{\mathrm{train,min}}}
+r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
+\left\lceil\frac{n}
 {\texttt{samples_per_predictor_rank}}\right\rceil\right],
 \]
 
-where `p_min` is the smallest predictor dimension reaching the Pi-PLS step across
-training folds. Supplying an integer `max_predictor_rank` bypasses the statistical rule but
-remains capped by fold-safe algebraic dimensions.
+where $n$ is the total number of observations supplied to `fit()` and `p_min` is the smallest
+predictor dimension reaching the Pi-PLS step across training folds. Supplying an integer
+`max_predictor_rank` bypasses the statistical rule but remains capped by centered fold-feasible
+dimensions.
 
 ## Complete-pipeline search
 

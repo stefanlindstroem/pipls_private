@@ -7,7 +7,8 @@ Status: accepted
 `PiPLSRegression` exposes several integer or integer-like controls whose invalid values can
 otherwise fail inside NumPy, joblib, or scikit-learn with inconsistent messages. The rank-bound
 parameter $c$, exposed as `samples_per_predictor_rank`, also controls how much training-sample
-support is required for each retained predictor-rank direction.
+support is required for each retained predictor-rank direction. Decision 0032 specifies that this
+support term uses the total number of observations supplied to `fit()`.
 
 ## Decision
 

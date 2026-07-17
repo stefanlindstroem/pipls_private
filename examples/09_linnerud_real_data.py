@@ -33,7 +33,6 @@ if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
 model = PiPLSRegression(
     n_components=2,
     predictor_rank="optimal",
-    samples_per_predictor_rank=5,
     cv=LeaveOneOut(),
     return_oof_predictions=True,
 ).fit(X, Y)

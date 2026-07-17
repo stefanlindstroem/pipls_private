@@ -57,8 +57,8 @@ def test_path_search_uses_public_selection_and_complete_ordered_oof_output() -> 
     report = search.validation_report_
     expected_max_rank = min(
         X.shape[1],
-        search.cv_n_train_min_,
-        math.ceil(search.cv_n_train_min_ / search.samples_per_predictor_rank),
+        search.cv_n_train_min_ - 1,
+        math.ceil(len(X) / search.samples_per_predictor_rank),
     )
     assert search.samples_per_predictor_rank == 5.0
     assert search.cv == 5

@@ -79,10 +79,11 @@ class PiPLSRegression(
         exhaustively searches all admissible ranks, and ``"auto"`` uses a
         deterministic adaptive coarse-to-fine search.
     samples_per_predictor_rank:
-        Positive rule parameter $c$ used to derive the upper predictor rank.
-        The default is 5. Rule-based values below 5 emit
-        ``StatisticalSupportWarning``. It does not constrain an explicitly
-        supplied integer rank.
+        Positive rule parameter $c$ used with the total number of samples
+        supplied to ``fit`` to derive the upper predictor rank. The default is
+        5. Cross-validation training-fold sizes impose only a feasibility cap.
+        Rule-based values below 5 emit ``StatisticalSupportWarning``. It does
+        not constrain an explicitly supplied integer rank.
     cv:
         Cross-validation splitter, integer split count of at least 2, iterable
         of train-validation index pairs, or ``None`` for the standard five-fold
@@ -192,6 +193,7 @@ class PiPLSRegression(
         else:
             max_predictor_rank = _max_predictor_rank(
                 n_features=self.n_features_in_,
+                n_samples=int(X_array.shape[0]),
                 n_train_min=int(X_array.shape[0]),
                 samples_per_predictor_rank=self.samples_per_predictor_rank,
             )
@@ -216,9 +218,11 @@ class PiPLSRegression(
                     groups=groups,
                 )
                 _validate_singleton_fold_scoring(self.scoring, materialized.splits)
-            if predictor_rank > min(self.n_features_in_, materialized.n_train_min):
+            if predictor_rank > min(
+                self.n_features_in_, materialized.n_train_min - 1
+            ):
                 raise ValueError(
-                    "The selected fixed predictor rank is not algebraically valid in every "
+                    "The selected fixed predictor rank is not valid after centering in every "
                     "CV training fold. Reduce predictor_rank or use a splitter with larger "
                     "training folds."
                 )
@@ -433,6 +437,7 @@ class PiPLSRegression(
         _validate_singleton_fold_scoring(self.scoring, materialized.splits)
         max_predictor_rank = _max_predictor_rank(
             n_features=self.n_features_in_,
+            n_samples=int(X.shape[0]),
             n_train_min=materialized.n_train_min,
             samples_per_predictor_rank=self.samples_per_predictor_rank,
         )
@@ -765,7 +770,7 @@ class PiPLSRegression(
         if uses_rank_rule and samples_per_rank < _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK:
             warnings.warn(
                 f"samples_per_predictor_rank={samples_per_rank:g} is below 5. "
-                "This permits fewer than five training samples per retained predictor-rank "
+                "This permits fewer than five supplied samples per retained predictor-rank "
                 "direction, so the resulting rank bound may not have sufficient statistical "
                 "support to be trusted without external validation.",
                 StatisticalSupportWarning,

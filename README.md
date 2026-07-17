@@ -134,7 +134,8 @@ Pi-PLS-specific factorization output is grouped in the public read-only `decompo
 
 `samples_per_predictor_rank` and `cv` default to 5. Rule-based values below 5 are allowed but
 emit `StatisticalSupportWarning` because the resulting rank bound may lack sufficient
-statistical support.
+statistical support. The support term uses the total number of observations supplied to `fit()`;
+cross-validation training folds only impose centered-data feasibility caps.
 
 ## Repository map
 

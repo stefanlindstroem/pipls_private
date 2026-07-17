@@ -51,9 +51,10 @@ coverage, pooled OOF R2, and whether the splitter is structurally leave-one-out.
 
 ## Leave-one-out interpretation
 
-`LeaveOneOut()` is not a special Pi-PLS mode. It produces the ordinary fold-safe bound using
-`n_train_min = n - 1`. The default response-standardized MSE is valid for singleton folds because
-response scales are estimated only from each training fold.
+`LeaveOneOut()` is not a special Pi-PLS mode. The samples-per-rank term uses the full $n$, while
+the centered-fold feasibility cap is `n_train_min - 1 = n - 2`. The default
+response-standardized MSE is valid for singleton validation folds because response scales are
+estimated only from each training fold.
 
 Ordinary foldwise R2 is rejected when any validation fold contains one sample. When OOF
 predictions are requested, `pooled_oof_r2_` may be reported as **R2 from pooled LOO predictions**;

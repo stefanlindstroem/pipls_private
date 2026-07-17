@@ -14,10 +14,10 @@ The complete estimator or pipeline is cloned inside every training fold and cand
 A unique nested `PiPLSRegression` is inferred, while deeper composites use an explicit
 `pipls_param_prefix`.
 
-The fold-safe default predictor-rank limit uses the smallest training-fold size and the
-smallest predictor dimension reaching the Pi-PLS step. An explicit integer
-`max_predictor_rank` bypasses the statistical samples-per-rank rule but not fold-safe
-algebraic limits.
+Under Decision 0032, the default predictor-rank support term uses the total number of supplied
+observations. The smallest training-fold size and the smallest predictor dimension reaching the
+Pi-PLS step remain hard feasibility caps. An explicit integer `max_predictor_rank` bypasses the
+statistical samples-per-rank rule but not those fold-level limits.
 
 Global ties prefer smaller `n_components`, then smaller `predictor_rank`. Conditional ties
 for one component count prefer smaller predictor rank. The selected complete estimator is

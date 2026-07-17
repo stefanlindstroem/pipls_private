@@ -24,14 +24,16 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    assert search.max_predictor_rank_ == 3
-    assert search.n_path_candidates_ == 6
-    assert search.n_path_candidates_evaluated_ == 6
+    assert search.max_predictor_rank_ == 5
+    assert search.n_path_candidates_ == 12
+    assert search.n_path_candidates_evaluated_ == 12
     assert search.n_path_candidates_skipped_ == 0
     assert search.path_search_exhaustive_
     assert search.path_search_method_ == "auto"
     np.testing.assert_array_equal(search.n_components_values_, np.array([1, 2, 3]))
-    np.testing.assert_array_equal(search.predictor_rank_values_, np.array([1, 2, 3]))
+    np.testing.assert_array_equal(
+        search.predictor_rank_values_, np.array([1, 2, 3, 4, 5])
+    )
     assert np.isnan(search.response_standardized_mse_path_[1, 0])
     assert np.isnan(search.response_standardized_mse_path_[2, 0])
     assert np.isnan(search.response_standardized_mse_path_[2, 1])

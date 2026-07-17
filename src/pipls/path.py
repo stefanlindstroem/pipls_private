@@ -101,14 +101,16 @@ class PiPLSPathCV(
         Positive predictor ranks to evaluate. ``None`` uses every value from 1
         through ``max_predictor_rank_``.
     max_predictor_rank:
-        ``"rule"`` uses the fold-safe rank rule. A positive integer imposes an
-        additional explicit upper bound.
+        ``"rule"`` uses the total-sample support rule with fold-level
+        feasibility caps. A positive integer imposes an additional explicit
+        upper bound.
     search_method:
         ``"optimal"`` evaluates every admissible pair; ``"auto"`` is adaptive
         and approximate.
     samples_per_predictor_rank:
-        Positive rank-bound parameter $c$. The default is 5. Values below 5
-        issue :class:`StatisticalSupportWarning`.
+        Positive rank-bound parameter $c$ applied to the total number of samples
+        supplied to ``fit``. The default is 5. Values below 5 issue
+        :class:`StatisticalSupportWarning`.
     cv:
         Integer split count, splitter, iterable of train-validation pairs, or
         ``None`` for the standard five-fold regression split. The default is 5.
@@ -209,10 +211,11 @@ class PiPLSPathCV(
             y=y_indexable,
             splits=materialized.splits,
         )
-        algebraic_limit = min(fold_feature_limit, materialized.n_train_min)
+        algebraic_limit = min(fold_feature_limit, materialized.n_train_min - 1)
         if self.max_predictor_rank == "rule":
             self.max_predictor_rank_ = _max_predictor_rank(
                 n_features=fold_feature_limit,
+                n_samples=int(X_array.shape[0]),
                 n_train_min=materialized.n_train_min,
                 samples_per_predictor_rank=self.samples_per_predictor_rank,
             )
@@ -576,7 +579,7 @@ class PiPLSPathCV(
         ):
             warnings.warn(
                 f"samples_per_predictor_rank={samples_per_rank:g} is below 5. "
-                "This permits fewer than five training samples per retained predictor-rank "
+                "This permits fewer than five supplied samples per retained predictor-rank "
                 "direction, so the resulting rank bound may not have sufficient statistical "
                 "support to be trusted without external validation.",
                 StatisticalSupportWarning,

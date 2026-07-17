@@ -129,16 +129,17 @@ r_{\pi,\max}
 =
 \min\left[
 p,
-n_{\mathrm{train,min}},
+n_{\mathrm{train,min}}-1,
 \left\lceil
-\frac{n_{\mathrm{train,min}}}{\texttt{samples\_per\_predictor\_rank}}
+\frac{n}{\texttt{samples\_per\_predictor\_rank}}
 \right\rceil
 \right].
 \end{equation}
 
-For `"auto"` and `"optimal"`, `n_train_min` is derived from the materialized internal-CV splits. For `"max"`,
-the samples supplied to `fit()` are the training data. An explicit integer bypasses the
-rule-derived bound but remains subject to the core numerical-rank and dimensional checks.
+Here $n$ is the total number of observations supplied to `fit()`. For `"auto"` and `"optimal"`,
+`n_train_min` is derived from the materialized internal-CV splits and acts only as a centered-fold
+feasibility cap. For `"max"`, `n_train_min = n`. An explicit integer bypasses the rule-derived
+bound but remains subject to the core numerical-rank and dimensional checks.
 
 ## Internal search parameters
 
@@ -204,8 +205,9 @@ and candidate. The terminal pipeline step is inferred, while `pipls_param_prefix
 step explicitly. Arbitrary nested meta-estimators are rejected until deliberately supported.
 
 An explicit integer `max_predictor_rank` bypasses the samples-per-rank rule but remains capped
-by the smallest fold-safe algebraic dimension. The default `"rule"` mode uses the smallest
-training-fold size and the smallest predictor dimension reaching the Pi-PLS step.
+by the smallest fold-safe algebraic dimension. The default `"rule"` mode uses total supplied $n$
+for statistical support, while the smallest centered training-fold size and smallest predictor
+dimension reaching the Pi-PLS step impose feasibility caps.
 
 Public fitted attributes include standard search attributes (`cv_results_`, `best_params_`,
 `best_score_`, `best_estimator_`), the selected nested estimator (`best_pipls_` and
