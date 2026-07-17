@@ -275,6 +275,34 @@ external-test estimate. The smoke check demonstrates the public workflow and rep
 does not claim model quality, compare methods, tune preprocessing, use nested CV, or establish a
 release threshold.
 
+### 6. Sugarcane high-dimensional path-selection smoke check
+
+**Question:** Can an ordinary programming user read a transparent $p \gg n$ spectral dataset, run
+the public adaptive Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporting?
+
+**Method:** read `datasets/sugarcane/X.csv` and `datasets/sugarcane/Y.csv` directly with pandas,
+then fit `PiPLSPathCV(n_components_values=[1, 2, 3, 4], return_oof_predictions=True, n_jobs=1)`.
+The call uses the ordinary defaults `samples_per_predictor_rank=5`, `cv=5`, adaptive path search,
+and automatic solver selection. It does not supply a predictor-rank ceiling or force randomized
+SVD. No loader, metadata parser, spectral preprocessing, comparator, or artificial held-out subset
+is introduced. Every candidate learns model centering and scaling within its training fold, and the
+selected model refits on all 57 rows.
+
+The script requires exactly one row-ordered OOF prediction for each of the 57 samples and verifies
+that the selected model's score matrices contain all 57 rows.
+
+**Output:** `benchmarks/results/sugarcane_path_smoke.csv`, containing one row with exactly:
+
+- `selected_n_components`;
+- `selected_predictor_rank`;
+- `selection_conditioned_response_standardized_mse`;
+- `selection_conditioned_pooled_oof_r2`.
+
+The diagnostic names identify their protocol. They are not external-test or unbiased post-selection
+estimates. The benchmark demonstrates high-dimensional workflow execution and reporting only; it
+does not claim predictive quality, compare methods, tune spectral preprocessing, force a solver,
+measure runtime, or establish a release threshold.
+
 ## Output and reproducibility policy
 
 Each benchmark owns its own script, scenario constants, tests, and CSV header. Prefer readable
@@ -300,8 +328,9 @@ Implement the benchmarks one at a time in this order:
 2. rank selection — implemented;
 3. predictor-nuisance comparison with PLS — implemented;
 4. solver consistency — implemented;
-5. Pulp path-selection smoke check — implemented.
+5. Pulp path-selection smoke check — implemented;
+6. Sugarcane high-dimensional path-selection smoke check — implemented.
 
-The focused synthetic sequence is complete, and the first real-data smoke check is implemented.
+The focused synthetic sequence and two separately reviewed real-data smoke checks are implemented.
 Any further real-data benchmark must remain question-specific and receive separate review. Do not
 recreate the removed universal manifest, universal schema, or broad CI runner.

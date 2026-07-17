@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add the Sugarcane high-dimensional path-selection smoke check using direct pandas tables, the ordinary public `PiPLSPathCV` defaults, complete ordered five-fold OOF reporting, full-data refit checks, and a minimal selection-conditioned CSV; revise the public Sugarcane example to remove fixed ranks and training R2.
+
 - Remove the Linnerud dataset integration, its executable example, and dataset-specific test
   because it does not provide a useful representative Pi-PLS workflow; retain pulp, sugarcane,
   and tobacco as the transparent real-data suite.

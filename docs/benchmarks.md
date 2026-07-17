@@ -278,11 +278,56 @@ results and are not unbiased post-selection performance estimates. The smoke che
 the public workflow and reporting contract operate on a transparent real dataset; it does not
 assert predictive quality or compare Pi-PLS with another method.
 
+## Sugarcane high-dimensional path-selection smoke check
+
+The second real-data smoke check asks:
+
+> Can an ordinary programming user run the default Pi-PLS path workflow on a transparent
+> high-dimensional spectral dataset and obtain complete ordered OOF reporting?
+
+Run it from the repository root after installing the data dependencies:
+
+```bash
+python benchmarks/sugarcane_path_smoke.py
+```
+
+The script reads `datasets/sugarcane/X.csv` and `Y.csv` directly with pandas. The predictor table
+has 57 rows and 1,721 columns, so this check exercises the ordinary workflow when $p \gg n$:
+
+```python
+X = pd.read_csv("datasets/sugarcane/X.csv")
+Y = pd.read_csv("datasets/sugarcane/Y.csv")
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    return_oof_predictions=True,
+    n_jobs=1,
+).fit(X, Y)
+```
+
+The call uses the ordinary `samples_per_predictor_rank=5`, `cv=5`, adaptive search, and automatic
+solver defaults. It does not set a predictor-rank ceiling, force randomized SVD, preprocess the
+spectra, or create a held-out subset. Centering and optional scaling are learned separately inside
+each candidate training fold, and the selected estimator is refitted on all 57 rows.
+
+The output is `benchmarks/results/sugarcane_path_smoke.csv` with one row and exactly the same four
+explicitly selection-conditioned columns used by the Pulp workflow check:
+
+```text
+selected_n_components
+selected_predictor_rank
+selection_conditioned_response_standardized_mse
+selection_conditioned_pooled_oof_r2
+```
+
+The script verifies one ordered OOF prediction per row and complete full-data refitting. The
+diagnostics are not external-test or unbiased post-selection estimates. The check does not compare
+methods, establish a performance threshold, select spectral preprocessing, or measure runtime.
+
 ## Benchmark sequence status
 
-All four planned focused synthetic benchmarks and the Pulp path-selection smoke check are
-implemented. Further real-data smoke checks will be designed and reviewed separately rather than
-appended to a universal table.
+All four planned focused synthetic benchmarks and the Pulp and Sugarcane path-selection smoke
+checks are implemented. Tobacco remains separately reviewed rather than appended to a universal
+table because its package-level question and computational cost differ.
 
 ## Interpretation boundary
 

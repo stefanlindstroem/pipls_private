@@ -161,11 +161,41 @@ reported values, so they are useful workflow diagnostics but not unbiased post-s
 external-test performance estimates. The script checks that every Pulp row receives exactly one
 OOF prediction and fails rather than silently reporting incomplete coverage.
 
+## Sugarcane high-dimensional path-selection smoke check
+
+`sugarcane_path_smoke.py` follows the same ordinary package-user workflow on a transparent
+$p \gg n$ dataset. It reads the 57-row, 1,721-predictor Sugarcane `X.csv` and four-response
+`Y.csv` tables directly with pandas and fits adaptive `PiPLSPathCV` over component counts 1 through
+4 with ordered OOF predictions. The script relies on the ordinary
+`samples_per_predictor_rank=5` and `cv=5` defaults and does not set a predictor-rank ceiling or
+force an SVD solver.
+
+Run it from the repository root after installing the data dependencies:
+
+```bash
+python benchmarks/sugarcane_path_smoke.py
+```
+
+It writes `benchmarks/results/sugarcane_path_smoke.csv` with one row and exactly these columns:
+
+```text
+selected_n_components
+selected_predictor_rank
+selection_conditioned_response_standardized_mse
+selection_conditioned_pooled_oof_r2
+```
+
+The script checks that every Sugarcane row receives exactly one OOF prediction and that the selected
+model is refitted on all 57 rows. The diagnostics remain selection-conditioned; the benchmark does
+not claim external predictive performance, compare methods, tune spectral preprocessing, or report
+runtime.
+
 ## Sequence status
 
-The four focused synthetic benchmarks and the first separately reviewed real-data smoke check are
+The four focused synthetic benchmarks and the Pulp and Sugarcane real-data smoke checks are
 implemented. Any additional benchmark must receive its own package-level question, script, and
-minimal output contract. High-dimensional real-data checks remain separately reviewed.
+minimal output contract. Tobacco remains separately reviewed because its ordinary path search is
+substantially heavier.
 
 Generated outputs under `benchmarks/results/` remain ignored by Git and are excluded from repository
 snapshots. Software versions, parallel settings, and timings are included only in a benchmark whose

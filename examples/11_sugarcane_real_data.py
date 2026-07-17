@@ -1,10 +1,10 @@
-"""Fit Pi-PLS after explicitly reading the sugarcane X and Y tables."""
+"""Select a Pi-PLS model after explicitly reading the sugarcane X and Y tables."""
 
 from pathlib import Path
 
 import pandas as pd
 
-from pipls import PiPLSRegression
+from pipls import PiPLSPathCV
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "sugarcane"
 
@@ -22,14 +22,14 @@ if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in X.dtypes):
 if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
     raise TypeError("All response columns must be numeric.")
 
-model = PiPLSRegression(
-    n_components=2,
-    predictor_rank=8,
-    svd_solver="randomized",
-    random_state=0,
+# Use the ordinary adaptive path defaults: five samples per retained predictor
+# direction and five-fold CV.
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    return_oof_predictions=True,
 ).fit(X, Y)
 
 print(f"X shape: {X.shape}")
 print(f"Y shape: {Y.shape}")
-print(f"predictor rank: {model.predictor_rank_}")
-print(f"training R2: {model.score(X, Y):.6f}")
+print(f"selected parameters: {search.best_params_}")
+print(f"selection-conditioned pooled OOF R2: {search.pooled_oof_r2_:.6f}")

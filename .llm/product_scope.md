@@ -123,11 +123,11 @@ The first universal synthetic manifest, result schema, and broad CI runner were 
 review because they combined unrelated questions and produced an unnecessarily wide table. The
 focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
-output. The first separately reviewed real-data smoke check uses the Pulp tables and a public
-`PiPLSPathCV` workflow with the ordinary `samples_per_predictor_rank=5` and `cv=5` defaults;
-the support term uses all 46 supplied observations and no explicit predictor-rank ceiling is set.
-Its output labels both validation diagnostics as
-selection-conditioned, so they cannot be mistaken for independent-test results. Further real-data
-checks remain separately reviewed. None of this includes a block-aware standardization API design;
+output. The separately reviewed Pulp and Sugarcane smoke checks use direct table reading and the
+public `PiPLSPathCV` workflow with the ordinary `samples_per_predictor_rank=5` and `cv=5` defaults;
+neither sets an explicit predictor-rank ceiling. Sugarcane adds the transparent $p \gg n$ case.
+Both outputs label validation diagnostics as selection-conditioned, so they cannot be mistaken for
+independent-test results. Further real-data checks remain separately reviewed. None of this
+includes a block-aware standardization API design;
 future block-aware variants remain deferred for months or until the project owner explicitly starts
 a separate phase.

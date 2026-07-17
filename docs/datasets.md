@@ -140,8 +140,8 @@ licensed CC BY 4.0.
 
 The repository adaptation matches the public LabSpec and response tables by `Sample`, removes three
 rows whose total-sugar response is missing, and applies no imputation or spectral preprocessing.
-`examples/11_sugarcane_real_data.py` reads `X.csv` and `Y.csv` directly and fits a fixed Pi-PLS
-model. The compact spectral-axis description in `metadata.yaml` avoids repeating 1,721 equivalent
+`examples/11_sugarcane_real_data.py` reads `X.csv` and `Y.csv` directly and runs the ordinary
+`PiPLSPathCV` workflow with selection-conditioned OOF reporting. The compact spectral-axis description in `metadata.yaml` avoids repeating 1,721 equivalent
 per-wavelength descriptions while still defining every predictor column exactly.
 
 ## Tobacco spectral integration

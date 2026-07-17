@@ -383,13 +383,13 @@ Add one transparent dataset and one ordinary package-user question at a time. A 
 exercise fitting, selection, prediction, or validation reporting, but it must not present
 selection-conditioned diagnostics as independent performance estimates.
 
-Current status: **in progress**. The Pulp path-selection smoke check reads `X.csv` and `Y.csv`
-directly with pandas, fits the public `PiPLSPathCV` workflow with the ordinary
-`samples_per_predictor_rank=5` and `cv=5` defaults, verifies complete ordered five-fold OOF
-output, derives the support term from all 46 supplied rows, and writes selected ranks plus
-explicitly named selection-conditioned diagnostics. No
-predictor-rank ceiling, method comparison, nested-CV claim, timing table, or general
-real-data runner is included.
+Current status: **in progress**. The Pulp and Sugarcane path-selection smoke checks read `X.csv`
+and `Y.csv` directly with pandas, fit the public `PiPLSPathCV` workflow with the ordinary
+`samples_per_predictor_rank=5` and `cv=5` defaults, verify complete ordered five-fold OOF output,
+and write selected ranks plus explicitly named selection-conditioned diagnostics. Sugarcane adds
+the transparent $p \gg n$ case and full-data refit checks. Neither check supplies a predictor-rank
+ceiling, method comparison, nested-CV claim, spectral preprocessing, timing table, or general
+real-data runner.
 
 ### Product documentation and release hardening
 
@@ -419,10 +419,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Review one high-dimensional real-data smoke-check question for either sugarcane or tobacco. Choose
-one dataset and one ordinary package-user workflow before implementation. Do not combine datasets,
-add method comparisons, introduce spectral preprocessing, report timings, or create a universal
-real-data runner or schema.
+Review one Tobacco package-level smoke-check question separately. Its ordinary path workflow is
+substantially heavier than Sugarcane, so define the computational boundary before implementation.
+Do not add method comparisons, introduce spectral preprocessing, report timings without a timing
+question, or create a universal real-data runner or schema.
 
 Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
 and preprocessing must be public and explicit.

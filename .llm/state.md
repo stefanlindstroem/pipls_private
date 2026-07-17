@@ -157,14 +157,14 @@ implemented independently:
 3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
 4. full-versus-randomized solver consistency.
 
-The first separately reviewed real-data smoke check is also implemented in
-`benchmarks/pulp_path_smoke.py`. It reads `datasets/pulp/X.csv` and `Y.csv` directly with pandas,
-fits the public `PiPLSPathCV` workflow with the ordinary
-`samples_per_predictor_rank=5` and `cv=5` defaults, verifies complete ordered five-fold OOF output,
-uses all 46 supplied rows in the rank-support term, and writes one row containing selected ranks
-plus explicitly named selection-conditioned
-diagnostics. It does not supply a predictor-rank ceiling. Those diagnostics are not described as
-independent-test or unbiased post-selection performance.
+Two separately reviewed real-data smoke checks are implemented. `benchmarks/pulp_path_smoke.py`
+reads the 46-row Pulp tables and exercises the compact ordinary path-selection workflow.
+`benchmarks/sugarcane_path_smoke.py` reads the 57-row, 1,721-predictor Sugarcane tables and exercises
+the same public defaults when $p \gg n$. Both use `samples_per_predictor_rank=5` and `cv=5`, verify
+complete ordered OOF output, refit the selected model on all supplied rows, and write one row of
+selected ranks plus explicitly named selection-conditioned diagnostics. Neither supplies a
+predictor-rank ceiling, and neither diagnostic table is described as independent-test or unbiased
+post-selection performance.
 
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
 ignored and are excluded from snapshots. Software versions, execution controls, timings, and
@@ -173,10 +173,10 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Review one **high-dimensional real-data smoke-check** question for one existing transparent spectral
-dataset. Define the user workflow and minimal output before implementation. Do not combine
-sugarcane and tobacco, add method comparisons, report timings, introduce spectral preprocessing,
-or create a universal real-data runner or schema.
+Review one **Tobacco package-level smoke-check** question separately. Its ordinary path search is
+substantially heavier than Sugarcane, so define the user workflow and computational boundary before
+implementation. Do not repeat the Sugarcane table mechanically, add method comparisons, introduce
+spectral preprocessing, report timings without a timing question, or create a universal runner.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
@@ -184,8 +184,8 @@ expose its public raw-data reading and analysis-relevant preprocessing directly.
 ## Subsequent roadmap
 
 1. **Focused synthetic benchmarks:** complete.
-2. **Representative real-data smoke checks:** Pulp path selection implemented; further datasets are
-   reviewed one package-level question at a time.
+2. **Representative real-data smoke checks:** Pulp and Sugarcane path selection implemented;
+   Tobacco remains separately reviewed one package-level question at a time.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 4. **Future product development:** additional estimators, validation tools, datasets, and—only after

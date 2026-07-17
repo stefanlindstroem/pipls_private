@@ -107,11 +107,11 @@ See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datase
 
 ## Lightweight benchmarks
 
-The repository contains four focused synthetic benchmarks and one separately reviewed real-data
-smoke check. The Pulp smoke check reads `X.csv` and `Y.csv` directly with pandas, runs a public
-`PiPLSPathCV` workflow with its rule-derived default predictor-rank bound, and writes selected
-ranks plus explicitly named
-selection-conditioned diagnostics. Run it with `python benchmarks/pulp_path_smoke.py`. These
+The repository contains four focused synthetic benchmarks and two separately reviewed real-data
+smoke checks. The Pulp and Sugarcane checks read `X.csv` and `Y.csv` directly with pandas, run the
+ordinary public `PiPLSPathCV` workflow with its rule-derived default predictor-rank bound, and write
+selected ranks plus explicitly named selection-conditioned diagnostics. Run them with
+`python benchmarks/pulp_path_smoke.py` and `python benchmarks/sugarcane_path_smoke.py`. These
 values are workflow diagnostics, not external-test or unbiased post-selection estimates.
 Publication-scale OLS/CCA comparisons and figure generation remain outside this repository.
 
