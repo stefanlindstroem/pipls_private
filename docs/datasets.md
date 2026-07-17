@@ -122,17 +122,6 @@ no public registry, generic loader, preparation-only script, or required metadat
 of the runtime API.
 
 
-## Transparent real-data example
-
-The repository's first real-data integration is the Linnerud physical-exercise dataset under
-`datasets/linnerud/`. It uses the repository convention `X.csv`, `Y.csv`, and `metadata.yaml`; both
-model tables are comma-delimited and contain 20 rows and three columns. The analysis script
-`examples/09_linnerud_real_data.py` reads `X.csv` and `Y.csv` directly with pandas, checks columns,
-numeric dtypes, row counts, and missingness, then calls `PiPLSRegression.fit(X, Y)`.
-
-The metadata file documents source, license, variables, row alignment, preparation, and integrity.
-It is not parsed by the example or required by the estimator.
-
 ## Pulp real-data integration
 
 `datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses adapted

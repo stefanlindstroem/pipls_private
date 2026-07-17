@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove the Linnerud dataset integration, its executable example, and dataset-specific test
+  because it does not provide a useful representative Pi-PLS workflow; retain pulp, sugarcane,
+  and tobacco as the transparent real-data suite.
 - Derive the rule-based predictor-rank support term from the total number of observations supplied
   to `fit()`, while retaining centered training-fold dimensions as hard feasibility caps; keep the
   public defaults at `samples_per_predictor_rank=5` and `cv=5` and remove the temporary Pulp

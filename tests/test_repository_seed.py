@@ -135,3 +135,13 @@ def test_repository_has_no_paper_reproduction_scaffolding() -> None:
         root / "scripts" / "reproduce_paper",
     ]
     assert not any(path.exists() for path in retired_paths)
+
+
+def test_retired_linnerud_integration_is_absent() -> None:
+    root = _repository_root()
+    retired_paths = [
+        root / "datasets" / "linnerud",
+        root / "examples" / "09_linnerud_real_data.py",
+        root / "tests" / "data" / "test_linnerud_dataset.py",
+    ]
+    assert not any(path.exists() for path in retired_paths)

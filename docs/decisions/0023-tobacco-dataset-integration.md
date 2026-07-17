@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted during Phase E3.
+Accepted during Phase E3. The suite composition was later revised by Decision 0033.
 
 ## Context
 
@@ -27,8 +27,8 @@ spectrum-index metadata that are not predictors for the regression example.
   spectral preprocessing.
 - Publish only `X.csv`, `Y.csv`, public metadata, attribution, and a direct-reading example; do not
   add a package loader or preparation-only script.
-- Treat the initial Phase E3 integration suite as complete after Linnerud, pulp, sugarcane, and
-  tobacco; proceed next to benchmark-fixture design rather than adding datasets indefinitely.
+- Treat the Phase E3 integration suite as complete after pulp, sugarcane, and tobacco; proceed
+  next to benchmark-fixture design rather than adding datasets indefinitely.
 
 ## Consequences
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted in Phase E3.
+Superseded by Decision 0033. The integration described below has been removed.
 
 ## Context
 

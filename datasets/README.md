@@ -5,12 +5,6 @@ row-order, missing-value, public-provenance, and preparation choices are reviewe
 directory uses
 comma-delimited `X.csv`, comma-delimited `Y.csv`, and a documentary `metadata.yaml`.
 
-Available integrations:
-
-- `linnerud/`: 20 exercise observations and three physiological responses, copied from
-  scikit-learn under the BSD 3-Clause license. See `datasets/linnerud/README.md` and
-  `examples/09_linnerud_real_data.py`.
-
 The installed package provides the optional Phase E1 in-memory dataset container and deterministic
 synthetic generator under `pipls.datasets`; see `docs/datasets.md`. Synthetic data are generated
 at runtime and are not committed as dataset files.
@@ -22,7 +16,6 @@ Private development paths and preparation-only scripts are not part of dataset i
 
 ## Included datasets
 
-- `linnerud/`: small BSD-licensed physical-exercise reference dataset.
 - `pulp/`: CC BY 4.0 thermomechanical-pulp fiber-property and handsheet dataset.
 - `sugarcane/`: CC BY 4.0 LabSpec absorbance spectra with four sugarcane quality responses.
 - `tobacco/`: CC BY 4.0 raw FT-NIR spectra with 13 tobacco chemical responses.

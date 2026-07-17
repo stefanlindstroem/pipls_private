@@ -19,8 +19,8 @@ Phases A through E4b are implemented, and E4c is in progress. The current public
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, and deterministic synthetic dataset generation.
 
-The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
-navigation now describes the installable package, API, examples, datasets, validation, and releases.
+The transparent real-dataset suite contains pulp, sugarcane, and tobacco. Public navigation now
+describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts and the
 first separately reviewed real-data smoke check for the Pulp path-selection workflow. It uses the

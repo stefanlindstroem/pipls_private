@@ -37,7 +37,6 @@ output; unrelated metrics, software metadata, and timings are not combined into 
 Each committed real dataset uses `X.csv`, `Y.csv`, and documentary `metadata.yaml`, together with
 public provenance and redistribution terms. Current integrations are:
 
-- Linnerud;
 - pulp;
 - sugarcane LabSpec spectroscopy;
 - tobacco FT-NIR spectroscopy.

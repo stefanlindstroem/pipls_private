@@ -35,7 +35,7 @@ Phases A through E4b are complete and committed, and E4c real-data smoke checks 
   metadata, registry, or package-owned loader required for fitting;
 - a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
   `metadata.yaml`;
-- an initial reference suite containing Linnerud, pulp, sugarcane, and tobacco.
+- a current reference suite containing pulp, sugarcane, and tobacco.
 
 The current top-level package exports are:
 

@@ -319,11 +319,12 @@ pandas code. Do not introduce a generic registry or loader, private-source refer
 preparation-only scripts. Defer Corn reconstruction until its preprocessing choices are explicitly
 fixed; Corn will expose its public raw-data reading and analysis-relevant preprocessing.
 
-Current status: **complete for the initial reference suite**. Linnerud establishes the compact
-layout reference; pulp adds named multivariate process variables; sugarcane adds a 1,721-column
-regular wavelength grid; and tobacco adds 347 samples, 1,557 raw FT-NIR predictors, and 13
-responses. Every integration uses public provenance, direct `X.csv`/`Y.csv` reading, documentary
-metadata, and no runtime loader or hidden preparation utility.
+Current status: **complete for the current reference suite**. Pulp provides a compact named
+multivariate process dataset; sugarcane adds a 1,721-column regular wavelength grid; and tobacco
+adds 347 samples, 1,557 raw FT-NIR predictors, and 13 responses. Every integration uses public
+provenance, direct `X.csv`/`Y.csv` reading, documentary metadata, and no runtime loader or hidden
+preparation utility. Decision 0033 removed the former Linnerud integration because it no longer
+served a useful package-level example or validation role.
 
 ### Product transition P1: repository cleanup
 

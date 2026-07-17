@@ -89,16 +89,18 @@ print(model.score(test.X, test.Y))
 
 ## Reference datasets and examples
 
-The repository includes transparent examples for Linnerud, pulp, sugarcane, and tobacco. Each
-example reads comma-delimited `X.csv` and `Y.csv` files directly with pandas and shows all
-analysis-facing matrix construction in ordinary user code.
+The repository includes transparent examples for pulp, sugarcane, and tobacco. Each example
+reads comma-delimited `X.csv` and `Y.csv` files directly with pandas and shows all analysis-facing
+matrix construction in ordinary user code.
 
 ```python
 import pandas as pd
 
-X = pd.read_csv("datasets/linnerud/X.csv")
-Y = pd.read_csv("datasets/linnerud/Y.csv")
-model = PiPLSRegression(n_components=2).fit(X, Y)
+from pipls import PiPLSPathCV
+
+X = pd.read_csv("datasets/pulp/X.csv")
+Y = pd.read_csv("datasets/pulp/Y.csv")
+search = PiPLSPathCV(n_components_values=[1, 2, 3, 4]).fit(X, Y)
 ```
 
 See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).

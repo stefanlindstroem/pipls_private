@@ -22,13 +22,13 @@ This index is navigation, not a substitute for those records.
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
 | `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional immutable datasets plus local seeded latent-structure generation |
 | `0016-transparent-data-ingestion.md` | real-data and example boundary | users and examples read `X` and `Y` explicitly; no required registry or generic loader |
-| `0017-first-real-dataset.md` | first transparent real-data integration | Linnerud files are read explicitly; provenance remains repository-only |
+| `0017-first-real-dataset.md` | former first transparent real-data integration | superseded by Decision 0033; the Linnerud integration is removed |
 | `0018-repository-dataset-layout.md` | committed real-dataset file convention | every dataset uses comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
-| `0019-pulp-dataset-integration.md` | second transparent real-data integration | pulp uses public supplementary provenance, CC BY 4.0 attribution, named column selection, and direct X/Y reading |
+| `0019-pulp-dataset-integration.md` | pulp dataset integration | pulp uses public supplementary provenance, CC BY 4.0 attribution, named column selection, and direct X/Y reading |
 | `0020-public-dataset-provenance-boundary.md` | public versus internal dataset materials | public-only provenance; no private paths or preparation-only scripts; Corn preprocessing remains user-facing |
 | `0021-durable-repository-tests.md` | repository test stability | test behavior and structural format without pinning living prose or documentary field values |
-| `0022-sugarcane-dataset-integration.md` | third transparent real-data integration | public LabSpec spectra, explicit row and wavelength selection, and compact regular-axis metadata |
-| `0023-tobacco-dataset-integration.md` | fourth transparent real-data integration | public raw FT-NIR spectra, explicit ID alignment, metadata-column exclusion, and no spectral preprocessing |
+| `0022-sugarcane-dataset-integration.md` | sugarcane dataset integration | public LabSpec spectra, explicit row and wavelength selection, and compact regular-axis metadata |
+| `0023-tobacco-dataset-integration.md` | tobacco dataset integration | public raw FT-NIR spectra, explicit ID alignment, metadata-column exclusion, and no spectral preprocessing |
 | `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction stays downstream; future block-aware API design is deferred |
 | `0025-model-internal-standardization-boundary.md` | current versus future scaling | estimator centering/scaling is current and fold-local; only future block-aware variants are deferred |
 | `0026-package-navigation-cleanup.md` | public repository navigation | remove paper placeholders and organize entry points around the installable software product |
@@ -38,6 +38,7 @@ This index is navigation, not a substitute for those records.
 | `0030-focused-benchmark-design.md` | focused benchmark questions | one question, one script, and one minimal CSV output per benchmark |
 | `0031-default-selection-support.md` | ordinary rank-selection defaults | five samples per retained predictor direction and five-fold CV by default |
 | `0032-full-sample-rank-support.md` | rank-support sample-count convention | full supplied $n$ defines support; centered training folds impose feasibility caps |
+| `0033-remove-linnerud-integration.md` | reference dataset scope | remove the Linnerud dataset, example, test, and active navigation |
 
 ## Accepted clarifications after earlier proposals
 
@@ -66,8 +67,8 @@ plan contains an earlier or more general proposal:
   utility functions;
 - committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
   external users remain free to use any data source or file organization;
-- the initial real-data integration suite is Linnerud, pulp, sugarcane, and tobacco; all are
-  repository example data, not runtime loaders or publication-result claims;
+- the current real-data integration suite is pulp, sugarcane, and tobacco; all are repository
+  example data, not runtime loaders or publication-result claims;
 - committed dataset assets use public or included provenance only; private archive references and
   preparation-only scripts stay outside the repository, while Corn raw-data preprocessing will be
   explicit and user-facing;

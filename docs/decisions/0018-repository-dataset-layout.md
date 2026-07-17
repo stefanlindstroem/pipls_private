@@ -7,9 +7,9 @@ Accepted during Phase E3; clarified by Decision 0020.
 ## Context
 
 Transparent examples should resemble ordinary user code, but committed datasets also need a
-consistent, reviewable repository layout. The first Linnerud integration used source-specific file
-names and whitespace-delimited tables, which would make later dataset directories unnecessarily
-heterogeneous.
+consistent, reviewable repository layout. The first committed integration used source-specific
+file names and whitespace-delimited tables, which would make later dataset directories
+unnecessarily heterogeneous.
 
 ## Decision
 
