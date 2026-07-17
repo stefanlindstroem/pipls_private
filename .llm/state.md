@@ -76,6 +76,7 @@ from pipls.datasets import (
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or loader required for fitting |
 | Repository datasets | comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
+| Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 
 Additional fixed decisions:
 
@@ -91,6 +92,8 @@ Additional fixed decisions:
   `selection-conditioned`, not unbiased external-test estimates.
 - Arbitrary nested meta-estimators and general metadata routing are not supported merely because
   scikit-learn can represent them.
+- Repository tests follow `.llm/testing.md`: living handoff, roadmap, and dataset metadata
+  contents are reviewed but are not mirrored as fixed phrase or field-value assertions.
 
 ## Current next increment
 
@@ -160,9 +163,10 @@ From an uploaded snapshot, a maintainer should:
 5. inspect the affected source and tests rather than trusting document claims alone;
 6. read `.llm/data_io.md` and `.llm/dataset_layout.md` for dataset, real-data, example, or
    reproduction work;
-7. verify that the requested work is the current increment or that the owner explicitly changed
+7. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
+8. verify that the requested work is the current increment or that the owner explicitly changed
    the order;
-8. return one root-relative unified Git patch, validation results, and exact direct Git commands.
+9. return one root-relative unified Git patch, validation results, and exact direct Git commands.
 
 Routine work should not require re-uploading the manuscript. Request external scientific material
 only when the repository contracts identify a genuine unresolved scientific choice.

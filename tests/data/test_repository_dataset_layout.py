@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import hashlib
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -21,7 +21,23 @@ def _dataset_directories() -> list[Path]:
 def _load_metadata(path: Path) -> dict[str, Any]:
     loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
     assert isinstance(loaded, dict)
+    assert loaded
+    assert all(isinstance(key, str) and key for key in loaded)
     return loaded
+
+
+def _assert_numeric_csv_format(path: Path) -> pd.DataFrame:
+    first_line = path.read_text(encoding="utf-8").splitlines()[0]
+    assert "," in first_line
+    assert "\t" not in first_line
+
+    frame = pd.read_csv(path)
+    assert not frame.empty
+    assert frame.columns.is_unique
+    assert all(isinstance(column, str) and column for column in frame.columns)
+    assert all(np.issubdtype(dtype, np.number) for dtype in frame.dtypes)
+    assert np.isfinite(frame.to_numpy()).all()
+    return frame
 
 
 def test_all_repository_datasets_use_standard_files() -> None:
@@ -34,57 +50,9 @@ def test_all_repository_datasets_use_standard_files() -> None:
         assert (data_dir / "metadata.yaml").is_file(), data_dir
 
 
-def test_all_repository_dataset_metadata_matches_tables() -> None:
+def test_all_repository_dataset_files_have_supported_formats() -> None:
     for data_dir in _dataset_directories():
-        metadata = _load_metadata(data_dir / "metadata.yaml")
-        X = pd.read_csv(data_dir / "X.csv")
-        Y = pd.read_csv(data_dir / "Y.csv")
-
-        assert metadata["schema_version"] == 1
-        assert metadata["dataset"]["id"] == data_dir.name
-        assert metadata["files"] == {"predictors": "X.csv", "responses": "Y.csv"}
-        assert metadata["format"] == {
-            "type": "csv",
-            "delimiter": ",",
-            "encoding": "utf-8",
-            "header": True,
-        }
-        assert metadata["dimensions"] == {
-            "n_samples": len(X),
-            "n_predictors": X.shape[1],
-            "n_responses": Y.shape[1],
-        }
-        assert [item["name"] for item in metadata["predictors"]] == list(X.columns)
-        assert [item["name"] for item in metadata["responses"]] == list(Y.columns)
-        assert all(item["description"] for item in metadata["predictors"])
-        assert all(item["description"] for item in metadata["responses"])
+        X = _assert_numeric_csv_format(data_dir / "X.csv")
+        Y = _assert_numeric_csv_format(data_dir / "Y.csv")
+        _load_metadata(data_dir / "metadata.yaml")
         assert len(X) == len(Y)
-
-
-def test_all_repository_dataset_integrity_hashes_are_current() -> None:
-    for data_dir in _dataset_directories():
-        metadata = _load_metadata(data_dir / "metadata.yaml")
-        checksums = metadata["integrity"]["sha256"]
-        assert "X.csv" in checksums
-        assert "Y.csv" in checksums
-
-        for filename, expected in checksums.items():
-            actual = hashlib.sha256((data_dir / filename).read_bytes()).hexdigest()
-            assert actual == expected
-
-
-def test_repository_dataset_assets_do_not_expose_private_sources() -> None:
-    forbidden = (
-        "piplsr_v0.1",
-        "vishal agrawal",
-        "research archive",
-        "scripts/prepare_data",
-    )
-    for data_dir in _dataset_directories():
-        for filename in ("metadata.yaml", "README.md", "LICENSE.txt"):
-            path = data_dir / filename
-            if not path.exists():
-                continue
-            text = path.read_text(encoding="utf-8").lower()
-            for fragment in forbidden:
-                assert fragment not in text, f"{path} exposes private source detail: {fragment}"

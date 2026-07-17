@@ -40,6 +40,8 @@ planning materials as the maintained source of project intent.
     for patch application or committing.
 13. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
     one patch unless the dependency cannot be separated.
+14. Keep repository tests durable: verify behavior and file structure, not current roadmap prose
+    or documentary metadata values.
 
 ## Fixed architectural decisions
 
@@ -69,6 +71,8 @@ planning materials as the maintained source of project intent.
 - Patch application and commits use ordinary Git commands rather than project wrapper scripts.
 - Snapshots contain repository-root contents without an enclosing project directory.
 - Patches are unified Git patches relative to repository root.
+- Living `.llm` documents and dataset metadata are reviewed artifacts, not duplicated as fixed
+  phrase or field-value assertions in the test suite.
 
 ## Increment sequence
 
@@ -347,5 +351,7 @@ For every patch, the LLM maintainer should:
 4. update `.llm/state.md`, `Current status`, and `Current next increment` when phase state changes;
 5. update fixed decisions only after an explicit owner decision;
 6. run and report each applicable Makefile validation target;
-7. return a root-relative patch and provide the exact direct Git commands for checking, applying,
+7. review tests against `.llm/testing.md` and remove accidental coupling to living prose or
+   documentary field values;
+8. return a root-relative patch and provide the exact direct Git commands for checking, applying,
    inspecting, staging, and committing it.

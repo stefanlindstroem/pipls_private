@@ -91,3 +91,14 @@ model = PiPLSRegression().fit(X, Y)
 A user may ignore `metadata.yaml`, use different filenames, use another delimiter, read a database,
 or obtain arrays from any domain-specific source. The repository convention exists for review,
 reproducibility, and consistent examples only.
+
+## Testing boundary
+
+Repository tests verify that `X.csv`, `Y.csv`, and `metadata.yaml` exist and use supported technical
+formats. They may check that the two CSV files are numeric, finite, non-empty, comma-delimited, and
+row-aligned, and that the metadata file parses as a non-empty YAML mapping.
+
+Tests do not duplicate the documentary contents of `metadata.yaml`: titles, descriptions,
+citations, dimensions, variable lists, preparation prose, and recorded hashes remain reviewable
+repository data rather than fixed test expectations. Exact scientific fixtures belong to Phase E4
+or a paper-reproduction decision with explicit tolerances and update rules.

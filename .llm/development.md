@@ -35,6 +35,12 @@
 
 ## Tests and documentation
 
+- Follow `.llm/testing.md`: test executable behavior and durable machine contracts, not the
+  current prose or individual field values of living guidance and documentary metadata.
+- For shipped Markdown and YAML, prefer existence, UTF-8 decoding, parsability, and generic
+  structural consistency over phrase matching or copied field values.
+- Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
+  benchmark or reproduction decision; do not freeze them accidentally in repository-layout tests.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.
