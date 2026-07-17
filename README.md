@@ -116,7 +116,7 @@ The repository defines a versioned synthetic package-validation contract coverin
 Pi-PLS rank selection, latent-subspace recovery, solver consistency, and representative runtime.
 Ordinary PLS is the sole external comparator in version 1; publication-scale OLS/CCA comparisons
 and figure generation remain outside this repository. The deterministic CI tier can be run with
-`make benchmark-ci`; generated JSON Lines remain ignored and no broad benchmark results are
+`make benchmark-ci`; generated flat CSV results remain ignored and no broad benchmark results are
 committed.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).

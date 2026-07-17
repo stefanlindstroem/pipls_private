@@ -62,7 +62,7 @@ block-aware scaling API is designed or scheduled.
   `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
   utilities or publication pipelines.
-- `benchmarks/`: versioned lightweight package-validation manifests, result schemas, and
+- `benchmarks/`: versioned lightweight package-validation manifests, flat CSV result schemas, and
   repository-local runners. Generated outputs are ignored; synthetic validation is primary.
 - `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,
   and accepted decision records.

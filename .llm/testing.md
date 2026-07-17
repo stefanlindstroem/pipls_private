@@ -47,8 +47,8 @@ the source of record for those contents.
 
 Package benchmark manifests and result schemas are executable, versioned contracts rather than
 living documentary metadata. Tests may therefore validate their required fields, references, rank
-constraints, metric domains, and schema structure when an accepted benchmark decision defines
-those semantics.
+constraints, metric domains, schema structure, CSV header order, and typed round-trip behavior when
+an accepted benchmark decision defines those semantics.
 
 Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
 assertions require an explicit decision record describing why the value is stable, what software

@@ -29,7 +29,7 @@ The principal navigation documents are:
 10. `data_io.md` — transparent real-data input and example contract.
 11. `dataset_layout.md` — normative `X.csv`/`Y.csv`/`metadata.yaml` convention for committed real
     datasets.
-12. `benchmarking.md` — versioned package-benchmark scenarios, metrics, tiers, result schema,
+12. `benchmarking.md` — versioned package-benchmark scenarios, metrics, tiers, flat CSV result schema,
     tolerances, and update rules.
 13. `testing.md` — durable test boundaries for behavior, shipped-file structure, and living
     documents.

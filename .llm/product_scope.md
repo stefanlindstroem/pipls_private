@@ -26,6 +26,18 @@ These assets should answer practical software-user questions: how to install the
 `X` and `Y`, fit and validate Pi-PLS models, interpret outputs, compose supported pipelines, and
 understand numerical or performance trade-offs.
 
+## Human and machine usability
+
+Every package-facing artifact should be comfortable for both human readers and automated tools.
+Prefer familiar, inspectable formats with explicit machine contracts: CSV for genuinely tabular
+results, YAML for concise structured metadata, and ordinary Python interfaces for computation.
+Avoid nesting, opaque encodings, or infrastructure-oriented formats when a flat representation is
+more natural.
+
+Machine readability does not justify making routine inspection difficult. Human readability does
+not justify ambiguous columns or undocumented types. Versioned schemas, stable names, explicit null
+semantics, and straightforward examples should serve both audiences together.
+
 ## Publication boundary
 
 Paper-specific reproduction assets do not belong in this repository:

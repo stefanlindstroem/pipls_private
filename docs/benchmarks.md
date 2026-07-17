@@ -35,7 +35,7 @@ make benchmark-ci
 ```
 
 The repository-local runner reads the versioned manifest and writes
-`benchmarks/results/synthetic-ci.jsonl`. The file is ignored by Git. Each record is validated against
+`benchmarks/results/synthetic-ci.csv`. The file is ignored by Git. Each flat row is validated against
 the versioned result schema. The command currently implements only the CI tier; standard and
 performance execution remain later, opt-in work.
 
@@ -74,11 +74,27 @@ loading matrices are transformed by the observed-variable generator scales divid
 training scales, orthonormalized, and compared through squared projection overlap. This preserves
 the current model-internal standardization contract.
 
+## Reading the results
+
+The output is ordinary UTF-8 CSV with a header row. It can be opened directly in spreadsheet
+software or read without custom parsing:
+
+```python
+import pandas as pd
+
+results = pd.read_csv("benchmarks/results/synthetic-ci.csv")
+print(results.to_string(index=False))
+```
+
+The flat columns include identifiers, software versions, resolved model and CV parameters, metrics,
+status, and an optional message. Empty cells represent non-applicable or unavailable values.
+
 ## Results and tolerances
 
-Generated records use JSON Lines and the schema at
-[`../benchmarks/schema/result-v1.schema.json`](../benchmarks/schema/result-v1.schema.json). Result
-files are not committed by default.
+Generated records use CSV and the schema at
+[`../benchmarks/schema/result-v2.schema.json`](../benchmarks/schema/result-v2.schema.json). The
+schema fixes column order, types, null representation, and the result-schema version. Result files
+are not committed by default.
 
 Contract version 1 freezes exact generator repeatability, strict deterministic-fit repeatability,
 finite metric requirements, and the `[0, 1]` range of subspace-capture metrics. It does not freeze

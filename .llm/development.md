@@ -52,6 +52,8 @@
 - Benchmark runners must consume versioned manifests, emit schema-conforming records, preserve
   fold-local standardization, and keep generated outputs out of Git unless a decision explicitly
   freezes a narrow fixture.
+- Design files and command outputs for both humans and machines. When records are naturally tabular,
+  prefer flat UTF-8 CSV with an explicit versioned column schema over nested serialization.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

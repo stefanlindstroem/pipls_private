@@ -262,8 +262,9 @@ tolerances:
   full_vs_randomized_thresholds: calibration_required_before_ci_gate
 
 results:
-  format: jsonl
-  schema: benchmarks/schema/result-v1.schema.json
+  format: csv
+  schema_version: 2
+  schema: benchmarks/schema/result-v2.schema.json
   generated_directory: benchmarks/results
   committed_by_default: false
   one_record_per: [suite_id, tier, scenario_id, seed, method_id]

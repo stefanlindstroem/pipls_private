@@ -156,16 +156,25 @@ def test_synthetic_benchmark_manifest_is_structurally_valid() -> None:
         assert tier["expected_runtime_seconds"] > 0
 
 
-def test_result_schema_is_valid_json_and_matches_manifest_version() -> None:
+def test_result_schema_defines_a_flat_ordered_csv_contract() -> None:
     root = _repository_root()
-    schema_path = root / "benchmarks" / "schema" / "result-v1.schema.json"
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
     manifest = _load_manifest()
+    results = manifest["results"]
+    schema_path = root / results["schema"]
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
+    assert results["format"] == "csv"
+    assert results["schema_version"] == 2
     assert schema["type"] == "object"
     assert schema["additionalProperties"] is False
-    assert schema["properties"]["schema_version"]["const"] == manifest["schema_version"]
-    assert {
+    assert schema["properties"]["schema_version"]["const"] == results["schema_version"]
+    assert schema["x-csv"]["encoding"] == "utf-8"
+    assert schema["x-csv"]["delimiter"] == ","
+    assert schema["x-csv"]["header"] is True
+    assert schema["x-csv"]["null"] == ""
+
+    columns = schema["x-csv"]["columns"]
+    assert columns[:7] == [
         "schema_version",
         "suite_id",
         "tier",
@@ -173,10 +182,12 @@ def test_result_schema_is_valid_json_and_matches_manifest_version() -> None:
         "seed",
         "method_id",
         "status",
-        "versions",
-        "parameters",
-        "metrics",
-    } <= set(schema["required"])
+    ]
+    assert len(columns) == len(set(columns))
+    assert set(columns) == set(schema["properties"]) == set(schema["required"])
+    assert all(
+        property_schema.get("type") != "object" for property_schema in schema["properties"].values()
+    )
 
 
 def test_generated_benchmark_results_are_ignored() -> None:

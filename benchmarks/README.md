@@ -6,8 +6,8 @@ grids, or cached paper outputs.
 
 The first accepted suite is [`manifests/synthetic-v1.yaml`](manifests/synthetic-v1.yaml). It defines
 controlled synthetic scenarios, deterministic seeds, method roles, runtime tiers, metrics,
-tolerance policy, and generated-result format. The result record schema is
-[`schema/result-v1.schema.json`](schema/result-v1.schema.json).
+tolerance policy, and generated-result format. The flat CSV record schema is
+[`schema/result-v2.schema.json`](schema/result-v2.schema.json).
 
 The CI tier is implemented by [`run_synthetic.py`](run_synthetic.py). Run it through:
 
@@ -15,9 +15,23 @@ The CI tier is implemented by [`run_synthetic.py`](run_synthetic.py). Run it thr
 make benchmark-ci
 ```
 
-This writes `benchmarks/results/synthetic-ci.jsonl`. Generated outputs are ignored by Git unless a
-later decision explicitly freezes a small package-validation fixture with documented meaning and
-tolerances. The standard and performance tiers remain unimplemented.
+This writes `benchmarks/results/synthetic-ci.csv`. The file is ordinary UTF-8, comma-delimited
+tabular data with one header row and one result row per scenario, seed, and method. Open it directly
+with pandas, R, spreadsheet software, or a text editor. Empty cells mean that a field does not apply
+to that method or was not measured.
+
+For example:
+
+```python
+import pandas as pd
+
+results = pd.read_csv("benchmarks/results/synthetic-ci.csv")
+print(results.to_string(index=False))
+```
+
+Generated outputs are ignored by Git unless a later decision explicitly freezes a small
+package-validation fixture with documented meaning and tolerances. The standard and performance
+tiers remain unimplemented.
 
 ## Scope
 
@@ -47,3 +61,10 @@ The runner is repository-local and is not exported from `pipls`. It consumes the
 than duplicating scenario values. Adaptive path candidates use joblib threads with one native
 linear-algebra thread per candidate so the CI tier stays small and avoids nested oversubscription.
 Resource timings are descriptive and are excluded from repeatability comparisons.
+
+
+## Human and machine readability
+
+Benchmark results are flat CSV because they are tables. Column order, names, types, null handling,
+and schema version are defined by the machine-readable JSON schema. This gives humans a familiar
+file and machines an explicit contract without requiring nested-record parsing.

@@ -372,7 +372,7 @@ representative real-dataset smoke checks. Store only package-validation expectat
 update rules; do not convert the benchmark layer into a publication-result archive.
 
 Current status: **underway**. The manifest-driven CI runner is implemented with deterministic
-scale expansion, schema-valid JSON Lines records, fixed and adaptive Pi-PLS execution, ordinary PLS
+scale expansion, schema-valid flat CSV records, fixed and adaptive Pi-PLS execution, ordinary PLS
 comparison, subspace metrics, bounded parallelism, and repeatability tests. Standard/performance
 tiers and frozen fixtures remain unimplemented.
 

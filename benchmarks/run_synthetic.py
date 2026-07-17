@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import platform
 import sys
@@ -51,8 +52,7 @@ def run_benchmark(
 
     if tier != _IMPLEMENTED_TIER:
         raise ValueError(
-            f"Only the {_IMPLEMENTED_TIER!r} synthetic benchmark tier is implemented; "
-            f"got {tier!r}."
+            f"Only the {_IMPLEMENTED_TIER!r} synthetic benchmark tier is implemented; got {tier!r}."
         )
 
     manifest = load_manifest(manifest_path)
@@ -70,10 +70,7 @@ def run_benchmark(
     }
     seed_set = _string(tier_config["seed_set"], name="seed_set")
     seeds = _sequence(_mapping(manifest["seeds"], name="seeds")[seed_set], name="seeds")
-    schema_path = _resolve_repository_path(
-        _string(_mapping(manifest["results"], name="results")["schema"], name="schema")
-    )
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    schema = load_result_schema(manifest)
 
     records: list[JsonObject] = []
     for scenario_id in _string_sequence(tier_config["scenarios"], name="tier scenarios"):
@@ -97,18 +94,107 @@ def run_benchmark(
     return records
 
 
-def write_jsonl(records: Sequence[Mapping[str, Any]], output: Path | None) -> None:
-    """Write records as deterministic JSON Lines to a file or standard output."""
+def load_result_schema(manifest: Mapping[str, Any]) -> JsonObject:
+    """Load the manifest-selected flat CSV result schema."""
 
-    text = "".join(
-        json.dumps(dict(record), sort_keys=True, allow_nan=False, separators=(",", ":")) + "\n"
-        for record in records
+    schema_path = _resolve_repository_path(
+        _string(_mapping(manifest["results"], name="results")["schema"], name="schema")
     )
+    data = json.loads(schema_path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("The benchmark result schema must contain a JSON object.")
+    return data
+
+
+def write_csv(
+    records: Sequence[Mapping[str, Any]],
+    output: Path | None,
+    schema: Mapping[str, Any],
+) -> None:
+    """Write flat benchmark records as deterministic UTF-8 CSV."""
+
+    columns = _csv_columns(schema)
     if output is None:
-        sys.stdout.write(text)
+        _write_csv_stream(records, stream=sys.stdout, columns=columns, schema=schema)
         return
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(text, encoding="utf-8")
+    with output.open("w", encoding="utf-8", newline="") as stream:
+        _write_csv_stream(records, stream=stream, columns=columns, schema=schema)
+
+
+def read_csv_results(path: Path, schema: Mapping[str, Any]) -> list[JsonObject]:
+    """Read and validate flat benchmark CSV records."""
+
+    columns = _csv_columns(schema)
+    with path.open("r", encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if reader.fieldnames != columns:
+            raise ValueError("Benchmark CSV header does not match the versioned result schema.")
+        records = [
+            {
+                name: _parse_csv_value(row[name], _mapping(schema["properties"][name], name=name))
+                for name in columns
+            }
+            for row in reader
+        ]
+    for record in records:
+        validate_result_record(record, schema)
+    return records
+
+
+def _write_csv_stream(
+    records: Sequence[Mapping[str, Any]],
+    *,
+    stream: Any,
+    columns: list[str],
+    schema: Mapping[str, Any],
+) -> None:
+    writer = csv.DictWriter(stream, fieldnames=columns, lineterminator="\n")
+    writer.writeheader()
+    for record in records:
+        validate_result_record(record, schema)
+        writer.writerow({name: _format_csv_value(record[name]) for name in columns})
+
+
+def _csv_columns(schema: Mapping[str, Any]) -> list[str]:
+    csv_contract = _mapping(schema["x-csv"], name="x-csv")
+    columns = _string_sequence(csv_contract["columns"], name="CSV columns")
+    properties = _mapping(schema["properties"], name="schema properties")
+    if set(columns) != set(properties):
+        raise ValueError("CSV columns and result-schema properties must agree exactly.")
+    return columns
+
+
+def _format_csv_value(value: Any) -> Any:
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return value
+
+
+def _parse_csv_value(value: str, schema: Mapping[str, Any]) -> Any:
+    expected = schema.get("type")
+    expected_types = expected if isinstance(expected, list) else [expected]
+    if value == "" and "null" in expected_types:
+        return None
+    non_null = [item for item in expected_types if item != "null"]
+    if len(non_null) != 1:
+        raise ValueError(f"CSV field has unsupported schema type {expected!r}.")
+    value_type = non_null[0]
+    if value_type == "string":
+        return value
+    if value_type == "integer":
+        return int(value)
+    if value_type == "number":
+        return float(value)
+    if value_type == "boolean":
+        if value == "true":
+            return True
+        if value == "false":
+            return False
+        raise ValueError(f"CSV boolean must be 'true' or 'false'; got {value!r}.")
+    raise ValueError(f"CSV field has unsupported schema type {value_type!r}.")
 
 
 def validate_result_record(record: Mapping[str, Any], schema: Mapping[str, Any]) -> None:
@@ -143,9 +229,7 @@ def _run_method(
         estimator = _make_estimator(method, parameters=parameters, seed=seed, manifest=manifest)
         fit_started = time.perf_counter()
         if isinstance(estimator, PiPLSPathCV):
-            with threadpool_limits(limits=1), parallel_config(
-                backend="threading", n_jobs=-1
-            ):
+            with threadpool_limits(limits=1), parallel_config(backend="threading", n_jobs=-1):
                 estimator.fit(train.X, train.Y)
         else:
             with threadpool_limits(limits=1):
@@ -168,12 +252,12 @@ def _run_method(
             fit_time=fit_time,
             predict_time=predict_time,
         )
-        return {**base, "status": "ok", "metrics": metrics, "message": None}
+        return {**base, "status": "ok", **metrics, "message": None}
     except Exception as error:  # pragma: no cover - defensive result capture
         return {
             **base,
             "status": "failed",
-            "metrics": {},
+            **_empty_metrics(manifest),
             "message": f"{type(error).__name__}: {error}",
         }
 
@@ -327,9 +411,7 @@ def _benchmark_metrics(
         fitted_scale=x_scale,
     )
     x_signal_truth = _scaled_truth_basis(
-        np.column_stack(
-            (truth.x_shared_loadings, truth.x_predictor_specific_loadings)
-        ),
+        np.column_stack((truth.x_shared_loadings, truth.x_predictor_specific_loadings)),
         observed_scale=truth.feature_scale,
         fitted_scale=x_scale,
     )
@@ -341,9 +423,7 @@ def _benchmark_metrics(
 
     return {
         "response_standardized_mse": float(np.mean(np.square(standardized_residual))),
-        "r2_uniform_average": float(
-            r2_score(test.Y, prediction, multioutput="uniform_average")
-        ),
+        "r2_uniform_average": float(r2_score(test.Y, prediction, multioutput="uniform_average")),
         "selected_n_components": selected_n_components,
         "selected_predictor_rank": selected_predictor_rank,
         "n_components_absolute_error_from_declared_shared_rank": abs(
@@ -430,6 +510,51 @@ def _fitted_pipls(estimator: Any) -> PiPLSRegression | None:
     return None
 
 
+def _empty_metrics(manifest: Mapping[str, Any]) -> JsonObject:
+    metric_groups = _mapping(manifest["metrics"], name="metrics")
+    return {
+        metric: None
+        for values in metric_groups.values()
+        for metric in _string_sequence(values, name="metric names")
+    }
+
+
+def _flatten_parameters(parameters: Mapping[str, Any]) -> JsonObject:
+    flattened: JsonObject = {
+        "scale": None,
+        "n_components": None,
+        "predictor_rank": None,
+        "svd_solver": None,
+        "random_state": None,
+        "search_method": None,
+        "max_predictor_rank": None,
+        "samples_per_predictor_rank": None,
+        "scoring": None,
+        "cv_splitter": None,
+        "cv_n_splits": None,
+        "cv_shuffle": None,
+        "cv_random_state": None,
+        "n_jobs": None,
+        "parallel_backend": None,
+        "native_threads_per_worker": None,
+    }
+    for key in flattened:
+        if key in parameters:
+            flattened[key] = parameters[key]
+    cv = parameters.get("cv")
+    if cv is not None:
+        cv_mapping = _mapping(cv, name="resolved cv")
+        flattened.update(
+            {
+                "cv_splitter": cv_mapping.get("splitter"),
+                "cv_n_splits": cv_mapping.get("n_splits"),
+                "cv_shuffle": cv_mapping.get("shuffle"),
+                "cv_random_state": cv_mapping.get("random_state"),
+            }
+        )
+    return flattened
+
+
 def _base_record(
     *,
     manifest: Mapping[str, Any],
@@ -440,19 +565,20 @@ def _base_record(
     parameters: Mapping[str, Any],
 ) -> JsonObject:
     return {
-        "schema_version": _integer(manifest["schema_version"], name="schema_version"),
+        "schema_version": _integer(
+            _mapping(manifest["results"], name="results")["schema_version"],
+            name="result schema_version",
+        ),
         "suite_id": _string(manifest["suite_id"], name="suite_id"),
         "tier": tier,
         "scenario_id": scenario_id,
         "seed": seed,
         "method_id": method_id,
-        "versions": {
-            "python": platform.python_version(),
-            "pipls": pipls.__version__,
-            "numpy": np.__version__,
-            "scikit_learn": sklearn.__version__,
-        },
-        "parameters": dict(parameters),
+        "python_version": platform.python_version(),
+        "pipls_version": pipls.__version__,
+        "numpy_version": np.__version__,
+        "scikit_learn_version": sklearn.__version__,
+        **_flatten_parameters(parameters),
     }
 
 
@@ -466,9 +592,11 @@ def _validate_schema_value(value: Any, schema: Mapping[str, Any], *, path: str) 
         raise ValueError(f"{path} must be one of {schema['enum']!r}.")
     if isinstance(value, str) and "minLength" in schema and len(value) < int(schema["minLength"]):
         raise ValueError(f"{path} is shorter than the schema minimum.")
-    if isinstance(value, int) and not isinstance(value, bool) and "minimum" in schema:
-        if value < int(schema["minimum"]):
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if "minimum" in schema and value < float(schema["minimum"]):
             raise ValueError(f"{path} is below the schema minimum.")
+        if "maximum" in schema and value > float(schema["maximum"]):
+            raise ValueError(f"{path} is above the schema maximum.")
     if isinstance(value, Mapping):
         properties = schema.get("properties", {})
         required = set(schema.get("required", []))
@@ -509,9 +637,7 @@ def _matches_one_json_type(value: Any, expected: str) -> bool:
         return isinstance(value, int) and not isinstance(value, bool)
     if expected == "number":
         return (
-            isinstance(value, (int, float))
-            and not isinstance(value, bool)
-            and np.isfinite(value)
+            isinstance(value, (int, float)) and not isinstance(value, bool) and np.isfinite(value)
         )
     return False
 
@@ -564,7 +690,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--output",
         type=Path,
         default=None,
-        help="Write JSON Lines to this path instead of standard output.",
+        help="Write flat CSV to this path instead of standard output.",
     )
     return parser.parse_args(argv)
 
@@ -574,9 +700,18 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     args = _parse_args(argv)
     try:
+        manifest = load_manifest(args.manifest)
+        schema = load_result_schema(manifest)
         records = run_benchmark(tier=args.tier, manifest_path=args.manifest)
-        write_jsonl(records, args.output)
-    except (OSError, ValueError, TypeError, yaml.YAMLError, json.JSONDecodeError) as error:
+        write_csv(records, args.output, schema)
+    except (
+        OSError,
+        ValueError,
+        TypeError,
+        csv.Error,
+        yaml.YAMLError,
+        json.JSONDecodeError,
+    ) as error:
         print(f"benchmark error: {error}", file=sys.stderr)
         return 2
     return 1 if any(record["status"] != "ok" for record in records) else 0

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import os
 import subprocess
 import sys
@@ -8,11 +7,14 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from benchmarks.run_synthetic import (
     _expand_scale_spec,
     load_manifest,
+    load_result_schema,
+    read_csv_results,
     run_benchmark,
     validate_result_record,
 )
@@ -49,53 +51,43 @@ def test_scale_specifications_expand_deterministically() -> None:
     np.testing.assert_allclose(logarithmic, np.array([0.1, 1.0, 10.0]))
 
 
-def test_ci_runner_produces_schema_valid_finite_records(
+def test_ci_runner_produces_schema_valid_finite_flat_records(
     ci_records: list[dict[str, Any]],
 ) -> None:
-    root = _repository_root()
     manifest = load_manifest()
     tier = manifest["tiers"]["ci"]
-    schema_path = root / manifest["results"]["schema"]
-    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    schema = load_result_schema(manifest)
     expected_count = (
-        len(tier["scenarios"])
-        * len(manifest["seeds"][tier["seed_set"]])
-        * len(tier["methods"])
+        len(tier["scenarios"]) * len(manifest["seeds"][tier["seed_set"]]) * len(tier["methods"])
     )
 
     assert len(ci_records) == expected_count
     assert all(record["status"] == "ok" for record in ci_records)
-    assert len(
-        {
-            (record["scenario_id"], record["seed"], record["method_id"])
-            for record in ci_records
-        }
-    ) == expected_count
+    assert (
+        len({(record["scenario_id"], record["seed"], record["method_id"]) for record in ci_records})
+        == expected_count
+    )
 
-    declared_metrics = {
-        metric
-        for group in manifest["metrics"].values()
-        for metric in group
-    }
+    declared_metrics = {metric for group in manifest["metrics"].values() for metric in group}
     for record in ci_records:
         validate_result_record(record, schema)
-        metrics = record["metrics"]
-        assert set(metrics) == declared_metrics
-        for name, value in metrics.items():
+        assert all(not isinstance(value, (dict, list)) for value in record.values())
+        for name in declared_metrics:
+            value = record[name]
             if value is not None:
                 assert np.isfinite(value), name
         for name in _CAPTURE_METRICS:
-            assert 0.0 <= metrics[name] <= 1.0
-        assert metrics["fit_time_seconds"] >= 0.0
-        assert metrics["predict_time_seconds"] >= 0.0
+            assert 0.0 <= record[name] <= 1.0
+        assert record["fit_time_seconds"] >= 0.0
+        assert record["predict_time_seconds"] >= 0.0
 
 
-def test_ci_cli_is_executable_and_numerically_repeatable(
+def test_ci_cli_writes_human_readable_schema_valid_csv(
     tmp_path: Path,
     ci_records: list[dict[str, Any]],
 ) -> None:
     root = _repository_root()
-    output = tmp_path / "synthetic-ci.jsonl"
+    output = tmp_path / "synthetic-ci.csv"
     environment = os.environ.copy()
     environment["PYTHONPATH"] = str(root / "src")
     completed = subprocess.run(
@@ -116,26 +108,25 @@ def test_ci_cli_is_executable_and_numerically_repeatable(
     )
 
     assert completed.returncode == 0, completed.stderr
-    repeated = [json.loads(line) for line in output.read_text(encoding="utf-8").splitlines()]
+    manifest = load_manifest()
+    schema = load_result_schema(manifest)
+    repeated = read_csv_results(output, schema)
+    table = pd.read_csv(output)
+
     assert len(repeated) == len(ci_records)
+    assert list(table.columns) == schema["x-csv"]["columns"]
+    assert table.shape == (len(ci_records), len(schema["x-csv"]["columns"]))
 
     for first, second in zip(ci_records, repeated, strict=True):
-        assert first["schema_version"] == second["schema_version"]
-        assert first["suite_id"] == second["suite_id"]
-        assert first["tier"] == second["tier"]
-        assert first["scenario_id"] == second["scenario_id"]
-        assert first["seed"] == second["seed"]
-        assert first["method_id"] == second["method_id"]
-        assert first["status"] == second["status"] == "ok"
-        assert first["parameters"] == second["parameters"]
-        for name, first_value in first["metrics"].items():
+        for name in schema["x-csv"]["columns"]:
             if name in _RESOURCE_METRICS:
                 continue
-            second_value = second["metrics"][name]
-            if first_value is None:
-                assert second_value is None
-            else:
+            first_value = first[name]
+            second_value = second[name]
+            if isinstance(first_value, float):
                 assert second_value == pytest.approx(first_value, rel=1e-12, abs=1e-12)
+            else:
+                assert second_value == first_value
 
 
 def test_unimplemented_tiers_are_rejected() -> None:

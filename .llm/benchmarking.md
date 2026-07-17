@@ -9,7 +9,7 @@ resource use.
 
 This file is normative for benchmark design. The machine-readable suite contract is
 `benchmarks/manifests/synthetic-v1.yaml`; generated record structure is defined by
-`benchmarks/schema/result-v1.schema.json`.
+`benchmarks/schema/result-v2.schema.json`.
 
 ## Scope boundary
 
@@ -116,23 +116,30 @@ The expected runtime values in the manifest are planning budgets, not pass/fail 
 ## Implemented CI runner
 
 `benchmarks/run_synthetic.py` implements only the `ci` tier. It must consume the manifest, produce
-schema-valid JSON Lines records, and remain outside the public `pipls` namespace.
+schema-valid flat CSV rows, and remain outside the public `pipls` namespace.
 
 For adaptive path evaluation, use joblib threading across independent candidates and limit native
 linear-algebra libraries to one thread per candidate. Record these execution controls in resolved
 parameters. This prevents nested oversubscription without changing model semantics.
 
-`make benchmark-ci` writes `benchmarks/results/synthetic-ci.jsonl`, which remains ignored. Tests may
+`make benchmark-ci` writes `benchmarks/results/synthetic-ci.csv`, which remains ignored. Tests may
 compare deterministic metrics across repeated runs, but must exclude fit time, prediction time, and
 optional memory. Standard and performance tiers remain unimplemented until separately reviewed.
 
 ## Result and tolerance policy
 
-Write one JSON Lines record per suite, tier, scenario, seed, and method. Record package versions,
-resolved parameters, metrics, status, and optional hardware details. Generated results live under
-`benchmarks/results/` and are ignored by default.
+Write one flat CSV row per suite, tier, scenario, seed, and method. Record package versions,
+resolved parameters, metrics, status, and optional messages in named columns. Use empty cells for
+non-applicable or unavailable values. Generated results live under `benchmarks/results/` and are
+ignored by default.
 
-Contract version 1 freezes only:
+Tabular benchmark outputs must use a format that is comfortable for both humans and machines. CSV
+is the default because it opens directly in pandas, R, spreadsheet software, and text editors. A
+versioned machine-readable schema must define column order, types, null representation, and schema
+version. Nested JSON output requires a separately documented need that cannot be represented
+cleanly as a table.
+
+The synthetic suite remains version 1; flat result-schema version 2 freezes only:
 
 - exact same-seed synthetic array generation;
 - deterministic fit repeatability at `rtol=1e-12`, `atol=1e-12`;

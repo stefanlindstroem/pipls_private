@@ -26,7 +26,9 @@ build:
 check: test lint typecheck
 
 benchmark-ci:
-	PYTHONPATH=src $(PYTHON) benchmarks/run_synthetic.py --tier ci --output benchmarks/results/synthetic-ci.jsonl
+	rm -f benchmarks/results/synthetic-ci.jsonl
+	PYTHONPATH=src $(PYTHON) benchmarks/run_synthetic.py --tier ci --output benchmarks/results/synthetic-ci.csv
+	@printf 'Wrote benchmarks/results/synthetic-ci.csv\n'
 
 snapshot:
 	./.llm/snapshot.sh

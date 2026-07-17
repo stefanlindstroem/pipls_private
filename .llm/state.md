@@ -156,7 +156,7 @@ implemented as machine-readable assets under `benchmarks/`:
 - fixed oracle Pi-PLS and ordinary PLS comparison plus separate adaptive Pi-PLS path validation;
 - prediction, selection, subspace-capture, numerical-consistency, timing, and optional memory
   metrics;
-- JSON Lines result records with a versioned schema;
+- flat UTF-8 CSV result rows with versioned column schema 2;
 - strict repeatability and metric-domain tolerances, while predictive, selection, solver-agreement,
   and timing thresholds remain deliberately unfrozen.
 
@@ -169,13 +169,14 @@ Plan the next **Phase E4b opt-in benchmark execution increment**:
 
 - extend the existing manifest-driven runner to the `standard` and `performance` tiers only after
   confirming their runtime and output policy;
-- preserve the current JSON Lines schema and ignored generated-result boundary;
+- preserve the flat CSV schema and ignored generated-result boundary;
 - keep timing descriptive and hardware-aware rather than a cross-machine CI gate;
 - calibrate full-versus-randomized comparison fields before considering any frozen tolerance;
 - do not add real-data benchmark claims, OLS/CCA comparators, figures, or block-aware scaling APIs.
 
-The CI runner is already complete: it executes nine manifest-defined records, validates the schema,
-checks deterministic numerical metrics, and excludes resource timings from repeatability gates.
+The CI runner is already complete: it executes nine manifest-defined records, writes directly
+inspectable `synthetic-ci.csv`, validates the flat schema, checks deterministic numerical metrics,
+and excludes resource timings from repeatability gates.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
