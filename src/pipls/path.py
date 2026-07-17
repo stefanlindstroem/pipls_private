@@ -51,6 +51,8 @@ IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
+PredictorRankPolicy = Literal["optimized", "fixed", "maximum"]
+PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _SELECTION_RTOL = 1e-12
@@ -98,8 +100,10 @@ class PiPLSPathCV(
         Positive component counts to evaluate. ``None`` uses every value from 1
         through ``min(n_targets, max_predictor_rank_)``.
     predictor_rank_values:
-        Positive predictor ranks to evaluate. ``None`` uses every value from 1
-        through ``max_predictor_rank_``.
+        Predictor ranks used for each component count. ``None`` searches every
+        value from 1 through ``max_predictor_rank_``. A one-element sequence fixes
+        one rank, a longer sequence searches within that set, and ``"max"`` uses
+        ``max_predictor_rank_`` directly for every component count.
     max_predictor_rank:
         ``"rule"`` uses the total-sample support rule with fold-level
         feasibility caps. A positive integer imposes an additional explicit
@@ -133,7 +137,7 @@ class PiPLSPathCV(
         *,
         pipls_param_prefix: str | None = None,
         n_components_values: Sequence[int] | None = None,
-        predictor_rank_values: Sequence[int] | None = None,
+        predictor_rank_values: PredictorRankValues = None,
         max_predictor_rank: int | Literal["rule"] = "rule",
         search_method: SearchMethod = "auto",
         samples_per_predictor_rank: float = 5.0,
@@ -229,12 +233,20 @@ class PiPLSPathCV(
             lower=1,
             upper=h_limit,
         )
-        self.predictor_rank_values_ = _validated_integer_values(
-            self.predictor_rank_values,
-            name="predictor_rank_values",
-            lower=1,
-            upper=self.max_predictor_rank_,
+        self.predictor_rank_policy_ = _predictor_rank_policy(
+            self.predictor_rank_values
         )
+        if isinstance(self.predictor_rank_values, str):
+            self.predictor_rank_values_ = np.asarray(
+                [self.max_predictor_rank_], dtype=np.intp
+            )
+        else:
+            self.predictor_rank_values_ = _validated_integer_values(
+                self.predictor_rank_values,
+                name="predictor_rank_values",
+                lower=1,
+                upper=self.max_predictor_rank_,
+            )
         admissible = tuple(
             (int(h), int(r))
             for h in self.n_components_values_
@@ -245,6 +257,17 @@ class PiPLSPathCV(
             raise ValueError(
                 "The supplied n_components_values and predictor_rank_values do not "
                 "contain an admissible pair satisfying n_components <= predictor_rank."
+            )
+        missing_components = [
+            int(h)
+            for h in self.n_components_values_
+            if not any(hh == int(h) for hh, _ in admissible)
+        ]
+        if missing_components:
+            missing = ", ".join(map(str, missing_components))
+            raise ValueError(
+                "Every n_components value must have at least one admissible predictor "
+                f"rank; missing ranks for {missing}."
             )
         self.n_path_candidates_ = len(admissible)
 
@@ -329,18 +352,27 @@ class PiPLSPathCV(
 
         self.best_predictor_rank_by_n_components_ = {}
         self.best_score_by_n_components_ = {}
+        conditional_indices: list[int] = []
         for h_value in self.n_components_values_:
             h = int(h_value)
             indices = np.flatnonzero(self.cv_results_["n_components"] == h)
             if indices.size == 0:
                 continue
             local_index = _select_conditional_best_index(self.cv_results_, indices)
+            conditional_indices.append(local_index)
             self.best_predictor_rank_by_n_components_[h] = int(
                 self.cv_results_["predictor_rank"][local_index]
             )
             self.best_score_by_n_components_[h] = float(
                 self.cv_results_["mean_test_score"][local_index]
             )
+
+        self.component_path_results_ = _component_path_results(
+            results=self.cv_results_,
+            conditional_indices=np.asarray(conditional_indices, dtype=np.intp),
+            predictor_rank_policy=self.predictor_rank_policy_,
+            n_splits=self.n_splits_,
+        )
 
         self.response_standardized_mse_path_ = _path_surface(
             self.n_components_values_,
@@ -826,6 +858,36 @@ def _path_cv_results(
     return results
 
 
+def _component_path_results(
+    *,
+    results: dict[str, Any],
+    conditional_indices: IntArray,
+    predictor_rank_policy: PredictorRankPolicy,
+    n_splits: int,
+) -> dict[str, Any]:
+    """Return one conditionally selected predictor-rank row per component count."""
+
+    n_rows = int(conditional_indices.size)
+    return {
+        "n_components": cast(IntArray, results["n_components"])[
+            conditional_indices
+        ].copy(),
+        "predictor_rank": cast(IntArray, results["predictor_rank"])[
+            conditional_indices
+        ].copy(),
+        "predictor_rank_policy": np.full(
+            n_rows, predictor_rank_policy, dtype=object
+        ),
+        "response_standardized_cv_mse_mean": cast(
+            FloatArray, results["mean_response_standardized_mse"]
+        )[conditional_indices].copy(),
+        "response_standardized_cv_mse_fold_sd": cast(
+            FloatArray, results["std_response_standardized_mse"]
+        )[conditional_indices].copy(),
+        "n_splits": np.full(n_rows, n_splits, dtype=np.intp),
+    }
+
+
 def _select_global_best_index(results: dict[str, Any]) -> int:
     scores = cast(FloatArray, results["mean_test_score"])
     maximum = float(np.max(scores))
@@ -884,10 +946,12 @@ def _validated_integer_values(
 
 
 def _validate_optional_integer_sequence(values: object, *, name: str) -> None:
-    if values is None:
+    if values is None or (isinstance(values, str) and values == "max"):
         return
     if isinstance(values, (str, bytes)):
-        raise ValueError(f"{name} must be None or a sequence of positive integers.")
+        raise ValueError(
+            f'{name} must be None, "max", or a sequence of positive integers.'
+        )
     try:
         sequence = tuple(cast(Iterable[object], values))
     except TypeError as error:
@@ -896,6 +960,16 @@ def _validate_optional_integer_sequence(values: object, *, name: str) -> None:
         raise ValueError(f"{name} must not be empty.")
     for value in sequence:
         _validate_positive_int(value, name=name)
+
+
+def _predictor_rank_policy(values: PredictorRankValues) -> PredictorRankPolicy:
+    """Describe how predictor rank is supplied for the component path."""
+
+    if isinstance(values, str):
+        return "maximum"
+    if values is None:
+        return "optimized"
+    return "fixed" if len(values) == 1 else "optimized"
 
 
 def _resolve_path_scorer(scoring: Scoring, estimator: Any) -> Scorer | None:

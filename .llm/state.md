@@ -84,6 +84,7 @@ case, or public behavior.
 |---|---|
 | Conditional predictor-rank selection | `PiPLSRegression(predictor_rank="auto")` by default |
 | Path search | `PiPLSPathCV(search_method="auto")` by default |
+| Component-path artifact | `component_path_results_`: one row per component count with numeric predictor rank, policy, mean CV-MSE, fold SD, and split count |
 | Exhaustive search | explicit `"optimal"` in either public interface |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
 | Reproducibility | `random_state=0` by default |
@@ -110,6 +111,9 @@ Additional fixed decisions:
 - Randomized SVD affects only the initial predictor-matrix decomposition. Response and coupling
   decompositions remain exact.
 - `PiPLSRegression` is the fixed-model estimator and `PiPLSPathCV` is the path meta-estimator.
+- Real-data examples use `PiPLSPathCV(refit=False)` for the path, treat CSV as canonical,
+  derive PDFs from the CSV, and fit a separate fixed `PiPLSRegression` after an explicit component
+  choice. `best_params_` remains a convenience, not the required user decision.
   Neither wraps the other; both use shared private search machinery.
 - Path coefficients are accessed through `best_pipls_` or `best_estimator_`; they are not flattened
   onto `PiPLSPathCV` when preprocessing may change the feature space.
@@ -157,14 +161,14 @@ implemented independently:
 3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
 4. full-versus-randomized solver consistency.
 
-Two separately reviewed real-data smoke checks are implemented. `benchmarks/pulp_path_smoke.py`
-reads the 46-row Pulp tables and exercises the compact ordinary path-selection workflow.
-`benchmarks/sugarcane_path_smoke.py` reads the 57-row, 1,721-predictor Sugarcane tables and exercises
-the same public defaults when $p \gg n$. Both use `samples_per_predictor_rank=5` and `cv=5`, verify
-complete ordered OOF output, refit the selected model on all supplied rows, and write one row of
-selected ranks plus explicitly named selection-conditioned diagnostics. Neither supplies a
-predictor-rank ceiling, and neither diagnostic table is described as independent-test or unbiased
-post-selection performance.
+Two separately reviewed real-data component-path smoke checks are implemented.
+`benchmarks/pulp_path_smoke.py` reads the 46-row Pulp tables, and
+`benchmarks/sugarcane_path_smoke.py` reads the 57-row, 1,721-predictor Sugarcane tables. Both use
+`samples_per_predictor_rank=5`, `cv=5`, and `refit=False`, then write one ordered CSV row per
+component count with numeric predictor rank, predictor-rank policy, mean response-standardized
+CV-MSE, fold SD, and split count. The benchmark scripts do not choose or refit a final model. The
+public examples generate PDFs by reading the canonical CSV files, expose a visible user component
+choice, and fit a separate fixed `PiPLSRegression` with both ranks recorded explicitly.
 
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
 ignored and are excluded from snapshots. Software versions, execution controls, timings, and
@@ -184,7 +188,7 @@ expose its public raw-data reading and analysis-relevant preprocessing directly.
 ## Subsequent roadmap
 
 1. **Focused synthetic benchmarks:** complete.
-2. **Representative real-data smoke checks:** Pulp and Sugarcane path selection implemented;
+2. **Representative real-data smoke checks:** Pulp and Sugarcane component paths implemented;
    Tobacco remains separately reviewed one package-level question at a time.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.

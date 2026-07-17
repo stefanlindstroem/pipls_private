@@ -132,14 +132,12 @@ Both quantities are Frobenius-norm differences relative to the corresponding ful
 benchmark records consistency without defining a universal numerical pass threshold and does not
 measure runtime.
 
-## Pulp path-selection smoke check
+## Pulp component-path smoke check
 
 `pulp_path_smoke.py` follows an explicit package-user workflow: it reads the public Pulp
-`X.csv` and `Y.csv` tables directly with pandas and fits adaptive `PiPLSPathCV` over component
-counts 1 through 4 with ordered OOF predictions. The script relies on the ordinary
-`samples_per_predictor_rank=5` and `cv=5` defaults and does not set a predictor-rank ceiling. The
-support term uses all 46 supplied observations, while the five-fold training sizes remain
-feasibility caps.
+`X.csv` and `Y.csv` tables directly with pandas and evaluates component counts 1 through 4 with
+`PiPLSPathCV(refit=False)`. Predictor rank is selected conditionally for each component count using
+the ordinary `samples_per_predictor_rank=5`, `cv=5`, and adaptive-search defaults.
 
 Run it from the repository root after installing the data dependencies:
 
@@ -147,28 +145,27 @@ Run it from the repository root after installing the data dependencies:
 python benchmarks/pulp_path_smoke.py
 ```
 
-It writes `benchmarks/results/pulp_path_smoke.csv` with one row and exactly these columns:
+It writes `benchmarks/results/pulp_path_smoke.csv` with four rows and exactly these columns:
 
 ```text
-selected_n_components
-selected_predictor_rank
-selection_conditioned_response_standardized_mse
-selection_conditioned_pooled_oof_r2
+n_components
+predictor_rank
+predictor_rank_policy
+response_standardized_cv_mse_mean
+response_standardized_cv_mse_fold_sd
+n_splits
 ```
 
-The long diagnostic names are intentional. The same CV result selects the ranks and supplies the
-reported values, so they are useful workflow diagnostics but not unbiased post-selection or
-external-test performance estimates. The script checks that every Pulp row receives exactly one
-OOF prediction and fails rather than silently reporting incomplete coverage.
+The numeric predictor rank is present in every row. The ordinary workflow records
+`predictor_rank_policy=optimized`. The fold SD describes variation across the five validation
+folds; it is not a confidence interval or an independent standard error. The benchmark does not
+choose a final component count, refit a final model, or generate a figure.
 
-## Sugarcane high-dimensional path-selection smoke check
+## Sugarcane high-dimensional component-path smoke check
 
-`sugarcane_path_smoke.py` follows the same ordinary package-user workflow on a transparent
-$p \gg n$ dataset. It reads the 57-row, 1,721-predictor Sugarcane `X.csv` and four-response
-`Y.csv` tables directly with pandas and fits adaptive `PiPLSPathCV` over component counts 1 through
-4 with ordered OOF predictions. The script relies on the ordinary
-`samples_per_predictor_rank=5` and `cv=5` defaults and does not set a predictor-rank ceiling or
-force an SVD solver.
+`sugarcane_path_smoke.py` applies the same component-path workflow to the transparent 57-row,
+1,721-predictor Sugarcane tables. It therefore exercises the ordinary public defaults when
+$p \gg n$ without setting a predictor-rank ceiling or forcing an SVD solver.
 
 Run it from the repository root after installing the data dependencies:
 
@@ -176,19 +173,10 @@ Run it from the repository root after installing the data dependencies:
 python benchmarks/sugarcane_path_smoke.py
 ```
 
-It writes `benchmarks/results/sugarcane_path_smoke.csv` with one row and exactly these columns:
-
-```text
-selected_n_components
-selected_predictor_rank
-selection_conditioned_response_standardized_mse
-selection_conditioned_pooled_oof_r2
-```
-
-The script checks that every Sugarcane row receives exactly one OOF prediction and that the selected
-model is refitted on all 57 rows. The diagnostics remain selection-conditioned; the benchmark does
-not claim external predictive performance, compare methods, tune spectral preprocessing, or report
-runtime.
+It writes `benchmarks/results/sugarcane_path_smoke.csv` with four rows and the same six-column
+component-path contract used by Pulp. The benchmark verifies deterministic finite mean CV-MSE and
+fold SD values, one numeric predictor rank per component count, and ordered rows. It does not select
+spectral preprocessing, choose the final model, report runtime, or generate a PDF.
 
 ## Sequence status
 

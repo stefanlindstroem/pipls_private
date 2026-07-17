@@ -23,10 +23,12 @@ The transparent real-dataset suite contains pulp, sugarcane, and tobacco. Public
 describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts and two
-separately reviewed real-data path-selection smoke checks. Pulp exercises the compact ordinary
-workflow; Sugarcane exercises the same public defaults when $p \gg n$. Their one-row CSV files use
-`selection_conditioned_` diagnostic names. A Tobacco package-level question is next under separate
-review. No block-aware scaling API is designed or scheduled.
+separately reviewed real-data component-path smoke checks. Pulp exercises the compact ordinary
+workflow; Sugarcane exercises the same public defaults when $p \gg n$. Their CSV files contain one
+row per component count with explicit predictor rank, rank policy, mean CV-MSE, fold SD, and split
+count. The public examples derive PDFs from those CSV files and then fit a separately chosen fixed
+model. A Tobacco package-level question is next under separate review. No block-aware scaling API
+is designed or scheduled.
 
 ## Runtime ownership
 

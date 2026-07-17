@@ -65,3 +65,15 @@ CV results are used for selection and performance reporting. Therefore
 `validation_report_.estimate_kind == "selection-conditioned"`. This estimate is useful for the
 paper protocol but is not an unbiased post-selection estimate. Use nested CV or an external test
 set for unbiased assessment.
+
+## Fold variation in component-path tables
+
+`PiPLSPathCV.component_path_results_` reports
+`response_standardized_cv_mse_fold_sd` for each component count. This is the population standard
+deviation of the fold-specific MSE values already stored in `cv_results_`. It is useful for seeing
+how much the validation loss varies across the chosen folds.
+
+It is not a confidence interval and should not be divided by the square root of the number of folds
+and described as an ordinary independent standard error. Cross-validation training sets overlap.
+Formal uncertainty statements require a separately designed repeated or nested resampling
+procedure.

@@ -9,10 +9,10 @@ test:
 	PYTHONPATH=src $(PYTHON) -m pytest -q
 
 lint:
-	$(PYTHON) -m ruff check src tests benchmarks
+	$(PYTHON) -m ruff check src tests benchmarks examples
 
 format:
-	$(PYTHON) -m ruff format src tests benchmarks
+	$(PYTHON) -m ruff format src tests benchmarks examples
 
 typecheck:
 	$(PYTHON) -m mypy src
@@ -29,6 +29,6 @@ snapshot:
 	./.llm/snapshot.sh
 
 clean:
-	rm -rf build dist benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
+	rm -rf build dist benchmarks/results examples/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	find . -type d -name '*.egg-info' -prune -exec rm -rf {} +

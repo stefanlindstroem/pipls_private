@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- Add the Sugarcane high-dimensional path-selection smoke check using direct pandas tables, the ordinary public `PiPLSPathCV` defaults, complete ordered five-fold OOF reporting, full-data refit checks, and a minimal selection-conditioned CSV; revise the public Sugarcane example to remove fixed ranks and training R2.
+- Present real-data model development as a two-stage component-path workflow: add the public
+  `component_path_results_` table, explicit optimized/fixed/maximum predictor-rank policies,
+  four-row Pulp and Sugarcane benchmark CSVs with fold SD, CSV-derived example PDFs, and separate
+  fixed final-model fits chosen through visible component-count constants.
+- Add the Sugarcane high-dimensional component-path smoke check using direct pandas tables and the ordinary public `PiPLSPathCV` defaults.
 
 - Remove the Linnerud dataset integration, its executable example, and dataset-specific test
   because it does not provide a useful representative Pi-PLS workflow; retain pulp, sugarcane,
@@ -14,9 +18,7 @@
 - Set the public rank-selection defaults to `samples_per_predictor_rank=5` and `cv=5` in both
   `PiPLSRegression` and `PiPLSPathCV`, and simplify the Pulp example and smoke check to use the
   ordinary rule-derived predictor-rank bound without an explicit maximum.
-- Add the transparent Pulp path-selection smoke check using direct pandas `X.csv`/`Y.csv` reading,
-  the ordinary public `PiPLSPathCV` workflow, complete ordered five-fold OOF reporting, and a
-  one-row CSV whose validation diagnostics are explicitly labeled selection-conditioned.
+- Add the transparent Pulp component-path smoke check using direct pandas `X.csv`/`Y.csv` reading and the ordinary public `PiPLSPathCV` workflow.
 - Add the full-versus-randomized solver-consistency benchmark with paired fixed ranks, three high-dimensional matrix geometries, independent-test prediction and coefficient relative differences, a minimal four-column CSV, and focused contract tests.
 - Add the paired predictor-nuisance benchmark comparing fixed Pi-PLS and ordinary PLS on identical deterministic synthetic train/test problems, with controlled nuisance strengths, training-fitted model standardization, independent-test MSE, a minimal five-column CSV, and focused contract tests.
 - Add the adaptive rank-selection benchmark with deterministic public synthetic train/test data, generator-declared reference ranks, fold-local model standardization, full-training refit, independent-test MSE, a minimal seven-column CSV output, and focused repeatability tests.

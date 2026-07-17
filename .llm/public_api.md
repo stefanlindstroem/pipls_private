@@ -212,9 +212,16 @@ dimension reaching the Pi-PLS step impose feasibility caps.
 Public fitted attributes include standard search attributes (`cv_results_`, `best_params_`,
 `best_score_`, `best_estimator_`), the selected nested estimator (`best_pipls_` and
 `best_pipls_params_`), plus conditional-path, surface, candidate-count, and search-method
-diagnostics documented in `docs/path_analysis.md`. Input containers are preserved within folds so
-name-based pandas and `ColumnTransformer` workflows remain valid. The path `score` method returns
-R2 like `PiPLSRegression`; `best_score_` remains the configured selection score.
+diagnostics documented in `docs/path_analysis.md`. `component_path_results_` is the canonical
+one-row-per-component view with columns `n_components`, `predictor_rank`,
+`predictor_rank_policy`, `response_standardized_cv_mse_mean`,
+`response_standardized_cv_mse_fold_sd`, and `n_splits`. The policy is `optimized`, `fixed`, or
+`maximum`; the numeric rank is always present. `predictor_rank_values="max"` evaluates the
+rule-derived maximum directly, a one-element sequence is fixed, and longer sequences remain
+conditionally optimized. Input containers are preserved within folds so name-based pandas and
+`ColumnTransformer` workflows remain valid. The path `score` method returns R2 like
+`PiPLSRegression`; `best_score_` remains the configured selection score and does not replace a
+user component-count decision.
 
 
 ## D1c scikit-learn cleanup

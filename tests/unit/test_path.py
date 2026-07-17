@@ -31,9 +31,7 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     assert search.path_search_exhaustive_
     assert search.path_search_method_ == "auto"
     np.testing.assert_array_equal(search.n_components_values_, np.array([1, 2, 3]))
-    np.testing.assert_array_equal(
-        search.predictor_rank_values_, np.array([1, 2, 3, 4, 5])
-    )
+    np.testing.assert_array_equal(search.predictor_rank_values_, np.array([1, 2, 3, 4, 5]))
     assert np.isnan(search.response_standardized_mse_path_[1, 0])
     assert np.isnan(search.response_standardized_mse_path_[2, 0])
     assert np.isnan(search.response_standardized_mse_path_[2, 1])
@@ -201,6 +199,7 @@ def test_low_samples_per_predictor_rank_warns() -> None:
         ("max_predictor_rank", 0, "max_predictor_rank"),
         ("n_components_values", [], "must not be empty"),
         ("predictor_rank_values", [1.0], "positive integer"),
+        ("predictor_rank_values", "maximum", "must be None"),
         ("n_jobs", 0, "must not be zero"),
         ("refit", 1, "refit must be boolean"),
     ],
@@ -214,3 +213,93 @@ def test_invalid_public_controls_are_rejected(
     kwargs = {keyword: value}
     with pytest.raises(ValueError, match=message):
         PiPLSPathCV(**kwargs).fit(X, Y)
+
+
+def test_component_path_results_expose_conditional_rank_mean_and_fold_sd() -> None:
+    X, Y = _data()
+    search = PiPLSPathCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=3,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    path = search.component_path_results_
+    assert tuple(path) == (
+        "n_components",
+        "predictor_rank",
+        "predictor_rank_policy",
+        "response_standardized_cv_mse_mean",
+        "response_standardized_cv_mse_fold_sd",
+        "n_splits",
+    )
+    np.testing.assert_array_equal(path["n_components"], np.array([1, 2]))
+    np.testing.assert_array_equal(path["n_splits"], np.array([3, 3]))
+    assert path["predictor_rank_policy"].tolist() == ["optimized", "optimized"]
+
+    for row_index, h in enumerate((1, 2)):
+        rank = int(path["predictor_rank"][row_index])
+        assert rank == search.best_predictor_rank_by_n_components_[h]
+        result_index = np.flatnonzero(
+            (search.cv_results_["n_components"] == h)
+            & (search.cv_results_["predictor_rank"] == rank)
+        )
+        assert result_index.size == 1
+        index = int(result_index[0])
+        assert path["response_standardized_cv_mse_mean"][row_index] == pytest.approx(
+            search.cv_results_["mean_response_standardized_mse"][index]
+        )
+        assert path["response_standardized_cv_mse_fold_sd"][row_index] == pytest.approx(
+            search.cv_results_["std_response_standardized_mse"][index]
+        )
+
+
+@pytest.mark.parametrize(
+    ("predictor_rank_values", "expected_policy"),
+    [
+        (None, "optimized"),
+        ([3], "fixed"),
+        ("max", "maximum"),
+        ([2, 3, 4], "optimized"),
+    ],
+)
+def test_component_path_records_predictor_rank_policy(
+    predictor_rank_values: object,
+    expected_policy: str,
+) -> None:
+    X, Y = _data()
+    search = PiPLSPathCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=predictor_rank_values,
+        cv=3,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.predictor_rank_policy_ == expected_policy
+    assert search.component_path_results_["predictor_rank_policy"].tolist() == [
+        expected_policy,
+        expected_policy,
+    ]
+    if expected_policy == "fixed":
+        np.testing.assert_array_equal(
+            search.component_path_results_["predictor_rank"], np.array([3, 3])
+        )
+    if expected_policy == "maximum":
+        np.testing.assert_array_equal(
+            search.component_path_results_["predictor_rank"],
+            np.full(2, search.max_predictor_rank_),
+        )
+
+
+def test_fixed_predictor_rank_must_support_every_component_count() -> None:
+    X, Y = _data()
+
+    with pytest.raises(ValueError, match="Every n_components value"):
+        PiPLSPathCV(
+            n_components_values=[1, 2, 3],
+            predictor_rank_values=[2],
+            cv=3,
+        ).fit(X, Y)

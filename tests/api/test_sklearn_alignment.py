@@ -438,6 +438,15 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
         "mean_score_time",
         "std_score_time",
     } <= search.cv_results_.keys()
+    assert search.predictor_rank_policy_ == "fixed"
+    assert tuple(search.component_path_results_) == (
+        "n_components",
+        "predictor_rank",
+        "predictor_rank_policy",
+        "response_standardized_cv_mse_mean",
+        "response_standardized_cv_mse_fold_sd",
+        "n_splits",
+    )
     x_scores, y_scores = search.transform(X, Y)
     X_reconstructed, Y_reconstructed = search.inverse_transform(x_scores, y_scores)
     direct_X, direct_Y = search.best_pipls_.inverse_transform(x_scores, y_scores)

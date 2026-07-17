@@ -61,7 +61,9 @@ Important additional fitted attributes include `predictor_rank_`, `max_predictor
 timing columns, evaluation order, search
 batches, the final refinement interval, candidate counts, whether the search was exhaustive, and
 the minimum CV training-fold size used for feasibility. `predictor_rank_cv_results_` is an alias
-for `cv_results_`.
+for `cv_results_`. `PiPLSPathCV.component_path_results_` is the concise one-row-per-component view
+with numeric predictor rank, predictor-rank policy, mean response-standardized CV-MSE, fold SD, and
+split count.
 
 The constructor `copy` controls fit-time preprocessing. For writable floating NumPy arrays,
 `copy=False` permits in-place centering and scaling, matching the familiar PLS contract.

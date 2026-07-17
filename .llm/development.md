@@ -55,6 +55,9 @@
   explicitly freezes a narrow fixture.
 - Design files and command outputs for both humans and machines. When results are naturally tabular,
   prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
+- For component-path examples, treat CSV as canonical. Any PDF view must read the written CSV rather
+  than the fitted estimator, and its uncertainty label must distinguish fold SD from a confidence
+  interval.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

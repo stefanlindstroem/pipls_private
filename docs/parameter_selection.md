@@ -3,6 +3,18 @@
 `PiPLSRegression` supports adaptive, exhaustive, rule-fixed, and explicit predictor ranks for a
 fixed `n_components`.
 
+
+## Component-count selection is a separate user decision
+
+`PiPLSRegression` selects or fixes predictor rank for one supplied `n_components`. To inspect several
+component counts, use `PiPLSPathCV(refit=False)` and write `component_path_results_` to CSV. Each row
+records the predictor rank actually used, the rank policy, mean response-standardized CV-MSE, fold
+SD, and split count.
+
+The user then chooses `n_components` from that path and fits a separate `PiPLSRegression` with both
+`n_components` and `predictor_rank` fixed. Do not treat `PiPLSPathCV.best_params_` as a mandatory
+scientific choice merely because it is the numerical minimum. See `path_analysis.md`.
+
 ## Shared rank bound
 
 Let $n$ be the total number of observations supplied to `fit()`. For both CV modes, the estimator

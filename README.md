@@ -43,18 +43,37 @@ print(model.decomposition_.D)
 training-sample standard deviations. During rank selection, these statistics are fitted separately
 inside every training fold and are refitted on the complete training set after selection.
 
-## Joint path analysis
+## Component-path analysis
+
+Scan component counts first and write one conditional predictor-rank row per value:
 
 ```python
-from pipls import PiPLSPathCV
+import pandas as pd
 
-search = PiPLSPathCV()
-search.fit(X_train, Y_train)
-print(search.best_params_)
-print(search.best_pipls_.coef_)
+from pipls import PiPLSPathCV, PiPLSRegression
+
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    refit=False,
+).fit(X_train, Y_train)
+
+path = pd.DataFrame(search.component_path_results_)
+path.to_csv("component_path.csv", index=False)
 ```
 
-For explicit validation reporting:
+After inspecting the CV-MSE path, choose a component count and fit both ranks explicitly:
+
+```python
+chosen_n_components = 3
+chosen = path.loc[path["n_components"] == chosen_n_components].iloc[0]
+model = PiPLSRegression(
+    n_components=chosen_n_components,
+    predictor_rank=int(chosen["predictor_rank"]),
+).fit(X_train, Y_train)
+```
+
+`best_params_` remains available as the numerical global minimum, but the examples present
+component-count selection as a user decision. For explicit validation reporting:
 
 ```python
 from sklearn.model_selection import LeaveOneOut
@@ -100,20 +119,27 @@ from pipls import PiPLSPathCV
 
 X = pd.read_csv("datasets/pulp/X.csv")
 Y = pd.read_csv("datasets/pulp/Y.csv")
-search = PiPLSPathCV(n_components_values=[1, 2, 3, 4]).fit(X, Y)
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    refit=False,
+).fit(X, Y)
+path = pd.DataFrame(search.component_path_results_)
 ```
 
-See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).
+The Pulp and Sugarcane examples write canonical component-path CSV files, generate PDFs by reading
+those CSV files, and then fit a separate fixed model using a visible component-count choice. Install
+the `data` and `plot` extras to run them. See [`examples/README.md`](examples/README.md) and
+[`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks
 
 The repository contains four focused synthetic benchmarks and two separately reviewed real-data
-smoke checks. The Pulp and Sugarcane checks read `X.csv` and `Y.csv` directly with pandas, run the
-ordinary public `PiPLSPathCV` workflow with its rule-derived default predictor-rank bound, and write
-selected ranks plus explicitly named selection-conditioned diagnostics. Run them with
-`python benchmarks/pulp_path_smoke.py` and `python benchmarks/sugarcane_path_smoke.py`. These
-values are workflow diagnostics, not external-test or unbiased post-selection estimates.
-Publication-scale OLS/CCA comparisons and figure generation remain outside this repository.
+smoke checks. The Pulp and Sugarcane checks read `X.csv` and `Y.csv` directly with pandas and write
+one component-path CSV row per `n_components`, including the numeric predictor rank, rank policy,
+mean response-standardized CV-MSE, fold SD, and split count. Run them with
+`python benchmarks/pulp_path_smoke.py` and `python benchmarks/sugarcane_path_smoke.py`. The fold SD
+is descriptive variation across overlapping CV folds, not a confidence interval. Benchmark scripts
+do not choose the final component count or generate figures.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).
 

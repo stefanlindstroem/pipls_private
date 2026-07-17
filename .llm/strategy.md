@@ -383,12 +383,14 @@ Add one transparent dataset and one ordinary package-user question at a time. A 
 exercise fitting, selection, prediction, or validation reporting, but it must not present
 selection-conditioned diagnostics as independent performance estimates.
 
-Current status: **in progress**. The Pulp and Sugarcane path-selection smoke checks read `X.csv`
+Current status: **in progress**. The Pulp and Sugarcane component-path smoke checks read `X.csv`
 and `Y.csv` directly with pandas, fit the public `PiPLSPathCV` workflow with the ordinary
-`samples_per_predictor_rank=5` and `cv=5` defaults, verify complete ordered five-fold OOF output,
-and write selected ranks plus explicitly named selection-conditioned diagnostics. Sugarcane adds
-the transparent $p \gg n$ case and full-data refit checks. Neither check supplies a predictor-rank
-ceiling, method comparison, nested-CV claim, spectral preprocessing, timing table, or general
+`samples_per_predictor_rank=5` and `cv=5` defaults plus `refit=False`, and write one row per
+component count with numeric predictor rank, rank policy, mean response-standardized CV-MSE, fold
+SD, and split count. Sugarcane adds the transparent $p \gg n$ case. The corresponding examples
+write the same canonical CSV schema, derive PDFs from those CSV files, expose a visible user choice
+of `n_components`, and fit a separate fixed model. Neither check supplies a predictor-rank ceiling,
+method comparison, formal confidence interval, spectral preprocessing, timing table, or general
 real-data runner.
 
 ### Product documentation and release hardening

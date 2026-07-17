@@ -47,8 +47,11 @@ the source of record for those contents.
 
 Focused package benchmarks are executable contracts once implemented. Tests may validate the
 question-specific script, deterministic generation, finite metrics, metric domains, exact minimal
-CSV header, and repeatability of scientific values. Do not require a universal manifest, universal
-schema, or shared wide result row across unrelated benchmarks.
+CSV header, and repeatability of scientific values. Component-path tests may also verify one ordered
+row per requested component count, a numeric predictor rank and explicit policy in every row, and
+agreement with the conditional rows in `cv_results_`. PDF tests should verify that the plot is
+generated from a valid CSV without freezing visual pixel output. Do not require a universal
+manifest, universal schema, or shared wide result row across unrelated benchmarks.
 
 Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
 assertions require an explicit decision record describing why the value is stable, what software

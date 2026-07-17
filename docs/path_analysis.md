@@ -6,39 +6,128 @@
 \mathcal{G}=\{(h,r_\pi):1\le h\le h_{\max},\ h\le r_\pi\le r_{\pi,\max}\}.
 \]
 
-It is the preferred interface when the complete conditional path over
-`n_components` is required or when learned preprocessing must be fitted inside every
-rank-selection fold.
+The ordinary user workflow is deliberately two-stage:
 
-## Basic use
+1. evaluate one conditional predictor-rank result for each candidate `n_components` value;
+2. inspect the resulting CV-MSE path and fit a separate fixed model with the chosen pair.
+
+The numerically smallest CV-MSE is informative, but it is not treated as an automatic scientific
+choice of model complexity.
+
+## Stage 1: evaluate the component path
 
 ```python
+import pandas as pd
+
 from pipls import PiPLSPathCV
 
-search = PiPLSPathCV()
-search.fit(X, Y)
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    refit=False,
+).fit(X, Y)
 
-print(search.best_params_)
-print(search.best_pipls_params_)
-print(search.best_predictor_rank_by_n_components_)
-Y_pred = search.predict(X_new)
+component_path = pd.DataFrame(search.component_path_results_)
+component_path.to_csv("component_path.csv", index=False)
 ```
 
+`component_path_results_` contains one row per requested component count:
+
+```text
+n_components
+predictor_rank
+predictor_rank_policy
+response_standardized_cv_mse_mean
+response_standardized_cv_mse_fold_sd
+n_splits
+```
+
+The numeric `predictor_rank` is always present. The policy column has one of three values:
+
+- `optimized`: predictor rank was selected conditionally for that component count;
+- `fixed`: one explicit predictor rank was used;
+- `maximum`: the rule-derived maximum predictor rank was used directly.
+
+The fold SD is the standard deviation of the fold-specific response-standardized MSE values. It is
+a descriptive measure of fold-to-fold variation, not a confidence interval or an independent
+standard error, because cross-validation training sets overlap.
+
+### Predictor-rank policies
+
+The default conditionally optimizes predictor rank independently for each component count:
+
+```python
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    predictor_rank_values=None,
+    refit=False,
+).fit(X, Y)
+```
+
+A one-element sequence fixes one predictor rank across the path:
+
+```python
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3],
+    predictor_rank_values=[8],
+    refit=False,
+).fit(X, Y)
+```
+
+A longer sequence conditionally selects within that explicit set, while `"max"` uses the
+rule-derived maximum directly:
+
+```python
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    predictor_rank_values="max",
+    refit=False,
+).fit(X, Y)
+```
+
+Every requested component count must have at least one admissible predictor rank satisfying
+`n_components <= predictor_rank`.
+
+## Stage 2: fit the chosen fixed model
+
+After inspecting the CSV or a plot derived from it, choose one component count and read the
+matching predictor rank from the table:
+
+```python
+import pandas as pd
+
+from pipls import PiPLSRegression
+
+component_path = pd.read_csv("component_path.csv")
+chosen_n_components = 3
+chosen = component_path.loc[
+    component_path["n_components"] == chosen_n_components
+].iloc[0]
+chosen_predictor_rank = int(chosen["predictor_rank"])
+
+model = PiPLSRegression(
+    n_components=chosen_n_components,
+    predictor_rank=chosen_predictor_rank,
+).fit(X, Y)
+```
+
+Both ranks are fixed in the final fit. This reproduces the parameterization represented by the
+chosen path row rather than performing a second automatic rank search.
+
+## Search settings and rank limits
+
 `search_method="auto"`, `samples_per_predictor_rank=5`, and `cv=5` are the default search
-settings. Set
-`search_method="optimal"` to evaluate every admissible pair.
-`search_method="auto"` performs deterministic logarithmic coarse-to-fine predictor-rank
-search independently for each `n_components` value and may skip candidates.
+settings. Set `search_method="optimal"` to evaluate every admissible pair.
+`search_method="auto"` performs deterministic logarithmic coarse-to-fine predictor-rank search
+independently for each `n_components` value and may skip candidates.
 
 The default full-sample-supported, fold-feasible upper rank is
 
 \[
 r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
-\left\lceil\frac{n}
-{\texttt{samples_per_predictor_rank}}\right\rceil\right],
+\left\lceil\frac{n}{\texttt{samples_per_predictor_rank}}\right\rceil\right],
 \]
 
-where $n$ is the total number of observations supplied to `fit()` and `p_min` is the smallest
+where $n$ is the total number of observations supplied to `fit()` and $p_{\min}$ is the smallest
 predictor dimension reaching the Pi-PLS step across training folds. Supplying an integer
 `max_predictor_rank` bypasses the statistical rule but remains capped by centered fold-feasible
 dimensions.
@@ -48,6 +137,7 @@ dimensions.
 ```python
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+
 from pipls import PiPLSPathCV, PiPLSRegression
 
 pipeline = Pipeline([
@@ -61,55 +151,40 @@ pipeline = Pipeline([
 
 search = PiPLSPathCV(
     estimator=pipeline,
+    n_components_values=[1, 2, 3],
+    refit=False,
     cv=10,
-)
-search.fit(X, Y)
+).fit(X, Y)
 ```
 
-The supported estimator forms are deliberately explicit: either a direct `PiPLSRegression`, or a
-scikit-learn `Pipeline` whose final step is `PiPLSRegression`. The path estimator preserves
-indexable input containers, then clones and fits the entire supported pipeline separately for every
-fold and candidate. This permits pandas column names and name-based `ColumnTransformer` selectors
-to remain available inside every fold. `pipls_param_prefix` may name the final Pi-PLS pipeline step;
-it is otherwise inferred. Arbitrary nested meta-estimators are rejected rather than partially
-supported.
+The supported estimator forms are either a direct `PiPLSRegression` or a scikit-learn `Pipeline`
+whose final step is `PiPLSRegression`. The complete supported estimator is cloned and fitted
+separately for every fold and candidate. `pipls_param_prefix` may identify the terminal Pi-PLS step;
+it is otherwise inferred.
 
-## Selection and diagnostics
+## Complete search diagnostics
 
-The global selection rule maximizes the configured scikit-learn score. Ties within the
-package tolerance prefer smaller `n_components` and then smaller `predictor_rank`.
-Conditional ties for fixed `n_components` prefer smaller predictor rank.
+`component_path_results_` is the concise user-facing view. The full search surface remains available
+through:
 
-Important fitted attributes include:
-
-- `cv_results_`, `best_params_`, `best_score_`, `scorer_`, and `best_estimator_`;
-- standard `mean_fit_time`, `std_fit_time`, `mean_score_time`, and `std_score_time` columns;
-- `refit_time_` when `refit=True`;
-- `best_pipls_`, the selected fitted nested `PiPLSRegression`, and `best_pipls_params_`;
-- `best_n_components_` and `best_predictor_rank_`;
+- `cv_results_`, `best_params_`, `best_score_`, and `best_index_`;
 - `best_predictor_rank_by_n_components_` and `best_score_by_n_components_`;
 - `response_standardized_mse_path_` and `score_path_`;
-- `n_components_values_`, `predictor_rank_values_`, and `max_predictor_rank_`;
-- `n_path_candidates_`, `n_path_candidates_evaluated_`, and
-  `n_path_candidates_skipped_`;
-- `path_search_method_`, `path_search_history_`, and `path_search_exhaustive_`.
+- `n_components_values_`, `predictor_rank_values_`, `predictor_rank_policy_`, and
+  `max_predictor_rank_`;
+- candidate-count, search-history, and exhaustive-search diagnostics.
 
-When `refit=True`, the selected complete estimator is fitted once on all supplied data. Standard
-`predict`, conditional `transform`/`fit_transform`/`inverse_transform`, feature-name, pandas-output,
-and R2 `score` behavior delegates to the selected estimator. Methods are exposed only when the
-selected estimator supports them. `best_score_` remains the configured selection score and can
-differ from the R2 returned by `score`. `cv=None` requests standard five-fold regression CV and
-`scoring=None` uses the estimator's own `score` method.
+`best_params_` remains the numerical global minimum for compatibility and automated workflows. It
+does not replace the user decision shown in the two-stage examples.
 
-With `refit=False`, path diagnostics remain available but `predict`, `transform`, and
-`score` are disabled.
-
+When `refit=True`, the globally selected estimator is fitted on all supplied data and prediction
+methods delegate to it. With `refit=False`, all path diagnostics remain available, while
+`predict`, `transform`, and `score` are disabled.
 
 ## Advanced splitters and OOF output
 
 `fit(X, y, groups=groups)` supports group-aware splitters. Repeated, predefined, temporal, and
 leave-one-out protocols use their ordinary scikit-learn splitter objects. Set
-`return_oof_predictions=True` to expose `oof_predictions_`, `oof_prediction_counts_`,
-`oof_params_`, `pooled_oof_r2_`, and the immutable `validation_report_`. Repeated predictions are
-averaged; uncovered rows remain NaN. Path validation reports are explicitly
-`selection-conditioned`. See `cross_validation.md`.
+`return_oof_predictions=True` only when row-ordered OOF predictions for the global numerical
+selection are specifically required. Those diagnostics are explicitly selection-conditioned. See
+`cross_validation.md`.

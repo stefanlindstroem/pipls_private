@@ -245,63 +245,46 @@ consistency without defining a universal pass threshold. Timing, memory, rank se
 PLS, software metadata, environment metadata, figures, and generic orchestration do not belong in
 this table. A future runtime benchmark requires a separate hardware and measurement question.
 
-### 5. Pulp path-selection smoke check
+### 5. Pulp component-path smoke check
 
-**Question:** Can an ordinary programming user read the transparent Pulp tables, run the public
-adaptive Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporting?
+**Question:** Can a programming user read the transparent Pulp tables and obtain one conditional
+predictor-rank and CV-MSE row for each requested component count?
 
-**Method:** read `datasets/pulp/X.csv` and `datasets/pulp/Y.csv` directly with pandas, then fit
-`PiPLSPathCV(n_components_values=[1, 2, 3, 4], return_oof_predictions=True, n_jobs=1)`. The call
-uses the ordinary adaptive defaults `samples_per_predictor_rank=5` and `cv=5`; the benchmark does
-not supply a predictor-rank ceiling. The support term therefore uses all 46 supplied rows, while
-the five-fold training sizes remain feasibility caps. No package loader, metadata parser, external
-preprocessing, comparator, or held-out test set is introduced. Every candidate learns model
-centering and scaling within its training fold, and the selected model refits on all 46 rows.
+**Setup:** Read `datasets/pulp/X.csv` and `Y.csv` directly with pandas. Evaluate component counts
+1 through 4 with ordinary `PiPLSPathCV` defaults, `refit=False`, and `n_jobs=1`. Do not request OOF
+predictions or refit the global numerical minimum.
 
-The script requires the standard five-fold splitter to produce exactly one row-ordered OOF
-prediction for every input row. Failure of that reporting contract raises an error rather than
-adding another result column.
+**Output:** `benchmarks/results/pulp_path_smoke.csv`, containing four rows with exactly:
 
-**Output:** `benchmarks/results/pulp_path_smoke.csv`, containing one row with exactly:
+```text
+n_components
+predictor_rank
+predictor_rank_policy
+response_standardized_cv_mse_mean
+response_standardized_cv_mse_fold_sd
+n_splits
+```
 
-- `selected_n_components`;
-- `selected_predictor_rank`;
-- `selection_conditioned_response_standardized_mse`;
-- `selection_conditioned_pooled_oof_r2`.
+The numeric predictor rank is mandatory. The ordinary path uses policy `optimized`. The fold SD is
+fold-to-fold descriptive variation, not a confidence interval or an independent standard error.
 
-The diagnostic names deliberately include `selection_conditioned_`. The same folds are used to
-select the ranks and calculate these values, so neither value is an unbiased post-selection or
-external-test estimate. The smoke check demonstrates the public workflow and reporting contract; it
-does not claim model quality, compare methods, tune preprocessing, use nested CV, or establish a
-release threshold.
+**Excluded:** final component choice, global refit, OOF R2, method comparison, timing, figures, and
+performance thresholds.
 
-### 6. Sugarcane high-dimensional path-selection smoke check
+### 6. Sugarcane high-dimensional component-path smoke check
 
-**Question:** Can an ordinary programming user read a transparent $p \gg n$ spectral dataset, run
-the public adaptive Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporting?
+**Question:** Does the same component-path artifact contract operate on transparent spectral data
+with $p \gg n$?
 
-**Method:** read `datasets/sugarcane/X.csv` and `datasets/sugarcane/Y.csv` directly with pandas,
-then fit `PiPLSPathCV(n_components_values=[1, 2, 3, 4], return_oof_predictions=True, n_jobs=1)`.
-The call uses the ordinary defaults `samples_per_predictor_rank=5`, `cv=5`, adaptive path search,
-and automatic solver selection. It does not supply a predictor-rank ceiling or force randomized
-SVD. No loader, metadata parser, spectral preprocessing, comparator, or artificial held-out subset
-is introduced. Every candidate learns model centering and scaling within its training fold, and the
-selected model refits on all 57 rows.
+**Setup:** Read the 57-row, 1,721-predictor Sugarcane `X.csv` and four-response `Y.csv` directly.
+Use the ordinary path defaults over component counts 1 through 4 with `refit=False` and `n_jobs=1`.
+Do not set a predictor-rank ceiling or force a solver.
 
-The script requires exactly one row-ordered OOF prediction for each of the 57 samples and verifies
-that the selected model's score matrices contain all 57 rows.
+**Output:** `benchmarks/results/sugarcane_path_smoke.csv`, with four rows and the same six-column
+contract as Pulp.
 
-**Output:** `benchmarks/results/sugarcane_path_smoke.csv`, containing one row with exactly:
-
-- `selected_n_components`;
-- `selected_predictor_rank`;
-- `selection_conditioned_response_standardized_mse`;
-- `selection_conditioned_pooled_oof_r2`.
-
-The diagnostic names identify their protocol. They are not external-test or unbiased post-selection
-estimates. The benchmark demonstrates high-dimensional workflow execution and reporting only; it
-does not claim predictive quality, compare methods, tune spectral preprocessing, force a solver,
-measure runtime, or establish a release threshold.
+**Excluded:** final model choice, global refit, OOF reporting, spectral preprocessing, method
+comparison, timing, figures, and predictive claims.
 
 ## Output and reproducibility policy
 
@@ -328,8 +311,8 @@ Implement the benchmarks one at a time in this order:
 2. rank selection — implemented;
 3. predictor-nuisance comparison with PLS — implemented;
 4. solver consistency — implemented;
-5. Pulp path-selection smoke check — implemented;
-6. Sugarcane high-dimensional path-selection smoke check — implemented.
+5. Pulp component-path smoke check — implemented;
+6. Sugarcane high-dimensional component-path smoke check — implemented.
 
 The focused synthetic sequence and two separately reviewed real-data smoke checks are implemented.
 Any further real-data benchmark must remain question-specific and receive separate review. Do not

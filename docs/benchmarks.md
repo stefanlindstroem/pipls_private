@@ -230,12 +230,12 @@ where $\epsilon$ is machine epsilon. Predictions and coefficients are in origina
 The benchmark is descriptive: it does not define a universal pass threshold, compare prediction
 accuracy, select ranks, measure runtime or memory, or record software and environment metadata.
 
-## Pulp path-selection smoke check
+## Pulp component-path smoke check
 
 The first real-data smoke check asks:
 
-> Can an ordinary programming user read the transparent Pulp tables, run the public adaptive
-> Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporting?
+> Can an ordinary programming user read the transparent Pulp tables and obtain one explicit
+> predictor-rank and CV-MSE result for every candidate component count?
 
 Run it from the repository root after installing the data dependencies:
 
@@ -243,89 +243,62 @@ Run it from the repository root after installing the data dependencies:
 python benchmarks/pulp_path_smoke.py
 ```
 
-The script uses the same visible workflow as the public Pulp example:
+The script reads `datasets/pulp/X.csv` and `Y.csv` directly with pandas and evaluates:
 
 ```python
-X = pd.read_csv("datasets/pulp/X.csv")
-Y = pd.read_csv("datasets/pulp/Y.csv")
 search = PiPLSPathCV(
     n_components_values=[1, 2, 3, 4],
-    return_oof_predictions=True,
+    refit=False,
     n_jobs=1,
 ).fit(X, Y)
 ```
 
-No loader, metadata parser, external preprocessing, method comparison, or artificial train/test
-split is added. The call relies on the ordinary adaptive defaults
-`samples_per_predictor_rank=5` and `cv=5`; no predictor-rank ceiling is supplied by the example.
-The support term uses all 46 supplied rows, while each five-fold training size remains a
-feasibility cap. Model centering and scaling are learned separately in every candidate training
-fold, and the selected estimator is refitted on all supplied rows.
-
-The output is `benchmarks/results/pulp_path_smoke.csv` with one row and exactly these columns:
+The output is `benchmarks/results/pulp_path_smoke.csv` with four ordered rows and exactly:
 
 ```text
-selected_n_components
-selected_predictor_rank
-selection_conditioned_response_standardized_mse
-selection_conditioned_pooled_oof_r2
+n_components
+predictor_rank
+predictor_rank_policy
+response_standardized_cv_mse_mean
+response_standardized_cv_mse_fold_sd
+n_splits
 ```
 
-The script also verifies that five-fold CV returns exactly one row-ordered OOF prediction for each
-of the 46 samples. The two diagnostic columns deliberately say `selection_conditioned`: the same
-cross-validation result selects the ranks and calculates the diagnostics. They are not external-test
-results and are not unbiased post-selection performance estimates. The smoke check establishes that
-the public workflow and reporting contract operate on a transparent real dataset; it does not
-assert predictive quality or compare Pi-PLS with another method.
+Predictor rank is selected conditionally for each component count and is always recorded as a
+numeric value. `predictor_rank_policy` states how the rank was obtained. The fold SD is the
+population standard deviation of the fold-specific response-standardized MSE values. It is
+descriptive variation across overlapping folds, not a confidence interval.
 
-## Sugarcane high-dimensional path-selection smoke check
+The benchmark does not use `best_params_` to declare a final model, does not refit a globally
+selected pair, and does not generate a plot. The corresponding public example writes the same path
+schema to CSV, generates a PDF from that CSV, and then performs a separate explicit fixed-model
+fit.
+
+## Sugarcane high-dimensional component-path smoke check
 
 The second real-data smoke check asks:
 
-> Can an ordinary programming user run the default Pi-PLS path workflow on a transparent
-> high-dimensional spectral dataset and obtain complete ordered OOF reporting?
+> Does the same transparent component-path workflow operate when the predictor matrix is
+> high-dimensional with $p \gg n$?
 
-Run it from the repository root after installing the data dependencies:
+Run it with:
 
 ```bash
 python benchmarks/sugarcane_path_smoke.py
 ```
 
-The script reads `datasets/sugarcane/X.csv` and `Y.csv` directly with pandas. The predictor table
-has 57 rows and 1,721 columns, so this check exercises the ordinary workflow when $p \gg n$:
+The script reads the 57-row, 1,721-predictor Sugarcane `X.csv` and four-response `Y.csv` tables
+directly with pandas and uses the same default `PiPLSPathCV(refit=False)` call over component counts
+1 through 4. It writes `benchmarks/results/sugarcane_path_smoke.csv` with the same six columns as the
+Pulp path.
 
-```python
-X = pd.read_csv("datasets/sugarcane/X.csv")
-Y = pd.read_csv("datasets/sugarcane/Y.csv")
-search = PiPLSPathCV(
-    n_components_values=[1, 2, 3, 4],
-    return_oof_predictions=True,
-    n_jobs=1,
-).fit(X, Y)
-```
-
-The call uses the ordinary `samples_per_predictor_rank=5`, `cv=5`, adaptive search, and automatic
-solver defaults. It does not set a predictor-rank ceiling, force randomized SVD, preprocess the
-spectra, or create a held-out subset. Centering and optional scaling are learned separately inside
-each candidate training fold, and the selected estimator is refitted on all 57 rows.
-
-The output is `benchmarks/results/sugarcane_path_smoke.csv` with one row and exactly the same four
-explicitly selection-conditioned columns used by the Pulp workflow check:
-
-```text
-selected_n_components
-selected_predictor_rank
-selection_conditioned_response_standardized_mse
-selection_conditioned_pooled_oof_r2
-```
-
-The script verifies one ordered OOF prediction per row and complete full-data refitting. The
-diagnostics are not external-test or unbiased post-selection estimates. The check does not compare
-methods, establish a performance threshold, select spectral preprocessing, or measure runtime.
+The check records one numeric predictor rank, policy, mean CV-MSE, fold SD, and split count per
+component count. It does not set an explicit predictor-rank ceiling, force randomized SVD, select
+spectral preprocessing, choose the final model, or report timing.
 
 ## Benchmark sequence status
 
-All four planned focused synthetic benchmarks and the Pulp and Sugarcane path-selection smoke
+All four planned focused synthetic benchmarks and the Pulp and Sugarcane component-path smoke
 checks are implemented. Tobacco remains separately reviewed rather than appended to a universal
 table because its package-level question and computational cost differ.
 

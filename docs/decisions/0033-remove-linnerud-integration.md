@@ -30,7 +30,7 @@ dataset.
 
 - Source distributions no longer contain the Linnerud tables, license, metadata, or example.
 - The package no longer presents a weak small-sample result as a representative real-data use case.
-- Pulp is the compact ordinary path-selection example and the first implemented real-data smoke
+- Pulp is the compact ordinary component-path example and the first implemented real-data smoke
   check.
 - Dataset numbering is not renumbered; existing Pulp, sugarcane, and tobacco example filenames
   remain stable.

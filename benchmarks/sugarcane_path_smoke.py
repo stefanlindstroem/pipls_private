@@ -1,9 +1,4 @@
-"""Run the Sugarcane high-dimensional Pi-PLS path-selection smoke check.
-
-The reported validation diagnostics are selection-conditioned. They describe the
-same cross-validation result used for rank selection and are not an unbiased
-post-selection performance estimate.
-"""
+"""Write the Sugarcane Pi-PLS component path as a focused CSV smoke check."""
 
 from __future__ import annotations
 
@@ -16,13 +11,15 @@ import pandas as pd
 
 from pipls import PiPLSPathCV
 
-ResultValue = int | float
+ResultValue = int | float | str
 
 RESULT_COLUMNS = (
-    "selected_n_components",
-    "selected_predictor_rank",
-    "selection_conditioned_response_standardized_mse",
-    "selection_conditioned_pooled_oof_r2",
+    "n_components",
+    "predictor_rank",
+    "predictor_rank_policy",
+    "response_standardized_cv_mse_mean",
+    "response_standardized_cv_mse_fold_sd",
+    "n_splits",
 )
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = REPOSITORY_ROOT / "datasets" / "sugarcane"
@@ -39,55 +36,53 @@ def read_sugarcane_data() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 def fit_search(X: pd.DataFrame, Y: pd.DataFrame) -> PiPLSPathCV:
-    """Fit the ordinary public adaptive path workflow."""
+    """Evaluate the ordinary conditional predictor-rank path without refitting."""
 
     return PiPLSPathCV(
         n_components_values=N_COMPONENTS_VALUES,
-        return_oof_predictions=True,
+        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
 
-def _result_row(search: PiPLSPathCV, n_samples: int) -> dict[str, ResultValue]:
-    """Return one minimal row after checking the OOF reporting contract."""
+def _result_rows(search: PiPLSPathCV) -> list[dict[str, ResultValue]]:
+    """Return one validated conditional predictor-rank row per component count."""
 
-    report = search.validation_report_
-    if report.estimate_kind != "selection-conditioned":
-        raise RuntimeError("The path-search validation report must be selection-conditioned.")
-    if report.oof_predictions is None or report.oof_prediction_counts is None:
-        raise RuntimeError("The path search did not return OOF predictions and counts.")
-    if report.oof_predictions.shape[0] != n_samples:
-        raise RuntimeError("The OOF prediction table does not preserve the input row count.")
-    if not np.all(report.oof_prediction_counts == 1):
-        raise RuntimeError(
-            "Five-fold CV must produce exactly one OOF prediction per Sugarcane row."
-        )
-    if report.pooled_oof_r2 is None:
-        raise RuntimeError("The path search did not report pooled OOF R2.")
-
-    return {
-        "selected_n_components": int(search.best_n_components_),
-        "selected_predictor_rank": int(search.best_predictor_rank_),
-        "selection_conditioned_response_standardized_mse": float(
-            report.mean_response_standardized_mse
-        ),
-        "selection_conditioned_pooled_oof_r2": float(report.pooled_oof_r2),
-    }
+    results = search.component_path_results_
+    rows: list[dict[str, ResultValue]] = []
+    for index in range(len(results["n_components"])):
+        row = {
+            column: (
+                results[column][index].item()
+                if isinstance(results[column][index], np.generic)
+                else results[column][index]
+            )
+            for column in RESULT_COLUMNS
+        }
+        if row["predictor_rank_policy"] != "optimized":
+            raise RuntimeError(
+                "The public Sugarcane path must conditionally optimize predictor rank."
+            )
+        if not np.isfinite(row["response_standardized_cv_mse_mean"]):
+            raise RuntimeError("The component-path mean CV-MSE must be finite.")
+        if not np.isfinite(row["response_standardized_cv_mse_fold_sd"]):
+            raise RuntimeError("The component-path fold SD must be finite.")
+        rows.append(row)
+    return rows
 
 
 def run_benchmark() -> list[dict[str, ResultValue]]:
-    """Run the single-dataset smoke check and return its one result row."""
+    """Run the Sugarcane component-path smoke check."""
 
     X, Y = read_sugarcane_data()
-    search = fit_search(X, Y)
-    return [_result_row(search, len(X))]
+    return _result_rows(fit_search(X, Y))
 
 
 def write_results(
     rows: list[dict[str, ResultValue]],
     output: Path = DEFAULT_OUTPUT,
 ) -> None:
-    """Write the smoke-check row as one minimal UTF-8 comma-separated table."""
+    """Write the component path as UTF-8 comma-separated data."""
 
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w", encoding="utf-8", newline="") as handle:
@@ -108,7 +103,7 @@ def _parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Run the smoke check and write its dedicated CSV output."""
+    """Run the smoke check and write its component-path CSV."""
 
     args = _parse_args()
     write_results(run_benchmark(), args.output)

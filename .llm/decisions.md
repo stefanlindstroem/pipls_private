@@ -39,6 +39,7 @@ This index is navigation, not a substitute for those records.
 | `0031-default-selection-support.md` | ordinary rank-selection defaults | five samples per retained predictor direction and five-fold CV by default |
 | `0032-full-sample-rank-support.md` | rank-support sample-count convention | full supplied $n$ defines support; centered training folds impose feasibility caps |
 | `0033-remove-linnerud-integration.md` | reference dataset scope | remove the Linnerud dataset, example, test, and active navigation |
+| `0034-two-stage-component-path-workflow.md` | component-path presentation | one CSV row per component count, explicit predictor-rank policy, CSV-derived PDF, and separate fixed final fit |
 
 ## Accepted clarifications after earlier proposals
 
@@ -85,6 +86,8 @@ plan contains an earlier or more general proposal:
   performance claim before calibration;
 - the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
+- real-data component paths are presented as CSV tables with fold SD, plots are derived from those
+  tables, and examples fit a separate fixed model after an explicit user component choice;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.
