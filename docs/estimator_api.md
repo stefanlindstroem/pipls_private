@@ -14,7 +14,8 @@ print(model.predictor_rank_)
 
 Constructor parameters are `n_components`, `scale`, `copy`, `predictor_rank`,
 `samples_per_predictor_rank`, `cv`, `scoring`, `n_jobs`, `svd_solver`, and `random_state`.
-`predictor_rank` accepts `"auto"`, `"optimal"`, `"max"`, or a positive integer.
+`predictor_rank` accepts `"auto"`, `"optimal"`, `"max"`, or a positive integer. The ordinary
+selection defaults are `samples_per_predictor_rank=5` and `cv=5`.
 
 `"optimal"` exhaustively evaluates every admissible rank. `"auto"` uses deterministic
 logarithmic coarse-to-fine search and may skip ranks; it becomes exhaustive when the admissible or

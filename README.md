@@ -31,14 +31,7 @@ make check
 ```python
 from pipls import PiPLSRegression
 
-model = PiPLSRegression(
-    n_components=2,
-    predictor_rank="auto",
-    samples_per_predictor_rank=10,
-    cv=5,
-    svd_solver="auto",
-    random_state=0,
-)
+model = PiPLSRegression(n_components=2)
 model.fit(X_train, Y_train)
 Y_pred = model.predict(X_test)
 X_scores, Y_scores = model.transform(X_train, Y_train)
@@ -55,7 +48,7 @@ inside every training fold and are refitted on the complete training set after s
 ```python
 from pipls import PiPLSPathCV
 
-search = PiPLSPathCV(cv=5)
+search = PiPLSPathCV()
 search.fit(X_train, Y_train)
 print(search.best_params_)
 print(search.best_pipls_.coef_)
@@ -114,8 +107,8 @@ See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datase
 
 The repository contains four focused synthetic benchmarks and one separately reviewed real-data
 smoke check. The Pulp smoke check reads `X.csv` and `Y.csv` directly with pandas, runs a public
-`PiPLSPathCV` workflow with the complete 14-rank predictor interval made explicit, and writes
-selected ranks plus explicitly named
+`PiPLSPathCV` workflow with its rule-derived default predictor-rank bound, and writes selected
+ranks plus explicitly named
 selection-conditioned diagnostics. Run it with `python benchmarks/pulp_path_smoke.py`. These
 values are workflow diagnostics, not external-test or unbiased post-selection estimates.
 Publication-scale OLS/CCA comparisons and figure generation remain outside this repository.
@@ -139,9 +132,9 @@ The estimator follows scikit-learn and `PLSRegression` conventions for coefficie
 latent-score transforms, feature names, pandas output containers, and fitted weights/loadings.
 Pi-PLS-specific factorization output is grouped in the public read-only `decomposition_` result.
 
-`samples_per_predictor_rank` defaults to 10. Rule-based values below 5 are allowed but emit
-`StatisticalSupportWarning` because the resulting rank bound may lack sufficient statistical
-support.
+`samples_per_predictor_rank` and `cv` default to 5. Rule-based values below 5 are allowed but
+emit `StatisticalSupportWarning` because the resulting rank bound may lack sufficient
+statistical support.
 
 ## Repository map
 

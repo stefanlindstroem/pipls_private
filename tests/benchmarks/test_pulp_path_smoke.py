@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import importlib.util
+import math
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -54,7 +55,15 @@ def test_path_search_uses_public_selection_and_complete_ordered_oof_output() -> 
         search = BENCHMARK.fit_search(X, Y)
 
     report = search.validation_report_
-    assert search.max_predictor_rank_ == X.shape[1]
+    expected_max_rank = min(
+        X.shape[1],
+        search.cv_n_train_min_,
+        math.ceil(search.cv_n_train_min_ / search.samples_per_predictor_rank),
+    )
+    assert search.samples_per_predictor_rank == 5.0
+    assert search.cv == 5
+    assert search.max_predictor_rank == "rule"
+    assert search.max_predictor_rank_ == expected_max_rank
     assert search.best_n_components_ == search.best_params_["n_components"]
     assert search.best_predictor_rank_ == search.best_params_["predictor_rank"]
     assert search.best_n_components_ == search.best_pipls_.n_components

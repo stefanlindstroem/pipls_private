@@ -138,10 +138,9 @@ It is not parsed by the example or required by the estimator.
 `datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses adapted
 from the public supplementary material identified by DOI `10.1016/j.compchemeng.2025.109143`.
 `examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly, validates columns, numeric
-dtypes, row alignment, and missingness, then runs `PiPLSPathCV`. Because the dataset has only 14
-predictors, the example explicitly makes all 14 predictor ranks available instead of applying the
-conservative default samples-per-rank bound. The example does not parse `metadata.yaml` or call a
-package loader.
+dtypes, row alignment, and missingness, then runs `PiPLSPathCV` with its ordinary adaptive
+defaults. It does not set a predictor-rank ceiling, parse `metadata.yaml`, or call a package
+loader.
 
 ## Sugarcane spectral integration
 

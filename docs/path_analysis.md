@@ -15,11 +15,7 @@ rank-selection fold.
 ```python
 from pipls import PiPLSPathCV
 
-search = PiPLSPathCV(
-    samples_per_predictor_rank=10,
-    cv=5,
-    n_jobs=-1,
-)
+search = PiPLSPathCV()
 search.fit(X, Y)
 
 print(search.best_params_)
@@ -28,7 +24,8 @@ print(search.best_predictor_rank_by_n_components_)
 Y_pred = search.predict(X_new)
 ```
 
-`search_method="auto"` is the default and performs adaptive search. Set
+`search_method="auto"`, `samples_per_predictor_rank=5`, and `cv=5` are the default search
+settings. Set
 `search_method="optimal"` to evaluate every admissible pair.
 `search_method="auto"` performs deterministic logarithmic coarse-to-fine predictor-rank
 search independently for each `n_components` value and may skip candidates.

@@ -50,7 +50,8 @@ scikit-learn internals.
   `svd_solver="full"`; `svd_solver="auto"` may randomize and therefore requires a seed.
 - `scale` and `copy` are Python or NumPy booleans.
 
-`StatisticalSupportWarning` is public from `pipls`. A rule-based fit emits it once when
+`samples_per_predictor_rank=5` and `cv=5` are the ordinary defaults in both public selection
+interfaces. `StatisticalSupportWarning` is public from `pipls`. A rule-based fit emits it once when
 `samples_per_predictor_rank < 5`, because the resulting upper rank bound may not have sufficient
 statistical support to be trusted without external validation. Explicit integer ranks do not emit
 this warning because they bypass the $c$-based bound.

@@ -107,11 +107,11 @@ class PiPLSPathCV(
         ``"optimal"`` evaluates every admissible pair; ``"auto"`` is adaptive
         and approximate.
     samples_per_predictor_rank:
-        Positive rank-bound parameter $c$. Values below 5 issue
-        :class:`StatisticalSupportWarning`.
+        Positive rank-bound parameter $c$. The default is 5. Values below 5
+        issue :class:`StatisticalSupportWarning`.
     cv:
         Integer split count, splitter, iterable of train-validation pairs, or
-        ``None`` for the standard five-fold regression split.
+        ``None`` for the standard five-fold regression split. The default is 5.
     scoring:
         Scikit-learn scorer name, callable, or ``None`` to use estimator ``score``.
         The default is negative response-standardized MSE.
@@ -134,7 +134,7 @@ class PiPLSPathCV(
         predictor_rank_values: Sequence[int] | None = None,
         max_predictor_rank: int | Literal["rule"] = "rule",
         search_method: SearchMethod = "auto",
-        samples_per_predictor_rank: float = 10.0,
+        samples_per_predictor_rank: float = 5.0,
         cv: object = 5,
         scoring: Scoring = _DEFAULT_SCORING,
         refit: bool = True,

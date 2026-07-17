@@ -36,6 +36,7 @@ This index is navigation, not a substitute for those records.
 | `0028-synthetic-ci-benchmark-runner.md` | earlier broad CI runner | historical implementation removed by Decision 0030 |
 | `0029-human-and-machine-readable-results.md` | benchmark result usability | CSV principle retained; universal wide schema superseded by Decision 0030 |
 | `0030-focused-benchmark-design.md` | focused benchmark questions | one question, one script, and one minimal CSV output per benchmark |
+| `0031-default-selection-support.md` | ordinary rank-selection defaults | five samples per retained predictor direction and five-fold CV by default |
 
 ## Accepted clarifications after earlier proposals
 
@@ -43,6 +44,7 @@ These points are fixed by implemented decisions and owner review even where the 
 plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
+- both public selection interfaces default to `samples_per_predictor_rank=5` and `cv=5`;
 - randomized SVD is controlled independently and follows the same policy inside regression and
   path candidate fits;
 - `PiPLSRegression` is not implemented as a wrapper around `PiPLSPathCV`; both use private shared

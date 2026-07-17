@@ -33,6 +33,16 @@ def _fixed_estimator() -> PiPLSRegression:
     )
 
 
+def test_public_selection_defaults_use_five_samples_and_five_folds() -> None:
+    regression = PiPLSRegression()
+    path = PiPLSPathCV()
+
+    assert regression.samples_per_predictor_rank == 5.0
+    assert path.samples_per_predictor_rank == 5.0
+    assert regression.cv == 5
+    assert path.cv == 5
+
+
 def test_pls_style_method_signatures_include_copy_controls() -> None:
     assert tuple(inspect.signature(PiPLSRegression.predict).parameters) == (
         "self",

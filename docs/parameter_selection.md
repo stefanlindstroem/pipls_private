@@ -30,7 +30,7 @@ sample standard deviations with `ddof=1`; zero scales and singleton-fold scales 
 
 ## Statistical-support warning
 
-The default is $c=10$. Values below 5 remain legal for exploratory work but emit
+The default is $c=5$. Values below 5 remain legal for exploratory work but emit
 `pipls.StatisticalSupportWarning` in `"max"`, `"optimal"`, and `"auto"` modes. Fewer than five
 training samples per retained predictor-rank direction provide insufficient statistical support
 for the resulting rank bound to be trusted without external validation. Explicit integer ranks
@@ -39,17 +39,12 @@ bypass the $c$ rule and do not emit this warning.
 ## Adaptive `"auto"` mode
 
 ```python
-model = PiPLSRegression(
-    n_components=2,
-    predictor_rank="auto",
-    samples_per_predictor_rank=10,
-    cv=5,
-    scoring="neg_response_standardized_mean_squared_error",
-    n_jobs=None,
-)
+model = PiPLSRegression(n_components=2)
 ```
 
-This is the default. It begins with seven deterministic approximately logarithmic integer ranks,
+This uses the defaults `predictor_rank="auto"`, `samples_per_predictor_rank=5`, `cv=5`,
+and response-standardized MSE scoring. It begins with seven deterministic approximately
+logarithmic integer ranks,
 including both endpoints. It caches every result, finds the best evaluated rank using the normal
 tie rule, and refines between its evaluated neighbors. When that interval contains at most 10
 integer ranks, the remaining ranks in the interval are evaluated exhaustively.

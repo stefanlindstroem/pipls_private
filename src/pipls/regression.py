@@ -80,12 +80,14 @@ class PiPLSRegression(
         deterministic adaptive coarse-to-fine search.
     samples_per_predictor_rank:
         Positive rule parameter $c$ used to derive the upper predictor rank.
-        Rule-based values below 5 emit ``StatisticalSupportWarning``. It does
-        not constrain an explicitly supplied integer rank.
+        The default is 5. Rule-based values below 5 emit
+        ``StatisticalSupportWarning``. It does not constrain an explicitly
+        supplied integer rank.
     cv:
         Cross-validation splitter, integer split count of at least 2, iterable
         of train-validation index pairs, or ``None`` for the standard five-fold
-        regression split, used when ``predictor_rank`` is ``"auto"`` or ``"optimal"``.
+        regression split. The default is 5 and is used when ``predictor_rank`` is
+        ``"auto"`` or ``"optimal"``.
     scoring:
         Scikit-learn scorer name, callable, or ``None`` to use estimator ``score``.
         The default is negative response-standardized mean squared error.
@@ -115,7 +117,7 @@ class PiPLSRegression(
         scale: bool = True,
         copy: bool = True,
         predictor_rank: int | Literal["max", "optimal", "auto"] = "auto",
-        samples_per_predictor_rank: float = 10.0,
+        samples_per_predictor_rank: float = 5.0,
         cv: object = 5,
         scoring: Scoring = _DEFAULT_SCORING,
         n_jobs: int | None = None,

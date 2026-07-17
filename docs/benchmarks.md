@@ -95,8 +95,8 @@ and 3141. The scenarios are:
   predictor-only directions of strengths `(3.0, 2.5, 2.0, 1.5)`.
 
 The search uses `PiPLSRegression(scale=True, svd_solver="full")` inside five-fold
-`PiPLSPathCV(search_method="auto")`, with the standard rule-based predictor-rank bound and
-`samples_per_predictor_rank=10.0`. Every candidate learns centering and scaling from its training
+`PiPLSPathCV(search_method="auto")`, with a benchmark-specific rule-based predictor-rank bound
+and `samples_per_predictor_rank=10.0`. Every candidate learns centering and scaling from its training
 fold only. The selected estimator is then refitted on the complete generated training block.
 
 The output is `benchmarks/results/rank_selection.csv` with exactly these columns:
@@ -250,19 +250,15 @@ X = pd.read_csv("datasets/pulp/X.csv")
 Y = pd.read_csv("datasets/pulp/Y.csv")
 search = PiPLSPathCV(
     n_components_values=[1, 2, 3, 4],
-    max_predictor_rank=X.shape[1],
-    search_method="auto",
-    cv=5,
     return_oof_predictions=True,
     n_jobs=1,
 ).fit(X, Y)
 ```
 
 No loader, metadata parser, external preprocessing, method comparison, or artificial train/test
-split is added. Pulp has only 14 predictors, so the example explicitly sets the maximum searched
-predictor rank to `X.shape[1]`. This avoids the conservative default samples-per-rank rule, which
-would restrict this five-fold small-data search to rank 4 and would not represent the intended Pulp
-path. Model centering and scaling are learned separately in every candidate training fold, and the
+split is added. The call relies on the ordinary adaptive defaults
+`samples_per_predictor_rank=5` and `cv=5`; no predictor-rank ceiling is supplied by the example.
+Model centering and scaling are learned separately in every candidate training fold, and the
 selected estimator is refitted on all supplied rows.
 
 The output is `benchmarks/results/pulp_path_smoke.csv` with one row and exactly these columns:

@@ -39,13 +39,10 @@ def read_pulp_data() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 def fit_search(X: pd.DataFrame, Y: pd.DataFrame) -> PiPLSPathCV:
-    """Fit the public path workflow over the complete Pulp predictor-rank range."""
+    """Fit the ordinary public adaptive path workflow."""
 
     return PiPLSPathCV(
         n_components_values=N_COMPONENTS_VALUES,
-        max_predictor_rank=X.shape[1],
-        search_method="auto",
-        cv=5,
         return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)

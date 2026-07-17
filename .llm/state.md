@@ -87,6 +87,7 @@ case, or public behavior.
 | Exhaustive search | explicit `"optimal"` in either public interface |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
 | Reproducibility | `random_state=0` by default |
+| Rank support rule | `samples_per_predictor_rank=5` in both public selection interfaces |
 | Validation | `cv=5`; `cv=None` requests standard five-fold regression CV |
 | Selection score | response-standardized negative MSE by default; `scoring=None` uses estimator score |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
@@ -158,10 +159,10 @@ implemented independently:
 
 The first separately reviewed real-data smoke check is also implemented in
 `benchmarks/pulp_path_smoke.py`. It reads `datasets/pulp/X.csv` and `Y.csv` directly with pandas,
-fits the public `PiPLSPathCV` workflow with the complete 14-rank predictor interval made explicit,
-verifies complete ordered five-fold OOF output, and writes one row containing selected ranks plus
-explicitly named selection-conditioned diagnostics. The explicit maximum avoids applying the
-conservative default rank rule to this small real dataset. Those diagnostics are not described as
+fits the public `PiPLSPathCV` workflow with the ordinary
+`samples_per_predictor_rank=5` and `cv=5` defaults, verifies complete ordered five-fold OOF output,
+and writes one row containing selected ranks plus explicitly named selection-conditioned
+diagnostics. It does not supply a predictor-rank ceiling. Those diagnostics are not described as
 independent-test or unbiased post-selection performance.
 
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain

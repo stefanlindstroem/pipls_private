@@ -106,8 +106,9 @@ table.
 which ranks does `PiPLSPathCV(search_method="auto")` select for prediction?
 
 **Method:** adaptive Pi-PLS path selection only. Candidate models use
-`PiPLSRegression(scale=True, svd_solver="full")`, five-fold CV, the standard rule-based
-predictor-rank bound with `samples_per_predictor_rank=10.0`, and one execution job. Every candidate
+`PiPLSRegression(scale=True, svd_solver="full")`, five-fold CV, a benchmark-specific
+rule-based predictor-rank bound with `samples_per_predictor_rank=10.0`, and one execution job.
+Every candidate
 learns model centering and scaling inside its training fold, and the selected model refits on the
 complete generated training block.
 
@@ -250,11 +251,9 @@ this table. A future runtime benchmark requires a separate hardware and measurem
 adaptive Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporting?
 
 **Method:** read `datasets/pulp/X.csv` and `datasets/pulp/Y.csv` directly with pandas, then fit
-`PiPLSPathCV(n_components_values=[1, 2, 3, 4], max_predictor_rank=X.shape[1],
-search_method="auto", cv=5, return_oof_predictions=True, n_jobs=1)`. Pulp has only 14 predictors,
-so the explicit maximum exposes the complete predictor-rank interval to the adaptive search. The
-conservative default samples-per-rank rule would otherwise cap this five-fold search at rank 4 and
-would not answer the intended Pulp workflow question. No package loader, metadata parser, external
+`PiPLSPathCV(n_components_values=[1, 2, 3, 4], return_oof_predictions=True, n_jobs=1)`. The call
+uses the ordinary adaptive defaults `samples_per_predictor_rank=5` and `cv=5`; the benchmark does
+not supply a predictor-rank ceiling. No package loader, metadata parser, external
 preprocessing, comparator, or held-out test set is introduced. Every candidate learns model
 centering and scaling within its training fold, and the selected model refits on all 46 rows.
 

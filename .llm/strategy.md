@@ -63,7 +63,8 @@ tagged `pipls` versions.
 - Predictor-rank modes target four semantics: integer, `"max"`, `"optimal"`, and `"auto"`.
 - `"optimal"` means exhaustive CV evaluation of every admissible predictor rank.
 - `"auto"` means deterministic adaptive coarse-to-fine search and is explicitly approximate.
-- General search bounds use the smallest training-fold size.
+- General search bounds use the smallest training-fold size. The ordinary public defaults are
+  `samples_per_predictor_rank=5` and `cv=5`.
 - All CV-based selection uses fold-local response-standardized MSE.
 - Search approximation and linear-algebra approximation are separate policies. Randomized SVD
   must be introduced through an explicit solver contract and diagnostics, not hidden inside the
@@ -381,10 +382,10 @@ exercise fitting, selection, prediction, or validation reporting, but it must no
 selection-conditioned diagnostics as independent performance estimates.
 
 Current status: **in progress**. The Pulp path-selection smoke check reads `X.csv` and `Y.csv`
-directly with pandas, fits the public `PiPLSPathCV` workflow with the complete 14-rank predictor
-interval made explicit, verifies complete ordered five-fold OOF output, and writes selected ranks
-plus explicitly named selection-conditioned diagnostics. The conservative default rank rule is not
-used for this small-data path. No method comparison, nested-CV claim, timing table, or general
+directly with pandas, fits the public `PiPLSPathCV` workflow with the ordinary
+`samples_per_predictor_rank=5` and `cv=5` defaults, verifies complete ordered five-fold OOF
+output, and writes selected ranks plus explicitly named selection-conditioned diagnostics. No
+predictor-rank ceiling, method comparison, nested-CV claim, timing table, or general
 real-data runner is included.
 
 ### Product documentation and release hardening
