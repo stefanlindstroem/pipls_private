@@ -97,15 +97,15 @@ Additional fixed decisions:
 
 ## Current next increment
 
-Phase E3 is underway. The repository now contains two transparent integrations: the small
-BSD-licensed Linnerud reference dataset and the CC BY 4.0 pulp dataset adapted from public
-supplementary material. Both use `X.csv`, `Y.csv`, and `metadata.yaml`; their examples read only the
-two comma-delimited model tables explicitly.
+Phase E3 is underway. The repository now contains three transparent integrations: the small
+BSD-licensed Linnerud reference dataset, the CC BY 4.0 pulp dataset, and the CC BY 4.0 sugarcane
+LabSpec dataset. All use `X.csv`, `Y.csv`, and `metadata.yaml`; their examples read only the two
+comma-delimited model tables explicitly.
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
 dataset after its source, citation, license, redistribution, and scientific preparation choices
-are resolved. Linnerud and pulp are the current layout and transparency references. E3 is performed one dataset at a time. Each dataset
-patch must:
+are resolved. Linnerud, pulp, and sugarcane are the current layout and transparency references.
+E3 is performed one dataset at a time. Each dataset patch must:
 
 1. establish a public or included source, citation, license, redistribution status, and
    preparation choices;

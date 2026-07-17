@@ -299,9 +299,10 @@ preparation-only scripts. Defer Corn reconstruction until its preprocessing choi
 fixed; Corn will expose its public raw-data reading and analysis-relevant preprocessing.
 
 Current status: **underway**. Linnerud establishes the layout reference. Pulp is the second
-integration: 14 fiber-property predictors and eight responses adapted from public supplementary
-material, documented under CC BY 4.0, and read directly by a path-search example. No runtime loader,
-metadata requirement, private archive reference, or internal preparation script is exposed.
+integration. Sugarcane is the third: 57 samples with a regular 780--2500 nm LabSpec predictor grid
+and four responses, adapted from a public CC BY 4.0 dataset with explicit row matching, missing-row
+exclusion, wavelength selection, and no spectral preprocessing. No runtime loader, metadata
+requirement, private archive reference, or internal preparation script is exposed.
 
 ### Phase E4: benchmark fixtures
 
@@ -333,8 +334,8 @@ Current status: **planned**.
 ## Current next increment
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
-dataset. Linnerud and pulp are completed transparent reference integrations and file-layout
-examples. A manuscript dataset may follow only when public source, citation, licensing,
+dataset. Linnerud, pulp, and sugarcane are completed transparent reference integrations and
+file-layout examples. A manuscript dataset may follow only when public source, citation, licensing,
 redistribution, row alignment, and scientific preparation are resolved. Require the standard
 repository metadata file, but do not add a public registry, generic loader, metadata-driven runtime
 path, implicit download, hidden example I/O utility, private source reference, or preparation-only

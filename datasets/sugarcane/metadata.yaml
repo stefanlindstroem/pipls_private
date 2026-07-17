@@ -1,0 +1,94 @@
+schema_version: 1
+dataset:
+  id: sugarcane
+  title: LabSpec sugarcane visible-near-infrared regression dataset
+  version: "1"
+  summary: >-
+    Fifty-seven sugarcane samples with LabSpec absorbance spectra from 780 to 2500 nm and four
+    chemical or feed-quality responses.
+files:
+  predictors: X.csv
+  responses: Y.csv
+format:
+  type: csv
+  delimiter: ","
+  encoding: utf-8
+  header: true
+dimensions:
+  n_samples: 57
+  n_predictors: 1721
+  n_responses: 4
+predictors:
+  representation: regular_spectral_axis
+  quantity: absorbance
+  description: >-
+    LabSpec absorbance values calculated by the source authors as log10(1 / reflectance).
+  axis:
+    name: wavelength
+    unit: nm
+    start: 780
+    stop: 2500
+    step: 1
+  columns: >-
+    X.csv contains one predictor column for every integer wavelength from 780 through 2500 nm,
+    ordered in increasing wavelength.
+responses:
+  - name: TS
+    description: Total sugar content.
+  - name: CP
+    description: Crude protein content.
+  - name: ADF
+    description: Acid detergent fiber content.
+  - name: IVOMD
+    description: In vitro organic matter digestibility.
+sample_alignment:
+  method: source_identifier_merge_then_positional
+  description: >-
+    The public LabSpec and response tables were matched one-to-one using their Sample column while
+    preserving LabSpec row order. Row i in X.csv and row i in Y.csv therefore refers to the same
+    sample. Source sample identifiers run from 100 through 159 except 103, 105, and 111, whose TS
+    values are missing and which were excluded before the matrices were written.
+missing_values:
+  predictors: none in the retained matrix
+  responses: >-
+    Source rows with missing values in any selected response were excluded. No remaining response
+    value is missing.
+source:
+  type: public-data-repository
+  dataset:
+    citation: >-
+      Chaix, G., Bendoula, R., and Zgouz, A. (2021). Data set of Visible-Near Infrared handled and
+      micro-spectrometers - comparison of their accuracy for predicting some sugarcane properties.
+      Mendeley Data, Version 1.
+    doi: 10.17632/mjttsjfj2s.1
+    repository: Mendeley Data
+    public_files:
+      predictors: LabSpec.csv
+      responses: responses.csv
+  related_publication:
+    citation: >-
+      Zgouz, A., Heran, D., Barthes, B., Bastianelli, D., Bonnal, L., Baeten, V., Lurol, S.,
+      Bonin, M., Roger, J.-M., Bendoula, R., and Chaix, G. (2020). Dataset of visible-near
+      infrared handheld and micro-spectrometers - comparison of the prediction accuracy of
+      sugarcane properties. Data in Brief, 31, 106013.
+    doi: 10.1016/j.dib.2020.106013
+  access_note: >-
+    The Mendeley Data DOI resolves to the public raw CSV collection. The committed X.csv and Y.csv
+    are the analysis-facing LabSpec subset described below.
+license:
+  identifier: CC-BY-4.0
+  file: LICENSE.txt
+  redistribution: permitted with attribution
+preparation:
+  description: >-
+    Read the public semicolon-delimited LabSpec.csv and responses.csv files. Parse TS, CP, ADF,
+    and IVOMD as numeric responses; exclude source samples 103, 105, and 111 because TS is missing;
+    match the remaining rows one-to-one by Sample; retain LabSpec wavelengths from 780 through
+    2500 nm inclusive; remove the Sample identifier from the model matrices; and write the aligned
+    numeric values as comma-delimited X.csv and Y.csv. No imputation, smoothing, derivative,
+    centering, scaling, or other spectral preprocessing was applied.
+integrity:
+  sha256:
+    X.csv: f5437f54fcf2bb0cb4754cfb005836f472bbe5f3b29113e0a78ba4d9973b91c4
+    Y.csv: a707650407e86af4fc08448f78fda1ee75ad0de25ee6906e17f159a7f2ec9d93
+    LICENSE.txt: 4a052472a6f2a041c62eb1530b571f104ea587b662830410e57cfb134ccbe2df

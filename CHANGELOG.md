@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add the CC BY 4.0 sugarcane LabSpec dataset as the third transparent real-data integration, with explicit sample alignment, missing-response exclusion, wavelength selection, compact spectral-axis metadata, and direct pandas I/O.
+
 - Replace brittle repository-document and dataset-metadata value assertions with structural file, format, decision-index, and executable-example tests; document the durable testing policy.
 
 - Restrict committed dataset provenance to public or included sources, remove private pulp archive references and its preparation-only converter, and document Corn as the explicit user-facing raw-data preprocessing exception.

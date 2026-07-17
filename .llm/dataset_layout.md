@@ -40,7 +40,8 @@ use `schema_version: 1` and contain these top-level fields:
 - `files`: `predictors: X.csv` and `responses: Y.csv`;
 - `format`: CSV type, comma delimiter, UTF-8 encoding, and header status;
 - `dimensions`: sample, predictor, and response counts;
-- `predictors`: ordered names and non-empty descriptions;
+- `predictors`: ordered names and non-empty descriptions, or an exact compact descriptor for a
+  regular high-dimensional axis such as a wavelength grid;
 - `responses`: ordered names and non-empty descriptions;
 - `sample_alignment`: row-alignment method and explanation;
 - `missing_values`: declared policy for predictors and responses;
@@ -51,7 +52,9 @@ use `schema_version: 1` and contain these top-level fields:
 - `integrity`: SHA-256 hashes for the analysis files and relevant license assets.
 
 The metadata may contain additional dataset-specific fields, but the required fields and meanings
-must remain stable across datasets.
+must remain stable across datasets. A compact regular-axis descriptor must state the measured
+quantity, axis name and unit, start, stop, step, ordering, and how CSV headers encode the axis; it
+must define every predictor column without relying on hidden code.
 
 ## Public-facing provenance rule
 
