@@ -97,10 +97,34 @@ table.
 
 ### 2. Rank selection
 
-**Question:** Does `PiPLSPathCV(search_method="auto")` select reasonable shared and predictor ranks
-when those ranks are known from the generator?
+**Question:** When the generator declares the shared dimension and complete predictor-signal rank,
+which ranks does `PiPLSPathCV(search_method="auto")` select for prediction?
 
-**Method:** adaptive Pi-PLS path selection only.
+**Method:** adaptive Pi-PLS path selection only. Candidate models use
+`PiPLSRegression(scale=True, svd_solver="full")`, five-fold CV, the standard rule-based
+predictor-rank bound with `samples_per_predictor_rank=10.0`, and one execution job. Every candidate
+learns model centering and scaling inside its training fold, and the selected model refits on the
+complete generated training block.
+
+**Implemented scenarios:**
+
+- `one_shared`: one shared direction of strength `(2.5,)` and no predictor-specific directions;
+- `two_shared`: two shared directions of strengths `(2.5, 1.5)` and no predictor-specific
+  directions;
+- `two_shared_with_predictor_nuisance`: the same two shared directions plus four predictor-only
+  directions of strengths `(3.0, 2.5, 2.0, 1.5)`.
+
+All scenarios use 160 training samples, 160 test samples, 24 predictors, six responses, no
+response-specific directions, noise `(0.2, 0.2)`, and seeds 1729, 2718, and 3141.
+
+**Metrics:**
+
+- `true_n_components` is `truth.n_shared`;
+- `selected_n_components` is `PiPLSPathCV.best_n_components_`;
+- `true_predictor_rank` is `truth.n_shared + truth.n_predictor_specific`;
+- `selected_predictor_rank` is `PiPLSPathCV.best_predictor_rank_`;
+- `test_mse` is the mean squared residual over the independent test samples and responses in
+  original response units after full-training refit.
 
 **Output:** `benchmarks/results/rank_selection.csv`.
 
@@ -114,8 +138,13 @@ Required columns:
 - `selected_predictor_rank`;
 - `test_mse`.
 
-Subspace metrics, software versions, and timings are not part of this benchmark unless a later
-question specifically requires them.
+The declared ranks are structural references, while selected ranks optimize a finite
+cross-validation estimate of predictive loss. Exact equality, a maximum rank error, and a
+predictive pass threshold are not benchmark acceptance criteria. Fixed-oracle comparison, ordinary
+PLS, exhaustive-versus-adaptive comparison, subspace metrics, solver comparison, candidate counts,
+software versions, timings, and figures do not belong in this table.
+
+The benchmark is implemented by `benchmarks/rank_selection.py`.
 
 ### 3. Predictor-nuisance comparison with PLS
 
@@ -179,8 +208,8 @@ rank selection is exact until a separate calibrated acceptance decision exists.
 Implement the benchmarks one at a time in this order:
 
 1. fixed-structure recovery — implemented;
-2. rank selection — next;
-3. predictor-nuisance comparison with PLS;
+2. rank selection — implemented;
+3. predictor-nuisance comparison with PLS — next;
 4. solver consistency.
 
 Each implementation patch must remain question-specific. Do not recreate the removed universal

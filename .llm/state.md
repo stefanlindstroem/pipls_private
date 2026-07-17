@@ -157,33 +157,37 @@ in `.llm/benchmarking.md` and contains four independent questions:
 4. full-versus-randomized solver consistency.
 
 Each benchmark owns one readable script and one minimal CSV output. Fixed-structure recovery is
-implemented in `benchmarks/fixed_structure_recovery.py`; its generated CSV remains ignored and is
-excluded from snapshots. Software versions, execution controls, timings, and unrelated metrics are
-omitted unless they answer that benchmark's explicit question. OLS, CCA, publication grids, and
-figure generation remain outside the repository.
+implemented in `benchmarks/fixed_structure_recovery.py`, and adaptive rank selection is implemented
+in `benchmarks/rank_selection.py`; their generated CSV files remain ignored and are excluded from
+snapshots. Software versions, execution controls, timings, and unrelated metrics are omitted unless
+they answer that benchmark's explicit question. OLS, CCA, publication grids, and figure generation
+remain outside the repository.
 
 ## Current next increment
 
-Implement only the second focused benchmark: **rank selection**.
+Implement only the third focused benchmark: **predictor-nuisance comparison with ordinary PLS**.
 
 The next patch should:
 
-- use `PiPLSPathCV(search_method="auto")` with fold-local estimator centering and scaling;
-- use deterministic public synthetic train/test data with declared shared and predictor-signal
-  ranks;
-- write `benchmarks/results/rank_selection.csv`;
-- report only `scenario`, `seed`, `true_n_components`, `selected_n_components`,
-  `true_predictor_rank`, `selected_predictor_rank`, and `test_mse`;
-- avoid ordinary PLS comparison, solver comparison, timings, software metadata, universal
-  orchestration, figures, or block-aware scaling APIs.
+- compare paired fixed Pi-PLS and `PLSRegression` fits on identical deterministic synthetic
+  train/test problems;
+- vary predictor-specific nuisance while holding the declared shared dimension and other structural
+  conditions controlled;
+- use the declared shared rank for both methods and the declared complete predictor-signal rank for
+  fixed Pi-PLS;
+- write `benchmarks/results/predictor_nuisance_comparison.csv`;
+- report only `scenario`, `seed`, `pipls_test_mse`, `pls_test_mse`, and
+  `pipls_minus_pls_mse`;
+- avoid rank selection, solver comparison, timings, software metadata, universal orchestration,
+  figures, or block-aware scaling APIs.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **Focused synthetic benchmarks:** implement rank selection next, then predictor-nuisance
-   comparison and solver consistency in separate patches.
+1. **Focused synthetic benchmarks:** implement predictor-nuisance comparison next, then solver
+   consistency in a separate patch.
 2. **Representative real-data smoke checks:** add only after the synthetic questions are stable and
    under separate review.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility

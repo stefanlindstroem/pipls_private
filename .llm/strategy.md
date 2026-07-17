@@ -372,8 +372,10 @@ operationally reviewable.
 
 Current status: **in progress**. Fixed-structure recovery is implemented with fixed oracle-rank
 Pi-PLS, deterministic public synthetic train/test data, test MSE, and three coordinate-correct
-subspace-capture metrics. Its dedicated CSV has six columns and no selection, comparison, solver,
-timing, software, or environment fields. Rank selection is the next separate benchmark.
+subspace-capture metrics. Adaptive rank selection is also implemented with deterministic public
+synthetic train/test data, generator-declared reference ranks, full-training refit, independent-test
+MSE, and a dedicated seven-column CSV. Predictor-nuisance comparison with ordinary PLS is the next
+separate benchmark.
 
 ### Product documentation and release hardening
 
@@ -403,12 +405,12 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the rank-selection benchmark only. Use adaptive `PiPLSPathCV(search_method="auto")`,
-retain fold-local learned centering and scaling, write its dedicated minimal CSV, and test
-deterministic selected ranks and finite prediction metrics without asserting exact recovery as a
-scientific claim. Do not add ordinary PLS comparison, solver consistency, timings, software
-metadata, a generic manifest, a universal schema, real-data benchmark outputs, figures, OLS/CCA
-comparisons, or block-aware scaling APIs.
+Implement the predictor-nuisance comparison benchmark only. Compare paired fixed Pi-PLS and
+ordinary `PLSRegression` fits on the same deterministic synthetic train/test problems, vary
+predictor-specific nuisance, use declared fixed ranks, and write the dedicated five-column CSV. Do
+not add rank selection, solver consistency, timings, software metadata, a generic manifest, a
+universal schema, real-data benchmark outputs, figures, OLS/CCA comparisons, or block-aware scaling
+APIs.
 
 Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
 and preprocessing must be public and explicit.

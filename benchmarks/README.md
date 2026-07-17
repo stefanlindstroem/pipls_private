@@ -40,10 +40,39 @@ The subspace captures are mean squared canonical correlations. Predictor and res
 are first expressed in the estimator coordinates using the observed-variable scales from the
 generator and the training scales learned by the fitted model.
 
+## Rank selection
+
+`rank_selection.py` asks how adaptive `PiPLSPathCV(search_method="auto")` selects the shared
+component count and complete predictor rank when both are declared by the synthetic generator. It
+uses three controlled structures: one shared direction, two shared directions, and two shared
+directions plus four predictor-only nuisance directions.
+
+Run it from the repository root after installing the package:
+
+```bash
+python benchmarks/rank_selection.py
+```
+
+It writes `benchmarks/results/rank_selection.csv` with exactly these columns:
+
+```text
+scenario
+seed
+true_n_components
+selected_n_components
+true_predictor_rank
+selected_predictor_rank
+test_mse
+```
+
+The selected model is refitted on the complete generated training block before independent-test
+prediction. Declared ranks are structural references, while selected ranks are predictive
+cross-validation choices; exact equality is not an acceptance criterion.
+
 ## Remaining sequence
 
-The next separately reviewed benchmarks are rank selection, predictor-nuisance comparison with
-ordinary PLS, and full-versus-randomized solver consistency.
+The next separately reviewed benchmarks are predictor-nuisance comparison with ordinary PLS and
+full-versus-randomized solver consistency.
 
 Generated outputs under `benchmarks/results/` remain ignored by Git and are excluded from repository
 snapshots. Software versions, parallel settings, and timings are included only in a benchmark whose

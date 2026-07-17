@@ -71,13 +71,65 @@ all learned scales come only from the benchmark training block.
 The benchmark does not perform rank selection, compare against ordinary PLS, compare SVD solvers,
 measure runtime, record software or environment metadata, or create figures.
 
+## Rank selection
+
+The implemented rank-selection benchmark asks:
+
+> When the generator declares the shared dimension and complete predictor-signal rank, which ranks
+> does adaptive `PiPLSPathCV(search_method="auto")` select for prediction?
+
+Run it from the repository root after installing the package:
+
+```bash
+python benchmarks/rank_selection.py
+```
+
+The script uses `make_pipls_train_test` with 160 training samples, 160 test samples, 24 predictors,
+six responses, no response-specific directions, block noise `(0.2, 0.2)`, and seeds 1729, 2718,
+and 3141. The scenarios are:
+
+- `one_shared`, with one shared direction of strength `(2.5,)`;
+- `two_shared`, with two shared directions of strengths `(2.5, 1.5)`;
+- `two_shared_with_predictor_nuisance`, retaining the two shared directions and adding four
+  predictor-only directions of strengths `(3.0, 2.5, 2.0, 1.5)`.
+
+The search uses `PiPLSRegression(scale=True, svd_solver="full")` inside five-fold
+`PiPLSPathCV(search_method="auto")`, with the standard rule-based predictor-rank bound and
+`samples_per_predictor_rank=10.0`. Every candidate learns centering and scaling from its training
+fold only. The selected estimator is then refitted on the complete generated training block.
+
+The output is `benchmarks/results/rank_selection.csv` with exactly these columns:
+
+```text
+scenario
+seed
+true_n_components
+selected_n_components
+true_predictor_rank
+selected_predictor_rank
+test_mse
+```
+
+`true_n_components` is the generator-declared shared rank.
+`true_predictor_rank` is the sum of the generator-declared shared and predictor-specific ranks.
+The selected fields are the global path-search choice. `test_mse` is the arithmetic mean of squared
+residuals over the independent test samples and responses in original response units.
+
+The declared ranks describe the data-generating structure. The selected ranks optimize a finite
+cross-validation estimate of predictive loss and need not equal the declared ranks. The benchmark
+therefore records behavior without defining exact recovery, a maximum rank error, or a predictive
+pass threshold.
+
+It does not compare against fixed oracle Pi-PLS, ordinary PLS, exhaustive path search, or another
+SVD solver. It also excludes subspace metrics, timings, candidate counts, software or environment
+metadata, and figures.
+
 ## Planned separate benchmarks
 
 The remaining benchmark sequence is:
 
-1. adaptive rank selection;
-2. predictor-specific nuisance comparison between fixed Pi-PLS and ordinary PLS;
-3. full-versus-randomized predictor-SVD consistency.
+1. predictor-specific nuisance comparison between fixed Pi-PLS and ordinary PLS;
+2. full-versus-randomized predictor-SVD consistency.
 
 Each will receive its own script and minimal CSV output in a separate patch.
 
