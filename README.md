@@ -112,12 +112,12 @@ See [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datase
 
 ## Lightweight benchmarks
 
-The repository uses a small sequence of focused synthetic benchmarks. Fixed-structure recovery is
-implemented and writes one six-column CSV table from fixed oracle-rank Pi-PLS fits. Run it with
-`python benchmarks/fixed_structure_recovery.py`. Rank selection, Pi-PLS versus ordinary PLS under
-predictor-specific nuisance, and full-versus-randomized solver consistency remain separate planned
-benchmarks. Publication-scale OLS/CCA comparisons and figure generation remain outside this
-repository.
+The repository contains four focused synthetic benchmarks and one separately reviewed real-data
+smoke check. The Pulp smoke check reads `X.csv` and `Y.csv` directly with pandas, runs the ordinary
+public `PiPLSPathCV` workflow, and writes selected ranks plus explicitly named
+selection-conditioned diagnostics. Run it with `python benchmarks/pulp_path_smoke.py`. These
+values are workflow diagnostics, not external-test or unbiased post-selection estimates.
+Publication-scale OLS/CCA comparisons and figure generation remain outside this repository.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).
 

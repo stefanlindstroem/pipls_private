@@ -13,7 +13,7 @@ material alone.
 
 ## Implemented boundary
 
-Phases A through E3 are complete and committed. The first broad E4 benchmark implementation has been removed and replaced by an accepted focused benchmark plan:
+Phases A through E4b are complete and committed, and E4c real-data smoke checks are in progress. The first broad E4 benchmark implementation was removed and replaced by focused question-specific benchmarks:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -145,31 +145,34 @@ Until the owner starts a dedicated phase:
 - require every future learned scaling rule to fit inside its corresponding training fold and the
   final full-training refit.
 
-## Focused synthetic benchmark plan
+## Focused benchmark status
 
 Decision 0030 supersedes the earlier universal manifest, universal result schema, and broad CI
-runner. Those implementation assets have been removed. The accepted benchmark plan is documented
-in `.llm/benchmarking.md` and contains four independent questions:
+runner. Those implementation assets have been removed. The four focused synthetic questions are
+implemented independently:
 
 1. fixed-structure recovery by fixed Pi-PLS;
 2. adaptive Pi-PLS rank selection;
 3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
 4. full-versus-randomized solver consistency.
 
-Each benchmark owns one readable script and one minimal CSV output. All four are implemented
-in `benchmarks/fixed_structure_recovery.py`, `benchmarks/rank_selection.py`,
-`benchmarks/predictor_nuisance_comparison.py`, and `benchmarks/solver_consistency.py`. Their
-generated CSV files remain ignored and are excluded from snapshots. Software versions, execution
-controls, timings, and unrelated metrics are omitted unless they answer that benchmark's explicit
-question. OLS, CCA, publication grids, and figure generation remain outside the repository.
+The first separately reviewed real-data smoke check is also implemented in
+`benchmarks/pulp_path_smoke.py`. It reads `datasets/pulp/X.csv` and `Y.csv` directly with pandas,
+fits the ordinary public `PiPLSPathCV` workflow, verifies complete ordered five-fold OOF output, and
+writes one row containing selected ranks plus explicitly named selection-conditioned diagnostics.
+Those diagnostics are not described as independent-test or unbiased post-selection performance.
+
+Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
+ignored and are excluded from snapshots. Software versions, execution controls, timings, and
+unrelated metrics are omitted unless they answer that benchmark's explicit question. OLS, CCA,
+publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Begin the separately reviewed **representative real-data smoke-check** phase. The next patch must
-first define one package-user question for one existing transparent dataset and a minimal output
-contract; it must not combine datasets, methods, timings, or publication reporting in a universal
-runner. No real-data benchmark question or result schema is accepted merely by completion of the
-synthetic sequence.
+Review one **high-dimensional real-data smoke-check** question for one existing transparent spectral
+dataset. Define the user workflow and minimal output before implementation. Do not combine
+sugarcane and tobacco, add method comparisons, report timings, introduce spectral preprocessing,
+or create a universal real-data runner or schema.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
 expose its public raw-data reading and analysis-relevant preprocessing directly.
@@ -177,8 +180,8 @@ expose its public raw-data reading and analysis-relevant preprocessing directly.
 ## Subsequent roadmap
 
 1. **Focused synthetic benchmarks:** complete.
-2. **Representative real-data smoke checks:** next, one separately reviewed package-level question
-   at a time.
+2. **Representative real-data smoke checks:** Pulp path selection implemented; further datasets are
+   reviewed one package-level question at a time.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 4. **Future product development:** additional estimators, validation tools, datasets, and—only after

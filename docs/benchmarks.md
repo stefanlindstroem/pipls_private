@@ -1,7 +1,8 @@
 # Lightweight validation benchmarks
 
-`pipls` uses small synthetic benchmarks to make selected package behavior understandable across
-releases. They are designed for programming users, not for reproducing a scientific paper.
+`pipls` uses small focused benchmarks to make selected package behavior understandable across
+releases. Synthetic questions remain primary; separately reviewed real-data smoke checks exercise
+ordinary user workflows. These assets are not scientific-paper reproduction studies.
 
 ## Focused design
 
@@ -229,10 +230,58 @@ where $\epsilon$ is machine epsilon. Predictions and coefficients are in origina
 The benchmark is descriptive: it does not define a universal pass threshold, compare prediction
 accuracy, select ranks, measure runtime or memory, or record software and environment metadata.
 
-## Focused synthetic sequence status
+## Pulp path-selection smoke check
 
-All four planned focused synthetic benchmarks are implemented. Representative real-data smoke
-checks, if added, will be designed and reviewed separately rather than appended to these tables.
+The first real-data smoke check asks:
+
+> Can an ordinary programming user read the transparent Pulp tables, run the public adaptive
+> Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporting?
+
+Run it from the repository root after installing the data dependencies:
+
+```bash
+python benchmarks/pulp_path_smoke.py
+```
+
+The script uses the same visible workflow as the public Pulp example:
+
+```python
+X = pd.read_csv("datasets/pulp/X.csv")
+Y = pd.read_csv("datasets/pulp/Y.csv")
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    search_method="auto",
+    cv=5,
+    return_oof_predictions=True,
+    n_jobs=1,
+).fit(X, Y)
+```
+
+No loader, metadata parser, external preprocessing, method comparison, or artificial train/test
+split is added. Model centering and scaling are learned separately in every candidate training
+fold, and the selected estimator is refitted on all supplied rows.
+
+The output is `benchmarks/results/pulp_path_smoke.csv` with one row and exactly these columns:
+
+```text
+selected_n_components
+selected_predictor_rank
+selection_conditioned_response_standardized_mse
+selection_conditioned_pooled_oof_r2
+```
+
+The script also verifies that five-fold CV returns exactly one row-ordered OOF prediction for each
+of the 46 samples. The two diagnostic columns deliberately say `selection_conditioned`: the same
+cross-validation result selects the ranks and calculates the diagnostics. They are not external-test
+results and are not unbiased post-selection performance estimates. The smoke check establishes that
+the public workflow and reporting contract operate on a transparent real dataset; it does not
+assert predictive quality or compare Pi-PLS with another method.
+
+## Benchmark sequence status
+
+All four planned focused synthetic benchmarks and the Pulp path-selection smoke check are
+implemented. Further real-data smoke checks will be designed and reviewed separately rather than
+appended to a universal table.
 
 ## Interpretation boundary
 

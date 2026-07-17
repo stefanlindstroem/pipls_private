@@ -15,17 +15,17 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through E3 are implemented. The current public surface includes `PiPLSRegression`,
+Phases A through E4b are implemented, and E4c is in progress. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, and deterministic synthetic dataset generation.
 
 The initial transparent real-dataset suite contains Linnerud, pulp, sugarcane, and tobacco. Public
 navigation now describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
-The benchmark layer now implements all four focused synthetic questions as separate scripts:
-fixed-structure recovery, adaptive rank selection, paired predictor-nuisance comparison with ordinary
-PLS, and full-versus-randomized solver consistency. Representative real-data smoke checks are next
-under separate review. No block-aware scaling API is designed or scheduled.
+The benchmark layer implements all four focused synthetic questions as separate scripts and the
+first separately reviewed real-data smoke check for the Pulp path-selection workflow. Its one-row
+CSV uses explicit `selection_conditioned_` diagnostic names. A high-dimensional real-data question
+is next under separate review. No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
 

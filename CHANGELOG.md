@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add the transparent Pulp path-selection smoke check using direct pandas `X.csv`/`Y.csv` reading,
+  the ordinary public `PiPLSPathCV` workflow, complete ordered five-fold OOF reporting, and a
+  one-row CSV whose validation diagnostics are explicitly labeled selection-conditioned.
 - Add the full-versus-randomized solver-consistency benchmark with paired fixed ranks, three high-dimensional matrix geometries, independent-test prediction and coefficient relative differences, a minimal four-column CSV, and focused contract tests.
 - Add the paired predictor-nuisance benchmark comparing fixed Pi-PLS and ordinary PLS on identical deterministic synthetic train/test problems, with controlled nuisance strengths, training-fitted model standardization, independent-test MSE, a minimal five-column CSV, and focused contract tests.
 - Add the adaptive rank-selection benchmark with deterministic public synthetic train/test data, generator-declared reference ranks, fold-local model standardization, full-training refit, independent-test MSE, a minimal seven-column CSV output, and focused repeatability tests.

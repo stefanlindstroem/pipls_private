@@ -70,7 +70,9 @@ Benchmarks should protect one question at a time, such as:
 - recovery of known synthetic structure by a fixed Pi-PLS model;
 - Pi-PLS rank-selection behavior;
 - paired prediction comparison with ordinary PLS under predictor-specific nuisance;
-- consistency between exact and randomized numerical paths.
+- consistency between exact and randomized numerical paths;
+- whether an ordinary public path-selection workflow runs transparently on one reference dataset
+  and returns correctly labeled validation diagnostics.
 
 Each question receives its own small script and minimal CSV output. Runtime and memory are separate
 questions and are not added to scientific result tables by default. Large experiment grids, final
@@ -121,6 +123,9 @@ The first universal synthetic manifest, result schema, and broad CI runner were 
 review because they combined unrelated questions and produced an unnecessarily wide table. The
 focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
-output. Representative real-data smoke checks are the next separately reviewed benchmark phase.
-None of this includes a block-aware standardization API design; future block-aware variants remain
-deferred for months or until the project owner explicitly starts a separate phase.
+output. The first separately reviewed real-data smoke check uses the Pulp tables and the ordinary
+public `PiPLSPathCV` workflow. Its output labels both validation diagnostics as
+selection-conditioned, so they cannot be mistaken for independent-test results. Further real-data
+checks remain separately reviewed. None of this includes a block-aware standardization API design;
+future block-aware variants remain deferred for months or until the project owner explicitly starts
+a separate phase.

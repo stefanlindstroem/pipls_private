@@ -44,7 +44,12 @@ Ordinary `PLSRegression` is the only planned external comparator because it is t
 programming-user baseline. OLS, CCA, publication grids, figure generation, and manuscript claims
 remain outside this repository.
 
-## Planned focused benchmarks
+For real-data smoke checks, read the repository `X.csv` and `Y.csv` tables directly in the script,
+use the same public estimator call shown to users, and label any diagnostic according to its actual
+validation protocol. A selection-conditioned value must not be named or described as test
+performance, unbiased generalization performance, or an external validation result.
+
+## Focused benchmarks
 
 ### 1. Fixed-structure recovery
 
@@ -239,6 +244,34 @@ consistency without defining a universal pass threshold. Timing, memory, rank se
 PLS, software metadata, environment metadata, figures, and generic orchestration do not belong in
 this table. A future runtime benchmark requires a separate hardware and measurement question.
 
+### 5. Pulp path-selection smoke check
+
+**Question:** Can an ordinary programming user read the transparent Pulp tables, run the public
+adaptive Pi-PLS path workflow, and obtain complete ordered five-fold OOF reporting?
+
+**Method:** read `datasets/pulp/X.csv` and `datasets/pulp/Y.csv` directly with pandas, then fit
+`PiPLSPathCV(n_components_values=[1, 2, 3, 4], search_method="auto", cv=5,
+return_oof_predictions=True, n_jobs=1)`. No package loader, metadata parser, external
+preprocessing, comparator, or held-out test set is introduced. Every candidate learns model
+centering and scaling within its training fold, and the selected model refits on all 46 rows.
+
+The script requires the standard five-fold splitter to produce exactly one row-ordered OOF
+prediction for every input row. Failure of that reporting contract raises an error rather than
+adding another result column.
+
+**Output:** `benchmarks/results/pulp_path_smoke.csv`, containing one row with exactly:
+
+- `selected_n_components`;
+- `selected_predictor_rank`;
+- `selection_conditioned_response_standardized_mse`;
+- `selection_conditioned_pooled_oof_r2`.
+
+The diagnostic names deliberately include `selection_conditioned_`. The same folds are used to
+select the ranks and calculate these values, so neither value is an unbiased post-selection or
+external-test estimate. The smoke check demonstrates the public workflow and reporting contract; it
+does not claim model quality, compare methods, tune preprocessing, use nested CV, or establish a
+release threshold.
+
 ## Output and reproducibility policy
 
 Each benchmark owns its own script, scenario constants, tests, and CSV header. Prefer readable
@@ -263,8 +296,9 @@ Implement the benchmarks one at a time in this order:
 1. fixed-structure recovery — implemented;
 2. rank selection — implemented;
 3. predictor-nuisance comparison with PLS — implemented;
-4. solver consistency — implemented.
+4. solver consistency — implemented;
+5. Pulp path-selection smoke check — implemented.
 
-The focused synthetic sequence is complete. Any additional synthetic or real-data benchmark must
-remain question-specific and receive separate review. Do not recreate the removed universal
-manifest, universal schema, or broad CI runner.
+The focused synthetic sequence is complete, and the first real-data smoke check is implemented.
+Any further real-data benchmark must remain question-specific and receive separate review. Do not
+recreate the removed universal manifest, universal schema, or broad CI runner.

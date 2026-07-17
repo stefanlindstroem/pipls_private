@@ -374,6 +374,17 @@ Current status: **complete**. Fixed-structure recovery, adaptive rank selection,
 predictor-nuisance comparison with ordinary `PLSRegression`, and full-versus-randomized solver
 consistency are implemented as independent scripts with minimal question-specific CSV outputs.
 
+### Phase E4c: representative real-data smoke checks
+
+Add one transparent dataset and one ordinary package-user question at a time. A smoke check may
+exercise fitting, selection, prediction, or validation reporting, but it must not present
+selection-conditioned diagnostics as independent performance estimates.
+
+Current status: **in progress**. The Pulp path-selection smoke check reads `X.csv` and `Y.csv`
+directly with pandas, fits the public `PiPLSPathCV` workflow, verifies complete ordered five-fold
+OOF output, and writes selected ranks plus explicitly named selection-conditioned diagnostics. No
+method comparison, nested-CV claim, timing table, or general real-data runner is included.
+
 ### Product documentation and release hardening
 
 Build a user-oriented documentation surface, API reference, compatibility policy, clean-install and
@@ -402,10 +413,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Begin representative real-data smoke checks under separate review. Before implementation, define
-one package-user question for one existing transparent dataset and its minimal result columns. Do
-not create a multi-dataset runner, universal schema, timing table, publication result, hidden data
-loader, OLS/CCA comparison, or block-aware scaling API.
+Review one high-dimensional real-data smoke-check question for either sugarcane or tobacco. Choose
+one dataset and one ordinary package-user workflow before implementation. Do not combine datasets,
+add method comparisons, introduce spectral preprocessing, report timings, or create a universal
+real-data runner or schema.
 
 Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
 and preprocessing must be public and explicit.

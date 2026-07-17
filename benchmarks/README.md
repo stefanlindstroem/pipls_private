@@ -132,11 +132,37 @@ Both quantities are Frobenius-norm differences relative to the corresponding ful
 benchmark records consistency without defining a universal numerical pass threshold and does not
 measure runtime.
 
+## Pulp path-selection smoke check
+
+`pulp_path_smoke.py` follows the ordinary package-user workflow: it reads the public Pulp `X.csv`
+and `Y.csv` tables directly with pandas and fits adaptive `PiPLSPathCV` over component counts 1
+through 4 with five-fold CV and ordered OOF predictions.
+
+Run it from the repository root after installing the data dependencies:
+
+```bash
+python benchmarks/pulp_path_smoke.py
+```
+
+It writes `benchmarks/results/pulp_path_smoke.csv` with one row and exactly these columns:
+
+```text
+selected_n_components
+selected_predictor_rank
+selection_conditioned_response_standardized_mse
+selection_conditioned_pooled_oof_r2
+```
+
+The long diagnostic names are intentional. The same CV result selects the ranks and supplies the
+reported values, so they are useful workflow diagnostics but not unbiased post-selection or
+external-test performance estimates. The script checks that every Pulp row receives exactly one
+OOF prediction and fails rather than silently reporting incomplete coverage.
+
 ## Sequence status
 
-The four focused synthetic benchmarks are implemented. Any additional benchmark must receive its
-own package-level question, script, and minimal output contract; representative real-data smoke
-checks are the next separately reviewed benchmark phase.
+The four focused synthetic benchmarks and the first separately reviewed real-data smoke check are
+implemented. Any additional benchmark must receive its own package-level question, script, and
+minimal output contract. High-dimensional real-data checks remain separately reviewed.
 
 Generated outputs under `benchmarks/results/` remain ignored by Git and are excluded from repository
 snapshots. Software versions, parallel settings, and timings are included only in a benchmark whose
