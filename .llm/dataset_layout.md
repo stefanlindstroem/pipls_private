@@ -28,8 +28,8 @@ Do not add internal conversion scripts or references to private development inpu
 - preserve a documented common row order;
 - use the exact filenames `X.csv` and `Y.csv`.
 
-Examples and reproduction scripts must read these files directly with ordinary NumPy or pandas
-code. They must not call a package loader or parse `metadata.yaml` to construct the model matrices.
+Examples must read these files directly with ordinary NumPy or pandas code. They must not call a
+package loader or parse `metadata.yaml` to construct the model matrices.
 
 ## Metadata contract
 
@@ -103,5 +103,5 @@ row-aligned, and that the metadata file parses as a non-empty YAML mapping.
 
 Tests do not duplicate the documentary contents of `metadata.yaml`: titles, descriptions,
 citations, dimensions, variable lists, preparation prose, and recorded hashes remain reviewable
-repository data rather than fixed test expectations. Exact scientific fixtures belong to Phase E4
-or a paper-reproduction decision with explicit tolerances and update rules.
+repository data rather than fixed test expectations. Exact scientific fixtures require an explicit
+package-benchmark decision with scientific meaning, tolerances, and update rules.

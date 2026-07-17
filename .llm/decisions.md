@@ -11,7 +11,7 @@ This index is navigation, not a substitute for those records.
 | `0003-predictor-rank-selection.md` | rank bound and conditional selection | fold-safe ceiling rule, materialized splits, deterministic low-rank ties |
 | `0004-response-standardized-mse.md` | selection loss | fold-local response scales and uniform response weighting |
 | `0005-leave-one-out-protocol.md` | advanced validation | ordinary splitters, singleton-safe scoring, ordered OOF reporting |
-| `0006-paper-versus-api-rank-rule.md` | reproduction versus general API | paper rules remain explicit reproduction inputs, not estimator defaults |
+| `0006-paper-versus-api-rank-rule.md` | publication versus general API | publication-specific rules remain external to estimator defaults |
 | `0007-predictor-rank-search-policies.md` | exhaustive versus adaptive search | `"optimal"` is exhaustive; `"auto"` is deterministic approximate search |
 | `0008-predictor-svd-policy.md` | scalable predictor decomposition | independent `full`, `randomized`, and `auto` solver policy |
 | `0009-public-parameter-validation.md` | exposed controls | early validation and low-statistical-support warning |
@@ -29,6 +29,7 @@ This index is navigation, not a substitute for those records.
 | `0021-durable-repository-tests.md` | repository test stability | test behavior and structural format without pinning living prose or documentary field values |
 | `0022-sugarcane-dataset-integration.md` | third transparent real-data integration | public LabSpec spectra, explicit row and wavelength selection, and compact regular-axis metadata |
 | `0023-tobacco-dataset-integration.md` | fourth transparent real-data integration | public raw FT-NIR spectra, explicit ID alignment, metadata-column exclusion, and no spectral preprocessing |
+| `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction stays in downstream repositories; preprocessing API design is deferred |
 
 ## Accepted clarifications after earlier proposals
 
@@ -50,13 +51,21 @@ plan contains an earlier or more general proposal:
   external-test estimates;
 - real-data users supply `X` and `Y` directly; metadata files, registry lookup, generic loaders,
   and `PiPLSDataset` are not prerequisites for fitting;
-- examples and reproduction scripts show their data-reading and matrix-construction code rather
-  than relying on hidden utility functions;
+- examples show their data-reading and matrix-construction code rather than relying on hidden
+  utility functions;
 - committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
   external users remain free to use any data source or file organization;
-- the initial real-data integration suite is Linnerud, pulp, sugarcane, and tobacco; all are repository example data, not runtime loaders or manuscript-result claims;
-- committed dataset assets use public or included provenance only; private archive references and preparation-only scripts stay outside the repository, while Corn raw-data preprocessing will be explicit and user-facing;
-- repository tests validate executable behavior and durable file structure rather than pinning living roadmap prose or documentary metadata values;
+- the initial real-data integration suite is Linnerud, pulp, sugarcane, and tobacco; all are
+  repository example data, not runtime loaders or publication-result claims;
+- committed dataset assets use public or included provenance only; private archive references and
+  preparation-only scripts stay outside the repository, while Corn raw-data preprocessing will be
+  explicit and user-facing;
+- repository tests validate executable behavior and durable file structure rather than pinning
+  living roadmap prose or documentary metadata values;
+- `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only
+  OLS/CCA comparisons, cached results, and publication environments belong downstream;
+- future standardization and block scaling remain valid directions, but no API design or schedule
+  is accepted until the owner starts a dedicated phase;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

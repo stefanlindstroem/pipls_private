@@ -30,8 +30,7 @@ synthetic generators. It is not required for real data, and examples must not im
 
 ## Example transparency
 
-Examples and paper-reproduction scripts must behave as an ordinary programming user is expected
-to behave:
+Examples must behave as an ordinary programming user is expected to behave:
 
 1. read the predictor file or columns explicitly;
 2. read the response file or columns explicitly;
@@ -101,8 +100,8 @@ materials, not in a generic internal preparation layer.
 - **Estimator API:** validates supplied model matrices and fits Pi-PLS.
 - **Repository dataset integration:** provides consistently named analysis files plus public
   documentary metadata and provenance.
-- **Examples and reproduction scripts:** visibly read `X.csv` and `Y.csv` and show all analytical
-  choices that form the matrices.
+- **Examples:** visibly read `X.csv` and `Y.csv` and show all analytical choices that form the
+  matrices.
 
 ## Prohibited directions
 
@@ -116,3 +115,9 @@ Do not introduce merely for repository examples:
 - private archive or local-path references in committed dataset materials;
 - preparation-only scripts whose required source is unavailable to users;
 - preprocessing learned across train/test or cross-validation boundaries.
+
+## Publication boundary
+
+Paper-specific data orchestration belongs in downstream reproduction repositories that depend on a
+tagged `pipls` release. This repository's examples remain concise package-use examples and should
+not grow into manuscript pipelines, figure generation, or complete comparison grids.

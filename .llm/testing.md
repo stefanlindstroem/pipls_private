@@ -13,15 +13,15 @@ Tests may verify:
 
 - public Python behavior, numerical invariants, validation, fitted attributes, and supported
   scikit-learn composition;
-- executable examples and reproduction scripts;
+- executable package examples and benchmark runners;
 - package and source-distribution contents;
 - presence, encoding, parsability, and structural format of shipped Markdown, YAML, CSV, TOML, and
   shell files;
 - generic consistency rules, such as every indexed decision record existing and every shipped
   decision record appearing in the index;
 - repository dataset tables being readable numeric comma-separated files with aligned rows;
-- explicitly frozen benchmark or reproduction results after a separate decision defines their
-  scientific meaning and tolerances.
+- explicitly frozen package-benchmark results after a separate decision defines their scientific
+  meaning, tolerances, and update procedure.
 
 ## What tests should not freeze
 
@@ -45,9 +45,10 @@ technical readability, not exact scientific values, row examples, column lists, 
 metadata checksums. Git history, review, public provenance, and the dataset documentation remain
 the source of record for those contents.
 
-Phase E4 may deliberately freeze selected shapes, values, metrics, or hashes as benchmark fixtures.
-Such assertions require an explicit decision record describing why the value is stable, what it
-protects, and what tolerance or update procedure applies.
+Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
+assertions require an explicit decision record describing why the value is stable, what software
+behavior it protects, and what tolerance or update procedure applies. Publication-result fixtures
+belong in downstream reproduction repositories.
 
 ## Review rule
 

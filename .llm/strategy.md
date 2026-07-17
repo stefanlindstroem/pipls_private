@@ -1,16 +1,21 @@
-# Pi-PLS implementation strategy
+# Pi-PLS package development strategy
 
 ## Status and purpose
 
-This is the operational implementation strategy for the repository. It records the accepted
-architecture as small, testable increments that can be maintained during LLM-assisted
-development. Current decision records and normative `.llm` contracts replace private or historical
-planning materials as the maintained source of project intent.
+This is the operational development strategy for the long-lived `pipls` software repository. It
+records the accepted architecture as small, testable increments that can be maintained during
+LLM-assisted development. Current decision records and normative `.llm` contracts replace private
+or historical planning materials as the maintained source of project intent.
+
+The repository-product boundary is normative in `.llm/product_scope.md`: `pipls` owns package
+functionality, user documentation, examples, datasets, lightweight validation benchmarks, tests,
+packaging, and releases. Paper-specific reproduction belongs in downstream repositories that pin
+tagged `pipls` versions.
 
 ## Ownership
 
-- The project owner decides scientific aims, publication policy, public API commitments, and
-  unresolved methodological choices.
+- The project owner decides scientific aims, product scope, publication boundaries, public API
+  commitments, and unresolved methodological choices.
 - The LLM maintainer owns the consistency of this operational strategy with the repository. A
   patch that changes phases, architecture, public behavior, mathematical contracts, or workflow
   must update this file when the strategy is affected.
@@ -30,7 +35,8 @@ planning materials as the maintained source of project intent.
 5. Add focused tests with every behavioral change.
 6. Compare subspaces, regression maps, and predictions rather than raw singular-vector signs.
 7. Fit every learned preprocessing operation inside the corresponding training fold.
-8. Keep paper-specific orchestration explicit and separate from general estimator defaults.
+8. Keep paper-specific orchestration outside the package repository; downstream reproduction
+   repositories pin released package versions.
 9. Keep real-data input transparent: examples read `X` and `Y` explicitly and do not depend on
    a public registry, generic loader, or required metadata sidecar.
 10. Update `.llm/state.md`, the relevant `.llm` contracts, and user-facing documentation when a
@@ -38,10 +44,12 @@ planning materials as the maintained source of project intent.
 11. Return one root-relative Git patch per increment with an explicit validation report.
 12. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
     for patch application or committing.
-13. Do not combine algorithm porting, API expansion, dataset migration, and paper reproduction in
-    one patch unless the dependency cannot be separated.
+13. Do not combine algorithm porting, API expansion, dataset migration, benchmark freezing, and
+    repository-product cleanup in one patch unless the dependency cannot be separated.
 14. Keep repository tests durable: verify behavior and file structure, not current roadmap prose
     or documentary metadata values.
+15. Do not design or anticipate future preprocessing, standardization, or block-scaling APIs until
+    the project owner starts a dedicated design phase.
 
 ## Fixed architectural decisions
 
@@ -49,8 +57,8 @@ planning materials as the maintained source of project intent.
 - Public estimator style: scikit-learn compatible.
 - Public names: `n_components`, `predictor_rank`, and
   `samples_per_predictor_rank`; no public aliases `h`, `r_pi`, or `c`.
-- Standard response subspace for the paper release: leading right singular vectors of
-  `Z.T @ Y`.
+- Standard response subspace for the current Pi-PLS construction: leading right singular
+  vectors of `Z.T @ Y`.
 - Predictor-rank modes target four semantics: integer, `"max"`, `"optimal"`, and `"auto"`.
 - `"optimal"` means exhaustive CV evaluation of every admissible predictor rank.
 - `"auto"` means deterministic adaptive coarse-to-fine search and is explicitly approximate.
@@ -62,7 +70,8 @@ planning materials as the maintained source of project intent.
 - Custom learned preprocessing is searched around the complete supported estimator boundary.
 - `PiPLSPathCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
   `PiPLSRegression`; arbitrary nested meta-estimators are not implied.
-- Paper-specific rank rules and LOO reporting conventions are explicit reproduction inputs.
+- Publication-specific rank rules and reporting conventions are not package defaults; they
+  belong in downstream reproduction repositories.
 - D2 metadata support is deliberately limited to `groups` for splitters. Weighted fitting,
   `sample_weight`, and general-purpose metadata routing are out of scope.
 - Real-data users supply `X` and `Y` directly. No public registry, generic loader, required
@@ -73,6 +82,10 @@ planning materials as the maintained source of project intent.
 - Patches are unified Git patches relative to repository root.
 - Living `.llm` documents and dataset metadata are reviewed artifacts, not duplicated as fixed
   phrase or field-value assertions in the test suite.
+- `pipls` is a long-lived software-product repository rather than a manuscript-reproduction
+  repository.
+- Future standardization and block scaling remain valid product directions, but no public API,
+  naming, scheduling, or implementation is accepted yet.
 
 ## Increment sequence
 
@@ -278,8 +291,8 @@ Acceptance conditions:
 - plain arrays or data frames supplied as `X` and `Y` remain the primary real-data interface;
 - `PiPLSDataset` is optional and no metadata sidecar is required for fitting;
 - no public registry or generic real-data loader is planned;
-- examples and reproduction scripts show ordinary reading, alignment, column selection, and matrix
-  construction directly rather than hiding them behind utilities;
+- examples show ordinary reading, alignment, column selection, and matrix construction directly
+  rather than hiding them behind utilities;
 - repository-specific provenance and preparation information may be tracked for reproducibility
   without becoming runtime requirements for external users;
 - the revised contract is navigable from a fresh snapshot.
@@ -304,42 +317,77 @@ regular wavelength grid; and tobacco adds 347 samples, 1,557 raw FT-NIR predicto
 responses. Every integration uses public provenance, direct `X.csv`/`Y.csv` reading, documentary
 metadata, and no runtime loader or hidden preparation utility.
 
-### Phase E4: benchmark fixtures
+### Product transition P1: repository cleanup
 
-Add deterministic benchmark manifests and frozen tolerances linking synthetic and migrated
-datasets to estimator/path behavior. Keep benchmark fixtures distinct from paper result claims.
+Remove the transitional `paper/` and `scripts/reproduce_paper/` placeholders and rewrite public
+repository navigation around the installable software product. Preserve historical scientific
+context where it explains accepted behavior, but remove future promises that manuscript figures,
+complete comparison grids, or paper orchestration will be implemented inside `pipls`.
 
-Current status: **planned**.
+Acceptance conditions:
 
-### Phase F1: paper reproduction
-
-Add explicit scripts and manifests for every paper figure and table, including paper-specific rank
-rules, splitters, seeds, and selection-conditioned reporting labels.
-
-Current status: **planned**.
-
-### Phase F2: release hardening
-
-Add clean-install and build smoke tests, frozen reproduction tolerances, licensing audit, release
-metadata, and final user/developer documentation.
+- no runtime or public API behavior changes;
+- paper-oriented placeholders are removed;
+- the public README and documentation navigation describe package installation, use, examples,
+  datasets, validation, and releases;
+- publication-specific reproduction is described only as downstream work that pins a tagged
+  `pipls` version;
+- no synthetic benchmark result or preprocessing API is introduced in the same patch.
 
 Current status: **planned**.
 
-### Phase F3: archival release
+### Phase E4a: synthetic benchmark contract
 
-Create the clean tagged release, archive/DOI workflow, and manuscript repository reference.
+Define lightweight package-validation scenarios using the deterministic synthetic generator before
+freezing numerical results.
+
+Acceptance conditions:
+
+- controlled scenarios cover sample size, predictor dimension, response dimension, shared rank,
+  predictor-specific rank, response-specific rank, signal strengths, and noise;
+- metrics distinguish prediction, rank-selection behavior, subspace recovery, numerical
+  consistency, runtime, and memory where practical;
+- Pi-PLS is compared primarily with ordinary PLS under identical splits and preprocessing;
+- OLS or CCA appear only when they protect a package-level identity or limiting case;
+- seeds, runtime tiers, result schema, tolerances, and fixture-update rules are explicit;
+- full publication grids and figure generation remain outside the repository.
 
 Current status: **planned**.
+
+### Phase E4b: lightweight benchmark implementation
+
+Implement a small deterministic CI tier from the accepted synthetic contract, then add
+representative real-dataset smoke checks. Store only package-validation expectations with documented
+update rules; do not convert the benchmark layer into a publication-result archive.
+
+Current status: **planned**.
+
+### Product documentation and release hardening
+
+Build a user-oriented documentation surface, API reference, compatibility policy, clean-install and
+build checks, licensing audit, release notes, and versioned releases. These are continuing software
+product responsibilities rather than the final steps of one publication.
+
+Current status: **planned and ongoing**.
+
+### Deferred future preprocessing
+
+Future standardization pipelines and block-scaling functionality remain valid product directions,
+but they are expected months from now. This strategy deliberately defines no class names,
+constructor parameters, block semantics, schedule, or implementation sequence. A separate owner
+decision and design phase are required before work begins.
+
+Current status: **deferred; no API design accepted**.
 
 ## Current next increment
 
-The next implementation patch should begin **Phase E4** and define benchmark-fixture policy and a
-small deterministic manifest across Linnerud, pulp, sugarcane, and tobacco. Specify fixed estimator
-configurations, metrics, tolerances, runtime expectations, and fixture-update rules before storing
-numerical expectations. Benchmark fixtures must remain distinct from paper reproduction and must
-not pin living metadata prose. Do not add another dataset in the same increment. Corn remains
-deferred until its preprocessing choices are resolved; its eventual raw-data reading and
-preprocessing must be public and explicit.
+The next patch should implement **Product transition P1** only: remove publication placeholders and
+rewrite public navigation around package users. Do not change estimator behavior, add benchmark
+results, or design preprocessing/block-scaling APIs in that patch.
+
+After the cleanup, begin **Phase E4a** with a synthetic benchmark contract. Corn remains deferred
+until its preprocessing choices are resolved; its eventual raw-data reading and preprocessing must
+be public and explicit.
 
 ## Maintenance protocol
 

@@ -13,21 +13,25 @@ The principal navigation documents are:
 
 1. `state.md` — concise fresh-chat handoff: implemented boundary, accepted defaults, exclusions,
    next increment, and revised roadmap. Update it whenever phase or public-scope state changes.
-2. `strategy.md` — complete increment history, acceptance conditions, next increment, and
+2. `product_scope.md` — normative boundary between the long-lived package repository and
+   downstream publication-reproduction repositories.
+3. `strategy.md` — complete increment history, acceptance conditions, next increment, and
    maintenance ownership. The LLM maintainer updates this file when strategy state changes.
-3. `project.md` — concise repository and source-ownership map.
-4. `decisions.md` — index of accepted decision records and implemented clarifications that
+4. `project.md` — concise repository and source-ownership map.
+5. `decisions.md` — index of accepted decision records and implemented clarifications that
    supersede broader historical proposals.
-5. `theory.md` — persistent conceptual derivation, interpretation, limiting cases, and
+6. `theory.md` — persistent conceptual derivation, interpretation, limiting cases, and
    theory-to-implementation consequences.
-6. `mathematics.md` — normative equations, notation, dimensions, and mathematical invariants.
-7. `numerical_contracts.md` — numerical algorithms, tolerances, degeneracy, and comparison rules.
-8. `public_api.md` — constructor parameters, fitted attributes, shapes, supported composition,
+7. `mathematics.md` — normative equations, notation, dimensions, and mathematical invariants.
+8. `numerical_contracts.md` — numerical algorithms, tolerances, degeneracy, and comparison rules.
+9. `public_api.md` — constructor parameters, fitted attributes, shapes, supported composition,
    dataset interfaces, and explicit exclusions.
-9. `data_io.md` — transparent real-data input and example contract.
-10. `dataset_layout.md` — normative `X.csv`/`Y.csv`/`metadata.yaml` convention for committed real datasets.
-11. `testing.md` — durable test boundaries for behavior, shipped-file structure, and living documents.
-12. `development.md` — coding, testing, documentation, dependency, and patch requirements.
+10. `data_io.md` — transparent real-data input and example contract.
+11. `dataset_layout.md` — normative `X.csv`/`Y.csv`/`metadata.yaml` convention for committed real
+    datasets.
+12. `testing.md` — durable test boundaries for behavior, shipped-file structure, and living
+    documents.
+13. `development.md` — coding, testing, documentation, dependency, and patch requirements.
 
 Git history, tests, and implemented behavior are evidence of what currently exists. Strategy and
 plans describe intended work. A conflict must be surfaced and resolved explicitly.
@@ -39,21 +43,23 @@ First inspect `.llm/SNAPSHOT_INFO`, then read:
 
 1. this file;
 2. `state.md`;
-3. `strategy.md`;
-4. `project.md`;
-5. `decisions.md` and the relevant full decision records;
-6. `theory.md` for mathematical or model-selection work;
-7. `data_io.md` and `dataset_layout.md` for real-data, example, dataset, or reproduction work;
-8. `testing.md` before changing repository-document, metadata, or fixture tests;
-9. the normative contracts relevant to the requested change;
-10. the affected source, tests, and user-facing documentation.
+3. `product_scope.md`;
+4. `strategy.md`;
+5. `project.md`;
+6. `decisions.md` and the relevant full decision records;
+7. `theory.md` for mathematical or model-selection work;
+8. `data_io.md` and `dataset_layout.md` for real-data, example, or dataset work;
+9. `testing.md` before changing repository-document, metadata, or fixture tests;
+10. the normative contracts relevant to the requested change;
+11. the affected source, tests, and user-facing documentation.
 
 Confirm that source and tests agree with the claimed state. Do not silently rely on remembered
 chat context or old patch descriptions. Surface any conflict before implementation.
 
 Do not implement work assigned to a later strategy phase unless the project owner explicitly
-changes the sequence. Routine work should not require the manuscript because `theory.md` and the
-normative contracts preserve the accepted scientific construction.
+changes the sequence. Paper-reproduction work belongs in downstream repositories that pin released
+versions of `pipls`. Routine package work should not require a manuscript because `theory.md` and
+the normative contracts preserve the accepted scientific construction.
 
 ## Expected patch response
 
