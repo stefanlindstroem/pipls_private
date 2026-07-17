@@ -297,10 +297,10 @@ Keep preparation deterministic, but make the analysis example read `X` and `Y` d
 ordinary NumPy or pandas code. Do not introduce a generic registry or loader. Defer Corn
 reconstruction until its preprocessing choices are explicitly fixed.
 
-Current status: **underway**. The first integration is Linnerud: upstream values from the
-BSD-licensed scikit-learn tables normalized to comma-delimited `X.csv` and `Y.csv`, a conforming
-`metadata.yaml`, and an example that reads only the two model tables directly with pandas. No
-runtime loader or metadata requirement for model fitting was added.
+Current status: **underway**. Linnerud establishes the layout reference. Pulp is the second
+integration: 14 fiber-property predictors and eight responses selected explicitly from the supplied
+PiPLSR_v0.1 source table, documented under CC BY 4.0, and read directly by a path-search example.
+No runtime loader or metadata requirement for model fitting was added.
 
 ### Phase E4: benchmark fixtures
 
@@ -332,8 +332,8 @@ Current status: **planned**.
 ## Current next increment
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
-dataset. Linnerud is the completed transparent reference integration and the file-layout
-reference. A manuscript dataset may follow only when source, citation, licensing, redistribution,
+dataset. Linnerud and pulp are completed transparent reference integrations and file-layout
+examples. A manuscript dataset may follow only when source, citation, licensing, redistribution,
 row alignment, and scientific preparation are resolved. Require the standard repository metadata
 file, but do not add a public registry, generic loader, metadata-driven runtime path, implicit
 download, or hidden example I/O utility. Corn remains deferred until its preprocessing

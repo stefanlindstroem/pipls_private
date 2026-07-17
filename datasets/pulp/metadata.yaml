@@ -1,0 +1,108 @@
+schema_version: 1
+dataset:
+  id: pulp
+  title: Thermomechanical pulp fiber-property regression dataset
+  version: "1"
+  summary: >-
+    Forty-six thermomechanical-pulp samples with 14 fiber-description predictors and eight
+    responses comprising Canadian Standard Freeness and handsheet properties.
+files:
+  predictors: X.csv
+  responses: Y.csv
+format:
+  type: csv
+  delimiter: ","
+  encoding: utf-8
+  header: true
+dimensions:
+  n_samples: 46
+  n_predictors: 14
+  n_responses: 8
+predictors:
+  - name: Shives
+    description: Shives-category measurement from the Pulp Expert analyzer; source units retained.
+  - name: Fines B
+    description: High-aspect-ratio Fines B particle measurement; source units retained.
+  - name: L (arith)
+    description: Arithmetic mean of the measured particle contour length L.
+  - name: L (lw)
+    description: Length-weighted mean of the measured particle contour length L.
+  - name: L (llw)
+    description: Length-length-weighted mean of the measured particle contour length L.
+  - name: W (arith)
+    description: Arithmetic mean of the measured particle width W.
+  - name: W (lw)
+    description: Length-weighted mean of the measured particle width W.
+  - name: W (llw)
+    description: Length-length-weighted mean of the measured particle width W.
+  - name: C (arith)
+    description: Arithmetic mean of the source FiberLab C particle descriptor.
+  - name: C (lw)
+    description: Length-weighted mean of the source FiberLab C particle descriptor.
+  - name: C (llw)
+    description: Length-length-weighted mean of the source FiberLab C particle descriptor.
+  - name: F (arith)
+    description: Arithmetic mean of the source FiberLab fibrillation descriptor F.
+  - name: F (lw)
+    description: Length-weighted mean of the source FiberLab fibrillation descriptor F.
+  - name: F (llw)
+    description: Length-length-weighted mean of the source FiberLab fibrillation descriptor F.
+responses:
+  - name: CSF
+    description: Canadian Standard Freeness measurement.
+  - name: Density
+    description: Laboratory handsheet density measurement.
+  - name: TI
+    description: Laboratory handsheet tensile-index measurement.
+  - name: Elongation
+    description: Laboratory handsheet elongation-at-break measurement.
+  - name: TEA
+    description: Laboratory handsheet tensile-energy-absorption measurement.
+  - name: TSI
+    description: Laboratory handsheet tensile-stiffness-index measurement.
+  - name: Tear index
+    description: Laboratory handsheet tear-index measurement.
+  - name: s
+    description: Laboratory handsheet light-scattering coefficient.
+sample_alignment:
+  method: positional
+  description: >-
+    Row i in X.csv and row i in Y.csv refer to the same pulp sample. The source table stores all
+    variables on one row, so splitting columns preserves alignment exactly.
+missing_values:
+  predictors: none
+  responses: none
+source:
+  provider: PiPLSR_v0.1 research archive supplied by Vishal Agrawal
+  upstream_file: data/pulp.csv
+  upstream_sha256: e5aeb8dacc4ae938b30b109da1cbcc1fef290f5cf7774295a2612e44ddc6a468
+  publication:
+    citation: >-
+      Lindström, S. B., Ferritsius, R., Carlson, J. E., Persson, J., and Nilsson, F. (2025).
+      Predicting handsheet properties and enhancing refiner control using fiber analyzer data and
+      latent variable modeling. Computers & Chemical Engineering, 199, 109143.
+    doi: 10.1016/j.compchemeng.2025.109143
+    supplementary_material: >-
+      MMC S1, spreadsheet containing refiner controls, specific refining energy, fiber properties,
+      and pulp and handsheet properties.
+  provenance_note: >-
+    The supplied source table has the variable structure described by the publication and is used
+    by the archived Pi-PLS analysis code. This repository records the supplied file checksum and
+    the exact analysis-facing column selection.
+license:
+  identifier: CC-BY-4.0
+  file: LICENSE.txt
+  redistribution: permitted with attribution
+preparation:
+  script: scripts/prepare_data/prepare_pulp.py
+  description: >-
+    Read the supplied 46-by-29 comma-delimited source table; verify its checksum, complete column
+    order, numeric finite values, and row count; write source columns 6 through 19 as X.csv and
+    columns 20 through 27 as Y.csv. Refiner controls, specific refining energy, and the final k
+    column are excluded. No rows are filtered or reordered, and no values are imputed, centered,
+    scaled, rounded, or otherwise transformed.
+integrity:
+  sha256:
+    X.csv: b26d1639339c406bf91070e2ad8ceb8df59d3ad1f90ece7c5cd5b18264d63b45
+    Y.csv: b600264d2319efce3500c6d7adbf5490b62e6d42a1e32af7df62709b1975ce93
+    LICENSE.txt: 4e5cfb9cbb9214bfa8fb55ef52735799dddd4206749e5386e0d6a12ce965891d

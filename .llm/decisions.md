@@ -24,6 +24,7 @@ This index is navigation, not a substitute for those records.
 | `0016-transparent-data-ingestion.md` | real-data and example boundary | users and examples read `X` and `Y` explicitly; no required registry or generic loader |
 | `0017-first-real-dataset.md` | first transparent real-data integration | Linnerud files are read explicitly; provenance remains repository-only |
 | `0018-repository-dataset-layout.md` | committed real-dataset file convention | every dataset uses comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
+| `0019-pulp-dataset-integration.md` | second transparent real-data integration | pulp uses archived column selection, CC BY 4.0 attribution, explicit preparation, and direct X/Y reading |
 
 ## Accepted clarifications after the original publication plan
 
@@ -49,7 +50,7 @@ plan contains an earlier or more general proposal:
   than relying on hidden utility functions;
 - committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
   external users remain free to use any data source or file organization;
-- the first real-data integration is Linnerud; it is repository example data, not a new runtime loader or a manuscript-result claim;
+- the first real-data integration is Linnerud; the second is pulp from the supplied PiPLSR_v0.1 archive; both are repository example data, not runtime loaders or manuscript-result claims;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

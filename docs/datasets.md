@@ -131,3 +131,7 @@ numeric dtypes, row counts, and missingness, then calls `PiPLSRegression.fit(X, 
 
 The metadata file documents source, license, variables, row alignment, preparation, and integrity.
 It is not parsed by the example or required by the estimator.
+
+## Pulp real-data integration
+
+`datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses. The analysis-facing matrices are selected transparently from the supplied `PiPLSR_v0.1/data/pulp.csv` source table. `examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly, validates columns, numeric dtypes, row alignment, and missingness, then runs `PiPLSPathCV`. The example does not parse `metadata.yaml` or call a package loader.

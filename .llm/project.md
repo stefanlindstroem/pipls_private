@@ -11,12 +11,12 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through E2 are implemented, and Phase E3 is underway with the first transparent real-data integration. The current public surface includes `PiPLSRegression`,
+Phases A through E2 are implemented, and Phase E3 is underway with two transparent real-data integrations. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics, and
 `StatisticalSupportWarning`.
 
-The next increment remains Phase E3: migrate the next reviewable real dataset. Linnerud now
-provides both the transparent I/O example and the standard repository layout reference. A
+The next increment remains Phase E3: migrate the next reviewable real dataset. Linnerud and pulp
+now provide transparent I/O examples and the standard repository layout reference. A
 manuscript dataset should follow only when its source, license, redistribution, and scientific
 preparation choices are resolved.
 

@@ -17,3 +17,10 @@ at runtime and are not committed as dataset files.
 Real-data examples read `X.csv` and `Y.csv` explicitly and form `X` and `Y` without a generic
 package loader. `metadata.yaml` standardizes repository descriptions and provenance, but it is not
 read by the estimator and is not required for external users fitting their own data.
+
+## Included datasets
+
+- `linnerud/`: small BSD-licensed physical-exercise reference dataset.
+- `pulp/`: CC BY 4.0 thermomechanical-pulp fiber-property and handsheet dataset.
+
+Each example reads `X.csv` and `Y.csv` directly. `metadata.yaml` documents the repository asset but is not a runtime model input.

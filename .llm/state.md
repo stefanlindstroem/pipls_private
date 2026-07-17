@@ -94,13 +94,14 @@ Additional fixed decisions:
 
 ## Current next increment
 
-Phase E3 is underway. The first integration is the small BSD-licensed Linnerud dataset. It now
-uses the repository-wide `X.csv`, `Y.csv`, and `metadata.yaml` layout; the example reads only the
+Phase E3 is underway. The repository now contains two transparent integrations: the small
+BSD-licensed Linnerud reference dataset and the CC BY 4.0 pulp dataset from the supplied
+PiPLSR_v0.1 archive. Both use `X.csv`, `Y.csv`, and `metadata.yaml`; their examples read only the
 two comma-delimited model tables explicitly.
 
 The next implementation patch should remain in **Phase E3** and migrate the next reviewable real
-dataset. Prefer a manuscript dataset only after its source, citation, license, redistribution, and
-scientific preparation choices are resolved. E3 is performed one dataset at a time. Each dataset
+dataset after its source, citation, license, redistribution, and scientific preparation choices
+are resolved. Linnerud and pulp are the current layout and transparency references. E3 is performed one dataset at a time. Each dataset
 patch must:
 
 1. establish source, citation, license, redistribution status, and preparation choices;

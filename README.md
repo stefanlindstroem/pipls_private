@@ -8,7 +8,7 @@ The repository contains the fixed-parameter numerical core and a scikit-learn-st
 full, randomized, and conservative automatic SVD policies. `PiPLSPathCV` provides pipeline-aware
 joint path analysis over `n_components` and `predictor_rank`. Both interfaces support ordinary
 scikit-learn grouped, repeated, predefined, temporal, and leave-one-out splitters, with optional
-ordered out-of-fold reporting. A validated dataset container and deterministic synthetic latent-structure generator are available under `pipls.datasets`. The repository also includes a first transparent real-data example using the Linnerud multi-output regression tables; manuscript dataset migration and paper reproduction remain later increments.
+ordered out-of-fold reporting. A validated dataset container and deterministic synthetic latent-structure generator are available under `pipls.datasets`. The repository also includes transparent real-data examples for the Linnerud and pulp multi-output regression tables; further manuscript dataset migration and paper reproduction remain later increments.
 
 ## Development setup
 
@@ -72,8 +72,9 @@ print(search.validation_report_)
 print(search.oof_predictions_)
 ```
 
-For a transparent real-data workflow, see `examples/09_linnerud_real_data.py`. It reads the
-predictor and response tables directly with pandas, verifies their alignment, and then fits:
+For transparent real-data workflows, see `examples/09_linnerud_real_data.py` and
+`examples/10_pulp_real_data.py`. Both read predictor and response tables directly with pandas,
+verify their alignment, and then fit:
 
 ```python
 X = pd.read_csv("datasets/linnerud/X.csv")
