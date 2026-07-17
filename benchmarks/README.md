@@ -69,10 +69,40 @@ The selected model is refitted on the complete generated training block before i
 prediction. Declared ranks are structural references, while selected ranks are predictive
 cross-validation choices; exact equality is not an acceptance criterion.
 
+## Predictor-nuisance comparison with ordinary PLS
+
+`predictor_nuisance_comparison.py` asks how paired fixed Pi-PLS and ordinary fixed-component PLS
+predict the same independent test block as predictor-specific variation increases. Both methods use
+the generator-declared shared rank. Pi-PLS also uses the declared complete predictor-signal rank.
+
+The three scenarios retain two shared directions and vary predictor-only structure:
+
+- `shared_only`: no predictor-specific directions;
+- `moderate_predictor_nuisance`: four directions of strengths `(1.5, 1.25, 1.0, 0.75)`;
+- `strong_predictor_nuisance`: the same four directions with strengths `(3.0, 2.5, 2.0, 1.5)`.
+
+Run it from the repository root after installing the package:
+
+```bash
+python benchmarks/predictor_nuisance_comparison.py
+```
+
+It writes `benchmarks/results/predictor_nuisance_comparison.csv` with exactly these columns:
+
+```text
+scenario
+seed
+pipls_test_mse
+pls_test_mse
+pipls_minus_pls_mse
+```
+
+The final column is the paired difference `pipls_test_mse - pls_test_mse`. The benchmark records the
+comparison for each generated problem; it does not assert that either method must win.
+
 ## Remaining sequence
 
-The next separately reviewed benchmarks are predictor-nuisance comparison with ordinary PLS and
-full-versus-randomized solver consistency.
+The next separately reviewed benchmark is full-versus-randomized solver consistency.
 
 Generated outputs under `benchmarks/results/` remain ignored by Git and are excluded from repository
 snapshots. Software versions, parallel settings, and timings are included only in a benchmark whose

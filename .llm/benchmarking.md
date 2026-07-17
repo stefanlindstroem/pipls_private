@@ -151,8 +151,31 @@ The benchmark is implemented by `benchmarks/rank_selection.py`.
 **Question:** When predictor-specific variation increases, how does fixed Pi-PLS prediction compare
 with ordinary fixed-component PLS on the same generated train/test problem?
 
-**Methods:** paired fixed Pi-PLS and `PLSRegression`, using the declared shared dimension. The Pi-PLS
-predictor rank uses the declared complete predictor-signal rank.
+**Methods:** paired fixed Pi-PLS and `PLSRegression`, both with `scale=True` and the
+generator-declared shared dimension as `n_components`. Pi-PLS additionally uses exact predictor SVD
+and the declared complete predictor-signal rank. Both methods fit their own centering and scaling
+statistics from the complete generated training block; no cross-validation is performed.
+
+**Implemented scenarios:**
+
+- `shared_only`: two shared directions and no predictor-specific directions;
+- `moderate_predictor_nuisance`: the same shared structure plus four predictor-only directions of
+  strengths `(1.5, 1.25, 1.0, 0.75)`;
+- `strong_predictor_nuisance`: the same four predictor-only directions with strengths
+  `(3.0, 2.5, 2.0, 1.5)`.
+
+All scenarios use 160 training samples, 160 test samples, 24 predictors, six responses, no
+response-specific directions, shared strengths `(2.5, 1.5)`, noise `(0.2, 0.2)`, and seeds 1729,
+2718, and 3141. The two nuisance scenarios keep the nuisance dimension fixed so their difference is
+its strength rather than another rank change.
+
+**Metrics:**
+
+- `pipls_test_mse` is the mean squared Pi-PLS residual over all independent test samples and
+  responses in original response units;
+- `pls_test_mse` is the corresponding ordinary PLS quantity;
+- `pipls_minus_pls_mse` is `pipls_test_mse - pls_test_mse`, so negative values favor Pi-PLS for that
+  generated problem and positive values favor ordinary PLS.
 
 **Output:** `benchmarks/results/predictor_nuisance_comparison.csv`.
 
@@ -164,8 +187,10 @@ Required columns:
 - `pls_test_mse`;
 - `pipls_minus_pls_mse`.
 
-Use a wide paired table because the comparison itself is the question. Do not add one row per method
-or unrelated latent metrics.
+Use a wide paired table because the comparison itself is the question. The benchmark is implemented
+by `benchmarks/predictor_nuisance_comparison.py`. It does not define a superiority threshold or add
+rank selection, latent recovery, solver comparison, timings, software metadata, figures, OLS, or
+CCA.
 
 ### 4. Solver consistency
 
@@ -209,8 +234,8 @@ Implement the benchmarks one at a time in this order:
 
 1. fixed-structure recovery — implemented;
 2. rank selection — implemented;
-3. predictor-nuisance comparison with PLS — next;
-4. solver consistency.
+3. predictor-nuisance comparison with PLS — implemented;
+4. solver consistency — next.
 
 Each implementation patch must remain question-specific. Do not recreate the removed universal
 manifest, universal schema, or broad CI runner.

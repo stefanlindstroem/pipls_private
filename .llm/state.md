@@ -156,29 +156,27 @@ in `.llm/benchmarking.md` and contains four independent questions:
 3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
 4. full-versus-randomized solver consistency.
 
-Each benchmark owns one readable script and one minimal CSV output. Fixed-structure recovery is
-implemented in `benchmarks/fixed_structure_recovery.py`, and adaptive rank selection is implemented
-in `benchmarks/rank_selection.py`; their generated CSV files remain ignored and are excluded from
-snapshots. Software versions, execution controls, timings, and unrelated metrics are omitted unless
-they answer that benchmark's explicit question. OLS, CCA, publication grids, and figure generation
-remain outside the repository.
+Each benchmark owns one readable script and one minimal CSV output. Fixed-structure recovery,
+adaptive rank selection, and predictor-nuisance comparison with ordinary PLS are implemented in
+`benchmarks/fixed_structure_recovery.py`, `benchmarks/rank_selection.py`, and
+`benchmarks/predictor_nuisance_comparison.py`. Their generated CSV files remain ignored and are
+excluded from snapshots. Software versions, execution controls, timings, and unrelated metrics are
+omitted unless they answer that benchmark's explicit question. OLS, CCA, publication grids, and
+figure generation remain outside the repository.
 
 ## Current next increment
 
-Implement only the third focused benchmark: **predictor-nuisance comparison with ordinary PLS**.
+Implement only the fourth focused benchmark: **full-versus-randomized solver consistency**.
 
 The next patch should:
 
-- compare paired fixed Pi-PLS and `PLSRegression` fits on identical deterministic synthetic
-  train/test problems;
-- vary predictor-specific nuisance while holding the declared shared dimension and other structural
-  conditions controlled;
-- use the declared shared rank for both methods and the declared complete predictor-signal rank for
-  fixed Pi-PLS;
-- write `benchmarks/results/predictor_nuisance_comparison.csv`;
-- report only `scenario`, `seed`, `pipls_test_mse`, `pls_test_mse`, and
-  `pipls_minus_pls_mse`;
-- avoid rank selection, solver comparison, timings, software metadata, universal orchestration,
+- compare fixed `PiPLSRegression` fits with `svd_solver="full"` and
+  `svd_solver="randomized"` on identical deterministic high-dimensional synthetic problems;
+- keep model ranks, generated data, and random seed paired across solvers;
+- write `benchmarks/results/solver_consistency.csv`;
+- report only `scenario`, `seed`, `prediction_relative_difference`, and
+  `coefficient_relative_difference`;
+- avoid timing analysis, rank selection, ordinary PLS, software metadata, universal orchestration,
   figures, or block-aware scaling APIs.
 
 Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
@@ -186,8 +184,7 @@ expose its public raw-data reading and analysis-relevant preprocessing directly.
 
 ## Subsequent roadmap
 
-1. **Focused synthetic benchmarks:** implement predictor-nuisance comparison next, then solver
-   consistency in a separate patch.
+1. **Focused synthetic benchmarks:** implement solver consistency next in a separate patch.
 2. **Representative real-data smoke checks:** add only after the synthetic questions are stable and
    under separate review.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility

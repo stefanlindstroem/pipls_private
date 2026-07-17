@@ -124,14 +124,57 @@ It does not compare against fixed oracle Pi-PLS, ordinary PLS, exhaustive path s
 SVD solver. It also excludes subspace metrics, timings, candidate counts, software or environment
 metadata, and figures.
 
-## Planned separate benchmarks
+## Predictor-nuisance comparison with ordinary PLS
 
-The remaining benchmark sequence is:
+The implemented paired benchmark asks:
 
-1. predictor-specific nuisance comparison between fixed Pi-PLS and ordinary PLS;
-2. full-versus-randomized predictor-SVD consistency.
+> When predictor-specific variation increases, how does fixed Pi-PLS prediction compare with
+> ordinary fixed-component PLS on the same generated train/test problem?
 
-Each will receive its own script and minimal CSV output in a separate patch.
+Run it from the repository root after installing the package:
+
+```bash
+python benchmarks/predictor_nuisance_comparison.py
+```
+
+The script uses `make_pipls_train_test` with 160 training samples, 160 test samples, 24 predictors,
+six responses, two shared directions of strengths `(2.5, 1.5)`, no response-specific directions,
+noise `(0.2, 0.2)`, and seeds 1729, 2718, and 3141. The scenarios are:
+
+- `shared_only`, with no predictor-specific directions;
+- `moderate_predictor_nuisance`, with four predictor-only directions of strengths `(1.5, 1.25,
+  1.0, 0.75)`;
+- `strong_predictor_nuisance`, with the same four directions strengthened to `(3.0, 2.5, 2.0,
+  1.5)`.
+
+Both methods use `scale=True` and `n_components` equal to the generator-declared shared rank. Fixed
+Pi-PLS uses exact predictor SVD and `predictor_rank` equal to the complete declared predictor-signal
+rank. Each model learns its own centering and scaling statistics from the generated training block.
+No cross-validation or preprocessing fit outside the model is used.
+
+The output is `benchmarks/results/predictor_nuisance_comparison.csv` with exactly these columns:
+
+```text
+scenario
+seed
+pipls_test_mse
+pls_test_mse
+pipls_minus_pls_mse
+```
+
+Both MSE values are arithmetic means of squared residuals over the independent test samples and
+responses in original response units. The paired difference is
+`pipls_test_mse - pls_test_mse`: negative values favor Pi-PLS for that generated problem, while
+positive values favor ordinary PLS.
+
+The benchmark is descriptive. It does not define a superiority threshold, aggregate across seeds,
+select ranks, compare SVD solvers, measure runtime, record software or environment metadata, or
+produce figures. OLS and CCA remain outside the package benchmark.
+
+## Planned separate benchmark
+
+The remaining benchmark is full-versus-randomized predictor-SVD consistency. It will receive its own
+script and minimal CSV output in a separate patch.
 
 ## Interpretation boundary
 
