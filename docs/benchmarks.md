@@ -296,11 +296,50 @@ The check records one numeric predictor rank, policy, mean CV-MSE, fold SD, and 
 component count. It does not set an explicit predictor-rank ceiling, force randomized SVD, select
 spectral preprocessing, choose the final model, or report timing.
 
+## Tobacco randomized-SVD component-path smoke check
+
+The third real-data smoke check asks:
+
+> Can a package user evaluate a bounded Tobacco component path with adaptive predictor-rank
+> scanning while explicitly using randomized predictor SVD?
+
+Run it with:
+
+```bash
+python benchmarks/tobacco_path_smoke.py
+```
+
+The script reads the 347-row, 1,557-predictor Tobacco `X.csv` and 13-response `Y.csv` tables
+directly with pandas. It evaluates component counts 1 through 8 using:
+
+```python
+search = PiPLSPathCV(
+    estimator=PiPLSRegression(
+        svd_solver="randomized",
+        random_state=0,
+    ),
+    n_components_values=range(1, 9),
+    search_method="auto",
+    refit=False,
+    n_jobs=1,
+).fit(X, Y)
+```
+
+The output is `benchmarks/results/tobacco_path_smoke.csv`, with eight rows and the same six columns
+as the Pulp and Sugarcane component paths. The numeric predictor rank is recorded for every
+component count. The example boundary at eight components keeps the repository workflow concise;
+it is not a claim that eight is optimal or that all 13 possible response components were scanned.
+
+The benchmark does not compare full and randomized SVD, select a final component count, refit a
+final model, introduce spectral preprocessing, report timing or memory, or define a performance
+threshold. The corresponding public example derives a PDF from the CSV and then fits a separately
+chosen fixed model with the same randomized-SVD policy.
+
 ## Benchmark sequence status
 
-All four planned focused synthetic benchmarks and the Pulp and Sugarcane component-path smoke
-checks are implemented. Tobacco remains separately reviewed rather than appended to a universal
-table because its package-level question and computational cost differ.
+All four planned focused synthetic benchmarks and the Pulp, Sugarcane, and Tobacco
+component-path smoke checks are implemented. Each real-data check retains its own question and
+computational boundary rather than being appended to a universal table.
 
 ## Interpretation boundary
 

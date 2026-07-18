@@ -9,8 +9,9 @@ or publication-result workflows.
   fixed Pulp model chosen from the recorded path.
 - `11_sugarcane_real_data.py`: the same two-stage workflow for high-dimensional LabSpec sugarcane
   spectra and four responses.
-- `12_tobacco_real_data.py`: direct pandas reading of raw FT-NIR tobacco spectra and 13 chemical
-  responses.
+- `12_tobacco_real_data.py`: a bounded component path for raw FT-NIR tobacco spectra using
+  adaptive predictor-rank scanning and explicit randomized predictor SVD, followed by a separate
+  fixed model.
 - `plot_component_path.py`: read a canonical component-path CSV and generate its PDF view.
 
 Install the data and plotting dependencies before running the real-data path examples:
@@ -19,7 +20,7 @@ Install the data and plotting dependencies before running the real-data path exa
 python -m pip install -e ".[examples]"
 ```
 
-The Pulp and Sugarcane examples deliberately separate two stages:
+The Pulp, Sugarcane, and Tobacco examples deliberately separate two stages:
 
 1. `PiPLSPathCV(refit=False)` evaluates candidate component counts and writes
    `examples/results/<dataset>_component_path.csv`.

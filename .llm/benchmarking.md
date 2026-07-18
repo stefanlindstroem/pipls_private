@@ -286,6 +286,22 @@ contract as Pulp.
 **Excluded:** final model choice, global refit, OOF reporting, spectral preprocessing, method
 comparison, timing, figures, and predictive claims.
 
+### 7. Tobacco randomized-SVD component-path smoke check
+
+**Question:** Can a programming user scan a bounded Tobacco component path with adaptive
+predictor-rank search while explicitly exercising randomized predictor SVD?
+
+**Setup:** Read the 347-row, 1,557-predictor Tobacco `X.csv` and 13-response `Y.csv` directly. Use
+`PiPLSRegression(svd_solver="randomized", random_state=0)` as the path estimator, component counts
+1 through 8, `search_method="auto"`, `refit=False`, and `n_jobs=1`. The upper component count is an
+explicit lightweight-example boundary, not an optimality claim.
+
+**Output:** `benchmarks/results/tobacco_path_smoke.csv`, with eight rows and the same six-column
+component-path contract as Pulp and Sugarcane. The numeric predictor rank remains mandatory.
+
+**Excluded:** final model choice, global refit, full-versus-randomized comparison, OOF reporting,
+spectral preprocessing, timing, memory, figures, and performance thresholds.
+
 ## Output and reproducibility policy
 
 Each benchmark owns its own script, scenario constants, tests, and CSV header. Prefer readable
@@ -312,8 +328,10 @@ Implement the benchmarks one at a time in this order:
 3. predictor-nuisance comparison with PLS — implemented;
 4. solver consistency — implemented;
 5. Pulp component-path smoke check — implemented;
-6. Sugarcane high-dimensional component-path smoke check — implemented.
+6. Sugarcane high-dimensional component-path smoke check — implemented;
+7. Tobacco randomized-SVD component-path smoke check — implemented.
 
-The focused synthetic sequence and two separately reviewed real-data smoke checks are implemented.
-Any further real-data benchmark must remain question-specific and receive separate review. Do not
+The focused synthetic sequence and three separately reviewed real-data smoke checks are
+implemented. Any further real-data benchmark must remain question-specific and receive separate
+review. Do not
 recreate the removed universal manifest, universal schema, or broad CI runner.

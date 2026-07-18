@@ -63,6 +63,7 @@ def test_real_data_examples_use_two_stage_artifact_workflow() -> None:
     examples = [
         _repository_root() / "examples" / "10_pulp_real_data.py",
         _repository_root() / "examples" / "11_sugarcane_real_data.py",
+        _repository_root() / "examples" / "12_tobacco_real_data.py",
     ]
     for path in examples:
         text = path.read_text(encoding="utf-8")
@@ -72,3 +73,12 @@ def test_real_data_examples_use_two_stage_artifact_workflow() -> None:
         assert "predictor_rank=chosen_predictor_rank" in text
         assert "best_params_" not in text
         assert "pooled_oof_r2_" not in text
+
+
+def test_tobacco_example_demonstrates_randomized_svd_and_auto_search() -> None:
+    path = _repository_root() / "examples" / "12_tobacco_real_data.py"
+    text = path.read_text(encoding="utf-8")
+
+    assert 'svd_solver="randomized"' in text
+    assert 'search_method="auto"' in text
+    assert 'random_state=0' in text

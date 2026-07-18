@@ -178,12 +178,31 @@ component-path contract used by Pulp. The benchmark verifies deterministic finit
 fold SD values, one numeric predictor rank per component count, and ordered rows. It does not select
 spectral preprocessing, choose the final model, report runtime, or generate a PDF.
 
+## Tobacco randomized-SVD component-path smoke check
+
+`tobacco_path_smoke.py` reads the transparent 347-row, 1,557-predictor Tobacco tables and evaluates
+component counts 1 through 8. It uses an explicit `PiPLSRegression(svd_solver="randomized",
+random_state=0)` template and `PiPLSPathCV(search_method="auto", refit=False)`, so the example
+demonstrates randomized predictor decomposition together with adaptive conditional predictor-rank
+scanning.
+
+Run it from the repository root after installing the example dependencies:
+
+```bash
+python benchmarks/tobacco_path_smoke.py
+```
+
+It writes `benchmarks/results/tobacco_path_smoke.csv` with eight rows and the same six-column
+component-path contract as Pulp and Sugarcane. The upper component count is a bounded example
+choice, not a claim that the complete 13-component path has been exhausted. The benchmark does not
+choose a final model, generate a PDF, compare SVD solvers, report timing, or select spectral
+preprocessing.
+
 ## Sequence status
 
-The four focused synthetic benchmarks and the Pulp and Sugarcane real-data smoke checks are
-implemented. Any additional benchmark must receive its own package-level question, script, and
-minimal output contract. Tobacco remains separately reviewed because its ordinary path search is
-substantially heavier.
+The four focused synthetic benchmarks and the Pulp, Sugarcane, and Tobacco real-data smoke checks
+are implemented. Any additional benchmark must receive its own package-level question, script, and
+minimal output contract.
 
 Generated outputs under `benchmarks/results/` remain ignored by Git and are excluded from repository
 snapshots. Software versions, parallel settings, and timings are included only in a benchmark whose

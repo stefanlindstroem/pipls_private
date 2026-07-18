@@ -383,15 +383,15 @@ Add one transparent dataset and one ordinary package-user question at a time. A 
 exercise fitting, selection, prediction, or validation reporting, but it must not present
 selection-conditioned diagnostics as independent performance estimates.
 
-Current status: **in progress**. The Pulp and Sugarcane component-path smoke checks read `X.csv`
-and `Y.csv` directly with pandas, fit the public `PiPLSPathCV` workflow with the ordinary
-`samples_per_predictor_rank=5` and `cv=5` defaults plus `refit=False`, and write one row per
-component count with numeric predictor rank, rank policy, mean response-standardized CV-MSE, fold
-SD, and split count. Sugarcane adds the transparent $p \gg n$ case. The corresponding examples
-write the same canonical CSV schema, derive PDFs from those CSV files, expose a visible user choice
-of `n_components`, and fit a separate fixed model. Neither check supplies a predictor-rank ceiling,
-method comparison, formal confidence interval, spectral preprocessing, timing table, or general
-real-data runner.
+Current status: **complete for the current reference suite**. The Pulp, Sugarcane, and Tobacco
+component-path smoke checks read `X.csv` and `Y.csv` directly and write one row per component count
+with numeric predictor rank, rank policy, mean response-standardized CV-MSE, fold SD, and split
+count. Pulp covers the compact ordinary workflow. Sugarcane covers the ordinary defaults when
+$p \gg n$. Tobacco covers a bounded eight-component path with adaptive rank scanning and explicit
+randomized predictor SVD. The corresponding examples derive PDFs from the canonical CSV files,
+expose a visible user choice of `n_components`, and fit a separate fixed model. The checks do not
+add method comparisons, formal confidence intervals, spectral preprocessing, timing tables, or a
+general real-data runner.
 
 ### Product documentation and release hardening
 
@@ -421,10 +421,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Review one Tobacco package-level smoke-check question separately. Its ordinary path workflow is
-substantially heavier than Sugarcane, so define the computational boundary before implementation.
-Do not add method comparisons, introduce spectral preprocessing, report timings without a timing
-question, or create a universal real-data runner or schema.
+Proceed to user documentation and release hardening through small, separately reviewed patches.
+Priorities are a buildable guide and API reference, compatibility policy, packaging checks, and
+versioned release automation. Do not add another dataset or benchmark without a new package-level
+question.
 
 Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
 and preprocessing must be public and explicit.

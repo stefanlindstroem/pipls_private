@@ -123,9 +123,9 @@ The first universal synthetic manifest, result schema, and broad CI runner were 
 review because they combined unrelated questions and produced an unnecessarily wide table. The
 focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
-output. The separately reviewed Pulp and Sugarcane smoke checks use direct table reading and the public
-`PiPLSPathCV` workflow with the ordinary `samples_per_predictor_rank=5` and `cv=5` defaults; neither
-sets an explicit predictor-rank ceiling. Sugarcane adds the transparent $p \gg n$ case. Their
+output. The separately reviewed Pulp, Sugarcane, and Tobacco smoke checks use direct table reading and the
+public `PiPLSPathCV` workflow. Pulp and Sugarcane use the ordinary defaults; Tobacco explicitly
+demonstrates adaptive scanning with randomized predictor SVD over a bounded component range. Their
 canonical outputs are component-path CSV files with one numeric predictor rank and fold-level
 uncertainty summary per component count. Example PDFs are derived from those CSV files, and the
 examples fit a separate fixed model only after a visible user component choice. Further real-data

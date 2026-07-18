@@ -49,13 +49,13 @@ def plot_component_path(csv_path: Path, pdf_path: Path, *, title: str) -> None:
     yerr = path["response_standardized_cv_mse_fold_sd"].to_numpy()
     ranks = path["predictor_rank"].to_numpy()
 
-    figure, axes = plt.subplots(figsize=(6.4, 4.2))
+    figure, axes = plt.subplots(figsize=(8, 5))
     axes.errorbar(x, y, yerr=yerr, fmt="o-", capsize=4)
     axes.set_title(title)
     axes.set_xlabel("Number of response components")
     axes.set_ylabel("Response-standardized CV-MSE")
     axes.set_xticks(x)
-    axes.margins(x=0.08)
+    axes.margins(x=0.05)
     axes.grid(axis="y", alpha=0.25)
     for n_components, mean_mse, predictor_rank in zip(x, y, ranks, strict=True):
         axes.annotate(
@@ -65,13 +65,8 @@ def plot_component_path(csv_path: Path, pdf_path: Path, *, title: str) -> None:
             textcoords="offset points",
             ha="center",
         )
-    figure.text(
-        0.5,
-        0.01,
-        "Error bars show fold-to-fold SD.",
-        ha="center",
-        fontsize="small",
-    )
+    upper = axes.get_ylim()[1]
+    axes.set_ylim(0, max(1, upper))
     figure.tight_layout(rect=(0.0, 0.05, 1.0, 1.0))
     pdf_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(pdf_path, format="pdf")

@@ -22,13 +22,13 @@ Phases A through E4b are implemented, and E4c is in progress. The current public
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. Public navigation now
 describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
-The benchmark layer implements all four focused synthetic questions as separate scripts and two
+The benchmark layer implements all four focused synthetic questions as separate scripts and three
 separately reviewed real-data component-path smoke checks. Pulp exercises the compact ordinary
-workflow; Sugarcane exercises the same public defaults when $p \gg n$. Their CSV files contain one
-row per component count with explicit predictor rank, rank policy, mean CV-MSE, fold SD, and split
-count. The public examples derive PDFs from those CSV files and then fit a separately chosen fixed
-model. A Tobacco package-level question is next under separate review. No block-aware scaling API
-is designed or scheduled.
+workflow; Sugarcane exercises the same public defaults when $p \gg n$; Tobacco demonstrates a
+bounded adaptive path with explicit randomized predictor SVD. Their CSV files contain one row per
+component count with explicit predictor rank, rank policy, mean CV-MSE, fold SD, and split count.
+The public examples derive PDFs from those CSV files and then fit a separately chosen fixed model.
+No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
 

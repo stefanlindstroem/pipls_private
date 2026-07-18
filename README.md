@@ -138,20 +138,21 @@ search = PiPLSPathCV(
 path = pd.DataFrame(search.component_path_results_)
 ```
 
-The Pulp and Sugarcane examples write canonical component-path CSV files, generate PDFs by reading
-those CSV files, and then fit a separate fixed model using a visible component-count choice. Install
+The Pulp, Sugarcane, and Tobacco examples write canonical component-path CSV files, generate PDFs
+by reading those CSV files, and then fit a separate fixed model using a visible component-count
+choice. Tobacco explicitly demonstrates adaptive scanning with randomized predictor SVD. Install
 the `examples` extra to run them. See [`examples/README.md`](examples/README.md) and
 [`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks
 
-The repository contains four focused synthetic benchmarks and two separately reviewed real-data
-smoke checks. The Pulp and Sugarcane checks read `X.csv` and `Y.csv` directly with pandas and write
-one component-path CSV row per `n_components`, including the numeric predictor rank, rank policy,
-mean response-standardized CV-MSE, fold SD, and split count. Run them with
-`python benchmarks/pulp_path_smoke.py` and `python benchmarks/sugarcane_path_smoke.py`. The fold SD
-is descriptive variation across overlapping CV folds, not a confidence interval. Benchmark scripts
-do not choose the final component count or generate figures.
+The repository contains four focused synthetic benchmarks and three separately reviewed real-data
+smoke checks. The Pulp, Sugarcane, and Tobacco checks read `X.csv` and `Y.csv` directly with pandas
+and write one component-path CSV row per `n_components`, including the numeric predictor rank, rank
+policy, mean response-standardized CV-MSE, fold SD, and split count. Tobacco explicitly uses
+randomized predictor SVD with adaptive rank scanning. Run the scripts under `benchmarks/`
+directly. The fold SD is descriptive variation across overlapping CV folds, not a confidence
+interval. Benchmark scripts do not choose the final component count or generate figures.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).
 

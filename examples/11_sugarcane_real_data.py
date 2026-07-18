@@ -13,7 +13,6 @@ DATA_DIR = REPOSITORY_ROOT / "datasets" / "sugarcane"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 COMPONENT_PATH_CSV = RESULTS_DIR / "sugarcane_component_path.csv"
 COMPONENT_PATH_PDF = RESULTS_DIR / "sugarcane_component_path.pdf"
-N_COMPONENTS_VALUES = (1, 2, 3, 4)
 
 # This example uses three components as an explicit parsimonious choice after
 # inspecting the path. Change the constant to fit another recorded row.
@@ -34,8 +33,13 @@ if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
     raise TypeError("All response columns must be numeric.")
 
 # Stage 1: scan n_components. Predictor rank is selected conditionally for each row.
+max_n_components = min(
+    Y.shape[1],      # number of responses
+    X.shape[1],      # number of predictors
+    X.shape[0] - 1,  # maximum rank after centering
+)
 path_search = PiPLSPathCV(
-    n_components_values=N_COMPONENTS_VALUES,
+    n_components_values=range(1, max_n_components + 1),
     refit=False,
 ).fit(X, Y)
 

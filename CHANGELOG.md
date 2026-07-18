@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add the Tobacco randomized-SVD component-path example and smoke check, using adaptive predictor-rank scanning over a bounded eight-component path, CSV/PDF artifacts, and a separate fixed final fit.
 - Add a dedicated `examples` dependency extra containing pandas and Matplotlib, and document how to refresh an existing development virtual environment after dependency changes.
 - Present real-data model development as a two-stage component-path workflow: add the public
   `component_path_results_` table, explicit optimized/fixed/maximum predictor-rank policies,
