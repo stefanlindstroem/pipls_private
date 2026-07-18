@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented.
+Accepted and implemented. The real-data benchmark-script and full example-execution-test portions are superseded by Decision 0037.
 
 ## Context
 
@@ -45,8 +45,9 @@ The final model stage remains Pi-PLS-specific: the user chooses `n_components`, 
 corresponding Pi-PLS predictor rank from the Pi-PLS CSV, and fits a separate fixed
 `PiPLSRegression` on all observations.
 
-The Tobacco example and smoke check use explicit full predictor SVD with adaptive rank scanning.
-Randomized-SVD behavior remains protected by the focused solver-consistency benchmark.
+The Tobacco example uses explicit full predictor SVD with adaptive rank scanning.
+Randomized-SVD behavior remains protected by the focused solver-consistency benchmark. The former
+Tobacco smoke benchmark copy was removed by Decision 0037.
 
 ## Consequences
 

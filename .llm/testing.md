@@ -13,7 +13,7 @@ Tests may verify:
 
 - public Python behavior, numerical invariants, validation, fitted attributes, and supported
   scikit-learn composition;
-- executable package examples and benchmark runners;
+- focused benchmark runners and small example helper contracts;
 - package and source-distribution contents;
 - presence, encoding, parsability, and structural format of shipped Markdown, YAML, CSV, TOML, and
   shell files;
@@ -45,13 +45,20 @@ technical readability, not exact scientific values, row examples, column lists, 
 metadata checksums. Git history, review, public provenance, and the dataset documentation remain
 the source of record for those contents.
 
-Focused package benchmarks are executable contracts once implemented. Tests may validate the
-question-specific script, deterministic generation, finite metrics, metric domains, exact minimal
-CSV header, and repeatability of scientific values. Component-path tests may also verify one ordered
-row per requested component count, a numeric predictor rank and explicit policy in every row, and
-agreement with the conditional rows in `cv_results_`. PDF tests should verify that the plot is
-generated from a valid CSV without freezing visual pixel output. Do not require a universal
-manifest, universal schema, or shared wide result row across unrelated benchmarks.
+Focused synthetic package benchmarks are executable contracts once implemented. Tests may validate
+the question-specific script, deterministic generation, finite metrics, metric domains, exact
+minimal CSV header, and repeatability of scientific values. Component-path API tests may verify one
+ordered row per requested component count, a numeric predictor rank and explicit policy in every
+row, and agreement with conditional rows in `cv_results_`. Plot and standard-PLS helper tests should
+use small synthetic tables and verify canonical CSV/PDF contracts without freezing visual pixel
+output.
+
+Do not execute the complete Pulp, Sugarcane, or Tobacco examples in `make check`, and do not duplicate
+their analyses as real-data benchmark scripts. Those examples are user-run analyses whose runtime
+depends on dataset size and hardware. Durable tests instead protect repository dataset readability,
+the two-stage workflow structure, the component-path API, the PLS helper, and CSV-to-PDF generation.
+Do not require a universal manifest, universal schema, or shared wide result row across unrelated
+benchmarks.
 
 Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
 assertions require an explicit decision record describing why the value is stable, what software

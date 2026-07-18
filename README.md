@@ -148,15 +148,20 @@ SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Ins
 
 ## Lightweight benchmarks
 
-The repository contains four focused synthetic benchmarks and three separately reviewed real-data
-smoke checks. The Pulp, Sugarcane, and Tobacco checks read `X.csv` and `Y.csv` directly with pandas
-and write one component-path CSV row per `n_components`, including the numeric predictor rank, rank
-policy, mean response-standardized CV-MSE, fold SD, and split count. Tobacco uses full predictor
-SVD with adaptive rank scanning. Run the scripts under `benchmarks/`
-directly. The fold SD is descriptive variation across overlapping CV folds, not a confidence
-interval. Benchmark scripts do not choose the final component count or generate figures.
+The repository contains four focused synthetic validation benchmarks. Each benchmark owns one
+scientific question and one minimal CSV output:
 
-See [`docs/benchmarks.md`](docs/benchmarks.md) and [`benchmarks/README.md`](benchmarks/README.md).
+- fixed-structure recovery;
+- adaptive rank selection;
+- predictor-nuisance comparison with ordinary PLS;
+- full-versus-randomized SVD consistency.
+
+The real-data workflows are user-run examples rather than benchmark or test-suite jobs. Examples
+10–12 read the public tables directly, write separate Pi-PLS and standard PLS component-path CSVs,
+generate a comparison PDF, and fit a separately chosen fixed Pi-PLS model.
+
+See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
+[`examples/README.md`](examples/README.md).
 
 ## Documentation
 

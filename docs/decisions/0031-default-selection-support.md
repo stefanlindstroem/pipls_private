@@ -35,7 +35,7 @@ n_{\mathrm{train,min}}-1,
 
 Values below 5 remain legal but emit `StatisticalSupportWarning` in rule-based modes. An explicit
 integer predictor rank or path maximum remains available for a deliberate scientific protocol,
-but ordinary examples and the Pulp smoke check do not set one.
+but ordinary examples do not set one.
 
 ## Consequences
 

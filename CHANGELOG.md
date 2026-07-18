@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove the duplicate Pulp, Sugarcane, and Tobacco smoke benchmark scripts and tests, and stop
+  executing complete real-data examples in `make check`; retain fast dataset, path, PLS-helper,
+  plotting, and workflow-structure contracts.
 - Compare the Pulp, Sugarcane, and Tobacco Pi-PLS component paths with separate standard PLS (NIPALS) CSV paths and CSV-derived overlaid PDFs; use explicit full predictor SVD for the Tobacco path while retaining adaptive predictor-rank scanning.
 - Add a dedicated `examples` dependency extra containing pandas and Matplotlib, and document how to refresh an existing development virtual environment after dependency changes.
 - Present real-data model development as a two-stage component-path workflow: add the public

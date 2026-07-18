@@ -1,8 +1,8 @@
 # Lightweight validation benchmarks
 
-`pipls` uses small focused benchmarks to make selected package behavior understandable across
-releases. Synthetic questions remain primary; separately reviewed real-data smoke checks exercise
-ordinary user workflows. These assets are not scientific-paper reproduction studies.
+`pipls` uses small focused synthetic benchmarks to make selected package behavior understandable
+across releases. Real-data workflows live under `examples/` and are run explicitly by users. These
+assets are not scientific-paper reproduction studies.
 
 ## Focused design
 
@@ -230,123 +230,16 @@ where $\epsilon$ is machine epsilon. Predictions and coefficients are in origina
 The benchmark is descriptive: it does not define a universal pass threshold, compare prediction
 accuracy, select ranks, measure runtime or memory, or record software and environment metadata.
 
-## Pulp component-path smoke check
-
-The first real-data smoke check asks:
-
-> Can an ordinary programming user read the transparent Pulp tables and obtain one explicit
-> predictor-rank and CV-MSE result for every candidate component count?
-
-Run it from the repository root after installing the data dependencies:
-
-```bash
-python benchmarks/pulp_path_smoke.py
-```
-
-The script reads `datasets/pulp/X.csv` and `Y.csv` directly with pandas and evaluates:
-
-```python
-search = PiPLSPathCV(
-    n_components_values=[1, 2, 3, 4],
-    refit=False,
-    n_jobs=1,
-).fit(X, Y)
-```
-
-The output is `benchmarks/results/pulp_path_smoke.csv` with four ordered rows and exactly:
-
-```text
-n_components
-predictor_rank
-predictor_rank_policy
-response_standardized_cv_mse_mean
-response_standardized_cv_mse_fold_sd
-n_splits
-```
-
-Predictor rank is selected conditionally for each component count and is always recorded as a
-numeric value. `predictor_rank_policy` states how the rank was obtained. The fold SD is the
-population standard deviation of the fold-specific response-standardized MSE values. It is
-descriptive variation across overlapping folds, not a confidence interval.
-
-The benchmark does not use `best_params_` to declare a final model, does not refit a globally
-selected pair, and does not generate a plot. The corresponding public example writes the same path
-schema to CSV, generates a PDF from that CSV, and then performs a separate explicit fixed-model
-fit.
-
-## Sugarcane high-dimensional component-path smoke check
-
-The second real-data smoke check asks:
-
-> Does the same transparent component-path workflow operate when the predictor matrix is
-> high-dimensional with $p \gg n$?
-
-Run it with:
-
-```bash
-python benchmarks/sugarcane_path_smoke.py
-```
-
-The script reads the 57-row, 1,721-predictor Sugarcane `X.csv` and four-response `Y.csv` tables
-directly with pandas and uses the same default `PiPLSPathCV(refit=False)` call over component counts
-1 through 4. It writes `benchmarks/results/sugarcane_path_smoke.csv` with the same six columns as the
-Pulp path.
-
-The check records one numeric predictor rank, policy, mean CV-MSE, fold SD, and split count per
-component count. It does not set an explicit predictor-rank ceiling, force randomized SVD, select
-spectral preprocessing, choose the final model, or report timing.
-
-## Tobacco full-SVD component-path smoke check
-
-The third real-data smoke check asks:
-
-> Can a package user evaluate the Tobacco component path with adaptive predictor-rank scanning
-> while using an explicit exact predictor decomposition?
-
-Run it with:
-
-```bash
-python benchmarks/tobacco_path_smoke.py
-```
-
-The script reads the 347-row, 1,557-predictor Tobacco `X.csv` and 13-response `Y.csv` tables
-directly with pandas. It uses:
-
-```python
-search = PiPLSPathCV(
-    estimator=PiPLSRegression(svd_solver="full"),
-    n_components_values=range(1, 9),
-    search_method="auto",
-    refit=False,
-    n_jobs=1,
-).fit(X, Y)
-```
-
-The output is `benchmarks/results/tobacco_path_smoke.csv`, with the same six columns as the Pulp
-and Sugarcane component paths. The numeric predictor rank is recorded for every component count.
-The smoke check remains Pi-PLS-only; standard PLS comparison CSVs and PDFs belong to the public
-examples.
-
-The benchmark does not select a final component count, refit a final model, introduce spectral
-preprocessing, report timing or memory, or define a performance threshold. Randomized predictor
-SVD remains covered by the focused full-versus-randomized solver-consistency benchmark.
-
 ## Benchmark sequence status
 
-All four planned focused synthetic benchmarks and the Pulp, Sugarcane, and Tobacco
-component-path smoke checks are implemented. Each real-data check retains its own question and
-computational boundary rather than being appended to a universal table.
+The four focused synthetic benchmarks are implemented. The Pulp, Sugarcane, and Tobacco
+component-path analyses are user-run examples, not package benchmarks. They produce their own
+canonical CSV and PDF artifacts under `examples/results/` when a user runs examples 10–12.
 
 ## Interpretation boundary
 
-Synthetic train and test blocks are generated independently from shared latent parameters. Models
-learn centering and optional scaling only from their training data; any future cross-validation
-benchmark must learn those statistics independently within each fold.
-
-Ordinary PLS is the nearest package-user comparator where a comparison is the stated question. OLS,
-CCA, publication-scale simulations, figures, and scientific superiority claims remain outside this
-repository.
-
-Generated CSV files live under `benchmarks/results/`, are ignored by Git, and are excluded from
-repository snapshots. Timings and software versions are not included automatically; they belong
-only in a separately designed benchmark whose question concerns runtime or compatibility.
+Package benchmarks validate focused numerical and selection contracts. They are not publication
+figures, complete method-comparison studies, or substitutes for downstream experiment
+repositories. Real-data examples illustrate analysis workflows and are intentionally excluded from
+`make check` because executing them would repeat the analyses and make ordinary package validation
+dataset- and hardware-dependent.

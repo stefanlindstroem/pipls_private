@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented.
+Accepted and implemented. The real-data benchmark-script and full example-execution-test portions are superseded by Decision 0037.
 
 ## Context
 
@@ -44,8 +44,8 @@ reading that CSV. The CSV is canonical; the plot does not receive a fitted searc
 then chooses `n_components` through a visible constant, reads the matching numeric predictor rank
 from the CSV, and fits a separate `PiPLSRegression` with both values fixed.
 
-The Pulp and Sugarcane smoke benchmarks write the same six-column component-path CSV. They do not
-choose a final component count, generate figures, or report a one-row global optimum.
+The public real-data examples write the six-column Pi-PLS component-path CSV. Earlier duplicate
+smoke benchmark copies were removed by Decision 0037.
 
 ## Consequences
 

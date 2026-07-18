@@ -42,6 +42,7 @@ This index is navigation, not a substitute for those records.
 | `0034-two-stage-component-path-workflow.md` | component-path presentation | one CSV row per component count, explicit predictor-rank policy, CSV-derived PDF, and separate fixed final fit |
 | `0035-tobacco-randomized-auto-path.md` | former Tobacco solver demonstration | superseded by Decision 0036; randomized SVD remains covered by solver consistency |
 | `0036-real-data-pls-path-comparison.md` | real-data example comparison | separate Pi-PLS and PLS CSV paths, overlaid PDF, and full-SVD Tobacco workflow |
+| `0037-user-run-real-data-analyses.md` | real-data execution boundary | examples remain user-run; duplicate smoke benchmarks and full example tests are removed |
 
 ## Accepted clarifications after earlier proposals
 
@@ -93,6 +94,8 @@ plan contains an earlier or more general proposal:
 - real-data examples compare separate Pi-PLS and standard PLS component-path CSVs in one PDF;
   Tobacco uses adaptive rank scanning with explicit full predictor SVD, while randomized SVD is
   covered by the solver-consistency benchmark;
+- complete Pulp, Sugarcane, and Tobacco analyses are user-run examples; they are not duplicated as
+  real-data benchmark scripts or executed by the default test suite;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

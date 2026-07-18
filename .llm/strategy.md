@@ -377,21 +377,17 @@ Current status: **complete**. Fixed-structure recovery, adaptive rank selection,
 predictor-nuisance comparison with ordinary `PLSRegression`, and full-versus-randomized solver
 consistency are implemented as independent scripts with minimal question-specific CSV outputs.
 
-### Phase E4c: representative real-data smoke checks
+### Phase E4c: representative real-data examples — complete
 
-Add one transparent dataset and one ordinary package-user question at a time. A smoke check may
-exercise fitting, selection, prediction, or validation reporting, but it must not present
-selection-conditioned diagnostics as independent performance estimates.
+Pulp, Sugarcane, and Tobacco provide transparent component-path analyses with direct `X.csv` and
+`Y.csv` reading. Each example writes canonical Pi-PLS and standard PLS CSVs, derives a comparison
+PDF from those tables, and performs a separate fixed Pi-PLS fit after an explicit component choice.
 
-Current status: **complete for the current reference suite**. The Pulp, Sugarcane, and Tobacco
-component-path smoke checks read `X.csv` and `Y.csv` directly and write one row per component count
-with numeric predictor rank, rank policy, mean response-standardized CV-MSE, fold SD, and split
-count. Pulp covers the compact ordinary workflow. Sugarcane covers the ordinary defaults when
-$p \gg n$. Tobacco covers adaptive rank scanning with explicit full predictor SVD. The
-corresponding examples write separate standard PLS (NIPALS) comparison CSVs, derive overlaid PDFs
-from the canonical tables, expose a visible user choice of `n_components`, and fit a separate fixed
-Pi-PLS model. The real-data smoke checks themselves do not add method comparisons, formal
-confidence intervals, spectral preprocessing, timing tables, or a general real-data runner.
+The initial real-data smoke benchmark scripts and tests were removed after review because they
+repeated the same Pi-PLS paths, while dataset-specific tests executed the complete examples again.
+Default package validation now protects the reusable machinery on small data and the durable
+repository/file contracts. Complete real-data examples are run explicitly by users when their
+artifacts are needed.
 
 ### Product documentation and release hardening
 

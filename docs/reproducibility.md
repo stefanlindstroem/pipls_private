@@ -16,8 +16,9 @@ make build
 ```
 
 Tests cover the numerical core, estimator API, model selection, cross-validation boundaries,
-scikit-learn compatibility, datasets, examples, and repository structure. Randomized numerical
-paths and synthetic generators expose explicit random seeds.
+scikit-learn compatibility, dataset readability, example helper/artifact contracts, and repository
+structure. Complete real-data examples are user-run analyses rather than default test-suite jobs.
+Randomized numerical paths and synthetic generators expose explicit random seeds.
 
 The executable real-data examples require pandas and Matplotlib. Install their dedicated extra with:
 

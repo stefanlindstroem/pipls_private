@@ -22,13 +22,10 @@ Phases A through E4b are implemented, and E4c is in progress. The current public
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. Public navigation now
 describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
-The benchmark layer implements all four focused synthetic questions as separate scripts and three
-separately reviewed real-data component-path smoke checks. Pulp exercises the compact ordinary
-workflow; Sugarcane exercises the same public defaults when $p \gg n$; Tobacco demonstrates
-adaptive rank scanning with explicit full predictor SVD. The smoke-check CSV files contain one row
-per component count with explicit predictor rank, rank policy, mean CV-MSE, fold SD, and split
-count. The public examples also write separate standard PLS (NIPALS) CSVs, derive comparison PDFs
-from both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
+The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
+Sugarcane, and Tobacco are user-run component-path examples rather than benchmark or test-suite
+executions. They write separate Pi-PLS and standard PLS (NIPALS) CSVs, derive comparison PDFs from
+both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
 No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
@@ -58,8 +55,10 @@ No block-aware scaling API is designed or scheduled.
   protocols.
 - `tests/estimator_checks/`: applicable scikit-learn common estimator checks.
 - `tests/regression/`: frozen comparisons with trusted implementations.
-- `tests/benchmarks/`: focused benchmark behavior and output-contract tests after each benchmark is
-  implemented; future frozen fixtures require separate review.
+- `tests/benchmarks/`: focused synthetic benchmark behavior and output-contract tests; future frozen
+  fixtures require separate review.
+- `tests/examples/`: small-data helper, CSV, PDF, and workflow-structure contracts; complete real-data
+  examples are user-run and are not executed by the default test suite.
 - `tests/test_repository_seed.py`: `.llm` navigation, snapshot layout, and workflow invariants.
 
 ## Product-asset ownership
@@ -70,9 +69,8 @@ No block-aware scaling API is designed or scheduled.
   utilities or publication pipelines. Real-data examples keep separate Pi-PLS and standard PLS
   (NIPALS) CSV paths and derive comparison PDFs from those tables. Their pandas and Matplotlib
   requirements are grouped in the `examples` optional dependency extra.
-- `benchmarks/`: focused lightweight package-validation plans and, incrementally, one readable
-  repository-local script per benchmark. Generated CSV outputs are ignored; synthetic validation is
-  primary.
+- `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
+  CSV. Real-data analyses are not duplicated here.
 - `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,
   and accepted decision records.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,

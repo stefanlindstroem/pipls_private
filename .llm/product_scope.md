@@ -63,7 +63,7 @@ downstream.
 
 Package benchmarks are lightweight validation assets, not publication claims. Synthetic benchmarks
 should be primary because ranks, latent structure, signal strengths, noise, and subspaces are known.
-Reference real datasets provide representative smoke checks and usage validation.
+Reference real datasets provide transparent user-run examples and usage orientation.
 
 Benchmarks should protect one question at a time, such as:
 
@@ -123,12 +123,9 @@ The first universal synthetic manifest, result schema, and broad CI runner were 
 review because they combined unrelated questions and produced an unnecessarily wide table. The
 focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
-output. The separately reviewed Pulp, Sugarcane, and Tobacco smoke checks use direct table reading and the
-public `PiPLSPathCV` workflow. Pulp and Sugarcane use the ordinary defaults; Tobacco uses adaptive
-scanning with explicit full predictor SVD. Their canonical benchmark outputs are component-path CSV
-files with one numeric predictor rank and fold-level uncertainty summary per component count. The
-examples additionally write standard PLS (NIPALS) path CSVs for orientation, derive comparison PDFs
-from both tables, and fit a separate fixed Pi-PLS model only after a visible user component choice. Further real-data
-checks remain separately reviewed. None of this includes a block-aware standardization API design;
+output. Pulp, Sugarcane, and Tobacco are transparent user-run examples rather than benchmark or
+default-test jobs. They read the public tables directly, write separate Pi-PLS and standard PLS
+(NIPALS) path CSVs, derive comparison PDFs from those tables, and fit a fixed Pi-PLS model only after
+a visible user component choice. None of this includes a block-aware standardization API design;
 future block-aware variants remain deferred for months or until the project owner explicitly starts
 a separate phase.

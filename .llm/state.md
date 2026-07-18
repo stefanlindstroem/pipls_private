@@ -13,7 +13,7 @@ material alone.
 
 ## Implemented boundary
 
-Phases A through E4b are complete and committed, and E4c real-data smoke checks are in progress. The first broad E4 benchmark implementation was removed and replaced by focused question-specific benchmarks:
+Phases A through E4c are complete and committed. The first broad E4 benchmark implementation was removed and replaced by focused question-specific benchmarks:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -161,14 +161,13 @@ implemented independently:
 3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
 4. full-versus-randomized solver consistency.
 
-Three separately reviewed real-data component-path smoke checks are implemented. Pulp covers the
-compact ordinary workflow, Sugarcane covers the ordinary defaults when $p \gg n$, and Tobacco
-covers adaptive predictor-rank scanning with explicit full predictor SVD. Every script writes one ordered CSV row per component count with numeric predictor
-rank, predictor-rank policy, mean response-standardized CV-MSE, fold SD, and split count. The
-benchmark scripts do not choose or refit a final model. The public examples additionally write a separate standard PLS (NIPALS) path CSV for the same
-folds and component counts, generate an overlaid PDF by reading both canonical tables, expose a
-visible user component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks
-recorded explicitly.
+The earlier real-data smoke-check scripts and full example-execution tests were removed because they
+duplicated the analyses users run explicitly in examples 10–12. Pulp, Sugarcane, and Tobacco remain
+transparent user-run component-path examples. They write separate Pi-PLS and standard PLS (NIPALS)
+path CSVs for the same folds and component counts, generate an overlaid PDF from those tables, expose
+a visible user component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks
+recorded explicitly. Default tests retain dataset-layout, component-path API, PLS-helper, plotting,
+and workflow-structure contracts without executing the complete real-data analyses.
 
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
 ignored and are excluded from snapshots. Software versions, execution controls, timings, and
@@ -187,8 +186,8 @@ expose its public raw-data reading and analysis-relevant preprocessing directly.
 ## Subsequent roadmap
 
 1. **Focused synthetic benchmarks:** complete.
-2. **Representative real-data smoke checks:** Pulp, Sugarcane, and Tobacco component paths
-   implemented.
+2. **Representative real-data examples:** Pulp, Sugarcane, and Tobacco component paths are
+   implemented as explicit user-run CSV/PDF workflows.
 3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 4. **Future product development:** additional estimators, validation tools, datasets, and—only after

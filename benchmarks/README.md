@@ -132,77 +132,9 @@ Both quantities are Frobenius-norm differences relative to the corresponding ful
 benchmark records consistency without defining a universal numerical pass threshold and does not
 measure runtime.
 
-## Pulp component-path smoke check
-
-`pulp_path_smoke.py` follows an explicit package-user workflow: it reads the public Pulp
-`X.csv` and `Y.csv` tables directly with pandas and evaluates component counts 1 through 4 with
-`PiPLSPathCV(refit=False)`. Predictor rank is selected conditionally for each component count using
-the ordinary `samples_per_predictor_rank=5`, `cv=5`, and adaptive-search defaults.
-
-Run it from the repository root after installing the data dependencies:
-
-```bash
-python benchmarks/pulp_path_smoke.py
-```
-
-It writes `benchmarks/results/pulp_path_smoke.csv` with four rows and exactly these columns:
-
-```text
-n_components
-predictor_rank
-predictor_rank_policy
-response_standardized_cv_mse_mean
-response_standardized_cv_mse_fold_sd
-n_splits
-```
-
-The numeric predictor rank is present in every row. The ordinary workflow records
-`predictor_rank_policy=optimized`. The fold SD describes variation across the five validation
-folds; it is not a confidence interval or an independent standard error. The benchmark does not
-choose a final component count, refit a final model, or generate a figure.
-
-## Sugarcane high-dimensional component-path smoke check
-
-`sugarcane_path_smoke.py` applies the same component-path workflow to the transparent 57-row,
-1,721-predictor Sugarcane tables. It therefore exercises the ordinary public defaults when
-$p \gg n$ without setting a predictor-rank ceiling or forcing an SVD solver.
-
-Run it from the repository root after installing the data dependencies:
-
-```bash
-python benchmarks/sugarcane_path_smoke.py
-```
-
-It writes `benchmarks/results/sugarcane_path_smoke.csv` with four rows and the same six-column
-component-path contract used by Pulp. The benchmark verifies deterministic finite mean CV-MSE and
-fold SD values, one numeric predictor rank per component count, and ordered rows. It does not select
-spectral preprocessing, choose the final model, report runtime, or generate a PDF.
-
-## Tobacco full-SVD component-path smoke check
-
-`tobacco_path_smoke.py` reads the transparent 347-row, 1,557-predictor Tobacco tables and evaluates
-the configured component path. It uses explicit `PiPLSRegression(svd_solver="full")` together with
-adaptive conditional predictor-rank scanning.
-
-Run it from the repository root:
-
-```bash
-python benchmarks/tobacco_path_smoke.py
-```
-
-It writes `benchmarks/results/tobacco_path_smoke.csv` with the same six-column contract as the Pulp
-and Sugarcane paths. The numeric predictor rank is retained for every component count. The smoke
-check stops at the Pi-PLS CSV and does not create the standard-PLS comparison artifacts used by the
-public examples.
-
-The benchmark does not select or refit a final model, generate a figure, compare methods, report
-timing, or introduce spectral preprocessing. Randomized predictor SVD is already exercised by the
-focused solver-consistency benchmark.
-
-
-The four focused synthetic benchmarks and the Pulp, Sugarcane, and Tobacco real-data smoke checks
-are implemented. Any additional benchmark must receive its own package-level question, script, and
-minimal output contract.
+The four focused synthetic benchmarks are implemented. Real-data component-path analyses live under
+`examples/` and are intentionally not duplicated as benchmark scripts or default test-suite jobs.
+Users run those analyses explicitly when they need their CSV and PDF artifacts.
 
 Generated outputs under `benchmarks/results/` remain ignored by Git and are excluded from repository
 snapshots. Software versions, parallel settings, and timings are included only in a benchmark whose

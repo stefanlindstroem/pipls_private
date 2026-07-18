@@ -46,3 +46,19 @@ def test_benchmark_results_are_excluded_from_snapshots(tmp_path: Path) -> None:
         names = {name.removeprefix("./") for name in handle.getnames()}
 
     assert not any(name.startswith("benchmarks/results/") for name in names)
+
+
+def test_real_data_analyses_are_not_duplicated_as_benchmarks_or_full_tests() -> None:
+    root = _repository_root()
+    retired = [
+        root / "benchmarks" / "pulp_path_smoke.py",
+        root / "benchmarks" / "sugarcane_path_smoke.py",
+        root / "benchmarks" / "tobacco_path_smoke.py",
+        root / "tests" / "benchmarks" / "test_pulp_path_smoke.py",
+        root / "tests" / "benchmarks" / "test_sugarcane_path_smoke.py",
+        root / "tests" / "benchmarks" / "test_tobacco_path_smoke.py",
+        root / "tests" / "data" / "test_pulp_dataset.py",
+        root / "tests" / "data" / "test_sugarcane_dataset.py",
+        root / "tests" / "data" / "test_tobacco_dataset.py",
+    ]
+    assert not any(path.exists() for path in retired)

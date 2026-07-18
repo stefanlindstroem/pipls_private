@@ -44,10 +44,9 @@ Ordinary `PLSRegression` is the only planned external comparator because it is t
 programming-user baseline. OLS, CCA, publication grids, figure generation, and manuscript claims
 remain outside this repository.
 
-For real-data smoke checks, read the repository `X.csv` and `Y.csv` tables directly in the script,
-use the same public estimator call shown to users, and label any diagnostic according to its actual
-validation protocol. A selection-conditioned value must not be named or described as test
-performance, unbiased generalization performance, or an external validation result.
+Real-data component-path analyses belong under `examples/`. They read repository `X.csv` and
+`Y.csv` tables directly, use public estimator calls, and label diagnostics according to their actual
+validation protocol. They are user-run analyses rather than benchmark or default-test jobs.
 
 ## Focused benchmarks
 
@@ -245,63 +244,6 @@ consistency without defining a universal pass threshold. Timing, memory, rank se
 PLS, software metadata, environment metadata, figures, and generic orchestration do not belong in
 this table. A future runtime benchmark requires a separate hardware and measurement question.
 
-### 5. Pulp component-path smoke check
-
-**Question:** Can a programming user read the transparent Pulp tables and obtain one conditional
-predictor-rank and CV-MSE row for each requested component count?
-
-**Setup:** Read `datasets/pulp/X.csv` and `Y.csv` directly with pandas. Evaluate component counts
-1 through 4 with ordinary `PiPLSPathCV` defaults, `refit=False`, and `n_jobs=1`. Do not request OOF
-predictions or refit the global numerical minimum.
-
-**Output:** `benchmarks/results/pulp_path_smoke.csv`, containing four rows with exactly:
-
-```text
-n_components
-predictor_rank
-predictor_rank_policy
-response_standardized_cv_mse_mean
-response_standardized_cv_mse_fold_sd
-n_splits
-```
-
-The numeric predictor rank is mandatory. The ordinary path uses policy `optimized`. The fold SD is
-fold-to-fold descriptive variation, not a confidence interval or an independent standard error.
-
-**Excluded:** final component choice, global refit, OOF R2, method comparison, timing, figures, and
-performance thresholds.
-
-### 6. Sugarcane high-dimensional component-path smoke check
-
-**Question:** Does the same component-path artifact contract operate on transparent spectral data
-with $p \gg n$?
-
-**Setup:** Read the 57-row, 1,721-predictor Sugarcane `X.csv` and four-response `Y.csv` directly.
-Use the ordinary path defaults over component counts 1 through 4 with `refit=False` and `n_jobs=1`.
-Do not set a predictor-rank ceiling or force a solver.
-
-**Output:** `benchmarks/results/sugarcane_path_smoke.csv`, with four rows and the same six-column
-contract as Pulp.
-
-**Excluded:** final model choice, global refit, OOF reporting, spectral preprocessing, method
-comparison, timing, figures, and predictive claims.
-
-### 7. Tobacco full-SVD component-path smoke check
-
-**Question:** Can a programming user scan the Tobacco component path with adaptive predictor-rank
-search and an explicit exact predictor decomposition?
-
-**Setup:** Read the 347-row, 1,557-predictor Tobacco `X.csv` and 13-response `Y.csv` directly. Use
-`PiPLSRegression(svd_solver="full")` as the path estimator, the requested component path,
-`search_method="auto"`, `refit=False`, and `n_jobs=1`. Randomized predictor SVD is already covered
-by the dedicated solver-consistency benchmark.
-
-**Output:** `benchmarks/results/tobacco_path_smoke.csv`, with the same six-column component-path
-contract as Pulp and Sugarcane. The numeric predictor rank remains mandatory.
-
-**Excluded:** final model choice, global refit, full-versus-randomized comparison, OOF reporting,
-spectral preprocessing, timing, memory, figures, and performance thresholds.
-
 ## Output and reproducibility policy
 
 Each benchmark owns its own script, scenario constants, tests, and CSV header. Prefer readable
@@ -321,17 +263,13 @@ rank selection is exact until a separate calibrated acceptance decision exists.
 
 ## Implementation sequence
 
-Implement the benchmarks one at a time in this order:
+The implemented focused sequence is:
 
-1. fixed-structure recovery — implemented;
-2. rank selection — implemented;
-3. predictor-nuisance comparison with PLS — implemented;
-4. solver consistency — implemented;
-5. Pulp component-path smoke check — implemented;
-6. Sugarcane high-dimensional component-path smoke check — implemented;
-7. Tobacco full-SVD component-path smoke check — implemented.
+1. Fixed-structure recovery;
+2. Rank selection;
+3. Predictor-nuisance comparison against ordinary PLS;
+4. Exact-versus-randomized SVD consistency.
 
-The focused synthetic sequence and three separately reviewed real-data smoke checks are
-implemented. Any further real-data benchmark must remain question-specific and receive separate
-review. Do not
-recreate the removed universal manifest, universal schema, or broad CI runner.
+Do not add real-data benchmark copies of public examples. A new benchmark requires a distinct
+package-level validation question that is not already answered by an example or a focused unit,
+integration, or artifact-contract test.
