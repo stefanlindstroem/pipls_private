@@ -7,10 +7,10 @@ With `scale=True`, each centered column is divided by its sample standard deviat
 `ddof=1`. A zero scale, and every scale estimated from a singleton training set, is replaced by 1.
 With `scale=False`, centering remains active while `x_scale_` and `y_scale_` are vectors of ones.
 
-Automatic predictor-rank selection fits these statistics independently inside every training
-fold. Validation observations do not influence fold means or scales. After rank selection, the
-estimator refits preprocessing and the selected fixed-rank Pi-PLS model on all data supplied to
-`fit()`.
+During `PiPLSPathCV` selection, every fixed candidate learns these statistics independently inside
+each training fold. Validation observations do not influence fold means or scales. With
+`refit=True`, the path meta-estimator learns preprocessing again while fitting the selected fixed
+pair on all data supplied to `PiPLSPathCV.fit()`.
 
 Response-standardized model-selection loss uses a separate
 `response_scale_for_scoring_`. It is always the safe training-response sample standard deviation,

@@ -31,23 +31,23 @@ No block-aware scaling API is designed or scheduled.
 
 ## Accepted transition
 
-Decision 0039 is partially implemented. `PiPLSRegression` now owns only one explicit fixed rank
-pair and no cross-validation or selection results. `PiPLSPathCV` retains the triangular search; the
-next patch consolidates it as the sole selection interface before later private-code and example
-cleanup.
+Decision 0039 is partially implemented. `PiPLSRegression` owns one explicit fixed rank pair and no
+cross-validation or selection results. `PiPLSPathCV` now owns the complete triangular-selection
+lifecycle. The next patch removes obsolete private selection machinery before later example and
+final-audit work.
 
 ## Runtime ownership
 
 - `src/pipls/_core.py`: fixed-`(n_components, predictor_rank)` numerical core.
-- `src/pipls/_cv_engine.py`: shared fold-local candidate evaluation, scoring, timing, caching, and
-  OOF refitting support.
+- `src/pipls/_cv_engine.py`: path-owned fold-local candidate evaluation, scoring, timing, caching,
+  warning filtering, and OOF support.
 - `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation and tags.
 - `src/pipls/decomposition.py`: immutable public Pi-PLS factorization result.
 - `src/pipls/datasets.py`: optional immutable dataset container and deterministic synthetic
   generators; it is not required for user-supplied real data.
 - `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
-- `src/pipls/model_selection.py`: rank limits, split materialization, and shared rank-search
+- `src/pipls/model_selection.py`: path-owned rank limits, split materialization, and rank-search
   orchestration.
 - `src/pipls/path.py`: pipeline-aware `PiPLSPathCV` meta-estimator.
 - `src/pipls/regression.py`: direct fixed-model `PiPLSRegression` estimator.
@@ -109,7 +109,8 @@ cleanup.
   publication workflows.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required
   registry or generic loader.
-- `PiPLSRegression` and `PiPLSPathCV` do not wrap each other; both use shared private machinery.
+- `PiPLSRegression` and `PiPLSPathCV` do not wrap each other; selection machinery is owned by the
+  path interface.
 - `PiPLSRegression` owns current centering and optional scaling: every candidate fit learns its
   statistics from the corresponding training fold, and the selected model refits them on all
   supplied training data.

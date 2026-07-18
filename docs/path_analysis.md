@@ -181,6 +181,11 @@ When `refit=True`, the globally selected estimator is fitted on all supplied dat
 methods delegate to it. With `refit=False`, all path diagnostics remain available, while
 `predict`, `transform`, and `score` are disabled.
 
+Direct fixed fits warn when they have fewer than four observations per retained predictor-rank
+direction. `PiPLSPathCV` suppresses only that expected diagnostic for its controlled feature
+probes, candidate folds, optional OOF fits, and selected full-data refit. Other warnings from a
+pipeline or estimator remain visible.
+
 ## Advanced splitters and OOF output
 
 `fit(X, y, groups=groups)` supports group-aware splitters. Repeated, predefined, temporal, and

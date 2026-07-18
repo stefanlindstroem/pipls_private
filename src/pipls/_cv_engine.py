@@ -1,4 +1,4 @@
-"""Private shared cross-validation engine for Pi-PLS candidate searches."""
+"""Private fold engine used by :class:`pipls.PiPLSPathCV`."""
 
 from __future__ import annotations
 
@@ -15,13 +15,13 @@ from sklearn.base import clone
 from sklearn.utils import _safe_indexing
 
 from ._core import ResolvedSVDSolver
-from .exceptions import StatisticalSupportWarning
 from .model_selection import CVSplit, _response_standardized_mse, _training_response_scale
 
 FloatArray = NDArray[np.float64]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 SolverGetter = Callable[[Any], ResolvedSVDSolver]
 ParallelPreference = Literal["threads"] | None
+WarningCategory = type[Warning]
 
 
 @dataclass(frozen=True)
@@ -92,6 +92,7 @@ def _evaluate_candidate_batch(
     n_jobs: int | None,
     solver_getter: SolverGetter | None = None,
     parallel_preference: ParallelPreference = None,
+    ignored_warning_categories: tuple[WarningCategory, ...] = (),
 ) -> tuple[_PiPLSCandidate, ...]:
     """Evaluate uncached candidates and update ``cache`` in input order."""
 
@@ -119,6 +120,7 @@ def _evaluate_candidate_batch(
                 y=y,
                 splits=splits,
                 solver_getter=solver_getter,
+                ignored_warning_categories=ignored_warning_categories,
             )
             for candidate in pending
         ),
@@ -140,6 +142,7 @@ def _evaluate_candidate(
     y: ArrayLike,
     splits: tuple[CVSplit, ...],
     solver_getter: SolverGetter | None,
+    ignored_warning_categories: tuple[WarningCategory, ...],
 ) -> _PiPLSCandidateResult:
     """Evaluate one candidate on every materialized split."""
 
@@ -160,9 +163,12 @@ def _evaluate_candidate(
         X_validation = _safe_indexing(X, validation)
         y_validation = _safe_indexing(y, validation)
         fit_started = perf_counter()
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", StatisticalSupportWarning)
-            estimator.fit(X_train, y_train)
+        _fit_with_ignored_warnings(
+            estimator,
+            X_train,
+            y_train,
+            ignored_warning_categories=ignored_warning_categories,
+        )
         split_fit_times[split_index] = perf_counter() - fit_started
 
         score_started = perf_counter()
@@ -213,6 +219,7 @@ def _ordered_oof_predictions(
     splits: tuple[CVSplit, ...],
     n_jobs: int | None,
     parallel_preference: ParallelPreference = None,
+    ignored_warning_categories: tuple[WarningCategory, ...] = (),
 ) -> _OOFResult:
     """Fit one fixed candidate on each split and return row-ordered predictions.
 
@@ -236,6 +243,7 @@ def _ordered_oof_predictions(
                 y=y,
                 train=train,
                 validation=validation,
+                ignored_warning_categories=ignored_warning_categories,
             )
             for train, validation in splits
         ),
@@ -278,6 +286,7 @@ def _fit_predict_split(
     y: ArrayLike,
     train: NDArray[np.intp],
     validation: NDArray[np.intp],
+    ignored_warning_categories: tuple[WarningCategory, ...],
 ) -> tuple[NDArray[np.intp], FloatArray, float, float]:
     """Fit and predict one split for ordered OOF aggregation."""
 
@@ -286,9 +295,12 @@ def _fit_predict_split(
     y_train = _safe_indexing(y, train)
     X_validation = _safe_indexing(X, validation)
     y_validation = _safe_indexing(y, validation)
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", StatisticalSupportWarning)
-        estimator.fit(X_train, y_train)
+    _fit_with_ignored_warnings(
+        estimator,
+        X_train,
+        y_train,
+        ignored_warning_categories=ignored_warning_categories,
+    )
     prediction = np.asarray(estimator.predict(X_validation), dtype=np.float64)
     if prediction.ndim == 1:
         prediction = prediction.reshape(-1, 1)
@@ -308,3 +320,18 @@ def _fit_predict_split(
                 "out-of-fold predictions."
             )
     return validation.copy(), prediction, score, mse
+
+
+def _fit_with_ignored_warnings(
+    estimator: Any,
+    X: ArrayLike,
+    y: ArrayLike,
+    *,
+    ignored_warning_categories: tuple[WarningCategory, ...] = (),
+) -> Any:
+    """Fit one estimator while ignoring only caller-owned warning categories."""
+
+    with warnings.catch_warnings():
+        for category in ignored_warning_categories:
+            warnings.simplefilter("ignore", category)
+        return estimator.fit(X, y)

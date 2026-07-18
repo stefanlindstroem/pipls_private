@@ -233,10 +233,11 @@ Extract fold-level candidate evaluation and one-dimensional rank-search orchestr
 public class wrap the other. Add equivalence tests showing that one fixed path row matches the
 corresponding estimator rank search.
 
-Current status: **complete**. Candidate cloning, fold-local fitting, scoring, standardized loss,
-caching, and optional solver diagnostics are centralized in `_cv_engine.py`; exhaustive and
-adaptive rank refinement are centralized in `model_selection.py`; and public equivalence tests
-protect the shared behavior.
+Current status: **historically complete and partially superseded by Decision 0039**. Candidate
+cloning, fold-local fitting, scoring, standardized loss, caching, and optional solver diagnostics
+remain centralized in `_cv_engine.py`, while exhaustive and adaptive rank refinement remain in
+`model_selection.py`. `PiPLSRegression` no longer consumes this machinery; it is now path-owned and
+scheduled for cleanup in Phase F1 patch 4.
 
 ### Phase D1b: scikit-learn and PLS-style API alignment
 
@@ -397,13 +398,14 @@ Decision 0039 establishes a staged API correction before release hardening. The 
 - `PiPLSPathCV` owns the bounded triangular scan and conditional predictor-rank selection;
 - the path ceiling uses `samples_per_predictor_rank=5`;
 - direct fixed fits warn when $n/r_\pi<4$;
-- expected support warnings are suppressed only inside controlled path candidate fits;
+- expected support warnings are suppressed only inside path-controlled feature probes, candidate
+  fits, optional OOF fits, and the selected full-data refit;
 - examples continue to recommend `PiPLSPathCV`, not a hand-built `GridSearchCV` surface.
 
 Implementation order is fixed-model estimator, sole path selection, dead-code consolidation,
 example and guide alignment, then final API/minimality audit.
 
-Current status: **patch 2 complete; path-ownership consolidation next**.
+Current status: **patches 2 and 3 complete; obsolete private selection cleanup next**.
 
 ### Product documentation and release hardening
 
@@ -433,9 +435,9 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the first code step of Phase F1: simplify `PiPLSRegression` to fixed-model fitting while
-preserving its mathematical, preprocessing, and scikit-learn estimator contracts. Leave
-`PiPLSPathCV` behavior unchanged in that patch.
+Implement patch 4 of Phase F1: remove obsolete private selection machinery and duplicated result
+structures left by the former embedded `PiPLSRegression` search. Preserve the public behavior of
+the fixed estimator and path meta-estimator.
 
 Resume documentation and release hardening only after the full Phase F1 sequence and final audit.
 

@@ -34,9 +34,10 @@ after pulling dependency changes into an existing virtual environment.
 
 ## Model-fitting reproducibility
 
-Centering and optional scaling are integral to `PiPLSRegression.fit`. During cross-validation,
-statistics are learned only from each training fold. After selection, the chosen model is refitted
-on the complete supplied training set. Learned scaling must not be fitted globally before CV.
+Centering and optional scaling are integral to `PiPLSRegression.fit`. `PiPLSPathCV` clones fixed
+estimators inside every training fold, so each candidate learns statistics only from that fold.
+With `refit=True`, the chosen fixed pair learns them again from the complete supplied training set.
+Learned scaling must not be fitted globally before CV.
 
 ## Synthetic validation
 

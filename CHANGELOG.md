@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Make `PiPLSPathCV` the sole package selection owner, including explicit control of support-warning suppression across feature probes, candidate folds, optional OOF fits, and the selected full-data refit; unrelated warnings continue to propagate.
 - Make `PiPLSRegression` a direct fixed-pair estimator with no embedded CV or search results; add the direct-fit support warning at fewer than four observations per retained predictor direction while preserving `PiPLSPathCV` candidate behavior.
 
 - Record the staged fixed-estimator/path-search boundary, exclude generated example artifacts from snapshots, repair malformed documentation LaTeX, and correct stale core/preprocessing decision statuses.

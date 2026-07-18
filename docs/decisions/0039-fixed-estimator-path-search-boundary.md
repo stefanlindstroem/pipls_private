@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted and partially implemented. The fixed-estimator step is complete; path-ownership,
-private-code consolidation, example alignment, and final audit remain staged follow-up work.
+Accepted and partially implemented. The fixed-estimator and sole-path-ownership steps are
+complete; private-code consolidation, example alignment, and final audit remain staged follow-up
+work.
 
 ## Context
 
@@ -57,8 +58,11 @@ This decision is implemented incrementally:
 4. align examples and guides with the final two-stage workflow;
 5. perform a final API and minimality audit.
 
-Step 1 is implemented: `PiPLSRegression` is now fixed-rank only. The remaining transition steps
-continue with `PiPLSPathCV` ownership, private-code cleanup, example alignment, and final audit.
+Steps 1 and 2 are implemented. `PiPLSRegression` is fixed-rank only, and `PiPLSPathCV` now owns the
+complete package selection lifecycle: feature probes, candidate folds, conditional path results,
+optional OOF fits, and selected full-data refit. The path supplies the warning-suppression policy to
+the private fold engine, which otherwise propagates warnings normally. Remaining transition work
+is private-code cleanup, example alignment, and final audit.
 
 ## Consequences
 

@@ -44,7 +44,8 @@ Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 
 A direct fixed fit emits `StatisticalSupportWarning` when $n/r_\pi<4$. This warning is diagnostic;
 it does not choose or cap the rank. `PiPLSPathCV` suppresses only this expected warning inside its
-controlled candidate and OOF fits.
+controlled feature probes, candidate fits, optional OOF fits, and selected full-data refit. Other
+warning categories remain visible.
 
 ## Model-internal standardization contract
 

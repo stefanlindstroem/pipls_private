@@ -31,10 +31,10 @@ Pi-PLS-specific factorization and numerical diagnostics are canonicalized in the
 `PiPLSDecomposition` object exposed as `decomposition_`. Existing matrix attributes remain direct
 fitted attributes for mathematical convenience and pre-1.0 compatibility.
 
-Cross-validated `PiPLSRegression` modes expose the standard `cv_results_`, `best_params_`,
-`best_index_`, and `best_score_` names. `predictor_rank_cv_results_` remains an alias.
-`rank_test_score` uses minimum ranks for tied scores, while the explicit Pi-PLS complexity rule
-selects the smaller admissible model among score ties.
+`PiPLSRegression` is a direct estimator and exposes no search-result attributes.
+`PiPLSPathCV` owns `cv_results_`, `best_params_`, `best_index_`, `best_score_`, and the conditional
+component-path results. `rank_test_score` uses minimum ranks for tied scores, while the explicit
+Pi-PLS complexity rule selects the smaller admissible model among score ties.
 
 `PiPLSPathCV` is a regressor, transformer, and meta-estimator. It preserves indexable input
 containers inside folds so pandas column names and column-selecting pipelines continue to work.

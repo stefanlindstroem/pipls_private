@@ -126,16 +126,18 @@ Additional fixed decisions:
 
 ## Accepted staged estimator/search correction
 
-Decision 0039 is partially implemented. Patch 2 established the fixed-estimator boundary:
+Decision 0039 is partially implemented. Patches 2 and 3 established the estimator/search boundary:
 
 - `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
 - it owns no CV, scoring, OOF, or search-result parameters and attributes;
 - direct fits warn when $n/r_\pi<4$;
-- controlled path folds suppress only that support warning.
+- `PiPLSPathCV` owns feature probes, candidate folds, conditional path selection, optional OOF
+  fitting, and selected full-data refitting;
+- the path supplies the private fold engine with the one warning category it may suppress, while
+  unrelated warnings remain visible.
 
-`PiPLSPathCV` retains its existing triangular search behavior. The next patches make it the sole
-selection implementation, remove obsolete private selection code, align examples and guides, and
-perform the final minimality audit.
+The next patches remove obsolete private selection code, align examples and guides, and perform the
+final minimality audit.
 
 ## Current standardization boundary and deferred block-aware direction
 
@@ -189,9 +191,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue Decision 0039 with patch 3/6: make `PiPLSPathCV` the sole triangular-selection
-interface and consolidate its ownership of candidate evaluation, warning suppression, and refit
-behavior. Do not yet perform the broader dead-code or example cleanup reserved for later patches.
+Continue Decision 0039 with patch 4/6: remove obsolete private selection machinery and duplicated
+results left by the former embedded `PiPLSRegression` search. Do not yet perform the example cleanup
+or final audit reserved for later patches.
 
 After the estimator/search correction and final audit, resume user documentation and release
 hardening. Do not add another dataset or benchmark without a new package-level question.

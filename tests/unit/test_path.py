@@ -1,11 +1,26 @@
 from __future__ import annotations
 
+import warnings
+
 import numpy as np
 import pytest
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from pipls import PiPLSPathCV, PiPLSRegression, StatisticalSupportWarning
+
+
+class _WarningTransformer(TransformerMixin, BaseEstimator):  # type: ignore[misc]
+    """Small step proving that path fits suppress only package support warnings."""
+
+    def fit(self, X: object, y: object = None) -> _WarningTransformer:
+        del X, y
+        warnings.warn("unrelated path warning", RuntimeWarning, stacklevel=2)
+        return self
+
+    def transform(self, X: object) -> object:
+        return X
 
 
 def _data(n_samples: int = 36) -> tuple[np.ndarray, np.ndarray]:
@@ -190,6 +205,66 @@ def test_low_samples_per_predictor_rank_warns() -> None:
             samples_per_predictor_rank=4,
             cv=3,
         ).fit(X, Y)
+
+
+def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> None:
+    X, Y = _data(12)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", StatisticalSupportWarning)
+        search = PiPLSPathCV(
+            n_components_values=[1],
+            predictor_rank_values=[4],
+            max_predictor_rank=4,
+            cv=3,
+            return_oof_predictions=True,
+            n_jobs=1,
+        ).fit(X, Y)
+
+    assert search.best_predictor_rank_ == 4
+    assert search.best_pipls_.predictor_rank_ == 4
+    np.testing.assert_array_equal(search.oof_prediction_counts_, np.ones(X.shape[0]))
+
+
+def test_path_does_not_suppress_unrelated_estimator_warnings() -> None:
+    X, Y = _data(18)
+    pipeline = Pipeline(
+        [
+            ("warning", _WarningTransformer()),
+            ("regression", PiPLSRegression(n_components=1, predictor_rank=1)),
+        ]
+    )
+
+    with pytest.warns(RuntimeWarning, match="unrelated path warning"):
+        PiPLSPathCV(
+            estimator=pipeline,
+            n_components_values=[1],
+            predictor_rank_values=[1],
+            max_predictor_rank=1,
+            cv=2,
+            refit=False,
+            n_jobs=1,
+        ).fit(X, Y)
+
+
+def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
+    X, Y = _data()
+    template = PiPLSRegression(n_components=2, predictor_rank=2)
+
+    search = PiPLSPathCV(
+        estimator=template,
+        n_components_values=[1],
+        predictor_rank_values=[3],
+        max_predictor_rank=3,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert template.n_components == 2
+    assert template.predictor_rank == 2
+    assert not hasattr(template, "coef_")
+    assert search.best_pipls_.n_components == 1
+    assert search.best_pipls_.predictor_rank == 3
 
 
 @pytest.mark.parametrize(

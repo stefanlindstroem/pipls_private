@@ -25,6 +25,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ._cv_engine import (
     _evaluate_candidate_batch,
+    _fit_with_ignored_warnings,
     _ordered_oof_predictions,
     _PiPLSCandidate,
     _PiPLSCandidateResult,
@@ -57,6 +58,7 @@ _DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _SELECTION_RTOL = 1e-12
 _SELECTION_ATOL = 1e-15
+_CONTROLLED_FIT_WARNING_CATEGORIES = (StatisticalSupportWarning,)
 
 
 def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
@@ -81,6 +83,10 @@ class PiPLSPathCV(
     BaseEstimator,  # type: ignore[misc]
 ):
     r"""Cross-validated search over the admissible Pi-PLS rank path.
+
+    This meta-estimator owns package-level model selection. Every candidate is a
+    fixed-rank :class:`PiPLSRegression` clone, fitted independently inside each
+    training fold. The selected pair is optionally refitted on all supplied data.
 
     The default ``search_method="auto"`` applies a deterministic logarithmic
     coarse-to-fine predictor-rank search independently for each value of
@@ -407,6 +413,7 @@ class PiPLSPathCV(
                 y=y_indexable,
                 splits=materialized.splits,
                 n_jobs=self.n_jobs,
+                ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
             )
             predictions = oof.predictions[:, 0] if y_array.ndim == 1 else oof.predictions
             counts = oof.prediction_counts
@@ -438,7 +445,7 @@ class PiPLSPathCV(
         if self.refit:
             refit_started = perf_counter()
             self.best_estimator_ = clone(template).set_params(**self.best_params_)
-            self.best_estimator_.fit(X_indexable, y_indexable)
+            _fit_controlled_estimator(self.best_estimator_, X_indexable, y_indexable)
             self.refit_time_ = perf_counter() - refit_started
             self.best_pipls_ = _extract_fitted_pipls(
                 self.best_estimator_,
@@ -711,9 +718,11 @@ def _fold_safe_feature_limit(
     feature_counts: list[int] = []
     for train, _ in splits:
         probe = clone(template).set_params(**{n_key: 1, r_key: 1})
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", StatisticalSupportWarning)
-            probe.fit(_safe_indexing(X, train), _safe_indexing(y, train))
+        _fit_controlled_estimator(
+            probe,
+            _safe_indexing(X, train),
+            _safe_indexing(y, train),
+        )
         feature_counts.append(_extract_fitted_pipls(probe, prefix).n_features_in_)
     return min(feature_counts)
 
@@ -747,8 +756,20 @@ def _evaluate_path_batch(
         y=y,
         splits=splits,
         n_jobs=n_jobs,
+        ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
     )
     return tuple(candidate.predictor_rank for candidate in evaluated)
+
+
+def _fit_controlled_estimator(estimator: Any, X: ArrayLike, y: ArrayLike) -> Any:
+    """Fit one path-owned estimator while suppressing only the support diagnostic."""
+
+    return _fit_with_ignored_warnings(
+        estimator,
+        X,
+        y,
+        ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
+    )
 
 
 def _adaptive_path_search(

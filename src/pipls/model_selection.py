@@ -1,4 +1,4 @@
-"""Private model-selection primitives shared by Pi-PLS selection modes."""
+"""Private split, scoring, and rank-search primitives for ``PiPLSPathCV``."""
 
 from __future__ import annotations
 

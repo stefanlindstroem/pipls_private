@@ -13,11 +13,11 @@ multivariate datasets and encouraged examples to bypass the rule by setting an e
 predictor rank. That gave the wrong impression that routine users should choose the search ceiling
 themselves.
 
-Both public selection interfaces already used five-fold regression cross-validation by default.
+The package selection interface uses five-fold regression cross-validation by default.
 
 ## Decision
 
-`PiPLSRegression` and `PiPLSPathCV` both default to:
+`PiPLSPathCV` defaults to:
 
 - `samples_per_predictor_rank=5`;
 - `cv=5`.
@@ -40,7 +40,7 @@ but ordinary examples do not set one.
 
 ## Consequences
 
-- Basic estimator calls use the same rank-support and fold-count defaults.
+- Basic path calls use the documented rank-support and fold-count defaults.
 - Small real-data examples demonstrate the rule-derived search rather than a hand-selected ceiling.
 - The support term describes the full-data refit, while all learned quantities remain fold-local
   and leakage-safe during CV.

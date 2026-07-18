@@ -20,9 +20,10 @@ search = PiPLSPathCV(cv=GroupKFold(n_splits=5))
 search.fit(X, Y, groups=sample_groups)
 ```
 
-`PiPLSRegression.fit` accepts the same `groups=` metadata for its internal rank search. Because
-`groups` is an explicit fit parameter, it also participates in scikit-learn metadata routing when
-routing is enabled and requested.
+Cross-validation splitters, `groups`, scoring, and OOF reporting belong to `PiPLSPathCV`.
+`PiPLSRegression.fit(X, Y)` fits one explicit fixed pair and accepts no split metadata.
+Because `groups` is an explicit `PiPLSPathCV.fit` parameter, it participates in scikit-learn
+metadata routing when routing is enabled and requested.
 
 Recommended splitters include:
 

@@ -49,9 +49,9 @@ This index is navigation, not a substitute for those records.
 ## Accepted staged transition
 
 Decision 0039 is partially implemented. `PiPLSRegression` is now a fixed-pair estimator with the
-direct-fit support warning at $n/r_\pi<4$. `PiPLSPathCV` retains the sole recommended triangular
-selection workflow and the default path-support ceiling with $c=5$; path-ownership consolidation
-and later cleanup remain staged.
+direct-fit support warning at $n/r_\pi<4$. `PiPLSPathCV` owns the complete triangular-selection
+lifecycle and the default path-support ceiling with $c=5$; private-code cleanup and later audit
+work remain staged.
 
 ## Accepted clarifications after earlier proposals
 
