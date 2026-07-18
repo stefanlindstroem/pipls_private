@@ -98,10 +98,6 @@ class PiPLSPathCV(
         A direct :class:`PiPLSRegression` or a scikit-learn :class:`Pipeline`
         whose final step is :class:`PiPLSRegression`. ``None`` creates a default
         direct estimator template.
-    pipls_param_prefix:
-        Optional final pipeline-step name locating Pi-PLS. It is inferred for
-        supported pipelines and retained for explicitness and nested parameter
-        compatibility.
     n_components_values:
         Positive component counts to evaluate. ``None`` uses every value from 1
         through ``min(n_targets, max_predictor_rank_)``.
@@ -141,7 +137,6 @@ class PiPLSPathCV(
         self,
         estimator: Any | None = None,
         *,
-        pipls_param_prefix: str | None = None,
         n_components_values: Sequence[int] | None = None,
         predictor_rank_values: PredictorRankValues = None,
         max_predictor_rank: int | Literal["rule"] = "rule",
@@ -154,7 +149,6 @@ class PiPLSPathCV(
         return_oof_predictions: bool = False,
     ) -> None:
         self.estimator = estimator
-        self.pipls_param_prefix = pipls_param_prefix
         self.n_components_values = n_components_values
         self.predictor_rank_values = predictor_rank_values
         self.max_predictor_rank = max_predictor_rank
@@ -197,12 +191,9 @@ class PiPLSPathCV(
         X_indexable, y_indexable = indexable(X, y)
 
         template = PiPLSRegression() if self.estimator is None else self.estimator
-        self.pipls_param_prefix_ = _resolve_pipls_param_prefix(
-            template,
-            self.pipls_param_prefix,
-        )
+        pipls_param_prefix = _resolve_pipls_param_prefix(template)
         n_components_key, predictor_rank_key = _pipls_parameter_keys(
-            self.pipls_param_prefix_
+            pipls_param_prefix
         )
         template = clone(template)
         materialized = _materialize_cv_splits(self.cv, X_array, y_array, groups=groups)
@@ -212,7 +203,7 @@ class PiPLSPathCV(
 
         fold_feature_limit = _fold_safe_feature_limit(
             template=template,
-            prefix=self.pipls_param_prefix_,
+            prefix=pipls_param_prefix,
             X=X_indexable,
             y=y_indexable,
             splits=materialized.splits,
@@ -449,7 +440,7 @@ class PiPLSPathCV(
             self.refit_time_ = perf_counter() - refit_started
             self.best_pipls_ = _extract_fitted_pipls(
                 self.best_estimator_,
-                self.pipls_param_prefix_,
+                pipls_param_prefix,
             )
         else:
             for name in ("best_estimator_", "best_pipls_", "refit_time_"):
@@ -591,10 +582,6 @@ class PiPLSPathCV(
     def _validate_constructor_parameters(self) -> None:
         if self.estimator is not None:
             _validate_supported_estimator(self.estimator)
-        if self.pipls_param_prefix is not None and not isinstance(
-            self.pipls_param_prefix, str
-        ):
-            raise ValueError("pipls_param_prefix must be None or a string.")
         if self.search_method not in ("optimal", "auto"):
             raise ValueError('search_method must be "optimal" or "auto".')
         if not isinstance(self.refit, (bool, np.bool_)):
@@ -653,27 +640,15 @@ def _validate_supported_estimator(estimator: Any) -> None:
     )
 
 
-def _resolve_pipls_param_prefix(template: Any, supplied: str | None) -> str:
+def _resolve_pipls_param_prefix(template: Any) -> str:
+    """Return the unique supported Pi-PLS parameter prefix."""
+
     _validate_supported_estimator(template)
     if isinstance(template, PiPLSRegression):
-        if supplied not in (None, ""):
-            raise ValueError(
-                "pipls_param_prefix must be None or an empty string for a direct "
-                "PiPLSRegression estimator."
-            )
         return ""
 
     assert isinstance(template, Pipeline)
-    final_name = template.steps[-1][0]
-    if supplied is None:
-        return cast(str, final_name)
-    prefix = supplied.removesuffix("__")
-    if prefix != final_name:
-        raise ValueError(
-            f"pipls_param_prefix={supplied!r} does not locate the final "
-            f"PiPLSRegression pipeline step {final_name!r}."
-        )
-    return prefix
+    return cast(str, template.steps[-1][0])
 
 
 def _pipls_parameter_keys(prefix: str) -> tuple[str, str]:

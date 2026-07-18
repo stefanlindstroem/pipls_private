@@ -19,7 +19,9 @@ Constructor parameters are `n_components`, `scale`, `copy`, `predictor_rank`, `s
 
 Use `PiPLSPathCV` for the standard bounded triangular search over component count and predictor
 rank. A fitted `PiPLSRegression` has no `cv_results_`, `best_params_`, OOF predictions, or other
-selection attributes.
+selection attributes. Fixed estimators remain compatible with ordinary scikit-learn meta-estimators
+when every candidate supplies an explicit admissible rank pair, but the package examples recommend
+`PiPLSPathCV` rather than a hand-built triangular grid.
 
 ## Preprocessing
 

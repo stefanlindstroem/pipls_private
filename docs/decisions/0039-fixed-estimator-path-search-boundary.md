@@ -2,8 +2,7 @@
 
 ## Status
 
-Accepted and partially implemented. The fixed-estimator, sole-path-ownership, private-code
-consolidation, and example-alignment steps are complete; only the final audit remains.
+Accepted and fully implemented.
 
 ## Context
 
@@ -57,22 +56,29 @@ This decision is implemented incrementally:
 4. align examples and guides with the final two-stage workflow;
 5. perform a final API and minimality audit.
 
-Steps 1 through 4 are implemented. `PiPLSRegression` is fixed-rank only, and `PiPLSPathCV` owns the
+All five steps are implemented. `PiPLSRegression` is fixed-rank only, and `PiPLSPathCV` owns the
 complete package selection lifecycle: feature probes, candidate folds, conditional path results,
 optional OOF fits, and selected full-data refit. The path supplies the warning-suppression policy to
 the private fold engine, which otherwise propagates warnings normally. Obsolete solver tracing,
 unused rank-grid construction, duplicate candidate metadata, and OOF rescoring have been removed.
-Examples now compose their PLS comparison and CSV-to-PDF helpers as ordinary imported functions,
-retain direct pandas I/O, and fit the final fixed pair from the chosen canonical CSV row. Only the
-final audit remains.
+Examples compose their PLS comparison and CSV-to-PDF helpers as ordinary imported functions, retain
+direct pandas I/O, and fit the final fixed pair from the chosen canonical CSV row.
+
+The final audit removed the redundant public `pipls_param_prefix` constructor control because the
+supported pipeline form already requires a unique terminal `PiPLSRegression` step. The terminal
+parameter prefix is now inferred. A focused interoperability test confirms that fixed explicit
+rank pairs remain usable with ordinary `GridSearchCV`, while repository examples continue to
+recommend `PiPLSPathCV`.
 
 ## Consequences
 
-- The fixed estimator will more closely resemble scikit-learn's direct regression estimators.
+- The fixed estimator resembles scikit-learn's direct regression estimators.
 - The standard Pi-PLS selection path remains bounded, adaptive, and package-owned.
 - Ordinary path analysis uses one CV layer; nested CV occurs only when a user deliberately places a
   selection procedure inside an external assessment procedure.
 - The $c=5$ path ceiling and the $c=4$ direct-fit warning have distinct purposes.
 - Decision 0032's full-sample support convention remains in force.
 - The selection-responsibility portions of Decisions 0003, 0009, 0011, 0012, and 0031 are
-  superseded when the staged implementation is complete.
+  superseded or refined by this implemented boundary.
+- Supported pipelines require no public parameter-prefix control because the terminal Pi-PLS step
+  is unique and inferred.

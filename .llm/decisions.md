@@ -16,7 +16,7 @@ This index is navigation, not a substitute for those records.
 | `0008-predictor-svd-policy.md` | scalable predictor decomposition | independent `full`, `randomized`, and `auto` solver policy |
 | `0009-public-parameter-validation.md` | exposed controls | early validation and low-statistical-support warning |
 | `0010-path-analysis-api.md` | triangular path search | pipeline-aware `PiPLSPathCV` with aligned search vocabulary |
-| `0011-shared-selection-engine.md` | code ownership | both public interfaces use the same private fold/search machinery |
+| `0011-shared-selection-engine.md` | code ownership | path-owned private fold/search machinery supports fixed candidate evaluation |
 | `0012-sklearn-api-alignment.md` | estimator and PLS compatibility | standard fitted surface plus structured Pi-PLS decomposition output |
 | `0013-sklearn-cleanup-boundary.md` | final pre-D2 scope | direct estimator or terminal-pipeline support and conditional delegation |
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
@@ -44,14 +44,14 @@ This index is navigation, not a substitute for those records.
 | `0036-real-data-pls-path-comparison.md` | real-data example comparison | separate Pi-PLS and PLS CSV paths, overlaid PDF, and full-SVD Tobacco workflow |
 | `0037-user-run-real-data-analyses.md` | real-data execution boundary | examples remain user-run; duplicate smoke benchmarks and full example tests are removed |
 | `0038-single-examples-target.md` | explicit application validation | `make examples` runs every numbered example; `make check` remains fast internal validation |
-| `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | accepted staged split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
+| `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
 
-## Accepted staged transition
+## Implemented estimator/search transition
 
-Decision 0039 is partially implemented. `PiPLSRegression` is now a fixed-pair estimator with the
-direct-fit support warning at $n/r_\pi<4$. `PiPLSPathCV` owns the complete triangular-selection
-lifecycle and the default path-support ceiling with $c=5$; private-code cleanup and example
-alignment are complete, and only the final audit remains staged.
+Decision 0039 is fully implemented. `PiPLSRegression` is a fixed-pair estimator with the direct-fit
+support warning at $n/r_\pi<4$. `PiPLSPathCV` owns the complete triangular-selection lifecycle and
+the default path-support ceiling with $c=5$. The private selection layer is consolidated, examples
+use the two-stage CSV workflow, and supported pipelines infer their unique terminal Pi-PLS step.
 
 ## Accepted clarifications after earlier proposals
 

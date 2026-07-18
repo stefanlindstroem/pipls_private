@@ -116,22 +116,8 @@ def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
     response_scale = np.std(Y[:12], axis=0, ddof=1)
     expected = np.mean(((Y[12:18] - prediction) / response_scale[None, :]) ** 2)
 
-    assert search.pipls_param_prefix_ == "regression"
     assert search.cv_results_["split0_response_standardized_mse"][0] == pytest.approx(expected)
     assert isinstance(search.best_estimator_, Pipeline)
-
-
-def test_explicit_nested_prefix_is_validated() -> None:
-    X, Y = _data()
-    pipeline = Pipeline([("regression", PiPLSRegression(predictor_rank=1))])
-
-    with pytest.raises(ValueError, match="does not locate"):
-        PiPLSPathCV(
-            estimator=pipeline,
-            pipls_param_prefix="missing",
-            n_components_values=[1],
-            predictor_rank_values=[1],
-        ).fit(X, Y)
 
 
 def test_auto_path_skips_candidates_with_constant_scorer() -> None:

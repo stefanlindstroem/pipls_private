@@ -9,6 +9,7 @@ import pandas as pd
 import pytest
 from sklearn.base import clone
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
+from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
@@ -56,6 +57,38 @@ def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
         "scale",
         "svd_solver",
     }
+
+
+def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
+    assert set(PiPLSPathCV().get_params(deep=False)) == {
+        "cv",
+        "estimator",
+        "max_predictor_rank",
+        "n_components_values",
+        "n_jobs",
+        "predictor_rank_values",
+        "refit",
+        "return_oof_predictions",
+        "samples_per_predictor_rank",
+        "scoring",
+        "search_method",
+    }
+
+
+def test_fixed_estimator_interoperates_with_grid_search_for_explicit_pairs() -> None:
+    X, Y = _data()
+    search = GridSearchCV(
+        _fixed_estimator(),
+        param_grid=[
+            {"n_components": [1], "predictor_rank": [2]},
+            {"n_components": [2], "predictor_rank": [3]},
+        ],
+        cv=3,
+    ).fit(X, Y)
+
+    assert isinstance(search.best_estimator_, PiPLSRegression)
+    assert search.best_estimator_.predictor_rank in (2, 3)
+    assert not hasattr(search.best_estimator_, "cv_results_")
 
 
 def test_pls_style_method_signatures_include_copy_controls() -> None:

@@ -29,12 +29,13 @@ They write separate Pi-PLS and standard PLS (NIPALS) CSVs, call imported helpers
 comparison PDFs from both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
 No block-aware scaling API is designed or scheduled.
 
-## Accepted transition
+## Implemented estimator and selection boundary
 
-Decision 0039 is partially implemented. `PiPLSRegression` owns one explicit fixed rank pair and no
+Decision 0039 is fully implemented. `PiPLSRegression` owns one explicit fixed rank pair and no
 cross-validation or selection results. `PiPLSPathCV` owns the complete triangular-selection
-lifecycle, obsolete private selection machinery has been removed, and the examples now use direct
-Python composition around canonical CSV artifacts. The final audit is the remaining patch.
+lifecycle, obsolete private selection machinery has been removed, and the examples use direct
+Python composition around canonical CSV artifacts. Supported pipelines infer their unique terminal
+Pi-PLS step without a public parameter-prefix control.
 
 ## Runtime ownership
 

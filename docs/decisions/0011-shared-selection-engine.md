@@ -2,9 +2,9 @@
 
 ## Status
 
-Partially superseded by Decision 0039. `PiPLSPathCV` is now the sole public selection interface;
-the private fold and adaptive-search helpers remain temporarily in place pending the dedicated
-cleanup patch.
+Refined and implemented by Decision 0039. `PiPLSPathCV` is the sole public selection interface;
+the retained private fold and adaptive-search helpers are path-owned and contain no duplicate
+fixed-estimator selection implementation.
 
 ## Decision
 

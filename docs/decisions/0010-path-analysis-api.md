@@ -11,8 +11,9 @@ applies the established adaptive predictor-rank search independently for each co
 admissible triangular surface.
 
 The complete estimator or pipeline is cloned inside every training fold and candidate fit.
-A unique nested `PiPLSRegression` is inferred, while deeper composites use an explicit
-`pipls_param_prefix`.
+The supported composite form is a scikit-learn `Pipeline` whose final step is the unique
+`PiPLSRegression`; its parameter prefix is inferred. Decision 0039's final audit removes the
+redundant public `pipls_param_prefix` control.
 
 Under Decision 0032, the default predictor-rank support term uses the total number of supplied
 observations. The smallest training-fold size and the smallest predictor dimension reaching the

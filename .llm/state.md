@@ -124,9 +124,9 @@ Additional fixed decisions:
 - Repository tests follow `.llm/testing.md`: living handoff, roadmap, and dataset metadata contents
   are reviewed but are not mirrored as fixed phrase or field-value assertions.
 
-## Accepted staged estimator/search correction
+## Implemented estimator/search correction
 
-Decision 0039 is partially implemented. Patches 2 through 4 established and consolidated the estimator/search boundary:
+Decision 0039 is fully implemented:
 
 - `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
 - it owns no CV, scoring, OOF, or search-result parameters and attributes;
@@ -138,7 +138,9 @@ Decision 0039 is partially implemented. Patches 2 through 4 established and cons
 - unused rank-grid construction, solver tracing, duplicate candidate metadata, and OOF rescoring
   have been removed from the private selection layer.
 
-The example and guide alignment is complete; the final minimality audit remains.
+The estimator/search correction and final minimality audit are complete. The redundant public
+path parameter-prefix control has been removed, supported pipelines infer their terminal Pi-PLS
+step, and fixed explicit rank pairs are covered by a focused `GridSearchCV` interoperability test.
 
 ## Current standardization boundary and deferred block-aware direction
 
@@ -194,16 +196,14 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Complete Decision 0039 with patch 6/6: perform the final API and minimality audit. Do not add new
-features, datasets, benchmarks, or block-scaling API during that audit.
-
-After the estimator/search correction and final audit, resume user documentation and release
-hardening. Do not add another dataset or benchmark without a new package-level question.
+Resume user documentation and release hardening. Select one small reviewable increment covering a
+buildable user guide, API reference, compatibility policy, clean-install validation, packaging
+audit, release notes, or versioned release preparation. Do not add another dataset, benchmark, or
+block-scaling API without a new package-level question.
 
 ## Subsequent roadmap
 
-1. **Fixed-estimator/path-search correction:** implement Decision 0039 through fixed estimator, sole
-   path selection, private-code consolidation, example alignment, and final audit patches.
+1. **Fixed-estimator/path-search correction:** complete.
 2. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 3. **Future product development:** additional estimators, validation tools, datasets, and—only after

@@ -163,8 +163,8 @@ search = PiPLSPathCV(
 
 The supported estimator forms are either a direct `PiPLSRegression` or a scikit-learn `Pipeline`
 whose final step is `PiPLSRegression`. The complete supported estimator is cloned and fitted
-separately for every fold and candidate. `pipls_param_prefix` may identify the terminal Pi-PLS step;
-it is otherwise inferred.
+separately for every fold and candidate. The terminal Pi-PLS step is inferred from the supported
+estimator structure; no separate parameter-prefix control is required.
 
 ## Complete search diagnostics
 

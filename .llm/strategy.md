@@ -404,7 +404,9 @@ Decision 0039 establishes a staged API correction before release hardening. The 
 Implementation order is fixed-model estimator, sole path selection, dead-code consolidation,
 example and guide alignment, then final API/minimality audit.
 
-Current status: **patches 2 through 5 complete; final API and minimality audit next**.
+Current status: **complete**. The final audit removed the redundant path parameter-prefix control,
+confirmed fixed-pair `GridSearchCV` interoperability, and found no further estimator/search changes
+needed before release hardening.
 
 ### Product documentation and release hardening
 
@@ -434,10 +436,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement patch 6 of Phase F1: perform the final API and minimality audit. Preserve the fixed
-estimator, triangular path selection, canonical CSV artifacts, and example execution boundary.
-
-Resume documentation and release hardening only after the full Phase F1 sequence and final audit.
+Begin product documentation and release hardening: choose and implement the smallest next increment
+for a buildable user guide, API reference, compatibility policy, clean-install checks, or release
+metadata. Do not add another dataset, benchmark, or block-scaling API without a separate
+package-level decision.
 
 ## Maintenance protocol
 
