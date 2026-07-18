@@ -1,9 +1,6 @@
-"""Evaluate a standard PLSRegression component path and write a canonical CSV."""
+"""Evaluate a standard PLS component path for comparison with Pi-PLS."""
 
 from __future__ import annotations
-
-import argparse
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -20,22 +17,6 @@ RESULT_COLUMNS = (
 )
 
 
-def read_model_tables(x_csv: Path, y_csv: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Read predictor and response CSV tables and validate their basic shape."""
-
-    X = pd.read_csv(x_csv)
-    Y = pd.read_csv(y_csv)
-    if len(X) != len(Y):
-        raise ValueError(f"Predictor and response row counts differ: {len(X)} != {len(Y)}.")
-    if X.isna().to_numpy().any() or Y.isna().to_numpy().any():
-        raise ValueError("PLS comparison tables must not contain missing values.")
-    if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in X.dtypes):
-        raise TypeError("All predictor columns must be numeric.")
-    if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
-        raise TypeError("All response columns must be numeric.")
-    return X, Y
-
-
 def evaluate_pls_component_path(
     X: pd.DataFrame,
     Y: pd.DataFrame,
@@ -45,12 +26,13 @@ def evaluate_pls_component_path(
 ) -> pd.DataFrame:
     """Return fold-local response-standardized CV-MSE for standard PLS.
 
-    One maximum-component ``PLSRegression`` fit is evaluated per fold. Because
-    NIPALS extracts components sequentially, truncating its fitted rotations and
-    response loadings gives the same nested component path without refitting the
-    earlier components for every row.
+    One maximum-component ``PLSRegression`` fit is evaluated per fold. NIPALS
+    extracts components sequentially, so truncating the fitted rotations and
+    response loadings gives the same nested path without repeated earlier fits.
     """
 
+    if len(X) != len(Y):
+        raise ValueError(f"Predictor and response row counts differ: {len(X)} != {len(Y)}.")
     if max_n_components < 1:
         raise ValueError("max_n_components must be at least 1.")
     algebraic_max = min(Y.shape[1], X.shape[1], X.shape[0] - 1)
@@ -74,8 +56,6 @@ def evaluate_pls_component_path(
         y_scale = np.std(Y_train, axis=0, ddof=1)
         x_scale = np.where(x_scale == 0.0, 1.0, x_scale)
         y_scale = np.where(y_scale == 0.0, 1.0, y_scale)
-        if not np.all(np.isfinite(x_scale)) or not np.all(np.isfinite(y_scale)):
-            raise ValueError("Training-fold scales must be finite.")
 
         X_train_scaled = (X_train - x_mean) / x_scale
         Y_train_scaled = (Y_train - y_mean) / y_scale
@@ -107,51 +87,3 @@ def evaluate_pls_component_path(
             }
         )
     return pd.DataFrame(rows, columns=RESULT_COLUMNS)
-
-
-def write_pls_component_path(
-    x_csv: Path,
-    y_csv: Path,
-    output_csv: Path,
-    *,
-    max_n_components: int,
-    n_splits: int = 5,
-) -> None:
-    """Evaluate standard PLS from explicit tables and write its CSV path."""
-
-    X, Y = read_model_tables(x_csv, y_csv)
-    path = evaluate_pls_component_path(
-        X,
-        Y,
-        max_n_components=max_n_components,
-        n_splits=n_splits,
-    )
-    output_csv.parent.mkdir(parents=True, exist_ok=True)
-    path.to_csv(output_csv, index=False)
-
-
-def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("x_csv", type=Path)
-    parser.add_argument("y_csv", type=Path)
-    parser.add_argument("output_csv", type=Path)
-    parser.add_argument("--max-components", type=int, required=True)
-    parser.add_argument("--n-splits", type=int, default=5)
-    return parser.parse_args()
-
-
-def main() -> None:
-    """Evaluate one standard-PLS component path from the command line."""
-
-    args = _parse_args()
-    write_pls_component_path(
-        args.x_csv,
-        args.y_csv,
-        args.output_csv,
-        max_n_components=args.max_components,
-        n_splits=args.n_splits,
-    )
-
-
-if __name__ == "__main__":
-    main()

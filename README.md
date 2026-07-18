@@ -75,14 +75,15 @@ path = pd.DataFrame(search.component_path_results_)
 path.to_csv("component_path.csv", index=False)
 ```
 
-After inspecting the CV-MSE path, choose a component count and fit both ranks explicitly:
+After inspecting the canonical CSV, choose a component count and fit both ranks explicitly:
 
 ```python
 chosen_n_components = 3
-chosen = path.loc[path["n_components"] == chosen_n_components].iloc[0]
+path = pd.read_csv("component_path.csv").set_index("n_components")
+chosen_predictor_rank = int(path.loc[chosen_n_components, "predictor_rank"])
 model = PiPLSRegression(
     n_components=chosen_n_components,
-    predictor_rank=int(chosen["predictor_rank"]),
+    predictor_rank=chosen_predictor_rank,
 ).fit(X_train, Y_train)
 ```
 
@@ -141,10 +142,10 @@ path = pd.DataFrame(search.component_path_results_)
 ```
 
 The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
-(NIPALS) component-path CSV files, generate one comparison PDF by reading those tables, and then
-fit a separate fixed Pi-PLS model using a visible component-count choice. The Pi-PLS CSV always
-records the selected predictor rank. Tobacco uses adaptive scanning with explicit full predictor
-SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
+(NIPALS) component-path CSV files, call small imported functions to generate the comparison PDF,
+and then fit a separate fixed Pi-PLS model using a visible component-count choice. The Pi-PLS CSV
+always records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
+predictor SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
 `examples` extra to run them. See [`examples/README.md`](examples/README.md) and
 [`datasets/README.md`](datasets/README.md).
 

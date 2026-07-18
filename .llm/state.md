@@ -138,7 +138,7 @@ Decision 0039 is partially implemented. Patches 2 through 4 established and cons
 - unused rank-grid construction, solver tracing, duplicate candidate metadata, and OOF rescoring
   have been removed from the private selection layer.
 
-The next patches align examples and guides and perform the final minimality audit.
+The example and guide alignment is complete; the final minimality audit remains.
 
 ## Current standardization boundary and deferred block-aware direction
 
@@ -180,10 +180,12 @@ implemented independently:
 The earlier real-data smoke-check scripts and full example-execution tests were removed because they
 duplicated examples 10–12. Pulp, Sugarcane, and Tobacco remain transparent component-path examples,
 and `make examples` runs every numbered example as an explicit application-validation action.
-They write separate Pi-PLS and standard PLS (NIPALS) path CSVs for the same folds and component counts, generate an overlaid PDF from those tables, expose
-a visible user component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks
-recorded explicitly. Default tests retain dataset-layout, component-path API, PLS-helper, plotting,
-and workflow-structure contracts without executing the complete real-data analyses.
+They write separate Pi-PLS and standard PLS (NIPALS) path CSVs for the same folds and component
+counts, call imported helpers to generate an overlaid PDF from those tables, expose a visible user
+component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks recorded
+explicitly. The examples contain no subprocess wrappers or repeated table-validation boilerplate.
+Default tests retain dataset-layout, component-path API, PLS-helper, plotting, and workflow-structure
+contracts without executing the complete real-data analyses.
 
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
 ignored and are excluded from snapshots. Software versions, execution controls, timings, and
@@ -192,9 +194,8 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue Decision 0039 with patch 5/6: simplify examples and guides around the final two-stage
-`PiPLSPathCV` workflow and explicit fixed-model refit. Do not yet perform the final audit reserved
-for patch 6.
+Complete Decision 0039 with patch 6/6: perform the final API and minimality audit. Do not add new
+features, datasets, benchmarks, or block-scaling API during that audit.
 
 After the estimator/search correction and final audit, resume user documentation and release
 hardening. Do not add another dataset or benchmark without a new package-level question.

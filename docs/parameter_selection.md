@@ -27,11 +27,12 @@ and fits both ranks explicitly:
 
 ```python
 chosen_n_components = 3
-chosen = path.loc[path["n_components"] == chosen_n_components].iloc[0]
+path = pd.read_csv("component_path.csv").set_index("n_components")
+chosen_predictor_rank = int(path.loc[chosen_n_components, "predictor_rank"])
 
 model = PiPLSRegression(
     n_components=chosen_n_components,
-    predictor_rank=int(chosen["predictor_rank"]),
+    predictor_rank=chosen_predictor_rank,
 ).fit(X, Y)
 ```
 

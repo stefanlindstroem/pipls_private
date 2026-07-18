@@ -25,16 +25,16 @@ The over-general synthetic manifest, universal result schema, and broad CI runne
 The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
 `make examples` runs every numbered example explicitly, including these complete real-data analyses.
-They write separate Pi-PLS and standard PLS (NIPALS) CSVs, derive comparison PDFs from both canonical
-tables, and then fit a separately chosen fixed Pi-PLS model.
+They write separate Pi-PLS and standard PLS (NIPALS) CSVs, call imported helpers to derive
+comparison PDFs from both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
 No block-aware scaling API is designed or scheduled.
 
 ## Accepted transition
 
 Decision 0039 is partially implemented. `PiPLSRegression` owns one explicit fixed rank pair and no
 cross-validation or selection results. `PiPLSPathCV` owns the complete triangular-selection
-lifecycle, and obsolete private selection machinery has been removed. The next patch simplifies
-examples and guides before the final audit.
+lifecycle, obsolete private selection machinery has been removed, and the examples now use direct
+Python composition around canonical CSV artifacts. The final audit is the remaining patch.
 
 ## Runtime ownership
 

@@ -135,3 +135,11 @@ strengths, and scales. Loading blocks that are structurally absent are explicit 
 No metadata file, registry lookup, or package-owned loader is required for real-data fitting.
 Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Repository examples
 must show these steps directly rather than hiding them behind convenience utilities.
+
+## Example workflow boundary
+
+The real-data examples use `PiPLSPathCV(refit=False)` to produce the Pi-PLS path, evaluate the
+standard-PLS comparison through a small imported example helper, write both canonical CSV files,
+and call the plotting helper on those files. The final `PiPLSRegression` fit uses the numeric
+predictor rank read from the chosen Pi-PLS CSV row. The package exposes no dataset I/O or plotting
+helper for this workflow.

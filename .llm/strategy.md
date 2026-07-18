@@ -404,7 +404,7 @@ Decision 0039 establishes a staged API correction before release hardening. The 
 Implementation order is fixed-model estimator, sole path selection, dead-code consolidation,
 example and guide alignment, then final API/minimality audit.
 
-Current status: **patches 2 through 4 complete; example and guide alignment next**.
+Current status: **patches 2 through 5 complete; final API and minimality audit next**.
 
 ### Product documentation and release hardening
 
@@ -434,8 +434,8 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement patch 5 of Phase F1: simplify examples and guides around the final two-stage path
-workflow and explicit fixed-model refit. Preserve the public selection and artifact contracts.
+Implement patch 6 of Phase F1: perform the final API and minimality audit. Preserve the fixed
+estimator, triangular path selection, canonical CSV artifacts, and example execution boundary.
 
 Resume documentation and release hardening only after the full Phase F1 sequence and final audit.
 

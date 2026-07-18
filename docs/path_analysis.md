@@ -97,12 +97,11 @@ import pandas as pd
 
 from pipls import PiPLSRegression
 
-component_path = pd.read_csv("component_path.csv")
+component_path = pd.read_csv("component_path.csv").set_index("n_components")
 chosen_n_components = 3
-chosen = component_path.loc[
-    component_path["n_components"] == chosen_n_components
-].iloc[0]
-chosen_predictor_rank = int(chosen["predictor_rank"])
+chosen_predictor_rank = int(
+    component_path.loc[chosen_n_components, "predictor_rank"]
+)
 
 model = PiPLSRegression(
     n_components=chosen_n_components,
@@ -112,6 +111,11 @@ model = PiPLSRegression(
 
 Both ranks are fixed in the final fit. This reproduces the parameterization represented by the
 chosen path row rather than performing a second automatic rank search.
+
+The repository real-data examples use the same sequence directly in Python. They evaluate the
+standard-PLS comparison with an imported helper function, write both CSV files, call the plotting
+function on those files, and then read the chosen Pi-PLS row. No subprocess or hidden dataset I/O
+layer is involved.
 
 ## Search settings and rank limits
 

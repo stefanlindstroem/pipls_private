@@ -66,9 +66,9 @@ def test_plot_is_generated_from_two_canonical_csvs(tmp_path: Path) -> None:
 
     PLOT.plot_component_path(
         csv_path,
+        pls_csv_path,
         pdf_path,
         title="Test component path",
-        pls_csv_path=pls_csv_path,
     )
 
     assert pdf_path.read_bytes().startswith(b"%PDF")
@@ -93,9 +93,9 @@ def test_plot_rejects_mismatched_component_counts(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="same component counts"):
         PLOT.plot_component_path(
             csv_path,
+            pls_csv_path,
             pdf_path,
             title="Test component path",
-            pls_csv_path=pls_csv_path,
         )
 
 
@@ -153,10 +153,13 @@ def test_real_data_examples_use_two_stage_comparison_workflow() -> None:
         assert "component_path_results_" in text
         assert "refit=False" in text
         assert "PLS_COMPONENT_PATH_CSV" in text
-        assert '"pls_component_path.py"' in text
-        assert '"--pls-csv"' in text
-        assert "pd.read_csv(COMPONENT_PATH_CSV)" in text
+        assert "from pls_component_path import evaluate_pls_component_path" in text
+        assert "from plot_component_path import plot_component_path" in text
+        assert "evaluate_pls_component_path(" in text
+        assert "plot_component_path(" in text
+        assert 'pd.read_csv(COMPONENT_PATH_CSV).set_index("n_components")' in text
         assert "predictor_rank=chosen_predictor_rank" in text
+        assert "subprocess" not in text
         assert "best_params_" not in text
         assert "pooled_oof_r2_" not in text
 
@@ -168,3 +171,11 @@ def test_tobacco_example_uses_full_svd_and_auto_search() -> None:
     assert 'svd_solver="full"' in text
     assert 'search_method="auto"' in text
     assert 'svd_solver="randomized"' not in text
+
+
+def test_example_helpers_are_importable_functions_not_command_line_wrappers() -> None:
+    for filename in ["pls_component_path.py", "plot_component_path.py"]:
+        text = (_repository_root() / "examples" / filename).read_text(encoding="utf-8")
+        assert "argparse" not in text
+        assert "subprocess" not in text
+        assert "if __name__ ==" not in text

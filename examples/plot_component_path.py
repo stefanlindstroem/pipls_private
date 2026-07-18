@@ -1,8 +1,7 @@
-"""Plot Pi-PLS and optional standard-PLS component paths from canonical CSVs."""
+"""Plot Pi-PLS and standard-PLS component paths from canonical CSV files."""
 
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 
 import numpy as np
@@ -58,54 +57,44 @@ def read_pls_component_path(csv_path: Path) -> pd.DataFrame:
 
 
 def plot_component_path(
-    csv_path: Path,
+    pipls_csv_path: Path,
+    pls_csv_path: Path,
     pdf_path: Path,
     *,
     title: str,
-    pls_csv_path: Path | None = None,
 ) -> None:
-    """Read canonical path CSVs and write a compact comparison PDF."""
+    """Read the two canonical path CSVs and write their comparison PDF."""
 
     import matplotlib
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    path = read_component_path(csv_path)
-    x = path["n_components"].to_numpy()
-    y = path["response_standardized_cv_mse_mean"].to_numpy()
-    yerr = path["response_standardized_cv_mse_fold_sd"].to_numpy()
-    ranks = path["predictor_rank"].to_numpy()
+    pipls_path = read_component_path(pipls_csv_path)
+    pls_path = read_pls_component_path(pls_csv_path)
+
+    x = pipls_path["n_components"].to_numpy()
+    pls_x = pls_path["n_components"].to_numpy()
+    if not np.array_equal(pls_x, x):
+        raise ValueError("Pi-PLS and PLS paths must contain the same component counts.")
+
+    y = pipls_path["response_standardized_cv_mse_mean"].to_numpy()
+    yerr = pipls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
+    ranks = pipls_path["predictor_rank"].to_numpy()
+    pls_y = pls_path["response_standardized_cv_mse_mean"].to_numpy()
+    pls_yerr = pls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
+    algorithm = str(pls_path["algorithm"].iloc[0])
 
     figure, axes = plt.subplots(figsize=(8, 5))
+    axes.errorbar(x, y, yerr=yerr, fmt="o-", capsize=4, label=r"$\Pi$-PLS")
     axes.errorbar(
-        x,
-        y,
-        yerr=yerr,
-        fmt="o-",
+        pls_x,
+        pls_y,
+        yerr=pls_yerr,
+        fmt="s--",
         capsize=4,
-        label=r"$\Pi$-PLS",
+        label=f"PLS ({algorithm})",
     )
-    upper_values = [float(np.max(y + yerr))]
-
-    if pls_csv_path is not None:
-        pls_path = read_pls_component_path(pls_csv_path)
-        pls_x = pls_path["n_components"].to_numpy()
-        if not np.array_equal(pls_x, x):
-            raise ValueError("Pi-PLS and PLS paths must contain the same component counts.")
-        pls_y = pls_path["response_standardized_cv_mse_mean"].to_numpy()
-        pls_yerr = pls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
-        algorithm = str(pls_path["algorithm"].iloc[0])
-        axes.errorbar(
-            pls_x,
-            pls_y,
-            yerr=pls_yerr,
-            fmt="s--",
-            capsize=4,
-            label=f"PLS ({algorithm})",
-        )
-        upper_values.append(float(np.max(pls_y + pls_yerr)))
-
     axes.set_title(title)
     axes.set_xlabel("Number of response components")
     axes.set_ylabel("Response-standardized CV-MSE")
@@ -120,34 +109,10 @@ def plot_component_path(
             textcoords="offset points",
             ha="center",
         )
-    axes.set_ylim(0, max(1.0, 1.05 * max(upper_values)))
+    upper = max(float(np.max(y + yerr)), float(np.max(pls_y + pls_yerr)))
+    axes.set_ylim(0, max(1.0, 1.05 * upper))
     axes.legend()
     figure.tight_layout(rect=(0.0, 0.05, 1.0, 1.0))
     pdf_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(pdf_path, format="pdf")
     plt.close(figure)
-
-
-def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("csv_path", type=Path)
-    parser.add_argument("pdf_path", type=Path)
-    parser.add_argument("--title", default="Component-path comparison")
-    parser.add_argument("--pls-csv", type=Path)
-    return parser.parse_args()
-
-
-def main() -> None:
-    """Plot one Pi-PLS path and an optional standard-PLS comparison."""
-
-    args = _parse_args()
-    plot_component_path(
-        args.csv_path,
-        args.pdf_path,
-        title=args.title,
-        pls_csv_path=args.pls_csv,
-    )
-
-
-if __name__ == "__main__":
-    main()

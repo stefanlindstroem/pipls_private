@@ -1,10 +1,10 @@
 """Compare Tobacco Pi-PLS and PLS paths, then fit one Pi-PLS model."""
 
-import subprocess
-import sys
 from pathlib import Path
 
 import pandas as pd
+from plot_component_path import plot_component_path
+from pls_component_path import evaluate_pls_component_path
 
 from pipls import PiPLSPathCV, PiPLSRegression
 
@@ -15,29 +15,15 @@ COMPONENT_PATH_CSV = RESULTS_DIR / "tobacco_component_path.csv"
 PLS_COMPONENT_PATH_CSV = RESULTS_DIR / "tobacco_pls_component_path.csv"
 COMPONENT_PATH_PDF = RESULTS_DIR / "tobacco_component_path.pdf"
 
-# This is a visible user decision made after inspecting the CSV or PDF. Change it
-# to fit another row of the recorded Pi-PLS component path.
+# Choose this value after inspecting the generated CSV or PDF.
 CHOSEN_N_COMPONENTS = 8
 
-# Read predictors X and responses Y exactly as an ordinary programming user would.
-# metadata.yaml documents the repository asset but is not required for model use.
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
-
-if len(X) != len(Y):
-    raise ValueError(f"Predictor and response row counts differ: {len(X)} != {len(Y)}.")
-if X.isna().to_numpy().any() or Y.isna().to_numpy().any():
-    raise ValueError("Tobacco model tables must not contain missing values.")
-if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in X.dtypes):
-    raise TypeError("All predictor columns must be numeric.")
-if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
-    raise TypeError("All response columns must be numeric.")
-
 max_n_components = min(Y.shape[1], X.shape[1], X.shape[0] - 1)
 
-# Stage 1: scan n_components. Predictor rank is selected conditionally with the
-# adaptive search. Full predictor SVD is explicit here because the randomized
-# implementation is already covered by the dedicated solver-consistency benchmark.
+# Stage 1: scan predictor rank conditionally for every component count. Full
+# predictor SVD is explicit because randomized SVD has a dedicated benchmark.
 path_search = PiPLSPathCV(
     estimator=PiPLSRegression(svd_solver="full"),
     n_components_values=range(1, max_n_components + 1),
@@ -45,45 +31,22 @@ path_search = PiPLSPathCV(
     refit=False,
     n_jobs=1,
 ).fit(X, Y)
+pipls_path = pd.DataFrame(path_search.component_path_results_)
+pls_path = evaluate_pls_component_path(X, Y, max_n_components=max_n_components)
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-pd.DataFrame(path_search.component_path_results_).to_csv(
+pipls_path.to_csv(COMPONENT_PATH_CSV, index=False)
+pls_path.to_csv(PLS_COMPONENT_PATH_CSV, index=False)
+plot_component_path(
     COMPONENT_PATH_CSV,
-    index=False,
-)
-subprocess.run(
-    [
-        sys.executable,
-        str(Path(__file__).with_name("pls_component_path.py")),
-        str(DATA_DIR / "X.csv"),
-        str(DATA_DIR / "Y.csv"),
-        str(PLS_COMPONENT_PATH_CSV),
-        "--max-components",
-        str(max_n_components),
-    ],
-    check=True,
-)
-subprocess.run(
-    [
-        sys.executable,
-        str(Path(__file__).with_name("plot_component_path.py")),
-        str(COMPONENT_PATH_CSV),
-        str(COMPONENT_PATH_PDF),
-        "--pls-csv",
-        str(PLS_COMPONENT_PATH_CSV),
-        "--title",
-        "Tobacco component-path comparison",
-    ],
-    check=True,
+    PLS_COMPONENT_PATH_CSV,
+    COMPONENT_PATH_PDF,
+    title="Tobacco component-path comparison",
 )
 
-# Stage 2: read the canonical Pi-PLS CSV and fit the chosen fixed parameterization
-# with the same full-SVD policy used during path evaluation.
-component_path = pd.read_csv(COMPONENT_PATH_CSV)
-chosen_rows = component_path.loc[component_path["n_components"] == CHOSEN_N_COMPONENTS]
-if len(chosen_rows) != 1:
-    raise ValueError(f"Expected one component-path row for n_components={CHOSEN_N_COMPONENTS}.")
-chosen_predictor_rank = int(chosen_rows.iloc[0]["predictor_rank"])
+# Stage 2: read the chosen Pi-PLS row and fit the same fixed full-SVD model.
+component_path = pd.read_csv(COMPONENT_PATH_CSV).set_index("n_components")
+chosen_predictor_rank = int(component_path.loc[CHOSEN_N_COMPONENTS, "predictor_rank"])
 model = PiPLSRegression(
     n_components=CHOSEN_N_COMPONENTS,
     predictor_rank=chosen_predictor_rank,
