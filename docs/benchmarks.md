@@ -296,12 +296,12 @@ The check records one numeric predictor rank, policy, mean CV-MSE, fold SD, and 
 component count. It does not set an explicit predictor-rank ceiling, force randomized SVD, select
 spectral preprocessing, choose the final model, or report timing.
 
-## Tobacco randomized-SVD component-path smoke check
+## Tobacco full-SVD component-path smoke check
 
 The third real-data smoke check asks:
 
-> Can a package user evaluate a bounded Tobacco component path with adaptive predictor-rank
-> scanning while explicitly using randomized predictor SVD?
+> Can a package user evaluate the Tobacco component path with adaptive predictor-rank scanning
+> while using an explicit exact predictor decomposition?
 
 Run it with:
 
@@ -310,14 +310,11 @@ python benchmarks/tobacco_path_smoke.py
 ```
 
 The script reads the 347-row, 1,557-predictor Tobacco `X.csv` and 13-response `Y.csv` tables
-directly with pandas. It evaluates component counts 1 through 8 using:
+directly with pandas. It uses:
 
 ```python
 search = PiPLSPathCV(
-    estimator=PiPLSRegression(
-        svd_solver="randomized",
-        random_state=0,
-    ),
+    estimator=PiPLSRegression(svd_solver="full"),
     n_components_values=range(1, 9),
     search_method="auto",
     refit=False,
@@ -325,15 +322,14 @@ search = PiPLSPathCV(
 ).fit(X, Y)
 ```
 
-The output is `benchmarks/results/tobacco_path_smoke.csv`, with eight rows and the same six columns
-as the Pulp and Sugarcane component paths. The numeric predictor rank is recorded for every
-component count. The example boundary at eight components keeps the repository workflow concise;
-it is not a claim that eight is optimal or that all 13 possible response components were scanned.
+The output is `benchmarks/results/tobacco_path_smoke.csv`, with the same six columns as the Pulp
+and Sugarcane component paths. The numeric predictor rank is recorded for every component count.
+The smoke check remains Pi-PLS-only; standard PLS comparison CSVs and PDFs belong to the public
+examples.
 
-The benchmark does not compare full and randomized SVD, select a final component count, refit a
-final model, introduce spectral preprocessing, report timing or memory, or define a performance
-threshold. The corresponding public example derives a PDF from the CSV and then fits a separately
-chosen fixed model with the same randomized-SVD policy.
+The benchmark does not select a final component count, refit a final model, introduce spectral
+preprocessing, report timing or memory, or define a performance threshold. Randomized predictor
+SVD remains covered by the focused full-versus-randomized solver-consistency benchmark.
 
 ## Benchmark sequence status
 

@@ -286,18 +286,18 @@ contract as Pulp.
 **Excluded:** final model choice, global refit, OOF reporting, spectral preprocessing, method
 comparison, timing, figures, and predictive claims.
 
-### 7. Tobacco randomized-SVD component-path smoke check
+### 7. Tobacco full-SVD component-path smoke check
 
-**Question:** Can a programming user scan a bounded Tobacco component path with adaptive
-predictor-rank search while explicitly exercising randomized predictor SVD?
+**Question:** Can a programming user scan the Tobacco component path with adaptive predictor-rank
+search and an explicit exact predictor decomposition?
 
 **Setup:** Read the 347-row, 1,557-predictor Tobacco `X.csv` and 13-response `Y.csv` directly. Use
-`PiPLSRegression(svd_solver="randomized", random_state=0)` as the path estimator, component counts
-1 through 8, `search_method="auto"`, `refit=False`, and `n_jobs=1`. The upper component count is an
-explicit lightweight-example boundary, not an optimality claim.
+`PiPLSRegression(svd_solver="full")` as the path estimator, the requested component path,
+`search_method="auto"`, `refit=False`, and `n_jobs=1`. Randomized predictor SVD is already covered
+by the dedicated solver-consistency benchmark.
 
-**Output:** `benchmarks/results/tobacco_path_smoke.csv`, with eight rows and the same six-column
-component-path contract as Pulp and Sugarcane. The numeric predictor rank remains mandatory.
+**Output:** `benchmarks/results/tobacco_path_smoke.csv`, with the same six-column component-path
+contract as Pulp and Sugarcane. The numeric predictor rank remains mandatory.
 
 **Excluded:** final model choice, global refit, full-versus-randomized comparison, OOF reporting,
 spectral preprocessing, timing, memory, figures, and performance thresholds.
@@ -329,7 +329,7 @@ Implement the benchmarks one at a time in this order:
 4. solver consistency — implemented;
 5. Pulp component-path smoke check — implemented;
 6. Sugarcane high-dimensional component-path smoke check — implemented;
-7. Tobacco randomized-SVD component-path smoke check — implemented.
+7. Tobacco full-SVD component-path smoke check — implemented.
 
 The focused synthetic sequence and three separately reviewed real-data smoke checks are
 implemented. Any further real-data benchmark must remain question-specific and receive separate

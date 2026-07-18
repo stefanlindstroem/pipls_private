@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Add the Tobacco randomized-SVD component-path example and smoke check, using adaptive predictor-rank scanning over a bounded eight-component path, CSV/PDF artifacts, and a separate fixed final fit.
+- Compare the Pulp, Sugarcane, and Tobacco Pi-PLS component paths with separate standard PLS (NIPALS) CSV paths and CSV-derived overlaid PDFs; use explicit full predictor SVD for the Tobacco path while retaining adaptive predictor-rank scanning.
 - Add a dedicated `examples` dependency extra containing pandas and Matplotlib, and document how to refresh an existing development virtual environment after dependency changes.
 - Present real-data model development as a two-stage component-path workflow: add the public
   `component_path_results_` table, explicit optimized/fixed/maximum predictor-rank policies,

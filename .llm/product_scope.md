@@ -124,11 +124,11 @@ review because they combined unrelated questions and produced an unnecessarily w
 focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
 output. The separately reviewed Pulp, Sugarcane, and Tobacco smoke checks use direct table reading and the
-public `PiPLSPathCV` workflow. Pulp and Sugarcane use the ordinary defaults; Tobacco explicitly
-demonstrates adaptive scanning with randomized predictor SVD over a bounded component range. Their
-canonical outputs are component-path CSV files with one numeric predictor rank and fold-level
-uncertainty summary per component count. Example PDFs are derived from those CSV files, and the
-examples fit a separate fixed model only after a visible user component choice. Further real-data
+public `PiPLSPathCV` workflow. Pulp and Sugarcane use the ordinary defaults; Tobacco uses adaptive
+scanning with explicit full predictor SVD. Their canonical benchmark outputs are component-path CSV
+files with one numeric predictor rank and fold-level uncertainty summary per component count. The
+examples additionally write standard PLS (NIPALS) path CSVs for orientation, derive comparison PDFs
+from both tables, and fit a separate fixed Pi-PLS model only after a visible user component choice. Further real-data
 checks remain separately reviewed. None of this includes a block-aware standardization API design;
 future block-aware variants remain deferred for months or until the project owner explicitly starts
 a separate phase.

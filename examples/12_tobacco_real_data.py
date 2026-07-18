@@ -1,8 +1,7 @@
-"""Scan the Tobacco component path with randomized SVD, then fit one model."""
+"""Compare Tobacco Pi-PLS and PLS paths, then fit one Pi-PLS model."""
 
 import subprocess
 import sys
-import os
 from pathlib import Path
 
 import pandas as pd
@@ -13,11 +12,11 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = REPOSITORY_ROOT / "datasets" / "tobacco"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 COMPONENT_PATH_CSV = RESULTS_DIR / "tobacco_component_path.csv"
+PLS_COMPONENT_PATH_CSV = RESULTS_DIR / "tobacco_pls_component_path.csv"
 COMPONENT_PATH_PDF = RESULTS_DIR / "tobacco_component_path.pdf"
 
-# This is a visible user decision made after inspecting the CSV or PDF. The
-# bounded example scans through the eight-component model used previously; users
-# can extend N_COMPONENTS_VALUES when their analysis calls for a longer path.
+# This is a visible user decision made after inspecting the CSV or PDF. Change it
+# to fit another row of the recorded Pi-PLS component path.
 CHOSEN_N_COMPONENTS = 8
 
 # Read predictors X and responses Y exactly as an ordinary programming user would.
@@ -34,18 +33,13 @@ if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in X.dtypes):
 if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
     raise TypeError("All response columns must be numeric.")
 
+max_n_components = min(Y.shape[1], X.shape[1], X.shape[0] - 1)
+
 # Stage 1: scan n_components. Predictor rank is selected conditionally with the
-# adaptive search, while the initial predictor decomposition uses randomized SVD.
-max_n_components = min(
-    Y.shape[1],      # number of responses
-    X.shape[1],      # number of predictors
-    X.shape[0] - 1,  # maximum rank after centering
-)
+# adaptive search. Full predictor SVD is explicit here because the randomized
+# implementation is already covered by the dedicated solver-consistency benchmark.
 path_search = PiPLSPathCV(
-    estimator=PiPLSRegression(
-        svd_solver="randomized",
-        random_state=0,
-    ),
+    estimator=PiPLSRegression(svd_solver="full"),
     n_components_values=range(1, max_n_components + 1),
     search_method="auto",
     refit=False,
@@ -60,17 +54,31 @@ pd.DataFrame(path_search.component_path_results_).to_csv(
 subprocess.run(
     [
         sys.executable,
+        str(Path(__file__).with_name("pls_component_path.py")),
+        str(DATA_DIR / "X.csv"),
+        str(DATA_DIR / "Y.csv"),
+        str(PLS_COMPONENT_PATH_CSV),
+        "--max-components",
+        str(max_n_components),
+    ],
+    check=True,
+)
+subprocess.run(
+    [
+        sys.executable,
         str(Path(__file__).with_name("plot_component_path.py")),
         str(COMPONENT_PATH_CSV),
         str(COMPONENT_PATH_PDF),
+        "--pls-csv",
+        str(PLS_COMPONENT_PATH_CSV),
         "--title",
-        "Tobacco Pi-PLS component path (randomized SVD)",
+        "Tobacco component-path comparison",
     ],
     check=True,
 )
 
-# Stage 2: read the canonical CSV and fit the chosen fixed parameterization with
-# the same predictor-SVD policy used during the path evaluation.
+# Stage 2: read the canonical Pi-PLS CSV and fit the chosen fixed parameterization
+# with the same full-SVD policy used during path evaluation.
 component_path = pd.read_csv(COMPONENT_PATH_CSV)
 chosen_rows = component_path.loc[component_path["n_components"] == CHOSEN_N_COMPONENTS]
 if len(chosen_rows) != 1:
@@ -79,17 +87,17 @@ chosen_predictor_rank = int(chosen_rows.iloc[0]["predictor_rank"])
 model = PiPLSRegression(
     n_components=CHOSEN_N_COMPONENTS,
     predictor_rank=chosen_predictor_rank,
-    svd_solver="randomized",
-    random_state=0,
+    svd_solver="full",
 ).fit(X, Y)
 
 print(f"X shape: {X.shape}")
 print(f"Y shape: {Y.shape}")
-print(f"component-path CSV: {COMPONENT_PATH_CSV}")
-print(f"component-path PDF: {COMPONENT_PATH_PDF}")
+print(f"Pi-PLS component-path CSV: {COMPONENT_PATH_CSV}")
+print(f"PLS component-path CSV: {PLS_COMPONENT_PATH_CSV}")
+print(f"comparison PDF: {COMPONENT_PATH_PDF}")
 print("path search method: auto")
 print(f"fixed-model predictor SVD: {model.svd_solver_}")
 print(
-    "fixed final parameters: "
+    "fixed final Pi-PLS parameters: "
     f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
 )

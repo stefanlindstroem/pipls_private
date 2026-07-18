@@ -1,4 +1,4 @@
-"""Write the Tobacco randomized-SVD component path as a focused CSV smoke check."""
+"""Write the Tobacco full-SVD component path as a focused CSV smoke check."""
 
 from __future__ import annotations
 
@@ -36,13 +36,10 @@ def read_tobacco_data() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 def fit_search(X: pd.DataFrame, Y: pd.DataFrame) -> PiPLSPathCV:
-    """Evaluate the bounded auto path with an explicit randomized predictor SVD."""
+    """Evaluate the auto path with an explicit full predictor SVD."""
 
     return PiPLSPathCV(
-        estimator=PiPLSRegression(
-            svd_solver="randomized",
-            random_state=0,
-        ),
+        estimator=PiPLSRegression(svd_solver="full"),
         n_components_values=N_COMPONENTS_VALUES,
         search_method="auto",
         refit=False,
@@ -75,7 +72,7 @@ def _result_rows(search: PiPLSPathCV) -> list[dict[str, ResultValue]]:
 
 
 def run_benchmark() -> list[dict[str, ResultValue]]:
-    """Run the Tobacco randomized-SVD component-path smoke check."""
+    """Run the Tobacco full-SVD component-path smoke check."""
 
     X, Y = read_tobacco_data()
     return _result_rows(fit_search(X, Y))

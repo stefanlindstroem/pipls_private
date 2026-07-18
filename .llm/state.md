@@ -163,12 +163,12 @@ implemented independently:
 
 Three separately reviewed real-data component-path smoke checks are implemented. Pulp covers the
 compact ordinary workflow, Sugarcane covers the ordinary defaults when $p \gg n$, and Tobacco
-covers a bounded eight-component path with `search_method="auto"` and explicit randomized
-predictor SVD. Every script writes one ordered CSV row per component count with numeric predictor
+covers adaptive predictor-rank scanning with explicit full predictor SVD. Every script writes one ordered CSV row per component count with numeric predictor
 rank, predictor-rank policy, mean response-standardized CV-MSE, fold SD, and split count. The
-benchmark scripts do not choose or refit a final model. The public examples generate PDFs by
-reading the canonical CSV files, expose a visible user component choice, and fit a separate fixed
-`PiPLSRegression` with both ranks recorded explicitly.
+benchmark scripts do not choose or refit a final model. The public examples additionally write a separate standard PLS (NIPALS) path CSV for the same
+folds and component counts, generate an overlaid PDF by reading both canonical tables, expose a
+visible user component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks
+recorded explicitly.
 
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
 ignored and are excluded from snapshots. Software versions, execution controls, timings, and

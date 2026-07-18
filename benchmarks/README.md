@@ -178,27 +178,27 @@ component-path contract used by Pulp. The benchmark verifies deterministic finit
 fold SD values, one numeric predictor rank per component count, and ordered rows. It does not select
 spectral preprocessing, choose the final model, report runtime, or generate a PDF.
 
-## Tobacco randomized-SVD component-path smoke check
+## Tobacco full-SVD component-path smoke check
 
 `tobacco_path_smoke.py` reads the transparent 347-row, 1,557-predictor Tobacco tables and evaluates
-component counts 1 through 8. It uses an explicit `PiPLSRegression(svd_solver="randomized",
-random_state=0)` template and `PiPLSPathCV(search_method="auto", refit=False)`, so the example
-demonstrates randomized predictor decomposition together with adaptive conditional predictor-rank
-scanning.
+the configured component path. It uses explicit `PiPLSRegression(svd_solver="full")` together with
+adaptive conditional predictor-rank scanning.
 
-Run it from the repository root after installing the example dependencies:
+Run it from the repository root:
 
 ```bash
 python benchmarks/tobacco_path_smoke.py
 ```
 
-It writes `benchmarks/results/tobacco_path_smoke.csv` with eight rows and the same six-column
-component-path contract as Pulp and Sugarcane. The upper component count is a bounded example
-choice, not a claim that the complete 13-component path has been exhausted. The benchmark does not
-choose a final model, generate a PDF, compare SVD solvers, report timing, or select spectral
-preprocessing.
+It writes `benchmarks/results/tobacco_path_smoke.csv` with the same six-column contract as the Pulp
+and Sugarcane paths. The numeric predictor rank is retained for every component count. The smoke
+check stops at the Pi-PLS CSV and does not create the standard-PLS comparison artifacts used by the
+public examples.
 
-## Sequence status
+The benchmark does not select or refit a final model, generate a figure, compare methods, report
+timing, or introduce spectral preprocessing. Randomized predictor SVD is already exercised by the
+focused solver-consistency benchmark.
+
 
 The four focused synthetic benchmarks and the Pulp, Sugarcane, and Tobacco real-data smoke checks
 are implemented. Any additional benchmark must receive its own package-level question, script, and

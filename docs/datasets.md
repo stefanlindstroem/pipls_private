@@ -156,6 +156,7 @@ The repository adaptation matches the public spectra and chemistry tables one-to
 orders rows by that identifier, and excludes only source metadata columns from the model matrices.
 All samples and chemical responses are retained. No imputation, smoothing, derivatives, scatter
 correction, centering, scaling, or other spectral preprocessing is applied.
-`examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly, evaluates a bounded
-component path with adaptive predictor-rank scanning and randomized predictor SVD, writes CSV and
-PDF artifacts, and then fits a separately chosen fixed model.
+`examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly, evaluates the component
+path with adaptive predictor-rank scanning and full predictor SVD, writes separate Pi-PLS and
+standard PLS (NIPALS) CSV paths plus a comparison PDF, and then fits a separately chosen fixed
+Pi-PLS model.

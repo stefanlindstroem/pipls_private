@@ -59,14 +59,13 @@ def test_tobacco_tables_are_read_directly_with_pandas(
     assert list(Y.columns) == ["value"]
 
 
-def test_path_uses_randomized_svd_and_adaptive_rank_scanning(tobacco_search: Any) -> None:
+def test_path_uses_full_svd_and_adaptive_rank_scanning(tobacco_search: Any) -> None:
     X, _ = BENCHMARK.read_tobacco_data()
     search = tobacco_search
 
     assert X.shape == (347, 1557)
     assert isinstance(search.estimator, PiPLSRegression)
-    assert search.estimator.svd_solver == "randomized"
-    assert search.estimator.random_state == 0
+    assert search.estimator.svd_solver == "full"
     assert search.search_method == "auto"
     assert search.path_search_method_ == "auto"
     assert search.predictor_rank_policy_ == "optimized"

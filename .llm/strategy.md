@@ -387,11 +387,11 @@ Current status: **complete for the current reference suite**. The Pulp, Sugarcan
 component-path smoke checks read `X.csv` and `Y.csv` directly and write one row per component count
 with numeric predictor rank, rank policy, mean response-standardized CV-MSE, fold SD, and split
 count. Pulp covers the compact ordinary workflow. Sugarcane covers the ordinary defaults when
-$p \gg n$. Tobacco covers a bounded eight-component path with adaptive rank scanning and explicit
-randomized predictor SVD. The corresponding examples derive PDFs from the canonical CSV files,
-expose a visible user choice of `n_components`, and fit a separate fixed model. The checks do not
-add method comparisons, formal confidence intervals, spectral preprocessing, timing tables, or a
-general real-data runner.
+$p \gg n$. Tobacco covers adaptive rank scanning with explicit full predictor SVD. The
+corresponding examples write separate standard PLS (NIPALS) comparison CSVs, derive overlaid PDFs
+from the canonical tables, expose a visible user choice of `n_components`, and fit a separate fixed
+Pi-PLS model. The real-data smoke checks themselves do not add method comparisons, formal
+confidence intervals, spectral preprocessing, timing tables, or a general real-data runner.
 
 ### Product documentation and release hardening
 

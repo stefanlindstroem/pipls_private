@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented.
+Superseded by Decision 0036.
 
 ## Context
 

@@ -1,4 +1,4 @@
-"""Scan the Sugarcane component path, then fit one chosen Pi-PLS model."""
+"""Compare Sugarcane Pi-PLS and PLS paths, then fit one Pi-PLS model."""
 
 import subprocess
 import sys
@@ -12,10 +12,11 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = REPOSITORY_ROOT / "datasets" / "sugarcane"
 RESULTS_DIR = Path(__file__).resolve().parent / "results"
 COMPONENT_PATH_CSV = RESULTS_DIR / "sugarcane_component_path.csv"
+PLS_COMPONENT_PATH_CSV = RESULTS_DIR / "sugarcane_pls_component_path.csv"
 COMPONENT_PATH_PDF = RESULTS_DIR / "sugarcane_component_path.pdf"
 
-# This example uses three components as an explicit parsimonious choice after
-# inspecting the path. Change the constant to fit another recorded row.
+# This is a visible parsimonious choice made after inspecting the path. Change
+# the constant to fit another row of the recorded Pi-PLS component path.
 CHOSEN_N_COMPONENTS = 2
 
 # Read predictors X and responses Y exactly as an ordinary programming user would.
@@ -32,12 +33,10 @@ if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in X.dtypes):
 if not all(pd.api.types.is_numeric_dtype(dtype) for dtype in Y.dtypes):
     raise TypeError("All response columns must be numeric.")
 
-# Stage 1: scan n_components. Predictor rank is selected conditionally for each row.
-max_n_components = min(
-    Y.shape[1],      # number of responses
-    X.shape[1],      # number of predictors
-    X.shape[0] - 1,  # maximum rank after centering
-)
+max_n_components = min(Y.shape[1], X.shape[1], X.shape[0] - 1)
+
+# Stage 1: scan n_components. Pi-PLS selects predictor rank conditionally for
+# each row, while standard PLS uses the same five folds and component counts.
 path_search = PiPLSPathCV(
     n_components_values=range(1, max_n_components + 1),
     refit=False,
@@ -51,16 +50,30 @@ pd.DataFrame(path_search.component_path_results_).to_csv(
 subprocess.run(
     [
         sys.executable,
+        str(Path(__file__).with_name("pls_component_path.py")),
+        str(DATA_DIR / "X.csv"),
+        str(DATA_DIR / "Y.csv"),
+        str(PLS_COMPONENT_PATH_CSV),
+        "--max-components",
+        str(max_n_components),
+    ],
+    check=True,
+)
+subprocess.run(
+    [
+        sys.executable,
         str(Path(__file__).with_name("plot_component_path.py")),
         str(COMPONENT_PATH_CSV),
         str(COMPONENT_PATH_PDF),
+        "--pls-csv",
+        str(PLS_COMPONENT_PATH_CSV),
         "--title",
-        "Sugarcane Pi-PLS component path",
+        "Sugarcane component-path comparison",
     ],
     check=True,
 )
 
-# Stage 2: read the canonical CSV and fit the chosen fixed parameterization.
+# Stage 2: read the canonical Pi-PLS CSV and fit the chosen fixed parameterization.
 component_path = pd.read_csv(COMPONENT_PATH_CSV)
 chosen_rows = component_path.loc[component_path["n_components"] == CHOSEN_N_COMPONENTS]
 if len(chosen_rows) != 1:
@@ -73,9 +86,10 @@ model = PiPLSRegression(
 
 print(f"X shape: {X.shape}")
 print(f"Y shape: {Y.shape}")
-print(f"component-path CSV: {COMPONENT_PATH_CSV}")
-print(f"component-path PDF: {COMPONENT_PATH_PDF}")
+print(f"Pi-PLS component-path CSV: {COMPONENT_PATH_CSV}")
+print(f"PLS component-path CSV: {PLS_COMPONENT_PATH_CSV}")
+print(f"comparison PDF: {COMPONENT_PATH_PDF}")
 print(
-    "fixed final parameters: "
+    "fixed final Pi-PLS parameters: "
     f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
 )

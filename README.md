@@ -138,10 +138,12 @@ search = PiPLSPathCV(
 path = pd.DataFrame(search.component_path_results_)
 ```
 
-The Pulp, Sugarcane, and Tobacco examples write canonical component-path CSV files, generate PDFs
-by reading those CSV files, and then fit a separate fixed model using a visible component-count
-choice. Tobacco explicitly demonstrates adaptive scanning with randomized predictor SVD. Install
-the `examples` extra to run them. See [`examples/README.md`](examples/README.md) and
+The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
+(NIPALS) component-path CSV files, generate one comparison PDF by reading those tables, and then
+fit a separate fixed Pi-PLS model using a visible component-count choice. The Pi-PLS CSV always
+records the selected predictor rank. Tobacco uses adaptive scanning with explicit full predictor
+SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
+`examples` extra to run them. See [`examples/README.md`](examples/README.md) and
 [`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks
@@ -149,8 +151,8 @@ the `examples` extra to run them. See [`examples/README.md`](examples/README.md)
 The repository contains four focused synthetic benchmarks and three separately reviewed real-data
 smoke checks. The Pulp, Sugarcane, and Tobacco checks read `X.csv` and `Y.csv` directly with pandas
 and write one component-path CSV row per `n_components`, including the numeric predictor rank, rank
-policy, mean response-standardized CV-MSE, fold SD, and split count. Tobacco explicitly uses
-randomized predictor SVD with adaptive rank scanning. Run the scripts under `benchmarks/`
+policy, mean response-standardized CV-MSE, fold SD, and split count. Tobacco uses full predictor
+SVD with adaptive rank scanning. Run the scripts under `benchmarks/`
 directly. The fold SD is descriptive variation across overlapping CV folds, not a confidence
 interval. Benchmark scripts do not choose the final component count or generate figures.
 

@@ -24,10 +24,11 @@ describes the installable package, API, examples, datasets, validation, and rele
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts and three
 separately reviewed real-data component-path smoke checks. Pulp exercises the compact ordinary
-workflow; Sugarcane exercises the same public defaults when $p \gg n$; Tobacco demonstrates a
-bounded adaptive path with explicit randomized predictor SVD. Their CSV files contain one row per
-component count with explicit predictor rank, rank policy, mean CV-MSE, fold SD, and split count.
-The public examples derive PDFs from those CSV files and then fit a separately chosen fixed model.
+workflow; Sugarcane exercises the same public defaults when $p \gg n$; Tobacco demonstrates
+adaptive rank scanning with explicit full predictor SVD. The smoke-check CSV files contain one row
+per component count with explicit predictor rank, rank policy, mean CV-MSE, fold SD, and split
+count. The public examples also write separate standard PLS (NIPALS) CSVs, derive comparison PDFs
+from both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
 No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
@@ -66,8 +67,9 @@ No block-aware scaling API is designed or scheduled.
 - `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`, and
   `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
-  utilities or publication pipelines.
-  Their pandas and Matplotlib requirements are grouped in the `examples` optional dependency extra.
+  utilities or publication pipelines. Real-data examples keep separate Pi-PLS and standard PLS
+  (NIPALS) CSV paths and derive comparison PDFs from those tables. Their pandas and Matplotlib
+  requirements are grouped in the `examples` optional dependency extra.
 - `benchmarks/`: focused lightweight package-validation plans and, incrementally, one readable
   repository-local script per benchmark. Generated CSV outputs are ignored; synthetic validation is
   primary.

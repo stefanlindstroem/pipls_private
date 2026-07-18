@@ -40,7 +40,8 @@ This index is navigation, not a substitute for those records.
 | `0032-full-sample-rank-support.md` | rank-support sample-count convention | full supplied $n$ defines support; centered training folds impose feasibility caps |
 | `0033-remove-linnerud-integration.md` | reference dataset scope | remove the Linnerud dataset, example, test, and active navigation |
 | `0034-two-stage-component-path-workflow.md` | component-path presentation | one CSV row per component count, explicit predictor-rank policy, CSV-derived PDF, and separate fixed final fit |
-| `0035-tobacco-randomized-auto-path.md` | Tobacco solver and path demonstration | bounded component path with adaptive rank scanning and explicit randomized predictor SVD |
+| `0035-tobacco-randomized-auto-path.md` | former Tobacco solver demonstration | superseded by Decision 0036; randomized SVD remains covered by solver consistency |
+| `0036-real-data-pls-path-comparison.md` | real-data example comparison | separate Pi-PLS and PLS CSV paths, overlaid PDF, and full-SVD Tobacco workflow |
 
 ## Accepted clarifications after earlier proposals
 
@@ -89,8 +90,9 @@ plan contains an earlier or more general proposal:
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
 - real-data component paths are presented as CSV tables with fold SD, plots are derived from those
   tables, and examples fit a separate fixed model after an explicit user component choice;
-- Tobacco is the explicit real-data demonstration of randomized predictor SVD together with the
-  adaptive `search_method="auto"` path, bounded to component counts 1 through 8;
+- real-data examples compare separate Pi-PLS and standard PLS component-path CSVs in one PDF;
+  Tobacco uses adaptive rank scanning with explicit full predictor SVD, while randomized SVD is
+  covered by the solver-consistency benchmark;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

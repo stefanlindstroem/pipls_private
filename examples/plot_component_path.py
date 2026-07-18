@@ -1,13 +1,14 @@
-"""Plot a Pi-PLS component-path PDF from its canonical CSV table."""
+"""Plot Pi-PLS and optional standard-PLS component paths from canonical CSVs."""
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
-REQUIRED_COLUMNS = (
+PIPLS_REQUIRED_COLUMNS = (
     "n_components",
     "predictor_rank",
     "predictor_rank_policy",
@@ -15,13 +16,18 @@ REQUIRED_COLUMNS = (
     "response_standardized_cv_mse_fold_sd",
     "n_splits",
 )
+PLS_REQUIRED_COLUMNS = (
+    "n_components",
+    "algorithm",
+    "response_standardized_cv_mse_mean",
+    "response_standardized_cv_mse_fold_sd",
+    "n_splits",
+)
 
 
-def read_component_path(csv_path: Path) -> pd.DataFrame:
-    """Read and validate a component-path CSV before plotting."""
-
+def _read_ordered_path(csv_path: Path, required_columns: tuple[str, ...]) -> pd.DataFrame:
     path = pd.read_csv(csv_path)
-    missing = [column for column in REQUIRED_COLUMNS if column not in path.columns]
+    missing = [column for column in required_columns if column not in path.columns]
     if missing:
         raise ValueError(f"Component-path CSV is missing columns: {missing!r}.")
     if path.empty:
@@ -35,8 +41,30 @@ def read_component_path(csv_path: Path) -> pd.DataFrame:
     return path
 
 
-def plot_component_path(csv_path: Path, pdf_path: Path, *, title: str) -> None:
-    """Read ``csv_path`` and write a compact component-path PDF."""
+def read_component_path(csv_path: Path) -> pd.DataFrame:
+    """Read and validate a Pi-PLS component-path CSV before plotting."""
+
+    return _read_ordered_path(csv_path, PIPLS_REQUIRED_COLUMNS)
+
+
+def read_pls_component_path(csv_path: Path) -> pd.DataFrame:
+    """Read and validate a standard-PLS component-path CSV before plotting."""
+
+    path = _read_ordered_path(csv_path, PLS_REQUIRED_COLUMNS)
+    algorithms = path["algorithm"].drop_duplicates().tolist()
+    if len(algorithms) != 1 or not str(algorithms[0]).strip():
+        raise ValueError("PLS component-path CSV must contain one nonempty algorithm value.")
+    return path
+
+
+def plot_component_path(
+    csv_path: Path,
+    pdf_path: Path,
+    *,
+    title: str,
+    pls_csv_path: Path | None = None,
+) -> None:
+    """Read canonical path CSVs and write a compact comparison PDF."""
 
     import matplotlib
 
@@ -50,7 +78,34 @@ def plot_component_path(csv_path: Path, pdf_path: Path, *, title: str) -> None:
     ranks = path["predictor_rank"].to_numpy()
 
     figure, axes = plt.subplots(figsize=(8, 5))
-    axes.errorbar(x, y, yerr=yerr, fmt="o-", capsize=4)
+    axes.errorbar(
+        x,
+        y,
+        yerr=yerr,
+        fmt="o-",
+        capsize=4,
+        label=r"$\Pi$-PLS",
+    )
+    upper_values = [float(np.max(y + yerr))]
+
+    if pls_csv_path is not None:
+        pls_path = read_pls_component_path(pls_csv_path)
+        pls_x = pls_path["n_components"].to_numpy()
+        if not np.array_equal(pls_x, x):
+            raise ValueError("Pi-PLS and PLS paths must contain the same component counts.")
+        pls_y = pls_path["response_standardized_cv_mse_mean"].to_numpy()
+        pls_yerr = pls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
+        algorithm = str(pls_path["algorithm"].iloc[0])
+        axes.errorbar(
+            pls_x,
+            pls_y,
+            yerr=pls_yerr,
+            fmt="s--",
+            capsize=4,
+            label=f"PLS ({algorithm})",
+        )
+        upper_values.append(float(np.max(pls_y + pls_yerr)))
+
     axes.set_title(title)
     axes.set_xlabel("Number of response components")
     axes.set_ylabel("Response-standardized CV-MSE")
@@ -65,8 +120,8 @@ def plot_component_path(csv_path: Path, pdf_path: Path, *, title: str) -> None:
             textcoords="offset points",
             ha="center",
         )
-    upper = axes.get_ylim()[1]
-    axes.set_ylim(0, max(1, upper))
+    axes.set_ylim(0, max(1.0, 1.05 * max(upper_values)))
+    axes.legend()
     figure.tight_layout(rect=(0.0, 0.05, 1.0, 1.0))
     pdf_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(pdf_path, format="pdf")
@@ -77,15 +132,21 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("csv_path", type=Path)
     parser.add_argument("pdf_path", type=Path)
-    parser.add_argument("--title", default="Pi-PLS component path")
+    parser.add_argument("--title", default="Component-path comparison")
+    parser.add_argument("--pls-csv", type=Path)
     return parser.parse_args()
 
 
 def main() -> None:
-    """Plot one component-path CSV from the command line."""
+    """Plot one Pi-PLS path and an optional standard-PLS comparison."""
 
     args = _parse_args()
-    plot_component_path(args.csv_path, args.pdf_path, title=args.title)
+    plot_component_path(
+        args.csv_path,
+        args.pdf_path,
+        title=args.title,
+        pls_csv_path=args.pls_csv,
+    )
 
 
 if __name__ == "__main__":
