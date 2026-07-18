@@ -24,37 +24,6 @@ CHOSEN_N_COMPONENTS = 3
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
 
-expected_predictors = [
-    "Shives",
-    "Fines B",
-    "L (arith)",
-    "L (lw)",
-    "L (llw)",
-    "W (arith)",
-    "W (lw)",
-    "W (llw)",
-    "C (arith)",
-    "C (lw)",
-    "C (llw)",
-    "F (arith)",
-    "F (lw)",
-    "F (llw)",
-]
-expected_responses = [
-    "CSF",
-    "Density",
-    "TI",
-    "Elongation",
-    "TEA",
-    "TSI",
-    "Tear index",
-    "s",
-]
-
-if list(X.columns) != expected_predictors:
-    raise ValueError(f"Unexpected predictor columns: {list(X.columns)!r}.")
-if list(Y.columns) != expected_responses:
-    raise ValueError(f"Unexpected response columns: {list(Y.columns)!r}.")
 if len(X) != len(Y):
     raise ValueError(f"Predictor and response row counts differ: {len(X)} != {len(Y)}.")
 if X.isna().to_numpy().any() or Y.isna().to_numpy().any():
