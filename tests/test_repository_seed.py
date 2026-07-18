@@ -36,7 +36,10 @@ def _repository_root() -> Path:
 def _assert_markdown_format(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     assert text.startswith("# "), f"{path} must start with a level-one heading"
-    assert "\x00" not in text, f"{path} contains a NUL byte"
+    controls = sorted(
+        {ord(character) for character in text if ord(character) < 32 and character not in "\n\r"}
+    )
+    assert not controls, f"{path} contains ASCII control characters: {controls}"
 
 
 def test_package_imports() -> None:
@@ -94,6 +97,19 @@ def test_required_llm_contracts_exist_and_are_formatted() -> None:
             _assert_markdown_format(path)
 
 
+def test_public_markdown_has_no_ascii_control_characters() -> None:
+    root = _repository_root()
+    markdown_paths = sorted(
+        path
+        for directory in (root / "docs", root / "examples", root / "benchmarks", root / "datasets")
+        for path in directory.rglob("*.md")
+    )
+    markdown_paths.extend([root / "README.md", root / "CONTRIBUTING.md", root / "CHANGELOG.md"])
+
+    for markdown_path in markdown_paths:
+        _assert_markdown_format(markdown_path)
+
+
 def test_llm_layer_is_outside_installable_package() -> None:
     package_root = Path(pipls.__file__).resolve().parent
     assert ".llm" not in {part.name for part in package_root.parents}
@@ -117,6 +133,7 @@ def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> Non
     assert "README.md" in names
     assert ".llm/SNAPSHOT_INFO" in names
     assert not any(name.startswith(f"{root.name}/") for name in names)
+    assert not any(name.startswith("examples/results/") for name in names)
 
 
 def test_llm_workflow_scripts_are_executable() -> None:

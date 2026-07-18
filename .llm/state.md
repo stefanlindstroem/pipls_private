@@ -124,6 +124,23 @@ Additional fixed decisions:
 - Repository tests follow `.llm/testing.md`: living handoff, roadmap, and dataset metadata contents
   are reviewed but are not mirrored as fixed phrase or field-value assertions.
 
+## Accepted staged estimator/search correction
+
+Decision 0039 records an accepted target architecture that is not yet implemented in this
+snapshot. The staged correction will:
+
+- simplify `PiPLSRegression` to one fixed `(n_components, predictor_rank)` model with no internal
+  cross-validation or parameter selection;
+- retain `PiPLSPathCV` as the standard triangular model-selection workflow;
+- keep `samples_per_predictor_rank=5` as the default path-support ceiling;
+- warn on direct fixed fits when $n/r_\pi<4$, while suppressing only that expected warning during
+  controlled path candidate fits;
+- retain explicit fixed-estimator interoperability with scikit-learn meta-estimators without
+  presenting `GridSearchCV` as the recommended Pi-PLS workflow.
+
+Until the implementation patches land, the current public defaults and fitted attributes in the
+preceding table remain the source of truth for executable behavior.
+
 ## Current standardization boundary and deferred block-aware direction
 
 `PiPLSRegression` currently owns leakage-safe model standardization. Every fit centers `X` and `Y`;
@@ -176,22 +193,24 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Proceed to **user documentation and release hardening**. Review the buildable guide, API reference,
-compatibility policy, packaging checks, and versioned release workflow as separate small patches.
-Do not add another dataset or benchmark without a new package-level question.
+Implement Decision 0039 in the next independently reviewable patch by making
+`PiPLSRegression` a fixed-model estimator. Do not yet change `PiPLSPathCV`, remove shared search
+machinery, or rewrite the examples; those are later patches in the accepted sequence.
 
-Corn remains deferred until its unresolved preprocessing choices are fixed. When Corn is added,
-expose its public raw-data reading and analysis-relevant preprocessing directly.
+After the estimator/search correction and final audit, resume user documentation and release
+hardening. Do not add another dataset or benchmark without a new package-level question.
 
 ## Subsequent roadmap
 
-1. **Focused synthetic benchmarks:** complete.
-2. **Representative real-data examples:** Pulp, Sugarcane, and Tobacco component paths are
-   implemented as explicit user-run CSV/PDF workflows.
-3. **User documentation and release hardening:** buildable user guide, API reference, compatibility
+1. **Fixed-estimator/path-search correction:** implement Decision 0039 through fixed estimator, sole
+   path selection, private-code consolidation, example alignment, and final audit patches.
+2. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
-4. **Future product development:** additional estimators, validation tools, datasets, and—only after
+3. **Future product development:** additional estimators, validation tools, datasets, and—only after
    a separate owner decision—block-aware variants of the existing model-internal standardization.
+
+The focused synthetic benchmarks and representative Pulp, Sugarcane, and Tobacco examples are
+complete. They remain validation and documentation assets during the architectural correction.
 
 The repository-product cleanup is complete. Paper-reproduction repositories remain outside this
 roadmap and may independently depend on specific tagged `pipls` releases.

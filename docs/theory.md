@@ -3,15 +3,15 @@
 Pi-PLS models multivariate linear regression through two rank controls and a diagonally coupled
 latent representation.
 
-For centered or centered-and-scaled predictors $\mathbf{X}\in\mathbb{R}^{n	imes p}$ and
-responses $\mathbf{Y}\in\mathbb{R}^{n	imes q}$, the method:
+For centered or centered-and-scaled predictors $\mathbf{X}\in\mathbb{R}^{n\times p}$ and
+responses $\mathbf{Y}\in\mathbb{R}^{n\times q}$, the method:
 
 1. retains a rank-$r_\pi$ predictor subspace from the leading right singular vectors of
    $\mathbf{X}$;
 2. selects an $h$-dimensional response subspace from the leading right singular vectors of
    $\mathbf{Z}^{\mathsf T}\mathbf{Y}$, where $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$;
 3. solves the reduced least-squares problem
-   $\mathbf{Z}\mathbf{W}pprox\mathbf{Y}\mathbf{C}$;
+   $\mathbf{Z}\mathbf{W}\approx\mathbf{Y}\mathbf{C}$;
 4. diagonalizes $\mathbf{W}$ to obtain orthonormal predictor and response modes linked one to one
    by nonnegative dilation values.
 

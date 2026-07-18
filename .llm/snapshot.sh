@@ -35,7 +35,8 @@ rsync -a \
   --exclude='coverage.xml' --exclude='htmlcov/' --exclude='build/' --exclude='dist/' \
   --exclude='*.egg-info/' --exclude='docs/_build/' --exclude='.ipynb_checkpoints/' \
   --exclude='.DS_Store' --exclude='._*' --exclude='*~' --exclude='*.patch' \
-  --exclude='*-snapshot.tar.gz' --exclude='benchmarks/results/' "$root/" "$staging/"
+  --exclude='*-snapshot.tar.gz' --exclude='benchmarks/results/' \
+  --exclude='examples/results/' "$root/" "$staging/"
 cp "$metadata" "$staging/.llm/SNAPSHOT_INFO"
 
 # Archive the contents of the repository root, not an enclosing project directory.

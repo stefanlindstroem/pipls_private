@@ -4,7 +4,7 @@ This file is a compact index for LLM-assisted work. The records under `docs/deci
 accepted rationale and consequences. Read the full record whenever a change touches its subject.
 This index is navigation, not a substitute for those records.
 
-| Record | Subject | Implemented consequence |
+| Record | Subject | Consequence |
 |---|---|---|
 | `0001-core-definition.md` | fixed Pi-PLS construction | SVD/least-squares core with explicit `(h, r_pi)` admissibility |
 | `0002-preprocessing-semantics.md` | centering and scaling | preprocessing remains outside the fixed numerical core |
@@ -44,6 +44,15 @@ This index is navigation, not a substitute for those records.
 | `0036-real-data-pls-path-comparison.md` | real-data example comparison | separate Pi-PLS and PLS CSV paths, overlaid PDF, and full-SVD Tobacco workflow |
 | `0037-user-run-real-data-analyses.md` | real-data execution boundary | examples remain user-run; duplicate smoke benchmarks and full example tests are removed |
 | `0038-single-examples-target.md` | explicit application validation | `make examples` runs every numbered example; `make check` remains fast internal validation |
+| `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | accepted staged split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
+
+## Accepted staged transition
+
+Decision 0039 defines the next architectural correction. The target state is a fixed-pair
+`PiPLSRegression`, a sole triangular-selection interface in `PiPLSPathCV`, a default path-support
+ceiling with $c=5$, and a direct fixed-fit support warning at $n/r_\pi<4$. The current runtime
+constructor and fitted-attribute documentation remains authoritative until the staged code patches
+implement that decision.
 
 ## Accepted clarifications after earlier proposals
 

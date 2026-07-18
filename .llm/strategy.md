@@ -389,6 +389,22 @@ Default package validation now protects the reusable machinery on small data and
 repository/file contracts. `make examples` runs every numbered example explicitly when application
 artifacts or end-to-end example validation are needed.
 
+### Phase F1: fixed-estimator and path-search correction
+
+Decision 0039 establishes a staged API correction before release hardening. The target boundary is:
+
+- `PiPLSRegression` fits one explicit fixed pair and owns no cross-validation or search results;
+- `PiPLSPathCV` owns the bounded triangular scan and conditional predictor-rank selection;
+- the path ceiling uses `samples_per_predictor_rank=5`;
+- direct fixed fits warn when $n/r_\pi<4$;
+- expected support warnings are suppressed only inside controlled path candidate fits;
+- examples continue to recommend `PiPLSPathCV`, not a hand-built `GridSearchCV` surface.
+
+Implementation order is fixed-model estimator, sole path selection, dead-code consolidation,
+example and guide alignment, then final API/minimality audit.
+
+Current status: **accepted; implementation pending**.
+
 ### Product documentation and release hardening
 
 Build a user-oriented documentation surface, API reference, compatibility policy, clean-install and
@@ -417,13 +433,11 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Proceed to user documentation and release hardening through small, separately reviewed patches.
-Priorities are a buildable guide and API reference, compatibility policy, packaging checks, and
-versioned release automation. Do not add another dataset or benchmark without a new package-level
-question.
+Implement the first code step of Phase F1: simplify `PiPLSRegression` to fixed-model fitting while
+preserving its mathematical, preprocessing, and scikit-learn estimator contracts. Leave
+`PiPLSPathCV` behavior unchanged in that patch.
 
-Corn remains deferred until its preprocessing choices are resolved; its eventual raw-data reading
-and preprocessing must be public and explicit.
+Resume documentation and release hardening only after the full Phase F1 sequence and final audit.
 
 ## Maintenance protocol
 

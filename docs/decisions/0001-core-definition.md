@@ -1,3 +1,3 @@
 # Decision: 0001-core-definition
 
-Status: specified in the publication repository plan; implementation pending.
+Status: accepted and implemented in the fixed numerical core.

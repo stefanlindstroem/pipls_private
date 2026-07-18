@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Record the staged fixed-estimator/path-search boundary, exclude generated example artifacts from snapshots, repair malformed documentation LaTeX, and correct stale core/preprocessing decision statuses.
 - Add a single `make examples` application-validation target that runs every numbered example in
   order, including the complete Tobacco analysis, while keeping `make check` focused on fast
   internal contracts.

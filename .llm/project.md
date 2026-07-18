@@ -29,6 +29,14 @@ They write separate Pi-PLS and standard PLS (NIPALS) CSVs, derive comparison PDF
 tables, and then fit a separately chosen fixed Pi-PLS model.
 No block-aware scaling API is designed or scheduled.
 
+## Accepted transition
+
+Decision 0039 defines the next staged architectural correction. The current runtime still includes
+conditional predictor-rank search in `PiPLSRegression`; the target state moves all selection to
+`PiPLSPathCV` and leaves `PiPLSRegression` responsible only for one fixed rank pair. The next patch
+changes only the fixed estimator; later patches consolidate path selection, private machinery, and
+examples.
+
 ## Runtime ownership
 
 - `src/pipls/_core.py`: fixed-`(n_components, predictor_rank)` numerical core.

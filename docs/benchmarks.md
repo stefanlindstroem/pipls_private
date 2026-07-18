@@ -52,7 +52,7 @@ original generated response units.
 For a true basis $A$ and estimated basis $B$, let $Q_A$ and $Q_B$ be orthonormal bases for their
 column spaces. Every capture metric is
 
-egin{equation}
+\begin{equation}
 \mathrm{capture}(A, B) = \frac{\lVert Q_A^{\mathsf{T}} Q_B \rVert_{\mathrm{F}}^2}{\dim[\mathrm{col}(A)]}.
 \end{equation}
 
