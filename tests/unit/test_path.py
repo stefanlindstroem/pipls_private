@@ -9,6 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from pipls import PiPLSPathCV, PiPLSRegression, StatisticalSupportWarning
+from pipls.metrics import neg_response_standardized_mean_squared_error
 
 
 class _WarningTransformer(TransformerMixin, BaseEstimator):  # type: ignore[misc]
@@ -52,6 +53,48 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     assert np.isnan(search.response_standardized_mse_path_[2, 1])
 
 
+def test_all_component_sentinel_matches_explicit_complete_range() -> None:
+    X, Y = _data()
+    all_search = PiPLSPathCV(
+        n_components_values="all",
+        predictor_rank_values=[1, 2, 3],
+        max_predictor_rank=3,
+        search_method="optimal",
+        cv=3,
+        refit=False,
+    ).fit(X, Y)
+    explicit_search = PiPLSPathCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3],
+        max_predictor_rank=3,
+        search_method="optimal",
+        cv=3,
+        refit=False,
+    ).fit(X, Y)
+
+    np.testing.assert_array_equal(all_search.n_components_values_, np.array([1, 2, 3]))
+    np.testing.assert_allclose(
+        all_search.cv_results_["mean_test_score"],
+        explicit_search.cv_results_["mean_test_score"],
+    )
+
+
+def test_default_scorer_is_the_public_callable() -> None:
+    X, Y = _data()
+    search = PiPLSPathCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        cv=3,
+        refit=False,
+    ).fit(X, Y)
+
+    assert search.scorer_ is neg_response_standardized_mean_squared_error
+    np.testing.assert_allclose(
+        search.cv_results_["mean_test_score"],
+        -search.cv_results_["mean_response_standardized_mse"],
+    )
+
+
 def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
     X, Y = _data()
     search = PiPLSPathCV(
@@ -68,18 +111,38 @@ def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
     assert search.score(X, Y) == pytest.approx(search.best_estimator_.score(X, Y))
 
 
-def test_refit_false_disables_prediction() -> None:
+def test_refit_false_hides_refit_dependent_methods() -> None:
     X, Y = _data()
     search = PiPLSPathCV(
         n_components_values=[1],
         predictor_rank_values=[1, 2],
         refit=False,
         cv=3,
-    ).fit(X, Y)
+    )
 
+    for method_name in (
+        "predict",
+        "transform",
+        "fit_transform",
+        "inverse_transform",
+        "score",
+        "get_feature_names_out",
+        "set_output",
+    ):
+        assert not hasattr(search, method_name)
+
+    search.fit(X, Y)
     assert not hasattr(search, "best_estimator_")
-    with pytest.raises(AttributeError, match="refit=False"):
-        search.predict(X)
+    for method_name in (
+        "predict",
+        "transform",
+        "fit_transform",
+        "inverse_transform",
+        "score",
+        "get_feature_names_out",
+        "set_output",
+    ):
+        assert not hasattr(search, method_name)
 
 
 def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
@@ -287,6 +350,9 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         ("search_method", "exhaustive", "search_method"),
         ("max_predictor_rank", 0, "max_predictor_rank"),
         ("n_components_values", [], "must not be empty"),
+        ("n_components_values", None, 'must be "all"'),
+        ("n_components_values", "everything", 'must be "all"'),
+        ("scoring", "neg_response_standardized_mean_squared_error", "Unknown scoring"),
         ("predictor_rank_values", [1.0], "positive integer"),
         ("predictor_rank_values", "maximum", "must be None"),
         ("n_jobs", 0, "must not be zero"),

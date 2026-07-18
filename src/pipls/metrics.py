@@ -11,6 +11,12 @@ from sklearn.utils.validation import check_is_fitted
 FloatArray = NDArray[np.float64]
 
 
+__all__ = [
+    "neg_response_standardized_mean_squared_error",
+    "response_standardized_mean_squared_error",
+]
+
+
 def response_standardized_mean_squared_error(
     estimator: Any,
     X: ArrayLike,

@@ -35,14 +35,14 @@ predictor_rank <= 0.2 * min(n_samples, n_features)
 Otherwise it uses the full thin SVD. Explicit `"full"` and `"randomized"` choices override the
 automatic rule.
 
-Randomized SVD requires a nonnegative integer `random_state`; the default value `0` makes the
-default estimator reproducible. Candidate models in internal CV receive the same solver policy and
-seed. The estimator records the final solver in `svd_solver_` and fold-level candidate solvers in
-`predictor_rank_cv_svd_solvers_`.
+`random_state` accepts an integer seed, a NumPy `RandomState`, or `None`, as refined by Decision
+0040. The default value `0` makes the default estimator reproducible. Candidate models in path CV
+receive the same solver policy and cloned random-state parameter.
 
-With full SVD, `x_rank_` is the complete numerical rank under the package tolerance. With
-randomized truncated SVD, `x_rank_` is only the verified number of retained singular values above
-the tolerance, and `x_rank_is_exact_` is false.
+The resolved solver and numerical-rank diagnostics are canonical fields of `decomposition_`:
+`predictor_svd_solver`, `x_rank`, `x_rank_is_exact`, and `rank_tolerance`. Under full SVD, `x_rank`
+is the complete numerical rank. Under randomized truncated SVD, it is only the verified number of
+retained singular values above the tolerance and `x_rank_is_exact` is false.
 
 ## Consequences
 

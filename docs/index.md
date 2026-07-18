@@ -8,7 +8,8 @@ user guide.
 
 - [`../README.md`](../README.md): installation, first model, datasets, and repository map;
 - [`estimator_api.md`](estimator_api.md): `PiPLSRegression` interface and fitted attributes;
-- [`parameter_selection.md`](parameter_selection.md): predictor-rank modes and selection policy;
+- [`parameter_selection.md`](parameter_selection.md): component and predictor-rank controls,
+  scoring, and selection policy;
 - [`path_analysis.md`](path_analysis.md): joint `n_components` and `predictor_rank` search;
 - [`cross_validation.md`](cross_validation.md): splitters, groups, repeated CV, OOF predictions, and
   validation reports.

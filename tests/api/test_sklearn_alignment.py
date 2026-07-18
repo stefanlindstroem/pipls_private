@@ -15,6 +15,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
 
 from pipls import PiPLSDecomposition, PiPLSPathCV, PiPLSRegression
+from pipls.metrics import neg_response_standardized_mean_squared_error
 
 
 def _data() -> tuple[np.ndarray, np.ndarray]:
@@ -34,8 +35,6 @@ def _fixed_estimator() -> PiPLSRegression:
     )
 
 
-
-
 def test_fixed_regression_and_path_defaults_have_distinct_ownership() -> None:
     regression = PiPLSRegression()
     path = PiPLSPathCV()
@@ -46,6 +45,8 @@ def test_fixed_regression_and_path_defaults_have_distinct_ownership() -> None:
     assert not hasattr(regression, "samples_per_predictor_rank")
     assert path.samples_per_predictor_rank == 5.0
     assert path.cv == 5
+    assert path.n_components_values == "all"
+    assert path.scoring is neg_response_standardized_mean_squared_error
 
 
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
@@ -73,6 +74,13 @@ def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
         "scoring",
         "search_method",
     }
+
+
+def test_path_output_configuration_belongs_to_estimator_template() -> None:
+    path = PiPLSPathCV()
+
+    assert not hasattr(path, "set_output")
+    assert hasattr(PiPLSRegression(), "set_output")
 
 
 def test_fixed_estimator_interoperates_with_grid_search_for_explicit_pairs() -> None:
@@ -142,25 +150,44 @@ def test_standard_pls_style_attributes_have_documented_meaning() -> None:
     np.testing.assert_allclose(model.y_scores_.T @ y_residual, 0.0, atol=1e-10)
 
 
-def test_public_decomposition_is_read_only_and_matches_legacy_attributes() -> None:
+def test_public_decomposition_is_read_only_and_replaces_symbolic_aliases() -> None:
     X, Y = _data()
     model = _fixed_estimator().fit(X, Y)
     decomposition = model.decomposition_
 
     assert isinstance(decomposition, PiPLSDecomposition)
-    for public, legacy in (
-        (decomposition.Pi, model.Pi_),
-        (decomposition.C, model.C_),
-        (decomposition.W, model.W_),
-        (decomposition.P, model.P_),
-        (decomposition.D, model.D_),
-        (decomposition.Q, model.Q_),
+    for matrix in (
+        decomposition.Pi,
+        decomposition.C,
+        decomposition.W,
+        decomposition.P,
+        decomposition.D,
+        decomposition.Q,
+        decomposition.dilation,
     ):
-        np.testing.assert_allclose(public, legacy)
-        assert not public.flags.writeable
-    np.testing.assert_allclose(decomposition.regression_map, model.P_ @ model.D_ @ model.Q_.T)
-    assert decomposition.predictor_svd_solver == model.svd_solver_
-    assert decomposition.x_rank == model.x_rank_
+        assert not matrix.flags.writeable
+    np.testing.assert_allclose(
+        decomposition.regression_map,
+        decomposition.P @ decomposition.D @ decomposition.Q.T,
+    )
+    assert model.x_rotations_ is decomposition.P
+    assert model.y_rotations_ is decomposition.Q
+
+    for removed_alias in (
+        "Pi_",
+        "C_",
+        "W_",
+        "P_",
+        "D_",
+        "Q_",
+        "dilation_",
+        "coef_matrix_",
+        "x_rank_",
+        "x_rank_is_exact_",
+        "rank_tolerance_",
+        "svd_solver_",
+    ):
+        assert not hasattr(model, removed_alias)
 
     with pytest.raises(ValueError, match="read-only"):
         decomposition.P[0, 0] = 0.0
@@ -198,8 +225,6 @@ def test_feature_names_and_set_output_match_sklearn_transformers() -> None:
     )
     transformed = model.set_output(transform="pandas").transform(X_frame)
     assert list(transformed.columns) == ["piplsregression0", "piplsregression1"]
-
-
 
 
 def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
@@ -266,12 +291,13 @@ def test_path_score_accepts_sample_weight_like_regression() -> None:
     )
 
 
-def test_path_feature_names_delegate_to_refitted_estimator() -> None:
+def test_path_preserves_refitted_estimator_output_configuration() -> None:
     X, Y = _data()
     columns = [f"feature_{index}" for index in range(X.shape[1])]
     X_frame = pd.DataFrame(X, columns=columns)
+    template = _fixed_estimator().set_output(transform="pandas")
     path = PiPLSPathCV(
-        estimator=_fixed_estimator(),
+        estimator=template,
         n_components_values=[2],
         predictor_rank_values=[3],
         max_predictor_rank=3,
@@ -281,7 +307,7 @@ def test_path_feature_names_delegate_to_refitted_estimator() -> None:
 
     np.testing.assert_array_equal(path.feature_names_in_, columns)
     np.testing.assert_array_equal(path.best_pipls_.feature_names_in_, columns)
-    transformed = path.set_output(transform="pandas").transform(X_frame)
+    transformed = path.transform(X_frame)
     assert list(transformed.columns) == ["piplsregression0", "piplsregression1"]
 
 
@@ -385,20 +411,15 @@ def test_inverse_transform_matches_documented_least_squares_reconstruction() -> 
     np.testing.assert_allclose(Y_reconstructed, expected_Y)
 
 
-def test_decomposition_is_single_source_of_truth_for_factorization_arrays() -> None:
+def test_decomposition_is_single_source_of_truth_for_pipls_specific_arrays() -> None:
     X, Y = _data()
     model = _fixed_estimator().fit(X, Y)
 
-    assert model.Pi_ is model.decomposition_.Pi
-    assert model.C_ is model.decomposition_.C
-    assert model.W_ is model.decomposition_.W
-    assert model.P_ is model.decomposition_.P
-    assert model.D_ is model.decomposition_.D
-    assert model.Q_ is model.decomposition_.Q
-    assert model.dilation_ is model.decomposition_.dilation
-    assert not model.P_.flags.writeable
-
-
+    assert model.x_weights_ is model.decomposition_.P
+    assert model.y_weights_ is model.decomposition_.Q
+    assert model.x_rotations_ is model.decomposition_.P
+    assert model.y_rotations_ is model.decomposition_.Q
+    assert not model.x_rotations_.flags.writeable
 
 
 def test_path_restricts_estimator_scope_to_direct_or_final_pipeline_pipls() -> None:
@@ -408,9 +429,7 @@ def test_path_restricts_estimator_scope_to_direct_or_final_pipeline_pipls() -> N
     with pytest.raises(ValueError, match="PiPLSRegression or a sklearn Pipeline"):
         PiPLSPathCV(estimator=unsupported).fit(X, Y)
 
-    invalid_pipeline = Pipeline(
-        [("pipls", _fixed_estimator()), ("scale", StandardScaler())]
-    )
+    invalid_pipeline = Pipeline([("pipls", _fixed_estimator()), ("scale", StandardScaler())])
     with pytest.raises(ValueError, match="pipelines must end"):
         PiPLSPathCV(estimator=invalid_pipeline).fit(X, Y)
 

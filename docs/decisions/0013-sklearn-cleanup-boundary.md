@@ -10,13 +10,14 @@ Before advanced CV work, the public API completes a compact compatibility cleanu
 
 - `PiPLSRegression.inverse_transform` reconstructs predictors and responses through the fitted
   least-squares loadings and restores original units.
-- `decomposition_` owns the canonical read-only Pi-PLS factorization arrays; direct fitted
-  attributes are identity aliases.
+- `decomposition_` owns the canonical read-only Pi-PLS factorization arrays; Decision 0040 later
+  removes the duplicate direct symbolic and diagnostic aliases.
 - Cross-validated interfaces accept `cv=None` for standard five-fold regression CV and
   `scoring=None` for estimator scoring, expose `scorer_`, and include standard timing diagnostics.
 - `PiPLSPathCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
   `PiPLSRegression`. Arbitrary nested meta-estimators are rejected until explicitly supported.
-- Delegated transform and inverse-transform methods are conditionally exposed.
+- Delegated prediction and transformation methods are conditionally exposed when refitting is
+  enabled and the selected estimator supports them.
 - CI checks both the declared minimum scikit-learn series and the current dependency resolution.
 
 ## Consequences

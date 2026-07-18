@@ -28,7 +28,8 @@ $$
 Here $r_\pi$ controls the retained predictor-side signal space, while $h$ controls the number of
 paired predictor-response modes. The structural conditions are
 $1\le h\le\min(r_\pi,q)$ and $r_\pi\le\min(n,p)$, with an additional numerical-rank check in the
-implementation.
+implementation. Because `PiPLSRegression` centers predictors before calling the core, its direct-fit
+algebraic limit is the tighter $r_\pi\le\min(n-1,p)$.
 
 The complete persistent theory reference for development is
 [`../.llm/theory.md`](../.llm/theory.md). It includes the derivation, interpretation, OLS and

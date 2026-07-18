@@ -20,14 +20,13 @@ def test_fit_exposes_expected_fixed_rank_attributes() -> None:
 
     assert model.predictor_rank_ == 4
     assert model.max_predictor_rank_ == min(X.shape[1], X.shape[0] - 1)
-    assert model.Pi_.shape == (8, 4)
-    assert model.C_.shape == (3, 2)
-    assert model.W_.shape == (4, 2)
-    assert model.P_.shape == (8, 2)
-    assert model.D_.shape == (2, 2)
-    assert model.Q_.shape == (3, 2)
+    assert model.decomposition_.Pi.shape == (8, 4)
+    assert model.decomposition_.C.shape == (3, 2)
+    assert model.decomposition_.W.shape == (4, 2)
+    assert model.decomposition_.P.shape == (8, 2)
+    assert model.decomposition_.D.shape == (2, 2)
+    assert model.decomposition_.Q.shape == (3, 2)
     assert model.coef_.shape == (3, 8)
-    assert model.coef_matrix_.shape == (8, 3)
     assert model.intercept_.shape == (3,)
     assert model.x_scores_.shape == (40, 2)
     assert model.y_scores_.shape == (40, 2)
@@ -151,8 +150,8 @@ def test_small_auto_svd_uses_full_solver_and_reports_exact_rank() -> None:
         svd_solver="auto",
     ).fit(X, Y)
 
-    assert model.svd_solver_ == "full"
-    assert model.x_rank_is_exact_
+    assert model.decomposition_.predictor_svd_solver == "full"
+    assert model.decomposition_.x_rank_is_exact
 
 
 def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
@@ -184,8 +183,8 @@ def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
         random_state=23,
     ).fit(X, Y)
 
-    assert first.svd_solver_ == "randomized"
-    assert not first.x_rank_is_exact_
+    assert first.decomposition_.predictor_svd_solver == "randomized"
+    assert not first.decomposition_.x_rank_is_exact
     np.testing.assert_allclose(first.coef_, second.coef_)
     np.testing.assert_allclose(first.predict(X), second.predict(X))
     np.testing.assert_allclose(first.predict(X), full.predict(X), rtol=1e-6, atol=1e-8)
@@ -205,11 +204,23 @@ def test_rejects_invalid_random_state(value: object) -> None:
         PiPLSRegression(random_state=value).fit(X, Y)  # type: ignore[arg-type]
 
 
-def test_randomized_svd_rejects_missing_random_state() -> None:
+def test_randomized_svd_accepts_none_and_random_state_instances() -> None:
     X, Y = _data()
-    with pytest.raises(ValueError, match="random_state"):
-        PiPLSRegression(
-            predictor_rank=3,
-            svd_solver="randomized",
-            random_state=None,
-        ).fit(X, Y)
+    none_model = PiPLSRegression(
+        predictor_rank=3,
+        svd_solver="randomized",
+        random_state=None,
+    ).fit(X, Y)
+    first = PiPLSRegression(
+        predictor_rank=3,
+        svd_solver="randomized",
+        random_state=np.random.RandomState(23),
+    ).fit(X, Y)
+    second = PiPLSRegression(
+        predictor_rank=3,
+        svd_solver="randomized",
+        random_state=np.random.RandomState(23),
+    ).fit(X, Y)
+
+    assert none_model.decomposition_.predictor_svd_solver == "randomized"
+    np.testing.assert_allclose(first.coef_, second.coef_)

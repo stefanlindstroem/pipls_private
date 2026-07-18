@@ -39,7 +39,8 @@ Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 - `n_components <= predictor_rank`.
 - `predictor_rank <= min(n_features, n_samples - 1)` after centering and must not exceed the
   verified numerical rank.
-- `random_state` lies in $[0, 2^{32}-1]`. It may be `None` only with `svd_solver="full"`.
+- `random_state` accepts an integer in $[0, 2^{32}-1]$, a NumPy `RandomState`, or `None`;
+  the default integer `0` is reproducible and `None` uses NumPy global state.
 - `scale` and `copy` are Python or NumPy booleans.
 
 A direct fixed fit emits `StatisticalSupportWarning` when $n/r_\pi<4$. This warning is diagnostic;
@@ -58,17 +59,18 @@ final refit learns them again from all observations supplied to `PiPLSPathCV.fit
 ## Predictor SVD policy
 
 `svd_solver` accepts `"full"`, `"randomized"`, or `"auto"`; the default is `"auto"`.
-`random_state=0` makes randomized decomposition reproducible. Only the first SVD of the
-centered/scaled predictor matrix may be randomized. The response-subspace and coupling SVDs remain
-exact.
+`random_state=0` makes randomized decomposition reproducible; a NumPy `RandomState` and `None` are
+also accepted. Only the first SVD of the centered/scaled predictor matrix may be randomized. The
+response-subspace and coupling SVDs remain exact.
 
 ## Fitted fixed-estimator behavior
 
 The estimator provides PLS-style `fit`, `predict(X, copy=True)`,
 `transform(X, y=None, copy=True)`, tuple-valued `fit_transform(X, y)`, `inverse_transform`, and
 scalar R2 `score`. It supports feature names and pandas output. Standard PLS-style fitted
-attributes, coefficients, and scores remain available; Pi-PLS factorization output is canonicalized
-in the frozen `decomposition_` object.
+attributes, coefficients, and scores remain available. Pi-PLS factorization matrices, dilation
+values, numerical-rank diagnostics, and the resolved predictor solver are canonicalized only in the
+frozen `decomposition_` object; duplicate top-level symbolic and diagnostic aliases are not public.
 
 The fixed estimator does not expose `cv_results_`, `best_params_`, OOF predictions, validation
 reports, or predictor-rank search diagnostics. `response_scale_for_scoring_` remains available for
@@ -77,7 +79,9 @@ package scorers. `predictor_rank_` is the requested fitted integer and `max_pred
 
 ## Path-analysis API
 
-`PiPLSPathCV` owns all package model selection. It defaults to adaptive
+`PiPLSPathCV` owns all package model selection. It defaults to
+`n_components_values="all"`, which resolves every admissible component count. Explicit integer
+sequences request a subset; `None` is not a component-path alias. It also defaults to adaptive
 `search_method="auto"`; explicit `"optimal"` exhaustively evaluates every admissible pair. The
 surface satisfies
 
@@ -90,9 +94,20 @@ The default ceiling uses total supplied $n$ for the support term with
 class accepts a direct fixed `PiPLSRegression` or a pipeline ending in one, materializes one CV
 split set, clones fixed candidates, and optionally refits the selected pair.
 
+The default `scoring` value is the public callable
+`pipls.metrics.neg_response_standardized_mean_squared_error`. Ordinary scikit-learn scorer names,
+other callables, and `None` remain accepted. Conditional and overall selections among evaluated
+candidates maximize the configured mean test score. Under the default scorer this is
+equivalent to minimizing mean response-standardized MSE among evaluated candidates; adaptive
+search makes no claim about
+unevaluated admissible pairs.
+
 Public path attributes include standard search results, `best_pipls_`, conditional path and surface
 diagnostics, immutable `validation_report_`, optional OOF outputs, and the canonical
 `component_path_results_` table. The numeric predictor rank is present in every component-path row.
+Refit-dependent delegated methods are absent when `refit=False`. Output-container configuration is
+owned by the estimator template and preserved through cloning and refit; the path object does not
+add a separate `set_output` layer.
 
 Group-aware splitters and keyword-only `groups` belong to `PiPLSPathCV.fit`, not to the fixed
 estimator. `return_oof_predictions` and selection-conditioned reporting likewise belong only to the

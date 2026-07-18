@@ -153,16 +153,35 @@ def test_randomized_predictor_svd_is_reproducible_and_close_to_full() -> None:
     np.testing.assert_allclose(first.regression_map, full.regression_map, rtol=1e-6, atol=1e-8)
 
 
-def test_randomized_predictor_svd_requires_seed() -> None:
+def test_randomized_predictor_svd_accepts_none_and_random_state() -> None:
     rng = np.random.default_rng(91)
     X = _center(rng.normal(size=(20, 8)))
     Y = _center(rng.normal(size=(20, 3)))
-    with pytest.raises(ValueError, match="random_state"):
-        fit_pipls_core(
-            X,
-            Y,
-            predictor_rank=3,
-            n_components=2,
-            svd_solver="randomized",
-            random_state=None,
-        )
+
+    none_result = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=3,
+        n_components=2,
+        svd_solver="randomized",
+        random_state=None,
+    )
+    first = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=3,
+        n_components=2,
+        svd_solver="randomized",
+        random_state=np.random.RandomState(5),
+    )
+    second = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=3,
+        n_components=2,
+        svd_solver="randomized",
+        random_state=np.random.RandomState(5),
+    )
+
+    assert none_result.predictor_svd_solver == "randomized"
+    np.testing.assert_allclose(first.regression_map, second.regression_map)

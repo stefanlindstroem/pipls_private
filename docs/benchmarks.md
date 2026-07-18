@@ -113,8 +113,9 @@ test_mse
 
 `true_n_components` is the generator-declared shared rank.
 `true_predictor_rank` is the sum of the generator-declared shared and predictor-specific ranks.
-The selected fields are the global path-search choice. `test_mse` is the arithmetic mean of squared
-residuals over the independent test samples and responses in original response units.
+The selected fields are the best evaluated path-search choice. `test_mse` is the arithmetic
+mean of squared residuals over the independent test samples and responses in original response
+units.
 
 The declared ranks describe the data-generating structure. The selected ranks optimize a finite
 cross-validation estimate of predictive loss and need not equal the declared ranks. The benchmark

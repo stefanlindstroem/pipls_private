@@ -70,6 +70,10 @@ parameter prefix is now inferred. A focused interoperability test confirms that 
 rank pairs remain usable with ordinary `GridSearchCV`, while repository examples continue to
 recommend `PiPLSPathCV`.
 
+Decision 0040 completes a separate public-surface polish: explicit `n_components_values="all"`,
+conventional random-state forms, a public callable default scorer, conditional refit method
+availability, and one canonical `decomposition_` location for Pi-PLS-specific fitted output.
+
 ## Consequences
 
 - The fixed estimator resembles scikit-learn's direct regression estimators.

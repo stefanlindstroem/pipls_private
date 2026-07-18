@@ -126,10 +126,10 @@ of the runtime API.
 
 `datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses adapted
 from the public supplementary material identified by DOI `10.1016/j.compchemeng.2025.109143`.
-`examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly, validates columns, numeric
-dtypes, row alignment, and missingness, then runs `PiPLSPathCV` with its ordinary adaptive
-defaults. It does not set a predictor-rank ceiling, parse `metadata.yaml`, or call a package
-loader.
+`examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly with pandas and then relies on
+ordinary estimator validation when fitting `PiPLSPathCV` with its adaptive defaults. It does not
+repeat repository-table validation, set a predictor-rank ceiling, parse `metadata.yaml`, or call a
+package loader.
 
 ## Sugarcane spectral integration
 

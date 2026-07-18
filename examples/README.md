@@ -27,7 +27,8 @@ make examples
 
 The Pulp, Sugarcane, and Tobacco examples deliberately separate two stages:
 
-1. `PiPLSPathCV(refit=False)` produces one Pi-PLS row per component count, while scikit-learn
+1. `PiPLSPathCV(refit=False)` uses the default `n_components_values="all"` and produces one
+   Pi-PLS row per admissible component count, while scikit-learn
    `PLSRegression` produces a comparison path for the same folds and component counts. The example
    writes both DataFrames as canonical CSV files and calls the plotting function on those files.
 2. A visible `CHOSEN_N_COMPONENTS` constant selects one Pi-PLS CSV row, and a separate

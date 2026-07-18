@@ -11,8 +11,8 @@ The ordinary user workflow is deliberately two-stage:
 1. evaluate one conditional predictor-rank result for each candidate `n_components` value;
 2. inspect the resulting CV-MSE path and fit a separate fixed model with the chosen pair.
 
-The numerically smallest CV-MSE is informative, but it is not treated as an automatic scientific
-choice of model complexity.
+With the default scorer, the numerically smallest evaluated CV-MSE is informative, but it is not
+treated as an automatic scientific choice of model complexity.
 
 ## Stage 1: evaluate the component path
 
@@ -21,13 +21,21 @@ import pandas as pd
 
 from pipls import PiPLSPathCV
 
+search = PiPLSPathCV(refit=False).fit(X, Y)
+
+component_path = pd.DataFrame(search.component_path_results_)
+component_path.to_csv("component_path.csv", index=False)
+```
+
+The default `n_components_values="all"` resolves to every admissible component count from 1
+through `min(n_targets, max_predictor_rank_)`. Supply an explicit sequence when the scientific
+question concerns only a subset:
+
+```python
 search = PiPLSPathCV(
     n_components_values=[1, 2, 3, 4],
     refit=False,
 ).fit(X, Y)
-
-component_path = pd.DataFrame(search.component_path_results_)
-component_path.to_csv("component_path.csv", index=False)
 ```
 
 `component_path_results_` contains one row per requested component count:
@@ -49,18 +57,17 @@ The numeric `predictor_rank` is always present. The policy column has one of thr
 
 The fold SD is the standard deviation of the fold-specific response-standardized MSE values. It is
 a descriptive measure of fold-to-fold variation, not a confidence interval or an independent
-standard error, because cross-validation training sets overlap.
+standard error, because cross-validation training sets overlap. Conditional rows are selected by
+the configured scorer. With a nondefault scorer, the reported MSE remains a diagnostic and need not
+be the quantity minimized by selection.
 
 ### Predictor-rank policies
 
-The default conditionally optimizes predictor rank independently for each component count:
+The default conditionally optimizes predictor rank independently for every admissible component
+count:
 
 ```python
-search = PiPLSPathCV(
-    n_components_values=[1, 2, 3, 4],
-    predictor_rank_values=None,
-    refit=False,
-).fit(X, Y)
+search = PiPLSPathCV(refit=False).fit(X, Y)
 ```
 
 A one-element sequence fixes one predictor rank across the path:
@@ -73,8 +80,9 @@ search = PiPLSPathCV(
 ).fit(X, Y)
 ```
 
-A longer sequence conditionally selects within that explicit set, while `"max"` uses the
-rule-derived maximum directly:
+A longer sequence defines the admissible predictor-rank set. `search_method="optimal"` evaluates
+the complete set, while `"auto"` may evaluate only an adaptive subset. `"max"` uses the rule-derived
+maximum directly:
 
 ```python
 search = PiPLSPathCV(
@@ -119,8 +127,8 @@ layer is involved.
 
 ## Search settings and rank limits
 
-`search_method="auto"`, `samples_per_predictor_rank=5`, and `cv=5` are the default search
-settings. Set `search_method="optimal"` to evaluate every admissible pair.
+`n_components_values="all"`, `search_method="auto"`, `samples_per_predictor_rank=5`, and `cv=5`
+are the default search settings. Set `search_method="optimal"` to evaluate every admissible pair.
 `search_method="auto"` performs deterministic logarithmic coarse-to-fine predictor-rank search
 independently for each `n_components` value and may skip candidates.
 
@@ -178,12 +186,16 @@ through:
   `max_predictor_rank_`;
 - candidate-count, search-history, and exhaustive-search diagnostics.
 
-`best_params_` remains the numerical global minimum for compatibility and automated workflows. It
-does not replace the user decision shown in the two-stage examples.
+`best_params_` identifies the best evaluated pair by maximum mean test score. With the default
+negative-MSE scorer, this is the evaluated pair with the smallest mean response-standardized
+CV-MSE. Adaptive search makes no claim about admissible pairs it did not evaluate. This numerical
+selection does not replace the user decision shown in the two-stage examples.
 
-When `refit=True`, the globally selected estimator is fitted on all supplied data and prediction
-methods delegate to it. With `refit=False`, all path diagnostics remain available, while
-`predict`, `transform`, and `score` are disabled.
+When `refit=True`, the best evaluated estimator is fitted on all supplied data and supported
+prediction or transformation methods delegate to it. With `refit=False`, those methods are absent
+and all path diagnostics remain available. Output-container configuration belongs to the estimator
+template; configuring a direct estimator before passing it to the path is preserved through
+candidate cloning and the selected refit.
 
 Direct fixed fits warn when they have fewer than four observations per retained predictor-rank
 direction. `PiPLSPathCV` suppresses only that expected diagnostic for its controlled feature
@@ -194,6 +206,6 @@ pipeline or estimator remain visible.
 
 `fit(X, y, groups=groups)` supports group-aware splitters. Repeated, predefined, temporal, and
 leave-one-out protocols use their ordinary scikit-learn splitter objects. Set
-`return_oof_predictions=True` only when row-ordered OOF predictions for the global numerical
-selection are specifically required. Those diagnostics are explicitly selection-conditioned. See
-`cross_validation.md`.
+`return_oof_predictions=True` only when row-ordered OOF predictions for the best evaluated
+parameter pair are specifically required. Those diagnostics are explicitly selection-conditioned.
+See `cross_validation.md`.

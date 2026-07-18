@@ -17,7 +17,11 @@ from sklearn.base import (
 from sklearn.metrics import r2_score
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ._core import SVDSolver, fit_pipls_core
+from ._core import (
+    SVDSolver,
+    _validate_random_state,
+    fit_pipls_core,
+)
 from ._sklearn_compat import _validate_estimator_data
 from .decomposition import PiPLSDecomposition
 from .exceptions import StatisticalSupportWarning
@@ -25,7 +29,6 @@ from .metrics import _training_response_scale
 
 FloatArray = NDArray[np.float64]
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 4.0
-_MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
 
 
 class PiPLSRegression(
@@ -54,9 +57,9 @@ class PiPLSRegression(
         uses randomized SVD only for sufficiently large matrices and low retained
         rank. The response-side and coupling SVDs always remain exact.
     random_state:
-        Integer seed in $[0, 2^{32}-1]$ used by randomized SVD. The default makes
-        ``"auto"`` and ``"randomized"`` reproducible. ``None`` is accepted only
-        with ``svd_solver="full"``.
+        Integer seed, NumPy ``RandomState`` instance, or ``None``. The default
+        integer seed makes ``"auto"`` and ``"randomized"`` reproducible.
+        ``None`` follows NumPy's global random state, as in scikit-learn.
 
     Notes
     -----
@@ -72,7 +75,7 @@ class PiPLSRegression(
         copy: bool = True,
         predictor_rank: int = 2,
         svd_solver: SVDSolver = "auto",
-        random_state: int | None = 0,
+        random_state: int | np.random.RandomState | None = 0,
     ) -> None:
         self.n_components = n_components
         self.scale = scale
@@ -176,7 +179,7 @@ class PiPLSRegression(
     ) -> FloatArray | tuple[FloatArray, FloatArray]:
         """Transform predictors, and optionally responses, to latent scores."""
 
-        check_is_fitted(self, attributes=["P_", "Q_", "x_mean_", "y_mean_"])
+        check_is_fitted(self, attributes=["x_rotations_", "y_rotations_", "x_mean_", "y_mean_"])
         X_checked = cast(
             FloatArray,
             _validate_estimator_data(
@@ -189,7 +192,7 @@ class PiPLSRegression(
             ),
         )
         X_cs = (np.asarray(X_checked, dtype=np.float64) - self.x_mean_) / self.x_scale_
-        x_scores = cast(FloatArray, X_cs @ self.P_)
+        x_scores = cast(FloatArray, X_cs @ self.x_rotations_)
         if y is None:
             return x_scores
 
@@ -214,7 +217,7 @@ class PiPLSRegression(
                 f"expected {self.n_targets_}, got {y_array.shape[1]}."
             )
         y_cs = (y_array - self.y_mean_) / self.y_scale_
-        y_scores = cast(FloatArray, y_cs @ self.Q_)
+        y_scores = cast(FloatArray, y_cs @ self.y_rotations_)
         return x_scores, y_scores
 
     def fit_transform(
@@ -304,7 +307,6 @@ class PiPLSRegression(
             tags.regressor_tags.poor_score = True
         return tags
 
-
     def _fit_fixed_rank(
         self,
         X: FloatArray,
@@ -342,30 +344,17 @@ class PiPLSRegression(
         self.predictor_rank_ = predictor_rank
         self.max_predictor_rank_ = max_predictor_rank
         self.decomposition_ = PiPLSDecomposition._from_core_result(result)
-        self.Pi_ = self.decomposition_.Pi
-        self.C_ = self.decomposition_.C
-        self.W_ = self.decomposition_.W
-        self.P_ = self.decomposition_.P
-        self.D_ = self.decomposition_.D
-        self.dilation_ = self.decomposition_.dilation
-        self.Q_ = self.decomposition_.Q
-        self.x_rotations_ = self.P_
-        self.y_rotations_ = self.Q_
-        self.x_weights_ = self.P_
-        self.y_weights_ = self.Q_
+        self.x_rotations_ = self.decomposition_.P
+        self.y_rotations_ = self.decomposition_.Q
+        self.x_weights_ = self.x_rotations_
+        self.y_weights_ = self.y_rotations_
         self._n_features_out = self.n_components
-        self.x_rank_ = result.x_rank
-        self.x_rank_is_exact_ = result.x_rank_is_exact
-        self.rank_tolerance_ = result.rank_tolerance
-        self.svd_solver_ = result.predictor_svd_solver
 
-        self.coef_matrix_ = (
-            result.regression_map * self.y_scale_[None, :] / self.x_scale_[:, None]
-        )
-        self.coef_ = self.coef_matrix_.T
-        self.intercept_ = self.y_mean_ - self.x_mean_ @ self.coef_matrix_
-        self.x_scores_ = X_cs @ self.P_
-        self.y_scores_ = y_cs @ self.Q_
+        coef_matrix = result.regression_map * self.y_scale_[None, :] / self.x_scale_[:, None]
+        self.coef_ = np.asarray(coef_matrix.T, dtype=np.float64)
+        self.intercept_ = self.y_mean_ - self.x_mean_ @ coef_matrix
+        self.x_scores_ = X_cs @ self.x_rotations_
+        self.y_scores_ = y_cs @ self.y_rotations_
         x_loadings, _, _, _ = np.linalg.lstsq(self.x_scores_, X_cs, rcond=None)
         y_loadings, _, _, _ = np.linalg.lstsq(self.y_scores_, y_cs, rcond=None)
         self.x_loadings_ = np.asarray(x_loadings.T, dtype=np.float64)
@@ -390,38 +379,9 @@ class PiPLSRegression(
             "auto",
         ):
             raise ValueError(
-                'svd_solver must be "full", "randomized", or "auto"; '
-                f"got {self.svd_solver!r}."
+                f'svd_solver must be "full", "randomized", or "auto"; got {self.svd_solver!r}.'
             )
-        _validate_random_state(self.random_state, svd_solver=self.svd_solver)
-
-
-def _validate_random_state(
-    random_state: int | None,
-    *,
-    svd_solver: SVDSolver,
-) -> None:
-    if random_state is None:
-        if svd_solver != "full":
-            raise ValueError(
-                'random_state=None is accepted only with svd_solver="full"; '
-                f"got svd_solver={svd_solver!r}."
-            )
-        return
-    if isinstance(random_state, (bool, np.bool_)) or not isinstance(
-        random_state,
-        (int, np.integer),
-    ):
-        raise ValueError(
-            "random_state must be None or an integer in "
-            f"[0, {_MAX_RANDOM_STATE}]; got {random_state!r}."
-        )
-    value = int(random_state)
-    if value < 0 or value > _MAX_RANDOM_STATE:
-        raise ValueError(
-            "random_state must be None or an integer in "
-            f"[0, {_MAX_RANDOM_STATE}]; got {random_state!r}."
-        )
+        _validate_random_state(self.random_state)
 
 
 def _safe_sample_scale(centered: FloatArray) -> FloatArray:

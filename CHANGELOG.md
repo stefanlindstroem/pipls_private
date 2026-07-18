@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Synchronize the guide layer with the final path API: describe score-maximizing selection and
+  adaptive-search limits accurately, clarify custom-scorer interpretation of component-path MSE,
+  correct the Pulp example narrative, document the centered direct-fit rank limit, and include the
+  user guides in source distributions.
+- Complete final scikit-learn API polish: make `n_components_values="all"` the explicit complete-path default, accept integer/NumPy `RandomState`/`None` random-state forms, use the public response-standardized scorer callable as the path default, hide refit-dependent path methods when unavailable, and remove duplicate Pi-PLS fitted aliases in favor of canonical `decomposition_` fields.
 - Complete the fixed-estimator/path-search correction with a final API and minimality audit: remove the redundant `pipls_param_prefix` control, infer the terminal Pi-PLS pipeline step, and protect fixed-pair `GridSearchCV` interoperability without recommending it in examples.
 - Simplify the real-data examples around the final two-stage workflow: import the PLS-path and CSV-to-PDF helpers directly, remove subprocess wrappers and repeated table-validation boilerplate, and fit the fixed final model from the chosen canonical Pi-PLS CSV row.
 - Remove obsolete private selection machinery after the fixed-estimator split: delete unused rank-grid and solver-tracing hooks, eliminate duplicate candidate metadata, move response-standardized loss primitives to `metrics.py`, and generate OOF predictions without rescoring the selected candidate.

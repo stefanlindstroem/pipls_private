@@ -17,7 +17,6 @@ from sklearn.utils.extmath import randomized_svd
 FloatArray = NDArray[np.float64]
 SVDSolver = Literal["full", "randomized", "auto"]
 ResolvedSVDSolver = Literal["full", "randomized"]
-
 _AUTO_RANDOMIZED_MIN_DIMENSION = 500
 _AUTO_RANDOMIZED_MIN_ENTRIES = 1_000_000
 _AUTO_RANDOMIZED_MAX_RANK_FRACTION = 0.2
@@ -93,7 +92,7 @@ def fit_pipls_core(
     predictor_rank: int,
     n_components: int,
     svd_solver: SVDSolver = "full",
-    random_state: int | None = 0,
+    random_state: int | np.random.RandomState | None = 0,
 ) -> PiPLSCoreResult:
     r"""Fit the fixed-parameter Pi-PLS core to preprocessed matrices.
 
@@ -112,7 +111,9 @@ def fit_pipls_core(
         ``"randomized"`` uses scikit-learn's randomized truncated SVD, and
         ``"auto"`` applies the package's conservative size/rank rule.
     random_state:
-        Nonnegative integer seed required whenever randomized SVD is selected.
+        Integer seed, NumPy ``RandomState`` instance, or ``None``. An integer
+        gives reproducible randomized SVD; ``None`` uses NumPy's global random
+        state, following scikit-learn convention.
 
     Returns
     -------
@@ -161,7 +162,7 @@ def fit_pipls_core(
         predictor_rank=r_pi,
         svd_solver=svd_solver,
     )
-    seed = _validate_random_state(random_state, required=resolved_solver == "randomized")
+    validated_random_state = _validate_random_state(random_state)
 
     if resolved_solver == "full":
         _, x_singular_values, x_vt = np.linalg.svd(X_array, full_matrices=False)
@@ -171,7 +172,7 @@ def fit_pipls_core(
             X_array,
             n_components=r_pi,
             n_iter="auto",
-            random_state=seed,
+            random_state=validated_random_state,
             flip_sign=True,
         )
         x_singular_values = np.asarray(x_singular_values, dtype=np.float64)
@@ -232,10 +233,7 @@ def _resolve_predictor_svd_solver(
     """Resolve the predictor SVD policy using the conservative auto rule."""
 
     if svd_solver not in ("full", "randomized", "auto"):
-        raise ValueError(
-            'svd_solver must be "full", "randomized", or "auto"; '
-            f"got {svd_solver!r}."
-        )
+        raise ValueError(f'svd_solver must be "full", "randomized", or "auto"; got {svd_solver!r}.')
     if svd_solver != "auto":
         return svd_solver
 
@@ -249,26 +247,28 @@ def _resolve_predictor_svd_solver(
     return "randomized" if use_randomized else "full"
 
 
-def _validate_random_state(random_state: int | None, *, required: bool) -> int | None:
-    if random_state is None:
-        if required:
-            raise ValueError(
-                "random_state must be a nonnegative integer when randomized SVD is selected."
-            )
-        return None
+def _validate_random_state(
+    random_state: object,
+) -> int | np.random.RandomState | None:
+    """Validate the scikit-learn-style random-state parameter."""
+
+    if random_state is None or isinstance(random_state, np.random.RandomState):
+        return random_state
     if isinstance(random_state, (bool, np.bool_)) or not isinstance(
         random_state,
         (int, np.integer),
     ):
         raise ValueError(
-            "random_state must be None or a nonnegative integer; "
+            "random_state must be None, an integer in "
+            f"[0, {_MAX_RANDOM_STATE}], or a numpy.random.RandomState instance; "
             f"got {random_state!r}."
         )
     seed = int(random_state)
     if seed < 0 or seed > _MAX_RANDOM_STATE:
         raise ValueError(
-            "random_state must be None or an integer between 0 and "
-            f"{_MAX_RANDOM_STATE}; got {random_state!r}."
+            "random_state must be None, an integer in "
+            f"[0, {_MAX_RANDOM_STATE}], or a numpy.random.RandomState instance; "
+            f"got {random_state!r}."
         )
     return seed
 

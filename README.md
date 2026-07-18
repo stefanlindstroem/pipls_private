@@ -66,14 +66,14 @@ import pandas as pd
 
 from pipls import PiPLSPathCV, PiPLSRegression
 
-search = PiPLSPathCV(
-    n_components_values=[1, 2, 3, 4],
-    refit=False,
-).fit(X_train, Y_train)
+search = PiPLSPathCV(refit=False).fit(X_train, Y_train)
 
 path = pd.DataFrame(search.component_path_results_)
 path.to_csv("component_path.csv", index=False)
 ```
+
+The default `n_components_values="all"` evaluates every admissible component count. Supply an
+explicit sequence such as `[1, 2, 3, 4]` when only a subset is wanted.
 
 After inspecting the canonical CSV, choose a component count and fit both ranks explicitly:
 
@@ -87,7 +87,9 @@ model = PiPLSRegression(
 ).fit(X_train, Y_train)
 ```
 
-`best_params_` remains available as the numerical global minimum, but the examples present
+`best_params_` identifies the best evaluated pair under the configured scorer. With the default
+negative response-standardized MSE scorer, this is the evaluated pair with the smallest mean
+CV-MSE. Adaptive search may leave admissible pairs unevaluated, and the examples still present
 component-count selection as a user decision. For explicit validation reporting:
 
 ```python
@@ -134,10 +136,7 @@ from pipls import PiPLSPathCV
 
 X = pd.read_csv("datasets/pulp/X.csv")
 Y = pd.read_csv("datasets/pulp/Y.csv")
-search = PiPLSPathCV(
-    n_components_values=[1, 2, 3, 4],
-    refit=False,
-).fit(X, Y)
+search = PiPLSPathCV(refit=False).fit(X, Y)
 path = pd.DataFrame(search.component_path_results_)
 ```
 
@@ -182,8 +181,13 @@ See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchma
 - [Reproducibility and validation](docs/reproducibility.md)
 
 The estimator follows scikit-learn and `PLSRegression` conventions for coefficient orientation,
-latent-score transforms, feature names, pandas output containers, and fitted weights/loadings.
-Pi-PLS-specific factorization output is grouped in the public read-only `decomposition_` result.
+latent-score transforms, feature names, pandas output containers, fitted weights/loadings, and
+`random_state` values. Pi-PLS-specific factorization output and numerical diagnostics are grouped
+in the public read-only `decomposition_` result rather than duplicated as top-level aliases.
+
+The default selection scorer is the ordinary callable
+`pipls.metrics.neg_response_standardized_mean_squared_error`; explicit scikit-learn scorer names,
+other callables, and `None` remain supported.
 
 `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`. Its support term uses the
 total number of observations supplied to `fit()`; cross-validation training folds impose

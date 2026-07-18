@@ -20,14 +20,11 @@ CHOSEN_N_COMPONENTS = 3
 
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
-max_n_components = min(Y.shape[1], X.shape[1], X.shape[0] - 1)
 
 # Stage 1: evaluate the component paths and write the canonical CSV files.
-path_search = PiPLSPathCV(
-    n_components_values=range(1, max_n_components + 1),
-    refit=False,
-).fit(X, Y)
+path_search = PiPLSPathCV(refit=False).fit(X, Y)
 pipls_path = pd.DataFrame(path_search.component_path_results_)
+max_n_components = int(path_search.n_components_values_[-1])
 pls_path = evaluate_pls_component_path(X, Y, max_n_components=max_n_components)
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)

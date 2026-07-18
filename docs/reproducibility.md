@@ -20,7 +20,7 @@ Tests cover the numerical core, estimator API, model selection, cross-validation
 scikit-learn compatibility, dataset readability, example helper/artifact contracts, and repository
 structure. `make examples` is the separate application-validation target and runs every numbered
 example, including the complete real-data analyses. Randomized numerical paths and synthetic
-generators expose explicit random seeds.
+generators expose explicit random-state controls.
 
 The executable real-data examples require pandas and Matplotlib. Install their dedicated extra with:
 
@@ -33,6 +33,11 @@ The development extra already includes these packages. Re-run `python -m pip ins
 after pulling dependency changes into an existing virtual environment.
 
 ## Model-fitting reproducibility
+
+`PiPLSRegression.random_state` accepts an integer seed, a NumPy `RandomState`, or `None`. The
+default integer `0` is reproducible. `None` uses NumPy's global random state and should be chosen
+only when repeatability is not required. The synthetic generators retain their separate explicit
+integer-seed contract.
 
 Centering and optional scaling are integral to `PiPLSRegression.fit`. `PiPLSPathCV` clones fixed
 estimators inside every training fold, so each candidate learns statistics only from that fold.

@@ -157,15 +157,15 @@ def evaluate_scenario(scenario: Scenario, seed: int) -> dict[str, ResultValue]:
         "test_mse": test_mse,
         "predictor_shared_capture": _subspace_capture(
             predictor_shared_truth,
-            model.P_,
+            model.decomposition_.P,
         ),
         "predictor_signal_capture": _subspace_capture(
             predictor_signal_truth,
-            model.Pi_,
+            model.decomposition_.Pi,
         ),
         "response_shared_capture": _subspace_capture(
             response_shared_truth,
-            model.Q_,
+            model.decomposition_.Q,
         ),
     }
 

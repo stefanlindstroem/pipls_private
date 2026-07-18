@@ -31,11 +31,12 @@ No block-aware scaling API is designed or scheduled.
 
 ## Implemented estimator and selection boundary
 
-Decision 0039 is fully implemented. `PiPLSRegression` owns one explicit fixed rank pair and no
-cross-validation or selection results. `PiPLSPathCV` owns the complete triangular-selection
-lifecycle, obsolete private selection machinery has been removed, and the examples use direct
-Python composition around canonical CSV artifacts. Supported pipelines infer their unique terminal
-Pi-PLS step without a public parameter-prefix control.
+Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` owns one explicit fixed rank
+pair and no cross-validation or selection results. `PiPLSPathCV` owns the complete triangular-
+selection lifecycle and defaults to the explicit complete-component sentinel `"all"`. Obsolete
+private selection machinery and duplicate fitted aliases have been removed; Pi-PLS-specific output
+is canonical in `decomposition_`. Supported pipelines infer their unique terminal Pi-PLS step and
+carry their own output-container configuration through cloning and refit.
 
 ## Runtime ownership
 

@@ -30,7 +30,7 @@ def test_n_components_rejects_nonpositive_and_noninteger_values(value: object) -
 def test_n_components_accepts_numpy_integer() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=np.int64(2), predictor_rank=3).fit(X, Y)
-    assert model.P_.shape[1] == 2
+    assert model.x_rotations_.shape[1] == 2
 
 
 def test_n_components_rejects_more_components_than_response_columns() -> None:
@@ -95,27 +95,27 @@ def test_random_state_rejects_invalid_or_out_of_range_values(value: object) -> N
         ).fit(X, Y)
 
 
-@pytest.mark.parametrize("solver", ["auto", "randomized"])
-def test_random_state_none_is_rejected_when_solver_may_randomize(solver: str) -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="random_state"):
-        PiPLSRegression(
-            n_components=1,
-            predictor_rank=2,
-            svd_solver=solver,  # type: ignore[arg-type]
-            random_state=None,
-        ).fit(X, Y)
-
-
-def test_random_state_none_is_accepted_for_full_solver() -> None:
+@pytest.mark.parametrize("solver", ["auto", "randomized", "full"])
+def test_random_state_none_is_accepted_for_all_solver_policies(solver: str) -> None:
     X, Y = _data()
     model = PiPLSRegression(
         n_components=1,
         predictor_rank=2,
-        svd_solver="full",
+        svd_solver=solver,  # type: ignore[arg-type]
         random_state=None,
     ).fit(X, Y)
-    assert model.svd_solver_ == "full"
+    assert model.decomposition_.predictor_svd_solver in ("full", "randomized")
+
+
+def test_random_state_instance_is_accepted() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=1,
+        predictor_rank=2,
+        svd_solver="randomized",
+        random_state=np.random.RandomState(7),
+    ).fit(X, Y)
+    assert model.decomposition_.predictor_svd_solver == "randomized"
 
 
 @pytest.mark.parametrize("parameter", ["scale", "copy"])

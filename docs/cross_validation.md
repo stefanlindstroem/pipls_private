@@ -33,6 +33,26 @@ Recommended splitters include:
 - `TimeSeriesSplit` for ordered temporal data;
 - `LeaveOneOut` only when the scientific protocol requires it.
 
+
+## Scoring
+
+The default path scorer is the public callable
+`pipls.metrics.neg_response_standardized_mean_squared_error`. It follows the ordinary
+`(estimator, X, y)` scorer protocol and can be imported wherever a scorer callable is accepted:
+
+```python
+from pipls.metrics import neg_response_standardized_mean_squared_error
+
+search = PiPLSPathCV(scoring=neg_response_standardized_mean_squared_error)
+```
+
+Ordinary scikit-learn scorer names, other callables, and `scoring=None` remain supported. The
+package does not define a package-local scorer string that could be mistaken for a scorer
+registered globally by scikit-learn. Predictor-rank and overall selections among evaluated
+candidates always maximize the configured mean test score. `component_path_results_` still
+reports response-standardized MSE, so with a nondefault scorer that MSE is diagnostic rather than
+necessarily minimized.
+
 ## Ordered out-of-fold predictions
 
 Set `return_oof_predictions=True` to fit the selected fixed parameterization once per training

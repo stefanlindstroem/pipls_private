@@ -197,10 +197,10 @@ with a deterministic `random_state` contract and fitted solver diagnostics. Keep
 from predictor-rank search semantics so users can distinguish exhaustive versus adaptive search
 from exact versus approximate SVD.
 
-Current status: **complete**. The estimator now exposes `svd_solver={"full", "randomized",
-"auto"}` and `random_state`; automatic selection follows the conservative matrix-size and
-retained-rank rule, only the predictor SVD may be randomized, and fitted plus CV-fold solver
-diagnostics are available.
+Current status: **complete**. The estimator exposes `svd_solver={"full", "randomized", "auto"}`
+and conventional integer, NumPy `RandomState`, or `None` random-state forms; automatic selection
+follows the conservative matrix-size and retained-rank rule, only the predictor SVD may be
+randomized, and resolved solver diagnostics are available through `decomposition_`.
 
 ### Phase C2e: public parameter-validation hardening
 
@@ -257,9 +257,11 @@ Complete the remaining pre-validation compatibility work: inverse reconstruction
 read-only decomposition arrays, standard CV sentinels and timings, conditional path delegation,
 an explicit supported estimator boundary, and minimum-version CI.
 
-Current status: **complete**. `PiPLSRegression.inverse_transform`, canonical decomposition aliases,
-`cv=None`, `scoring=None`, `scorer_`, timing diagnostics, conditional delegated methods, direct or
-terminal-pipeline path support, and minimum-version scikit-learn CI are implemented and tested.
+Current status: **complete**. `PiPLSRegression.inverse_transform`, canonical read-only
+`decomposition_`, `cv=None`, `scoring=None`, `scorer_`, timing diagnostics, conditional delegated
+methods, direct or terminal-pipeline path support, and minimum-version scikit-learn CI are
+implemented and tested. Decision 0040 later removes duplicate decomposition aliases and makes
+refit-dependent path method availability explicit.
 
 ### Phase D2: LOO and advanced split protocols
 
@@ -405,8 +407,10 @@ Implementation order is fixed-model estimator, sole path selection, dead-code co
 example and guide alignment, then final API/minimality audit.
 
 Current status: **complete**. The final audit removed the redundant path parameter-prefix control,
-confirmed fixed-pair `GridSearchCV` interoperability, and found no further estimator/search changes
-needed before release hardening.
+confirmed fixed-pair `GridSearchCV` interoperability, and was followed by Decision 0040's final
+public-surface polish: `n_components_values="all"`, conventional random-state forms, a public
+callable default scorer, refit-dependent method availability, and canonical decomposition-only
+Pi-PLS diagnostics.
 
 ### Product documentation and release hardening
 

@@ -55,6 +55,16 @@ def test_packaging_uses_pep639_license_metadata() -> None:
     assert 'license = {file = "LICENSE"}' not in pyproject
 
 
+def test_source_distribution_manifest_includes_user_guides() -> None:
+    manifest_lines = {
+        line.strip()
+        for line in (_repository_root() / "MANIFEST.in").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+
+    assert "recursive-include docs *.md" in manifest_lines
+
+
 def test_examples_extra_declares_data_and_plotting_dependencies() -> None:
     pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
 

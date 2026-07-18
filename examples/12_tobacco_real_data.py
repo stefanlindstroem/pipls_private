@@ -20,18 +20,17 @@ CHOSEN_N_COMPONENTS = 8
 
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
-max_n_components = min(Y.shape[1], X.shape[1], X.shape[0] - 1)
 
 # Stage 1: scan predictor rank conditionally for every component count. Full
 # predictor SVD is explicit because randomized SVD has a dedicated benchmark.
 path_search = PiPLSPathCV(
     estimator=PiPLSRegression(svd_solver="full"),
-    n_components_values=range(1, max_n_components + 1),
     search_method="auto",
     refit=False,
     n_jobs=1,
 ).fit(X, Y)
 pipls_path = pd.DataFrame(path_search.component_path_results_)
+max_n_components = int(path_search.n_components_values_[-1])
 pls_path = evaluate_pls_component_path(X, Y, max_n_components=max_n_components)
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -59,7 +58,7 @@ print(f"Pi-PLS component-path CSV: {COMPONENT_PATH_CSV}")
 print(f"PLS component-path CSV: {PLS_COMPONENT_PATH_CSV}")
 print(f"comparison PDF: {COMPONENT_PATH_PDF}")
 print("path search method: auto")
-print(f"fixed-model predictor SVD: {model.svd_solver_}")
+print(f"fixed-model predictor SVD: {model.decomposition_.predictor_svd_solver}")
 print(
     "fixed final Pi-PLS parameters: "
     f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"

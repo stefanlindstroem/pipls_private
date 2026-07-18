@@ -83,14 +83,15 @@ case, or public behavior.
 | Concern | Current contract |
 |---|---|
 | Conditional predictor-rank selection | `PiPLSPathCV(search_method="auto")` |
+| Component counts | `n_components_values="all"` by default; explicit integer sequences request a subset |
 | Path search | `PiPLSPathCV(search_method="auto")` by default |
 | Component-path artifact | `component_path_results_`: one row per component count with numeric predictor rank, policy, mean CV-MSE, fold SD, and split count |
 | Exhaustive search | explicit `PiPLSPathCV(search_method="optimal")` |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
-| Reproducibility | `random_state=0` by default |
+| Reproducibility | estimator `random_state` accepts integer, NumPy `RandomState`, or `None`; default `0` is reproducible |
 | Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
 | Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
-| Selection score | response-standardized negative MSE by default; `scoring=None` uses estimator score |
+| Selection score | public response-standardized negative-MSE callable by default; sklearn scorer names, callables, and `None` accepted |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | path-only opt-in through `return_oof_predictions=True` |
@@ -110,6 +111,10 @@ Additional fixed decisions:
   final small integer interval. `"optimal"` is exhaustive over the complete admissible range.
 - Randomized SVD affects only the initial predictor-matrix decomposition. Response and coupling
   decompositions remain exact.
+- Pi-PLS-specific factorization and numerical diagnostics live only in the read-only
+  `decomposition_` object; standard PLS-style fitted attributes remain top-level.
+- Refit-dependent path methods are absent when `refit=False`; output-container configuration is
+  carried by the estimator template rather than a second path-level `set_output` layer.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
 - Real-data examples use `PiPLSPathCV(refit=False)` for the path, treat CSV as canonical,
@@ -124,9 +129,9 @@ Additional fixed decisions:
 - Repository tests follow `.llm/testing.md`: living handoff, roadmap, and dataset metadata contents
   are reviewed but are not mirrored as fixed phrase or field-value assertions.
 
-## Implemented estimator/search correction
+## Implemented estimator/search correction and API polish
 
-Decision 0039 is fully implemented:
+Decisions 0039 and 0040 are fully implemented:
 
 - `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
 - it owns no CV, scoring, OOF, or search-result parameters and attributes;
@@ -137,6 +142,13 @@ Decision 0039 is fully implemented:
   unrelated warnings remain visible;
 - unused rank-grid construction, solver tracing, duplicate candidate metadata, and OOF rescoring
   have been removed from the private selection layer.
+- the complete component path is explicit through `n_components_values="all"`;
+- random-state forms and refit-dependent method availability follow scikit-learn conventions;
+- the public response-standardized scorer callable is the default selection metric;
+- duplicate Pi-PLS-specific fitted aliases are removed in favor of canonical `decomposition_` fields;
+- the public guides distinguish best evaluated score from a global surface optimum, explain that
+  response-standardized MSE is diagnostic when a nondefault scorer drives selection, and are
+  included in source distributions.
 
 The estimator/search correction and final minimality audit are complete. The redundant public
 path parameter-prefix control has been removed, supported pipelines infer their terminal Pi-PLS

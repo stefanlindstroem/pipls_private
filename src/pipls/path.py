@@ -53,8 +53,9 @@ Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
 PredictorRankPolicy = Literal["optimized", "fixed", "maximum"]
+ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
-_DEFAULT_SCORING = "neg_response_standardized_mean_squared_error"
+_DEFAULT_SCORING = neg_response_standardized_mean_squared_error
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _SELECTION_RTOL = 1e-12
 _SELECTION_ATOL = 1e-15
@@ -63,6 +64,8 @@ _CONTROLLED_FIT_WARNING_CATEGORIES = (StatisticalSupportWarning,)
 
 def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
     def check(search: Any) -> bool:
+        if not bool(search.refit):
+            return False
         if hasattr(search, "best_params_") and not hasattr(search, "best_estimator_"):
             return False
         estimator = (
@@ -81,6 +84,7 @@ class PiPLSPathCV(
     MultiOutputMixin,  # type: ignore[misc]
     MetaEstimatorMixin,  # type: ignore[misc]
     BaseEstimator,  # type: ignore[misc]
+    auto_wrap_output_keys=None,  # type: ignore[call-arg]
 ):
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
@@ -99,13 +103,14 @@ class PiPLSPathCV(
         whose final step is :class:`PiPLSRegression`. ``None`` creates a default
         direct estimator template.
     n_components_values:
-        Positive component counts to evaluate. ``None`` uses every value from 1
-        through ``min(n_targets, max_predictor_rank_)``.
+        Positive component counts to evaluate. ``"all"`` uses every value from
+        1 through ``min(n_targets, max_predictor_rank_)`` and is the default.
     predictor_rank_values:
-        Predictor ranks used for each component count. ``None`` searches every
-        value from 1 through ``max_predictor_rank_``. A one-element sequence fixes
-        one rank, a longer sequence searches within that set, and ``"max"`` uses
-        ``max_predictor_rank_`` directly for every component count.
+        Admissible predictor ranks for each component count. ``None`` makes every
+        value from 1 through ``max_predictor_rank_`` available; ``search_method``
+        determines whether all are evaluated. A one-element sequence fixes one
+        rank, a longer sequence defines an explicit admissible set, and ``"max"``
+        uses ``max_predictor_rank_`` directly for every component count.
     max_predictor_rank:
         ``"rule"`` uses the total-sample support rule with fold-level
         feasibility caps. A positive integer imposes an additional explicit
@@ -122,9 +127,10 @@ class PiPLSPathCV(
         ``None`` for the standard five-fold regression split. The default is 5.
     scoring:
         Scikit-learn scorer name, callable, or ``None`` to use estimator ``score``.
-        The default is negative response-standardized MSE.
+        The default is the public callable
+        :func:`pipls.metrics.neg_response_standardized_mean_squared_error`.
     refit:
-        Refit the globally selected pair on all supplied data.
+        Refit the best evaluated pair on all supplied data.
     n_jobs:
         Joblib parallelism across candidate pairs within each evaluation batch.
     return_oof_predictions:
@@ -137,7 +143,7 @@ class PiPLSPathCV(
         self,
         estimator: Any | None = None,
         *,
-        n_components_values: Sequence[int] | None = None,
+        n_components_values: ComponentValues = "all",
         predictor_rank_values: PredictorRankValues = None,
         max_predictor_rank: int | Literal["rule"] = "rule",
         search_method: SearchMethod = "auto",
@@ -167,7 +173,7 @@ class PiPLSPathCV(
         *,
         groups: ArrayLike | None = None,
     ) -> PiPLSPathCV:
-        """Evaluate the path and optionally refit the globally selected pair."""
+        """Evaluate the path and optionally refit the best evaluated pair."""
 
         self._validate_constructor_parameters()
         self._clear_validation_attributes()
@@ -220,10 +226,8 @@ class PiPLSPathCV(
             self.max_predictor_rank_ = min(int(self.max_predictor_rank), algebraic_limit)
 
         h_limit = min(self.n_targets_, self.max_predictor_rank_)
-        self.n_components_values_ = _validated_integer_values(
+        self.n_components_values_ = _validated_component_values(
             self.n_components_values,
-            name="n_components_values",
-            lower=1,
             upper=h_limit,
         )
         self.predictor_rank_policy_ = _predictor_rank_policy(
@@ -265,11 +269,7 @@ class PiPLSPathCV(
         self.n_path_candidates_ = len(admissible)
 
         scorer = _resolve_path_scorer(self.scoring, template)
-        self.scorer_ = (
-            neg_response_standardized_mean_squared_error
-            if _uses_default_path_scoring(self.scoring)
-            else scorer
-        )
+        self.scorer_ = scorer
         cache: dict[tuple[int, int], _PiPLSCandidateResult] = {}
         history: dict[int, tuple[tuple[int, ...], ...]] = {}
         if self.search_method == "optimal":
@@ -448,8 +448,9 @@ class PiPLSPathCV(
                     delattr(self, name)
         return self
 
+    @available_if(_estimator_supports("predict"))  # type: ignore[untyped-decorator]
     def predict(self, X: ArrayLike, copy: bool = True) -> FloatArray:
-        """Predict with the refitted globally selected estimator."""
+        """Predict with the refitted best evaluated estimator."""
 
         estimator = self._refitted_estimator()
         if isinstance(estimator, PiPLSRegression):
@@ -463,7 +464,7 @@ class PiPLSPathCV(
         y: ArrayLike | None = None,
         copy: bool = True,
     ) -> Any:
-        """Transform with the refitted globally selected estimator."""
+        """Transform with the refitted best evaluated estimator."""
 
         estimator = self._refitted_estimator()
         if isinstance(estimator, PiPLSRegression):
@@ -515,6 +516,7 @@ class PiPLSPathCV(
             )
         return estimator.inverse_transform(X)
 
+    @available_if(_estimator_supports("score"))  # type: ignore[untyped-decorator]
     def score(
         self,
         X: ArrayLike,
@@ -609,14 +611,8 @@ class PiPLSPathCV(
             )
         if self.max_predictor_rank != "rule":
             _validate_positive_int(self.max_predictor_rank, name="max_predictor_rank")
-        _validate_optional_integer_sequence(
-            self.n_components_values,
-            name="n_components_values",
-        )
-        _validate_optional_integer_sequence(
-            self.predictor_rank_values,
-            name="predictor_rank_values",
-        )
+        _validate_component_values(self.n_components_values)
+        _validate_predictor_rank_values(self.predictor_rank_values)
         _validate_n_jobs(self.n_jobs)
         _validate_cv(self.cv)
         scorer_template = (
@@ -804,9 +800,9 @@ def _adaptive_path_search(
 
 
 def _uses_default_path_scoring(scoring: Scoring) -> bool:
-    """Return whether the shared default response-standardized scorer is requested."""
+    """Return whether the public default response-standardized scorer is requested."""
 
-    return isinstance(scoring, str) and scoring == _DEFAULT_SCORING
+    return scoring is _DEFAULT_SCORING
 
 
 def _path_cv_results(
@@ -919,6 +915,17 @@ def _path_surface(
     return surface
 
 
+def _validated_component_values(values: ComponentValues, *, upper: int) -> IntArray:
+    if isinstance(values, str) and values == "all":
+        return np.arange(1, upper + 1, dtype=np.intp)
+    return _validated_integer_values(
+        values,
+        name="n_components_values",
+        lower=1,
+        upper=upper,
+    )
+
+
 def _validated_integer_values(
     values: Sequence[int] | None,
     *,
@@ -939,17 +946,35 @@ def _validated_integer_values(
     return np.sort(converted)
 
 
-def _validate_optional_integer_sequence(values: object, *, name: str) -> None:
+def _validate_component_values(values: object) -> None:
+    if values is None:
+        raise ValueError(
+            'n_components_values must be "all" or a sequence of positive integers.'
+        )
+    if isinstance(values, str):
+        if values == "all":
+            return
+        raise ValueError(
+            'n_components_values must be "all" or a sequence of positive integers.'
+        )
+    _validate_integer_sequence(values, name="n_components_values")
+
+
+def _validate_predictor_rank_values(values: object) -> None:
     if values is None or (isinstance(values, str) and values == "max"):
         return
     if isinstance(values, (str, bytes)):
         raise ValueError(
-            f'{name} must be None, "max", or a sequence of positive integers.'
+            'predictor_rank_values must be None, "max", or a sequence of positive integers.'
         )
+    _validate_integer_sequence(values, name="predictor_rank_values")
+
+
+def _validate_integer_sequence(values: object, *, name: str) -> None:
     try:
         sequence = tuple(cast(Iterable[object], values))
     except TypeError as error:
-        raise ValueError(f"{name} must be None or a sequence of positive integers.") from error
+        raise ValueError(f"{name} must be a sequence of positive integers.") from error
     if not sequence:
         raise ValueError(f"{name} must not be empty.")
     for value in sequence:
@@ -966,10 +991,8 @@ def _predictor_rank_policy(values: PredictorRankValues) -> PredictorRankPolicy:
     return "fixed" if len(values) == 1 else "optimized"
 
 
-def _resolve_path_scorer(scoring: Scoring, estimator: Any) -> Scorer | None:
+def _resolve_path_scorer(scoring: Scoring, estimator: Any) -> Scorer:
     if isinstance(scoring, str):
-        if scoring == _DEFAULT_SCORING:
-            return None
         try:
             return cast(Scorer, get_scorer(scoring))
         except ValueError as error:

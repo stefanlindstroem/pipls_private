@@ -22,14 +22,13 @@ and tuple-valued `fit_transform(X, y)` behavior.
 
 The standard fitted surface includes `x_weights_`, `y_weights_`, `x_loadings_`, `y_loadings_`,
 `x_scores_`, `y_scores_`, `x_rotations_`, `y_rotations_`, `coef_`, and `intercept_`. In Pi-PLS,
-`P_` and `Q_` are the direct orthogonal score maps, so weights and rotations coincide. Loadings
-are separately computed least-squares reconstruction coefficients; they are not aliases for
-`P_` and `Q_`. `n_iter_` is omitted because Pi-PLS uses a closed-form SVD construction rather
-than an iterative NIPALS loop.
+the direct orthogonal score maps are both weights and rotations. Loadings are separately computed
+least-squares reconstruction coefficients. `n_iter_` is omitted because Pi-PLS uses a closed-form
+SVD construction rather than an iterative NIPALS loop.
 
 Pi-PLS-specific factorization and numerical diagnostics are canonicalized in the public frozen
-`PiPLSDecomposition` object exposed as `decomposition_`. Existing matrix attributes remain direct
-fitted attributes for mathematical convenience and pre-1.0 compatibility.
+`PiPLSDecomposition` object exposed as `decomposition_`. Decision 0040 removes duplicate symbolic
+and diagnostic top-level aliases so the structured result is the single method-specific source.
 
 `PiPLSRegression` is a direct estimator and exposes no search-result attributes.
 `PiPLSPathCV` owns `cv_results_`, `best_params_`, `best_index_`, `best_score_`, and the conditional

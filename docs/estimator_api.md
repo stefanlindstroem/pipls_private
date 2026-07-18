@@ -38,10 +38,25 @@ A direct fixed fit emits `StatisticalSupportWarning` when
 \frac{n}{r_\pi}<4.
 \]
 
-This is a diagnostic, not a rank-selection rule. Algebraically infeasible ranks and ranks above the
-verified numerical rank remain errors.
+The warning is diagnostic and does not alter the requested rank. Algebraically or numerically
+infeasible ranks remain errors. The standard path search uses a more conservative default support
+ceiling with five supplied observations per retained predictor direction.
 
-## PLS-style estimator surface
+## Predictor SVD and random state
+
+`svd_solver` accepts `"full"`, `"randomized"`, or `"auto"`. Only the predictor SVD may be
+randomized; the response-side and final coupling SVDs remain exact.
+
+`random_state` accepts the conventional scikit-learn forms:
+
+- an integer in `[0, 2**32 - 1]` for repeatable randomized SVD;
+- a NumPy `RandomState` instance;
+- `None`, which uses NumPy's global random state and is not promised to be repeatable.
+
+The default `random_state=0` keeps the default estimator reproducible when randomized SVD is used.
+The solver actually used and numerical-rank diagnostics are recorded in `decomposition_`.
+
+## Methods and fitted output
 
 `predict(X, copy=True)`, `transform(X, y=None, copy=True)`, `fit_transform(X, y)`, and
 `inverse_transform(X, y=None)` mirror the corresponding `PLSRegression` conventions.
@@ -53,7 +68,10 @@ uses direct orthogonal score maps rather than iterative deflation, weights and r
 
 Pi-PLS-specific factorization output is available through the public frozen
 `PiPLSDecomposition` instance at `decomposition_`. It contains `Pi`, `C`, `W`, `P`, `D`, `Q`, the
-dilation vector, numerical-rank diagnostics, and the resolved predictor SVD solver.
+dilation vector, numerical-rank diagnostics, and the resolved predictor SVD solver. Its arrays are
+read-only. These values are not duplicated as top-level symbolic aliases; this keeps one canonical
+location for method-specific internals while standard PLS-style attributes remain directly
+available.
 
 `response_scale_for_scoring_` is the safe training-response sample standard deviation used by the
 package response-standardized scorer. `predictor_rank_` records the fitted explicit rank, while

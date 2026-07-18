@@ -90,8 +90,8 @@ def test_models_use_paired_generator_declared_ranks_and_solvers() -> None:
     assert full.predictor_rank == randomized.predictor_rank == expected_predictor_rank
     assert full.scale is randomized.scale is True
     assert full.random_state == randomized.random_state == BENCHMARK.SEEDS[0]
-    assert full.svd_solver_ == "full"
-    assert randomized.svd_solver_ == "randomized"
+    assert full.decomposition_.predictor_svd_solver == "full"
+    assert randomized.decomposition_.predictor_svd_solver == "randomized"
     assert_array_equal(full.x_mean_, randomized.x_mean_)
     assert_array_equal(full.x_scale_, randomized.x_scale_)
     assert_array_equal(full.y_mean_, randomized.y_mean_)

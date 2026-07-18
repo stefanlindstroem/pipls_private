@@ -45,13 +45,15 @@ This index is navigation, not a substitute for those records.
 | `0037-user-run-real-data-analyses.md` | real-data execution boundary | examples remain user-run; duplicate smoke benchmarks and full example tests are removed |
 | `0038-single-examples-target.md` | explicit application validation | `make examples` runs every numbered example; `make check` remains fast internal validation |
 | `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
+| `0040-sklearn-api-polish.md` | final public API polish | explicit complete-path sentinel, conventional random state, callable scorer, and canonical decomposition output |
 
 ## Implemented estimator/search transition
 
-Decision 0039 is fully implemented. `PiPLSRegression` is a fixed-pair estimator with the direct-fit
-support warning at $n/r_\pi<4$. `PiPLSPathCV` owns the complete triangular-selection lifecycle and
-the default path-support ceiling with $c=5$. The private selection layer is consolidated, examples
-use the two-stage CSV workflow, and supported pipelines infer their unique terminal Pi-PLS step.
+Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` is a fixed-pair estimator with
+the direct-fit support warning at $n/r_\pi<4$. `PiPLSPathCV` owns the complete triangular-selection
+lifecycle and defaults to the explicit complete-component sentinel `n_components_values="all"`.
+The default scorer is a public callable, conventional scikit-learn random-state forms are accepted,
+and Pi-PLS-specific fitted output is canonicalized in `decomposition_`.
 
 ## Accepted clarifications after earlier proposals
 
@@ -59,6 +61,7 @@ These points are fixed by implemented decisions and owner review even where the 
 plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
+- `PiPLSPathCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
 - `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
   while centered training-fold dimensions remain hard candidate-feasibility caps;
