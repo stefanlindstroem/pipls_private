@@ -53,10 +53,11 @@ row, and agreement with conditional rows in `cv_results_`. Plot and standard-PLS
 use small synthetic tables and verify canonical CSV/PDF contracts without freezing visual pixel
 output.
 
-Do not execute the complete Pulp, Sugarcane, or Tobacco examples in `make check`, and do not duplicate
-their analyses as real-data benchmark scripts. Those examples are user-run analyses whose runtime
-depends on dataset size and hardware. Durable tests instead protect repository dataset readability,
-the two-stage workflow structure, the component-path API, the PLS helper, and CSV-to-PDF generation.
+Do not execute the complete Pulp, Sugarcane, or Tobacco examples in `make check`, and do not
+duplicate their analyses as real-data benchmark scripts. `make examples` is the explicit
+application-validation target and runs every numbered example, including the slower Tobacco
+analysis. Durable tests instead protect repository dataset readability, the two-stage workflow
+structure, the component-path API, the PLS helper, and CSV-to-PDF generation.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 

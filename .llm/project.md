@@ -15,7 +15,7 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through E4b are implemented, and E4c is in progress. The current public surface includes `PiPLSRegression`,
+Phases A through E4c are implemented. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, and deterministic synthetic dataset generation.
 
@@ -23,9 +23,10 @@ The transparent real-dataset suite contains pulp, sugarcane, and tobacco. Public
 describes the installable package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
-Sugarcane, and Tobacco are user-run component-path examples rather than benchmark or test-suite
-executions. They write separate Pi-PLS and standard PLS (NIPALS) CSVs, derive comparison PDFs from
-both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
+Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
+`make examples` runs every numbered example explicitly, including these complete real-data analyses.
+They write separate Pi-PLS and standard PLS (NIPALS) CSVs, derive comparison PDFs from both canonical
+tables, and then fit a separately chosen fixed Pi-PLS model.
 No block-aware scaling API is designed or scheduled.
 
 ## Runtime ownership
@@ -118,8 +119,10 @@ No block-aware scaling API is designed or scheduled.
 
 ```bash
 make check
+make examples
 make build
 ```
 
+Use `make examples` whenever numbered examples or their generated application artifacts change.
 Use `make build` whenever packaging, dependencies, public modules, or included data files change.
 Record each validation target as passed, failed, or not run.

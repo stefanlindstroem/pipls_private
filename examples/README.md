@@ -19,7 +19,12 @@ Install the data and plotting dependencies before running the real-data path exa
 
 ```bash
 python -m pip install -e ".[examples]"
+make examples
 ```
+
+`make examples` runs all numbered examples in order. It is intentionally separate from
+`make check`: the real-data analyses can be slow and generate application artifacts under
+`examples/results/`.
 
 The Pulp, Sugarcane, and Tobacco examples deliberately separate two stages:
 

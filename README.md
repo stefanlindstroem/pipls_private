@@ -36,6 +36,7 @@ For an examples-only environment, install the data-reading and plotting dependen
 
 ```bash
 python -m pip install -e ".[examples]"
+make examples
 ```
 
 ## Basic model
@@ -156,9 +157,11 @@ scientific question and one minimal CSV output:
 - predictor-nuisance comparison with ordinary PLS;
 - full-versus-randomized SVD consistency.
 
-The real-data workflows are user-run examples rather than benchmark or test-suite jobs. Examples
-10–12 read the public tables directly, write separate Pi-PLS and standard PLS component-path CSVs,
-generate a comparison PDF, and fit a separately chosen fixed Pi-PLS model.
+The real-data workflows are explicit application runs rather than benchmark or test-suite jobs.
+`make examples` runs every numbered example in order, including the complete Pulp, Sugarcane, and
+Tobacco analyses. Examples 10–12 read the public tables directly, write separate Pi-PLS and
+standard PLS component-path CSVs, generate a comparison PDF, and fit a separately chosen fixed
+Pi-PLS model.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
 [`examples/README.md`](examples/README.md).

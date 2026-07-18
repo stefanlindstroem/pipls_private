@@ -81,6 +81,8 @@
 - Report each applicable target as passed, failed, or not run; never describe inspection alone as
   validation.
 - Run focused tests while developing, then `make check` before delivery.
+- Run `make examples` for changes to numbered examples, example-generated CSV/PDF artifacts, or the
+  application-facing workflow. This target runs all examples, including Tobacco.
 - Run `make build` for packaging, dependency, public-module, or included-data changes.
 - Provide exact direct Git commands for `git apply --check`, application, inspection, validation,
   staging, committing, and `make snapshot`.

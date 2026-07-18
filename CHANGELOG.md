@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add a single `make examples` application-validation target that runs every numbered example in
+  order, including the complete Tobacco analysis, while keeping `make check` focused on fast
+  internal contracts.
 - Remove the duplicate Pulp, Sugarcane, and Tobacco smoke benchmark scripts and tests, and stop
   executing complete real-data examples in `make check`; retain fast dataset, path, PLS-helper,
   plotting, and workflow-structure contracts.

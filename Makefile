@@ -1,6 +1,9 @@
 PYTHON ?= python3
+EXAMPLE_SCRIPTS := $(sort $(wildcard examples/[0-9][0-9]_*.py))
+EXAMPLE_ENV := PYTHONPATH=src MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+	MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
 
-.PHONY: install test lint format typecheck docs build check snapshot clean
+.PHONY: install test lint format typecheck docs build check examples snapshot clean
 
 install:
 	$(PYTHON) -m pip install -e ".[dev]"
@@ -24,6 +27,12 @@ build:
 	$(PYTHON) -m build
 
 check: test lint typecheck
+
+examples:
+	@set -e; for example in $(EXAMPLE_SCRIPTS); do \
+		printf '==> %s\n' "$$example"; \
+		$(EXAMPLE_ENV) $(PYTHON) "$$example"; \
+	done
 
 snapshot:
 	./.llm/snapshot.sh

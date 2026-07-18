@@ -60,6 +60,29 @@ def test_examples_extra_declares_data_and_plotting_dependencies() -> None:
     assert '"matplotlib>=3.8"' in pyproject.split("dev = [", 1)[1].split("]", 1)[0]
 
 
+def test_make_examples_runs_every_numbered_example() -> None:
+    root = _repository_root()
+    completed = subprocess.run(
+        ["make", "-n", "examples"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    expected = [
+        "examples/07_advanced_cv.py",
+        "examples/08_synthetic_data.py",
+        "examples/10_pulp_real_data.py",
+        "examples/11_sugarcane_real_data.py",
+        "examples/12_tobacco_real_data.py",
+    ]
+    positions = [completed.stdout.index(filename) for filename in expected]
+
+    assert positions == sorted(positions)
+    assert completed.stdout.count("MPLBACKEND=Agg") == 1
+
+
 def test_required_llm_contracts_exist_and_are_formatted() -> None:
     root = _repository_root()
     missing = sorted(path for path in _REQUIRED_LLM_CONTRACTS if not (root / path).is_file())

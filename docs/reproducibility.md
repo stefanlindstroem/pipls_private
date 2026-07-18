@@ -12,18 +12,21 @@ A clean source checkout should support:
 ```bash
 python -m pip install -e ".[dev]"
 make check
+make examples
 make build
 ```
 
 Tests cover the numerical core, estimator API, model selection, cross-validation boundaries,
 scikit-learn compatibility, dataset readability, example helper/artifact contracts, and repository
-structure. Complete real-data examples are user-run analyses rather than default test-suite jobs.
-Randomized numerical paths and synthetic generators expose explicit random seeds.
+structure. `make examples` is the separate application-validation target and runs every numbered
+example, including the complete real-data analyses. Randomized numerical paths and synthetic
+generators expose explicit random seeds.
 
 The executable real-data examples require pandas and Matplotlib. Install their dedicated extra with:
 
 ```bash
 python -m pip install -e ".[examples]"
+make examples
 ```
 
 The development extra already includes these packages. Re-run `python -m pip install -e ".[dev]"`

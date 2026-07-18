@@ -386,8 +386,8 @@ PDF from those tables, and performs a separate fixed Pi-PLS fit after an explici
 The initial real-data smoke benchmark scripts and tests were removed after review because they
 repeated the same Pi-PLS paths, while dataset-specific tests executed the complete examples again.
 Default package validation now protects the reusable machinery on small data and the durable
-repository/file contracts. Complete real-data examples are run explicitly by users when their
-artifacts are needed.
+repository/file contracts. `make examples` runs every numbered example explicitly when application
+artifacts or end-to-end example validation are needed.
 
 ### Product documentation and release hardening
 

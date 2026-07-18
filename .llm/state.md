@@ -162,9 +162,9 @@ implemented independently:
 4. full-versus-randomized solver consistency.
 
 The earlier real-data smoke-check scripts and full example-execution tests were removed because they
-duplicated the analyses users run explicitly in examples 10–12. Pulp, Sugarcane, and Tobacco remain
-transparent user-run component-path examples. They write separate Pi-PLS and standard PLS (NIPALS)
-path CSVs for the same folds and component counts, generate an overlaid PDF from those tables, expose
+duplicated examples 10–12. Pulp, Sugarcane, and Tobacco remain transparent component-path examples,
+and `make examples` runs every numbered example as an explicit application-validation action.
+They write separate Pi-PLS and standard PLS (NIPALS) path CSVs for the same folds and component counts, generate an overlaid PDF from those tables, expose
 a visible user component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks
 recorded explicitly. Default tests retain dataset-layout, component-path API, PLS-helper, plotting,
 and workflow-structure contracts without executing the complete real-data analyses.
