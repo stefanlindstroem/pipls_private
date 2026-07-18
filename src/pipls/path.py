@@ -407,16 +407,16 @@ class PiPLSPathCV(
                 template=template,
                 n_components_key=n_components_key,
                 predictor_rank_key=predictor_rank_key,
-                scorer=scorer,
-                use_default_scoring=_uses_default_path_scoring(self.scoring),
                 X=X_indexable,
                 y=y_indexable,
                 splits=materialized.splits,
                 n_jobs=self.n_jobs,
                 ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
             )
-            predictions = oof.predictions[:, 0] if y_array.ndim == 1 else oof.predictions
-            counts = oof.prediction_counts
+            oof_predictions, counts = oof
+            predictions = (
+                oof_predictions[:, 0] if y_array.ndim == 1 else oof_predictions
+            )
             pooled_r2 = _pooled_oof_r2(y_indexable, predictions, counts)
 
         self.validation_report_ = PiPLSValidationReport(
@@ -817,14 +817,14 @@ def _adaptive_path_search(
         )
         return ranks, scores
 
-    search = _search_predictor_ranks(
+    history = _search_predictor_ranks(
         allowed_ranks=allowed_ranks,
         search_method="auto",
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
     )
     return tuple(
-        tuple(int(rank) for rank in batch) for batch in search.history
+        tuple(int(rank) for rank in batch) for batch in history
     )
 
 

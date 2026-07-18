@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and partially implemented. The fixed-estimator and sole-path-ownership steps are
-complete; private-code consolidation, example alignment, and final audit remain staged follow-up
+Accepted and partially implemented. The fixed-estimator, sole-path-ownership, and private-code
+consolidation steps are complete; example alignment and the final audit remain staged follow-up
 work.
 
 ## Context
@@ -54,15 +54,16 @@ This decision is implemented incrementally:
 
 1. simplify `PiPLSRegression` to fixed-model fitting;
 2. make `PiPLSPathCV` the sole triangular-selection interface;
-3. remove obsolete shared machinery and duplicated public results;
+3. remove obsolete shared machinery and duplicated private results;
 4. align examples and guides with the final two-stage workflow;
 5. perform a final API and minimality audit.
 
-Steps 1 and 2 are implemented. `PiPLSRegression` is fixed-rank only, and `PiPLSPathCV` now owns the
+Steps 1 through 3 are implemented. `PiPLSRegression` is fixed-rank only, and `PiPLSPathCV` owns the
 complete package selection lifecycle: feature probes, candidate folds, conditional path results,
 optional OOF fits, and selected full-data refit. The path supplies the warning-suppression policy to
-the private fold engine, which otherwise propagates warnings normally. Remaining transition work
-is private-code cleanup, example alignment, and final audit.
+the private fold engine, which otherwise propagates warnings normally. Obsolete solver tracing,
+unused rank-grid construction, duplicate candidate metadata, and OOF rescoring have been removed.
+Remaining transition work is example alignment and the final audit.
 
 ## Consequences
 

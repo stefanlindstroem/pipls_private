@@ -1,6 +1,7 @@
 from typing import Any
 
 import numpy as np
+import pytest
 
 from pipls import PiPLSRegression
 from pipls.metrics import (
@@ -30,3 +31,64 @@ def test_metric_callable_has_sklearn_scorer_signature() -> None:
         assert callable(scorer)
 
     consume_scorer(neg_response_standardized_mean_squared_error)
+
+
+def test_training_response_scale_uses_sample_standard_deviation() -> None:
+    from pipls.metrics import _training_response_scale
+
+    y_train = np.array(
+        [
+            [1.0, 5.0],
+            [3.0, 5.0],
+            [5.0, 5.0],
+        ]
+    )
+
+    scale = _training_response_scale(y_train)
+
+    np.testing.assert_allclose(scale, np.array([2.0, 1.0]))
+
+
+def test_training_response_scale_is_unit_for_singleton_training_data() -> None:
+    from pipls.metrics import _training_response_scale
+
+    np.testing.assert_array_equal(
+        _training_response_scale(np.array([[2.0, -3.0]])),
+        np.ones(2),
+    )
+
+
+def test_response_standardized_mse_is_uniform_over_samples_and_responses() -> None:
+    from pipls.metrics import _response_standardized_mse
+
+    y_true = np.array([[3.0, 9.0], [5.0, 13.0]])
+    y_pred = np.array([[1.0, 5.0], [4.0, 9.0]])
+    scale = np.array([2.0, 4.0])
+
+    loss = _response_standardized_mse(y_true, y_pred, scale)
+
+    expected = np.mean(np.array([1.0, 1.0, 0.25, 1.0]))
+    assert loss == expected
+
+
+def test_response_standardized_mse_supports_one_dimensional_targets() -> None:
+    from pipls.metrics import _response_standardized_mse
+
+    loss = _response_standardized_mse(
+        np.array([2.0, 6.0]),
+        np.array([0.0, 4.0]),
+        np.array([2.0]),
+    )
+
+    assert loss == 1.0
+
+
+def test_response_standardized_mse_rejects_invalid_scale() -> None:
+    from pipls.metrics import _response_standardized_mse
+
+    with pytest.raises(ValueError, match="positive finite"):
+        _response_standardized_mse(
+            np.ones((2, 2)),
+            np.zeros((2, 2)),
+            np.array([1.0, 0.0]),
+        )

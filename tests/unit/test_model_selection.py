@@ -9,10 +9,7 @@ from pipls.model_selection import (
     _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
     _max_predictor_rank,
-    _predictor_rank_values,
-    _response_standardized_mse,
     _select_predictor_rank,
-    _training_response_scale,
 )
 
 
@@ -162,69 +159,6 @@ def test_materialize_cv_splits_rejects_invalid_splits(splits: object) -> None:
 
     with pytest.raises(ValueError):
         _materialize_cv_splits(splits, X, y)
-
-
-def test_predictor_rank_values_cover_every_admissible_rank() -> None:
-    np.testing.assert_array_equal(
-        _predictor_rank_values(n_components=3, max_predictor_rank=6),
-        np.array([3, 4, 5, 6], dtype=np.intp),
-    )
-
-
-def test_predictor_rank_values_reject_empty_admissible_set() -> None:
-    with pytest.raises(ValueError, match="must not exceed"):
-        _predictor_rank_values(n_components=4, max_predictor_rank=3)
-
-
-def test_training_response_scale_uses_sample_standard_deviation() -> None:
-    y_train = np.array(
-        [
-            [1.0, 5.0],
-            [3.0, 5.0],
-            [5.0, 5.0],
-        ]
-    )
-
-    scale = _training_response_scale(y_train)
-
-    np.testing.assert_allclose(scale, np.array([2.0, 1.0]))
-
-
-def test_training_response_scale_is_unit_for_singleton_training_data() -> None:
-    np.testing.assert_array_equal(
-        _training_response_scale(np.array([[2.0, -3.0]])),
-        np.ones(2),
-    )
-
-
-def test_response_standardized_mse_is_uniform_over_samples_and_responses() -> None:
-    y_true = np.array([[3.0, 9.0], [5.0, 13.0]])
-    y_pred = np.array([[1.0, 5.0], [4.0, 9.0]])
-    scale = np.array([2.0, 4.0])
-
-    loss = _response_standardized_mse(y_true, y_pred, scale)
-
-    expected = np.mean(np.array([1.0, 1.0, 0.25, 1.0]))
-    assert loss == pytest.approx(expected)
-
-
-def test_response_standardized_mse_supports_one_dimensional_targets() -> None:
-    loss = _response_standardized_mse(
-        np.array([2.0, 6.0]),
-        np.array([0.0, 4.0]),
-        np.array([2.0]),
-    )
-
-    assert loss == pytest.approx(1.0)
-
-
-def test_response_standardized_mse_rejects_invalid_scale() -> None:
-    with pytest.raises(ValueError, match="positive finite"):
-        _response_standardized_mse(
-            np.ones((2, 2)),
-            np.zeros((2, 2)),
-            np.array([1.0, 0.0]),
-        )
 
 
 def test_select_predictor_rank_uses_low_rank_tie_breaking() -> None:

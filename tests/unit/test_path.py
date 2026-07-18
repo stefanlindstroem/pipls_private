@@ -207,6 +207,34 @@ def test_low_samples_per_predictor_rank_warns() -> None:
         ).fit(X, Y)
 
 
+def test_oof_generation_does_not_rescore_the_selected_candidate() -> None:
+    X, Y = _data(18)
+    calls = 0
+
+    def counting_scorer(
+        estimator: object,
+        X_validation: object,
+        y_validation: object,
+    ) -> float:
+        nonlocal calls
+        del estimator, X_validation, y_validation
+        calls += 1
+        return 0.0
+
+    PiPLSPathCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        max_predictor_rank=1,
+        cv=3,
+        scoring=counting_scorer,
+        refit=False,
+        return_oof_predictions=True,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert calls == 3
+
+
 def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> None:
     X, Y = _data(12)
 

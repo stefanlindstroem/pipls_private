@@ -32,9 +32,9 @@ No block-aware scaling API is designed or scheduled.
 ## Accepted transition
 
 Decision 0039 is partially implemented. `PiPLSRegression` owns one explicit fixed rank pair and no
-cross-validation or selection results. `PiPLSPathCV` now owns the complete triangular-selection
-lifecycle. The next patch removes obsolete private selection machinery before later example and
-final-audit work.
+cross-validation or selection results. `PiPLSPathCV` owns the complete triangular-selection
+lifecycle, and obsolete private selection machinery has been removed. The next patch simplifies
+examples and guides before the final audit.
 
 ## Runtime ownership
 

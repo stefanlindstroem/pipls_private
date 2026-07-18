@@ -21,7 +21,7 @@ from ._core import SVDSolver, fit_pipls_core
 from ._sklearn_compat import _validate_estimator_data
 from .decomposition import PiPLSDecomposition
 from .exceptions import StatisticalSupportWarning
-from .model_selection import _training_response_scale
+from .metrics import _training_response_scale
 
 FloatArray = NDArray[np.float64]
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 4.0

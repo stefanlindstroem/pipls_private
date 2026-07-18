@@ -6,7 +6,7 @@ import warnings
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from time import perf_counter
-from typing import Any, Literal, cast
+from typing import Any, cast
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -14,13 +14,11 @@ from numpy.typing import ArrayLike, NDArray
 from sklearn.base import clone
 from sklearn.utils import _safe_indexing
 
-from ._core import ResolvedSVDSolver
-from .model_selection import CVSplit, _response_standardized_mse, _training_response_scale
+from .metrics import _response_standardized_mse, _training_response_scale
+from .model_selection import CVSplit
 
 FloatArray = NDArray[np.float64]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
-SolverGetter = Callable[[Any], ResolvedSVDSolver]
-ParallelPreference = Literal["threads"] | None
 WarningCategory = type[Warning]
 
 
@@ -42,36 +40,10 @@ class _PiPLSCandidate:
 class _PiPLSCandidateResult:
     """Fold-level results for one Pi-PLS candidate."""
 
-    candidate: _PiPLSCandidate
     split_scores: FloatArray
     split_response_standardized_mse: FloatArray
     split_fit_times: FloatArray
     split_score_times: FloatArray
-    split_svd_solvers: tuple[ResolvedSVDSolver, ...]
-
-    @property
-    def n_components(self) -> int:
-        """Return the response-side component count."""
-
-        return self.candidate.n_components
-
-    @property
-    def predictor_rank(self) -> int:
-        """Return the predictor truncation rank."""
-
-        return self.candidate.predictor_rank
-
-
-
-
-@dataclass(frozen=True)
-class _OOFResult:
-    """Ordered out-of-fold predictions for one fixed candidate."""
-
-    predictions: FloatArray
-    prediction_counts: NDArray[np.intp]
-    split_scores: FloatArray
-    split_response_standardized_mse: FloatArray
 
 
 CandidateCache = dict[tuple[int, int], _PiPLSCandidateResult]
@@ -90,8 +62,6 @@ def _evaluate_candidate_batch(
     y: ArrayLike,
     splits: tuple[CVSplit, ...],
     n_jobs: int | None,
-    solver_getter: SolverGetter | None = None,
-    parallel_preference: ParallelPreference = None,
     ignored_warning_categories: tuple[WarningCategory, ...] = (),
 ) -> tuple[_PiPLSCandidate, ...]:
     """Evaluate uncached candidates and update ``cache`` in input order."""
@@ -108,7 +78,7 @@ def _evaluate_candidate_batch(
 
     results = cast(
         list[_PiPLSCandidateResult],
-        Parallel(n_jobs=n_jobs, prefer=parallel_preference)(
+        Parallel(n_jobs=n_jobs)(
             delayed(_evaluate_candidate)(
                 candidate=candidate,
                 template=template,
@@ -119,14 +89,13 @@ def _evaluate_candidate_batch(
                 X=X,
                 y=y,
                 splits=splits,
-                solver_getter=solver_getter,
                 ignored_warning_categories=ignored_warning_categories,
             )
             for candidate in pending
         ),
     )
-    for result in results:
-        cache[result.candidate.key] = result
+    for candidate, result in zip(pending, results, strict=True):
+        cache[candidate.key] = result
     return tuple(pending)
 
 
@@ -141,7 +110,6 @@ def _evaluate_candidate(
     X: ArrayLike,
     y: ArrayLike,
     splits: tuple[CVSplit, ...],
-    solver_getter: SolverGetter | None,
     ignored_warning_categories: tuple[WarningCategory, ...],
 ) -> _PiPLSCandidateResult:
     """Evaluate one candidate on every materialized split."""
@@ -150,7 +118,6 @@ def _evaluate_candidate(
     split_mse = np.empty(len(splits), dtype=np.float64)
     split_fit_times = np.empty(len(splits), dtype=np.float64)
     split_score_times = np.empty(len(splits), dtype=np.float64)
-    split_svd_solvers: list[ResolvedSVDSolver] = []
     params = {
         n_components_key: candidate.n_components,
         predictor_rank_key: candidate.predictor_rank,
@@ -194,17 +161,13 @@ def _evaluate_candidate(
             split_scores[split_index] = score
         split_score_times[split_index] = perf_counter() - score_started
 
-        if solver_getter is not None:
-            split_svd_solvers.append(solver_getter(estimator))
-
     return _PiPLSCandidateResult(
-        candidate=candidate,
         split_scores=split_scores,
         split_response_standardized_mse=split_mse,
         split_fit_times=split_fit_times,
         split_score_times=split_score_times,
-        split_svd_solvers=tuple(split_svd_solvers),
     )
+
 
 def _ordered_oof_predictions(
     *,
@@ -212,16 +175,13 @@ def _ordered_oof_predictions(
     template: Any,
     n_components_key: str,
     predictor_rank_key: str,
-    scorer: Scorer | None,
-    use_default_scoring: bool,
     X: ArrayLike,
     y: ArrayLike,
     splits: tuple[CVSplit, ...],
     n_jobs: int | None,
-    parallel_preference: ParallelPreference = None,
     ignored_warning_categories: tuple[WarningCategory, ...] = (),
-) -> _OOFResult:
-    """Fit one fixed candidate on each split and return row-ordered predictions.
+) -> tuple[FloatArray, NDArray[np.intp]]:
+    """Fit one fixed candidate on each split and return ordered predictions.
 
     Rows validated more than once are averaged. Rows never used for validation are
     filled with NaN and have a zero entry in ``prediction_counts``.
@@ -232,13 +192,11 @@ def _ordered_oof_predictions(
         predictor_rank_key: candidate.predictor_rank,
     }
     split_results = cast(
-        list[tuple[NDArray[np.intp], FloatArray, float, float]],
-        Parallel(n_jobs=n_jobs, prefer=parallel_preference)(
+        list[tuple[NDArray[np.intp], FloatArray]],
+        Parallel(n_jobs=n_jobs)(
             delayed(_fit_predict_split)(
                 template=template,
                 params=params,
-                scorer=scorer,
-                use_default_scoring=use_default_scoring,
                 X=X,
                 y=y,
                 train=train,
@@ -254,47 +212,33 @@ def _ordered_oof_predictions(
     n_targets = 1 if y_array.ndim == 1 else int(y_array.shape[1])
     prediction_sum = np.zeros((n_samples, n_targets), dtype=np.float64)
     prediction_counts = np.zeros(n_samples, dtype=np.intp)
-    split_scores = np.empty(len(split_results), dtype=np.float64)
-    split_mse = np.empty(len(split_results), dtype=np.float64)
 
-    for split_index, (validation, prediction, score, mse) in enumerate(split_results):
+    for validation, prediction in split_results:
         prediction_sum[validation] += prediction
         prediction_counts[validation] += 1
-        split_scores[split_index] = score
-        split_mse[split_index] = mse
 
     predictions = np.full((n_samples, n_targets), np.nan, dtype=np.float64)
     covered = prediction_counts > 0
-    predictions[covered] = (
-        prediction_sum[covered] / prediction_counts[covered, None]
-    )
-    return _OOFResult(
-        predictions=predictions,
-        prediction_counts=prediction_counts,
-        split_scores=split_scores,
-        split_response_standardized_mse=split_mse,
-    )
+    predictions[covered] = prediction_sum[covered] / prediction_counts[covered, None]
+    return predictions, prediction_counts
 
 
 def _fit_predict_split(
     *,
     template: Any,
     params: dict[str, int],
-    scorer: Scorer | None,
-    use_default_scoring: bool,
     X: ArrayLike,
     y: ArrayLike,
     train: NDArray[np.intp],
     validation: NDArray[np.intp],
     ignored_warning_categories: tuple[WarningCategory, ...],
-) -> tuple[NDArray[np.intp], FloatArray, float, float]:
+) -> tuple[NDArray[np.intp], FloatArray]:
     """Fit and predict one split for ordered OOF aggregation."""
 
     estimator = clone(template).set_params(**params)
     X_train = _safe_indexing(X, train)
     y_train = _safe_indexing(y, train)
     X_validation = _safe_indexing(X, validation)
-    y_validation = _safe_indexing(y, validation)
     _fit_with_ignored_warnings(
         estimator,
         X_train,
@@ -304,22 +248,7 @@ def _fit_predict_split(
     prediction = np.asarray(estimator.predict(X_validation), dtype=np.float64)
     if prediction.ndim == 1:
         prediction = prediction.reshape(-1, 1)
-    mse = _response_standardized_mse(
-        y_validation,
-        prediction,
-        _training_response_scale(y_train),
-    )
-    if use_default_scoring:
-        score = -mse
-    else:
-        assert scorer is not None
-        score = float(scorer(estimator, X_validation, y_validation))
-        if not np.isfinite(score):
-            raise ValueError(
-                "The scoring callable returned a nonfinite value while generating "
-                "out-of-fold predictions."
-            )
-    return validation.copy(), prediction, score, mse
+    return validation.copy(), prediction
 
 
 def _fit_with_ignored_warnings(

@@ -233,11 +233,10 @@ Extract fold-level candidate evaluation and one-dimensional rank-search orchestr
 public class wrap the other. Add equivalence tests showing that one fixed path row matches the
 corresponding estimator rank search.
 
-Current status: **historically complete and partially superseded by Decision 0039**. Candidate
-cloning, fold-local fitting, scoring, standardized loss, caching, and optional solver diagnostics
-remain centralized in `_cv_engine.py`, while exhaustive and adaptive rank refinement remain in
-`model_selection.py`. `PiPLSRegression` no longer consumes this machinery; it is now path-owned and
-scheduled for cleanup in Phase F1 patch 4.
+Current status: **historically complete and superseded by Decision 0039**. Candidate cloning,
+fold-local fitting, scoring, standardized loss, and caching remain path-owned. Unused solver
+diagnostics, duplicate candidate metadata, and former estimator-search helpers have been removed.
+Exhaustive and adaptive rank refinement remain in `model_selection.py`.
 
 ### Phase D1b: scikit-learn and PLS-style API alignment
 
@@ -405,7 +404,7 @@ Decision 0039 establishes a staged API correction before release hardening. The 
 Implementation order is fixed-model estimator, sole path selection, dead-code consolidation,
 example and guide alignment, then final API/minimality audit.
 
-Current status: **patches 2 and 3 complete; obsolete private selection cleanup next**.
+Current status: **patches 2 through 4 complete; example and guide alignment next**.
 
 ### Product documentation and release hardening
 
@@ -435,9 +434,8 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement patch 4 of Phase F1: remove obsolete private selection machinery and duplicated result
-structures left by the former embedded `PiPLSRegression` search. Preserve the public behavior of
-the fixed estimator and path meta-estimator.
+Implement patch 5 of Phase F1: simplify examples and guides around the final two-stage path
+workflow and explicit fixed-model refit. Preserve the public selection and artifact contracts.
 
 Resume documentation and release hardening only after the full Phase F1 sequence and final audit.
 

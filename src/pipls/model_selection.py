@@ -126,7 +126,6 @@ def _materialize_cv_splits(
     )
 
 
-
 def _is_leave_one_out_splits(
     splits: tuple[CVSplit, ...],
     *,
@@ -183,18 +182,6 @@ def _pooled_oof_r2(
         )
     )
 
-def _predictor_rank_values(*, n_components: int, max_predictor_rank: int) -> IntArray:
-    """Return every admissible predictor rank for one fixed component count."""
-
-    _validate_positive_int(n_components, name="n_components")
-    _validate_positive_int(max_predictor_rank, name="max_predictor_rank")
-    if n_components > max_predictor_rank:
-        raise ValueError(
-            "n_components must not exceed max_predictor_rank: "
-            f"got {n_components} and {max_predictor_rank}."
-        )
-    return np.arange(n_components, max_predictor_rank + 1, dtype=np.intp)
-
 
 def _logarithmic_predictor_rank_values(
     *,
@@ -243,23 +230,14 @@ def _adaptive_refinement_interval(
     return int(sorted_ranks[lower_index]), int(sorted_ranks[upper_index])
 
 
-
-@dataclass(frozen=True)
-class _RankSearchResult:
-    """Trace of one exhaustive or adaptive predictor-rank search."""
-
-    history: tuple[IntArray, ...]
-    final_interval: tuple[int, int]
-
-
 def _search_predictor_ranks(
     *,
     allowed_ranks: ArrayLike,
     search_method: Literal["optimal", "auto"],
     evaluate: Callable[[IntArray], IntArray],
     evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
-) -> _RankSearchResult:
-    """Run the shared exhaustive or adaptive one-dimensional rank search."""
+) -> tuple[IntArray, ...]:
+    """Return the evaluated batches from one rank search."""
 
     allowed = np.asarray(allowed_ranks)
     if allowed.ndim != 1 or allowed.size == 0 or allowed.dtype.kind not in "iu":
@@ -305,46 +283,7 @@ def _search_predictor_ranks(
             break
         interval = refined
 
-    return _RankSearchResult(
-        history=tuple(history),
-        final_interval=(int(interval[0]), int(interval[-1])),
-    )
-
-def _training_response_scale(y_train: ArrayLike) -> FloatArray:
-    """Return fold-local response scales using ``ddof=1`` and unit zero scales."""
-
-    y_array = _as_2d_targets(y_train, name="y_train")
-    if y_array.shape[0] <= 1:
-        return np.ones(y_array.shape[1], dtype=np.float64)
-    scale = np.std(y_array, axis=0, ddof=1)
-    return np.where(scale == 0.0, 1.0, scale).astype(np.float64, copy=False)
-
-
-def _response_standardized_mse(
-    y_true: ArrayLike,
-    y_pred: ArrayLike,
-    response_scale: ArrayLike,
-) -> float:
-    """Return uniformly response-weighted MSE after fold-local scaling."""
-
-    true_array = _as_2d_targets(y_true, name="y_true")
-    pred_array = _as_2d_targets(y_pred, name="y_pred")
-    if true_array.shape != pred_array.shape:
-        raise ValueError(
-            "y_true and y_pred must have identical shapes: "
-            f"got {true_array.shape} and {pred_array.shape}."
-        )
-    scale = np.asarray(response_scale, dtype=np.float64)
-    if scale.ndim != 1 or scale.shape[0] != true_array.shape[1]:
-        raise ValueError(
-            "response_scale must contain one value per response: "
-            f"expected {(true_array.shape[1],)}, got {scale.shape}."
-        )
-    if not np.all(np.isfinite(scale)) or np.any(scale <= 0.0):
-        raise ValueError("response_scale must contain positive finite values.")
-    standardized_residual = (true_array - pred_array) / scale[None, :]
-    return float(np.mean(np.square(standardized_residual)))
-
+    return tuple(history)
 
 
 def _rank_test_scores(
@@ -371,6 +310,7 @@ def _rank_test_scores(
             group_start = position
         ranks[index] = group_start + 1
     return ranks
+
 
 def _select_predictor_rank(
     predictor_ranks: ArrayLike,
@@ -417,19 +357,6 @@ def _as_index_array(index: ArrayLike, *, name: str, n_samples: int) -> IntArray:
     if np.any(converted < 0) or np.any(converted >= n_samples):
         raise ValueError(f"{name} contains an index outside [0, {n_samples}).")
     return converted
-
-
-def _as_2d_targets(values: ArrayLike, *, name: str) -> FloatArray:
-    array = np.asarray(values, dtype=np.float64)
-    if array.ndim == 1:
-        array = array.reshape(-1, 1)
-    if array.ndim != 2:
-        raise ValueError(f"{name} must be one- or two-dimensional; got shape {array.shape}.")
-    if array.shape[0] == 0 or array.shape[1] == 0:
-        raise ValueError(f"{name} must contain at least one sample and one response.")
-    if not np.all(np.isfinite(array)):
-        raise ValueError(f"{name} must contain only finite values.")
-    return array
 
 
 def _validate_positive_int(value: Any, *, name: str) -> None:

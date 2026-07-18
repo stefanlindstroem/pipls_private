@@ -126,7 +126,7 @@ Additional fixed decisions:
 
 ## Accepted staged estimator/search correction
 
-Decision 0039 is partially implemented. Patches 2 and 3 established the estimator/search boundary:
+Decision 0039 is partially implemented. Patches 2 through 4 established and consolidated the estimator/search boundary:
 
 - `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
 - it owns no CV, scoring, OOF, or search-result parameters and attributes;
@@ -134,10 +134,11 @@ Decision 0039 is partially implemented. Patches 2 and 3 established the estimato
 - `PiPLSPathCV` owns feature probes, candidate folds, conditional path selection, optional OOF
   fitting, and selected full-data refitting;
 - the path supplies the private fold engine with the one warning category it may suppress, while
-  unrelated warnings remain visible.
+  unrelated warnings remain visible;
+- unused rank-grid construction, solver tracing, duplicate candidate metadata, and OOF rescoring
+  have been removed from the private selection layer.
 
-The next patches remove obsolete private selection code, align examples and guides, and perform the
-final minimality audit.
+The next patches align examples and guides and perform the final minimality audit.
 
 ## Current standardization boundary and deferred block-aware direction
 
@@ -191,9 +192,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue Decision 0039 with patch 4/6: remove obsolete private selection machinery and duplicated
-results left by the former embedded `PiPLSRegression` search. Do not yet perform the example cleanup
-or final audit reserved for later patches.
+Continue Decision 0039 with patch 5/6: simplify examples and guides around the final two-stage
+`PiPLSPathCV` workflow and explicit fixed-model refit. Do not yet perform the final audit reserved
+for patch 6.
 
 After the estimator/search correction and final audit, resume user documentation and release
 hardening. Do not add another dataset or benchmark without a new package-level question.

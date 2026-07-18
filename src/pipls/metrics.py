@@ -4,10 +4,11 @@ from __future__ import annotations
 
 from typing import Any, cast
 
-from numpy.typing import ArrayLike
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
 from sklearn.utils.validation import check_is_fitted
 
-from .model_selection import _response_standardized_mse
+FloatArray = NDArray[np.float64]
 
 
 def response_standardized_mean_squared_error(
@@ -41,6 +42,42 @@ def neg_response_standardized_mean_squared_error(
     return -response_standardized_mean_squared_error(estimator, X, y)
 
 
+def _training_response_scale(y_train: ArrayLike) -> FloatArray:
+    """Return training response scales using ``ddof=1`` and unit zero scales."""
+
+    y_array = _as_2d_targets(y_train, name="y_train")
+    if y_array.shape[0] <= 1:
+        return np.ones(y_array.shape[1], dtype=np.float64)
+    scale = np.std(y_array, axis=0, ddof=1)
+    return np.where(scale == 0.0, 1.0, scale).astype(np.float64, copy=False)
+
+
+def _response_standardized_mse(
+    y_true: ArrayLike,
+    y_pred: ArrayLike,
+    response_scale: ArrayLike,
+) -> float:
+    """Return uniformly response-weighted MSE after response scaling."""
+
+    true_array = _as_2d_targets(y_true, name="y_true")
+    pred_array = _as_2d_targets(y_pred, name="y_pred")
+    if true_array.shape != pred_array.shape:
+        raise ValueError(
+            "y_true and y_pred must have identical shapes: "
+            f"got {true_array.shape} and {pred_array.shape}."
+        )
+    scale = np.asarray(response_scale, dtype=np.float64)
+    if scale.ndim != 1 or scale.shape[0] != true_array.shape[1]:
+        raise ValueError(
+            "response_scale must contain one value per response: "
+            f"expected {(true_array.shape[1],)}, got {scale.shape}."
+        )
+    if not np.all(np.isfinite(scale)) or np.any(scale <= 0.0):
+        raise ValueError("response_scale must contain positive finite values.")
+    standardized_residual = (true_array - pred_array) / scale[None, :]
+    return float(np.mean(np.square(standardized_residual)))
+
+
 def _response_scale_for_scoring(estimator: Any) -> ArrayLike:
     """Return the fitted response scale from a direct estimator or final pipeline step."""
 
@@ -52,6 +89,17 @@ def _response_scale_for_scoring(estimator: Any) -> ArrayLike:
         final_estimator = steps[-1][1]
         check_is_fitted(final_estimator, attributes=["response_scale_for_scoring_"])
         return cast(ArrayLike, final_estimator.response_scale_for_scoring_)
-    raise ValueError(
-        "The estimator does not expose a fitted Pi-PLS response scale for scoring."
-    )
+    raise ValueError("The estimator does not expose a fitted Pi-PLS response scale for scoring.")
+
+
+def _as_2d_targets(values: ArrayLike, *, name: str) -> FloatArray:
+    array = np.asarray(values, dtype=np.float64)
+    if array.ndim == 1:
+        array = array.reshape(-1, 1)
+    if array.ndim != 2:
+        raise ValueError(f"{name} must be one- or two-dimensional; got shape {array.shape}.")
+    if array.shape[0] == 0 or array.shape[1] == 0:
+        raise ValueError(f"{name} must contain at least one sample and one response.")
+    if not np.all(np.isfinite(array)):
+        raise ValueError(f"{name} must contain only finite values.")
+    return array
