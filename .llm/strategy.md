@@ -403,7 +403,7 @@ Decision 0039 establishes a staged API correction before release hardening. The 
 Implementation order is fixed-model estimator, sole path selection, dead-code consolidation,
 example and guide alignment, then final API/minimality audit.
 
-Current status: **accepted; implementation pending**.
+Current status: **patch 2 complete; path-ownership consolidation next**.
 
 ### Product documentation and release hardening
 

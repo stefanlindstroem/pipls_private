@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented. This decision refines the rank-bound parts of Decisions 0003, 0005,
-0010, and 0031.
+Accepted and implemented for `PiPLSPathCV`. This decision refines the rank-bound parts of
+Decisions 0003, 0005, 0010, and 0031; fixed `PiPLSRegression` no longer derives a rank ceiling.
 
 ## Context
 

@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import pytest
 
@@ -17,6 +19,7 @@ def test_fit_exposes_expected_fixed_rank_attributes() -> None:
     model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
 
     assert model.predictor_rank_ == 4
+    assert model.max_predictor_rank_ == min(X.shape[1], X.shape[0] - 1)
     assert model.Pi_.shape == (8, 4)
     assert model.C_.shape == (3, 2)
     assert model.W_.shape == (4, 2)
@@ -73,6 +76,12 @@ def test_invalid_constructor_combination_is_rejected() -> None:
         PiPLSRegression(n_components=3, predictor_rank=2).fit(X, Y)
 
 
+def test_rank_above_centered_matrix_limit_is_rejected() -> None:
+    X, Y = _data()
+    with pytest.raises(ValueError, match="predictor_rank <= min"):
+        PiPLSRegression(n_components=1, predictor_rank=X.shape[1] + 1).fit(X, Y)
+
+
 def test_wrong_feature_count_is_rejected_at_prediction() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
@@ -91,310 +100,47 @@ def test_constant_columns_have_unit_scale() -> None:
     assert model.y_scale_[0] == 1.0
 
 
-def test_max_rank_mode_uses_rule_derived_bound() -> None:
+def test_default_estimator_is_one_fixed_pair() -> None:
+    model = PiPLSRegression()
+
+    assert model.n_components == 2
+    assert model.predictor_rank == 2
+    assert set(model.get_params()) == {
+        "copy",
+        "n_components",
+        "predictor_rank",
+        "random_state",
+        "scale",
+        "svd_solver",
+    }
+
+
+def test_fit_creates_no_selection_attributes() -> None:
     X, Y = _data()
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="max",
-        samples_per_predictor_rank=10,
-    ).fit(X, Y)
+    model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
 
-    assert model.max_predictor_rank_ == 4
-    assert model.predictor_rank_ == 4
-    assert model.Pi_.shape == (X.shape[1], 4)
+    for name in (
+        "best_params_",
+        "best_score_",
+        "cv_results_",
+        "validation_report_",
+        "oof_predictions_",
+        "predictor_rank_values_",
+        "predictor_rank_search_history_",
+    ):
+        assert not hasattr(model, name)
 
 
-def test_samples_per_predictor_rank_changes_max_mode() -> None:
+def test_statistical_support_warning_uses_four_samples_per_rank_boundary() -> None:
     X, Y = _data()
-    lower_rank = PiPLSRegression(
-        n_components=2,
-        predictor_rank="max",
-        samples_per_predictor_rank=20,
-    ).fit(X, Y)
-    higher_rank = PiPLSRegression(
-        n_components=2,
-        predictor_rank="max",
-        samples_per_predictor_rank=8,
-    ).fit(X, Y)
+    rng = np.random.default_rng(99)
+    X_wide = np.column_stack([X, rng.normal(size=(X.shape[0], 3))])
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", StatisticalSupportWarning)
+        PiPLSRegression(n_components=2, predictor_rank=10).fit(X_wide, Y)
 
-    assert lower_rank.predictor_rank_ == 2
-    assert higher_rank.predictor_rank_ == 5
-
-
-def test_explicit_rank_bypasses_rule_derived_bound() -> None:
-    X, Y = _data()
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank=4,
-        samples_per_predictor_rank=100,
-    ).fit(X, Y)
-
-    assert model.max_predictor_rank_ == 1
-    assert model.predictor_rank_ == 4
-
-
-@pytest.mark.parametrize("value", [0, -1, np.inf, True])
-def test_invalid_samples_per_predictor_rank_is_rejected(value: object) -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="samples_per_predictor_rank"):
-        PiPLSRegression(
-            n_components=2,
-            predictor_rank="max",
-            samples_per_predictor_rank=value,  # type: ignore[arg-type]
-        ).fit(X, Y)
-
-
-def test_default_predictor_rank_mode_is_auto() -> None:
-    assert PiPLSRegression().predictor_rank == "auto"
-
-
-def test_auto_rank_mode_exposes_diagnostics() -> None:
-    X, Y = _data()
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=8,
-        cv=4,
-        n_jobs=1,
-    ).fit(X, Y)
-
-    assert model.max_predictor_rank_ == 5
-    assert model.predictor_rank_search_method_ == "auto"
-    assert model.predictor_rank_search_exhaustive_
-    assert model.n_predictor_rank_candidates_ == 4
-    assert model.n_predictor_rank_evaluated_ == 4
-    assert model.n_predictor_rank_skipped_ == 0
-    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4, 5]))
-    assert model.predictor_rank_ in model.predictor_rank_values_
-    assert model.n_splits_ == 4
-    assert model.cv_n_train_min_ == 30
-    results = model.predictor_rank_cv_results_
-    assert results["mean_test_score"].shape == (4,)
-    assert results["mean_response_standardized_mse"].shape == (4,)
-    selected_index = int(np.flatnonzero(model.predictor_rank_values_ == model.predictor_rank_)[0])
-    assert model.best_score_ == pytest.approx(results["mean_test_score"][selected_index])
-    assert model.best_response_standardized_mse_ == pytest.approx(
-        results["mean_response_standardized_mse"][selected_index]
-    )
-
-
-def test_auto_rank_refits_selected_rank_on_all_data() -> None:
-    X, Y = _data()
-    automatic = PiPLSRegression(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=8,
-        cv=4,
-        n_jobs=1,
-    ).fit(X, Y)
-    explicit = PiPLSRegression(
-        n_components=2,
-        predictor_rank=automatic.predictor_rank_,
-    ).fit(X, Y)
-
-    np.testing.assert_allclose(automatic.coef_, explicit.coef_)
-    np.testing.assert_allclose(automatic.intercept_, explicit.intercept_)
-    np.testing.assert_allclose(automatic.predict(X), explicit.predict(X))
-
-
-def test_auto_rank_uses_full_sample_support_and_fold_feasibility_cap() -> None:
-    X, Y = _data()
-    splits = [
-        (np.arange(8), np.arange(8, 12)),
-        (np.arange(6), np.arange(12, 16)),
-    ]
-    with pytest.warns(StatisticalSupportWarning):
-        model = PiPLSRegression(
-            n_components=2,
-            predictor_rank="auto",
-            samples_per_predictor_rank=2,
-            cv=splits,
-            n_jobs=1,
-        ).fit(X[:16], Y[:16])
-
-    assert model.cv_n_train_min_ == 6
-    assert model.max_predictor_rank_ == 5
-    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4, 5]))
-
-
-def test_auto_rank_uses_fold_local_preprocessing() -> None:
-    X, Y = _data()
-    splits = [
-        (np.arange(8), np.arange(8, 12)),
-        (np.arange(4, 12), np.arange(0, 4)),
-    ]
-    with pytest.warns(StatisticalSupportWarning):
-        automatic = PiPLSRegression(
-            n_components=2,
-            predictor_rank="auto",
-            samples_per_predictor_rank=4,
-            cv=splits,
-            n_jobs=1,
-        ).fit(X[:12], Y[:12])
-    manual = PiPLSRegression(n_components=2, predictor_rank=2).fit(
-        X[:8],
-        Y[:8],
-    )
-    response_scale = np.std(Y[:8], axis=0, ddof=1)
-    expected = np.mean(((Y[8:12] - manual.predict(X[8:12])) / response_scale[None, :]) ** 2)
-
-    assert automatic.predictor_rank_cv_results_["split0_response_standardized_mse"][
-        0
-    ] == pytest.approx(expected)
-
-
-def test_auto_rank_uses_smallest_rank_for_equal_scores() -> None:
-    X, Y = _data()
-
-    def constant_scorer(
-        estimator: PiPLSRegression,
-        X_validation: np.ndarray,
-        y_validation: np.ndarray,
-    ) -> float:
-        del estimator, X_validation, y_validation
-        return 1.0
-
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=5,
-        cv=3,
-        scoring=constant_scorer,
-        n_jobs=1,
-    ).fit(X, Y)
-
-    assert model.predictor_rank_ == 2
-
-
-@pytest.mark.parametrize("value", [0, True, 1.5])
-def test_auto_rank_rejects_invalid_n_jobs(value: object) -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="n_jobs"):
-        PiPLSRegression(
-            n_components=2,
-            predictor_rank="auto",
-            n_jobs=value,  # type: ignore[arg-type]
-        ).fit(X, Y)
-
-
-def test_auto_rank_rejects_unknown_scorer() -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="Unknown scoring"):
-        PiPLSRegression(
-            n_components=2,
-            predictor_rank="auto",
-            scoring="not_a_scorer",
-        ).fit(X, Y)
-
-
-def test_auto_rank_accepts_sklearn_scorer_and_parallel_candidates() -> None:
-    X, Y = _data()
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=8,
-        cv=3,
-        scoring="neg_mean_squared_error",
-        n_jobs=2,
-    ).fit(X, Y)
-
-    assert model.predictor_rank_ in model.predictor_rank_values_
-    assert np.isfinite(model.best_score_)
-    assert np.isfinite(model.best_response_standardized_mse_)
-
-
-def test_optimal_rank_mode_exhaustively_evaluates_all_candidates() -> None:
-    X, Y = _data()
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="optimal",
-        samples_per_predictor_rank=8,
-        cv=4,
-        n_jobs=1,
-    ).fit(X, Y)
-
-    np.testing.assert_array_equal(model.predictor_rank_values_, np.array([2, 3, 4, 5]))
-    np.testing.assert_array_equal(
-        model.predictor_rank_evaluation_order_, np.array([2, 3, 4, 5])
-    )
-    assert model.predictor_rank_search_method_ == "optimal"
-    assert model.predictor_rank_search_exhaustive_
-    assert model.n_predictor_rank_candidates_ == 4
-    assert model.n_predictor_rank_evaluated_ == 4
-    assert model.n_predictor_rank_skipped_ == 0
-    np.testing.assert_array_equal(model.predictor_rank_search_interval_, np.array([2, 5]))
-
-
-def test_auto_rank_reduces_candidates_and_matches_optimal_on_synthetic_data() -> None:
-    rng = np.random.default_rng(123)
-    X = rng.normal(size=(45, 24))
-    coefficient = rng.normal(size=(24, 3))
-    Y = X @ coefficient + 0.2 * rng.normal(size=(45, 3))
-
-    with pytest.warns(StatisticalSupportWarning):
-        automatic = PiPLSRegression(
-            n_components=2,
-            predictor_rank="auto",
-            samples_per_predictor_rank=1,
-            cv=3,
-            n_jobs=1,
-        ).fit(X, Y)
-    with pytest.warns(StatisticalSupportWarning):
-        optimal = PiPLSRegression(
-            n_components=2,
-            predictor_rank="optimal",
-            samples_per_predictor_rank=1,
-            cv=3,
-            n_jobs=1,
-        ).fit(X, Y)
-
-    assert automatic.predictor_rank_ == optimal.predictor_rank_
-    assert automatic.n_predictor_rank_evaluated_ < automatic.n_predictor_rank_candidates_
-    assert automatic.n_predictor_rank_skipped_ > 0
-    assert not automatic.predictor_rank_search_exhaustive_
-    assert optimal.predictor_rank_search_exhaustive_
-    assert len(np.unique(automatic.predictor_rank_evaluation_order_)) == (
-        automatic.n_predictor_rank_evaluated_
-    )
-    flattened_history = np.concatenate(automatic.predictor_rank_search_history_)
-    np.testing.assert_array_equal(
-        flattened_history,
-        automatic.predictor_rank_evaluation_order_,
-    )
-
-
-def test_auto_rank_search_is_deterministic() -> None:
-    rng = np.random.default_rng(321)
-    X = rng.normal(size=(45, 20))
-    Y = rng.normal(size=(45, 3))
-    parameters = dict(
-        n_components=2,
-        predictor_rank="auto",
-        samples_per_predictor_rank=1,
-        cv=3,
-        n_jobs=1,
-    )
-
-    with pytest.warns(StatisticalSupportWarning):
-        first = PiPLSRegression(**parameters).fit(X, Y)
-    with pytest.warns(StatisticalSupportWarning):
-        second = PiPLSRegression(**parameters).fit(X, Y)
-
-    assert first.predictor_rank_ == second.predictor_rank_
-    np.testing.assert_array_equal(
-        first.predictor_rank_evaluation_order_,
-        second.predictor_rank_evaluation_order_,
-    )
-    np.testing.assert_allclose(
-        first.predictor_rank_cv_results_["mean_test_score"],
-        second.predictor_rank_cv_results_["mean_test_score"],
-    )
-
-
-def test_invalid_legacy_auto_alias_is_not_needed() -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="positive integer"):
-        PiPLSRegression(predictor_rank="exhaustive").fit(X, Y)  # type: ignore[arg-type]
+    with pytest.warns(StatisticalSupportWarning, match="recommended minimum of 4"):
+        PiPLSRegression(n_components=2, predictor_rank=11).fit(X_wide, Y)
 
 
 def test_small_auto_svd_uses_full_solver_and_reports_exact_rank() -> None:
@@ -413,7 +159,9 @@ def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
     rng = np.random.default_rng(817)
     left, _ = np.linalg.qr(rng.normal(size=(100, 14)))
     right, _ = np.linalg.qr(rng.normal(size=(70, 14)))
-    values = np.array([35.0, 28.0, 21.0, 16.0, 12.0, 9.0, 6.0, 4.0, 3.0, 2.0, 1.0, 0.5, 0.2, 0.1])
+    values = np.array(
+        [35.0, 28.0, 21.0, 16.0, 12.0, 9.0, 6.0, 4.0, 3.0, 2.0, 1.0, 0.5, 0.2, 0.1]
+    )
     X = left @ np.diag(values) @ right.T
     Y = X @ rng.normal(size=(70, 3)) + 0.01 * rng.normal(size=(100, 3))
 
@@ -421,6 +169,7 @@ def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
         n_components=2,
         predictor_rank=6,
         svd_solver="full",
+        random_state=None,
     ).fit(X, Y)
     first = PiPLSRegression(
         n_components=2,
@@ -464,23 +213,3 @@ def test_randomized_svd_rejects_missing_random_state() -> None:
             svd_solver="randomized",
             random_state=None,
         ).fit(X, Y)
-
-
-def test_cross_validated_mode_records_fold_solver_diagnostics() -> None:
-    X, Y = _data()
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="optimal",
-        samples_per_predictor_rank=8,
-        cv=3,
-        n_jobs=1,
-        svd_solver="randomized",
-        random_state=29,
-    ).fit(X, Y)
-
-    assert model.svd_solver_ == "randomized"
-    assert set(model.predictor_rank_cv_svd_solvers_) == set(model.predictor_rank_values_)
-    assert all(
-        solvers == ("randomized", "randomized", "randomized")
-        for solvers in model.predictor_rank_cv_svd_solvers_.values()
-    )

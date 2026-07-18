@@ -1,10 +1,10 @@
 # Pi-PLS
 
 `pipls` is an installable Python package for Pi-PLS, a PLS-family method for multivariate
-regression. Its public interfaces follow scikit-learn conventions and provide fixed, rule-derived,
-adaptive, and exhaustive predictor-rank selection, pipeline-aware path analysis, advanced
-cross-validation, ordered out-of-fold diagnostics, deterministic synthetic data generation, and
-transparent reference datasets.
+regression. Its public interfaces follow scikit-learn conventions and provide a fixed-model
+regression estimator, pipeline-aware triangular path analysis, advanced cross-validation, ordered
+out-of-fold diagnostics, deterministic synthetic data generation, and transparent reference
+datasets.
 
 ## Installation
 
@@ -44,7 +44,7 @@ make examples
 ```python
 from pipls import PiPLSRegression
 
-model = PiPLSRegression(n_components=2)
+model = PiPLSRegression(n_components=2, predictor_rank=4)
 model.fit(X_train, Y_train)
 Y_pred = model.predict(X_test)
 X_scores, Y_scores = model.transform(X_train, Y_train)
@@ -52,9 +52,10 @@ print(model.predictor_rank_)
 print(model.decomposition_.D)
 ```
 
-`PiPLSRegression` centers `X` and `Y` during fitting. With `scale=True`, it also learns their
-training-sample standard deviations. During rank selection, these statistics are fitted separately
-inside every training fold and are refitted on the complete training set after selection.
+`PiPLSRegression` fits one explicit `(n_components, predictor_rank)` pair. It centers `X` and
+`Y` during fitting and, with `scale=True`, learns their training-sample standard deviations.
+`PiPLSPathCV` performs model selection by cloning and fitting fixed estimators separately inside
+every training fold, then optionally refits the selected pair on the complete training set.
 
 ## Component-path analysis
 
@@ -183,10 +184,10 @@ The estimator follows scikit-learn and `PLSRegression` conventions for coefficie
 latent-score transforms, feature names, pandas output containers, and fitted weights/loadings.
 Pi-PLS-specific factorization output is grouped in the public read-only `decomposition_` result.
 
-`samples_per_predictor_rank` and `cv` default to 5. Rule-based values below 5 are allowed but
-emit `StatisticalSupportWarning` because the resulting rank bound may lack sufficient
-statistical support. The support term uses the total number of observations supplied to `fit()`;
-cross-validation training folds only impose centered-data feasibility caps.
+`PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`. Its support term uses the
+total number of observations supplied to `fit()`; cross-validation training folds impose
+centered-data feasibility caps. A direct `PiPLSRegression` fit warns when it has fewer than four
+observations per retained predictor-rank direction.
 
 ## Repository map
 

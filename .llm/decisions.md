@@ -48,11 +48,10 @@ This index is navigation, not a substitute for those records.
 
 ## Accepted staged transition
 
-Decision 0039 defines the next architectural correction. The target state is a fixed-pair
-`PiPLSRegression`, a sole triangular-selection interface in `PiPLSPathCV`, a default path-support
-ceiling with $c=5$, and a direct fixed-fit support warning at $n/r_\pi<4$. The current runtime
-constructor and fitted-attribute documentation remains authoritative until the staged code patches
-implement that decision.
+Decision 0039 is partially implemented. `PiPLSRegression` is now a fixed-pair estimator with the
+direct-fit support warning at $n/r_\pi<4$. `PiPLSPathCV` retains the sole recommended triangular
+selection workflow and the default path-support ceiling with $c=5$; path-ownership consolidation
+and later cleanup remain staged.
 
 ## Accepted clarifications after earlier proposals
 
@@ -60,13 +59,13 @@ These points are fixed by implemented decisions and owner review even where the 
 plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
-- both public selection interfaces default to `samples_per_predictor_rank=5` and `cv=5`;
+- `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
   while centered training-fold dimensions remain hard candidate-feasibility caps;
 - randomized SVD is controlled independently and follows the same policy inside regression and
   path candidate fits;
-- `PiPLSRegression` is not implemented as a wrapper around `PiPLSPathCV`; both use private shared
-  machinery;
+- `PiPLSRegression` fits explicit ranks only; `PiPLSPathCV` owns package selection and fits fixed
+  estimator clones;
 - `PiPLSPathCV` supports a direct estimator or a scikit-learn `Pipeline` ending in
   `PiPLSRegression`, not arbitrary nested meta-estimators;
 - D2 supports explicit group metadata for splitters, but weighted fitting and general-purpose

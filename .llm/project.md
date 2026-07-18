@@ -31,11 +31,10 @@ No block-aware scaling API is designed or scheduled.
 
 ## Accepted transition
 
-Decision 0039 defines the next staged architectural correction. The current runtime still includes
-conditional predictor-rank search in `PiPLSRegression`; the target state moves all selection to
-`PiPLSPathCV` and leaves `PiPLSRegression` responsible only for one fixed rank pair. The next patch
-changes only the fixed estimator; later patches consolidate path selection, private machinery, and
-examples.
+Decision 0039 is partially implemented. `PiPLSRegression` now owns only one explicit fixed rank
+pair and no cross-validation or selection results. `PiPLSPathCV` retains the triangular search; the
+next patch consolidates it as the sole selection interface before later private-code and example
+cleanup.
 
 ## Runtime ownership
 
@@ -51,7 +50,7 @@ examples.
 - `src/pipls/model_selection.py`: rank limits, split materialization, and shared rank-search
   orchestration.
 - `src/pipls/path.py`: pipeline-aware `PiPLSPathCV` meta-estimator.
-- `src/pipls/regression.py`: `PiPLSRegression` fixed-model estimator and conditional rank search.
+- `src/pipls/regression.py`: direct fixed-model `PiPLSRegression` estimator.
 - `src/pipls/validation.py`: immutable validation and OOF reporting.
 - `src/pipls/__init__.py`: deliberate top-level public exports.
 
@@ -59,7 +58,7 @@ examples.
 
 - `tests/unit/`: local behavior and boundary conditions.
 - `tests/invariants/`: mathematical identities, dimensions, orthogonality, and subspace properties.
-- `tests/integration/`: estimator composition, leakage boundaries, and shared-engine equivalence.
+- `tests/integration/`: estimator composition and leakage boundaries.
 - `tests/api/`: exposed parameter validation, scikit-learn/PLS compatibility, and validation
   protocols.
 - `tests/estimator_checks/`: applicable scikit-learn common estimator checks.

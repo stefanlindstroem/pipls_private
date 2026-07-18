@@ -472,12 +472,9 @@ each candidate centers its training predictors, $n_{\mathrm{train,min}}-1$ is a 
 cap. Using the public sample count in the support term does not fit any quantity from $X$ or $Y$
 outside the training folds.
 
-The implemented rank-mode semantics are:
-
-- an integer: fixed $r_\pi$;
-- `predictor_rank="max"`: use the rule-derived upper bound without rank CV;
-- `predictor_rank="optimal"`: exhaustively evaluate every admissible integer rank;
-- `predictor_rank="auto"`: use deterministic adaptive coarse-to-fine search and permit an approximate optimum.
+The fixed estimator accepts one explicit integer $r_\pi$. Rule-derived ceilings and adaptive or
+exhaustive rank search belong to `PiPLSPathCV`, which evaluates fixed-estimator clones on the
+admissible triangular surface.
 
 Adaptive search reports every evaluated rank and does not guarantee the exhaustive optimum for
 an arbitrary non-unimodal CV curve. Search approximation and linear-algebra approximation are

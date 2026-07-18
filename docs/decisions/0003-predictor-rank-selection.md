@@ -1,8 +1,7 @@
 # Decision: 0003-predictor-rank-selection
 
-Status: implemented for explicit, rule-fixed, exhaustive, and adaptive conditional selection;
-search semantics are refined by Decision 0007 and the rank-support term is refined by Decision
-0032.
+Status: historical selection design. Decision 0039 supersedes the `PiPLSRegression` search
+modes; the rank ceiling and adaptive/exhaustive policies remain implemented in `PiPLSPathCV`.
 
 For total supplied sample count $n$, smallest training-set size $n_{\mathrm{train,min}}$,
 predictor count $p$, and positive numeric `samples_per_predictor_rank` value $c$, the shared

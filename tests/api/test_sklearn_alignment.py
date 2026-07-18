@@ -33,14 +33,29 @@ def _fixed_estimator() -> PiPLSRegression:
     )
 
 
-def test_public_selection_defaults_use_five_samples_and_five_folds() -> None:
+
+
+def test_fixed_regression_and_path_defaults_have_distinct_ownership() -> None:
     regression = PiPLSRegression()
     path = PiPLSPathCV()
 
-    assert regression.samples_per_predictor_rank == 5.0
+    assert regression.n_components == 2
+    assert regression.predictor_rank == 2
+    assert not hasattr(regression, "cv")
+    assert not hasattr(regression, "samples_per_predictor_rank")
     assert path.samples_per_predictor_rank == 5.0
-    assert regression.cv == 5
     assert path.cv == 5
+
+
+def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
+    assert set(PiPLSRegression().get_params()) == {
+        "copy",
+        "n_components",
+        "predictor_rank",
+        "random_state",
+        "scale",
+        "svd_solver",
+    }
 
 
 def test_pls_style_method_signatures_include_copy_controls() -> None:
@@ -152,35 +167,6 @@ def test_feature_names_and_set_output_match_sklearn_transformers() -> None:
     assert list(transformed.columns) == ["piplsregression0", "piplsregression1"]
 
 
-def test_cross_validated_regression_exposes_standard_search_results() -> None:
-    X, Y = _data()
-    model = PiPLSRegression(
-        n_components=2,
-        predictor_rank="optimal",
-        samples_per_predictor_rank=8,
-        cv=3,
-        n_jobs=1,
-        svd_solver="full",
-        random_state=None,
-    ).fit(X, Y)
-
-    assert model.predictor_rank_cv_results_ is model.cv_results_
-    assert model.best_index_ == int(
-        np.flatnonzero(model.cv_results_["predictor_rank"] == model.predictor_rank_)[0]
-    )
-    assert model.best_params_ == {
-        "n_components": model.n_components,
-        "predictor_rank": model.predictor_rank_,
-    }
-    required = {
-        "params",
-        "param_n_components",
-        "param_predictor_rank",
-        "mean_test_score",
-        "std_test_score",
-        "rank_test_score",
-    }
-    assert required <= model.cv_results_.keys()
 
 
 def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
@@ -380,27 +366,6 @@ def test_decomposition_is_single_source_of_truth_for_factorization_arrays() -> N
     assert not model.P_.flags.writeable
 
 
-def test_standard_cv_and_scoring_sentinels_are_accepted() -> None:
-    X, Y = _data()
-    model = PiPLSRegression(
-        n_components=1,
-        predictor_rank="optimal",
-        samples_per_predictor_rank=12,
-        cv=None,
-        scoring=None,
-        n_jobs=1,
-        svd_solver="full",
-        random_state=None,
-    ).fit(X, Y)
-
-    assert model.n_splits_ == 5
-    assert callable(model.scorer_)
-    assert {
-        "mean_fit_time",
-        "std_fit_time",
-        "mean_score_time",
-        "std_score_time",
-    } <= model.cv_results_.keys()
 
 
 def test_path_restricts_estimator_scope_to_direct_or_final_pipeline_pipls() -> None:

@@ -60,7 +60,7 @@ Ordinary foldwise R2 is rejected when any validation fold contains one sample. W
 predictions are requested, `pooled_oof_r2_` may be reported as **R2 from pooled LOO predictions**;
 it is not mean foldwise R2.
 
-For `PiPLSPathCV`, and for `PiPLSRegression` with `predictor_rank="auto"` or `"optimal"`, the same
+For `PiPLSPathCV`, the same
 CV results are used for selection and performance reporting. Therefore
 `validation_report_.estimate_kind == "selection-conditioned"`. This estimate is useful for the
 paper protocol but is not an unbiased post-selection estimate. Use nested CV or an external test

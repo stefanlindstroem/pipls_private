@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from time import perf_counter
@@ -14,6 +15,7 @@ from sklearn.base import clone
 from sklearn.utils import _safe_indexing
 
 from ._core import ResolvedSVDSolver
+from .exceptions import StatisticalSupportWarning
 from .model_selection import CVSplit, _response_standardized_mse, _training_response_scale
 
 FloatArray = NDArray[np.float64]
@@ -158,7 +160,9 @@ def _evaluate_candidate(
         X_validation = _safe_indexing(X, validation)
         y_validation = _safe_indexing(y, validation)
         fit_started = perf_counter()
-        estimator.fit(X_train, y_train)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", StatisticalSupportWarning)
+            estimator.fit(X_train, y_train)
         split_fit_times[split_index] = perf_counter() - fit_started
 
         score_started = perf_counter()
@@ -282,7 +286,9 @@ def _fit_predict_split(
     y_train = _safe_indexing(y, train)
     X_validation = _safe_indexing(X, validation)
     y_validation = _safe_indexing(y, validation)
-    estimator.fit(X_train, y_train)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", StatisticalSupportWarning)
+        estimator.fit(X_train, y_train)
     prediction = np.asarray(estimator.predict(X_validation), dtype=np.float64)
     if prediction.ndim == 1:
         prediction = prediction.reshape(-1, 1)

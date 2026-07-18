@@ -88,7 +88,7 @@ workflow remains:
 ```python
 X = ...
 Y = ...
-model = PiPLSRegression().fit(X, Y)
+model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
 ```
 
 A user may ignore `metadata.yaml`, use different filenames, use another delimiter, read a database,

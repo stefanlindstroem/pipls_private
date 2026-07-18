@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted and implemented.
+Accepted and implemented, with selection-result ownership refined by Decision 0039: search
+attributes belong to `PiPLSPathCV`, while `PiPLSRegression` is a direct estimator.
 
 ## Context
 

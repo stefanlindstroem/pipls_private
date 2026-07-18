@@ -1,116 +1,71 @@
-# Predictor-rank selection
+# Parameter selection
 
-`PiPLSRegression` supports adaptive, exhaustive, rule-fixed, and explicit predictor ranks for a
-fixed `n_components`.
+Pi-PLS separates fixed-model fitting from model selection.
 
+- `PiPLSRegression` fits one explicit pair `(n_components, predictor_rank)`.
+- `PiPLSPathCV` is the standard package workflow for the bounded triangular search.
 
-## Component-count selection is a separate user decision
+## Component-path workflow
 
-`PiPLSRegression` selects or fixes predictor rank for one supplied `n_components`. To inspect several
-component counts, use `PiPLSPathCV(refit=False)` and write `component_path_results_` to CSV. Each row
-records the predictor rank actually used, the rank policy, mean response-standardized CV-MSE, fold
-SD, and split count.
+```python
+import pandas as pd
 
-The user then chooses `n_components` from that path and fits a separate `PiPLSRegression` with both
-`n_components` and `predictor_rank` fixed. Do not treat `PiPLSPathCV.best_params_` as a mandatory
-scientific choice merely because it is the numerical minimum. See `path_analysis.md`.
+from pipls import PiPLSPathCV, PiPLSRegression
 
-## Shared rank bound
+search = PiPLSPathCV(
+    n_components_values=[1, 2, 3, 4],
+    refit=False,
+).fit(X, Y)
 
-Let $n$ be the total number of observations supplied to `fit()`. For both CV modes, the estimator
-materializes one split set. If the smallest training fold has $n_{\mathrm{train,min}}$ samples and
-the input has $p$ predictors, then
+path = pd.DataFrame(search.component_path_results_)
+path.to_csv("component_path.csv", index=False)
+```
 
-\begin{equation}
+For each component count, the path reports the conditionally selected numeric predictor rank and
+its response-standardized CV-MSE. After inspecting that path, the user chooses a component count
+and fits both ranks explicitly:
+
+```python
+chosen_n_components = 3
+chosen = path.loc[path["n_components"] == chosen_n_components].iloc[0]
+
+model = PiPLSRegression(
+    n_components=chosen_n_components,
+    predictor_rank=int(chosen["predictor_rank"]),
+).fit(X, Y)
+```
+
+`PiPLSPathCV.best_params_` remains the numerical global minimum for programmatic convenience. It is
+not presented as a mandatory scientific choice.
+
+## Predictor-rank ceiling
+
+The default path ceiling is
+
+\[
 r_{\pi,\max}
 =
 \min\left[
-p,
-n_{\mathrm{train,min}}-1,
-\left\lceil
-n / \texttt{samples\_per\_predictor\_rank}
-\right\rceil
-\right].
-\end{equation}
+ p_{\min},
+ n_{\mathrm{train,min}}-1,
+ \left\lceil\frac{n}{c}\right\rceil
+\right],
+\qquad c=5.
+\]
 
-The samples-per-rank term describes support for the final model, which is refitted on all $n$
-observations. The centered-fold term and predictor count are hard feasibility caps. Every
-evaluated candidate uses the same splits and fold-local centering and scaling. Scores use
-standard scikit-learn orientation, where larger is better. Equal mean scores within
-`rtol=1e-12` and `atol=1e-15` are resolved in favor of the smaller predictor rank. The selected
-rank is refitted once on all data supplied to `fit()`.
+The support term uses the total number of observations supplied to `fit()`. Fold dimensions only
+impose feasibility caps. `search_method="auto"` performs deterministic adaptive coarse-to-fine
+search; `search_method="optimal"` evaluates all admissible pairs.
 
-The default scorer is negative response-standardized MSE. Fold response scales are training-fold
-sample standard deviations with `ddof=1`; zero scales and singleton-fold scales become 1.
+The canonical `component_path_results_` columns are:
 
-## Statistical-support warning
-
-The default is $c=5$. Values below 5 remain legal for exploratory work but emit
-`pipls.StatisticalSupportWarning` in `"max"`, `"optimal"`, and `"auto"` modes. Fewer than five
-supplied observations per retained predictor-rank direction may provide insufficient statistical
-support for the resulting rank bound without external validation. Explicit integer ranks bypass
-the $c$ rule and do not emit this warning.
-
-## Adaptive `"auto"` mode
-
-```python
-model = PiPLSRegression(n_components=2)
+```text
+n_components
+predictor_rank
+predictor_rank_policy
+response_standardized_cv_mse_mean
+response_standardized_cv_mse_fold_sd
+n_splits
 ```
 
-This uses the defaults `predictor_rank="auto"`, `samples_per_predictor_rank=5`, `cv=5`,
-and response-standardized MSE scoring. It begins with seven deterministic approximately
-logarithmic integer ranks,
-including both endpoints. It caches every result, finds the best evaluated rank using the normal
-tie rule, and refines between its evaluated neighbors. When that interval contains at most 10
-integer ranks, the remaining ranks in the interval are evaluated exhaustively.
-
-The method is deterministic but approximate: a discrete CV curve need not be unimodal, so
-`"auto"` is not guaranteed to equal `"optimal"`. It does become exhaustive for small admissible
-sets.
-
-## Exhaustive `"optimal"` mode
-
-```python
-model = PiPLSRegression(
-    n_components=2,
-    predictor_rank="optimal",
-    cv=5,
-)
-```
-
-This evaluates every admissible integer rank and therefore returns the CV optimum for the fixed
-split set, scorer, and tie rule.
-
-## Search diagnostics
-
-Both CV modes expose `predictor_rank_values_`, `predictor_rank_cv_results_`, `best_score_`,
-`best_response_standardized_mse_`, `n_splits_`, and `cv_n_train_min_`. Search-specific diagnostics
-are:
-
-- `predictor_rank_evaluation_order_`;
-- `predictor_rank_search_history_`;
-- `predictor_rank_search_method_`;
-- `predictor_rank_search_interval_`;
-- `n_predictor_rank_candidates_`;
-- `n_predictor_rank_evaluated_`;
-- `n_predictor_rank_skipped_`;
-- `predictor_rank_search_exhaustive_`.
-
-## Rule-fixed `"max"` mode
-
-`predictor_rank="max"` uses the same rule directly without rank CV. Here
-$n_{\mathrm{train,min}}=n$, so the centered-data feasibility cap is $n-1$.
-
-## Explicit integer mode
-
-A positive integer fixes the predictor rank and bypasses the rule-derived bound, while remaining
-subject to dimensional and numerical-rank validation in the fixed core.
-
-
-## Groups, OOF predictions, and validation reports
-
-`PiPLSRegression.fit(X, y, groups=groups)` passes groups to its internal splitter. With
-`return_oof_predictions=True`, the selected fixed rank is refitted on the same materialized
-training folds and produces row-ordered `oof_predictions_` plus per-row counts. Automatic and
-optimal rank reports are labeled selection-conditioned; explicit integer and rule-fixed ranks are
-labeled fixed-parameter. Singleton validation folds reject ordinary R2 scoring.
+The predictor rank is always numeric, whether it was optimized, fixed, or set to the maximum.

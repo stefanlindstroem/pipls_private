@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted and implemented. The rank-bound sample-count convention is refined by Decision 0032.
+Accepted and implemented for `PiPLSPathCV`. Decision 0039 removes the rank-bound parameters and
+CV defaults from `PiPLSRegression`; the sample-count convention remains refined by Decision 0032.
 
 ## Context
 

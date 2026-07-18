@@ -1,6 +1,7 @@
 # Decision: 0007-predictor-rank-search-policies
 
-Status: accepted and implemented in Phase C2c.
+Status: accepted and implemented in `PiPLSPathCV`; Decision 0039 removes these search modes from
+`PiPLSRegression`.
 
 ## Context
 

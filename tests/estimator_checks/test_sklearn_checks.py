@@ -8,9 +8,8 @@ def test_estimator_is_cloneable() -> None:
         n_components=1,
         predictor_rank=2,
         scale=False,
-        cv=3,
-        scoring="neg_mean_squared_error",
-        n_jobs=1,
+        svd_solver="full",
+        random_state=None,
     )
     cloned = clone(model)
     assert cloned.get_params() == model.get_params()

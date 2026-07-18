@@ -17,7 +17,7 @@ The primary public workflow is:
 X = ...  # user-owned data reading and selection
 Y = ...
 
-model = PiPLSRegression().fit(X, Y)
+model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
 ```
 
 `X` and `Y` may come from NumPy, pandas, a database client, a domain-specific file reader, or any
@@ -48,7 +48,7 @@ import pandas as pd
 
 X = pd.read_csv("datasets/example/X.csv")
 Y = pd.read_csv("datasets/example/Y.csv")
-model = PiPLSRegression().fit(X, Y)
+model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
 ```
 
 The example must not need to parse `metadata.yaml`; that file documents the repository asset.

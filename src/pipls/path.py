@@ -82,9 +82,9 @@ class PiPLSPathCV(
 ):
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
-    The default ``search_method="auto"`` applies the same deterministic logarithmic
-    coarse-to-fine predictor-rank search used by :class:`PiPLSRegression`
-    independently for each value of ``n_components``.
+    The default ``search_method="auto"`` applies a deterministic logarithmic
+    coarse-to-fine predictor-rank search independently for each value of
+    ``n_components``.
 
     Parameters
     ----------
@@ -198,11 +198,7 @@ class PiPLSPathCV(
         n_components_key, predictor_rank_key = _pipls_parameter_keys(
             self.pipls_param_prefix_
         )
-        return_oof_key = _pipls_parameter_key(
-            self.pipls_param_prefix_,
-            "return_oof_predictions",
-        )
-        template = clone(template).set_params(**{return_oof_key: False})
+        template = clone(template)
         materialized = _materialize_cv_splits(self.cv, X_array, y_array, groups=groups)
         _validate_singleton_fold_scoring(self.scoring, materialized.splits)
         self.n_splits_ = len(materialized.splits)
@@ -715,7 +711,9 @@ def _fold_safe_feature_limit(
     feature_counts: list[int] = []
     for train, _ in splits:
         probe = clone(template).set_params(**{n_key: 1, r_key: 1})
-        probe.fit(_safe_indexing(X, train), _safe_indexing(y, train))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", StatisticalSupportWarning)
+            probe.fit(_safe_indexing(X, train), _safe_indexing(y, train))
         feature_counts.append(_extract_fitted_pipls(probe, prefix).n_features_in_)
     return min(feature_counts)
 

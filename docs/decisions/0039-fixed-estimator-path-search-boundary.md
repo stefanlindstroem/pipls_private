@@ -2,13 +2,13 @@
 
 ## Status
 
-Accepted for staged implementation. This record defines the target architecture; the current
-runtime API remains unchanged until the follow-up implementation patches are applied.
+Accepted and partially implemented. The fixed-estimator step is complete; path-ownership,
+private-code consolidation, example alignment, and final audit remain staged follow-up work.
 
 ## Context
 
-The current `PiPLSRegression` supports both fixed-rank fitting and internally cross-validated
-predictor-rank selection. `PiPLSPathCV` separately performs the intended triangular search over
+Before implementation, `PiPLSRegression` supported both fixed-rank fitting and internally
+cross-validated predictor-rank selection. `PiPLSPathCV` separately performed the intended triangular search over
 response component count and predictor rank. This duplicates model-selection responsibility and
 makes an apparently ordinary estimator fit perform hidden cross-validation.
 
@@ -57,8 +57,8 @@ This decision is implemented incrementally:
 4. align examples and guides with the final two-stage workflow;
 5. perform a final API and minimality audit.
 
-Until those patches land, documentation describing the implemented constructor parameters and
-fitted attributes remains authoritative for the current runtime behavior.
+Step 1 is implemented: `PiPLSRegression` is now fixed-rank only. The remaining transition steps
+continue with `PiPLSPathCV` ownership, private-code cleanup, example alignment, and final audit.
 
 ## Consequences
 

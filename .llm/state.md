@@ -17,11 +17,11 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
-- scikit-learn-compatible `PiPLSRegression` with fixed, rule-derived, exhaustive, and adaptive
-  predictor-rank modes;
+- scikit-learn-compatible fixed-model `PiPLSRegression` for one explicit
+  `(n_components, predictor_rank)` pair;
 - independent full, randomized, and automatic predictor-SVD policies;
-- hardened public validation and `StatisticalSupportWarning` for
-  `samples_per_predictor_rank < 5` in rule-based modes;
+- hardened public validation and `StatisticalSupportWarning` for direct fixed fits with
+  fewer than four observations per retained predictor-rank direction;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
 - shared private fold-evaluation and adaptive-search machinery;
 - PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and public
@@ -82,18 +82,18 @@ case, or public behavior.
 
 | Concern | Current contract |
 |---|---|
-| Conditional predictor-rank selection | `PiPLSRegression(predictor_rank="auto")` by default |
+| Conditional predictor-rank selection | `PiPLSPathCV(search_method="auto")` |
 | Path search | `PiPLSPathCV(search_method="auto")` by default |
 | Component-path artifact | `component_path_results_`: one row per component count with numeric predictor rank, policy, mean CV-MSE, fold SD, and split count |
-| Exhaustive search | explicit `"optimal"` in either public interface |
+| Exhaustive search | explicit `PiPLSPathCV(search_method="optimal")` |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
 | Reproducibility | `random_state=0` by default |
-| Rank support rule | `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
-| Validation | `cv=5`; `cv=None` requests standard five-fold regression CV |
+| Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
+| Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
 | Selection score | response-standardized negative MSE by default; `scoring=None` uses estimator score |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
-| Group handling | keyword-only `groups` routed to group-aware splitters |
-| OOF output | opt-in through `return_oof_predictions=True` |
+| Group handling | path-only keyword `groups` routed to group-aware splitters |
+| OOF output | path-only opt-in through `return_oof_predictions=True` |
 | Dataset namespace | optional immutable container and seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or loader required for fitting |
 | Repository datasets | comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
@@ -110,11 +110,11 @@ Additional fixed decisions:
   final small integer interval. `"optimal"` is exhaustive over the complete admissible range.
 - Randomized SVD affects only the initial predictor-matrix decomposition. Response and coupling
   decompositions remain exact.
-- `PiPLSRegression` is the fixed-model estimator and `PiPLSPathCV` is the path meta-estimator.
+- `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
+  `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
 - Real-data examples use `PiPLSPathCV(refit=False)` for the path, treat CSV as canonical,
   derive PDFs from the CSV, and fit a separate fixed `PiPLSRegression` after an explicit component
   choice. `best_params_` remains a convenience, not the required user decision.
-  Neither wraps the other; both use shared private search machinery.
 - Path coefficients are accessed through `best_pipls_` or `best_estimator_`; they are not flattened
   onto `PiPLSPathCV` when preprocessing may change the feature space.
 - OOF results produced after using the same splits for model selection are labeled
@@ -126,20 +126,16 @@ Additional fixed decisions:
 
 ## Accepted staged estimator/search correction
 
-Decision 0039 records an accepted target architecture that is not yet implemented in this
-snapshot. The staged correction will:
+Decision 0039 is partially implemented. Patch 2 established the fixed-estimator boundary:
 
-- simplify `PiPLSRegression` to one fixed `(n_components, predictor_rank)` model with no internal
-  cross-validation or parameter selection;
-- retain `PiPLSPathCV` as the standard triangular model-selection workflow;
-- keep `samples_per_predictor_rank=5` as the default path-support ceiling;
-- warn on direct fixed fits when $n/r_\pi<4$, while suppressing only that expected warning during
-  controlled path candidate fits;
-- retain explicit fixed-estimator interoperability with scikit-learn meta-estimators without
-  presenting `GridSearchCV` as the recommended Pi-PLS workflow.
+- `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
+- it owns no CV, scoring, OOF, or search-result parameters and attributes;
+- direct fits warn when $n/r_\pi<4$;
+- controlled path folds suppress only that support warning.
 
-Until the implementation patches land, the current public defaults and fitted attributes in the
-preceding table remain the source of truth for executable behavior.
+`PiPLSPathCV` retains its existing triangular search behavior. The next patches make it the sole
+selection implementation, remove obsolete private selection code, align examples and guides, and
+perform the final minimality audit.
 
 ## Current standardization boundary and deferred block-aware direction
 
@@ -193,9 +189,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Implement Decision 0039 in the next independently reviewable patch by making
-`PiPLSRegression` a fixed-model estimator. Do not yet change `PiPLSPathCV`, remove shared search
-machinery, or rewrite the examples; those are later patches in the accepted sequence.
+Continue Decision 0039 with patch 3/6: make `PiPLSPathCV` the sole triangular-selection
+interface and consolidate its ownership of candidate evaluation, warning suppression, and refit
+behavior. Do not yet perform the broader dead-code or example cleanup reserved for later patches.
 
 After the estimator/search correction and final audit, resume user documentation and release
 hardening. Do not add another dataset or benchmark without a new package-level question.
