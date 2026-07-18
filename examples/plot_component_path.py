@@ -68,7 +68,7 @@ def plot_component_path(csv_path: Path, pdf_path: Path, *, title: str) -> None:
     figure.text(
         0.5,
         0.01,
-        "Error bars show fold-to-fold SD, not a confidence interval.",
+        "Error bars show fold-to-fold SD.",
         ha="center",
         fontsize="small",
     )

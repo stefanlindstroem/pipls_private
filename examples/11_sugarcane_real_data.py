@@ -17,7 +17,7 @@ N_COMPONENTS_VALUES = (1, 2, 3, 4)
 
 # This example uses three components as an explicit parsimonious choice after
 # inspecting the path. Change the constant to fit another recorded row.
-CHOSEN_N_COMPONENTS = 3
+CHOSEN_N_COMPONENTS = 2
 
 # Read predictors X and responses Y exactly as an ordinary programming user would.
 # metadata.yaml documents the repository asset but is not required for model use.
