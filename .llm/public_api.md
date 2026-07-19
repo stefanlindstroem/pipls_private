@@ -151,6 +151,28 @@ No metadata file, registry lookup, or package-owned loader is required for real-
 Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Repository examples
 must show these steps directly rather than hiding them behind convenience utilities.
 
+## Accepted model-inspection boundary
+
+Decision 0042 accepts two public submodules for staged implementation:
+
+- `pipls.inspection` for pure NumPy computations and immutable result objects;
+- `pipls.plotting` for optional Matplotlib figures built from explicit computed results.
+
+These submodules are not yet implemented in this snapshot and their names are not top-level
+`pipls` exports. Their accepted contract is defined in `.llm/analysis.md`. In particular:
+
+- component-path helpers remain example-local selection diagnostics;
+- Pi-PLS interpretation uses copied $P$, $D$, and $Q$ factors and preserves
+  $PDQ^\mathsf{T}$ under any display-only sign convention;
+- prediction diagnostics accept observed and predicted responses explicitly and record prediction
+  provenance;
+- plotting remains optional, returns figures and axes, and performs no file writing;
+- dataset-specific OOF loops, pandas tables, canonical CSV files, and PDF composition remain under
+  `examples/`.
+
+No estimator method, fitted attribute, path-search parameter, or top-level export is added by the
+architecture decision alone.
+
 ## Example workflow boundary
 
 The real-data examples use `PiPLSPathCV(refit=False)` to produce the Pi-PLS path, evaluate the

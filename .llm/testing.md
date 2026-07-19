@@ -53,11 +53,18 @@ row, and agreement with conditional rows in `cv_results_`. Plot and standard-PLS
 use small synthetic tables and verify canonical CSV/PDF contracts without freezing visual pixel
 output.
 
+Post-analysis inspection tests should verify mathematical identities, shapes, finite-value
+validation, defensive copying, read-only results, deterministic sign handling, prediction
+provenance, and absence of estimator mutation. Plot tests should use a headless backend and verify
+returned figures, named axes, explicit line/bar modes, label validation, and successful rendering
+without pinning pixels or incidental Matplotlib artist counts.
+
 Do not execute the complete Pulp, Sugarcane, or Tobacco examples in `make check`, and do not
 duplicate their analyses as real-data benchmark scripts. `make examples` is the explicit
 application-validation target and runs every numbered example, including the slower Tobacco
-analysis. Durable tests instead protect repository dataset readability, the two-stage workflow
-structure, the component-path API, the PLS helper, and CSV-to-PDF generation.
+analysis. Durable tests instead protect repository dataset readability, the staged workflow structure, the
+component-path API, inspection equations, plotting contracts, example helpers, and CSV-to-PDF
+generation.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 

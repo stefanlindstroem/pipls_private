@@ -1,0 +1,252 @@
+# Model inspection and post-analysis contract
+
+## Purpose
+
+This document is the durable maintainer contract for fitted-model interpretation, prediction
+diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.inspection`,
+`pipls.plotting`, post-analysis example helpers, or the real-data analysis reports.
+
+Decision 0042 establishes the architecture. Source code and tests establish which planned parts are
+currently implemented. Do not describe a planned analysis function as available until it exists in
+the package and is covered by the corresponding tests and user documentation.
+
+## Analysis stages
+
+Keep these stages separate in code, documentation, filenames, and figure labels.
+
+### Model-selection diagnostics
+
+The component-path workflows answer how cross-validated loss changes with component count and, for
+Pi-PLS, the conditional predictor rank. Their canonical artifacts are the existing Pi-PLS and
+ordinary PLS path CSV files. `examples/pls_component_path.py` and
+`examples/plot_component_path.py` remain example-local helpers.
+
+A component-path result is not a fitted-model interpretation and is not an unbiased estimate of a
+subsequent user choice made after inspecting that same path.
+
+### Fixed-model interpretation
+
+A fitted model may be interpreted through its decomposition, scores, loadings, and coefficients.
+Unless a separate resampling construction is stated, these quantities describe a model fitted on
+all supplied observations. Figure text and documentation must not present them as validation
+results.
+
+### Prediction diagnostics
+
+Prediction diagnostics receive `y_true` and `y_pred` explicitly. They must record one precise
+prediction kind:
+
+- `fitted values`;
+- `fixed-parameter OOF predictions`;
+- `selection-conditioned OOF predictions`;
+- `external test predictions`.
+
+Use another label only when it is equally explicit and covered by the same validation rules. Do not
+use the generic label `cross-validated predictions` when the parameters were selected using the
+same observations.
+
+## Package and example ownership
+
+### `pipls.inspection`
+
+The inspection submodule owns reusable numerical computations and immutable result objects. It
+uses NumPy and package/scikit-learn fitted results, but not pandas or Matplotlib. Returned arrays
+must be defensive copies and read-only where practical.
+
+Initial planned responsibilities are:
+
+- canonical Pi-PLS display factors;
+- standardized prediction diagnostics;
+- ordinary PLS latent-structure extraction;
+- ordinary PLS observation diagnostics;
+- mathematically defined biplot coordinates.
+
+### `pipls.plotting`
+
+The plotting submodule owns reusable Matplotlib figures for computed analysis results. It imports
+Matplotlib inside plotting code so that importing `pipls` and `pipls.inspection` does not require
+the optional plotting dependency.
+
+Plotting functions return the `Figure` and named axes. They do not call `show()`, write files,
+retain models, or change supplied arrays. The names remain under `pipls.plotting`; they are not
+added automatically to `pipls.__all__`.
+
+### `examples/`
+
+Examples own scientific orchestration:
+
+- direct dataset reading and alignment;
+- visible fixed component and predictor-rank choices;
+- explicit cross-validation splitters;
+- fixed-parameter OOF loops;
+- pandas table construction;
+- canonical CSV writing;
+- CSV rereading and multipage PDF composition;
+- dataset-specific physical-axis labels, response subsets, and pagination.
+
+Do not hide real-data reading behind a package loader. Do not place user analysis helpers under
+`scripts/`, which remains the repository-maintenance and preparation area.
+
+## Pi-PLS factorization display
+
+For a fitted standardized map,
+
+\begin{equation}
+B_{\mathrm{cs}} = P D Q^\mathsf{T}.
+\end{equation}
+
+The primary decomposition report displays:
+
+- predictor rotations $P$;
+- dilation values $d_k=D_{kk}$;
+- dilation-weighted response rotations $d_kq_{jk}$, stored or plotted as $QD$.
+
+Use the terms **predictor rotation** or **predictor direction** for $P$. Do not call $P$ an X
+loading: `PiPLSRegression.x_loadings_` is a separate score-reconstruction quantity.
+
+### Display signs
+
+Signs may be canonicalized only on copies. For component $k$, locate the largest-magnitude entry of
+$P_{:k}$. Choose a sign that makes that entry nonnegative, and apply the same sign to $Q_{:k}$.
+This must preserve
+
+\begin{equation}
+P_{\mathrm{display}}D Q_{\mathrm{display}}^\mathsf{T}=PDQ^\mathsf{T}.
+\end{equation}
+
+Ties must be resolved deterministically by the first array position. Zero columns remain unchanged.
+Never modify `model.decomposition_`, `x_rotations_`, `y_rotations_`, or another fitted array.
+
+### Predictor rendering
+
+The caller chooses an explicit predictor style:
+
+- `bar` for a small unordered or categorically named predictor set;
+- `line` for an ordered physical coordinate.
+
+For line plots, the caller supplies the coordinate values and axis label. Preserve the supplied
+order, including a decreasing wavenumber axis. Do not infer spectra from feature count or names. Do
+not smooth, interpolate, or normalize plotted vectors unless a separate documented computation
+produced that result.
+
+## Prediction diagnostics
+
+Residuals follow
+
+\begin{equation}
+e_{ij}=y_{ij}-\hat y_{ij}.
+\end{equation}
+
+Standardization for a common display uses the observed responses supplied to the diagnostic:
+
+\begin{equation}
+\bar y_j=\frac{1}{n}\sum_{i=1}^n y_{ij},\qquad
+s_j=\sqrt{\frac{1}{n-1}\sum_{i=1}^n (y_{ij}-\bar y_j)^2},
+\end{equation}
+
+and
+
+\begin{equation}
+z_{ij}=\frac{y_{ij}-\bar y_j}{s_j},\qquad
+\hat z_{ij}=\frac{\hat y_{ij}-\bar y_j}{s_j},\qquad
+e^{(z)}_{ij}=z_{ij}-\hat z_{ij}.
+\end{equation}
+
+The scale therefore uses `ddof=1`. The same observed-response center and scale apply to predictions.
+Reject nonfinite inputs, shape disagreement, fewer than two observations, and constant response
+columns.
+
+The initial figure contract contains:
+
+- standardized observed versus predicted values with an identity line;
+- standardized residuals versus standardized predictions with a zero line;
+- response-wise standardized RMSE.
+
+A pooled residual histogram and fitted normal density are excluded. They combine responses that may
+have different error structures and add a distributional display not required by the diagnostic.
+
+## Ordinary PLS analysis
+
+Use public `sklearn.cross_decomposition.PLSRegression` fitted quantities only. The initial surface
+covers:
+
+- X score pairs;
+- X loadings;
+- Y loadings;
+- response-specific regression coefficients;
+- a two-component X score-loading biplot for low-dimensional data;
+- raw score distance and X reconstruction residual for observation diagnostics.
+
+Component and response subsets are explicit function arguments. Do not choose responses by hidden
+heuristics. Do not draw thousands of biplot arrows for spectral data.
+
+Biplot coordinate scaling must state and test the reconstruction identity it preserves. Observation
+diagnostics must state their equations and initially omit theoretical probability limits.
+
+VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation tests,
+contribution plots, and theoretical outlier thresholds require separate decisions.
+
+## Artifact contract
+
+For real-data post-analysis, CSV is canonical and PDF is a derived view. The example writes numeric
+tables, reads them back, and constructs the report from those reread tables.
+
+Prediction tables use long form and retain at least:
+
+```text
+model
+sample
+response
+observed
+predicted
+residual
+observed_standardized
+predicted_standardized
+residual_standardized
+prediction_kind
+```
+
+Pi-PLS response-direction tables retain at least:
+
+```text
+response
+component
+q
+dilation
+weighted_q
+```
+
+Predictor-direction, score, loading, coefficient, and observation-diagnostic tables use explicit
+sample, feature, response, and component identifiers as applicable. Do not serialize estimators as
+part of the result contract.
+
+A figure page must identify the dataset, model, selected components or responses, and prediction
+kind where predictions are shown. The example-level report composer controls page order and
+pagination; a package plotting function renders one explicit selection at a time.
+
+## Testing boundary
+
+Pure inspection tests should verify equations, shapes, finite-value validation, defensive copying,
+read-only results, sign preservation, and no estimator mutation.
+
+Plot tests should use a headless Matplotlib backend and verify returned figures, named axes, line and
+bar modes, label validation, and successful PDF rendering. Do not freeze pixel values, exact artist
+counts unrelated to the contract, or Matplotlib implementation details.
+
+Example-helper tests should use small synthetic tables. They may freeze canonical CSV column names,
+prediction provenance, sample order, and PDF generation from reread tables. They must not execute
+the complete Pulp, Sugarcane, or Tobacco analyses in `make check`; those remain under
+`make examples`.
+
+## Implementation order
+
+The accepted order after this architecture patch is:
+
+1. pure Pi-PLS display-factor and prediction-diagnostic computations;
+2. Pi-PLS plotting and a fast synthetic inspection example;
+3. ordinary PLS scores, loadings, and coefficient analysis;
+4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics;
+5. Sugarcane spectral analysis;
+6. Tobacco pagination and observation diagnostics;
+7. Pulp biplot and final cross-dataset review;
+8. return to product documentation and release hardening.

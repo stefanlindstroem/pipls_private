@@ -4,8 +4,9 @@
 
 Pi-PLS is a PLS-family method for multivariate regression. The repository is the long-lived home of
 the installable `pipls` package: its numerical core, scikit-learn-compatible public interfaces,
-validation utilities, synthetic generators, user documentation, concise examples, transparent
-reference datasets, lightweight validation benchmarks, tests, packaging, and releases.
+validation utilities, synthetic generators, user documentation, concise examples, staged fitted-
+model analysis tools, transparent reference datasets, lightweight validation benchmarks, tests,
+packaging, and releases.
 
 The repository is not the reproduction environment for any one paper. Read
 `.llm/product_scope.md` for the normative product/publication boundary.
@@ -40,6 +41,19 @@ selection lifecycle and defaults to the explicit complete-component sentinel `"a
 private selection machinery and duplicate fitted aliases have been removed; Pi-PLS-specific output
 is canonical in `decomposition_`. Supported pipelines infer their unique terminal Pi-PLS step and
 carry their own output-container configuration through cloning and refit.
+
+## Accepted analysis ownership
+
+Decision 0042 adds a staged fitted-model analysis surface without changing the estimator or path
+engine. Reusable numerical computations belong in the planned `pipls.inspection` submodule, and
+reusable Matplotlib figures belong in the planned optional `pipls.plotting` submodule. Dataset-
+specific model choices, OOF loops, pandas tables, CSV writing, and multipage reports remain in
+`examples/`.
+
+The current component-path helpers remain example-local selection-diagnostic tools. Full-data
+decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
+receive predictions explicitly and record their provenance. Read `.llm/analysis.md` before
+implementing or reviewing this surface.
 
 ## Runtime ownership
 
@@ -81,8 +95,10 @@ carry their own output-container configuration through cloning and refit.
   grant for the exact included material. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
   utilities or publication pipelines. Real-data examples keep separate Pi-PLS and standard PLS
-  (NIPALS) CSV paths and derive comparison PDFs from those tables. Their pandas and Matplotlib
-  requirements are grouped in the `examples` optional dependency extra.
+  (NIPALS) CSV paths and derive comparison PDFs from those tables. Future post-analysis examples
+  also own fixed-model OOF loops, canonical tables, physical-axis semantics, pagination, and report
+  composition. Their pandas and Matplotlib requirements are grouped in the `examples` optional
+  dependency extra.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
 - `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,
@@ -104,6 +120,8 @@ carry their own output-container configuration through cloning and refit.
 - `.llm/dataset_layout.md`: normative committed-dataset file and metadata convention.
 - `.llm/benchmarking.md`: normative benchmark questions, minimal outputs, interpretation boundaries,
   and implementation order.
+- `.llm/analysis.md`: normative fitted-model interpretation, prediction-diagnostic, plotting, and
+  analysis-artifact contracts.
 - `.llm/testing.md`: durable testing boundary.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
 - `docs/decisions/`: accepted design records.

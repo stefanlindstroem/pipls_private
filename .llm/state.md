@@ -39,6 +39,10 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution.
 
+Decision 0042 now defines the accepted fitted-model analysis architecture. Runtime implementation
+has not started: `pipls.inspection`, `pipls.plotting`, the synthetic inspection example, and the
+real-data post-analysis reports are planned work.
+
 The current top-level package exports are:
 
 ```python
@@ -106,6 +110,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
+| Model inspection | accepted staged boundary: pure `pipls.inspection`, optional `pipls.plotting`, and example-owned artifacts; not yet implemented |
 
 Additional fixed decisions:
 
@@ -233,20 +238,28 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Resume user documentation and release hardening. The legacy dataset licensing audit is complete,
-and no companion-analysis dataset remains pending. Select one small reviewable increment covering
-a buildable user guide, API reference, compatibility policy, clean-install validation, packaging
-audit, release notes, or versioned release preparation. Do not add another dataset, benchmark, or
-block-scaling API without a new package-level question and, for datasets, a verified source-level
-redistribution license.
+Implement the pure numerical foundation of Decision 0042 in `pipls.inspection`: immutable Pi-PLS
+display factors, deterministic display-only sign canonicalization, and standardized prediction
+diagnostics. This patch must add no Matplotlib or pandas dependency, no estimator mutation, no
+plotting function, and no real-data example execution.
 
 ## Subsequent roadmap
 
-1. **Fixed-estimator/path-search correction:** complete.
-2. **User documentation and release hardening:** buildable user guide, API reference, compatibility
+1. **Post-analysis numerical foundation:** Pi-PLS display factors and prediction diagnostics.
+2. **Pi-PLS plotting:** decomposition and prediction figures plus a fast synthetic inspection
+   example.
+3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients.
+4. **Pulp post-analysis workflow:** example-local fixed-model OOF predictions, canonical tables, and
+   a CSV-derived report.
+5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays.
+6. **Tobacco analysis:** deterministic response pagination and raw PLS observation diagnostics.
+7. **Pulp biplot and cross-dataset review:** one explicit reconstruction-preserving scaling and
+   aligned artifact contracts.
+8. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
-3. **Future product development:** additional estimators, validation tools, datasets, and—only after
-   a separate owner decision—block-aware variants of the existing model-internal standardization.
+
+Future datasets still require a distinct package-level use case and verified source-level
+redistribution rights. Block-aware scaling still requires a separate owner decision.
 
 The focused synthetic benchmarks and representative Pulp, Sugarcane, and Tobacco examples are
 complete. Corn, the legacy Steel table, SARCOS, and FRED-MD are intentionally outside the repository
@@ -283,10 +296,12 @@ From an uploaded snapshot, a maintainer should:
 5. inspect the affected source and tests rather than trusting document claims alone;
 6. read `.llm/data_io.md` and `.llm/dataset_layout.md` for dataset, real-data, or example work;
 7. read `.llm/benchmarking.md` for benchmark questions, scripts, metrics, outputs, or fixtures;
-8. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
-9. verify that the requested work is the current increment or that the owner explicitly changed
-   the order;
-10. return one root-relative unified Git patch, validation results, and exact direct Git commands.
+8. read `.llm/analysis.md` for fitted-model interpretation, plotting, prediction diagnostics, or
+   analysis artifacts;
+9. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
+10. verify that the requested work is the current increment or that the owner explicitly changed
+    the order;
+11. return one root-relative unified Git patch, validation results, and exact direct Git commands.
 
 Routine package work should not require re-uploading a manuscript. Request external scientific
 material only when the repository contracts identify a genuine unresolved scientific choice.

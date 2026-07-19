@@ -14,6 +14,17 @@ user guide.
 - [`cross_validation.md`](cross_validation.md): splitters, groups, repeated CV, OOF predictions, and
   validation reports.
 
+## Analysis workflow
+
+Component-path tables diagnose model selection. Fitted-model decomposition, score, loading, and
+coefficient views are a separate interpretation stage, while observed-versus-predicted and residual
+diagnostics require explicit prediction provenance. Decision 0042 records the staged architecture;
+the reusable inspection and plotting API will be documented here as each implementation patch
+lands.
+
+- [`../examples/README.md`](../examples/README.md): current component-path workflows and the accepted
+  post-analysis staging boundary.
+
 ## Data and model fitting
 
 - [`preprocessing.md`](preprocessing.md): model-internal centering and scaling, fold-local fitting,

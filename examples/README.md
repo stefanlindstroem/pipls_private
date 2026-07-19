@@ -25,7 +25,7 @@ make examples
 `make check`: the real-data analyses can be slow and generate application artifacts under
 `examples/results/`.
 
-The Pulp, Sugarcane, and Tobacco examples deliberately separate two stages:
+The current Pulp, Sugarcane, and Tobacco examples deliberately separate two stages:
 
 1. `PiPLSPathCV(refit=False)` uses the default `n_components_values="all"` and produces one
    Pi-PLS row per admissible component count, while scikit-learn
@@ -38,6 +38,18 @@ The examples import the two small helper functions directly. They do not launch 
 hide data reading behind a package loader. The CSV files remain canonical; the PDF is only a view of
 them. Error bars show fold-to-fold SD, not a confidence interval. Predictor-rank annotations apply
 only to Pi-PLS. Generated files under `examples/results/` are ignored by Git.
+
+Decision 0042 adds a third, separately implemented stage for post-fit analysis. The existing
+`pls_component_path.py` and `plot_component_path.py` remain selection-diagnostic helpers. Future
+reusable numerical inspection belongs in `pipls.inspection`, optional figures belong in
+`pipls.plotting`, and dataset-specific fixed-model OOF loops, pandas tables, CSV writing, physical
+axes, pagination, and multipage reports remain example-local.
+
+Full-data decomposition, score, loading, and coefficient plots will be labeled as fitted-model
+interpretation. Prediction and residual plots will accept explicit predictions and record whether
+they are fitted, fixed-parameter OOF, selection-conditioned OOF, or external-test values. The
+real-data examples will use `selection-conditioned OOF predictions` after component counts have
+been chosen from paths computed on the same observations.
 
 Real-data examples must show the ordinary I/O used to create `X` and `Y` in the example itself. Do
 not route example data through a package registry, generic loader, or hidden data-reading helper.

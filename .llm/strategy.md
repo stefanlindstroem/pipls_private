@@ -416,13 +416,44 @@ public-surface polish: `n_components_values="all"`, conventional random-state fo
 callable default scorer, refit-dependent method availability, and canonical decomposition-only
 Pi-PLS diagnostics.
 
+### Phase F2: model inspection and post-analysis
+
+Decision 0042 separates component-path selection diagnostics, fitted-model interpretation, and
+prediction diagnostics. Implement a reusable but restrained analysis surface without changing the
+Pi-PLS numerical core, fixed estimator, or path-selection engine.
+
+Acceptance conditions:
+
+- pure numerical computations and immutable results live in `pipls.inspection` without pandas or
+  Matplotlib;
+- optional plotting lives in `pipls.plotting`, returns figures and axes, performs no file writing,
+  and is not exported at package top level;
+- Pi-PLS decomposition views display $P$, $D$, and $QD$ while preserving $PDQ^\mathsf{T}$ under
+  deterministic display-only sign canonicalization;
+- prediction diagnostics accept explicit predictions, use residuals $e=y-\hat y$, standardize
+  from supplied observed responses with `ddof=1`, and record prediction provenance;
+- established PLS coverage begins with scores, X/Y loadings, coefficients, one low-dimensional
+  biplot, and raw observation diagnostics;
+- real-data examples own OOF loops, pandas tables, canonical CSV files, physical-axis semantics,
+  pagination, and multipage report composition;
+- complete real-data post-analysis remains under `make examples`, while `make check` uses small
+  synthetic contracts;
+- VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation
+  tests, theoretical outlier limits, and contribution plots remain deferred.
+
+Implementation order is pure inspection primitives, Pi-PLS plotting and a synthetic example, basic
+ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
+pagination and observation diagnostics, then the Pulp biplot and cross-dataset review.
+
+Current status: **architecture accepted; implementation not started**.
+
 ### Product documentation and release hardening
 
 Build a user-oriented documentation surface, API reference, compatibility policy, clean-install and
 build checks, licensing audit, release notes, and versioned releases. These are continuing software
 product responsibilities rather than the final steps of one publication.
 
-Current status: **planned and ongoing**.
+Current status: **planned after Phase F2**.
 
 ### Current standardization and deferred block-aware variants
 
@@ -444,11 +475,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Begin product documentation and release hardening: choose and implement the smallest next increment
-for a buildable user guide, API reference, compatibility policy, clean-install checks, or release
-metadata. The legacy dataset review is closed. Do not add another dataset, benchmark, or
-block-scaling API without a separate package-level decision; any future dataset must first pass the
-source-level licensing gate in Decision 0041.
+Implement the first runtime patch under Decision 0042: add pure immutable Pi-PLS display-factor and
+prediction-diagnostic computations in `pipls.inspection`, with equation-level tests and no plotting
+dependency. Do not add Matplotlib code, ordinary PLS analysis, example artifact helpers, or
+real-data post-analysis in the same patch.
 
 ## Maintenance protocol
 

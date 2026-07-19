@@ -31,9 +31,11 @@ The principal navigation documents are:
     datasets.
 12. `benchmarking.md` — focused package-benchmark questions, minimal per-benchmark CSV outputs,
     interpretation boundaries, and implementation order.
-13. `testing.md` — durable test boundaries for behavior, shipped-file structure, and living
+13. `analysis.md` — fitted-model interpretation, prediction-provenance, plotting, and analysis-
+    artifact contracts.
+14. `testing.md` — durable test boundaries for behavior, shipped-file structure, and living
     documents.
-14. `development.md` — coding, testing, documentation, dependency, and patch requirements.
+15. `development.md` — coding, testing, documentation, dependency, and patch requirements.
 
 Git history, tests, and implemented behavior are evidence of what currently exists. Strategy and
 plans describe intended work. A conflict must be surfaced and resolved explicitly.
@@ -52,9 +54,11 @@ First inspect `.llm/SNAPSHOT_INFO`, then read:
 7. `theory.md` for mathematical or model-selection work;
 8. `data_io.md` and `dataset_layout.md` for real-data, example, or dataset work;
 9. `benchmarking.md` for benchmark questions, scripts, outputs, fixtures, or performance work;
-10. `testing.md` before changing repository-document, metadata, or fixture tests;
-11. the normative contracts relevant to the requested change;
-12. the affected source, tests, and user-facing documentation.
+10. `analysis.md` for fitted-model interpretation, plotting, prediction diagnostics, or analysis
+    artifacts;
+11. `testing.md` before changing repository-document, metadata, or fixture tests;
+12. the normative contracts relevant to the requested change;
+13. the affected source, tests, and user-facing documentation.
 
 Confirm that source and tests agree with the claimed state. Do not silently rely on remembered
 chat context or old patch descriptions. Surface any conflict before implementation.

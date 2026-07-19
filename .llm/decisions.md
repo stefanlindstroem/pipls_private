@@ -46,7 +46,8 @@ This index is navigation, not a substitute for those records.
 | `0038-single-examples-target.md` | explicit application validation | `make examples` runs every numbered example; `make check` remains fast internal validation |
 | `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
 | `0040-sklearn-api-polish.md` | final public API polish | explicit complete-path sentinel, conventional random state, callable scorer, and canonical decomposition output |
-| `0041-legacy-dataset-licensing-roadmap.md` | legacy dataset licensing and roadmap | retain the three licensed datasets; exclude Corn, legacy Steel, SARCOS, and FRED-MD; resume release hardening |
+| `0041-legacy-dataset-licensing-roadmap.md` | legacy dataset licensing and roadmap | retain the three licensed datasets; exclude Corn, legacy Steel, SARCOS, and FRED-MD |
+| `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; stage reusable inspection and plotting tools |
 
 ## Implemented estimator/search transition
 
@@ -92,6 +93,9 @@ plan contains an earlier or more general proposal:
 - Corn, the legacy Citrination Steel table, SARCOS, and FRED-MD are intentionally excluded under
   Decision 0041; separately licensed derivatives are new candidate datasets, not retroactive
   clearance of the companion-analysis files;
+- fitted-model analysis is separated into selection diagnostics, full-data interpretation, and
+  prediction diagnostics under Decision 0042; numerical inspection will be package-owned, optional
+  plotting will be submodule-owned, and dataset-specific artifacts will remain example-owned;
 - repository tests validate executable behavior and durable file structure rather than pinning
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only

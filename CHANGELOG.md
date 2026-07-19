@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Accept the staged model-inspection and post-analysis architecture: separate component-path
+  diagnostics, fitted-model interpretation, and prediction diagnostics; reserve pure numerical
+  work for `pipls.inspection`, optional figures for `pipls.plotting`, and dataset-specific artifact
+  orchestration for `examples/`.
 - Complete the legacy real-dataset licensing review: retain pulp, sugarcane, and tobacco as the
   repository suite; intentionally exclude Corn, the legacy Citrination Steel table, SARCOS, and
   FRED-MD because the exact source materials do not carry sufficiently clear redistribution rights;
