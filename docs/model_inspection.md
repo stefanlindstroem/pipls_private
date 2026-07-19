@@ -10,10 +10,12 @@ Import these names from the submodule:
 ```python
 from pipls.inspection import (
     PLSLatentStructure,
+    PLSObservationDiagnostics,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     pipls_display_factors,
     pls_latent_structure,
+    pls_observation_diagnostics,
     prediction_diagnostics,
 )
 ```
@@ -141,6 +143,35 @@ The arrays are defensive read-only copies. No scores, loadings, or coefficients 
 rescaled, or sign-adjusted by `pipls`. These quantities describe the fitted ordinary PLS model and
 are not validation results.
 
+## Ordinary PLS observation diagnostics
+
+`pls_observation_diagnostics()` accepts a fitted `PLSRegression` and explicit predictor observations:
+
+```python
+from pipls.inspection import pls_observation_diagnostics
+
+observation_diagnostics = pls_observation_diagnostics(pls_model, X)
+```
+
+Let $t_i$ be the transformed score of supplied observation $i$, and let
+$\bar t_{\mathrm{train}}$ and $S_{T,\mathrm{train}}$ be the center and sample covariance of
+the fitted training scores. The squared score distance is
+
+\begin{equation}
+h_i=(t_i-\bar t_{\mathrm{train}})^\mathsf{T}S_{T,\mathrm{train}}^{+}(t_i-\bar t_{\mathrm{train}}).
+\end{equation}
+
+Here $+$ denotes the Moore--Penrose inverse. The row-wise squared X-reconstruction residual is
+
+\begin{equation}
+q_i=\lVert x_i-\hat x_i\rVert_2^2,
+\end{equation}
+
+The reconstruction $\hat x_i$ is obtained from the fitted model's public
+transform/inverse-transform round trip. The immutable result contains `score_distance` and
+`x_reconstruction_residual`. These are raw descriptive quantities; the package does not add
+theoretical limits, automatic outlier labels, or contribution diagnostics.
+
 ## Interpretation boundary
 
 Display factors describe a fixed fitted model. They are not validation results. Prediction
@@ -192,6 +223,7 @@ The plotting names remain in their own submodule:
 from pipls.plotting import (
     plot_pipls_decomposition,
     plot_pls_coefficients,
+    plot_pls_observation_diagnostics,
     plot_pls_scores,
     plot_pls_x_loadings,
     plot_pls_y_loadings,
@@ -229,8 +261,8 @@ The supplied coordinate order is preserved, including decreasing wavenumber axes
 components are overlaid as separate labeled lines. The function does not smooth, interpolate,
 reorder, or infer a spectral representation.
 
-Categorical plots require the caller to supply predictor and response names. The Pulp and
-Sugarcane post-analysis examples read those names from `X.csv` and `Y.csv`; the package itself
+Categorical plots require the caller to supply predictor and response names. The Pulp, Sugarcane,
+and Tobacco post-analysis examples read those names from `X.csv` and `Y.csv`; the package itself
 remains agnostic about whether labels originated in file headers or another metadata source.
 
 `plot_prediction_diagnostics()` renders standardized observed versus predicted responses,
@@ -249,6 +281,17 @@ title. Both plotting functions return `(figure, axes)`, where `axes` is a dictio
 semantic names. They do not call `show()`, save files, retain estimators, or modify supplied arrays.
 Importing `pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is loaded only when a
 plotting function is called.
+
+Raw ordinary PLS observation diagnostics use a separate result object:
+
+```python
+observation_figure, observation_axes = plot_pls_observation_diagnostics(
+    observation_diagnostics,
+)
+```
+
+The function returns one `observation_diagnostics` axis and adds neither theoretical limits nor
+automatic observation labels.
 
 
 ### Ordinary PLS figures
@@ -292,8 +335,11 @@ grouped bars or overlaid lines on one predictor axis. Categorical displays requi
 predictor or response names. For line rendering, the caller supplies the physical predictor
 coordinate and axis label, whose order is preserved.
 
-The initial ordinary PLS plotting surface does not include biplots, confidence ellipses, VIP,
-automatic variable selection, theoretical outlier limits, or uncertainty intervals.
+The ordinary PLS plotting surface also includes `plot_pls_observation_diagnostics()`, which draws
+raw score distance against squared X-reconstruction residual. It does not include theoretical
+limits, automatic observation labels, or contribution plots. Biplots, confidence ellipses, VIP,
+automatic variable selection, uncertainty intervals, and permutation tests remain outside the
+implemented surface.
 
 The complete [`10_pulp_real_data.py`](../examples/10_pulp_real_data.py) workflow demonstrates the
 package inspection and plotting APIs together with example-owned I/O. It derives predictor and
@@ -316,3 +362,12 @@ strictly increasing, and passes it to the report renderer with the label `Wavele
 canonical loading, direction, and coefficient values remain in long-form CSV tables; the report
 uses line rendering only because the example supplies the ordered physical coordinate explicitly.
 All four response headers (`TS`, `CP`, `ADF`, and `IVOMD`) are retained.
+
+The complete [`12_tobacco_real_data.py`](../examples/12_tobacco_real_data.py) workflow preserves
+the strictly decreasing wavenumber coordinate read from the `X.csv` headers and uses it for Pi-PLS
+predictor directions, ordinary PLS X loadings, and response-specific coefficient curves. All
+thirteen response headers are partitioned into deterministic source-order pages of at most five
+responses; the report renderer rejects pagination that omits, duplicates, or reorders a response.
+Tobacco writes the seven common post-analysis tables plus
+`pls_observation_diagnostics.csv`, whose columns are `sample`, `score_distance`, and
+`x_reconstruction_residual`. The report plots these raw values without theoretical outlier limits.

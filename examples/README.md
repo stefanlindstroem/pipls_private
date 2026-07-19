@@ -11,8 +11,10 @@ or publication-result workflows.
 - `11_sugarcane_real_data.py`: direct pandas reading, Pi-PLS and standard PLS paths, fixed
   interpretation models, selection-conditioned OOF predictions, seven canonical post-analysis
   CSV files, and a wavelength-aware report reconstructed from them.
-- `12_tobacco_real_data.py`: adaptive predictor-rank scanning with explicit full predictor SVD, a
-  standard PLS comparison path, and a separately chosen fixed Pi-PLS model.
+- `12_tobacco_real_data.py`: adaptive predictor-rank scanning with explicit full predictor SVD,
+  fixed Pi-PLS and ordinary PLS interpretation models, selection-conditioned OOF predictions,
+  decreasing-wavenumber spectral plots, deterministic response pagination, eight canonical
+  post-analysis CSV files, and raw ordinary PLS observation diagnostics.
 - `pls_component_path.py`: reusable standard-PLS path evaluation for the real-data examples.
 - `plot_component_path.py`: reusable CSV-to-PDF plotting for the Pi-PLS and PLS paths.
 - `fixed_model_oof.py`: example-local cloning and aligned OOF prediction for already fixed models.
@@ -26,7 +28,8 @@ python -m pip install -e ".[examples]"
 make examples
 ```
 
-The Pulp and Sugarcane post-analysis examples show label acquisition as a separate I/O step:
+The Pulp, Sugarcane, and Tobacco post-analysis examples show label acquisition as a separate I/O
+step:
 
 ```python
 X = pd.read_csv(DATA_DIR / "X.csv")
@@ -53,14 +56,15 @@ The current Pulp, Sugarcane, and Tobacco examples begin with two common stages:
 2. A visible `CHOSEN_N_COMPONENTS` constant selects one Pi-PLS CSV row, and a separate
    `PiPLSRegression` fixes both recorded ranks for the final full-data fit.
 
-The Pulp and Sugarcane examples add a third stage. Visible fixed Pi-PLS and PLS parameter choices
-are cloned inside the same five non-shuffled folds, producing `selection-conditioned OOF
-predictions`. Each example writes seven long-form CSV files under its dataset-specific
-post-analysis directory, then rereads those files to generate `post_analysis.pdf`. Full-data
-decomposition, score, loading, and coefficient tables remain interpretation artifacts; OOF rows
-remain prediction diagnostics. Sugarcane reads the strictly increasing 780--2500 nm coordinate
-from the `X.csv` headers and explicitly requests line rendering for predictor directions, X
-loadings, and response-specific coefficients.
+All three examples add a third stage. Visible fixed Pi-PLS and PLS parameter choices are cloned
+inside the same five non-shuffled folds, producing `selection-conditioned OOF predictions`. Each
+example writes seven common long-form CSV files under its dataset-specific post-analysis directory,
+then rereads those files to generate `post_analysis.pdf`. Full-data decomposition, score, loading,
+and coefficient tables remain interpretation artifacts; OOF rows remain prediction diagnostics.
+Sugarcane reads the strictly increasing 780--2500 nm coordinate from the `X.csv` headers. Tobacco
+preserves its strictly decreasing wavenumber coordinate, partitions all thirteen responses into
+source-ordered pages of at most five responses, and adds `pls_observation_diagnostics.csv` with raw
+score-distance and X-reconstruction-residual values. Theoretical outlier limits are not added.
 
 The display-standardized columns in `predictions.csv` use the complete observed-response matrix.
 They are intended for a common response display and do not reproduce the fold-local standardization
@@ -75,15 +79,15 @@ Decision 0042 adds a third, separately implemented stage for post-fit analysis. 
 `pls_component_path.py` and `plot_component_path.py` remain selection-diagnostic helpers. Reusable
 Pi-PLS and ordinary PLS computations belong in `pipls.inspection`. `pipls.plotting` now renders
 Pi-PLS decomposition and prediction-diagnostic figures together with ordinary PLS score, X- and
-Y-loading, and coefficient figures from immutable results. Dataset-specific fixed-model OOF loops,
-pandas tables, CSV writing, physical axes, pagination, and multipage reports remain example-local.
+Y-loading, coefficient, and raw observation-diagnostic figures from immutable results.
+Dataset-specific fixed-model OOF loops, pandas tables, CSV writing, physical axes, pagination, and
+multipage reports remain example-local.
 
 Full-data decomposition, score, loading, and coefficient plots are fitted-model interpretation.
 Prediction and residual plots accept explicit predictions and record whether they are fitted,
-fixed-parameter OOF, selection-conditioned OOF, or external-test values. The Pulp and Sugarcane
-real-data examples use `selection-conditioned OOF predictions` after component counts have been
-chosen from paths computed on the same observations. Tobacco will adopt the same provenance
-contract when its post-analysis stage is integrated.
+fixed-parameter OOF, selection-conditioned OOF, or external-test values. The Pulp, Sugarcane, and
+Tobacco real-data examples use `selection-conditioned OOF predictions` after component counts have
+been chosen from paths computed on the same observations.
 
 Real-data examples must show the ordinary I/O used to create `X` and `Y` in the example itself. Do
 not route example data through a package registry, generic loader, or hidden data-reading helper.

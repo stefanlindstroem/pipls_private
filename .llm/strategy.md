@@ -445,8 +445,8 @@ Implementation order is pure inspection primitives, Pi-PLS plotting, basic ordin
 Pulp artifact integration, Sugarcane spectral integration, Tobacco pagination and observation
 diagnostics, then the Pulp biplot and cross-dataset review.
 
-Current status: **Pi-PLS and basic ordinary PLS foundations complete; Pulp and Sugarcane real-data
-integrations complete; Tobacco pagination and observation diagnostics pending**.
+Current status: **Pi-PLS and ordinary PLS foundations complete; Pulp, Sugarcane, and Tobacco
+real-data integrations complete; the Pulp biplot and cross-dataset review remain pending**.
 
 ### Product documentation and release hardening
 
@@ -476,11 +476,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the Tobacco post-analysis workflow using deterministic response pagination and raw
-ordinary PLS observation diagnostics. Preserve the decreasing wavenumber order read from the
-`X.csv` headers, display all thirteen responses through explicit subsets, and retain the established
-selection-conditioned OOF provenance and canonical-table contract. Do not add theoretical outlier
-thresholds or the Pulp biplot in the same patch.
+Implement the Pulp score-loading biplot with one explicit reconstruction-preserving scaling and
+complete the final cross-dataset analysis-surface review. Keep the biplot restricted to the
+low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds, VIP,
+or other deferred diagnostics.
 
 ## Maintenance protocol
 

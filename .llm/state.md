@@ -39,17 +39,19 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors, standardized explicit-provenance prediction diagnostics,
-  and ordinary PLS latent-structure copies under `pipls.inspection`;
+  ordinary PLS latent-structure copies, and raw PLS observation diagnostics under
+  `pipls.inspection`;
 - optional Pi-PLS decomposition and prediction-diagnostic figures plus ordinary PLS score, loading,
-  and coefficient figures under `pipls.plotting`, with shared component axes and required semantic
-  labels for categorical variables;
-- complete Pulp and Sugarcane post-analysis workflows with fixed-estimator OOF prediction
-  helpers, seven canonical long-form CSV tables per dataset, scientific labels obtained at the
-  file-reading boundary, and multipage reports reconstructed from those tables.
+  coefficient, and observation-diagnostic figures under `pipls.plotting`, with shared component
+  axes and required semantic labels for categorical variables;
+- complete Pulp, Sugarcane, and Tobacco post-analysis workflows with fixed-estimator OOF prediction
+  helpers, seven common canonical long-form CSV tables, an optional Tobacco observation-diagnostic
+  table, scientific labels obtained at the file-reading boundary, and multipage reports
+  reconstructed from those tables.
 
-Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and basic ordinary PLS
-foundations are implemented in `pipls.inspection` and `pipls.plotting`; Pulp and Sugarcane are
-complete real-data post-analysis integrations.
+Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and ordinary PLS
+foundations are implemented in `pipls.inspection` and `pipls.plotting`; Pulp, Sugarcane, and Tobacco
+are complete real-data post-analysis integrations.
 
 The current top-level package exports are:
 
@@ -118,7 +120,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | package inspection and plotting are implemented; Pulp and Sugarcane have canonical OOF and post-analysis artifacts; Tobacco integration remains staged |
+| Model inspection | package inspection and plotting are implemented; Pulp, Sugarcane, and Tobacco have canonical OOF and post-analysis artifacts; the Pulp biplot remains staged |
 
 Additional fixed decisions:
 
@@ -246,10 +248,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add the Tobacco post-analysis workflow using deterministic response pagination and raw ordinary PLS
-observation diagnostics. Preserve the decreasing wavenumber order from the `X.csv` headers, display
-all thirteen responses through explicit subsets, and do not add theoretical outlier thresholds or
-the Pulp biplot in the same patch.
+Add the Pulp score-loading biplot with one explicit reconstruction-preserving scaling, then perform
+the final cross-dataset analysis-surface review. Keep the biplot restricted to the readable
+low-dimensional Pulp predictors and do not add spectral biplots or unrelated advanced diagnostics.
 
 ## Subsequent roadmap
 
@@ -261,9 +262,9 @@ the Pulp biplot in the same patch.
    a CSV-derived report — complete.
 5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays — complete.
 6. **Tobacco analysis:** deterministic response pagination and raw PLS observation
-   diagnostics — next.
+   diagnostics — complete.
 7. **Pulp biplot and cross-dataset review:** one explicit reconstruction-preserving scaling and
-   aligned artifact contracts.
+   aligned artifact contracts — next.
 8. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 

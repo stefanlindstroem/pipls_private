@@ -5,7 +5,12 @@ import pytest
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 
-from pipls.inspection import PLSLatentStructure, pls_latent_structure
+from pipls.inspection import (
+    PLSLatentStructure,
+    PLSObservationDiagnostics,
+    pls_latent_structure,
+    pls_observation_diagnostics,
+)
 
 
 def _fitted_pls() -> PLSRegression:
@@ -19,6 +24,19 @@ def _fitted_pls() -> PLSRegression:
         ]
     ) + 0.1 * rng.normal(size=(36, 2))
     return PLSRegression(n_components=3, scale=True).fit(X, Y)
+
+
+def _fitted_pls_with_data() -> tuple[PLSRegression, np.ndarray]:
+    rng = np.random.default_rng(441)
+    X = rng.normal(size=(36, 7))
+    Y = X[:, :3] @ np.array(
+        [
+            [1.0, -0.5],
+            [0.4, 0.8],
+            [-0.2, 0.3],
+        ]
+    ) + 0.1 * rng.normal(size=(36, 2))
+    return PLSRegression(n_components=3, scale=True).fit(X, Y), X
 
 
 def test_pls_latent_structure_copies_public_fitted_arrays() -> None:
@@ -94,3 +112,55 @@ def test_pls_latent_structure_rejects_nonfinite_fitted_arrays() -> None:
 
     with pytest.raises(ValueError, match="finite values"):
         pls_latent_structure(model)
+
+
+def test_pls_observation_diagnostics_match_explicit_public_method_calculation() -> None:
+    model, X = _fitted_pls_with_data()
+
+    diagnostics = pls_observation_diagnostics(model, X)
+
+    training_scores = model.x_scores_
+    center = np.mean(training_scores, axis=0)
+    centered_training = training_scores - center
+    covariance = centered_training.T @ centered_training / (len(training_scores) - 1)
+    scores = model.transform(X)
+    centered_scores = scores - center
+    expected_distance = np.einsum(
+        "ij,jk,ik->i",
+        centered_scores,
+        np.linalg.pinv(covariance),
+        centered_scores,
+    )
+    reconstructed = model.inverse_transform(scores)
+    expected_residual = np.sum((X - reconstructed) ** 2, axis=1)
+
+    assert isinstance(diagnostics, PLSObservationDiagnostics)
+    np.testing.assert_allclose(diagnostics.score_distance, expected_distance)
+    np.testing.assert_allclose(
+        diagnostics.x_reconstruction_residual,
+        expected_residual,
+    )
+    assert diagnostics.n_samples == len(X)
+    assert not diagnostics.score_distance.flags.writeable
+    assert not diagnostics.x_reconstruction_residual.flags.writeable
+
+
+def test_pls_observation_diagnostics_accept_external_observations() -> None:
+    model, X = _fitted_pls_with_data()
+
+    diagnostics = pls_observation_diagnostics(model, X[:5])
+
+    assert diagnostics.score_distance.shape == (5,)
+    assert diagnostics.x_reconstruction_residual.shape == (5,)
+
+
+def test_pls_observation_diagnostics_rejects_wrong_feature_count() -> None:
+    model, X = _fitted_pls_with_data()
+
+    with pytest.raises(ValueError, match="fitted number of predictor columns"):
+        pls_observation_diagnostics(model, X[:, :-1])
+
+
+def test_pls_observation_diagnostics_rejects_unfitted_estimator() -> None:
+    with pytest.raises(NotFittedError):
+        pls_observation_diagnostics(PLSRegression(n_components=2), np.ones((4, 3)))

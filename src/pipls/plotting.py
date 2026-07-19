@@ -8,7 +8,12 @@ from typing import TYPE_CHECKING, Any, Literal, TypeAlias
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .inspection import PiPLSDisplayFactors, PLSLatentStructure, PredictionDiagnostics
+from .inspection import (
+    PiPLSDisplayFactors,
+    PLSLatentStructure,
+    PLSObservationDiagnostics,
+    PredictionDiagnostics,
+)
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -20,12 +25,42 @@ PredictorStyle: TypeAlias = Literal["bar", "line"]
 __all__ = [
     "PredictorStyle",
     "plot_pls_coefficients",
+    "plot_pls_observation_diagnostics",
     "plot_pls_scores",
     "plot_pls_x_loadings",
     "plot_pls_y_loadings",
     "plot_pipls_decomposition",
     "plot_prediction_diagnostics",
 ]
+
+
+def plot_pls_observation_diagnostics(
+    diagnostics: PLSObservationDiagnostics,
+    *,
+    title: str = "PLS observation diagnostics",
+    figsize: tuple[float, float] = (6.5, 5.0),
+) -> tuple[Figure, dict[str, Axes]]:
+    """Plot raw score distance against squared X-reconstruction residual.
+
+    No theoretical limits or automatic observation labels are added. The raw
+    numerical values remain available in ``diagnostics`` for application-level
+    interpretation.
+    """
+
+    if not isinstance(diagnostics, PLSObservationDiagnostics):
+        raise TypeError("diagnostics must be a PLSObservationDiagnostics instance.")
+
+    plt = _pyplot()
+    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    axis.scatter(
+        diagnostics.score_distance,
+        diagnostics.x_reconstruction_residual,
+        alpha=0.75,
+    )
+    axis.set_xlabel("Score distance")
+    axis.set_ylabel("Squared X-reconstruction residual")
+    axis.set_title(title)
+    return figure, {"observation_diagnostics": axis}
 
 
 def plot_pls_scores(
@@ -576,6 +611,7 @@ def _overlay_lines(
         raise ValueError("Line labels must match the number of displayed series.")
     for column, label in enumerate(series_labels):
         axis.plot(coordinate, values[:, column], label=label)
+    axis.set_xlim(float(coordinate[0]), float(coordinate[-1]))
 
 
 def _single_axis_figsize(n_categories: int, *, style: PredictorStyle) -> tuple[float, float]:

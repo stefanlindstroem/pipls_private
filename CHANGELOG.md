@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Complete the Tobacco post-analysis workflow with decreasing-wavenumber spectral displays,
+  selection-conditioned Pi-PLS and ordinary PLS OOF predictions, deterministic source-order
+  response pagination, an optional eighth canonical CSV for raw PLS score-distance and
+  X-reconstruction-residual diagnostics, and a CSV-derived multipage report without theoretical
+  outlier limits.
 - Remove the superseded standalone `09_model_inspection.py` workflow and its dedicated structural
   test. Pulp and Sugarcane now provide the maintained demonstrations of CSV-header label
   acquisition, fitted-model interpretation, OOF diagnostics, canonical tables, and reports;

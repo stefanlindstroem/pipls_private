@@ -163,11 +163,13 @@ Decision 0042 accepts two public submodules for staged implementation:
 ```python
 from pipls.inspection import (
     PLSLatentStructure,
+    PLSObservationDiagnostics,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     PredictionKind,
     pipls_display_factors,
     pls_latent_structure,
+    pls_observation_diagnostics,
     prediction_diagnostics,
 )
 ```
@@ -189,6 +191,11 @@ its public X scores, X loadings, Y loadings, and regression coefficients. Coeffi
 scikit-learn orientation `(n_targets, n_features)`. The result does not recompute, rescale, or
 canonicalize ordinary PLS quantities.
 
+`pls_observation_diagnostics()` accepts a fitted `PLSRegression` and explicit predictor observations.
+It calculates squared score distance relative to the fitted training-score covariance and the
+row-wise squared X-reconstruction residual from the public transform/inverse-transform round trip.
+The result contains read-only raw arrays and no theoretical probability limits.
+
 `pipls.plotting` is implemented and exports from its own namespace:
 
 ```python
@@ -196,6 +203,7 @@ from pipls.plotting import (
     PredictorStyle,
     plot_pipls_decomposition,
     plot_pls_coefficients,
+    plot_pls_observation_diagnostics,
     plot_pls_scores,
     plot_pls_x_loadings,
     plot_pls_y_loadings,
@@ -215,6 +223,8 @@ exactly two selected X-score columns. X and Y loadings place selected components
 axis; coefficient plots place selected responses together on one axis. Categorical displays require
 caller-supplied variable names, while line displays require an explicit physical coordinate and axis
 label. Components and responses are selected by explicit zero-based indices.
+`plot_pls_observation_diagnostics()` renders one raw score-distance versus X-reconstruction-residual
+scatter plot without theoretical limits or automatic observation labels.
 
 Matplotlib remains optional and is imported only when a plotting function is called. The functions
 perform no file writing, call no display function, retain no models, and do not alter supplied

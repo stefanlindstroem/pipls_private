@@ -81,6 +81,7 @@ def test_plotting_names_are_submodule_exports_only() -> None:
         "PredictorStyle",
         "plot_pipls_decomposition",
         "plot_pls_coefficients",
+        "plot_pls_observation_diagnostics",
         "plot_pls_scores",
         "plot_pls_x_loadings",
         "plot_pls_y_loadings",
@@ -172,6 +173,7 @@ def test_plot_pipls_decomposition_line_mode_overlays_selected_components() -> No
     axis = axes["predictor_directions"]
     np.testing.assert_array_equal(axis.lines[0].get_xdata(), coordinate)
     np.testing.assert_array_equal(axis.lines[1].get_xdata(), coordinate)
+    assert axis.get_xlim() == (coordinate[0], coordinate[-1])
     assert axis.get_xlabel() == "Wavenumber (1/cm)"
     assert [text.get_text() for text in axis.get_legend().get_texts()] == [
         "Component 1",

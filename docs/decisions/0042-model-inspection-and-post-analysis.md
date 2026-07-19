@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted. The Pi-PLS and basic ordinary PLS numerical and plotting foundations are implemented.
-Pulp and Sugarcane are complete real-data post-analysis integrations; Tobacco remains staged.
+Accepted. The Pi-PLS and ordinary PLS numerical and plotting foundations are implemented. Pulp,
+Sugarcane, and Tobacco are complete real-data post-analysis integrations. The low-dimensional Pulp
+biplot and final cross-dataset review remain staged.
 
 ## Context
 
@@ -126,18 +127,22 @@ or external-test estimates.
 
 ### Established PLS analysis contract
 
-The initial ordinary PLS surface is restricted to public `PLSRegression` quantities:
+The ordinary PLS surface is restricted to public `PLSRegression` quantities:
 
 - X scores;
 - X loadings;
 - Y loadings;
 - regression coefficients;
-- a two-component score-loading biplot for suitable low-dimensional data;
 - raw score-distance and X-reconstruction-residual diagnostics for suitable larger data.
 
 Scores, loadings, and coefficients support explicit component or response subsets. Predictor
 loadings and coefficients use the same explicit bar-versus-line rendering contract as Pi-PLS
 predictor directions.
+
+The raw score distance uses the fitted training-score center and covariance, with the
+Moore--Penrose inverse for numerical rank deficiency. The X reconstruction residual uses the
+public transform/inverse-transform round trip. The initial implementation draws no theoretical
+limits and performs no automatic observation labeling.
 
 Biplot scaling must be mathematically stated and must preserve the selected score-loading
 reconstruction. Biplots are demonstrated only where the number of predictor arrows is readable;
@@ -175,12 +180,12 @@ Implementation proceeds as a series of small patches:
 4. example-local fixed-model OOF and post-analysis artifact helpers, integrated first with
    Pulp — complete;
 5. Sugarcane spectral line analysis — complete;
-6. Tobacco pagination and observation diagnostics — next;
-7. the Pulp biplot and a final cross-dataset analysis-surface review.
+6. Tobacco pagination and observation diagnostics — complete;
+7. the Pulp biplot and a final cross-dataset analysis-surface review — next.
 
 The temporary standalone `09_model_inspection.py` demonstration was removed after the complete
-Pulp and Sugarcane workflows superseded it. The reusable package APIs remain documented directly
-and exercised through focused tests and the complete real-data examples.
+Pulp, Sugarcane, and Tobacco workflows superseded it. The reusable package APIs remain documented
+directly and exercised through focused tests and the complete real-data examples.
 
 The package numerical core, estimator fitting, path-selection engine, and current component-path
 helpers do not change as part of this decision.

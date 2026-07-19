@@ -30,11 +30,13 @@ _PREDICTION_KINDS: tuple[PredictionKind, ...] = (
 
 __all__ = [
     "PLSLatentStructure",
+    "PLSObservationDiagnostics",
     "PiPLSDisplayFactors",
     "PredictionDiagnostics",
     "PredictionKind",
     "pipls_display_factors",
     "pls_latent_structure",
+    "pls_observation_diagnostics",
     "prediction_diagnostics",
 ]
 
@@ -76,6 +78,29 @@ class PLSLatentStructure:
         """Number of retained ordinary-PLS components."""
 
         return int(self.x_scores.shape[1])
+
+
+@dataclass(frozen=True)
+class PLSObservationDiagnostics:
+    """Immutable raw ordinary-PLS observation diagnostics.
+
+    ``score_distance`` is the squared Mahalanobis distance of each supplied
+    X score from the fitted training-score center, using the Moore--Penrose
+    inverse of the fitted training-score covariance. ``x_reconstruction_residual``
+    is the row-wise squared Euclidean residual after the public PLS
+    transform/inverse-transform round trip.
+
+    Construct instances with :func:`pls_observation_diagnostics`.
+    """
+
+    score_distance: FloatArray
+    x_reconstruction_residual: FloatArray
+
+    @property
+    def n_samples(self) -> int:
+        """Number of supplied observations."""
+
+        return int(self.score_distance.shape[0])
 
 
 @dataclass(frozen=True)
@@ -201,6 +226,77 @@ def pls_latent_structure(model: PLSRegression) -> PLSLatentStructure:
         x_loadings=_read_only(x_loadings),
         y_loadings=_read_only(y_loadings),
         coefficients=_read_only(coefficients),
+    )
+
+
+def pls_observation_diagnostics(
+    model: PLSRegression,
+    X: ArrayLike,
+) -> PLSObservationDiagnostics:
+    """Return raw score-distance and X-reconstruction diagnostics.
+
+    The fitted training scores establish the score center and covariance.
+    The supplied observations are transformed with the fitted model, and the
+    covariance inverse is calculated with :func:`numpy.linalg.pinv` so that
+    numerically rank-deficient score covariance remains well defined.
+
+    No theoretical warning limits are calculated. The returned quantities are
+    descriptive diagnostics whose interpretation depends on the fitted model
+    and the scientific application.
+
+    Parameters
+    ----------
+    model:
+        A fitted :class:`sklearn.cross_decomposition.PLSRegression` estimator.
+    X:
+        Predictor observations with the fitted number of features.
+
+    Returns
+    -------
+    PLSObservationDiagnostics
+        Read-only raw score distances and squared X-reconstruction residuals.
+    """
+
+    if not isinstance(model, PLSRegression):
+        raise TypeError("model must be a sklearn.cross_decomposition.PLSRegression.")
+    check_is_fitted(model, attributes=["x_scores_", "x_loadings_"])
+
+    training_scores = _finite_matrix(model.x_scores_, name="model.x_scores_")
+    X_values = _finite_matrix(X, name="X")
+    if training_scores.shape[0] < 2:
+        raise ValueError("model.x_scores_ must contain at least two training observations.")
+    if X_values.shape[1] != model.x_loadings_.shape[0]:
+        raise ValueError(
+            "X must contain the fitted number of predictor columns: "
+            f"expected {model.x_loadings_.shape[0]}, got {X_values.shape[1]}."
+        )
+
+    score_center = np.mean(training_scores, axis=0)
+    centered_training_scores = training_scores - score_center
+    score_covariance = (
+        centered_training_scores.T @ centered_training_scores
+    ) / (training_scores.shape[0] - 1)
+    inverse_covariance = np.linalg.pinv(score_covariance)
+
+    transformed = _finite_matrix(model.transform(X), name="model.transform(X)")
+    centered_scores = transformed - score_center
+    score_distance = np.einsum(
+        "ij,jk,ik->i",
+        centered_scores,
+        inverse_covariance,
+        centered_scores,
+    )
+    reconstructed = _finite_matrix(
+        model.inverse_transform(transformed),
+        name="model.inverse_transform(model.transform(X))",
+    )
+    x_reconstruction_residual = np.sum((X_values - reconstructed) ** 2, axis=1)
+
+    return PLSObservationDiagnostics(
+        score_distance=_read_only(np.asarray(score_distance, dtype=np.float64)),
+        x_reconstruction_residual=_read_only(
+            np.asarray(x_reconstruction_residual, dtype=np.float64)
+        ),
     )
 
 

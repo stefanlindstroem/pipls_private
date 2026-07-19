@@ -10,12 +10,13 @@ Decision 0042 establishes the architecture. Source code and tests establish whic
 currently implemented. Do not describe a planned analysis function as available until it exists in
 the package and is covered by the corresponding tests and user documentation.
 
-The implemented foundation includes `pipls.inspection` for immutable Pi-PLS, prediction, and
-ordinary PLS latent-structure results. `pipls.plotting` provides Pi-PLS decomposition,
-prediction-diagnostic, ordinary PLS score, loading, and coefficient figures. The complete Pulp
-and Sugarcane workflows demonstrate these tools with scientific labels and physical coordinates
-obtained visibly during file input. They add example-owned fixed-model OOF predictions, seven
-canonical long-form CSV tables, and multipage reports reconstructed from those tables.
+The implemented foundation includes `pipls.inspection` for immutable Pi-PLS, prediction, ordinary
+PLS latent-structure, and raw PLS observation-diagnostic results. `pipls.plotting` provides Pi-PLS
+decomposition, prediction-diagnostic, ordinary PLS score, loading, coefficient, and observation
+diagnostic figures. The complete Pulp, Sugarcane, and Tobacco workflows demonstrate these tools
+with scientific labels and physical coordinates obtained visibly during file input. They add
+example-owned fixed-model OOF predictions, seven common canonical long-form CSV tables, an
+optional PLS observation-diagnostic table, and multipage reports reconstructed from those tables.
 
 ## Analysis stages
 
@@ -60,13 +61,14 @@ The inspection submodule owns reusable numerical computations and immutable resu
 uses NumPy and package/scikit-learn fitted results, but not pandas or Matplotlib. Returned arrays
 must be defensive copies and read-only where practical.
 
-Initial planned responsibilities are:
+Implemented responsibilities are:
 
 - canonical Pi-PLS display factors;
 - standardized prediction diagnostics;
 - ordinary PLS latent-structure extraction;
-- ordinary PLS observation diagnostics;
-- mathematically defined biplot coordinates.
+- ordinary PLS observation diagnostics.
+
+Mathematically defined biplot coordinates remain the next planned inspection addition.
 
 ### `pipls.plotting`
 
@@ -189,13 +191,12 @@ have different error structures and add a distributional display not required by
 Use public `sklearn.cross_decomposition.PLSRegression` fitted quantities only.
 `PLSLatentStructure` copies `x_scores_`, `x_loadings_`, `y_loadings_`, and `coef_` without
 recomputing or sign-adjusting them. Coefficients retain the scikit-learn orientation
-`(n_targets, n_features)`. The initial surface covers:
+`(n_targets, n_features)`. The implemented surface covers:
 
 - X score pairs;
 - X loadings;
 - Y loadings;
 - response-specific regression coefficients;
-- a two-component X score-loading biplot for low-dimensional data;
 - raw score distance and X reconstruction residual for observation diagnostics.
 
 Component and response subsets are explicit function arguments. Selected X or Y loading components
@@ -203,8 +204,26 @@ share one axis, using grouped bars for named categorical variables or overlaid l
 predictor axis. Selected coefficient responses likewise share one axis. Do not choose responses by
 hidden heuristics. Do not draw thousands of biplot arrows for spectral data.
 
-Biplot coordinate scaling must state and test the reconstruction identity it preserves. Observation
-diagnostics must state their equations and initially omit theoretical probability limits.
+For a supplied observation with X score $t_i$, let $\bar t_{\mathrm{train}}$ and
+$S_{T,\mathrm{train}}$ be the center and sample covariance of the fitted training scores. The raw
+score distance is
+
+\begin{equation}
+h_i=(t_i-\bar t_{\mathrm{train}})^\mathsf{T}S_{T,\mathrm{train}}^{+}(t_i-\bar t_{\mathrm{train}}).
+\end{equation}
+
+Here $+$ denotes the Moore--Penrose inverse. The X reconstruction residual is
+
+\begin{equation}
+q_i=\lVert x_i-\hat x_i\rVert_2^2.
+\end{equation}
+
+The reconstruction $\hat x_i$ is obtained through the fitted model's public
+transform/inverse-transform round trip. These are descriptive raw quantities. Do not add
+theoretical probability limits, automatic outlier labels, or contribution plots without a separate
+decision.
+
+Biplot coordinate scaling must state and test the reconstruction identity it preserves.
 
 VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation tests,
 contribution plots, and theoretical outlier thresholds require separate decisions.
@@ -246,6 +265,11 @@ Predictor-direction, score, loading, coefficient, and observation-diagnostic tab
 sample, feature, response, and component identifiers as applicable. Do not serialize estimators as
 part of the result contract.
 
+The seven common tables are required for every complete post-analysis workflow. A workflow may add
+`pls_observation_diagnostics.csv` with columns `sample`, `score_distance`, and
+`x_reconstruction_residual`. Tobacco uses this optional eighth table. Response pagination must
+partition the source response names exactly once and preserve their source order.
+
 A figure page must identify the dataset, model, selected components or responses, and prediction
 kind where predictions are shown. The example-level report composer controls page order and
 pagination; a package plotting function renders one explicit selection at a time.
@@ -281,6 +305,6 @@ The accepted order after Decision 0042 is:
 3. ordinary PLS scores, loadings, and coefficient analysis — **complete**;
 4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **complete**;
 5. Sugarcane spectral analysis with an explicit wavelength axis — **complete**;
-6. Tobacco pagination and observation diagnostics — **next**;
-7. Pulp biplot and final cross-dataset review;
+6. Tobacco pagination and observation diagnostics — **complete**;
+7. Pulp biplot and final cross-dataset review — **next**;
 8. return to product documentation and release hardening.

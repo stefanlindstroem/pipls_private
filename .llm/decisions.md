@@ -47,7 +47,7 @@ This index is navigation, not a substitute for those records.
 | `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
 | `0040-sklearn-api-polish.md` | final public API polish | explicit complete-path sentinel, conventional random state, callable scorer, and canonical decomposition output |
 | `0041-legacy-dataset-licensing-roadmap.md` | legacy dataset licensing and roadmap | retain the three licensed datasets; exclude Corn, legacy Steel, SARCOS, and FRED-MD |
-| `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; stage reusable inspection and plotting tools |
+| `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; reusable inspection, plotting, and all three real-data integrations are implemented, with the Pulp biplot remaining |
 
 ## Implemented estimator/search transition
 
@@ -94,8 +94,8 @@ plan contains an earlier or more general proposal:
   Decision 0041; separately licensed derivatives are new candidate datasets, not retroactive
   clearance of the companion-analysis files;
 - fitted-model analysis is separated into selection diagnostics, full-data interpretation, and
-  prediction diagnostics under Decision 0042; numerical inspection will be package-owned, optional
-  plotting will be submodule-owned, and dataset-specific artifacts will remain example-owned;
+  prediction diagnostics under Decision 0042; numerical inspection is package-owned, optional
+  plotting is submodule-owned, and dataset-specific artifacts remain example-owned;
 - repository tests validate executable behavior and durable file structure rather than pinning
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only

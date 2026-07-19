@@ -36,11 +36,13 @@ def _decomposition(
 def test_inspection_names_are_submodule_exports_only() -> None:
     expected = {
         "PLSLatentStructure",
+        "PLSObservationDiagnostics",
         "PiPLSDisplayFactors",
         "PredictionDiagnostics",
         "PredictionKind",
         "pipls_display_factors",
         "pls_latent_structure",
+        "pls_observation_diagnostics",
         "prediction_diagnostics",
     }
 

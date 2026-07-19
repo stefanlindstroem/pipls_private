@@ -10,7 +10,11 @@ from matplotlib.figure import Figure
 from sklearn.cross_decomposition import PLSRegression
 
 import pipls.plotting as plotting
-from pipls.inspection import PLSLatentStructure, pls_latent_structure
+from pipls.inspection import (
+    PLSLatentStructure,
+    pls_latent_structure,
+    pls_observation_diagnostics,
+)
 
 matplotlib.use("Agg")
 
@@ -59,6 +63,7 @@ def test_plot_pls_x_loadings_line_mode_overlays_components_and_preserves_axis() 
     axis = axes["x_loadings"]
     np.testing.assert_array_equal(axis.lines[0].get_xdata(), coordinate)
     np.testing.assert_array_equal(axis.lines[1].get_xdata(), coordinate)
+    assert axis.get_xlim() == (coordinate[0], coordinate[-1])
     assert axis.get_xlabel() == "Wavenumber (1/cm)"
     assert [text.get_text() for text in axis.get_legend().get_texts()] == [
         "Component 1",
@@ -144,6 +149,27 @@ def test_plot_pls_coefficients_groups_responses_by_named_predictor() -> None:
         "Purity",
         "Energy demand",
     ]
+
+
+def test_plot_pls_observation_diagnostics_returns_one_raw_scatter_axis() -> None:
+    rng = np.random.default_rng(181)
+    X = rng.normal(size=(32, 6))
+    Y = X[:, :2] + 0.1 * rng.normal(size=(32, 2))
+    model = PLSRegression(n_components=2).fit(X, Y)
+    diagnostics = pls_observation_diagnostics(model, X)
+
+    figure, axes = plotting.plot_pls_observation_diagnostics(
+        diagnostics,
+        title="Observation review",
+    )
+
+    assert isinstance(figure, Figure)
+    assert set(axes) == {"observation_diagnostics"}
+    axis = axes["observation_diagnostics"]
+    assert axis.get_xlabel() == "Score distance"
+    assert axis.get_ylabel() == "Squared X-reconstruction residual"
+    assert axis.get_title() == "Observation review"
+    assert len(axis.collections) == 1
 
 
 def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:

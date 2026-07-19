@@ -221,14 +221,15 @@ path = pd.DataFrame(search.component_path_results_)
 
 The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
 (NIPALS) component-path CSV files, call small imported functions to generate the comparison PDF,
-and then fit separate fixed models using visible component-count choices. The Pulp and
-Sugarcane examples also generate selection-conditioned OOF predictions for fixed Pi-PLS and
-ordinary PLS models, write seven canonical post-analysis CSV files per dataset, and
-rebuild multipage reports from those files. The
-Pi-PLS path CSV always records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
-predictor SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
-`examples` extra to run them. See [`examples/README.md`](examples/README.md) and
-[`datasets/README.md`](datasets/README.md).
+and then fit separate fixed models using visible component-count choices. All three examples also
+generate selection-conditioned OOF predictions for fixed Pi-PLS and ordinary PLS models, write
+seven common canonical post-analysis CSV files, and rebuild multipage reports from those files.
+Tobacco adds an eighth table with raw ordinary PLS score-distance and X-reconstruction-residual
+diagnostics, preserves the decreasing wavenumber axis from `X.csv`, and paginates all thirteen
+responses in source order. The Pi-PLS path CSV always records the selected predictor rank. Tobacco
+uses adaptive scanning with explicit full predictor SVD; randomized-SVD behavior is covered by the
+solver-consistency benchmark. Install the `examples` extra to run them. See
+[`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks
 
@@ -244,7 +245,7 @@ The real-data workflows are explicit application runs rather than benchmark or t
 `make examples` runs every numbered example in order, including the complete Pulp, Sugarcane, and
 Tobacco analyses. Examples 10–12 read the public tables directly, write separate Pi-PLS and
 standard PLS component-path CSVs, generate a comparison PDF, and fit separately chosen fixed
-models. Pulp and Sugarcane additionally demonstrate the complete post-analysis artifact workflow.
+models. All three additionally demonstrate the complete post-analysis artifact workflow.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
 [`examples/README.md`](examples/README.md).
