@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, Literal, TypeAlias, cast
+from typing import TYPE_CHECKING, Any, Literal, TypeAlias
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -264,7 +264,7 @@ def _pyplot() -> Any:
 def _predictor_style(value: object) -> PredictorStyle:
     if value not in ("bar", "line"):
         raise ValueError(f'predictor_style must be "bar" or "line"; got {value!r}.')
-    return cast(PredictorStyle, value)
+    return value
 
 
 def _predictor_coordinate(
