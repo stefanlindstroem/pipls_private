@@ -33,7 +33,7 @@ PLS_COEFFICIENTS_PDF = RESULTS_DIR / "pls_coefficients.pdf"
 
 # These fixed values are chosen only to demonstrate fitted-model inspection.
 N_COMPONENTS = 3
-PREDICTOR_RANK = 4
+PREDICTOR_RANK = 10
 COEFFICIENT_RESPONSES = (0, 1, 2)
 
 # File reading and label acquisition are example-level tasks. The plotting API
