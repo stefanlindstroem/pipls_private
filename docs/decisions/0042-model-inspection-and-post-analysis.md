@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. The Pi-PLS and ordinary PLS numerical and plotting foundations are implemented. Pulp,
-Sugarcane, and Tobacco are complete real-data post-analysis integrations. The low-dimensional Pulp
-biplot and final cross-dataset review are completed by Decision 0043.
+Accepted, with the ordinary-PLS-specific analysis ownership and numbered-example use superseded by
+Decision 0045. The separation of selection diagnostics, fitted-model interpretation, prediction
+diagnostics, immutable inspection results, optional plotting, explicit labels, physical axes, and
+canonical artifacts remains in force. The current runtime still awaits the Decision 0045 migration.
 
 ## Context
 
@@ -34,9 +35,10 @@ The repository distinguishes three analysis stages:
    conditional path over component counts and predictor ranks. The existing
    `examples/_support/pls_component_path.py` and `examples/_support/plot_component_path.py` remain example-local
    helpers for this stage.
-2. **Fixed-model interpretation.** Full-data fitted Pi-PLS and ordinary PLS models provide
-   decomposition, score, loading, and coefficient quantities. These plots describe the fitted
-   models and are not validation results.
+2. **Fixed-model interpretation.** A full-data fitted Pi-PLS model provides the method-specific
+   factorization and the shared PLS-family score, loading, coefficient, biplot, and observation
+   quantities. These plots describe the fitted model and are not validation results. Ordinary PLS
+   remains a component-path comparator rather than a second post-analysis model.
 3. **Prediction diagnostics.** Observed-versus-predicted and residual displays use predictions
    supplied explicitly by the caller. Every diagnostic records whether the values are fitted,
    fixed-parameter out-of-fold, selection-conditioned out-of-fold, or external-test predictions.
@@ -125,9 +127,11 @@ component counts from the same observations. Such results are labeled
 `selection-conditioned OOF predictions`; they are descriptive diagnostics, not unbiased nested-CV
 or external-test estimates.
 
-### Established PLS analysis contract
+### Shared PLS-family analysis contract
 
-The ordinary PLS surface is restricted to public `PLSRegression` quantities:
+Decision 0045 supersedes the restriction to a concrete ordinary `PLSRegression` model. The shared
+PLS-family surface uses compatible public fitted quantities from either `PLSRegression` or
+`PiPLSRegression`:
 
 - X scores;
 - X loadings;
@@ -176,7 +180,8 @@ Implementation proceeds as a series of small patches:
 
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — complete;
 2. Pi-PLS decomposition and prediction plots — complete;
-3. ordinary PLS scores, loadings, and coefficient analysis — complete;
+3. shared score, loading, coefficient, biplot, and observation analysis — implemented currently
+   under transitional ordinary-PLS-specific names; Decision 0045 migration pending;
 4. example-local fixed-model OOF and post-analysis artifact helpers, integrated first with
    Pulp — complete;
 5. Sugarcane spectral line analysis — complete;

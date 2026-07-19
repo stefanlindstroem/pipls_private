@@ -50,6 +50,7 @@ This index is navigation, not a substitute for those records.
 | `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; reusable inspection, plotting, and all three real-data integrations |
 | `0043-pls-biplot-and-analysis-surface.md` | final fitted-model analysis increment | balanced reconstruction-preserving Pulp biplot; no spectral biplots; analysis series complete |
 | `0044-minimal-onboarding-and-example-support.md` | user onboarding and example organization | literal-matrix first example; complete-workflow helpers under `examples/_support/`; one examples target retained |
+| `0045-pls-family-analysis-boundary.md` | comparison versus fitted-model analysis ownership | retain ordinary PLS for CV-MSE comparison; keep $P$, $D$, and $Q$ Pi-PLS-specific; make shared analysis estimator-neutral and apply it only to Pi-PLS in numbered examples |
 
 ## Implemented estimator/search transition
 
@@ -100,6 +101,10 @@ plan contains an earlier or more general proposal:
 - fitted-model analysis is separated into selection diagnostics, full-data interpretation, and
   prediction diagnostics under Decision 0042; numerical inspection is package-owned, optional
   plotting is submodule-owned, and dataset-specific artifacts remain example-owned;
+- Decision 0045 further separates model roles: ordinary PLS remains in component-path comparisons
+  and declared comparator benchmarks; $P$, $D$, and $Q$ inspection stays Pi-PLS-specific; shared
+  score, loading, coefficient, biplot, observation, and prediction analysis uses estimator-neutral
+  APIs and is applied only to the selected Pi-PLS model in numbered examples;
 - repository tests validate executable behavior and durable file structure rather than pinning
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only

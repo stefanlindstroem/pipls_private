@@ -7,6 +7,18 @@ workflows. For the shortest fitted-model path, begin with [`quickstart.md`](quic
 [`01_minimal_fit_and_plot.py`](../examples/01_minimal_fit_and_plot.py). The support modules under
 `examples/_support/` are report infrastructure, not prerequisites for ordinary estimator use.
 
+## Accepted analysis-model boundary
+
+Decision 0045 distinguishes three roles. The component-path comparison continues to fit both
+Pi-PLS and ordinary PLS and plots both CV-MSE curves. Inspection of $P$, $D$, $Q$, and $QD$ remains
+explicitly Pi-PLS-specific. Scores, loadings, coefficients, biplots, observation diagnostics, and
+prediction diagnostics are shared PLS-family analyses whose reusable API will be estimator-neutral.
+
+The numbered real-data examples will apply those shared tools only to the selected Pi-PLS model.
+Ordinary PLS will remain only as the comparison path, not as a second post-analysis or OOF model.
+The ordinary-PLS-specific shared names and examples shown later in this document describe the
+current transitional implementation and will be replaced in the following corrective patches.
+
 Import these names from the submodule:
 
 ```python

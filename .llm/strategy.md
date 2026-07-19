@@ -441,12 +441,14 @@ Acceptance conditions:
 - VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation
   tests, theoretical outlier limits, and contribution plots remain deferred.
 
-Implementation order is pure inspection primitives, Pi-PLS plotting, basic ordinary PLS analysis,
-Pulp artifact integration, Sugarcane spectral integration, Tobacco pagination and observation
-diagnostics, followed by the Pulp biplot and cross-dataset review.
+The original implementation order completed the numerical and plotting mechanics, but Decision
+0045 corrects the model-ownership boundary. The corrective order is: estimator-neutral shared
+inspection and plotting names; Pi-PLS-only post-analysis for Pulp, Sugarcane, and Tobacco while
+retaining ordinary PLS in the CV-MSE comparison; then stale-name, artifact, documentation, and
+boundary-test cleanup.
 
-Current status: **Pi-PLS and ordinary PLS foundations complete; Pulp, Sugarcane, and Tobacco
-real-data integrations, the Pulp biplot, and the cross-dataset review complete**.
+Current status: **reopened by Decision 0045; documentation boundary accepted, runtime migration
+next**.
 
 ### Product documentation and release hardening
 
@@ -454,7 +456,7 @@ Build a user-oriented documentation surface, API reference, compatibility policy
 build checks, licensing audit, release notes, and versioned releases. These are continuing software
 product responsibilities rather than the final steps of one publication.
 
-Current status: **next; Phase F2 is complete**.
+Current status: **blocked until the Decision 0045 corrective Phase F2 series is complete**.
 
 ### Current standardization and deferred block-aware variants
 
@@ -476,10 +478,12 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Proceed to buildable documentation, generated API reference, compatibility policy, packaging checks,
-and versioned release preparation. The literal-matrix quickstart and example-support reorganization
-are complete. Keep the biplot restricted to the low-dimensional Pulp predictors; do not add spectral
-biplots, theoretical outlier thresholds, VIP, or other deferred diagnostics.
+Implement the Decision 0045 corrective series. First generalize and rename shared PLS-family
+inspection and plotting; then migrate examples 10–12 to Pi-PLS-only post-analysis while preserving
+the ordinary PLS CV-MSE comparison; finally remove stale names and artifacts and add boundary tests.
+Resume buildable documentation and release preparation afterward. Keep the biplot restricted to the
+low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds, VIP,
+or other deferred diagnostics.
 
 ## Maintenance protocol
 

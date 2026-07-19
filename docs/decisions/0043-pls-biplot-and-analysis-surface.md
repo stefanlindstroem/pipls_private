@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted and implemented.
+Accepted, with ordinary-PLS-specific naming and numbered-example application superseded by
+Decision 0045.
 
 ## Context
 
@@ -12,7 +13,10 @@ A biplot places sample scores and variable loadings in one coordinate system, bu
 
 ## Decision
 
-Add `PLSBiplotCoordinates` and `pls_biplot_coordinates()` under `pipls.inspection`. For exactly two selected zero-based components, let $t_k$ be the X-score column and $p_k$ the X-loading column. Define
+The balanced biplot scaling below remains accepted. Decision 0045 requires estimator-neutral
+result and function names and permits the computation from compatible PLS-family latent
+structures rather than only ordinary PLS. For exactly two selected zero-based components, let
+$t_k$ be the X-score column and $p_k$ the X-loading column. Define
 
 \begin{equation}
 a_k=\sqrt{\frac{\lVert p_k\rVert_2}{\lVert t_k\rVert_2}},\qquad
@@ -26,11 +30,17 @@ The result has equal score and loading norms within each selected component and 
 \tilde T\tilde P^\mathsf{T}=T_{\mathcal K}P_{\mathcal K}^\mathsf{T}.
 \end{equation}
 
-Add `plot_pls_biplot()` under `pipls.plotting`. It displays sample coordinates and named X-loading arrows only. It does not add Y arrows, inferred groups, confidence regions, automatic labels, or importance claims.
+The plotting contract displays sample coordinates and named X-loading arrows only. Its final
+public name is estimator-neutral under Decision 0045. It does not add Y arrows, inferred groups,
+confidence regions, automatic labels, or importance claims.
 
-Demonstrate the biplot only in the Pulp report using components 1 and 2. Pulp has fourteen named scalar predictors, so the arrows remain interpretable. Do not generate biplots for Sugarcane or Tobacco because their spectral predictor counts make the display unsuitable.
+Demonstrate the biplot only in the Pulp report using components 1 and 2. Pulp has fourteen named
+scalar predictors, so the arrows remain interpretable. Do not generate biplots for Sugarcane or
+Tobacco because their spectral predictor counts make the display unsuitable.
 
-The Pulp report reconstructs biplot coordinates from the existing canonical `pls_scores.csv` and `pls_x_loadings.csv`. No additional CSV table is required.
+The Pulp report continues to reconstruct biplot coordinates from canonical score and X-loading
+tables. Decision 0045 requires generic shared-quantity filenames and applies the biplot to the
+selected Pi-PLS model. No additional biplot table is required.
 
 ## Cross-dataset review
 
@@ -40,7 +50,8 @@ The completed surface has these common rules:
 - package inspection functions contain no pandas or Matplotlib dependency;
 - package plotting functions accept immutable computed results and perform no file writing;
 - component and response selections are explicit;
-- full-data factors, scores, loadings, coefficients, biplots, and observation diagnostics are interpretive;
+- full-data factors, scores, loadings, coefficients, biplots, and observation diagnostics are
+  interpretive;
 - prediction diagnostics carry explicit provenance;
 - CSV tables are canonical and reports are reconstructed from them;
 - Pulp uses named categorical bars and the low-dimensional biplot;
@@ -49,4 +60,8 @@ The completed surface has these common rules:
 
 ## Consequences
 
-The eight-part fitted-model analysis implementation series is complete. Further PLS diagnostics such as VIP, confidence regions, uncertainty intervals, probability limits, contribution plots, or automatic variable selection require separate decisions. The next repository phase is product documentation and release hardening.
+The mathematical biplot increment is complete, but Decision 0045 reopens the analysis surface for
+a corrective ownership, naming, and example migration. Further PLS diagnostics such as VIP,
+confidence regions, uncertainty intervals, probability limits, contribution plots, or automatic
+variable selection require separate decisions. Product documentation and release hardening resume
+after the Decision 0045 migration.

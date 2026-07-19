@@ -153,6 +153,17 @@ must show these steps directly rather than hiding them behind convenience utilit
 
 ## Accepted model-inspection boundary
 
+Decision 0045 distinguishes method-specific Pi-PLS factorization inspection from shared PLS-family
+analysis. Final public names for $P$, $D$, and $Q$ inspection retain an explicit `pipls` marker.
+Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics use
+estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiPLSRegression`
+objects. Numbered examples apply those shared tools only to the selected Pi-PLS model; ordinary PLS
+remains only in component-path comparisons and declared comparator benchmarks.
+
+The ordinary-PLS-specific inspection and plotting names documented below describe the current
+transitional implementation. They are scheduled for replacement without compatibility aliases
+because version `0.0.0` has not been released.
+
 Decision 0042 accepts two public submodules for staged implementation:
 
 - `pipls.inspection` for pure NumPy computations and immutable result objects;

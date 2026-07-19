@@ -26,7 +26,8 @@ coefficient views are a separate interpretation stage, while observed-versus-pre
 diagnostics require explicit prediction provenance.
 
 - [`model_inspection.md`](model_inspection.md): Pi-PLS display factors, prediction diagnostics,
-  ordinary PLS analysis, and optional Matplotlib figures;
+  Pi-PLS-specific factorization inspection, shared PLS-family analysis, and optional Matplotlib
+  figures;
 - [`../examples/README.md`](../examples/README.md): numbered examples, complete reference analyses,
   and the role of `examples/_support/`.
 

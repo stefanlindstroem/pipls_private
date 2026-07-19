@@ -39,20 +39,20 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - a current reference suite containing pulp, sugarcane, and tobacco;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
-- pure immutable Pi-PLS display factors, standardized explicit-provenance prediction diagnostics,
-  ordinary PLS latent-structure copies, and raw PLS observation diagnostics under
-  `pipls.inspection`;
-- optional Pi-PLS decomposition and prediction-diagnostic figures plus ordinary PLS score, loading,
-  coefficient, and observation-diagnostic figures under `pipls.plotting`, with shared component
-  axes and required semantic labels for categorical variables;
+- pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
+  diagnostics under `pipls.inspection`;
+- transitional ordinary-PLS-specific latent-structure, biplot, observation-diagnostic, and plotting
+  names that Decision 0045 requires to become estimator-neutral shared PLS-family tools;
 - complete Pulp, Sugarcane, and Tobacco post-analysis workflows with fixed-estimator OOF prediction
   helpers, seven common canonical long-form CSV tables, an optional Tobacco observation-diagnostic
   table, scientific labels obtained at the file-reading boundary, and multipage reports
   reconstructed from those tables.
 
-Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and ordinary PLS
-foundations are implemented in `pipls.inspection` and `pipls.plotting`; Pulp, Sugarcane, and Tobacco
-are complete real-data post-analysis integrations.
+Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+analysis-model boundary. The current runtime still fits ordinary PLS models for post-analysis in
+examples 10–12; this is transitional. The accepted target retains ordinary PLS only for CV-MSE
+comparison, keeps $P$, $D$, and $Q$ inspection Pi-PLS-specific, and applies estimator-neutral shared
+analysis tools only to the selected Pi-PLS model in numbered examples.
 
 The current top-level package exports are:
 
@@ -249,26 +249,24 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Proceed to buildable user documentation, generated API reference, compatibility policy, packaging
-checks, and versioned release preparation. The minimal onboarding path and fitted-model analysis
-series are complete; do not add further PLS diagnostics without a separate decision.
+Implement Decision 0045 in three patches: estimator-neutral shared inspection and plotting names,
+Pi-PLS-only post-analysis in examples 10–12 while preserving the two-model CV-MSE comparison, and
+final stale-name/artifact/documentation cleanup with boundary tests. Resume release hardening only
+after that corrective series. The minimal onboarding path is complete; the fitted-model analysis
+surface is reopened only for the Decision 0045 correction. Do not add further diagnostics outside
+that correction without a separate decision.
 
 ## Subsequent roadmap
 
-1. **Post-analysis numerical foundation:** Pi-PLS display factors and prediction diagnostics —
-   complete.
-2. **Pi-PLS plotting:** decomposition and prediction figures — complete.
-3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients — complete.
-4. **Pulp post-analysis workflow:** example-local fixed-model OOF predictions, canonical tables, and
-   a CSV-derived report — complete.
-5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays — complete.
-6. **Tobacco analysis:** deterministic response pagination and raw PLS observation
-   diagnostics — complete.
-7. **Pulp biplot and cross-dataset review:** complete with balanced score-loading coordinates and
-   aligned artifact contracts.
-8. **User documentation and release hardening:** literal-matrix quickstart and navigation hierarchy
+1. **Decision 0045 API migration:** replace ordinary-PLS-specific shared analysis names with
+   estimator-neutral names and test them with both fitted estimator classes — next.
+2. **Decision 0045 example migration:** retain the two-model CV-MSE comparison but use only the
+   selected Pi-PLS model for OOF prediction and post-analysis in examples 10–12 — pending.
+3. **Decision 0045 cleanup:** remove stale names and artifact files, align documentation, and add
+   repository-boundary tests — pending.
+4. **User documentation and release hardening:** literal-matrix quickstart and navigation hierarchy
    complete; buildable user guide, generated API reference, compatibility policy, packaging checks,
-   and versioned releases remain.
+   and versioned releases remain after the corrective series.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

@@ -6,17 +6,17 @@ This document is the durable maintainer contract for fitted-model interpretation
 diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.inspection`,
 `pipls.plotting`, post-analysis example helpers, or the real-data analysis reports.
 
-Decision 0042 establishes the architecture. Source code and tests establish which planned parts are
-currently implemented. Do not describe a planned analysis function as available until it exists in
-the package and is covered by the corresponding tests and user documentation.
+Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
+Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
+factorization inspection, and shared PLS-family analysis. Source code and tests establish which
+parts are currently implemented. Do not describe the Decision 0045 migration as complete until the
+renamed API, Pi-PLS-only numbered-example post-analysis, and cleanup tests are committed.
 
-The implemented foundation includes `pipls.inspection` for immutable Pi-PLS, prediction, ordinary
-PLS latent-structure, and raw PLS observation-diagnostic results. `pipls.plotting` provides Pi-PLS
-decomposition, prediction-diagnostic, ordinary PLS score, loading, coefficient, and observation
-diagnostic figures. The complete Pulp, Sugarcane, and Tobacco workflows demonstrate these tools
-with scientific labels and physical coordinates obtained visibly during file input. They add
-example-owned fixed-model OOF predictions, seven common canonical long-form CSV tables, an
-optional PLS observation-diagnostic table, and multipage reports reconstructed from those tables.
+The current implementation includes `pipls.inspection` and `pipls.plotting`, but the shared
+latent-structure functions and numbered-example post-analysis still use transitional
+ordinary-PLS-specific names and final ordinary PLS fits. Decision 0045 requires those shared tools
+to become estimator-neutral and requires the numbered examples to apply them only to the selected
+Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface remains explicitly method-specific.
 
 ## Analysis stages
 
@@ -65,9 +65,13 @@ Implemented responsibilities are:
 
 - canonical Pi-PLS display factors;
 - standardized prediction diagnostics;
-- ordinary PLS latent-structure extraction;
-- ordinary PLS observation diagnostics;
-- balanced two-component ordinary PLS biplot coordinates.
+- shared PLS-family latent-structure extraction;
+- shared PLS-family observation diagnostics;
+- balanced two-component score-loading biplot coordinates.
+
+The current concrete names remain transitional until the Decision 0045 API migration. The final
+implementation must validate compatible public fitted attributes and transformations rather than
+requiring a concrete `PLSRegression` instance.
 
 ### `pipls.plotting`
 
@@ -190,19 +194,31 @@ The initial figure contract contains:
 A pooled residual histogram and fitted normal density are excluded. They combine responses that may
 have different error structures and add a distributional display not required by the diagnostic.
 
-## Ordinary PLS analysis
+## Shared PLS-family analysis
 
-Use public `sklearn.cross_decomposition.PLSRegression` fitted quantities only.
-`PLSLatentStructure` copies `x_scores_`, `x_loadings_`, `y_loadings_`, and `coef_` without
-recomputing or sign-adjusting them. Coefficients retain the scikit-learn orientation
-`(n_targets, n_features)`. The implemented surface covers:
+Scores, reconstruction loadings, regression coefficients, balanced score-loading biplots, and raw
+score-distance or X-reconstruction-residual diagnostics are shared PLS-family analyses. They are not
+specific to ordinary `PLSRegression`, and their final reusable API names must not contain either
+`pls` or `pipls`.
 
-- X score pairs;
-- X loadings;
-- Y loadings;
-- response-specific regression coefficients;
-- raw score distance and X reconstruction residual for observation diagnostics;
-- a two-component X score-loading biplot with balanced reconstruction-preserving scaling.
+The shared numerical API may operate on a fitted `PLSRegression` or `PiPLSRegression` when the
+object exposes compatible public attributes and transformations. Latent-structure extraction uses:
+
+- `x_scores_`;
+- `x_loadings_`;
+- `y_loadings_`;
+- `coef_`.
+
+Observation diagnostics additionally require callable `transform()` and `inverse_transform()`
+methods. The implementation validates this structural contract rather than using a concrete
+`isinstance(..., PLSRegression)` restriction. Coefficients retain the public orientation
+`(n_targets, n_features)`.
+
+The numbered real-data examples use ordinary PLS only for the comparative component-path CV-MSE
+curve. After a Pi-PLS configuration is selected, one fitted `PiPLSRegression` supplies the shared
+scores, loadings, coefficients, biplot coordinates, observation diagnostics, and OOF prediction
+diagnostics. No second ordinary PLS model is fitted for post-analysis. Tests may and should apply
+the shared API to both estimator classes.
 
 Component and response subsets are explicit function arguments. Selected X or Y loading components
 share one axis, using grouped bars for named categorical variables or overlaid lines for a physical
@@ -247,7 +263,6 @@ tables, reads them back, and constructs the report from those reread tables.
 Prediction tables use long form and retain at least:
 
 ```text
-model
 sample
 fold
 response
@@ -274,8 +289,8 @@ Predictor-direction, score, loading, coefficient, and observation-diagnostic tab
 sample, feature, response, and component identifiers as applicable. Do not serialize estimators as
 part of the result contract.
 
-The seven common tables are required for every complete post-analysis workflow. A workflow may add
-`pls_observation_diagnostics.csv` with columns `sample`, `score_distance`, and
+The seven common tables are required for every complete post-analysis workflow. The Decision 0045
+migration will replace ordinary-PLS-prefixed shared artifact names with estimator-neutral names. A workflow may add an observation-diagnostic table with columns `sample`, `score_distance`, and
 `x_reconstruction_residual`. Tobacco uses this optional eighth table. Response pagination must
 partition the source response names exactly once and preserve their source order.
 
@@ -283,11 +298,11 @@ A figure page must identify the dataset, model, selected components or responses
 kind where predictions are shown. The example-level report composer controls page order and
 pagination; a package plotting function renders one explicit selection at a time.
 
-The Pulp workflow uses the same five non-shuffled folds as its component-path comparison. It
-clones one already fixed Pi-PLS estimator and one already fixed ordinary PLS estimator in each
-fold. Because both component counts and the Pi-PLS predictor rank were chosen after inspecting
-paths computed from the same 46 observations, the resulting OOF predictions are
-selection-conditioned rather than independent validation. The standardized values stored in
+The Pulp workflow uses the same five non-shuffled folds as its component-path comparison. Under
+Decision 0045 it clones only the already fixed Pi-PLS estimator in each fold. Because the Pi-PLS
+component count and predictor rank were chosen after inspecting paths computed from the same 46
+observations, the resulting OOF predictions are selection-conditioned rather than independent
+validation. The standardized values stored in
 `predictions.csv` use the full supplied observed-response means and sample standard deviations
 for display; they do not reproduce the fold-local scaling used by the component-path loss.
 
@@ -311,9 +326,8 @@ The accepted order after Decision 0042 is:
 
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
 2. Pi-PLS decomposition and prediction plotting — **complete**;
-3. ordinary PLS scores, loadings, and coefficient analysis — **complete**;
-4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **complete**;
-5. Sugarcane spectral analysis with an explicit wavelength axis — **complete**;
-6. Tobacco pagination and observation diagnostics — **complete**;
-7. Pulp biplot and final cross-dataset review — **complete**;
-8. return to product documentation and release hardening — **next**.
+3. transitional ordinary-PLS-specific shared analysis — **implemented but superseded by Decision 0045**;
+4. estimator-neutral shared inspection and plotting API — **next**;
+5. Pi-PLS-only Pulp, Sugarcane, and Tobacco post-analysis migration — **pending**;
+6. stale-name, artifact, documentation, and boundary-test cleanup — **pending**;
+7. return to product documentation and release hardening — **after the corrective series**.

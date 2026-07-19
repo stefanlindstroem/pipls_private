@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Accept the corrected fitted-model analysis boundary: retain ordinary PLS in the shared CV-MSE
+  component-path comparison, keep $P$, $D$, and $Q$ inspection explicitly Pi-PLS-specific, and
+  require estimator-neutral shared PLS-family tools that numbered examples apply only to the
+  selected Pi-PLS model. Runtime migration follows in separate patches.
+
 - Add a literal-matrix `01_minimal_fit_and_plot.py` quickstart, organize user documentation around
   direct fit, selection, inspection, and complete reports, and move advanced real-data helper modules
   under `examples/_support/` without adding another Make target or changing estimator behavior.

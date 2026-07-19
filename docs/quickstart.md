@@ -75,6 +75,7 @@ The complete executable version is
 
 1. [`parameter_selection.md`](parameter_selection.md) when component count or predictor rank must be
    selected;
-2. [`model_inspection.md`](model_inspection.md) for prediction diagnostics and ordinary PLS analysis;
+2. [`model_inspection.md`](model_inspection.md) for Pi-PLS factorization inspection, prediction
+   diagnostics, and shared PLS-family analysis;
 3. [`../examples/README.md`](../examples/README.md) for the complete Pulp, Sugarcane, and Tobacco
    workflows.
