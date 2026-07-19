@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Make model-inspection label provenance explicit: the Pulp inspection example now reads
+  predictor and response names from `X.csv` and `Y.csv` headers, while plotting remains independent
+  of pandas and file layout and accepts labels from any caller-owned metadata source.
 - Present selected Pi-PLS and ordinary PLS components together on shared axes, using side-by-side bars for named categorical variables and overlaid lines for physical predictor axes; require caller-supplied scientific labels for categorical predictor and response displays.
 - Add immutable ordinary PLS latent-structure extraction from public `PLSRegression` scores,
   X/Y loadings, and coefficients, together with optional score, loading, and response-specific

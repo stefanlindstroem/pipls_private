@@ -441,8 +441,8 @@ Acceptance conditions:
 - VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation
   tests, theoretical outlier limits, and contribution plots remain deferred.
 
-Implementation order is pure inspection primitives, Pi-PLS plotting and a synthetic example, basic
-ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
+Implementation order is pure inspection primitives, Pi-PLS plotting and a file-backed inspection
+example, basic ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
 pagination and observation diagnostics, then the Pulp biplot and cross-dataset review.
 
 Current status: **Pi-PLS and basic ordinary PLS analysis foundations complete; real-data integration pending**.

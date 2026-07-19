@@ -43,10 +43,10 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - optional Pi-PLS decomposition and prediction-diagnostic figures plus ordinary PLS score, loading,
   and coefficient figures under `pipls.plotting`, with shared component axes and required semantic
   labels for categorical variables;
-- a deterministic synthetic inspection example covering fixed Pi-PLS and ordinary PLS models.
+- a compact file-backed Pulp inspection example covering fixed Pi-PLS and ordinary PLS models.
 
 Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and basic ordinary PLS
-foundations are implemented in `pipls.inspection`, `pipls.plotting`, and the synthetic inspection
+foundations are implemented in `pipls.inspection`, `pipls.plotting`, and the file-backed inspection
 example. Real-data post-analysis reports remain planned work.
 
 The current top-level package exports are:

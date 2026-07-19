@@ -45,10 +45,10 @@ plotting belongs in a public `pipls.plotting` submodule. Matplotlib remains opti
 only when that submodule's plotting functions are called. These submodule names are not added to
 the top-level `pipls` exports.
 
-Dataset-specific orchestration, explicit data reading, fixed model choices, out-of-fold prediction
-loops, table construction, artifact writing, and multipage-report composition remain under
-`examples/`. Repository-maintenance and data-preparation code remains under `scripts/` or the
-relevant dataset directory; it is not mixed with user analysis.
+Dataset-specific orchestration, explicit data reading, variable-name acquisition, fixed model
+choices, out-of-fold prediction loops, table construction, artifact writing, and multipage-report
+composition remain under `examples/`. Repository-maintenance and data-preparation code remains
+under `scripts/` or the relevant dataset directory; it is not mixed with user analysis.
 
 ### Pi-PLS interpretation contract
 
@@ -83,11 +83,13 @@ Predictor rendering is selected explicitly by the example or caller:
 - `"bar"` for a small set of scalar predictors;
 - `"line"` for an ordered physical axis such as wavelength or wavenumber.
 
-Categorical predictor and response displays require caller-supplied scientific labels; real-data
-examples use the `X.csv` and `Y.csv` column headers. Selected components share one axis per plotted
-quantity, with side-by-side bars for categorical variables and overlaid lines for a physical
-predictor axis. The plotting API does not infer whether predictors are spectra, generate substitute
-variable names, smooth or interpolate supplied curves, or reorder a supplied physical axis.
+Categorical predictor and response displays require caller-supplied scientific labels. Real-data
+examples read `X.csv` and `Y.csv` headers visibly when those headers contain the relevant names; a
+programming user may instead supply labels from a schema or any other explicit metadata source.
+Selected components share one axis per plotted quantity, with side-by-side bars for categorical
+variables and overlaid lines for a physical predictor axis. The plotting API does not read files,
+infer whether predictors are spectra, generate substitute variable names, smooth or interpolate
+supplied curves, or reorder a supplied physical axis.
 
 ### Prediction-diagnostic contract
 
@@ -167,7 +169,7 @@ only the plotted product. Pickled estimators are not analysis artifacts.
 Implementation proceeds as a series of small patches:
 
 1. pure Pi-PLS display-factor and prediction-diagnostic computations;
-2. Pi-PLS decomposition and prediction plots with a fast synthetic example;
+2. Pi-PLS decomposition and prediction plots with a compact file-backed Pulp example;
 3. ordinary PLS scores, loadings, and coefficient analysis;
 4. example-local fixed-model OOF and post-analysis artifact helpers, integrated first with Pulp;
 5. Sugarcane spectral line analysis;

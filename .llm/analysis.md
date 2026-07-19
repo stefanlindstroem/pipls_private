@@ -12,9 +12,10 @@ the package and is covered by the corresponding tests and user documentation.
 
 The implemented foundation includes `pipls.inspection` for immutable Pi-PLS, prediction, and
 ordinary PLS latent-structure results. `pipls.plotting` provides Pi-PLS decomposition,
-prediction-diagnostic, ordinary PLS score, loading, and coefficient figures. The deterministic
-`examples/09_model_inspection.py` workflow demonstrates these tools on synthetic data. Example-owned
-real-data post-analysis artifacts remain planned.
+prediction-diagnostic, ordinary PLS score, loading, and coefficient figures. The compact
+`examples/09_model_inspection.py` workflow demonstrates these tools on the file-backed Pulp data and
+reads scientific variable labels from the CSV headers. Example-owned real-data post-analysis
+artifacts remain planned.
 
 ## Analysis stages
 
@@ -92,6 +93,11 @@ Examples own scientific orchestration:
 
 Do not hide real-data reading behind a package loader. Do not place user analysis helpers under
 `scripts/`, which remains the repository-maintenance and preparation area.
+
+Variable-name acquisition is also example-owned. When a table has meaningful headers, examples
+should derive names visibly from `X.columns` and `Y.columns` and pass them to plotting functions.
+Users without header-bearing tables may supply names from any explicit metadata source. Package
+plotting code must neither read files nor generate scientific-looking fallback names.
 
 ## Pi-PLS factorization display
 

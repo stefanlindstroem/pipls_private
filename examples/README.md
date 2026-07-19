@@ -5,8 +5,8 @@ or publication-result workflows.
 
 - `07_advanced_cv.py`: grouped and advanced cross-validation workflows.
 - `08_synthetic_data.py`: deterministic train/test generation with shared latent structure.
-- `09_model_inspection.py`: a fixed Pi-PLS fit, $P$/$D$/$QD$ interpretation, and external-test
-  prediction diagnostics on deterministic synthetic data.
+- `09_model_inspection.py`: direct Pulp CSV reading, header-derived scientific labels, fixed
+  Pi-PLS and ordinary PLS interpretation, and clearly labeled fitted-value diagnostics.
 - `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, a
   CSV-derived comparison PDF, and a fixed Pulp Pi-PLS model chosen from the recorded path.
 - `11_sugarcane_real_data.py`: the same comparison workflow for high-dimensional LabSpec sugarcane
@@ -22,6 +22,18 @@ Install the data and plotting dependencies before running the real-data examples
 python -m pip install -e ".[examples]"
 make examples
 ```
+
+The inspection example shows label acquisition as a separate I/O step:
+
+```python
+X = pd.read_csv(DATA_DIR / "X.csv")
+Y = pd.read_csv(DATA_DIR / "Y.csv")
+predictor_names = X.columns.astype(str).tolist()
+response_names = Y.columns.astype(str).tolist()
+```
+
+These names are then passed explicitly to `pipls.plotting`. Users whose arrays do not carry column
+headers can obtain equivalent lists from a schema or other domain metadata.
 
 `make examples` runs all numbered examples in order. It is intentionally separate from
 `make check`: the real-data analyses can be slow and generate application artifacts under

@@ -134,6 +134,19 @@ all responses from the supplied observed-response center and sample standard dev
 provenance label distinguishes fitted, fixed-parameter OOF, selection-conditioned OOF, and external
 test predictions.
 
+Variable labels are supplied separately from numerical inspection. For a header-bearing CSV
+workflow, read them visibly at the example boundary:
+
+```python
+import pandas as pd
+
+X = pd.read_csv("X.csv")
+Y = pd.read_csv("Y.csv")
+predictor_names = X.columns.astype(str).tolist()
+response_names = Y.columns.astype(str).tolist()
+```
+
+Users working with NumPy arrays can supply the same lists from any explicit metadata source.
 Install the optional plotting dependency and render the computed results explicitly:
 
 ```python
@@ -147,18 +160,18 @@ from pipls.plotting import (
 factor_figure, factor_axes = plot_pipls_decomposition(
     factors,
     predictor_style="bar",
-    predictor_names=feature_names,
-    response_names=target_names,
+    predictor_names=predictor_names,
+    response_names=response_names,
 )
 prediction_figure, prediction_axes = plot_prediction_diagnostics(
     diagnostics,
-    response_names=target_names,
+    response_names=response_names,
 )
 score_figure, score_axes = plot_pls_scores(pls_structure, components=(0, 1))
 loading_figure, loading_axes = plot_pls_x_loadings(
     pls_structure,
     predictor_style="bar",
-    predictor_names=feature_names,
+    predictor_names=predictor_names,
 )
 ```
 

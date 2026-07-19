@@ -149,6 +149,35 @@ statistics mean different things depending on their provenance. In particular,
 earlier parameter-selection path, so they are not an independent post-selection performance
 estimate.
 
+## Supplying scientific variable names
+
+Variable-name acquisition is outside the plotting API. Plotting functions receive labels explicitly
+and do not read files, inspect pandas objects, or invent scientific meanings for unlabeled arrays.
+When a CSV file stores variable names in its header, an example can preserve them directly:
+
+```python
+import pandas as pd
+
+X = pd.read_csv("X.csv")
+Y = pd.read_csv("Y.csv")
+predictor_names = X.columns.astype(str).tolist()
+response_names = Y.columns.astype(str).tolist()
+```
+
+Those lists can then be passed to categorical Pi-PLS and ordinary PLS plots. This is an
+example-level I/O operation, not a package requirement. A user whose arrays do not come from
+header-bearing files can supply names from a schema, laboratory-information system, domain
+metadata, or an explicit list:
+
+```python
+predictor_names = ["Temperature", "Pressure", "Flow rate"]
+response_names = ["Yield", "Purity"]
+```
+
+For spectral line plots, CSV headers may instead be converted to the physical coordinate, for
+example `X.columns.to_numpy(dtype=float)`, while response names still come from `Y.columns` or
+another metadata source.
+
 ## Plotting computed results
 
 Install the optional plotting dependency with:
@@ -200,9 +229,9 @@ The supplied coordinate order is preserved, including decreasing wavenumber axes
 components are overlaid as separate labeled lines. The function does not smooth, interpolate,
 reorder, or infer a spectral representation.
 
-Categorical plots require the caller to supply predictor and response names. Real-data examples use
-`X.columns` and `Y.columns` from the committed CSV files so that the plot retains the scientific
-variable names rather than generated labels such as `x1` and `y1`.
+Categorical plots require the caller to supply predictor and response names. The file-backed Pulp
+inspection example reads those names from `X.csv` and `Y.csv`; the package itself remains agnostic
+about whether labels originated in file headers or another metadata source.
 
 `plot_prediction_diagnostics()` renders standardized observed versus predicted responses,
 standardized residuals versus standardized predictions, and response-wise standardized RMSE:
@@ -266,8 +295,9 @@ coordinate and axis label, whose order is preserved.
 The initial ordinary PLS plotting surface does not include biplots, confidence ellipses, VIP,
 automatic variable selection, theoretical outlier limits, or uncertainty intervals.
 
-The fast [`09_model_inspection.py`](../examples/09_model_inspection.py) example fits fixed Pi-PLS and
-ordinary PLS models to deterministic synthetic training data. It diagnoses Pi-PLS predictions on a
-separate synthetic test set and writes decomposition, prediction, score, loading, and coefficient
-figures. pandas tables, fixed-model OOF orchestration, canonical CSV artifacts, and dataset-specific
-multipage reports remain owned by later real-data example stages.
+The fast [`09_model_inspection.py`](../examples/09_model_inspection.py) example reads the Pulp
+`X.csv` and `Y.csv` files directly, derives predictor and response labels from their headers, and
+fits fixed Pi-PLS and ordinary PLS models for display. Its prediction panel is explicitly labeled
+`fitted values`; it is an interpretation example, not validation. Fixed-model OOF orchestration,
+canonical post-analysis CSV artifacts, and dataset-specific multipage reports remain owned by later
+real-data example stages.
