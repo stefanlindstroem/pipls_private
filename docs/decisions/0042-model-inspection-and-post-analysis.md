@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Implementation is staged after this decision record.
+Accepted. The pure numerical foundation is implemented; plotting and example integration remain staged.
 
 ## Context
 

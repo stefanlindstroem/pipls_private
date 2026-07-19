@@ -445,7 +445,7 @@ Implementation order is pure inspection primitives, Pi-PLS plotting and a synthe
 ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
 pagination and observation diagnostics, then the Pulp biplot and cross-dataset review.
 
-Current status: **architecture accepted; implementation not started**.
+Current status: **numerical foundation complete; plotting and example integration pending**.
 
 ### Product documentation and release hardening
 
@@ -475,10 +475,11 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the first runtime patch under Decision 0042: add pure immutable Pi-PLS display-factor and
-prediction-diagnostic computations in `pipls.inspection`, with equation-level tests and no plotting
-dependency. Do not add Matplotlib code, ordinary PLS analysis, example artifact helpers, or
-real-data post-analysis in the same patch.
+Add `pipls.plotting` functions for Pi-PLS decomposition and prediction diagnostics, together with a
+fast synthetic inspection example. The package plotting functions must consume explicit immutable
+inspection results, import Matplotlib only in the plotting submodule, return figures and named axes,
+and perform no file writing. Do not add ordinary PLS analysis or real-data artifact orchestration in
+the same patch.
 
 ## Maintenance protocol
 

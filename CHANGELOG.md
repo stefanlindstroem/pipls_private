@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add the pure `pipls.inspection` foundation with immutable Pi-PLS display factors,
+  deterministic sign canonicalization that preserves $PDQ^\mathsf{T}$, and explicit-provenance
+  prediction diagnostics standardized from observed responses with `ddof=1`.
 - Accept the staged model-inspection and post-analysis architecture: separate component-path
   diagnostics, fitted-model interpretation, and prediction diagnostics; reserve pure numerical
   work for `pipls.inspection`, optional figures for `pipls.plotting`, and dataset-specific artifact

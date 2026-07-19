@@ -18,7 +18,8 @@ implemented boundary and next increment; this file records where responsibilitie
 
 Phases A through E4c are implemented. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
-`StatisticalSupportWarning`, and deterministic synthetic dataset generation.
+`StatisticalSupportWarning`, deterministic synthetic dataset generation, and the pure numerical
+`pipls.inspection` surface.
 
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
@@ -45,10 +46,10 @@ carry their own output-container configuration through cloning and refit.
 ## Accepted analysis ownership
 
 Decision 0042 adds a staged fitted-model analysis surface without changing the estimator or path
-engine. Reusable numerical computations belong in the planned `pipls.inspection` submodule, and
-reusable Matplotlib figures belong in the planned optional `pipls.plotting` submodule. Dataset-
-specific model choices, OOF loops, pandas tables, CSV writing, and multipage reports remain in
-`examples/`.
+engine. The implemented `pipls.inspection` submodule owns immutable Pi-PLS display factors and
+standardized prediction diagnostics. Reusable Matplotlib figures belong in the planned optional
+`pipls.plotting` submodule. Dataset-specific model choices, OOF loops, pandas tables, CSV writing,
+and multipage reports remain in `examples/`.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
@@ -66,6 +67,7 @@ implementing or reviewing this surface.
   generators; it is not required for user-supplied real data.
 - `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
+- `src/pipls/inspection.py`: pure immutable fitted-model inspection computations.
 - `src/pipls/model_selection.py`: path-owned rank limits, split materialization, and rank-search
   orchestration.
 - `src/pipls/path.py`: pipeline-aware `PiPLSPathCV` meta-estimator.

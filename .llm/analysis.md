@@ -10,6 +10,10 @@ Decision 0042 establishes the architecture. Source code and tests establish whic
 currently implemented. Do not describe a planned analysis function as available until it exists in
 the package and is covered by the corresponding tests and user documentation.
 
+The implemented numerical foundation is `pipls.inspection`: `PiPLSDisplayFactors`,
+`PredictionDiagnostics`, `pipls_display_factors`, and `prediction_diagnostics`. The plotting
+submodule, ordinary PLS inspection, and example-owned post-analysis artifacts remain planned.
+
 ## Analysis stages
 
 Keep these stages separate in code, documentation, filenames, and figure labels.
@@ -240,10 +244,10 @@ the complete Pulp, Sugarcane, or Tobacco analyses in `make check`; those remain 
 
 ## Implementation order
 
-The accepted order after this architecture patch is:
+The accepted order after Decision 0042 is:
 
-1. pure Pi-PLS display-factor and prediction-diagnostic computations;
-2. Pi-PLS plotting and a fast synthetic inspection example;
+1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
+2. Pi-PLS plotting and a fast synthetic inspection example — **next**;
 3. ordinary PLS scores, loadings, and coefficient analysis;
 4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics;
 5. Sugarcane spectral analysis;

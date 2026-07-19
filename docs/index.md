@@ -18,10 +18,10 @@ user guide.
 
 Component-path tables diagnose model selection. Fitted-model decomposition, score, loading, and
 coefficient views are a separate interpretation stage, while observed-versus-predicted and residual
-diagnostics require explicit prediction provenance. Decision 0042 records the staged architecture;
-the reusable inspection and plotting API will be documented here as each implementation patch
-lands.
+diagnostics require explicit prediction provenance. Decision 0042 records the staged architecture.
 
+- [`model_inspection.md`](model_inspection.md): implemented pure Pi-PLS display factors and
+  standardized prediction diagnostics;
 - [`../examples/README.md`](../examples/README.md): current component-path workflows and the accepted
   post-analysis staging boundary.
 

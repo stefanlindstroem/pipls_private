@@ -3,8 +3,8 @@
 `pipls` is an installable Python package for Pi-PLS, a PLS-family method for multivariate
 regression. Its public interfaces follow scikit-learn conventions and provide a fixed-model
 regression estimator, pipeline-aware triangular path analysis, advanced cross-validation, ordered
-out-of-fold diagnostics, deterministic synthetic data generation, and transparent reference
-datasets.
+out-of-fold diagnostics, pure fitted-model inspection, deterministic synthetic data generation,
+and transparent reference datasets.
 
 ## Installation
 
@@ -103,6 +103,28 @@ print(search.validation_report_)
 print(search.oof_predictions_)
 ```
 
+## Numerical model inspection
+
+Inspect a fitted Pi-PLS factorization without changing the estimator:
+
+```python
+from pipls.inspection import pipls_display_factors, prediction_diagnostics
+
+factors = pipls_display_factors(model.decomposition_)
+Y_pred = model.predict(X_test)
+diagnostics = prediction_diagnostics(
+    Y_test,
+    Y_pred,
+    prediction_kind="external test predictions",
+)
+```
+
+The display factors are read-only copies of $P$, $D$, and $Q$ with deterministic component signs;
+they preserve $P D Q^\mathsf{T}$. Prediction diagnostics use residuals $y-\hat y$ and standardize
+all responses from the supplied observed-response center and sample standard deviation. The
+provenance label distinguishes fitted, fixed-parameter OOF, selection-conditioned OOF, and external
+test predictions. See [`docs/model_inspection.md`](docs/model_inspection.md).
+
 ## Synthetic data
 
 ```python
@@ -174,6 +196,7 @@ See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchma
 - [Parameter selection](docs/parameter_selection.md)
 - [Path analysis](docs/path_analysis.md)
 - [Cross-validation and OOF reporting](docs/cross_validation.md)
+- [Numerical model inspection](docs/model_inspection.md)
 - [Model-internal preprocessing](docs/preprocessing.md)
 - [Datasets and synthetic generation](docs/datasets.md)
 - [Lightweight validation benchmarks](docs/benchmarks.md)

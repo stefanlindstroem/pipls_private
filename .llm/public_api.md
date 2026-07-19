@@ -158,20 +158,35 @@ Decision 0042 accepts two public submodules for staged implementation:
 - `pipls.inspection` for pure NumPy computations and immutable result objects;
 - `pipls.plotting` for optional Matplotlib figures built from explicit computed results.
 
-These submodules are not yet implemented in this snapshot and their names are not top-level
-`pipls` exports. Their accepted contract is defined in `.llm/analysis.md`. In particular:
+`pipls.inspection` is implemented and exports from its own namespace:
 
-- component-path helpers remain example-local selection diagnostics;
-- Pi-PLS interpretation uses copied $P$, $D$, and $Q$ factors and preserves
-  $PDQ^\mathsf{T}$ under any display-only sign convention;
-- prediction diagnostics accept observed and predicted responses explicitly and record prediction
-  provenance;
-- plotting remains optional, returns figures and axes, and performs no file writing;
-- dataset-specific OOF loops, pandas tables, canonical CSV files, and PDF composition remain under
-  `examples/`.
+```python
+from pipls.inspection import (
+    PiPLSDisplayFactors,
+    PredictionDiagnostics,
+    PredictionKind,
+    pipls_display_factors,
+    prediction_diagnostics,
+)
+```
 
-No estimator method, fitted attribute, path-search parameter, or top-level export is added by the
-architecture decision alone.
+These names are not top-level `pipls` exports. `pipls_display_factors()` accepts a
+`PiPLSDecomposition`, copies $P$, $D$, and $Q$, chooses deterministic display signs from the first
+largest-magnitude predictor entry, and preserves $PDQ^\mathsf{T}$. It returns $P$, the dilation
+vector, $Q$, $QD$, and the applied signs as read-only arrays.
+
+`prediction_diagnostics()` accepts one- or two-dimensional observed and predicted responses,
+normalizes outputs to two dimensions, uses residuals $y-\hat y$, and applies observed-response
+sample centers and standard deviations with `ddof=1`. It returns original and standardized arrays,
+response centers and scales, response-wise standardized RMSE, and one of the explicit prediction
+provenance labels defined by `PredictionKind`. Constant response columns and ambiguous labels are
+rejected.
+
+`pipls.plotting` is not yet implemented. It remains optional, returns figures and axes, and performs
+no file writing. Component-path helpers remain example-local selection diagnostics, while
+dataset-specific OOF loops, pandas tables, canonical CSV files, and PDF composition remain under
+`examples/`. No estimator method, fitted attribute, path-search parameter, or top-level export is
+added by the inspection foundation.
 
 ## Example workflow boundary
 
