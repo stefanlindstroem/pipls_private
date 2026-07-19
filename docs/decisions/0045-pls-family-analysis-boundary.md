@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. The estimator-neutral shared API is implemented; numbered-example migration and final cleanup remain.
+Accepted and implemented for the shared API and numbered examples; final cleanup remains.
 
 This decision supersedes the ordinary-PLS-specific ownership and example-use portions of Decisions
 0042 and 0043. Their separation of selection diagnostics, fitted-model interpretation, prediction
@@ -80,6 +80,13 @@ The numbered examples apply these shared tools only to the selected `PiPLSRegres
 the comparative component-path figure, they must not fit a second ordinary PLS model for OOF
 prediction or interpretation. This demonstrates that standard PLS-family analyses remain available
 for Pi-PLS while keeping one coherent fitted-model narrative.
+
+## Implementation status
+
+Examples 10–12 now retain ordinary PLS only in the component-path CV-MSE comparison. Each example
+then fits one selected `PiPLSRegression`, clones that fixed model for OOF predictions, and derives
+all shared scores, loadings, coefficients, biplots, and observation diagnostics from the same
+Pi-PLS fit. Canonical shared-analysis artifacts use estimator-neutral filenames.
 
 ## Naming and artifact consequences
 

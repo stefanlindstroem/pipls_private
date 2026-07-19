@@ -264,13 +264,14 @@ path = pd.DataFrame(search.component_path_results_)
 ```
 
 The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
-(NIPALS) component-path CSV files, call support functions from `examples/_support/` to generate the comparison PDF,
-and then fit separate fixed models using visible component-count choices. All three examples also
-generate selection-conditioned OOF predictions for fixed Pi-PLS and ordinary PLS models, write
-seven common canonical post-analysis CSV files, and rebuild multipage reports from those files.
-Pulp also adds a balanced two-component score-loading biplot reconstructed from the existing score and X-loading tables. Tobacco adds an eighth table with raw ordinary PLS score-distance and X-reconstruction-residual
-diagnostics, preserves the decreasing wavenumber axis from `X.csv`, and paginates all thirteen
-responses in source order. The Pi-PLS path CSV always records the selected predictor rank. Tobacco
+(NIPALS) component-path CSV files and derive a shared CV-MSE comparison figure from them. After
+that comparison, each example fits one selected Pi-PLS model. The same Pi-PLS model supplies the
+selection-conditioned OOF predictions and all shared score, loading, coefficient, biplot, and
+observation analyses. Seven common canonical post-analysis CSV files are rebuilt into multipage
+reports. Pulp adds a balanced two-component score-loading biplot reconstructed from the existing
+score and X-loading tables. Tobacco adds an eighth table with raw score-distance and
+X-reconstruction-residual diagnostics, preserves the decreasing wavenumber axis from `X.csv`, and
+paginates all thirteen responses in source order. The Pi-PLS path CSV always records the selected predictor rank. Tobacco
 uses adaptive scanning with explicit full predictor SVD; randomized-SVD behavior is covered by the
 solver-consistency benchmark. Install the `examples` extra to run them. See
 [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).

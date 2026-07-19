@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Convert the Pulp, Sugarcane, and Tobacco post-analysis workflows to one selected Pi-PLS model
+  after the retained Pi-PLS-versus-PLS CV-MSE comparison; derive all shared analyses from that
+  Pi-PLS fit, use estimator-neutral artifact filenames, and remove stale `pls_*.csv` files during
+  regeneration.
 - Replace ordinary-PLS-specific shared inspection and plotting names with estimator-neutral PLS-family names, and accept compatible fitted `PiPLSRegression` and scikit-learn `PLSRegression` models through a structural public-attribute contract.
 - Accept the corrected fitted-model analysis boundary: retain ordinary PLS in the shared CV-MSE
   component-path comparison, keep $P$, $D$, and $Q$ inspection explicitly Pi-PLS-specific, and

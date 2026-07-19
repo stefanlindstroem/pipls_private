@@ -328,7 +328,7 @@ The accepted order after Decision 0042 is:
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
 2. Pi-PLS decomposition and prediction plotting — **complete**;
 3. estimator-neutral shared PLS-family analysis — **implemented**;
-4. estimator-neutral shared inspection and plotting API — **next**;
-5. Pi-PLS-only Pulp, Sugarcane, and Tobacco post-analysis migration — **pending**;
-6. stale-name, artifact, documentation, and boundary-test cleanup — **pending**;
+4. estimator-neutral shared inspection and plotting API — **complete**;
+5. Pi-PLS-only Pulp, Sugarcane, and Tobacco post-analysis migration — **complete**;
+6. stale-name, artifact, documentation, and boundary-test cleanup — **next**;
 7. return to product documentation and release hardening — **after the corrective series**.

@@ -27,16 +27,16 @@ source rather than from pandas or CSV headers.
 
 ## Complete reference workflows
 
-- `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, fixed
-  full-data interpretation models, selection-conditioned OOF predictions, seven canonical
-  post-analysis CSV files, a balanced two-component score-loading biplot, and a multipage report.
-- `11_sugarcane_real_data.py`: direct pandas reading, Pi-PLS and standard PLS paths, fixed
-  interpretation models, selection-conditioned OOF predictions, seven canonical post-analysis
-  CSV files, and a wavelength-aware report.
+- `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, one
+  selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions, seven
+  canonical post-analysis CSV files, a balanced score-loading biplot, and a multipage report.
+- `11_sugarcane_real_data.py`: direct pandas reading, Pi-PLS and standard PLS paths, one selected
+  Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions, seven canonical
+  post-analysis CSV files, and a wavelength-aware report.
 - `12_tobacco_real_data.py`: adaptive predictor-rank scanning with explicit full predictor SVD,
-  fixed Pi-PLS and ordinary PLS interpretation models, selection-conditioned OOF predictions,
+  one selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions,
   decreasing-wavenumber spectral plots, deterministic response pagination, eight canonical
-  post-analysis CSV files, and raw ordinary PLS observation diagnostics.
+  post-analysis CSV files, and raw observation diagnostics.
 
 These are application analyses rather than introductory snippets. `make examples` runs every
 numbered example in filename order, including the slower real-data workflows. It remains separate
@@ -87,7 +87,7 @@ are interpretive. Prediction and residual figures retain explicit provenance. Th
 columns in `predictions.csv` use the complete observed-response matrix and do not reproduce the
 fold-local scaling used by the component-path loss.
 
-Pulp reconstructs its biplot from `pls_scores.csv` and `pls_x_loadings.csv`. Sugarcane reads its
+Pulp reconstructs its biplot from `x_scores.csv` and `x_loadings.csv`. Sugarcane reads its
 strictly increasing wavelength coordinate from `X.csv`. Tobacco preserves its decreasing
 wavenumber coordinate, partitions all thirteen responses in source order, and adds
-`pls_observation_diagnostics.csv`. Generated files under `examples/results/` are ignored by Git.
+`observation_diagnostics.csv`. Generated files under `examples/results/` are ignored by Git.

@@ -105,22 +105,16 @@ def test_fixed_model_oof_requires_exactly_one_validation_assignment() -> None:
 def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) -> None:
     X, Y = _example_data()
     pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    pls_model = PLSRegression(n_components=2, scale=True).fit(X, Y)
     pipls_diagnostics = prediction_diagnostics(
         Y,
         pipls_model.predict(X),
         prediction_kind="fixed-parameter OOF predictions",
     )
-    pls_diagnostics = prediction_diagnostics(
-        Y,
-        pls_model.predict(X),
-        prediction_kind="fixed-parameter OOF predictions",
-    )
 
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics_by_model={"Pi-PLS": pipls_diagnostics, "PLS": pls_diagnostics},
-        pls_structure=latent_structure(pls_model),
+        diagnostics=pipls_diagnostics,
+        structure=latent_structure(pipls_model),
         predictor_names=X.columns.tolist(),
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
@@ -132,13 +126,13 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
         assert tuple(table.columns) == ARTIFACTS.TABLE_COLUMNS[name]
         assert not table.empty
 
-    stale_optional = tmp_path / ARTIFACTS.TABLE_FILENAMES[
-        "pls_observation_diagnostics"
-    ]
+    stale_optional = tmp_path / ARTIFACTS.TABLE_FILENAMES["observation_diagnostics"]
     stale_optional.write_text("stale\n", encoding="utf-8")
     paths = ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
     assert set(paths) == set(ARTIFACTS.REQUIRED_TABLE_NAMES)
     assert not stale_optional.exists()
+    for stale_name in ARTIFACTS.STALE_TABLE_FILENAMES:
+        assert not (tmp_path / stale_name).exists()
     for path in paths.values():
         assert path.is_file()
 
@@ -147,6 +141,7 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
         predictions["residual"],
         predictions["observed"] - predictions["predicted"],
     )
+    assert "model" not in predictions.columns
     assert set(predictions["prediction_kind"]) == {"fixed-parameter OOF predictions"}
 
     pdf_path = tmp_path / "post_analysis.pdf"
@@ -154,9 +149,9 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
         tmp_path,
         pdf_path,
         dataset_name="Synthetic",
-        pls_score_components=(1, 2),
-        pls_biplot_components=(1, 2),
-        pls_loading_components=(1, 2),
+        score_components=(1, 2),
+        biplot_components=(1, 2),
+        loading_components=(1, 2),
         coefficient_responses=("Response A",),
     )
     assert pdf_path.read_bytes().startswith(b"%PDF")
@@ -169,10 +164,11 @@ def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
     )
 
     assert "CHOSEN_N_COMPONENTS = 3" in text
-    assert "CHOSEN_PLS_N_COMPONENTS = 8" in text
-    assert "PLS_SCORE_COMPONENTS = (1, 2)" in text
-    assert "PLS_BIPLOT_COMPONENTS = (1, 2)" in text
-    assert "PLS_LOADING_COMPONENTS = (1, 2, 3)" in text
+    assert "CHOSEN_PLS_N_COMPONENTS" not in text
+    assert "from sklearn.cross_decomposition import PLSRegression" not in text
+    assert "SCORE_COMPONENTS = (1, 2)" in text
+    assert "BIPLOT_COMPONENTS = (1, 2)" in text
+    assert "LOADING_COMPONENTS = (1, 2, 3)" in text
     assert "predictor_names = X.columns.astype(str).tolist()" in text
     assert "response_names = Y.columns.astype(str).tolist()" in text
     assert "fixed_model_oof_predictions(" in text
@@ -180,7 +176,7 @@ def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
-    assert "pls_biplot_components=PLS_BIPLOT_COMPONENTS" in text
+    assert "biplot_components=BIPLOT_COMPONENTS" in text
     assert "POST_ANALYSIS_DIR" in text
     assert "POST_ANALYSIS_PDF" in text
     assert 'prediction_kind="fitted values"' not in text
@@ -192,17 +188,16 @@ def test_post_analysis_report_supports_an_explicit_physical_predictor_axis(
 ) -> None:
     X, Y = _example_data()
     pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    pls_model = PLSRegression(n_components=2, scale=True).fit(X, Y)
     diagnostics = prediction_diagnostics(
         Y,
-        pls_model.predict(X),
+        pipls_model.predict(X),
         prediction_kind="fixed-parameter OOF predictions",
     )
     wavelength_labels = [str(value) for value in np.linspace(780, 2500, X.shape[1])]
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics_by_model={"PLS": diagnostics},
-        pls_structure=latent_structure(pls_model),
+        diagnostics=diagnostics,
+        structure=latent_structure(pipls_model),
         predictor_names=wavelength_labels,
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
@@ -218,8 +213,8 @@ def test_post_analysis_report_supports_an_explicit_physical_predictor_axis(
         predictor_style="line",
         predictor_axis=np.linspace(780.0, 2500.0, X.shape[1]),
         predictor_axis_label="Wavelength (nm)",
-        pls_score_components=(1, 2),
-        pls_loading_components=(1, 2),
+        score_components=(1, 2),
+        loading_components=(1, 2),
         coefficient_responses=("Response A", "Response B"),
     )
 
@@ -232,28 +227,27 @@ def test_post_analysis_report_supports_response_pages_and_observation_diagnostic
 ) -> None:
     X, Y = _example_data()
     pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    pls_model = PLSRegression(n_components=2, scale=True).fit(X, Y)
     diagnostics = prediction_diagnostics(
         Y,
-        pls_model.predict(X),
+        pipls_model.predict(X),
         prediction_kind="fixed-parameter OOF predictions",
     )
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics_by_model={"PLS": diagnostics},
-        pls_structure=latent_structure(pls_model),
+        diagnostics=diagnostics,
+        structure=latent_structure(pipls_model),
         predictor_names=X.columns.tolist(),
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
         fold_index=np.repeat(np.arange(1, 6), 6),
-        pls_observation_diagnostics_result=observation_diagnostics(pls_model, X),
+        observation_diagnostics_result=observation_diagnostics(pipls_model, X),
     )
     paths = ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
 
-    assert "pls_observation_diagnostics" in paths
-    observation_table = pd.read_csv(paths["pls_observation_diagnostics"])
+    assert "observation_diagnostics" in paths
+    observation_table = pd.read_csv(paths["observation_diagnostics"])
     assert tuple(observation_table.columns) == ARTIFACTS.TABLE_COLUMNS[
-        "pls_observation_diagnostics"
+        "observation_diagnostics"
     ]
     assert len(observation_table) == len(X)
 
@@ -262,8 +256,8 @@ def test_post_analysis_report_supports_response_pages_and_observation_diagnostic
         tmp_path,
         pdf_path,
         dataset_name="Synthetic",
-        pls_score_components=(1, 2),
-        pls_loading_components=(1, 2),
+        score_components=(1, 2),
+        loading_components=(1, 2),
         response_pages=(("Response A",), ("Response B",)),
     )
 
@@ -274,16 +268,15 @@ def test_post_analysis_report_supports_response_pages_and_observation_diagnostic
 def test_response_pages_must_partition_source_order(tmp_path: Path) -> None:
     X, Y = _example_data()
     pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    pls_model = PLSRegression(n_components=2, scale=True).fit(X, Y)
     diagnostics = prediction_diagnostics(
         Y,
-        pls_model.predict(X),
+        pipls_model.predict(X),
         prediction_kind="fixed-parameter OOF predictions",
     )
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics_by_model={"PLS": diagnostics},
-        pls_structure=latent_structure(pls_model),
+        diagnostics=diagnostics,
+        structure=latent_structure(pipls_model),
         predictor_names=X.columns.tolist(),
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
@@ -296,8 +289,8 @@ def test_response_pages_must_partition_source_order(tmp_path: Path) -> None:
             tmp_path,
             tmp_path / "invalid.pdf",
             dataset_name="Synthetic",
-            pls_score_components=(1, 2),
-            pls_loading_components=(1, 2),
+            score_components=(1, 2),
+            loading_components=(1, 2),
             response_pages=(("Response B",), ("Response A",)),
         )
 
@@ -308,9 +301,10 @@ def test_sugarcane_example_contains_complete_spectral_post_analysis() -> None:
     )
 
     assert "CHOSEN_N_COMPONENTS = 2" in text
-    assert "CHOSEN_PLS_N_COMPONENTS = 4" in text
-    assert "PLS_SCORE_COMPONENTS = (1, 2)" in text
-    assert "PLS_LOADING_COMPONENTS = (1, 2, 3, 4)" in text
+    assert "CHOSEN_PLS_N_COMPONENTS" not in text
+    assert "from sklearn.cross_decomposition import PLSRegression" not in text
+    assert "SCORE_COMPONENTS = (1, 2)" in text
+    assert "LOADING_COMPONENTS = (1, 2)" in text
     assert 'COEFFICIENT_RESPONSES = ("TS", "CP", "ADF", "IVOMD")' in text
     assert "predictor_names = X.columns.astype(str).tolist()" in text
     assert "response_names = Y.columns.astype(str).tolist()" in text
@@ -324,7 +318,7 @@ def test_sugarcane_example_contains_complete_spectral_post_analysis() -> None:
     assert "render_post_analysis_report(" in text
     assert "POST_ANALYSIS_DIR" in text
     assert "POST_ANALYSIS_PDF" in text
-    assert "pls_biplot_components" not in text
+    assert "biplot_components" not in text
     assert "subprocess" not in text
 
 
@@ -334,9 +328,10 @@ def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     )
 
     assert "CHOSEN_N_COMPONENTS = 8" in text
-    assert "CHOSEN_PLS_N_COMPONENTS = 13" in text
-    assert "PLS_SCORE_COMPONENTS = (1, 2)" in text
-    assert "PLS_LOADING_COMPONENTS = (1, 2, 3, 4)" in text
+    assert "CHOSEN_PLS_N_COMPONENTS" not in text
+    assert "from sklearn.cross_decomposition import PLSRegression" not in text
+    assert "SCORE_COMPONENTS = (1, 2)" in text
+    assert "LOADING_COMPONENTS = (1, 2, 3, 4)" in text
     assert "RESPONSE_PAGE_SIZE = 5" in text
     assert "predictor_names = X.columns.astype(str).tolist()" in text
     assert "response_names = Y.columns.astype(str).tolist()" in text
@@ -345,7 +340,7 @@ def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     assert 'predictor_style="line"' in text
     assert 'predictor_axis_label="Wavenumber (cm$^{-1}$)"' in text
     assert "response_pages=response_pages" in text
-    assert "observation_diagnostics(pls_model, X)" in text
+    assert "observation_diagnostics(pipls_model, X)" in text
     assert "fixed_model_oof_predictions(" in text
     assert 'prediction_kind = "selection-conditioned OOF predictions"' in text
     assert "build_post_analysis_tables(" in text
@@ -353,5 +348,5 @@ def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     assert "render_post_analysis_report(" in text
     assert "POST_ANALYSIS_DIR" in text
     assert "POST_ANALYSIS_PDF" in text
-    assert "pls_biplot_components" not in text
+    assert "biplot_components" not in text
     assert "subprocess" not in text

@@ -477,8 +477,8 @@ Current status: **current estimator standardization complete; block-aware API de
 ## Current next increment
 
 Implement the Decision 0045 corrective series. First generalize and rename shared PLS-family
-inspection and plotting; then migrate examples 10–12 to Pi-PLS-only post-analysis while preserving
-the ordinary PLS CV-MSE comparison; finally remove stale names and artifacts and add boundary tests.
+inspection and plotting and the examples 10–12 Pi-PLS-only post-analysis migration are complete.
+The remaining corrective step is stale-name, artifact, documentation, and boundary-test cleanup.
 Resume buildable documentation and release preparation afterward. Keep the biplot restricted to the
 low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds, VIP,
 or other deferred diagnostics.

@@ -49,11 +49,9 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
   reconstructed from those tables.
 
 Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
-analysis-model boundary. The shared API migration is complete. The current runtime still fits
-ordinary PLS models for post-analysis in examples 10–12; this is the remaining transitional layer.
-The accepted target retains ordinary PLS only for CV-MSE
-comparison, keeps $P$, $D$, and $Q$ inspection Pi-PLS-specific, and applies estimator-neutral shared
-analysis tools only to the selected Pi-PLS model in numbered examples.
+analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
+is retained only for CV-MSE comparison, while $P$, $D$, and $Q$ inspection remains Pi-PLS-specific
+and every post-analysis quantity in examples 10–12 comes from the selected Pi-PLS model.
 
 The current top-level package exports are:
 
@@ -250,9 +248,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Complete the remaining Decision 0045 corrections: convert examples 10–12 to Pi-PLS-only
-post-analysis while preserving the two-model CV-MSE comparison, then perform stale-artifact,
-documentation, and boundary-test cleanup. The estimator-neutral shared API is complete. Resume
+Complete the remaining Decision 0045 cleanup: remove stale terminology, add repository-boundary
+tests, and review regenerated post-analysis artifacts. The estimator-neutral shared API and
+Pi-PLS-only numbered-example migration are complete. Resume
 release hardening only after this corrective series. Do not add further diagnostics outside that
 correction without a separate decision.
 
@@ -261,9 +259,9 @@ correction without a separate decision.
 1. **Decision 0045 API migration:** estimator-neutral shared names and structural support for both
    fitted estimator classes — complete.
 2. **Decision 0045 example migration:** retain the two-model CV-MSE comparison but use only the
-   selected Pi-PLS model for OOF prediction and post-analysis in examples 10–12 — next.
-3. **Decision 0045 cleanup:** remove stale names and artifact files, align documentation, and add
-   repository-boundary tests — pending.
+   selected Pi-PLS model for OOF prediction and post-analysis in examples 10–12 — complete.
+3. **Decision 0045 cleanup:** remove remaining stale terminology, review generated artifacts, and
+   add repository-boundary tests — next.
 4. **User documentation and release hardening:** literal-matrix quickstart and navigation hierarchy
    complete; buildable user guide, generated API reference, compatibility policy, packaging checks,
    and versioned releases remain after the corrective series.

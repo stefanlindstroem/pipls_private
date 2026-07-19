@@ -16,9 +16,8 @@ prediction diagnostics are shared PLS-family analyses with estimator-neutral nam
 
 The shared numerical extraction accepts compatible fitted `PiPLSRegression` and scikit-learn
 `PLSRegression` models through their public fitted attributes and transformation methods. The
-numbered real-data examples will apply those tools only to the selected Pi-PLS model after the
-next workflow migration. Until then, their final ordinary PLS fits remain transitional example
-behavior rather than a limitation of the shared API.
+numbered real-data examples apply those tools only to the selected Pi-PLS model. Ordinary PLS is
+retained there only for the comparative component-path CV-MSE curve.
 
 Import these names from the submodule:
 
@@ -396,7 +395,7 @@ implemented surface.
 The complete [`10_pulp_real_data.py`](../examples/10_pulp_real_data.py) workflow demonstrates the
 package inspection and plotting APIs together with example-owned I/O. It derives predictor and
 response names visibly from the Pulp CSV headers, reads fixed component choices from the canonical
-path artifacts, and clones those fixed estimators
+path artifacts, and clones the fixed Pi-PLS estimator
 inside the same five non-shuffled folds, writes seven long-form CSV files under
 `examples/results/pulp_post_analysis/`, rereads them, and constructs one eight-page PDF, including the Pulp biplot. The OOF
 predictions are labeled `selection-conditioned OOF predictions` because the fixed parameters were
@@ -417,11 +416,11 @@ All four response headers (`TS`, `CP`, `ADF`, and `IVOMD`) are retained.
 
 The complete [`12_tobacco_real_data.py`](../examples/12_tobacco_real_data.py) workflow preserves
 the strictly decreasing wavenumber coordinate read from the `X.csv` headers and uses it for Pi-PLS
-predictor directions, ordinary PLS X loadings, and response-specific coefficient curves. All
+predictor directions, Pi-PLS X loadings, and response-specific coefficient curves. All
 thirteen response headers are partitioned into deterministic source-order pages of at most five
 responses; the report renderer rejects pagination that omits, duplicates, or reorders a response.
-The Pulp report derives its biplot from the canonical `pls_scores.csv` and `pls_x_loadings.csv`; no additional biplot table is required.
+The Pulp report derives its biplot from the canonical `x_scores.csv` and `x_loadings.csv`; no additional biplot table is required.
 
 Tobacco writes the seven common post-analysis tables plus
-`pls_observation_diagnostics.csv`, whose columns are `sample`, `score_distance`, and
+`observation_diagnostics.csv`, whose columns are `sample`, `score_distance`, and
 `x_reconstruction_residual`. The report plots these raw values without theoretical outlier limits.
