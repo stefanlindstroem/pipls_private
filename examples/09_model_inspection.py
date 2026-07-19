@@ -53,8 +53,21 @@ diagnostics = prediction_diagnostics(
 pls_model = PLSRegression(n_components=2, scale=True).fit(train.X, train.Y)
 pls_structure = pls_latent_structure(pls_model)
 
-feature_names = [f"x{index + 1}" for index in range(train.n_features)]
-target_names = [f"y{index + 1}" for index in range(train.n_targets)]
+feature_names = [
+    "Process variable A",
+    "Process variable B",
+    "Process variable C",
+    "Process variable D",
+    "Process variable E",
+    "Process variable F",
+    "Process variable G",
+    "Process variable H",
+    "Process variable I",
+    "Process variable J",
+    "Process variable K",
+    "Process variable L",
+]
+target_names = ["Quality response A", "Quality response B", "Quality response C"]
 
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 decomposition_figure, _ = plot_pipls_decomposition(

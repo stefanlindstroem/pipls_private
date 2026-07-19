@@ -41,7 +41,8 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - pure immutable Pi-PLS display factors, standardized explicit-provenance prediction diagnostics,
   and ordinary PLS latent-structure copies under `pipls.inspection`;
 - optional Pi-PLS decomposition and prediction-diagnostic figures plus ordinary PLS score, loading,
-  and coefficient figures under `pipls.plotting`;
+  and coefficient figures under `pipls.plotting`, with shared component axes and required semantic
+  labels for categorical variables;
 - a deterministic synthetic inspection example covering fixed Pi-PLS and ordinary PLS models.
 
 Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and basic ordinary PLS

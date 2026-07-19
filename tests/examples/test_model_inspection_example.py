@@ -22,4 +22,8 @@ def test_synthetic_model_inspection_example_uses_external_test_predictions() -> 
     assert "plot_pls_x_loadings(" in text
     assert "plot_pls_y_loadings(" in text
     assert "plot_pls_coefficients(" in text
+    assert "Process variable A" in text
+    assert "Quality response A" in text
+    assert 'f"x{index + 1}"' not in text
+    assert 'f"y{index + 1}"' not in text
     assert "subprocess" not in text

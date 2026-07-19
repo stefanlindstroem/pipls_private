@@ -32,7 +32,7 @@ def test_plot_pls_scores_returns_named_axis_and_selected_components() -> None:
     figure, axes = plotting.plot_pls_scores(
         _structure(),
         components=(0, 2),
-        sample_names=[f"s{index + 1}" for index in range(28)],
+        sample_names=[f"Sample {index + 1}" for index in range(28)],
         title="PLS score review",
     )
 
@@ -44,7 +44,7 @@ def test_plot_pls_scores_returns_named_axis_and_selected_components() -> None:
     assert len(axes["scores"].texts) == 28
 
 
-def test_plot_pls_x_loadings_line_mode_preserves_supplied_axis_order() -> None:
+def test_plot_pls_x_loadings_line_mode_overlays_components_and_preserves_axis() -> None:
     coordinate = np.array([1600.0, 1500.0, 1400.0, 1300.0, 1200.0])
 
     _, axes = plotting.plot_pls_x_loadings(
@@ -52,15 +52,41 @@ def test_plot_pls_x_loadings_line_mode_preserves_supplied_axis_order() -> None:
         predictor_style="line",
         predictor_axis=coordinate,
         predictor_axis_label="Wavenumber (1/cm)",
-        components=[1],
+        components=[0, 2],
     )
 
-    axis = axes["x_loading_component_2"]
+    assert set(axes) == {"x_loadings"}
+    axis = axes["x_loadings"]
     np.testing.assert_array_equal(axis.lines[0].get_xdata(), coordinate)
+    np.testing.assert_array_equal(axis.lines[1].get_xdata(), coordinate)
     assert axis.get_xlabel() == "Wavenumber (1/cm)"
+    assert [text.get_text() for text in axis.get_legend().get_texts()] == [
+        "Component 1",
+        "Component 3",
+    ]
 
 
-def test_plot_pls_coefficients_line_mode_preserves_supplied_axis_order() -> None:
+def test_plot_pls_x_loadings_groups_component_bars_by_predictor() -> None:
+    _, axes = plotting.plot_pls_x_loadings(
+        _structure(),
+        predictor_style="bar",
+        predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
+        components=[0, 1, 2],
+    )
+
+    axis = axes["x_loadings"]
+    assert len(axis.containers) == 3
+    assert all(len(container) == 5 for container in axis.containers)
+    assert [tick.get_text() for tick in axis.get_xticklabels()] == [
+        "Temperature",
+        "Pressure",
+        "Flow",
+        "Density",
+        "Viscosity",
+    ]
+
+
+def test_plot_pls_coefficients_line_mode_overlays_selected_responses() -> None:
     coordinate = np.array([1600.0, 1500.0, 1400.0, 1300.0, 1200.0])
     structure = _structure()
 
@@ -69,47 +95,54 @@ def test_plot_pls_coefficients_line_mode_preserves_supplied_axis_order() -> None
         predictor_style="line",
         predictor_axis=coordinate,
         predictor_axis_label="Wavenumber (1/cm)",
-        response_names=["a", "b", "c"],
-        responses=[1],
+        response_names=["Yield", "Purity", "Energy demand"],
+        responses=[0, 2],
     )
 
-    line = axes["coefficient_response_2"].lines[0]
-    np.testing.assert_array_equal(line.get_xdata(), coordinate)
-    np.testing.assert_array_equal(line.get_ydata(), structure.coefficients[1, :])
-
-
-def test_plot_pls_y_loadings_uses_response_labels() -> None:
-    _, axes = plotting.plot_pls_y_loadings(
-        _structure(),
-        response_names=["a", "b", "c"],
-        components=[0],
-    )
-
-    assert set(axes) == {"y_loading_component_1"}
-    assert [tick.get_text() for tick in axes["y_loading_component_1"].get_xticklabels()] == [
-        "a",
-        "b",
-        "c",
+    assert set(axes) == {"coefficients"}
+    axis = axes["coefficients"]
+    np.testing.assert_array_equal(axis.lines[0].get_xdata(), coordinate)
+    np.testing.assert_array_equal(axis.lines[0].get_ydata(), structure.coefficients[0, :])
+    np.testing.assert_array_equal(axis.lines[1].get_ydata(), structure.coefficients[2, :])
+    assert [text.get_text() for text in axis.get_legend().get_texts()] == [
+        "Yield",
+        "Energy demand",
     ]
 
 
-def test_plot_pls_coefficients_selects_responses_and_bar_labels() -> None:
+def test_plot_pls_y_loadings_groups_components_by_named_response() -> None:
+    _, axes = plotting.plot_pls_y_loadings(
+        _structure(),
+        response_names=["Yield", "Purity", "Energy demand"],
+        components=[0, 2],
+    )
+
+    assert set(axes) == {"y_loadings"}
+    axis = axes["y_loadings"]
+    assert len(axis.containers) == 2
+    assert all(len(container) == 3 for container in axis.containers)
+    assert [tick.get_text() for tick in axis.get_xticklabels()] == [
+        "Yield",
+        "Purity",
+        "Energy demand",
+    ]
+
+
+def test_plot_pls_coefficients_groups_responses_by_named_predictor() -> None:
     _, axes = plotting.plot_pls_coefficients(
         _structure(),
         predictor_style="bar",
-        predictor_names=["p1", "p2", "p3", "p4", "p5"],
-        response_names=["a", "b", "c"],
-        responses=[2],
+        predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
+        response_names=["Yield", "Purity", "Energy demand"],
+        responses=[1, 2],
     )
 
-    axis = axes["coefficient_response_3"]
-    assert axis.get_title() == "c"
-    assert [tick.get_text() for tick in axis.get_xticklabels()] == [
-        "p1",
-        "p2",
-        "p3",
-        "p4",
-        "p5",
+    axis = axes["coefficients"]
+    assert len(axis.containers) == 2
+    assert all(len(container) == 5 for container in axis.containers)
+    assert [text.get_text() for text in axis.get_legend().get_texts()] == [
+        "Purity",
+        "Energy demand",
     ]
 
 
@@ -117,6 +150,7 @@ def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:
     figure, _ = plotting.plot_pls_x_loadings(
         _structure(),
         predictor_style="bar",
+        predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
     )
     output = tmp_path / "pls_x_loadings.pdf"
 
@@ -146,9 +180,22 @@ def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:
         (
             lambda: plotting.plot_pls_x_loadings(
                 _structure(),
+                predictor_style="bar",
+            ),
+            "predictor_names is required",
+        ),
+        (
+            lambda: plotting.plot_pls_x_loadings(
+                _structure(),
                 predictor_style="line",
             ),
             "predictor_axis is required",
+        ),
+        (
+            lambda: plotting.plot_pls_y_loadings(
+                _structure(),
+            ),
+            "response_names is required",
         ),
         (
             lambda: plotting.plot_pls_y_loadings(
@@ -161,6 +208,16 @@ def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:
             lambda: plotting.plot_pls_coefficients(
                 _structure(),
                 predictor_style="bar",
+                predictor_names=["a", "b", "c", "d", "e"],
+            ),
+            "response_names is required",
+        ),
+        (
+            lambda: plotting.plot_pls_coefficients(
+                _structure(),
+                predictor_style="bar",
+                predictor_names=["a", "b", "c", "d", "e"],
+                response_names=["u", "v", "w"],
                 responses=[3],
             ),
             "0 <= index < 3",

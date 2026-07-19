@@ -48,11 +48,14 @@ def plot_pls_scores(
     selected = _indices(components, size=structure.n_components, name="components")
     if len(selected) != 2:
         raise ValueError("components must contain exactly two indices for a score plot.")
-    labels = (
-        None
-        if sample_names is None
-        else _labels(sample_names, size=structure.n_samples, prefix="Sample")
-    )
+    labels = None if sample_names is None else tuple(str(value) for value in sample_names)
+    if labels is not None:
+        if len(labels) != structure.n_samples:
+            raise ValueError(
+                f"Expected {structure.n_samples} labels in sample_names, got {len(labels)}."
+            )
+        if any(not label.strip() for label in labels):
+            raise ValueError("sample_names must contain only nonempty labels.")
 
     first, second = selected
     plt = _pyplot()
@@ -83,13 +86,22 @@ def plot_pls_x_loadings(
     title: str = "PLS X loadings",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot ordinary-PLS X loadings as explicit bars or ordered lines."""
+    """Plot selected ordinary-PLS X loadings together on one axis.
+
+    Bar rendering groups component bars side by side for each named predictor.
+    Line rendering overlays components on the supplied physical coordinate.
+    """
 
     if not isinstance(structure, PLSLatentStructure):
         raise TypeError("structure must be a PLSLatentStructure instance.")
     selected = _indices(components, size=structure.n_components, name="components")
     style = _predictor_style(predictor_style)
-    feature_labels = _labels(predictor_names, size=structure.n_features, prefix="Feature")
+    feature_labels = _categorical_labels(
+        predictor_names,
+        size=structure.n_features,
+        argument_name="predictor_names",
+        required=style == "bar",
+    )
     coordinate = _predictor_coordinate(
         predictor_axis,
         size=structure.n_features,
@@ -99,40 +111,24 @@ def plot_pls_x_loadings(
 
     plt = _pyplot()
     if figsize is None:
-        figsize = (max(5.0, 4.0 * len(selected)), 4.2)
-    figure, axis_array = plt.subplots(
-        1,
-        len(selected),
-        figsize=figsize,
-        layout="constrained",
-        squeeze=False,
-    )
-    axes: dict[str, Axes] = {}
-    for column, component in enumerate(selected):
-        axis = axis_array[0, column]
-        component_number = component + 1
-        axes[f"x_loading_component_{component_number}"] = axis
-        values = structure.x_loadings[:, component]
-        if style == "bar":
-            positions = np.arange(structure.n_features)
-            axis.bar(positions, values)
-            axis.set_xticks(positions)
-            axis.set_xticklabels(
-                feature_labels,
-                rotation=45 if structure.n_features > 8 else 0,
-                ha="right" if structure.n_features > 8 else "center",
-            )
-            axis.set_xlabel("Predictor")
-        else:
-            assert coordinate is not None
-            axis.plot(coordinate, values)
-            axis.set_xlabel(str(predictor_axis_label))
-        axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-        axis.set_ylabel("X loading")
-        axis.set_title(f"Component {component_number}")
-
-    figure.suptitle(title)
-    return figure, axes
+        figsize = _single_axis_figsize(structure.n_features, style=style)
+    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    selected_array = np.array(selected, dtype=np.int64)
+    component_labels = _component_labels(selected)
+    values = structure.x_loadings[:, selected_array]
+    if style == "bar":
+        assert feature_labels is not None
+        _grouped_bars(axis, values, category_labels=feature_labels, series_labels=component_labels)
+        axis.set_xlabel("Predictor")
+    else:
+        assert coordinate is not None
+        _overlay_lines(axis, coordinate, values, series_labels=component_labels)
+        axis.set_xlabel(str(predictor_axis_label))
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_ylabel("X loading")
+    axis.set_title(title)
+    axis.legend(title="Component")
+    return figure, {"x_loadings": axis}
 
 
 def plot_pls_y_loadings(
@@ -143,43 +139,36 @@ def plot_pls_y_loadings(
     title: str = "PLS Y loadings",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot ordinary-PLS Y loadings as component-wise bars."""
+    """Plot selected ordinary-PLS Y loadings as grouped bars on one axis."""
 
     if not isinstance(structure, PLSLatentStructure):
         raise TypeError("structure must be a PLSLatentStructure instance.")
     selected = _indices(components, size=structure.n_components, name="components")
-    response_labels = _labels(response_names, size=structure.n_targets, prefix="Response")
+    response_labels = _categorical_labels(
+        response_names,
+        size=structure.n_targets,
+        argument_name="response_names",
+        required=True,
+    )
+    assert response_labels is not None
 
     plt = _pyplot()
     if figsize is None:
-        figsize = (max(5.0, 4.0 * len(selected)), 4.2)
-    figure, axis_array = plt.subplots(
-        1,
-        len(selected),
-        figsize=figsize,
-        layout="constrained",
-        squeeze=False,
+        figsize = _single_axis_figsize(structure.n_targets, style="bar")
+    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    selected_array = np.array(selected, dtype=np.int64)
+    _grouped_bars(
+        axis,
+        structure.y_loadings[:, selected_array],
+        category_labels=response_labels,
+        series_labels=_component_labels(selected),
     )
-    axes: dict[str, Axes] = {}
-    positions = np.arange(structure.n_targets)
-    for column, component in enumerate(selected):
-        axis = axis_array[0, column]
-        component_number = component + 1
-        axes[f"y_loading_component_{component_number}"] = axis
-        axis.bar(positions, structure.y_loadings[:, component])
-        axis.set_xticks(positions)
-        axis.set_xticklabels(
-            response_labels,
-            rotation=45 if structure.n_targets > 6 else 0,
-            ha="right" if structure.n_targets > 6 else "center",
-        )
-        axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-        axis.set_xlabel("Response")
-        axis.set_ylabel("Y loading")
-        axis.set_title(f"Component {component_number}")
-
-    figure.suptitle(title)
-    return figure, axes
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xlabel("Response")
+    axis.set_ylabel("Y loading")
+    axis.set_title(title)
+    axis.legend(title="Component")
+    return figure, {"y_loadings": axis}
 
 
 def plot_pls_coefficients(
@@ -194,14 +183,25 @@ def plot_pls_coefficients(
     title: str = "PLS regression coefficients",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot response-specific ordinary-PLS regression coefficients."""
+    """Plot selected response-specific PLS coefficients together on one axis."""
 
     if not isinstance(structure, PLSLatentStructure):
         raise TypeError("structure must be a PLSLatentStructure instance.")
     selected = _indices(responses, size=structure.n_targets, name="responses")
     style = _predictor_style(predictor_style)
-    feature_labels = _labels(predictor_names, size=structure.n_features, prefix="Feature")
-    response_labels = _labels(response_names, size=structure.n_targets, prefix="Response")
+    feature_labels = _categorical_labels(
+        predictor_names,
+        size=structure.n_features,
+        argument_name="predictor_names",
+        required=style == "bar",
+    )
+    response_labels = _categorical_labels(
+        response_names,
+        size=structure.n_targets,
+        argument_name="response_names",
+        required=True,
+    )
+    assert response_labels is not None
     coordinate = _predictor_coordinate(
         predictor_axis,
         size=structure.n_features,
@@ -211,40 +211,34 @@ def plot_pls_coefficients(
 
     plt = _pyplot()
     if figsize is None:
-        figsize = (max(5.0, 4.0 * len(selected)), 4.2)
-    figure, axis_array = plt.subplots(
-        1,
-        len(selected),
-        figsize=figsize,
-        layout="constrained",
-        squeeze=False,
-    )
-    axes: dict[str, Axes] = {}
-    for column, response in enumerate(selected):
-        axis = axis_array[0, column]
-        response_number = response + 1
-        axes[f"coefficient_response_{response_number}"] = axis
-        values = structure.coefficients[response, :]
-        if style == "bar":
-            positions = np.arange(structure.n_features)
-            axis.bar(positions, values)
-            axis.set_xticks(positions)
-            axis.set_xticklabels(
-                feature_labels,
-                rotation=45 if structure.n_features > 8 else 0,
-                ha="right" if structure.n_features > 8 else "center",
-            )
-            axis.set_xlabel("Predictor")
-        else:
-            assert coordinate is not None
-            axis.plot(coordinate, values)
-            axis.set_xlabel(str(predictor_axis_label))
-        axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-        axis.set_ylabel("Regression coefficient")
-        axis.set_title(response_labels[response])
-
-    figure.suptitle(title)
-    return figure, axes
+        figsize = _single_axis_figsize(structure.n_features, style=style)
+    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    selected_array = np.array(selected, dtype=np.int64)
+    selected_response_labels = tuple(response_labels[index] for index in selected)
+    values = structure.coefficients[selected_array, :].T
+    if style == "bar":
+        assert feature_labels is not None
+        _grouped_bars(
+            axis,
+            values,
+            category_labels=feature_labels,
+            series_labels=selected_response_labels,
+        )
+        axis.set_xlabel("Predictor")
+    else:
+        assert coordinate is not None
+        _overlay_lines(
+            axis,
+            coordinate,
+            values,
+            series_labels=selected_response_labels,
+        )
+        axis.set_xlabel(str(predictor_axis_label))
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_ylabel("Regression coefficient")
+    axis.set_title(title)
+    axis.legend(title="Response")
+    return figure, {"coefficients": axis}
 
 
 def plot_pipls_decomposition(
@@ -259,33 +253,12 @@ def plot_pipls_decomposition(
     title: str = "Pi-PLS decomposition",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    r"""Plot display copies of $P$, $D$, and $QD$.
+    r"""Plot selected display copies of $P$, $D$, and $QD$ on three shared axes.
 
-    Parameters
-    ----------
-    factors:
-        Immutable factors returned by :func:`pipls.inspection.pipls_display_factors`.
-    predictor_style:
-        ``"bar"`` for a small scalar predictor set or ``"line"`` for an ordered
-        physical coordinate.
-    predictor_names, response_names:
-        Optional labels. Predictor names are used only for bar plots.
-    predictor_axis, predictor_axis_label:
-        Required for line plots. Values are used in the supplied order.
-    components:
-        Zero-based component indices to display. The default displays all components.
-    title:
-        Figure title.
-    figsize:
-        Optional Matplotlib figure size.
-
-    Returns
-    -------
-    figure, axes:
-        The Matplotlib figure and a dictionary of named axes. Predictor and weighted
-        response axes use keys ``predictor_component_<k>`` and
-        ``response_component_<k>`` with one-based component numbers. The dilation
-        axis uses the key ``dilation``.
+    Bar rendering groups components side by side for each named predictor or
+    response. Line rendering overlays predictor directions on the supplied
+    physical coordinate. The axes dictionary contains ``predictor_directions``,
+    ``weighted_response_directions``, and ``dilation``.
     """
 
     if not isinstance(factors, PiPLSDisplayFactors):
@@ -296,8 +269,19 @@ def plot_pipls_decomposition(
         name="components",
     )
     style = _predictor_style(predictor_style)
-    feature_labels = _labels(predictor_names, size=factors.n_features, prefix="Feature")
-    target_labels = _labels(response_names, size=factors.n_targets, prefix="Response")
+    feature_labels = _categorical_labels(
+        predictor_names,
+        size=factors.n_features,
+        argument_name="predictor_names",
+        required=style == "bar",
+    )
+    target_labels = _categorical_labels(
+        response_names,
+        size=factors.n_targets,
+        argument_name="response_names",
+        required=True,
+    )
+    assert target_labels is not None
     coordinate = _predictor_coordinate(
         predictor_axis,
         size=factors.n_features,
@@ -306,62 +290,65 @@ def plot_pipls_decomposition(
     )
 
     plt = _pyplot()
-    n_selected = len(selected)
     if figsize is None:
-        figsize = (max(5.0, 4.0 * n_selected), 8.5)
-    figure = plt.figure(figsize=figsize, layout="constrained")
-    grid = figure.add_gridspec(3, n_selected, height_ratios=(1.0, 1.0, 0.65))
-    axes: dict[str, Axes] = {}
-
-    for column, component in enumerate(selected):
-        component_number = component + 1
-        predictor_ax = figure.add_subplot(grid[0, column])
-        response_ax = figure.add_subplot(grid[1, column])
-        axes[f"predictor_component_{component_number}"] = predictor_ax
-        axes[f"response_component_{component_number}"] = response_ax
-
-        predictor_values = factors.predictor_directions[:, component]
-        if style == "bar":
-            positions = np.arange(factors.n_features)
-            predictor_ax.bar(positions, predictor_values)
-            predictor_ax.set_xticks(positions)
-            predictor_ax.set_xticklabels(
-                feature_labels,
-                rotation=45 if factors.n_features > 8 else 0,
-                ha="right" if factors.n_features > 8 else "center",
-            )
-            predictor_ax.set_xlabel("Predictor")
-        else:
-            assert coordinate is not None
-            predictor_ax.plot(coordinate, predictor_values)
-            predictor_ax.set_xlabel(str(predictor_axis_label))
-        predictor_ax.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-        predictor_ax.set_ylabel("Predictor direction $P$")
-        predictor_ax.set_title(f"Component {component_number}")
-
-        positions = np.arange(factors.n_targets)
-        response_ax.bar(
-            positions,
-            factors.weighted_response_directions[:, component],
+        width = max(
+            _single_axis_figsize(factors.n_features, style=style)[0],
+            _single_axis_figsize(factors.n_targets, style="bar")[0],
         )
-        response_ax.set_xticks(positions)
-        response_ax.set_xticklabels(
-            target_labels,
-            rotation=45 if factors.n_targets > 6 else 0,
-            ha="right" if factors.n_targets > 6 else "center",
-        )
-        response_ax.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-        response_ax.set_xlabel("Response")
-        response_ax.set_ylabel("Weighted response direction $d_k q_{:k}$")
-        response_ax.set_title(f"Component {component_number}")
+        figsize = (width, 10.0)
+    figure, axis_array = plt.subplots(3, 1, figsize=figsize, layout="constrained")
+    predictor_ax, response_ax, dilation_ax = axis_array
+    axes: dict[str, Axes] = {
+        "predictor_directions": predictor_ax,
+        "weighted_response_directions": response_ax,
+        "dilation": dilation_ax,
+    }
 
-    dilation_ax = figure.add_subplot(grid[2, :])
-    axes["dilation"] = dilation_ax
-    component_numbers = np.array(selected, dtype=np.int64) + 1
-    dilation_ax.bar(component_numbers, factors.dilation[np.array(selected, dtype=np.int64)])
+    selected_array = np.array(selected, dtype=np.int64)
+    component_labels = _component_labels(selected)
+    predictor_values = factors.predictor_directions[:, selected_array]
+    if style == "bar":
+        assert feature_labels is not None
+        _grouped_bars(
+            predictor_ax,
+            predictor_values,
+            category_labels=feature_labels,
+            series_labels=component_labels,
+        )
+        predictor_ax.set_xlabel("Predictor")
+    else:
+        assert coordinate is not None
+        _overlay_lines(
+            predictor_ax,
+            coordinate,
+            predictor_values,
+            series_labels=component_labels,
+        )
+        predictor_ax.set_xlabel(str(predictor_axis_label))
+    predictor_ax.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    predictor_ax.set_ylabel("Predictor direction $P$")
+    predictor_ax.set_title("Predictor directions")
+    predictor_ax.legend(title="Component")
+
+    _grouped_bars(
+        response_ax,
+        factors.weighted_response_directions[:, selected_array],
+        category_labels=target_labels,
+        series_labels=component_labels,
+    )
+    response_ax.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    response_ax.set_xlabel("Response")
+    response_ax.set_ylabel("Weighted response direction $d_k q_{:k}$")
+    response_ax.set_title("Weighted response directions")
+    response_ax.legend(title="Component")
+
+    component_numbers = selected_array + 1
+    dilation_ax.bar(component_numbers, factors.dilation[selected_array])
     dilation_ax.set_xticks(component_numbers)
+    dilation_ax.set_xticklabels(component_labels)
     dilation_ax.set_xlabel("Component")
     dilation_ax.set_ylabel("Dilation $d_k$")
+    dilation_ax.set_title("Dilation")
 
     figure.suptitle(title)
     return figure, axes
@@ -382,7 +369,7 @@ def plot_prediction_diagnostics(
     diagnostics:
         Immutable result returned by :func:`pipls.inspection.prediction_diagnostics`.
     response_names:
-        Optional labels for all response columns.
+        Required scientific labels for all response columns.
     responses:
         Zero-based response indices to display. The default displays all responses.
     title:
@@ -400,7 +387,13 @@ def plot_prediction_diagnostics(
     if not isinstance(diagnostics, PredictionDiagnostics):
         raise TypeError("diagnostics must be a PredictionDiagnostics instance.")
     selected = _indices(responses, size=diagnostics.n_targets, name="responses")
-    labels = _labels(response_names, size=diagnostics.n_targets, prefix="Response")
+    labels = _categorical_labels(
+        response_names,
+        size=diagnostics.n_targets,
+        argument_name="response_names",
+        required=True,
+    )
+    assert labels is not None
 
     plt = _pyplot()
     figure, axis_array = plt.subplots(1, 3, figsize=figsize, layout="constrained")
@@ -519,15 +512,76 @@ def _predictor_coordinate(
     return coordinate
 
 
-def _labels(values: Sequence[object] | None, *, size: int, prefix: str) -> tuple[str, ...]:
+def _categorical_labels(
+    values: Sequence[object] | None,
+    *,
+    size: int,
+    argument_name: str,
+    required: bool,
+) -> tuple[str, ...] | None:
     if values is None:
-        return tuple(f"{prefix} {index + 1}" for index in range(size))
+        if required:
+            raise ValueError(
+                f"{argument_name} is required for categorical plots so the displayed variables "
+                "remain scientifically identifiable."
+            )
+        return None
     labels = tuple(str(value) for value in values)
     if len(labels) != size:
-        raise ValueError(f"Expected {size} {prefix.lower()} labels, got {len(labels)}.")
+        raise ValueError(f"Expected {size} labels in {argument_name}, got {len(labels)}.")
     if any(not label.strip() for label in labels):
-        raise ValueError(f"{prefix} labels must be nonempty.")
+        raise ValueError(f"{argument_name} must contain only nonempty labels.")
     return labels
+
+
+def _component_labels(components: Sequence[int]) -> tuple[str, ...]:
+    return tuple(f"Component {component + 1}" for component in components)
+
+
+def _grouped_bars(
+    axis: Axes,
+    values: FloatArray,
+    *,
+    category_labels: Sequence[str],
+    series_labels: Sequence[str],
+) -> None:
+    if values.ndim != 2:
+        raise ValueError(f"Grouped-bar values must be two-dimensional; got {values.shape}.")
+    n_categories, n_series = values.shape
+    if len(category_labels) != n_categories or len(series_labels) != n_series:
+        raise ValueError("Grouped-bar labels must match the value matrix dimensions.")
+    positions = np.arange(n_categories, dtype=np.float64)
+    width = 0.8 / n_series
+    offsets = (np.arange(n_series, dtype=np.float64) - (n_series - 1) / 2.0) * width
+    for column, (offset, label) in enumerate(zip(offsets, series_labels, strict=True)):
+        axis.bar(positions + offset, values[:, column], width=width, label=label)
+    axis.set_xticks(positions)
+    axis.set_xticklabels(
+        category_labels,
+        rotation=45 if n_categories > 8 else 0,
+        ha="right" if n_categories > 8 else "center",
+    )
+
+
+def _overlay_lines(
+    axis: Axes,
+    coordinate: FloatArray,
+    values: FloatArray,
+    *,
+    series_labels: Sequence[str],
+) -> None:
+    if values.ndim != 2 or values.shape[0] != coordinate.shape[0]:
+        raise ValueError("Line values must have one row per predictor-axis coordinate.")
+    if values.shape[1] != len(series_labels):
+        raise ValueError("Line labels must match the number of displayed series.")
+    for column, label in enumerate(series_labels):
+        axis.plot(coordinate, values[:, column], label=label)
+
+
+def _single_axis_figsize(n_categories: int, *, style: PredictorStyle) -> tuple[float, float]:
+    if style == "line":
+        return 8.0, 4.8
+    return max(6.4, min(14.0, 0.55 * n_categories + 3.5)), 4.8
 
 
 def _indices(values: Sequence[int] | None, *, size: int, name: str) -> tuple[int, ...]:

@@ -204,14 +204,17 @@ from pipls.plotting import (
 ```
 
 `plot_pipls_decomposition()` accepts `PiPLSDisplayFactors`, an explicit `"bar"` or `"line"`
-predictor style, optional zero-based component indices, and caller-supplied labels or a physical
-predictor coordinate. It returns a figure and axes named by displayed component plus one `dilation`
-axis. `plot_prediction_diagnostics()` accepts `PredictionDiagnostics`, optional zero-based response
-indices, and response labels. It returns named observed-versus-predicted, residual, and RMSE axes
-and includes the stored prediction provenance in the title. `plot_pls_scores()` renders exactly
-two selected X-score columns. The X-loading and coefficient functions support explicit bar or line
-predictor rendering; Y loadings use component-wise bars. Components and responses are selected by
-explicit zero-based indices.
+predictor style, optional zero-based component indices, and caller-supplied scientific labels or a
+physical predictor coordinate. It returns shared `predictor_directions`,
+`weighted_response_directions`, and `dilation` axes. Selected components appear side by side within
+named categorical bars or as overlaid lines on one physical predictor axis.
+`plot_prediction_diagnostics()` accepts `PredictionDiagnostics`, optional zero-based response
+indices, and required response labels. It returns named observed-versus-predicted, residual, and
+RMSE axes and includes the stored prediction provenance in the title. `plot_pls_scores()` renders
+exactly two selected X-score columns. X and Y loadings place selected components together on one
+axis; coefficient plots place selected responses together on one axis. Categorical displays require
+caller-supplied variable names, while line displays require an explicit physical coordinate and axis
+label. Components and responses are selected by explicit zero-based indices.
 
 Matplotlib remains optional and is imported only when a plotting function is called. The functions
 perform no file writing, call no display function, retain no models, and do not alter supplied

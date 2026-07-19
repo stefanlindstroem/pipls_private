@@ -130,10 +130,17 @@ The caller chooses an explicit predictor style:
 - `bar` for a small unordered or categorically named predictor set;
 - `line` for an ordered physical coordinate.
 
-For line plots, the caller supplies the coordinate values and axis label. Preserve the supplied
-order, including a decreasing wavenumber axis. Do not infer spectra from feature count or names. Do
-not smooth, interpolate, or normalize plotted vectors unless a separate documented computation
-produced that result.
+For categorical bar plots, predictor and response labels are required. Real-data examples pass the
+column headers read from `X.csv` and `Y.csv`; plotting code must not replace scientific variable
+names with generated labels such as `x1` or `y1`. For line plots, the caller supplies the coordinate
+values and axis label. Preserve the supplied order, including a decreasing wavenumber axis. Do not
+infer spectra from feature count or names. Do not smooth, interpolate, or normalize plotted vectors
+unless a separate documented computation produced that result.
+
+Selected components share one axis per plotted quantity. Categorical values use grouped bars, with
+component bars side by side within each predictor or response. Ordered predictor quantities use one
+line per selected component on the same physical axis. Do not create one subplot per component when
+the components represent directly comparable values on the same variables.
 
 ## Prediction diagnostics
 
@@ -185,8 +192,10 @@ recomputing or sign-adjusting them. Coefficients retain the scikit-learn orienta
 - a two-component X score-loading biplot for low-dimensional data;
 - raw score distance and X reconstruction residual for observation diagnostics.
 
-Component and response subsets are explicit function arguments. Do not choose responses by hidden
-heuristics. Do not draw thousands of biplot arrows for spectral data.
+Component and response subsets are explicit function arguments. Selected X or Y loading components
+share one axis, using grouped bars for named categorical variables or overlaid lines for a physical
+predictor axis. Selected coefficient responses likewise share one axis. Do not choose responses by
+hidden heuristics. Do not draw thousands of biplot arrows for spectral data.
 
 Biplot coordinate scaling must state and test the reconstruction identity it preserves. Observation
 diagnostics must state their equations and initially omit theoretical probability limits.

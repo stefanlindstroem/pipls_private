@@ -108,31 +108,45 @@ assert not any(name == 'matplotlib' or name.startswith('matplotlib.') for name i
     assert completed.stderr == ""
 
 
-def test_plot_pipls_decomposition_bar_mode_returns_named_axes() -> None:
+def test_plot_pipls_decomposition_groups_components_on_shared_axes() -> None:
     factors = _factors()
     predictor_before = factors.predictor_directions.copy()  # type: ignore[union-attr]
 
     figure, axes = plotting.plot_pipls_decomposition(
         factors,  # type: ignore[arg-type]
         predictor_style="bar",
-        predictor_names=["A", "B", "C", "D"],
-        response_names=["u", "v", "w"],
-        components=[1],
+        predictor_names=["Temperature", "Pressure", "Flow", "Residence time"],
+        response_names=["Yield", "Purity", "Energy demand"],
+        components=[0, 1],
         title="Example decomposition",
     )
 
     assert isinstance(figure, Figure)
-    assert set(axes) == {"predictor_component_2", "response_component_2", "dilation"}
-    assert [tick.get_text() for tick in axes["predictor_component_2"].get_xticklabels()] == [
-        "A",
-        "B",
-        "C",
-        "D",
+    assert set(axes) == {
+        "predictor_directions",
+        "weighted_response_directions",
+        "dilation",
+    }
+    predictor_axis = axes["predictor_directions"]
+    response_axis = axes["weighted_response_directions"]
+    assert [tick.get_text() for tick in predictor_axis.get_xticklabels()] == [
+        "Temperature",
+        "Pressure",
+        "Flow",
+        "Residence time",
     ]
-    assert [tick.get_text() for tick in axes["response_component_2"].get_xticklabels()] == [
-        "u",
-        "v",
-        "w",
+    assert [tick.get_text() for tick in response_axis.get_xticklabels()] == [
+        "Yield",
+        "Purity",
+        "Energy demand",
+    ]
+    assert len(predictor_axis.containers) == 2
+    assert all(len(container) == 4 for container in predictor_axis.containers)
+    assert len(response_axis.containers) == 2
+    assert all(len(container) == 3 for container in response_axis.containers)
+    assert [text.get_text() for text in predictor_axis.get_legend().get_texts()] == [
+        "Component 1",
+        "Component 2",
     ]
     assert figure._suptitle is not None
     assert figure._suptitle.get_text() == "Example decomposition"
@@ -142,7 +156,7 @@ def test_plot_pipls_decomposition_bar_mode_returns_named_axes() -> None:
     )
 
 
-def test_plot_pipls_decomposition_line_mode_preserves_supplied_axis_order() -> None:
+def test_plot_pipls_decomposition_line_mode_overlays_selected_components() -> None:
     factors = _factors()
     coordinate = np.array([1600.0, 1500.0, 1400.0, 1300.0])
 
@@ -151,44 +165,83 @@ def test_plot_pipls_decomposition_line_mode_preserves_supplied_axis_order() -> N
         predictor_style="line",
         predictor_axis=coordinate,
         predictor_axis_label="Wavenumber (1/cm)",
-        response_names=["u", "v", "w"],
-        components=[0],
+        response_names=["Yield", "Purity", "Energy demand"],
+        components=[0, 1],
     )
 
-    line = axes["predictor_component_1"].lines[0]
-    np.testing.assert_array_equal(line.get_xdata(), coordinate)
-    assert axes["predictor_component_1"].get_xlabel() == "Wavenumber (1/cm)"
+    axis = axes["predictor_directions"]
+    np.testing.assert_array_equal(axis.lines[0].get_xdata(), coordinate)
+    np.testing.assert_array_equal(axis.lines[1].get_xdata(), coordinate)
+    assert axis.get_xlabel() == "Wavenumber (1/cm)"
+    assert [text.get_text() for text in axis.get_legend().get_texts()] == [
+        "Component 1",
+        "Component 2",
+    ]
 
 
 @pytest.mark.parametrize(
     ("kwargs", "message"),
     [
         ({"predictor_style": "points"}, "bar.*line"),
-        ({"predictor_style": "line"}, "predictor_axis is required"),
+        (
+            {"predictor_style": "bar", "response_names": ["a", "b", "c"]},
+            "predictor_names is required",
+        ),
+        (
+            {
+                "predictor_style": "bar",
+                "predictor_names": ["a", "b", "c", "d"],
+            },
+            "response_names is required",
+        ),
+        (
+            {
+                "predictor_style": "line",
+                "response_names": ["a", "b", "c"],
+            },
+            "predictor_axis is required",
+        ),
         (
             {
                 "predictor_style": "line",
                 "predictor_axis": [1.0, 2.0, 3.0, 4.0],
+                "response_names": ["a", "b", "c"],
             },
             "predictor_axis_label is required",
         ),
         (
             {
                 "predictor_style": "bar",
+                "predictor_names": ["a", "b", "c", "d"],
+                "response_names": ["u", "v", "w"],
                 "predictor_axis": [1.0, 2.0, 3.0, 4.0],
             },
             "only valid",
         ),
         (
-            {"predictor_style": "bar", "predictor_names": ["a"]},
+            {
+                "predictor_style": "bar",
+                "predictor_names": ["a"],
+                "response_names": ["u", "v", "w"],
+            },
             "Expected 4",
         ),
         (
-            {"predictor_style": "bar", "components": [2]},
+            {
+                "predictor_style": "bar",
+                "predictor_names": ["a", "b", "c", "d"],
+                "response_names": ["u", "v", "w"],
+                "components": [2],
+            },
             "0 <= index < 2",
         ),
         (
-            {"predictor_style": "bar", "components": [0, 0]},
+            {
+                "predictor_style": "bar",
+                "predictor_names": ["a", "b", "c", "d"],
+                "response_names": ["u", "v", "w"],
+                "components": [0, 0],
+            },
             "duplicate",
         ),
     ],
@@ -207,7 +260,7 @@ def test_plot_prediction_diagnostics_returns_named_axes_and_provenance() -> None
 
     figure, axes = plotting.plot_prediction_diagnostics(
         diagnostics,  # type: ignore[arg-type]
-        response_names=["a", "b", "c"],
+        response_names=["Yield", "Purity", "Energy demand"],
         responses=[0, 2],
         title="External prediction review",
     )
@@ -221,8 +274,8 @@ def test_plot_prediction_diagnostics_returns_named_axes_and_provenance() -> None
     assert figure._suptitle is not None
     assert figure._suptitle.get_text() == ("External prediction review\nexternal test predictions")
     assert [tick.get_text() for tick in axes["standardized_rmse"].get_xticklabels()] == [
-        "a",
-        "c",
+        "Yield",
+        "Energy demand",
     ]
     np.testing.assert_array_equal(diagnostics.residual, residual_before)  # type: ignore[union-attr]
 
@@ -230,7 +283,7 @@ def test_plot_prediction_diagnostics_returns_named_axes_and_provenance() -> None
 def test_plot_prediction_diagnostics_writes_pdf(tmp_path: Path) -> None:
     figure, _ = plotting.plot_prediction_diagnostics(
         _diagnostics(),  # type: ignore[arg-type]
-        response_names=["a", "b", "c"],
+        response_names=["Yield", "Purity", "Energy demand"],
     )
     output = tmp_path / "diagnostics.pdf"
 
@@ -243,10 +296,20 @@ def test_plot_prediction_diagnostics_writes_pdf(tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     ("kwargs", "message"),
     [
+        ({}, "response_names is required"),
         ({"response_names": ["a"]}, "Expected 3"),
-        ({"responses": []}, "at least one"),
-        ({"responses": [3]}, "0 <= index < 3"),
-        ({"responses": [True]}, "integer indices"),
+        (
+            {"response_names": ["a", "b", "c"], "responses": []},
+            "at least one",
+        ),
+        (
+            {"response_names": ["a", "b", "c"], "responses": [3]},
+            "0 <= index < 3",
+        ),
+        (
+            {"response_names": ["a", "b", "c"], "responses": [True]},
+            "integer indices",
+        ),
     ],
 )
 def test_plot_prediction_diagnostics_rejects_invalid_arguments(

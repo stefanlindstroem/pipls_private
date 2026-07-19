@@ -170,10 +170,9 @@ from pipls.plotting import (
 )
 ```
 
-`plot_pipls_decomposition()` displays one small multiple per requested zero-based component index.
-The first row contains predictor directions $P_{:k}$, the second contains weighted response
-directions $d_kq_{:k}$, and the final axis contains the corresponding dilation values. Use bars for
-a small scalar predictor set:
+`plot_pipls_decomposition()` places all requested zero-based components on three shared axes:
+predictor directions $P_{:k}$, weighted response directions $d_kq_{:k}$, and dilation values. For a
+small scalar predictor set, component bars are grouped side by side within each named variable:
 
 ```python
 factor_figure, factor_axes = plot_pipls_decomposition(
@@ -197,8 +196,13 @@ factor_figure, factor_axes = plot_pipls_decomposition(
 )
 ```
 
-The supplied coordinate order is preserved, including decreasing wavenumber axes. The function does
-not smooth, interpolate, reorder, or infer a spectral representation.
+The supplied coordinate order is preserved, including decreasing wavenumber axes, and selected
+components are overlaid as separate labeled lines. The function does not smooth, interpolate,
+reorder, or infer a spectral representation.
+
+Categorical plots require the caller to supply predictor and response names. Real-data examples use
+`X.columns` and `Y.columns` from the committed CSV files so that the plot retains the scientific
+variable names rather than generated labels such as `x1` and `y1`.
 
 `plot_prediction_diagnostics()` renders standardized observed versus predicted responses,
 standardized residuals versus standardized predictions, and response-wise standardized RMSE:
@@ -253,8 +257,11 @@ coefficient_figure, coefficient_axes = plot_pls_coefficients(
 `plot_pls_scores()` requires exactly two distinct zero-based component indices. Optional sample
 labels annotate observations, but the function does not infer groups or draw confidence regions.
 X loadings and response-specific coefficients share the explicit bar-versus-line predictor
-contract. Y loadings are component-wise bar plots. For line rendering, the caller supplies the
-physical predictor coordinate and axis label, whose order is preserved.
+contract. Selected X-loading components use grouped bars or overlaid lines on one axis. Selected
+Y-loading components use grouped bars on one response axis. Selected coefficient responses use
+grouped bars or overlaid lines on one predictor axis. Categorical displays require caller-supplied
+predictor or response names. For line rendering, the caller supplies the physical predictor
+coordinate and axis label, whose order is preserved.
 
 The initial ordinary PLS plotting surface does not include biplots, confidence ellipses, VIP,
 automatic variable selection, theoretical outlier limits, or uncertainty intervals.

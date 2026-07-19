@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Present selected Pi-PLS and ordinary PLS components together on shared axes, using side-by-side bars for named categorical variables and overlaid lines for physical predictor axes; require caller-supplied scientific labels for categorical predictor and response displays.
 - Add immutable ordinary PLS latent-structure extraction from public `PLSRegression` scores,
   X/Y loadings, and coefficients, together with optional score, loading, and response-specific
   coefficient figures and a synthetic demonstration.

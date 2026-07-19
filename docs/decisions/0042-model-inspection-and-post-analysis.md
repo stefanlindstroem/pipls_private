@@ -83,8 +83,11 @@ Predictor rendering is selected explicitly by the example or caller:
 - `"bar"` for a small set of scalar predictors;
 - `"line"` for an ordered physical axis such as wavelength or wavenumber.
 
-The plotting API does not infer whether predictors are spectra, smooth or interpolate supplied
-curves, or reorder a supplied physical axis.
+Categorical predictor and response displays require caller-supplied scientific labels; real-data
+examples use the `X.csv` and `Y.csv` column headers. Selected components share one axis per plotted
+quantity, with side-by-side bars for categorical variables and overlaid lines for a physical
+predictor axis. The plotting API does not infer whether predictors are spectra, generate substitute
+variable names, smooth or interpolate supplied curves, or reorder a supplied physical axis.
 
 ### Prediction-diagnostic contract
 
