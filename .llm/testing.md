@@ -59,6 +59,10 @@ provenance, and absence of estimator mutation. Plot tests should use a headless 
 returned figures, named axes, explicit line/bar modes, label validation, and successful rendering
 without pinning pixels or incidental Matplotlib artist counts.
 
+Example-helper tests cover `fixed_model_oof.py` and `post_analysis_artifacts.py` with small
+synthetic matrices. They verify exact one-fold assignment, estimator cloning, canonical table
+columns, residual signs, and PDF generation after rereading CSV files.
+
 Do not execute the complete Pulp, Sugarcane, or Tobacco examples in `make check`, and do not
 duplicate their analyses as real-data benchmark scripts. `make examples` is the explicit
 application-validation target and runs every numbered example, including the slower Tobacco

@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted. The Pi-PLS and basic ordinary PLS numerical and plotting foundations are implemented; real-data integration remains staged.
+Accepted. The Pi-PLS and basic ordinary PLS numerical and plotting foundations are implemented.
+Pulp is the first complete real-data post-analysis integration; Sugarcane and Tobacco remain
+staged.
 
 ## Context
 
@@ -171,8 +173,9 @@ Implementation proceeds as a series of small patches:
 1. pure Pi-PLS display-factor and prediction-diagnostic computations;
 2. Pi-PLS decomposition and prediction plots with a compact file-backed Pulp example;
 3. ordinary PLS scores, loadings, and coefficient analysis;
-4. example-local fixed-model OOF and post-analysis artifact helpers, integrated first with Pulp;
-5. Sugarcane spectral line analysis;
+4. example-local fixed-model OOF and post-analysis artifact helpers, integrated first with
+   Pulp — complete;
+5. Sugarcane spectral line analysis — next;
 6. Tobacco pagination and observation diagnostics;
 7. the Pulp biplot and a final cross-dataset analysis-surface review.
 

@@ -43,11 +43,13 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - optional Pi-PLS decomposition and prediction-diagnostic figures plus ordinary PLS score, loading,
   and coefficient figures under `pipls.plotting`, with shared component axes and required semantic
   labels for categorical variables;
-- a compact file-backed Pulp inspection example covering fixed Pi-PLS and ordinary PLS models.
+- a compact file-backed Pulp inspection example covering fixed Pi-PLS and ordinary PLS models;
+- a complete Pulp post-analysis workflow with fixed-estimator OOF prediction helpers, seven
+  canonical long-form CSV tables, and a multipage report reconstructed from those tables.
 
 Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and basic ordinary PLS
-foundations are implemented in `pipls.inspection`, `pipls.plotting`, and the file-backed inspection
-example. Real-data post-analysis reports remain planned work.
+foundations are implemented in `pipls.inspection` and `pipls.plotting`; the Pulp workflow is the
+first complete real-data integration.
 
 The current top-level package exports are:
 
@@ -116,7 +118,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | `pipls.inspection` and `pipls.plotting` implement Pi-PLS factors, explicit-provenance prediction diagnostics, ordinary PLS scores/loadings/coefficients, and optional figures; real-data artifacts remain staged |
+| Model inspection | package inspection and plotting are implemented; Pulp has canonical OOF and post-analysis artifacts; Sugarcane and Tobacco integrations remain staged |
 
 Additional fixed decisions:
 
@@ -244,10 +246,11 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add the Pulp post-analysis workflow: example-local fixed-model OOF predictions for fixed Pi-PLS and
-ordinary PLS settings, canonical long-form CSV tables, and a report reconstructed from those tables.
-Keep parameter choices visible and label predictions as `selection-conditioned OOF predictions`. Do
-not add the Pulp biplot, spectral handling, or Tobacco observation diagnostics in the same patch.
+Add the Sugarcane spectral post-analysis workflow using the established Pulp artifact contract.
+Read wavelengths explicitly from the `X.csv` headers, render Pi-PLS directions and ordinary PLS
+loadings and coefficients as lines on that physical axis, retain all four response names, and keep
+the report derived from canonical CSV files. Do not add Tobacco pagination or observation
+diagnostics in the same patch.
 
 ## Subsequent roadmap
 
@@ -257,8 +260,8 @@ not add the Pulp biplot, spectral handling, or Tobacco observation diagnostics i
    example — complete.
 3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients — complete.
 4. **Pulp post-analysis workflow:** example-local fixed-model OOF predictions, canonical tables, and
-   a CSV-derived report.
-5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays.
+   a CSV-derived report — complete.
+5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays — next.
 6. **Tobacco analysis:** deterministic response pagination and raw PLS observation diagnostics.
 7. **Pulp biplot and cross-dataset review:** one explicit reconstruction-preserving scaling and
    aligned artifact contracts.

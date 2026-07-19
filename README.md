@@ -221,8 +221,10 @@ path = pd.DataFrame(search.component_path_results_)
 
 The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
 (NIPALS) component-path CSV files, call small imported functions to generate the comparison PDF,
-and then fit a separate fixed Pi-PLS model using a visible component-count choice. The Pi-PLS CSV
-always records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
+and then fit separate fixed models using visible component-count choices. The Pulp example also
+generates selection-conditioned OOF predictions for fixed Pi-PLS and ordinary PLS models, writes
+seven canonical post-analysis CSV files, and rebuilds a multipage report from those files. The
+Pi-PLS path CSV always records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
 predictor SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
 `examples` extra to run them. See [`examples/README.md`](examples/README.md) and
 [`datasets/README.md`](datasets/README.md).
@@ -240,8 +242,8 @@ scientific question and one minimal CSV output:
 The real-data workflows are explicit application runs rather than benchmark or test-suite jobs.
 `make examples` runs every numbered example in order, including the complete Pulp, Sugarcane, and
 Tobacco analyses. Examples 10–12 read the public tables directly, write separate Pi-PLS and
-standard PLS component-path CSVs, generate a comparison PDF, and fit a separately chosen fixed
-Pi-PLS model.
+standard PLS component-path CSVs, generate a comparison PDF, and fit separately chosen fixed
+models. Pulp additionally demonstrates the complete post-analysis artifact workflow.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
 [`examples/README.md`](examples/README.md).

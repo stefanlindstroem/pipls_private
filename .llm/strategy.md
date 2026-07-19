@@ -445,7 +445,8 @@ Implementation order is pure inspection primitives, Pi-PLS plotting and a file-b
 example, basic ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
 pagination and observation diagnostics, then the Pulp biplot and cross-dataset review.
 
-Current status: **Pi-PLS and basic ordinary PLS analysis foundations complete; real-data integration pending**.
+Current status: **Pi-PLS and basic ordinary PLS foundations complete; Pulp real-data
+integration complete; spectral and observation-diagnostic integrations pending**.
 
 ### Product documentation and release hardening
 

@@ -298,6 +298,16 @@ automatic variable selection, theoretical outlier limits, or uncertainty interva
 The fast [`09_model_inspection.py`](../examples/09_model_inspection.py) example reads the Pulp
 `X.csv` and `Y.csv` files directly, derives predictor and response labels from their headers, and
 fits fixed Pi-PLS and ordinary PLS models for display. Its prediction panel is explicitly labeled
-`fitted values`; it is an interpretation example, not validation. Fixed-model OOF orchestration,
-canonical post-analysis CSV artifacts, and dataset-specific multipage reports remain owned by later
-real-data example stages.
+`fitted values`; it is an interpretation example, not validation.
+
+The complete [`10_pulp_real_data.py`](../examples/10_pulp_real_data.py) workflow adds a third stage.
+It reads fixed component choices from the canonical path artifacts, clones those fixed estimators
+inside the same five non-shuffled folds, writes seven long-form CSV files under
+`examples/results/pulp_post_analysis/`, rereads them, and constructs one seven-page PDF. The OOF
+predictions are labeled `selection-conditioned OOF predictions` because the fixed parameters were
+chosen after examining paths computed from the same observations.
+
+The standardized response columns in `predictions.csv` use centers and sample standard deviations
+computed from the complete supplied observed-response matrix for display. They are not the
+fold-local response scales used by the component-path scorer, so their aggregate squared values
+should not be expected to equal the reported mean fold CV-MSE exactly.

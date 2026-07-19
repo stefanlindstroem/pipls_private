@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add the complete Pulp post-analysis workflow: fixed Pi-PLS and ordinary PLS OOF predictions
+  on the established five folds, explicit selection-conditioned provenance, seven canonical
+  long-form CSV tables, and a seven-page report reconstructed only after rereading those tables.
 - Make model-inspection label provenance explicit: the Pulp inspection example now reads
   predictor and response names from `X.csv` and `Y.csv` headers, while plotting remains independent
   of pandas and file layout and accepts labels from any caller-owned metadata source.

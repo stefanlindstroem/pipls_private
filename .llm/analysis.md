@@ -14,8 +14,9 @@ The implemented foundation includes `pipls.inspection` for immutable Pi-PLS, pre
 ordinary PLS latent-structure results. `pipls.plotting` provides Pi-PLS decomposition,
 prediction-diagnostic, ordinary PLS score, loading, and coefficient figures. The compact
 `examples/09_model_inspection.py` workflow demonstrates these tools on the file-backed Pulp data and
-reads scientific variable labels from the CSV headers. Example-owned real-data post-analysis
-artifacts remain planned.
+reads scientific variable labels from the CSV headers. The Pulp real-data workflow now adds
+example-owned fixed-model OOF predictions, seven canonical long-form CSV tables, and a multipage
+report reconstructed from those tables.
 
 ## Analysis stages
 
@@ -219,6 +220,7 @@ Prediction tables use long form and retain at least:
 ```text
 model
 sample
+fold
 response
 observed
 predicted
@@ -247,6 +249,14 @@ A figure page must identify the dataset, model, selected components or responses
 kind where predictions are shown. The example-level report composer controls page order and
 pagination; a package plotting function renders one explicit selection at a time.
 
+The Pulp workflow uses the same five non-shuffled folds as its component-path comparison. It
+clones one already fixed Pi-PLS estimator and one already fixed ordinary PLS estimator in each
+fold. Because both component counts and the Pi-PLS predictor rank were chosen after inspecting
+paths computed from the same 46 observations, the resulting OOF predictions are
+selection-conditioned rather than independent validation. The standardized values stored in
+`predictions.csv` use the full supplied observed-response means and sample standard deviations
+for display; they do not reproduce the fold-local scaling used by the component-path loss.
+
 ## Testing boundary
 
 Pure inspection tests should verify equations, shapes, finite-value validation, defensive copying,
@@ -268,8 +278,8 @@ The accepted order after Decision 0042 is:
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
 2. Pi-PLS plotting and a fast synthetic inspection example — **complete**;
 3. ordinary PLS scores, loadings, and coefficient analysis — **complete**;
-4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **next**;
-5. Sugarcane spectral analysis;
+4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **complete**;
+5. Sugarcane spectral analysis — **next**;
 6. Tobacco pagination and observation diagnostics;
 7. Pulp biplot and final cross-dataset review;
 8. return to product documentation and release hardening.
