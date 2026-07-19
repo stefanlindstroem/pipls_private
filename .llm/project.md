@@ -19,8 +19,11 @@ Phases A through E4c are implemented. The current public surface includes `PiPLS
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, and deterministic synthetic dataset generation.
 
-The transparent real-dataset suite contains pulp, sugarcane, and tobacco. Public navigation now
-describes the installable package, API, examples, datasets, validation, and releases.
+The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
+the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
+Steel table, SARCOS, and FRED-MD from this repository because the exact source materials do not
+carry sufficiently clear redistribution rights. Public navigation now describes the installable
+package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
@@ -74,7 +77,8 @@ carry their own output-container configuration through cloning and refit.
 ## Product-asset ownership
 
 - `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`, and
-  `metadata.yaml` layout with public-only provenance. No generic runtime registry is required.
+  `metadata.yaml` layout with public-only provenance and an explicit source-level redistribution
+  grant for the exact included material. No generic runtime registry is required.
 - `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
   utilities or publication pipelines. Real-data examples keep separate Pi-PLS and standard PLS
   (NIPALS) CSV paths and derive comparison PDFs from those tables. Their pandas and Matplotlib

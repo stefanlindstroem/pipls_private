@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted during Phase E3.
+Accepted during Phase E3. The Corn-specific reconstruction plan was superseded by Decision 0041.
 
 ## Context
 
@@ -20,12 +20,14 @@ public assets confusing and irreproducible even when the committed model matrice
 - Simple adaptations are described directly in the dataset metadata and README.
 - Public reconstruction code is included only when it operates on included or publicly obtainable
   raw data and exposes analysis-relevant choices that programming users should see.
-- Corn is the explicit special case: its raw-data reading and necessary preprocessing are public,
-  scientifically relevant parts of the user-facing workflow.
+- At the time of this decision, Corn was designated as a possible public reconstruction case.
+  Decision 0041 later excluded it because source-level redistribution rights were not sufficiently
+  explicit and its package-level value did not justify the uncertainty.
 
 ## Consequences
 
 - Every committed dataset can be understood from public repository materials alone.
 - Programming users are not directed toward unavailable files or internal project tooling.
 - Internal development lineage does not become part of the runtime or example contract.
-- Corn preprocessing remains transparent rather than being hidden behind preparation utilities.
+- Any future public reconstruction remains transparent and is admitted only after the exact
+  source material passes the licensing gate established by Decision 0041.

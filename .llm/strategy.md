@@ -318,15 +318,19 @@ defined in `.llm/dataset_layout.md`. Record only public or included sources, cit
 redistribution decision, preparation choices, shapes, columns, row ordering, missing-value policy,
 and integrity hashes. Make the analysis example read `X` and `Y` directly with ordinary NumPy or
 pandas code. Do not introduce a generic registry or loader, private-source references, or
-preparation-only scripts. Defer Corn reconstruction until its preprocessing choices are explicitly
-fixed; Corn will expose its public raw-data reading and analysis-relevant preprocessing.
+preparation-only scripts. Before implementation, verify that the exact source material has an
+explicit source-level license or permission granting redistribution and adaptation for general
+repository use; public download access alone is insufficient.
 
-Current status: **complete for the current reference suite**. Pulp provides a compact named
-multivariate process dataset; sugarcane adds a 1,721-column regular wavelength grid; and tobacco
-adds 347 samples, 1,557 raw FT-NIR predictors, and 13 responses. Every integration uses public
-provenance, direct `X.csv`/`Y.csv` reading, documentary metadata, and no runtime loader or hidden
-preparation utility. Decision 0033 removed the former Linnerud integration because it no longer
-served a useful package-level example or validation role.
+Current status: **complete for the current reference suite and licensing audit**. Pulp provides a
+compact named multivariate process dataset; sugarcane adds a 1,721-column regular wavelength grid;
+and tobacco adds 347 samples, 1,557 raw FT-NIR predictors, and 13 responses. Every integration uses
+public provenance, direct `X.csv`/`Y.csv` reading, documentary metadata, and no runtime loader or
+hidden preparation utility. Decision 0033 removed the former Linnerud integration because it no
+longer served a useful package-level example or validation role. Decision 0041 intentionally
+excludes Corn, the legacy Citrination Steel table, SARCOS, and FRED-MD because the exact source
+materials do not provide sufficiently clear redistribution rights. No legacy dataset remains
+pending.
 
 ### Product transition P1: repository cleanup
 
@@ -442,8 +446,9 @@ Current status: **current estimator standardization complete; block-aware API de
 
 Begin product documentation and release hardening: choose and implement the smallest next increment
 for a buildable user guide, API reference, compatibility policy, clean-install checks, or release
-metadata. Do not add another dataset, benchmark, or block-scaling API without a separate
-package-level decision.
+metadata. The legacy dataset review is closed. Do not add another dataset, benchmark, or
+block-scaling API without a separate package-level decision; any future dataset must first pass the
+source-level licensing gate in Decision 0041.
 
 ## Maintenance protocol
 

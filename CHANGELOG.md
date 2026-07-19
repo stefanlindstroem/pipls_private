@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Complete the legacy real-dataset licensing review: retain pulp, sugarcane, and tobacco as the
+  repository suite; intentionally exclude Corn, the legacy Citrination Steel table, SARCOS, and
+  FRED-MD because the exact source materials do not carry sufficiently clear redistribution rights;
+  and return the roadmap to documentation and release hardening.
 - Synchronize the guide layer with the final path API: describe score-maximizing selection and
   adaptive-search limits accurately, clarify custom-scorer interpretation of component-path MSE,
   correct the Pulp example narrative, document the centered direct-fit rank limit, and include the
@@ -53,7 +57,7 @@
 
 - Replace brittle repository-document and dataset-metadata value assertions with structural file, format, decision-index, and executable-example tests; document the durable testing policy.
 
-- Restrict committed dataset provenance to public or included sources, remove private pulp archive references and its preparation-only converter, and document Corn as the explicit user-facing raw-data preprocessing exception.
+- Restrict committed dataset provenance to public or included sources, remove private pulp archive references and its preparation-only converter, and initially reserve Corn as a user-facing raw-data preprocessing exception; Decision 0041 later excludes it after licensing review.
 
 - Add the CC BY 4.0 pulp dataset as the second transparent real-data integration, with explicit column selection, deterministic preparation, direct pandas I/O, provenance, integrity tests, and source-distribution packaging.
 

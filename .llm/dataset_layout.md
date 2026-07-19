@@ -56,6 +56,18 @@ must remain stable across datasets. A compact regular-axis descriptor must state
 quantity, axis name and unit, start, stop, step, ordering, and how CSV headers encode the axis; it
 must define every predictor column without relying on hidden code.
 
+## Source-level licensing gate
+
+Before files are added under `datasets/`, verify that the exact source material used to derive them
+has an explicit license or written permission granting redistribution and adaptation for general
+use. A public download page, a research-use statement, or a license attached to a different cleaned
+or reduced derivative is not enough.
+
+Record the source license, attribution requirements, and redistribution conclusion in
+`metadata.yaml`, and include the governing license or permission text locally when appropriate. If
+the source-level grant is absent or ambiguous, do not commit the source, derived matrices, or an
+automatic downloader for them.
+
 ## Public-facing provenance rule
 
 Dataset assets must stand on their own for a programming user who sees only the public repository.
@@ -77,8 +89,8 @@ Do not commit preparation-only code merely to document how private development f
 Public reconstruction code is allowed only when it operates on included or publicly obtainable raw
 data and represents analysis-relevant work that users should see.
 
-Corn is explicitly reserved for this second case: the raw data and the necessary reading and
-preprocessing choices must be exposed transparently to programming users.
+No current dataset uses this exception. Any future reconstruction must operate on source material
+whose redistribution and adaptation rights have already been verified.
 
 ## Separation from the programming-user contract
 

@@ -67,6 +67,17 @@ checksums of unshared source files, or preparation scripts that only reconstruct
 from private development inputs. Such development-only lineage remains outside the public
 repository.
 
+## Licensing gate
+
+A dataset is eligible for repository inclusion only when the exact source material used to create
+the committed tables has an explicit license or written permission that permits redistribution and
+adaptation for general use. Public accessibility, an academic citation, or a license attached only
+to a different derivative does not satisfy this requirement.
+
+The source license and required attribution must be preserved in the dataset directory and recorded
+in `metadata.yaml`. If rights are uncertain, the data remain external to `pipls`; an example may not
+work around this boundary by downloading and republishing the same material automatically.
+
 ## Repository dataset policy
 
 Every committed real dataset follows `.llm/dataset_layout.md`:
@@ -90,9 +101,9 @@ A reconstruction or preprocessing script is appropriate only when all of the fol
 - the code is intended to be read and run by programming users;
 - the example exposes, rather than hides, the analytical choices.
 
-Corn is the planned special case: its raw public data and analysis-relevant reading and
-preprocessing must be shown explicitly. That code belongs with the public example or dataset
-materials, not in a generic internal preparation layer.
+No current dataset uses this exception. A future reconstruction must first pass the repository
+licensing gate and must remain dataset-specific rather than becoming a generic internal preparation
+layer.
 
 ## Separation of responsibilities
 

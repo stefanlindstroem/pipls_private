@@ -25,7 +25,7 @@ This index is navigation, not a substitute for those records.
 | `0017-first-real-dataset.md` | former first transparent real-data integration | superseded by Decision 0033; the Linnerud integration is removed |
 | `0018-repository-dataset-layout.md` | committed real-dataset file convention | every dataset uses comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
 | `0019-pulp-dataset-integration.md` | pulp dataset integration | pulp uses public supplementary provenance, CC BY 4.0 attribution, named column selection, and direct X/Y reading |
-| `0020-public-dataset-provenance-boundary.md` | public versus internal dataset materials | public-only provenance; no private paths or preparation-only scripts; Corn preprocessing remains user-facing |
+| `0020-public-dataset-provenance-boundary.md` | public versus internal dataset materials | public-only provenance and no private paths or preparation-only scripts; Corn-specific plan superseded by 0041 |
 | `0021-durable-repository-tests.md` | repository test stability | test behavior and structural format without pinning living prose or documentary field values |
 | `0022-sugarcane-dataset-integration.md` | sugarcane dataset integration | public LabSpec spectra, explicit row and wavelength selection, and compact regular-axis metadata |
 | `0023-tobacco-dataset-integration.md` | tobacco dataset integration | public raw FT-NIR spectra, explicit ID alignment, metadata-column exclusion, and no spectral preprocessing |
@@ -46,6 +46,7 @@ This index is navigation, not a substitute for those records.
 | `0038-single-examples-target.md` | explicit application validation | `make examples` runs every numbered example; `make check` remains fast internal validation |
 | `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
 | `0040-sklearn-api-polish.md` | final public API polish | explicit complete-path sentinel, conventional random state, callable scorer, and canonical decomposition output |
+| `0041-legacy-dataset-licensing-roadmap.md` | legacy dataset licensing and roadmap | retain the three licensed datasets; exclude Corn, legacy Steel, SARCOS, and FRED-MD; resume release hardening |
 
 ## Implemented estimator/search transition
 
@@ -85,9 +86,12 @@ plan contains an earlier or more general proposal:
   external users remain free to use any data source or file organization;
 - the current real-data integration suite is pulp, sugarcane, and tobacco; all are repository
   example data, not runtime loaders or publication-result claims;
-- committed dataset assets use public or included provenance only; private archive references and
-  preparation-only scripts stay outside the repository, while Corn raw-data preprocessing will be
-  explicit and user-facing;
+- committed dataset assets use public or included provenance only, and the exact source material
+  must carry an explicit redistribution and adaptation grant; private archive references and
+  preparation-only scripts stay outside the repository;
+- Corn, the legacy Citrination Steel table, SARCOS, and FRED-MD are intentionally excluded under
+  Decision 0041; separately licensed derivatives are new candidate datasets, not retroactive
+  clearance of the companion-analysis files;
 - repository tests validate executable behavior and durable file structure rather than pinning
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only

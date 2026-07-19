@@ -35,7 +35,9 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
   metadata, registry, or package-owned loader required for fitting;
 - a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
   `metadata.yaml`;
-- a current reference suite containing pulp, sugarcane, and tobacco.
+- a current reference suite containing pulp, sugarcane, and tobacco;
+- a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
+  table, SARCOS, and FRED-MD from repository redistribution.
 
 The current top-level package exports are:
 
@@ -201,6 +203,29 @@ explicitly. The examples contain no subprocess wrappers or repeated table-valida
 Default tests retain dataset-layout, component-path API, PLS-helper, plotting, and workflow-structure
 contracts without executing the complete real-data analyses.
 
+## Legacy dataset licensing review
+
+Decision 0041 closes the companion-analysis dataset inventory for the current repository. The
+review applied a strict inclusion rule: public download access is not enough; the exact source
+material committed or transformed by `pipls` must carry an explicit license or permission granting
+redistribution and adaptation for the repository's general use.
+
+- Corn is intentionally excluded because redistribution permission for the exact source file is not
+  sufficiently explicit and the dataset adds little beyond the existing NIR examples.
+- The companion materials identify the legacy Steel table as Citrination-processed. The matching
+  public source candidate, Citrination dataset 153092, provides neither a documented derivation for
+  the exact 267-row table nor an explicit dataset license, and its service terms do not grant
+  general redistribution of hosted data. Separately licensed 312-row Steel Strength derivatives are
+  different datasets and do not establish rights for the companion table.
+- The canonical GPML SARCOS page provides the train and test files and attribution but no dataset
+  license or redistribution grant.
+- FRED-MD is publicly accessible for research, but current FRED terms reserve rights in the
+  compilation and require users to resolve third-party series rights; the repository therefore
+  cannot redistribute the historical derived regression table with confidence.
+
+No additional legacy dataset is pending integration. A future real dataset must add a distinct
+package-level use case and pass the source-level licensing gate before implementation work begins.
+
 Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
 ignored and are excluded from snapshots. Software versions, execution controls, timings, and
 unrelated metrics are omitted unless they answer that benchmark's explicit question. OLS, CCA,
@@ -208,10 +233,12 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Resume user documentation and release hardening. Select one small reviewable increment covering a
-buildable user guide, API reference, compatibility policy, clean-install validation, packaging
+Resume user documentation and release hardening. The legacy dataset licensing audit is complete,
+and no companion-analysis dataset remains pending. Select one small reviewable increment covering
+a buildable user guide, API reference, compatibility policy, clean-install validation, packaging
 audit, release notes, or versioned release preparation. Do not add another dataset, benchmark, or
-block-scaling API without a new package-level question.
+block-scaling API without a new package-level question and, for datasets, a verified source-level
+redistribution license.
 
 ## Subsequent roadmap
 
@@ -222,7 +249,9 @@ block-scaling API without a new package-level question.
    a separate owner decision—block-aware variants of the existing model-internal standardization.
 
 The focused synthetic benchmarks and representative Pulp, Sugarcane, and Tobacco examples are
-complete. They remain validation and documentation assets during the architectural correction.
+complete. Corn, the legacy Steel table, SARCOS, and FRED-MD are intentionally outside the repository
+under Decision 0041. The included assets remain validation and documentation material during
+release hardening.
 
 The repository-product cleanup is complete. Paper-reproduction repositories remain outside this
 roadmap and may independently depend on specific tagged `pipls` releases.
