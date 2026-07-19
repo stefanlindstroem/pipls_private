@@ -16,8 +16,8 @@ def _repository_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
-def _load_example_module(filename: str, module_name: str) -> ModuleType:
-    path = _repository_root() / "examples" / filename
+def _load_example_module(relative_path: str, module_name: str) -> ModuleType:
+    path = _repository_root() / "examples" / relative_path
     spec = importlib.util.spec_from_file_location(module_name, path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Could not load example module from {path}.")
@@ -27,8 +27,8 @@ def _load_example_module(filename: str, module_name: str) -> ModuleType:
     return module
 
 
-PLOT = _load_example_module("plot_component_path.py", "plot_component_path_example")
-PLS_PATH = _load_example_module("pls_component_path.py", "pls_component_path_example")
+PLOT = _load_example_module("_support/plot_component_path.py", "plot_component_path_example")
+PLS_PATH = _load_example_module("_support/pls_component_path.py", "pls_component_path_example")
 
 
 def _write_component_path(path: Path) -> None:
@@ -153,8 +153,8 @@ def test_real_data_examples_use_two_stage_comparison_workflow() -> None:
         assert "component_path_results_" in text
         assert "refit=False" in text
         assert "PLS_COMPONENT_PATH_CSV" in text
-        assert "from pls_component_path import evaluate_pls_component_path" in text
-        assert "from plot_component_path import plot_component_path" in text
+        assert "from _support.pls_component_path import evaluate_pls_component_path" in text
+        assert "from _support.plot_component_path import plot_component_path" in text
         assert "evaluate_pls_component_path(" in text
         assert "plot_component_path(" in text
         assert 'pd.read_csv(COMPONENT_PATH_CSV).set_index("n_components")' in text
@@ -175,7 +175,7 @@ def test_tobacco_example_uses_full_svd_and_auto_search() -> None:
 
 def test_example_helpers_are_importable_functions_not_command_line_wrappers() -> None:
     for filename in ["pls_component_path.py", "plot_component_path.py"]:
-        text = (_repository_root() / "examples" / filename).read_text(encoding="utf-8")
+        text = (_repository_root() / "examples" / "_support" / filename).read_text(encoding="utf-8")
         assert "argparse" not in text
         assert "subprocess" not in text
         assert "if __name__ ==" not in text

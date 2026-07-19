@@ -37,7 +37,7 @@ nested component count by truncating the public fitted weights and loadings. NIP
 components sequentially, so this is numerically equivalent to separately fitting each earlier
 component count while avoiding repeated high-dimensional decompositions.
 
-`plot_component_path.py` reads both CSV files. It plots `$\Pi$-PLS` and `PLS (NIPALS)` in one PDF,
+`examples/_support/plot_component_path.py` reads both CSV files. It plots `$\Pi$-PLS` and `PLS (NIPALS)` in one PDF,
 shows fold-SD error bars for both paths, and annotates the Pi-PLS predictor rank beside every Pi-PLS
 point. The lower y-limit is zero and the upper limit is data-driven but never below one.
 

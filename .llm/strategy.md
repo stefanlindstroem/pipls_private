@@ -476,8 +476,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Proceed to product documentation and release hardening. Keep the completed biplot restricted to the low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds, VIP,
-or other deferred diagnostics.
+Proceed to buildable documentation, generated API reference, compatibility policy, packaging checks,
+and versioned release preparation. The literal-matrix quickstart and example-support reorganization
+are complete. Keep the biplot restricted to the low-dimensional Pulp predictors; do not add spectral
+biplots, theoretical outlier thresholds, VIP, or other deferred diagnostics.
 
 ## Maintenance protocol
 

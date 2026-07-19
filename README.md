@@ -32,29 +32,70 @@ After pulling a change that adds dependencies, refresh the active development en
 python -m pip install -e ".[dev]"
 ```
 
-For an examples-only environment, install the data-reading and plotting dependencies with:
+For an examples environment, install the data-reading and plotting dependencies with:
 
 ```bash
 python -m pip install -e ".[examples]"
-make examples
+PYTHONPATH=src MPLBACKEND=Agg python examples/01_minimal_fit_and_plot.py
 ```
 
-## Basic model
+`make examples` runs every numbered example, including the complete and slower real-data analyses.
+
+## Quickstart: one fixed model
+
+The shortest complete workflow uses literal NumPy matrices, one fixed fit, and one plot. It performs
+no cross-validation or parameter selection:
 
 ```python
-from pipls import PiPLSRegression
+import numpy as np
 
-model = PiPLSRegression(n_components=2, predictor_rank=4)
-model.fit(X_train, Y_train)
-Y_pred = model.predict(X_test)
-X_scores, Y_scores = model.transform(X_train, Y_train)
-print(model.predictor_rank_)
-print(model.decomposition_.D)
+from pipls import PiPLSRegression
+from pipls.inspection import pipls_display_factors
+from pipls.plotting import plot_pipls_decomposition
+
+X = np.array(
+    [
+        [1.0, 2.0, 0.5],
+        [2.0, 1.0, 1.0],
+        [3.0, 4.0, 1.5],
+        [4.0, 3.0, 2.0],
+        [5.0, 6.0, 2.5],
+        [6.0, 5.0, 3.0],
+        [7.0, 8.0, 3.5],
+        [8.0, 7.0, 4.0],
+    ]
+)
+Y = np.array(
+    [
+        [1.2, 2.0],
+        [1.8, 1.7],
+        [3.1, 3.3],
+        [3.7, 3.0],
+        [5.2, 4.6],
+        [5.8, 4.3],
+        [7.1, 5.9],
+        [7.7, 5.6],
+    ]
+)
+
+model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
+Y_fitted = model.predict(X)
+
+figure, _ = plot_pipls_decomposition(
+    pipls_display_factors(model.decomposition_),
+    predictor_style="bar",
+    predictor_names=["Temperature", "Pressure", "Flow rate"],
+    response_names=["Yield", "Purity"],
+)
 ```
 
 `PiPLSRegression` fits one explicit `(n_components, predictor_rank)` pair. It centers `X` and
 `Y` during fitting and, with `scale=True`, learns their training-sample standard deviations.
-`PiPLSPathCV` performs model selection by cloning and fitting fixed estimators separately inside
+Fitting, numerical inspection, and plotting remain separate operations. See the runnable
+[`01_minimal_fit_and_plot.py`](examples/01_minimal_fit_and_plot.py) example and the
+[quickstart guide](docs/quickstart.md).
+
+`PiPLSPathCV` is the separate model-selection interface. It clones and fits fixed estimators inside
 every training fold, then optionally refits the selected pair on the complete training set.
 
 ## Component-path analysis
@@ -227,7 +268,7 @@ path = pd.DataFrame(search.component_path_results_)
 ```
 
 The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
-(NIPALS) component-path CSV files, call small imported functions to generate the comparison PDF,
+(NIPALS) component-path CSV files, call support functions from `examples/_support/` to generate the comparison PDF,
 and then fit separate fixed models using visible component-count choices. All three examples also
 generate selection-conditioned OOF predictions for fixed Pi-PLS and ordinary PLS models, write
 seven common canonical post-analysis CSV files, and rebuild multipage reports from those files.
@@ -259,6 +300,7 @@ See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchma
 
 ## Documentation
 
+- [Quickstart](docs/quickstart.md)
 - [Documentation index](docs/index.md)
 - [Estimator API](docs/estimator_api.md)
 - [Parameter selection](docs/parameter_selection.md)
@@ -289,7 +331,7 @@ observations per retained predictor-rank direction.
 
 - `src/pipls/`: installable package and public API;
 - `docs/`: user and developer documentation;
-- `examples/`: concise executable workflows;
+- `examples/`: numbered user workflows plus underscore-prefixed support for complete analyses;
 - `datasets/`: transparent redistributable reference datasets;
 - `benchmarks/`: focused package-validation plans, scripts, and ignored CSV outputs;
 - `tests/`: numerical, API, integration, and repository tests;

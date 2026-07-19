@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add a literal-matrix `01_minimal_fit_and_plot.py` quickstart, organize user documentation around
+  direct fit, selection, inspection, and complete reports, and move advanced real-data helper modules
+  under `examples/_support/` without adding another Make target or changing estimator behavior.
+
 - Complete the fitted-model analysis series with balanced reconstruction-preserving ordinary PLS biplot coordinates, a Pulp-only score-loading biplot reconstructed from canonical score/loading tables, and a final cross-dataset API and artifact review.
 
 - Complete the Tobacco post-analysis workflow with decreasing-wavenumber spectral displays,

@@ -2,8 +2,10 @@
 
 `pipls.inspection` contains fitted-model analysis computations that do not depend on pandas or
 Matplotlib. `pipls.plotting` consumes those immutable results and provides optional Matplotlib
-figures. Dataset-specific tables, OOF orchestration, and multipage reports remain separate example
-workflows.
+figures. Dataset-specific tables, OOF orchestration, and multipage reports remain separate complete-example
+workflows. For the shortest fitted-model path, begin with [`quickstart.md`](quickstart.md) or
+[`01_minimal_fit_and_plot.py`](../examples/01_minimal_fit_and_plot.py). The support modules under
+`examples/_support/` are report infrastructure, not prerequisites for ordinary estimator use.
 
 Import these names from the submodule:
 

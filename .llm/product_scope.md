@@ -17,7 +17,7 @@ The repository owns:
 - the installable `pipls` package and its supported public API;
 - numerical, estimator, model-selection, validation, and synthetic-data functionality;
 - user documentation and API reference;
-- concise executable examples that demonstrate ordinary package use;
+- numbered user examples ranging from one minimal fit to complete reference workflows;
 - transparent redistributable reference datasets;
 - lightweight deterministic validation benchmarks;
 - package tests, compatibility policy, release notes, packaging, and versioned releases.

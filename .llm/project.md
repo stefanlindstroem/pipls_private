@@ -4,7 +4,7 @@
 
 Pi-PLS is a PLS-family method for multivariate regression. The repository is the long-lived home of
 the installable `pipls` package: its numerical core, scikit-learn-compatible public interfaces,
-validation utilities, synthetic generators, user documentation, concise examples, staged fitted-
+validation utilities, synthetic generators, user documentation, numbered examples, staged fitted-
 model analysis tools, transparent reference datasets, lightweight validation benchmarks, tests,
 packaging, and releases.
 
@@ -29,8 +29,10 @@ package, API, examples, datasets, validation, and releases.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
-`make examples` runs every numbered example explicitly, including these complete real-data analyses.
-They write separate Pi-PLS and standard PLS (NIPALS) CSVs, call imported helpers to derive
+`make examples` runs every numbered example explicitly, beginning with the literal-matrix
+`01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. The complete
+workflows write separate Pi-PLS and standard PLS (NIPALS) CSVs, call support modules under
+`examples/_support/` to derive
 comparison PDFs from both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
 No block-aware scaling API is designed or scheduled.
 
@@ -50,7 +52,8 @@ engine. The implemented `pipls.inspection` submodule owns immutable Pi-PLS displ
 standardized prediction diagnostics, copies of public ordinary PLS scores, loadings, and
 coefficients, balanced biplot coordinates, and raw observation diagnostics. The optional `pipls.plotting` submodule renders Pi-PLS decomposition, prediction, and
 ordinary PLS score/loading/coefficient, biplot, and observation-diagnostic figures from those explicit results. Dataset-specific model
-choices, OOF loops, pandas tables, CSV writing, and multipage reports remain in `examples/`.
+choices, OOF loops, pandas tables, CSV writing, and multipage reports remain in
+`examples/_support/` and are called by the complete numbered examples.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
@@ -97,8 +100,9 @@ implementing or reviewing this surface.
 - `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`, and
   `metadata.yaml` layout with public-only provenance and an explicit source-level redistribution
   grant for the exact included material. No generic runtime registry is required.
-- `examples/`: small executable API demonstrations with transparent data reading, not hidden loader
-  utilities or publication pipelines. Real-data examples keep separate Pi-PLS and standard PLS
+- `examples/`: numbered user workflows with a literal-matrix quickstart first, followed by selection,
+  synthetic-data, and complete real-data analyses. Underscore-prefixed `examples/_support/` contains
+  report infrastructure rather than primary entry points. Real-data examples keep separate Pi-PLS and standard PLS
   (NIPALS) CSV paths and derive comparison PDFs from those tables. Post-analysis examples own
   fixed-model OOF loops, canonical tables, physical-axis semantics, pagination, and report
   composition; Pulp, Sugarcane, and Tobacco are complete implementations. Their pandas and

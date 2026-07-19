@@ -1,35 +1,65 @@
 # Examples
 
-These concise executable examples demonstrate ordinary package use. They are not manuscript-figure
-or publication-result workflows.
+The examples are arranged by user task rather than by implementation complexity. Start with the
+literal-matrix fit, then move to selection, synthetic data, or the complete real-data workflows.
+The complete workflows are intentionally more extensive than ordinary estimator use.
+
+## Start here
+
+- `01_minimal_fit_and_plot.py`: literal NumPy matrices, one fixed `PiPLSRegression` fit, predictions,
+  and one Pi-PLS decomposition figure. It performs no cross-validation or parameter selection.
+
+Run it with:
+
+```bash
+python -m pip install -e ".[examples]"
+PYTHONPATH=src MPLBACKEND=Agg python examples/01_minimal_fit_and_plot.py
+```
+
+The script writes `examples/results/minimal_fit_and_plot.pdf`. Its predictor and response names are
+ordinary Python lists, demonstrating that plotting labels may come from any explicit metadata
+source rather than from pandas or CSV headers.
+
+## Selection and synthetic-data examples
 
 - `07_advanced_cv.py`: grouped and advanced cross-validation workflows.
 - `08_synthetic_data.py`: deterministic train/test generation with shared latent structure.
+
+## Complete reference workflows
+
 - `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, fixed
   full-data interpretation models, selection-conditioned OOF predictions, seven canonical
-  post-analysis CSV files, a balanced two-component score-loading biplot, and a multipage report reconstructed from them.
+  post-analysis CSV files, a balanced two-component score-loading biplot, and a multipage report.
 - `11_sugarcane_real_data.py`: direct pandas reading, Pi-PLS and standard PLS paths, fixed
   interpretation models, selection-conditioned OOF predictions, seven canonical post-analysis
-  CSV files, and a wavelength-aware report reconstructed from them.
+  CSV files, and a wavelength-aware report.
 - `12_tobacco_real_data.py`: adaptive predictor-rank scanning with explicit full predictor SVD,
   fixed Pi-PLS and ordinary PLS interpretation models, selection-conditioned OOF predictions,
   decreasing-wavenumber spectral plots, deterministic response pagination, eight canonical
   post-analysis CSV files, and raw ordinary PLS observation diagnostics.
-- `pls_component_path.py`: reusable standard-PLS path evaluation for the real-data examples.
-- `plot_component_path.py`: reusable CSV-to-PDF plotting for the Pi-PLS and PLS paths.
-- `fixed_model_oof.py`: example-local cloning and aligned OOF prediction for already fixed models.
-- `post_analysis_artifacts.py`: canonical post-analysis table construction, CSV writing, rereading,
-  and multipage report composition.
 
-Install the data and plotting dependencies before running the real-data examples:
+These are application analyses rather than introductory snippets. `make examples` runs every
+numbered example in filename order, including the slower real-data workflows. It remains separate
+from `make check`.
 
-```bash
-python -m pip install -e ".[examples]"
-make examples
-```
+## Example support modules
 
-The Pulp, Sugarcane, and Tobacco post-analysis examples show label acquisition as a separate I/O
-step:
+The complete workflows import implementation support from `examples/_support/`:
+
+- `pls_component_path.py`: ordinary-PLS path evaluation;
+- `plot_component_path.py`: component-path CSV-to-PDF rendering;
+- `fixed_model_oof.py`: cloning and aligned OOF prediction for already fixed models;
+- `post_analysis_artifacts.py`: canonical table construction, CSV round trips, pagination, and
+  multipage report composition.
+
+The underscore-prefixed directory marks these files as support for the complete examples, not as
+the shortest route to fitting Pi-PLS. They remain example-owned because they contain pandas I/O,
+fixed-model OOF orchestration, physical-axis handling, and report composition. Reusable numerical
+inspection belongs in `pipls.inspection`, and optional rendering belongs in `pipls.plotting`.
+
+## Real-data workflow contract
+
+The Pulp, Sugarcane, and Tobacco examples show label acquisition as a separate I/O step:
 
 ```python
 X = pd.read_csv(DATA_DIR / "X.csv")
@@ -38,56 +68,26 @@ predictor_names = X.columns.astype(str).tolist()
 response_names = Y.columns.astype(str).tolist()
 ```
 
-These names are then passed explicitly to `pipls.inspection`, `pipls.plotting`, and the
-example-owned artifact helpers. Users whose arrays do not carry column headers can obtain
-equivalent lists from a schema or other domain metadata.
+Users whose arrays do not carry column headers can supply equivalent lists from a schema, laboratory
+information system, or other domain metadata. The package plotting API does not read files or
+invent scientific variable names.
 
-`make examples` runs all existing numbered examples in filename order; numbering gaps are
-permitted when an obsolete example is removed. It is intentionally separate from
-`make check`: the real-data analyses can be slow and generate application artifacts under
-`examples/results/`.
+The three real-data examples share these stages:
 
-The current Pulp, Sugarcane, and Tobacco examples begin with two common stages:
+1. `PiPLSPathCV(refit=False)` produces one Pi-PLS row per admissible component count, while
+   scikit-learn `PLSRegression` produces a comparison path for the same folds and component counts.
+   Both paths are written as canonical CSV files before plotting.
+2. Visible component-count choices select fixed full-data Pi-PLS and PLS models for interpretation.
+3. The same visible parameters are cloned inside five non-shuffled folds to produce
+   `selection-conditioned OOF predictions`. Seven common long-form CSV files are written and
+   reread before report generation.
 
-1. `PiPLSPathCV(refit=False)` uses the default `n_components_values="all"` and produces one
-   Pi-PLS row per admissible component count, while scikit-learn
-   `PLSRegression` produces a comparison path for the same folds and component counts. The example
-   writes both DataFrames as canonical CSV files and calls the plotting function on those files.
-2. A visible `CHOSEN_N_COMPONENTS` constant selects one Pi-PLS CSV row, and a separate
-   `PiPLSRegression` fixes both recorded ranks for the final full-data fit.
+Full-data decomposition, score, loading, coefficient, biplot, and observation-diagnostic figures
+are interpretive. Prediction and residual figures retain explicit provenance. The display-standardized
+columns in `predictions.csv` use the complete observed-response matrix and do not reproduce the
+fold-local scaling used by the component-path loss.
 
-All three examples add a third stage. Visible fixed Pi-PLS and PLS parameter choices are cloned
-inside the same five non-shuffled folds, producing `selection-conditioned OOF predictions`. Each
-example writes seven common long-form CSV files under its dataset-specific post-analysis directory,
-then rereads those files to generate `post_analysis.pdf`. Full-data decomposition, score, loading,
-and coefficient tables remain interpretation artifacts; OOF rows remain prediction diagnostics.
-The Pulp biplot is reconstructed from `pls_scores.csv` and `pls_x_loadings.csv`; it does not require another artifact table. Sugarcane reads the strictly increasing 780--2500 nm coordinate from the `X.csv` headers. Tobacco
-preserves its strictly decreasing wavenumber coordinate, partitions all thirteen responses into
-source-ordered pages of at most five responses, and adds `pls_observation_diagnostics.csv` with raw
-score-distance and X-reconstruction-residual values. Theoretical outlier limits are not added.
-
-The display-standardized columns in `predictions.csv` use the complete observed-response matrix.
-They are intended for a common response display and do not reproduce the fold-local standardization
-used by the component-path loss.
-
-The examples import the small helper functions directly. They do not launch subprocesses or
-hide data reading behind a package loader. The CSV files remain canonical; the PDF is only a view of
-them. Error bars show fold-to-fold SD, not a confidence interval. Predictor-rank annotations apply
-only to Pi-PLS. Generated files under `examples/results/` are ignored by Git.
-
-Decision 0042 adds a third, separately implemented stage for post-fit analysis. The existing
-`pls_component_path.py` and `plot_component_path.py` remain selection-diagnostic helpers. Reusable
-Pi-PLS and ordinary PLS computations belong in `pipls.inspection`. `pipls.plotting` now renders
-Pi-PLS decomposition and prediction-diagnostic figures together with ordinary PLS score, balanced biplot, X- and
-Y-loading, coefficient, and raw observation-diagnostic figures from immutable results.
-Dataset-specific fixed-model OOF loops, pandas tables, CSV writing, physical axes, pagination, and
-multipage reports remain example-local.
-
-Full-data decomposition, score, loading, and coefficient plots are fitted-model interpretation.
-Prediction and residual plots accept explicit predictions and record whether they are fitted,
-fixed-parameter OOF, selection-conditioned OOF, or external-test values. The Pulp, Sugarcane, and
-Tobacco real-data examples use `selection-conditioned OOF predictions` after component counts have
-been chosen from paths computed on the same observations.
-
-Real-data examples must show the ordinary I/O used to create `X` and `Y` in the example itself. Do
-not route example data through a package registry, generic loader, or hidden data-reading helper.
+Pulp reconstructs its biplot from `pls_scores.csv` and `pls_x_loadings.csv`. Sugarcane reads its
+strictly increasing wavelength coordinate from `X.csv`. Tobacco preserves its decreasing
+wavenumber coordinate, partitions all thirteen responses in source order, and adds
+`pls_observation_diagnostics.csv`. Generated files under `examples/results/` are ignored by Git.

@@ -26,8 +26,8 @@ Keep these stages separate in code, documentation, filenames, and figure labels.
 
 The component-path workflows answer how cross-validated loss changes with component count and, for
 Pi-PLS, the conditional predictor rank. Their canonical artifacts are the existing Pi-PLS and
-ordinary PLS path CSV files. `examples/pls_component_path.py` and
-`examples/plot_component_path.py` remain example-local helpers.
+ordinary PLS path CSV files. `examples/_support/pls_component_path.py` and
+`examples/_support/plot_component_path.py` remain example-local helpers for the complete workflows.
 
 A component-path result is not a fitted-model interpretation and is not an unbiased estimate of a
 subsequent user choice made after inspecting that same path.
@@ -81,7 +81,11 @@ added automatically to `pipls.__all__`.
 
 ### `examples/`
 
-Examples own scientific orchestration:
+`examples/01_minimal_fit_and_plot.py` is the primary onboarding path: literal NumPy matrices, one
+fixed fit, one prediction call, and one decomposition plot. It must not depend on the complete
+workflow helpers, pandas, cross-validation, or parameter selection.
+
+The complete real-data examples own scientific orchestration:
 
 - direct dataset reading and alignment;
 - visible fixed component and predictor-rank choices;
@@ -92,8 +96,9 @@ Examples own scientific orchestration:
 - CSV rereading and multipage PDF composition;
 - dataset-specific physical-axis labels, response subsets, and pagination.
 
-Do not hide real-data reading behind a package loader. Do not place user analysis helpers under
-`scripts/`, which remains the repository-maintenance and preparation area.
+Their support modules live under `examples/_support/` so they are visibly separate from numbered
+user entry points. Do not hide real-data reading behind a package loader. Do not place user analysis
+helpers under `scripts/`, which remains the repository-maintenance and preparation area.
 
 Variable-name acquisition is also example-owned. When a table has meaningful headers, examples
 should derive names visibly from `X.columns` and `Y.columns` and pass them to plotting functions.

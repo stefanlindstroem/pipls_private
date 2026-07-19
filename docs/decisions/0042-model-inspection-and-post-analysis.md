@@ -32,7 +32,7 @@ The repository distinguishes three analysis stages:
 
 1. **Model-selection diagnostics.** Component-path CSV files and their comparison PDF describe the
    conditional path over component counts and predictor ranks. The existing
-   `examples/pls_component_path.py` and `examples/plot_component_path.py` remain example-local
+   `examples/_support/pls_component_path.py` and `examples/_support/plot_component_path.py` remain example-local
    helpers for this stage.
 2. **Fixed-model interpretation.** Full-data fitted Pi-PLS and ordinary PLS models provide
    decomposition, score, loading, and coefficient quantities. These plots describe the fitted

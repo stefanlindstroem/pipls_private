@@ -24,8 +24,8 @@ def _repository_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
-def _load_example_module(filename: str, module_name: str) -> ModuleType:
-    path = _repository_root() / "examples" / filename
+def _load_example_module(relative_path: str, module_name: str) -> ModuleType:
+    path = _repository_root() / "examples" / relative_path
     spec = importlib.util.spec_from_file_location(module_name, path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Could not load example module from {path}.")
@@ -35,9 +35,9 @@ def _load_example_module(filename: str, module_name: str) -> ModuleType:
     return module
 
 
-OOF = _load_example_module("fixed_model_oof.py", "fixed_model_oof_example")
+OOF = _load_example_module("_support/fixed_model_oof.py", "fixed_model_oof_example")
 ARTIFACTS = _load_example_module(
-    "post_analysis_artifacts.py",
+    "_support/post_analysis_artifacts.py",
     "post_analysis_artifacts_example",
 )
 

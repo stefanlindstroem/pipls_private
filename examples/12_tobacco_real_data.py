@@ -4,10 +4,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from fixed_model_oof import fixed_model_oof_predictions
-from plot_component_path import plot_component_path
-from pls_component_path import evaluate_pls_component_path
-from post_analysis_artifacts import (
+from _support.fixed_model_oof import fixed_model_oof_predictions
+from _support.plot_component_path import plot_component_path
+from _support.pls_component_path import evaluate_pls_component_path
+from _support.post_analysis_artifacts import (
     build_post_analysis_tables,
     render_post_analysis_report,
     write_post_analysis_tables,

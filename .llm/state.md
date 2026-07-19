@@ -23,6 +23,7 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - hardened public validation and `StatisticalSupportWarning` for direct fixed fits with
   fewer than three observations per retained predictor-rank direction;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
+- a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
 - shared private fold-evaluation and adaptive-search machinery;
 - PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and public
   immutable `PiPLSDecomposition`;
@@ -81,7 +82,7 @@ from pipls.datasets import (
 Decision 0024 defines `pipls` as a long-lived software-product repository. It owns:
 
 - the installable package and public API;
-- user documentation and concise executable examples;
+- user documentation and numbered examples from a minimal fixed fit through complete analyses;
 - transparent reference datasets;
 - lightweight synthetic and real-data validation benchmarks;
 - tests, packaging, compatibility policy, and releases.
@@ -248,7 +249,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Proceed to product documentation and release hardening. The fitted-model analysis series is complete; do not add further PLS diagnostics without a separate decision.
+Proceed to buildable user documentation, generated API reference, compatibility policy, packaging
+checks, and versioned release preparation. The minimal onboarding path and fitted-model analysis
+series are complete; do not add further PLS diagnostics without a separate decision.
 
 ## Subsequent roadmap
 
@@ -263,8 +266,9 @@ Proceed to product documentation and release hardening. The fitted-model analysi
    diagnostics — complete.
 7. **Pulp biplot and cross-dataset review:** complete with balanced score-loading coordinates and
    aligned artifact contracts.
-8. **User documentation and release hardening:** buildable user guide, API reference, compatibility
-   policy, packaging checks, and versioned releases.
+8. **User documentation and release hardening:** literal-matrix quickstart and navigation hierarchy
+   complete; buildable user guide, generated API reference, compatibility policy, packaging checks,
+   and versioned releases remain.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

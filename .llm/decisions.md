@@ -49,6 +49,7 @@ This index is navigation, not a substitute for those records.
 | `0041-legacy-dataset-licensing-roadmap.md` | legacy dataset licensing and roadmap | retain the three licensed datasets; exclude Corn, legacy Steel, SARCOS, and FRED-MD |
 | `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; reusable inspection, plotting, and all three real-data integrations |
 | `0043-pls-biplot-and-analysis-surface.md` | final fitted-model analysis increment | balanced reconstruction-preserving Pulp biplot; no spectral biplots; analysis series complete |
+| `0044-minimal-onboarding-and-example-support.md` | user onboarding and example organization | literal-matrix first example; complete-workflow helpers under `examples/_support/`; one examples target retained |
 
 ## Implemented estimator/search transition
 
@@ -84,6 +85,8 @@ plan contains an earlier or more general proposal:
   and `PiPLSDataset` are not prerequisites for fitting;
 - examples show their data-reading and matrix-construction code rather than relying on hidden
   utility functions;
+- the first numbered example uses literal NumPy matrices and one fixed fit; complete-workflow
+  helpers are separated under `examples/_support/`;
 - committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
   external users remain free to use any data source or file organization;
 - the current real-data integration suite is pulp, sugarcane, and tobacco; all are repository
