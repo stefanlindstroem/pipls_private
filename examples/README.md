@@ -5,8 +5,6 @@ or publication-result workflows.
 
 - `07_advanced_cv.py`: grouped and advanced cross-validation workflows.
 - `08_synthetic_data.py`: deterministic train/test generation with shared latent structure.
-- `09_model_inspection.py`: direct Pulp CSV reading, header-derived scientific labels, fixed
-  Pi-PLS and ordinary PLS interpretation, and clearly labeled fitted-value diagnostics.
 - `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, fixed
   full-data interpretation models, selection-conditioned OOF predictions, seven canonical
   post-analysis CSV files, and a multipage report reconstructed from them.
@@ -28,7 +26,7 @@ python -m pip install -e ".[examples]"
 make examples
 ```
 
-The inspection example shows label acquisition as a separate I/O step:
+The Pulp and Sugarcane post-analysis examples show label acquisition as a separate I/O step:
 
 ```python
 X = pd.read_csv(DATA_DIR / "X.csv")
@@ -37,10 +35,12 @@ predictor_names = X.columns.astype(str).tolist()
 response_names = Y.columns.astype(str).tolist()
 ```
 
-These names are then passed explicitly to `pipls.plotting`. Users whose arrays do not carry column
-headers can obtain equivalent lists from a schema or other domain metadata.
+These names are then passed explicitly to `pipls.inspection`, `pipls.plotting`, and the
+example-owned artifact helpers. Users whose arrays do not carry column headers can obtain
+equivalent lists from a schema or other domain metadata.
 
-`make examples` runs all numbered examples in order. It is intentionally separate from
+`make examples` runs all existing numbered examples in filename order; numbering gaps are
+permitted when an obsolete example is removed. It is intentionally separate from
 `make check`: the real-data analyses can be slow and generate application artifacts under
 `examples/results/`.
 

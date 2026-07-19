@@ -229,9 +229,9 @@ The supplied coordinate order is preserved, including decreasing wavenumber axes
 components are overlaid as separate labeled lines. The function does not smooth, interpolate,
 reorder, or infer a spectral representation.
 
-Categorical plots require the caller to supply predictor and response names. The file-backed Pulp
-inspection example reads those names from `X.csv` and `Y.csv`; the package itself remains agnostic
-about whether labels originated in file headers or another metadata source.
+Categorical plots require the caller to supply predictor and response names. The Pulp and
+Sugarcane post-analysis examples read those names from `X.csv` and `Y.csv`; the package itself
+remains agnostic about whether labels originated in file headers or another metadata source.
 
 `plot_prediction_diagnostics()` renders standardized observed versus predicted responses,
 standardized residuals versus standardized predictions, and response-wise standardized RMSE:
@@ -295,13 +295,10 @@ coordinate and axis label, whose order is preserved.
 The initial ordinary PLS plotting surface does not include biplots, confidence ellipses, VIP,
 automatic variable selection, theoretical outlier limits, or uncertainty intervals.
 
-The fast [`09_model_inspection.py`](../examples/09_model_inspection.py) example reads the Pulp
-`X.csv` and `Y.csv` files directly, derives predictor and response labels from their headers, and
-fits fixed Pi-PLS and ordinary PLS models for display. Its prediction panel is explicitly labeled
-`fitted values`; it is an interpretation example, not validation.
-
-The complete [`10_pulp_real_data.py`](../examples/10_pulp_real_data.py) workflow adds a third stage.
-It reads fixed component choices from the canonical path artifacts, clones those fixed estimators
+The complete [`10_pulp_real_data.py`](../examples/10_pulp_real_data.py) workflow demonstrates the
+package inspection and plotting APIs together with example-owned I/O. It derives predictor and
+response names visibly from the Pulp CSV headers, reads fixed component choices from the canonical
+path artifacts, and clones those fixed estimators
 inside the same five non-shuffled folds, writes seven long-form CSV files under
 `examples/results/pulp_post_analysis/`, rereads them, and constructs one seven-page PDF. The OOF
 predictions are labeled `selection-conditioned OOF predictions` because the fixed parameters were

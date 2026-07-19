@@ -197,7 +197,7 @@ and all path diagnostics remain available. Output-container configuration belong
 template; configuring a direct estimator before passing it to the path is preserved through
 candidate cloning and the selected refit.
 
-Direct fixed fits warn when they have fewer than four observations per retained predictor-rank
+Direct fixed fits warn when they have fewer than three observations per retained predictor-rank
 direction. `PiPLSPathCV` suppresses only that expected diagnostic for its controlled feature
 probes, candidate folds, optional OOF fits, and selected full-data refit. Other warnings from a
 pipeline or estimator remain visible.

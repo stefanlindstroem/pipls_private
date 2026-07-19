@@ -12,11 +12,10 @@ the package and is covered by the corresponding tests and user documentation.
 
 The implemented foundation includes `pipls.inspection` for immutable Pi-PLS, prediction, and
 ordinary PLS latent-structure results. `pipls.plotting` provides Pi-PLS decomposition,
-prediction-diagnostic, ordinary PLS score, loading, and coefficient figures. The compact
-`examples/09_model_inspection.py` workflow demonstrates these tools on the file-backed Pulp data and
-reads scientific variable labels from the CSV headers. The Pulp real-data workflow now adds
-example-owned fixed-model OOF predictions, seven canonical long-form CSV tables, and a multipage
-report reconstructed from those tables.
+prediction-diagnostic, ordinary PLS score, loading, and coefficient figures. The complete Pulp
+and Sugarcane workflows demonstrate these tools with scientific labels and physical coordinates
+obtained visibly during file input. They add example-owned fixed-model OOF predictions, seven
+canonical long-form CSV tables, and multipage reports reconstructed from those tables.
 
 ## Analysis stages
 
@@ -278,7 +277,7 @@ the complete Pulp, Sugarcane, or Tobacco analyses in `make check`; those remain 
 The accepted order after Decision 0042 is:
 
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
-2. Pi-PLS plotting and a fast synthetic inspection example — **complete**;
+2. Pi-PLS decomposition and prediction plotting — **complete**;
 3. ordinary PLS scores, loadings, and coefficient analysis — **complete**;
 4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **complete**;
 5. Sugarcane spectral analysis with an explicit wavelength axis — **complete**;

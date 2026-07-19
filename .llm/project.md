@@ -101,7 +101,7 @@ implementing or reviewing this surface.
   utilities or publication pipelines. Real-data examples keep separate Pi-PLS and standard PLS
   (NIPALS) CSV paths and derive comparison PDFs from those tables. Post-analysis examples own
   fixed-model OOF loops, canonical tables, physical-axis semantics, pagination, and report
-  composition; the Pulp workflow is the first complete implementation. Their pandas and Matplotlib
+  composition; Pulp and Sugarcane are complete implementations. Their pandas and Matplotlib
   requirements are grouped in the `examples` optional
   dependency extra.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated

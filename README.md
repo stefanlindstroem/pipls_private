@@ -179,8 +179,8 @@ The plotting functions return figures and named axes. They do not call `show()`,
 models, or infer whether predictors are spectra. Ordinary PLS score, X/Y-loading, and coefficient
 figures are also available from `pipls.plotting`. Use `predictor_style="line"` with an explicit
 physical coordinate and axis label for spectra. Install with `python -m pip install "pipls[plot]"`.
-See [`docs/model_inspection.md`](docs/model_inspection.md) and
-[`examples/09_model_inspection.py`](examples/09_model_inspection.py).
+See [`docs/model_inspection.md`](docs/model_inspection.md) and the complete
+[Pulp post-analysis example](examples/10_pulp_real_data.py).
 
 ## Synthetic data
 
@@ -221,9 +221,10 @@ path = pd.DataFrame(search.component_path_results_)
 
 The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
 (NIPALS) component-path CSV files, call small imported functions to generate the comparison PDF,
-and then fit separate fixed models using visible component-count choices. The Pulp example also
-generates selection-conditioned OOF predictions for fixed Pi-PLS and ordinary PLS models, writes
-seven canonical post-analysis CSV files, and rebuilds a multipage report from those files. The
+and then fit separate fixed models using visible component-count choices. The Pulp and
+Sugarcane examples also generate selection-conditioned OOF predictions for fixed Pi-PLS and
+ordinary PLS models, write seven canonical post-analysis CSV files per dataset, and
+rebuild multipage reports from those files. The
 Pi-PLS path CSV always records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
 predictor SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
 `examples` extra to run them. See [`examples/README.md`](examples/README.md) and
@@ -243,7 +244,7 @@ The real-data workflows are explicit application runs rather than benchmark or t
 `make examples` runs every numbered example in order, including the complete Pulp, Sugarcane, and
 Tobacco analyses. Examples 10–12 read the public tables directly, write separate Pi-PLS and
 standard PLS component-path CSVs, generate a comparison PDF, and fit separately chosen fixed
-models. Pulp additionally demonstrates the complete post-analysis artifact workflow.
+models. Pulp and Sugarcane additionally demonstrate the complete post-analysis artifact workflow.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
 [`examples/README.md`](examples/README.md).
@@ -273,7 +274,7 @@ other callables, and `None` remain supported.
 
 `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`. Its support term uses the
 total number of observations supplied to `fit()`; cross-validation training folds impose
-centered-data feasibility caps. A direct `PiPLSRegression` fit warns when it has fewer than four
+centered-data feasibility caps. A direct `PiPLSRegression` fit warns when it has fewer than three
 observations per retained predictor-rank direction.
 
 ## Repository map

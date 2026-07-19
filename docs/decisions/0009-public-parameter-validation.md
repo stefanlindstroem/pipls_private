@@ -1,7 +1,7 @@
 # Decision 0009: public parameter validation and statistical-support warning
 
 Status: accepted and refined by Decision 0039. Fixed-estimator validation now covers only
-explicit ranks and warns at $n/r_\pi<4$; rank-bound validation remains in `PiPLSPathCV`.
+explicit ranks and warns at $n/r_\pi<3$; rank-bound validation remains in `PiPLSPathCV`.
 
 ## Context
 

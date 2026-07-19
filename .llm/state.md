@@ -21,7 +21,7 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
   `(n_components, predictor_rank)` pair;
 - independent full, randomized, and automatic predictor-SVD policies;
 - hardened public validation and `StatisticalSupportWarning` for direct fixed fits with
-  fewer than four observations per retained predictor-rank direction;
+  fewer than three observations per retained predictor-rank direction;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
 - shared private fold-evaluation and adaptive-search machinery;
 - PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and public
@@ -43,13 +43,13 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - optional Pi-PLS decomposition and prediction-diagnostic figures plus ordinary PLS score, loading,
   and coefficient figures under `pipls.plotting`, with shared component axes and required semantic
   labels for categorical variables;
-- a compact file-backed Pulp inspection example covering fixed Pi-PLS and ordinary PLS models;
-- a complete Pulp post-analysis workflow with fixed-estimator OOF prediction helpers, seven
-  canonical long-form CSV tables, and a multipage report reconstructed from those tables.
+- complete Pulp and Sugarcane post-analysis workflows with fixed-estimator OOF prediction
+  helpers, seven canonical long-form CSV tables per dataset, scientific labels obtained at the
+  file-reading boundary, and multipage reports reconstructed from those tables.
 
 Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and basic ordinary PLS
-foundations are implemented in `pipls.inspection` and `pipls.plotting`; the Pulp workflow is the
-first complete real-data integration.
+foundations are implemented in `pipls.inspection` and `pipls.plotting`; Pulp and Sugarcane are
+complete real-data post-analysis integrations.
 
 The current top-level package exports are:
 
@@ -150,7 +150,7 @@ Decisions 0039 and 0040 are fully implemented:
 
 - `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
 - it owns no CV, scoring, OOF, or search-result parameters and attributes;
-- direct fits warn when $n/r_\pi<4$;
+- direct fits warn when $n/r_\pi<3$;
 - `PiPLSPathCV` owns feature probes, candidate folds, conditional path selection, optional OOF
   fitting, and selected full-data refitting;
 - the path supplies the private fold engine with the one warning category it may suppress, while
@@ -255,8 +255,7 @@ the Pulp biplot in the same patch.
 
 1. **Post-analysis numerical foundation:** Pi-PLS display factors and prediction diagnostics —
    complete.
-2. **Pi-PLS plotting:** decomposition and prediction figures plus a fast synthetic inspection
-   example — complete.
+2. **Pi-PLS plotting:** decomposition and prediction figures — complete.
 3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients — complete.
 4. **Pulp post-analysis workflow:** example-local fixed-model OOF predictions, canonical tables, and
    a CSV-derived report — complete.

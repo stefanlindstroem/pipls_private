@@ -52,7 +52,7 @@ This index is navigation, not a substitute for those records.
 ## Implemented estimator/search transition
 
 Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` is a fixed-pair estimator with
-the direct-fit support warning at $n/r_\pi<4$. `PiPLSPathCV` owns the complete triangular-selection
+the direct-fit support warning at $n/r_\pi<3$. `PiPLSPathCV` owns the complete triangular-selection
 lifecycle and defaults to the explicit complete-component sentinel `n_components_values="all"`.
 The default scorer is a public callable, conventional scikit-learn random-state forms are accepted,
 and Pi-PLS-specific fitted output is canonicalized in `decomposition_`.

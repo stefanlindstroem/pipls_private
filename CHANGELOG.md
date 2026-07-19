@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Remove the superseded standalone `09_model_inspection.py` workflow and its dedicated structural
+  test. Pulp and Sugarcane now provide the maintained demonstrations of CSV-header label
+  acquisition, fitted-model interpretation, OOF diagnostics, canonical tables, and reports;
+  `make clean` removes any locally retained `examples/results/model_inspection/` directory.
+- Align documentation and the guide layer with the restored ceiling-based path bound and the
+  direct fixed-fit support warning at fewer than three observations per retained predictor-rank
+  direction.
 - Add the complete Sugarcane spectral post-analysis workflow: explicit wavelength coordinates
   from `X.csv` headers, fixed Pi-PLS and ordinary PLS OOF predictions, seven canonical long-form
   CSV tables, and a seven-page report with spectral directions, loadings, and coefficients rendered
@@ -9,14 +16,15 @@
 - Add the complete Pulp post-analysis workflow: fixed Pi-PLS and ordinary PLS OOF predictions
   on the established five folds, explicit selection-conditioned provenance, seven canonical
   long-form CSV tables, and a seven-page report reconstructed only after rereading those tables.
-- Make model-inspection label provenance explicit: the Pulp inspection example now reads
+- Make model-inspection label provenance explicit: the real-data post-analysis examples read
   predictor and response names from `X.csv` and `Y.csv` headers, while plotting remains independent
   of pandas and file layout and accepts labels from any caller-owned metadata source.
 - Present selected Pi-PLS and ordinary PLS components together on shared axes, using side-by-side bars for named categorical variables and overlaid lines for physical predictor axes; require caller-supplied scientific labels for categorical predictor and response displays.
 - Add immutable ordinary PLS latent-structure extraction from public `PLSRegression` scores,
   X/Y loadings, and coefficients, together with optional score, loading, and response-specific
-  coefficient figures and a synthetic demonstration.
-- Add optional `pipls.plotting` figures for Pi-PLS $P$, $D$, and $QD$ displays and explicit-provenance prediction diagnostics, together with a deterministic external-test inspection example.
+  coefficient figures used by the maintained real-data post-analysis workflows.
+- Add optional `pipls.plotting` figures for Pi-PLS $P$, $D$, and $QD$ displays and
+  explicit-provenance prediction diagnostics.
 - Add the pure `pipls.inspection` foundation with immutable Pi-PLS display factors,
   deterministic sign canonicalization that preserves $PDQ^\mathsf{T}$, and explicit-provenance
   prediction diagnostics standardized from observed responses with `ddof=1`.
@@ -37,7 +45,7 @@
 - Simplify the real-data examples around the final two-stage workflow: import the PLS-path and CSV-to-PDF helpers directly, remove subprocess wrappers and repeated table-validation boilerplate, and fit the fixed final model from the chosen canonical Pi-PLS CSV row.
 - Remove obsolete private selection machinery after the fixed-estimator split: delete unused rank-grid and solver-tracing hooks, eliminate duplicate candidate metadata, move response-standardized loss primitives to `metrics.py`, and generate OOF predictions without rescoring the selected candidate.
 - Make `PiPLSPathCV` the sole package selection owner, including explicit control of support-warning suppression across feature probes, candidate folds, optional OOF fits, and the selected full-data refit; unrelated warnings continue to propagate.
-- Make `PiPLSRegression` a direct fixed-pair estimator with no embedded CV or search results; add the direct-fit support warning at fewer than four observations per retained predictor direction while preserving `PiPLSPathCV` candidate behavior.
+- Make `PiPLSRegression` a direct fixed-pair estimator with no embedded CV or search results; add the direct-fit support warning at fewer than three observations per retained predictor direction while preserving `PiPLSPathCV` candidate behavior.
 
 - Record the staged fixed-estimator/path-search boundary, exclude generated example artifacts from snapshots, repair malformed documentation LaTeX, and correct stale core/preprocessing decision statuses.
 - Add a single `make examples` application-validation target that runs every numbered example in

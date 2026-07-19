@@ -402,7 +402,7 @@ Decision 0039 establishes a staged API correction before release hardening. The 
 - `PiPLSRegression` fits one explicit fixed pair and owns no cross-validation or search results;
 - `PiPLSPathCV` owns the bounded triangular scan and conditional predictor-rank selection;
 - the path ceiling uses `samples_per_predictor_rank=5`;
-- direct fixed fits warn when $n/r_\pi<4$;
+- direct fixed fits warn when $n/r_\pi<3$;
 - expected support warnings are suppressed only inside path-controlled feature probes, candidate
   fits, optional OOF fits, and the selected full-data refit;
 - examples continue to recommend `PiPLSPathCV`, not a hand-built `GridSearchCV` surface.
@@ -441,9 +441,9 @@ Acceptance conditions:
 - VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation
   tests, theoretical outlier limits, and contribution plots remain deferred.
 
-Implementation order is pure inspection primitives, Pi-PLS plotting and a file-backed inspection
-example, basic ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
-pagination and observation diagnostics, then the Pulp biplot and cross-dataset review.
+Implementation order is pure inspection primitives, Pi-PLS plotting, basic ordinary PLS analysis,
+Pulp artifact integration, Sugarcane spectral integration, Tobacco pagination and observation
+diagnostics, then the Pulp biplot and cross-dataset review.
 
 Current status: **Pi-PLS and basic ordinary PLS foundations complete; Pulp and Sugarcane real-data
 integrations complete; Tobacco pagination and observation diagnostics pending**.
