@@ -43,7 +43,7 @@ Do not expose constructor aliases named `h`, `r_pi`, or `c`.
   the default integer `0` is reproducible and `None` uses NumPy global state.
 - `scale` and `copy` are Python or NumPy booleans.
 
-A direct fixed fit emits `StatisticalSupportWarning` when $n/r_\pi<4$. This warning is diagnostic;
+A direct fixed fit emits `StatisticalSupportWarning` when $n/r_\pi<3$. This warning is diagnostic;
 it does not choose or cap the rank. `PiPLSPathCV` suppresses only this expected warning inside its
 controlled feature probes, candidate fits, optional OOF fits, and selected full-data refit. Other
 warning categories remain visible.

@@ -35,7 +35,7 @@ clone learns them only from its training fold.
 A direct fixed fit emits `StatisticalSupportWarning` when
 
 \[
-\frac{n}{r_\pi}<4.
+\frac{n}{r_\pi}<3.
 \]
 
 The warning is diagnostic and does not alter the requested rank. Algebraically or numerically

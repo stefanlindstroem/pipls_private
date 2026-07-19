@@ -130,17 +130,17 @@ def test_fit_creates_no_selection_attributes() -> None:
         assert not hasattr(model, name)
 
 
-def test_statistical_support_warning_uses_four_samples_per_rank_boundary() -> None:
+def test_statistical_support_warning_uses_three_samples_per_rank_boundary() -> None:
     X, Y = _data()
     rng = np.random.default_rng(99)
-    X_wide = np.column_stack([X, rng.normal(size=(X.shape[0], 3))])
+    X_wide = np.column_stack([X, rng.normal(size=(X.shape[0], 6))])
+
     with warnings.catch_warnings():
         warnings.simplefilter("error", StatisticalSupportWarning)
-        PiPLSRegression(n_components=2, predictor_rank=10).fit(X_wide, Y)
+        PiPLSRegression(n_components=2, predictor_rank=13).fit(X_wide, Y)
 
-    with pytest.warns(StatisticalSupportWarning, match="recommended minimum of 4"):
-        PiPLSRegression(n_components=2, predictor_rank=11).fit(X_wide, Y)
-
+    with pytest.warns(StatisticalSupportWarning, match="recommended minimum of 3"):
+        PiPLSRegression(n_components=2, predictor_rank=14).fit(X_wide, Y)
 
 def test_small_auto_svd_uses_full_solver_and_reports_exact_rank() -> None:
     X, Y = _data()

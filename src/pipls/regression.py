@@ -28,7 +28,7 @@ from .exceptions import StatisticalSupportWarning
 from .metrics import _training_response_scale
 
 FloatArray = NDArray[np.float64]
-_MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 4.0
+_MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 3.0
 
 
 class PiPLSRegression(
@@ -126,7 +126,7 @@ class PiPLSRegression(
         if n_samples < _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK * predictor_rank:
             warnings.warn(
                 f"The fitted model has {n_samples / predictor_rank:.3g} samples per "
-                "retained predictor-rank direction, below the recommended minimum of 4. "
+                "retained predictor-rank direction, below the recommended minimum of 3. "
                 "The model may have poor statistical support; use external validation.",
                 StatisticalSupportWarning,
                 stacklevel=2,

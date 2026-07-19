@@ -68,16 +68,17 @@ def test_predictor_rank_rejects_rank_above_numerical_rank() -> None:
         PiPLSRegression(n_components=1, predictor_rank=3).fit(X, Y)
 
 
-def test_support_warning_boundary_is_strictly_below_four() -> None:
+def test_support_warning_boundary_is_strictly_below_three() -> None:
     X, Y = _data()
+    rng = np.random.default_rng(13)
+    X_wide = np.column_stack([X, rng.normal(size=(X.shape[0], 3))])
+
     with warnings.catch_warnings():
         warnings.simplefilter("error", StatisticalSupportWarning)
-        PiPLSRegression(n_components=1, predictor_rank=6).fit(X, Y)
+        PiPLSRegression(n_components=1, predictor_rank=8).fit(X_wide, Y)
 
-    rng = np.random.default_rng(13)
-    X_wide = np.column_stack([X, rng.normal(size=(X.shape[0], 1))])
     with pytest.warns(StatisticalSupportWarning):
-        PiPLSRegression(n_components=1, predictor_rank=7).fit(X_wide, Y)
+        PiPLSRegression(n_components=1, predictor_rank=9).fit(X_wide, Y)
 
 
 @pytest.mark.parametrize(

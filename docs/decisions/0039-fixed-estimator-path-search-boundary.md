@@ -27,7 +27,7 @@ standard selection procedure.
 - Cross-validation controls, scoring controls, OOF reporting, and search-result attributes will not
   belong to the fixed estimator.
 - A direct fixed fit will emit `StatisticalSupportWarning` when
-  $n/r_\pi < 4$. Algebraically infeasible ranks remain errors.
+  $n/r_\pi < 3$. Algebraically infeasible ranks remain errors.
 
 `PiPLSPathCV` will be the standard package interface for model selection.
 
@@ -80,7 +80,7 @@ availability, and one canonical `decomposition_` location for Pi-PLS-specific fi
 - The standard Pi-PLS selection path remains bounded, adaptive, and package-owned.
 - Ordinary path analysis uses one CV layer; nested CV occurs only when a user deliberately places a
   selection procedure inside an external assessment procedure.
-- The $c=5$ path ceiling and the $c=4$ direct-fit warning have distinct purposes.
+- The $c=5$ path ceiling and the $c=3$ direct-fit warning have distinct purposes.
 - Decision 0032's full-sample support convention remains in force.
 - The selection-responsibility portions of Decisions 0003, 0009, 0011, 0012, and 0031 are
   superseded or refined by this implemented boundary.
