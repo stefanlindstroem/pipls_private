@@ -311,3 +311,11 @@ The standardized response columns in `predictions.csv` use centers and sample st
 computed from the complete supplied observed-response matrix for display. They are not the
 fold-local response scales used by the component-path scorer, so their aggregate squared values
 should not be expected to equal the reported mean fold CV-MSE exactly.
+
+The complete [`11_sugarcane_real_data.py`](../examples/11_sugarcane_real_data.py) workflow uses the
+same seven-table contract under `examples/results/sugarcane_post_analysis/`. The script reads the
+physical wavelength coordinate separately from the numeric `X.csv` headers, verifies that it is
+strictly increasing, and passes it to the report renderer with the label `Wavelength (nm)`. The
+canonical loading, direction, and coefficient values remain in long-form CSV tables; the report
+uses line rendering only because the example supplies the ordered physical coordinate explicitly.
+All four response headers (`TS`, `CP`, `ADF`, and `IVOMD`) are retained.

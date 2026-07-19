@@ -118,7 +118,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | package inspection and plotting are implemented; Pulp has canonical OOF and post-analysis artifacts; Sugarcane and Tobacco integrations remain staged |
+| Model inspection | package inspection and plotting are implemented; Pulp and Sugarcane have canonical OOF and post-analysis artifacts; Tobacco integration remains staged |
 
 Additional fixed decisions:
 
@@ -246,11 +246,10 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add the Sugarcane spectral post-analysis workflow using the established Pulp artifact contract.
-Read wavelengths explicitly from the `X.csv` headers, render Pi-PLS directions and ordinary PLS
-loadings and coefficients as lines on that physical axis, retain all four response names, and keep
-the report derived from canonical CSV files. Do not add Tobacco pagination or observation
-diagnostics in the same patch.
+Add the Tobacco post-analysis workflow using deterministic response pagination and raw ordinary PLS
+observation diagnostics. Preserve the decreasing wavenumber order from the `X.csv` headers, display
+all thirteen responses through explicit subsets, and do not add theoretical outlier thresholds or
+the Pulp biplot in the same patch.
 
 ## Subsequent roadmap
 
@@ -261,8 +260,9 @@ diagnostics in the same patch.
 3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients — complete.
 4. **Pulp post-analysis workflow:** example-local fixed-model OOF predictions, canonical tables, and
    a CSV-derived report — complete.
-5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays — next.
-6. **Tobacco analysis:** deterministic response pagination and raw PLS observation diagnostics.
+5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays — complete.
+6. **Tobacco analysis:** deterministic response pagination and raw PLS observation
+   diagnostics — next.
 7. **Pulp biplot and cross-dataset review:** one explicit reconstruction-preserving scaling and
    aligned artifact contracts.
 8. **User documentation and release hardening:** buildable user guide, API reference, compatibility

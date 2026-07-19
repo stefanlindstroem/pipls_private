@@ -445,8 +445,8 @@ Implementation order is pure inspection primitives, Pi-PLS plotting and a file-b
 example, basic ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
 pagination and observation diagnostics, then the Pulp biplot and cross-dataset review.
 
-Current status: **Pi-PLS and basic ordinary PLS foundations complete; Pulp real-data
-integration complete; spectral and observation-diagnostic integrations pending**.
+Current status: **Pi-PLS and basic ordinary PLS foundations complete; Pulp and Sugarcane real-data
+integrations complete; Tobacco pagination and observation diagnostics pending**.
 
 ### Product documentation and release hardening
 
@@ -476,11 +476,11 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the Pulp post-analysis workflow using example-local fixed-model OOF orchestration,
-canonical CSV tables, and a PDF reconstructed from those tables. Use visible fixed Pi-PLS and
-ordinary PLS component choices and the explicit label `selection-conditioned OOF predictions`. Do
-not add biplots, spectral handling, Tobacco observation diagnostics, or package-owned pandas code in
-the same patch.
+Implement the Tobacco post-analysis workflow using deterministic response pagination and raw
+ordinary PLS observation diagnostics. Preserve the decreasing wavenumber order read from the
+`X.csv` headers, display all thirteen responses through explicit subsets, and retain the established
+selection-conditioned OOF provenance and canonical-table contract. Do not add theoretical outlier
+thresholds or the Pulp biplot in the same patch.
 
 ## Maintenance protocol
 

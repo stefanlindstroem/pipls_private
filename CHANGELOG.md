@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add the complete Sugarcane spectral post-analysis workflow: explicit wavelength coordinates
+  from `X.csv` headers, fixed Pi-PLS and ordinary PLS OOF predictions, seven canonical long-form
+  CSV tables, and a seven-page report with spectral directions, loadings, and coefficients rendered
+  as physical-axis lines.
 - Add the complete Pulp post-analysis workflow: fixed Pi-PLS and ordinary PLS OOF predictions
   on the established five folds, explicit selection-conditioned provenance, seven canonical
   long-form CSV tables, and a seven-page report reconstructed only after rereading those tables.

@@ -212,7 +212,9 @@ contribution plots, and theoretical outlier thresholds require separate decision
 
 ## Artifact contract
 
-For real-data post-analysis, CSV is canonical and PDF is a derived view. The example writes numeric
+For real-data post-analysis, CSV is canonical and PDF is a derived view. Physical predictor
+coordinates are caller-owned metadata read during example input handling and passed explicitly to
+the report renderer; they are not inferred by `pipls.plotting`. The example writes numeric
 tables, reads them back, and constructs the report from those reread tables.
 
 Prediction tables use long form and retain at least:
@@ -279,7 +281,7 @@ The accepted order after Decision 0042 is:
 2. Pi-PLS plotting and a fast synthetic inspection example — **complete**;
 3. ordinary PLS scores, loadings, and coefficient analysis — **complete**;
 4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **complete**;
-5. Sugarcane spectral analysis — **next**;
-6. Tobacco pagination and observation diagnostics;
+5. Sugarcane spectral analysis with an explicit wavelength axis — **complete**;
+6. Tobacco pagination and observation diagnostics — **next**;
 7. Pulp biplot and final cross-dataset review;
 8. return to product documentation and release hardening.

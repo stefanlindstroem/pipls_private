@@ -176,3 +176,68 @@ def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
     assert "POST_ANALYSIS_PDF" in text
     assert 'prediction_kind="fitted values"' not in text
     assert "subprocess" not in text
+
+
+def test_post_analysis_report_supports_an_explicit_physical_predictor_axis(
+    tmp_path: Path,
+) -> None:
+    X, Y = _example_data()
+    pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
+    pls_model = PLSRegression(n_components=2, scale=True).fit(X, Y)
+    diagnostics = prediction_diagnostics(
+        Y,
+        pls_model.predict(X),
+        prediction_kind="fixed-parameter OOF predictions",
+    )
+    wavelength_labels = [str(value) for value in np.linspace(780, 2500, X.shape[1])]
+    tables = ARTIFACTS.build_post_analysis_tables(
+        factors=pipls_display_factors(pipls_model.decomposition_),
+        diagnostics_by_model={"PLS": diagnostics},
+        pls_structure=pls_latent_structure(pls_model),
+        predictor_names=wavelength_labels,
+        response_names=Y.columns.tolist(),
+        sample_names=[str(index) for index in range(1, len(X) + 1)],
+        fold_index=np.repeat(np.arange(1, 6), 6),
+    )
+    ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
+
+    pdf_path = tmp_path / "spectral_post_analysis.pdf"
+    ARTIFACTS.render_post_analysis_report(
+        tmp_path,
+        pdf_path,
+        dataset_name="Synthetic spectra",
+        predictor_style="line",
+        predictor_axis=np.linspace(780.0, 2500.0, X.shape[1]),
+        predictor_axis_label="Wavelength (nm)",
+        pls_score_components=(1, 2),
+        pls_loading_components=(1, 2),
+        coefficient_responses=("Response A", "Response B"),
+    )
+
+    assert pdf_path.read_bytes().startswith(b"%PDF")
+    assert pdf_path.stat().st_size > 5_000
+
+
+def test_sugarcane_example_contains_complete_spectral_post_analysis() -> None:
+    text = (_repository_root() / "examples" / "11_sugarcane_real_data.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "CHOSEN_N_COMPONENTS = 2" in text
+    assert "CHOSEN_PLS_N_COMPONENTS = 4" in text
+    assert "PLS_SCORE_COMPONENTS = (1, 2)" in text
+    assert "PLS_LOADING_COMPONENTS = (1, 2, 3, 4)" in text
+    assert 'COEFFICIENT_RESPONSES = ("TS", "CP", "ADF", "IVOMD")' in text
+    assert "predictor_names = X.columns.astype(str).tolist()" in text
+    assert "response_names = Y.columns.astype(str).tolist()" in text
+    assert "wavelength_nm = X.columns.to_numpy(dtype=np.float64)" in text
+    assert 'predictor_style="line"' in text
+    assert 'predictor_axis_label="Wavelength (nm)"' in text
+    assert "fixed_model_oof_predictions(" in text
+    assert 'prediction_kind = "selection-conditioned OOF predictions"' in text
+    assert "build_post_analysis_tables(" in text
+    assert "write_post_analysis_tables(" in text
+    assert "render_post_analysis_report(" in text
+    assert "POST_ANALYSIS_DIR" in text
+    assert "POST_ANALYSIS_PDF" in text
+    assert "subprocess" not in text

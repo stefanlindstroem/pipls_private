@@ -1,12 +1,26 @@
-"""Compare Sugarcane Pi-PLS and PLS paths, then fit one Pi-PLS model."""
+"""Compare Sugarcane component paths and export one spectral post-analysis."""
 
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
+from fixed_model_oof import fixed_model_oof_predictions
 from plot_component_path import plot_component_path
 from pls_component_path import evaluate_pls_component_path
+from post_analysis_artifacts import (
+    build_post_analysis_tables,
+    render_post_analysis_report,
+    write_post_analysis_tables,
+)
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import KFold
 
 from pipls import PiPLSPathCV, PiPLSRegression
+from pipls.inspection import (
+    pipls_display_factors,
+    pls_latent_structure,
+    prediction_diagnostics,
+)
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = REPOSITORY_ROOT / "datasets" / "sugarcane"
@@ -14,12 +28,25 @@ RESULTS_DIR = Path(__file__).resolve().parent / "results"
 COMPONENT_PATH_CSV = RESULTS_DIR / "sugarcane_component_path.csv"
 PLS_COMPONENT_PATH_CSV = RESULTS_DIR / "sugarcane_pls_component_path.csv"
 COMPONENT_PATH_PDF = RESULTS_DIR / "sugarcane_component_path.pdf"
+POST_ANALYSIS_DIR = RESULTS_DIR / "sugarcane_post_analysis"
+POST_ANALYSIS_PDF = POST_ANALYSIS_DIR / "post_analysis.pdf"
 
-# Choose this value after inspecting the generated CSV or PDF.
+# Choose these values after inspecting the generated path CSV or PDF.
 CHOSEN_N_COMPONENTS = 2
+CHOSEN_PLS_N_COMPONENTS = 4
+PLS_SCORE_COMPONENTS = (1, 2)
+PLS_LOADING_COMPONENTS = (1, 2, 3, 4)
+COEFFICIENT_RESPONSES = ("TS", "CP", "ADF", "IVOMD")
+N_SPLITS = 5
 
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
+predictor_names = X.columns.astype(str).tolist()
+response_names = Y.columns.astype(str).tolist()
+wavelength_nm = X.columns.to_numpy(dtype=np.float64)
+if not np.all(np.diff(wavelength_nm) > 0.0):
+    raise ValueError("Sugarcane predictor headers must be strictly increasing wavelengths.")
+sample_names = [str(index) for index in range(1, len(X) + 1)]
 
 # Stage 1: evaluate the component paths and write the canonical CSV files.
 path_search = PiPLSPathCV(refit=False).fit(X, Y)
@@ -37,20 +64,82 @@ plot_component_path(
     title="Sugarcane component-path comparison",
 )
 
-# Stage 2: read the chosen Pi-PLS row and fit that fixed parameter pair.
+# Stage 2: read the chosen rows and fit fixed full-data models for interpretation.
 component_path = pd.read_csv(COMPONENT_PATH_CSV).set_index("n_components")
 chosen_predictor_rank = int(component_path.loc[CHOSEN_N_COMPONENTS, "predictor_rank"])
-model = PiPLSRegression(
+pipls_model = PiPLSRegression(
     n_components=CHOSEN_N_COMPONENTS,
     predictor_rank=chosen_predictor_rank,
 ).fit(X, Y)
+pls_model = PLSRegression(
+    n_components=CHOSEN_PLS_N_COMPONENTS,
+    scale=True,
+).fit(X, Y)
+
+# Stage 3: generate fixed-parameter OOF predictions and canonical post-analysis tables.
+splitter = KFold(n_splits=N_SPLITS, shuffle=False)
+pipls_oof = fixed_model_oof_predictions(
+    PiPLSRegression(
+        n_components=CHOSEN_N_COMPONENTS,
+        predictor_rank=chosen_predictor_rank,
+    ),
+    X,
+    Y,
+    splitter=splitter,
+)
+pls_oof = fixed_model_oof_predictions(
+    PLSRegression(n_components=CHOSEN_PLS_N_COMPONENTS, scale=True),
+    X,
+    Y,
+    splitter=splitter,
+)
+if not np.array_equal(pipls_oof.fold_index, pls_oof.fold_index):
+    raise RuntimeError("Pi-PLS and PLS OOF predictions must use identical folds.")
+
+prediction_kind = "selection-conditioned OOF predictions"
+pipls_diagnostics = prediction_diagnostics(
+    Y,
+    pipls_oof.predictions,
+    prediction_kind=prediction_kind,
+)
+pls_diagnostics = prediction_diagnostics(
+    Y,
+    pls_oof.predictions,
+    prediction_kind=prediction_kind,
+)
+tables = build_post_analysis_tables(
+    factors=pipls_display_factors(pipls_model.decomposition_),
+    diagnostics_by_model={"Pi-PLS": pipls_diagnostics, "PLS": pls_diagnostics},
+    pls_structure=pls_latent_structure(pls_model),
+    predictor_names=predictor_names,
+    response_names=response_names,
+    sample_names=sample_names,
+    fold_index=pipls_oof.fold_index,
+)
+written_tables = write_post_analysis_tables(POST_ANALYSIS_DIR, tables)
+render_post_analysis_report(
+    POST_ANALYSIS_DIR,
+    POST_ANALYSIS_PDF,
+    dataset_name="Sugarcane",
+    predictor_style="line",
+    predictor_axis=wavelength_nm,
+    predictor_axis_label="Wavelength (nm)",
+    pls_score_components=PLS_SCORE_COMPONENTS,
+    pls_loading_components=PLS_LOADING_COMPONENTS,
+    coefficient_responses=COEFFICIENT_RESPONSES,
+)
 
 print(f"X shape: {X.shape}")
 print(f"Y shape: {Y.shape}")
+print(f"wavelength range: {wavelength_nm[0]:.0f}-{wavelength_nm[-1]:.0f} nm")
 print(f"Pi-PLS component-path CSV: {COMPONENT_PATH_CSV}")
 print(f"PLS component-path CSV: {PLS_COMPONENT_PATH_CSV}")
 print(f"comparison PDF: {COMPONENT_PATH_PDF}")
 print(
     "fixed final Pi-PLS parameters: "
-    f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
+    f"n_components={pipls_model.n_components}, predictor_rank={pipls_model.predictor_rank_}"
 )
+print(f"fixed final PLS components: {CHOSEN_PLS_N_COMPONENTS}")
+for table_name, table_path in written_tables.items():
+    print(f"{table_name} CSV: {table_path}")
+print(f"post-analysis PDF: {POST_ANALYSIS_PDF}")

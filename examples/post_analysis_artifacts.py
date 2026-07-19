@@ -9,6 +9,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
+from numpy.typing import ArrayLike
 
 from pipls.inspection import (
     PiPLSDisplayFactors,
@@ -17,6 +18,7 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 from pipls.plotting import (
+    PredictorStyle,
     plot_pipls_decomposition,
     plot_pls_coefficients,
     plot_pls_scores,
@@ -245,6 +247,9 @@ def render_post_analysis_report(
     pdf_path: Path,
     *,
     dataset_name: str,
+    predictor_style: PredictorStyle = "bar",
+    predictor_axis: ArrayLike | None = None,
+    predictor_axis_label: str | None = None,
     pls_score_components: Sequence[int],
     pls_loading_components: Sequence[int],
     coefficient_responses: Sequence[object],
@@ -289,9 +294,11 @@ def render_post_analysis_report(
     with PdfPages(pdf_path) as report:
         figure, _ = plot_pipls_decomposition(
             factors,
-            predictor_style="bar",
+            predictor_style=predictor_style,
             predictor_names=predictor_names,
             response_names=response_names,
+            predictor_axis=predictor_axis,
+            predictor_axis_label=predictor_axis_label,
             title=f"{dataset_name} Pi-PLS decomposition",
         )
         report.savefig(figure)
@@ -316,8 +323,10 @@ def render_post_analysis_report(
 
         figure, _ = plot_pls_x_loadings(
             pls_structure,
-            predictor_style="bar",
+            predictor_style=predictor_style,
             predictor_names=predictor_names,
+            predictor_axis=predictor_axis,
+            predictor_axis_label=predictor_axis_label,
             components=loading_components,
             title=f"{dataset_name} ordinary PLS X loadings",
         )
@@ -335,9 +344,11 @@ def render_post_analysis_report(
 
         figure, _ = plot_pls_coefficients(
             pls_structure,
-            predictor_style="bar",
+            predictor_style=predictor_style,
             predictor_names=predictor_names,
             response_names=response_names,
+            predictor_axis=predictor_axis,
+            predictor_axis_label=predictor_axis_label,
             responses=selected_responses,
             title=f"{dataset_name} ordinary PLS coefficients",
         )
@@ -346,8 +357,10 @@ def render_post_analysis_report(
 
 
 def _read_table(path: Path, *, name: str) -> pd.DataFrame:
-    table = pd.read_csv(path, dtype={"sample": str})
     expected = TABLE_COLUMNS[name]
+    identifier_columns = {"model", "sample", "response", "predictor", "prediction_kind"}
+    dtypes = {column: str for column in expected if column in identifier_columns}
+    table = pd.read_csv(path, dtype=dtypes)
     if tuple(table.columns) != expected:
         raise ValueError(f"{path.name} columns must be {expected!r}.")
     if table.empty:
