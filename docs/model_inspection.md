@@ -9,11 +9,13 @@ Import these names from the submodule:
 
 ```python
 from pipls.inspection import (
+    PLSBiplotCoordinates,
     PLSLatentStructure,
     PLSObservationDiagnostics,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     pipls_display_factors,
+    pls_biplot_coordinates,
     pls_latent_structure,
     pls_observation_diagnostics,
     prediction_diagnostics,
@@ -143,6 +145,40 @@ The arrays are defensive read-only copies. No scores, loadings, or coefficients 
 rescaled, or sign-adjusted by `pipls`. These quantities describe the fitted ordinary PLS model and
 are not validation results.
 
+
+## Ordinary PLS score-loading biplot
+
+`pls_biplot_coordinates()` constructs a two-component score-loading biplot from an existing
+`PLSLatentStructure`. For selected score and X-loading columns $t_k$ and $p_k$, it uses
+
+\begin{equation}
+a_k=\sqrt{\frac{\lVert p_k\rVert_2}{\lVert t_k\rVert_2}},\qquad
+\tilde t_k=a_kt_k,\qquad
+\tilde p_k=\frac{p_k}{a_k}.
+\end{equation}
+
+The scaling balances the Euclidean norms and preserves the selected reconstruction:
+
+\begin{equation}
+\tilde T\tilde P^\mathsf{T}=T_{\mathcal K}P_{\mathcal K}^\mathsf{T}.
+\end{equation}
+
+```python
+from pipls.inspection import pls_biplot_coordinates
+from pipls.plotting import plot_pls_biplot
+
+coordinates = pls_biplot_coordinates(pls_structure, components=(0, 1))
+figure, axes = plot_pls_biplot(
+    coordinates,
+    predictor_names=predictor_names,
+)
+```
+
+The figure shows sample coordinates and X-variable arrows only. It does not add Y-variable arrows,
+confidence regions, inferred groups, or automatic importance claims. The maintained demonstration is
+restricted to Pulp, where fourteen predictor arrows remain readable. Sugarcane and Tobacco do not
+generate biplots because their spectral predictor counts make such a display unsuitable.
+
 ## Ordinary PLS observation diagnostics
 
 `pls_observation_diagnostics()` accepts a fitted `PLSRegression` and explicit predictor observations:
@@ -222,6 +258,7 @@ The plotting names remain in their own submodule:
 ```python
 from pipls.plotting import (
     plot_pipls_decomposition,
+    plot_pls_biplot,
     plot_pls_coefficients,
     plot_pls_observation_diagnostics,
     plot_pls_scores,
@@ -346,7 +383,7 @@ package inspection and plotting APIs together with example-owned I/O. It derives
 response names visibly from the Pulp CSV headers, reads fixed component choices from the canonical
 path artifacts, and clones those fixed estimators
 inside the same five non-shuffled folds, writes seven long-form CSV files under
-`examples/results/pulp_post_analysis/`, rereads them, and constructs one seven-page PDF. The OOF
+`examples/results/pulp_post_analysis/`, rereads them, and constructs one eight-page PDF, including the Pulp biplot. The OOF
 predictions are labeled `selection-conditioned OOF predictions` because the fixed parameters were
 chosen after examining paths computed from the same observations.
 
@@ -368,6 +405,8 @@ the strictly decreasing wavenumber coordinate read from the `X.csv` headers and 
 predictor directions, ordinary PLS X loadings, and response-specific coefficient curves. All
 thirteen response headers are partitioned into deterministic source-order pages of at most five
 responses; the report renderer rejects pagination that omits, duplicates, or reorders a response.
+The Pulp report derives its biplot from the canonical `pls_scores.csv` and `pls_x_loadings.csv`; no additional biplot table is required.
+
 Tobacco writes the seven common post-analysis tables plus
 `pls_observation_diagnostics.csv`, whose columns are `sample`, `score_distance`, and
 `x_reconstruction_residual`. The report plots these raw values without theoretical outlier limits.

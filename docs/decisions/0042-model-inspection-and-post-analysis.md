@@ -4,7 +4,7 @@
 
 Accepted. The Pi-PLS and ordinary PLS numerical and plotting foundations are implemented. Pulp,
 Sugarcane, and Tobacco are complete real-data post-analysis integrations. The low-dimensional Pulp
-biplot and final cross-dataset review remain staged.
+biplot and final cross-dataset review are completed by Decision 0043.
 
 ## Context
 
@@ -181,7 +181,7 @@ Implementation proceeds as a series of small patches:
    Pulp — complete;
 5. Sugarcane spectral line analysis — complete;
 6. Tobacco pagination and observation diagnostics — complete;
-7. the Pulp biplot and a final cross-dataset analysis-surface review — next.
+7. the Pulp biplot and a final cross-dataset analysis-surface review — completed by Decision 0043.
 
 The temporary standalone `09_model_inspection.py` demonstration was removed after the complete
 Pulp, Sugarcane, and Tobacco workflows superseded it. The reusable package APIs remain documented

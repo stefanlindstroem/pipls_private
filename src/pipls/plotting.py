@@ -10,6 +10,7 @@ from numpy.typing import ArrayLike, NDArray
 
 from .inspection import (
     PiPLSDisplayFactors,
+    PLSBiplotCoordinates,
     PLSLatentStructure,
     PLSObservationDiagnostics,
     PredictionDiagnostics,
@@ -24,6 +25,7 @@ PredictorStyle: TypeAlias = Literal["bar", "line"]
 
 __all__ = [
     "PredictorStyle",
+    "plot_pls_biplot",
     "plot_pls_coefficients",
     "plot_pls_observation_diagnostics",
     "plot_pls_scores",
@@ -32,6 +34,88 @@ __all__ = [
     "plot_pipls_decomposition",
     "plot_prediction_diagnostics",
 ]
+
+
+def plot_pls_biplot(
+    coordinates: PLSBiplotCoordinates,
+    *,
+    predictor_names: Sequence[object],
+    sample_names: Sequence[object] | None = None,
+    title: str = "PLS score-loading biplot",
+    figsize: tuple[float, float] = (8.0, 6.5),
+) -> tuple[Figure, dict[str, Axes]]:
+    """Plot balanced sample scores and predictor-loading arrows.
+
+    The coordinate scaling is calculated separately by
+    :func:`pipls.inspection.pls_biplot_coordinates`. This figure adds no
+    response arrows, confidence regions, grouping, or automatic labels.
+    """
+
+    if not isinstance(coordinates, PLSBiplotCoordinates):
+        raise TypeError("coordinates must be a PLSBiplotCoordinates instance.")
+    predictor_labels = _categorical_labels(
+        predictor_names,
+        size=coordinates.n_features,
+        argument_name="predictor_names",
+        required=True,
+    )
+    assert predictor_labels is not None
+    sample_labels = _optional_labels(
+        sample_names,
+        size=coordinates.n_samples,
+        argument_name="sample_names",
+    )
+
+    plt = _pyplot()
+    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    axis.scatter(
+        coordinates.sample_coordinates[:, 0],
+        coordinates.sample_coordinates[:, 1],
+        alpha=0.75,
+        label="Samples",
+    )
+    if sample_labels is not None:
+        for row, label in enumerate(sample_labels):
+            axis.annotate(
+                label,
+                (
+                    coordinates.sample_coordinates[row, 0],
+                    coordinates.sample_coordinates[row, 1],
+                ),
+            )
+
+    from matplotlib.patches import FancyArrowPatch
+
+    for row, label in enumerate(predictor_labels):
+        endpoint = coordinates.predictor_coordinates[row, :]
+        axis.add_patch(
+            FancyArrowPatch(
+                (0.0, 0.0),
+                (float(endpoint[0]), float(endpoint[1])),
+                arrowstyle="->",
+                mutation_scale=10.0,
+                linewidth=1.0,
+            )
+        )
+        axis.annotate(
+            label,
+            (endpoint[0], endpoint[1]),
+            xytext=(3.0 if endpoint[0] >= 0.0 else -3.0, 3.0 if endpoint[1] >= 0.0 else -3.0),
+            textcoords="offset points",
+            horizontalalignment="left" if endpoint[0] >= 0.0 else "right",
+            verticalalignment="bottom" if endpoint[1] >= 0.0 else "top",
+            fontsize="small",
+        )
+
+    first, second = (int(value) for value in coordinates.component_indices)
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xlabel(f"Balanced component {first + 1}")
+    axis.set_ylabel(f"Balanced component {second + 1}")
+    axis.set_title(title)
+    axis.legend()
+    axis.set_aspect("equal", adjustable="datalim")
+    return figure, {"biplot": axis}
 
 
 def plot_pls_observation_diagnostics(
@@ -545,6 +629,24 @@ def _predictor_coordinate(
         raise ValueError("predictor_axis must contain only finite values.")
     coordinate.setflags(write=False)
     return coordinate
+
+
+def _optional_labels(
+    values: Sequence[object] | None,
+    *,
+    size: int,
+    argument_name: str,
+) -> tuple[str, ...] | None:
+    if values is None:
+        return None
+    labels = tuple(str(value) for value in values)
+    if len(labels) != size:
+        raise ValueError(
+            f"Expected {size} labels in {argument_name}, got {len(labels)}."
+        )
+    if any(not label.strip() for label in labels):
+        raise ValueError(f"{argument_name} must contain only nonempty labels.")
+    return labels
 
 
 def _categorical_labels(

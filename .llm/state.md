@@ -120,7 +120,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | package inspection and plotting are implemented; Pulp, Sugarcane, and Tobacco have canonical OOF and post-analysis artifacts; the Pulp biplot remains staged |
+| Model inspection | package inspection and plotting are implemented; Pulp, Sugarcane, and Tobacco have canonical OOF and post-analysis artifacts; the Pulp biplot and cross-dataset review are complete |
 
 Additional fixed decisions:
 
@@ -248,9 +248,7 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add the Pulp score-loading biplot with one explicit reconstruction-preserving scaling, then perform
-the final cross-dataset analysis-surface review. Keep the biplot restricted to the readable
-low-dimensional Pulp predictors and do not add spectral biplots or unrelated advanced diagnostics.
+Proceed to product documentation and release hardening. The fitted-model analysis series is complete; do not add further PLS diagnostics without a separate decision.
 
 ## Subsequent roadmap
 
@@ -263,8 +261,8 @@ low-dimensional Pulp predictors and do not add spectral biplots or unrelated adv
 5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays — complete.
 6. **Tobacco analysis:** deterministic response pagination and raw PLS observation
    diagnostics — complete.
-7. **Pulp biplot and cross-dataset review:** one explicit reconstruction-preserving scaling and
-   aligned artifact contracts — next.
+7. **Pulp biplot and cross-dataset review:** complete with balanced score-loading coordinates and
+   aligned artifact contracts.
 8. **User documentation and release hardening:** buildable user guide, API reference, compatibility
    policy, packaging checks, and versioned releases.
 

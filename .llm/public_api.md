@@ -162,12 +162,14 @@ Decision 0042 accepts two public submodules for staged implementation:
 
 ```python
 from pipls.inspection import (
+    PLSBiplotCoordinates,
     PLSLatentStructure,
     PLSObservationDiagnostics,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     PredictionKind,
     pipls_display_factors,
+    pls_biplot_coordinates,
     pls_latent_structure,
     pls_observation_diagnostics,
     prediction_diagnostics,
@@ -196,12 +198,16 @@ It calculates squared score distance relative to the fitted training-score covar
 row-wise squared X-reconstruction residual from the public transform/inverse-transform round trip.
 The result contains read-only raw arrays and no theoretical probability limits.
 
+`pls_biplot_coordinates()` accepts a `PLSLatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
+$TP^\mathsf{T}$ reconstruction.
+
 `pipls.plotting` is implemented and exports from its own namespace:
 
 ```python
 from pipls.plotting import (
     PredictorStyle,
     plot_pipls_decomposition,
+    plot_pls_biplot,
     plot_pls_coefficients,
     plot_pls_observation_diagnostics,
     plot_pls_scores,
@@ -223,7 +229,9 @@ exactly two selected X-score columns. X and Y loadings place selected components
 axis; coefficient plots place selected responses together on one axis. Categorical displays require
 caller-supplied variable names, while line displays require an explicit physical coordinate and axis
 label. Components and responses are selected by explicit zero-based indices.
-`plot_pls_observation_diagnostics()` renders one raw score-distance versus X-reconstruction-residual
+`plot_pls_biplot()` renders balanced sample scores with named X-loading arrows and no response
+arrows or confidence regions. `plot_pls_observation_diagnostics()` renders one raw score-distance
+versus X-reconstruction-residual
 scatter plot without theoretical limits or automatic observation labels.
 
 Matplotlib remains optional and is imported only when a plotting function is called. The functions

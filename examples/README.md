@@ -7,7 +7,7 @@ or publication-result workflows.
 - `08_synthetic_data.py`: deterministic train/test generation with shared latent structure.
 - `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, fixed
   full-data interpretation models, selection-conditioned OOF predictions, seven canonical
-  post-analysis CSV files, and a multipage report reconstructed from them.
+  post-analysis CSV files, a balanced two-component score-loading biplot, and a multipage report reconstructed from them.
 - `11_sugarcane_real_data.py`: direct pandas reading, Pi-PLS and standard PLS paths, fixed
   interpretation models, selection-conditioned OOF predictions, seven canonical post-analysis
   CSV files, and a wavelength-aware report reconstructed from them.
@@ -61,7 +61,7 @@ inside the same five non-shuffled folds, producing `selection-conditioned OOF pr
 example writes seven common long-form CSV files under its dataset-specific post-analysis directory,
 then rereads those files to generate `post_analysis.pdf`. Full-data decomposition, score, loading,
 and coefficient tables remain interpretation artifacts; OOF rows remain prediction diagnostics.
-Sugarcane reads the strictly increasing 780--2500 nm coordinate from the `X.csv` headers. Tobacco
+The Pulp biplot is reconstructed from `pls_scores.csv` and `pls_x_loadings.csv`; it does not require another artifact table. Sugarcane reads the strictly increasing 780--2500 nm coordinate from the `X.csv` headers. Tobacco
 preserves its strictly decreasing wavenumber coordinate, partitions all thirteen responses into
 source-ordered pages of at most five responses, and adds `pls_observation_diagnostics.csv` with raw
 score-distance and X-reconstruction-residual values. Theoretical outlier limits are not added.
@@ -78,7 +78,7 @@ only to Pi-PLS. Generated files under `examples/results/` are ignored by Git.
 Decision 0042 adds a third, separately implemented stage for post-fit analysis. The existing
 `pls_component_path.py` and `plot_component_path.py` remain selection-diagnostic helpers. Reusable
 Pi-PLS and ordinary PLS computations belong in `pipls.inspection`. `pipls.plotting` now renders
-Pi-PLS decomposition and prediction-diagnostic figures together with ordinary PLS score, X- and
+Pi-PLS decomposition and prediction-diagnostic figures together with ordinary PLS score, balanced biplot, X- and
 Y-loading, coefficient, and raw observation-diagnostic figures from immutable results.
 Dataset-specific fixed-model OOF loops, pandas tables, CSV writing, physical axes, pagination, and
 multipage reports remain example-local.

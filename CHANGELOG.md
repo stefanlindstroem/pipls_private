@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Complete the fitted-model analysis series with balanced reconstruction-preserving ordinary PLS biplot coordinates, a Pulp-only score-loading biplot reconstructed from canonical score/loading tables, and a final cross-dataset API and artifact review.
+
 - Complete the Tobacco post-analysis workflow with decreasing-wavenumber spectral displays,
   selection-conditioned Pi-PLS and ordinary PLS OOF predictions, deterministic source-order
   response pagination, an optional eighth canonical CSV for raw PLS score-distance and

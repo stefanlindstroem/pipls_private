@@ -80,6 +80,7 @@ def test_plotting_names_are_submodule_exports_only() -> None:
     expected = {
         "PredictorStyle",
         "plot_pipls_decomposition",
+        "plot_pls_biplot",
         "plot_pls_coefficients",
         "plot_pls_observation_diagnostics",
         "plot_pls_scores",

@@ -443,10 +443,10 @@ Acceptance conditions:
 
 Implementation order is pure inspection primitives, Pi-PLS plotting, basic ordinary PLS analysis,
 Pulp artifact integration, Sugarcane spectral integration, Tobacco pagination and observation
-diagnostics, then the Pulp biplot and cross-dataset review.
+diagnostics, followed by the Pulp biplot and cross-dataset review.
 
 Current status: **Pi-PLS and ordinary PLS foundations complete; Pulp, Sugarcane, and Tobacco
-real-data integrations complete; the Pulp biplot and cross-dataset review remain pending**.
+real-data integrations, the Pulp biplot, and the cross-dataset review complete**.
 
 ### Product documentation and release hardening
 
@@ -454,7 +454,7 @@ Build a user-oriented documentation surface, API reference, compatibility policy
 build checks, licensing audit, release notes, and versioned releases. These are continuing software
 product responsibilities rather than the final steps of one publication.
 
-Current status: **planned after Phase F2**.
+Current status: **next; Phase F2 is complete**.
 
 ### Current standardization and deferred block-aware variants
 
@@ -476,9 +476,7 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the Pulp score-loading biplot with one explicit reconstruction-preserving scaling and
-complete the final cross-dataset analysis-surface review. Keep the biplot restricted to the
-low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds, VIP,
+Proceed to product documentation and release hardening. Keep the completed biplot restricted to the low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds, VIP,
 or other deferred diagnostics.
 
 ## Maintenance protocol

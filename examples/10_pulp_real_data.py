@@ -35,6 +35,7 @@ POST_ANALYSIS_PDF = POST_ANALYSIS_DIR / "post_analysis.pdf"
 CHOSEN_N_COMPONENTS = 3
 CHOSEN_PLS_N_COMPONENTS = 8
 PLS_SCORE_COMPONENTS = (1, 2)
+PLS_BIPLOT_COMPONENTS = (1, 2)
 PLS_LOADING_COMPONENTS = (1, 2, 3)
 COEFFICIENT_RESPONSES = ("CSF", "Density", "TI")
 N_SPLITS = 5
@@ -119,6 +120,7 @@ render_post_analysis_report(
     POST_ANALYSIS_PDF,
     dataset_name="Pulp",
     pls_score_components=PLS_SCORE_COMPONENTS,
+    pls_biplot_components=PLS_BIPLOT_COMPONENTS,
     pls_loading_components=PLS_LOADING_COMPONENTS,
     coefficient_responses=COEFFICIENT_RESPONSES,
 )

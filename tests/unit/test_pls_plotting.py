@@ -12,6 +12,7 @@ from sklearn.cross_decomposition import PLSRegression
 import pipls.plotting as plotting
 from pipls.inspection import (
     PLSLatentStructure,
+    pls_biplot_coordinates,
     pls_latent_structure,
     pls_observation_diagnostics,
 )
@@ -256,3 +257,55 @@ def test_pls_plotting_rejects_invalid_arguments(
 ) -> None:
     with pytest.raises(ValueError, match=message):
         call()
+
+
+def test_plot_pls_biplot_uses_balanced_coordinates_and_predictor_labels() -> None:
+    structure = _structure()
+    coordinates = pls_biplot_coordinates(structure, components=(0, 1))
+
+    figure, axes = plotting.plot_pls_biplot(
+        coordinates,
+        predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
+        title="Pulp-like PLS biplot",
+    )
+
+    assert isinstance(figure, Figure)
+    assert set(axes) == {"biplot"}
+    axis = axes["biplot"]
+    assert axis.get_xlabel() == "Balanced component 1"
+    assert axis.get_ylabel() == "Balanced component 2"
+    assert axis.get_title() == "Pulp-like PLS biplot"
+    assert len(axis.collections) == 1
+    assert [text.get_text() for text in axis.texts] == [
+        "Temperature",
+        "Pressure",
+        "Flow",
+        "Density",
+        "Viscosity",
+    ]
+
+
+def test_plot_pls_biplot_accepts_optional_sample_labels() -> None:
+    structure = _structure()
+    coordinates = pls_biplot_coordinates(structure)
+    sample_names = [f"Sample {index + 1}" for index in range(structure.n_samples)]
+
+    _, axes = plotting.plot_pls_biplot(
+        coordinates,
+        predictor_names=["A", "B", "C", "D", "E"],
+        sample_names=sample_names,
+    )
+
+    texts = [text.get_text() for text in axes["biplot"].texts]
+    assert texts[: structure.n_samples] == sample_names
+    assert texts[structure.n_samples :] == ["A", "B", "C", "D", "E"]
+
+
+def test_plot_pls_biplot_requires_predictor_names() -> None:
+    coordinates = pls_biplot_coordinates(_structure())
+
+    with pytest.raises(ValueError, match="Expected 5"):
+        plotting.plot_pls_biplot(
+            coordinates,
+            predictor_names=["A"],
+        )

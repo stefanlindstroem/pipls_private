@@ -66,9 +66,8 @@ Implemented responsibilities are:
 - canonical Pi-PLS display factors;
 - standardized prediction diagnostics;
 - ordinary PLS latent-structure extraction;
-- ordinary PLS observation diagnostics.
-
-Mathematically defined biplot coordinates remain the next planned inspection addition.
+- ordinary PLS observation diagnostics;
+- balanced two-component ordinary PLS biplot coordinates.
 
 ### `pipls.plotting`
 
@@ -197,7 +196,8 @@ recomputing or sign-adjusting them. Coefficients retain the scikit-learn orienta
 - X loadings;
 - Y loadings;
 - response-specific regression coefficients;
-- raw score distance and X reconstruction residual for observation diagnostics.
+- raw score distance and X reconstruction residual for observation diagnostics;
+- a two-component X score-loading biplot with balanced reconstruction-preserving scaling.
 
 Component and response subsets are explicit function arguments. Selected X or Y loading components
 share one axis, using grouped bars for named categorical variables or overlaid lines for a physical
@@ -223,7 +223,11 @@ transform/inverse-transform round trip. These are descriptive raw quantities. Do
 theoretical probability limits, automatic outlier labels, or contribution plots without a separate
 decision.
 
-Biplot coordinate scaling must state and test the reconstruction identity it preserves.
+For selected $t_k$ and $p_k$, the biplot uses
+$a_k=\sqrt{\lVert p_k\rVert_2/\lVert t_k\rVert_2}$,
+$\tilde t_k=a_kt_k$, and $\tilde p_k=p_k/a_k$. Tests must preserve
+$\tilde T\tilde P^\mathsf{T}=T_{\mathcal K}P_{\mathcal K}^\mathsf{T}$ and equal component-wise
+score/loading norms. The biplot is enabled only for Pulp.
 
 VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation tests,
 contribution plots, and theoretical outlier thresholds require separate decisions.
@@ -306,5 +310,5 @@ The accepted order after Decision 0042 is:
 4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **complete**;
 5. Sugarcane spectral analysis with an explicit wavelength axis — **complete**;
 6. Tobacco pagination and observation diagnostics — **complete**;
-7. Pulp biplot and final cross-dataset review — **next**;
-8. return to product documentation and release hardening.
+7. Pulp biplot and final cross-dataset review — **complete**;
+8. return to product documentation and release hardening — **next**.

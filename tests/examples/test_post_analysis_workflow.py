@@ -155,6 +155,7 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
         pdf_path,
         dataset_name="Synthetic",
         pls_score_components=(1, 2),
+        pls_biplot_components=(1, 2),
         pls_loading_components=(1, 2),
         coefficient_responses=("Response A",),
     )
@@ -170,6 +171,7 @@ def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
     assert "CHOSEN_N_COMPONENTS = 3" in text
     assert "CHOSEN_PLS_N_COMPONENTS = 8" in text
     assert "PLS_SCORE_COMPONENTS = (1, 2)" in text
+    assert "PLS_BIPLOT_COMPONENTS = (1, 2)" in text
     assert "PLS_LOADING_COMPONENTS = (1, 2, 3)" in text
     assert "predictor_names = X.columns.astype(str).tolist()" in text
     assert "response_names = Y.columns.astype(str).tolist()" in text
@@ -178,6 +180,7 @@ def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
+    assert "pls_biplot_components=PLS_BIPLOT_COMPONENTS" in text
     assert "POST_ANALYSIS_DIR" in text
     assert "POST_ANALYSIS_PDF" in text
     assert 'prediction_kind="fitted values"' not in text
@@ -321,6 +324,7 @@ def test_sugarcane_example_contains_complete_spectral_post_analysis() -> None:
     assert "render_post_analysis_report(" in text
     assert "POST_ANALYSIS_DIR" in text
     assert "POST_ANALYSIS_PDF" in text
+    assert "pls_biplot_components" not in text
     assert "subprocess" not in text
 
 
@@ -349,4 +353,5 @@ def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     assert "render_post_analysis_report(" in text
     assert "POST_ANALYSIS_DIR" in text
     assert "POST_ANALYSIS_PDF" in text
+    assert "pls_biplot_components" not in text
     assert "subprocess" not in text

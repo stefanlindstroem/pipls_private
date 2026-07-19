@@ -6,8 +6,10 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 
 from pipls.inspection import (
+    PLSBiplotCoordinates,
     PLSLatentStructure,
     PLSObservationDiagnostics,
+    pls_biplot_coordinates,
     pls_latent_structure,
     pls_observation_diagnostics,
 )
@@ -164,3 +166,68 @@ def test_pls_observation_diagnostics_rejects_wrong_feature_count() -> None:
 def test_pls_observation_diagnostics_rejects_unfitted_estimator() -> None:
     with pytest.raises(NotFittedError):
         pls_observation_diagnostics(PLSRegression(n_components=2), np.ones((4, 3)))
+
+
+def test_pls_biplot_coordinates_preserve_selected_reconstruction_and_balance_norms() -> None:
+    model = _fitted_pls()
+    structure = pls_latent_structure(model)
+    scores_before = structure.x_scores.copy()
+    loadings_before = structure.x_loadings.copy()
+
+    coordinates = pls_biplot_coordinates(structure, components=(0, 2))
+
+    assert isinstance(coordinates, PLSBiplotCoordinates)
+    expected = structure.x_scores[:, [0, 2]] @ structure.x_loadings[:, [0, 2]].T
+    reconstructed = coordinates.sample_coordinates @ coordinates.predictor_coordinates.T
+    np.testing.assert_allclose(reconstructed, expected)
+    np.testing.assert_allclose(
+        np.linalg.norm(coordinates.sample_coordinates, axis=0),
+        np.linalg.norm(coordinates.predictor_coordinates, axis=0),
+    )
+    np.testing.assert_array_equal(coordinates.component_indices, np.array([0, 2]))
+    assert coordinates.n_samples == structure.n_samples
+    assert coordinates.n_features == structure.n_features
+    for values in (
+        coordinates.sample_coordinates,
+        coordinates.predictor_coordinates,
+        coordinates.component_indices,
+        coordinates.scaling_factors,
+    ):
+        assert not values.flags.writeable
+    np.testing.assert_array_equal(structure.x_scores, scores_before)
+    np.testing.assert_array_equal(structure.x_loadings, loadings_before)
+
+
+@pytest.mark.parametrize(
+    ("components", "message"),
+    [
+        ((0,), "exactly two"),
+        ((0, 0), "distinct"),
+        ((0, 3), "must lie"),
+    ],
+)
+def test_pls_biplot_coordinates_reject_invalid_component_selections(
+    components: tuple[int, ...],
+    message: str,
+) -> None:
+    with pytest.raises(ValueError, match=message):
+        pls_biplot_coordinates(_structure_for_biplot(), components=components)
+
+
+def test_pls_biplot_coordinates_reject_zero_norm_loadings() -> None:
+    structure = _structure_for_biplot()
+    x_loadings = structure.x_loadings.copy()
+    x_loadings[:, 1] = 0.0
+    invalid = PLSLatentStructure(
+        x_scores=structure.x_scores,
+        x_loadings=x_loadings,
+        y_loadings=structure.y_loadings,
+        coefficients=structure.coefficients,
+    )
+
+    with pytest.raises(ValueError, match="X-loading columns"):
+        pls_biplot_coordinates(invalid, components=(0, 1))
+
+
+def _structure_for_biplot() -> PLSLatentStructure:
+    return pls_latent_structure(_fitted_pls())

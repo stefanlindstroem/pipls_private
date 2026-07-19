@@ -16,11 +16,13 @@ from pipls.inspection import (
     PLSLatentStructure,
     PLSObservationDiagnostics,
     PredictionDiagnostics,
+    pls_biplot_coordinates,
     prediction_diagnostics,
 )
 from pipls.plotting import (
     PredictorStyle,
     plot_pipls_decomposition,
+    plot_pls_biplot,
     plot_pls_coefficients,
     plot_pls_observation_diagnostics,
     plot_pls_scores,
@@ -291,6 +293,7 @@ def render_post_analysis_report(
     predictor_axis_label: str | None = None,
     pls_score_components: Sequence[int],
     pls_loading_components: Sequence[int],
+    pls_biplot_components: Sequence[int] | None = None,
     coefficient_responses: Sequence[object] | None = None,
     response_pages: Sequence[Sequence[object]] | None = None,
 ) -> None:
@@ -320,6 +323,16 @@ def render_post_analysis_report(
         size=pls_structure.n_components,
         argument_name="pls_score_components",
         required_count=2,
+    )
+    biplot_components = (
+        None
+        if pls_biplot_components is None
+        else _component_indices(
+            pls_biplot_components,
+            size=pls_structure.n_components,
+            argument_name="pls_biplot_components",
+            required_count=2,
+        )
     )
     loading_components = _component_indices(
         pls_loading_components,
@@ -389,6 +402,19 @@ def render_post_analysis_report(
         )
         report.savefig(figure)
         plt.close(figure)
+
+        if biplot_components is not None:
+            biplot = pls_biplot_coordinates(
+                pls_structure,
+                components=biplot_components,
+            )
+            figure, _ = plot_pls_biplot(
+                biplot,
+                predictor_names=predictor_names,
+                title=f"{dataset_name} ordinary PLS score-loading biplot",
+            )
+            report.savefig(figure)
+            plt.close(figure)
 
         figure, _ = plot_pls_x_loadings(
             pls_structure,

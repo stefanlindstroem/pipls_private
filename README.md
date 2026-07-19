@@ -112,6 +112,7 @@ from sklearn.cross_decomposition import PLSRegression
 
 from pipls.inspection import (
     pipls_display_factors,
+    pls_biplot_coordinates,
     pls_latent_structure,
     prediction_diagnostics,
 )
@@ -126,6 +127,7 @@ diagnostics = prediction_diagnostics(
 
 pls_model = PLSRegression(n_components=2, scale=True).fit(X_train, Y_train)
 pls_structure = pls_latent_structure(pls_model)
+biplot = pls_biplot_coordinates(pls_structure, components=(0, 1))
 ```
 
 The display factors are read-only copies of $P$, $D$, and $Q$ with deterministic component signs;
@@ -152,6 +154,7 @@ Install the optional plotting dependency and render the computed results explici
 ```python
 from pipls.plotting import (
     plot_pipls_decomposition,
+    plot_pls_biplot,
     plot_pls_scores,
     plot_pls_x_loadings,
     plot_prediction_diagnostics,
@@ -168,6 +171,10 @@ prediction_figure, prediction_axes = plot_prediction_diagnostics(
     response_names=response_names,
 )
 score_figure, score_axes = plot_pls_scores(pls_structure, components=(0, 1))
+biplot_figure, biplot_axes = plot_pls_biplot(
+    biplot,
+    predictor_names=predictor_names,
+)
 loading_figure, loading_axes = plot_pls_x_loadings(
     pls_structure,
     predictor_style="bar",
@@ -176,7 +183,7 @@ loading_figure, loading_axes = plot_pls_x_loadings(
 ```
 
 The plotting functions return figures and named axes. They do not call `show()`, save files, retain
-models, or infer whether predictors are spectra. Ordinary PLS score, X/Y-loading, and coefficient
+models, or infer whether predictors are spectra. Ordinary PLS score, balanced score-loading biplot, X/Y-loading, coefficient, and raw observation-diagnostic
 figures are also available from `pipls.plotting`. Use `predictor_style="line"` with an explicit
 physical coordinate and axis label for spectra. Install with `python -m pip install "pipls[plot]"`.
 See [`docs/model_inspection.md`](docs/model_inspection.md) and the complete
@@ -224,7 +231,7 @@ The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and st
 and then fit separate fixed models using visible component-count choices. All three examples also
 generate selection-conditioned OOF predictions for fixed Pi-PLS and ordinary PLS models, write
 seven common canonical post-analysis CSV files, and rebuild multipage reports from those files.
-Tobacco adds an eighth table with raw ordinary PLS score-distance and X-reconstruction-residual
+Pulp also adds a balanced two-component score-loading biplot reconstructed from the existing score and X-loading tables. Tobacco adds an eighth table with raw ordinary PLS score-distance and X-reconstruction-residual
 diagnostics, preserves the decreasing wavenumber axis from `X.csv`, and paginates all thirteen
 responses in source order. The Pi-PLS path CSV always records the selected predictor rank. Tobacco
 uses adaptive scanning with explicit full predictor SVD; randomized-SVD behavior is covered by the

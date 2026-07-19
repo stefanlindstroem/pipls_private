@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal, TypeAlias
 
@@ -13,6 +14,7 @@ from sklearn.utils.validation import check_is_fitted
 from .decomposition import PiPLSDecomposition
 
 FloatArray = NDArray[np.float64]
+IntArray = NDArray[np.int64]
 SignArray = NDArray[np.int8]
 PredictionKind: TypeAlias = Literal[
     "fitted values",
@@ -29,16 +31,46 @@ _PREDICTION_KINDS: tuple[PredictionKind, ...] = (
 )
 
 __all__ = [
+    "PLSBiplotCoordinates",
     "PLSLatentStructure",
     "PLSObservationDiagnostics",
     "PiPLSDisplayFactors",
     "PredictionDiagnostics",
     "PredictionKind",
     "pipls_display_factors",
+    "pls_biplot_coordinates",
     "pls_latent_structure",
     "pls_observation_diagnostics",
     "prediction_diagnostics",
 ]
+
+
+@dataclass(frozen=True)
+class PLSBiplotCoordinates:
+    """Immutable balanced score-loading coordinates for two PLS components.
+
+    ``sample_coordinates`` and ``predictor_coordinates`` preserve the selected
+    score-loading reconstruction while giving both coordinate sets equal
+    Euclidean norm within each component. Construct instances with
+    :func:`pls_biplot_coordinates`.
+    """
+
+    sample_coordinates: FloatArray
+    predictor_coordinates: FloatArray
+    component_indices: IntArray
+    scaling_factors: FloatArray
+
+    @property
+    def n_samples(self) -> int:
+        """Number of represented observations."""
+
+        return int(self.sample_coordinates.shape[0])
+
+    @property
+    def n_features(self) -> int:
+        """Number of represented predictor variables."""
+
+        return int(self.predictor_coordinates.shape[0])
 
 
 @dataclass(frozen=True)
@@ -173,6 +205,62 @@ class PredictionDiagnostics:
         """Number of response variables."""
 
         return int(self.observed.shape[1])
+
+
+def pls_biplot_coordinates(
+    structure: PLSLatentStructure,
+    *,
+    components: Sequence[int] = (0, 1),
+) -> PLSBiplotCoordinates:
+    r"""Return balanced coordinates for a two-component PLS score-loading biplot.
+
+    For selected score and X-loading columns $t_k$ and $p_k$, define
+
+    .. math::
+
+       a_k = \sqrt{\frac{\lVert p_k \rVert_2}{\lVert t_k \rVert_2}},
+       \qquad \tilde t_k = a_k t_k,
+       \qquad \tilde p_k = p_k / a_k.
+
+    The transformed coordinates satisfy
+    ``sample_coordinates @ predictor_coordinates.T == T_K @ P_K.T`` and
+    have equal score and loading norm within each selected component.
+
+    Parameters
+    ----------
+    structure:
+        Immutable ordinary-PLS latent structure.
+    components:
+        Exactly two distinct zero-based component indices.
+
+    Returns
+    -------
+    PLSBiplotCoordinates
+        Read-only balanced sample and predictor coordinates.
+    """
+
+    if not isinstance(structure, PLSLatentStructure):
+        raise TypeError("structure must be a PLSLatentStructure instance.")
+    indices = _two_component_indices(components, size=structure.n_components)
+    selected_scores = structure.x_scores[:, indices]
+    selected_loadings = structure.x_loadings[:, indices]
+    score_norms = np.linalg.norm(selected_scores, axis=0)
+    loading_norms = np.linalg.norm(selected_loadings, axis=0)
+    if np.any(score_norms == 0.0):
+        raise ValueError("Selected PLS score columns must have nonzero norm.")
+    if np.any(loading_norms == 0.0):
+        raise ValueError("Selected PLS X-loading columns must have nonzero norm.")
+
+    scaling_factors = np.sqrt(loading_norms / score_norms)
+    sample_coordinates = selected_scores * scaling_factors[None, :]
+    predictor_coordinates = selected_loadings / scaling_factors[None, :]
+
+    return PLSBiplotCoordinates(
+        sample_coordinates=_read_only(np.array(sample_coordinates, copy=True)),
+        predictor_coordinates=_read_only(np.array(predictor_coordinates, copy=True)),
+        component_indices=_read_only_ints(np.array(indices, dtype=np.int64)),
+        scaling_factors=_read_only(np.array(scaling_factors, copy=True)),
+    )
 
 
 def pls_latent_structure(model: PLSRegression) -> PLSLatentStructure:
@@ -472,7 +560,28 @@ def _finite_vector(values: ArrayLike, *, name: str) -> FloatArray:
     return array
 
 
+def _two_component_indices(components: Sequence[int], *, size: int) -> tuple[int, int]:
+    values = tuple(components)
+    if len(values) != 2:
+        raise ValueError("components must contain exactly two indices.")
+    if any(isinstance(value, bool) or not isinstance(value, (int, np.integer)) for value in values):
+        raise TypeError("components must contain integer indices.")
+    first, second = (int(value) for value in values)
+    if first == second:
+        raise ValueError("components must contain two distinct indices.")
+    if first < 0 or second < 0 or first >= size or second >= size:
+        raise ValueError(
+            f"components must lie in [0, {size - 1}]; got {(first, second)}."
+        )
+    return first, second
+
+
 def _read_only(values: FloatArray) -> FloatArray:
+    values.setflags(write=False)
+    return values
+
+
+def _read_only_ints(values: IntArray) -> IntArray:
     values.setflags(write=False)
     return values
 

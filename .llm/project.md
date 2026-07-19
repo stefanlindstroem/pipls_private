@@ -47,9 +47,9 @@ carry their own output-container configuration through cloning and refit.
 
 Decision 0042 adds a staged fitted-model analysis surface without changing the estimator or path
 engine. The implemented `pipls.inspection` submodule owns immutable Pi-PLS display factors,
-standardized prediction diagnostics, and copies of public ordinary PLS scores, loadings, and
-coefficients. The optional `pipls.plotting` submodule renders Pi-PLS decomposition, prediction, and
-ordinary PLS score/loading/coefficient figures from those explicit results. Dataset-specific model
+standardized prediction diagnostics, copies of public ordinary PLS scores, loadings, and
+coefficients, balanced biplot coordinates, and raw observation diagnostics. The optional `pipls.plotting` submodule renders Pi-PLS decomposition, prediction, and
+ordinary PLS score/loading/coefficient, biplot, and observation-diagnostic figures from those explicit results. Dataset-specific model
 choices, OOF loops, pandas tables, CSV writing, and multipage reports remain in `examples/`.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
