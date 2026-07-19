@@ -5,6 +5,8 @@ or publication-result workflows.
 
 - `07_advanced_cv.py`: grouped and advanced cross-validation workflows.
 - `08_synthetic_data.py`: deterministic train/test generation with shared latent structure.
+- `09_model_inspection.py`: a fixed Pi-PLS fit, $P$/$D$/$QD$ interpretation, and external-test
+  prediction diagnostics on deterministic synthetic data.
 - `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, a
   CSV-derived comparison PDF, and a fixed Pulp Pi-PLS model chosen from the recorded path.
 - `11_sugarcane_real_data.py`: the same comparison workflow for high-dimensional LabSpec sugarcane
@@ -40,10 +42,11 @@ them. Error bars show fold-to-fold SD, not a confidence interval. Predictor-rank
 only to Pi-PLS. Generated files under `examples/results/` are ignored by Git.
 
 Decision 0042 adds a third, separately implemented stage for post-fit analysis. The existing
-`pls_component_path.py` and `plot_component_path.py` remain selection-diagnostic helpers. Future
-reusable numerical inspection belongs in `pipls.inspection`, optional figures belong in
-`pipls.plotting`, and dataset-specific fixed-model OOF loops, pandas tables, CSV writing, physical
-axes, pagination, and multipage reports remain example-local.
+`pls_component_path.py` and `plot_component_path.py` remain selection-diagnostic helpers. Reusable
+Pi-PLS computations belong in `pipls.inspection`, and `pipls.plotting` now renders decomposition
+and prediction-diagnostic figures from those immutable results. Dataset-specific fixed-model OOF
+loops, pandas tables, CSV writing, physical axes, pagination, and multipage reports remain
+example-local.
 
 Full-data decomposition, score, loading, and coefficient plots will be labeled as fitted-model
 interpretation. Prediction and residual plots will accept explicit predictions and record whether

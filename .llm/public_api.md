@@ -182,11 +182,29 @@ response centers and scales, response-wise standardized RMSE, and one of the exp
 provenance labels defined by `PredictionKind`. Constant response columns and ambiguous labels are
 rejected.
 
-`pipls.plotting` is not yet implemented. It remains optional, returns figures and axes, and performs
-no file writing. Component-path helpers remain example-local selection diagnostics, while
-dataset-specific OOF loops, pandas tables, canonical CSV files, and PDF composition remain under
-`examples/`. No estimator method, fitted attribute, path-search parameter, or top-level export is
-added by the inspection foundation.
+`pipls.plotting` is implemented and exports from its own namespace:
+
+```python
+from pipls.plotting import (
+    PredictorStyle,
+    plot_pipls_decomposition,
+    plot_prediction_diagnostics,
+)
+```
+
+`plot_pipls_decomposition()` accepts `PiPLSDisplayFactors`, an explicit `"bar"` or `"line"`
+predictor style, optional zero-based component indices, and caller-supplied labels or a physical
+predictor coordinate. It returns a figure and axes named by displayed component plus one `dilation`
+axis. `plot_prediction_diagnostics()` accepts `PredictionDiagnostics`, optional zero-based response
+indices, and response labels. It returns named observed-versus-predicted, residual, and RMSE axes
+and includes the stored prediction provenance in the title.
+
+Matplotlib remains optional and is imported only when a plotting function is called. The functions
+perform no file writing, call no display function, retain no models, and do not alter supplied
+arrays. Component-path helpers remain example-local selection diagnostics, while dataset-specific
+OOF loops, pandas tables, canonical CSV files, and PDF composition remain under `examples/`. No
+estimator method, fitted attribute, path-search parameter, or top-level export is added by this
+plotting layer.
 
 ## Example workflow boundary
 

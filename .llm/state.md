@@ -39,11 +39,13 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
-  diagnostics under `pipls.inspection`.
+  diagnostics under `pipls.inspection`;
+- optional Pi-PLS decomposition and prediction-diagnostic figures under `pipls.plotting`, plus a
+  deterministic external-test inspection example.
 
-Decision 0042 defines the fitted-model analysis architecture. Its pure numerical foundation is
-implemented in `pipls.inspection`. `pipls.plotting`, the synthetic inspection example, ordinary PLS
-inspection, and the real-data post-analysis reports remain planned work.
+Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS numerical and plotting
+foundation is implemented in `pipls.inspection`, `pipls.plotting`, and the synthetic inspection
+example. Ordinary PLS inspection and the real-data post-analysis reports remain planned work.
 
 The current top-level package exports are:
 
@@ -112,7 +114,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | `pipls.inspection` implements Pi-PLS display factors and prediction diagnostics; optional plotting and example-owned artifacts remain staged |
+| Model inspection | `pipls.inspection` and `pipls.plotting` implement Pi-PLS factors, explicit-provenance prediction diagnostics, and optional figures; ordinary PLS and real-data artifacts remain staged |
 
 Additional fixed decisions:
 
@@ -240,18 +242,19 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Implement `pipls.plotting` for Pi-PLS decomposition and prediction-diagnostic figures, then add the
-fast synthetic `examples/09_model_inspection.py` workflow. The patch must consume the immutable
-`pipls.inspection` results, keep Matplotlib optional and submodule-local, return figures and named
-axes, and perform no file writing inside package plotting functions.
+Add the established ordinary PLS analysis foundation: immutable extraction of public
+`PLSRegression` scores, X/Y loadings, and coefficients in `pipls.inspection`, followed by score,
+loading, and coefficient figures in `pipls.plotting`. Extend the fast synthetic inspection example,
+but do not add biplots, observation diagnostics, OOF orchestration, or real-data artifact tables in
+the same patch.
 
 ## Subsequent roadmap
 
 1. **Post-analysis numerical foundation:** Pi-PLS display factors and prediction diagnostics —
    complete.
 2. **Pi-PLS plotting:** decomposition and prediction figures plus a fast synthetic inspection
-   example — next.
-3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients.
+   example — complete.
+3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients — next.
 4. **Pulp post-analysis workflow:** example-local fixed-model OOF predictions, canonical tables, and
    a CSV-derived report.
 5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays.

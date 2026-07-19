@@ -20,8 +20,8 @@ Component-path tables diagnose model selection. Fitted-model decomposition, scor
 coefficient views are a separate interpretation stage, while observed-versus-predicted and residual
 diagnostics require explicit prediction provenance. Decision 0042 records the staged architecture.
 
-- [`model_inspection.md`](model_inspection.md): implemented pure Pi-PLS display factors and
-  standardized prediction diagnostics;
+- [`model_inspection.md`](model_inspection.md): Pi-PLS display factors, standardized prediction
+  diagnostics, and optional decomposition and prediction figures;
 - [`../examples/README.md`](../examples/README.md): current component-path workflows and the accepted
   post-analysis staging boundary.
 

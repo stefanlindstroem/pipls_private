@@ -123,7 +123,30 @@ The display factors are read-only copies of $P$, $D$, and $Q$ with deterministic
 they preserve $P D Q^\mathsf{T}$. Prediction diagnostics use residuals $y-\hat y$ and standardize
 all responses from the supplied observed-response center and sample standard deviation. The
 provenance label distinguishes fitted, fixed-parameter OOF, selection-conditioned OOF, and external
-test predictions. See [`docs/model_inspection.md`](docs/model_inspection.md).
+test predictions.
+
+Install the optional plotting dependency and render the computed results explicitly:
+
+```python
+from pipls.plotting import plot_pipls_decomposition, plot_prediction_diagnostics
+
+factor_figure, factor_axes = plot_pipls_decomposition(
+    factors,
+    predictor_style="bar",
+    predictor_names=feature_names,
+    response_names=target_names,
+)
+prediction_figure, prediction_axes = plot_prediction_diagnostics(
+    diagnostics,
+    response_names=target_names,
+)
+```
+
+The plotting functions return figures and named axes. They do not call `show()`, save files, retain
+models, or infer whether predictors are spectra. Use `predictor_style="line"` with an explicit
+physical coordinate and axis label for spectra. Install with `python -m pip install "pipls[plot]"`.
+See [`docs/model_inspection.md`](docs/model_inspection.md) and
+[`examples/09_model_inspection.py`](examples/09_model_inspection.py).
 
 ## Synthetic data
 

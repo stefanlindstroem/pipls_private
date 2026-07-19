@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add optional `pipls.plotting` figures for Pi-PLS $P$, $D$, and $QD$ displays and explicit-provenance prediction diagnostics, together with a deterministic external-test inspection example.
 - Add the pure `pipls.inspection` foundation with immutable Pi-PLS display factors,
   deterministic sign canonicalization that preserves $PDQ^\mathsf{T}$, and explicit-provenance
   prediction diagnostics standardized from observed responses with `ddof=1`.

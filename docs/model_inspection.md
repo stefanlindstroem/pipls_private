@@ -1,9 +1,9 @@
 # Numerical model inspection
 
 `pipls.inspection` contains fitted-model analysis computations that do not depend on pandas or
-Matplotlib. The current surface covers deterministic display copies of the Pi-PLS factorization and
-standardized prediction diagnostics. Plotting and dataset-specific report generation are separate
-later stages.
+Matplotlib. `pipls.plotting` consumes those immutable results and provides optional Matplotlib
+figures. Dataset-specific tables, OOF orchestration, and multipage reports remain separate example
+workflows.
 
 Import these names from the submodule:
 
@@ -123,6 +123,68 @@ statistics mean different things depending on their provenance. In particular,
 earlier parameter-selection path, so they are not an independent post-selection performance
 estimate.
 
-The forthcoming `pipls.plotting` submodule will consume these immutable numerical results. pandas
-tables, fixed-model OOF orchestration, CSV artifacts, and dataset-specific reports remain owned by
-the examples.
+## Plotting computed results
+
+Install the optional plotting dependency with:
+
+```bash
+python -m pip install "pipls[plot]"
+```
+
+The plotting names remain in their own submodule:
+
+```python
+from pipls.plotting import plot_pipls_decomposition, plot_prediction_diagnostics
+```
+
+`plot_pipls_decomposition()` displays one small multiple per requested zero-based component index.
+The first row contains predictor directions $P_{:k}$, the second contains weighted response
+directions $d_kq_{:k}$, and the final axis contains the corresponding dilation values. Use bars for
+a small scalar predictor set:
+
+```python
+factor_figure, factor_axes = plot_pipls_decomposition(
+    factors,
+    predictor_style="bar",
+    predictor_names=feature_names,
+    response_names=target_names,
+    components=[0, 1],
+)
+```
+
+For an ordered physical coordinate, choose line rendering explicitly:
+
+```python
+factor_figure, factor_axes = plot_pipls_decomposition(
+    factors,
+    predictor_style="line",
+    predictor_axis=wavelength_nm,
+    predictor_axis_label="Wavelength (nm)",
+    response_names=target_names,
+)
+```
+
+The supplied coordinate order is preserved, including decreasing wavenumber axes. The function does
+not smooth, interpolate, reorder, or infer a spectral representation.
+
+`plot_prediction_diagnostics()` renders standardized observed versus predicted responses,
+standardized residuals versus standardized predictions, and response-wise standardized RMSE:
+
+```python
+prediction_figure, prediction_axes = plot_prediction_diagnostics(
+    diagnostics,
+    response_names=target_names,
+    responses=[0, 2],
+)
+```
+
+The prediction provenance stored in `diagnostics.prediction_kind` is always included in the figure
+title. Both plotting functions return `(figure, axes)`, where `axes` is a dictionary with stable
+semantic names. They do not call `show()`, save files, retain estimators, or modify supplied arrays.
+Importing `pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is loaded only when a
+plotting function is called.
+
+The fast [`09_model_inspection.py`](../examples/09_model_inspection.py) example fits a fixed Pi-PLS
+model to deterministic synthetic training data, diagnoses predictions on a separate synthetic test
+set, and writes two compact PDFs. pandas tables, fixed-model OOF orchestration, canonical CSV
+artifacts, and dataset-specific multipage reports remain owned by later real-data example stages.
