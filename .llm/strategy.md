@@ -445,7 +445,7 @@ Implementation order is pure inspection primitives, Pi-PLS plotting and a synthe
 ordinary PLS analysis, Pulp artifact integration, Sugarcane spectral integration, Tobacco
 pagination and observation diagnostics, then the Pulp biplot and cross-dataset review.
 
-Current status: **Pi-PLS numerical and plotting foundation complete; ordinary PLS and real-data integration pending**.
+Current status: **Pi-PLS and basic ordinary PLS analysis foundations complete; real-data integration pending**.
 
 ### Product documentation and release hardening
 
@@ -475,11 +475,11 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Implement the established ordinary PLS foundation using public `PLSRegression` quantities only:
-immutable score, X-loading, Y-loading, and coefficient results under `pipls.inspection`, plus
-explicit score, loading, and coefficient figures under `pipls.plotting`. Extend the fast synthetic
-inspection example. Do not add biplots, observation diagnostics, fixed-model OOF orchestration, or
-real-data artifact reports in the same patch.
+Implement the Pulp post-analysis workflow using example-local fixed-model OOF orchestration,
+canonical CSV tables, and a PDF reconstructed from those tables. Use visible fixed Pi-PLS and
+ordinary PLS component choices and the explicit label `selection-conditioned OOF predictions`. Do
+not add biplots, spectral handling, Tobacco observation diagnostics, or package-owned pandas code in
+the same patch.
 
 ## Maintenance protocol
 

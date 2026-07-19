@@ -38,14 +38,15 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - a current reference suite containing pulp, sugarcane, and tobacco;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
-- pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
-  diagnostics under `pipls.inspection`;
-- optional Pi-PLS decomposition and prediction-diagnostic figures under `pipls.plotting`, plus a
-  deterministic external-test inspection example.
+- pure immutable Pi-PLS display factors, standardized explicit-provenance prediction diagnostics,
+  and ordinary PLS latent-structure copies under `pipls.inspection`;
+- optional Pi-PLS decomposition and prediction-diagnostic figures plus ordinary PLS score, loading,
+  and coefficient figures under `pipls.plotting`;
+- a deterministic synthetic inspection example covering fixed Pi-PLS and ordinary PLS models.
 
-Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS numerical and plotting
-foundation is implemented in `pipls.inspection`, `pipls.plotting`, and the synthetic inspection
-example. Ordinary PLS inspection and the real-data post-analysis reports remain planned work.
+Decision 0042 defines the fitted-model analysis architecture. Its Pi-PLS and basic ordinary PLS
+foundations are implemented in `pipls.inspection`, `pipls.plotting`, and the synthetic inspection
+example. Real-data post-analysis reports remain planned work.
 
 The current top-level package exports are:
 
@@ -114,7 +115,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | `pipls.inspection` and `pipls.plotting` implement Pi-PLS factors, explicit-provenance prediction diagnostics, and optional figures; ordinary PLS and real-data artifacts remain staged |
+| Model inspection | `pipls.inspection` and `pipls.plotting` implement Pi-PLS factors, explicit-provenance prediction diagnostics, ordinary PLS scores/loadings/coefficients, and optional figures; real-data artifacts remain staged |
 
 Additional fixed decisions:
 
@@ -242,11 +243,10 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add the established ordinary PLS analysis foundation: immutable extraction of public
-`PLSRegression` scores, X/Y loadings, and coefficients in `pipls.inspection`, followed by score,
-loading, and coefficient figures in `pipls.plotting`. Extend the fast synthetic inspection example,
-but do not add biplots, observation diagnostics, OOF orchestration, or real-data artifact tables in
-the same patch.
+Add the Pulp post-analysis workflow: example-local fixed-model OOF predictions for fixed Pi-PLS and
+ordinary PLS settings, canonical long-form CSV tables, and a report reconstructed from those tables.
+Keep parameter choices visible and label predictions as `selection-conditioned OOF predictions`. Do
+not add the Pulp biplot, spectral handling, or Tobacco observation diagnostics in the same patch.
 
 ## Subsequent roadmap
 
@@ -254,7 +254,7 @@ the same patch.
    complete.
 2. **Pi-PLS plotting:** decomposition and prediction figures plus a fast synthetic inspection
    example — complete.
-3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients — next.
+3. **Established PLS analysis:** scores, X/Y loadings, and regression coefficients — complete.
 4. **Pulp post-analysis workflow:** example-local fixed-model OOF predictions, canonical tables, and
    a CSV-derived report.
 5. **Sugarcane spectral analysis:** explicit wavelength-axis line displays.

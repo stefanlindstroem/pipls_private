@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add immutable ordinary PLS latent-structure extraction from public `PLSRegression` scores,
+  X/Y loadings, and coefficients, together with optional score, loading, and response-specific
+  coefficient figures and a synthetic demonstration.
 - Add optional `pipls.plotting` figures for Pi-PLS $P$, $D$, and $QD$ displays and explicit-provenance prediction diagnostics, together with a deterministic external-test inspection example.
 - Add the pure `pipls.inspection` foundation with immutable Pi-PLS display factors,
   deterministic sign canonicalization that preserves $PDQ^\mathsf{T}$, and explicit-provenance

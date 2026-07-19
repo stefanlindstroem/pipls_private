@@ -7,6 +7,8 @@ from typing import Literal, TypeAlias
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.utils.validation import check_is_fitted
 
 from .decomposition import PiPLSDecomposition
 
@@ -27,12 +29,53 @@ _PREDICTION_KINDS: tuple[PredictionKind, ...] = (
 )
 
 __all__ = [
+    "PLSLatentStructure",
     "PiPLSDisplayFactors",
     "PredictionDiagnostics",
     "PredictionKind",
     "pipls_display_factors",
+    "pls_latent_structure",
     "prediction_diagnostics",
 ]
+
+
+@dataclass(frozen=True)
+class PLSLatentStructure:
+    """Immutable copies of public fitted ordinary-PLS quantities.
+
+    ``coefficients`` follows the public scikit-learn ``coef_`` orientation and
+    therefore has shape ``(n_targets, n_features)``. Construct instances with
+    :func:`pls_latent_structure`.
+    """
+
+    x_scores: FloatArray
+    x_loadings: FloatArray
+    y_loadings: FloatArray
+    coefficients: FloatArray
+
+    @property
+    def n_samples(self) -> int:
+        """Number of observations represented by the X scores."""
+
+        return int(self.x_scores.shape[0])
+
+    @property
+    def n_features(self) -> int:
+        """Number of predictor variables."""
+
+        return int(self.x_loadings.shape[0])
+
+    @property
+    def n_targets(self) -> int:
+        """Number of response variables."""
+
+        return int(self.y_loadings.shape[0])
+
+    @property
+    def n_components(self) -> int:
+        """Number of retained ordinary-PLS components."""
+
+        return int(self.x_scores.shape[1])
 
 
 @dataclass(frozen=True)
@@ -105,6 +148,60 @@ class PredictionDiagnostics:
         """Number of response variables."""
 
         return int(self.observed.shape[1])
+
+
+def pls_latent_structure(model: PLSRegression) -> PLSLatentStructure:
+    """Return defensive copies of public fitted ``PLSRegression`` arrays.
+
+    Parameters
+    ----------
+    model:
+        A fitted :class:`sklearn.cross_decomposition.PLSRegression` estimator.
+
+    Returns
+    -------
+    PLSLatentStructure
+        Read-only X scores, X loadings, Y loadings, and regression
+        coefficients.
+    """
+
+    if not isinstance(model, PLSRegression):
+        raise TypeError("model must be a sklearn.cross_decomposition.PLSRegression.")
+    check_is_fitted(
+        model,
+        attributes=["x_scores_", "x_loadings_", "y_loadings_", "coef_"],
+    )
+
+    x_scores = _finite_matrix(model.x_scores_, name="model.x_scores_")
+    x_loadings = _finite_matrix(model.x_loadings_, name="model.x_loadings_")
+    y_loadings = _finite_matrix(model.y_loadings_, name="model.y_loadings_")
+    coefficients = _finite_matrix(model.coef_, name="model.coef_")
+
+    n_components = x_scores.shape[1]
+    if n_components == 0:
+        raise ValueError("model must contain at least one retained component.")
+    if x_loadings.shape[1] != n_components:
+        raise ValueError(
+            "model.x_scores_ and model.x_loadings_ must contain the same number of components."
+        )
+    if y_loadings.shape[1] != n_components:
+        raise ValueError(
+            "model.x_scores_ and model.y_loadings_ must contain the same number of components."
+        )
+
+    expected_coefficients = (y_loadings.shape[0], x_loadings.shape[0])
+    if coefficients.shape != expected_coefficients:
+        raise ValueError(
+            "model.coef_ must have shape (n_targets, n_features): "
+            f"expected {expected_coefficients}, got {coefficients.shape}."
+        )
+
+    return PLSLatentStructure(
+        x_scores=_read_only(x_scores),
+        x_loadings=_read_only(x_loadings),
+        y_loadings=_read_only(y_loadings),
+        coefficients=_read_only(coefficients),
+    )
 
 
 def pipls_display_factors(decomposition: PiPLSDecomposition) -> PiPLSDisplayFactors:

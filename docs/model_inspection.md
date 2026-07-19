@@ -9,9 +9,11 @@ Import these names from the submodule:
 
 ```python
 from pipls.inspection import (
+    PLSLatentStructure,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     pipls_display_factors,
+    pls_latent_structure,
     prediction_diagnostics,
 )
 ```
@@ -115,6 +117,30 @@ The function rejects nonfinite values, shape disagreement, fewer than two observ
 response columns, and an unrecognized provenance label. The standardization is for diagnostics;
 it does not modify the estimator or its predictions in original response units.
 
+## Ordinary PLS latent structure
+
+`pls_latent_structure()` accepts a fitted scikit-learn `PLSRegression` model and copies only its
+public fitted arrays:
+
+```python
+from sklearn.cross_decomposition import PLSRegression
+from pipls.inspection import pls_latent_structure
+
+pls_model = PLSRegression(n_components=2, scale=True).fit(X, Y)
+pls_structure = pls_latent_structure(pls_model)
+```
+
+The immutable result contains:
+
+- `x_scores`, with shape `(n_samples, n_components)`;
+- `x_loadings`, with shape `(n_features, n_components)`;
+- `y_loadings`, with shape `(n_targets, n_components)`;
+- `coefficients`, with the public scikit-learn orientation `(n_targets, n_features)`.
+
+The arrays are defensive read-only copies. No scores, loadings, or coefficients are recomputed,
+rescaled, or sign-adjusted by `pipls`. These quantities describe the fitted ordinary PLS model and
+are not validation results.
+
 ## Interpretation boundary
 
 Display factors describe a fixed fitted model. They are not validation results. Prediction
@@ -134,7 +160,14 @@ python -m pip install "pipls[plot]"
 The plotting names remain in their own submodule:
 
 ```python
-from pipls.plotting import plot_pipls_decomposition, plot_prediction_diagnostics
+from pipls.plotting import (
+    plot_pipls_decomposition,
+    plot_pls_coefficients,
+    plot_pls_scores,
+    plot_pls_x_loadings,
+    plot_pls_y_loadings,
+    plot_prediction_diagnostics,
+)
 ```
 
 `plot_pipls_decomposition()` displays one small multiple per requested zero-based component index.
@@ -184,7 +217,50 @@ semantic names. They do not call `show()`, save files, retain estimators, or mod
 Importing `pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is loaded only when a
 plotting function is called.
 
-The fast [`09_model_inspection.py`](../examples/09_model_inspection.py) example fits a fixed Pi-PLS
-model to deterministic synthetic training data, diagnoses predictions on a separate synthetic test
-set, and writes two compact PDFs. pandas tables, fixed-model OOF orchestration, canonical CSV
-artifacts, and dataset-specific multipage reports remain owned by later real-data example stages.
+
+### Ordinary PLS figures
+
+The ordinary PLS functions consume `PLSLatentStructure`, not an estimator:
+
+```python
+score_figure, score_axes = plot_pls_scores(
+    pls_structure,
+    components=(0, 1),
+)
+
+x_loading_figure, x_loading_axes = plot_pls_x_loadings(
+    pls_structure,
+    predictor_style="bar",
+    predictor_names=feature_names,
+    components=[0, 1],
+)
+
+y_loading_figure, y_loading_axes = plot_pls_y_loadings(
+    pls_structure,
+    response_names=target_names,
+    components=[0, 1],
+)
+
+coefficient_figure, coefficient_axes = plot_pls_coefficients(
+    pls_structure,
+    predictor_style="bar",
+    predictor_names=feature_names,
+    response_names=target_names,
+    responses=[0, 2],
+)
+```
+
+`plot_pls_scores()` requires exactly two distinct zero-based component indices. Optional sample
+labels annotate observations, but the function does not infer groups or draw confidence regions.
+X loadings and response-specific coefficients share the explicit bar-versus-line predictor
+contract. Y loadings are component-wise bar plots. For line rendering, the caller supplies the
+physical predictor coordinate and axis label, whose order is preserved.
+
+The initial ordinary PLS plotting surface does not include biplots, confidence ellipses, VIP,
+automatic variable selection, theoretical outlier limits, or uncertainty intervals.
+
+The fast [`09_model_inspection.py`](../examples/09_model_inspection.py) example fits fixed Pi-PLS and
+ordinary PLS models to deterministic synthetic training data. It diagnoses Pi-PLS predictions on a
+separate synthetic test set and writes decomposition, prediction, score, loading, and coefficient
+figures. pandas tables, fixed-model OOF orchestration, canonical CSV artifacts, and dataset-specific
+multipage reports remain owned by later real-data example stages.

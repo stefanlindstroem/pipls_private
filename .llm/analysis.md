@@ -10,10 +10,11 @@ Decision 0042 establishes the architecture. Source code and tests establish whic
 currently implemented. Do not describe a planned analysis function as available until it exists in
 the package and is covered by the corresponding tests and user documentation.
 
-The implemented foundation includes `pipls.inspection` for immutable numerical results and
-`pipls.plotting` for Pi-PLS decomposition and prediction-diagnostic figures. The deterministic
-`examples/09_model_inspection.py` workflow demonstrates external-test diagnostics. Ordinary PLS
-inspection and example-owned real-data post-analysis artifacts remain planned.
+The implemented foundation includes `pipls.inspection` for immutable Pi-PLS, prediction, and
+ordinary PLS latent-structure results. `pipls.plotting` provides Pi-PLS decomposition,
+prediction-diagnostic, ordinary PLS score, loading, and coefficient figures. The deterministic
+`examples/09_model_inspection.py` workflow demonstrates these tools on synthetic data. Example-owned
+real-data post-analysis artifacts remain planned.
 
 ## Analysis stages
 
@@ -172,8 +173,10 @@ have different error structures and add a distributional display not required by
 
 ## Ordinary PLS analysis
 
-Use public `sklearn.cross_decomposition.PLSRegression` fitted quantities only. The initial surface
-covers:
+Use public `sklearn.cross_decomposition.PLSRegression` fitted quantities only.
+`PLSLatentStructure` copies `x_scores_`, `x_loadings_`, `y_loadings_`, and `coef_` without
+recomputing or sign-adjusting them. Coefficients retain the scikit-learn orientation
+`(n_targets, n_features)`. The initial surface covers:
 
 - X score pairs;
 - X loadings;
@@ -249,8 +252,8 @@ The accepted order after Decision 0042 is:
 
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
 2. Pi-PLS plotting and a fast synthetic inspection example — **complete**;
-3. ordinary PLS scores, loadings, and coefficient analysis — **next**;
-4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics;
+3. ordinary PLS scores, loadings, and coefficient analysis — **complete**;
+4. Pulp post-analysis artifacts and selection-conditioned OOF diagnostics — **next**;
 5. Sugarcane spectral analysis;
 6. Tobacco pagination and observation diagnostics;
 7. Pulp biplot and final cross-dataset review;

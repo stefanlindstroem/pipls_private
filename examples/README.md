@@ -43,16 +43,16 @@ only to Pi-PLS. Generated files under `examples/results/` are ignored by Git.
 
 Decision 0042 adds a third, separately implemented stage for post-fit analysis. The existing
 `pls_component_path.py` and `plot_component_path.py` remain selection-diagnostic helpers. Reusable
-Pi-PLS computations belong in `pipls.inspection`, and `pipls.plotting` now renders decomposition
-and prediction-diagnostic figures from those immutable results. Dataset-specific fixed-model OOF
-loops, pandas tables, CSV writing, physical axes, pagination, and multipage reports remain
-example-local.
+Pi-PLS and ordinary PLS computations belong in `pipls.inspection`. `pipls.plotting` now renders
+Pi-PLS decomposition and prediction-diagnostic figures together with ordinary PLS score, X- and
+Y-loading, and coefficient figures from immutable results. Dataset-specific fixed-model OOF loops,
+pandas tables, CSV writing, physical axes, pagination, and multipage reports remain example-local.
 
-Full-data decomposition, score, loading, and coefficient plots will be labeled as fitted-model
-interpretation. Prediction and residual plots will accept explicit predictions and record whether
-they are fitted, fixed-parameter OOF, selection-conditioned OOF, or external-test values. The
-real-data examples will use `selection-conditioned OOF predictions` after component counts have
-been chosen from paths computed on the same observations.
+Full-data decomposition, score, loading, and coefficient plots are fitted-model interpretation.
+Prediction and residual plots accept explicit predictions and record whether they are fitted,
+fixed-parameter OOF, selection-conditioned OOF, or external-test values. The real-data examples
+will use `selection-conditioned OOF predictions` after component counts have been chosen from paths
+computed on the same observations.
 
 Real-data examples must show the ordinary I/O used to create `X` and `Y` in the example itself. Do
 not route example data through a package registry, generic loader, or hidden data-reading helper.

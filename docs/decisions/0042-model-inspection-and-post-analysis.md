@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. The Pi-PLS numerical and plotting foundation is implemented; ordinary PLS and real-data integration remain staged.
+Accepted. The Pi-PLS and basic ordinary PLS numerical and plotting foundations are implemented; real-data integration remains staged.
 
 ## Context
 

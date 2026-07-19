@@ -80,6 +80,10 @@ def test_plotting_names_are_submodule_exports_only() -> None:
     expected = {
         "PredictorStyle",
         "plot_pipls_decomposition",
+        "plot_pls_coefficients",
+        "plot_pls_scores",
+        "plot_pls_x_loadings",
+        "plot_pls_y_loadings",
         "plot_prediction_diagnostics",
     }
 
@@ -215,9 +219,7 @@ def test_plot_prediction_diagnostics_returns_named_axes_and_provenance() -> None
         "standardized_rmse",
     }
     assert figure._suptitle is not None
-    assert figure._suptitle.get_text() == (
-        "External prediction review\nexternal test predictions"
-    )
+    assert figure._suptitle.get_text() == ("External prediction review\nexternal test predictions")
     assert [tick.get_text() for tick in axes["standardized_rmse"].get_xticklabels()] == [
         "a",
         "c",

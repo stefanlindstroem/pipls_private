@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Literal, TypeAlias
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .inspection import PiPLSDisplayFactors, PredictionDiagnostics
+from .inspection import PiPLSDisplayFactors, PLSLatentStructure, PredictionDiagnostics
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -19,9 +19,232 @@ PredictorStyle: TypeAlias = Literal["bar", "line"]
 
 __all__ = [
     "PredictorStyle",
+    "plot_pls_coefficients",
+    "plot_pls_scores",
+    "plot_pls_x_loadings",
+    "plot_pls_y_loadings",
     "plot_pipls_decomposition",
     "plot_prediction_diagnostics",
 ]
+
+
+def plot_pls_scores(
+    structure: PLSLatentStructure,
+    *,
+    components: Sequence[int] = (0, 1),
+    sample_names: Sequence[object] | None = None,
+    title: str = "PLS X scores",
+    figsize: tuple[float, float] = (6.4, 5.2),
+) -> tuple[Figure, dict[str, Axes]]:
+    """Plot one pair of ordinary-PLS X score columns.
+
+    ``components`` contains exactly two distinct zero-based component indices.
+    Optional sample labels annotate the points but do not define groups or
+    confidence regions.
+    """
+
+    if not isinstance(structure, PLSLatentStructure):
+        raise TypeError("structure must be a PLSLatentStructure instance.")
+    selected = _indices(components, size=structure.n_components, name="components")
+    if len(selected) != 2:
+        raise ValueError("components must contain exactly two indices for a score plot.")
+    labels = (
+        None
+        if sample_names is None
+        else _labels(sample_names, size=structure.n_samples, prefix="Sample")
+    )
+
+    first, second = selected
+    plt = _pyplot()
+    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    axis.scatter(structure.x_scores[:, first], structure.x_scores[:, second], alpha=0.75)
+    if labels is not None:
+        for row, label in enumerate(labels):
+            axis.annotate(
+                label,
+                (structure.x_scores[row, first], structure.x_scores[row, second]),
+            )
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xlabel(f"X score component {first + 1}")
+    axis.set_ylabel(f"X score component {second + 1}")
+    axis.set_title(title)
+    return figure, {"scores": axis}
+
+
+def plot_pls_x_loadings(
+    structure: PLSLatentStructure,
+    *,
+    predictor_style: PredictorStyle,
+    predictor_names: Sequence[object] | None = None,
+    predictor_axis: ArrayLike | None = None,
+    predictor_axis_label: str | None = None,
+    components: Sequence[int] | None = None,
+    title: str = "PLS X loadings",
+    figsize: tuple[float, float] | None = None,
+) -> tuple[Figure, dict[str, Axes]]:
+    """Plot ordinary-PLS X loadings as explicit bars or ordered lines."""
+
+    if not isinstance(structure, PLSLatentStructure):
+        raise TypeError("structure must be a PLSLatentStructure instance.")
+    selected = _indices(components, size=structure.n_components, name="components")
+    style = _predictor_style(predictor_style)
+    feature_labels = _labels(predictor_names, size=structure.n_features, prefix="Feature")
+    coordinate = _predictor_coordinate(
+        predictor_axis,
+        size=structure.n_features,
+        style=style,
+        axis_label=predictor_axis_label,
+    )
+
+    plt = _pyplot()
+    if figsize is None:
+        figsize = (max(5.0, 4.0 * len(selected)), 4.2)
+    figure, axis_array = plt.subplots(
+        1,
+        len(selected),
+        figsize=figsize,
+        layout="constrained",
+        squeeze=False,
+    )
+    axes: dict[str, Axes] = {}
+    for column, component in enumerate(selected):
+        axis = axis_array[0, column]
+        component_number = component + 1
+        axes[f"x_loading_component_{component_number}"] = axis
+        values = structure.x_loadings[:, component]
+        if style == "bar":
+            positions = np.arange(structure.n_features)
+            axis.bar(positions, values)
+            axis.set_xticks(positions)
+            axis.set_xticklabels(
+                feature_labels,
+                rotation=45 if structure.n_features > 8 else 0,
+                ha="right" if structure.n_features > 8 else "center",
+            )
+            axis.set_xlabel("Predictor")
+        else:
+            assert coordinate is not None
+            axis.plot(coordinate, values)
+            axis.set_xlabel(str(predictor_axis_label))
+        axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+        axis.set_ylabel("X loading")
+        axis.set_title(f"Component {component_number}")
+
+    figure.suptitle(title)
+    return figure, axes
+
+
+def plot_pls_y_loadings(
+    structure: PLSLatentStructure,
+    *,
+    response_names: Sequence[object] | None = None,
+    components: Sequence[int] | None = None,
+    title: str = "PLS Y loadings",
+    figsize: tuple[float, float] | None = None,
+) -> tuple[Figure, dict[str, Axes]]:
+    """Plot ordinary-PLS Y loadings as component-wise bars."""
+
+    if not isinstance(structure, PLSLatentStructure):
+        raise TypeError("structure must be a PLSLatentStructure instance.")
+    selected = _indices(components, size=structure.n_components, name="components")
+    response_labels = _labels(response_names, size=structure.n_targets, prefix="Response")
+
+    plt = _pyplot()
+    if figsize is None:
+        figsize = (max(5.0, 4.0 * len(selected)), 4.2)
+    figure, axis_array = plt.subplots(
+        1,
+        len(selected),
+        figsize=figsize,
+        layout="constrained",
+        squeeze=False,
+    )
+    axes: dict[str, Axes] = {}
+    positions = np.arange(structure.n_targets)
+    for column, component in enumerate(selected):
+        axis = axis_array[0, column]
+        component_number = component + 1
+        axes[f"y_loading_component_{component_number}"] = axis
+        axis.bar(positions, structure.y_loadings[:, component])
+        axis.set_xticks(positions)
+        axis.set_xticklabels(
+            response_labels,
+            rotation=45 if structure.n_targets > 6 else 0,
+            ha="right" if structure.n_targets > 6 else "center",
+        )
+        axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+        axis.set_xlabel("Response")
+        axis.set_ylabel("Y loading")
+        axis.set_title(f"Component {component_number}")
+
+    figure.suptitle(title)
+    return figure, axes
+
+
+def plot_pls_coefficients(
+    structure: PLSLatentStructure,
+    *,
+    predictor_style: PredictorStyle,
+    predictor_names: Sequence[object] | None = None,
+    response_names: Sequence[object] | None = None,
+    predictor_axis: ArrayLike | None = None,
+    predictor_axis_label: str | None = None,
+    responses: Sequence[int] | None = None,
+    title: str = "PLS regression coefficients",
+    figsize: tuple[float, float] | None = None,
+) -> tuple[Figure, dict[str, Axes]]:
+    """Plot response-specific ordinary-PLS regression coefficients."""
+
+    if not isinstance(structure, PLSLatentStructure):
+        raise TypeError("structure must be a PLSLatentStructure instance.")
+    selected = _indices(responses, size=structure.n_targets, name="responses")
+    style = _predictor_style(predictor_style)
+    feature_labels = _labels(predictor_names, size=structure.n_features, prefix="Feature")
+    response_labels = _labels(response_names, size=structure.n_targets, prefix="Response")
+    coordinate = _predictor_coordinate(
+        predictor_axis,
+        size=structure.n_features,
+        style=style,
+        axis_label=predictor_axis_label,
+    )
+
+    plt = _pyplot()
+    if figsize is None:
+        figsize = (max(5.0, 4.0 * len(selected)), 4.2)
+    figure, axis_array = plt.subplots(
+        1,
+        len(selected),
+        figsize=figsize,
+        layout="constrained",
+        squeeze=False,
+    )
+    axes: dict[str, Axes] = {}
+    for column, response in enumerate(selected):
+        axis = axis_array[0, column]
+        response_number = response + 1
+        axes[f"coefficient_response_{response_number}"] = axis
+        values = structure.coefficients[response, :]
+        if style == "bar":
+            positions = np.arange(structure.n_features)
+            axis.bar(positions, values)
+            axis.set_xticks(positions)
+            axis.set_xticklabels(
+                feature_labels,
+                rotation=45 if structure.n_features > 8 else 0,
+                ha="right" if structure.n_features > 8 else "center",
+            )
+            axis.set_xlabel("Predictor")
+        else:
+            assert coordinate is not None
+            axis.plot(coordinate, values)
+            axis.set_xlabel(str(predictor_axis_label))
+        axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+        axis.set_ylabel("Regression coefficient")
+        axis.set_title(response_labels[response])
+
+    figure.suptitle(title)
+    return figure, axes
 
 
 def plot_pipls_decomposition(

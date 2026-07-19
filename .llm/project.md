@@ -19,7 +19,7 @@ implemented boundary and next increment; this file records where responsibilitie
 Phases A through E4c are implemented. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
-`pipls.inspection`, and optional Pi-PLS figures under `pipls.plotting`.
+`pipls.inspection`, and optional Pi-PLS and ordinary PLS figures under `pipls.plotting`.
 
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
@@ -46,11 +46,11 @@ carry their own output-container configuration through cloning and refit.
 ## Accepted analysis ownership
 
 Decision 0042 adds a staged fitted-model analysis surface without changing the estimator or path
-engine. The implemented `pipls.inspection` submodule owns immutable Pi-PLS display factors and
-standardized prediction diagnostics. The optional `pipls.plotting` submodule renders Pi-PLS
-decomposition and prediction-diagnostic figures from those explicit results. Dataset-specific
-model choices, OOF loops, pandas tables, CSV writing,
-and multipage reports remain in `examples/`.
+engine. The implemented `pipls.inspection` submodule owns immutable Pi-PLS display factors,
+standardized prediction diagnostics, and copies of public ordinary PLS scores, loadings, and
+coefficients. The optional `pipls.plotting` submodule renders Pi-PLS decomposition, prediction, and
+ordinary PLS score/loading/coefficient figures from those explicit results. Dataset-specific model
+choices, OOF loops, pandas tables, CSV writing, and multipage reports remain in `examples/`.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must

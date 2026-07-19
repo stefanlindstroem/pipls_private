@@ -108,7 +108,13 @@ print(search.oof_predictions_)
 Inspect a fitted Pi-PLS factorization without changing the estimator:
 
 ```python
-from pipls.inspection import pipls_display_factors, prediction_diagnostics
+from sklearn.cross_decomposition import PLSRegression
+
+from pipls.inspection import (
+    pipls_display_factors,
+    pls_latent_structure,
+    prediction_diagnostics,
+)
 
 factors = pipls_display_factors(model.decomposition_)
 Y_pred = model.predict(X_test)
@@ -117,6 +123,9 @@ diagnostics = prediction_diagnostics(
     Y_pred,
     prediction_kind="external test predictions",
 )
+
+pls_model = PLSRegression(n_components=2, scale=True).fit(X_train, Y_train)
+pls_structure = pls_latent_structure(pls_model)
 ```
 
 The display factors are read-only copies of $P$, $D$, and $Q$ with deterministic component signs;
@@ -128,7 +137,12 @@ test predictions.
 Install the optional plotting dependency and render the computed results explicitly:
 
 ```python
-from pipls.plotting import plot_pipls_decomposition, plot_prediction_diagnostics
+from pipls.plotting import (
+    plot_pipls_decomposition,
+    plot_pls_scores,
+    plot_pls_x_loadings,
+    plot_prediction_diagnostics,
+)
 
 factor_figure, factor_axes = plot_pipls_decomposition(
     factors,
@@ -140,10 +154,17 @@ prediction_figure, prediction_axes = plot_prediction_diagnostics(
     diagnostics,
     response_names=target_names,
 )
+score_figure, score_axes = plot_pls_scores(pls_structure, components=(0, 1))
+loading_figure, loading_axes = plot_pls_x_loadings(
+    pls_structure,
+    predictor_style="bar",
+    predictor_names=feature_names,
+)
 ```
 
 The plotting functions return figures and named axes. They do not call `show()`, save files, retain
-models, or infer whether predictors are spectra. Use `predictor_style="line"` with an explicit
+models, or infer whether predictors are spectra. Ordinary PLS score, X/Y-loading, and coefficient
+figures are also available from `pipls.plotting`. Use `predictor_style="line"` with an explicit
 physical coordinate and axis label for spectra. Install with `python -m pip install "pipls[plot]"`.
 See [`docs/model_inspection.md`](docs/model_inspection.md) and
 [`examples/09_model_inspection.py`](examples/09_model_inspection.py).

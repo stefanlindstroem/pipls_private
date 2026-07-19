@@ -162,10 +162,12 @@ Decision 0042 accepts two public submodules for staged implementation:
 
 ```python
 from pipls.inspection import (
+    PLSLatentStructure,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     PredictionKind,
     pipls_display_factors,
+    pls_latent_structure,
     prediction_diagnostics,
 )
 ```
@@ -182,12 +184,21 @@ response centers and scales, response-wise standardized RMSE, and one of the exp
 provenance labels defined by `PredictionKind`. Constant response columns and ambiguous labels are
 rejected.
 
+`pls_latent_structure()` accepts a fitted `PLSRegression` and returns defensive read-only copies of
+its public X scores, X loadings, Y loadings, and regression coefficients. Coefficients retain the
+scikit-learn orientation `(n_targets, n_features)`. The result does not recompute, rescale, or
+canonicalize ordinary PLS quantities.
+
 `pipls.plotting` is implemented and exports from its own namespace:
 
 ```python
 from pipls.plotting import (
     PredictorStyle,
     plot_pipls_decomposition,
+    plot_pls_coefficients,
+    plot_pls_scores,
+    plot_pls_x_loadings,
+    plot_pls_y_loadings,
     plot_prediction_diagnostics,
 )
 ```
@@ -197,7 +208,10 @@ predictor style, optional zero-based component indices, and caller-supplied labe
 predictor coordinate. It returns a figure and axes named by displayed component plus one `dilation`
 axis. `plot_prediction_diagnostics()` accepts `PredictionDiagnostics`, optional zero-based response
 indices, and response labels. It returns named observed-versus-predicted, residual, and RMSE axes
-and includes the stored prediction provenance in the title.
+and includes the stored prediction provenance in the title. `plot_pls_scores()` renders exactly
+two selected X-score columns. The X-loading and coefficient functions support explicit bar or line
+predictor rendering; Y loadings use component-wise bars. Components and responses are selected by
+explicit zero-based indices.
 
 Matplotlib remains optional and is imported only when a plotting function is called. The functions
 perform no file writing, call no display function, retain no models, and do not alter supplied
