@@ -157,10 +157,8 @@ Decision 0045 distinguishes method-specific Pi-PLS factorization inspection from
 analysis. Final public names for $P$, $D$, and $Q$ inspection retain an explicit `pipls` marker.
 Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics use
 estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiPLSRegression`
-objects. The estimator-neutral API migration is complete. Numbered examples are the remaining
-transitional layer: their post-analysis will be converted to the selected Pi-PLS model in the next
-increment, while ordinary PLS remains available for component-path comparisons and declared
-comparator benchmarks.
+objects. Numbered examples apply these shared tools only to the selected Pi-PLS model. Ordinary PLS
+remains available for component-path comparisons and declared comparator benchmarks.
 
 Decision 0042 accepts two public submodules for staged implementation:
 

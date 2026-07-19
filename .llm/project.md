@@ -19,7 +19,7 @@ implemented boundary and next increment; this file records where responsibilitie
 Phases A through E4c are implemented. The current public surface includes `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
-`pipls.inspection`, and optional Pi-PLS and ordinary PLS figures under `pipls.plotting`.
+`pipls.inspection`, and optional Pi-PLS-specific and shared PLS-family figures under `pipls.plotting`.
 
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination

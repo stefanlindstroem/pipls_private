@@ -5,15 +5,16 @@
 Accepted, with the ordinary-PLS-specific analysis ownership and numbered-example use superseded by
 Decision 0045. The separation of selection diagnostics, fitted-model interpretation, prediction
 diagnostics, immutable inspection results, optional plotting, explicit labels, physical axes, and
-canonical artifacts remains in force. The shared API migration required by Decision 0045 is complete; the numbered-example migration remains.
+canonical artifacts remains in force. The corrective API, numbered-example, artifact, and
+boundary-test migration required by Decision 0045 is complete.
 
 ## Context
 
-The real-data examples currently answer a model-development question through canonical Pi-PLS and
-ordinary PLS component-path CSV files and a CSV-derived comparison PDF. They then fit one fixed
-Pi-PLS model chosen through a visible component-count constant. Those artifacts are selection
-diagnostics. They do not yet provide a supported analysis of the fitted Pi-PLS factorization,
-standard PLS latent structure, predictions, or residuals.
+Before this architecture was implemented, the real-data examples answered a model-development
+question through canonical Pi-PLS and ordinary PLS component-path CSV files and a CSV-derived
+comparison PDF, then fitted one fixed Pi-PLS model chosen through a visible component-count
+constant. Those artifacts were selection diagnostics but did not yet provide supported analysis
+of the fitted factorization, shared PLS-family latent structure, predictions, or residuals.
 
 The companion Pi-PLS implementation contains a combined display of the predictor rotations $P$,
 the dilation matrix $D$, the response rotations $Q$, standardized observed-versus-predicted values,
@@ -170,7 +171,8 @@ Plotting functions:
 
 For real-data analyses, numerical CSV files are canonical and PDFs are views reconstructed from
 those tables. Prediction tables retain original-unit and standardized observed values, predictions,
-residuals, model identity, sample identity, response identity, and prediction provenance. Pi-PLS
+residuals, sample identity, response identity, and prediction provenance. The numbered reports
+contain one selected Pi-PLS model, so no redundant model column is stored. Pi-PLS
 response-direction tables retain $q_{jk}$, $d_k$, and $d_kq_{jk}$ separately rather than exporting
 only the plotted product. Pickled estimators are not analysis artifacts.
 
@@ -180,8 +182,8 @@ Implementation proceeds as a series of small patches:
 
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — complete;
 2. Pi-PLS decomposition and prediction plots — complete;
-3. shared score, loading, coefficient, biplot, and observation analysis — implemented currently
-   under estimator-neutral shared names; numbered-example migration pending;
+3. shared score, loading, coefficient, biplot, and observation analysis under
+   estimator-neutral shared names — complete;
 4. example-local fixed-model OOF and post-analysis artifact helpers, integrated first with
    Pulp — complete;
 5. Sugarcane spectral line analysis — complete;

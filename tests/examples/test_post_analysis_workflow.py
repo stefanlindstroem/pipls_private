@@ -131,7 +131,7 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
     paths = ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
     assert set(paths) == set(ARTIFACTS.REQUIRED_TABLE_NAMES)
     assert not stale_optional.exists()
-    for stale_name in ARTIFACTS.STALE_TABLE_FILENAMES:
+    for stale_name in ARTIFACTS.LEGACY_TABLE_FILENAMES:
         assert not (tmp_path / stale_name).exists()
     for path in paths.values():
         assert path.is_file()

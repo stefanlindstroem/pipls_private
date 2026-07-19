@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented for the shared API and numbered examples; final cleanup remains.
+Accepted and complete.
 
 This decision supersedes the ordinary-PLS-specific ownership and example-use portions of Decisions
 0042 and 0043. Their separation of selection diagnostics, fitted-model interpretation, prediction
@@ -11,7 +11,7 @@ canonical CSV artifacts, and mathematically stated biplot scaling remains accept
 
 ## Context
 
-The real-data examples currently use ordinary scikit-learn `PLSRegression` in two different roles:
+Before this correction, the real-data examples used ordinary scikit-learn `PLSRegression` in two different roles:
 
 1. as the established reference curve in the component-path CV-MSE comparison; and
 2. as a second fitted model for OOF predictions, scores, loadings, coefficients, the Pulp biplot,
@@ -21,7 +21,7 @@ The first role is useful and should remain. The second role weakens the intended
 After model selection, the examples should demonstrate one selected Pi-PLS model and show that the
 standard analysis techniques familiar from PLS also apply to that model.
 
-The current package also names shared latent-structure computations and plots after ordinary PLS.
+Before this correction, the package also named shared latent-structure computations and plots after ordinary PLS.
 Scores, reconstruction loadings, coefficients, score-loading biplots, and score-distance or
 X-reconstruction-residual diagnostics are not unique to `PLSRegression`. Both
 `PLSRegression` and `PiPLSRegression` expose the fitted quantities and transformations needed by
@@ -90,17 +90,17 @@ Pi-PLS fit. Canonical shared-analysis artifacts use estimator-neutral filenames.
 
 ## Naming and artifact consequences
 
-The corrective implementation will:
+The implementation:
 
-- retain Pi-PLS-specific names only for $P$, $D$, and $Q$ inspection;
-- replace ordinary-PLS-specific shared inspection and plotting names with estimator-neutral names;
-- test the shared numerical API with both `PLSRegression` and `PiPLSRegression`;
-- remove final ordinary PLS fits and ordinary PLS OOF predictions from numbered examples;
-- retain ordinary PLS only in component-path comparison and declared comparator benchmarks;
-- rename shared post-analysis CSV files so that they describe their quantities rather than an
-  ordinary PLS estimator;
-- retain explicit Pi-PLS prefixes for factorization-specific artifact files;
-- label report pages with the fitted model identity supplied by the example, even when the plotting
+- retains Pi-PLS-specific names only for $P$, $D$, and $Q$ inspection;
+- uses estimator-neutral names for shared inspection and plotting;
+- tests the shared numerical API with both `PLSRegression` and `PiPLSRegression`;
+- fits no final ordinary PLS model and generates no ordinary PLS OOF predictions in numbered
+  examples;
+- retains ordinary PLS only in component-path comparison and declared comparator benchmarks;
+- uses quantity-based shared post-analysis filenames;
+- retains explicit Pi-PLS prefixes for factorization-specific artifact files;
+- labels report pages with the fitted model identity supplied by the example, even when the plotting
   function itself has a generic name.
 
 No compatibility aliases are required for the mistaken intermediate shared-analysis names because
@@ -108,17 +108,14 @@ the package remains unreleased at version `0.0.0`.
 
 ## Migration sequence
 
-The corrective migration proceeds in three stages:
+The corrective migration is complete:
 
-1. **Complete:** generalize and rename the shared inspection and plotting API, with tests against
-   fitted `PLSRegression` and `PiPLSRegression` models.
-2. Convert Pulp, Sugarcane, and Tobacco post-analysis to one selected Pi-PLS model while preserving
-   the two-model CV-MSE comparison.
-3. Remove stale ordinary-PLS post-analysis terminology, filenames, tests, and documentation, and
-   add static repository-boundary enforcement.
-
-The shared runtime names now follow this decision. The remaining transitional behavior is confined
-to the numbered real-data examples and their post-analysis artifacts.
+1. shared inspection and plotting use estimator-neutral names and are tested with fitted
+   `PLSRegression` and `PiPLSRegression` models;
+2. Pulp, Sugarcane, and Tobacco post-analysis use one selected Pi-PLS model while preserving the
+   two-model CV-MSE comparison;
+3. shared artifacts use quantity-based filenames, stale local-development filenames are removed
+   during regeneration, and repository-boundary tests enforce the model-ownership rule.
 
 ## Consequences
 

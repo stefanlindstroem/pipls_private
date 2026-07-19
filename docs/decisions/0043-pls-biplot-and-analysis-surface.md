@@ -60,8 +60,8 @@ The completed surface has these common rules:
 
 ## Consequences
 
-The mathematical biplot increment is complete, but Decision 0045 reopens the analysis surface for
-a corrective ownership, naming, and example migration. Further PLS diagnostics such as VIP,
-confidence regions, uncertainty intervals, probability limits, contribution plots, or automatic
-variable selection require separate decisions. Product documentation and release hardening resume
-after the Decision 0045 migration.
+Decision 0045 completes the ownership, naming, and example correction: the biplot API is shared
+PLS-family analysis, and the maintained Pulp report applies it to the selected Pi-PLS model.
+Further PLS diagnostics such as VIP, confidence regions, uncertainty intervals, probability
+limits, contribution plots, or automatic variable selection require separate decisions. Product
+documentation and release hardening may now resume.

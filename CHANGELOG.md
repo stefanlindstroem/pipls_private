@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Complete the Decision 0045 analysis-boundary migration: enforce ordinary PLS as a comparison-only
+  model in numbered examples, keep shared PLS-family inspection estimator-neutral, use one selected
+  Pi-PLS model for post-analysis, and align quantity-based artifact and documentation contracts.
+
 - Convert the Pulp, Sugarcane, and Tobacco post-analysis workflows to one selected Pi-PLS model
   after the retained Pi-PLS-versus-PLS CV-MSE comparison; derive all shared analyses from that
   Pi-PLS fit, use estimator-neutral artifact filenames, and remove stale `pls_*.csv` files during

@@ -8,17 +8,10 @@ diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.in
 
 Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
 Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
-factorization inspection, and shared PLS-family analysis. Source code and tests establish which
-parts are currently implemented. The shared API migration is complete; do not describe the full
-Decision 0045 migration as complete until Pi-PLS-only numbered-example post-analysis and cleanup
-tests are committed.
-
-The current implementation includes `pipls.inspection` and `pipls.plotting`, but the shared
-latent-structure functions now use estimator-neutral names and structural fitted-model contracts.
-Numbered-example post-analysis still contains transitional final ordinary PLS fits. Decision 0045
-requires those examples
-to become estimator-neutral and requires the numbered examples to apply them only to the selected
-Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface remains explicitly method-specific.
+factorization inspection, and shared PLS-family analysis. The migration is complete: shared
+latent-structure functions use estimator-neutral names and structural fitted-model contracts, and
+numbered-example post-analysis applies them only to the selected Pi-PLS model. The Pi-PLS $P$, $D$,
+and $Q$ surface remains explicitly method-specific.
 
 ## Analysis stages
 
@@ -290,8 +283,19 @@ Predictor-direction, score, loading, coefficient, and observation-diagnostic tab
 sample, feature, response, and component identifiers as applicable. Do not serialize estimators as
 part of the result contract.
 
-The seven common tables are required for every complete post-analysis workflow. The Decision 0045
-migration will replace ordinary-PLS-prefixed shared artifact names with estimator-neutral names. A workflow may add an observation-diagnostic table with columns `sample`, `score_distance`, and
+The seven common tables are required for every complete post-analysis workflow:
+
+```text
+pipls_predictor_directions.csv
+pipls_response_directions.csv
+predictions.csv
+x_scores.csv
+x_loadings.csv
+y_loadings.csv
+coefficients.csv
+```
+
+A workflow may add `observation_diagnostics.csv` with columns `sample`, `score_distance`, and
 `x_reconstruction_residual`. Tobacco uses this optional eighth table. Response pagination must
 partition the source response names exactly once and preserve their source order.
 
@@ -330,5 +334,5 @@ The accepted order after Decision 0042 is:
 3. estimator-neutral shared PLS-family analysis — **implemented**;
 4. estimator-neutral shared inspection and plotting API — **complete**;
 5. Pi-PLS-only Pulp, Sugarcane, and Tobacco post-analysis migration — **complete**;
-6. stale-name, artifact, documentation, and boundary-test cleanup — **next**;
-7. return to product documentation and release hardening — **after the corrective series**.
+6. stale-name, artifact, documentation, and boundary-test cleanup — **complete**;
+7. return to product documentation and release hardening — **next**.

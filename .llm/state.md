@@ -248,23 +248,19 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Complete the remaining Decision 0045 cleanup: remove stale terminology, add repository-boundary
-tests, and review regenerated post-analysis artifacts. The estimator-neutral shared API and
-Pi-PLS-only numbered-example migration are complete. Resume
-release hardening only after this corrective series. Do not add further diagnostics outside that
-correction without a separate decision.
+Resume user documentation and release hardening. The Decision 0045 corrective series is complete:
+shared APIs are estimator-neutral, numbered examples use ordinary PLS only for CV-MSE comparison,
+and post-analysis uses one selected Pi-PLS model. Do not add further diagnostics without a separate
+decision.
 
 ## Subsequent roadmap
 
-1. **Decision 0045 API migration:** estimator-neutral shared names and structural support for both
-   fitted estimator classes — complete.
-2. **Decision 0045 example migration:** retain the two-model CV-MSE comparison but use only the
-   selected Pi-PLS model for OOF prediction and post-analysis in examples 10–12 — complete.
-3. **Decision 0045 cleanup:** remove remaining stale terminology, review generated artifacts, and
-   add repository-boundary tests — next.
-4. **User documentation and release hardening:** literal-matrix quickstart and navigation hierarchy
-   complete; buildable user guide, generated API reference, compatibility policy, packaging checks,
-   and versioned releases remain after the corrective series.
+1. **Buildable user documentation:** turn the current Markdown guides into a navigable built site
+   with generated API references.
+2. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
+   and validate clean installations and distributions.
+3. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
+   first tagged-release checklist.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

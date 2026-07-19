@@ -41,7 +41,7 @@ TABLE_FILENAMES = {
     "coefficients": "coefficients.csv",
     "observation_diagnostics": "observation_diagnostics.csv",
 }
-STALE_TABLE_FILENAMES = (
+LEGACY_TABLE_FILENAMES = (
     "pls_scores.csv",
     "pls_x_loadings.csv",
     "pls_y_loadings.csv",
@@ -246,7 +246,7 @@ def write_post_analysis_tables(
             f"missing={missing}, extra={extra}."
         )
     output_dir.mkdir(parents=True, exist_ok=True)
-    for filename in STALE_TABLE_FILENAMES:
+    for filename in LEGACY_TABLE_FILENAMES:
         (output_dir / filename).unlink(missing_ok=True)
     paths: dict[str, Path] = {}
     for name, filename in TABLE_FILENAMES.items():

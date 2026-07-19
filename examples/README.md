@@ -77,8 +77,9 @@ The three real-data examples share these stages:
 1. `PiPLSPathCV(refit=False)` produces one Pi-PLS row per admissible component count, while
    scikit-learn `PLSRegression` produces a comparison path for the same folds and component counts.
    Both paths are written as canonical CSV files before plotting.
-2. Visible component-count choices select fixed full-data Pi-PLS and PLS models for interpretation.
-3. The same visible parameters are cloned inside five non-shuffled folds to produce
+2. A visible component-count choice selects one fixed full-data Pi-PLS model for interpretation;
+   ordinary PLS is not fitted again after the comparison path.
+3. The selected Pi-PLS parameters are cloned inside five non-shuffled folds to produce
    `selection-conditioned OOF predictions`. Seven common long-form CSV files are written and
    reread before report generation.
 
