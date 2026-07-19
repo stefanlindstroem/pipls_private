@@ -12,26 +12,27 @@ workflows. For the shortest fitted-model path, begin with [`quickstart.md`](quic
 Decision 0045 distinguishes three roles. The component-path comparison continues to fit both
 Pi-PLS and ordinary PLS and plots both CV-MSE curves. Inspection of $P$, $D$, $Q$, and $QD$ remains
 explicitly Pi-PLS-specific. Scores, loadings, coefficients, biplots, observation diagnostics, and
-prediction diagnostics are shared PLS-family analyses whose reusable API will be estimator-neutral.
+prediction diagnostics are shared PLS-family analyses with estimator-neutral names.
 
-The numbered real-data examples will apply those shared tools only to the selected Pi-PLS model.
-Ordinary PLS will remain only as the comparison path, not as a second post-analysis or OOF model.
-The ordinary-PLS-specific shared names and examples shown later in this document describe the
-current transitional implementation and will be replaced in the following corrective patches.
+The shared numerical extraction accepts compatible fitted `PiPLSRegression` and scikit-learn
+`PLSRegression` models through their public fitted attributes and transformation methods. The
+numbered real-data examples will apply those tools only to the selected Pi-PLS model after the
+next workflow migration. Until then, their final ordinary PLS fits remain transitional example
+behavior rather than a limitation of the shared API.
 
 Import these names from the submodule:
 
 ```python
 from pipls.inspection import (
-    PLSBiplotCoordinates,
-    PLSLatentStructure,
-    PLSObservationDiagnostics,
+    BiplotCoordinates,
+    LatentStructure,
+    ObservationDiagnostics,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     pipls_display_factors,
-    pls_biplot_coordinates,
-    pls_latent_structure,
-    pls_observation_diagnostics,
+    biplot_coordinates,
+    latent_structure,
+    observation_diagnostics,
     prediction_diagnostics,
 )
 ```
@@ -135,17 +136,16 @@ The function rejects nonfinite values, shape disagreement, fewer than two observ
 response columns, and an unrecognized provenance label. The standardization is for diagnostics;
 it does not modify the estimator or its predictions in original response units.
 
-## Ordinary PLS latent structure
+## Shared PLS-family latent structure
 
-`pls_latent_structure()` accepts a fitted scikit-learn `PLSRegression` model and copies only its
-public fitted arrays:
+`latent_structure()` accepts a compatible fitted PLS-family model and copies only its public fitted
+arrays. Both `PiPLSRegression` and scikit-learn `PLSRegression` satisfy the supported structural
+contract:
 
 ```python
-from sklearn.cross_decomposition import PLSRegression
-from pipls.inspection import pls_latent_structure
+from pipls.inspection import latent_structure
 
-pls_model = PLSRegression(n_components=2, scale=True).fit(X, Y)
-pls_structure = pls_latent_structure(pls_model)
+structure = latent_structure(model)
 ```
 
 The immutable result contains:
@@ -153,17 +153,17 @@ The immutable result contains:
 - `x_scores`, with shape `(n_samples, n_components)`;
 - `x_loadings`, with shape `(n_features, n_components)`;
 - `y_loadings`, with shape `(n_targets, n_components)`;
-- `coefficients`, with the public scikit-learn orientation `(n_targets, n_features)`.
+- `coefficients`, with shape `(n_targets, n_features)`.
 
 The arrays are defensive read-only copies. No scores, loadings, or coefficients are recomputed,
-rescaled, or sign-adjusted by `pipls`. These quantities describe the fitted ordinary PLS model and
-are not validation results.
+rescaled, or sign-adjusted by `pipls`. They describe the supplied fitted model and are not validation
+results. The function validates the public fitted attributes structurally; it does not require a
+concrete estimator class.
 
+## Shared PLS-family score-loading biplot
 
-## Ordinary PLS score-loading biplot
-
-`pls_biplot_coordinates()` constructs a two-component score-loading biplot from an existing
-`PLSLatentStructure`. For selected score and X-loading columns $t_k$ and $p_k$, it uses
+`biplot_coordinates()` constructs a two-component score-loading biplot from an existing
+`LatentStructure`. For selected score and X-loading columns $t_k$ and $p_k$, it uses
 
 \begin{equation}
 a_k=\sqrt{\frac{\lVert p_k\rVert_2}{\lVert t_k\rVert_2}},\qquad
@@ -178,11 +178,11 @@ The scaling balances the Euclidean norms and preserves the selected reconstructi
 \end{equation}
 
 ```python
-from pipls.inspection import pls_biplot_coordinates
-from pipls.plotting import plot_pls_biplot
+from pipls.inspection import biplot_coordinates
+from pipls.plotting import plot_biplot
 
-coordinates = pls_biplot_coordinates(pls_structure, components=(0, 1))
-figure, axes = plot_pls_biplot(
+coordinates = biplot_coordinates(structure, components=(0, 1))
+figure, axes = plot_biplot(
     coordinates,
     predictor_names=predictor_names,
 )
@@ -193,19 +193,20 @@ confidence regions, inferred groups, or automatic importance claims. The maintai
 restricted to Pulp, where fourteen predictor arrows remain readable. Sugarcane and Tobacco do not
 generate biplots because their spectral predictor counts make such a display unsuitable.
 
-## Ordinary PLS observation diagnostics
+## Shared PLS-family observation diagnostics
 
-`pls_observation_diagnostics()` accepts a fitted `PLSRegression` and explicit predictor observations:
+`observation_diagnostics()` accepts a compatible fitted model and explicit predictor observations:
 
 ```python
-from pipls.inspection import pls_observation_diagnostics
+from pipls.inspection import observation_diagnostics
 
-observation_diagnostics = pls_observation_diagnostics(pls_model, X)
+observation_result = observation_diagnostics(model, X)
 ```
 
-Let $t_i$ be the transformed score of supplied observation $i$, and let
-$\bar t_{\mathrm{train}}$ and $S_{T,\mathrm{train}}$ be the center and sample covariance of
-the fitted training scores. The squared score distance is
+The model must expose fitted `x_scores_` and `x_loadings_` arrays together with public
+`transform()` and `inverse_transform()` methods. Let $t_i$ be the transformed score of supplied
+observation $i$, and let $\bar t_{\mathrm{train}}$ and $S_{T,\mathrm{train}}$ be the center and sample
+covariance of the fitted training scores. The squared score distance is
 
 \begin{equation}
 h_i=(t_i-\bar t_{\mathrm{train}})^\mathsf{T}S_{T,\mathrm{train}}^{+}(t_i-\bar t_{\mathrm{train}}).
@@ -214,7 +215,7 @@ h_i=(t_i-\bar t_{\mathrm{train}})^\mathsf{T}S_{T,\mathrm{train}}^{+}(t_i-\bar t_
 Here $+$ denotes the Moore--Penrose inverse. The row-wise squared X-reconstruction residual is
 
 \begin{equation}
-q_i=\lVert x_i-\hat x_i\rVert_2^2,
+q_i=\lVert x_i-\hat x_i\rVert_2^2.
 \end{equation}
 
 The reconstruction $\hat x_i$ is obtained from the fitted model's public
@@ -245,7 +246,7 @@ predictor_names = X.columns.astype(str).tolist()
 response_names = Y.columns.astype(str).tolist()
 ```
 
-Those lists can then be passed to categorical Pi-PLS and ordinary PLS plots. This is an
+Those lists can then be passed to Pi-PLS-specific factor plots and shared PLS-family plots. This is an
 example-level I/O operation, not a package requirement. A user whose arrays do not come from
 header-bearing files can supply names from a schema, laboratory-information system, domain
 metadata, or an explicit list:
@@ -272,12 +273,12 @@ The plotting names remain in their own submodule:
 ```python
 from pipls.plotting import (
     plot_pipls_decomposition,
-    plot_pls_biplot,
-    plot_pls_coefficients,
-    plot_pls_observation_diagnostics,
-    plot_pls_scores,
-    plot_pls_x_loadings,
-    plot_pls_y_loadings,
+    plot_biplot,
+    plot_coefficients,
+    plot_observation_diagnostics,
+    plot_scores,
+    plot_x_loadings,
+    plot_y_loadings,
     plot_prediction_diagnostics,
 )
 ```
@@ -333,10 +334,10 @@ semantic names. They do not call `show()`, save files, retain estimators, or mod
 Importing `pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is loaded only when a
 plotting function is called.
 
-Raw ordinary PLS observation diagnostics use a separate result object:
+Raw PLS-family observation diagnostics use a separate result object:
 
 ```python
-observation_figure, observation_axes = plot_pls_observation_diagnostics(
+observation_figure, observation_axes = plot_observation_diagnostics(
     observation_diagnostics,
 )
 ```
@@ -345,31 +346,31 @@ The function returns one `observation_diagnostics` axis and adds neither theoret
 automatic observation labels.
 
 
-### Ordinary PLS figures
+### Shared PLS-family figures
 
-The ordinary PLS functions consume `PLSLatentStructure`, not an estimator:
+The shared plotting functions consume `LatentStructure`, not an estimator:
 
 ```python
-score_figure, score_axes = plot_pls_scores(
-    pls_structure,
+score_figure, score_axes = plot_scores(
+    structure,
     components=(0, 1),
 )
 
-x_loading_figure, x_loading_axes = plot_pls_x_loadings(
-    pls_structure,
+x_loading_figure, x_loading_axes = plot_x_loadings(
+    structure,
     predictor_style="bar",
     predictor_names=feature_names,
     components=[0, 1],
 )
 
-y_loading_figure, y_loading_axes = plot_pls_y_loadings(
-    pls_structure,
+y_loading_figure, y_loading_axes = plot_y_loadings(
+    structure,
     response_names=target_names,
     components=[0, 1],
 )
 
-coefficient_figure, coefficient_axes = plot_pls_coefficients(
-    pls_structure,
+coefficient_figure, coefficient_axes = plot_coefficients(
+    structure,
     predictor_style="bar",
     predictor_names=feature_names,
     response_names=target_names,
@@ -377,7 +378,7 @@ coefficient_figure, coefficient_axes = plot_pls_coefficients(
 )
 ```
 
-`plot_pls_scores()` requires exactly two distinct zero-based component indices. Optional sample
+`plot_scores()` requires exactly two distinct zero-based component indices. Optional sample
 labels annotate observations, but the function does not infer groups or draw confidence regions.
 X loadings and response-specific coefficients share the explicit bar-versus-line predictor
 contract. Selected X-loading components use grouped bars or overlaid lines on one axis. Selected
@@ -386,7 +387,7 @@ grouped bars or overlaid lines on one predictor axis. Categorical displays requi
 predictor or response names. For line rendering, the caller supplies the physical predictor
 coordinate and axis label, whose order is preserved.
 
-The ordinary PLS plotting surface also includes `plot_pls_observation_diagnostics()`, which draws
+The shared plotting surface also includes `plot_observation_diagnostics()`, which draws
 raw score distance against squared X-reconstruction residual. It does not include theoretical
 limits, automatic observation labels, or contribution plots. Biplots, confidence ellipses, VIP,
 automatic variable selection, uncertainty intervals, and permutation tests remain outside the

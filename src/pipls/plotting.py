@@ -9,10 +9,10 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from .inspection import (
+    BiplotCoordinates,
+    LatentStructure,
+    ObservationDiagnostics,
     PiPLSDisplayFactors,
-    PLSBiplotCoordinates,
-    PLSLatentStructure,
-    PLSObservationDiagnostics,
     PredictionDiagnostics,
 )
 
@@ -25,34 +25,34 @@ PredictorStyle: TypeAlias = Literal["bar", "line"]
 
 __all__ = [
     "PredictorStyle",
-    "plot_pls_biplot",
-    "plot_pls_coefficients",
-    "plot_pls_observation_diagnostics",
-    "plot_pls_scores",
-    "plot_pls_x_loadings",
-    "plot_pls_y_loadings",
+    "plot_biplot",
+    "plot_coefficients",
+    "plot_observation_diagnostics",
+    "plot_scores",
+    "plot_x_loadings",
+    "plot_y_loadings",
     "plot_pipls_decomposition",
     "plot_prediction_diagnostics",
 ]
 
 
-def plot_pls_biplot(
-    coordinates: PLSBiplotCoordinates,
+def plot_biplot(
+    coordinates: BiplotCoordinates,
     *,
     predictor_names: Sequence[object],
     sample_names: Sequence[object] | None = None,
-    title: str = "PLS score-loading biplot",
+    title: str = "PLS-family score-loading biplot",
     figsize: tuple[float, float] = (8.0, 6.5),
 ) -> tuple[Figure, dict[str, Axes]]:
     """Plot balanced sample scores and predictor-loading arrows.
 
     The coordinate scaling is calculated separately by
-    :func:`pipls.inspection.pls_biplot_coordinates`. This figure adds no
+    :func:`pipls.inspection.biplot_coordinates`. This figure adds no
     response arrows, confidence regions, grouping, or automatic labels.
     """
 
-    if not isinstance(coordinates, PLSBiplotCoordinates):
-        raise TypeError("coordinates must be a PLSBiplotCoordinates instance.")
+    if not isinstance(coordinates, BiplotCoordinates):
+        raise TypeError("coordinates must be a BiplotCoordinates instance.")
     predictor_labels = _categorical_labels(
         predictor_names,
         size=coordinates.n_features,
@@ -118,10 +118,10 @@ def plot_pls_biplot(
     return figure, {"biplot": axis}
 
 
-def plot_pls_observation_diagnostics(
-    diagnostics: PLSObservationDiagnostics,
+def plot_observation_diagnostics(
+    diagnostics: ObservationDiagnostics,
     *,
-    title: str = "PLS observation diagnostics",
+    title: str = "PLS-family observation diagnostics",
     figsize: tuple[float, float] = (6.5, 5.0),
 ) -> tuple[Figure, dict[str, Axes]]:
     """Plot raw score distance against squared X-reconstruction residual.
@@ -131,8 +131,8 @@ def plot_pls_observation_diagnostics(
     interpretation.
     """
 
-    if not isinstance(diagnostics, PLSObservationDiagnostics):
-        raise TypeError("diagnostics must be a PLSObservationDiagnostics instance.")
+    if not isinstance(diagnostics, ObservationDiagnostics):
+        raise TypeError("diagnostics must be an ObservationDiagnostics instance.")
 
     plt = _pyplot()
     figure, axis = plt.subplots(figsize=figsize, layout="constrained")
@@ -147,23 +147,23 @@ def plot_pls_observation_diagnostics(
     return figure, {"observation_diagnostics": axis}
 
 
-def plot_pls_scores(
-    structure: PLSLatentStructure,
+def plot_scores(
+    structure: LatentStructure,
     *,
     components: Sequence[int] = (0, 1),
     sample_names: Sequence[object] | None = None,
-    title: str = "PLS X scores",
+    title: str = "PLS-family X scores",
     figsize: tuple[float, float] = (6.4, 5.2),
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot one pair of ordinary-PLS X score columns.
+    """Plot one pair of PLS-family X-score columns.
 
     ``components`` contains exactly two distinct zero-based component indices.
     Optional sample labels annotate the points but do not define groups or
     confidence regions.
     """
 
-    if not isinstance(structure, PLSLatentStructure):
-        raise TypeError("structure must be a PLSLatentStructure instance.")
+    if not isinstance(structure, LatentStructure):
+        raise TypeError("structure must be a LatentStructure instance.")
     selected = _indices(components, size=structure.n_components, name="components")
     if len(selected) != 2:
         raise ValueError("components must contain exactly two indices for a score plot.")
@@ -194,25 +194,25 @@ def plot_pls_scores(
     return figure, {"scores": axis}
 
 
-def plot_pls_x_loadings(
-    structure: PLSLatentStructure,
+def plot_x_loadings(
+    structure: LatentStructure,
     *,
     predictor_style: PredictorStyle,
     predictor_names: Sequence[object] | None = None,
     predictor_axis: ArrayLike | None = None,
     predictor_axis_label: str | None = None,
     components: Sequence[int] | None = None,
-    title: str = "PLS X loadings",
+    title: str = "PLS-family X loadings",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot selected ordinary-PLS X loadings together on one axis.
+    """Plot selected PLS-family X loadings together on one axis.
 
     Bar rendering groups component bars side by side for each named predictor.
     Line rendering overlays components on the supplied physical coordinate.
     """
 
-    if not isinstance(structure, PLSLatentStructure):
-        raise TypeError("structure must be a PLSLatentStructure instance.")
+    if not isinstance(structure, LatentStructure):
+        raise TypeError("structure must be a LatentStructure instance.")
     selected = _indices(components, size=structure.n_components, name="components")
     style = _predictor_style(predictor_style)
     feature_labels = _categorical_labels(
@@ -250,18 +250,18 @@ def plot_pls_x_loadings(
     return figure, {"x_loadings": axis}
 
 
-def plot_pls_y_loadings(
-    structure: PLSLatentStructure,
+def plot_y_loadings(
+    structure: LatentStructure,
     *,
     response_names: Sequence[object] | None = None,
     components: Sequence[int] | None = None,
-    title: str = "PLS Y loadings",
+    title: str = "PLS-family Y loadings",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot selected ordinary-PLS Y loadings as grouped bars on one axis."""
+    """Plot selected PLS-family Y loadings as grouped bars on one axis."""
 
-    if not isinstance(structure, PLSLatentStructure):
-        raise TypeError("structure must be a PLSLatentStructure instance.")
+    if not isinstance(structure, LatentStructure):
+        raise TypeError("structure must be a LatentStructure instance.")
     selected = _indices(components, size=structure.n_components, name="components")
     response_labels = _categorical_labels(
         response_names,
@@ -290,8 +290,8 @@ def plot_pls_y_loadings(
     return figure, {"y_loadings": axis}
 
 
-def plot_pls_coefficients(
-    structure: PLSLatentStructure,
+def plot_coefficients(
+    structure: LatentStructure,
     *,
     predictor_style: PredictorStyle,
     predictor_names: Sequence[object] | None = None,
@@ -299,13 +299,13 @@ def plot_pls_coefficients(
     predictor_axis: ArrayLike | None = None,
     predictor_axis_label: str | None = None,
     responses: Sequence[int] | None = None,
-    title: str = "PLS regression coefficients",
+    title: str = "PLS-family regression coefficients",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
     """Plot selected response-specific PLS coefficients together on one axis."""
 
-    if not isinstance(structure, PLSLatentStructure):
-        raise TypeError("structure must be a PLSLatentStructure instance.")
+    if not isinstance(structure, LatentStructure):
+        raise TypeError("structure must be a LatentStructure instance.")
     selected = _indices(responses, size=structure.n_targets, name="responses")
     style = _predictor_style(predictor_style)
     feature_labels = _categorical_labels(
@@ -641,9 +641,7 @@ def _optional_labels(
         return None
     labels = tuple(str(value) for value in values)
     if len(labels) != size:
-        raise ValueError(
-            f"Expected {size} labels in {argument_name}, got {len(labels)}."
-        )
+        raise ValueError(f"Expected {size} labels in {argument_name}, got {len(labels)}.")
     if any(not label.strip() for label in labels):
         raise ValueError(f"{argument_name} must contain only nonempty labels.")
     return labels

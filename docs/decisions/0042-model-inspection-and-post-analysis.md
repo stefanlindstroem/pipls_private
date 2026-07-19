@@ -5,7 +5,7 @@
 Accepted, with the ordinary-PLS-specific analysis ownership and numbered-example use superseded by
 Decision 0045. The separation of selection diagnostics, fitted-model interpretation, prediction
 diagnostics, immutable inspection results, optional plotting, explicit labels, physical axes, and
-canonical artifacts remains in force. The current runtime still awaits the Decision 0045 migration.
+canonical artifacts remains in force. The shared API migration required by Decision 0045 is complete; the numbered-example migration remains.
 
 ## Context
 
@@ -181,7 +181,7 @@ Implementation proceeds as a series of small patches:
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — complete;
 2. Pi-PLS decomposition and prediction plots — complete;
 3. shared score, loading, coefficient, biplot, and observation analysis — implemented currently
-   under transitional ordinary-PLS-specific names; Decision 0045 migration pending;
+   under estimator-neutral shared names; numbered-example migration pending;
 4. example-local fixed-model OOF and post-analysis artifact helpers, integrated first with
    Pulp — complete;
 5. Sugarcane spectral line analysis — complete;

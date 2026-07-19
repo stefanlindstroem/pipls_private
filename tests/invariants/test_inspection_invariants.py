@@ -17,9 +17,7 @@ def test_display_sign_canonicalization_preserves_fitted_regression_map() -> None
 
     factors = pipls_display_factors(decomposition)
     display_map = (
-        factors.predictor_directions
-        @ np.diag(factors.dilation)
-        @ factors.response_directions.T
+        factors.predictor_directions @ np.diag(factors.dilation) @ factors.response_directions.T
     )
 
     np.testing.assert_allclose(display_map, decomposition.regression_map, atol=1e-14)
@@ -34,19 +32,22 @@ def test_display_sign_canonicalization_preserves_fitted_regression_map() -> None
     assert model.y_rotations_ is decomposition.Q
 
 
-def test_balanced_pls_biplot_preserves_selected_score_loading_reconstruction() -> None:
-    from sklearn.cross_decomposition import PLSRegression
-
-    from pipls.inspection import pls_biplot_coordinates, pls_latent_structure
+def test_balanced_biplot_preserves_selected_score_loading_reconstruction() -> None:
+    from pipls.inspection import biplot_coordinates, latent_structure
 
     rng = np.random.default_rng(2301)
     X = rng.normal(size=(48, 9))
     Y = X[:, :4] @ rng.normal(size=(4, 3)) + 0.05 * rng.normal(size=(48, 3))
-    structure = pls_latent_structure(PLSRegression(n_components=4).fit(X, Y))
+    model = PiPLSRegression(
+        n_components=3,
+        predictor_rank=6,
+        svd_solver="full",
+    ).fit(X, Y)
+    structure = latent_structure(model)
 
-    coordinates = pls_biplot_coordinates(structure, components=(1, 3))
+    coordinates = biplot_coordinates(structure, components=(0, 2))
 
-    expected = structure.x_scores[:, [1, 3]] @ structure.x_loadings[:, [1, 3]].T
+    expected = structure.x_scores[:, [0, 2]] @ structure.x_loadings[:, [0, 2]].T
     actual = coordinates.sample_coordinates @ coordinates.predictor_coordinates.T
     np.testing.assert_allclose(actual, expected, rtol=1e-13, atol=1e-13)
     np.testing.assert_allclose(

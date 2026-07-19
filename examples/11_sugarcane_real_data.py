@@ -17,8 +17,8 @@ from sklearn.model_selection import KFold
 
 from pipls import PiPLSPathCV, PiPLSRegression
 from pipls.inspection import (
+    latent_structure,
     pipls_display_factors,
-    pls_latent_structure,
     prediction_diagnostics,
 )
 
@@ -110,7 +110,7 @@ pls_diagnostics = prediction_diagnostics(
 tables = build_post_analysis_tables(
     factors=pipls_display_factors(pipls_model.decomposition_),
     diagnostics_by_model={"Pi-PLS": pipls_diagnostics, "PLS": pls_diagnostics},
-    pls_structure=pls_latent_structure(pls_model),
+    pls_structure=latent_structure(pls_model),
     predictor_names=predictor_names,
     response_names=response_names,
     sample_names=sample_names,

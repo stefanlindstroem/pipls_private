@@ -157,12 +157,10 @@ Decision 0045 distinguishes method-specific Pi-PLS factorization inspection from
 analysis. Final public names for $P$, $D$, and $Q$ inspection retain an explicit `pipls` marker.
 Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics use
 estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiPLSRegression`
-objects. Numbered examples apply those shared tools only to the selected Pi-PLS model; ordinary PLS
-remains only in component-path comparisons and declared comparator benchmarks.
-
-The ordinary-PLS-specific inspection and plotting names documented below describe the current
-transitional implementation. They are scheduled for replacement without compatibility aliases
-because version `0.0.0` has not been released.
+objects. The estimator-neutral API migration is complete. Numbered examples are the remaining
+transitional layer: their post-analysis will be converted to the selected Pi-PLS model in the next
+increment, while ordinary PLS remains available for component-path comparisons and declared
+comparator benchmarks.
 
 Decision 0042 accepts two public submodules for staged implementation:
 
@@ -173,16 +171,16 @@ Decision 0042 accepts two public submodules for staged implementation:
 
 ```python
 from pipls.inspection import (
-    PLSBiplotCoordinates,
-    PLSLatentStructure,
-    PLSObservationDiagnostics,
+    BiplotCoordinates,
+    LatentStructure,
+    ObservationDiagnostics,
     PiPLSDisplayFactors,
     PredictionDiagnostics,
     PredictionKind,
     pipls_display_factors,
-    pls_biplot_coordinates,
-    pls_latent_structure,
-    pls_observation_diagnostics,
+    biplot_coordinates,
+    latent_structure,
+    observation_diagnostics,
     prediction_diagnostics,
 )
 ```
@@ -199,17 +197,18 @@ response centers and scales, response-wise standardized RMSE, and one of the exp
 provenance labels defined by `PredictionKind`. Constant response columns and ambiguous labels are
 rejected.
 
-`pls_latent_structure()` accepts a fitted `PLSRegression` and returns defensive read-only copies of
-its public X scores, X loadings, Y loadings, and regression coefficients. Coefficients retain the
-scikit-learn orientation `(n_targets, n_features)`. The result does not recompute, rescale, or
-canonicalize ordinary PLS quantities.
+`latent_structure()` accepts a compatible fitted PLS-family model through the public
+`x_scores_`, `x_loadings_`, `y_loadings_`, and `coef_` attributes. Both `PiPLSRegression` and
+scikit-learn `PLSRegression` satisfy this contract. The returned arrays are defensive and read-only;
+coefficients retain the common `(n_targets, n_features)` orientation.
 
-`pls_observation_diagnostics()` accepts a fitted `PLSRegression` and explicit predictor observations.
-It calculates squared score distance relative to the fitted training-score covariance and the
-row-wise squared X-reconstruction residual from the public transform/inverse-transform round trip.
-The result contains read-only raw arrays and no theoretical probability limits.
+`observation_diagnostics()` accepts a compatible fitted model with public X scores, X loadings,
+`transform()`, and `inverse_transform()`. It calculates squared score distance relative to the
+fitted training-score covariance and the row-wise squared X-reconstruction residual from the public
+transform/inverse-transform round trip. The result contains read-only raw arrays and no theoretical
+probability limits.
 
-`pls_biplot_coordinates()` accepts a `PLSLatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
+`biplot_coordinates()` accepts a `LatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
 $TP^\mathsf{T}$ reconstruction.
 
 `pipls.plotting` is implemented and exports from its own namespace:
@@ -218,12 +217,12 @@ $TP^\mathsf{T}$ reconstruction.
 from pipls.plotting import (
     PredictorStyle,
     plot_pipls_decomposition,
-    plot_pls_biplot,
-    plot_pls_coefficients,
-    plot_pls_observation_diagnostics,
-    plot_pls_scores,
-    plot_pls_x_loadings,
-    plot_pls_y_loadings,
+    plot_biplot,
+    plot_coefficients,
+    plot_observation_diagnostics,
+    plot_scores,
+    plot_x_loadings,
+    plot_y_loadings,
     plot_prediction_diagnostics,
 )
 ```
@@ -235,13 +234,13 @@ physical predictor coordinate. It returns shared `predictor_directions`,
 named categorical bars or as overlaid lines on one physical predictor axis.
 `plot_prediction_diagnostics()` accepts `PredictionDiagnostics`, optional zero-based response
 indices, and required response labels. It returns named observed-versus-predicted, residual, and
-RMSE axes and includes the stored prediction provenance in the title. `plot_pls_scores()` renders
+RMSE axes and includes the stored prediction provenance in the title. `plot_scores()` renders
 exactly two selected X-score columns. X and Y loadings place selected components together on one
 axis; coefficient plots place selected responses together on one axis. Categorical displays require
 caller-supplied variable names, while line displays require an explicit physical coordinate and axis
 label. Components and responses are selected by explicit zero-based indices.
-`plot_pls_biplot()` renders balanced sample scores with named X-loading arrows and no response
-arrows or confidence regions. `plot_pls_observation_diagnostics()` renders one raw score-distance
+`plot_biplot()` renders balanced sample scores with named X-loading arrows and no response
+arrows or confidence regions. `plot_observation_diagnostics()` renders one raw score-distance
 versus X-reconstruction-residual
 scatter plot without theoretical limits or automatic observation labels.
 

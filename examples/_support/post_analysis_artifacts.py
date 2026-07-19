@@ -12,23 +12,23 @@ from matplotlib.backends.backend_pdf import PdfPages
 from numpy.typing import ArrayLike
 
 from pipls.inspection import (
+    LatentStructure,
+    ObservationDiagnostics,
     PiPLSDisplayFactors,
-    PLSLatentStructure,
-    PLSObservationDiagnostics,
     PredictionDiagnostics,
-    pls_biplot_coordinates,
+    biplot_coordinates,
     prediction_diagnostics,
 )
 from pipls.plotting import (
     PredictorStyle,
+    plot_biplot,
+    plot_coefficients,
+    plot_observation_diagnostics,
     plot_pipls_decomposition,
-    plot_pls_biplot,
-    plot_pls_coefficients,
-    plot_pls_observation_diagnostics,
-    plot_pls_scores,
-    plot_pls_x_loadings,
-    plot_pls_y_loadings,
     plot_prediction_diagnostics,
+    plot_scores,
+    plot_x_loadings,
+    plot_y_loadings,
 )
 
 TABLE_FILENAMES = {
@@ -83,12 +83,12 @@ def build_post_analysis_tables(
     *,
     factors: PiPLSDisplayFactors,
     diagnostics_by_model: Mapping[str, PredictionDiagnostics],
-    pls_structure: PLSLatentStructure,
+    pls_structure: LatentStructure,
     predictor_names: Sequence[object],
     response_names: Sequence[object],
     sample_names: Sequence[object],
     fold_index: Sequence[int],
-    pls_observation_diagnostics_result: PLSObservationDiagnostics | None = None,
+    pls_observation_diagnostics_result: ObservationDiagnostics | None = None,
 ) -> dict[str, pd.DataFrame]:
     """Return canonical long-form post-analysis tables.
 
@@ -395,7 +395,7 @@ def render_post_analysis_report(
                 report.savefig(figure)
                 plt.close(figure)
 
-        figure, _ = plot_pls_scores(
+        figure, _ = plot_scores(
             pls_structure,
             components=score_components,
             title=f"{dataset_name} ordinary PLS scores",
@@ -404,11 +404,11 @@ def render_post_analysis_report(
         plt.close(figure)
 
         if biplot_components is not None:
-            biplot = pls_biplot_coordinates(
+            biplot = biplot_coordinates(
                 pls_structure,
                 components=biplot_components,
             )
-            figure, _ = plot_pls_biplot(
+            figure, _ = plot_biplot(
                 biplot,
                 predictor_names=predictor_names,
                 title=f"{dataset_name} ordinary PLS score-loading biplot",
@@ -416,7 +416,7 @@ def render_post_analysis_report(
             report.savefig(figure)
             plt.close(figure)
 
-        figure, _ = plot_pls_x_loadings(
+        figure, _ = plot_x_loadings(
             pls_structure,
             predictor_style=predictor_style,
             predictor_names=predictor_names,
@@ -428,7 +428,7 @@ def render_post_analysis_report(
         report.savefig(figure)
         plt.close(figure)
 
-        figure, _ = plot_pls_y_loadings(
+        figure, _ = plot_y_loadings(
             pls_structure,
             response_names=response_names,
             components=loading_components,
@@ -443,7 +443,7 @@ def render_post_analysis_report(
                 if len(coefficient_pages) == 1
                 else f" — response page {page_number}/{len(coefficient_pages)}"
             )
-            figure, _ = plot_pls_coefficients(
+            figure, _ = plot_coefficients(
                 pls_structure,
                 predictor_style=predictor_style,
                 predictor_names=predictor_names,
@@ -461,7 +461,7 @@ def render_post_analysis_report(
                 tables["pls_observation_diagnostics"],
                 sample_names=sample_names,
             )
-            figure, _ = plot_pls_observation_diagnostics(
+            figure, _ = plot_observation_diagnostics(
                 observation_diagnostics,
                 title=f"{dataset_name} ordinary PLS observation diagnostics",
             )
@@ -539,7 +539,7 @@ def _pls_structure_from_tables(
     *,
     predictor_names: Sequence[str],
     response_names: Sequence[str],
-) -> tuple[PLSLatentStructure, tuple[str, ...]]:
+) -> tuple[LatentStructure, tuple[str, ...]]:
     score_table = tables["pls_scores"]
     sample_names = tuple(score_table["sample"].drop_duplicates().astype(str))
     components = tuple(sorted(int(value) for value in score_table["component"].unique()))
@@ -578,7 +578,7 @@ def _pls_structure_from_tables(
         column_order=predictor_names,
     )
     return (
-        PLSLatentStructure(
+        LatentStructure(
             x_scores=x_scores,
             x_loadings=x_loadings,
             y_loadings=y_loadings,
@@ -628,7 +628,7 @@ def _observation_diagnostics_from_table(
     table: pd.DataFrame,
     *,
     sample_names: Sequence[str],
-) -> PLSObservationDiagnostics:
+) -> ObservationDiagnostics:
     if table["sample"].duplicated().any():
         raise ValueError("PLS observation diagnostics must contain one row per sample.")
     indexed = table.set_index("sample")
@@ -646,7 +646,7 @@ def _observation_diagnostics_from_table(
         raise ValueError("PLS observation diagnostics must contain only finite values.")
     score_distance.setflags(write=False)
     x_residual.setflags(write=False)
-    return PLSObservationDiagnostics(
+    return ObservationDiagnostics(
         score_distance=score_distance,
         x_reconstruction_residual=x_residual,
     )

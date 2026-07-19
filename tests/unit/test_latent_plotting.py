@@ -11,16 +11,16 @@ from sklearn.cross_decomposition import PLSRegression
 
 import pipls.plotting as plotting
 from pipls.inspection import (
-    PLSLatentStructure,
-    pls_biplot_coordinates,
-    pls_latent_structure,
-    pls_observation_diagnostics,
+    LatentStructure,
+    biplot_coordinates,
+    latent_structure,
+    observation_diagnostics,
 )
 
 matplotlib.use("Agg")
 
 
-def _structure() -> PLSLatentStructure:
+def _structure() -> LatentStructure:
     rng = np.random.default_rng(932)
     X = rng.normal(size=(28, 5))
     Y = X[:, :3] @ np.array(
@@ -30,11 +30,11 @@ def _structure() -> PLSLatentStructure:
             [-0.4, 0.3, 0.8],
         ]
     ) + 0.05 * rng.normal(size=(28, 3))
-    return pls_latent_structure(PLSRegression(n_components=3).fit(X, Y))
+    return latent_structure(PLSRegression(n_components=3).fit(X, Y))
 
 
-def test_plot_pls_scores_returns_named_axis_and_selected_components() -> None:
-    figure, axes = plotting.plot_pls_scores(
+def test_plot_scores_returns_named_axis_and_selected_components() -> None:
+    figure, axes = plotting.plot_scores(
         _structure(),
         components=(0, 2),
         sample_names=[f"Sample {index + 1}" for index in range(28)],
@@ -49,10 +49,10 @@ def test_plot_pls_scores_returns_named_axis_and_selected_components() -> None:
     assert len(axes["scores"].texts) == 28
 
 
-def test_plot_pls_x_loadings_line_mode_overlays_components_and_preserves_axis() -> None:
+def test_plot_x_loadings_line_mode_overlays_components_and_preserves_axis() -> None:
     coordinate = np.array([1600.0, 1500.0, 1400.0, 1300.0, 1200.0])
 
-    _, axes = plotting.plot_pls_x_loadings(
+    _, axes = plotting.plot_x_loadings(
         _structure(),
         predictor_style="line",
         predictor_axis=coordinate,
@@ -72,8 +72,8 @@ def test_plot_pls_x_loadings_line_mode_overlays_components_and_preserves_axis() 
     ]
 
 
-def test_plot_pls_x_loadings_groups_component_bars_by_predictor() -> None:
-    _, axes = plotting.plot_pls_x_loadings(
+def test_plot_x_loadings_groups_component_bars_by_predictor() -> None:
+    _, axes = plotting.plot_x_loadings(
         _structure(),
         predictor_style="bar",
         predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
@@ -92,11 +92,11 @@ def test_plot_pls_x_loadings_groups_component_bars_by_predictor() -> None:
     ]
 
 
-def test_plot_pls_coefficients_line_mode_overlays_selected_responses() -> None:
+def test_plot_coefficients_line_mode_overlays_selected_responses() -> None:
     coordinate = np.array([1600.0, 1500.0, 1400.0, 1300.0, 1200.0])
     structure = _structure()
 
-    _, axes = plotting.plot_pls_coefficients(
+    _, axes = plotting.plot_coefficients(
         structure,
         predictor_style="line",
         predictor_axis=coordinate,
@@ -116,8 +116,8 @@ def test_plot_pls_coefficients_line_mode_overlays_selected_responses() -> None:
     ]
 
 
-def test_plot_pls_y_loadings_groups_components_by_named_response() -> None:
-    _, axes = plotting.plot_pls_y_loadings(
+def test_plot_y_loadings_groups_components_by_named_response() -> None:
+    _, axes = plotting.plot_y_loadings(
         _structure(),
         response_names=["Yield", "Purity", "Energy demand"],
         components=[0, 2],
@@ -134,8 +134,8 @@ def test_plot_pls_y_loadings_groups_components_by_named_response() -> None:
     ]
 
 
-def test_plot_pls_coefficients_groups_responses_by_named_predictor() -> None:
-    _, axes = plotting.plot_pls_coefficients(
+def test_plot_coefficients_groups_responses_by_named_predictor() -> None:
+    _, axes = plotting.plot_coefficients(
         _structure(),
         predictor_style="bar",
         predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
@@ -152,14 +152,14 @@ def test_plot_pls_coefficients_groups_responses_by_named_predictor() -> None:
     ]
 
 
-def test_plot_pls_observation_diagnostics_returns_one_raw_scatter_axis() -> None:
+def test_plot_observation_diagnostics_returns_one_raw_scatter_axis() -> None:
     rng = np.random.default_rng(181)
     X = rng.normal(size=(32, 6))
     Y = X[:, :2] + 0.1 * rng.normal(size=(32, 2))
     model = PLSRegression(n_components=2).fit(X, Y)
-    diagnostics = pls_observation_diagnostics(model, X)
+    diagnostics = observation_diagnostics(model, X)
 
-    figure, axes = plotting.plot_pls_observation_diagnostics(
+    figure, axes = plotting.plot_observation_diagnostics(
         diagnostics,
         title="Observation review",
     )
@@ -173,13 +173,13 @@ def test_plot_pls_observation_diagnostics_returns_one_raw_scatter_axis() -> None
     assert len(axis.collections) == 1
 
 
-def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:
-    figure, _ = plotting.plot_pls_x_loadings(
+def test_shared_plotting_writes_pdf(tmp_path: Path) -> None:
+    figure, _ = plotting.plot_x_loadings(
         _structure(),
         predictor_style="bar",
         predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
     )
-    output = tmp_path / "pls_x_loadings.pdf"
+    output = tmp_path / "x_loadings.pdf"
 
     figure.savefig(output)
 
@@ -191,48 +191,48 @@ def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:
     ("call", "message"),
     [
         (
-            lambda: plotting.plot_pls_scores(
+            lambda: plotting.plot_scores(
                 _structure(),
                 components=[0],
             ),
             "exactly two",
         ),
         (
-            lambda: plotting.plot_pls_scores(
+            lambda: plotting.plot_scores(
                 _structure(),
                 components=[0, 0],
             ),
             "duplicate",
         ),
         (
-            lambda: plotting.plot_pls_x_loadings(
+            lambda: plotting.plot_x_loadings(
                 _structure(),
                 predictor_style="bar",
             ),
             "predictor_names is required",
         ),
         (
-            lambda: plotting.plot_pls_x_loadings(
+            lambda: plotting.plot_x_loadings(
                 _structure(),
                 predictor_style="line",
             ),
             "predictor_axis is required",
         ),
         (
-            lambda: plotting.plot_pls_y_loadings(
+            lambda: plotting.plot_y_loadings(
                 _structure(),
             ),
             "response_names is required",
         ),
         (
-            lambda: plotting.plot_pls_y_loadings(
+            lambda: plotting.plot_y_loadings(
                 _structure(),
                 response_names=["a"],
             ),
             "Expected 3",
         ),
         (
-            lambda: plotting.plot_pls_coefficients(
+            lambda: plotting.plot_coefficients(
                 _structure(),
                 predictor_style="bar",
                 predictor_names=["a", "b", "c", "d", "e"],
@@ -240,7 +240,7 @@ def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:
             "response_names is required",
         ),
         (
-            lambda: plotting.plot_pls_coefficients(
+            lambda: plotting.plot_coefficients(
                 _structure(),
                 predictor_style="bar",
                 predictor_names=["a", "b", "c", "d", "e"],
@@ -251,7 +251,7 @@ def test_pls_plotting_writes_pdf(tmp_path: Path) -> None:
         ),
     ],
 )
-def test_pls_plotting_rejects_invalid_arguments(
+def test_shared_plotting_rejects_invalid_arguments(
     call: Callable[[], object],
     message: str,
 ) -> None:
@@ -259,11 +259,11 @@ def test_pls_plotting_rejects_invalid_arguments(
         call()
 
 
-def test_plot_pls_biplot_uses_balanced_coordinates_and_predictor_labels() -> None:
+def test_plot_biplot_uses_balanced_coordinates_and_predictor_labels() -> None:
     structure = _structure()
-    coordinates = pls_biplot_coordinates(structure, components=(0, 1))
+    coordinates = biplot_coordinates(structure, components=(0, 1))
 
-    figure, axes = plotting.plot_pls_biplot(
+    figure, axes = plotting.plot_biplot(
         coordinates,
         predictor_names=["Temperature", "Pressure", "Flow", "Density", "Viscosity"],
         title="Pulp-like PLS biplot",
@@ -285,12 +285,12 @@ def test_plot_pls_biplot_uses_balanced_coordinates_and_predictor_labels() -> Non
     ]
 
 
-def test_plot_pls_biplot_accepts_optional_sample_labels() -> None:
+def test_plot_biplot_accepts_optional_sample_labels() -> None:
     structure = _structure()
-    coordinates = pls_biplot_coordinates(structure)
+    coordinates = biplot_coordinates(structure)
     sample_names = [f"Sample {index + 1}" for index in range(structure.n_samples)]
 
-    _, axes = plotting.plot_pls_biplot(
+    _, axes = plotting.plot_biplot(
         coordinates,
         predictor_names=["A", "B", "C", "D", "E"],
         sample_names=sample_names,
@@ -301,11 +301,11 @@ def test_plot_pls_biplot_accepts_optional_sample_labels() -> None:
     assert texts[structure.n_samples :] == ["A", "B", "C", "D", "E"]
 
 
-def test_plot_pls_biplot_requires_predictor_names() -> None:
-    coordinates = pls_biplot_coordinates(_structure())
+def test_plot_biplot_requires_predictor_names() -> None:
+    coordinates = biplot_coordinates(_structure())
 
     with pytest.raises(ValueError, match="Expected 5"):
-        plotting.plot_pls_biplot(
+        plotting.plot_biplot(
             coordinates,
             predictor_names=["A"],
         )

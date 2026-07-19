@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Replace ordinary-PLS-specific shared inspection and plotting names with estimator-neutral PLS-family names, and accept compatible fitted `PiPLSRegression` and scikit-learn `PLSRegression` models through a structural public-attribute contract.
 - Accept the corrected fitted-model analysis boundary: retain ordinary PLS in the shared CV-MSE
   component-path comparison, keep $P$, $D$, and $Q$ inspection explicitly Pi-PLS-specific, and
   require estimator-neutral shared PLS-family tools that numbered examples apply only to the

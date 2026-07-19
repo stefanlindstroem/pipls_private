@@ -41,16 +41,17 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
   diagnostics under `pipls.inspection`;
-- transitional ordinary-PLS-specific latent-structure, biplot, observation-diagnostic, and plotting
-  names that Decision 0045 requires to become estimator-neutral shared PLS-family tools;
+- estimator-neutral latent-structure, biplot, observation-diagnostic, and plotting names that
+  accept compatible fitted Pi-PLS and ordinary PLS models;
 - complete Pulp, Sugarcane, and Tobacco post-analysis workflows with fixed-estimator OOF prediction
   helpers, seven common canonical long-form CSV tables, an optional Tobacco observation-diagnostic
   table, scientific labels obtained at the file-reading boundary, and multipage reports
   reconstructed from those tables.
 
 Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
-analysis-model boundary. The current runtime still fits ordinary PLS models for post-analysis in
-examples 10–12; this is transitional. The accepted target retains ordinary PLS only for CV-MSE
+analysis-model boundary. The shared API migration is complete. The current runtime still fits
+ordinary PLS models for post-analysis in examples 10–12; this is the remaining transitional layer.
+The accepted target retains ordinary PLS only for CV-MSE
 comparison, keeps $P$, $D$, and $Q$ inspection Pi-PLS-specific, and applies estimator-neutral shared
 analysis tools only to the selected Pi-PLS model in numbered examples.
 
@@ -249,19 +250,18 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Implement Decision 0045 in three patches: estimator-neutral shared inspection and plotting names,
-Pi-PLS-only post-analysis in examples 10–12 while preserving the two-model CV-MSE comparison, and
-final stale-name/artifact/documentation cleanup with boundary tests. Resume release hardening only
-after that corrective series. The minimal onboarding path is complete; the fitted-model analysis
-surface is reopened only for the Decision 0045 correction. Do not add further diagnostics outside
-that correction without a separate decision.
+Complete the remaining Decision 0045 corrections: convert examples 10–12 to Pi-PLS-only
+post-analysis while preserving the two-model CV-MSE comparison, then perform stale-artifact,
+documentation, and boundary-test cleanup. The estimator-neutral shared API is complete. Resume
+release hardening only after this corrective series. Do not add further diagnostics outside that
+correction without a separate decision.
 
 ## Subsequent roadmap
 
-1. **Decision 0045 API migration:** replace ordinary-PLS-specific shared analysis names with
-   estimator-neutral names and test them with both fitted estimator classes — next.
+1. **Decision 0045 API migration:** estimator-neutral shared names and structural support for both
+   fitted estimator classes — complete.
 2. **Decision 0045 example migration:** retain the two-model CV-MSE comparison but use only the
-   selected Pi-PLS model for OOF prediction and post-analysis in examples 10–12 — pending.
+   selected Pi-PLS model for OOF prediction and post-analysis in examples 10–12 — next.
 3. **Decision 0045 cleanup:** remove stale names and artifact files, align documentation, and add
    repository-boundary tests — pending.
 4. **User documentation and release hardening:** literal-matrix quickstart and navigation hierarchy

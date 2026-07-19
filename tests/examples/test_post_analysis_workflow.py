@@ -13,9 +13,9 @@ from sklearn.model_selection import KFold
 
 from pipls import PiPLSRegression
 from pipls.inspection import (
+    latent_structure,
+    observation_diagnostics,
     pipls_display_factors,
-    pls_latent_structure,
-    pls_observation_diagnostics,
     prediction_diagnostics,
 )
 
@@ -120,7 +120,7 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
         diagnostics_by_model={"Pi-PLS": pipls_diagnostics, "PLS": pls_diagnostics},
-        pls_structure=pls_latent_structure(pls_model),
+        pls_structure=latent_structure(pls_model),
         predictor_names=X.columns.tolist(),
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
@@ -202,7 +202,7 @@ def test_post_analysis_report_supports_an_explicit_physical_predictor_axis(
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
         diagnostics_by_model={"PLS": diagnostics},
-        pls_structure=pls_latent_structure(pls_model),
+        pls_structure=latent_structure(pls_model),
         predictor_names=wavelength_labels,
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
@@ -241,12 +241,12 @@ def test_post_analysis_report_supports_response_pages_and_observation_diagnostic
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
         diagnostics_by_model={"PLS": diagnostics},
-        pls_structure=pls_latent_structure(pls_model),
+        pls_structure=latent_structure(pls_model),
         predictor_names=X.columns.tolist(),
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
         fold_index=np.repeat(np.arange(1, 6), 6),
-        pls_observation_diagnostics_result=pls_observation_diagnostics(pls_model, X),
+        pls_observation_diagnostics_result=observation_diagnostics(pls_model, X),
     )
     paths = ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
 
@@ -283,7 +283,7 @@ def test_response_pages_must_partition_source_order(tmp_path: Path) -> None:
     tables = ARTIFACTS.build_post_analysis_tables(
         factors=pipls_display_factors(pipls_model.decomposition_),
         diagnostics_by_model={"PLS": diagnostics},
-        pls_structure=pls_latent_structure(pls_model),
+        pls_structure=latent_structure(pls_model),
         predictor_names=X.columns.tolist(),
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
@@ -345,7 +345,7 @@ def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     assert 'predictor_style="line"' in text
     assert 'predictor_axis_label="Wavenumber (cm$^{-1}$)"' in text
     assert "response_pages=response_pages" in text
-    assert "pls_observation_diagnostics(pls_model, X)" in text
+    assert "observation_diagnostics(pls_model, X)" in text
     assert "fixed_model_oof_predictions(" in text
     assert 'prediction_kind = "selection-conditioned OOF predictions"' in text
     assert "build_post_analysis_tables(" in text

@@ -49,12 +49,11 @@ carry their own output-container configuration through cloning and refit.
 
 Decisions 0042 and 0045 define the staged fitted-model analysis surface. Pi-PLS-specific $P$, $D$,
 and $Q$ inspection remains explicitly method-owned. Scores, loadings, coefficients, biplots,
-observation diagnostics, and prediction diagnostics are shared PLS-family analyses whose final API
-will be estimator-neutral. Ordinary PLS remains the component-path and benchmark comparator; the
-numbered post-analysis examples will apply shared tools only to the selected Pi-PLS model. The
-current ordinary-PLS-specific shared names and final ordinary PLS example fits are transitional and
-are the next migration target. Dataset-specific choices, OOF loops, pandas tables, CSV writing, and
-multipage reports remain in `examples/_support/`.
+observation diagnostics, and prediction diagnostics are shared PLS-family analyses with an
+estimator-neutral API. Ordinary PLS remains the component-path and benchmark comparator; the
+numbered post-analysis examples will apply shared tools only to the selected Pi-PLS model. Their
+current final ordinary PLS fits are the remaining migration target. Dataset-specific choices, OOF
+loops, pandas tables, CSV writing, and multipage reports remain in `examples/_support/`.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must

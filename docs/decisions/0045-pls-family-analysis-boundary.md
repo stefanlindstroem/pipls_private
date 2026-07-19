@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Implementation is pending in the corrective series following this decision.
+Accepted. The estimator-neutral shared API is implemented; numbered-example migration and final cleanup remain.
 
 This decision supersedes the ordinary-PLS-specific ownership and example-use portions of Decisions
 0042 and 0043. Their separation of selection diagnostics, fitted-model interpretation, prediction
@@ -101,17 +101,17 @@ the package remains unreleased at version `0.0.0`.
 
 ## Migration sequence
 
-Implementation proceeds in three further patches:
+The corrective migration proceeds in three stages:
 
-1. generalize and rename the shared inspection and plotting API, with tests against both estimator
-   classes;
-2. convert Pulp, Sugarcane, and Tobacco post-analysis to one selected Pi-PLS model while preserving
-   the two-model CV-MSE comparison;
-3. remove stale ordinary-PLS post-analysis terminology, filenames, tests, and documentation, and
+1. **Complete:** generalize and rename the shared inspection and plotting API, with tests against
+   fitted `PLSRegression` and `PiPLSRegression` models.
+2. Convert Pulp, Sugarcane, and Tobacco post-analysis to one selected Pi-PLS model while preserving
+   the two-model CV-MSE comparison.
+3. Remove stale ordinary-PLS post-analysis terminology, filenames, tests, and documentation, and
    add static repository-boundary enforcement.
 
-Until those patches are complete, the current runtime names and example behavior are transitional
-and must not be treated as the final analysis contract.
+The shared runtime names now follow this decision. The remaining transitional behavior is confined
+to the numbered real-data examples and their post-analysis artifacts.
 
 ## Consequences
 

@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal, TypeAlias
+from typing import Any, Literal, Protocol, TypeAlias, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.utils.validation import check_is_fitted
 
 from .decomposition import PiPLSDecomposition
@@ -23,6 +22,29 @@ PredictionKind: TypeAlias = Literal[
     "external test predictions",
 ]
 
+
+class _LatentStructureModel(Protocol):
+    """Structural fitted-model contract used by shared PLS-family analysis."""
+
+    x_scores_: ArrayLike
+    x_loadings_: ArrayLike
+    y_loadings_: ArrayLike
+    coef_: ArrayLike
+
+    def fit(self, X: ArrayLike, y: ArrayLike) -> Any:
+        """Fit the estimator."""
+
+
+class _ObservationModel(_LatentStructureModel, Protocol):
+    """Latent-structure model with public X transform reconstruction methods."""
+
+    def transform(self, X: ArrayLike) -> ArrayLike:
+        """Transform predictor observations to X scores."""
+
+    def inverse_transform(self, X: ArrayLike) -> ArrayLike:
+        """Reconstruct predictor observations from X scores."""
+
+
 _PREDICTION_KINDS: tuple[PredictionKind, ...] = (
     "fitted values",
     "fixed-parameter OOF predictions",
@@ -31,28 +53,28 @@ _PREDICTION_KINDS: tuple[PredictionKind, ...] = (
 )
 
 __all__ = [
-    "PLSBiplotCoordinates",
-    "PLSLatentStructure",
-    "PLSObservationDiagnostics",
+    "BiplotCoordinates",
+    "LatentStructure",
+    "ObservationDiagnostics",
     "PiPLSDisplayFactors",
     "PredictionDiagnostics",
     "PredictionKind",
     "pipls_display_factors",
-    "pls_biplot_coordinates",
-    "pls_latent_structure",
-    "pls_observation_diagnostics",
+    "biplot_coordinates",
+    "latent_structure",
+    "observation_diagnostics",
     "prediction_diagnostics",
 ]
 
 
 @dataclass(frozen=True)
-class PLSBiplotCoordinates:
+class BiplotCoordinates:
     """Immutable balanced score-loading coordinates for two PLS components.
 
     ``sample_coordinates`` and ``predictor_coordinates`` preserve the selected
     score-loading reconstruction while giving both coordinate sets equal
     Euclidean norm within each component. Construct instances with
-    :func:`pls_biplot_coordinates`.
+    :func:`biplot_coordinates`.
     """
 
     sample_coordinates: FloatArray
@@ -74,12 +96,13 @@ class PLSBiplotCoordinates:
 
 
 @dataclass(frozen=True)
-class PLSLatentStructure:
-    """Immutable copies of public fitted ordinary-PLS quantities.
+class LatentStructure:
+    """Immutable copies of public fitted PLS-family quantities.
 
-    ``coefficients`` follows the public scikit-learn ``coef_`` orientation and
-    therefore has shape ``(n_targets, n_features)``. Construct instances with
-    :func:`pls_latent_structure`.
+    ``coefficients`` follows the shared ``coef_`` orientation used by
+    ``PLSRegression`` and ``PiPLSRegression`` and therefore has shape
+    ``(n_targets, n_features)``. Construct instances with
+    :func:`latent_structure`.
     """
 
     x_scores: FloatArray
@@ -107,14 +130,14 @@ class PLSLatentStructure:
 
     @property
     def n_components(self) -> int:
-        """Number of retained ordinary-PLS components."""
+        """Number of retained latent components."""
 
         return int(self.x_scores.shape[1])
 
 
 @dataclass(frozen=True)
-class PLSObservationDiagnostics:
-    """Immutable raw ordinary-PLS observation diagnostics.
+class ObservationDiagnostics:
+    """Immutable raw PLS-family observation diagnostics.
 
     ``score_distance`` is the squared Mahalanobis distance of each supplied
     X score from the fitted training-score center, using the Moore--Penrose
@@ -122,7 +145,7 @@ class PLSObservationDiagnostics:
     is the row-wise squared Euclidean residual after the public PLS
     transform/inverse-transform round trip.
 
-    Construct instances with :func:`pls_observation_diagnostics`.
+    Construct instances with :func:`observation_diagnostics`.
     """
 
     score_distance: FloatArray
@@ -207,11 +230,11 @@ class PredictionDiagnostics:
         return int(self.observed.shape[1])
 
 
-def pls_biplot_coordinates(
-    structure: PLSLatentStructure,
+def biplot_coordinates(
+    structure: LatentStructure,
     *,
     components: Sequence[int] = (0, 1),
-) -> PLSBiplotCoordinates:
+) -> BiplotCoordinates:
     r"""Return balanced coordinates for a two-component PLS score-loading biplot.
 
     For selected score and X-loading columns $t_k$ and $p_k$, define
@@ -229,18 +252,18 @@ def pls_biplot_coordinates(
     Parameters
     ----------
     structure:
-        Immutable ordinary-PLS latent structure.
+        Immutable PLS-family latent structure.
     components:
         Exactly two distinct zero-based component indices.
 
     Returns
     -------
-    PLSBiplotCoordinates
+    BiplotCoordinates
         Read-only balanced sample and predictor coordinates.
     """
 
-    if not isinstance(structure, PLSLatentStructure):
-        raise TypeError("structure must be a PLSLatentStructure instance.")
+    if not isinstance(structure, LatentStructure):
+        raise TypeError("structure must be a LatentStructure instance.")
     indices = _two_component_indices(components, size=structure.n_components)
     selected_scores = structure.x_scores[:, indices]
     selected_loadings = structure.x_loadings[:, indices]
@@ -255,7 +278,7 @@ def pls_biplot_coordinates(
     sample_coordinates = selected_scores * scaling_factors[None, :]
     predictor_coordinates = selected_loadings / scaling_factors[None, :]
 
-    return PLSBiplotCoordinates(
+    return BiplotCoordinates(
         sample_coordinates=_read_only(np.array(sample_coordinates, copy=True)),
         predictor_coordinates=_read_only(np.array(predictor_coordinates, copy=True)),
         component_indices=_read_only_ints(np.array(indices, dtype=np.int64)),
@@ -263,32 +286,38 @@ def pls_biplot_coordinates(
     )
 
 
-def pls_latent_structure(model: PLSRegression) -> PLSLatentStructure:
-    """Return defensive copies of public fitted ``PLSRegression`` arrays.
+def latent_structure(model: object) -> LatentStructure:
+    """Return defensive copies of public fitted PLS-family arrays.
+
+    The function uses a structural fitted-model contract rather than a concrete
+    estimator class. Compatible models expose ``x_scores_``, ``x_loadings_``,
+    ``y_loadings_``, and ``coef_`` with the usual PLS-family orientations.
 
     Parameters
     ----------
     model:
-        A fitted :class:`sklearn.cross_decomposition.PLSRegression` estimator.
+        A fitted PLS-family estimator, such as scikit-learn ``PLSRegression``
+        or :class:`pipls.PiPLSRegression`.
 
     Returns
     -------
-    PLSLatentStructure
+    LatentStructure
         Read-only X scores, X loadings, Y loadings, and regression
         coefficients.
     """
 
-    if not isinstance(model, PLSRegression):
-        raise TypeError("model must be a sklearn.cross_decomposition.PLSRegression.")
-    check_is_fitted(
-        model,
-        attributes=["x_scores_", "x_loadings_", "y_loadings_", "coef_"],
+    fitted = cast(
+        _LatentStructureModel,
+        _require_fitted_model(
+            model,
+            attributes=("x_scores_", "x_loadings_", "y_loadings_", "coef_"),
+        ),
     )
 
-    x_scores = _finite_matrix(model.x_scores_, name="model.x_scores_")
-    x_loadings = _finite_matrix(model.x_loadings_, name="model.x_loadings_")
-    y_loadings = _finite_matrix(model.y_loadings_, name="model.y_loadings_")
-    coefficients = _finite_matrix(model.coef_, name="model.coef_")
+    x_scores = _finite_matrix(fitted.x_scores_, name="model.x_scores_")
+    x_loadings = _finite_matrix(fitted.x_loadings_, name="model.x_loadings_")
+    y_loadings = _finite_matrix(fitted.y_loadings_, name="model.y_loadings_")
+    coefficients = _finite_matrix(fitted.coef_, name="model.coef_")
 
     n_components = x_scores.shape[1]
     if n_components == 0:
@@ -309,7 +338,7 @@ def pls_latent_structure(model: PLSRegression) -> PLSLatentStructure:
             f"expected {expected_coefficients}, got {coefficients.shape}."
         )
 
-    return PLSLatentStructure(
+    return LatentStructure(
         x_scores=_read_only(x_scores),
         x_loadings=_read_only(x_loadings),
         y_loadings=_read_only(y_loadings),
@@ -317,56 +346,63 @@ def pls_latent_structure(model: PLSRegression) -> PLSLatentStructure:
     )
 
 
-def pls_observation_diagnostics(
-    model: PLSRegression,
+def observation_diagnostics(
+    model: object,
     X: ArrayLike,
-) -> PLSObservationDiagnostics:
+) -> ObservationDiagnostics:
     """Return raw score-distance and X-reconstruction diagnostics.
 
-    The fitted training scores establish the score center and covariance.
-    The supplied observations are transformed with the fitted model, and the
+    The fitted training scores establish the score center and covariance. The
+    supplied observations are transformed with the fitted model, and the
     covariance inverse is calculated with :func:`numpy.linalg.pinv` so that
     numerically rank-deficient score covariance remains well defined.
 
-    No theoretical warning limits are calculated. The returned quantities are
-    descriptive diagnostics whose interpretation depends on the fitted model
-    and the scientific application.
+    The function uses the public fitted arrays and X transform methods shared by
+    ``PLSRegression`` and ``PiPLSRegression``. No theoretical warning limits
+    are calculated.
 
     Parameters
     ----------
     model:
-        A fitted :class:`sklearn.cross_decomposition.PLSRegression` estimator.
+        A fitted PLS-family estimator exposing public X scores, X loadings,
+        ``transform()``, and ``inverse_transform()``.
     X:
         Predictor observations with the fitted number of features.
 
     Returns
     -------
-    PLSObservationDiagnostics
+    ObservationDiagnostics
         Read-only raw score distances and squared X-reconstruction residuals.
     """
 
-    if not isinstance(model, PLSRegression):
-        raise TypeError("model must be a sklearn.cross_decomposition.PLSRegression.")
-    check_is_fitted(model, attributes=["x_scores_", "x_loadings_"])
+    fitted = cast(
+        _ObservationModel,
+        _require_fitted_model(
+            model,
+            attributes=("x_scores_", "x_loadings_"),
+            methods=("transform", "inverse_transform"),
+        ),
+    )
 
-    training_scores = _finite_matrix(model.x_scores_, name="model.x_scores_")
+    training_scores = _finite_matrix(fitted.x_scores_, name="model.x_scores_")
+    x_loadings = _finite_matrix(fitted.x_loadings_, name="model.x_loadings_")
     X_values = _finite_matrix(X, name="X")
     if training_scores.shape[0] < 2:
         raise ValueError("model.x_scores_ must contain at least two training observations.")
-    if X_values.shape[1] != model.x_loadings_.shape[0]:
+    if X_values.shape[1] != x_loadings.shape[0]:
         raise ValueError(
             "X must contain the fitted number of predictor columns: "
-            f"expected {model.x_loadings_.shape[0]}, got {X_values.shape[1]}."
+            f"expected {x_loadings.shape[0]}, got {X_values.shape[1]}."
         )
 
     score_center = np.mean(training_scores, axis=0)
     centered_training_scores = training_scores - score_center
-    score_covariance = (
-        centered_training_scores.T @ centered_training_scores
-    ) / (training_scores.shape[0] - 1)
+    score_covariance = (centered_training_scores.T @ centered_training_scores) / (
+        training_scores.shape[0] - 1
+    )
     inverse_covariance = np.linalg.pinv(score_covariance)
 
-    transformed = _finite_matrix(model.transform(X), name="model.transform(X)")
+    transformed = _finite_matrix(fitted.transform(X), name="model.transform(X)")
     centered_scores = transformed - score_center
     score_distance = np.einsum(
         "ij,jk,ik->i",
@@ -375,12 +411,12 @@ def pls_observation_diagnostics(
         centered_scores,
     )
     reconstructed = _finite_matrix(
-        model.inverse_transform(transformed),
+        fitted.inverse_transform(transformed),
         name="model.inverse_transform(model.transform(X))",
     )
     x_reconstruction_residual = np.sum((X_values - reconstructed) ** 2, axis=1)
 
-    return PLSObservationDiagnostics(
+    return ObservationDiagnostics(
         score_distance=_read_only(np.asarray(score_distance, dtype=np.float64)),
         x_reconstruction_residual=_read_only(
             np.asarray(x_reconstruction_residual, dtype=np.float64)
@@ -538,6 +574,24 @@ def _response_matrix(values: ArrayLike, *, name: str) -> FloatArray:
     return array
 
 
+def _require_fitted_model(
+    model: object,
+    *,
+    attributes: Sequence[str],
+    methods: Sequence[str] = (),
+) -> object:
+    """Validate the structural contract and return the fitted model."""
+
+    if not callable(getattr(model, "fit", None)):
+        raise TypeError("model must be a PLS-family estimator with a callable fit method.")
+    missing_methods = [name for name in methods if not callable(getattr(model, name, None))]
+    if missing_methods:
+        joined = ", ".join(f"{name}()" for name in missing_methods)
+        raise TypeError(f"model must expose callable {joined} methods.")
+    check_is_fitted(cast(Any, model), attributes=list(attributes))
+    return model
+
+
 def _finite_matrix(values: ArrayLike, *, name: str) -> FloatArray:
     array = np.array(values, dtype=np.float64, copy=True)
     if array.ndim != 2:
@@ -570,9 +624,7 @@ def _two_component_indices(components: Sequence[int], *, size: int) -> tuple[int
     if first == second:
         raise ValueError("components must contain two distinct indices.")
     if first < 0 or second < 0 or first >= size or second >= size:
-        raise ValueError(
-            f"components must lie in [0, {size - 1}]; got {(first, second)}."
-        )
+        raise ValueError(f"components must lie in [0, {size - 1}]; got {(first, second)}.")
     return first, second
 
 

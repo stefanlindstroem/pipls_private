@@ -9,12 +9,14 @@ diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.in
 Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
 Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
 factorization inspection, and shared PLS-family analysis. Source code and tests establish which
-parts are currently implemented. Do not describe the Decision 0045 migration as complete until the
-renamed API, Pi-PLS-only numbered-example post-analysis, and cleanup tests are committed.
+parts are currently implemented. The shared API migration is complete; do not describe the full
+Decision 0045 migration as complete until Pi-PLS-only numbered-example post-analysis and cleanup
+tests are committed.
 
 The current implementation includes `pipls.inspection` and `pipls.plotting`, but the shared
-latent-structure functions and numbered-example post-analysis still use transitional
-ordinary-PLS-specific names and final ordinary PLS fits. Decision 0045 requires those shared tools
+latent-structure functions now use estimator-neutral names and structural fitted-model contracts.
+Numbered-example post-analysis still contains transitional final ordinary PLS fits. Decision 0045
+requires those examples
 to become estimator-neutral and requires the numbered examples to apply them only to the selected
 Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface remains explicitly method-specific.
 
@@ -69,9 +71,8 @@ Implemented responsibilities are:
 - shared PLS-family observation diagnostics;
 - balanced two-component score-loading biplot coordinates.
 
-The current concrete names remain transitional until the Decision 0045 API migration. The final
-implementation must validate compatible public fitted attributes and transformations rather than
-requiring a concrete `PLSRegression` instance.
+The estimator-neutral names and structural fitted-model validation required by Decision 0045 are
+implemented. Compatible `PiPLSRegression` and `PLSRegression` models are covered by focused tests.
 
 ### `pipls.plotting`
 
@@ -326,7 +327,7 @@ The accepted order after Decision 0042 is:
 
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
 2. Pi-PLS decomposition and prediction plotting — **complete**;
-3. transitional ordinary-PLS-specific shared analysis — **implemented but superseded by Decision 0045**;
+3. estimator-neutral shared PLS-family analysis — **implemented**;
 4. estimator-neutral shared inspection and plotting API — **next**;
 5. Pi-PLS-only Pulp, Sugarcane, and Tobacco post-analysis migration — **pending**;
 6. stale-name, artifact, documentation, and boundary-test cleanup — **pending**;

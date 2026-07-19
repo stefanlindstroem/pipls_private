@@ -442,13 +442,11 @@ Acceptance conditions:
   tests, theoretical outlier limits, and contribution plots remain deferred.
 
 The original implementation order completed the numerical and plotting mechanics, but Decision
-0045 corrects the model-ownership boundary. The corrective order is: estimator-neutral shared
-inspection and plotting names; Pi-PLS-only post-analysis for Pulp, Sugarcane, and Tobacco while
-retaining ordinary PLS in the CV-MSE comparison; then stale-name, artifact, documentation, and
-boundary-test cleanup.
+0045 corrects the model-ownership boundary. The estimator-neutral shared inspection and plotting API is complete. The remaining corrective
+order is: Pi-PLS-only post-analysis for Pulp, Sugarcane, and Tobacco while retaining ordinary PLS in
+the CV-MSE comparison; then stale artifact, documentation, and boundary-test cleanup.
 
-Current status: **reopened by Decision 0045; documentation boundary accepted, runtime migration
-next**.
+Current status: **reopened by Decision 0045; shared API complete, example migration next**.
 
 ### Product documentation and release hardening
 

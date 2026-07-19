@@ -149,26 +149,23 @@ print(search.oof_predictions_)
 Inspect a fitted Pi-PLS factorization without changing the estimator:
 
 ```python
-from sklearn.cross_decomposition import PLSRegression
-
 from pipls.inspection import (
+    biplot_coordinates,
+    latent_structure,
     pipls_display_factors,
-    pls_biplot_coordinates,
-    pls_latent_structure,
     prediction_diagnostics,
 )
 
 factors = pipls_display_factors(model.decomposition_)
+structure = latent_structure(model)
+biplot = biplot_coordinates(structure, components=(0, 1))
+
 Y_pred = model.predict(X_test)
 diagnostics = prediction_diagnostics(
     Y_test,
     Y_pred,
     prediction_kind="external test predictions",
 )
-
-pls_model = PLSRegression(n_components=2, scale=True).fit(X_train, Y_train)
-pls_structure = pls_latent_structure(pls_model)
-biplot = pls_biplot_coordinates(pls_structure, components=(0, 1))
 ```
 
 The display factors are read-only copies of $P$, $D$, and $Q$ with deterministic component signs;
@@ -195,9 +192,9 @@ Install the optional plotting dependency and render the computed results explici
 ```python
 from pipls.plotting import (
     plot_pipls_decomposition,
-    plot_pls_biplot,
-    plot_pls_scores,
-    plot_pls_x_loadings,
+    plot_biplot,
+    plot_scores,
+    plot_x_loadings,
     plot_prediction_diagnostics,
 )
 
@@ -211,21 +208,20 @@ prediction_figure, prediction_axes = plot_prediction_diagnostics(
     diagnostics,
     response_names=response_names,
 )
-score_figure, score_axes = plot_pls_scores(pls_structure, components=(0, 1))
-biplot_figure, biplot_axes = plot_pls_biplot(
+score_figure, score_axes = plot_scores(structure, components=(0, 1))
+biplot_figure, biplot_axes = plot_biplot(
     biplot,
     predictor_names=predictor_names,
 )
-loading_figure, loading_axes = plot_pls_x_loadings(
-    pls_structure,
+loading_figure, loading_axes = plot_x_loadings(
+    structure,
     predictor_style="bar",
     predictor_names=predictor_names,
 )
 ```
 
 The plotting functions return figures and named axes. They do not call `show()`, save files, retain
-models, or infer whether predictors are spectra. Ordinary PLS score, balanced score-loading biplot, X/Y-loading, coefficient, and raw observation-diagnostic
-figures are also available from `pipls.plotting`. Use `predictor_style="line"` with an explicit
+models, or infer whether predictors are spectra. The shared PLS-family score, balanced score-loading biplot, X/Y-loading, coefficient, and raw observation-diagnostic figures are available from `pipls.plotting`. The numerical extraction accepts compatible fitted `PiPLSRegression` and scikit-learn `PLSRegression` models. Use `predictor_style="line"` with an explicit
 physical coordinate and axis label for spectra. Install with `python -m pip install "pipls[plot]"`.
 See [`docs/model_inspection.md`](docs/model_inspection.md) and the complete
 [Pulp post-analysis example](examples/10_pulp_real_data.py).
