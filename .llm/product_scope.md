@@ -124,8 +124,8 @@ review because they combined unrelated questions and produced an unnecessarily w
 focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
 output. Pulp, Sugarcane, and Tobacco are transparent user-run examples rather than benchmark or
-default-test jobs. They read the public tables directly, write separate Pi-PLS and standard PLS
-(NIPALS) path CSVs, derive comparison PDFs from those tables, and fit a fixed Pi-PLS model only after
-a visible user component choice. None of this includes a block-aware standardization API design;
+default-test jobs. Example 09 reads the public tables and writes the separate Pi-PLS and standard
+PLS (NIPALS) comparison paths. Examples 10–12 write Pi-PLS-only paths beside their post-analysis
+reports and fit a fixed Pi-PLS model only after a visible user component choice. None of this includes a block-aware standardization API design;
 future block-aware variants remain deferred for months or until the project owner explicitly starts
 a separate phase.

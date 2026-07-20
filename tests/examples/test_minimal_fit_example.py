@@ -33,6 +33,7 @@ def test_examples_assume_repository_owned_result_directories() -> None:
 
     for relative in (
         "results",
+        "results/pls_path_comparison",
         "results/pulp_post_analysis",
         "results/sugarcane_post_analysis",
         "results/tobacco_post_analysis",

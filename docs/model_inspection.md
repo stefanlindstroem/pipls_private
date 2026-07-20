@@ -9,15 +9,16 @@ workflows. For the shortest fitted-model path, begin with [`quickstart.md`](quic
 
 ## Accepted analysis-model boundary
 
-Decision 0045 distinguishes three roles. The component-path comparison continues to fit both
-Pi-PLS and ordinary PLS and plots both CV-MSE curves. Inspection of $P$, $D$, $Q$, and $QD$ remains
-explicitly Pi-PLS-specific. Scores, loadings, coefficients, biplots, observation diagnostics, and
-prediction diagnostics are shared PLS-family analyses with estimator-neutral names.
+Decisions 0045 and 0047 distinguish three roles. Example 09 explicitly fits Pi-PLS and ordinary
+PLS paths and plots both CV-MSE curves. Examples 10–12 evaluate only a Pi-PLS path before fitting
+and inspecting one selected Pi-PLS model. Inspection of $P$, $D$, $Q$, and $QD$ remains explicitly
+Pi-PLS-specific. Scores, loadings, coefficients, biplots, observation diagnostics, and prediction
+diagnostics are shared PLS-family analyses with estimator-neutral names.
 
 The shared numerical extraction accepts compatible fitted `PiPLSRegression` and scikit-learn
 `PLSRegression` models through their public fitted attributes and transformation methods. The
-numbered real-data examples apply those tools only to the selected Pi-PLS model. Ordinary PLS is
-retained there only for the comparative component-path CV-MSE curve.
+numbered real-data analysis examples apply those tools only to the selected Pi-PLS model. Ordinary
+PLS appears in the dedicated comparison example rather than as an automatic stage of normal use.
 
 Import these names from the submodule:
 

@@ -174,7 +174,7 @@ def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
     assert "render_post_analysis_report(" in text
     assert "biplot_components=(1, 2)" in text
     assert "loading_components=(1, 2, 3)" in text
-    assert "POST_ANALYSIS_DIR" in text
+    assert "ANALYSIS_DIR" in text
     assert 'prediction_kind="fitted values"' not in text
     assert "subprocess" not in text
 
@@ -309,7 +309,7 @@ def test_sugarcane_example_contains_complete_spectral_post_analysis() -> None:
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
-    assert "POST_ANALYSIS_DIR" in text
+    assert "ANALYSIS_DIR" in text
     assert "biplot_components" not in text
     assert "subprocess" not in text
 
@@ -333,6 +333,6 @@ def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
-    assert "POST_ANALYSIS_DIR" in text
+    assert "ANALYSIS_DIR" in text
     assert "biplot_components" not in text
     assert "subprocess" not in text

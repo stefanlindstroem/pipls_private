@@ -57,18 +57,29 @@ def _write_pls_component_path(path: Path, components: list[int] | None = None) -
     ).to_csv(path, index=False)
 
 
-def test_plot_is_generated_from_two_canonical_csvs(tmp_path: Path) -> None:
+def test_pipls_plot_is_generated_from_one_canonical_csv(tmp_path: Path) -> None:
+    csv_path = tmp_path / "component_path.csv"
+    pdf_path = tmp_path / "component_path.pdf"
+    _write_component_path(csv_path)
+
+    PLOT.plot_pipls_component_path(csv_path, pdf_path, title="Test Pi-PLS path")
+
+    assert pdf_path.read_bytes().startswith(b"%PDF")
+    assert pdf_path.stat().st_size > 1_000
+
+
+def test_comparison_plot_is_generated_from_two_canonical_csvs(tmp_path: Path) -> None:
     csv_path = tmp_path / "component_path.csv"
     pls_csv_path = tmp_path / "pls_component_path.csv"
-    pdf_path = tmp_path / "component_path.pdf"
+    pdf_path = tmp_path / "component_path_comparison.pdf"
     _write_component_path(csv_path)
     _write_pls_component_path(pls_csv_path)
 
-    PLOT.plot_component_path(
+    PLOT.plot_component_path_comparison(
         csv_path,
         pls_csv_path,
         pdf_path,
-        title="Test component path",
+        title="Test component-path comparison",
     )
 
     assert pdf_path.read_bytes().startswith(b"%PDF")
@@ -83,19 +94,19 @@ def test_plot_reader_rejects_missing_columns(tmp_path: Path) -> None:
         PLOT.read_component_path(csv_path)
 
 
-def test_plot_rejects_mismatched_component_counts(tmp_path: Path) -> None:
+def test_comparison_plot_rejects_mismatched_component_counts(tmp_path: Path) -> None:
     csv_path = tmp_path / "component_path.csv"
     pls_csv_path = tmp_path / "pls_component_path.csv"
-    pdf_path = tmp_path / "component_path.pdf"
+    pdf_path = tmp_path / "component_path_comparison.pdf"
     _write_component_path(csv_path)
     _write_pls_component_path(pls_csv_path, [1, 2])
 
     with pytest.raises(ValueError, match="same component counts"):
-        PLOT.plot_component_path(
+        PLOT.plot_component_path_comparison(
             csv_path,
             pls_csv_path,
             pdf_path,
-            title="Test component path",
+            title="Test component-path comparison",
         )
 
 
@@ -142,21 +153,35 @@ def test_nested_pls_path_matches_separate_pls_fits() -> None:
         )
 
 
-def test_real_data_examples_use_two_stage_comparison_workflow() -> None:
-    examples = [
-        _repository_root() / "examples" / "10_pulp_real_data.py",
-        _repository_root() / "examples" / "11_sugarcane_real_data.py",
-        _repository_root() / "examples" / "12_tobacco_real_data.py",
-    ]
-    for path in examples:
-        text = path.read_text(encoding="utf-8")
+def test_dedicated_example_owns_all_pls_path_comparisons() -> None:
+    text = (_repository_root() / "examples" / "09_pls_path_comparison.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "evaluate_pls_component_path(" in text
+    assert "plot_component_path_comparison(" in text
+    assert text.count('("pulp",') == 1
+    assert text.count('("sugarcane",') == 1
+    assert '"tobacco",' in text
+    assert "component_path_results_" in text
+    assert "refit=False" in text
+
+
+def test_real_data_examples_use_pipls_only_component_paths() -> None:
+    for filename in (
+        "10_pulp_real_data.py",
+        "11_sugarcane_real_data.py",
+        "12_tobacco_real_data.py",
+    ):
+        text = (_repository_root() / "examples" / filename).read_text(encoding="utf-8")
         assert "component_path_results_" in text
         assert "refit=False" in text
-        assert "PLS_PATH_CSV" in text
-        assert "from _support.pls_component_path import evaluate_pls_component_path" in text
-        assert "from _support.plot_component_path import plot_component_path" in text
-        assert "evaluate_pls_component_path(" in text
-        assert "plot_component_path(" in text
+        assert "plot_pipls_component_path(" in text
+        assert "evaluate_pls_component_path(" not in text
+        assert "plot_component_path_comparison(" not in text
+        assert 'ANALYSIS_DIR / "component_path.csv"' in text
+        assert 'ANALYSIS_DIR / "component_path.pdf"' in text
+        assert 'ANALYSIS_DIR / "post_analysis.pdf"' in text
         assert 'pipls_path.set_index("n_components")' in text
         assert "predictor_rank=chosen_predictor_rank" in text
         assert "subprocess" not in text
@@ -165,8 +190,9 @@ def test_real_data_examples_use_two_stage_comparison_workflow() -> None:
 
 
 def test_tobacco_example_uses_full_svd_and_auto_search() -> None:
-    path = _repository_root() / "examples" / "12_tobacco_real_data.py"
-    text = path.read_text(encoding="utf-8")
+    text = (_repository_root() / "examples" / "12_tobacco_real_data.py").read_text(
+        encoding="utf-8"
+    )
 
     assert 'svd_solver="full"' in text
     assert 'search_method="auto"' in text
@@ -175,7 +201,9 @@ def test_tobacco_example_uses_full_svd_and_auto_search() -> None:
 
 def test_example_helpers_are_importable_functions_not_command_line_wrappers() -> None:
     for filename in ["pls_component_path.py", "plot_component_path.py"]:
-        text = (_repository_root() / "examples" / "_support" / filename).read_text(encoding="utf-8")
+        text = (_repository_root() / "examples" / "_support" / filename).read_text(
+            encoding="utf-8"
+        )
         assert "argparse" not in text
         assert "subprocess" not in text
         assert "if __name__ ==" not in text

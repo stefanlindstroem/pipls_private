@@ -477,7 +477,7 @@ Current status: **current estimator standardization complete; block-aware API de
 ## Current next increment
 
 Resume buildable documentation and release preparation. Preserve the completed Decision 0045
-boundary: ordinary PLS remains a comparison model, shared analysis names remain estimator-neutral,
+boundary: ordinary PLS remains a comparison model isolated in example 09 and declared benchmarks, shared analysis names remain estimator-neutral,
 and numbered post-analysis reports interpret one selected Pi-PLS model. Keep the biplot restricted
 to the low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds,
 VIP, or other deferred diagnostics.

@@ -10,10 +10,11 @@ boundary-test migration required by Decision 0045 is complete.
 
 ## Context
 
-Before this architecture was implemented, the real-data examples answered a model-development
+Before this architecture was implemented, the real-data workflows answered a model-development
 question through canonical Pi-PLS and ordinary PLS component-path CSV files and a CSV-derived
 comparison PDF, then fitted one fixed Pi-PLS model chosen through a visible component-count
-constant. Those artifacts were selection diagnostics but did not yet provide supported analysis
+constant. Decision 0047 later moved the comparison into example 09 while retaining a Pi-PLS-only
+path in examples 10–12. Those artifacts were selection diagnostics but did not yet provide supported analysis
 of the fitted factorization, shared PLS-family latent structure, predictions, or residuals.
 
 The companion Pi-PLS implementation contains a combined display of the predictor rotations $P$,

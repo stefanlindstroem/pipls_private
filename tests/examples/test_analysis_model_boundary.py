@@ -43,15 +43,20 @@ def test_numbered_examples_do_not_import_or_fit_ordinary_pls() -> None:
         assert not _calls_name(path, "PLSRegression"), path
 
 
-def test_real_data_examples_keep_the_pls_comparison_path_only() -> None:
+def test_dedicated_example_owns_the_pls_comparison_path() -> None:
     examples_dir = _repository_root() / "examples"
+    comparison = (examples_dir / "09_pls_path_comparison.py").read_text(encoding="utf-8")
+    assert "evaluate_pls_component_path(" in comparison
+    assert "plot_component_path_comparison(" in comparison
+
     for filename in (
         "10_pulp_real_data.py",
         "11_sugarcane_real_data.py",
         "12_tobacco_real_data.py",
     ):
         text = (examples_dir / filename).read_text(encoding="utf-8")
-        assert "evaluate_pls_component_path(" in text
+        assert "evaluate_pls_component_path(" not in text
+        assert "plot_pipls_component_path(" in text
         assert "latent_structure(model)" in text
         assert "PiPLSRegression(" in text
 

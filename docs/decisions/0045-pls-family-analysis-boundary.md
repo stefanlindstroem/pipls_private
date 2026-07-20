@@ -41,8 +41,9 @@ The repository distinguishes three analysis roles.
 
 ### 1. Comparative component-path diagnostics
 
-The Pulp, Sugarcane, and Tobacco component-path figures continue to show Pi-PLS and ordinary PLS
-CV-MSE in the same plot. Separate canonical path CSV files remain the source of that figure.
+`examples/09_pls_path_comparison.py` shows Pi-PLS and ordinary PLS CV-MSE in the same plot for
+Pulp, Sugarcane, and Tobacco. Examples 10–12 retain separate Pi-PLS-only path figures. Separate
+canonical path CSV files remain the source of each figure.
 
 Ordinary `PLSRegression` is permitted in the example-local component-path comparison helper and in
 focused benchmarks where it is the declared external comparator. This use answers a comparative
@@ -76,16 +77,16 @@ a fitted `PLSRegression` or a fitted `PiPLSRegression` when the object exposes t
 fitted attributes and transformations. The API must validate that structural contract rather than
 restricting use through a concrete `isinstance(..., PLSRegression)` check.
 
-The numbered examples apply these shared tools only to the selected `PiPLSRegression` model. After
-the comparative component-path figure, they must not fit a second ordinary PLS model for OOF
-prediction or interpretation. This demonstrates that standard PLS-family analyses remain available
+The numbered dataset analyses apply these shared tools only to the selected `PiPLSRegression`
+model. They must not fit an ordinary PLS model for OOF prediction or interpretation. This
+demonstrates that standard PLS-family analyses remain available
 for Pi-PLS while keeping one coherent fitted-model narrative.
 
 ## Implementation status
 
-Examples 10–12 now retain ordinary PLS only in the component-path CV-MSE comparison. Each example
-then fits one selected `PiPLSRegression`, clones that fixed model for OOF predictions, and derives
-all shared scores, loadings, coefficients, biplots, and observation diagnostics from the same
+Example 09 now owns the ordinary-PLS component-path CV-MSE comparison. Examples 10–12 contain no
+ordinary PLS path evaluation. Each dataset example fits one selected `PiPLSRegression`, clones that
+fixed model for OOF predictions, and derives all shared scores, loadings, coefficients, biplots, and observation diagnostics from the same
 Pi-PLS fit. Canonical shared-analysis artifacts use estimator-neutral filenames.
 
 ## Naming and artifact consequences

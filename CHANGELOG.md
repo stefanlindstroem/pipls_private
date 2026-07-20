@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Separate comparison from normal analysis examples: add one dedicated Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS path-comparison example, and make examples 10–12 write Pi-PLS-only `component_path.csv` and `component_path.pdf` beside each dataset post-analysis report.
+
 - Shorten the numbered examples without changing their analyses: inline one-use arguments, remove redundant checks of committed CSV headers and axis order, use one selected Pi-PLS object for fixed-fit and OOF calls, reduce console scaffolding, and track required result directories instead of creating them at runtime.
 
 - Complete the Decision 0045 analysis-boundary migration: enforce ordinary PLS as a comparison-only

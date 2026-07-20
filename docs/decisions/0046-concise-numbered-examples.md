@@ -26,15 +26,14 @@ Keep the scientific stages visible, but remove scaffolding that does not help ex
   order assertions.
 - Assume the tracked output directories exist. Numbered examples and their support functions do not
   create directories.
-- Track `examples/results/` and the three post-analysis subdirectories with `.gitkeep` files while
+- Track `examples/results/`, the comparison subdirectory, and the three post-analysis subdirectories with `.gitkeep` files while
   continuing to ignore generated CSV and PDF artifacts.
 - Preserve those tracked directories during `make clean`.
 - Keep validation of reusable numerical and artifact contracts in package code and focused tests;
   do not repeat those checks in numbered scripts.
 - Retain concise completion output rather than listing every generated file.
 
-The complete workflows remain explicit about their three scientific stages: component-path
-comparison, fixed Pi-PLS fitting, and Pi-PLS post-analysis.
+The complete dataset workflows remain explicit about their three scientific stages: Pi-PLS component-path evaluation, fixed Pi-PLS fitting, and Pi-PLS post-analysis. The external PLS comparison is isolated in example 09.
 
 ## Consequences
 

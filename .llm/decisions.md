@@ -52,6 +52,7 @@ This index is navigation, not a substitute for those records.
 | `0044-minimal-onboarding-and-example-support.md` | user onboarding and example organization | literal-matrix first example; complete-workflow helpers under `examples/_support/`; one examples target retained |
 | `0045-pls-family-analysis-boundary.md` | comparison versus fitted-model analysis ownership | retain ordinary PLS for CV-MSE comparison; keep $P$, $D$, and $Q$ Pi-PLS-specific; make shared analysis estimator-neutral and apply it only to Pi-PLS in numbered examples |
 | `0046-concise-numbered-examples.md` | pedagogical example minimality | keep scientific stages explicit; remove one-use scaffolding and redundant repository-data checks; track required result directories |
+| `0047-separate-pls-path-comparison-example.md` | comparison versus normal analysis examples | isolate all PLS path comparisons in example 09; keep examples 10–12 Pi-PLS-only and co-locate path and post-analysis artifacts |
 
 ## Implemented estimator/search transition
 
@@ -107,6 +108,8 @@ plan contains an earlier or more general proposal:
   and declared comparator benchmarks; $P$, $D$, and $Q$ inspection stays Pi-PLS-specific; shared
   score, loading, coefficient, biplot, observation, and prediction analysis uses estimator-neutral
   APIs and is applied only to the selected Pi-PLS model in numbered examples;
+- Decision 0047 isolates all real-data Pi-PLS-versus-PLS path comparisons in example 09;
+  examples 10–12 write Pi-PLS-only component paths beside their post-analysis reports.
 - repository tests validate executable behavior and durable file structure rather than pinning
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only
@@ -122,9 +125,10 @@ plan contains an earlier or more general proposal:
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
 - real-data component paths are presented as CSV tables with fold SD, plots are derived from those
   tables, and examples fit a separate fixed model after an explicit user component choice;
-- real-data examples compare separate Pi-PLS and standard PLS component-path CSVs in one PDF;
-  Tobacco uses adaptive rank scanning with explicit full predictor SVD, while randomized SVD is
-  covered by the solver-consistency benchmark;
+- example 09 compares separate Pi-PLS and standard PLS component-path CSVs in one PDF per
+  dataset; examples 10–12 write Pi-PLS-only paths beside their post-analysis reports; Tobacco uses
+  adaptive rank scanning with explicit full predictor SVD, while randomized SVD is covered by the
+  solver-consistency benchmark;
 - complete Pulp, Sugarcane, and Tobacco analyses are not duplicated as real-data benchmark scripts
   or executed by the default test suite; `make examples` runs all numbered examples explicitly;
 

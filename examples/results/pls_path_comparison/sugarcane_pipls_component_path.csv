@@ -1,0 +1,5 @@
+n_components,predictor_rank,predictor_rank_policy,response_standardized_cv_mse_mean,response_standardized_cv_mse_fold_sd,n_splits
+1,12,optimized,0.31520643614661276,0.10613942667088982,5
+2,12,optimized,0.11440386448861142,0.03940014532507902,5
+3,11,optimized,0.10917632304654201,0.039870191423902454,5
+4,11,optimized,0.09839472416921151,0.040136047839550985,5

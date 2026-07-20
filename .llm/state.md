@@ -50,8 +50,9 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 
 Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
-is retained only for CV-MSE comparison, while $P$, $D$, and $Q$ inspection remains Pi-PLS-specific
-and every post-analysis quantity in examples 10–12 comes from the selected Pi-PLS model.
+is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
+10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
+model.
 
 The current top-level package exports are:
 
@@ -209,12 +210,14 @@ implemented independently:
 4. full-versus-randomized solver consistency.
 
 The earlier real-data smoke-check scripts and full example-execution tests were removed because they
-duplicated examples 10–12. Pulp, Sugarcane, and Tobacco remain transparent component-path examples,
-and `make examples` runs every numbered example as an explicit application-validation action.
-They write separate Pi-PLS and standard PLS (NIPALS) path CSVs for the same folds and component
-counts, call imported helpers to generate an overlaid PDF from those tables, expose a visible user
+duplicated the numbered analyses. `make examples` runs every numbered example as an explicit
+application-validation action. Example 09 writes separate Pi-PLS and standard PLS (NIPALS) path
+CSVs for the same folds and component counts and generates the overlaid comparison PDFs. Examples
+10–12 write Pi-PLS-only path artifacts beside their post-analysis reports, expose a visible
 component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks recorded
-explicitly. The examples contain no subprocess wrappers, repeated table-validation boilerplate, one-use configuration constants, redundant committed-data checks, or directory-creation scaffolding. Required result directories are tracked and preserved by `make clean`.
+explicitly. The scripts contain no subprocess wrappers, repeated table-validation boilerplate,
+one-use configuration constants, redundant committed-data checks, or directory-creation
+scaffolding. Required result directories are tracked and preserved by `make clean`.
 Default tests retain dataset-layout, component-path API, PLS-helper, plotting, and workflow-structure
 contracts without executing the complete real-data analyses.
 

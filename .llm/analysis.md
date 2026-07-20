@@ -20,9 +20,12 @@ Keep these stages separate in code, documentation, filenames, and figure labels.
 ### Model-selection diagnostics
 
 The component-path workflows answer how cross-validated loss changes with component count and, for
-Pi-PLS, the conditional predictor rank. Their canonical artifacts are the existing Pi-PLS and
-ordinary PLS path CSV files. `examples/_support/pls_component_path.py` and
-`examples/_support/plot_component_path.py` remain example-local helpers for the complete workflows.
+Pi-PLS, the conditional predictor rank. Example 09 owns the canonical Pi-PLS and ordinary PLS path
+CSVs and their overlaid comparison PDFs. Examples 10–12 own one Pi-PLS `component_path.csv` and
+`component_path.pdf` beside each dataset post-analysis report.
+`examples/_support/pls_component_path.py` remains comparison-specific;
+`examples/_support/plot_component_path.py` renders both single Pi-PLS paths and explicit
+comparisons from canonical CSV files.
 
 A component-path result is not a fitted-model interpretation and is not an unbiased estimate of a
 subsequent user choice made after inspecting that same path.
@@ -214,8 +217,9 @@ methods. The implementation validates this structural contract rather than using
 `isinstance(..., PLSRegression)` restriction. Coefficients retain the public orientation
 `(n_targets, n_features)`.
 
-The numbered real-data examples use ordinary PLS only for the comparative component-path CV-MSE
-curve. After a Pi-PLS configuration is selected, one fitted `PiPLSRegression` supplies the shared
+Example 09 uses ordinary PLS only for the comparative component-path CV-MSE curves. Examples
+10–12 evaluate Pi-PLS paths only. After a Pi-PLS configuration is selected, one fitted
+`PiPLSRegression` supplies the shared
 scores, loadings, coefficients, biplot coordinates, observation diagnostics, and OOF prediction
 diagnostics. No second ordinary PLS model is fitted for post-analysis. Tests may and should apply
 the shared API to both estimator classes.

@@ -1,4 +1,4 @@
-"""Plot Pi-PLS and standard-PLS component paths from canonical CSV files."""
+"""Plot Pi-PLS paths and Pi-PLS-versus-PLS path comparisons from CSV files."""
 
 from __future__ import annotations
 
@@ -56,14 +56,88 @@ def read_pls_component_path(csv_path: Path) -> pd.DataFrame:
     return path
 
 
-def plot_component_path(
+def _add_pipls_path(axes: object, path: pd.DataFrame, *, label: str | None = None) -> None:
+    x = path["n_components"].to_numpy()
+    y = path["response_standardized_cv_mse_mean"].to_numpy()
+    yerr = path["response_standardized_cv_mse_fold_sd"].to_numpy()
+    axes.errorbar(x, y, yerr=yerr, fmt="o-", capsize=4, label=label)
+    for n_components, mean_mse, predictor_rank in zip(
+        x,
+        y,
+        path["predictor_rank"].to_numpy(),
+        strict=True,
+    ):
+        axes.annotate(
+            rf"$r_\pi={int(predictor_rank)}$",
+            (n_components, mean_mse),
+            xytext=(0, 8),
+            textcoords="offset points",
+            ha="center",
+        )
+
+
+def _finish_path_figure(
+    figure: object,
+    axes: object,
+    *,
+    title: str,
+    component_counts: np.ndarray,
+    upper: float,
+    show_legend: bool,
+) -> None:
+    axes.set_title(title)
+    axes.set_xlabel("Number of response components")
+    axes.set_ylabel("Response-standardized CV-MSE")
+    axes.set_xticks(component_counts)
+    axes.margins(x=0.05)
+    axes.grid(axis="y", alpha=0.25)
+    axes.set_ylim(0, max(1.0, 1.05 * upper))
+    if show_legend:
+        axes.legend()
+    figure.tight_layout(rect=(0.0, 0.05, 1.0, 1.0))
+
+
+def plot_pipls_component_path(
+    pipls_csv_path: Path,
+    pdf_path: Path,
+    *,
+    title: str,
+) -> None:
+    """Read one canonical Pi-PLS path CSV and write its PDF."""
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    path = read_component_path(pipls_csv_path)
+    figure, axes = plt.subplots(figsize=(8, 5))
+    _add_pipls_path(axes, path)
+    _finish_path_figure(
+        figure,
+        axes,
+        title=title,
+        component_counts=path["n_components"].to_numpy(),
+        upper=float(
+            np.max(
+                path["response_standardized_cv_mse_mean"].to_numpy()
+                + path["response_standardized_cv_mse_fold_sd"].to_numpy()
+            )
+        ),
+        show_legend=False,
+    )
+    figure.savefig(pdf_path, format="pdf")
+    plt.close(figure)
+
+
+def plot_component_path_comparison(
     pipls_csv_path: Path,
     pls_csv_path: Path,
     pdf_path: Path,
     *,
     title: str,
 ) -> None:
-    """Read the two canonical path CSVs and write their comparison PDF."""
+    """Read canonical Pi-PLS and PLS path CSVs and write their comparison PDF."""
 
     import matplotlib
 
@@ -73,45 +147,38 @@ def plot_component_path(
     pipls_path = read_component_path(pipls_csv_path)
     pls_path = read_pls_component_path(pls_csv_path)
 
-    x = pipls_path["n_components"].to_numpy()
-    pls_x = pls_path["n_components"].to_numpy()
-    if not np.array_equal(pls_x, x):
+    component_counts = pipls_path["n_components"].to_numpy()
+    pls_component_counts = pls_path["n_components"].to_numpy()
+    if not np.array_equal(pls_component_counts, component_counts):
         raise ValueError("Pi-PLS and PLS paths must contain the same component counts.")
 
-    y = pipls_path["response_standardized_cv_mse_mean"].to_numpy()
-    yerr = pipls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
-    ranks = pipls_path["predictor_rank"].to_numpy()
-    pls_y = pls_path["response_standardized_cv_mse_mean"].to_numpy()
-    pls_yerr = pls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
-    algorithm = str(pls_path["algorithm"].iloc[0])
-
     figure, axes = plt.subplots(figsize=(8, 5))
-    axes.errorbar(x, y, yerr=yerr, fmt="o-", capsize=4, label=r"$\Pi$-PLS")
+    _add_pipls_path(axes, pipls_path, label=r"$\Pi$-PLS")
+    pls_mean = pls_path["response_standardized_cv_mse_mean"].to_numpy()
+    pls_sd = pls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
     axes.errorbar(
-        pls_x,
-        pls_y,
-        yerr=pls_yerr,
+        pls_component_counts,
+        pls_mean,
+        yerr=pls_sd,
         fmt="s--",
         capsize=4,
-        label=f"PLS ({algorithm})",
+        label=f"PLS ({pls_path['algorithm'].iloc[0]})",
     )
-    axes.set_title(title)
-    axes.set_xlabel("Number of response components")
-    axes.set_ylabel("Response-standardized CV-MSE")
-    axes.set_xticks(x)
-    axes.margins(x=0.05)
-    axes.grid(axis="y", alpha=0.25)
-    for n_components, mean_mse, predictor_rank in zip(x, y, ranks, strict=True):
-        axes.annotate(
-            rf"$r_\pi={int(predictor_rank)}$",
-            (n_components, mean_mse),
-            xytext=(0, 8),
-            textcoords="offset points",
-            ha="center",
-        )
-    upper = max(float(np.max(y + yerr)), float(np.max(pls_y + pls_yerr)))
-    axes.set_ylim(0, max(1.0, 1.05 * upper))
-    axes.legend()
-    figure.tight_layout(rect=(0.0, 0.05, 1.0, 1.0))
+    _finish_path_figure(
+        figure,
+        axes,
+        title=title,
+        component_counts=component_counts,
+        upper=max(
+            float(
+                np.max(
+                    pipls_path["response_standardized_cv_mse_mean"].to_numpy()
+                    + pipls_path["response_standardized_cv_mse_fold_sd"].to_numpy()
+                )
+            ),
+            float(np.max(pls_mean + pls_sd)),
+        ),
+        show_legend=True,
+    )
     figure.savefig(pdf_path, format="pdf")
     plt.close(figure)

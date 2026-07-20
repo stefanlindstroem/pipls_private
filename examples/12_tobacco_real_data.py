@@ -1,11 +1,10 @@
-"""Compare Tobacco component paths and export one paginated post-analysis."""
+"""Create a Tobacco Pi-PLS component path and paginated post-analysis."""
 
 from pathlib import Path
 
 import pandas as pd
 from _support.fixed_model_oof import fixed_model_oof_predictions
-from _support.plot_component_path import plot_component_path
-from _support.pls_component_path import evaluate_pls_component_path
+from _support.plot_component_path import plot_pipls_component_path
 from _support.post_analysis_artifacts import (
     build_post_analysis_tables,
     render_post_analysis_report,
@@ -22,10 +21,7 @@ from pipls.inspection import (
 )
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "tobacco"
-RESULTS_DIR = Path(__file__).resolve().parent / "results"
-PIPLS_PATH_CSV = RESULTS_DIR / "tobacco_component_path.csv"
-PLS_PATH_CSV = RESULTS_DIR / "tobacco_pls_component_path.csv"
-POST_ANALYSIS_DIR = RESULTS_DIR / "tobacco_post_analysis"
+ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analysis"
 CHOSEN_N_COMPONENTS = 8
 
 X = pd.read_csv(DATA_DIR / "X.csv")
@@ -36,7 +32,7 @@ response_pages = tuple(
     for start in range(0, len(response_names), 5)
 )
 
-# Compare Pi-PLS and ordinary PLS component paths.
+# Evaluate the Pi-PLS component path.
 path_search = PiPLSPathCV(
     estimator=PiPLSRegression(svd_solver="full"),
     search_method="auto",
@@ -44,17 +40,11 @@ path_search = PiPLSPathCV(
     n_jobs=1,
 ).fit(X, Y)
 pipls_path = pd.DataFrame(path_search.component_path_results_)
-pipls_path.to_csv(PIPLS_PATH_CSV, index=False)
-evaluate_pls_component_path(
-    X,
-    Y,
-    max_n_components=int(path_search.n_components_values_[-1]),
-).to_csv(PLS_PATH_CSV, index=False)
-plot_component_path(
-    PIPLS_PATH_CSV,
-    PLS_PATH_CSV,
-    RESULTS_DIR / "tobacco_component_path.pdf",
-    title="Tobacco component-path comparison",
+pipls_path.to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
+plot_pipls_component_path(
+    ANALYSIS_DIR / "component_path.csv",
+    ANALYSIS_DIR / "component_path.pdf",
+    title="Tobacco Pi-PLS component path",
 )
 
 # Fit the selected Pi-PLS model.
@@ -75,7 +65,7 @@ oof = fixed_model_oof_predictions(
     splitter=KFold(n_splits=5, shuffle=False),
 )
 write_post_analysis_tables(
-    POST_ANALYSIS_DIR,
+    ANALYSIS_DIR,
     build_post_analysis_tables(
         factors=pipls_display_factors(model.decomposition_),
         diagnostics=prediction_diagnostics(
@@ -92,8 +82,8 @@ write_post_analysis_tables(
     ),
 )
 render_post_analysis_report(
-    POST_ANALYSIS_DIR,
-    POST_ANALYSIS_DIR / "post_analysis.pdf",
+    ANALYSIS_DIR,
+    ANALYSIS_DIR / "post_analysis.pdf",
     dataset_name="Tobacco",
     predictor_style="line",
     predictor_axis=X.columns.to_numpy(dtype=float),
@@ -108,4 +98,4 @@ print(
     "Selected Pi-PLS: "
     f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
 )
-print(f"Wrote results to {RESULTS_DIR}")
+print(f"Wrote results to {ANALYSIS_DIR}")

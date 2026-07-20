@@ -30,10 +30,10 @@ The over-general synthetic manifest, universal result schema, and broad CI runne
 The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
 `make examples` runs every numbered example explicitly, beginning with the literal-matrix
-`01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. The complete
-workflows write separate Pi-PLS and standard PLS (NIPALS) CSVs, call support modules under
-`examples/_support/` to derive
-comparison PDFs from both canonical tables, and then fit a separately chosen fixed Pi-PLS model.
+`01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. Example 09
+writes separate Pi-PLS and standard PLS (NIPALS) CSVs and derives the comparison PDFs from those
+canonical tables. Examples 10–12 write Pi-PLS-only paths in their analysis directories and then fit
+a separately chosen fixed Pi-PLS model. Shared orchestration remains under `examples/_support/`.
 No block-aware scaling API is designed or scheduled.
 
 ## Implemented estimator and selection boundary
@@ -100,13 +100,12 @@ implementing or reviewing this surface.
   `metadata.yaml` layout with public-only provenance and an explicit source-level redistribution
   grant for the exact included material. No generic runtime registry is required.
 - `examples/`: numbered user workflows with a literal-matrix quickstart first, followed by selection,
-  synthetic-data, and complete real-data analyses. Underscore-prefixed `examples/_support/` contains
-  report infrastructure rather than primary entry points. Real-data examples keep separate Pi-PLS and standard PLS
-  (NIPALS) CSV paths and derive comparison PDFs from those tables. Post-analysis examples own
-  fixed-model OOF loops, canonical tables, physical-axis semantics, pagination, and report
-  composition; Pulp, Sugarcane, and Tobacco are complete implementations. Their pandas and
-  Matplotlib requirements are grouped in the `examples` optional
-  dependency extra.
+  synthetic-data, one explicit comparison example, and complete Pi-PLS real-data analyses.
+  Underscore-prefixed `examples/_support/` contains report infrastructure rather than primary entry
+  points. Example 09 owns the separate Pi-PLS and standard PLS (NIPALS) paths and comparison PDFs.
+  Examples 10–12 own Pi-PLS-only paths, fixed-model OOF loops, canonical tables, physical-axis
+  semantics, pagination, and report composition. Their pandas and Matplotlib requirements are
+  grouped in the `examples` optional dependency extra.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
 - `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,

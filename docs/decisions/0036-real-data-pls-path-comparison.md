@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented. The real-data benchmark-script and full example-execution-test portions are superseded by Decision 0037.
+Accepted, with comparison-example ownership superseded by Decision 0047. The numerical comparison contract remains implemented. The real-data benchmark-script and full example-execution-test portions are superseded by Decision 0037.
 
 ## Context
 
@@ -21,7 +21,7 @@ benchmark, so the Tobacco example does not need to repeat that role.
 
 ## Decision
 
-Examples 10, 11, and 12 write two separate path tables:
+`examples/09_pls_path_comparison.py` writes two separate path tables for each reference dataset:
 
 - `<dataset>_component_path.csv` for Pi-PLS, retaining the established six-column schema with the
   numeric predictor rank on every row;
@@ -37,12 +37,13 @@ nested component count by truncating the public fitted weights and loadings. NIP
 components sequentially, so this is numerically equivalent to separately fitting each earlier
 component count while avoiding repeated high-dimensional decompositions.
 
-`examples/_support/plot_component_path.py` reads both CSV files. It plots `$\Pi$-PLS` and `PLS (NIPALS)` in one PDF,
-shows fold-SD error bars for both paths, and annotates the Pi-PLS predictor rank beside every Pi-PLS
-point. The lower y-limit is zero and the upper limit is data-driven but never below one.
+`examples/_support/plot_component_path.py` reads both CSV files. Its comparison function plots
+`$\Pi$-PLS` and `PLS (NIPALS)` in one PDF, shows fold-SD error bars for both paths, and annotates
+the Pi-PLS predictor rank beside every Pi-PLS point. The lower y-limit is zero and the upper limit
+is data-driven but never below one.
 
-The final model stage remains Pi-PLS-specific: the user chooses `n_components`, reads the
-corresponding Pi-PLS predictor rank from the Pi-PLS CSV, and fits a separate fixed
+Examples 10–12 retain a separate Pi-PLS-only path and final-model stage. The user chooses
+`n_components`, reads the corresponding predictor rank from the Pi-PLS CSV, and fits a separate fixed
 `PiPLSRegression` on all observations.
 
 The Tobacco example uses explicit full predictor SVD with adaptive rank scanning.

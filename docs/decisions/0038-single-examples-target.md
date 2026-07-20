@@ -24,11 +24,13 @@ make examples
 
 It runs every numbered script under `examples/` in order:
 
-1. advanced cross-validation;
-2. deterministic synthetic data;
-3. Pulp component-path comparison and fixed fit;
-4. Sugarcane component-path comparison and fixed fit;
-5. Tobacco component-path comparison and fixed fit.
+1. minimal literal-matrix fit and plot;
+2. advanced cross-validation;
+3. deterministic synthetic data;
+4. dedicated Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS path comparisons;
+5. Pulp Pi-PLS path and fixed-model analysis;
+6. Sugarcane Pi-PLS path and fixed-model analysis;
+7. Tobacco Pi-PLS path and fixed-model analysis.
 
 The target sets `PYTHONPATH=src` and `MPLBACKEND=Agg` for each command so a source checkout and a
 headless shell can execute the examples consistently. It also limits common BLAS/OpenMP backends to

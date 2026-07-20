@@ -20,21 +20,23 @@ The script writes `examples/results/minimal_fit_and_plot.pdf`. Its predictor and
 ordinary Python lists, demonstrating that plotting labels may come from any explicit metadata
 source rather than from pandas or CSV headers.
 
-## Selection and synthetic-data examples
+## Selection, comparison, and synthetic-data examples
 
 - `07_advanced_cv.py`: grouped and advanced cross-validation workflows.
 - `08_synthetic_data.py`: deterministic train/test generation with shared latent structure.
+- `09_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
+  component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model.
 
-## Complete reference workflows
+## Complete Pi-PLS reference workflows
 
-- `10_pulp_real_data.py`: direct pandas reading, separate Pi-PLS and standard PLS path CSVs, one
-  selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions, seven
-  canonical post-analysis CSV files, a balanced score-loading biplot, and a multipage report.
-- `11_sugarcane_real_data.py`: direct pandas reading, Pi-PLS and standard PLS paths, one selected
+- `10_pulp_real_data.py`: direct pandas reading, one Pi-PLS component path, one selected Pi-PLS
+  interpretation model, selection-conditioned Pi-PLS OOF predictions, seven canonical
+  post-analysis CSV files, a balanced score-loading biplot, and a multipage report.
+- `11_sugarcane_real_data.py`: direct pandas reading, one Pi-PLS component path, one selected
   Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions, seven canonical
   post-analysis CSV files, and a wavelength-aware report.
-- `12_tobacco_real_data.py`: adaptive predictor-rank scanning with explicit full predictor SVD,
-  one selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions,
+- `12_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
+  SVD, one selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions,
   decreasing-wavenumber spectral plots, deterministic response pagination, eight canonical
   post-analysis CSV files, and raw observation diagnostics.
 
@@ -74,16 +76,18 @@ information system, or other domain metadata. The package plotting API does not 
 invent scientific variable names. The committed datasets already have tested headers and ordering,
 so the numbered examples use them directly instead of repeating repository-integrity checks.
 
-The three real-data examples share these stages:
+Example 09 writes the separate Pi-PLS and ordinary PLS path tables used by the three overlaid
+comparison figures. Examples 10–12 instead share this normal Pi-PLS workflow:
 
-1. `PiPLSPathCV(refit=False)` produces one Pi-PLS row per admissible component count, while
-   scikit-learn `PLSRegression` produces a comparison path for the same folds and component counts.
-   Both paths are written as canonical CSV files before plotting.
-2. A visible component-count choice selects one fixed full-data Pi-PLS model for interpretation;
-   ordinary PLS is not fitted again after the comparison path.
+1. `PiPLSPathCV(refit=False)` produces one Pi-PLS row per admissible component count.
+   `component_path.csv` is written before `component_path.pdf` is rendered from it.
+2. A visible component-count choice selects one fixed full-data Pi-PLS model for interpretation.
 3. The selected Pi-PLS parameters are cloned inside five non-shuffled folds to produce
    `selection-conditioned OOF predictions`. Seven common long-form CSV files are written and
    reread before report generation.
+
+Each dataset keeps `component_path.pdf` and `post_analysis.pdf` as separate files in the same
+analysis directory.
 
 Full-data decomposition, score, loading, coefficient, biplot, and observation-diagnostic figures
 are interpretive. Prediction and residual figures retain explicit provenance. The display-standardized
@@ -97,7 +101,7 @@ wavenumber coordinate, partitions all thirteen responses in source order, and ad
 
 ## Output directories
 
-`examples/results/` and the Pulp, Sugarcane, and Tobacco post-analysis subdirectories are tracked
-with placeholder files. The examples therefore write directly to known destinations and do not
+`examples/results/`, the PLS-path-comparison directory, and the Pulp, Sugarcane, and Tobacco
+post-analysis subdirectories are tracked with placeholder files. The examples therefore write directly to known destinations and do not
 contain directory-creation code. Generated CSV and PDF files remain ignored, and `make clean`
 removes them while preserving the tracked directory structure.

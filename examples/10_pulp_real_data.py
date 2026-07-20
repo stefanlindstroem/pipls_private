@@ -1,11 +1,10 @@
-"""Compare Pulp component paths and export one fixed-model post-analysis."""
+"""Create a Pulp Pi-PLS component path and fixed-model post-analysis."""
 
 from pathlib import Path
 
 import pandas as pd
 from _support.fixed_model_oof import fixed_model_oof_predictions
-from _support.plot_component_path import plot_component_path
-from _support.pls_component_path import evaluate_pls_component_path
+from _support.plot_component_path import plot_pipls_component_path
 from _support.post_analysis_artifacts import (
     build_post_analysis_tables,
     render_post_analysis_report,
@@ -21,29 +20,20 @@ from pipls.inspection import (
 )
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "pulp"
-RESULTS_DIR = Path(__file__).resolve().parent / "results"
-PIPLS_PATH_CSV = RESULTS_DIR / "pulp_component_path.csv"
-PLS_PATH_CSV = RESULTS_DIR / "pulp_pls_component_path.csv"
-POST_ANALYSIS_DIR = RESULTS_DIR / "pulp_post_analysis"
+ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
 CHOSEN_N_COMPONENTS = 3
 
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
 
-# Compare Pi-PLS and ordinary PLS component paths.
+# Evaluate the Pi-PLS component path.
 path_search = PiPLSPathCV(refit=False).fit(X, Y)
 pipls_path = pd.DataFrame(path_search.component_path_results_)
-pipls_path.to_csv(PIPLS_PATH_CSV, index=False)
-evaluate_pls_component_path(
-    X,
-    Y,
-    max_n_components=int(path_search.n_components_values_[-1]),
-).to_csv(PLS_PATH_CSV, index=False)
-plot_component_path(
-    PIPLS_PATH_CSV,
-    PLS_PATH_CSV,
-    RESULTS_DIR / "pulp_component_path.pdf",
-    title="Pulp component-path comparison",
+pipls_path.to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
+plot_pipls_component_path(
+    ANALYSIS_DIR / "component_path.csv",
+    ANALYSIS_DIR / "component_path.pdf",
+    title="Pulp Pi-PLS component path",
 )
 
 # Fit the selected Pi-PLS model.
@@ -63,7 +53,7 @@ oof = fixed_model_oof_predictions(
     splitter=KFold(n_splits=5, shuffle=False),
 )
 write_post_analysis_tables(
-    POST_ANALYSIS_DIR,
+    ANALYSIS_DIR,
     build_post_analysis_tables(
         factors=pipls_display_factors(model.decomposition_),
         diagnostics=prediction_diagnostics(
@@ -79,8 +69,8 @@ write_post_analysis_tables(
     ),
 )
 render_post_analysis_report(
-    POST_ANALYSIS_DIR,
-    POST_ANALYSIS_DIR / "post_analysis.pdf",
+    ANALYSIS_DIR,
+    ANALYSIS_DIR / "post_analysis.pdf",
     dataset_name="Pulp",
     score_components=(1, 2),
     biplot_components=(1, 2),
@@ -93,4 +83,4 @@ print(
     "Selected Pi-PLS: "
     f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
 )
-print(f"Wrote results to {RESULTS_DIR}")
+print(f"Wrote results to {ANALYSIS_DIR}")

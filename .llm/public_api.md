@@ -158,7 +158,7 @@ analysis. Final public names for $P$, $D$, and $Q$ inspection retain an explicit
 Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics use
 estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiPLSRegression`
 objects. Numbered examples apply these shared tools only to the selected Pi-PLS model. Ordinary PLS
-remains available for component-path comparisons and declared comparator benchmarks.
+remains available in the dedicated component-path comparison example and declared comparator benchmarks. Examples 10–12 evaluate only Pi-PLS paths.
 
 Decision 0042 accepts two public submodules for staged implementation:
 
