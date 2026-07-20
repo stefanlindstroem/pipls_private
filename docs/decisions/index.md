@@ -68,3 +68,4 @@ reference describe the current public behavior directly.
 - [0051: core generated API reference](0051-core-generated-api-reference.md)
 - [0052: complete generated API reference](0052-complete-generated-api-reference.md)
 - [0053: documentation distribution validation](0053-documentation-distribution-validation.md)
+- [0054: compatibility policy](0054-compatibility-policy.md)

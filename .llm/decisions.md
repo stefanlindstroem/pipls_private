@@ -59,6 +59,7 @@ This index is navigation, not a substitute for those records.
 | `0051-core-generated-api-reference.md` | core generated API documentation | mkdocstrings pages cover the supported top-level objects and audit parameters, fitted attributes, shapes, and conditional outputs |
 | `0052-complete-generated-api-reference.md` | complete generated API documentation | inspection, plotting, datasets, and metrics are generated from audited public docstrings with explicit submodule coverage |
 | `0053-documentation-distribution-validation.md` | documentation artifact validation | CI builds the strict site from the checkout and from a clean installation of the unpacked source distribution |
+| `0054-compatibility-policy.md` | supported interpreter and dependency ranges | Python 3.10–3.14, guarded runtime dependency majors, and one Python 3.10 minimum stack |
 
 ## Implemented estimator/search transition
 
@@ -137,6 +138,9 @@ plan contains an earlier or more general proposal:
   dataset; examples 10–12 write Pi-PLS-only paths beside their post-analysis reports; Tobacco uses
   adaptive rank scanning with explicit full predictor SVD, while randomized SVD is covered by the
   solver-consistency benchmark;
+- Python 3.10–3.14 are supported; runtime metadata admits NumPy 1.26--2.x,
+  scikit-learn 1.4--1.x, and joblib 1.2--1.x; the complete minimum stack is tested only on
+  Python 3.10 because its oldest binary releases do not cover every newer interpreter;
 - complete Pulp, Sugarcane, and Tobacco analyses are not duplicated as real-data benchmark scripts
   or executed by the default test suite; `make examples` runs all numbered examples explicitly;
 

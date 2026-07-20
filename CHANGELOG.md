@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Define the first-release compatibility policy for Python 3.10–3.14, NumPy 1.26--2.x,
+  scikit-learn 1.4--1.x, and joblib 1.2--1.x; add minimum-dependency constraints, Python
+  classifiers, guarded runtime ranges, Python 3.14 CI coverage, and consistency tests.
 - Add a self-documenting Make interface: `make` and `make help` list the maintained targets, and
   `make docs-serve` provides a memorable live documentation preview at
   `http://127.0.0.1:8000/`.

@@ -21,7 +21,16 @@ documentation, navigation, or docstrings. Use `make docs-serve` for a live local
 serves `http://127.0.0.1:8000/` until stopped with `Ctrl+C`. Run `make docs-dist` when changing
 documentation packaging, documentation dependencies, `MANIFEST.in`, or the source-distribution
 boundary. Run
-`make build` when changing packaging, dependencies, included data, or public modules.
+`make build` when changing packaging, dependencies, included data, or public modules. When changing
+core dependency bounds or compatibility code, also verify a fresh Python 3.10 environment with:
+
+```bash
+python -m pip install -c constraints/minimum.txt -e ".[dev]"
+make check
+```
+
+The constraint file represents the minimum supported dependency lines; it is not the normal user
+installation command or an application lock file.
 
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
 Benchmark changes must follow `.llm/benchmarking.md`: one question, one readable script, and one

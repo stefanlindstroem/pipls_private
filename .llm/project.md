@@ -34,7 +34,9 @@ Sugarcane, and Tobacco are component-path examples rather than benchmark or test
 writes separate Pi-PLS and standard PLS (NIPALS) CSVs and derives the comparison PDFs from those
 canonical tables. Examples 10–12 write Pi-PLS-only paths in their analysis directories and then fit
 a separately chosen fixed Pi-PLS model. Shared orchestration remains under `examples/_support/`.
-No block-aware scaling API is designed or scheduled.
+No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
+support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
+environment. The next packaging increment is the explicit compatibility CI matrix.
 
 ## Implemented estimator and selection boundary
 
@@ -114,7 +116,8 @@ implementing or reviewing this surface.
   theory, generated-API source pages, release notes, accepted decision records, and local MathJax
   configuration. Root `mkdocs.yml` defines the strict Material site build and navigation.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
-  and release automation.
+  and release automation. `constraints/minimum.txt` records the maintainer-only lower-bound test
+  environment; `docs/compatibility.md` owns the public support statement.
 
 ## Contract and documentation ownership
 
@@ -142,9 +145,11 @@ implementing or reviewing this surface.
 - Runtime code does not import from `.llm`, tests, examples, docs, scripts, datasets, or benchmarks.
 - Public Markdown under `docs/` is self-contained and does not link outside the documentation source
   tree. `.llm` contracts may be more detailed but are never user prerequisites.
-- The source distribution ships `mkdocs.yml`, the Makefile, documentation sources and assets, and
-  the validation helper needed for a clean strict documentation build. Generated `site/` output is
-  excluded from Git, distributions, and snapshots.
+- The source distribution ships `mkdocs.yml`, the Makefile, documentation sources and assets, the
+  minimum-dependency constraint file, and the validation helper needed for a clean strict
+  documentation build. Generated `site/` output is excluded from Git, distributions, and snapshots.
+- Runtime metadata and public documentation agree on Python 3.10–3.14 and the guarded NumPy,
+  scikit-learn, and joblib ranges. The minimum dependency lines are tested together on Python 3.10.
 - The fixed numerical core does not own preprocessing, CV, datasets, benchmark policy, or
   publication workflows.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required

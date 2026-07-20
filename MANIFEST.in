@@ -1,6 +1,7 @@
 include Makefile
 include mkdocs.yml
 include tools/check_sdist_docs.py
+include constraints/minimum.txt
 recursive-include docs *.md *.js
 recursive-include datasets *.csv *.md *.txt *.yaml
 recursive-include examples *.py *.md

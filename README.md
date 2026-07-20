@@ -49,6 +49,10 @@ PYTHONPATH=src MPLBACKEND=Agg python examples/01_minimal_fit_and_plot.py
 
 `make examples` runs every numbered example, including the complete and slower real-data analyses.
 
+Pi-PLS supports Python 3.10 through 3.14 with NumPy `>=1.26,<3`, scikit-learn
+`>=1.4,<2`, and joblib `>=1.2,<2`. See the
+[compatibility guide](docs/compatibility.md) for the minimum-dependency and CI policy.
+
 ## Quickstart: one fixed model
 
 The shortest complete workflow uses literal NumPy matrices, one fixed fit, and one plot. It performs
@@ -271,18 +275,19 @@ search = PiPLSPathCV(refit=False).fit(X, Y)
 path = pd.DataFrame(search.component_path_results_)
 ```
 
-The Pulp, Sugarcane, and Tobacco examples write separate canonical Pi-PLS and standard PLS
-(NIPALS) component-path CSV files and derive a shared CV-MSE comparison figure from them. After
-that comparison, each example fits one selected Pi-PLS model. The same Pi-PLS model supplies the
-selection-conditioned OOF predictions and all shared score, loading, coefficient, biplot, and
-observation analyses. Seven common canonical post-analysis CSV files are rebuilt into multipage
-reports. Pulp adds a balanced two-component score-loading biplot reconstructed from the existing
-score and X-loading tables. Tobacco adds an eighth table with raw score-distance and
-X-reconstruction-residual diagnostics, preserves the decreasing wavenumber axis from `X.csv`, and
-paginates all thirteen responses in source order. The Pi-PLS path CSV always records the selected predictor rank. Tobacco
-uses adaptive scanning with explicit full predictor SVD; randomized-SVD behavior is covered by the
-solver-consistency benchmark. Install the `examples` extra to run them. See
-[`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).
+Example 09 writes separate canonical Pi-PLS and standard PLS (NIPALS) component-path CSV
+files for Pulp, Sugarcane, and Tobacco and derives the shared CV-MSE comparison figures from those
+tables. Examples 10–12 then perform Pi-PLS-only analyses. Each writes one Pi-PLS path, fits one
+selected Pi-PLS model, and uses that model for selection-conditioned OOF predictions and all shared
+score, loading, coefficient, biplot, and observation analyses. Seven common canonical post-analysis
+CSV files are rebuilt into multipage reports. Pulp adds a balanced two-component score-loading
+biplot reconstructed from the existing score and X-loading tables. Tobacco adds an eighth table
+with raw score-distance and X-reconstruction-residual diagnostics, preserves the decreasing
+wavenumber axis from `X.csv`, and paginates all thirteen responses in source order. Every Pi-PLS
+path CSV records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
+predictor SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
+`examples` extra to run them. See [`examples/README.md`](examples/README.md) and
+[`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks
 

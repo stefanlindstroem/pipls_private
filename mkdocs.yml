@@ -14,6 +14,7 @@ nav:
   - Home: index.md
   - Getting started:
       - Quickstart: quickstart.md
+      - Compatibility: compatibility.md
       - Examples: examples.md
       - Estimator API: estimator_api.md
   - Using Pi-PLS:

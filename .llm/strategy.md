@@ -460,9 +460,9 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **complete**. Decisions 0049--0053 define the self-contained public source, strict
-MkDocs build, generated public API reference, source-distribution contents, and checkout/sdist CI
-validation.
+Current status: **in progress**. Decisions 0049--0053 complete the documentation boundary.
+Decision 0054 defines the supported Python and runtime dependency ranges and the minimum test
+environment. Explicit latest-compatible and installed-distribution checks remain.
 
 ### Current standardization and deferred block-aware variants
 
@@ -497,10 +497,20 @@ source distribution.
 Current status: **complete**. Decisions 0049--0053 define the self-contained public source, strict
 site build, generated public reference, distributed documentation inputs, and CI validation.
 
+## Compatibility policy status
+
+Decision 0054 defines Python 3.10–3.14 as the supported interpreter range, retains an open-ended
+`requires-python = ">=3.10"`, guards the next NumPy, scikit-learn, and joblib major versions, and
+records one reproducible minimum stack in `constraints/minimum.txt`. The minimum stack is tested on
+Python 3.10, while all supported interpreters use normally resolved dependencies.
+
+Current status: **policy complete; explicit compatibility CI matrix pending**.
+
 ## Current next increment
 
-Define and validate the compatibility and packaging policy, including clean wheel and source-
-distribution installation checks across the supported Python, NumPy, and scikit-learn boundaries.
+Separate compatibility CI into minimum-dependency, supported-Python, and latest-compatible jobs.
+Each job must print the resolved Python, NumPy, scikit-learn, and joblib versions. Avoid a full
+Cartesian product; clean wheel and source-distribution installation checks follow separately.
 
 ## Maintenance protocol
 
