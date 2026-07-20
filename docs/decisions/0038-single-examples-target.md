@@ -25,12 +25,11 @@ make examples
 It runs every numbered script under `examples/` in order:
 
 1. minimal literal-matrix fit and plot;
-2. advanced cross-validation;
-3. deterministic synthetic data;
-4. dedicated Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS path comparisons;
-5. Pulp Pi-PLS path and fixed-model analysis;
-6. Sugarcane Pi-PLS path and fixed-model analysis;
-7. Tobacco Pi-PLS path and fixed-model analysis.
+2. explained deterministic synthetic train/test data;
+3. dedicated Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS path comparisons;
+4. Pulp Pi-PLS path and fixed-model analysis;
+5. Sugarcane Pi-PLS path and fixed-model analysis;
+6. Tobacco Pi-PLS path and fixed-model analysis.
 
 The target sets `PYTHONPATH=src` and `MPLBACKEND=Agg` for each command so a source checkout and a
 headless shell can execute the examples consistently. It also limits common BLAS/OpenMP backends to
@@ -47,3 +46,8 @@ command and may take substantially longer because it includes the full Tobacco a
   should validate with `make examples`.
 - Fast internal validation remains `make check`.
 - Generated files remain under `examples/results/` and are ignored by Git.
+
+## Later refinement
+
+Decision 0048 removes the context-free advanced-cross-validation script while retaining the single
+`make examples` target. Advanced splitters remain documented and supported.

@@ -86,7 +86,6 @@ def test_make_examples_runs_every_numbered_example() -> None:
 
     expected = [
         "examples/01_minimal_fit_and_plot.py",
-        "examples/07_advanced_cv.py",
         "examples/08_synthetic_data.py",
         "examples/09_pls_path_comparison.py",
         "examples/10_pulp_real_data.py",

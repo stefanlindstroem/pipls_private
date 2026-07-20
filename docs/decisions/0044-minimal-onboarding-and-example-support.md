@@ -54,3 +54,6 @@ separate decision.
 Decision 0046 preserves this organization while making the numbered scripts more concise. Required
 result directories are now tracked, one-use arguments are inlined, and redundant checks of committed
 dataset structure are left to repository tests.
+
+Decision 0048 later removes the context-free advanced-CV example and requires every numbered script
+to explain a recognizable use case without publication context.

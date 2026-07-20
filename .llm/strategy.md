@@ -39,16 +39,19 @@ tagged `pipls` versions.
    repositories pin released package versions.
 9. Keep real-data input transparent: examples read `X` and `Y` explicitly and do not depend on
    a public registry, generic loader, or required metadata sidecar.
-10. Update `.llm/state.md`, the relevant `.llm` contracts, and user-facing documentation when a
-   phase, roadmap, architecture, or public contract changes.
-11. Return one root-relative Git patch per increment with an explicit validation report.
-12. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
+10. Keep numbered examples self-contained and user-oriented: each demonstrates a recognizable use
+    case, comparison, or benchmark, explains its data, labels its output, and assumes no publication
+    context.
+11. Update `.llm/state.md`, the relevant `.llm` contracts, and user-facing documentation when a
+    phase, roadmap, architecture, or public contract changes.
+12. Return one root-relative Git patch per increment with an explicit validation report.
+13. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
     for patch application or committing.
-13. Do not combine algorithm porting, API expansion, dataset migration, benchmark freezing, and
+14. Do not combine algorithm porting, API expansion, dataset migration, benchmark freezing, and
     repository-product cleanup in one patch unless the dependency cannot be separated.
-14. Keep repository tests durable: verify behavior and file structure, not current roadmap prose
+15. Keep repository tests durable: verify behavior and file structure, not current roadmap prose
     or documentary metadata values.
-15. Preserve the implemented estimator-internal, fold-local centering/scaling contract. Do not
+16. Preserve the implemented estimator-internal, fold-local centering/scaling contract. Do not
     design or anticipate future block-aware standardization APIs until the project owner starts a
     dedicated design phase.
 

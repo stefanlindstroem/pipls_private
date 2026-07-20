@@ -101,11 +101,17 @@ Their support modules live under `examples/_support/` so they are visibly separa
 user entry points. Do not hide real-data reading behind a package loader. Do not place user analysis
 helpers under `scripts/`, which remains the repository-maintenance and preparation area.
 
-Numbered examples are pedagogical scripts, not production applications. Keep genuine user choices
-named, but inline one-use arguments whose function names already explain them. Trust committed CSV
-headers and the tracked `examples/results/` directory structure; do not add repeated dtype, ordering,
-missing-value, or directory-creation checks to the scripts. Reusable helper contracts remain tested
-separately.
+Numbered examples are pedagogical scripts, not production applications. Each one must demonstrate a
+recognizable minimal use case, explicit comparison, or focused benchmark and must be understandable
+without knowledge of a paper, manuscript, or project history. State what the data represent and
+label printed values or generated artifacts so their meaning is clear. An isolated collection of API
+features without a coherent problem belongs in documentation or focused tests, not in a numbered
+example.
+
+Keep genuine user choices named, but inline one-use arguments whose function names already explain
+them. Trust committed CSV headers and the tracked `examples/results/` directory structure; do not add
+repeated dtype, ordering, missing-value, or directory-creation checks to the scripts. Reusable helper
+contracts remain tested separately. Brevity removes scaffolding, not explanatory context.
 
 Variable-name acquisition is also example-owned. When a table has meaningful headers, examples
 should derive names visibly from `X.columns` and `Y.columns` and pass them to plotting functions.

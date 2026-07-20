@@ -27,6 +27,9 @@
 - Do not broaden supported estimator composition or metadata routing implicitly.
 - Weighted fitting and `sample_weight` propagation during fitting are out of scope unless the
   project owner explicitly reverses that decision.
+- Every numbered example must present a recognizable user task, explicit comparison, or focused
+  benchmark. It must explain its data and label its output without relying on publication context or
+  earlier project history. Do not ship context-free API demonstrations as numbered examples.
 - For real-data examples, read and form `X` and `Y` explicitly in the script. Do not introduce a
   public registry, generic loader, metadata-driven runtime path, or helper function that obscures
   the data-reading steps.

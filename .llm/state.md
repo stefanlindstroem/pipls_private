@@ -13,6 +13,10 @@ material alone.
 
 ## Implemented boundary
 
+Numbered examples are self-contained user tasks rather than publication-oriented or context-free API
+demonstrations. Example 07 has been removed; example 08 explains its synthetic latent structure and
+prints labeled independent-test results.
+
 Phases A through E4c are complete and committed. The first broad E4 benchmark implementation was removed and replaced by focused question-specific benchmarks:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;

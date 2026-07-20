@@ -1,8 +1,10 @@
 # Examples
 
-The examples are arranged by user task rather than by implementation complexity. Start with the
-literal-matrix fit, then move to selection, synthetic data, or the complete real-data workflows.
-The complete workflows are intentionally more extensive than ordinary estimator use.
+The examples are arranged by user task rather than by implementation complexity. Each numbered
+script is self-contained: it explains its data, purpose, and printed or written results without
+assuming familiarity with a publication. Start with the literal-matrix fit, then move to synthetic
+data, explicit comparison, or the complete real-data workflows. The complete workflows are
+intentionally more extensive than ordinary estimator use.
 
 ## Start here
 
@@ -20,12 +22,17 @@ The script writes `examples/results/minimal_fit_and_plot.pdf`. Its predictor and
 ordinary Python lists, demonstrating that plotting labels may come from any explicit metadata
 source rather than from pandas or CSV headers.
 
-## Selection, comparison, and synthetic-data examples
+## Synthetic data and explicit comparison
 
-- `07_advanced_cv.py`: grouped and advanced cross-validation workflows.
-- `08_synthetic_data.py`: deterministic train/test generation with shared latent structure.
+- `08_synthetic_data.py`: generates an independent train/test problem with known shared,
+  predictor-specific, and response-specific latent directions; fits one Pi-PLS model; and prints
+  labeled data, model, and held-out evaluation summaries.
 - `09_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
   component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model.
+
+Grouped, leave-one-out, and temporal validation require application-specific sampling semantics.
+They are documented in `docs/cross_validation.md` rather than combined into a context-free numbered
+example.
 
 ## Complete Pi-PLS reference workflows
 

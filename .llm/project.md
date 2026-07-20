@@ -99,8 +99,10 @@ implementing or reviewing this surface.
 - `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`, and
   `metadata.yaml` layout with public-only provenance and an explicit source-level redistribution
   grant for the exact included material. No generic runtime registry is required.
-- `examples/`: numbered user workflows with a literal-matrix quickstart first, followed by selection,
-  synthetic-data, one explicit comparison example, and complete Pi-PLS real-data analyses.
+- `examples/`: self-contained numbered user workflows with a literal-matrix quickstart first,
+  followed by an explained synthetic train/test use case, one explicit comparison example, and
+  complete Pi-PLS real-data analyses. Advanced splitters are documented rather than combined into a
+  context-free numbered script.
   Underscore-prefixed `examples/_support/` contains report infrastructure rather than primary entry
   points. Example 09 owns the separate Pi-PLS and standard PLS (NIPALS) paths and comparison PDFs.
   Examples 10–12 own Pi-PLS-only paths, fixed-model OOF loops, canonical tables, physical-axis
