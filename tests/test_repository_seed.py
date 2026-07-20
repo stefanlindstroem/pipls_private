@@ -5,6 +5,8 @@ import subprocess
 import tarfile
 from pathlib import Path
 
+import yaml
+
 import pipls
 
 _REQUIRED_LLM_CONTRACTS = {
@@ -56,14 +58,76 @@ def test_packaging_uses_pep639_license_metadata() -> None:
     assert 'license = {file = "LICENSE"}' not in pyproject
 
 
-def test_source_distribution_manifest_includes_user_guides() -> None:
+def test_source_distribution_manifest_includes_documentation_sources() -> None:
     manifest_lines = {
         line.strip()
         for line in (_repository_root() / "MANIFEST.in").read_text(encoding="utf-8").splitlines()
         if line.strip()
     }
 
-    assert "recursive-include docs *.md" in manifest_lines
+    assert "recursive-include docs *.md *.js" in manifest_lines
+
+
+def test_docs_extra_declares_the_build_toolchain() -> None:
+    pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
+    assert 'docs = [' in pyproject
+    assert '"mkdocs>=1.6,<2"' in pyproject
+    assert '"mkdocs-material>=9.5,<10"' in pyproject
+
+
+def test_mkdocs_configuration_has_valid_user_navigation() -> None:
+    root = _repository_root()
+    config = yaml.safe_load((root / "mkdocs.yml").read_text(encoding="utf-8"))
+
+    def targets(items: list[object]) -> set[str]:
+        found: set[str] = set()
+        for item in items:
+            if isinstance(item, str):
+                found.add(item)
+                continue
+            assert isinstance(item, dict)
+            for value in item.values():
+                if isinstance(value, str):
+                    found.add(value)
+                else:
+                    assert isinstance(value, list)
+                    found.update(targets(value))
+        return found
+
+    nav_targets = targets(config["nav"])
+    top_level_pages = {
+        path.relative_to(root / "docs").as_posix()
+        for path in (root / "docs").glob("*.md")
+    }
+
+    assert config["strict"] is True
+    assert config["theme"]["name"] == "material"
+    assert nav_targets == top_level_pages | {"decisions/index.md"}
+    assert all((root / "docs" / target).is_file() for target in nav_targets)
+    assert "decisions/[0-9][0-9][0-9][0-9]-*.md" in config["not_in_nav"]
+    assert "javascripts/mathjax.js" in config["extra_javascript"]
+
+
+def test_make_docs_is_strict_and_generated_site_is_ignored() -> None:
+    root = _repository_root()
+    completed = subprocess.run(
+        ["make", "-n", "docs"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    clean = subprocess.run(
+        ["make", "-n", "clean"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "-m mkdocs build --strict" in completed.stdout
+    assert "site" in clean.stdout.splitlines()[0].split()
+    assert "site/" in (root / ".gitignore").read_text(encoding="utf-8").splitlines()
 
 
 def test_examples_extra_declares_data_and_plotting_dependencies() -> None:

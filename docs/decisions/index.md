@@ -64,3 +64,4 @@ reference describe the current public behavior directly.
 - [0024: package product boundary](0024-package-product-repository-boundary.md)
 - [0026: package navigation cleanup](0026-package-navigation-cleanup.md)
 - [0049: public documentation source boundary](0049-public-documentation-source-boundary.md)
+- [0050: buildable documentation foundation](0050-buildable-documentation-foundation.md)

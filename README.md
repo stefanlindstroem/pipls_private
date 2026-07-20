@@ -297,6 +297,15 @@ See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchma
 
 ## Documentation
 
+Build the documentation locally with:
+
+```bash
+python -m pip install -e ".[docs]"
+make docs
+```
+
+The strict MkDocs build writes the generated site to `site/`.
+
 - [Quickstart](docs/quickstart.md)
 - [Examples](docs/examples.md)
 - [Documentation index](docs/index.md)

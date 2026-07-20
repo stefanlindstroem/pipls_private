@@ -12,6 +12,7 @@ build/
 dist/
 *.egg-info/
 docs/_build/
+site/
 notebooks/.ipynb_checkpoints/
 .DS_Store
 ._*

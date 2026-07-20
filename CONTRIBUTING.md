@@ -16,8 +16,9 @@ make check
 
 Run `make examples` when changing executable example behavior, example artifacts, or the
 application-facing workflow. This target intentionally runs every numbered example, including the
-slower Tobacco analysis. Run `make build` when changing packaging, dependencies, included data, or
-public modules.
+slower Tobacco analysis. Run `make docs` after installing `.[docs]` when changing public
+documentation, navigation, or docstrings. Run `make build` when changing packaging, dependencies,
+included data, or public modules.
 
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
 Benchmark changes must follow `.llm/benchmarking.md`: one question, one readable script, and one

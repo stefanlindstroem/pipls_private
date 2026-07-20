@@ -111,7 +111,8 @@ implementing or reviewing this surface.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
 - `docs/`: the self-contained public documentation source, including user guides, implemented
-  theory, generated-API source pages, release notes, and accepted decision records.
+  theory, generated-API source pages, release notes, accepted decision records, and local MathJax
+  configuration. Root `mkdocs.yml` defines the strict Material site build and navigation.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
   and release automation.
 

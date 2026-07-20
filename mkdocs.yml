@@ -1,0 +1,61 @@
+site_name: Pi-PLS
+site_description: Pi-PLS multivariate regression for Python
+strict: true
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.indexes
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - Quickstart: quickstart.md
+      - Examples: examples.md
+      - Estimator API: estimator_api.md
+  - Using Pi-PLS:
+      - Parameter selection: parameter_selection.md
+      - Component paths: path_analysis.md
+      - Cross-validation: cross_validation.md
+      - Preprocessing: preprocessing.md
+  - Model inspection: model_inspection.md
+  - Data and validation:
+      - Datasets: datasets.md
+      - Benchmarks: benchmarks.md
+      - Reproducibility: reproducibility.md
+  - Scientific background:
+      - Theory: theory.md
+  - Design decisions: decisions/index.md
+
+not_in_nav: |
+  decisions/[0-9][0-9][0-9][0-9]-*.md
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.superfences
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js

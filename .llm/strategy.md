@@ -480,12 +480,20 @@ never be prefit globally before cross-validation.
 
 Current status: **current estimator standardization complete; block-aware API design deferred**.
 
+## Documentation foundation status
+
+Decision 0050 completes the MkDocs foundation: the dedicated `docs` extra installs MkDocs and
+Material; `make docs` performs a strict build; PyMdown Extensions and MathJax
+render the existing notation; navigation follows the user journey; and generated `site/` output is
+ignored and cleaned.
+
 ## Current next increment
 
-Add the MkDocs build foundation on top of the Decision 0049 source boundary: bounded documentation
-dependencies, user-oriented navigation, MathJax rendering, strict link validation, a real
-`make docs` target, and ignored generated site output. Do not add generated API pages until the
-foundation builds cleanly.
+Add generated reference pages for the core estimator surface: `PiPLSRegression`, `PiPLSPathCV`,
+`PiPLSDecomposition`, `PiPLSValidationReport`, and `StatisticalSupportWarning`. Use that build to
+audit public signatures, parameter descriptions, fitted attributes, shapes, and refit-dependent
+behavior. Keep private modules and the remaining inspection, plotting, dataset, and metric pages for
+their assigned later increment.
 
 ## Maintenance protocol
 

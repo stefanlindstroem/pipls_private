@@ -29,7 +29,10 @@ dev = [
   "ruff>=0.6",
 ]
 examples = ["pandas>=2.0", "matplotlib>=3.8"]
-docs = []
+docs = [
+  "mkdocs>=1.6,<2",
+  "mkdocs-material>=9.5,<10",
+]
 data = ["pandas>=2.0", "scipy>=1.11", "openpyxl>=3.1", "PyYAML>=6"]
 plot = ["matplotlib>=3.8"]
 

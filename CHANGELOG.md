@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add a strict MkDocs documentation build with Material navigation, MathJax rendering, dedicated documentation dependencies, and ignored `site/` output.
 - Define `docs/` as the self-contained public documentation source, add public example and design-decision navigation, expand the implemented Pi-PLS theory guide, and remove unused selection alternatives from current documentation.
 - Align component-path documentation with the current example ownership: example 09 owns explicit
   Pi-PLS-versus-PLS comparisons, examples 10–12 use Pi-PLS-only paths, fold SD remains descriptive,

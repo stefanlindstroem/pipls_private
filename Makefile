@@ -21,7 +21,7 @@ typecheck:
 	$(PYTHON) -m mypy src
 
 docs:
-	@printf 'Documentation build is introduced in a later increment.\n'
+	$(PYTHON) -m mkdocs build --strict
 
 build:
 	$(PYTHON) -m build
@@ -38,7 +38,7 @@ snapshot:
 	./.llm/snapshot.sh
 
 clean:
-	rm -rf build dist benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
+	rm -rf build dist site benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
 	find examples/results -type f ! -name .gitkeep -delete
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	find . -type d -name '*.egg-info' -prune -exec rm -rf {} +

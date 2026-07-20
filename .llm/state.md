@@ -255,15 +255,18 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add the MkDocs foundation defined for the documentation phase: configure a strict site build,
-render mathematics, establish user-oriented navigation, replace the placeholder `make docs` target,
-and keep individual decision records outside the primary navigation. Decision 0049 has completed
-the self-contained public source boundary required before that tooling is introduced.
+Add the core generated API reference for `PiPLSRegression`, `PiPLSPathCV`, decomposition and
+validation result objects, and `StatisticalSupportWarning`. Audit their public docstrings while
+keeping private modules and inherited implementation details outside the reference.
+
+The MkDocs foundation is complete under Decision 0050: `make docs` performs a strict Material
+build, mathematical notation is configured through PyMdown Extensions and MathJax, and individual
+decision records remain built but outside the primary navigation.
 
 ## Subsequent roadmap
 
-1. **Generated API reference:** document the supported estimator, selection, inspection, plotting,
-   dataset, metric, decomposition, validation, and warning surfaces.
+1. **Remaining generated API reference:** document inspection, plotting, datasets, metrics, and
+   their immutable result objects.
 2. **Documentation distribution and CI:** build the site strictly in CI and from an unpacked source
    distribution.
 3. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges

@@ -56,6 +56,9 @@
   documentation pages instead.
 - User guides describe implemented theory and behavior. Do not preserve rejected or unused options
   merely because they appeared in design discussions.
+- Build public documentation with the dedicated `docs` dependency extra and `make docs`. The build
+  is strict: navigation, internal links, anchors, mathematics support, and generated API targets must
+  remain warning-free. Never commit generated `site/` output.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
 - Design each benchmark around one explicit user-facing question. Give it one readable script and
@@ -89,6 +92,8 @@
 - Report each applicable target as passed, failed, or not run; never describe inspection alone as
   validation.
 - Run focused tests while developing, then `make check` before delivery.
+- Run `make docs` for changes to public guides, navigation, documentation configuration, or public
+  docstrings.
 - Run `make examples` for changes to numbered examples, example-generated CSV/PDF artifacts, or the
   application-facing workflow. This target runs all examples, including Tobacco.
 - Run `make build` for packaging, dependency, public-module, or included-data changes.
