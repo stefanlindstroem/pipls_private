@@ -127,6 +127,8 @@ plan contains an earlier or more general proposal:
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
 - real-data component paths are presented as CSV tables with fold SD, plots are derived from those
   tables, and examples fit a separate fixed model after an explicit user component choice;
+- fold SD is descriptive and is not converted into an automatic one-standard-error or
+  one-standard-deviation rule in the numbered examples or public API;
 - example 09 compares separate Pi-PLS and standard PLS component-path CSVs in one PDF per
   dataset; examples 10–12 write Pi-PLS-only paths beside their post-analysis reports; Tobacco uses
   adaptive rank scanning with explicit full predictor SVD, while randomized SVD is covered by the

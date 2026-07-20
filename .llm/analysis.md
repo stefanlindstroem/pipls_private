@@ -28,7 +28,8 @@ CSVs and their overlaid comparison PDFs. Examples 10–12 own one Pi-PLS `compon
 comparisons from canonical CSV files.
 
 A component-path result is not a fitted-model interpretation and is not an unbiased estimate of a
-subsequent user choice made after inspecting that same path.
+subsequent user choice made after inspecting that same path. Fold SD is descriptive only; numbered
+examples do not automate a one-standard-error or one-standard-deviation component choice.
 
 ### Fixed-model interpretation
 

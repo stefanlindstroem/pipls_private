@@ -40,7 +40,9 @@ model = PiPLSRegression(
 `PiPLSPathCV.best_params_` identifies the best evaluated pair under the configured scorer. With the
 default scorer, it has the smallest evaluated mean response-standardized CV-MSE. Under adaptive
 `search_method="auto"`, admissible pairs that were not evaluated are not part of that comparison.
-The numerical selection is not presented as a mandatory scientific choice.
+The numerical selection is not presented as a mandatory scientific choice. The numbered examples
+also do not apply an automatic one-standard-error or one-standard-deviation rule: the reported fold
+SD is descriptive, and the component count remains an explicit path-based user choice.
 
 ## Predictor-rank ceiling
 

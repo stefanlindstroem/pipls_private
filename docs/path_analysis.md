@@ -57,9 +57,10 @@ The numeric `predictor_rank` is always present. The policy column has one of thr
 
 The fold SD is the standard deviation of the fold-specific response-standardized MSE values. It is
 a descriptive measure of fold-to-fold variation, not a confidence interval or an independent
-standard error, because cross-validation training sets overlap. Conditional rows are selected by
-the configured scorer. With a nondefault scorer, the reported MSE remains a diagnostic and need not
-be the quantity minimized by selection.
+standard error, because cross-validation training sets overlap. The numbered examples do not turn
+it into an automatic one-standard-error or one-standard-deviation selection threshold. Conditional
+rows are selected by the configured scorer. With a nondefault scorer, the reported MSE remains a
+diagnostic and need not be the quantity minimized by selection.
 
 ### Predictor-rank policies
 
@@ -120,10 +121,10 @@ model = PiPLSRegression(
 Both ranks are fixed in the final fit. This reproduces the parameterization represented by the
 chosen path row rather than performing a second automatic rank search.
 
-The repository real-data examples use the same sequence directly in Python. They evaluate the
-standard-PLS comparison with an imported helper function, write both CSV files, call the plotting
-function on those files, and then read the chosen Pi-PLS row. No subprocess or hidden dataset I/O
-layer is involved.
+The repository separates explicit comparison from routine Pi-PLS analysis. Example 09 writes the
+Pi-PLS and ordinary-PLS path CSV files and their comparison PDFs. Examples 10–12 write only one
+Pi-PLS `component_path.csv` and `component_path.pdf` beside each post-analysis report, then read the
+chosen Pi-PLS row. No subprocess or hidden dataset I/O layer is involved.
 
 ## Search settings and rank limits
 

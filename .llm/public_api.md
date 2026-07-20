@@ -251,8 +251,8 @@ plotting layer.
 
 ## Example workflow boundary
 
-The real-data examples use `PiPLSPathCV(refit=False)` to produce the Pi-PLS path, evaluate the
-standard-PLS comparison through a small imported example helper, write both canonical CSV files,
-and call the plotting helper on those files. The final `PiPLSRegression` fit uses the numeric
-predictor rank read from the chosen Pi-PLS CSV row. The package exposes no dataset I/O or plotting
-helper for this workflow.
+Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and their separate
+canonical CSV files. Examples 10–12 use `PiPLSPathCV(refit=False)` to produce one Pi-PLS path, write
+`component_path.csv` and `component_path.pdf` beside the post-analysis report, and fit the final
+`PiPLSRegression` with the numeric predictor rank read from the chosen Pi-PLS row. The package
+exposes no dataset I/O or plotting helper for this workflow.
