@@ -255,18 +255,18 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Complete documentation distribution and CI validation: build the strict site in CI and from an
-unpacked source distribution, verify that all documentation sources and configuration are shipped,
-and keep generated `site/` output outside distributions and commits.
+Define and validate the compatibility and packaging policy: state supported Python, NumPy, and
+scikit-learn ranges and verify clean wheel and source-distribution installations across those
+boundaries.
 
-The MkDocs foundation and complete generated public API reference are implemented under Decisions
-0050--0052. The reference covers the top-level API and the supported inspection, plotting, dataset,
-and metric submodules while excluding private modules and `pipls.model_selection`.
+The documentation phase is complete under Decisions 0049--0053. CI builds the strict site from the
+checkout and from a clean installation of the unpacked source distribution, while generated `site/`
+output remains outside Git, distributions, and snapshots.
 
 ## Subsequent roadmap
 
 1. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
-   and validate clean installations and distributions.
+   and validate clean wheel and source-distribution installations.
 2. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
    first tagged-release checklist.
 

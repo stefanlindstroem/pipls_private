@@ -67,3 +67,4 @@ reference describe the current public behavior directly.
 - [0050: buildable documentation foundation](0050-buildable-documentation-foundation.md)
 - [0051: core generated API reference](0051-core-generated-api-reference.md)
 - [0052: complete generated API reference](0052-complete-generated-api-reference.md)
+- [0053: documentation distribution validation](0053-documentation-distribution-validation.md)

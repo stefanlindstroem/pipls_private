@@ -58,6 +58,7 @@ This index is navigation, not a substitute for those records.
 | `0050-buildable-documentation-foundation.md` | strict MkDocs foundation | Material, MathJax, user navigation, and `make docs` define the buildable public site |
 | `0051-core-generated-api-reference.md` | core generated API documentation | mkdocstrings pages cover the supported top-level objects and audit parameters, fitted attributes, shapes, and conditional outputs |
 | `0052-complete-generated-api-reference.md` | complete generated API documentation | inspection, plotting, datasets, and metrics are generated from audited public docstrings with explicit submodule coverage |
+| `0053-documentation-distribution-validation.md` | documentation artifact validation | CI builds the strict site from the checkout and from a clean installation of the unpacked source distribution |
 
 ## Implemented estimator/search transition
 

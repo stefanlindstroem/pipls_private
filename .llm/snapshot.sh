@@ -33,7 +33,8 @@ rsync -a \
   --exclude='__pycache__/' --exclude='*.pyc' --exclude='.pytest_cache/' \
   --exclude='.mypy_cache/' --exclude='.ruff_cache/' --exclude='.coverage' \
   --exclude='coverage.xml' --exclude='htmlcov/' --exclude='build/' --exclude='dist/' \
-  --exclude='*.egg-info/' --exclude='docs/_build/' --exclude='.ipynb_checkpoints/' \
+  --exclude='*.egg-info/' --exclude='docs/_build/' --exclude='site/' \
+  --exclude='.ipynb_checkpoints/' \
   --exclude='.DS_Store' --exclude='._*' --exclude='*~' --exclude='*.patch' \
   --exclude='*-snapshot.tar.gz' --exclude='benchmarks/results/' \
   --include='examples/results/' --include='examples/results/.gitkeep' \

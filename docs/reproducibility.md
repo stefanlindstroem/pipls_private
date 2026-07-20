@@ -31,6 +31,27 @@ make examples
 The development extra already includes these packages. Re-run `python -m pip install -e ".[dev]"`
 after pulling dependency changes into an existing virtual environment.
 
+## Documentation reproducibility
+
+Install the dedicated documentation dependencies and build the strict site from a checkout with:
+
+```bash
+python -m pip install -e ".[docs]"
+make docs
+```
+
+The stronger distribution check is:
+
+```bash
+make docs-dist
+```
+
+It builds a source distribution, unpacks it, creates a clean virtual environment, installs the
+unpacked package with its documentation extra, and runs the same strict site build. This verifies
+that `mkdocs.yml`, the Makefile, Markdown sources, JavaScript assets, generated-reference inputs,
+and package source are shipped together. Generated `site/` output is temporary and is not part of
+the source distribution.
+
 ## Model-fitting reproducibility
 
 `PiPLSRegression.random_state` accepts an integer seed, a NumPy `RandomState`, or `None`. The

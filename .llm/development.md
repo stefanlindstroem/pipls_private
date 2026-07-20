@@ -60,7 +60,9 @@
   is strict: navigation, internal links, anchors, mathematics support, and generated API targets must
   remain warning-free. Core generated pages use explicit public objects and source docstrings; do not
   expose private modules or inherited implementation machinery by broad module expansion. Never commit
-  generated `site/` output.
+  generated `site/` output. Use `make docs-dist` when changing documentation packaging or the
+  source-distribution boundary; it performs a clean install and strict build from the unpacked
+  sdist and therefore remains outside the ordinary fast test target.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
 - Design each benchmark around one explicit user-facing question. Give it one readable script and

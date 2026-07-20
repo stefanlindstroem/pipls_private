@@ -142,6 +142,9 @@ implementing or reviewing this surface.
 - Runtime code does not import from `.llm`, tests, examples, docs, scripts, datasets, or benchmarks.
 - Public Markdown under `docs/` is self-contained and does not link outside the documentation source
   tree. `.llm` contracts may be more detailed but are never user prerequisites.
+- The source distribution ships `mkdocs.yml`, the Makefile, documentation sources and assets, and
+  the validation helper needed for a clean strict documentation build. Generated `site/` output is
+  excluded from Git, distributions, and snapshots.
 - The fixed numerical core does not own preprocessing, CV, datasets, benchmark policy, or
   publication workflows.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required

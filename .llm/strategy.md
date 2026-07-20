@@ -460,8 +460,9 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **public source, build tooling, and complete generated public reference complete;
-distribution and CI validation next**.
+Current status: **complete**. Decisions 0049--0053 define the self-contained public source, strict
+MkDocs build, generated public API reference, source-distribution contents, and checkout/sdist CI
+validation.
 
 ### Current standardization and deferred block-aware variants
 
@@ -489,12 +490,17 @@ notation; navigation follows the user journey; and generated `site/` output is i
 Decision 0051 adds mkdocstrings and generated pages for every supported top-level object, with
 source docstrings covering signatures, parameters, fitted attributes, shapes, and conditional
 refit and OOF behavior. Decision 0052 completes the generated reference for inspection, plotting,
-datasets, and metrics, with exact submodule coverage and optional Matplotlib imports.
+datasets, and metrics, with exact submodule coverage and optional Matplotlib imports. Decision 0053
+validates the strict site in CI from both the checkout and a clean installation of the unpacked
+source distribution.
+
+Current status: **complete**. Decisions 0049--0053 define the self-contained public source, strict
+site build, generated public reference, distributed documentation inputs, and CI validation.
 
 ## Current next increment
 
-Build the strict site in CI and from an unpacked source distribution. Verify shipped documentation
-sources and configuration without committing generated `site/` output.
+Define and validate the compatibility and packaging policy, including clean wheel and source-
+distribution installation checks across the supported Python, NumPy, and scikit-learn boundaries.
 
 ## Maintenance protocol
 

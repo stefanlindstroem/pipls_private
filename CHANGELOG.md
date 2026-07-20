@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Validate the strict documentation site in CI from both the repository checkout and a clean
+  installation of the unpacked source distribution; ship the MkDocs configuration, Makefile, and
+  validation helper; and exclude generated `site/` output from repository snapshots.
 - Complete the generated public API reference for inspection, plotting, datasets, and metrics;
   audit immutable-result shapes, plotting contracts, synthetic generators, and scorer semantics;
   formalize the dataset submodule exports; and verify that importing plotting remains independent

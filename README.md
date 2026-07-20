@@ -304,7 +304,14 @@ python -m pip install -e ".[docs]"
 make docs
 ```
 
-The strict MkDocs build writes the generated site to `site/`.
+The strict MkDocs build writes the generated site to `site/`. To verify that the same site can
+be built from the shipped source distribution, run:
+
+```bash
+make docs-dist
+```
+
+This creates a temporary clean environment and does not retain generated files in the repository.
 
 - [Quickstart](docs/quickstart.md)
 - [Examples](docs/examples.md)

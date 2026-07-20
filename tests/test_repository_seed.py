@@ -58,19 +58,25 @@ def test_packaging_uses_pep639_license_metadata() -> None:
     assert 'license = {file = "LICENSE"}' not in pyproject
 
 
-def test_source_distribution_manifest_includes_documentation_sources() -> None:
+def test_source_distribution_manifest_includes_documentation_build_inputs() -> None:
     manifest_lines = {
         line.strip()
         for line in (_repository_root() / "MANIFEST.in").read_text(encoding="utf-8").splitlines()
         if line.strip()
     }
 
-    assert "recursive-include docs *.md *.js" in manifest_lines
+    assert {
+        "include Makefile",
+        "include mkdocs.yml",
+        "include tools/check_sdist_docs.py",
+        "recursive-include docs *.md *.js",
+    } <= manifest_lines
 
 
 def test_docs_extra_declares_the_build_toolchain() -> None:
     pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
     assert "docs = [" in pyproject
+    assert '"build>=1.2,<2"' in pyproject
     assert '"mkdocs>=1.6,<2"' in pyproject
     assert '"mkdocs-material>=9.5,<9.7"' in pyproject
     assert '"mkdocstrings-python>=2,<3"' in pyproject
@@ -140,6 +146,36 @@ def test_make_docs_is_strict_and_generated_site_is_ignored() -> None:
     assert "-m mkdocs build --strict" in completed.stdout
     assert "site" in clean.stdout.split()
     assert "site/" in (root / ".gitignore").read_text(encoding="utf-8").splitlines()
+
+
+def test_documentation_distribution_target_uses_the_validation_helper() -> None:
+    root = _repository_root()
+    completed = subprocess.run(
+        ["make", "-n", "docs-dist"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert "tools/check_sdist_docs.py" in completed.stdout
+    helper = (root / "tools" / "check_sdist_docs.py").read_text(encoding="utf-8")
+    assert '"--sdist"' in helper
+    assert 'f"{source}[docs]"' in helper
+    assert '"docs"' in helper
+    assert "PYTHON={python}" in helper
+
+
+def test_documentation_ci_builds_checkout_and_source_distribution() -> None:
+    workflow = yaml.safe_load(
+        (_repository_root() / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
+    )
+    docs_steps = workflow["jobs"]["docs"]["steps"]
+    commands = [step["run"] for step in docs_steps if "run" in step]
+
+    assert 'python -m pip install -e ".[docs]"' in commands
+    assert "make docs" in commands
+    assert "make docs-dist" in commands
 
 
 def test_examples_extra_declares_data_and_plotting_dependencies() -> None:
@@ -252,6 +288,7 @@ def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> Non
     assert "README.md" in names
     assert ".llm/SNAPSHOT_INFO" in names
     assert not any(name.startswith(f"{root.name}/") for name in names)
+    assert not any(name == "site" or name.startswith("site/") for name in names)
     expected_result_placeholders = {
         "examples/results/.gitkeep",
         "examples/results/pls_path_comparison/.gitkeep",
