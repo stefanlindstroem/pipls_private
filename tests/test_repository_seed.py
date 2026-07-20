@@ -72,7 +72,9 @@ def test_docs_extra_declares_the_build_toolchain() -> None:
     pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
     assert 'docs = [' in pyproject
     assert '"mkdocs>=1.6,<2"' in pyproject
-    assert '"mkdocs-material>=9.5,<10"' in pyproject
+    assert '"mkdocs-material>=9.5,<9.7"' in pyproject
+    assert '"mkdocstrings-python>=2,<3"' in pyproject
+    assert '"ruff>=0.6"' in pyproject.split("docs = [", 1)[1].split("]", 1)[0]
 
 
 def test_mkdocs_configuration_has_valid_user_navigation() -> None:
@@ -95,17 +97,27 @@ def test_mkdocs_configuration_has_valid_user_navigation() -> None:
         return found
 
     nav_targets = targets(config["nav"])
-    top_level_pages = {
+    public_pages = {
         path.relative_to(root / "docs").as_posix()
-        for path in (root / "docs").glob("*.md")
+        for path in (root / "docs").rglob("*.md")
+        if not (path.parent.name == "decisions" and path.name[:4].isdigit())
     }
 
     assert config["strict"] is True
     assert config["theme"]["name"] == "material"
-    assert nav_targets == top_level_pages | {"decisions/index.md"}
+    assert nav_targets == public_pages
     assert all((root / "docs" / target).is_file() for target in nav_targets)
     assert "decisions/[0-9][0-9][0-9][0-9]-*.md" in config["not_in_nav"]
     assert "javascripts/mathjax.js" in config["extra_javascript"]
+    mkdocstrings = next(
+        plugin["mkdocstrings"]
+        for plugin in config["plugins"]
+        if isinstance(plugin, dict) and "mkdocstrings" in plugin
+    )
+    python_handler = mkdocstrings["handlers"]["python"]
+    assert python_handler["paths"] == ["src"]
+    assert python_handler["options"]["docstring_style"] == "numpy"
+    assert python_handler["options"]["show_source"] is False
 
 
 def test_make_docs_is_strict_and_generated_site_is_ignored() -> None:

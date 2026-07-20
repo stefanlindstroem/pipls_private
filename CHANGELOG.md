@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add generated API reference pages for the fixed estimator, path selector, decomposition,
+  validation report, and support warning; introduce mkdocstrings with Ruff-formatted signatures,
+  and audit the corresponding public docstrings for parameters, fitted attributes, shapes, and
+  conditional outputs.
 - Add a strict MkDocs documentation build with Material navigation, MathJax rendering, dedicated documentation dependencies, and ignored `site/` output.
 - Define `docs/` as the self-contained public documentation source, add public example and design-decision navigation, expand the implemented Pi-PLS theory guide, and remove unused selection alternatives from current documentation.
 - Align component-path documentation with the current example ownership: example 09 owns explicit

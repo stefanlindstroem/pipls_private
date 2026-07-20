@@ -88,55 +88,142 @@ class PiPLSPathCV(
 ):
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
-    This meta-estimator owns package-level model selection. Every candidate is a
-    fixed-rank :class:`PiPLSRegression` clone, fitted independently inside each
-    training fold. The selected pair is optionally refitted on all supplied data.
-
-    The default ``search_method="auto"`` applies a deterministic logarithmic
-    coarse-to-fine predictor-rank search independently for each value of
-    ``n_components``.
+    Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
+    independently inside each training fold. The selected pair is optionally
+    refitted on all supplied data. The default ``search_method="auto"`` applies
+    a deterministic logarithmic coarse-to-fine predictor-rank search separately
+    for each component count.
 
     Parameters
     ----------
-    estimator:
-        A direct :class:`PiPLSRegression` or a scikit-learn :class:`Pipeline`
-        whose final step is :class:`PiPLSRegression`. ``None`` creates a default
-        direct estimator template.
-    n_components_values:
+    estimator : PiPLSRegression, sklearn.pipeline.Pipeline or None, default=None
+        Direct Pi-PLS estimator or pipeline whose final step is
+        :class:`pipls.PiPLSRegression`. ``None`` creates a default direct
+        estimator template.
+    n_components_values : sequence of int or "all", default="all"
         Positive component counts to evaluate. ``"all"`` uses every value from
-        1 through ``min(n_targets, max_predictor_rank_)`` and is the default.
-    predictor_rank_values:
-        Admissible predictor ranks for each component count. ``None`` makes every
-        value from 1 through ``max_predictor_rank_`` available; ``search_method``
-        determines whether all are evaluated. A one-element sequence fixes one
-        rank, a longer sequence defines an explicit admissible set, and ``"max"``
-        uses ``max_predictor_rank_`` directly for every component count.
-    max_predictor_rank:
-        ``"rule"`` uses the total-sample support rule with fold-level
-        feasibility caps. A positive integer imposes an additional explicit
-        upper bound.
-    search_method:
-        ``"optimal"`` evaluates every admissible pair; ``"auto"`` is adaptive
-        and approximate.
-    samples_per_predictor_rank:
-        Positive rank-bound parameter $c$ applied to the total number of samples
-        supplied to ``fit``. The default is 5. Values below 5 issue
-        :class:`StatisticalSupportWarning`.
-    cv:
-        Integer split count, splitter, iterable of train-validation pairs, or
-        ``None`` for the standard five-fold regression split. The default is 5.
-    scoring:
-        Scikit-learn scorer name, callable, or ``None`` to use estimator ``score``.
-        The default is the public callable
+        one through ``min(n_targets_, max_predictor_rank_)``.
+    predictor_rank_values : sequence of int, "max" or None, default=None
+        Admissible predictor ranks. ``None`` makes every rank from one through
+        ``max_predictor_rank_`` available; ``search_method`` determines which
+        are evaluated. A one-element sequence fixes one rank, a longer sequence
+        defines an explicit set, and ``"max"`` uses ``max_predictor_rank_`` for
+        every component count.
+    max_predictor_rank : int or "rule", default="rule"
+        ``"rule"`` applies the total-sample support rule and fold-feasibility
+        caps. A positive integer imposes an additional upper bound.
+    search_method : {"auto", "optimal"}, default="auto"
+        ``"optimal"`` evaluates every admissible pair. ``"auto"`` uses the
+        deterministic adaptive search and may skip pairs.
+    samples_per_predictor_rank : float, default=5
+        Positive support parameter $c$ for ``max_predictor_rank="rule"``. Values
+        below five issue :class:`pipls.StatisticalSupportWarning`.
+    cv : int, splitter, iterable or None, default=5
+        Cross-validation specification. ``None`` requests the standard five-fold
+        regression split.
+    scoring : str, callable or None
+        Scikit-learn scorer name, scorer callable, or ``None`` to use estimator
+        ``score``. The default is
         :func:`pipls.metrics.neg_response_standardized_mean_squared_error`.
-    refit:
-        Refit the best evaluated pair on all supplied data.
-    n_jobs:
+    refit : bool, default=True
+        Whether to refit the best evaluated pair on all supplied data. Delegated
+        prediction, transformation, scoring, and feature-name methods require
+        ``refit=True``.
+    n_jobs : int or None, default=None
         Joblib parallelism across candidate pairs within each evaluation batch.
-    return_oof_predictions:
-        If true, fit the selected fixed parameterization on every training fold
+    return_oof_predictions : bool, default=False
+        Whether to fit the selected fixed parameterization on every training fold
         and retain row-ordered validation predictions. Repeated predictions are
         averaged and rows never validated are marked with NaN.
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        Number of predictor columns seen during fitting.
+    feature_names_in_ : ndarray of shape (n_features_in_,)
+        Predictor names seen during fitting. Defined only when all input feature
+        names are strings.
+    n_targets_ : int
+        Number of response columns seen during fitting.
+    n_splits_ : int
+        Number of materialized cross-validation splits.
+    cv_n_train_min_ : int
+        Smallest training-fold size.
+    max_predictor_rank_ : int
+        Effective predictor-rank upper bound after support and fold-feasibility
+        constraints.
+    n_components_values_ : ndarray of shape (n_component_values,)
+        Validated component counts in ascending order.
+    predictor_rank_values_ : ndarray of shape (n_predictor_rank_values,)
+        Validated predictor ranks defining the available path surface.
+    predictor_rank_policy_ : {"optimized", "fixed", "maximum"}
+        Interpretation of the predictor-rank specification.
+    n_path_candidates_ : int
+        Number of admissible candidate pairs.
+    n_path_candidates_evaluated_ : int
+        Number of candidate pairs actually evaluated.
+    n_path_candidates_skipped_ : int
+        Number of admissible pairs skipped by adaptive search.
+    path_search_exhaustive_ : bool
+        Whether every admissible pair was evaluated.
+    path_search_method_ : {"auto", "optimal"}
+        Search method used by the fitted object.
+    path_search_history_ : dict of int to tuple of tuple of int
+        Predictor-rank batches evaluated for each component count.
+    scorer_ : callable
+        Validated scikit-learn scorer used during fitting.
+    cv_results_ : dict of str to array-like
+        Full candidate-level results. It includes parameter pairs, split scores,
+        response-standardized MSE values, timing summaries, and score ranks.
+    component_path_results_ : dict of str to ndarray
+        One conditionally selected predictor-rank row per component count. The
+        columns are ``n_components``, ``predictor_rank``,
+        ``predictor_rank_policy``, ``response_standardized_cv_mse_mean``,
+        ``response_standardized_cv_mse_fold_sd``, and ``n_splits``.
+    response_standardized_mse_path_ : ndarray
+        Candidate response-standardized MSE surface. Unevaluated adaptive-search
+        cells are NaN.
+    score_path_ : ndarray
+        Candidate mean-score surface. Unevaluated adaptive-search cells are NaN.
+    best_index_ : int
+        Row of ``cv_results_`` selected by maximum mean test score, with smaller
+        component count and predictor rank used as deterministic tie-breakers.
+    best_score_ : float
+        Mean cross-validation score at ``best_index_``.
+    best_response_standardized_mse_ : float
+        Mean response-standardized CV-MSE at ``best_index_``.
+    best_n_components_ : int
+        Selected component count.
+    best_predictor_rank_ : int
+        Selected predictor rank.
+    best_params_ : dict of str to int
+        Parameters required to configure the supplied estimator or pipeline.
+    best_pipls_params_ : dict of str to int
+        Selected direct Pi-PLS parameters with unprefixed keys.
+    best_predictor_rank_by_n_components_ : dict of int to int
+        Conditionally selected predictor rank for each component count.
+    best_score_by_n_components_ : dict of int to float
+        Corresponding conditional mean test score for each component count.
+    validation_report_ : PiPLSValidationReport
+        Immutable summary of the selected cross-validation result.
+    best_estimator_ : estimator
+        Estimator refitted on all data. Defined only when ``refit=True``.
+    best_pipls_ : PiPLSRegression
+        Fitted terminal Pi-PLS estimator. Defined only when ``refit=True``.
+    refit_time_ : float
+        Full-data refit time in seconds. Defined only when ``refit=True``.
+    oof_predictions_ : ndarray
+        Ordered out-of-fold predictions. Defined only when
+        ``return_oof_predictions=True``.
+    oof_prediction_counts_ : ndarray of shape (n_samples,)
+        Number of validation predictions contributing to each OOF row. Defined
+        only when ``return_oof_predictions=True``.
+    oof_params_ : dict of str to int
+        Parameterization used for the OOF fits. Defined only when
+        ``return_oof_predictions=True``.
+    pooled_oof_r2_ : float or None
+        Pooled $R^2$ over rows with OOF coverage. Defined only when
+        ``return_oof_predictions=True``.
     """
 
     def __init__(
@@ -173,7 +260,22 @@ class PiPLSPathCV(
         *,
         groups: ArrayLike | None = None,
     ) -> PiPLSPathCV:
-        """Evaluate the path and optionally refit the best evaluated pair."""
+        """Evaluate the path and optionally refit the best evaluated pair.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Response vector or matrix.
+        groups : array-like of shape (n_samples,), optional
+            Group labels passed to a group-aware splitter.
+
+        Returns
+        -------
+        self : PiPLSPathCV
+            Fitted path-search object.
+        """
 
         self._validate_constructor_parameters()
         self._clear_validation_attributes()
@@ -450,7 +552,25 @@ class PiPLSPathCV(
 
     @available_if(_estimator_supports("predict"))  # type: ignore[untyped-decorator]
     def predict(self, X: ArrayLike, copy: bool = True) -> FloatArray:
-        """Predict with the refitted best evaluated estimator."""
+        """Predict with the refitted best evaluated estimator.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        copy : bool, default=True
+            Whether validation may copy ``X`` for a direct Pi-PLS estimator.
+
+        Returns
+        -------
+        y_pred : ndarray
+            Predictions from ``best_estimator_``.
+
+        Notes
+        -----
+        This method is available only when ``refit=True`` and the estimator
+        template supports prediction.
+        """
 
         estimator = self._refitted_estimator()
         if isinstance(estimator, PiPLSRegression):
@@ -464,7 +584,28 @@ class PiPLSPathCV(
         y: ArrayLike | None = None,
         copy: bool = True,
     ) -> Any:
-        """Transform with the refitted best evaluated estimator."""
+        """Transform with the refitted best evaluated estimator.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        y : array-like, optional
+            Responses to transform with a direct ``PiPLSRegression``. Composite
+            estimators support predictor transformation only.
+        copy : bool, default=True
+            Whether validation may copy arrays for a direct Pi-PLS estimator.
+
+        Returns
+        -------
+        transformed : ndarray or tuple of ndarray
+            Output of the selected estimator's transformation.
+
+        Notes
+        -----
+        This method is available only when ``refit=True`` and the estimator
+        template supports transformation.
+        """
 
         estimator = self._refitted_estimator()
         if isinstance(estimator, PiPLSRegression):
@@ -486,7 +627,29 @@ class PiPLSPathCV(
         groups: ArrayLike | None = None,
         **fit_params: Any,
     ) -> Any:
-        """Fit the path search and delegate transformation to the selected estimator."""
+        """Fit the path search and transform with the selected estimator.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Response vector or matrix. ``y`` is required.
+        groups : array-like of shape (n_samples,), optional
+            Group labels passed to a group-aware splitter.
+        **fit_params : dict
+            Additional fit parameters are not supported and raise ``TypeError``.
+
+        Returns
+        -------
+        transformed : ndarray or tuple of ndarray
+            Transformation of the fitted data by ``best_estimator_``.
+
+        Notes
+        -----
+        This method is available only when ``refit=True`` and the estimator
+        template supports transformation.
+        """
 
         if fit_params:
             names = ", ".join(sorted(fit_params))
@@ -504,7 +667,26 @@ class PiPLSPathCV(
         X: ArrayLike,
         y: ArrayLike | None = None,
     ) -> Any:
-        """Delegate inverse transformation to the refitted selected estimator."""
+        """Reconstruct data through the refitted selected estimator.
+
+        Parameters
+        ----------
+        X : array-like
+            Transformed predictor representation.
+        y : array-like, optional
+            Response scores for a direct ``PiPLSRegression``. Composite
+            estimators reconstruct predictors only.
+
+        Returns
+        -------
+        reconstructed : ndarray or tuple of ndarray
+            Output of the selected estimator's inverse transformation.
+
+        Notes
+        -----
+        This method is available only when ``refit=True`` and the estimator
+        template supports inverse transformation.
+        """
 
         estimator = self._refitted_estimator()
         if isinstance(estimator, PiPLSRegression):
@@ -523,7 +705,27 @@ class PiPLSPathCV(
         y: ArrayLike,
         sample_weight: ArrayLike | None = None,
     ) -> float:
-        """Return the selected estimator's uniformly averaged :math:`R^2`."""
+        r"""Return the selected estimator's uniformly averaged $R^2$.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Observed responses.
+        sample_weight : array-like of shape (n_samples,), optional
+            Sample weights forwarded to the selected estimator.
+
+        Returns
+        -------
+        score : float
+            Score returned by ``best_estimator_``.
+
+        Notes
+        -----
+        This method is available only when ``refit=True`` and the estimator
+        template supports scoring.
+        """
 
         estimator = self._refitted_estimator()
         if sample_weight is None:
@@ -535,7 +737,24 @@ class PiPLSPathCV(
         self,
         input_features: ArrayLike | None = None,
     ) -> NDArray[np.object_]:
-        """Return names for the selected latent predictor scores."""
+        """Return names for the selected transformed predictor features.
+
+        Parameters
+        ----------
+        input_features : array-like of str, optional
+            Input feature names validated by the selected estimator.
+
+        Returns
+        -------
+        feature_names_out : ndarray of str
+            Names returned by ``best_estimator_`` or its fitted terminal
+            ``PiPLSRegression``.
+
+        Notes
+        -----
+        This method is available only when ``refit=True`` and the estimator
+        template supports output feature names.
+        """
 
         estimator = self._refitted_estimator()
         method = getattr(estimator, "get_feature_names_out", None)

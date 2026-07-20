@@ -22,26 +22,29 @@ class PiPLSDecomposition:
 
     Attributes
     ----------
-    Pi:
-        Truncated predictor basis with shape ``(n_features, predictor_rank)``.
-    C:
-        Response basis with shape ``(n_targets, n_components)``.
-    W:
-        Least-squares coupling map with shape
-        ``(predictor_rank, n_components)``.
-    P, D, Q:
-        Orthogonal-diagonal-orthogonal factorization of the centered/scaled
-        regression map, so that ``P @ D @ Q.T`` is that map.
-    dilation:
+    Pi : ndarray of shape (n_features, predictor_rank)
+        Truncated predictor basis.
+    C : ndarray of shape (n_targets, n_components)
+        Response basis.
+    W : ndarray of shape (predictor_rank, n_components)
+        Least-squares coupling map.
+    P : ndarray of shape (n_features, n_components)
+        Orthogonal predictor rotations of the centered/scaled regression map.
+    D : ndarray of shape (n_components, n_components)
+        Diagonal dilation matrix.
+    Q : ndarray of shape (n_targets, n_components)
+        Orthogonal response rotations. ``P @ D @ Q.T`` is the centered/scaled
+        regression map.
+    dilation : ndarray of shape (n_components,)
         Diagonal of ``D``.
-    x_rank:
+    x_rank : int
         Complete numerical predictor rank under full SVD, or a verified lower
         bound under truncated randomized SVD.
-    x_rank_is_exact:
+    x_rank_is_exact : bool
         Whether ``x_rank`` is the complete numerical rank.
-    rank_tolerance:
+    rank_tolerance : float
         Tolerance used to classify retained predictor singular values.
-    predictor_svd_solver:
+    predictor_svd_solver : {"full", "randomized"}
         Predictor SVD implementation actually used.
     """
 

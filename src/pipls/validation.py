@@ -15,11 +15,40 @@ EstimateKind = Literal["selection-conditioned", "fixed-parameter"]
 
 @dataclass(frozen=True)
 class PiPLSValidationReport:
-    """Immutable summary of the CV result attached to a fitted Pi-PLS object.
+    """Immutable summary of a Pi-PLS cross-validation result.
 
+    Parameters
+    ----------
+    n_components : int
+        Component count represented by the report.
+    predictor_rank : int
+        Predictor rank represented by the report.
+    n_splits : int
+        Number of cross-validation splits.
+    mean_test_score : float
+        Mean configured test score.
+    mean_response_standardized_mse : float
+        Mean response-standardized validation MSE.
+    estimate_kind : {"selection-conditioned", "fixed-parameter"}
+        Whether the same validation result selected model parameters or evaluated
+        a parameterization fixed independently of those predictions.
+    is_leave_one_out : bool
+        Whether the materialized splitter is leave-one-out.
+    oof_predictions : ndarray or None, default=None
+        Ordered OOF predictions. One-dimensional responses produce shape
+        ``(n_samples,)``; multi-output responses produce
+        ``(n_samples, n_targets)``.
+    oof_prediction_counts : ndarray of shape (n_samples,) or None, default=None
+        Number of validation predictions contributing to each OOF row.
+    pooled_oof_r2 : float or None, default=None
+        Pooled $R^2$ over rows with OOF coverage.
+
+    Notes
+    -----
     ``estimate_kind="selection-conditioned"`` means the reported validation
     result was also used to choose ``n_components`` and/or ``predictor_rank``.
-    It is therefore not an unbiased post-selection performance estimate.
+    It is therefore not an unbiased post-selection performance estimate. Arrays
+    stored by the report are defensive, read-only copies.
     """
 
     n_components: int

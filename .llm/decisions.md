@@ -56,6 +56,7 @@ This index is navigation, not a substitute for those records.
 | `0048-self-contained-user-examples.md` | user-facing example semantics | remove context-free advanced CV; require explained data, labeled output, and publication-independent numbered examples |
 | `0049-public-documentation-source-boundary.md` | public documentation ownership | `docs/` is self-contained; user guides describe implemented behavior and do not depend on `.llm` or repository-external Markdown |
 | `0050-buildable-documentation-foundation.md` | strict MkDocs foundation | Material, MathJax, user navigation, and `make docs` define the buildable public site |
+| `0051-core-generated-api-reference.md` | core generated API documentation | mkdocstrings pages cover the supported top-level objects and audit parameters, fitted attributes, shapes, and conditional outputs |
 
 ## Implemented estimator/search transition
 

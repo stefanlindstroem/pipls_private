@@ -255,23 +255,21 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add the core generated API reference for `PiPLSRegression`, `PiPLSPathCV`, decomposition and
-validation result objects, and `StatisticalSupportWarning`. Audit their public docstrings while
-keeping private modules and inherited implementation details outside the reference.
+Complete the generated API reference for inspection, plotting, datasets, metrics, and their
+immutable result objects. Preserve the distinction between Pi-PLS-specific factorization tools and
+estimator-neutral PLS-family analysis, and keep Matplotlib optional.
 
-The MkDocs foundation is complete under Decision 0050: `make docs` performs a strict Material
-build, mathematical notation is configured through PyMdown Extensions and MathJax, and individual
-decision records remain built but outside the primary navigation.
+The MkDocs foundation and core generated reference are complete under Decisions 0050 and 0051.
+`make docs` resolves every supported top-level object, and their public docstrings now specify
+parameters, fitted attributes, shapes, and refit- or OOF-dependent output.
 
 ## Subsequent roadmap
 
-1. **Remaining generated API reference:** document inspection, plotting, datasets, metrics, and
-   their immutable result objects.
-2. **Documentation distribution and CI:** build the site strictly in CI and from an unpacked source
+1. **Documentation distribution and CI:** build the site strictly in CI and from an unpacked source
    distribution.
-3. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
+2. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
    and validate clean installations and distributions.
-4. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
+3. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
    first tagged-release checklist.
 
 Future datasets still require a distinct package-level use case and verified source-level

@@ -460,7 +460,8 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **public source architecture complete; build tooling next**.
+Current status: **public source, build tooling, and core generated reference complete; remaining
+public submodules next**.
 
 ### Current standardization and deferred block-aware variants
 
@@ -483,17 +484,17 @@ Current status: **current estimator standardization complete; block-aware API de
 ## Documentation foundation status
 
 Decision 0050 completes the MkDocs foundation: the dedicated `docs` extra installs MkDocs and
-Material; `make docs` performs a strict build; PyMdown Extensions and MathJax
-render the existing notation; navigation follows the user journey; and generated `site/` output is
-ignored and cleaned.
+Material; `make docs` performs a strict build; PyMdown Extensions and MathJax render the existing
+notation; navigation follows the user journey; and generated `site/` output is ignored and cleaned.
+Decision 0051 adds mkdocstrings and generated pages for every supported top-level object, with
+source docstrings covering signatures, parameters, fitted attributes, shapes, and conditional
+refit and OOF behavior.
 
 ## Current next increment
 
-Add generated reference pages for the core estimator surface: `PiPLSRegression`, `PiPLSPathCV`,
-`PiPLSDecomposition`, `PiPLSValidationReport`, and `StatisticalSupportWarning`. Use that build to
-audit public signatures, parameter descriptions, fitted attributes, shapes, and refit-dependent
-behavior. Keep private modules and the remaining inspection, plotting, dataset, and metric pages for
-their assigned later increment.
+Complete the generated reference for inspection, plotting, datasets, metrics, and their immutable
+result objects. Keep Matplotlib optional, preserve the Pi-PLS-specific versus shared PLS-family
+boundary, and continue to exclude private modules from the site.
 
 ## Maintenance protocol
 

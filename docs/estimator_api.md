@@ -77,3 +77,11 @@ available.
 package response-standardized scorer. `predictor_rank_` records the fitted explicit rank, while
 `max_predictor_rank_` records the centered algebraic limit `min(n_features, n_samples - 1)` for the
 supplied training data.
+
+
+## Generated reference
+
+The generated [fixed-regression reference](api/regression.md) gives the complete constructor
+signature, fitted-attribute shapes, and method return contracts. The generated
+[path-selection reference](api/path.md) documents the search results and which attributes and
+methods depend on `refit=True` or `return_oof_predictions=True`.

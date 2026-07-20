@@ -65,3 +65,4 @@ reference describe the current public behavior directly.
 - [0026: package navigation cleanup](0026-package-navigation-cleanup.md)
 - [0049: public documentation source boundary](0049-public-documentation-source-boundary.md)
 - [0050: buildable documentation foundation](0050-buildable-documentation-foundation.md)
+- [0051: core generated API reference](0051-core-generated-api-reference.md)

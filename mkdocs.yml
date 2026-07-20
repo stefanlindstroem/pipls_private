@@ -22,6 +22,13 @@ nav:
       - Cross-validation: cross_validation.md
       - Preprocessing: preprocessing.md
   - Model inspection: model_inspection.md
+  - API reference:
+      - Overview: api/index.md
+      - Fixed regression: api/regression.md
+      - Path selection: api/path.md
+      - Decomposition: api/decomposition.md
+      - Validation report: api/validation.md
+      - Warnings: api/exceptions.md
   - Data and validation:
       - Datasets: datasets.md
       - Benchmarks: benchmarks.md
@@ -41,6 +48,22 @@ validation:
 
 plugins:
   - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - src
+          options:
+            docstring_style: numpy
+            members_order: source
+            merge_init_into_class: true
+            separate_signature: true
+            show_object_full_path: false
+            show_root_full_path: false
+            show_root_heading: true
+            show_signature_annotations: true
+            show_source: false
+            signature_crossrefs: true
 
 markdown_extensions:
   - admonition

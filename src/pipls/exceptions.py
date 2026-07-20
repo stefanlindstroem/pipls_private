@@ -2,4 +2,9 @@
 
 
 class StatisticalSupportWarning(UserWarning):
-    """Warn that a configuration lacks the conservative statistical support margin."""
+    """Warning for a configuration below the documented support margin.
+
+    Direct fixed fits warn below three observations per retained predictor-rank
+    direction. Path searches warn when their configured support rule permits fewer
+    than five supplied observations per retained direction.
+    """

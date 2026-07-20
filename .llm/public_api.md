@@ -12,6 +12,9 @@ from pipls import (
 )
 ```
 
+The generated core reference under `docs/api/` documents exactly these supported top-level
+objects; `__version__` remains package metadata rather than an API reference page.
+
 `PiPLSRegression` fits one explicit fixed pair `(n_components, predictor_rank)` and performs no
 cross-validation or parameter selection. `PiPLSPathCV` is the standard package workflow for the
 bounded triangular scan and conditional predictor-rank selection. Public scoring callables remain

@@ -42,29 +42,79 @@ class PiPLSRegression(
 
     Parameters
     ----------
-    n_components:
-        Response-side latent dimension $h$.
-    scale:
+    n_components : int, default=2
+        Response-side latent dimension $h$. It must satisfy
+        ``1 <= n_components <= min(n_targets, predictor_rank)``.
+    scale : bool, default=True
         If true, center and divide predictor and response columns by their
         training-sample standard deviations. If false, center without scaling.
-    copy:
-        If true, copy input arrays before preprocessing.
-    predictor_rank:
-        Explicit positive predictor truncation rank $r_\pi$.
-    svd_solver:
+    copy : bool, default=True
+        Whether fitting may copy the supplied arrays before preprocessing.
+    predictor_rank : int, default=2
+        Explicit positive predictor truncation rank $r_\pi$. After centering, it
+        must not exceed ``min(n_features, n_samples - 1)``.
+    svd_solver : {"auto", "full", "randomized"}, default="auto"
         Predictor SVD policy. ``"full"`` uses the exact thin SVD,
         ``"randomized"`` always uses randomized truncated SVD, and ``"auto"``
         uses randomized SVD only for sufficiently large matrices and low retained
         rank. The response-side and coupling SVDs always remain exact.
-    random_state:
-        Integer seed, NumPy ``RandomState`` instance, or ``None``. The default
-        integer seed makes ``"auto"`` and ``"randomized"`` reproducible.
-        ``None`` follows NumPy's global random state, as in scikit-learn.
+    random_state : int, numpy.random.RandomState or None, default=0
+        Random state used by randomized predictor SVD. The default integer seed
+        makes ``"auto"`` and ``"randomized"`` reproducible. ``None`` follows
+        NumPy's global random state.
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        Number of predictor columns seen during fitting.
+    feature_names_in_ : ndarray of shape (n_features_in_,)
+        Predictor names seen during fitting. Defined only when all input feature
+        names are strings.
+    n_targets_ : int
+        Number of response columns seen during fitting.
+    predictor_rank_ : int
+        Predictor rank used by the fitted model.
+    max_predictor_rank_ : int
+        Algebraic upper bound ``min(n_features_in_, n_samples - 1)`` for the
+        fitted data.
+    decomposition_ : PiPLSDecomposition
+        Immutable canonical Pi-PLS factorization and numerical diagnostics.
+    coef_ : ndarray of shape (n_targets_, n_features_in_)
+        Regression coefficients in original predictor and response units.
+    intercept_ : ndarray of shape (n_targets_,)
+        Regression intercept in original response units.
+    x_mean_ : ndarray of shape (n_features_in_,)
+        Predictor means learned from the training data.
+    y_mean_ : ndarray of shape (n_targets_,)
+        Response means learned from the training data.
+    x_scale_ : ndarray of shape (n_features_in_,)
+        Predictor scales learned from the training data, or ones when
+        ``scale=False``. Constant columns receive scale one.
+    y_scale_ : ndarray of shape (n_targets_,)
+        Response scales learned from the training data, or ones when
+        ``scale=False``. Constant columns receive scale one.
+    response_scale_for_scoring_ : ndarray of shape (n_targets_,)
+        Training-response scales used by the response-standardized MSE scorer.
+    x_rotations_, x_weights_ : ndarray of shape (n_features_in_, n_components)
+        Predictor directions. ``x_weights_`` is the PLS-style alias of
+        ``x_rotations_``.
+    y_rotations_, y_weights_ : ndarray of shape (n_targets_, n_components)
+        Response directions. ``y_weights_`` is the PLS-style alias of
+        ``y_rotations_``.
+    x_scores_ : ndarray of shape (n_samples, n_components)
+        Training predictor scores.
+    y_scores_ : ndarray of shape (n_samples, n_components)
+        Training response scores.
+    x_loadings_ : ndarray of shape (n_features_in_, n_components)
+        Least-squares predictor loadings for reconstructing centered/scaled X.
+    y_loadings_ : ndarray of shape (n_targets_, n_components)
+        Least-squares response loadings for reconstructing centered/scaled y.
 
     Notes
     -----
     This estimator performs no parameter selection or cross-validation. Use
-    :class:`pipls.PiPLSPathCV` for the standard triangular model-selection path.
+    :class:`pipls.PiPLSPathCV` when component count and predictor rank must be
+    selected by cross-validation.
     """
 
     def __init__(
@@ -85,7 +135,20 @@ class PiPLSRegression(
         self.random_state = random_state
 
     def fit(self, X: ArrayLike, y: ArrayLike) -> PiPLSRegression:
-        """Fit one fixed Pi-PLS model."""
+        """Fit one fixed Pi-PLS model.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix. Sparse input is not supported.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Response vector or matrix.
+
+        Returns
+        -------
+        self : PiPLSRegression
+            Fitted estimator.
+        """
 
         self._validate_constructor_parameters()
         validated = _validate_estimator_data(
@@ -144,11 +207,16 @@ class PiPLSRegression(
 
         Parameters
         ----------
-        X:
+        X : array-like of shape (n_samples, n_features)
             Predictor matrix.
-        copy:
-            Whether validation may copy ``X``. This mirrors
-            :class:`sklearn.cross_decomposition.PLSRegression`.
+        copy : bool, default=True
+            Whether validation may copy ``X``.
+
+        Returns
+        -------
+        y_pred : ndarray of shape (n_samples,) or (n_samples, n_targets)
+            Predictions in original response units. A one-dimensional response
+            supplied to ``fit`` produces one-dimensional predictions.
         """
 
         check_is_fitted(self, attributes=["coef_", "intercept_"])
@@ -177,7 +245,25 @@ class PiPLSRegression(
         y: ArrayLike | None = None,
         copy: bool = True,
     ) -> FloatArray | tuple[FloatArray, FloatArray]:
-        """Transform predictors, and optionally responses, to latent scores."""
+        """Transform predictors, and optionally responses, to latent scores.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets), optional
+            Response vector or matrix.
+        copy : bool, default=True
+            Whether validation may copy the supplied arrays.
+
+        Returns
+        -------
+        x_scores : ndarray of shape (n_samples, n_components)
+            Predictor scores when ``y`` is omitted.
+        (x_scores, y_scores) : tuple of ndarray
+            Predictor and response scores when ``y`` is supplied. Both arrays
+            have shape ``(n_samples, n_components)``.
+        """
 
         check_is_fitted(self, attributes=["x_rotations_", "y_rotations_", "x_mean_", "y_mean_"])
         X_checked = cast(
@@ -227,8 +313,18 @@ class PiPLSRegression(
     ) -> tuple[FloatArray, FloatArray]:
         """Fit the model and return predictor and response scores.
 
-        As for scikit-learn's ``PLSRegression``, supplying ``y`` returns the
-        pair ``(x_scores, y_scores)``.
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Response vector or matrix. ``y`` is required.
+
+        Returns
+        -------
+        x_scores, y_scores : tuple of ndarray
+            Training predictor and response scores, each with shape
+            ``(n_samples, n_components)``.
         """
 
         if y is None:
@@ -243,6 +339,22 @@ class PiPLSRegression(
     ) -> FloatArray | tuple[FloatArray, FloatArray]:
         """Reconstruct predictors, and optionally responses, from latent scores.
 
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_components)
+            Predictor scores.
+        y : array-like of shape (n_samples, n_components), optional
+            Response scores.
+
+        Returns
+        -------
+        X_reconstructed : ndarray of shape (n_samples, n_features_in_)
+            Predictor reconstruction when ``y`` is omitted.
+        (X_reconstructed, y_reconstructed) : tuple of ndarray
+            Predictor and response reconstructions when ``y`` is supplied.
+
+        Notes
+        -----
         Reconstruction is least-squares and is exact only when the retained
         latent spaces span the corresponding centered/scaled data spaces.
         """
@@ -278,7 +390,22 @@ class PiPLSRegression(
         )
 
     def score(self, X: ArrayLike, y: ArrayLike, sample_weight: ArrayLike | None = None) -> float:
-        """Return uniformly averaged $R^2$ in original response units."""
+        r"""Return uniformly averaged $R^2$ in original response units.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Observed responses.
+        sample_weight : array-like of shape (n_samples,), optional
+            Sample weights passed to :func:`sklearn.metrics.r2_score`.
+
+        Returns
+        -------
+        score : float
+            Uniform average of response-wise $R^2$ values.
+        """
 
         return float(
             r2_score(

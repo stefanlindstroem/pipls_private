@@ -14,7 +14,9 @@ supported user workflows.
    scoring, and selection policy;
 5. [`path_analysis.md`](path_analysis.md): joint `n_components` and `predictor_rank` search;
 6. [`cross_validation.md`](cross_validation.md): splitters, groups, repeated CV, OOF predictions,
-   and validation reports.
+   and validation reports;
+7. [`api/index.md`](api/index.md): generated signatures, parameters, fitted attributes, shapes, and
+   method contracts for the core public API.
 
 The quickstart is the ordinary fixed-model entry point. It does not require pandas, a repository
 dataset, or cross-validation. The complete real-data examples are later-stage reference workflows.
