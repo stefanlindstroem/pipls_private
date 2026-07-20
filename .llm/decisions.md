@@ -54,6 +54,7 @@ This index is navigation, not a substitute for those records.
 | `0046-concise-numbered-examples.md` | pedagogical example minimality | keep scientific stages explicit; remove one-use scaffolding and redundant repository-data checks; track required result directories |
 | `0047-separate-pls-path-comparison-example.md` | comparison versus normal analysis examples | isolate all PLS path comparisons in example 09; keep examples 10–12 Pi-PLS-only and co-locate path and post-analysis artifacts |
 | `0048-self-contained-user-examples.md` | user-facing example semantics | remove context-free advanced CV; require explained data, labeled output, and publication-independent numbered examples |
+| `0049-public-documentation-source-boundary.md` | public documentation ownership | `docs/` is self-contained; user guides describe implemented behavior and do not depend on `.llm` or repository-external Markdown |
 
 ## Implemented estimator/search transition
 
@@ -127,8 +128,7 @@ plan contains an earlier or more general proposal:
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
 - real-data component paths are presented as CSV tables with fold SD, plots are derived from those
   tables, and examples fit a separate fixed model after an explicit user component choice;
-- fold SD is descriptive and is not converted into an automatic one-standard-error or
-  one-standard-deviation rule in the numbered examples or public API;
+- fold SD is descriptive, while component count remains a visible path-based user choice;
 - example 09 compares separate Pi-PLS and standard PLS component-path CSVs in one PDF per
   dataset; examples 10–12 write Pi-PLS-only paths beside their post-analysis reports; Tobacco uses
   adaptive rank scanning with explicit full predictor SVD, while randomized SVD is covered by the

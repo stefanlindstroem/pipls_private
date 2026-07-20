@@ -42,9 +42,8 @@ independent standard error because CV training sets overlap.
 Real-data path examples use `refit=False`, write the component path to CSV, and generate a PDF by
 reading that CSV. The CSV is canonical; the plot does not receive a fitted search object. The user
 then chooses `n_components` through a visible constant, reads the matching numeric predictor rank
-from the CSV, and fits a separate `PiPLSRegression` with both values fixed. The examples do not
-apply an automated one-standard-error or one-standard-deviation rule; fold SD remains descriptive
-rather than becoming a formal selection threshold.
+from the CSV, and fits a separate `PiPLSRegression` with both values fixed. Fold SD remains
+descriptive rather than becoming a formal selection threshold.
 
 The public real-data examples write the six-column Pi-PLS component-path CSV. Earlier duplicate
 smoke benchmark copies were removed by Decision 0037.
@@ -58,7 +57,5 @@ smoke benchmark copies were removed by Decision 0037.
 - CSV output remains the source artifact; example PDFs are derived views and are ignored by Git.
 - A final model reproduces one evaluated path row because both `n_components` and `predictor_rank`
   are fixed explicitly.
-- Component count remains an explicit path-based user choice; no one-standard-error or
-  one-standard-deviation selector is part of the examples or public API.
-- Formal uncertainty estimates requiring repeated or nested resampling remain separate future
-  designs.
+- Component count remains an explicit path-based user choice.
+- Formal uncertainty estimates requiring repeated or nested resampling require a separate design.

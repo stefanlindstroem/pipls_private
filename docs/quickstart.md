@@ -70,12 +70,10 @@ immutable display copy of the fitted Pi-PLS decomposition, and `plot_pipls_decom
 that result. Matplotlib remains an optional dependency and the estimator does not retain plotting
 state.
 
-The complete executable version is
-[`examples/01_minimal_fit_and_plot.py`](../examples/01_minimal_fit_and_plot.py). Continue with:
+The complete executable script is summarized in [`examples.md`](examples.md). Continue with:
 
 1. [`parameter_selection.md`](parameter_selection.md) when component count or predictor rank must be
    selected;
 2. [`model_inspection.md`](model_inspection.md) for Pi-PLS factorization inspection, prediction
    diagnostics, and shared PLS-family analysis;
-3. [`../examples/README.md`](../examples/README.md) for the complete Pulp, Sugarcane, and Tobacco
-   workflows.
+3. [`examples.md`](examples.md) for the synthetic, comparison, and complete real-data workflows.

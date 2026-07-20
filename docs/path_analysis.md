@@ -56,11 +56,9 @@ The numeric `predictor_rank` is always present. The policy column has one of thr
 - `maximum`: the rule-derived maximum predictor rank was used directly.
 
 The fold SD is the standard deviation of the fold-specific response-standardized MSE values. It is
-a descriptive measure of fold-to-fold variation, not a confidence interval or an independent
-standard error, because cross-validation training sets overlap. The numbered examples do not turn
-it into an automatic one-standard-error or one-standard-deviation selection threshold. Conditional
-rows are selected by the configured scorer. With a nondefault scorer, the reported MSE remains a
-diagnostic and need not be the quantity minimized by selection.
+a descriptive measure of fold-to-fold variation, not a confidence interval, because cross-validation
+training sets overlap. Conditional rows are selected by the configured scorer. With a nondefault
+scorer, the reported MSE remains a diagnostic and need not be the quantity minimized by selection.
 
 ### Predictor-rank policies
 

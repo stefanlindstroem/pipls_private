@@ -3,14 +3,14 @@
 `pipls.inspection` contains fitted-model analysis computations that do not depend on pandas or
 Matplotlib. `pipls.plotting` consumes those immutable results and provides optional Matplotlib
 figures. Dataset-specific tables, OOF orchestration, and multipage reports remain separate complete-example
-workflows. For the shortest fitted-model path, begin with [`quickstart.md`](quickstart.md) or
-[`01_minimal_fit_and_plot.py`](../examples/01_minimal_fit_and_plot.py). The support modules under
-`examples/_support/` are report infrastructure, not prerequisites for ordinary estimator use.
+workflows. For the shortest fitted-model path, begin with [`quickstart.md`](quickstart.md). The
+numbered workflows are summarized in [`examples.md`](examples.md); their support modules are report
+infrastructure, not prerequisites for ordinary estimator use.
 
-## Accepted analysis-model boundary
+## Analysis-model boundary
 
-Decisions 0045 and 0047 distinguish three roles. Example 09 explicitly fits Pi-PLS and ordinary
-PLS paths and plots both CV-MSE curves. Examples 10–12 evaluate only a Pi-PLS path before fitting
+Example 09 explicitly fits Pi-PLS and ordinary PLS paths and plots both CV-MSE curves. Examples
+10–12 evaluate only a Pi-PLS path before fitting
 and inspecting one selected Pi-PLS model. Inspection of $P$, $D$, $Q$, and $QD$ remains explicitly
 Pi-PLS-specific. Scores, loadings, coefficients, biplots, observation diagnostics, and prediction
 diagnostics are shared PLS-family analyses with estimator-neutral names.
@@ -393,12 +393,12 @@ limits, automatic observation labels, or contribution plots. Biplots, confidence
 automatic variable selection, uncertainty intervals, and permutation tests remain outside the
 implemented surface.
 
-The complete [`10_pulp_real_data.py`](../examples/10_pulp_real_data.py) workflow demonstrates the
-package inspection and plotting APIs together with example-owned I/O. It derives predictor and
+The Pulp workflow described in [`examples.md`](examples.md#complete-pi-pls-analyses) demonstrates
+the package inspection and plotting APIs together with example-owned I/O. It derives predictor and
 response names visibly from the Pulp CSV headers, reads fixed component choices from the canonical
 path artifacts, and clones the fixed Pi-PLS estimator
 inside the same five non-shuffled folds, writes seven long-form CSV files under
-`examples/results/pulp_post_analysis/`, rereads them, and constructs one eight-page PDF, including the Pulp biplot. The OOF
+`examples/results/pulp_post_analysis/`, rereads them, and constructs one seven-page PDF, including the Pulp biplot. The OOF
 predictions are labeled `selection-conditioned OOF predictions` because the fixed parameters were
 chosen after examining paths computed from the same observations.
 
@@ -407,15 +407,15 @@ computed from the complete supplied observed-response matrix for display. They a
 fold-local response scales used by the component-path scorer, so their aggregate squared values
 should not be expected to equal the reported mean fold CV-MSE exactly.
 
-The complete [`11_sugarcane_real_data.py`](../examples/11_sugarcane_real_data.py) workflow uses the
+The Sugarcane workflow described in [`examples.md`](examples.md#complete-pi-pls-analyses) uses the
 same seven-table contract under `examples/results/sugarcane_post_analysis/`. The script reads the
-physical wavelength coordinate separately from the numeric `X.csv` headers, verifies that it is
-strictly increasing, and passes it to the report renderer with the label `Wavelength (nm)`. The
+physical wavelength coordinate from the numeric `X.csv` headers and passes it to the report renderer
+with the label `Wavelength (nm)`. The
 canonical loading, direction, and coefficient values remain in long-form CSV tables; the report
 uses line rendering only because the example supplies the ordered physical coordinate explicitly.
 All four response headers (`TS`, `CP`, `ADF`, and `IVOMD`) are retained.
 
-The complete [`12_tobacco_real_data.py`](../examples/12_tobacco_real_data.py) workflow preserves
+The Tobacco workflow described in [`examples.md`](examples.md#complete-pi-pls-analyses) preserves
 the strictly decreasing wavenumber coordinate read from the `X.csv` headers and uses it for Pi-PLS
 predictor directions, Pi-PLS X loadings, and response-specific coefficient curves. All
 thirteen response headers are partitioned into deterministic source-order pages of at most five

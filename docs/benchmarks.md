@@ -1,8 +1,8 @@
 # Lightweight validation benchmarks
 
 `pipls` uses small focused synthetic benchmarks to make selected package behavior understandable
-across releases. Real-data workflows live under `examples/` and are run explicitly by users. These
-assets are not scientific-paper reproduction studies.
+across releases. Real-data workflows live under `examples/` and are run explicitly by users. Each
+benchmark is defined by one package-level validation question.
 
 ## Focused design
 
@@ -239,8 +239,7 @@ canonical CSV and PDF artifacts under `examples/results/` when a user runs examp
 
 ## Interpretation boundary
 
-Package benchmarks validate focused numerical and selection contracts. They are not publication
-figures, complete method-comparison studies, or substitutes for downstream experiment
-repositories. Real-data examples illustrate analysis workflows and are intentionally excluded from
-`make check` because executing them would repeat the analyses and make ordinary package validation
-dataset- and hardware-dependent.
+Package benchmarks validate focused numerical and selection contracts. They do not attempt a
+complete method-comparison study. Real-data examples illustrate analysis workflows and are
+intentionally excluded from `make check` because executing them would repeat the analyses and make
+ordinary package validation dataset- and hardware-dependent.

@@ -255,18 +255,20 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Resume user documentation and release hardening. The Decision 0045 corrective series is complete:
-shared APIs are estimator-neutral, numbered examples use ordinary PLS only for CV-MSE comparison,
-and post-analysis uses one selected Pi-PLS model. Do not add further diagnostics without a separate
-decision.
+Add the MkDocs foundation defined for the documentation phase: configure a strict site build,
+render mathematics, establish user-oriented navigation, replace the placeholder `make docs` target,
+and keep individual decision records outside the primary navigation. Decision 0049 has completed
+the self-contained public source boundary required before that tooling is introduced.
 
 ## Subsequent roadmap
 
-1. **Buildable user documentation:** turn the current Markdown guides into a navigable built site
-   with generated API references.
-2. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
+1. **Generated API reference:** document the supported estimator, selection, inspection, plotting,
+   dataset, metric, decomposition, validation, and warning surfaces.
+2. **Documentation distribution and CI:** build the site strictly in CI and from an unpacked source
+   distribution.
+3. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
    and validate clean installations and distributions.
-3. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
+4. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
    first tagged-release checklist.
 
 Future datasets still require a distinct package-level use case and verified source-level

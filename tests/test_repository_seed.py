@@ -122,6 +122,37 @@ def test_public_markdown_has_no_ascii_control_characters() -> None:
         _assert_markdown_format(markdown_path)
 
 
+def test_public_documentation_is_self_contained() -> None:
+    root = _repository_root()
+    escaped_link = re.compile(r"\[[^]]*\]\(\.\./")
+    abandoned_selection_terms = (
+        "one-standard-error",
+        "one-standard-deviation",
+        "1sd",
+    )
+
+    for path in sorted((root / "docs").rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        assert escaped_link.search(text) is None, f"{path} links outside docs/"
+        lowered = text.lower()
+        assert not any(term in lowered for term in abandoned_selection_terms), path
+
+    theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+    assert ".llm" not in theory
+
+
+def test_public_decision_index_links_every_record() -> None:
+    root = _repository_root()
+    index = (root / "docs" / "decisions" / "index.md").read_text(encoding="utf-8")
+    linked_files = set(re.findall(r"\((\d{4}-[a-z0-9-]+\.md)\)", index))
+    decision_files = {
+        path.name
+        for path in (root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md")
+    }
+
+    assert linked_files == decision_files
+
+
 def test_llm_layer_is_outside_installable_package() -> None:
     package_root = Path(pipls.__file__).resolve().parent
     assert ".llm" not in {part.name for part in package_root.parents}
@@ -161,7 +192,7 @@ def test_decision_index_and_records_are_structurally_consistent() -> None:
     root = _repository_root()
     index = (root / ".llm" / "decisions.md").read_text(encoding="utf-8")
     indexed_files = set(_DECISION_ROW.findall(index))
-    decision_paths = sorted((root / "docs" / "decisions").glob("*.md"))
+    decision_paths = sorted((root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md"))
     shipped_files = {path.name for path in decision_paths}
 
     assert indexed_files == shipped_files

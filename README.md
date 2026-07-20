@@ -298,6 +298,7 @@ See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchma
 ## Documentation
 
 - [Quickstart](docs/quickstart.md)
+- [Examples](docs/examples.md)
 - [Documentation index](docs/index.md)
 - [Estimator API](docs/estimator_api.md)
 - [Parameter selection](docs/parameter_selection.md)

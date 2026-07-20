@@ -2,8 +2,7 @@
 
 The `pipls` repository treats reproducibility as a software-product responsibility: released code,
 numerical contracts, deterministic synthetic generation, transparent example data, executable
-examples, and lightweight validation benchmarks should be reviewable independently of any one
-scientific paper.
+examples, and lightweight validation benchmarks should be reviewable from the repository itself.
 
 ## Software reproducibility
 
@@ -66,8 +65,8 @@ Metadata supports repository review but is not required by the runtime API. Data
 transformations that matter to users are described publicly; private preparation archives and
 inaccessible paths are not part of the repository.
 
-## Publication reproduction
+## Scope of reproducibility
 
-A publication may depend on a tagged `pipls` release and maintain its own complete simulations,
-comparators, cached results, tables, and figure-generation environment. Such downstream artifacts
-are separate from package validation and do not determine this repository's public surface.
+The repository validates the installable package, its documented datasets, and its maintained
+examples and benchmarks. Application-specific studies may add their own simulations, comparators,
+tables, and figures without changing the package reproducibility contract.

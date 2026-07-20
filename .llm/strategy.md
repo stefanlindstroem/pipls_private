@@ -454,10 +454,13 @@ Current status: **complete**.
 ### Product documentation and release hardening
 
 Build a user-oriented documentation surface, API reference, compatibility policy, clean-install and
-build checks, licensing audit, release notes, and versioned releases. These are continuing software
-product responsibilities rather than the final steps of one publication.
+build checks, licensing audit, release notes, and versioned releases.
 
-Current status: **next active product phase**.
+Decision 0049 establishes `docs/` as the self-contained public source, adds public example and
+decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
+from current documentation.
+
+Current status: **public source architecture complete; build tooling next**.
 
 ### Current standardization and deferred block-aware variants
 
@@ -479,11 +482,10 @@ Current status: **current estimator standardization complete; block-aware API de
 
 ## Current next increment
 
-Resume buildable documentation and release preparation. Preserve the completed Decision 0045
-boundary: ordinary PLS remains a comparison model isolated in example 09 and declared benchmarks, shared analysis names remain estimator-neutral,
-and numbered post-analysis reports interpret one selected Pi-PLS model. Keep the biplot restricted
-to the low-dimensional Pulp predictors; do not add spectral biplots, theoretical outlier thresholds,
-VIP, or other deferred diagnostics.
+Add the MkDocs build foundation on top of the Decision 0049 source boundary: bounded documentation
+dependencies, user-oriented navigation, MathJax rendering, strict link validation, a real
+`make docs` target, and ignored generated site output. Do not add generated API pages until the
+foundation builds cleanly.
 
 ## Maintenance protocol
 

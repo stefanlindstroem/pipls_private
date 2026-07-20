@@ -2,10 +2,10 @@
 
 ## Unreleased
 
+- Define `docs/` as the self-contained public documentation source, add public example and design-decision navigation, expand the implemented Pi-PLS theory guide, and remove unused selection alternatives from current documentation.
 - Align component-path documentation with the current example ownership: example 09 owns explicit
-  Pi-PLS-versus-PLS comparisons, examples 10–12 use Pi-PLS-only paths, and fold SD remains a
-  descriptive diagnostic rather than an automated one-standard-error or one-standard-deviation
-  selection rule.
+  Pi-PLS-versus-PLS comparisons, examples 10–12 use Pi-PLS-only paths, fold SD remains descriptive,
+  and component count remains an explicit path-based choice.
 - Remove the context-free advanced-cross-validation example; keep grouped, leave-one-out, and temporal splitters in the dedicated cross-validation documentation.
 - Rewrite the synthetic-data example as an explained independent train/test use case with labeled matrix dimensions, latent structure, fitted parameters, prediction shape, and test $R^2$.
 - Require numbered examples to demonstrate self-contained user tasks, comparisons, or benchmarks without publication context.

@@ -110,8 +110,8 @@ implementing or reviewing this surface.
   grouped in the `examples` optional dependency extra.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
-- `docs/`: user and developer documentation, API guidance, mathematical contracts, release notes,
-  and accepted decision records.
+- `docs/`: the self-contained public documentation source, including user guides, implemented
+  theory, generated-API source pages, release notes, and accepted decision records.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
   and release automation.
 
@@ -133,11 +133,14 @@ implementing or reviewing this surface.
   analysis-artifact contracts.
 - `.llm/testing.md`: durable testing boundary.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
-- `docs/decisions/`: accepted design records.
+- `docs/decisions/`: accepted maintainer history. These records remain linkable but are not
+  prerequisites for understanding the public method or API.
 
 ## Architectural invariants
 
 - Runtime code does not import from `.llm`, tests, examples, docs, scripts, datasets, or benchmarks.
+- Public Markdown under `docs/` is self-contained and does not link outside the documentation source
+  tree. `.llm` contracts may be more detailed but are never user prerequisites.
 - The fixed numerical core does not own preprocessing, CV, datasets, benchmark policy, or
   publication workflows.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required

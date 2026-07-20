@@ -51,6 +51,11 @@
   current prose or individual field values of living guidance and documentary metadata.
 - For shipped Markdown and YAML, prefer existence, UTF-8 decoding, parsability, and generic
   structural consistency over phrase matching or copied field values.
+- Keep public Markdown under `docs/` self-contained. Do not link to `.llm`, example source files,
+  dataset README files, or other paths outside `docs/`; summarize those public workflows in dedicated
+  documentation pages instead.
+- User guides describe implemented theory and behavior. Do not preserve rejected or unused options
+  merely because they appeared in design discussions.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
 - Design each benchmark around one explicit user-facing question. Give it one readable script and
