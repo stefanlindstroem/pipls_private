@@ -66,3 +66,4 @@ reference describe the current public behavior directly.
 - [0049: public documentation source boundary](0049-public-documentation-source-boundary.md)
 - [0050: buildable documentation foundation](0050-buildable-documentation-foundation.md)
 - [0051: core generated API reference](0051-core-generated-api-reference.md)
+- [0052: complete generated API reference](0052-complete-generated-api-reference.md)

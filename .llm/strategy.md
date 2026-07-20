@@ -460,8 +460,8 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **public source, build tooling, and core generated reference complete; remaining
-public submodules next**.
+Current status: **public source, build tooling, and complete generated public reference complete;
+distribution and CI validation next**.
 
 ### Current standardization and deferred block-aware variants
 
@@ -488,13 +488,13 @@ Material; `make docs` performs a strict build; PyMdown Extensions and MathJax re
 notation; navigation follows the user journey; and generated `site/` output is ignored and cleaned.
 Decision 0051 adds mkdocstrings and generated pages for every supported top-level object, with
 source docstrings covering signatures, parameters, fitted attributes, shapes, and conditional
-refit and OOF behavior.
+refit and OOF behavior. Decision 0052 completes the generated reference for inspection, plotting,
+datasets, and metrics, with exact submodule coverage and optional Matplotlib imports.
 
 ## Current next increment
 
-Complete the generated reference for inspection, plotting, datasets, metrics, and their immutable
-result objects. Keep Matplotlib optional, preserve the Pi-PLS-specific versus shared PLS-family
-boundary, and continue to exclude private modules from the site.
+Build the strict site in CI and from an unpacked source distribution. Verify shipped documentation
+sources and configuration without committing generated `site/` output.
 
 ## Maintenance protocol
 

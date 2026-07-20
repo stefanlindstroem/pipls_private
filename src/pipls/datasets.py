@@ -15,6 +15,13 @@ Distribution: TypeAlias = Literal["normal", "uniform"]
 NumericSpec: TypeAlias = float | Sequence[float]
 NoiseSpec: TypeAlias = float | tuple[float, float]
 
+__all__ = [
+    "PiPLSDataset",
+    "PiPLSSyntheticTruth",
+    "make_pipls_regression",
+    "make_pipls_train_test",
+]
+
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -47,11 +54,37 @@ _UINT32_MAX = 2**32 - 1
 
 @dataclass(frozen=True)
 class PiPLSSyntheticTruth:
-    """Immutable latent structure used to generate a synthetic dataset.
+    r"""Immutable latent structure used to generate a synthetic dataset.
 
-    All arrays are read-only copies. Loading blocks that cannot affect one side
-    of the regression problem are represented explicitly as zero-width or zero
-    arrays rather than being omitted.
+    All arrays are read-only copies. Loading blocks that cannot affect one side of
+    the regression are represented explicitly by zero-width or zero arrays.
+
+    Attributes
+    ----------
+    shared_scores : ndarray of shape (n_samples, n_shared)
+        Latent scores shared by predictors and responses.
+    predictor_specific_scores : ndarray of shape (n_samples, n_predictor_specific)
+        Latent scores affecting only predictors.
+    response_specific_scores : ndarray of shape (n_samples, n_response_specific)
+        Latent scores affecting only responses.
+    x_shared_loadings, y_shared_loadings : ndarray
+        Predictor and response loading blocks for shared directions.
+    x_predictor_specific_loadings : ndarray of shape (n_features, n_predictor_specific)
+        Predictor-specific loading block.
+    y_response_specific_loadings : ndarray of shape (n_targets, n_response_specific)
+        Response-specific loading block.
+    x_response_specific_loadings, y_predictor_specific_loadings : ndarray
+        Explicit zero blocks for structurally absent effects.
+    x_signal, x_noise : ndarray of shape (n_samples, n_features)
+        Predictor signal and additive noise, whose sum is the generated ``X``.
+    y_signal, y_noise : ndarray of shape (n_samples, n_targets)
+        Response signal and additive noise, whose sum is the generated ``Y``.
+    feature_scale : ndarray of shape (n_features,)
+        Multiplicative observed-predictor scales.
+    target_scale : ndarray of shape (n_targets,)
+        Multiplicative observed-response scales.
+    shared_strengths, predictor_specific_strengths, response_specific_strengths : ndarray
+        Strength of each latent direction in its corresponding block.
     """
 
     shared_scores: FloatArray
@@ -99,23 +132,41 @@ class PiPLSSyntheticTruth:
 
 @dataclass(frozen=True)
 class PiPLSDataset:
-    """Immutable validated multivariate regression dataset.
+    r"""Immutable validated multivariate regression dataset.
+
+    Plain arrays and data frames passed directly to ``fit(X, Y)`` remain the
+    primary real-data interface. This container is an optional convenience for
+    synthetic data and structured experiments.
 
     Parameters
     ----------
-    X, Y:
-        Numeric predictor and response arrays. ``X`` must be two-dimensional.
-        A one-dimensional ``Y`` is accepted and stored as one response column.
-    feature_names, target_names, sample_ids:
-        Unique non-empty names aligned with the corresponding array axes.
-    provenance:
-        Mapping containing non-empty ``source``, ``license``, ``citation``, and
-        ``version`` strings.
-    metadata:
-        Dataset-level metadata composed of immutable scalar, sequence, mapping,
-        and NumPy-array values. Arrays are copied and made read-only.
-    truth:
-        Optional synthetic latent structure.
+    X : array-like of shape (n_samples, n_features)
+        Numeric predictor matrix.
+    Y : array-like of shape (n_samples,) or (n_samples, n_targets)
+        Numeric response data. One-dimensional input is stored as one column.
+    feature_names : sequence of str
+        Unique nonempty predictor names.
+    target_names : sequence of str
+        Unique nonempty response names.
+    sample_ids : sequence of str
+        Unique nonempty sample identifiers.
+    provenance : mapping of str to str
+        Nonempty ``source``, ``license``, ``citation``, and ``version`` entries.
+    metadata : mapping of str to object, default={}
+        Recursively frozen dataset metadata.
+    truth : PiPLSSyntheticTruth or None, default=None
+        Optional synthetic latent structure consistent with ``X`` and ``Y``.
+
+    Attributes
+    ----------
+    X, Y : ndarray
+        Read-only ``float64`` predictor and two-dimensional response matrices.
+    feature_names, target_names, sample_ids : tuple of str
+        Validated axis labels.
+    provenance, metadata : mapping
+        Immutable mappings.
+    truth : PiPLSSyntheticTruth or None
+        Optional synthetic truth object.
     """
 
     X: FloatArray
@@ -256,12 +307,50 @@ def make_pipls_regression(
     noise: NoiseSpec = 0.1,
     random_state: int = 0,
 ) -> PiPLSDataset:
-    """Generate one deterministic Pi-PLS latent-structure dataset.
+    r"""Generate one deterministic Pi-PLS latent-structure dataset.
 
     Shared latent scores affect both ``X`` and ``Y``. Predictor-specific scores
-    affect only ``X`` and response-specific scores affect only ``Y``. A scalar
-    ``noise`` applies to both blocks; a two-tuple specifies predictor and
-    response noise separately.
+    affect only ``X`` and response-specific scores affect only ``Y``.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of observations; at least two.
+    n_features : int
+        Number of predictor variables.
+    n_targets : int
+        Number of response variables.
+    n_shared : int
+        Number of latent directions shared by predictors and responses.
+    n_predictor_specific : int, default=0
+        Number of predictor-only latent directions.
+    n_response_specific : int, default=0
+        Number of response-only latent directions.
+    shared_strength : float or sequence of float, default=1.0
+        Strengths of the shared directions.
+    predictor_specific_strength : float or sequence of float, default=1.0
+        Strengths of the predictor-only directions.
+    response_specific_strength : float or sequence of float, default=1.0
+        Strengths of the response-only directions.
+    shared_distribution : {"normal", "uniform"}, default="normal"
+        Shared-score distribution.
+    predictor_specific_distribution : {"normal", "uniform"}, default="normal"
+        Predictor-only score distribution.
+    response_specific_distribution : {"normal", "uniform"}, default="normal"
+        Response-only score distribution.
+    feature_scale : float or sequence of float, default=1.0
+        Scalar or predictor-wise observed scales.
+    target_scale : float or sequence of float, default=1.0
+        Scalar or response-wise observed scales.
+    noise : float or tuple of float, default=0.1
+        Common noise standard deviation, or separate ``(x_noise, y_noise)`` values.
+    random_state : int, default=0
+        Local deterministic random seed.
+
+    Returns
+    -------
+    PiPLSDataset
+        Generated data, metadata, provenance, and latent truth.
     """
 
     n_samples = _positive_integer(n_samples, name="n_samples", minimum=2)
@@ -316,11 +405,51 @@ def make_pipls_train_test(
     noise: NoiseSpec = 0.1,
     random_state: int = 0,
 ) -> tuple[PiPLSDataset, PiPLSDataset]:
-    """Generate deterministic train and test datasets from one latent model.
+    r"""Generate independent train and test blocks from one latent model.
 
-    Loadings, strengths, and observed-variable scales are shared. Latent scores
-    and noise are generated independently for the two blocks. No centering,
-    scaling, imputation, or other fitted preprocessing is performed.
+    Loadings, strengths, and observed-variable scales are shared. Latent scores and
+    noise are generated independently for the two blocks. No fitted preprocessing
+    is performed.
+
+    Parameters
+    ----------
+    n_train, n_test : int
+        Numbers of training and test observations; each at least two.
+    n_features : int
+        Number of predictor variables.
+    n_targets : int
+        Number of response variables.
+    n_shared : int
+        Number of latent directions shared by predictors and responses.
+    n_predictor_specific : int, default=0
+        Number of predictor-only latent directions.
+    n_response_specific : int, default=0
+        Number of response-only latent directions.
+    shared_strength : float or sequence of float, default=1.0
+        Strengths of the shared directions.
+    predictor_specific_strength : float or sequence of float, default=1.0
+        Strengths of the predictor-only directions.
+    response_specific_strength : float or sequence of float, default=1.0
+        Strengths of the response-only directions.
+    shared_distribution : {"normal", "uniform"}, default="normal"
+        Shared-score distribution.
+    predictor_specific_distribution : {"normal", "uniform"}, default="normal"
+        Predictor-only score distribution.
+    response_specific_distribution : {"normal", "uniform"}, default="normal"
+        Response-only score distribution.
+    feature_scale : float or sequence of float, default=1.0
+        Scalar or predictor-wise observed scales.
+    target_scale : float or sequence of float, default=1.0
+        Scalar or response-wise observed scales.
+    noise : float or tuple of float, default=0.1
+        Common noise standard deviation, or separate ``(x_noise, y_noise)`` values.
+    random_state : int, default=0
+        Local deterministic random seed.
+
+    Returns
+    -------
+    train, test : tuple of PiPLSDataset
+        Independent blocks sharing one generated latent model.
     """
 
     n_train = _positive_integer(n_train, name="n_train", minimum=2)
@@ -397,13 +526,9 @@ def _validated_synthetic_config(
         name="n_response_specific",
     )
     if n_shared + n_predictor_specific > n_features:
-        raise ValueError(
-            "n_shared + n_predictor_specific must not exceed n_features."
-        )
+        raise ValueError("n_shared + n_predictor_specific must not exceed n_features.")
     if n_shared + n_response_specific > n_targets:
-        raise ValueError(
-            "n_shared + n_response_specific must not exceed n_targets."
-        )
+        raise ValueError("n_shared + n_response_specific must not exceed n_targets.")
 
     distributions = (
         ("shared_distribution", shared_distribution),
@@ -467,8 +592,7 @@ def _validate_sample_capacity(
     )
     if n_samples <= required_rank:
         raise ValueError(
-            f"{name} must exceed the largest declared centered latent rank "
-            f"({required_rank})."
+            f"{name} must exceed the largest declared centered latent rank ({required_rank})."
         )
 
 

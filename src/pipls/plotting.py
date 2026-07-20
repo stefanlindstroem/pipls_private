@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 FloatArray = NDArray[np.float64]
 PredictorStyle: TypeAlias = Literal["bar", "line"]
+"""Supported predictor-axis rendering styles."""
 
 __all__ = [
     "PredictorStyle",
@@ -44,11 +45,31 @@ def plot_biplot(
     title: str = "PLS-family score-loading biplot",
     figsize: tuple[float, float] = (8.0, 6.5),
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot balanced sample scores and predictor-loading arrows.
+    r"""Plot balanced sample scores and predictor-loading arrows.
 
-    The coordinate scaling is calculated separately by
-    :func:`pipls.inspection.biplot_coordinates`. This figure adds no
-    response arrows, confidence regions, grouping, or automatic labels.
+    The coordinates are calculated by
+    :func:`pipls.inspection.biplot_coordinates`. The figure adds no response
+    arrows, confidence regions, grouping, or automatic scientific labels.
+
+    Parameters
+    ----------
+    coordinates : pipls.inspection.BiplotCoordinates
+        Balanced coordinates for two components.
+    predictor_names : sequence of object
+        Required labels for all predictor arrows.
+    sample_names : sequence of object or None, default=None
+        Optional labels for all sample points.
+    title : str, default="PLS-family score-loading biplot"
+        Figure title.
+    figsize : tuple of float, default=(8.0, 6.5)
+        Matplotlib figure size in inches.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mapping containing the ``"biplot"`` axis.
     """
 
     if not isinstance(coordinates, BiplotCoordinates):
@@ -124,11 +145,25 @@ def plot_observation_diagnostics(
     title: str = "PLS-family observation diagnostics",
     figsize: tuple[float, float] = (6.5, 5.0),
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot raw score distance against squared X-reconstruction residual.
+    r"""Plot raw score distance against squared X-reconstruction residual.
 
-    No theoretical limits or automatic observation labels are added. The raw
-    numerical values remain available in ``diagnostics`` for application-level
-    interpretation.
+    No theoretical limits or automatic observation labels are added.
+
+    Parameters
+    ----------
+    diagnostics : pipls.inspection.ObservationDiagnostics
+        Raw observation diagnostics.
+    title : str, default="PLS-family observation diagnostics"
+        Figure title.
+    figsize : tuple of float, default=(6.5, 5.0)
+        Matplotlib figure size in inches.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mapping containing the ``"observation_diagnostics"`` axis.
     """
 
     if not isinstance(diagnostics, ObservationDiagnostics):
@@ -155,11 +190,27 @@ def plot_scores(
     title: str = "PLS-family X scores",
     figsize: tuple[float, float] = (6.4, 5.2),
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot one pair of PLS-family X-score columns.
+    r"""Plot one pair of PLS-family X-score columns.
 
-    ``components`` contains exactly two distinct zero-based component indices.
-    Optional sample labels annotate the points but do not define groups or
-    confidence regions.
+    Parameters
+    ----------
+    structure : pipls.inspection.LatentStructure
+        Extracted fitted PLS-family quantities.
+    components : sequence of int, default=(0, 1)
+        Exactly two distinct zero-based component indices.
+    sample_names : sequence of object or None, default=None
+        Optional labels for all sample points.
+    title : str, default="PLS-family X scores"
+        Figure title.
+    figsize : tuple of float, default=(6.4, 5.2)
+        Matplotlib figure size in inches.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mapping containing the ``"scores"`` axis.
     """
 
     if not isinstance(structure, LatentStructure):
@@ -205,10 +256,36 @@ def plot_x_loadings(
     title: str = "PLS-family X loadings",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot selected PLS-family X loadings together on one axis.
+    r"""Plot selected PLS-family X loadings on one axis.
 
-    Bar rendering groups component bars side by side for each named predictor.
-    Line rendering overlays components on the supplied physical coordinate.
+    Bar rendering groups component bars by named predictor. Line rendering overlays
+    components on a caller-supplied physical predictor coordinate.
+
+    Parameters
+    ----------
+    structure : pipls.inspection.LatentStructure
+        Extracted fitted PLS-family quantities.
+    predictor_style : {"bar", "line"}
+        Rendering mode for the predictor axis.
+    predictor_names : sequence of object or None, default=None
+        Required labels for bar rendering.
+    predictor_axis : array-like of shape (n_features,) or None, default=None
+        Required physical coordinate for line rendering.
+    predictor_axis_label : str or None, default=None
+        Required coordinate label for line rendering.
+    components : sequence of int or None, default=None
+        Zero-based components to display; ``None`` displays all components.
+    title : str, default="PLS-family X loadings"
+        Figure title.
+    figsize : tuple of float or None, default=None
+        Matplotlib figure size; ``None`` chooses a size from the predictor count.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mapping containing the ``"x_loadings"`` axis.
     """
 
     if not isinstance(structure, LatentStructure):
@@ -258,7 +335,28 @@ def plot_y_loadings(
     title: str = "PLS-family Y loadings",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot selected PLS-family Y loadings as grouped bars on one axis."""
+    r"""Plot selected PLS-family Y loadings as grouped bars.
+
+    Parameters
+    ----------
+    structure : pipls.inspection.LatentStructure
+        Extracted fitted PLS-family quantities.
+    response_names : sequence of object
+        Required labels for all responses.
+    components : sequence of int or None, default=None
+        Zero-based components to display; ``None`` displays all components.
+    title : str, default="PLS-family Y loadings"
+        Figure title.
+    figsize : tuple of float or None, default=None
+        Matplotlib figure size; ``None`` chooses a size from the response count.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mapping containing the ``"y_loadings"`` axis.
+    """
 
     if not isinstance(structure, LatentStructure):
         raise TypeError("structure must be a LatentStructure instance.")
@@ -302,7 +400,36 @@ def plot_coefficients(
     title: str = "PLS-family regression coefficients",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot selected response-specific PLS coefficients together on one axis."""
+    r"""Plot selected response-specific PLS coefficients on one axis.
+
+    Parameters
+    ----------
+    structure : pipls.inspection.LatentStructure
+        Extracted fitted PLS-family quantities.
+    predictor_style : {"bar", "line"}
+        Rendering mode for the predictor axis.
+    predictor_names : sequence of object or None, default=None
+        Required labels for bar rendering.
+    response_names : sequence of object
+        Required labels for all responses.
+    predictor_axis : array-like of shape (n_features,) or None, default=None
+        Required physical coordinate for line rendering.
+    predictor_axis_label : str or None, default=None
+        Required coordinate label for line rendering.
+    responses : sequence of int or None, default=None
+        Zero-based responses to display; ``None`` displays all responses.
+    title : str, default="PLS-family regression coefficients"
+        Figure title.
+    figsize : tuple of float or None, default=None
+        Matplotlib figure size; ``None`` chooses a size from the predictor count.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mapping containing the ``"coefficients"`` axis.
+    """
 
     if not isinstance(structure, LatentStructure):
         raise TypeError("structure must be a LatentStructure instance.")
@@ -372,12 +499,40 @@ def plot_pipls_decomposition(
     title: str = "Pi-PLS decomposition",
     figsize: tuple[float, float] | None = None,
 ) -> tuple[Figure, dict[str, Axes]]:
-    r"""Plot selected display copies of $P$, $D$, and $QD$ on three shared axes.
+    r"""Plot selected display copies of $P$, $D$, and $QD$.
 
-    Bar rendering groups components side by side for each named predictor or
-    response. Line rendering overlays predictor directions on the supplied
-    physical coordinate. The axes dictionary contains ``predictor_directions``,
-    ``weighted_response_directions``, and ``dilation``.
+    Bar rendering groups components for named predictors and responses. Line
+    rendering overlays predictor directions on a caller-supplied physical
+    coordinate.
+
+    Parameters
+    ----------
+    factors : pipls.inspection.PiPLSDisplayFactors
+        Display-oriented Pi-PLS factors.
+    predictor_style : {"bar", "line"}
+        Rendering mode for predictor directions.
+    predictor_names : sequence of object or None, default=None
+        Required predictor labels for bar rendering.
+    response_names : sequence of object
+        Required labels for all responses.
+    predictor_axis : array-like of shape (n_features,) or None, default=None
+        Required physical coordinate for line rendering.
+    predictor_axis_label : str or None, default=None
+        Required coordinate label for line rendering.
+    components : sequence of int or None, default=None
+        Zero-based components to display; ``None`` displays all components.
+    title : str, default="Pi-PLS decomposition"
+        Figure title.
+    figsize : tuple of float or None, default=None
+        Matplotlib figure size.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mappings named ``"predictor_directions"``,
+        ``"weighted_response_directions"``, and ``"dilation"``.
     """
 
     if not isinstance(factors, PiPLSDisplayFactors):
@@ -481,26 +636,28 @@ def plot_prediction_diagnostics(
     title: str = "Prediction diagnostics",
     figsize: tuple[float, float] = (13.0, 4.2),
 ) -> tuple[Figure, dict[str, Axes]]:
-    """Plot standardized predictions, residuals, and response-wise RMSE.
+    r"""Plot standardized predictions, residuals, and response-wise RMSE.
 
     Parameters
     ----------
-    diagnostics:
-        Immutable result returned by :func:`pipls.inspection.prediction_diagnostics`.
-    response_names:
-        Required scientific labels for all response columns.
-    responses:
-        Zero-based response indices to display. The default displays all responses.
-    title:
-        Figure title. The prediction provenance is appended automatically.
-    figsize:
-        Matplotlib figure size.
+    diagnostics : pipls.inspection.PredictionDiagnostics
+        Standardized prediction diagnostics.
+    response_names : sequence of object
+        Required labels for all responses.
+    responses : sequence of int or None, default=None
+        Zero-based responses to display; ``None`` displays all responses.
+    title : str, default="Prediction diagnostics"
+        Figure title. Prediction provenance is appended automatically.
+    figsize : tuple of float, default=(13.0, 4.2)
+        Matplotlib figure size in inches.
 
     Returns
     -------
-    figure, axes:
-        The Matplotlib figure and named axes ``observed_vs_predicted``,
-        ``residual_vs_predicted``, and ``standardized_rmse``.
+    figure : matplotlib.figure.Figure
+        Created figure.
+    axes : dict of str to matplotlib.axes.Axes
+        Mappings named ``"observed_vs_predicted"``,
+        ``"residual_vs_predicted"``, and ``"standardized_rmse"``.
     """
 
     if not isinstance(diagnostics, PredictionDiagnostics):

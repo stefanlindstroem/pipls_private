@@ -255,21 +255,19 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Complete the generated API reference for inspection, plotting, datasets, metrics, and their
-immutable result objects. Preserve the distinction between Pi-PLS-specific factorization tools and
-estimator-neutral PLS-family analysis, and keep Matplotlib optional.
+Complete documentation distribution and CI validation: build the strict site in CI and from an
+unpacked source distribution, verify that all documentation sources and configuration are shipped,
+and keep generated `site/` output outside distributions and commits.
 
-The MkDocs foundation and core generated reference are complete under Decisions 0050 and 0051.
-`make docs` resolves every supported top-level object, and their public docstrings now specify
-parameters, fitted attributes, shapes, and refit- or OOF-dependent output.
+The MkDocs foundation and complete generated public API reference are implemented under Decisions
+0050--0052. The reference covers the top-level API and the supported inspection, plotting, dataset,
+and metric submodules while excluding private modules and `pipls.model_selection`.
 
 ## Subsequent roadmap
 
-1. **Documentation distribution and CI:** build the site strictly in CI and from an unpacked source
-   distribution.
-2. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
+1. **Compatibility and packaging policy:** state supported Python, NumPy, and scikit-learn ranges
    and validate clean installations and distributions.
-3. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
+2. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
    first tagged-release checklist.
 
 Future datasets still require a distinct package-level use case and verified source-level

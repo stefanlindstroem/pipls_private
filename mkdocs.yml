@@ -29,6 +29,10 @@ nav:
       - Decomposition: api/decomposition.md
       - Validation report: api/validation.md
       - Warnings: api/exceptions.md
+      - Inspection: api/inspection.md
+      - Plotting: api/plotting.md
+      - Datasets and synthetic data: api/datasets.md
+      - Metrics: api/metrics.md
   - Data and validation:
       - Datasets: datasets.md
       - Benchmarks: benchmarks.md

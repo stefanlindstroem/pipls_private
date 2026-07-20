@@ -1,8 +1,10 @@
 # API reference
 
-The core package namespace contains the fixed Pi-PLS estimator, the path-selection meta-estimator,
-and immutable fitted-result containers. The reference pages below are generated directly from the
-public Python docstrings.
+The generated reference documents supported public objects directly from their Python docstrings.
+Core estimators are available from `pipls`; focused analysis, plotting, dataset, and metric tools
+live in dedicated submodules.
+
+## Core API
 
 - [Fixed regression](regression.md)
 - [Path selection](path.md)
@@ -10,4 +12,9 @@ public Python docstrings.
 - [Validation report](validation.md)
 - [Warnings](exceptions.md)
 
-Inspection, plotting, dataset, and metric references are added in the next documentation increment.
+## Focused submodules
+
+- [Inspection](inspection.md)
+- [Plotting](plotting.md)
+- [Dataset containers and synthetic data](datasets.md)
+- [Metrics](metrics.md)

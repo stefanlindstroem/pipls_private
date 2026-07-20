@@ -57,6 +57,7 @@ This index is navigation, not a substitute for those records.
 | `0049-public-documentation-source-boundary.md` | public documentation ownership | `docs/` is self-contained; user guides describe implemented behavior and do not depend on `.llm` or repository-external Markdown |
 | `0050-buildable-documentation-foundation.md` | strict MkDocs foundation | Material, MathJax, user navigation, and `make docs` define the buildable public site |
 | `0051-core-generated-api-reference.md` | core generated API documentation | mkdocstrings pages cover the supported top-level objects and audit parameters, fitted attributes, shapes, and conditional outputs |
+| `0052-complete-generated-api-reference.md` | complete generated API documentation | inspection, plotting, datasets, and metrics are generated from audited public docstrings with explicit submodule coverage |
 
 ## Implemented estimator/search transition
 

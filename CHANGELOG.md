@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Complete the generated public API reference for inspection, plotting, datasets, and metrics;
+  audit immutable-result shapes, plotting contracts, synthetic generators, and scorer semantics;
+  formalize the dataset submodule exports; and verify that importing plotting remains independent
+  of Matplotlib.
+- Preserve the tracked example-result directory placeholders in repository snapshots while still
+  excluding generated analysis artifacts.
 - Add generated API reference pages for the fixed estimator, path selector, decomposition,
   validation report, and support warning; introduce mkdocstrings with Ruff-formatted signatures,
   and audit the corresponding public docstrings for parameters, fitted attributes, shapes, and

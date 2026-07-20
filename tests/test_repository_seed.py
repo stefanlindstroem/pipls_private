@@ -70,7 +70,7 @@ def test_source_distribution_manifest_includes_documentation_sources() -> None:
 
 def test_docs_extra_declares_the_build_toolchain() -> None:
     pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
-    assert 'docs = [' in pyproject
+    assert "docs = [" in pyproject
     assert '"mkdocs>=1.6,<2"' in pyproject
     assert '"mkdocs-material>=9.5,<9.7"' in pyproject
     assert '"mkdocstrings-python>=2,<3"' in pyproject
@@ -222,8 +222,7 @@ def test_public_decision_index_links_every_record() -> None:
     index = (root / "docs" / "decisions" / "index.md").read_text(encoding="utf-8")
     linked_files = set(re.findall(r"\((\d{4}-[a-z0-9-]+\.md)\)", index))
     decision_files = {
-        path.name
-        for path in (root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md")
+        path.name for path in (root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md")
     }
 
     assert linked_files == decision_files
@@ -247,12 +246,25 @@ def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> Non
     )
 
     with tarfile.open(archive, "r:gz") as handle:
-        names = {name.removeprefix("./") for name in handle.getnames()}
+        members = handle.getmembers()
+        names = {member.name.removeprefix("./") for member in members}
 
     assert "README.md" in names
     assert ".llm/SNAPSHOT_INFO" in names
     assert not any(name.startswith(f"{root.name}/") for name in names)
-    assert not any(name.startswith("examples/results/") for name in names)
+    expected_result_placeholders = {
+        "examples/results/.gitkeep",
+        "examples/results/pls_path_comparison/.gitkeep",
+        "examples/results/pulp_post_analysis/.gitkeep",
+        "examples/results/sugarcane_post_analysis/.gitkeep",
+        "examples/results/tobacco_post_analysis/.gitkeep",
+    }
+    archived_results = {
+        member.name.removeprefix("./")
+        for member in members
+        if member.isfile() and member.name.removeprefix("./").startswith("examples/results/")
+    }
+    assert archived_results == expected_result_placeholders
 
 
 def test_llm_workflow_scripts_are_executable() -> None:

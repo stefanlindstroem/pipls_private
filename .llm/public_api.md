@@ -12,8 +12,10 @@ from pipls import (
 )
 ```
 
-The generated core reference under `docs/api/` documents exactly these supported top-level
-objects; `__version__` remains package metadata rather than an API reference page.
+The generated reference under `docs/api/` documents exactly these supported top-level objects and
+the declared public names from `pipls.inspection`, `pipls.plotting`, `pipls.datasets`, and
+`pipls.metrics`; `__version__` remains package metadata rather than an API reference page.
+Private modules and `pipls.model_selection` are not reference surfaces.
 
 `PiPLSRegression` fits one explicit fixed pair `(n_components, predictor_rank)` and performs no
 cross-validation or parameter selection. `PiPLSPathCV` is the standard package workflow for the
@@ -118,7 +120,8 @@ path interface.
 
 ## E1 dataset and synthetic-data API
 
-Dataset functionality is public from the dedicated `pipls.datasets` namespace:
+Dataset functionality is public from the dedicated `pipls.datasets` namespace and is declared by
+that module's `__all__`:
 
 ```python
 from pipls.datasets import (

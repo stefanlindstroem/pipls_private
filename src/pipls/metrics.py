@@ -22,12 +22,27 @@ def response_standardized_mean_squared_error(
     X: ArrayLike,
     y: ArrayLike,
 ) -> float:
-    """Return response-standardized MSE using scales learned by ``estimator``.
+    r"""Return response-standardized mean squared error.
 
-    The callable follows the scikit-learn scorer protocol ``(estimator, X, y)``.
-    Response scales are sample standard deviations estimated from the data used
-    to fit the estimator, independently of whether estimator preprocessing uses
-    response scaling.
+    For response $j$, residuals are divided by the sample standard deviation
+    estimated from the estimator's training responses. The returned scalar is the
+    uniform mean over observations and responses. The scaling is independent of
+    whether the estimator itself was fitted with response scaling.
+
+    Parameters
+    ----------
+    estimator : estimator
+        Fitted Pi-PLS estimator, or pipeline whose final estimator exposes
+        ``response_scale_for_scoring_``.
+    X : array-like of shape (n_samples, n_features)
+        Predictor observations to score.
+    y : array-like of shape (n_samples,) or (n_samples, n_targets)
+        Observed responses.
+
+    Returns
+    -------
+    float
+        Nonnegative response-standardized MSE.
     """
 
     response_scale = _response_scale_for_scoring(estimator)
@@ -43,7 +58,26 @@ def neg_response_standardized_mean_squared_error(
     X: ArrayLike,
     y: ArrayLike,
 ) -> float:
-    """Return negative response-standardized MSE for scorer maximization."""
+    r"""Return negative response-standardized MSE.
+
+    This sign-reversed form follows the scikit-learn scorer convention that larger
+    scores are better. Maximizing it is equivalent to minimizing
+    :func:`response_standardized_mean_squared_error`.
+
+    Parameters
+    ----------
+    estimator : estimator
+        Fitted Pi-PLS estimator or compatible pipeline.
+    X : array-like of shape (n_samples, n_features)
+        Predictor observations to score.
+    y : array-like of shape (n_samples,) or (n_samples, n_targets)
+        Observed responses.
+
+    Returns
+    -------
+    float
+        Nonpositive negative response-standardized MSE.
+    """
 
     return -response_standardized_mean_squared_error(estimator, X, y)
 

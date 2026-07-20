@@ -21,6 +21,7 @@ PredictionKind: TypeAlias = Literal[
     "selection-conditioned OOF predictions",
     "external test predictions",
 ]
+"""Provenance label attached to prediction diagnostics."""
 
 
 class _LatentStructureModel(Protocol):
@@ -69,12 +70,23 @@ __all__ = [
 
 @dataclass(frozen=True)
 class BiplotCoordinates:
-    """Immutable balanced score-loading coordinates for two PLS components.
+    r"""Immutable balanced coordinates for a two-component PLS biplot.
 
     ``sample_coordinates`` and ``predictor_coordinates`` preserve the selected
     score-loading reconstruction while giving both coordinate sets equal
     Euclidean norm within each component. Construct instances with
     :func:`biplot_coordinates`.
+
+    Attributes
+    ----------
+    sample_coordinates : ndarray of shape (n_samples, 2)
+        Balanced X-score coordinates for the observations.
+    predictor_coordinates : ndarray of shape (n_features, 2)
+        Balanced X-loading coordinates for the predictors.
+    component_indices : ndarray of shape (2,)
+        Selected zero-based component indices.
+    scaling_factors : ndarray of shape (2,)
+        Positive factors applied to scores and inversely to loadings.
     """
 
     sample_coordinates: FloatArray
@@ -97,12 +109,21 @@ class BiplotCoordinates:
 
 @dataclass(frozen=True)
 class LatentStructure:
-    """Immutable copies of public fitted PLS-family quantities.
+    r"""Immutable copies of public fitted PLS-family quantities.
 
-    ``coefficients`` follows the shared ``coef_`` orientation used by
-    ``PLSRegression`` and ``PiPLSRegression`` and therefore has shape
-    ``(n_targets, n_features)``. Construct instances with
-    :func:`latent_structure`.
+    The coefficient orientation follows ``PLSRegression`` and
+    ``PiPLSRegression``. Construct instances with :func:`latent_structure`.
+
+    Attributes
+    ----------
+    x_scores : ndarray of shape (n_samples, n_components)
+        Fitted X-score matrix.
+    x_loadings : ndarray of shape (n_features, n_components)
+        X-loading matrix.
+    y_loadings : ndarray of shape (n_targets, n_components)
+        Y-loading matrix.
+    coefficients : ndarray of shape (n_targets, n_features)
+        Regression coefficients mapping predictors to responses.
     """
 
     x_scores: FloatArray
@@ -137,15 +158,20 @@ class LatentStructure:
 
 @dataclass(frozen=True)
 class ObservationDiagnostics:
-    """Immutable raw PLS-family observation diagnostics.
+    r"""Immutable raw PLS-family observation diagnostics.
 
-    ``score_distance`` is the squared Mahalanobis distance of each supplied
-    X score from the fitted training-score center, using the Moore--Penrose
-    inverse of the fitted training-score covariance. ``x_reconstruction_residual``
-    is the row-wise squared Euclidean residual after the public PLS
-    transform/inverse-transform round trip.
+    ``score_distance`` is the squared Mahalanobis distance from the fitted
+    training-score center, using the Moore--Penrose inverse of the fitted
+    training-score covariance. ``x_reconstruction_residual`` is the row-wise
+    squared Euclidean residual after the public transform/inverse-transform round
+    trip. No theoretical warning limits are attached.
 
-    Construct instances with :func:`observation_diagnostics`.
+    Attributes
+    ----------
+    score_distance : ndarray of shape (n_samples,)
+        Raw squared score distances for the supplied observations.
+    x_reconstruction_residual : ndarray of shape (n_samples,)
+        Raw squared X-reconstruction residuals.
     """
 
     score_distance: FloatArray
@@ -162,12 +188,22 @@ class ObservationDiagnostics:
 class PiPLSDisplayFactors:
     r"""Immutable display-oriented copy of a Pi-PLS factorization.
 
-    The columns of ``predictor_directions`` and ``response_directions`` use a
-    deterministic display sign. Applying the same sign to both sides preserves
-    the centered/scaled regression map. ``weighted_response_directions`` is
-    ``response_directions * dilation[None, :]``.
+    The predictor and response direction columns use one deterministic display
+    sign per component. Applying the same sign to both sides preserves the
+    centered/scaled regression map $PDQ^{\mathsf T}$.
 
-    Construct instances with :func:`pipls_display_factors`.
+    Attributes
+    ----------
+    predictor_directions : ndarray of shape (n_features, n_components)
+        Display-signed copy of $P$.
+    dilation : ndarray of shape (n_components,)
+        Diagonal values of $D$.
+    response_directions : ndarray of shape (n_targets, n_components)
+        Display-signed copy of $Q$.
+    weighted_response_directions : ndarray of shape (n_targets, n_components)
+        Columns $d_k q_{:k}$, equal to ``response_directions * dilation``.
+    component_signs : ndarray of shape (n_components,)
+        Applied signs, each equal to ``-1`` or ``1``.
     """
 
     predictor_directions: FloatArray
@@ -197,13 +233,30 @@ class PiPLSDisplayFactors:
 
 @dataclass(frozen=True)
 class PredictionDiagnostics:
-    """Immutable standardized prediction and residual diagnostics.
+    r"""Immutable standardized prediction and residual diagnostics.
 
-    All response arrays have shape ``(n_samples, n_targets)`` even when the
-    inputs were one-dimensional. Centers and sample standard deviations are
-    estimated from ``observed`` and then applied unchanged to ``predicted``.
+    All response matrices are two-dimensional, including single-response input.
+    Centers and sample standard deviations are estimated from ``observed`` and
+    applied unchanged to ``predicted``.
 
-    Construct instances with :func:`prediction_diagnostics`.
+    Attributes
+    ----------
+    observed, predicted, residual : ndarray of shape (n_samples, n_targets)
+        Responses on their original scale, with residual defined as observed minus
+        predicted.
+    observed_standardized : ndarray of shape (n_samples, n_targets)
+        Standardized observed responses.
+    predicted_standardized : ndarray of shape (n_samples, n_targets)
+        Standardized predicted responses.
+    residual_standardized : ndarray of shape (n_samples, n_targets)
+        Standardized residuals.
+    response_centers, response_scales : ndarray of shape (n_targets,)
+        Display centering and sample-standard-deviation vectors from the observed
+        responses.
+    standardized_rmse : ndarray of shape (n_targets,)
+        Response-wise root mean squared standardized residual.
+    prediction_kind : PredictionKind
+        Explicit provenance of the supplied predictions.
     """
 
     observed: FloatArray
@@ -245,15 +298,14 @@ def biplot_coordinates(
        \qquad \tilde t_k = a_k t_k,
        \qquad \tilde p_k = p_k / a_k.
 
-    The transformed coordinates satisfy
-    ``sample_coordinates @ predictor_coordinates.T == T_K @ P_K.T`` and
-    have equal score and loading norm within each selected component.
+    The balanced coordinates preserve ``T_K @ P_K.T`` and have equal score and
+    loading norm within each selected component.
 
     Parameters
     ----------
-    structure:
-        Immutable PLS-family latent structure.
-    components:
+    structure : LatentStructure
+        Extracted fitted PLS-family quantities.
+    components : sequence of int, default=(0, 1)
         Exactly two distinct zero-based component indices.
 
     Returns
@@ -287,23 +339,23 @@ def biplot_coordinates(
 
 
 def latent_structure(model: object) -> LatentStructure:
-    """Return defensive copies of public fitted PLS-family arrays.
+    r"""Return defensive copies of public fitted PLS-family arrays.
 
     The function uses a structural fitted-model contract rather than a concrete
-    estimator class. Compatible models expose ``x_scores_``, ``x_loadings_``,
-    ``y_loadings_``, and ``coef_`` with the usual PLS-family orientations.
+    estimator class. Compatible fitted models expose ``x_scores_``,
+    ``x_loadings_``, ``y_loadings_``, and ``coef_`` with the usual PLS-family
+    orientations.
 
     Parameters
     ----------
-    model:
-        A fitted PLS-family estimator, such as scikit-learn ``PLSRegression``
-        or :class:`pipls.PiPLSRegression`.
+    model : object
+        Fitted PLS-family estimator, such as :class:`pipls.PiPLSRegression` or
+        scikit-learn ``PLSRegression``.
 
     Returns
     -------
     LatentStructure
-        Read-only X scores, X loadings, Y loadings, and regression
-        coefficients.
+        Read-only scores, loadings, and coefficients.
     """
 
     fitted = cast(
@@ -350,24 +402,20 @@ def observation_diagnostics(
     model: object,
     X: ArrayLike,
 ) -> ObservationDiagnostics:
-    """Return raw score-distance and X-reconstruction diagnostics.
+    r"""Return raw score-distance and X-reconstruction diagnostics.
 
     The fitted training scores establish the score center and covariance. The
-    supplied observations are transformed with the fitted model, and the
-    covariance inverse is calculated with :func:`numpy.linalg.pinv` so that
-    numerically rank-deficient score covariance remains well defined.
-
-    The function uses the public fitted arrays and X transform methods shared by
-    ``PLSRegression`` and ``PiPLSRegression``. No theoretical warning limits
-    are calculated.
+    supplied observations are transformed with the fitted model, and the covariance
+    inverse is calculated with :func:`numpy.linalg.pinv`. No theoretical warning
+    limits are calculated.
 
     Parameters
     ----------
-    model:
-        A fitted PLS-family estimator exposing public X scores, X loadings,
+    model : object
+        Fitted PLS-family estimator exposing public X scores, X loadings,
         ``transform()``, and ``inverse_transform()``.
-    X:
-        Predictor observations with the fitted number of features.
+    X : array-like of shape (n_samples, n_features)
+        Predictor observations on the fitted model's input scale.
 
     Returns
     -------
@@ -429,18 +477,17 @@ def pipls_display_factors(decomposition: PiPLSDecomposition) -> PiPLSDisplayFact
 
     For each component, the first largest-magnitude entry of the predictor
     direction is made nonnegative. The same sign is applied to the corresponding
-    response direction, preserving ``P @ D @ Q.T``. A zero predictor direction
-    is left unchanged.
+    response direction, preserving $PDQ^{\mathsf T}$.
 
     Parameters
     ----------
-    decomposition:
+    decomposition : pipls.PiPLSDecomposition
         Public fitted Pi-PLS decomposition.
 
     Returns
     -------
     PiPLSDisplayFactors
-        Read-only copies of the display factors and applied component signs.
+        Read-only display factors and the applied component signs.
     """
 
     if not isinstance(decomposition, PiPLSDecomposition):
@@ -501,23 +548,22 @@ def prediction_diagnostics(
 ) -> PredictionDiagnostics:
     r"""Return standardized observed, predicted, and residual diagnostics.
 
-    Residuals use ``observed - predicted``. Response centers and scales are
-    calculated from the observed responses. Scales are sample standard
-    deviations using ``ddof=1`` and are then applied unchanged to predictions.
+    Residuals use observed minus predicted. Response centers and scales are
+    calculated from the observed responses. Scales are sample standard deviations
+    with ``ddof=1`` and are applied unchanged to predictions.
 
     Parameters
     ----------
-    y_true, y_pred:
-        Aligned observed and predicted responses. One- and two-dimensional
-        inputs are accepted.
-    prediction_kind:
+    y_true, y_pred : array-like of shape (n_samples,) or (n_samples, n_targets)
+        Aligned observed and predicted responses.
+    prediction_kind : PredictionKind
         Explicit provenance label for the predictions.
 
     Returns
     -------
     PredictionDiagnostics
-        Read-only response matrices, display standardization statistics, and
-        response-wise standardized RMSE.
+        Read-only response matrices, standardization statistics, and response-wise
+        standardized RMSE.
     """
 
     if prediction_kind not in _PREDICTION_KINDS:
