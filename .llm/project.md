@@ -37,7 +37,8 @@ a separately chosen fixed Pi-PLS model. Shared orchestration remains under `exam
 No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
-environments with resolved-version diagnostics. Clean installed-distribution validation is next.
+environments with resolved-version diagnostics. Decision 0056 adds clean installed wheel and
+source-distribution validation. First-release preparation is next.
 
 ## Implemented estimator and selection boundary
 
@@ -119,7 +120,8 @@ implementing or reviewing this surface.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
   and release automation. `constraints/minimum.txt` records the maintainer-only lower-bound test
   environment; `.github/workflows/tests.yml` owns the three compatibility CI environments;
-  `docs/compatibility.md` owns the public support statement.
+  `.github/workflows/build.yml` and `tools/check_distributions.py` own clean artifact-installation
+  validation; `docs/compatibility.md` owns the public support statement.
 
 ## Contract and documentation ownership
 
@@ -148,12 +150,15 @@ implementing or reviewing this surface.
 - Public Markdown under `docs/` is self-contained and does not link outside the documentation source
   tree. `.llm` contracts may be more detailed but are never user prerequisites.
 - The source distribution ships `mkdocs.yml`, the Makefile, documentation sources and assets, the
-  minimum-dependency constraint file, and the validation helper needed for a clean strict
-  documentation build. Generated `site/` output is excluded from Git, distributions, and snapshots.
+  minimum-dependency constraint file, and the helpers needed for clean strict documentation and
+  installed-distribution checks. Generated `site/` output is excluded from Git, distributions, and
+  snapshots.
 - Runtime metadata and public documentation agree on Python 3.10–3.14 and the guarded NumPy,
   scikit-learn, and joblib ranges. CI separates the Python 3.10 minimum stack, normal resolution on
   every supported interpreter, and explicit latest-compatible upgrades on Python 3.14; every job
-  prints the resolved interpreter and runtime dependency versions.
+  prints the resolved interpreter and runtime dependency versions. The build workflow separately
+  installs the wheel and source distribution into clean environments and verifies public runtime
+  behavior outside the checkout.
 - The fixed numerical core does not own preprocessing, CV, datasets, benchmark policy, or
   publication workflows.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required
@@ -178,8 +183,10 @@ implementing or reviewing this surface.
 make check
 make examples
 make build
+make dist-check
 ```
 
 Use `make examples` whenever numbered examples or their generated application artifacts change.
-Use `make build` whenever packaging, dependencies, public modules, or included data files change.
+Use `make build` for a quick artifact build, and use `make dist-check` whenever packaging,
+dependencies, public modules, or included data files change.
 Record each validation target as passed, failed, or not run.

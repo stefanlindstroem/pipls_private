@@ -13,6 +13,7 @@ python -m pip install -e ".[dev]"
 make check
 make examples
 make build
+make dist-check
 ```
 
 Tests cover the numerical core, estimator API, model selection, cross-validation boundaries,
@@ -30,6 +31,26 @@ make examples
 
 The development extra already includes these packages. Re-run `python -m pip install -e ".[dev]"`
 after pulling dependency changes into an existing virtual environment.
+
+## Installed-distribution reproducibility
+
+The stronger packaging check is:
+
+```bash
+make dist-check
+```
+
+It builds the wheel and source distribution once in a temporary directory, creates a separate clean
+virtual environment for each artifact, and installs each exact artifact path while running outside
+the repository checkout. Both environments execute the same smoke test: public package and
+submodule imports, installed version-metadata agreement, a representative fixed Pi-PLS fit and
+prediction, and an explicit check that imports resolve from the temporary installation rather than
+`src/`. The check imports `pipls.plotting` but does not call optional plotting functions, so it also
+protects the plotting module's import-time independence from Matplotlib.
+
+The temporary environments and artifacts are removed after the check. This target validates
+installation behavior; `make check` remains the ordinary source-checkout test suite, and
+`make docs-dist` separately validates the distributed documentation inputs.
 
 ## Documentation reproducibility
 

@@ -504,16 +504,17 @@ Decision 0054 defines Python 3.10–3.14 as the supported interpreter range, ret
 `requires-python = ">=3.10"`, guards the next NumPy, scikit-learn, and joblib major versions, and
 records one reproducible minimum stack in `constraints/minimum.txt`. Decision 0055 separates the
 minimum, supported-Python, and latest-compatible CI responsibilities and requires resolved-version
-diagnostics in every job.
+diagnostics in every job. Decision 0056 builds the wheel and source distribution once, installs
+each artifact into a separate clean environment outside the checkout, and runs one shared public
+runtime smoke test with metadata and import-origin checks.
 
-Current status: **compatibility policy and CI matrix complete; installed-distribution validation
-pending**.
+Current status: **compatibility policy, CI matrix, and installed-distribution validation complete**.
 
 ## Current next increment
 
-Build the wheel and source distribution once, install each into a separate clean environment outside
-the repository checkout, and run one shared public-import, version-metadata, and representative
-prediction smoke test.
+Prepare the first release: choose the initial version, turn the accumulated Unreleased changelog
+into release notes, complete final package metadata and project URLs, define the tag and publication
+checklist, and rehearse publication through TestPyPI.
 
 ## Maintenance protocol
 

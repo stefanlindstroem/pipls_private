@@ -5,7 +5,7 @@ EXAMPLE_ENV := PYTHONPATH=src MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THRE
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install test lint format typecheck docs docs-serve docs-dist build check examples snapshot clean
+.PHONY: help install test lint format typecheck docs docs-serve docs-dist build dist-check check examples snapshot clean
 
 help: ## Show the available Make targets.
 	@printf 'Usage: make <target>\n\nAvailable targets:\n'
@@ -38,6 +38,9 @@ docs-dist: ## Verify documentation from a clean source distribution.
 
 build: ## Build the wheel and source distribution.
 	$(PYTHON) -m build
+
+dist-check: ## Verify clean wheel and source-distribution installations.
+	$(PYTHON) tools/check_distributions.py
 
 check: test lint typecheck ## Run tests, lint, and type checks.
 

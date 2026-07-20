@@ -329,6 +329,16 @@ make docs-dist
 
 This creates a temporary clean environment and does not retain generated files in the repository.
 
+To validate the installable runtime artifacts themselves, run:
+
+```bash
+make dist-check
+```
+
+This builds the wheel and source distribution once, installs each into its own clean virtual
+environment outside the checkout, and runs the same public-import, metadata, fit, and prediction
+smoke test against both artifacts.
+
 - [Quickstart](docs/quickstart.md)
 - [Examples](docs/examples.md)
 - [Documentation index](docs/index.md)

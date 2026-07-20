@@ -20,9 +20,12 @@ slower Tobacco analysis. Run `make docs` after installing `.[docs]` when changin
 documentation, navigation, or docstrings. Use `make docs-serve` for a live local preview; it
 serves `http://127.0.0.1:8000/` until stopped with `Ctrl+C`. Run `make docs-dist` when changing
 documentation packaging, documentation dependencies, `MANIFEST.in`, or the source-distribution
-boundary. Run
-`make build` when changing packaging, dependencies, included data, or public modules. When changing
-core dependency bounds or compatibility code, also verify a fresh Python 3.10 environment with:
+documentation boundary. Run `make build` for a quick artifact build when changing packaging,
+dependencies, included data, or public modules, and run `make dist-check` before submitting such a
+change. The stronger target builds the artifacts once, installs the wheel and source distribution
+into separate clean virtual environments, and exercises the same installed-package smoke test from
+outside the checkout. When changing core dependency bounds or compatibility code, also verify a
+fresh Python 3.10 environment with:
 
 ```bash
 python -m pip install -c constraints/minimum.txt -e ".[dev]"

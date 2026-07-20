@@ -54,6 +54,18 @@ Each job prints the resolved Python, NumPy, scikit-learn, and joblib versions be
 standard repository checks. The supported-Python matrix continues after an individual interpreter
 failure so the workflow reports the state of the complete supported range.
 
+## Installed distribution artifacts
+
+The build workflow runs `make dist-check` to validate the artifacts users install. The target builds
+one wheel and one source distribution, installs them into separate clean virtual environments, and
+runs one shared public smoke test outside the repository checkout. It verifies package metadata,
+public imports, a representative fit and prediction, and import resolution from the temporary
+environment rather than repository `src/`.
+
+This artifact check complements the compatibility matrix rather than multiplying it: the matrix
+owns interpreter and dependency ranges, while the distribution check owns clean installation of the
+standard release artifacts.
+
 ## What support means
 
 The three environments avoid an unnecessary Cartesian product while checking the declared lower

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add clean installed-distribution validation: build the wheel and source distribution once,
+  install each into a separate temporary environment outside the checkout, and run one shared
+  public-import, metadata, fit, prediction, and import-origin smoke test in CI.
 - Separate compatibility CI into diagnosable minimum-dependency, supported-Python, and
   latest-compatible jobs; print the resolved Python, NumPy, scikit-learn, and joblib versions in
   every environment.

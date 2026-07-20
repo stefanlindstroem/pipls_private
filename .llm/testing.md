@@ -14,7 +14,8 @@ Tests may verify:
 - public Python behavior, numerical invariants, validation, fitted attributes, and supported
   scikit-learn composition;
 - focused benchmark runners and small example helper contracts;
-- package and source-distribution contents;
+- package and source-distribution contents, plus clean installed wheel and source-distribution
+  runtime behavior at the public import and representative fit/predict boundary;
 - presence, encoding, parsability, and structural format of shipped Markdown, YAML, CSV, TOML, and
   shell files;
 - generic consistency rules, such as every indexed decision record existing and every shipped

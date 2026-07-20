@@ -69,6 +69,7 @@ def test_source_distribution_manifest_includes_documentation_build_inputs() -> N
         "include Makefile",
         "include mkdocs.yml",
         "include tools/check_sdist_docs.py",
+        "include tools/check_distributions.py",
         "recursive-include docs *.md *.js",
     } <= manifest_lines
 
@@ -184,6 +185,7 @@ def test_make_help_and_documentation_preview_are_discoverable() -> None:
         "docs-serve",
         "docs-dist",
         "build",
+        "dist-check",
         "check",
         "examples",
         "snapshot",
@@ -193,9 +195,7 @@ def test_make_help_and_documentation_preview_are_discoverable() -> None:
     assert ".DEFAULT_GOAL := help" in makefile
     assert "Usage: make <target>" in help_output
     assert "Usage: make <target>" in default_output
-    assert public_targets <= set(
-        re.findall(r"^([A-Za-z0-9_.-]+):.*## .+$", makefile, re.MULTILINE)
-    )
+    assert public_targets <= set(re.findall(r"^([A-Za-z0-9_.-]+):.*## .+$", makefile, re.MULTILINE))
     assert all(target in help_output for target in public_targets)
     assert "-m mkdocs serve --dev-addr=127.0.0.1:8000" in preview
     assert "http://127.0.0.1:8000/" in preview

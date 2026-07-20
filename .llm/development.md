@@ -64,8 +64,10 @@
   remain warning-free. Core generated pages use explicit public objects and source docstrings; do not
   expose private modules or inherited implementation machinery by broad module expansion. Never commit
   generated `site/` output. Use `make docs-dist` when changing documentation packaging or the
-  source-distribution boundary; it performs a clean install and strict build from the unpacked
-  sdist and therefore remains outside the ordinary fast test target.
+  source-distribution documentation boundary; it performs a clean install and strict build from
+  the unpacked sdist and therefore remains outside the ordinary fast test target. Use
+  `make dist-check` for packaging, dependency, public-module, or included-data changes; it builds
+  once and checks separate clean wheel and sdist installations outside the checkout.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
 - Design each benchmark around one explicit user-facing question. Give it one readable script and
@@ -103,6 +105,7 @@
   docstrings.
 - Run `make examples` for changes to numbered examples, example-generated CSV/PDF artifacts, or the
   application-facing workflow. This target runs all examples, including Tobacco.
-- Run `make build` for packaging, dependency, public-module, or included-data changes.
+- Run `make build` for a quick artifact build and `make dist-check` for packaging, dependency,
+  public-module, or included-data changes before delivery.
 - Provide exact direct Git commands for `git apply --check`, application, inspection, validation,
   staging, committing, and `make snapshot`.

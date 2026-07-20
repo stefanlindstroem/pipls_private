@@ -129,6 +129,7 @@ case, or public behavior.
 | Python compatibility | supported and classified on Python 3.10–3.14; metadata keeps `requires-python = ">=3.10"` without an upper bound |
 | Runtime dependencies | `numpy>=1.26,<3`, `scikit-learn>=1.4,<2`, and `joblib>=1.2,<2`; the minimum lines are constrained together on Python 3.10 |
 | Compatibility CI | separate minimum, supported-Python, and latest-compatible jobs; every job prints resolved interpreter and runtime dependency versions |
+| Distribution validation | `make dist-check` builds once and verifies separate clean wheel and sdist installations with one shared public smoke test |
 
 Additional fixed decisions:
 
@@ -258,20 +259,20 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Add installed-distribution validation for the artifacts users receive. Build the wheel and source
-distribution once, install each into a separate clean environment outside the repository checkout,
-and run the same public-import, version-metadata, and representative prediction smoke test.
+Prepare the first release. Choose the initial version, condense the large Unreleased changelog into
+release notes, complete project URLs and package metadata, define the tag and publication checklist,
+and rehearse publication through TestPyPI before using the main package index.
 
-Decisions 0054 and 0055 now make the compatibility policy executable through separate minimum,
-supported-Python, and latest-compatible jobs with resolved-version diagnostics. The next patch
-should not expand the compatibility matrix; it should validate clean installed artifacts.
+Decisions 0054--0056 complete compatibility and packaging hardening: the repository now owns an
+explicit support policy, three diagnosable compatibility environments, and clean installed wheel
+and source-distribution checks. The next patch should not add another packaging smoke layer before
+the version and release boundary is decided.
 
 ## Subsequent roadmap
 
-1. **Installed-distribution validation:** verify clean wheel and source-distribution installations
-   outside the repository checkout.
-2. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
-   first tagged-release checklist.
+1. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
+   package metadata, define the first tagged-release checklist, and rehearse publication.
+2. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.
