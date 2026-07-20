@@ -40,11 +40,25 @@ The constraint file is a maintainer test input, not a user lock file. Users shou
 Pi-PLS without it and use their own application-level lock or environment-management policy when
 exact reproducibility is required.
 
+## Continuous-integration environments
+
+The test workflow separates three compatibility responsibilities:
+
+| Job | Environment | Purpose |
+|---|---|---|
+| `minimum-dependencies` | Python 3.10 and `constraints/minimum.txt` | Verify all declared lower runtime dependency lines together |
+| `supported-python` | Python 3.10 through 3.14 with normal resolution | Verify every supported interpreter |
+| `latest-dependencies` | Python 3.14 with explicit runtime dependency upgrades | Verify the newest releases admitted by the declared major-version limits |
+
+Each job prints the resolved Python, NumPy, scikit-learn, and joblib versions before running the
+standard repository checks. The supported-Python matrix continues after an individual interpreter
+failure so the workflow reports the state of the complete supported range.
+
 ## What support means
 
-The supported Python matrix is exercised with normally resolved dependencies. The minimum stack is
-exercised separately on Python 3.10. This avoids an unnecessary Cartesian product while checking
-both the declared lower bounds and the active interpreter range.
+The three environments avoid an unnecessary Cartesian product while checking the declared lower
+bounds, the active interpreter range, and the newest admitted runtime dependencies. They do not
+claim that every historical combination inside the declared ranges is continuously exercised.
 
 A combination inside the declared ranges is expected to work. When a reproducible incompatibility
 is found, the project should either correct it or narrow the metadata and documentation in the same

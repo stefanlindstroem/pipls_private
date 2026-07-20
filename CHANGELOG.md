@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Separate compatibility CI into diagnosable minimum-dependency, supported-Python, and
+  latest-compatible jobs; print the resolved Python, NumPy, scikit-learn, and joblib versions in
+  every environment.
 - Define the first-release compatibility policy for Python 3.10–3.14, NumPy 1.26--2.x,
   scikit-learn 1.4--1.x, and joblib 1.2--1.x; add minimum-dependency constraints, Python
   classifiers, guarded runtime ranges, Python 3.14 CI coverage, and consistency tests.

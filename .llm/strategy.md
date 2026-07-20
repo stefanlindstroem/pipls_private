@@ -462,7 +462,8 @@ from current documentation.
 
 Current status: **in progress**. Decisions 0049--0053 complete the documentation boundary.
 Decision 0054 defines the supported Python and runtime dependency ranges and the minimum test
-environment. Explicit latest-compatible and installed-distribution checks remain.
+environment. Decision 0055 implements the explicit latest-compatible and supported-Python CI
+boundaries. Installed-distribution checks remain.
 
 ### Current standardization and deferred block-aware variants
 
@@ -501,16 +502,18 @@ site build, generated public reference, distributed documentation inputs, and CI
 
 Decision 0054 defines Python 3.10–3.14 as the supported interpreter range, retains an open-ended
 `requires-python = ">=3.10"`, guards the next NumPy, scikit-learn, and joblib major versions, and
-records one reproducible minimum stack in `constraints/minimum.txt`. The minimum stack is tested on
-Python 3.10, while all supported interpreters use normally resolved dependencies.
+records one reproducible minimum stack in `constraints/minimum.txt`. Decision 0055 separates the
+minimum, supported-Python, and latest-compatible CI responsibilities and requires resolved-version
+diagnostics in every job.
 
-Current status: **policy complete; explicit compatibility CI matrix pending**.
+Current status: **compatibility policy and CI matrix complete; installed-distribution validation
+pending**.
 
 ## Current next increment
 
-Separate compatibility CI into minimum-dependency, supported-Python, and latest-compatible jobs.
-Each job must print the resolved Python, NumPy, scikit-learn, and joblib versions. Avoid a full
-Cartesian product; clean wheel and source-distribution installation checks follow separately.
+Build the wheel and source distribution once, install each into a separate clean environment outside
+the repository checkout, and run one shared public-import, version-metadata, and representative
+prediction smoke test.
 
 ## Maintenance protocol
 

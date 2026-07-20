@@ -69,3 +69,4 @@ reference describe the current public behavior directly.
 - [0052: complete generated API reference](0052-complete-generated-api-reference.md)
 - [0053: documentation distribution validation](0053-documentation-distribution-validation.md)
 - [0054: compatibility policy](0054-compatibility-policy.md)
+- [0055: compatibility CI matrix](0055-compatibility-ci-matrix.md)

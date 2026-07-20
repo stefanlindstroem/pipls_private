@@ -77,20 +77,66 @@ def test_compatibility_documentation_matches_metadata_and_constraints() -> None:
         assert constraint in text
 
 
-def test_test_workflow_covers_supported_python_and_minimum_constraints() -> None:
+def _test_workflow_jobs() -> dict[str, object]:
     workflow = yaml.safe_load(
         (_repository_root() / ".github" / "workflows" / "tests.yml").read_text(encoding="utf-8")
     )
+    return workflow["jobs"]
 
-    assert (
-        tuple(workflow["jobs"]["test"]["strategy"]["matrix"]["python-version"])
-        == _SUPPORTED_PYTHONS
+
+def _setup_python_version(steps: list[dict[str, object]]) -> str:
+    setup = next(step for step in steps if step.get("uses") == "actions/setup-python@v5")
+    return setup["with"]["python-version"]
+
+
+def _run_commands(steps: list[dict[str, object]]) -> list[str]:
+    return [step["run"] for step in steps if "run" in step]
+
+
+def test_test_workflow_separates_the_three_compatibility_responsibilities() -> None:
+    jobs = _test_workflow_jobs()
+
+    assert {
+        "minimum-dependencies",
+        "supported-python",
+        "latest-dependencies",
+    } <= set(jobs)
+
+    minimum = jobs["minimum-dependencies"]
+    minimum_steps = minimum["steps"]
+    assert "strategy" not in minimum
+    assert _setup_python_version(minimum_steps) == "3.10"
+    assert 'python -m pip install -c constraints/minimum.txt -e ".[dev]"' in _run_commands(
+        minimum_steps
     )
-    minimum_steps = workflow["jobs"]["minimum-dependencies"]["steps"]
-    minimum_commands = [step["run"] for step in minimum_steps if "run" in step]
-    assert 'python -m pip install -c constraints/minimum.txt -e ".[dev]"' in minimum_commands
-    setup = next(step for step in minimum_steps if step.get("uses") == "actions/setup-python@v5")
-    assert setup["with"]["python-version"] == "3.10"
+
+    supported = jobs["supported-python"]
+    assert supported["strategy"]["fail-fast"] is False
+    assert tuple(supported["strategy"]["matrix"]["python-version"]) == _SUPPORTED_PYTHONS
+    assert 'python -m pip install -e ".[dev]"' in _run_commands(supported["steps"])
+
+    latest = jobs["latest-dependencies"]
+    latest_steps = latest["steps"]
+    assert "strategy" not in latest
+    assert _setup_python_version(latest_steps) == "3.14"
+    assert (
+        'python -m pip install --upgrade -e ".[dev]" "numpy<3" "scikit-learn<2" "joblib<2"'
+        in _run_commands(latest_steps)
+    )
+
+
+def test_every_compatibility_job_prints_resolved_versions() -> None:
+    jobs = _test_workflow_jobs()
+
+    for job_name in ("minimum-dependencies", "supported-python", "latest-dependencies"):
+        version_step = next(
+            step for step in jobs[job_name]["steps"] if step.get("name") == "Show resolved versions"
+        )
+        command = version_step["run"]
+        assert "sys.version.split()[0]" in command
+        assert "numpy.__version__" in command
+        assert "sklearn.__version__" in command
+        assert "joblib.__version__" in command
 
 
 def test_minimum_constraints_are_included_in_source_distributions() -> None:

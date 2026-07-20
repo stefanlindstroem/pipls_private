@@ -30,7 +30,10 @@ make check
 ```
 
 The constraint file represents the minimum supported dependency lines; it is not the normal user
-installation command or an application lock file.
+installation command or an application lock file. CI separately exercises normal dependency
+resolution on every supported Python version and explicit latest-compatible runtime upgrades on
+Python 3.14. Each compatibility job prints the resolved interpreter and runtime dependency
+versions before running `make check`.
 
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
 Benchmark changes must follow `.llm/benchmarking.md`: one question, one readable script, and one

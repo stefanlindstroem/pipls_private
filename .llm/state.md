@@ -128,6 +128,7 @@ case, or public behavior.
 | Model inspection | package inspection and plotting are implemented; Pulp, Sugarcane, and Tobacco have canonical OOF and post-analysis artifacts; the Pulp biplot and cross-dataset review are complete |
 | Python compatibility | supported and classified on Python 3.10–3.14; metadata keeps `requires-python = ">=3.10"` without an upper bound |
 | Runtime dependencies | `numpy>=1.26,<3`, `scikit-learn>=1.4,<2`, and `joblib>=1.2,<2`; the minimum lines are constrained together on Python 3.10 |
+| Compatibility CI | separate minimum, supported-Python, and latest-compatible jobs; every job prints resolved interpreter and runtime dependency versions |
 
 Additional fixed decisions:
 
@@ -257,22 +258,19 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Implement the explicit compatibility CI matrix: separate minimum dependencies, supported Python,
-and latest-compatible dependencies into diagnosable jobs that print the resolved interpreter and
-runtime dependency versions.
+Add installed-distribution validation for the artifacts users receive. Build the wheel and source
+distribution once, install each into a separate clean environment outside the repository checkout,
+and run the same public-import, version-metadata, and representative prediction smoke test.
 
-Decision 0054 defines Python 3.10–3.14 support, guarded NumPy, scikit-learn, and joblib ranges, and
-the Python 3.10 minimum stack. The existing test workflow now includes Python 3.14 and consumes the
-minimum constraint file; the next patch should clarify job ownership and add the latest-compatible
-environment without testing a Cartesian product.
+Decisions 0054 and 0055 now make the compatibility policy executable through separate minimum,
+supported-Python, and latest-compatible jobs with resolved-version diagnostics. The next patch
+should not expand the compatibility matrix; it should validate clean installed artifacts.
 
 ## Subsequent roadmap
 
-1. **Compatibility CI matrix:** separate minimum, supported-Python, and latest-compatible jobs and
-   print resolved versions.
-2. **Installed-distribution validation:** verify clean wheel and source-distribution installations
+1. **Installed-distribution validation:** verify clean wheel and source-distribution installations
    outside the repository checkout.
-3. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
+2. **Versioning and release preparation:** replace version `0.0.0`, add release notes, and define the
    first tagged-release checklist.
 
 Future datasets still require a distinct package-level use case and verified source-level
