@@ -48,3 +48,9 @@ clear that complete report generation is optional. The real-data workflows and t
 contracts remain unchanged. Estimator defaults, single-response behavior, selection rules, and
 numerical results are not changed by this decision; any change to those public contracts requires a
 separate decision.
+
+## Later refinement
+
+Decision 0046 preserves this organization while making the numbered scripts more concise. Required
+result directories are now tracked, one-use arguments are inlined, and redundant checks of committed
+dataset structure are left to repository tests.

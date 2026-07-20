@@ -34,9 +34,14 @@ Examples must behave as an ordinary programming user is expected to behave:
 
 1. read the predictor file or columns explicitly;
 2. read the response file or columns explicitly;
-3. show row alignment, column selection, dtype conversion, and missing-value policy in the script;
+3. show any scientifically meaningful row alignment or column selection in the script;
 4. form `X` and `Y` visibly;
 5. call `fit(X, Y)`.
+
+For committed repository datasets, examples may trust the documented CSV schema and tested file
+layout. Do not repeat dtype, missing-value, header-order, or directory-existence checks when the
+repository already establishes those facts. External users remain responsible for validating their
+own data sources.
 
 Do not hide these steps behind a package utility such as `load_dataset`, an example helper module,
 a registry resolver, metadata parser, or an implicit converter.

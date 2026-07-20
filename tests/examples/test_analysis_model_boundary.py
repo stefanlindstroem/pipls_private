@@ -52,7 +52,7 @@ def test_real_data_examples_keep_the_pls_comparison_path_only() -> None:
     ):
         text = (examples_dir / filename).read_text(encoding="utf-8")
         assert "evaluate_pls_component_path(" in text
-        assert "latent_structure(pipls_model)" in text
+        assert "latent_structure(model)" in text
         assert "PiPLSRegression(" in text
 
 

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Shorten the numbered examples without changing their analyses: inline one-use arguments, remove redundant checks of committed CSV headers and axis order, use one selected Pi-PLS object for fixed-fit and OOF calls, reduce console scaffolding, and track required result directories instead of creating them at runtime.
+
 - Complete the Decision 0045 analysis-boundary migration: enforce ordinary PLS as a comparison-only
   model in numbered examples, keep shared PLS-family inspection estimator-neutral, use one selected
   Pi-PLS model for post-analysis, and align quantity-based artifact and documentation contracts.

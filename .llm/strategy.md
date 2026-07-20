@@ -444,6 +444,7 @@ Acceptance conditions:
 Decision 0045 corrected the model-ownership boundary. The estimator-neutral shared inspection and
 plotting API, Pi-PLS-only numbered-example post-analysis, quantity-based artifacts, and static
 boundary enforcement are complete.
+Decision 0046 then reduced the numbered scripts to their scientific stages, moved repository-layout validation out of the scripts, and made the required result directories tracked repository structure.
 
 Current status: **complete**.
 

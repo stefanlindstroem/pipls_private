@@ -51,6 +51,7 @@ This index is navigation, not a substitute for those records.
 | `0043-pls-biplot-and-analysis-surface.md` | final fitted-model analysis increment | balanced reconstruction-preserving Pulp biplot; no spectral biplots; analysis series complete |
 | `0044-minimal-onboarding-and-example-support.md` | user onboarding and example organization | literal-matrix first example; complete-workflow helpers under `examples/_support/`; one examples target retained |
 | `0045-pls-family-analysis-boundary.md` | comparison versus fitted-model analysis ownership | retain ordinary PLS for CV-MSE comparison; keep $P$, $D$, and $Q$ Pi-PLS-specific; make shared analysis estimator-neutral and apply it only to Pi-PLS in numbered examples |
+| `0046-concise-numbered-examples.md` | pedagogical example minimality | keep scientific stages explicit; remove one-use scaffolding and redundant repository-data checks; track required result directories |
 
 ## Implemented estimator/search transition
 
@@ -88,6 +89,7 @@ plan contains an earlier or more general proposal:
   utility functions;
 - the first numbered example uses literal NumPy matrices and one fixed fit; complete-workflow
   helpers are separated under `examples/_support/`;
+- numbered examples trust committed dataset and result-directory structure, avoid one-use configuration constants and repeated validation scaffolding, and leave reusable contract validation to focused tests;
 - committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
   external users remain free to use any data source or file organization;
 - the current real-data integration suite is pulp, sugarcane, and tobacco; all are repository

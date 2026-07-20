@@ -214,7 +214,7 @@ and `make examples` runs every numbered example as an explicit application-valid
 They write separate Pi-PLS and standard PLS (NIPALS) path CSVs for the same folds and component
 counts, call imported helpers to generate an overlaid PDF from those tables, expose a visible user
 component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks recorded
-explicitly. The examples contain no subprocess wrappers or repeated table-validation boilerplate.
+explicitly. The examples contain no subprocess wrappers, repeated table-validation boilerplate, one-use configuration constants, redundant committed-data checks, or directory-creation scaffolding. Required result directories are tracked and preserved by `make clean`.
 Default tests retain dataset-layout, component-path API, PLS-helper, plotting, and workflow-structure
 contracts without executing the complete real-data analyses.
 

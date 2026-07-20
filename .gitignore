@@ -19,5 +19,12 @@ notebooks/.ipynb_checkpoints/
 *.patch
 *-snapshot.tar.gz
 benchmarks/results/
-examples/results/
+examples/results/*
+!examples/results/.gitkeep
+!examples/results/pulp_post_analysis/
+!examples/results/pulp_post_analysis/.gitkeep
+!examples/results/sugarcane_post_analysis/
+!examples/results/sugarcane_post_analysis/.gitkeep
+!examples/results/tobacco_post_analysis/
+!examples/results/tobacco_post_analysis/.gitkeep
 benchmarks/.cache/

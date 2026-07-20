@@ -113,6 +113,5 @@ def plot_component_path(
     axes.set_ylim(0, max(1.0, 1.05 * upper))
     axes.legend()
     figure.tight_layout(rect=(0.0, 0.05, 1.0, 1.0))
-    pdf_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(pdf_path, format="pdf")
     plt.close(figure)

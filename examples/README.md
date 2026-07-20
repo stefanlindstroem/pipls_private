@@ -38,9 +38,10 @@ source rather than from pandas or CSV headers.
   decreasing-wavenumber spectral plots, deterministic response pagination, eight canonical
   post-analysis CSV files, and raw observation diagnostics.
 
-These are application analyses rather than introductory snippets. `make examples` runs every
-numbered example in filename order, including the slower real-data workflows. It remains separate
-from `make check`.
+These are application analyses rather than introductory snippets, but the numbered scripts keep
+only their scientific stages visible. Reusable validation, CSV reconstruction, and report
+composition remain in `_support`. `make examples` runs every numbered example in filename order,
+including the slower real-data workflows. It remains separate from `make check`.
 
 ## Example support modules
 
@@ -64,13 +65,14 @@ The Pulp, Sugarcane, and Tobacco examples show label acquisition as a separate I
 ```python
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
-predictor_names = X.columns.astype(str).tolist()
-response_names = Y.columns.astype(str).tolist()
+predictor_names = X.columns.tolist()
+response_names = Y.columns.tolist()
 ```
 
 Users whose arrays do not carry column headers can supply equivalent lists from a schema, laboratory
 information system, or other domain metadata. The package plotting API does not read files or
-invent scientific variable names.
+invent scientific variable names. The committed datasets already have tested headers and ordering,
+so the numbered examples use them directly instead of repeating repository-integrity checks.
 
 The three real-data examples share these stages:
 
@@ -92,3 +94,10 @@ Pulp reconstructs its biplot from `x_scores.csv` and `x_loadings.csv`. Sugarcane
 strictly increasing wavelength coordinate from `X.csv`. Tobacco preserves its decreasing
 wavenumber coordinate, partitions all thirteen responses in source order, and adds
 `observation_diagnostics.csv`. Generated files under `examples/results/` are ignored by Git.
+
+## Output directories
+
+`examples/results/` and the Pulp, Sugarcane, and Tobacco post-analysis subdirectories are tracked
+with placeholder files. The examples therefore write directly to known destinations and do not
+contain directory-creation code. Generated CSV and PDF files remain ignored, and `make clean`
+removes them while preserving the tracked directory structure.

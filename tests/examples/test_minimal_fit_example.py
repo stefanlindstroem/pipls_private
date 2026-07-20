@@ -17,9 +17,24 @@ def test_minimal_example_is_a_literal_fixed_model_workflow() -> None:
     assert "model.predict(X)" in text
     assert "pipls_display_factors(model.decomposition_)" in text
     assert "plot_pipls_decomposition(" in text
-    assert 'predictor_names = ["Temperature", "Pressure", "Flow rate"]' in text
-    assert 'response_names = ["Yield", "Purity"]' in text
+    assert 'predictor_names=["Temperature", "Pressure", "Flow rate"]' in text
+    assert 'response_names=["Yield", "Purity"]' in text
     assert "PiPLSPathCV" not in text
     assert "KFold" not in text
     assert "pandas" not in text
     assert "_support" not in text
+
+
+def test_examples_assume_repository_owned_result_directories() -> None:
+    root = _repository_root()
+    examples_dir = root / "examples"
+    for path in examples_dir.rglob("*.py"):
+        assert ".mkdir(" not in path.read_text(encoding="utf-8"), path
+
+    for relative in (
+        "results",
+        "results/pulp_post_analysis",
+        "results/sugarcane_post_analysis",
+        "results/tobacco_post_analysis",
+    ):
+        assert (examples_dir / relative / ".gitkeep").is_file()

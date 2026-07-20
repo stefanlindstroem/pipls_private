@@ -33,23 +33,14 @@ Y = np.array(
     ]
 )
 
-predictor_names = ["Temperature", "Pressure", "Flow rate"]
-response_names = ["Yield", "Purity"]
-
 model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
-Y_fitted = model.predict(X)
-print("Fitted responses:")
-print(Y_fitted)
+print(model.predict(X))
 
 figure, _ = plot_pipls_decomposition(
     pipls_display_factors(model.decomposition_),
     predictor_style="bar",
-    predictor_names=predictor_names,
-    response_names=response_names,
+    predictor_names=["Temperature", "Pressure", "Flow rate"],
+    response_names=["Yield", "Purity"],
     title="Minimal Pi-PLS fit",
 )
-
-output_path = Path(__file__).resolve().parent / "results" / "minimal_fit_and_plot.pdf"
-output_path.parent.mkdir(parents=True, exist_ok=True)
-figure.savefig(output_path)
-print(f"Wrote {output_path}")
+figure.savefig(Path(__file__).resolve().parent / "results" / "minimal_fit_and_plot.pdf")

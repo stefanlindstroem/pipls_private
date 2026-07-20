@@ -98,6 +98,12 @@ Their support modules live under `examples/_support/` so they are visibly separa
 user entry points. Do not hide real-data reading behind a package loader. Do not place user analysis
 helpers under `scripts/`, which remains the repository-maintenance and preparation area.
 
+Numbered examples are pedagogical scripts, not production applications. Keep genuine user choices
+named, but inline one-use arguments whose function names already explain them. Trust committed CSV
+headers and the tracked `examples/results/` directory structure; do not add repeated dtype, ordering,
+missing-value, or directory-creation checks to the scripts. Reusable helper contracts remain tested
+separately.
+
 Variable-name acquisition is also example-owned. When a table has meaningful headers, examples
 should derive names visibly from `X.columns` and `Y.columns` and pass them to plotting functions.
 Users without header-bearing tables may supply names from any explicit metadata source. Package

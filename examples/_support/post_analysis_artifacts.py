@@ -245,7 +245,6 @@ def write_post_analysis_tables(
             "Post-analysis tables differ from the contract: "
             f"missing={missing}, extra={extra}."
         )
-    output_dir.mkdir(parents=True, exist_ok=True)
     for filename in LEGACY_TABLE_FILENAMES:
         (output_dir / filename).unlink(missing_ok=True)
     paths: dict[str, Path] = {}
@@ -347,7 +346,6 @@ def render_post_analysis_report(
 
     import matplotlib.pyplot as plt
 
-    pdf_path.parent.mkdir(parents=True, exist_ok=True)
     with PdfPages(pdf_path) as report:
         figure, _ = plot_pipls_decomposition(
             factors,

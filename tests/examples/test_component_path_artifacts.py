@@ -152,12 +152,12 @@ def test_real_data_examples_use_two_stage_comparison_workflow() -> None:
         text = path.read_text(encoding="utf-8")
         assert "component_path_results_" in text
         assert "refit=False" in text
-        assert "PLS_COMPONENT_PATH_CSV" in text
+        assert "PLS_PATH_CSV" in text
         assert "from _support.pls_component_path import evaluate_pls_component_path" in text
         assert "from _support.plot_component_path import plot_component_path" in text
         assert "evaluate_pls_component_path(" in text
         assert "plot_component_path(" in text
-        assert 'pd.read_csv(COMPONENT_PATH_CSV).set_index("n_components")' in text
+        assert 'pipls_path.set_index("n_components")' in text
         assert "predictor_rank=chosen_predictor_rank" in text
         assert "subprocess" not in text
         assert "best_params_" not in text

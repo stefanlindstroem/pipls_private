@@ -164,24 +164,19 @@ def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
     )
 
     assert "CHOSEN_N_COMPONENTS = 3" in text
-    assert "CHOSEN_PLS_N_COMPONENTS" not in text
     assert "from sklearn.cross_decomposition import PLSRegression" not in text
-    assert "SCORE_COMPONENTS = (1, 2)" in text
-    assert "BIPLOT_COMPONENTS = (1, 2)" in text
-    assert "LOADING_COMPONENTS = (1, 2, 3)" in text
-    assert "predictor_names = X.columns.astype(str).tolist()" in text
-    assert "response_names = Y.columns.astype(str).tolist()" in text
+    assert "X.columns.tolist()" in text
+    assert "Y.columns.tolist()" in text
     assert "fixed_model_oof_predictions(" in text
-    assert 'prediction_kind = "selection-conditioned OOF predictions"' in text
+    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
-    assert "biplot_components=BIPLOT_COMPONENTS" in text
+    assert "biplot_components=(1, 2)" in text
+    assert "loading_components=(1, 2, 3)" in text
     assert "POST_ANALYSIS_DIR" in text
-    assert "POST_ANALYSIS_PDF" in text
     assert 'prediction_kind="fitted values"' not in text
     assert "subprocess" not in text
-
 
 def test_post_analysis_report_supports_an_explicit_physical_predictor_axis(
     tmp_path: Path,
@@ -301,26 +296,22 @@ def test_sugarcane_example_contains_complete_spectral_post_analysis() -> None:
     )
 
     assert "CHOSEN_N_COMPONENTS = 2" in text
-    assert "CHOSEN_PLS_N_COMPONENTS" not in text
     assert "from sklearn.cross_decomposition import PLSRegression" not in text
-    assert "SCORE_COMPONENTS = (1, 2)" in text
-    assert "LOADING_COMPONENTS = (1, 2)" in text
-    assert 'COEFFICIENT_RESPONSES = ("TS", "CP", "ADF", "IVOMD")' in text
-    assert "predictor_names = X.columns.astype(str).tolist()" in text
-    assert "response_names = Y.columns.astype(str).tolist()" in text
-    assert "wavelength_nm = X.columns.to_numpy(dtype=np.float64)" in text
+    assert "X.columns.tolist()" in text
+    assert "Y.columns.tolist()" in text
+    assert "X.columns.to_numpy(dtype=float)" in text
     assert 'predictor_style="line"' in text
     assert 'predictor_axis_label="Wavelength (nm)"' in text
+    assert "loading_components=(1, 2)" in text
+    assert 'coefficient_responses=("TS", "CP", "ADF", "IVOMD")' in text
     assert "fixed_model_oof_predictions(" in text
-    assert 'prediction_kind = "selection-conditioned OOF predictions"' in text
+    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
     assert "POST_ANALYSIS_DIR" in text
-    assert "POST_ANALYSIS_PDF" in text
     assert "biplot_components" not in text
     assert "subprocess" not in text
-
 
 def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     text = (_repository_root() / "examples" / "12_tobacco_real_data.py").read_text(
@@ -328,25 +319,20 @@ def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     )
 
     assert "CHOSEN_N_COMPONENTS = 8" in text
-    assert "CHOSEN_PLS_N_COMPONENTS" not in text
     assert "from sklearn.cross_decomposition import PLSRegression" not in text
-    assert "SCORE_COMPONENTS = (1, 2)" in text
-    assert "LOADING_COMPONENTS = (1, 2, 3, 4)" in text
-    assert "RESPONSE_PAGE_SIZE = 5" in text
-    assert "predictor_names = X.columns.astype(str).tolist()" in text
-    assert "response_names = Y.columns.astype(str).tolist()" in text
-    assert "wavenumber_cm_inverse = X.columns.to_numpy(dtype=np.float64)" in text
-    assert "np.all(np.diff(wavenumber_cm_inverse) < 0.0)" in text
+    assert "X.columns.tolist()" in text
+    assert "Y.columns.tolist()" in text
+    assert "X.columns.to_numpy(dtype=float)" in text
     assert 'predictor_style="line"' in text
     assert 'predictor_axis_label="Wavenumber (cm$^{-1}$)"' in text
+    assert "loading_components=(1, 2, 3, 4)" in text
     assert "response_pages=response_pages" in text
-    assert "observation_diagnostics(pipls_model, X)" in text
+    assert "observation_diagnostics(model, X)" in text
     assert "fixed_model_oof_predictions(" in text
-    assert 'prediction_kind = "selection-conditioned OOF predictions"' in text
+    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
     assert "POST_ANALYSIS_DIR" in text
-    assert "POST_ANALYSIS_PDF" in text
     assert "biplot_components" not in text
     assert "subprocess" not in text

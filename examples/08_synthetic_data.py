@@ -16,6 +16,5 @@ train, test = make_pipls_train_test(
     random_state=0,
 )
 
-model = PiPLSRegression(n_components=2, predictor_rank=4).fit(train.X, train.Y)
-print(model.score(test.X, test.Y))
-print(train.truth.n_shared if train.truth is not None else None)
+print(PiPLSRegression(n_components=2, predictor_rank=4).fit(train.X, train.Y).score(test.X, test.Y))
+print(train.truth.n_shared)
