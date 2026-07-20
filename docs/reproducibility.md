@@ -33,14 +33,16 @@ after pulling dependency changes into an existing virtual environment.
 
 ## Documentation reproducibility
 
-Install the dedicated documentation dependencies and build the strict site from a checkout with:
+Install the dedicated documentation dependencies and build or preview the site from a checkout:
 
 ```bash
 python -m pip install -e ".[docs]"
 make docs
+make docs-serve
 ```
 
-The stronger distribution check is:
+The preview is served at `http://127.0.0.1:8000/` and updates as documentation files change. Stop it
+with `Ctrl+C`. The stronger distribution check is:
 
 ```bash
 make docs-dist

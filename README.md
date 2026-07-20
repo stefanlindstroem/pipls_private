@@ -32,6 +32,14 @@ After pulling a change that adds dependencies, refresh the active development en
 python -m pip install -e ".[dev]"
 ```
 
+The Makefile is the command index for repository work. Run:
+
+```bash
+make help
+```
+
+to list the maintained targets and their purpose.
+
 For an examples environment, install the data-reading and plotting dependencies with:
 
 ```bash
@@ -297,14 +305,17 @@ See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchma
 
 ## Documentation
 
-Build the documentation locally with:
+Install the documentation dependencies once, then either build or preview the site:
 
 ```bash
 python -m pip install -e ".[docs]"
 make docs
+make docs-serve
 ```
 
-The strict MkDocs build writes the generated site to `site/`. To verify that the same site can
+`make docs-serve` prints and serves the documentation at `http://127.0.0.1:8000/`; stop the local
+server with `Ctrl+C`. The strict `make docs` build writes the generated site to `site/`. To verify
+that the same site can
 be built from the shipped source distribution, run:
 
 ```bash

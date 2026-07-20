@@ -148,6 +148,59 @@ def test_make_docs_is_strict_and_generated_site_is_ignored() -> None:
     assert "site/" in (root / ".gitignore").read_text(encoding="utf-8").splitlines()
 
 
+def test_make_help_and_documentation_preview_are_discoverable() -> None:
+    root = _repository_root()
+    makefile = (root / "Makefile").read_text(encoding="utf-8")
+    help_output = subprocess.run(
+        ["make", "help"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    default_output = subprocess.run(
+        ["make"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    preview = subprocess.run(
+        ["make", "-n", "docs-serve"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+
+    public_targets = {
+        "help",
+        "install",
+        "test",
+        "lint",
+        "format",
+        "typecheck",
+        "docs",
+        "docs-serve",
+        "docs-dist",
+        "build",
+        "check",
+        "examples",
+        "snapshot",
+        "clean",
+    }
+
+    assert ".DEFAULT_GOAL := help" in makefile
+    assert "Usage: make <target>" in help_output
+    assert "Usage: make <target>" in default_output
+    assert public_targets <= set(
+        re.findall(r"^([A-Za-z0-9_.-]+):.*## .+$", makefile, re.MULTILINE)
+    )
+    assert all(target in help_output for target in public_targets)
+    assert "-m mkdocs serve --dev-addr=127.0.0.1:8000" in preview
+    assert "http://127.0.0.1:8000/" in preview
+
+
 def test_documentation_distribution_target_uses_the_validation_helper() -> None:
     root = _repository_root()
     completed = subprocess.run(

@@ -8,7 +8,7 @@ lightweight validation benchmarks, tests, packaging, or release maintenance. Pap
 pipelines, complete publication grids, manuscript tables, and paper-only comparator workflows
 belong in downstream reproduction repositories.
 
-Before submitting a patch, run:
+Run `make help` to see the maintained repository commands. Before submitting a patch, run:
 
 ```bash
 make check
@@ -17,8 +17,10 @@ make check
 Run `make examples` when changing executable example behavior, example artifacts, or the
 application-facing workflow. This target intentionally runs every numbered example, including the
 slower Tobacco analysis. Run `make docs` after installing `.[docs]` when changing public
-documentation, navigation, or docstrings. Run `make docs-dist` when changing documentation
-packaging, documentation dependencies, `MANIFEST.in`, or the source-distribution boundary. Run
+documentation, navigation, or docstrings. Use `make docs-serve` for a live local preview; it
+serves `http://127.0.0.1:8000/` until stopped with `Ctrl+C`. Run `make docs-dist` when changing
+documentation packaging, documentation dependencies, `MANIFEST.in`, or the source-distribution
+boundary. Run
 `make build` when changing packaging, dependencies, included data, or public modules.
 
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.

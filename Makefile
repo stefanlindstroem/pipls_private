@@ -3,44 +3,54 @@ EXAMPLE_SCRIPTS := $(sort $(wildcard examples/[0-9][0-9]_*.py))
 EXAMPLE_ENV := PYTHONPATH=src MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 	MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1
 
-.PHONY: install test lint format typecheck docs docs-dist build check examples snapshot clean
+.DEFAULT_GOAL := help
 
-install:
+.PHONY: help install test lint format typecheck docs docs-serve docs-dist build check examples snapshot clean
+
+help: ## Show the available Make targets.
+	@printf 'Usage: make <target>\n\nAvailable targets:\n'
+	@awk 'BEGIN {FS = ":.*## "} /^[A-Za-z0-9_.-]+:.*## / {printf "  %-12s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+install: ## Install the editable package with development dependencies.
 	$(PYTHON) -m pip install -e ".[dev]"
 
-test:
+test: ## Run the test suite.
 	PYTHONPATH=src $(PYTHON) -m pytest -q
 
-lint:
+lint: ## Run Ruff lint checks.
 	$(PYTHON) -m ruff check src tests benchmarks examples tools
 
-format:
+format: ## Format Python files with Ruff.
 	$(PYTHON) -m ruff format src tests benchmarks examples tools
 
-typecheck:
+typecheck: ## Run strict mypy checks.
 	$(PYTHON) -m mypy src
 
-docs:
+docs: ## Build the strict documentation site.
 	$(PYTHON) -m mkdocs build --strict
 
-docs-dist:
+docs-serve: ## Preview documentation at http://127.0.0.1:8000/.
+	@printf 'Documentation preview: http://127.0.0.1:8000/ (stop with Ctrl+C)\n'
+	$(PYTHON) -m mkdocs serve --dev-addr=127.0.0.1:8000
+
+docs-dist: ## Verify documentation from a clean source distribution.
 	$(PYTHON) tools/check_sdist_docs.py
 
-build:
+build: ## Build the wheel and source distribution.
 	$(PYTHON) -m build
 
-check: test lint typecheck
+check: test lint typecheck ## Run tests, lint, and type checks.
 
-examples:
+examples: ## Run all numbered examples.
 	@set -e; for example in $(EXAMPLE_SCRIPTS); do \
 		printf '==> %s\n' "$$example"; \
 		$(EXAMPLE_ENV) $(PYTHON) "$$example"; \
 	done
 
-snapshot:
+snapshot: ## Create an uploadable repository snapshot.
 	./.llm/snapshot.sh
 
-clean:
+clean: ## Remove generated files and caches.
 	rm -rf build dist site benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
 	find examples/results -type f ! -name .gitkeep -delete
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +

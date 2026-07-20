@@ -56,7 +56,10 @@
   documentation pages instead.
 - User guides describe implemented theory and behavior. Do not preserve rejected or unused options
   merely because they appeared in design discussions.
-- Build public documentation with the dedicated `docs` dependency extra and `make docs`. The build
+- Keep repository commands discoverable through the self-documenting Makefile. `make` and
+  `make help` list the maintained targets; each public target carries one `##` description.
+- Build public documentation with the dedicated `docs` dependency extra and `make docs`. Use
+  `make docs-serve` for a live local preview at `http://127.0.0.1:8000/`. The build
   is strict: navigation, internal links, anchors, mathematics support, and generated API targets must
   remain warning-free. Core generated pages use explicit public objects and source docstrings; do not
   expose private modules or inherited implementation machinery by broad module expansion. Never commit

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add a self-documenting Make interface: `make` and `make help` list the maintained targets, and
+  `make docs-serve` provides a memorable live documentation preview at
+  `http://127.0.0.1:8000/`.
 - Validate the strict documentation site in CI from both the repository checkout and a clean
   installation of the unpacked source distribution; ship the MkDocs configuration, Makefile, and
   validation helper; and exclude generated `site/` output from repository snapshots.
