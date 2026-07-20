@@ -126,7 +126,7 @@ def test_make_docs_is_strict_and_generated_site_is_ignored() -> None:
     )
 
     assert "-m mkdocs build --strict" in completed.stdout
-    assert "site" in clean.stdout.splitlines()[0].split()
+    assert "site" in clean.stdout.split()
     assert "site/" in (root / ".gitignore").read_text(encoding="utf-8").splitlines()
 
 
