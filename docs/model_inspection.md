@@ -272,53 +272,73 @@ The plotting names remain in their own submodule:
 
 ```python
 from pipls.plotting import (
-    plot_pipls_decomposition,
     plot_biplot,
     plot_coefficients,
     plot_observation_diagnostics,
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
+    plot_prediction_diagnostics,
     plot_scores,
     plot_x_loadings,
     plot_y_loadings,
-    plot_prediction_diagnostics,
 )
 ```
 
-`plot_pipls_decomposition()` places all requested zero-based components on three shared axes:
-predictor directions $P_{:k}$, weighted response directions $d_kq_{:k}$, and dilation values. For a
-small scalar predictor set, component bars are grouped side by side within each named variable:
+The Pi-PLS factorization is $P D Q^{\mathsf T}$. Four separate plotting functions display the
+predictor directions $P$, dilation values $d_k=D_{kk}$, response directions $Q$, and weighted
+response directions $QD$. Each function draws one chart on one axis. The caller decides whether to
+use them separately or in a panel:
 
 ```python
-factor_figure, factor_axes = plot_pipls_decomposition(
+import matplotlib.pyplot as plt
+
+factor_figure, factor_axes = plt.subplots(2, 2, figsize=(12, 9), layout="constrained")
+plot_pipls_predictor_directions(
     factors,
     predictor_style="bar",
     predictor_names=feature_names,
+    components=[0, 1],
+    ax=factor_axes[0, 0],
+)
+plot_pipls_dilation(factors, components=[0, 1], ax=factor_axes[0, 1])
+plot_pipls_response_directions(
+    factors,
     response_names=target_names,
     components=[0, 1],
+    ax=factor_axes[1, 0],
 )
+plot_pipls_weighted_response_directions(
+    factors,
+    response_names=target_names,
+    components=[0, 1],
+    ax=factor_axes[1, 1],
+)
+for axis in (factor_axes[0, 0], factor_axes[1, 0], factor_axes[1, 1]):
+    axis.legend(title="Component")
+factor_figure.suptitle("Pi-PLS factors")
 ```
 
-For an ordered physical coordinate, choose line rendering explicitly:
+For an ordered physical predictor coordinate, use line rendering for $P$:
 
 ```python
-factor_figure, factor_axes = plot_pipls_decomposition(
+predictor_figure, predictor_axis = plot_pipls_predictor_directions(
     factors,
     predictor_style="line",
     predictor_axis=wavelength_nm,
     predictor_axis_label="Wavelength (nm)",
-    response_names=target_names,
 )
+predictor_axis.legend(title="Component")
 ```
 
-The supplied coordinate order is preserved, including decreasing wavenumber axes, and selected
-components are overlaid as separate labeled lines. The function does not smooth, interpolate,
-reorder, or infer a spectral representation.
+The supplied coordinate order is preserved, including decreasing wavenumber axes. The function does
+not smooth, interpolate, reorder, or infer a spectral representation. Categorical plots require the
+caller to supply predictor or response names.
 
-Categorical plots require the caller to supply predictor and response names. The Pulp, Sugarcane,
-and Tobacco post-analysis examples read those names from `X.csv` and `Y.csv`; the package itself
-remains agnostic about whether labels originated in file headers or another metadata source.
-
-`plot_prediction_diagnostics()` renders standardized observed versus predicted responses,
-standardized residuals versus standardized predictions, and response-wise standardized RMSE:
+`plot_prediction_diagnostics()` remains a temporary composite function. It renders standardized
+observed versus predicted responses, standardized residuals versus standardized predictions, and
+response-wise standardized RMSE:
 
 ```python
 prediction_figure, prediction_axes = plot_prediction_diagnostics(
@@ -328,12 +348,11 @@ prediction_figure, prediction_axes = plot_prediction_diagnostics(
 )
 ```
 
-The prediction provenance stored in `diagnostics.prediction_kind` is always included in the figure
-title. The two current composite functions return `(figure, axes)`, where `axes` is a dictionary
-with stable semantic names. They will be replaced by single-chart functions in the next plotting
-increments. No plotting function calls `show()`, saves files, retains estimators, or modifies
-supplied arrays. Importing `pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is
-loaded only when a plotting function is called.
+The prediction provenance stored in `diagnostics.prediction_kind` is included in the figure title.
+This composite will be split into single-chart functions in the next plotting increment. No plotting
+function calls `show()`, saves files, retains estimators, or modifies supplied arrays. Importing
+`pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is loaded only when a plotting
+function is called.
 
 Raw PLS-family observation diagnostics use a separate result object:
 
@@ -425,7 +444,7 @@ the package inspection and plotting APIs together with example-owned I/O. It der
 response names visibly from the Pulp CSV headers, reads fixed component choices from the canonical
 path artifacts, and clones the fixed Pi-PLS estimator
 inside the same five non-shuffled folds, writes seven long-form CSV files under
-`examples/results/pulp_post_analysis/`, rereads them, and constructs one seven-page PDF, including the Pulp biplot. The OOF
+`examples/results/pulp_post_analysis/`, rereads them, and constructs one multipage PDF, including a caller-composed $P$/$D$/$Q$/$QD$ factor page and the Pulp biplot. The OOF
 predictions are labeled `selection-conditioned OOF predictions` because the fixed parameters were
 chosen after examining paths computed from the same observations.
 

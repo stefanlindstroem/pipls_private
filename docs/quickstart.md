@@ -16,11 +16,17 @@ Then run:
 ```python
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from pipls import PiPLSRegression
 from pipls.inspection import pipls_display_factors
-from pipls.plotting import plot_pipls_decomposition
+from pipls.plotting import (
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
+)
 
 X = np.array(
     [
@@ -53,13 +59,30 @@ response_names = ["Yield", "Purity"]
 model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
 Y_fitted = model.predict(X)
 
-figure, _ = plot_pipls_decomposition(
-    pipls_display_factors(model.decomposition_),
+factors = pipls_display_factors(model.decomposition_)
+figure, axes = plt.subplots(2, 2, figsize=(11, 8), layout="constrained")
+plot_pipls_predictor_directions(
+    factors,
     predictor_style="bar",
     predictor_names=predictor_names,
-    response_names=response_names,
+    ax=axes[0, 0],
 )
+plot_pipls_dilation(factors, ax=axes[0, 1])
+plot_pipls_response_directions(
+    factors,
+    response_names=response_names,
+    ax=axes[1, 0],
+)
+plot_pipls_weighted_response_directions(
+    factors,
+    response_names=response_names,
+    ax=axes[1, 1],
+)
+for axis in (axes[0, 0], axes[1, 0], axes[1, 1]):
+    axis.legend(title="Component")
+figure.suptitle("Minimal Pi-PLS fit")
 figure.savefig(Path("minimal_fit.pdf"))
+plt.close(figure)
 ```
 
 `PiPLSRegression` follows the normal scikit-learn estimator pattern: constructor arguments describe
@@ -67,10 +90,10 @@ the model, `fit()` learns from `X` and `Y`, and `predict()` returns responses in
 response units. Here both ranks are fixed explicitly. The model does not run cross-validation
 internally.
 
-The plotting calls are separate from fitting. `pipls_display_factors()` creates an immutable display
-copy of the fitted latent factorization, and `plot_pipls_decomposition()` renders its paired
-predictor directions, response directions, and component strengths. The corresponding matrices
-form $P D Q^{\mathsf T}$; see the [theory overview](theory.md#diagonal-latent-coupling) for their
+The plotting calls are separate from fitting. `pipls_display_factors()` creates immutable display
+copies of $P$, $D$, $Q$, and $QD$. Each plotting function renders one factor quantity on one axis;
+the caller creates the panel, legends, figure title, and output file. The factorization is
+$P D Q^{\mathsf T}$; see the [theory overview](theory.md#diagonal-latent-coupling) for its
 construction. Matplotlib remains optional and the estimator retains no plotting state.
 
 The complete executable script is summarized in [`examples.md`](examples.md). Continue with:

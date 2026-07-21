@@ -54,7 +54,8 @@ post-analysis report.
 
 Inspection of $P$, $D$, $Q$, $QD$, and the identity $PDQ^\mathsf{T}$ is specific to Pi-PLS.
 These numerical and plotting names retain an explicit `pipls` marker, including
-`pipls_display_factors()` and `plot_pipls_decomposition()`.
+`pipls_display_factors()` and the Pi-PLS-specific factor plotters; Decision 0059 later replaced
+the original composite plotting function with separate $P$, $D$, $Q$, and $QD$ charts.
 
 The terminology remains predictor rotations or predictor directions for $P$, dilation values for
 $D$, and response rotations or dilation-weighted response directions for $Q$ and $QD$. These

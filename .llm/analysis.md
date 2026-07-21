@@ -90,17 +90,17 @@ carry labels, but the plotting function does not create a legend; callers and ex
 creation, placement, and styling. Callers also own subplot grids, mosaics, figure-level titles,
 layout adjustment, file writing, display, and closing.
 
-The existing `plot_pipls_decomposition()` and `plot_prediction_diagnostics()` remain temporary
-composite exceptions while their callers are migrated. They must be replaced by atomic functions
-before the first release. Plotting functions do not call `show()`, write files, retain models, or
-change supplied arrays. The names remain under `pipls.plotting`; they are not added automatically
-to `pipls.__all__`.
+Decision 0059 replaces the Pi-PLS decomposition composite with separate one-axis plots for $P$,
+$D$, $Q$, and $QD$. `plot_prediction_diagnostics()` remains the sole temporary composite exception
+and must be replaced before the first release. Plotting functions do not call `show()`, write files,
+retain models, or change supplied arrays. The names remain under `pipls.plotting`; they are not
+added automatically to `pipls.__all__`.
 
 ### `examples/`
 
 `examples/01_minimal_fit_and_plot.py` is the primary onboarding path: literal NumPy matrices, one
-fixed fit, one prediction call, and one decomposition plot. It must not depend on the complete
-workflow helpers, pandas, cross-validation, or parameter selection.
+fixed fit, one prediction call, and one caller-composed panel of the four Pi-PLS factor plots. It
+must not depend on the complete workflow helpers, pandas, cross-validation, or parameter selection.
 
 The complete real-data examples own scientific orchestration:
 

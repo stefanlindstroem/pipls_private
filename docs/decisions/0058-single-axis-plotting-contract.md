@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented for the existing single-chart plotting functions. The two composite
-plotters remain temporary migration targets.
+Accepted and implemented. Decision 0059 applies the contract to the Pi-PLS factor plots; the
+prediction-diagnostic composite remains a temporary migration target.
 
 ## Context
 
@@ -28,8 +28,8 @@ should decide whether those charts appear alone, in a panel, or in a multipage r
   creation, placement, and styling.
 - Callers own subplot grids, mosaics, figure-level titles, layout adjustment, saving, display, and
   closing.
-- `plot_pipls_decomposition()` and `plot_prediction_diagnostics()` remain temporary composite
-  exceptions. They must be replaced by single-chart functions before the first release.
+- `plot_prediction_diagnostics()` remains a temporary composite exception. It must be replaced by
+  single-chart functions before the first release.
 
 This contract is implemented first for `plot_scores()`, `plot_x_loadings()`, `plot_y_loadings()`,
 `plot_coefficients()`, `plot_biplot()`, and `plot_observation_diagnostics()`.
@@ -38,5 +38,5 @@ This contract is implemented first for `plot_scores()`, `plot_x_loadings()`, `pl
 
 The same plotting function can be used as a standalone convenience or embedded in a caller-owned
 panel. One-entry axis dictionaries disappear from the atomic API. The example layer adds legends
-explicitly and continues to own PDF writing and closing. The next plotting increment splits the
-Pi-PLS decomposition display into one function per factor quantity.
+explicitly and continues to own PDF writing and closing. Decision 0059 splits the Pi-PLS factor
+display into one function per factor quantity.

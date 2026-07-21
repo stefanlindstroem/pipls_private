@@ -468,9 +468,10 @@ Implementation order:
 4. migrate numbered examples and documentation so all tiled layouts are caller-owned and generated
    PDFs preserve their intended scientific groupings.
 
-Current status: **first increment complete**. The six existing atomic plotters accept `ax`, return a
-single axis, create no legends, and preserve standalone creation. The Pi-PLS decomposition and
-prediction-diagnostic composites remain temporary migration targets.
+Current status: **second increment complete**. The six shared plotters and four Pi-PLS factor
+plotters accept `ax`, return a single axis, create no legends, and preserve standalone creation. The
+minimal and real-data examples own the $P$/$D$/$Q$/$QD$ panels. The prediction-diagnostic composite
+remains the temporary migration target.
 
 ### Product documentation and release hardening
 
@@ -485,8 +486,8 @@ Current status: **release preparation follows plotting refinement**. Decisions 0
 establish the documentation boundary, Decisions 0054--0056 complete compatibility and
 installed-distribution validation, and Decision 0057 removes maintainer decisions from the served
 site while making the method and its component-selection workflow understandable before specialized
-terminology appears. Decision 0058 begins the final plotting-API correction required before the
-initial version is chosen.
+terminology appears. Decisions 0058 and 0059 establish atomic plotting composition and the Pi-PLS
+factor surface; prediction diagnostics remain to be split before the initial version is chosen.
 
 ### Current standardization and deferred block-aware variants
 
@@ -537,8 +538,9 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Replace `plot_pipls_decomposition()` with atomic $P$, $D$, $Q$, and $QD$ plotters, then migrate the
-minimal and real-data examples to compose those charts in caller-owned Matplotlib panels.
+Replace `plot_prediction_diagnostics()` with atomic observed-versus-predicted,
+residual-versus-predicted, and standardized-RMSE plotters, then migrate its callers to compose those
+charts in caller-owned Matplotlib panels.
 
 ## Maintenance protocol
 

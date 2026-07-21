@@ -2,11 +2,17 @@
 
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from pipls import PiPLSRegression
 from pipls.inspection import pipls_display_factors
-from pipls.plotting import plot_pipls_decomposition
+from pipls.plotting import (
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
+)
 
 X = np.array(
     [
@@ -36,11 +42,28 @@ Y = np.array(
 model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
 print(model.predict(X))
 
-figure, _ = plot_pipls_decomposition(
-    pipls_display_factors(model.decomposition_),
+factors = pipls_display_factors(model.decomposition_)
+figure, axes = plt.subplots(2, 2, figsize=(11.0, 8.0), layout="constrained")
+plot_pipls_predictor_directions(
+    factors,
     predictor_style="bar",
     predictor_names=["Temperature", "Pressure", "Flow rate"],
-    response_names=["Yield", "Purity"],
-    title="Minimal Pi-PLS fit",
+    ax=axes[0, 0],
 )
+plot_pipls_dilation(factors, ax=axes[0, 1])
+plot_pipls_response_directions(
+    factors,
+    response_names=["Yield", "Purity"],
+    ax=axes[1, 0],
+)
+plot_pipls_weighted_response_directions(
+    factors,
+    response_names=["Yield", "Purity"],
+    ax=axes[1, 1],
+)
+axes[0, 0].legend(title="Component")
+axes[1, 0].legend(title="Component")
+axes[1, 1].legend(title="Component")
+figure.suptitle("Minimal Pi-PLS fit")
 figure.savefig(Path(__file__).resolve().parent / "results" / "minimal_fit_and_plot.pdf")
+plt.close(figure)

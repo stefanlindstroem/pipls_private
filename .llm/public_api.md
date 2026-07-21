@@ -220,7 +220,10 @@ $TP^\mathsf{T}$ reconstruction.
 ```python
 from pipls.plotting import (
     PredictorStyle,
-    plot_pipls_decomposition,
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
     plot_biplot,
     plot_coefficients,
     plot_observation_diagnostics,
@@ -238,13 +241,16 @@ clearing it, resizing its figure, or creating another figure. Supplying both `ax
 error. The functions provide concise semantic axis labels and titles that callers may replace.
 Multi-series artists carry labels, but legends are caller-owned and are not created automatically.
 
-`plot_pipls_decomposition()` accepts `PiPLSDisplayFactors`, an explicit `"bar"` or `"line"`
-predictor style, optional zero-based component indices, and caller-supplied scientific labels or a
-physical predictor coordinate. It temporarily retains shared `predictor_directions`,
-`weighted_response_directions`, and `dilation` axes. `plot_prediction_diagnostics()` temporarily
-retains named observed-versus-predicted, residual, and RMSE axes and includes the stored prediction
-provenance in the title. These two composite functions are migration targets and must be replaced by
-single-chart functions before the first release.
+The Pi-PLS-specific functions accept `PiPLSDisplayFactors` and render one factor quantity each:
+`plot_pipls_predictor_directions()` for $P$, `plot_pipls_dilation()` for $D$,
+`plot_pipls_response_directions()` for $Q$, and
+`plot_pipls_weighted_response_directions()` for $QD$. Predictor directions require an explicit
+`"bar"` or `"line"` style and caller-supplied labels or a physical predictor coordinate. Response
+plots require caller-supplied response names. All component subsets use zero-based indices.
+
+`plot_prediction_diagnostics()` temporarily retains named observed-versus-predicted, residual, and
+RMSE axes and includes the stored prediction provenance in the title. It is the remaining composite
+migration target and must be replaced by single-chart functions before the first release.
 
 `plot_scores()` renders exactly two selected X-score columns. X and Y loadings place selected
 components together on one axis; coefficient plots place selected responses together on one axis.

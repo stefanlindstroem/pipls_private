@@ -73,3 +73,4 @@ reference describe the current public behavior directly.
 - [0056: installed-distribution validation](0056-installed-distribution-validation.md)
 - [0057: public documentation entry](0057-public-documentation-entry.md)
 - [0058: single-axis plotting contract](0058-single-axis-plotting-contract.md)
+- [0059: atomic Pi-PLS factor plots](0059-atomic-pipls-factor-plots.md)

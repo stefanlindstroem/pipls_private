@@ -64,6 +64,7 @@ This index is navigation, not a substitute for those records.
 | `0056-installed-distribution-validation.md` | installed release-artifact validation | build once, then verify clean wheel and source-distribution installations with one shared public smoke test |
 | `0057-public-documentation-entry.md` | public documentation entry and maintainer-record boundary | exclude decisions from the served site, define latent-variable selection before jargon, and keep compatibility concise |
 | `0058-single-axis-plotting-contract.md` | reusable plotting composition | one chart per public plotter, optional caller-supplied axes, caller-owned legends and panel layout |
+| `0059-atomic-pipls-factor-plots.md` | Pi-PLS factor plotting surface | separate one-axis $P$, $D$, $Q$, and $QD$ plots; caller-owned factor panels |
 
 ## Implemented estimator/search transition
 

@@ -32,7 +32,10 @@ __all__ = [
     "plot_scores",
     "plot_x_loadings",
     "plot_y_loadings",
-    "plot_pipls_decomposition",
+    "plot_pipls_dilation",
+    "plot_pipls_predictor_directions",
+    "plot_pipls_response_directions",
+    "plot_pipls_weighted_response_directions",
     "plot_prediction_diagnostics",
 ]
 
@@ -539,23 +542,23 @@ def plot_coefficients(
     return figure, axis
 
 
-def plot_pipls_decomposition(
+def plot_pipls_predictor_directions(
     factors: PiPLSDisplayFactors,
     *,
     predictor_style: PredictorStyle,
     predictor_names: Sequence[object] | None = None,
-    response_names: Sequence[object] | None = None,
     predictor_axis: ArrayLike | None = None,
     predictor_axis_label: str | None = None,
     components: Sequence[int] | None = None,
-    title: str = "Pi-PLS decomposition",
+    title: str = "Pi-PLS predictor directions",
     figsize: tuple[float, float] | None = None,
-) -> tuple[Figure, dict[str, Axes]]:
-    r"""Plot selected display copies of $P$, $D$, and $QD$.
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot selected columns of the Pi-PLS predictor-direction matrix $P$.
 
-    Bar rendering groups components for named predictors and responses. Line
-    rendering overlays predictor directions on a caller-supplied physical
-    coordinate.
+    Bar rendering groups components for named predictors. Line rendering
+    overlays predictor directions on a caller-supplied physical coordinate.
+    The function labels component artists but does not create a legend.
 
     Parameters
     ----------
@@ -565,35 +568,31 @@ def plot_pipls_decomposition(
         Rendering mode for predictor directions.
     predictor_names : sequence of object or None, default=None
         Required predictor labels for bar rendering.
-    response_names : sequence of object
-        Required labels for all responses.
     predictor_axis : array-like of shape (n_features,) or None, default=None
         Required physical coordinate for line rendering.
     predictor_axis_label : str or None, default=None
         Required coordinate label for line rendering.
     components : sequence of int or None, default=None
         Zero-based components to display; ``None`` displays all components.
-    title : str, default="Pi-PLS decomposition"
-        Figure title.
+    title : str, default="Pi-PLS predictor directions"
+        Axis title.
     figsize : tuple of float or None, default=None
-        Matplotlib figure size.
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mappings named ``"predictor_directions"``,
-        ``"weighted_response_directions"``, and ``"dilation"``.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
 
-    if not isinstance(factors, PiPLSDisplayFactors):
-        raise TypeError("factors must be a PiPLSDisplayFactors instance.")
-    selected = _indices(
-        components,
-        size=factors.n_components,
-        name="components",
-    )
+    _require_pipls_display_factors(factors)
+    selected = _indices(components, size=factors.n_components, name="components")
     style = _predictor_style(predictor_style)
     feature_labels = _categorical_labels(
         predictor_names,
@@ -601,6 +600,214 @@ def plot_pipls_decomposition(
         argument_name="predictor_names",
         required=style == "bar",
     )
+    coordinate = _predictor_coordinate(
+        predictor_axis,
+        size=factors.n_features,
+        style=style,
+        axis_label=predictor_axis_label,
+    )
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=_single_axis_figsize(factors.n_features, style=style),
+    )
+
+    selected_array = np.array(selected, dtype=np.int64)
+    values = factors.predictor_directions[:, selected_array]
+    component_labels = _component_labels(selected)
+    if style == "bar":
+        assert feature_labels is not None
+        _grouped_bars(
+            axis,
+            values,
+            category_labels=feature_labels,
+            series_labels=component_labels,
+        )
+        axis.set_xlabel("Predictor")
+    else:
+        assert coordinate is not None
+        _overlay_lines(
+            axis,
+            coordinate,
+            values,
+            series_labels=component_labels,
+        )
+        axis.set_xlabel(str(predictor_axis_label))
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_ylabel("Predictor direction $P_{:k}$")
+    axis.set_title(title)
+    return figure, axis
+
+
+def plot_pipls_dilation(
+    factors: PiPLSDisplayFactors,
+    *,
+    components: Sequence[int] | None = None,
+    title: str = "Pi-PLS dilation",
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot selected diagonal entries $d_k=D_{kk}$ of the Pi-PLS matrix $D$.
+
+    Parameters
+    ----------
+    factors : pipls.inspection.PiPLSDisplayFactors
+        Display-oriented Pi-PLS factors.
+    components : sequence of int or None, default=None
+        Zero-based components to display; ``None`` displays all components.
+    title : str, default="Pi-PLS dilation"
+        Axis title.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
+    """
+
+    _require_pipls_display_factors(factors)
+    selected = _indices(components, size=factors.n_components, name="components")
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=(6.4, 4.8),
+    )
+
+    selected_array = np.array(selected, dtype=np.int64)
+    positions = np.arange(len(selected), dtype=np.int64)
+    axis.bar(positions, factors.dilation[selected_array])
+    axis.set_xticks(positions)
+    axis.set_xticklabels(_component_labels(selected))
+    axis.set_xlabel("Component")
+    axis.set_ylabel("Dilation $d_k$")
+    axis.set_title(title)
+    return figure, axis
+
+
+def plot_pipls_response_directions(
+    factors: PiPLSDisplayFactors,
+    *,
+    response_names: Sequence[object] | None = None,
+    components: Sequence[int] | None = None,
+    title: str = "Pi-PLS response directions",
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot selected columns of the Pi-PLS response-direction matrix $Q$.
+
+    Component artists are labeled, but the function does not create a legend.
+
+    Parameters
+    ----------
+    factors : pipls.inspection.PiPLSDisplayFactors
+        Display-oriented Pi-PLS factors.
+    response_names : sequence of object
+        Required labels for all responses.
+    components : sequence of int or None, default=None
+        Zero-based components to display; ``None`` displays all components.
+    title : str, default="Pi-PLS response directions"
+        Axis title.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
+    """
+
+    _require_pipls_display_factors(factors)
+    return _plot_pipls_response_factor(
+        factors,
+        values=factors.response_directions,
+        response_names=response_names,
+        components=components,
+        title=title,
+        ylabel="Response direction $q_{:k}$",
+        figsize=figsize,
+        ax=ax,
+    )
+
+
+def plot_pipls_weighted_response_directions(
+    factors: PiPLSDisplayFactors,
+    *,
+    response_names: Sequence[object] | None = None,
+    components: Sequence[int] | None = None,
+    title: str = "Pi-PLS weighted response directions",
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot selected columns of $QD$, namely $d_kq_{:k}$.
+
+    Component artists are labeled, but the function does not create a legend.
+
+    Parameters
+    ----------
+    factors : pipls.inspection.PiPLSDisplayFactors
+        Display-oriented Pi-PLS factors.
+    response_names : sequence of object
+        Required labels for all responses.
+    components : sequence of int or None, default=None
+        Zero-based components to display; ``None`` displays all components.
+    title : str, default="Pi-PLS weighted response directions"
+        Axis title.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
+    """
+
+    _require_pipls_display_factors(factors)
+    return _plot_pipls_response_factor(
+        factors,
+        values=factors.weighted_response_directions,
+        response_names=response_names,
+        components=components,
+        title=title,
+        ylabel="Weighted response direction $d_k q_{:k}$",
+        figsize=figsize,
+        ax=ax,
+    )
+
+
+def _plot_pipls_response_factor(
+    factors: PiPLSDisplayFactors,
+    *,
+    values: FloatArray,
+    response_names: Sequence[object] | None,
+    components: Sequence[int] | None,
+    title: str,
+    ylabel: str,
+    figsize: tuple[float, float] | None,
+    ax: Axes | None,
+) -> tuple[Figure | SubFigure, Axes]:
+    """Plot one response-side Pi-PLS factor matrix."""
+
+    _require_pipls_display_factors(factors)
+    selected = _indices(components, size=factors.n_components, name="components")
     target_labels = _categorical_labels(
         response_names,
         size=factors.n_targets,
@@ -608,76 +815,31 @@ def plot_pipls_decomposition(
         required=True,
     )
     assert target_labels is not None
-    coordinate = _predictor_coordinate(
-        predictor_axis,
-        size=factors.n_features,
-        style=style,
-        axis_label=predictor_axis_label,
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=_single_axis_figsize(factors.n_targets, style="bar"),
     )
-
-    plt = _pyplot()
-    if figsize is None:
-        width = max(
-            _single_axis_figsize(factors.n_features, style=style)[0],
-            _single_axis_figsize(factors.n_targets, style="bar")[0],
-        )
-        figsize = (width, 10.0)
-    figure, axis_array = plt.subplots(3, 1, figsize=figsize, layout="constrained")
-    predictor_ax, response_ax, dilation_ax = axis_array
-    axes: dict[str, Axes] = {
-        "predictor_directions": predictor_ax,
-        "weighted_response_directions": response_ax,
-        "dilation": dilation_ax,
-    }
 
     selected_array = np.array(selected, dtype=np.int64)
-    component_labels = _component_labels(selected)
-    predictor_values = factors.predictor_directions[:, selected_array]
-    if style == "bar":
-        assert feature_labels is not None
-        _grouped_bars(
-            predictor_ax,
-            predictor_values,
-            category_labels=feature_labels,
-            series_labels=component_labels,
-        )
-        predictor_ax.set_xlabel("Predictor")
-    else:
-        assert coordinate is not None
-        _overlay_lines(
-            predictor_ax,
-            coordinate,
-            predictor_values,
-            series_labels=component_labels,
-        )
-        predictor_ax.set_xlabel(str(predictor_axis_label))
-    predictor_ax.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    predictor_ax.set_ylabel("Predictor direction $P$")
-    predictor_ax.set_title("Predictor directions")
-    predictor_ax.legend(title="Component")
-
     _grouped_bars(
-        response_ax,
-        factors.weighted_response_directions[:, selected_array],
+        axis,
+        values[:, selected_array],
         category_labels=target_labels,
-        series_labels=component_labels,
+        series_labels=_component_labels(selected),
     )
-    response_ax.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    response_ax.set_xlabel("Response")
-    response_ax.set_ylabel("Weighted response direction $d_k q_{:k}$")
-    response_ax.set_title("Weighted response directions")
-    response_ax.legend(title="Component")
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xlabel("Response")
+    axis.set_ylabel(ylabel)
+    axis.set_title(title)
+    return figure, axis
 
-    component_numbers = selected_array + 1
-    dilation_ax.bar(component_numbers, factors.dilation[selected_array])
-    dilation_ax.set_xticks(component_numbers)
-    dilation_ax.set_xticklabels(component_labels)
-    dilation_ax.set_xlabel("Component")
-    dilation_ax.set_ylabel("Dilation $d_k$")
-    dilation_ax.set_title("Dilation")
 
-    figure.suptitle(title)
-    return figure, axes
+def _require_pipls_display_factors(factors: object) -> None:
+    """Validate one Pi-PLS display-factor input."""
+
+    if not isinstance(factors, PiPLSDisplayFactors):
+        raise TypeError("factors must be a PiPLSDisplayFactors instance.")
 
 
 def plot_prediction_diagnostics(

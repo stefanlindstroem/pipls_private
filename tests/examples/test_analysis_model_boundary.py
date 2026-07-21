@@ -96,7 +96,12 @@ def test_shared_public_analysis_names_are_estimator_neutral() -> None:
         "plot_x_loadings",
         "plot_y_loadings",
     }
-    pipls_specific_plotting = {"plot_pipls_decomposition"}
+    pipls_specific_plotting = {
+        "plot_pipls_dilation",
+        "plot_pipls_predictor_directions",
+        "plot_pipls_response_directions",
+        "plot_pipls_weighted_response_directions",
+    }
     assert set(plotting.__all__) == shared_plotting | pipls_specific_plotting
 
     for name in shared_inspection | shared_plotting:

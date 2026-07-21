@@ -15,7 +15,8 @@ intentionally more extensive than ordinary estimator use.
 ## Start here
 
 - `01_minimal_fit_and_plot.py`: literal NumPy matrices, one fixed `PiPLSRegression` fit, predictions,
-  and one Pi-PLS decomposition figure. It performs no cross-validation or parameter selection.
+  and one caller-composed panel of the $P$, $D$, $Q$, and $QD$ factor plots. It performs no
+  cross-validation or parameter selection.
 
 Run it with:
 

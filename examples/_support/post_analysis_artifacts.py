@@ -24,7 +24,10 @@ from pipls.plotting import (
     plot_biplot,
     plot_coefficients,
     plot_observation_diagnostics,
-    plot_pipls_decomposition,
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
     plot_prediction_diagnostics,
     plot_scores,
     plot_x_loadings,
@@ -48,9 +51,7 @@ LEGACY_TABLE_FILENAMES = (
     "pls_coefficients.csv",
     "pls_observation_diagnostics.csv",
 )
-REQUIRED_TABLE_NAMES = tuple(
-    name for name in TABLE_FILENAMES if name != "observation_diagnostics"
-)
+REQUIRED_TABLE_NAMES = tuple(name for name in TABLE_FILENAMES if name != "observation_diagnostics")
 TABLE_COLUMNS = {
     "pipls_predictor_directions": ("predictor", "component", "p", "component_sign"),
     "pipls_response_directions": (
@@ -109,16 +110,12 @@ def build_post_analysis_tables(
     if factors.n_targets != structure.n_targets:
         raise ValueError("Pi-PLS factors and latent structure must contain the same responses.")
     if diagnostics.n_samples != len(samples) or diagnostics.n_targets != len(responses):
-        raise ValueError(
-            "Prediction diagnostics must match the supplied samples and responses."
-        )
+        raise ValueError("Prediction diagnostics must match the supplied samples and responses.")
     if (
         observation_diagnostics_result is not None
         and observation_diagnostics_result.n_samples != len(samples)
     ):
-        raise ValueError(
-            "Observation diagnostics must match the supplied sample names."
-        )
+        raise ValueError("Observation diagnostics must match the supplied sample names.")
 
     predictor_rows: list[dict[str, Any]] = []
     for component in range(factors.n_components):
@@ -208,15 +205,9 @@ def build_post_analysis_tables(
         ),
         "predictions": pd.DataFrame(prediction_rows, columns=TABLE_COLUMNS["predictions"]),
         "x_scores": pd.DataFrame(score_rows, columns=TABLE_COLUMNS["x_scores"]),
-        "x_loadings": pd.DataFrame(
-            x_loading_rows, columns=TABLE_COLUMNS["x_loadings"]
-        ),
-        "y_loadings": pd.DataFrame(
-            y_loading_rows, columns=TABLE_COLUMNS["y_loadings"]
-        ),
-        "coefficients": pd.DataFrame(
-            coefficient_rows, columns=TABLE_COLUMNS["coefficients"]
-        ),
+        "x_loadings": pd.DataFrame(x_loading_rows, columns=TABLE_COLUMNS["x_loadings"]),
+        "y_loadings": pd.DataFrame(y_loading_rows, columns=TABLE_COLUMNS["y_loadings"]),
+        "coefficients": pd.DataFrame(coefficient_rows, columns=TABLE_COLUMNS["coefficients"]),
     }
     if observation_diagnostics_result is not None:
         tables["observation_diagnostics"] = pd.DataFrame(
@@ -242,8 +233,7 @@ def write_post_analysis_tables(
     extra = [name for name in tables if name not in TABLE_FILENAMES]
     if missing or extra:
         raise ValueError(
-            "Post-analysis tables differ from the contract: "
-            f"missing={missing}, extra={extra}."
+            f"Post-analysis tables differ from the contract: missing={missing}, extra={extra}."
         )
     for filename in LEGACY_TABLE_FILENAMES:
         (output_dir / filename).unlink(missing_ok=True)
@@ -256,9 +246,7 @@ def write_post_analysis_tables(
         table = tables[name]
         expected = TABLE_COLUMNS[name]
         if tuple(table.columns) != expected:
-            raise ValueError(
-                f"{name} columns must be {expected!r}; got {tuple(table.columns)!r}."
-            )
+            raise ValueError(f"{name} columns must be {expected!r}; got {tuple(table.columns)!r}.")
         if table.empty:
             raise ValueError(f"{name} must contain at least one row.")
         table.to_csv(path, index=False, float_format="%.17g")
@@ -338,24 +326,42 @@ def render_post_analysis_report(
         diagnostic_pages = (tuple(range(len(response_names))),)
     else:
         if coefficient_responses is not None:
-            raise ValueError(
-                "coefficient_responses and response_pages cannot both be supplied."
-            )
+            raise ValueError("coefficient_responses and response_pages cannot both be supplied.")
         coefficient_pages = pages
         diagnostic_pages = pages
 
     import matplotlib.pyplot as plt
 
     with PdfPages(pdf_path) as report:
-        figure, _ = plot_pipls_decomposition(
+        figure, axes = plt.subplots(
+            2,
+            2,
+            figsize=(12.0, 9.0),
+            layout="constrained",
+        )
+        plot_pipls_predictor_directions(
             factors,
             predictor_style=predictor_style,
             predictor_names=predictor_names,
-            response_names=response_names,
             predictor_axis=predictor_axis,
             predictor_axis_label=predictor_axis_label,
-            title=f"{dataset_name} Pi-PLS decomposition",
+            ax=axes[0, 0],
         )
+        plot_pipls_dilation(factors, ax=axes[0, 1])
+        plot_pipls_response_directions(
+            factors,
+            response_names=response_names,
+            ax=axes[1, 0],
+        )
+        plot_pipls_weighted_response_directions(
+            factors,
+            response_names=response_names,
+            ax=axes[1, 1],
+        )
+        axes[0, 0].legend(title="Component")
+        axes[1, 0].legend(title="Component")
+        axes[1, 1].legend(title="Component")
+        figure.suptitle(f"{dataset_name} Pi-PLS factors")
         report.savefig(figure)
         plt.close(figure)
 
@@ -728,7 +734,4 @@ def _response_pages(
         raise ValueError(
             "response_pages must partition response_names exactly once and in source order."
         )
-    return tuple(
-        tuple(response_names.index(value) for value in page)
-        for page in pages
-    )
+    return tuple(tuple(response_names.index(value) for value in page) for page in pages)

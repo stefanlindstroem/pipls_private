@@ -64,11 +64,17 @@ The shortest complete workflow uses literal NumPy matrices, one fixed fit, and o
 no cross-validation or parameter selection:
 
 ```python
+import matplotlib.pyplot as plt
 import numpy as np
 
 from pipls import PiPLSRegression
 from pipls.inspection import pipls_display_factors
-from pipls.plotting import plot_pipls_decomposition
+from pipls.plotting import (
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
+)
 
 X = np.array(
     [
@@ -98,12 +104,28 @@ Y = np.array(
 model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
 Y_fitted = model.predict(X)
 
-figure, _ = plot_pipls_decomposition(
-    pipls_display_factors(model.decomposition_),
+factors = pipls_display_factors(model.decomposition_)
+figure, axes = plt.subplots(2, 2, figsize=(11, 8), layout="constrained")
+plot_pipls_predictor_directions(
+    factors,
     predictor_style="bar",
     predictor_names=["Temperature", "Pressure", "Flow rate"],
-    response_names=["Yield", "Purity"],
+    ax=axes[0, 0],
 )
+plot_pipls_dilation(factors, ax=axes[0, 1])
+plot_pipls_response_directions(
+    factors,
+    response_names=["Yield", "Purity"],
+    ax=axes[1, 0],
+)
+plot_pipls_weighted_response_directions(
+    factors,
+    response_names=["Yield", "Purity"],
+    ax=axes[1, 1],
+)
+for axis in (axes[0, 0], axes[1, 0], axes[1, 1]):
+    axis.legend(title="Component")
+figure.suptitle("Minimal Pi-PLS fit")
 ```
 
 `PiPLSRegression` fits one explicit `(n_components, predictor_rank)` pair. It centers `X` and
@@ -209,20 +231,39 @@ Users working with NumPy arrays can supply the same lists from any explicit meta
 Install the optional plotting dependency and render the computed results explicitly:
 
 ```python
+import matplotlib.pyplot as plt
+
 from pipls.plotting import (
-    plot_pipls_decomposition,
     plot_biplot,
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
+    plot_prediction_diagnostics,
     plot_scores,
     plot_x_loadings,
-    plot_prediction_diagnostics,
 )
 
-factor_figure, factor_axes = plot_pipls_decomposition(
+factor_figure, factor_axes = plt.subplots(2, 2, figsize=(12, 9), layout="constrained")
+plot_pipls_predictor_directions(
     factors,
     predictor_style="bar",
     predictor_names=predictor_names,
-    response_names=response_names,
+    ax=factor_axes[0, 0],
 )
+plot_pipls_dilation(factors, ax=factor_axes[0, 1])
+plot_pipls_response_directions(
+    factors,
+    response_names=response_names,
+    ax=factor_axes[1, 0],
+)
+plot_pipls_weighted_response_directions(
+    factors,
+    response_names=response_names,
+    ax=factor_axes[1, 1],
+)
+for axis in (factor_axes[0, 0], factor_axes[1, 0], factor_axes[1, 1]):
+    axis.legend(title="Component")
 prediction_figure, prediction_axes = plot_prediction_diagnostics(
     diagnostics,
     response_names=response_names,
@@ -240,9 +281,10 @@ loading_figure, loading_axis = plot_x_loadings(
 loading_axis.legend(title="Component")
 ```
 
-Single-chart plotting functions return `(figure, axis)` and accept an optional caller-supplied
-`ax`, so the same function can create a standalone figure or draw into a user-owned panel. They do
-not call `show()`, save files, clear supplied axes, or infer whether predictors are spectra.
+Every factor and shared PLS-family plotting function returns `(figure, axis)` and accepts an
+optional caller-supplied `ax`, so the same function can create a standalone figure or draw into a
+user-owned panel. They do not call `show()`, save files, clear supplied axes, or infer whether
+predictors are spectra.
 Multi-series artists are labeled, but callers add and position legends themselves. The shared
 PLS-family score, balanced score-loading biplot, X/Y-loading, coefficient, and raw
 observation-diagnostic figures are available from `pipls.plotting`. The numerical extraction

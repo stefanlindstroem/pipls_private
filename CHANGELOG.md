@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Replace the composite Pi-PLS decomposition figure with separate one-axis plots for $P$, $D$,
+  $Q$, and $QD$; move factor-panel composition, legends, titles, PDF writing, and closing into the
+  example layer.
+
 - Establish the single-axis plotting contract for the existing atomic PLS-family figures: accept
   caller-supplied Matplotlib axes, return `(figure, axis)`, leave panel composition and legends to
   the caller, and retain standalone one-axis figure creation.

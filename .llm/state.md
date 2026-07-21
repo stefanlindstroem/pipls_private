@@ -264,24 +264,23 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue the pre-release plotting refinement. Decision 0058 gives the existing atomic PLS-family
-plotters one-axis behavior and caller-supplied-axis support. The next patch should replace
-`plot_pipls_decomposition()` with separate functions for $P$, $D$, $Q$, and $QD$, and migrate the
-minimal and real-data examples so that their panel layouts are created in the example layer.
+Continue the pre-release plotting refinement. Decisions 0058 and 0059 establish the one-axis
+contract and replace the Pi-PLS factor composite with separate $P$, $D$, $Q$, and $QD$ functions.
+The minimal and real-data examples now compose their factor panels in the example layer.
 
-The subsequent plotting patches should split prediction diagnostics and complete the cross-example
-panel/documentation audit. Release preparation resumes only after the composite plotting functions
-have been removed and all maintained PDFs are composed by their callers.
+The next patch should split `plot_prediction_diagnostics()` into separate observed-versus-predicted,
+residual-versus-predicted, and standardized-RMSE functions. A final plotting audit should then
+complete cross-example panel composition and structural enforcement before release preparation
+resumes.
 
 ## Subsequent roadmap
 
-1. **Atomic Pi-PLS factor plots:** replace the decomposition composite and migrate its callers.
-2. **Atomic prediction diagnostics:** replace the prediction composite and migrate its callers.
-3. **Example and documentation audit:** finish caller-owned panel composition across maintained
+1. **Atomic prediction diagnostics:** replace the prediction composite and migrate its callers.
+2. **Example and documentation audit:** finish caller-owned panel composition across maintained
    reports and enforce the plotting contract structurally.
-4. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
+3. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
    package metadata, define the first tagged-release checklist, and rehearse publication.
-5. **First tagged release:** publish only after the rehearsal and checklist pass.
+4. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.
