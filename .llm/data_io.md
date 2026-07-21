@@ -137,3 +137,10 @@ Do not introduce merely for repository examples:
 Paper-specific data orchestration belongs in downstream reproduction repositories that depend on a
 tagged `pipls` release. This repository's examples remain concise package-use examples and should
 not grow into manuscript pipelines, figure generation, or complete comparison grids.
+
+## Pulp tutorial assets
+
+The canonical Pulp workflow reads the committed `datasets/pulp/X.csv` and `Y.csv` tables directly.
+The documentation renderer records their SHA-256 values in a generated manifest and derives SVG
+figures from the workflow. The figures and manifest are ignored build products, not alternative
+dataset representations or package inputs.

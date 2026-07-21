@@ -487,9 +487,10 @@ the documentation boundary, Decisions 0054--0056 complete compatibility and inst
 validation, and Decision 0057 removes maintainer decisions from the served site while making the
 method and its component-selection workflow understandable before specialized terminology appears.
 Decisions 0058--0061 complete atomic plotting and example-owned report composition. Decision 0062
-adds one canonical Pulp pipeline workflow shared by the numbered example and future tutorial tools.
-The next increment is repository-generated Pulp tutorial figures; release metadata follows after the
-tutorial and documentation consolidation are complete.
+adds one canonical Pulp pipeline workflow shared by the numbered example and tutorial tools.
+Decision 0063 generates deterministic single-chart SVG assets and a manifest from that workflow in
+checkout and source-distribution documentation builds. The next increment is the detailed Pulp
+tutorial; release metadata follows after the tutorial and documentation consolidation are complete.
 
 ### Current standardization and deferred block-aware variants
 

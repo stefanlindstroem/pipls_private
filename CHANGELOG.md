@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Generate deterministic single-chart SVG assets and a machine-readable manifest for the planned Pulp tutorial from the canonical workflow; integrate generation into documentation builds and clean source-distribution validation.
+
 - Establish one canonical Pulp workflow for the numbered example and planned tutorial: evaluate a terminal-Pi-PLS pipeline, transfer the selected nested rank pair to a fixed clone, generate selection-conditioned OOF predictions, and compute the shared inspection results without duplicating the numerical analysis.
 
 - Complete the plotting-composition audit: make the example report layer create every figure and

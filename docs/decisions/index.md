@@ -58,6 +58,7 @@ reference describe the current public behavior directly.
 - [0047: separate PLS path comparison](0047-separate-pls-path-comparison-example.md)
 - [0048: self-contained user examples](0048-self-contained-user-examples.md)
 - [0062: canonical Pulp workflow](0062-canonical-pulp-workflow.md)
+- [0063: repository-generated Pulp tutorial figures](0063-repository-generated-pulp-tutorial-figures.md)
 
 ## Repository and documentation policy
 

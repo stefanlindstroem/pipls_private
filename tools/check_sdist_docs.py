@@ -2,13 +2,40 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import shutil
 import subprocess
 import sys
 import tarfile
 import tempfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
+
+PULP_TUTORIAL_FIGURES = (
+    "component_path.svg",
+    "scores.svg",
+    "biplot.svg",
+    "x_loadings.svg",
+    "y_loadings.svg",
+    "predictor_directions.svg",
+    "dilation.svg",
+    "response_directions.svg",
+    "weighted_response_directions.svg",
+    "coefficients.svg",
+    "observed_vs_predicted.svg",
+    "residuals_vs_predicted.svg",
+    "standardized_rmse.svg",
+)
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _run(command: list[str], *, cwd: Path | None = None) -> None:
@@ -88,6 +115,10 @@ def main() -> None:
             source / "docs" / "index.md",
             source / "docs" / "api" / "index.md",
             source / "docs" / "javascripts" / "mathjax.js",
+            source / "tools" / "render_pulp_tutorial.py",
+            source / "examples" / "_support" / "pulp_workflow.py",
+            source / "datasets" / "pulp" / "X.csv",
+            source / "datasets" / "pulp" / "Y.csv",
             source / "src" / "pipls" / "__init__.py",
         ]
         missing = [path.relative_to(source).as_posix() for path in required if not path.is_file()]
@@ -114,10 +145,36 @@ def main() -> None:
         )
         _run([make, "docs", f"PYTHON={python}"], cwd=source)
 
+        generated_dir = source / "docs" / "assets" / "generated" / "pulp"
+        manifest_path = generated_dir / "manifest.json"
+        if not manifest_path.is_file():
+            raise RuntimeError("Documentation build did not generate the Pulp tutorial manifest.")
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        declared = tuple(item["filename"] for item in manifest.get("figures", []))
+        if declared != PULP_TUTORIAL_FIGURES:
+            raise RuntimeError(
+                f"Pulp tutorial manifest does not declare the expected figures: {declared!r}."
+            )
+        figure_records = {item["filename"]: item for item in manifest["figures"]}
+        for filename in PULP_TUTORIAL_FIGURES:
+            figure_path = generated_dir / filename
+            if not figure_path.is_file():
+                raise RuntimeError(f"Missing generated Pulp tutorial figure: {filename}")
+            ET.parse(figure_path)
+            if figure_records[filename]["sha256"] != _sha256(figure_path):
+                raise RuntimeError(f"Generated Pulp tutorial figure hash disagrees: {filename}")
+        dataset_hashes = manifest.get("dataset", {}).get("files", {})
+        for filename in ("X.csv", "Y.csv"):
+            dataset_path = source / "datasets" / "pulp" / filename
+            if dataset_hashes.get(filename) != _sha256(dataset_path):
+                raise RuntimeError(f"Generated Pulp tutorial dataset hash disagrees: {filename}")
+
         rendered = [
             source / "site" / "index.html",
             source / "site" / "api" / "regression" / "index.html",
             source / "site" / "api" / "inspection" / "index.html",
+            source / "site" / "assets" / "generated" / "pulp" / "component_path.svg",
+            source / "site" / "assets" / "generated" / "pulp" / "standardized_rmse.svg",
         ]
         missing_rendered = [
             path.relative_to(source).as_posix() for path in rendered if not path.is_file()

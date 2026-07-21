@@ -63,8 +63,10 @@
   is strict: navigation, internal links, anchors, mathematics support, and generated API targets must
   remain warning-free. Core generated pages use explicit public objects and source docstrings; do not
   expose private modules or inherited implementation machinery by broad module expansion. Never commit
-  generated `site/` output. Use `make docs-dist` when changing documentation packaging or the
-  source-distribution documentation boundary; it performs a clean install and strict build from
+  generated `site/` output or `docs/assets/generated/` tutorial assets. `make docs` and
+  `make docs-serve` regenerate the Pulp assets through `make docs-figures`. Use `make docs-dist`
+  when changing documentation packaging or the source-distribution documentation boundary; it
+  performs a clean install and strict build from
   the unpacked sdist and therefore remains outside the ordinary fast test target. Use
   `make dist-check` for packaging, dependency, public-module, or included-data changes; it builds
   once and checks separate clean wheel and sdist installations outside the checkout.
@@ -101,8 +103,10 @@
 - Report each applicable target as passed, failed, or not run; never describe inspection alone as
   validation.
 - Run focused tests while developing, then `make check` before delivery.
-- Run `make docs` for changes to public guides, navigation, documentation configuration, or public
-  docstrings.
+- Run `make docs-figures` for changes to the canonical Pulp workflow, tutorial renderer, tutorial
+  display subset, or plot behavior used by generated assets.
+- Run `make docs` for changes to public guides, navigation, documentation configuration, public
+  docstrings, or generated tutorial assets.
 - Run `make examples` for changes to numbered examples, example-generated CSV/PDF artifacts, or the
   application-facing workflow. This target runs all examples, including Tobacco.
 - Run `make build` for a quick artifact build and `make dist-check` for packaging, dependency,

@@ -43,8 +43,9 @@ environments with resolved-version diagnostics. Decision 0056 adds clean install
 source-distribution validation. Decisions 0058--0061 make every public plotter a caller-embeddable
 one-axis primitive, replace the former factor and prediction composites, and make the example layer
 own every report figure, panel, legend, title, PDF operation, and close. Decision 0062
-establishes the canonical Pulp workflow for the planned tutorial-first documentation phase.
-Repository-generated tutorial figures are the current next increment.
+establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
+generates its deterministic single-chart SVG assets and manifest. The detailed Pulp tutorial is the
+current next increment.
 
 ## Implemented estimator and selection boundary
 

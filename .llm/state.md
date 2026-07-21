@@ -269,13 +269,15 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue the tutorial-first documentation transition. Decision 0062 establishes one canonical Pulp
-pipeline workflow shared by example 10 and future documentation tooling without adding package API
-or external preprocessing.
+Continue the tutorial-first documentation transition. Decisions 0062 and 0063 establish one
+canonical Pulp pipeline workflow and deterministic repository-generated SVG assets with a
+machine-readable manifest. Documentation builds and clean source-distribution validation regenerate
+the figures without adding package API or committing generated files.
 
-The next patch should generate deterministic single-chart Pulp tutorial figures and a machine-
-readable manifest from that workflow, add a `docs-figures` target, and validate generation from the
-repository and source distribution. It should not yet restructure the served documentation.
+The next patch should add the detailed Pulp tutorial, make it the primary pedagogical route through
+the served documentation, include the generated figures one at a time, and use executable source
+snippets from the canonical workflow. It should not yet perform the final consolidation of all
+surrounding guide and reference pages.
 
 ## Subsequent roadmap
 

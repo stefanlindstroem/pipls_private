@@ -126,6 +126,11 @@ inspection computations. `examples/10_pulp_real_data.py` owns only artifact writ
 composition, and printed summaries. The workflow intentionally adds no external scaler because
 `PiPLSRegression` learns predictor and response standardization inside each fit.
 
+`tools/render_pulp_tutorial.py` is a second consumer of that workflow. It owns tutorial-specific
+figure dimensions, titles, legends, selected display components and responses, SVG writing, closing,
+and the generated manifest. It must call the public one-axis plotters rather than reproduce plotting
+logic. Generated tutorial files remain derived documentation assets and are not committed.
+
 Numbered examples are pedagogical scripts, not production applications. Each one must demonstrate a
 recognizable minimal use case, explicit comparison, or focused benchmark and must be understandable
 without knowledge of a paper, manuscript, or project history. State what the data represent and

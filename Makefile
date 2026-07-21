@@ -5,7 +5,7 @@ EXAMPLE_ENV := PYTHONPATH=src MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THRE
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install test lint format typecheck docs docs-serve docs-dist build dist-check check examples snapshot clean
+.PHONY: help install test lint format typecheck docs-figures docs docs-serve docs-dist build dist-check check examples snapshot clean
 
 help: ## Show the available Make targets.
 	@printf 'Usage: make <target>\n\nAvailable targets:\n'
@@ -26,10 +26,13 @@ format: ## Format Python files with Ruff.
 typecheck: ## Run strict mypy checks.
 	$(PYTHON) -m mypy src
 
-docs: ## Build the strict documentation site.
+docs-figures: ## Generate the Pulp tutorial figures.
+	$(EXAMPLE_ENV) $(PYTHON) tools/render_pulp_tutorial.py
+
+docs: docs-figures ## Build the strict documentation site.
 	$(PYTHON) -m mkdocs build --strict
 
-docs-serve: ## Preview documentation at http://127.0.0.1:8000/.
+docs-serve: docs-figures ## Preview documentation at http://127.0.0.1:8000/.
 	@printf 'Documentation preview: http://127.0.0.1:8000/ (stop with Ctrl+C)\n'
 	$(PYTHON) -m mkdocs serve --dev-addr=127.0.0.1:8000
 
@@ -54,7 +57,7 @@ snapshot: ## Create an uploadable repository snapshot.
 	./.llm/snapshot.sh
 
 clean: ## Remove generated files and caches.
-	rm -rf build dist site benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
+	rm -rf build dist site docs/assets/generated benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
 	find examples/results -type f ! -name .gitkeep -delete
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	find . -type d -name '*.egg-info' -prune -exec rm -rf {} +
