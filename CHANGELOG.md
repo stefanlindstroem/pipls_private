@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Complete the tutorial-first documentation transition: make the Pulp tutorial the sole worked analysis, shorten task guides, separate the path-search reference from the selection how-to, and turn model inspection into the stable figure-by-figure interpretation reference.
+
 - Add a tutorial-first documentation route built around the canonical Pulp workflow: include checked source snippets, all generated figures one chart at a time, explicit selection and validation provenance, and links to the general inspection, plotting, and theory references.
 
 - Generate deterministic single-chart SVG assets and a machine-readable manifest for the planned Pulp tutorial from the canonical workflow; integrate generation into documentation builds and clean source-distribution validation.

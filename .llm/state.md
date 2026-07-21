@@ -271,24 +271,19 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Complete the tutorial-first documentation transition. Decisions 0062 and 0063 establish one
-canonical Pulp pipeline workflow and deterministic repository-generated SVG assets with a
-machine-readable manifest. Decision 0064 adds the detailed Pulp tutorial, makes it the primary
-pedagogical route through the served site, includes each generated chart separately, and extracts
-checked code snippets from the canonical workflow.
+Define the first release. Decision 0065 completes the tutorial-first documentation transition: the
+Pulp tutorial owns the worked analysis, task guides remain concise, `model_inspection.md` owns stable
+figure-by-figure interpretation, and generated API pages retain exact signatures.
 
-The next patch should consolidate the surrounding home, quickstart, examples, parameter-selection,
-model-inspection, plotting-reference, and theory pages so each has one distinct role and avoids
-repeating the worked Pulp analysis. It should retain the tutorial as the linear workflow and the
-other pages as concise how-to or reference material.
+The next patch should choose the initial version, complete project metadata, condense the Unreleased
+changelog into release notes, and define the tag and publication checklist without publishing
+artifacts.
 
 ## Subsequent roadmap
 
-1. **Tutorial-first documentation:** generate Pulp tutorial assets, add the detailed worked tutorial,
-   and consolidate the surrounding guide and reference pages.
-2. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
+1. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
    package metadata, define the first tagged-release checklist, and rehearse publication.
-3. **First tagged release:** publish only after the rehearsal and checklist pass.
+2. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

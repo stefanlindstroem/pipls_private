@@ -1,50 +1,48 @@
 # Parameter selection
 
-Pi-PLS uses paired predictor and response latent variables. `n_components` controls how many pairs
-are retained, while `predictor_rank` controls how much predictor variation is available when those
-pairs are estimated. See the [theory overview](theory.md#interpretation-of-the-ranks) for the
-mathematical distinction.
+Pi-PLS has two complexity controls: `n_components` is the number of paired latent modes, while
+`predictor_rank` is the retained predictor-subspace dimension. The usual procedure is:
 
-The usual workflow scans candidate component counts by cross-validation. For each count,
-`PiPLSPathCV` selects a predictor rank and reports cross-validated mean squared error (CV-MSE). The
-resulting table or curve is the **component path**. Inspect CV-MSE against the number of components
-and choose a parsimonious point, often the elbow or plateau where additional components give little
-improvement. The absolute
-minimum is informative, but it need not be the final scientific choice.
+1. evaluate a component path with `PiPLSPathCV`;
+2. choose a parsimonious component count from the CV-MSE curve;
+3. read the predictor rank from the same path row;
+4. fit a separate `PiPLSRegression` with both values fixed.
 
-The [Pulp tutorial](tutorials/pulp.md#evaluate-the-component-path) shows this process with the
-repository's canonical real-data workflow.
-
-Pi-PLS separates this selection step from fixed-model fitting:
-
-- `PiPLSPathCV` evaluates the bounded two-parameter search;
-- `PiPLSRegression` fits one explicit pair `(n_components, predictor_rank)`.
+The [Pulp tutorial](tutorials/pulp.md#evaluate-the-component-path) shows the complete procedure. The
+[path-search reference](path_analysis.md) defines all search policies, bounds, diagnostics, and
+pipeline behavior.
 
 ## Evaluate the component path
 
 ```python
 import pandas as pd
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSPathCV
 
 search = PiPLSPathCV(refit=False).fit(X, Y)
-
-path = pd.DataFrame(search.component_path_results_)
-path.to_csv("component_path.csv", index=False)
+component_path = pd.DataFrame(search.component_path_results_)
+component_path.to_csv("component_path.csv", index=False)
 ```
 
-The default `n_components_values="all"` evaluates every admissible component count. An explicit
-integer sequence requests a smaller or nonconsecutive path.
+The default `n_components_values="all"` evaluates every admissible component count. For each count,
+the path reports one conditionally selected predictor rank, response-standardized CV-MSE, and fold
+standard deviation.
 
-For each component count, the path selects predictor rank by maximizing the configured mean CV
-score and reports the corresponding response-standardized CV-MSE. Under the default negative-MSE
-scorer, this is equivalent to minimizing mean response-standardized CV-MSE. After inspecting the
-curve, choose a component count and fit both ranks explicitly:
+Plot CV-MSE against component count and choose an elbow, plateau, or other scientifically justified
+point. The smallest evaluated CV-MSE is informative, but it is not an automatic scientific choice.
+The fold standard deviation describes variation among the realized folds; it is not a confidence
+interval.
+
+## Fit the chosen fixed model
 
 ```python
+from pipls import PiPLSRegression
+
 chosen_n_components = 3
-path = pd.read_csv("component_path.csv").set_index("n_components")
-chosen_predictor_rank = int(path.loc[chosen_n_components, "predictor_rank"])
+path_by_component = component_path.set_index("n_components")
+chosen_predictor_rank = int(
+    path_by_component.loc[chosen_n_components, "predictor_rank"]
+)
 
 model = PiPLSRegression(
     n_components=chosen_n_components,
@@ -52,42 +50,6 @@ model = PiPLSRegression(
 ).fit(X, Y)
 ```
 
-`PiPLSPathCV.best_params_` identifies the best evaluated pair under the configured scorer. With the
-default scorer, it has the smallest evaluated mean response-standardized CV-MSE. Under adaptive
-`search_method="auto"`, admissible pairs that were not evaluated are not part of that comparison.
-The reported fold SD describes fold-to-fold variation and is not a confidence interval.
-
-## Predictor-rank ceiling
-
-The default path ceiling is
-
-\[
-r_{\pi,\max}
-=
-\min\left[
- p_{\min},
- n_{\mathrm{train,min}}-1,
- \left\lceil\frac{n}{c}\right\rceil
-\right],
-\qquad c=5.
-\]
-
-The support term uses the total number of observations supplied to `fit()`. Fold dimensions only
-impose feasibility caps. `search_method="auto"` performs deterministic adaptive coarse-to-fine
-search and may leave admissible predictor ranks unevaluated; `search_method="optimal"` evaluates all
-admissible pairs. Score ties within numerical tolerance favor the smaller predictor rank for a
-fixed component count. The global best among evaluated pairs favors the smaller component count,
-then the smaller predictor rank.
-
-The canonical `component_path_results_` columns are:
-
-```text
-n_components
-predictor_rank
-predictor_rank_policy
-response_standardized_cv_mse_mean
-response_standardized_cv_mse_fold_sd
-n_splits
-```
-
-The predictor rank is always numeric, whether it was optimized, fixed, or set to the maximum.
+Both values must come from the selected path row. This fixed fit does not repeat parameter
+selection. Use [cross-validation protocols](cross_validation.md) when the split design, scorer, or
+OOF reporting requires more control.

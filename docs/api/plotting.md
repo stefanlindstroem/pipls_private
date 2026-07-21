@@ -1,19 +1,22 @@
 # Plotting
 
-`pipls.plotting` provides optional Matplotlib figures for results from `pipls.inspection`.
-Matplotlib is imported only when a plotting function is called; the numerical package and the
-inspection helpers remain usable without it. Install Matplotlib directly or use the `examples`
-optional dependency group.
+`pipls.plotting` is the operational reference for optional Matplotlib chart primitives. Scientific
+interpretation belongs in [Model inspection](../model_inspection.md), and the
+[Pulp tutorial](../tutorials/pulp.md#interpret-the-fitted-model) shows the complete maintained
+plotting surface.
 
-The single-chart plotting functions accept an optional Matplotlib `ax` and return `(figure, axis)`.
-With `ax=None`, they create one figure containing one axis. With a supplied axis, they draw on that
-axis without clearing it or changing the surrounding figure.
-Plotters provide concise semantic axis labels and titles, which callers may replace through the
-returned axis. They label multi-series artists but do not create legends; legend placement and
-styling belong to the caller. They do not create subplot grids or mosaics, set figure-level titles,
-show or save figures, or close them. Component and response selections use zero-based Python
-indices. The [Pulp tutorial](../tutorials/pulp.md#interpret-the-fitted-model) shows every maintained
-plotting function in one fitted analysis.
+Every function renders one chart on one optional caller-supplied `ax` and returns `(figure, axis)`.
+Plotters do not create panels, legends, figure-level titles, files, displays, or closing operations.
+They provide concise axis labels and titles that callers may replace. Component and response
+selections use zero-based Python indices. Matplotlib is imported only when a plotting function is
+called.
+
+Conceptual reference: [scores](../model_inspection.md#scores),
+[biplots](../model_inspection.md#score-loading-biplot),
+[loadings](../model_inspection.md#x-loadings),
+[Pi-PLS factors](../model_inspection.md#predictor-directions),
+[coefficients](../model_inspection.md#regression-coefficients), and
+[prediction diagnostics](../model_inspection.md#observed-versus-predicted).
 
 ::: pipls.plotting.PredictorStyle
     options:

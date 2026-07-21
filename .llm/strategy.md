@@ -482,17 +482,14 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **tutorial-first documentation is in progress**. Decisions 0049--0053 establish
-the documentation boundary, Decisions 0054--0056 complete compatibility and installed-distribution
-validation, and Decision 0057 removes maintainer decisions from the served site while making the
-method and its component-selection workflow understandable before specialized terminology appears.
-Decisions 0058--0061 complete atomic plotting and example-owned report composition. Decision 0062
-adds one canonical Pulp pipeline workflow shared by the numbered example and tutorial tools.
-Decision 0063 generates deterministic single-chart SVG assets and a manifest from that workflow in
-checkout and source-distribution documentation builds. Decision 0064 adds the complete Pulp tutorial
-as the site's primary pedagogical route, using checked source snippets and generated figures. The
-next increment is final consolidation of the surrounding guides and references; release metadata
-follows after that audit.
+Current status: **tutorial-first documentation complete**. Decisions 0049--0053 establish the
+documentation boundary, Decisions 0054--0056 complete compatibility and installed-distribution
+validation, and Decision 0057 removes maintainer decisions from the served site. Decisions
+0058--0061 complete atomic plotting and example-owned report composition. Decisions 0062--0064 add
+the canonical Pulp workflow, deterministic generated figures, and complete tutorial. Decision 0065
+separates the remaining page roles: the tutorial owns the worked analysis, task guides own concise
+procedures, model inspection owns stable scientific interpretation, and generated API pages own
+exact signatures. Release metadata is the next increment.
 
 ### Current standardization and deferred block-aware variants
 

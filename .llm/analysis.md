@@ -124,6 +124,12 @@ that workflow and presents each deterministic generated figure separately. Plot-
 link to the general inspection and plotting references rather than duplicating API contracts.
 Prediction figures must retain the selection-conditioned OOF provenance.
 
+Documentation ownership is fixed by Decision 0065. The tutorial owns the linear Pulp narrative and
+all generated Pulp figures. `model_inspection.md` owns general figure-by-figure interpretation with
+stable anchors. `docs/api/plotting.md` owns signatures and operational contracts only. Example pages
+may describe script purpose and artifacts but must not reproduce the tutorial analysis or embed its
+generated figures.
+
 Pulp is the canonical tutorial analysis. `examples/_support/pulp_workflow.py` owns its direct pandas
 loading, terminal-Pi-PLS pipeline template, complete-pipeline path evaluation, visible component-
 count choice, nested fixed-parameter transfer, five-fold fixed-pipeline OOF predictions, and

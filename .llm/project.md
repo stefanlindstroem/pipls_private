@@ -46,8 +46,9 @@ own every report figure, panel, legend, title, PDF operation, and close. Decisio
 establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
 generates its deterministic single-chart SVG assets and manifest. Decision 0064 makes the detailed
 Pulp tutorial the primary pedagogical route through the served documentation, using checked source
-snippets and one generated chart per explanation. Final guide and reference consolidation is the
-current next increment.
+snippets and one generated chart per explanation. Decision 0065 completes the transition by
+separating tutorial, task-guide, scientific-reference, and generated-API ownership. First-release
+definition and metadata are the current next increment.
 
 ## Implemented estimator and selection boundary
 

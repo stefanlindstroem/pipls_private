@@ -96,11 +96,5 @@ the caller creates the panel, legends, figure title, and output file. The factor
 $P D Q^{\mathsf T}$; see the [theory overview](theory.md#diagonal-latent-coupling) for its
 construction. Matplotlib remains optional and the estimator retains no plotting state.
 
-The complete executable script is summarized in [`examples.md`](examples.md). Continue with:
-
-1. the [Pulp tutorial](tutorials/pulp.md) for one complete real-data workflow;
-2. [`parameter_selection.md`](parameter_selection.md) to scan component counts and choose a model
-   from the CV-MSE curve;
-3. [`model_inspection.md`](model_inspection.md) for fitted latent structure, prediction diagnostics,
-   and the Pi-PLS-specific factorization;
-4. [`examples.md`](examples.md) for synthetic, comparison, and complete real-data workflows.
+Continue with the [Pulp tutorial](tutorials/pulp.md) for parameter selection and interpretation, or
+use [Model inspection](model_inspection.md) as the conceptual reference for the plotted quantities.

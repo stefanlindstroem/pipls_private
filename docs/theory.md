@@ -151,3 +151,17 @@ out-of-fold predictions, or an independent test set.
 See the [Pulp tutorial](tutorials/pulp.md) for a complete worked analysis.
 [`parameter_selection.md`](parameter_selection.md), [`path_analysis.md`](path_analysis.md), and
 [`cross_validation.md`](cross_validation.md) define the general selection and validation contracts.
+
+## Reference and scope
+
+The equations on this page describe the method implemented by this package. The worked Pulp
+application and dataset provenance are documented in:
+
+Stefan B. Lindström, Rita Ferritsius, Johan E. Carlson, Johan Persson, and Fritjof Nilsson,
+“Predicting handsheet properties and enhancing refiner control using fiber analyzer data and latent
+variable modeling,” *Computers & Chemical Engineering* **199** (2025), 109143,
+[doi:10.1016/j.compchemeng.2025.109143](https://doi.org/10.1016/j.compchemeng.2025.109143).
+
+The [Pulp tutorial](tutorials/pulp.md) connects the implemented construction to that repository
+analysis. Broader PLS and reduced-rank context is summarized only to position the implemented method;
+this page does not define APIs beyond the package behavior documented and tested in this repository.

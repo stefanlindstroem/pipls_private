@@ -161,15 +161,11 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     }
 
     linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
-    assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(
-        encoding="utf-8"
-    )
+    assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(encoding="utf-8")
     assert "tutorials/pulp.md" in (repository / "docs" / "quickstart.md").read_text(
         encoding="utf-8"
     )
-    assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(
-        encoding="utf-8"
-    )
+    assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(encoding="utf-8")
     assert "../cross_validation.md" in linked_targets
     assert "../model_inspection.md" in linked_targets
     assert "../theory.md" in linked_targets
@@ -184,7 +180,7 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
         "pulp-inspection-results",
     }
     for section in snippet_sections:
-        assert f'examples/_support/pulp_workflow.py:{section}' in tutorial
+        assert f"examples/_support/pulp_workflow.py:{section}" in tutorial
         assert f"# --8<-- [start:{section}]" in workflow
         assert f"# --8<-- [end:{section}]" in workflow
 
@@ -212,4 +208,58 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
         'PULP_PREDICTION_KIND: PredictionKind = "selection-conditioned OOF predictions"'
     )
     assert prediction_kind in workflow
-    assert 'examples/10_pulp_real_data.py' in tutorial
+    assert "examples/10_pulp_real_data.py" in tutorial
+
+
+def test_documentation_layers_have_distinct_ownership() -> None:
+    repository = _repository_root()
+    docs = repository / "docs"
+    tutorial_path = docs / "tutorials" / "pulp.md"
+    tutorial = tutorial_path.read_text(encoding="utf-8")
+    inspection = (docs / "model_inspection.md").read_text(encoding="utf-8")
+    plotting_reference = (docs / "api" / "plotting.md").read_text(encoding="utf-8")
+    examples = (docs / "examples.md").read_text(encoding="utf-8")
+    parameter_selection = (docs / "parameter_selection.md").read_text(encoding="utf-8")
+    path_reference = (docs / "path_analysis.md").read_text(encoding="utf-8")
+
+    image_owners = {
+        path.relative_to(docs).as_posix()
+        for path in docs.rglob("*.md")
+        if "decisions" not in path.relative_to(docs).parts
+        and "assets/generated/pulp/" in path.read_text(encoding="utf-8")
+    }
+    assert image_owners == {"tutorials/pulp.md"}
+
+    inspection_anchors = {
+        "scores",
+        "score-loading-biplot",
+        "x-loadings",
+        "y-loadings",
+        "predictor-directions",
+        "dilation",
+        "response-directions",
+        "weighted-response-directions",
+        "regression-coefficients",
+        "observed-versus-predicted",
+        "residuals-versus-predicted",
+        "standardized-rmse",
+        "observation-diagnostics",
+    }
+    for anchor in inspection_anchors:
+        assert f"{{ #{anchor} }}" in inspection
+
+    tutorial_anchors = inspection_anchors - {"observation-diagnostics"}
+    for anchor in tutorial_anchors:
+        assert f"../model_inspection.md#{anchor}" in tutorial
+
+    assert "examples/results/" not in inspection
+    assert "post_analysis.pdf" not in inspection
+    assert "Sugarcane workflow" not in inspection
+    assert "Tobacco workflow" not in inspection
+    assert "```python" not in plotting_reference
+    assert "assets/generated/pulp/" not in examples
+
+    assert "path_analysis.md" in parameter_selection
+    assert "tutorials/pulp.md" in parameter_selection
+    assert "Example 09" not in path_reference
+    assert "Examples 10" not in path_reference

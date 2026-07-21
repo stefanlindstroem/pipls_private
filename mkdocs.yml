@@ -21,7 +21,7 @@ nav:
       - Estimator API: estimator_api.md
   - Using Pi-PLS:
       - Parameter selection: parameter_selection.md
-      - Choosing components: path_analysis.md
+      - Path-search reference: path_analysis.md
       - Cross-validation: cross_validation.md
       - Preprocessing: preprocessing.md
   - Model inspection: model_inspection.md
