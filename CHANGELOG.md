@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Establish one canonical Pulp workflow for the numbered example and planned tutorial: evaluate a terminal-Pi-PLS pipeline, transfer the selected nested rank pair to a fixed clone, generate selection-conditioned OOF predictions, and compute the shared inspection results without duplicating the numerical analysis.
+
 - Complete the plotting-composition audit: make the example report layer create every figure and
   axis, group shared latent-model views into dataset-appropriate panels, retain full-width
   coefficient pages, and enforce structurally that package plotters remain one-axis primitives.

@@ -2,70 +2,41 @@
 
 from pathlib import Path
 
-import pandas as pd
-from _support.fixed_model_oof import fixed_model_oof_predictions
 from _support.plot_component_path import plot_pipls_component_path
 from _support.post_analysis_artifacts import (
     build_post_analysis_tables,
     render_post_analysis_report,
     write_post_analysis_tables,
 )
-from sklearn.model_selection import KFold
+from _support.pulp_workflow import PULP_CHOSEN_N_COMPONENTS, run_pulp_workflow
 
-from pipls import PiPLSPathCV, PiPLSRegression
-from pipls.inspection import (
-    latent_structure,
-    pipls_display_factors,
-    prediction_diagnostics,
-)
-
-DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "pulp"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
-CHOSEN_N_COMPONENTS = 3
+CHOSEN_N_COMPONENTS = PULP_CHOSEN_N_COMPONENTS
 
-X = pd.read_csv(DATA_DIR / "X.csv")
-Y = pd.read_csv(DATA_DIR / "Y.csv")
+workflow = run_pulp_workflow(chosen_n_components=CHOSEN_N_COMPONENTS)
+X = workflow.X
+Y = workflow.Y
+model = workflow.model
 
-# Evaluate the Pi-PLS component path.
-path_search = PiPLSPathCV(refit=False).fit(X, Y)
-pipls_path = pd.DataFrame(path_search.component_path_results_)
-pipls_path.to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
+# Export the component path and its derived figure.
+workflow.component_path.to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
 plot_pipls_component_path(
     ANALYSIS_DIR / "component_path.csv",
     ANALYSIS_DIR / "component_path.pdf",
     title="Pulp Pi-PLS component path",
 )
 
-# Fit the selected Pi-PLS model.
-chosen_predictor_rank = int(
-    pipls_path.set_index("n_components").loc[CHOSEN_N_COMPONENTS, "predictor_rank"]
-)
-model = PiPLSRegression(
-    n_components=CHOSEN_N_COMPONENTS,
-    predictor_rank=chosen_predictor_rank,
-).fit(X, Y)
-
 # Export OOF predictions and fitted-model inspection tables.
-oof = fixed_model_oof_predictions(
-    model,
-    X,
-    Y,
-    splitter=KFold(n_splits=5, shuffle=False),
-)
 write_post_analysis_tables(
     ANALYSIS_DIR,
     build_post_analysis_tables(
-        factors=pipls_display_factors(model.decomposition_),
-        diagnostics=prediction_diagnostics(
-            Y,
-            oof.predictions,
-            prediction_kind="selection-conditioned OOF predictions",
-        ),
-        structure=latent_structure(model),
+        factors=workflow.factors,
+        diagnostics=workflow.diagnostics,
+        structure=workflow.structure,
         predictor_names=X.columns.tolist(),
         response_names=Y.columns.tolist(),
         sample_names=[str(index) for index in range(1, len(X) + 1)],
-        fold_index=oof.fold_index,
+        fold_index=workflow.oof.fold_index,
     ),
 )
 render_post_analysis_report(

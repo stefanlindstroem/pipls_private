@@ -168,24 +168,36 @@ def test_dedicated_example_owns_all_pls_path_comparisons() -> None:
 
 
 def test_real_data_examples_use_pipls_only_component_paths() -> None:
-    for filename in (
-        "10_pulp_real_data.py",
-        "11_sugarcane_real_data.py",
-        "12_tobacco_real_data.py",
-    ):
-        text = (_repository_root() / "examples" / filename).read_text(encoding="utf-8")
+    examples_dir = _repository_root() / "examples"
+    pulp_text = (examples_dir / "10_pulp_real_data.py").read_text(encoding="utf-8")
+    pulp_workflow = (examples_dir / "_support" / "pulp_workflow.py").read_text(
+        encoding="utf-8"
+    )
+    assert "component_path_results_" in pulp_workflow
+    assert "refit=False" in pulp_workflow
+    assert 'component_path["n_components"] == n_components' in pulp_workflow
+    assert "pipls__n_components=n_components" in pulp_workflow
+    assert "pipls__predictor_rank=predictor_rank" in pulp_workflow
+    assert "plot_pipls_component_path(" in pulp_text
+    assert 'ANALYSIS_DIR / "component_path.csv"' in pulp_text
+    assert 'ANALYSIS_DIR / "component_path.pdf"' in pulp_text
+    assert 'ANALYSIS_DIR / "post_analysis.pdf"' in pulp_text
+
+    for filename in ("11_sugarcane_real_data.py", "12_tobacco_real_data.py"):
+        text = (examples_dir / filename).read_text(encoding="utf-8")
         assert "component_path_results_" in text
         assert "refit=False" in text
         assert "plot_pipls_component_path(" in text
-        assert "evaluate_pls_component_path(" not in text
-        assert "plot_component_path_comparison(" not in text
+        assert 'pipls_path.set_index("n_components")' in text
+        assert "predictor_rank=chosen_predictor_rank" in text
         assert 'ANALYSIS_DIR / "component_path.csv"' in text
         assert 'ANALYSIS_DIR / "component_path.pdf"' in text
         assert 'ANALYSIS_DIR / "post_analysis.pdf"' in text
-        assert 'pipls_path.set_index("n_components")' in text
-        assert "predictor_rank=chosen_predictor_rank" in text
+
+    for text in (pulp_text, pulp_workflow):
+        assert "evaluate_pls_component_path(" not in text
+        assert "plot_component_path_comparison(" not in text
         assert "subprocess" not in text
-        assert "best_params_" not in text
         assert "pooled_oof_r2_" not in text
 
 

@@ -67,6 +67,7 @@ This index is navigation, not a substitute for those records.
 | `0059-atomic-pipls-factor-plots.md` | Pi-PLS factor plotting surface | separate one-axis $P$, $D$, $Q$, and $QD$ plots; caller-owned factor panels |
 | `0060-atomic-prediction-diagnostic-plots.md` | prediction-diagnostic plotting surface | separate one-axis observed/predicted, residual, and standardized-RMSE plots; caller-owned diagnostic panels |
 | `0061-example-owned-report-composition.md` | complete example plotting ownership | example reports create every figure and axis, group related charts in dataset-appropriate panels, and leave package plotters atomic |
+| `0062-canonical-pulp-workflow.md` | shared Pulp tutorial analysis | one example-owned pipeline workflow supplies path evaluation, fixed fitting, OOF prediction, and inspection to the numbered example and future tutorial assets |
 
 ## Implemented estimator/search transition
 

@@ -61,19 +61,20 @@ returned figures and axes, explicit line/bar modes, label validation, and succes
 without pinning pixels or incidental Matplotlib artist counts. Structural tests should enforce the
 single-axis package boundary and example-owned report composition.
 
-Example-helper tests cover `examples/_support/fixed_model_oof.py` and
-`examples/_support/post_analysis_artifacts.py` with small
-synthetic matrices. They verify exact one-fold assignment, estimator cloning, canonical table
-columns, residual signs, and PDF generation after rereading CSV files.
+Example-helper tests cover `examples/_support/fixed_model_oof.py`,
+`examples/_support/post_analysis_artifacts.py`, and the canonical Pulp workflow. Small synthetic
+matrices protect generic OOF and report contracts. One module-scoped Pulp numerical run may verify
+pipeline cloning, nested parameter transfer, component-path schema, aligned OOF predictions, and
+inspection shapes without writing application artifacts.
 
 The minimal numbered example may be protected structurally and through the package-level numerical
 and plotting tests; do not duplicate its arrays as a frozen scientific fixture. Do not execute the
-complete Pulp, Sugarcane, or Tobacco examples in `make check`, and do not
-duplicate their analyses as real-data benchmark scripts. `make examples` is the explicit
-application-validation target and runs every numbered example, including the slower Tobacco
-analysis. Durable tests instead protect repository dataset readability, the staged workflow structure, the
-component-path API, inspection equations, plotting contracts, example helpers, and CSV-to-PDF
-generation.
+artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
+analyses as real-data benchmark scripts. `make examples` is the explicit application-validation
+target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead
+protect repository dataset readability, the canonical Pulp numerical workflow, staged workflow
+structure, component-path API, inspection equations, plotting contracts, example helpers, and
+CSV-to-PDF generation.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 

@@ -43,9 +43,10 @@ example.
 
 ## Complete Pi-PLS reference workflows
 
-- `10_pulp_real_data.py`: direct pandas reading, one Pi-PLS component path, one selected Pi-PLS
-  interpretation model, selection-conditioned Pi-PLS OOF predictions, seven canonical
-  post-analysis CSV files, a balanced score-loading biplot, and a multipage report.
+- `10_pulp_real_data.py`: the canonical tutorial analysis, using one terminal-Pi-PLS pipeline
+  for component-path evaluation, one selected fixed pipeline, selection-conditioned OOF
+  predictions, seven canonical post-analysis CSV files, a balanced score-loading biplot, and a
+  multipage report.
 - `11_sugarcane_real_data.py`: direct pandas reading, one Pi-PLS component path, one selected
   Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions, seven canonical
   post-analysis CSV files, and a wavelength-aware report.
@@ -72,7 +73,9 @@ The complete workflows import implementation support from `examples/_support/`:
 - `plot_component_path.py`: component-path CSV-to-PDF rendering;
 - `fixed_model_oof.py`: cloning and aligned OOF prediction for already fixed models;
 - `post_analysis_artifacts.py`: canonical table construction, CSV round trips, pagination, and
-  multipage report composition.
+  multipage report composition;
+- `pulp_workflow.py`: the shared Pulp pipeline, path, fixed-fit, OOF, and inspection workflow used
+  by example 10 and the planned tutorial assets.
 
 The underscore-prefixed directory marks these files as support for the complete examples, not as
 the shortest route to fitting Pi-PLS. They remain example-owned because they contain pandas I/O,
@@ -96,14 +99,20 @@ invent scientific variable names. The committed datasets already have tested hea
 so the numbered examples use them directly instead of repeating repository-integrity checks.
 
 Example 09 writes the separate Pi-PLS and ordinary PLS path tables used by the three overlaid
-comparison figures. Examples 10–12 instead share this normal Pi-PLS workflow:
+comparison figures. Examples 10–12 retain the same three scientific stages:
 
 1. `PiPLSPathCV(refit=False)` produces one Pi-PLS row per admissible component count.
    `component_path.csv` is written before `component_path.pdf` is rendered from it.
 2. A visible component-count choice selects one fixed full-data Pi-PLS model for interpretation.
-3. The selected Pi-PLS parameters are cloned inside five non-shuffled folds to produce
+3. The selected parameters are cloned inside five non-shuffled folds to produce
    `selection-conditioned OOF predictions`. Seven common long-form CSV files are written and
    reread before report generation.
+
+Pulp is the canonical tutorial workflow. Its support module evaluates a one-step scikit-learn
+pipeline ending in `PiPLSRegression`, transfers the selected pair with nested pipeline parameters,
+and supplies the fitted estimator and inspection results to example 10. The one-step pipeline adds
+no external preprocessing because Pi-PLS already learns predictor and response standardization
+inside each fit. Sugarcane and Tobacco retain direct fixed-estimator orchestration.
 
 Each dataset keeps `component_path.pdf` and `post_analysis.pdf` as separate files in the same
 analysis directory.

@@ -158,23 +158,29 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
     assert pdf_path.stat().st_size > 5_000
 
 
-def test_pulp_example_contains_complete_three_stage_post_analysis() -> None:
+def test_pulp_example_uses_the_canonical_workflow_and_exports_the_same_artifacts() -> None:
     text = (_repository_root() / "examples" / "10_pulp_real_data.py").read_text(
         encoding="utf-8"
     )
 
-    assert "CHOSEN_N_COMPONENTS = 3" in text
-    assert "from sklearn.cross_decomposition import PLSRegression" not in text
+    assert "PULP_CHOSEN_N_COMPONENTS" in text
+    assert "run_pulp_workflow(" in text
+    assert "workflow.component_path.to_csv(" in text
+    assert "workflow.factors" in text
+    assert "workflow.diagnostics" in text
+    assert "workflow.structure" in text
+    assert "workflow.oof.fold_index" in text
     assert "X.columns.tolist()" in text
     assert "Y.columns.tolist()" in text
-    assert "fixed_model_oof_predictions(" in text
-    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert "build_post_analysis_tables(" in text
     assert "write_post_analysis_tables(" in text
     assert "render_post_analysis_report(" in text
     assert "biplot_components=(1, 2)" in text
     assert "loading_components=(1, 2, 3)" in text
     assert "ANALYSIS_DIR" in text
+    assert "PiPLSPathCV" not in text
+    assert "PiPLSRegression" not in text
+    assert "fixed_model_oof_predictions" not in text
     assert 'prediction_kind="fitted values"' not in text
     assert "subprocess" not in text
 

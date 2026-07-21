@@ -119,6 +119,13 @@ Their support modules live under `examples/_support/` so they are visibly separa
 user entry points. Do not hide real-data reading behind a package loader. Do not place user analysis
 helpers under `scripts/`, which remains the repository-maintenance and preparation area.
 
+Pulp is the canonical tutorial analysis. `examples/_support/pulp_workflow.py` owns its direct pandas
+loading, terminal-Pi-PLS pipeline template, complete-pipeline path evaluation, visible component-
+count choice, nested fixed-parameter transfer, five-fold fixed-pipeline OOF predictions, and
+inspection computations. `examples/10_pulp_real_data.py` owns only artifact writing, report
+composition, and printed summaries. The workflow intentionally adds no external scaler because
+`PiPLSRegression` learns predictor and response standardization inside each fit.
+
 Numbered examples are pedagogical scripts, not production applications. Each one must demonstrate a
 recognizable minimal use case, explicit comparison, or focused benchmark and must be understandable
 without knowledge of a paper, manuscript, or project history. State what the data represent and
@@ -340,8 +347,9 @@ plotting function renders one explicit selection on one supplied axis at a time.
 reports use a $2\times2$ factor page, a $1\times3$ prediction page per response group, one
 dataset-appropriate shared latent-model panel, and full-width coefficient pages.
 
-The Pulp workflow uses the same five non-shuffled folds as its component-path comparison. Under
-Decision 0045 it clones only the already fixed Pi-PLS estimator in each fold. Because the Pi-PLS
+The Pulp workflow uses the same five non-shuffled folds as its component-path comparison. It
+clones the already fixed complete pipeline in each fold; the pipeline currently contains only
+the terminal Pi-PLS estimator. Because the Pi-PLS
 component count and predictor rank were chosen after inspecting paths computed from the same 46
 observations, the resulting OOF predictions are selection-conditioned rather than independent
 validation. The standardized values stored in

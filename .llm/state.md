@@ -54,7 +54,10 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - complete Pulp, Sugarcane, and Tobacco post-analysis workflows with fixed-estimator OOF prediction
   helpers, seven common canonical long-form CSV tables, an optional Tobacco observation-diagnostic
   table, scientific labels obtained at the file-reading boundary, and multipage reports
-  reconstructed from those tables.
+  reconstructed from those tables;
+- a canonical example-owned Pulp pipeline workflow that supplies path evaluation, explicit
+  component-count selection, fixed fitting, selection-conditioned OOF prediction, and inspection
+  results to example 10 and the planned tutorial renderer.
 
 Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
@@ -149,8 +152,9 @@ Additional fixed decisions:
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
 - Real-data examples use `PiPLSPathCV(refit=False)` for the path, treat CSV as canonical,
-  derive PDFs from the CSV, and fit a separate fixed `PiPLSRegression` after an explicit component
-  choice. `best_params_` remains a convenience, not the required user decision.
+  derive PDFs from the CSV, and fit a separate fixed model after an explicit component choice.
+  Pulp evaluates and fits a one-step pipeline ending in `PiPLSRegression`; Sugarcane and Tobacco
+  retain direct estimators. `best_params_` remains a convenience, not the required user decision.
 - Path coefficients are accessed through `best_pipls_` or `best_estimator_`; they are not flattened
   onto `PiPLSPathCV` when preprocessing may change the feature space.
 - OOF results produced after using the same splits for model selection are labeled
@@ -227,12 +231,13 @@ duplicated the numbered analyses. `make examples` runs every numbered example as
 application-validation action. Example 09 writes separate Pi-PLS and standard PLS (NIPALS) path
 CSVs for the same folds and component counts and generates the overlaid comparison PDFs. Examples
 10–12 write Pi-PLS-only path artifacts beside their post-analysis reports, expose a visible
-component choice, and fit a separate fixed `PiPLSRegression` with both Pi-PLS ranks recorded
-explicitly. The scripts contain no subprocess wrappers, repeated table-validation boilerplate,
-one-use configuration constants, redundant committed-data checks, or directory-creation
-scaffolding. Required result directories are tracked and preserved by `make clean`.
-Default tests retain dataset-layout, component-path API, PLS-helper, plotting, and workflow-structure
-contracts without executing the complete real-data analyses.
+component choice, and fit a separate fixed model with both Pi-PLS ranks recorded explicitly. Pulp
+uses a one-step pipeline ending in `PiPLSRegression`; Sugarcane and Tobacco use direct estimators.
+The scripts contain no subprocess wrappers, repeated table-validation boilerplate, one-use
+configuration constants, redundant committed-data checks, or directory-creation scaffolding.
+Required result directories are tracked and preserved by `make clean`. Default tests retain
+dataset-layout, component-path API, PLS-helper, plotting, workflow-structure, and one canonical Pulp
+numerical-workflow contract without executing the artifact-producing real-data scripts.
 
 ## Legacy dataset licensing review
 
@@ -264,19 +269,21 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Begin first-release preparation. Decisions 0058--0061 complete the plotting refinement: every
-package plotter is a one-axis primitive, every maintained report figure is created in the example
-layer, and the real-data reports group related charts in caller-owned panels.
+Continue the tutorial-first documentation transition. Decision 0062 establishes one canonical Pulp
+pipeline workflow shared by example 10 and future documentation tooling without adding package API
+or external preprocessing.
 
-The next patch should define the initial version and release metadata, condense the Unreleased
-changelog into first-release notes, document the release checklist, and leave publication itself to
-a later rehearsal.
+The next patch should generate deterministic single-chart Pulp tutorial figures and a machine-
+readable manifest from that workflow, add a `docs-figures` target, and validate generation from the
+repository and source distribution. It should not yet restructure the served documentation.
 
 ## Subsequent roadmap
 
-1. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
+1. **Tutorial-first documentation:** generate Pulp tutorial assets, add the detailed worked tutorial,
+   and consolidate the surrounding guide and reference pages.
+2. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
    package metadata, define the first tagged-release checklist, and rehearse publication.
-2. **First tagged release:** publish only after the rehearsal and checklist pass.
+3. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

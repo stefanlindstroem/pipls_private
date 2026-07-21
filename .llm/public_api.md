@@ -277,6 +277,9 @@ parameter, or top-level export is added by this plotting layer.
 
 Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and their separate
 canonical CSV files. Examples 10–12 use `PiPLSPathCV(refit=False)` to produce one Pi-PLS path, write
-`component_path.csv` and `component_path.pdf` beside the post-analysis report, and fit the final
-`PiPLSRegression` with the numeric predictor rank read from the chosen Pi-PLS row. The package
-exposes no dataset I/O or plotting helper for this workflow.
+`component_path.csv` and `component_path.pdf` beside the post-analysis report, and fit a separate
+fixed model with the numeric predictor rank read from the chosen Pi-PLS row. Pulp evaluates a
+cloneable `Pipeline` whose terminal step is `PiPLSRegression`, transfers the chosen pair through
+`pipls__n_components` and `pipls__predictor_rank`, and exposes the fitted terminal estimator only in
+its example-owned workflow result. Sugarcane and Tobacco retain direct `PiPLSRegression` templates.
+The package exposes no dataset I/O, tutorial workflow, or component-path plotting helper.

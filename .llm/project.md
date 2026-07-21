@@ -33,15 +33,18 @@ Sugarcane, and Tobacco are component-path examples rather than benchmark or test
 `01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. Example 09
 writes separate Pi-PLS and standard PLS (NIPALS) CSVs and derives the comparison PDFs from those
 canonical tables. Examples 10–12 write Pi-PLS-only paths in their analysis directories and then fit
-a separately chosen fixed Pi-PLS model. Shared orchestration remains under `examples/_support/`.
+a separately chosen fixed model. Pulp now uses a shared example-owned pipeline workflow for path
+evaluation, nested fixed fitting, OOF prediction, and inspection; artifact orchestration remains
+in example 10. Other shared orchestration remains under `examples/_support/`.
 No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
 environments with resolved-version diagnostics. Decision 0056 adds clean installed wheel and
 source-distribution validation. Decisions 0058--0061 make every public plotter a caller-embeddable
 one-axis primitive, replace the former factor and prediction composites, and make the example layer
-own every report figure, panel, legend, title, PDF operation, and close. Release preparation is the
-current next increment.
+own every report figure, panel, legend, title, PDF operation, and close. Decision 0062
+establishes the canonical Pulp workflow for the planned tutorial-first documentation phase.
+Repository-generated tutorial figures are the current next increment.
 
 ## Implemented estimator and selection boundary
 

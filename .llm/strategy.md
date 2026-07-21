@@ -482,12 +482,14 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **release preparation is next**. Decisions 0049--0053 establish the documentation
-boundary, Decisions 0054--0056 complete compatibility and installed-distribution validation, and
-Decision 0057 removes maintainer decisions from the served site while making the method and its
-component-selection workflow understandable before specialized terminology appears. Decisions
-0058--0061 complete atomic plotting and example-owned report composition. The initial version and
-release metadata can now be chosen.
+Current status: **tutorial-first documentation is in progress**. Decisions 0049--0053 establish
+the documentation boundary, Decisions 0054--0056 complete compatibility and installed-distribution
+validation, and Decision 0057 removes maintainer decisions from the served site while making the
+method and its component-selection workflow understandable before specialized terminology appears.
+Decisions 0058--0061 complete atomic plotting and example-owned report composition. Decision 0062
+adds one canonical Pulp pipeline workflow shared by the numbered example and future tutorial tools.
+The next increment is repository-generated Pulp tutorial figures; release metadata follows after the
+tutorial and documentation consolidation are complete.
 
 ### Current standardization and deferred block-aware variants
 
