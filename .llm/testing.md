@@ -57,8 +57,9 @@ output.
 Post-analysis inspection tests should verify mathematical identities, shapes, finite-value
 validation, defensive copying, read-only results, deterministic sign handling, prediction
 provenance, and absence of estimator mutation. Plot tests should use a headless backend and verify
-returned figures, named axes, explicit line/bar modes, label validation, and successful rendering
-without pinning pixels or incidental Matplotlib artist counts.
+returned figures and axes, explicit line/bar modes, label validation, and successful rendering
+without pinning pixels or incidental Matplotlib artist counts. Structural tests should enforce the
+single-axis package boundary and example-owned report composition.
 
 Example-helper tests cover `examples/_support/fixed_model_oof.py` and
 `examples/_support/post_analysis_artifacts.py` with small

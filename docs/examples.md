@@ -63,6 +63,14 @@ Each dataset analysis directory contains `component_path.csv`, `component_path.p
 post-analysis CSV tables, and `post_analysis.pdf`. The path PDF and the post-analysis PDF are
 separate because model selection and fitted-model interpretation answer different questions.
 
+The example layer creates every report figure and passes its axes to the package plotters. Each
+report begins with a $2\times2$ $P$/$D$/$Q$/$QD$ factor page and a $1\times3$ prediction-diagnostic
+page for each response group. The shared latent-model page is dataset-specific: Pulp uses a
+$2\times2$ scores/biplot/X-loading/Y-loading panel, Sugarcane uses a $1\times3$
+scores/X-loading/Y-loading panel, and Tobacco uses a $2\times2$
+scores/X-loading/Y-loading/observation-diagnostic panel. Coefficient curves remain on full-width
+pages so the predictor coordinate is readable.
+
 ## Example support code
 
 The modules under `examples/_support/` implement reusable orchestration for the complete examples:

@@ -468,10 +468,10 @@ Implementation order:
 4. migrate numbered examples and documentation so all tiled layouts are caller-owned and generated
    PDFs preserve their intended scientific groupings.
 
-Current status: **second increment complete**. The six shared plotters and four Pi-PLS factor
-plotters accept `ax`, return a single axis, create no legends, and preserve standalone creation. The
-minimal and real-data examples own the $P$/$D$/$Q$/$QD$ panels. The prediction-diagnostic composite
-remains the temporary migration target.
+Current status: **complete**. Decisions 0058--0061 establish the one-axis plotting contract, split
+the Pi-PLS factor and prediction-diagnostic composites, and make the example layer create every
+report figure and axis. The real-data reports use caller-owned factor, prediction, and shared
+latent-model panels; coefficient curves remain full-width pages.
 
 ### Product documentation and release hardening
 
@@ -482,13 +482,12 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **release preparation follows plotting refinement**. Decisions 0049--0053
-establish the documentation boundary, Decisions 0054--0056 complete compatibility and
-installed-distribution validation, and Decision 0057 removes maintainer decisions from the served
-site while making the method and its component-selection workflow understandable before specialized
-terminology appears. Decisions 0058--0060 establish atomic plotting composition for the Pi-PLS
-factor surface and prediction diagnostics; one final plotting and example audit remains before the
-initial version is chosen.
+Current status: **release preparation is next**. Decisions 0049--0053 establish the documentation
+boundary, Decisions 0054--0056 complete compatibility and installed-distribution validation, and
+Decision 0057 removes maintainer decisions from the served site while making the method and its
+component-selection workflow understandable before specialized terminology appears. Decisions
+0058--0061 complete atomic plotting and example-owned report composition. The initial version and
+release metadata can now be chosen.
 
 ### Current standardization and deferred block-aware variants
 
@@ -539,9 +538,9 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Complete the plotting and example-composition audit: use caller-owned panels consistently, remove
-stale composite-plot wording, and enforce structurally that package plotters remain single-axis
-chart primitives.
+Define the first release: choose the initial version, complete project metadata, condense the
+Unreleased changelog into release notes, and document the tag and publication checklist without
+publishing artifacts yet.
 
 ## Maintenance protocol
 

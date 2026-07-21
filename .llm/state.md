@@ -129,7 +129,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | inspection is implemented; existing atomic plotters accept caller-owned axes, while the two composite plotters remain pre-release migration targets |
+| Model inspection | inspection and atomic plotting are implemented; package plotters render one axis, while examples own all panel and report composition |
 | Python compatibility | supported and classified on Python 3.10–3.14; metadata keeps `requires-python = ">=3.10"` without an upper bound |
 | Runtime dependencies | `numpy>=1.26,<3`, `scikit-learn>=1.4,<2`, and `joblib>=1.2,<2`; the minimum lines are constrained together on Python 3.10 |
 | Compatibility CI | separate minimum, supported-Python, and latest-compatible jobs; every job prints resolved interpreter and runtime dependency versions |
@@ -264,22 +264,19 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue the pre-release plotting refinement. Decisions 0058--0060 establish the one-axis
-contract and replace both public composite plotters with atomic factor and prediction-diagnostic
-charts. The example layer now composes the $2\times2$ factor panel and $1\times3$ prediction panel.
+Begin first-release preparation. Decisions 0058--0061 complete the plotting refinement: every
+package plotter is a one-axis primitive, every maintained report figure is created in the example
+layer, and the real-data reports group related charts in caller-owned panels.
 
-The next patch should complete the plotting audit: apply caller-owned panel composition consistently
-across maintained reports, remove stale transitional wording, and add structural enforcement that
-public package plotters remain one-axis chart primitives. Release preparation resumes after that
-audit.
+The next patch should define the initial version and release metadata, condense the Unreleased
+changelog into first-release notes, document the release checklist, and leave publication itself to
+a later rehearsal.
 
 ## Subsequent roadmap
 
-1. **Example and documentation audit:** finish caller-owned panel composition across maintained
-   reports and enforce the plotting contract structurally.
-2. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
+1. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
    package metadata, define the first tagged-release checklist, and rehearse publication.
-3. **First tagged release:** publish only after the rehearsal and checklist pass.
+2. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

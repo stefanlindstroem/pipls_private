@@ -303,11 +303,10 @@ loading_figure, loading_axis = plot_x_loadings(
 loading_axis.legend(title="Component")
 ```
 
-Every factor and shared PLS-family plotting function returns `(figure, axis)` and accepts an
-optional caller-supplied `ax`, so the same function can create a standalone figure or draw into a
-user-owned panel. They do not call `show()`, save files, clear supplied axes, or infer whether
-predictors are spectra.
-Multi-series artists are labeled, but callers add and position legends themselves. The shared
+Every plotting function returns `(figure, axis)` and accepts an optional caller-supplied `ax`, so
+the same chart can stand alone or draw into a user-owned panel. Package plotters do not create
+panels, legends, figure-level titles, files, displays, or closing operations. Multi-series artists
+are labeled, but callers add and position legends themselves. The shared
 PLS-family score, balanced score-loading biplot, X/Y-loading, coefficient, and raw
 observation-diagnostic figures are available from `pipls.plotting`. The numerical extraction
 accepts compatible fitted `PiPLSRegression` and scikit-learn `PLSRegression` models. Use
@@ -358,10 +357,12 @@ files for Pulp, Sugarcane, and Tobacco and derives the shared CV-MSE comparison 
 tables. Examples 10–12 then perform Pi-PLS-only analyses. Each writes one Pi-PLS path, fits one
 selected Pi-PLS model, and uses that model for selection-conditioned OOF predictions and all shared
 score, loading, coefficient, biplot, and observation analyses. Seven common canonical post-analysis
-CSV files are rebuilt into multipage reports. Pulp adds a balanced two-component score-loading
-biplot reconstructed from the existing score and X-loading tables. Tobacco adds an eighth table
-with raw score-distance and X-reconstruction-residual diagnostics, preserves the decreasing
-wavenumber axis from `X.csv`, and paginates all thirteen responses in source order. Every Pi-PLS
+CSV files are rebuilt into multipage reports whose figures are composed entirely in the example
+layer. Pulp groups scores, its balanced two-component biplot, X loadings, and Y loadings in one
+$2\times2$ page. Sugarcane uses a $1\times3$ scores/loading page. Tobacco adds an eighth table with
+raw score-distance and X-reconstruction-residual diagnostics, places those diagnostics with scores
+and loadings in a $2\times2$ page, preserves the decreasing wavenumber axis from `X.csv`, and
+paginates all thirteen responses in source order. Every Pi-PLS
 path CSV records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
 predictor SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
 `examples` extra to run them. See [`examples/README.md`](examples/README.md) and

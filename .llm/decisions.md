@@ -66,6 +66,7 @@ This index is navigation, not a substitute for those records.
 | `0058-single-axis-plotting-contract.md` | reusable plotting composition | one chart per public plotter, optional caller-supplied axes, caller-owned legends and panel layout |
 | `0059-atomic-pipls-factor-plots.md` | Pi-PLS factor plotting surface | separate one-axis $P$, $D$, $Q$, and $QD$ plots; caller-owned factor panels |
 | `0060-atomic-prediction-diagnostic-plots.md` | prediction-diagnostic plotting surface | separate one-axis observed/predicted, residual, and standardized-RMSE plots; caller-owned diagnostic panels |
+| `0061-example-owned-report-composition.md` | complete example plotting ownership | example reports create every figure and axis, group related charts in dataset-appropriate panels, and leave package plotters atomic |
 
 ## Implemented estimator/search transition
 
@@ -149,6 +150,9 @@ plan contains an earlier or more general proposal:
   Python 3.10 because its oldest binary releases do not cover every newer interpreter;
 - complete Pulp, Sugarcane, and Tobacco analyses are not duplicated as real-data benchmark scripts
   or executed by the default test suite; `make examples` runs all numbered examples explicitly;
+- every public package plotter renders one chart on one axis; maintained reports create all figures
+  in the example layer, pass explicit axes to package plotters, group related charts in
+  dataset-appropriate panels, and retain full-width coefficient pages;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

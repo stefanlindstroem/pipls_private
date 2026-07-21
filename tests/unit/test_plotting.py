@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import ast
+import inspect
 import os
 import subprocess
 import sys
@@ -98,6 +100,52 @@ def test_plotting_names_are_submodule_exports_only() -> None:
     assert expected.isdisjoint(pipls.__all__)
     assert not hasattr(plotting, "plot_prediction_diagnostics")
 
+
+
+def test_public_plotters_have_one_axis_and_no_composition_side_effects() -> None:
+    public_plotters = {
+        name for name in plotting.__all__ if name.startswith("plot_")
+    }
+    for name in public_plotters:
+        signature = inspect.signature(getattr(plotting, name))
+        assert "ax" in signature.parameters, name
+
+    source = (_repository_root() / "src" / "pipls" / "plotting.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(source)
+    function_stack: list[str] = []
+    subplot_owners: list[str] = []
+    prohibited: list[tuple[str, str]] = []
+
+    class PlottingVisitor(ast.NodeVisitor):
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            function_stack.append(node.name)
+            self.generic_visit(node)
+            function_stack.pop()
+
+        def visit_Call(self, node: ast.Call) -> None:
+            owner = function_stack[-1] if function_stack else "<module>"
+            if isinstance(node.func, ast.Attribute):
+                name = node.func.attr
+                if name == "subplots":
+                    subplot_owners.append(owner)
+                if name in {
+                    "subplot_mosaic",
+                    "legend",
+                    "savefig",
+                    "show",
+                    "close",
+                    "tight_layout",
+                    "suptitle",
+                }:
+                    prohibited.append((owner, name))
+            self.generic_visit(node)
+
+    PlottingVisitor().visit(tree)
+
+    assert subplot_owners == ["_resolve_axis"]
+    assert prohibited == []
 
 def test_plotting_submodule_import_does_not_import_matplotlib() -> None:
     script = """

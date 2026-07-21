@@ -116,15 +116,49 @@ def test_shared_inspection_uses_no_concrete_plsregression_restriction() -> None:
     assert "isinstance(model, PLSRegression)" not in source
 
 
-def test_post_analysis_helper_owns_prediction_panel_composition() -> None:
-    source = (
-        _repository_root() / "examples" / "_support" / "post_analysis_artifacts.py"
-    ).read_text(encoding="utf-8")
+def test_post_analysis_helper_owns_all_report_composition() -> None:
+    path = _repository_root() / "examples" / "_support" / "post_analysis_artifacts.py"
+    source = path.read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=str(path))
+    render = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "render_post_analysis_report"
+    )
+    report_plotters = {
+        "plot_biplot",
+        "plot_coefficients",
+        "plot_observation_diagnostics",
+        "plot_observed_vs_predicted",
+        "plot_pipls_dilation",
+        "plot_pipls_predictor_directions",
+        "plot_pipls_response_directions",
+        "plot_pipls_weighted_response_directions",
+        "plot_residuals_vs_predicted",
+        "plot_scores",
+        "plot_standardized_rmse",
+        "plot_x_loadings",
+        "plot_y_loadings",
+    }
+    calls = [
+        node
+        for node in ast.walk(render)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in report_plotters
+    ]
 
+    assert {call.func.id for call in calls if isinstance(call.func, ast.Name)} == report_plotters
+    assert all(any(keyword.arg == "ax" for keyword in call.keywords) for call in calls)
     assert "plot_prediction_diagnostics" not in source
-    assert "plot_observed_vs_predicted(" in source
-    assert "plot_residuals_vs_predicted(" in source
-    assert "plot_standardized_rmse(" in source
+    assert "plot_pipls_decomposition" not in source
+    assert "plt.subplots(\n            2,\n            2," in source
     assert "plt.subplots(\n                1,\n                3," in source
+    assert source.count("plt.subplot_mosaic(") == 4
+    assert '["scores", "biplot", "x_loadings"]' in source
+    assert '["y_loadings", "observations", "observations"]' in source
+    assert '[["scores", "biplot"], ["x_loadings", "y_loadings"]]' in source
+    assert '[["scores", "x_loadings"], ["y_loadings", "observations"]]' in source
+    assert '[["scores", "x_loadings", "y_loadings"]]' in source
     assert source.count("include_prediction_kind=False") == 3
-    assert "figure.suptitle(" in source
+    assert 'figure.suptitle(f"{dataset_name} Pi-PLS latent-model views")' in source

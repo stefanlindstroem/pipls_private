@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Complete the plotting-composition audit: make the example report layer create every figure and
+  axis, group shared latent-model views into dataset-appropriate panels, retain full-width
+  coefficient pages, and enforce structurally that package plotters remain one-axis primitives.
+
 - Replace the composite prediction-diagnostics figure with separate one-axis plots for observed
   versus predicted responses, residuals versus predicted responses, and standardized RMSE; move
   prediction-panel composition, provenance, legends, PDF writing, and closing into the example

@@ -468,7 +468,9 @@ the package inspection and plotting APIs together with example-owned I/O. It der
 response names visibly from the Pulp CSV headers, reads fixed component choices from the canonical
 path artifacts, and clones the fixed Pi-PLS estimator
 inside the same five non-shuffled folds, writes seven long-form CSV files under
-`examples/results/pulp_post_analysis/`, rereads them, and constructs one multipage PDF, including a caller-composed $P$/$D$/$Q$/$QD$ factor page and the Pulp biplot. The OOF
+`examples/results/pulp_post_analysis/`, rereads them, and constructs one multipage PDF. The example
+composer creates a $P$/$D$/$Q$/$QD$ factor page, a prediction-diagnostic page, and a $2\times2$
+latent-model page containing scores, the balanced biplot, X loadings, and Y loadings. The OOF
 predictions are labeled `selection-conditioned OOF predictions` because the fixed parameters were
 chosen after examining paths computed from the same observations.
 
@@ -483,7 +485,8 @@ physical wavelength coordinate from the numeric `X.csv` headers and passes it to
 with the label `Wavelength (nm)`. The
 canonical loading, direction, and coefficient values remain in long-form CSV tables; the report
 uses line rendering only because the example supplies the ordered physical coordinate explicitly.
-All four response headers (`TS`, `CP`, `ADF`, and `IVOMD`) are retained.
+Its shared latent-model page places scores, spectral X loadings, and Y loadings in a $1\times3$
+panel. All four response headers (`TS`, `CP`, `ADF`, and `IVOMD`) are retained.
 
 The Tobacco workflow described in [`examples.md`](examples.md#complete-pi-pls-analyses) preserves
 the strictly decreasing wavenumber coordinate read from the `X.csv` headers and uses it for Pi-PLS
@@ -494,4 +497,6 @@ The Pulp report derives its biplot from the canonical `x_scores.csv` and `x_load
 
 Tobacco writes the seven common post-analysis tables plus
 `observation_diagnostics.csv`, whose columns are `sample`, `score_distance`, and
-`x_reconstruction_residual`. The report plots these raw values without theoretical outlier limits.
+`x_reconstruction_residual`. Its shared latent-model page combines scores, spectral X loadings, Y
+loadings, and these raw observation diagnostics in a $2\times2$ panel without theoretical outlier
+limits. Coefficient curves remain on full-width response pages in all three reports.

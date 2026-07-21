@@ -291,6 +291,14 @@ def render_post_analysis_report(
         sample_names=sample_names,
         response_names=response_names,
     )
+    observations = (
+        None
+        if "observation_diagnostics" not in tables
+        else _observation_diagnostics_from_table(
+            tables["observation_diagnostics"],
+            sample_names=sample_names,
+        )
+    )
     selected_scores = _component_indices(
         score_components,
         size=structure.n_components,
@@ -410,45 +418,75 @@ def render_post_analysis_report(
             report.savefig(figure)
             plt.close(figure)
 
-        figure, _ = plot_scores(
+        if selected_biplot is not None and observations is not None:
+            figure, axes = plt.subplot_mosaic(
+                [
+                    ["scores", "biplot", "x_loadings"],
+                    ["y_loadings", "observations", "observations"],
+                ],
+                figsize=(15.0, 9.0),
+                layout="constrained",
+            )
+        elif selected_biplot is not None:
+            figure, axes = plt.subplot_mosaic(
+                [["scores", "biplot"], ["x_loadings", "y_loadings"]],
+                figsize=(12.0, 9.0),
+                layout="constrained",
+            )
+        elif observations is not None:
+            figure, axes = plt.subplot_mosaic(
+                [["scores", "x_loadings"], ["y_loadings", "observations"]],
+                figsize=(12.0, 9.0),
+                layout="constrained",
+            )
+        else:
+            figure, axes = plt.subplot_mosaic(
+                [["scores", "x_loadings", "y_loadings"]],
+                figsize=(15.0, 4.5),
+                layout="constrained",
+                gridspec_kw={"width_ratios": (1.0, 1.6, 1.0)},
+            )
+
+        plot_scores(
             structure,
             components=selected_scores,
-            title=f"{dataset_name} Pi-PLS X scores",
+            title="X scores",
+            ax=axes["scores"],
         )
-        report.savefig(figure)
-        plt.close(figure)
-
         if selected_biplot is not None:
-            biplot = biplot_coordinates(structure, components=selected_biplot)
-            figure, axis = plot_biplot(
-                biplot,
+            plot_biplot(
+                biplot_coordinates(structure, components=selected_biplot),
                 predictor_names=predictor_names,
-                title=f"{dataset_name} Pi-PLS score-loading biplot",
+                title="Score-loading biplot",
+                ax=axes["biplot"],
             )
-            axis.legend()
-            report.savefig(figure)
-            plt.close(figure)
-
-        figure, axis = plot_x_loadings(
+            axes["biplot"].legend()
+        plot_x_loadings(
             structure,
             predictor_style=predictor_style,
             predictor_names=predictor_names,
             predictor_axis=predictor_axis,
             predictor_axis_label=predictor_axis_label,
             components=selected_loadings,
-            title=f"{dataset_name} Pi-PLS X loadings",
+            title="X loadings",
+            ax=axes["x_loadings"],
         )
-        axis.legend(title="Component")
-        report.savefig(figure)
-        plt.close(figure)
-
-        figure, axis = plot_y_loadings(
+        axes["x_loadings"].legend(title="Component")
+        plot_y_loadings(
             structure,
             response_names=response_names,
             components=selected_loadings,
-            title=f"{dataset_name} Pi-PLS Y loadings",
+            title="Y loadings",
+            ax=axes["y_loadings"],
         )
-        axis.legend(title="Component")
+        axes["y_loadings"].legend(title="Component")
+        if observations is not None:
+            plot_observation_diagnostics(
+                observations,
+                title="Observation diagnostics",
+                ax=axes["observations"],
+            )
+        figure.suptitle(f"{dataset_name} Pi-PLS latent-model views")
         report.savefig(figure)
         plt.close(figure)
 
@@ -458,7 +496,11 @@ def render_post_analysis_report(
                 if len(coefficient_pages) == 1
                 else f" — response page {page_number}/{len(coefficient_pages)}"
             )
-            figure, axis = plot_coefficients(
+            figure, axis = plt.subplots(
+                figsize=(10.0, 5.0),
+                layout="constrained",
+            )
+            plot_coefficients(
                 structure,
                 predictor_style=predictor_style,
                 predictor_names=predictor_names,
@@ -467,22 +509,12 @@ def render_post_analysis_report(
                 predictor_axis_label=predictor_axis_label,
                 responses=selected_responses,
                 title=f"{dataset_name} Pi-PLS coefficients{page_suffix}",
+                ax=axis,
             )
             axis.legend(title="Response")
             report.savefig(figure)
             plt.close(figure)
 
-        if "observation_diagnostics" in tables:
-            observations = _observation_diagnostics_from_table(
-                tables["observation_diagnostics"],
-                sample_names=sample_names,
-            )
-            figure, _ = plot_observation_diagnostics(
-                observations,
-                title=f"{dataset_name} Pi-PLS observation diagnostics",
-            )
-            report.savefig(figure)
-            plt.close(figure)
 
 
 def _read_table(path: Path, *, name: str) -> pd.DataFrame:

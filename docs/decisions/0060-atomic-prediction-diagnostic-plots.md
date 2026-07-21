@@ -40,5 +40,5 @@ closes the figure.
 
 All public package plotters now represent one chart and compose naturally with ordinary Matplotlib
 layouts. `src/pipls/plotting.py` owns chart primitives; examples and applications own panel
-composition and reporting. A final audit remains to apply this boundary consistently across all
-maintained example pages and documentation.
+composition and reporting. Decision 0061 completes that ownership boundary across the maintained
+reports and structural tests.

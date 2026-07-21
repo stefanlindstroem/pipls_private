@@ -92,10 +92,11 @@ layout adjustment, file writing, display, and closing.
 
 Decision 0059 replaces the Pi-PLS decomposition composite with separate one-axis plots for $P$,
 $D$, $Q$, and $QD$. Decision 0060 likewise splits prediction diagnostics into observed-versus-
-predicted, residual-versus-predicted, and standardized-RMSE charts. All public plotters now follow
-the single-axis contract. They do not call `show()`, write files, retain models, or change supplied
-arrays. The names remain under `pipls.plotting`; they are not added automatically to
-`pipls.__all__`.
+predicted, residual-versus-predicted, and standardized-RMSE charts. Decision 0061 completes the
+boundary: the example layer creates every report figure and axis and passes `ax` explicitly to each
+package plotter. All public plotters follow the single-axis contract. They do not create legends or
+panels, call `show()`, write files, retain models, or change supplied arrays. The names remain under
+`pipls.plotting`; they are not added automatically to `pipls.__all__`.
 
 ### `examples/`
 
@@ -333,8 +334,11 @@ A workflow may add `observation_diagnostics.csv` with columns `sample`, `score_d
 partition the source response names exactly once and preserve their source order.
 
 A figure page must identify the dataset, model, selected components or responses, and prediction
-kind where predictions are shown. The example-level report composer controls page order and
-pagination; a package plotting function renders one explicit selection at a time.
+kind where predictions are shown. The example-level report composer controls page order,
+pagination, panel geometry, legends, figure-level titles, PDF writing, and closing; a package
+plotting function renders one explicit selection on one supplied axis at a time. The maintained
+reports use a $2\times2$ factor page, a $1\times3$ prediction page per response group, one
+dataset-appropriate shared latent-model panel, and full-width coefficient pages.
 
 The Pulp workflow uses the same five non-shuffled folds as its component-path comparison. Under
 Decision 0045 it clones only the already fixed Pi-PLS estimator in each fold. Because the Pi-PLS
@@ -349,9 +353,11 @@ for display; they do not reproduce the fold-local scaling used by the component-
 Pure inspection tests should verify equations, shapes, finite-value validation, defensive copying,
 read-only results, sign preservation, and no estimator mutation.
 
-Plot tests should use a headless Matplotlib backend and verify returned figures, named axes, line and
-bar modes, label validation, and successful PDF rendering. Do not freeze pixel values, exact artist
-counts unrelated to the contract, or Matplotlib implementation details.
+Plot tests should use a headless Matplotlib backend and verify returned figures and axes, line and
+bar modes, label validation, and successful PDF rendering. Structural tests should verify that
+public plotters accept `ax`, use only the shared one-axis resolver for standalone creation, and do
+not create legends, panels, files, displays, or closing operations. Do not freeze pixel values,
+exact artist counts unrelated to the contract, or Matplotlib implementation details.
 
 Example-helper tests should use small synthetic tables. They may freeze canonical CSV column names,
 prediction provenance, sample order, and PDF generation from reread tables. They must not execute

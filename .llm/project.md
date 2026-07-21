@@ -38,10 +38,10 @@ No block-aware scaling API is designed or scheduled. Decision 0054 defines Pytho
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
 environments with resolved-version diagnostics. Decision 0056 adds clean installed wheel and
-source-distribution validation. Decisions 0058--0060 make the public plotters caller-embeddable,
-replace the Pi-PLS factor composite with separate $P$, $D$, $Q$, and $QD$ functions, and split
-prediction diagnostics into three one-axis charts. One final plotting and example-composition audit
-remains before release preparation.
+source-distribution validation. Decisions 0058--0061 make every public plotter a caller-embeddable
+one-axis primitive, replace the former factor and prediction composites, and make the example layer
+own every report figure, panel, legend, title, PDF operation, and close. Release preparation is the
+current next increment.
 
 ## Implemented estimator and selection boundary
 

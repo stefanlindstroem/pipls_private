@@ -266,11 +266,12 @@ versus X-reconstruction-residual scatter plot without theoretical limits or auto
 labels.
 
 Matplotlib remains optional and is imported only when a plotting function is called. The functions
-perform no file writing, call no display function, retain no models, and do not alter supplied
-arrays. Component-path helpers remain example-local selection diagnostics, while callers and the
-example layer own panel geometry, legends, figure-level titles, pandas tables, canonical CSV files,
-and PDF composition. No estimator method, fitted attribute, path-search parameter, or top-level
-export is added by this plotting layer.
+perform no legend or panel creation, file writing, display, or closing, retain no models, and do not
+alter supplied arrays. Component-path helpers remain example-local selection diagnostics. Every
+maintained post-analysis report figure is created in the example layer, which passes an explicit
+axis to each package plotter and owns panel geometry, legends, figure-level titles, pandas tables,
+canonical CSV files, and PDF composition. No estimator method, fitted attribute, path-search
+parameter, or top-level export is added by this plotting layer.
 
 ## Example workflow boundary
 

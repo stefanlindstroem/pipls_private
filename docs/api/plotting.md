@@ -10,8 +10,9 @@ With `ax=None`, they create one figure containing one axis. With a supplied axis
 axis without clearing it or changing the surrounding figure.
 Plotters provide concise semantic axis labels and titles, which callers may replace through the
 returned axis. They label multi-series artists but do not create legends; legend placement and
-styling belong to the caller. No function calls `show()`, writes files, or infers scientific
-variable names. Component and response selections use zero-based Python indices.
+styling belong to the caller. They do not create subplot grids or mosaics, set figure-level titles,
+show or save figures, or close them. Component and response selections use zero-based Python
+indices.
 
 ::: pipls.plotting.PredictorStyle
     options:
