@@ -114,9 +114,10 @@ implementing or reviewing this surface.
   grouped in the `examples` optional dependency extra.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
-- `docs/`: the self-contained public documentation source, including user guides, implemented
-  theory, generated-API source pages, release notes, accepted decision records, and local MathJax
-  configuration. Root `mkdocs.yml` defines the strict Material site build and navigation.
+- `docs/`: the self-contained documentation source, including served user guides, implemented
+  theory, generated-API source pages, release notes, local MathJax configuration, and maintainer
+  records under `docs/decisions/`. Root `mkdocs.yml` defines the strict Material site and excludes
+  the maintainer records from rendered pages and search.
 - packaging and release configuration: installable distributions, compatibility policy, versioning,
   and release automation. `constraints/minimum.txt` records the maintainer-only lower-bound test
   environment; `.github/workflows/tests.yml` owns the three compatibility CI environments;
@@ -141,14 +142,16 @@ implementing or reviewing this surface.
   analysis-artifact contracts.
 - `.llm/testing.md`: durable testing boundary.
 - `.llm/development.md`: implementation, testing, patch, and documentation rules.
-- `docs/decisions/`: accepted maintainer history. These records remain linkable but are not
-  prerequisites for understanding the public method or API.
+- `docs/decisions/`: accepted maintainer history. These records remain versioned and distributed
+  but are excluded from the served MkDocs site.
 
 ## Architectural invariants
 
 - Runtime code does not import from `.llm`, tests, examples, docs, scripts, datasets, or benchmarks.
-- Public Markdown under `docs/` is self-contained and does not link outside the documentation source
-  tree. `.llm` contracts may be more detailed but are never user prerequisites.
+- Served Markdown under `docs/` is self-contained and does not link outside the documentation
+  source tree. It defines Pi-PLS, component count, predictor rank, and the CV-MSE selection curve
+  before specialized path or factorization terminology. `.llm` contracts and `docs/decisions/` may
+  be more detailed but are never user prerequisites.
 - The source distribution ships `mkdocs.yml`, the Makefile, documentation sources and assets, the
   minimum-dependency constraint file, and the helpers needed for clean strict documentation and
   installed-distribution checks. Generated `site/` output is excluded from Git, distributions, and

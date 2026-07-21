@@ -1,11 +1,23 @@
 # Parameter selection
 
-Pi-PLS separates fixed-model fitting from model selection.
+Pi-PLS uses paired predictor and response latent variables. `n_components` controls how many pairs
+are retained, while `predictor_rank` controls how much predictor variation is available when those
+pairs are estimated. See the [theory overview](theory.md#interpretation-of-the-ranks) for the
+mathematical distinction.
 
+The usual workflow scans candidate component counts by cross-validation. For each count,
+`PiPLSPathCV` selects a predictor rank and reports cross-validated mean squared error (CV-MSE). The
+resulting table or curve is the **component path**. Inspect CV-MSE against the number of components
+and choose a parsimonious point, often the elbow or plateau where additional components give little
+improvement. The absolute
+minimum is informative, but it need not be the final scientific choice.
+
+Pi-PLS separates this selection step from fixed-model fitting:
+
+- `PiPLSPathCV` evaluates the bounded two-parameter search;
 - `PiPLSRegression` fits one explicit pair `(n_components, predictor_rank)`.
-- `PiPLSPathCV` is the standard package workflow for the bounded triangular search.
 
-## Component-path workflow
+## Evaluate the component path
 
 ```python
 import pandas as pd
@@ -23,8 +35,8 @@ integer sequence requests a smaller or nonconsecutive path.
 
 For each component count, the path selects predictor rank by maximizing the configured mean CV
 score and reports the corresponding response-standardized CV-MSE. Under the default negative-MSE
-scorer, this is equivalent to minimizing mean response-standardized CV-MSE. After inspecting that
-path, the user chooses a component count and fits both ranks explicitly:
+scorer, this is equivalent to minimizing mean response-standardized CV-MSE. After inspecting the
+curve, choose a component count and fit both ranks explicitly:
 
 ```python
 chosen_n_components = 3
@@ -40,8 +52,7 @@ model = PiPLSRegression(
 `PiPLSPathCV.best_params_` identifies the best evaluated pair under the configured scorer. With the
 default scorer, it has the smallest evaluated mean response-standardized CV-MSE. Under adaptive
 `search_method="auto"`, admissible pairs that were not evaluated are not part of that comparison.
-The numerical selection is not presented as a mandatory scientific choice. The reported fold SD
-is descriptive, and the component count remains an explicit path-based user choice.
+The reported fold SD describes fold-to-fold variation and is not a confidence interval.
 
 ## Predictor-rank ceiling
 

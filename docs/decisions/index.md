@@ -71,3 +71,4 @@ reference describe the current public behavior directly.
 - [0054: compatibility policy](0054-compatibility-policy.md)
 - [0055: compatibility CI matrix](0055-compatibility-ci-matrix.md)
 - [0056: installed-distribution validation](0056-installed-distribution-validation.md)
+- [0057: public documentation entry](0057-public-documentation-entry.md)

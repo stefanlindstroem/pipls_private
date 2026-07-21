@@ -107,14 +107,16 @@ def test_mkdocs_configuration_has_valid_user_navigation() -> None:
     public_pages = {
         path.relative_to(root / "docs").as_posix()
         for path in (root / "docs").rglob("*.md")
-        if not (path.parent.name == "decisions" and path.name[:4].isdigit())
+        if "decisions" not in path.relative_to(root / "docs").parts
     }
 
     assert config["strict"] is True
     assert config["theme"]["name"] == "material"
     assert nav_targets == public_pages
     assert all((root / "docs" / target).is_file() for target in nav_targets)
-    assert "decisions/[0-9][0-9][0-9][0-9]-*.md" in config["not_in_nav"]
+    assert config["exclude_docs"].splitlines() == ["decisions/**"]
+    assert "not_in_nav" not in config
+    assert not any(target.startswith("decisions/") for target in nav_targets)
     assert "javascripts/mathjax.js" in config["extra_javascript"]
     mkdocstrings = next(
         plugin["mkdocstrings"]
@@ -306,7 +308,7 @@ def test_public_documentation_is_self_contained() -> None:
     assert ".llm" not in theory
 
 
-def test_public_decision_index_links_every_record() -> None:
+def test_maintainer_decision_index_links_every_record() -> None:
     root = _repository_root()
     index = (root / "docs" / "decisions" / "index.md").read_text(encoding="utf-8")
     linked_files = set(re.findall(r"\((\d{4}-[a-z0-9-]+\.md)\)", index))

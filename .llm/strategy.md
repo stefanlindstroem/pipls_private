@@ -460,10 +460,10 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **in progress**. Decisions 0049--0053 complete the documentation boundary.
-Decision 0054 defines the supported Python and runtime dependency ranges and the minimum test
-environment. Decision 0055 implements the explicit latest-compatible and supported-Python CI
-boundaries. Installed-distribution checks remain.
+Current status: **release preparation remains**. Decisions 0049--0053 establish the documentation
+boundary, Decisions 0054--0056 complete compatibility and installed-distribution validation, and
+Decision 0057 removes maintainer decisions from the served site while making the method and its
+component-selection workflow understandable before specialized terminology appears.
 
 ### Current standardization and deferred block-aware variants
 
@@ -495,8 +495,10 @@ datasets, and metrics, with exact submodule coverage and optional Matplotlib imp
 validates the strict site in CI from both the checkout and a clean installation of the unpacked
 source distribution.
 
-Current status: **complete**. Decisions 0049--0053 define the self-contained public source, strict
-site build, generated public reference, distributed documentation inputs, and CI validation.
+Current status: **complete**. Decisions 0049--0053 define the self-contained source, strict site
+build, generated public reference, distributed documentation inputs, and CI validation. Decision
+0057 excludes maintainer decision records from the served site and requires concise, theory-linked
+onboarding before path and factorization terminology.
 
 ## Compatibility policy status
 

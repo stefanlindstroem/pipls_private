@@ -1,5 +1,16 @@
 # Examples
 
+Pi-PLS predicts through paired predictor and response latent variables. `n_components` is the number
+of pairs retained in the model. In routine use, the examples scan candidate component counts by
+cross-validation and plot cross-validated mean squared error (CV-MSE) against the number of
+components. They then choose a parsimonious point such as an elbow or plateau. For each component
+count, `PiPLSPathCV` also selects the predictor rank that determines how much predictor variation is
+retained.
+
+The resulting table and curve are called the **component path**. See the
+[theory overview](theory.md) for the mathematical construction and
+[`parameter_selection.md`](parameter_selection.md) for the selection workflow.
+
 The numbered examples are organized by user task. Each one states what its data represent, what
 question it addresses, and which outputs it produces.
 
@@ -7,7 +18,7 @@ question it addresses, and which outputs it produces.
 
 `examples/01_minimal_fit_and_plot.py` is the shortest complete route through the package. It uses
 literal NumPy matrices, fits one fixed `PiPLSRegression`, predicts responses, and plots the fitted
-$P D Q^{\mathsf T}$ decomposition. It performs no cross-validation or parameter selection.
+latent predictor-response pairs. It performs no cross-validation or parameter selection.
 
 The same workflow is reproduced in [`quickstart.md`](quickstart.md).
 
@@ -22,9 +33,9 @@ See [`datasets.md`](datasets.md) for the synthetic generator contract.
 
 ## Explicit Pi-PLS and PLS comparison
 
-`examples/09_pls_path_comparison.py` is the dedicated comparison example. For Pulp, Sugarcane, and
-Tobacco, it writes separate Pi-PLS and ordinary-PLS component-path tables and produces one overlaid
-CV-MSE figure per dataset.
+`examples/09_pls_path_comparison.py` scans component counts for Pulp, Sugarcane, and Tobacco. It
+writes separate Pi-PLS and ordinary-PLS CV-MSE tables and produces one overlaid CV-MSE curve per
+dataset.
 
 This comparison is optional. Ordinary Pi-PLS use does not require fitting a PLS reference model.
 
@@ -32,10 +43,11 @@ This comparison is optional. Ordinary Pi-PLS use does not require fitting a PLS 
 
 The real-data examples demonstrate the normal two-stage Pi-PLS workflow:
 
-1. evaluate a Pi-PLS component path;
-2. inspect the path and choose a component count;
+1. scan candidate component counts by cross-validation;
+2. inspect CV-MSE against component count and choose an elbow, plateau, or other scientifically
+   justified point;
 3. read the matching predictor rank from the path table;
-4. fit one fixed Pi-PLS model;
+4. fit one fixed Pi-PLS model with both values;
 5. generate fitted-model interpretation and prediction-diagnostic artifacts.
 
 The examples are:
@@ -55,8 +67,8 @@ separate because model selection and fitted-model interpretation answer differen
 
 The modules under `examples/_support/` implement reusable orchestration for the complete examples:
 
-- ordinary-PLS component-path evaluation for example 09;
-- CSV-to-PDF component-path plotting;
+- ordinary-PLS component-count evaluation for example 09;
+- CSV-to-PDF CV-MSE plotting;
 - fixed-parameter out-of-fold prediction;
 - canonical post-analysis tables and report composition.
 

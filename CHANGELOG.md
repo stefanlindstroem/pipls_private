@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Refine the public documentation entry: exclude maintainer decision records from the served site,
+  introduce Pi-PLS through paired latent variables and CV-MSE component scanning, link introductory
+  material to the theory guide, and shorten the compatibility page.
+
 - Add clean installed-distribution validation: build the wheel and source distribution once,
   install each into a separate temporary environment outside the checkout, and run one shared
   public-import, metadata, fit, prediction, and import-origin smoke test in CI.

@@ -1,20 +1,29 @@
-# Pi-PLS path analysis
+# Choosing the number of components
 
-`PiPLSPathCV` evaluates the admissible two-parameter Pi-PLS surface
+A Pi-PLS component is a paired latent predictor-response direction. `PiPLSPathCV` scans candidate
+component counts by cross-validation. For each count it selects a predictor rank and reports
+cross-validated mean squared error (CV-MSE). The resulting rows, or a plot of CV-MSE against
+component count, are called the **component path**.
+
+Use the curve to choose a parsimonious model, commonly near the elbow or plateau where further
+components give little improvement. The smallest evaluated CV-MSE is informative, but it is not an
+automatic scientific choice. See the [theory overview](theory.md#interpretation-of-the-ranks) for
+the roles of component count and predictor rank.
+
+## Admissible search surface
+
+`PiPLSPathCV` evaluates pairs in
 
 \[
 \mathcal{G}=\{(h,r_\pi):1\le h\le h_{\max},\ h\le r_\pi\le r_{\pi,\max}\}.
 \]
 
-The ordinary user workflow is deliberately two-stage:
+Here $h$ is the component count and $r_\pi$ is the predictor rank. The ordinary workflow is:
 
-1. evaluate one conditional predictor-rank result for each candidate `n_components` value;
-2. inspect the resulting CV-MSE path and fit a separate fixed model with the chosen pair.
+1. evaluate one conditionally selected predictor rank for each candidate component count;
+2. inspect the CV-MSE curve and fit a separate fixed model with the chosen pair.
 
-With the default scorer, the numerically smallest evaluated CV-MSE is informative, but it is not
-treated as an automatic scientific choice of model complexity.
-
-## Stage 1: evaluate the component path
+## Stage 1: scan component counts
 
 ```python
 import pandas as pd

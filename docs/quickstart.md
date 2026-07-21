@@ -1,8 +1,9 @@
 # Quickstart
 
 This page shows the shortest complete Pi-PLS workflow: construct two NumPy matrices, fit one fixed
-model, make predictions, and inspect the fitted $P D Q^\mathsf{T}$ factorization. It performs no
-cross-validation or parameter selection.
+model, make predictions, and plot its paired latent predictor-response directions. It performs no
+cross-validation or parameter selection. The example fixes one latent component and a predictor
+rank of two; applied model development normally selects these values first.
 
 Install the package with the optional plotting dependency:
 
@@ -62,18 +63,20 @@ figure.savefig(Path("minimal_fit.pdf"))
 ```
 
 `PiPLSRegression` follows the normal scikit-learn estimator pattern: constructor arguments describe
-the model, `fit()` learns from `X` and `Y`, and `predict()` returns responses in the original response
-units. Here both ranks are fixed explicitly. The model does not run cross-validation internally.
+the model, `fit()` learns from `X` and `Y`, and `predict()` returns responses in the original
+response units. Here both ranks are fixed explicitly. The model does not run cross-validation
+internally.
 
-The plotting calls are deliberately separate from fitting. `pipls_display_factors()` creates an
-immutable display copy of the fitted Pi-PLS decomposition, and `plot_pipls_decomposition()` renders
-that result. Matplotlib remains an optional dependency and the estimator does not retain plotting
-state.
+The plotting calls are separate from fitting. `pipls_display_factors()` creates an immutable display
+copy of the fitted latent factorization, and `plot_pipls_decomposition()` renders its paired
+predictor directions, response directions, and component strengths. The corresponding matrices
+form $P D Q^{\mathsf T}$; see the [theory overview](theory.md#diagonal-latent-coupling) for their
+construction. Matplotlib remains optional and the estimator retains no plotting state.
 
 The complete executable script is summarized in [`examples.md`](examples.md). Continue with:
 
-1. [`parameter_selection.md`](parameter_selection.md) when component count or predictor rank must be
-   selected;
-2. [`model_inspection.md`](model_inspection.md) for Pi-PLS factorization inspection, prediction
-   diagnostics, and shared PLS-family analysis;
-3. [`examples.md`](examples.md) for the synthetic, comparison, and complete real-data workflows.
+1. [`parameter_selection.md`](parameter_selection.md) to scan component counts and choose a model
+   from the CV-MSE curve;
+2. [`model_inspection.md`](model_inspection.md) for fitted latent structure, prediction diagnostics,
+   and the Pi-PLS-specific factorization;
+3. [`examples.md`](examples.md) for synthetic, comparison, and complete real-data workflows.

@@ -62,6 +62,7 @@ This index is navigation, not a substitute for those records.
 | `0054-compatibility-policy.md` | supported interpreter and dependency ranges | Python 3.10–3.14, guarded runtime dependency majors, and one Python 3.10 minimum stack |
 | `0055-compatibility-ci-matrix.md` | executable compatibility environments | separate minimum, supported-Python, and latest-compatible jobs with resolved-version diagnostics |
 | `0056-installed-distribution-validation.md` | installed release-artifact validation | build once, then verify clean wheel and source-distribution installations with one shared public smoke test |
+| `0057-public-documentation-entry.md` | public documentation entry and maintainer-record boundary | exclude decisions from the served site, define latent-variable selection before jargon, and keep compatibility concise |
 
 ## Implemented estimator/search transition
 

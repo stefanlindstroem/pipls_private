@@ -1,37 +1,54 @@
 # Pi-PLS documentation
 
-This documentation describes the installable `pipls` package, its implemented theory, and its
-supported user workflows.
+Pi-PLS is a multivariate linear-regression method for predicting one or more response variables
+from a block of predictors. It represents the predictive relation through a small number of paired
+predictor and response latent variables.
+
+## What Pi-PLS does
+
+Two parameters control model complexity:
+
+- `n_components` is the number of paired latent variables used for prediction;
+- `predictor_rank` is the dimension of the predictor subspace retained before those pairs are
+  estimated.
+
+In routine use, `PiPLSPathCV` evaluates successive component counts by cross-validation. For each
+count it selects a predictor rank and reports cross-validated mean squared error (CV-MSE). Plotting
+CV-MSE against the number of components gives the model-selection curve used throughout the
+examples. A common choice is the
+elbow or plateau where additional components give little improvement, rather than automatically
+using the absolute minimum.
+
+See the [theory overview](theory.md) for the mathematical construction and the distinct roles of
+the two ranks.
 
 ## Start here
 
 1. [`quickstart.md`](quickstart.md): literal NumPy matrices, one fixed fit, predictions, and one
-   decomposition plot;
-2. [`examples.md`](examples.md): synthetic, comparison, and complete real-data workflows;
-3. [`estimator_api.md`](estimator_api.md): `PiPLSRegression` parameters, fitted attributes, and
+   latent-factor plot;
+2. [`parameter_selection.md`](parameter_selection.md): scan component counts, inspect CV-MSE, and
+   choose the final fixed model;
+3. [`examples.md`](examples.md): synthetic, comparison, and complete real-data workflows;
+4. [`estimator_api.md`](estimator_api.md): `PiPLSRegression` parameters, fitted attributes, and
    scikit-learn behavior;
-4. [`parameter_selection.md`](parameter_selection.md): component and predictor-rank controls,
-   scoring, and selection policy;
-5. [`path_analysis.md`](path_analysis.md): joint `n_components` and `predictor_rank` search;
+5. [`path_analysis.md`](path_analysis.md): details of the cross-validated component and
+   predictor-rank search;
 6. [`cross_validation.md`](cross_validation.md): splitters, groups, repeated CV, OOF predictions,
    and validation reports;
 7. [`api/index.md`](api/index.md): generated signatures, parameters, fitted attributes, shapes, and
    method contracts for the core public API.
 
-The quickstart is the ordinary fixed-model entry point. It does not require pandas, a repository
-dataset, or cross-validation. The complete real-data examples are later-stage reference workflows.
+The quickstart fixes both ranks and shows the estimator interface. The selection guides and
+real-data examples show how to choose them.
 
 ## Fitted-model inspection
 
-Component-path tables diagnose model selection. Fitted-model decomposition, score, loading, and
-coefficient views are a separate interpretation stage, while observed-versus-predicted and residual
-diagnostics require explicit prediction provenance.
+Model selection and fitted-model interpretation answer different questions. After choosing and
+fitting a model, use:
 
-- [`model_inspection.md`](model_inspection.md): Pi-PLS display factors, prediction diagnostics,
-  Pi-PLS-specific factorization inspection, shared PLS-family analysis, and optional Matplotlib
-  figures;
-- [`examples.md`](examples.md): numbered examples and the distinction between introductory scripts,
-  explicit comparison, and complete analyses.
+- [`model_inspection.md`](model_inspection.md): latent scores, loadings, coefficients, prediction
+  diagnostics, and the Pi-PLS-specific factorization;
+- [`examples.md`](examples.md): numbered workflows from a fixed fit to complete analyses.
 
 ## Data and validation workflows
 
@@ -44,10 +61,5 @@ diagnostics require explicit prediction provenance.
 
 ## Scientific and numerical background
 
-- [`theory.md`](theory.md): implemented Pi-PLS construction, rank interpretation, fitted quantities,
-  and numerical invariances.
-
-## Maintainer records
-
-Accepted engineering decisions are indexed under [`decisions/index.md`](decisions/index.md). They
-record why contracts were adopted, but they are not prerequisites for using the package.
+- [`theory.md`](theory.md): implemented Pi-PLS construction, interpretation of the two ranks,
+  fitted quantities, and numerical invariances.

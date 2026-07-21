@@ -28,6 +28,8 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
   fewer than three observations per retained predictor-rank direction;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
 - a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
+- a public documentation entry that defines paired latent variables, component-count scanning,
+  and elbow-based CV-MSE interpretation before specialized terminology;
 - shared private fold-evaluation and adaptive-search machinery;
 - PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and public
   immutable `PiPLSDecomposition`;
@@ -130,6 +132,7 @@ case, or public behavior.
 | Runtime dependencies | `numpy>=1.26,<3`, `scikit-learn>=1.4,<2`, and `joblib>=1.2,<2`; the minimum lines are constrained together on Python 3.10 |
 | Compatibility CI | separate minimum, supported-Python, and latest-compatible jobs; every job prints resolved interpreter and runtime dependency versions |
 | Distribution validation | `make dist-check` builds once and verifies separate clean wheel and sdist installations with one shared public smoke test |
+| Served documentation | user guides and API reference only; `docs/decisions/` remains maintainer history and is excluded from MkDocs |
 
 Additional fixed decisions:
 
@@ -263,10 +266,11 @@ Prepare the first release. Choose the initial version, condense the large Unrele
 release notes, complete project URLs and package metadata, define the tag and publication checklist,
 and rehearse publication through TestPyPI before using the main package index.
 
-Decisions 0054--0056 complete compatibility and packaging hardening: the repository now owns an
-explicit support policy, three diagnosable compatibility environments, and clean installed wheel
-and source-distribution checks. The next patch should not add another packaging smoke layer before
-the version and release boundary is decided.
+Decisions 0054--0056 complete compatibility and packaging hardening. Decision 0057 completes the
+current documentation refinement by excluding maintainer decisions from the served site, defining
+Pi-PLS and its latent-variable selection workflow before specialized terminology, and reducing the
+compatibility page to its user-facing contract. The next patch should not add another documentation
+or packaging layer before the version and release boundary is decided.
 
 ## Subsequent roadmap
 

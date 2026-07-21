@@ -1,5 +1,11 @@
 # Examples
 
+Pi-PLS predicts through paired predictor and response latent variables. Applied workflows normally
+scan the number of latent components by cross-validation and inspect CV-MSE against component count.
+The resulting table or curve is called the component path; a common choice is an elbow or plateau
+where further components add little improvement. For the mathematical construction, see
+`docs/theory.md`.
+
 The examples are arranged by user task rather than by implementation complexity. Each numbered
 script is self-contained: it explains its data, purpose, and printed or written results without
 assuming familiarity with a publication. Start with the literal-matrix fit, then move to synthetic

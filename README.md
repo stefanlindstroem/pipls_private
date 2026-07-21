@@ -1,10 +1,15 @@
 # Pi-PLS
 
 `pipls` is an installable Python package for Pi-PLS, a PLS-family method for multivariate
-regression. Its public interfaces follow scikit-learn conventions and provide a fixed-model
-regression estimator, pipeline-aware triangular path analysis, advanced cross-validation, ordered
-out-of-fold diagnostics, pure fitted-model inspection, deterministic synthetic data generation,
-and transparent reference datasets.
+regression. Pi-PLS represents the predictive relation through paired predictor and response latent
+variables. The number of components controls how many pairs are retained, while predictor rank
+controls how much predictor variation is available to form them.
+
+In routine use, `PiPLSPathCV` scans component counts by cross-validation and reports
+cross-validated mean squared error (CV-MSE) for each count. The user then chooses a parsimonious
+point, often an elbow or plateau in the CV-MSE curve, and fits one fixed `PiPLSRegression` model.
+The public interfaces follow scikit-learn conventions and also provide validation diagnostics, fitted-model inspection, synthetic data, and
+transparent reference datasets. See the [theory overview](docs/theory.md) for the construction.
 
 ## Installation
 
@@ -110,9 +115,10 @@ Fitting, numerical inspection, and plotting remain separate operations. See the 
 `PiPLSPathCV` is the separate model-selection interface. It clones and fits fixed estimators inside
 every training fold, then optionally refits the selected pair on the complete training set.
 
-## Component-path analysis
+## Choosing latent components
 
-Scan component counts first and write one conditional predictor-rank row per value:
+A component path is the table or curve obtained by scanning component counts. Each row contains the
+mean CV-MSE and the predictor rank selected for that component count:
 
 ```python
 import pandas as pd
@@ -128,7 +134,8 @@ path.to_csv("component_path.csv", index=False)
 The default `n_components_values="all"` evaluates every admissible component count. Supply an
 explicit sequence such as `[1, 2, 3, 4]` when only a subset is wanted.
 
-After inspecting the canonical CSV, choose a component count and fit both ranks explicitly:
+Plot or inspect CV-MSE against component count, choose an elbow, plateau, or other justified
+point, and fit both ranks explicitly:
 
 ```python
 chosen_n_components = 3

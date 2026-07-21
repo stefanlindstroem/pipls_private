@@ -19,7 +19,7 @@ nav:
       - Estimator API: estimator_api.md
   - Using Pi-PLS:
       - Parameter selection: parameter_selection.md
-      - Component paths: path_analysis.md
+      - Choosing components: path_analysis.md
       - Cross-validation: cross_validation.md
       - Preprocessing: preprocessing.md
   - Model inspection: model_inspection.md
@@ -40,10 +40,9 @@ nav:
       - Reproducibility: reproducibility.md
   - Scientific background:
       - Theory: theory.md
-  - Design decisions: decisions/index.md
 
-not_in_nav: |
-  decisions/[0-9][0-9][0-9][0-9]-*.md
+exclude_docs: |
+  decisions/**
 
 validation:
   omitted_files: warn
