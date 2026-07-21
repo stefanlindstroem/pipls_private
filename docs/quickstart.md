@@ -1,9 +1,9 @@
 # Quickstart
 
-This page shows the shortest complete Pi-PLS workflow: construct two NumPy matrices, fit one fixed
-model, make predictions, and plot its paired latent predictor-response directions. It performs no
-cross-validation or parameter selection. The example fixes one latent component and a predictor
-rank of two; applied model development normally selects these values first.
+This page is a compact API introduction: construct two NumPy matrices, fit one fixed model, make
+predictions, and plot its paired latent predictor-response directions. It performs no
+cross-validation or parameter selection. For the complete model-development workflow, begin with
+the [Pulp tutorial](tutorials/pulp.md).
 
 Install the package with the optional plotting dependency:
 
@@ -98,8 +98,9 @@ construction. Matplotlib remains optional and the estimator retains no plotting 
 
 The complete executable script is summarized in [`examples.md`](examples.md). Continue with:
 
-1. [`parameter_selection.md`](parameter_selection.md) to scan component counts and choose a model
+1. the [Pulp tutorial](tutorials/pulp.md) for one complete real-data workflow;
+2. [`parameter_selection.md`](parameter_selection.md) to scan component counts and choose a model
    from the CV-MSE curve;
-2. [`model_inspection.md`](model_inspection.md) for fitted latent structure, prediction diagnostics,
+3. [`model_inspection.md`](model_inspection.md) for fitted latent structure, prediction diagnostics,
    and the Pi-PLS-specific factorization;
-3. [`examples.md`](examples.md) for synthetic, comparison, and complete real-data workflows.
+4. [`examples.md`](examples.md) for synthetic, comparison, and complete real-data workflows.

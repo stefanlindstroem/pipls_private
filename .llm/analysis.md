@@ -119,6 +119,11 @@ Their support modules live under `examples/_support/` so they are visibly separa
 user entry points. Do not hide real-data reading behind a package loader. Do not place user analysis
 helpers under `scripts/`, which remains the repository-maintenance and preparation area.
 
+The served Pulp tutorial is the primary pedagogical analysis. It extracts executable snippets from
+that workflow and presents each deterministic generated figure separately. Plot-specific sections
+link to the general inspection and plotting references rather than duplicating API contracts.
+Prediction figures must retain the selection-conditioned OOF provenance.
+
 Pulp is the canonical tutorial analysis. `examples/_support/pulp_workflow.py` owns its direct pandas
 loading, terminal-Pi-PLS pipeline template, complete-pipeline path evaluation, visible component-
 count choice, nested fixed-parameter transfer, five-fold fixed-pipeline OOF predictions, and

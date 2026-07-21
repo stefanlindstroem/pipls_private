@@ -52,12 +52,15 @@ class PulpWorkflowResult:
         return _pipls_step(self.fitted_pipeline)
 
 
+# --8<-- [start:load-pulp-data]
 def load_pulp_data(data_dir: Path = PULP_DATA_DIR) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Read the committed Pulp predictor and response tables."""
 
     return pd.read_csv(data_dir / "X.csv"), pd.read_csv(data_dir / "Y.csv")
+# --8<-- [end:load-pulp-data]
 
 
+# --8<-- [start:build-pulp-pipeline]
 def build_pulp_pipeline() -> Pipeline:
     """Return the pipeline template evaluated by the Pulp component path."""
 
@@ -72,8 +75,10 @@ def build_pulp_pipeline() -> Pipeline:
             )
         ]
     )
+# --8<-- [end:build-pulp-pipeline]
 
 
+# --8<-- [start:evaluate-pulp-component-path]
 def evaluate_pulp_component_path(
     pipeline_template: Pipeline,
     X: pd.DataFrame,
@@ -87,8 +92,10 @@ def evaluate_pulp_component_path(
     ).fit(X, Y)
     component_path = pd.DataFrame(path_search.component_path_results_)
     return path_search, component_path
+# --8<-- [end:evaluate-pulp-component-path]
 
 
+# --8<-- [start:select-pulp-predictor-rank]
 def select_pulp_predictor_rank(
     component_path: pd.DataFrame,
     *,
@@ -109,8 +116,10 @@ def select_pulp_predictor_rank(
             f"n_components={n_components}, predictor_rank={predictor_rank}."
         )
     return predictor_rank
+# --8<-- [end:select-pulp-predictor-rank]
 
 
+# --8<-- [start:fit-pulp-pipeline]
 def fit_pulp_pipeline(
     pipeline_template: Pipeline,
     X: pd.DataFrame,
@@ -126,6 +135,7 @@ def fit_pulp_pipeline(
         pipls__predictor_rank=predictor_rank,
     )
     return fitted_pipeline.fit(X, Y)
+# --8<-- [end:fit-pulp-pipeline]
 
 
 def run_pulp_workflow(
@@ -154,12 +164,15 @@ def run_pulp_workflow(
         predictor_rank=chosen_predictor_rank,
     )
     model = _pipls_step(fitted_pipeline)
+    # --8<-- [start:pulp-oof-predictions]
     oof = fixed_model_oof_predictions(
         fitted_pipeline,
         X,
         Y,
         splitter=KFold(n_splits=5, shuffle=False),
     )
+    # --8<-- [end:pulp-oof-predictions]
+    # --8<-- [start:pulp-inspection-results]
     factors = pipls_display_factors(model.decomposition_)
     diagnostics = prediction_diagnostics(
         Y,
@@ -167,6 +180,7 @@ def run_pulp_workflow(
         prediction_kind=PULP_PREDICTION_KIND,
     )
     structure = latent_structure(model)
+    # --8<-- [end:pulp-inspection-results]
     return PulpWorkflowResult(
         X=X,
         Y=Y,

@@ -291,7 +291,8 @@ def test_public_markdown_has_no_ascii_control_characters() -> None:
 
 def test_public_documentation_is_self_contained() -> None:
     root = _repository_root()
-    escaped_link = re.compile(r"\[[^]]*\]\(\.\./")
+    docs_root = (root / "docs").resolve()
+    markdown_target = re.compile(r"\]\((?P<target>[^)]+)\)")
     abandoned_selection_terms = (
         "one-standard-error",
         "one-standard-deviation",
@@ -300,7 +301,13 @@ def test_public_documentation_is_self_contained() -> None:
 
     for path in sorted((root / "docs").rglob("*.md")):
         text = path.read_text(encoding="utf-8")
-        assert escaped_link.search(text) is None, f"{path} links outside docs/"
+        for match in markdown_target.finditer(text):
+            target = match.group("target").strip().split(maxsplit=1)[0].strip("<>")
+            if not target or target.startswith(("#", "http://", "https://", "mailto:")):
+                continue
+            relative_path = target.split("#", 1)[0]
+            resolved = (path.parent / relative_path).resolve()
+            assert resolved.is_relative_to(docs_root), f"{path} links outside docs/: {target}"
         lowered = text.lower()
         assert not any(term in lowered for term in abandoned_selection_terms), path
 

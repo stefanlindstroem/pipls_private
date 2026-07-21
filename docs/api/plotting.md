@@ -12,7 +12,8 @@ Plotters provide concise semantic axis labels and titles, which callers may repl
 returned axis. They label multi-series artists but do not create legends; legend placement and
 styling belong to the caller. They do not create subplot grids or mosaics, set figure-level titles,
 show or save figures, or close them. Component and response selections use zero-based Python
-indices.
+indices. The [Pulp tutorial](../tutorials/pulp.md#interpret-the-fitted-model) shows every maintained
+plotting function in one fitted analysis.
 
 ::: pipls.plotting.PredictorStyle
     options:

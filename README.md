@@ -11,6 +11,10 @@ point, often an elbow or plateau in the CV-MSE curve, and fits one fixed `PiPLSR
 The public interfaces follow scikit-learn conventions and also provide validation diagnostics, fitted-model inspection, synthetic data, and
 transparent reference datasets. See the [theory overview](docs/theory.md) for the construction.
 
+The recommended documentation entry point is the
+[complete Pulp tutorial](docs/tutorials/pulp.md), which covers pipeline construction, parameter
+selection, fixed fitting, out-of-fold prediction, and figure-by-figure interpretation.
+
 ## Installation
 
 For development from a source checkout:
@@ -418,6 +422,7 @@ This builds the wheel and source distribution once, installs each into its own c
 environment outside the checkout, and runs the same public-import, metadata, fit, and prediction
 smoke test against both artifacts.
 
+- [Complete Pulp tutorial](docs/tutorials/pulp.md)
 - [Quickstart](docs/quickstart.md)
 - [Examples](docs/examples.md)
 - [Documentation index](docs/index.md)

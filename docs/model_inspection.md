@@ -463,8 +463,8 @@ limits, automatic observation labels, or contribution plots. Biplots, confidence
 automatic variable selection, uncertainty intervals, and permutation tests remain outside the
 implemented surface.
 
-The Pulp workflow described in [`examples.md`](examples.md#complete-pi-pls-analyses) demonstrates
-the package inspection and plotting APIs together with example-owned I/O. It derives predictor and
+The [Pulp tutorial](tutorials/pulp.md#interpret-the-fitted-model) demonstrates these inspection and
+plotting APIs one figure at a time. The complete workflow retains example-owned I/O. It derives predictor and
 response names visibly from the Pulp CSV headers, reads fixed component choices from the canonical
 path artifacts, and clones the fixed Pi-PLS estimator
 inside the same five non-shuffled folds, writes seven long-form CSV files under

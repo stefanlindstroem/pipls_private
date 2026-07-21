@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
+import yaml
 
 try:
     import tomllib
@@ -129,4 +131,85 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert "pandas>=2.0" in docs_dependencies
     assert "matplotlib>=3.8" in docs_dependencies
     assert "render_pulp_tutorial.py" in sdist_checker
+    assert 'source / "docs" / "tutorials" / "pulp.md"' in sdist_checker
+    assert 'source / "examples" / "10_pulp_real_data.py"' in sdist_checker
+    assert 'source / "site" / "tutorials" / "pulp" / "index.html"' in sdist_checker
     assert "PULP_TUTORIAL_FIGURES" in sdist_checker
+
+
+def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
+    repository = _repository_root()
+    tutorial_path = repository / "docs" / "tutorials" / "pulp.md"
+    tutorial = tutorial_path.read_text(encoding="utf-8")
+    workflow = (repository / "examples" / "_support" / "pulp_workflow.py").read_text(
+        encoding="utf-8"
+    )
+    with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
+        mkdocs = yaml.safe_load(stream)
+
+    tutorial_nav = next(item["Tutorial"] for item in mkdocs["nav"] if "Tutorial" in item)
+    assert tutorial_nav == [{"Pulp workflow": "tutorials/pulp.md"}]
+    snippets = next(
+        extension["pymdownx.snippets"]
+        for extension in mkdocs["markdown_extensions"]
+        if isinstance(extension, dict) and "pymdownx.snippets" in extension
+    )
+    assert snippets == {
+        "base_path": ["."],
+        "check_paths": True,
+        "dedent_subsections": True,
+    }
+
+    linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
+    assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(
+        encoding="utf-8"
+    )
+    assert "tutorials/pulp.md" in (repository / "docs" / "quickstart.md").read_text(
+        encoding="utf-8"
+    )
+    assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(
+        encoding="utf-8"
+    )
+    assert "../cross_validation.md" in linked_targets
+    assert "../model_inspection.md" in linked_targets
+    assert "../theory.md" in linked_targets
+
+    snippet_sections = {
+        "load-pulp-data",
+        "build-pulp-pipeline",
+        "evaluate-pulp-component-path",
+        "select-pulp-predictor-rank",
+        "fit-pulp-pipeline",
+        "pulp-oof-predictions",
+        "pulp-inspection-results",
+    }
+    for section in snippet_sections:
+        assert f'examples/_support/pulp_workflow.py:{section}' in tutorial
+        assert f"# --8<-- [start:{section}]" in workflow
+        assert f"# --8<-- [end:{section}]" in workflow
+
+    for filename in FIGURE_FILENAMES:
+        assert f"../assets/generated/pulp/{filename}" in tutorial
+
+    plotting_functions = {
+        "plot_scores",
+        "plot_biplot",
+        "plot_x_loadings",
+        "plot_y_loadings",
+        "plot_pipls_predictor_directions",
+        "plot_pipls_dilation",
+        "plot_pipls_response_directions",
+        "plot_pipls_weighted_response_directions",
+        "plot_coefficients",
+        "plot_observed_vs_predicted",
+        "plot_residuals_vs_predicted",
+        "plot_standardized_rmse",
+    }
+    for function_name in plotting_functions:
+        assert f"../api/plotting.md#pipls.plotting.{function_name}" in tutorial
+
+    prediction_kind = (
+        'PULP_PREDICTION_KIND: PredictionKind = "selection-conditioned OOF predictions"'
+    )
+    assert prediction_kind in workflow
+    assert 'examples/10_pulp_real_data.py' in tutorial

@@ -44,7 +44,9 @@ source-distribution validation. Decisions 0058--0061 make every public plotter a
 one-axis primitive, replace the former factor and prediction composites, and make the example layer
 own every report figure, panel, legend, title, PDF operation, and close. Decision 0062
 establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
-generates its deterministic single-chart SVG assets and manifest. The detailed Pulp tutorial is the
+generates its deterministic single-chart SVG assets and manifest. Decision 0064 makes the detailed
+Pulp tutorial the primary pedagogical route through the served documentation, using checked source
+snippets and one generated chart per explanation. Final guide and reference consolidation is the
 current next increment.
 
 ## Implemented estimator and selection boundary

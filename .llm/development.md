@@ -64,7 +64,9 @@
   remain warning-free. Core generated pages use explicit public objects and source docstrings; do not
   expose private modules or inherited implementation machinery by broad module expansion. Never commit
   generated `site/` output or `docs/assets/generated/` tutorial assets. `make docs` and
-  `make docs-serve` regenerate the Pulp assets through `make docs-figures`. Use `make docs-dist`
+  `make docs-serve` regenerate the Pulp assets through `make docs-figures`. Tutorial code excerpts
+  use checked `pymdownx.snippets` sections from repository source; do not copy the canonical Pulp
+  analysis into Markdown. Use `make docs-dist`
   when changing documentation packaging or the source-distribution documentation boundary; it
   performs a clean install and strict build from
   the unpacked sdist and therefore remains outside the ordinary fast test target. Use

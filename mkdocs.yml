@@ -12,6 +12,8 @@ theme:
 
 nav:
   - Home: index.md
+  - Tutorial:
+      - Pulp workflow: tutorials/pulp.md
   - Getting started:
       - Quickstart: quickstart.md
       - Compatibility: compatibility.md
@@ -81,6 +83,11 @@ markdown_extensions:
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.details
+  - pymdownx.snippets:
+      base_path:
+        - .
+      check_paths: true
+      dedent_subsections: true
   - pymdownx.superfences
 
 extra_javascript:

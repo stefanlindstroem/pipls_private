@@ -57,7 +57,9 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
   reconstructed from those tables;
 - a canonical example-owned Pulp pipeline workflow that supplies path evaluation, explicit
   component-count selection, fixed fitting, selection-conditioned OOF prediction, and inspection
-  results to example 10 and the planned tutorial renderer.
+  results to example 10, the deterministic tutorial renderer, and checked documentation snippets;
+- a tutorial-first served site whose primary Pulp walkthrough includes every generated chart
+  separately and links each interpretation to the general inspection, plotting, and theory references.
 
 Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
@@ -269,15 +271,16 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue the tutorial-first documentation transition. Decisions 0062 and 0063 establish one
+Complete the tutorial-first documentation transition. Decisions 0062 and 0063 establish one
 canonical Pulp pipeline workflow and deterministic repository-generated SVG assets with a
-machine-readable manifest. Documentation builds and clean source-distribution validation regenerate
-the figures without adding package API or committing generated files.
+machine-readable manifest. Decision 0064 adds the detailed Pulp tutorial, makes it the primary
+pedagogical route through the served site, includes each generated chart separately, and extracts
+checked code snippets from the canonical workflow.
 
-The next patch should add the detailed Pulp tutorial, make it the primary pedagogical route through
-the served documentation, include the generated figures one at a time, and use executable source
-snippets from the canonical workflow. It should not yet perform the final consolidation of all
-surrounding guide and reference pages.
+The next patch should consolidate the surrounding home, quickstart, examples, parameter-selection,
+model-inspection, plotting-reference, and theory pages so each has one distinct role and avoids
+repeating the worked Pulp analysis. It should retain the tutorial as the linear workflow and the
+other pages as concise how-to or reference material.
 
 ## Subsequent roadmap
 

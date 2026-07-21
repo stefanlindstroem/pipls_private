@@ -12,6 +12,9 @@ and choose a parsimonious point, often the elbow or plateau where additional com
 improvement. The absolute
 minimum is informative, but it need not be the final scientific choice.
 
+The [Pulp tutorial](tutorials/pulp.md#evaluate-the-component-path) shows this process with the
+repository's canonical real-data workflow.
+
 Pi-PLS separates this selection step from fixed-model fitting:
 
 - `PiPLSPathCV` evaluates the bounded two-parameter search;

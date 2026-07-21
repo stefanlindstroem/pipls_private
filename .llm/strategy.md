@@ -489,8 +489,10 @@ method and its component-selection workflow understandable before specialized te
 Decisions 0058--0061 complete atomic plotting and example-owned report composition. Decision 0062
 adds one canonical Pulp pipeline workflow shared by the numbered example and tutorial tools.
 Decision 0063 generates deterministic single-chart SVG assets and a manifest from that workflow in
-checkout and source-distribution documentation builds. The next increment is the detailed Pulp
-tutorial; release metadata follows after the tutorial and documentation consolidation are complete.
+checkout and source-distribution documentation builds. Decision 0064 adds the complete Pulp tutorial
+as the site's primary pedagogical route, using checked source snippets and generated figures. The
+next increment is final consolidation of the surrounding guides and references; release metadata
+follows after that audit.
 
 ### Current standardization and deferred block-aware variants
 

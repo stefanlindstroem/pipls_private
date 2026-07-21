@@ -65,8 +65,9 @@ Example-helper tests cover `examples/_support/fixed_model_oof.py`,
 `examples/_support/post_analysis_artifacts.py`, and the canonical Pulp workflow. Tutorial-renderer
 tests may run that workflow once in a temporary directory, parse every declared SVG, verify manifest
 hashes and generated filenames, and enforce Makefile/source-distribution ownership without pinning
-pixels or Matplotlib artist counts. Small synthetic matrices protect generic OOF and report
-contracts. One module-scoped Pulp numerical run may verify
+pixels or Matplotlib artist counts. Tutorial structure tests may verify navigation, generated-asset
+references, checked snippet sections, and links to stable API objects without freezing narrative
+wording. Small synthetic matrices protect generic OOF and report contracts. One module-scoped Pulp numerical run may verify
 pipeline cloning, nested parameter transfer, component-path schema, aligned OOF predictions, and
 inspection shapes without writing application artifacts.
 

@@ -59,6 +59,7 @@ reference describe the current public behavior directly.
 - [0048: self-contained user examples](0048-self-contained-user-examples.md)
 - [0062: canonical Pulp workflow](0062-canonical-pulp-workflow.md)
 - [0063: repository-generated Pulp tutorial figures](0063-repository-generated-pulp-tutorial-figures.md)
+- [0064: tutorial-first documentation](0064-tutorial-first-documentation.md)
 
 ## Repository and documentation policy
 

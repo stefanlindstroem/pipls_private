@@ -113,10 +113,12 @@ def main() -> None:
             source / "Makefile",
             source / "mkdocs.yml",
             source / "docs" / "index.md",
+            source / "docs" / "tutorials" / "pulp.md",
             source / "docs" / "api" / "index.md",
             source / "docs" / "javascripts" / "mathjax.js",
             source / "tools" / "render_pulp_tutorial.py",
             source / "examples" / "_support" / "pulp_workflow.py",
+            source / "examples" / "10_pulp_real_data.py",
             source / "datasets" / "pulp" / "X.csv",
             source / "datasets" / "pulp" / "Y.csv",
             source / "src" / "pipls" / "__init__.py",
@@ -171,6 +173,7 @@ def main() -> None:
 
         rendered = [
             source / "site" / "index.html",
+            source / "site" / "tutorials" / "pulp" / "index.html",
             source / "site" / "api" / "regression" / "index.html",
             source / "site" / "api" / "inspection" / "index.html",
             source / "site" / "assets" / "generated" / "pulp" / "component_path.svg",

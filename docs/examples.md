@@ -14,6 +14,10 @@ The resulting table and curve are called the **component path**. See the
 The numbered examples are organized by user task. Each one states what its data represent, what
 question it addresses, and which outputs it produces.
 
+The Pulp analysis is also developed step by step in the
+[complete Pulp tutorial](tutorials/pulp.md), which is the recommended starting point for learning
+the full workflow.
+
 ## Minimal fixed fit
 
 `examples/01_minimal_fit_and_plot.py` is the shortest complete route through the package. It uses
