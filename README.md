@@ -227,21 +227,28 @@ prediction_figure, prediction_axes = plot_prediction_diagnostics(
     diagnostics,
     response_names=response_names,
 )
-score_figure, score_axes = plot_scores(structure, components=(0, 1))
-biplot_figure, biplot_axes = plot_biplot(
+score_figure, score_axis = plot_scores(structure, components=(0, 1))
+biplot_figure, biplot_axis = plot_biplot(
     biplot,
     predictor_names=predictor_names,
 )
-loading_figure, loading_axes = plot_x_loadings(
+loading_figure, loading_axis = plot_x_loadings(
     structure,
     predictor_style="bar",
     predictor_names=predictor_names,
 )
+loading_axis.legend(title="Component")
 ```
 
-The plotting functions return figures and named axes. They do not call `show()`, save files, retain
-models, or infer whether predictors are spectra. The shared PLS-family score, balanced score-loading biplot, X/Y-loading, coefficient, and raw observation-diagnostic figures are available from `pipls.plotting`. The numerical extraction accepts compatible fitted `PiPLSRegression` and scikit-learn `PLSRegression` models. Use `predictor_style="line"` with an explicit
-physical coordinate and axis label for spectra. Install with `python -m pip install "pipls[plot]"`.
+Single-chart plotting functions return `(figure, axis)` and accept an optional caller-supplied
+`ax`, so the same function can create a standalone figure or draw into a user-owned panel. They do
+not call `show()`, save files, clear supplied axes, or infer whether predictors are spectra.
+Multi-series artists are labeled, but callers add and position legends themselves. The shared
+PLS-family score, balanced score-loading biplot, X/Y-loading, coefficient, and raw
+observation-diagnostic figures are available from `pipls.plotting`. The numerical extraction
+accepts compatible fitted `PiPLSRegression` and scikit-learn `PLSRegression` models. Use
+`predictor_style="line"` with an explicit physical coordinate and axis label for spectra. Install
+with `python -m pip install "pipls[plot]"`.
 See [`docs/model_inspection.md`](docs/model_inspection.md) and the complete
 [Pulp post-analysis example](examples/10_pulp_real_data.py).
 

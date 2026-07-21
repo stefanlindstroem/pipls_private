@@ -3,10 +3,11 @@
 ## Status
 
 Accepted, with the ordinary-PLS-specific analysis ownership and numbered-example use superseded by
-Decision 0045. The separation of selection diagnostics, fitted-model interpretation, prediction
-diagnostics, immutable inspection results, optional plotting, explicit labels, physical axes, and
-canonical artifacts remains in force. The corrective API, numbered-example, artifact, and
-boundary-test migration required by Decision 0045 is complete.
+Decision 0045, and the package-owned figure-composition contract superseded by Decision 0058. The
+separation of selection diagnostics, fitted-model interpretation, prediction diagnostics,
+immutable inspection results, optional plotting, explicit labels, physical axes, and canonical
+artifacts remains in force. The corrective API, numbered-example, artifact, and boundary-test
+migration required by Decision 0045 is complete.
 
 ## Context
 

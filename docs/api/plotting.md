@@ -5,9 +5,16 @@ Matplotlib is imported only when a plotting function is called; the numerical pa
 inspection helpers remain usable without it. Install Matplotlib directly or use the `examples`
 optional dependency group.
 
-Every plotting function returns a Matplotlib figure and a dictionary of named axes. The functions
-do not call `show()`, write files, infer scientific variable names, or add theoretical decision
-limits. Component and response selections use zero-based Python indices.
+The single-chart plotting functions accept an optional Matplotlib `ax` and return `(figure, axis)`.
+With `ax=None`, they create one figure containing one axis. With a supplied axis, they draw on that
+axis without clearing it or changing the surrounding figure. The current composite decomposition
+and prediction-diagnostic functions retain their named-axis dictionaries until they are split into
+single-chart functions.
+
+Plotters provide concise semantic axis labels and titles, which callers may replace through the
+returned axis. They label multi-series artists but do not create legends; legend placement and
+styling belong to the caller. No function calls `show()`, writes files, or infers scientific
+variable names. Component and response selections use zero-based Python indices.
 
 ::: pipls.plotting.PredictorStyle
     options:

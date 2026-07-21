@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Establish the single-axis plotting contract for the existing atomic PLS-family figures: accept
+  caller-supplied Matplotlib axes, return `(figure, axis)`, leave panel composition and legends to
+  the caller, and retain standalone one-axis figure creation.
+
 - Refine the public documentation entry: exclude maintainer decision records from the served site,
   introduce Pi-PLS through paired latent variables and CV-MSE component scanning, link introductory
   material to the theory guide, and shorten the compatibility page.

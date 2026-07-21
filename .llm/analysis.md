@@ -8,10 +8,11 @@ diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.in
 
 Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
 Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
-factorization inspection, and shared PLS-family analysis. The migration is complete: shared
-latent-structure functions use estimator-neutral names and structural fitted-model contracts, and
-numbered-example post-analysis applies them only to the selected Pi-PLS model. The Pi-PLS $P$, $D$,
-and $Q$ surface remains explicitly method-specific.
+factorization inspection, and shared PLS-family analysis. Decision 0058 establishes one chart per
+public plotting function and caller-owned figure composition. The shared latent-structure functions
+use estimator-neutral names and structural fitted-model contracts, and numbered-example
+post-analysis applies them only to the selected Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface
+remains explicitly method-specific.
 
 ## Analysis stages
 
@@ -77,9 +78,23 @@ The plotting submodule owns reusable Matplotlib figures for computed analysis re
 Matplotlib inside plotting code so that importing `pipls` and `pipls.inspection` does not require
 the optional plotting dependency.
 
-Plotting functions return the `Figure` and named axes. They do not call `show()`, write files,
-retain models, or change supplied arrays. The names remain under `pipls.plotting`; they are not
-added automatically to `pipls.__all__`.
+A public single-chart plotting function draws exactly one scientific chart on exactly one
+Matplotlib `Axes`. It accepts `ax=None` and returns `(figure, axis)`. With no axis it creates one
+figure containing one axis. With a supplied axis it draws without clearing the axis, changing the
+figure layout, or creating another figure. `figsize` applies only to standalone creation and is
+rejected together with `ax`.
+
+The plotting function owns the chart geometry and may provide concise semantic axis labels and an
+axis title. The caller may replace or remove them through the returned axis. Multi-series artists
+carry labels, but the plotting function does not create a legend; callers and examples own legend
+creation, placement, and styling. Callers also own subplot grids, mosaics, figure-level titles,
+layout adjustment, file writing, display, and closing.
+
+The existing `plot_pipls_decomposition()` and `plot_prediction_diagnostics()` remain temporary
+composite exceptions while their callers are migrated. They must be replaced by atomic functions
+before the first release. Plotting functions do not call `show()`, write files, retain models, or
+change supplied arrays. The names remain under `pipls.plotting`; they are not added automatically
+to `pipls.__all__`.
 
 ### `examples/`
 

@@ -18,7 +18,7 @@ from .inspection import (
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
-    from matplotlib.figure import Figure
+    from matplotlib.figure import Figure, SubFigure
 
 FloatArray = NDArray[np.float64]
 PredictorStyle: TypeAlias = Literal["bar", "line"]
@@ -43,13 +43,16 @@ def plot_biplot(
     predictor_names: Sequence[object],
     sample_names: Sequence[object] | None = None,
     title: str = "PLS-family score-loading biplot",
-    figsize: tuple[float, float] = (8.0, 6.5),
-) -> tuple[Figure, dict[str, Axes]]:
-    r"""Plot balanced sample scores and predictor-loading arrows.
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot balanced sample scores and predictor-loading arrows on one axis.
 
     The coordinates are calculated by
-    :func:`pipls.inspection.biplot_coordinates`. The figure adds no response
-    arrows, confidence regions, grouping, or automatic scientific labels.
+    :func:`pipls.inspection.biplot_coordinates`. The chart adds no response
+    arrows, confidence regions, grouping, or automatic scientific labels. It
+    labels the sample artist but does not create a legend; callers may compose
+    legends and replace labels or titles through the returned axis.
 
     Parameters
     ----------
@@ -60,16 +63,20 @@ def plot_biplot(
     sample_names : sequence of object or None, default=None
         Optional labels for all sample points.
     title : str, default="PLS-family score-loading biplot"
-        Figure title.
-    figsize : tuple of float, default=(8.0, 6.5)
-        Matplotlib figure size in inches.
+        Axis title.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mapping containing the ``"biplot"`` axis.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
 
     if not isinstance(coordinates, BiplotCoordinates):
@@ -87,8 +94,11 @@ def plot_biplot(
         argument_name="sample_names",
     )
 
-    plt = _pyplot()
-    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=(8.0, 6.5),
+    )
     axis.scatter(
         coordinates.sample_coordinates[:, 0],
         coordinates.sample_coordinates[:, 1],
@@ -134,43 +144,51 @@ def plot_biplot(
     axis.set_xlabel(f"Balanced component {first + 1}")
     axis.set_ylabel(f"Balanced component {second + 1}")
     axis.set_title(title)
-    axis.legend()
     axis.set_aspect("equal", adjustable="datalim")
-    return figure, {"biplot": axis}
+    return figure, axis
 
 
 def plot_observation_diagnostics(
     diagnostics: ObservationDiagnostics,
     *,
     title: str = "PLS-family observation diagnostics",
-    figsize: tuple[float, float] = (6.5, 5.0),
-) -> tuple[Figure, dict[str, Axes]]:
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
     r"""Plot raw score distance against squared X-reconstruction residual.
 
-    No theoretical limits or automatic observation labels are added.
+    No theoretical limits or automatic observation labels are added. Callers
+    may replace the semantic axis labels or title through the returned axis.
 
     Parameters
     ----------
     diagnostics : pipls.inspection.ObservationDiagnostics
         Raw observation diagnostics.
     title : str, default="PLS-family observation diagnostics"
-        Figure title.
-    figsize : tuple of float, default=(6.5, 5.0)
-        Matplotlib figure size in inches.
+        Axis title.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mapping containing the ``"observation_diagnostics"`` axis.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
 
     if not isinstance(diagnostics, ObservationDiagnostics):
         raise TypeError("diagnostics must be an ObservationDiagnostics instance.")
 
-    plt = _pyplot()
-    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=(6.5, 5.0),
+    )
     axis.scatter(
         diagnostics.score_distance,
         diagnostics.x_reconstruction_residual,
@@ -179,7 +197,7 @@ def plot_observation_diagnostics(
     axis.set_xlabel("Score distance")
     axis.set_ylabel("Squared X-reconstruction residual")
     axis.set_title(title)
-    return figure, {"observation_diagnostics": axis}
+    return figure, axis
 
 
 def plot_scores(
@@ -188,9 +206,10 @@ def plot_scores(
     components: Sequence[int] = (0, 1),
     sample_names: Sequence[object] | None = None,
     title: str = "PLS-family X scores",
-    figsize: tuple[float, float] = (6.4, 5.2),
-) -> tuple[Figure, dict[str, Axes]]:
-    r"""Plot one pair of PLS-family X-score columns.
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot one pair of PLS-family X-score columns on one axis.
 
     Parameters
     ----------
@@ -201,16 +220,20 @@ def plot_scores(
     sample_names : sequence of object or None, default=None
         Optional labels for all sample points.
     title : str, default="PLS-family X scores"
-        Figure title.
-    figsize : tuple of float, default=(6.4, 5.2)
-        Matplotlib figure size in inches.
+        Axis title.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mapping containing the ``"scores"`` axis.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
 
     if not isinstance(structure, LatentStructure):
@@ -228,8 +251,11 @@ def plot_scores(
             raise ValueError("sample_names must contain only nonempty labels.")
 
     first, second = selected
-    plt = _pyplot()
-    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=(6.4, 5.2),
+    )
     axis.scatter(structure.x_scores[:, first], structure.x_scores[:, second], alpha=0.75)
     if labels is not None:
         for row, label in enumerate(labels):
@@ -242,7 +268,7 @@ def plot_scores(
     axis.set_xlabel(f"X score component {first + 1}")
     axis.set_ylabel(f"X score component {second + 1}")
     axis.set_title(title)
-    return figure, {"scores": axis}
+    return figure, axis
 
 
 def plot_x_loadings(
@@ -255,11 +281,14 @@ def plot_x_loadings(
     components: Sequence[int] | None = None,
     title: str = "PLS-family X loadings",
     figsize: tuple[float, float] | None = None,
-) -> tuple[Figure, dict[str, Axes]]:
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
     r"""Plot selected PLS-family X loadings on one axis.
 
-    Bar rendering groups component bars by named predictor. Line rendering overlays
-    components on a caller-supplied physical predictor coordinate.
+    Bar rendering groups component bars by named predictor. Line rendering
+    overlays components on a caller-supplied physical predictor coordinate.
+    Artists receive component labels, but the function does not create a
+    legend; callers own legend placement and styling.
 
     Parameters
     ----------
@@ -276,16 +305,21 @@ def plot_x_loadings(
     components : sequence of int or None, default=None
         Zero-based components to display; ``None`` displays all components.
     title : str, default="PLS-family X loadings"
-        Figure title.
+        Axis title.
     figsize : tuple of float or None, default=None
-        Matplotlib figure size; ``None`` chooses a size from the predictor count.
+        Figure size in inches when the function creates the axis. ``None``
+        chooses a size from the predictor count. It cannot be supplied together
+        with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mapping containing the ``"x_loadings"`` axis.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
 
     if not isinstance(structure, LatentStructure):
@@ -305,10 +339,11 @@ def plot_x_loadings(
         axis_label=predictor_axis_label,
     )
 
-    plt = _pyplot()
-    if figsize is None:
-        figsize = _single_axis_figsize(structure.n_features, style=style)
-    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=_single_axis_figsize(structure.n_features, style=style),
+    )
     selected_array = np.array(selected, dtype=np.int64)
     component_labels = _component_labels(selected)
     values = structure.x_loadings[:, selected_array]
@@ -323,8 +358,7 @@ def plot_x_loadings(
     axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
     axis.set_ylabel("X loading")
     axis.set_title(title)
-    axis.legend(title="Component")
-    return figure, {"x_loadings": axis}
+    return figure, axis
 
 
 def plot_y_loadings(
@@ -334,8 +368,12 @@ def plot_y_loadings(
     components: Sequence[int] | None = None,
     title: str = "PLS-family Y loadings",
     figsize: tuple[float, float] | None = None,
-) -> tuple[Figure, dict[str, Axes]]:
-    r"""Plot selected PLS-family Y loadings as grouped bars.
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot selected PLS-family Y loadings as grouped bars on one axis.
+
+    Artists receive component labels, but the function does not create a
+    legend; callers own legend placement and styling.
 
     Parameters
     ----------
@@ -346,16 +384,21 @@ def plot_y_loadings(
     components : sequence of int or None, default=None
         Zero-based components to display; ``None`` displays all components.
     title : str, default="PLS-family Y loadings"
-        Figure title.
+        Axis title.
     figsize : tuple of float or None, default=None
-        Matplotlib figure size; ``None`` chooses a size from the response count.
+        Figure size in inches when the function creates the axis. ``None``
+        chooses a size from the response count. It cannot be supplied together
+        with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mapping containing the ``"y_loadings"`` axis.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
 
     if not isinstance(structure, LatentStructure):
@@ -369,10 +412,11 @@ def plot_y_loadings(
     )
     assert response_labels is not None
 
-    plt = _pyplot()
-    if figsize is None:
-        figsize = _single_axis_figsize(structure.n_targets, style="bar")
-    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=_single_axis_figsize(structure.n_targets, style="bar"),
+    )
     selected_array = np.array(selected, dtype=np.int64)
     _grouped_bars(
         axis,
@@ -384,8 +428,7 @@ def plot_y_loadings(
     axis.set_xlabel("Response")
     axis.set_ylabel("Y loading")
     axis.set_title(title)
-    axis.legend(title="Component")
-    return figure, {"y_loadings": axis}
+    return figure, axis
 
 
 def plot_coefficients(
@@ -399,8 +442,12 @@ def plot_coefficients(
     responses: Sequence[int] | None = None,
     title: str = "PLS-family regression coefficients",
     figsize: tuple[float, float] | None = None,
-) -> tuple[Figure, dict[str, Axes]]:
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
     r"""Plot selected response-specific PLS coefficients on one axis.
+
+    Artists receive response labels, but the function does not create a legend;
+    callers own legend placement and styling.
 
     Parameters
     ----------
@@ -419,16 +466,21 @@ def plot_coefficients(
     responses : sequence of int or None, default=None
         Zero-based responses to display; ``None`` displays all responses.
     title : str, default="PLS-family regression coefficients"
-        Figure title.
+        Axis title.
     figsize : tuple of float or None, default=None
-        Matplotlib figure size; ``None`` chooses a size from the predictor count.
+        Figure size in inches when the function creates the axis. ``None``
+        chooses a size from the predictor count. It cannot be supplied together
+        with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mapping containing the ``"coefficients"`` axis.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
 
     if not isinstance(structure, LatentStructure):
@@ -455,10 +507,11 @@ def plot_coefficients(
         axis_label=predictor_axis_label,
     )
 
-    plt = _pyplot()
-    if figsize is None:
-        figsize = _single_axis_figsize(structure.n_features, style=style)
-    figure, axis = plt.subplots(figsize=figsize, layout="constrained")
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=_single_axis_figsize(structure.n_features, style=style),
+    )
     selected_array = np.array(selected, dtype=np.int64)
     selected_response_labels = tuple(response_labels[index] for index in selected)
     values = structure.coefficients[selected_array, :].T
@@ -483,8 +536,7 @@ def plot_coefficients(
     axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
     axis.set_ylabel("Regression coefficient")
     axis.set_title(title)
-    axis.legend(title="Response")
-    return figure, {"coefficients": axis}
+    return figure, axis
 
 
 def plot_pipls_decomposition(
@@ -741,6 +793,31 @@ def plot_prediction_diagnostics(
 
     figure.suptitle(f"{title}\n{diagnostics.prediction_kind}")
     return figure, axes
+
+
+def _resolve_axis(
+    ax: Axes | None,
+    *,
+    figsize: tuple[float, float] | None,
+    default_figsize: tuple[float, float],
+) -> tuple[Figure | SubFigure, Axes]:
+    """Return one caller-owned or newly created Matplotlib axis."""
+
+    plt = _pyplot()
+    if ax is None:
+        size = default_figsize if figsize is None else figsize
+        figure: Figure
+        axis: Axes
+        figure, axis = plt.subplots(figsize=size, layout="constrained")
+        return figure, axis
+    if figsize is not None:
+        raise ValueError("figsize cannot be supplied when ax is provided.")
+
+    from matplotlib.axes import Axes as MatplotlibAxes
+
+    if not isinstance(ax, MatplotlibAxes):
+        raise TypeError("ax must be a matplotlib.axes.Axes instance or None.")
+    return ax.figure, ax
 
 
 def _pyplot() -> Any:

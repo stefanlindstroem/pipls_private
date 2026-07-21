@@ -451,6 +451,27 @@ Decision 0046 then reduced the numbered scripts to their scientific stages, move
 
 Current status: **complete**.
 
+### Phase F3: atomic plotting composition
+
+Decision 0058 refines the pre-release plotting surface around ordinary Matplotlib composition.
+Every public single-chart plotter draws on one `Axes`, accepts a caller-supplied axis, and returns
+`(figure, axis)`. Plotters may provide semantic labels and titles, but callers own legends, subplot
+geometry, figure-level layout, saving, display, and closing. The package must not preserve
+one-entry axis dictionaries or package-owned multi-panel figures in the first release.
+
+Implementation order:
+
+1. add the common axis-resolution contract to the existing atomic PLS-family plotters;
+2. split the Pi-PLS factor composite into separate $P$, $D$, $Q$, and $QD$ functions;
+3. split the prediction-diagnostic composite into separate observed/predicted, residual, and RMSE
+   functions;
+4. migrate numbered examples and documentation so all tiled layouts are caller-owned and generated
+   PDFs preserve their intended scientific groupings.
+
+Current status: **first increment complete**. The six existing atomic plotters accept `ax`, return a
+single axis, create no legends, and preserve standalone creation. The Pi-PLS decomposition and
+prediction-diagnostic composites remain temporary migration targets.
+
 ### Product documentation and release hardening
 
 Build a user-oriented documentation surface, API reference, compatibility policy, clean-install and
@@ -460,10 +481,12 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **release preparation remains**. Decisions 0049--0053 establish the documentation
-boundary, Decisions 0054--0056 complete compatibility and installed-distribution validation, and
-Decision 0057 removes maintainer decisions from the served site while making the method and its
-component-selection workflow understandable before specialized terminology appears.
+Current status: **release preparation follows plotting refinement**. Decisions 0049--0053
+establish the documentation boundary, Decisions 0054--0056 complete compatibility and
+installed-distribution validation, and Decision 0057 removes maintainer decisions from the served
+site while making the method and its component-selection workflow understandable before specialized
+terminology appears. Decision 0058 begins the final plotting-API correction required before the
+initial version is chosen.
 
 ### Current standardization and deferred block-aware variants
 
@@ -514,9 +537,8 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Prepare the first release: choose the initial version, turn the accumulated Unreleased changelog
-into release notes, complete final package metadata and project URLs, define the tag and publication
-checklist, and rehearse publication through TestPyPI.
+Replace `plot_pipls_decomposition()` with atomic $P$, $D$, $Q$, and $QD$ plotters, then migrate the
+minimal and real-data examples to compose those charts in caller-owned Matplotlib panels.
 
 ## Maintenance protocol
 

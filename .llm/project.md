@@ -38,7 +38,9 @@ No block-aware scaling API is designed or scheduled. Decision 0054 defines Pytho
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
 environments with resolved-version diagnostics. Decision 0056 adds clean installed wheel and
-source-distribution validation. First-release preparation is next.
+source-distribution validation. Decision 0058 begins the pre-release plotting refinement by making
+the existing atomic plotters caller-embeddable; decomposition and prediction composites remain to
+be split before release preparation.
 
 ## Implemented estimator and selection boundary
 
@@ -75,7 +77,8 @@ implementing or reviewing this surface.
 - `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `src/pipls/inspection.py`: pure immutable fitted-model inspection computations.
-- `src/pipls/plotting.py`: optional Matplotlib figures for explicit inspection results.
+- `src/pipls/plotting.py`: optional single-chart Matplotlib functions for explicit inspection
+  results; callers own axes composition, legends, figure-level layout, and output.
 - `src/pipls/model_selection.py`: path-owned rank limits, split materialization, and rank-search
   orchestration.
 - `src/pipls/path.py`: pipeline-aware `PiPLSPathCV` meta-estimator.

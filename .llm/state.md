@@ -49,6 +49,8 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
   diagnostics under `pipls.inspection`;
 - estimator-neutral latent-structure, biplot, observation-diagnostic, and plotting names that
   accept compatible fitted Pi-PLS and ordinary PLS models;
+- a single-axis contract for the existing atomic plotters: optional caller-supplied axes,
+  `(figure, axis)` returns, and caller-owned legends and panel composition;
 - complete Pulp, Sugarcane, and Tobacco post-analysis workflows with fixed-estimator OOF prediction
   helpers, seven common canonical long-form CSV tables, an optional Tobacco observation-diagnostic
   table, scientific labels obtained at the file-reading boundary, and multipage reports
@@ -127,7 +129,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | package inspection and plotting are implemented; Pulp, Sugarcane, and Tobacco have canonical OOF and post-analysis artifacts; the Pulp biplot and cross-dataset review are complete |
+| Model inspection | inspection is implemented; existing atomic plotters accept caller-owned axes, while the two composite plotters remain pre-release migration targets |
 | Python compatibility | supported and classified on Python 3.10–3.14; metadata keeps `requires-python = ">=3.10"` without an upper bound |
 | Runtime dependencies | `numpy>=1.26,<3`, `scikit-learn>=1.4,<2`, and `joblib>=1.2,<2`; the minimum lines are constrained together on Python 3.10 |
 | Compatibility CI | separate minimum, supported-Python, and latest-compatible jobs; every job prints resolved interpreter and runtime dependency versions |
@@ -262,21 +264,24 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Prepare the first release. Choose the initial version, condense the large Unreleased changelog into
-release notes, complete project URLs and package metadata, define the tag and publication checklist,
-and rehearse publication through TestPyPI before using the main package index.
+Continue the pre-release plotting refinement. Decision 0058 gives the existing atomic PLS-family
+plotters one-axis behavior and caller-supplied-axis support. The next patch should replace
+`plot_pipls_decomposition()` with separate functions for $P$, $D$, $Q$, and $QD$, and migrate the
+minimal and real-data examples so that their panel layouts are created in the example layer.
 
-Decisions 0054--0056 complete compatibility and packaging hardening. Decision 0057 completes the
-current documentation refinement by excluding maintainer decisions from the served site, defining
-Pi-PLS and its latent-variable selection workflow before specialized terminology, and reducing the
-compatibility page to its user-facing contract. The next patch should not add another documentation
-or packaging layer before the version and release boundary is decided.
+The subsequent plotting patches should split prediction diagnostics and complete the cross-example
+panel/documentation audit. Release preparation resumes only after the composite plotting functions
+have been removed and all maintained PDFs are composed by their callers.
 
 ## Subsequent roadmap
 
-1. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
+1. **Atomic Pi-PLS factor plots:** replace the decomposition composite and migrate its callers.
+2. **Atomic prediction diagnostics:** replace the prediction composite and migrate its callers.
+3. **Example and documentation audit:** finish caller-owned panel composition across maintained
+   reports and enforce the plotting contract structurally.
+4. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
    package metadata, define the first tagged-release checklist, and rehearse publication.
-2. **First tagged release:** publish only after the rehearsal and checklist pass.
+5. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

@@ -384,15 +384,16 @@ def render_post_analysis_report(
 
         if selected_biplot is not None:
             biplot = biplot_coordinates(structure, components=selected_biplot)
-            figure, _ = plot_biplot(
+            figure, axis = plot_biplot(
                 biplot,
                 predictor_names=predictor_names,
                 title=f"{dataset_name} Pi-PLS score-loading biplot",
             )
+            axis.legend()
             report.savefig(figure)
             plt.close(figure)
 
-        figure, _ = plot_x_loadings(
+        figure, axis = plot_x_loadings(
             structure,
             predictor_style=predictor_style,
             predictor_names=predictor_names,
@@ -401,15 +402,17 @@ def render_post_analysis_report(
             components=selected_loadings,
             title=f"{dataset_name} Pi-PLS X loadings",
         )
+        axis.legend(title="Component")
         report.savefig(figure)
         plt.close(figure)
 
-        figure, _ = plot_y_loadings(
+        figure, axis = plot_y_loadings(
             structure,
             response_names=response_names,
             components=selected_loadings,
             title=f"{dataset_name} Pi-PLS Y loadings",
         )
+        axis.legend(title="Component")
         report.savefig(figure)
         plt.close(figure)
 
@@ -419,7 +422,7 @@ def render_post_analysis_report(
                 if len(coefficient_pages) == 1
                 else f" — response page {page_number}/{len(coefficient_pages)}"
             )
-            figure, _ = plot_coefficients(
+            figure, axis = plot_coefficients(
                 structure,
                 predictor_style=predictor_style,
                 predictor_names=predictor_names,
@@ -429,6 +432,7 @@ def render_post_analysis_report(
                 responses=selected_responses,
                 title=f"{dataset_name} Pi-PLS coefficients{page_suffix}",
             )
+            axis.legend(title="Response")
             report.savefig(figure)
             plt.close(figure)
 

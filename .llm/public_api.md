@@ -231,29 +231,36 @@ from pipls.plotting import (
 )
 ```
 
+`plot_scores()`, `plot_x_loadings()`, `plot_y_loadings()`, `plot_coefficients()`,
+`plot_biplot()`, and `plot_observation_diagnostics()` each render one chart. Every function accepts
+`ax=None` and returns `(figure, axis)`. With a supplied Matplotlib axis, it draws on that axis without
+clearing it, resizing its figure, or creating another figure. Supplying both `ax` and `figsize` is an
+error. The functions provide concise semantic axis labels and titles that callers may replace.
+Multi-series artists carry labels, but legends are caller-owned and are not created automatically.
+
 `plot_pipls_decomposition()` accepts `PiPLSDisplayFactors`, an explicit `"bar"` or `"line"`
 predictor style, optional zero-based component indices, and caller-supplied scientific labels or a
-physical predictor coordinate. It returns shared `predictor_directions`,
-`weighted_response_directions`, and `dilation` axes. Selected components appear side by side within
-named categorical bars or as overlaid lines on one physical predictor axis.
-`plot_prediction_diagnostics()` accepts `PredictionDiagnostics`, optional zero-based response
-indices, and required response labels. It returns named observed-versus-predicted, residual, and
-RMSE axes and includes the stored prediction provenance in the title. `plot_scores()` renders
-exactly two selected X-score columns. X and Y loadings place selected components together on one
-axis; coefficient plots place selected responses together on one axis. Categorical displays require
-caller-supplied variable names, while line displays require an explicit physical coordinate and axis
-label. Components and responses are selected by explicit zero-based indices.
-`plot_biplot()` renders balanced sample scores with named X-loading arrows and no response
+physical predictor coordinate. It temporarily retains shared `predictor_directions`,
+`weighted_response_directions`, and `dilation` axes. `plot_prediction_diagnostics()` temporarily
+retains named observed-versus-predicted, residual, and RMSE axes and includes the stored prediction
+provenance in the title. These two composite functions are migration targets and must be replaced by
+single-chart functions before the first release.
+
+`plot_scores()` renders exactly two selected X-score columns. X and Y loadings place selected
+components together on one axis; coefficient plots place selected responses together on one axis.
+Categorical displays require caller-supplied variable names, while line displays require an explicit
+physical coordinate and axis label. Components and responses are selected by explicit zero-based
+indices. `plot_biplot()` renders balanced sample scores with named X-loading arrows and no response
 arrows or confidence regions. `plot_observation_diagnostics()` renders one raw score-distance
-versus X-reconstruction-residual
-scatter plot without theoretical limits or automatic observation labels.
+versus X-reconstruction-residual scatter plot without theoretical limits or automatic observation
+labels.
 
 Matplotlib remains optional and is imported only when a plotting function is called. The functions
 perform no file writing, call no display function, retain no models, and do not alter supplied
-arrays. Component-path helpers remain example-local selection diagnostics, while dataset-specific
-OOF loops, pandas tables, canonical CSV files, and PDF composition remain under `examples/`. No
-estimator method, fitted attribute, path-search parameter, or top-level export is added by this
-plotting layer.
+arrays. Component-path helpers remain example-local selection diagnostics, while callers and the
+example layer own panel geometry, legends, figure-level titles, pandas tables, canonical CSV files,
+and PDF composition. No estimator method, fitted attribute, path-search parameter, or top-level
+export is added by this plotting layer.
 
 ## Example workflow boundary
 

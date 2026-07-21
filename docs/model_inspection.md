@@ -182,7 +182,7 @@ from pipls.inspection import biplot_coordinates
 from pipls.plotting import plot_biplot
 
 coordinates = biplot_coordinates(structure, components=(0, 1))
-figure, axes = plot_biplot(
+figure, axis = plot_biplot(
     coordinates,
     predictor_names=predictor_names,
 )
@@ -329,47 +329,74 @@ prediction_figure, prediction_axes = plot_prediction_diagnostics(
 ```
 
 The prediction provenance stored in `diagnostics.prediction_kind` is always included in the figure
-title. Both plotting functions return `(figure, axes)`, where `axes` is a dictionary with stable
-semantic names. They do not call `show()`, save files, retain estimators, or modify supplied arrays.
-Importing `pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is loaded only when a
-plotting function is called.
+title. The two current composite functions return `(figure, axes)`, where `axes` is a dictionary
+with stable semantic names. They will be replaced by single-chart functions in the next plotting
+increments. No plotting function calls `show()`, saves files, retains estimators, or modifies
+supplied arrays. Importing `pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is
+loaded only when a plotting function is called.
 
 Raw PLS-family observation diagnostics use a separate result object:
 
 ```python
-observation_figure, observation_axes = plot_observation_diagnostics(
+observation_figure, observation_axis = plot_observation_diagnostics(
     observation_diagnostics,
 )
 ```
 
-The function returns one `observation_diagnostics` axis and adds neither theoretical limits nor
+The function returns the figure and its single axis and adds neither theoretical limits nor
 automatic observation labels.
 
+### Standalone and panel composition
+
+The single-chart functions accept `ax=None`. Without an axis they create one standalone figure. A
+caller that wants a panel creates the layout and passes its axes explicitly:
+
+```python
+import matplotlib.pyplot as plt
+
+figure, axes = plt.subplots(1, 2, figsize=(12, 5), layout="constrained")
+
+plot_scores(structure, components=(0, 1), ax=axes[0])
+plot_x_loadings(
+    structure,
+    predictor_style="bar",
+    predictor_names=feature_names,
+    components=[0, 1],
+    ax=axes[1],
+)
+axes[1].legend(title="Component")
+figure.savefig("latent_structure.pdf")
+```
+
+A supplied axis is not cleared, resized, or placed into a new figure. `figsize` therefore applies
+only when the plotting function creates the figure. The functions provide concise semantic axis
+labels and titles; callers may replace them through ordinary Matplotlib methods. Multi-series
+artists carry labels, but legend creation, placement, and styling remain caller-owned.
 
 ### Shared PLS-family figures
 
 The shared plotting functions consume `LatentStructure`, not an estimator:
 
 ```python
-score_figure, score_axes = plot_scores(
+score_figure, score_axis = plot_scores(
     structure,
     components=(0, 1),
 )
 
-x_loading_figure, x_loading_axes = plot_x_loadings(
+x_loading_figure, x_loading_axis = plot_x_loadings(
     structure,
     predictor_style="bar",
     predictor_names=feature_names,
     components=[0, 1],
 )
 
-y_loading_figure, y_loading_axes = plot_y_loadings(
+y_loading_figure, y_loading_axis = plot_y_loadings(
     structure,
     response_names=target_names,
     components=[0, 1],
 )
 
-coefficient_figure, coefficient_axes = plot_coefficients(
+coefficient_figure, coefficient_axis = plot_coefficients(
     structure,
     predictor_style="bar",
     predictor_names=feature_names,
