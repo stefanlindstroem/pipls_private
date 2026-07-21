@@ -55,9 +55,11 @@ example.
   post-analysis CSV files, and raw observation diagnostics.
 
 These are application analyses rather than introductory snippets, but the numbered scripts keep
-only their scientific stages visible. Reusable validation, CSV reconstruction, and report
-composition remain in `_support`. `make examples` runs every numbered example in filename order,
-including the slower real-data workflows. It remains separate from `make check`.
+only their scientific stages visible. Their PDF reports compose the separate $P$, $D$, $Q$, and
+$QD$ charts in a $2\times2$ factor panel and the three prediction diagnostics in a $1\times3$
+panel. Reusable validation, CSV reconstruction, and report composition remain in `_support`.
+`make examples` runs every numbered example in filename order, including the slower real-data
+workflows. It remains separate from `make check`.
 
 ## Example support modules
 

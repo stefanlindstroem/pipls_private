@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Replace the composite prediction-diagnostics figure with separate one-axis plots for observed
+  versus predicted responses, residuals versus predicted responses, and standardized RMSE; move
+  prediction-panel composition, provenance, legends, PDF writing, and closing into the example
+  layer.
+
 - Replace the composite Pi-PLS decomposition figure with separate one-axis plots for $P$, $D$,
   $Q$, and $QD$; move factor-panel composition, legends, titles, PDF writing, and closing into the
   example layer.

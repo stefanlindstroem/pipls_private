@@ -24,12 +24,14 @@ from pipls.plotting import (
     plot_biplot,
     plot_coefficients,
     plot_observation_diagnostics,
+    plot_observed_vs_predicted,
     plot_pipls_dilation,
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_prediction_diagnostics,
+    plot_residuals_vs_predicted,
     plot_scores,
+    plot_standardized_rmse,
     plot_x_loadings,
     plot_y_loadings,
 )
@@ -371,11 +373,39 @@ def render_post_analysis_report(
                 if len(diagnostic_pages) == 1
                 else f" — response page {page_number}/{len(diagnostic_pages)}"
             )
-            figure, _ = plot_prediction_diagnostics(
+            figure, axes = plt.subplots(
+                1,
+                3,
+                figsize=(13.0, 4.2),
+                layout="constrained",
+            )
+            plot_observed_vs_predicted(
                 diagnostics,
                 response_names=response_names,
                 responses=selected_responses,
-                title=f"{dataset_name} Pi-PLS prediction diagnostics{page_suffix}",
+                include_prediction_kind=False,
+                ax=axes[0],
+            )
+            plot_residuals_vs_predicted(
+                diagnostics,
+                response_names=response_names,
+                responses=selected_responses,
+                include_prediction_kind=False,
+                ax=axes[1],
+            )
+            plot_standardized_rmse(
+                diagnostics,
+                response_names=response_names,
+                responses=selected_responses,
+                include_prediction_kind=False,
+                ax=axes[2],
+            )
+            if len(selected_responses) > 1:
+                axes[0].legend()
+                axes[1].legend()
+            figure.suptitle(
+                f"{dataset_name} Pi-PLS prediction diagnostics{page_suffix}\n"
+                f"{diagnostics.prediction_kind}"
             )
             report.savefig(figure)
             plt.close(figure)

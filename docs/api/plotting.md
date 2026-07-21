@@ -7,9 +7,7 @@ optional dependency group.
 
 The single-chart plotting functions accept an optional Matplotlib `ax` and return `(figure, axis)`.
 With `ax=None`, they create one figure containing one axis. With a supplied axis, they draw on that
-axis without clearing it or changing the surrounding figure. The prediction-diagnostic composite
-remains a temporary exception until it is split into single-chart functions.
-
+axis without clearing it or changing the surrounding figure.
 Plotters provide concise semantic axis labels and titles, which callers may replace through the
 returned axis. They label multi-series artists but do not create legends; legend placement and
 styling belong to the caller. No function calls `show()`, writes files, or infers scientific
@@ -35,7 +33,15 @@ variable names. Component and response selections use zero-based Python indices.
     options:
       members: false
 
-::: pipls.plotting.plot_prediction_diagnostics
+::: pipls.plotting.plot_observed_vs_predicted
+    options:
+      members: false
+
+::: pipls.plotting.plot_residuals_vs_predicted
+    options:
+      members: false
+
+::: pipls.plotting.plot_standardized_rmse
     options:
       members: false
 

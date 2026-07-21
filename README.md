@@ -239,7 +239,9 @@ from pipls.plotting import (
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_prediction_diagnostics,
+    plot_observed_vs_predicted,
+    plot_residuals_vs_predicted,
+    plot_standardized_rmse,
     plot_scores,
     plot_x_loadings,
 )
@@ -264,10 +266,30 @@ plot_pipls_weighted_response_directions(
 )
 for axis in (factor_axes[0, 0], factor_axes[1, 0], factor_axes[1, 1]):
     axis.legend(title="Component")
-prediction_figure, prediction_axes = plot_prediction_diagnostics(
+prediction_figure, prediction_axes = plt.subplots(
+    1, 3, figsize=(13, 4.2), layout="constrained"
+)
+plot_observed_vs_predicted(
     diagnostics,
     response_names=response_names,
+    include_prediction_kind=False,
+    ax=prediction_axes[0],
 )
+plot_residuals_vs_predicted(
+    diagnostics,
+    response_names=response_names,
+    include_prediction_kind=False,
+    ax=prediction_axes[1],
+)
+plot_standardized_rmse(
+    diagnostics,
+    response_names=response_names,
+    include_prediction_kind=False,
+    ax=prediction_axes[2],
+)
+prediction_axes[0].legend()
+prediction_axes[1].legend()
+prediction_figure.suptitle(diagnostics.prediction_kind)
 score_figure, score_axis = plot_scores(structure, components=(0, 1))
 biplot_figure, biplot_axis = plot_biplot(
     biplot,

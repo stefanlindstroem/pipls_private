@@ -26,9 +26,7 @@ def _imports_name(path: Path, name: str) -> bool:
 def _calls_name(path: Path, name: str) -> bool:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
     return any(
-        isinstance(node, ast.Call)
-        and isinstance(node.func, ast.Name)
-        and node.func.id == name
+        isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == name
         for node in ast.walk(tree)
     )
 
@@ -91,7 +89,9 @@ def test_shared_public_analysis_names_are_estimator_neutral() -> None:
         "plot_biplot",
         "plot_coefficients",
         "plot_observation_diagnostics",
-        "plot_prediction_diagnostics",
+        "plot_observed_vs_predicted",
+        "plot_residuals_vs_predicted",
+        "plot_standardized_rmse",
         "plot_scores",
         "plot_x_loadings",
         "plot_y_loadings",
@@ -111,8 +111,20 @@ def test_shared_public_analysis_names_are_estimator_neutral() -> None:
 
 
 def test_shared_inspection_uses_no_concrete_plsregression_restriction() -> None:
-    source = (_repository_root() / "src" / "pipls" / "inspection.py").read_text(
-        encoding="utf-8"
-    )
+    source = (_repository_root() / "src" / "pipls" / "inspection.py").read_text(encoding="utf-8")
     assert "from sklearn.cross_decomposition import PLSRegression" not in source
     assert "isinstance(model, PLSRegression)" not in source
+
+
+def test_post_analysis_helper_owns_prediction_panel_composition() -> None:
+    source = (
+        _repository_root() / "examples" / "_support" / "post_analysis_artifacts.py"
+    ).read_text(encoding="utf-8")
+
+    assert "plot_prediction_diagnostics" not in source
+    assert "plot_observed_vs_predicted(" in source
+    assert "plot_residuals_vs_predicted(" in source
+    assert "plot_standardized_rmse(" in source
+    assert "plt.subplots(\n                1,\n                3," in source
+    assert source.count("include_prediction_kind=False") == 3
+    assert "figure.suptitle(" in source

@@ -264,23 +264,22 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Continue the pre-release plotting refinement. Decisions 0058 and 0059 establish the one-axis
-contract and replace the Pi-PLS factor composite with separate $P$, $D$, $Q$, and $QD$ functions.
-The minimal and real-data examples now compose their factor panels in the example layer.
+Continue the pre-release plotting refinement. Decisions 0058--0060 establish the one-axis
+contract and replace both public composite plotters with atomic factor and prediction-diagnostic
+charts. The example layer now composes the $2\times2$ factor panel and $1\times3$ prediction panel.
 
-The next patch should split `plot_prediction_diagnostics()` into separate observed-versus-predicted,
-residual-versus-predicted, and standardized-RMSE functions. A final plotting audit should then
-complete cross-example panel composition and structural enforcement before release preparation
-resumes.
+The next patch should complete the plotting audit: apply caller-owned panel composition consistently
+across maintained reports, remove stale transitional wording, and add structural enforcement that
+public package plotters remain one-axis chart primitives. Release preparation resumes after that
+audit.
 
 ## Subsequent roadmap
 
-1. **Atomic prediction diagnostics:** replace the prediction composite and migrate its callers.
-2. **Example and documentation audit:** finish caller-owned panel composition across maintained
+1. **Example and documentation audit:** finish caller-owned panel composition across maintained
    reports and enforce the plotting contract structurally.
-3. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
+2. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
    package metadata, define the first tagged-release checklist, and rehearse publication.
-4. **First tagged release:** publish only after the rehearsal and checklist pass.
+3. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

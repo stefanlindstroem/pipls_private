@@ -65,6 +65,7 @@ This index is navigation, not a substitute for those records.
 | `0057-public-documentation-entry.md` | public documentation entry and maintainer-record boundary | exclude decisions from the served site, define latent-variable selection before jargon, and keep compatibility concise |
 | `0058-single-axis-plotting-contract.md` | reusable plotting composition | one chart per public plotter, optional caller-supplied axes, caller-owned legends and panel layout |
 | `0059-atomic-pipls-factor-plots.md` | Pi-PLS factor plotting surface | separate one-axis $P$, $D$, $Q$, and $QD$ plots; caller-owned factor panels |
+| `0060-atomic-prediction-diagnostic-plots.md` | prediction-diagnostic plotting surface | separate one-axis observed/predicted, residual, and standardized-RMSE plots; caller-owned diagnostic panels |
 
 ## Implemented estimator/search transition
 

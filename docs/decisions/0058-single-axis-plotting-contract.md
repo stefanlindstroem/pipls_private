@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented. Decision 0059 applies the contract to the Pi-PLS factor plots; the
-prediction-diagnostic composite remains a temporary migration target.
+Accepted and implemented. Decisions 0059 and 0060 apply the contract to the Pi-PLS factor and
+prediction-diagnostic plots.
 
 ## Context
 
@@ -28,15 +28,13 @@ should decide whether those charts appear alone, in a panel, or in a multipage r
   creation, placement, and styling.
 - Callers own subplot grids, mosaics, figure-level titles, layout adjustment, saving, display, and
   closing.
-- `plot_prediction_diagnostics()` remains a temporary composite exception. It must be replaced by
-  single-chart functions before the first release.
 
-This contract is implemented first for `plot_scores()`, `plot_x_loadings()`, `plot_y_loadings()`,
-`plot_coefficients()`, `plot_biplot()`, and `plot_observation_diagnostics()`.
+This contract applies to every public function in `pipls.plotting`. Decisions 0059 and 0060 remove
+the two former composite exceptions.
 
 ## Consequences
 
 The same plotting function can be used as a standalone convenience or embedded in a caller-owned
 panel. One-entry axis dictionaries disappear from the atomic API. The example layer adds legends
-explicitly and continues to own PDF writing and closing. Decision 0059 splits the Pi-PLS factor
-display into one function per factor quantity.
+explicitly and continues to own PDF writing and closing. Decisions 0059 and 0060 split the Pi-PLS factor and
+prediction-diagnostic displays into one function per chart quantity.

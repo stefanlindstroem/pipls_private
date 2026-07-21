@@ -36,7 +36,9 @@ __all__ = [
     "plot_pipls_predictor_directions",
     "plot_pipls_response_directions",
     "plot_pipls_weighted_response_directions",
-    "plot_prediction_diagnostics",
+    "plot_observed_vs_predicted",
+    "plot_residuals_vs_predicted",
+    "plot_standardized_rmse",
 ]
 
 
@@ -842,15 +844,22 @@ def _require_pipls_display_factors(factors: object) -> None:
         raise TypeError("factors must be a PiPLSDisplayFactors instance.")
 
 
-def plot_prediction_diagnostics(
+def plot_observed_vs_predicted(
     diagnostics: PredictionDiagnostics,
     *,
     response_names: Sequence[object] | None = None,
     responses: Sequence[int] | None = None,
-    title: str = "Prediction diagnostics",
-    figsize: tuple[float, float] = (13.0, 4.2),
-) -> tuple[Figure, dict[str, Axes]]:
-    r"""Plot standardized predictions, residuals, and response-wise RMSE.
+    title: str = "Observed versus predicted",
+    include_prediction_kind: bool = True,
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot standardized observed responses against standardized predictions.
+
+    The dashed identity line indicates exact agreement. Response series are
+    labelled, but the function does not create a legend. By default the axis
+    title includes ``diagnostics.prediction_kind`` so that prediction
+    provenance remains visible in a standalone chart.
 
     Parameters
     ----------
@@ -860,19 +869,211 @@ def plot_prediction_diagnostics(
         Required labels for all responses.
     responses : sequence of int or None, default=None
         Zero-based responses to display; ``None`` displays all responses.
-    title : str, default="Prediction diagnostics"
-        Figure title. Prediction provenance is appended automatically.
-    figsize : tuple of float, default=(13.0, 4.2)
-        Matplotlib figure size in inches.
+    title : str, default="Observed versus predicted"
+        Axis title before optional prediction provenance.
+    include_prediction_kind : bool, default=True
+        Whether to append prediction provenance to the axis title. Set this to
+        ``False`` when a caller-owned panel reports provenance at figure level.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
 
     Returns
     -------
     figure : matplotlib.figure.Figure
-        Created figure.
-    axes : dict of str to matplotlib.axes.Axes
-        Mappings named ``"observed_vs_predicted"``,
-        ``"residual_vs_predicted"``, and ``"standardized_rmse"``.
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
     """
+
+    selected, labels, selected_array = _prediction_plot_inputs(
+        diagnostics,
+        response_names=response_names,
+        responses=responses,
+    )
+    axis_title = _prediction_title(title, diagnostics, include_prediction_kind)
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=(5.4, 4.8),
+    )
+    for response in selected:
+        axis.scatter(
+            diagnostics.observed_standardized[:, response],
+            diagnostics.predicted_standardized[:, response],
+            label=labels[response],
+            alpha=0.75,
+        )
+
+    identity_limits = _plot_limits(
+        diagnostics.observed_standardized[:, selected_array],
+        diagnostics.predicted_standardized[:, selected_array],
+    )
+    axis.plot(identity_limits, identity_limits, linewidth=1.0, linestyle="--", color="0.35")
+    axis.set_xlim(identity_limits)
+    axis.set_ylim(identity_limits)
+    axis.set_xlabel("Observed response (standardized)")
+    axis.set_ylabel("Predicted response (standardized)")
+    axis.set_title(axis_title)
+    return figure, axis
+
+
+def plot_residuals_vs_predicted(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: Sequence[object] | None = None,
+    responses: Sequence[int] | None = None,
+    title: str = "Residual versus predicted",
+    include_prediction_kind: bool = True,
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    r"""Plot standardized residuals against standardized predictions.
+
+    The dashed horizontal line marks zero residual. Response series are
+    labelled, but the function does not create a legend. By default the axis
+    title includes ``diagnostics.prediction_kind``.
+
+    Parameters
+    ----------
+    diagnostics : pipls.inspection.PredictionDiagnostics
+        Standardized prediction diagnostics.
+    response_names : sequence of object
+        Required labels for all responses.
+    responses : sequence of int or None, default=None
+        Zero-based responses to display; ``None`` displays all responses.
+    title : str, default="Residual versus predicted"
+        Axis title before optional prediction provenance.
+    include_prediction_kind : bool, default=True
+        Whether to append prediction provenance to the axis title. Set this to
+        ``False`` when a caller-owned panel reports provenance at figure level.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
+    """
+
+    selected, labels, selected_array = _prediction_plot_inputs(
+        diagnostics,
+        response_names=response_names,
+        responses=responses,
+    )
+    axis_title = _prediction_title(title, diagnostics, include_prediction_kind)
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=(5.4, 4.8),
+    )
+    for response in selected:
+        axis.scatter(
+            diagnostics.predicted_standardized[:, response],
+            diagnostics.residual_standardized[:, response],
+            label=labels[response],
+            alpha=0.75,
+        )
+
+    prediction_limits = _plot_limits(
+        diagnostics.predicted_standardized[:, selected_array],
+        diagnostics.predicted_standardized[:, selected_array],
+    )
+    residual_limits = _plot_limits(
+        diagnostics.residual_standardized[:, selected_array],
+        diagnostics.residual_standardized[:, selected_array],
+    )
+    axis.axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
+    axis.set_xlim(prediction_limits)
+    axis.set_ylim(residual_limits)
+    axis.set_xlabel("Predicted response (standardized)")
+    axis.set_ylabel("Residual $y-\\hat y$ (standardized)")
+    axis.set_title(axis_title)
+    return figure, axis
+
+
+def plot_standardized_rmse(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: Sequence[object] | None = None,
+    responses: Sequence[int] | None = None,
+    title: str = "Response-wise standardized RMSE",
+    include_prediction_kind: bool = True,
+    figsize: tuple[float, float] | None = None,
+    ax: Axes | None = None,
+) -> tuple[Figure | SubFigure, Axes]:
+    """Plot response-wise root mean squared standardized residuals.
+
+    Parameters
+    ----------
+    diagnostics : pipls.inspection.PredictionDiagnostics
+        Standardized prediction diagnostics.
+    response_names : sequence of object
+        Required labels for all responses.
+    responses : sequence of int or None, default=None
+        Zero-based responses to display; ``None`` displays all responses.
+    title : str, default="Response-wise standardized RMSE"
+        Axis title before optional prediction provenance.
+    include_prediction_kind : bool, default=True
+        Whether to append prediction provenance to the axis title. Set this to
+        ``False`` when a caller-owned panel reports provenance at figure level.
+    figsize : tuple of float or None, default=None
+        Figure size in inches when the function creates the axis. ``None`` uses
+        the chart default. It cannot be supplied together with ``ax``.
+    ax : matplotlib.axes.Axes or None, default=None
+        Existing axis on which to draw. ``None`` creates one figure with one
+        axis.
+
+    Returns
+    -------
+    figure : matplotlib.figure.Figure
+        Created figure, or the supplied axis container when ``ax`` is supplied.
+    axis : matplotlib.axes.Axes
+        Axis containing the chart.
+    """
+
+    selected, labels, selected_array = _prediction_plot_inputs(
+        diagnostics,
+        response_names=response_names,
+        responses=responses,
+    )
+    axis_title = _prediction_title(title, diagnostics, include_prediction_kind)
+    figure, axis = _resolve_axis(
+        ax,
+        figsize=figsize,
+        default_figsize=_single_axis_figsize(len(selected), style="bar"),
+    )
+    selected_labels = [labels[index] for index in selected]
+    positions = np.arange(len(selected))
+    axis.bar(positions, diagnostics.standardized_rmse[selected_array])
+    axis.set_xticks(positions)
+    axis.set_xticklabels(
+        selected_labels,
+        rotation=45 if len(selected) > 6 else 0,
+        ha="right" if len(selected) > 6 else "center",
+    )
+    axis.set_xlabel("Response")
+    axis.set_ylabel("Standardized RMSE")
+    axis.set_title(axis_title)
+    return figure, axis
+
+
+def _prediction_plot_inputs(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: Sequence[object] | None,
+    responses: Sequence[int] | None,
+) -> tuple[tuple[int, ...], tuple[str, ...], NDArray[np.int64]]:
+    """Validate shared prediction-plot inputs."""
 
     if not isinstance(diagnostics, PredictionDiagnostics):
         raise TypeError("diagnostics must be a PredictionDiagnostics instance.")
@@ -884,77 +1085,21 @@ def plot_prediction_diagnostics(
         required=True,
     )
     assert labels is not None
+    return selected, labels, np.array(selected, dtype=np.int64)
 
-    plt = _pyplot()
-    figure, axis_array = plt.subplots(1, 3, figsize=figsize, layout="constrained")
-    observed_ax, residual_ax, rmse_ax = axis_array
-    axes: dict[str, Axes] = {
-        "observed_vs_predicted": observed_ax,
-        "residual_vs_predicted": residual_ax,
-        "standardized_rmse": rmse_ax,
-    }
 
-    selected_array = np.array(selected, dtype=np.int64)
-    for response in selected:
-        label = labels[response]
-        observed_ax.scatter(
-            diagnostics.observed_standardized[:, response],
-            diagnostics.predicted_standardized[:, response],
-            label=label,
-            alpha=0.75,
-        )
-        residual_ax.scatter(
-            diagnostics.predicted_standardized[:, response],
-            diagnostics.residual_standardized[:, response],
-            label=label,
-            alpha=0.75,
-        )
+def _prediction_title(
+    title: str,
+    diagnostics: PredictionDiagnostics,
+    include_prediction_kind: bool,
+) -> str:
+    """Return one axis title with optional prediction provenance."""
 
-    identity_limits = _plot_limits(
-        diagnostics.observed_standardized[:, selected_array],
-        diagnostics.predicted_standardized[:, selected_array],
-    )
-    observed_ax.plot(identity_limits, identity_limits, linewidth=1.0, linestyle="--", color="0.35")
-    observed_ax.set_xlim(identity_limits)
-    observed_ax.set_ylim(identity_limits)
-    observed_ax.set_xlabel("Observed response (standardized)")
-    observed_ax.set_ylabel("Predicted response (standardized)")
-    observed_ax.set_title("Observed versus predicted")
-
-    prediction_limits = _plot_limits(
-        diagnostics.predicted_standardized[:, selected_array],
-        diagnostics.predicted_standardized[:, selected_array],
-    )
-    residual_limits = _plot_limits(
-        diagnostics.residual_standardized[:, selected_array],
-        diagnostics.residual_standardized[:, selected_array],
-    )
-    residual_ax.axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
-    residual_ax.set_xlim(prediction_limits)
-    residual_ax.set_ylim(residual_limits)
-    residual_ax.set_xlabel("Predicted response (standardized)")
-    residual_ax.set_ylabel("Residual $y-\\hat y$ (standardized)")
-    residual_ax.set_title("Residual versus predicted")
-
-    selected_labels = [labels[index] for index in selected]
-    positions = np.arange(len(selected))
-    rmse_ax.bar(positions, diagnostics.standardized_rmse[selected_array])
-    rmse_ax.set_xticks(positions)
-    rmse_ax.set_xticklabels(
-        selected_labels,
-        rotation=45 if len(selected) > 6 else 0,
-        ha="right" if len(selected) > 6 else "center",
-    )
-    rmse_ax.set_xlabel("Response")
-    rmse_ax.set_ylabel("Standardized RMSE")
-    rmse_ax.set_title("Response-wise error")
-
-    if len(selected) > 1:
-        observed_ax.legend()
-        residual_ax.legend()
-
-    figure.suptitle(f"{title}\n{diagnostics.prediction_kind}")
-    return figure, axes
+    if not isinstance(include_prediction_kind, (bool, np.bool_)):
+        raise TypeError("include_prediction_kind must be a boolean.")
+    if include_prediction_kind:
+        return f"{title}\n{diagnostics.prediction_kind}"
+    return title
 
 
 def _resolve_axis(

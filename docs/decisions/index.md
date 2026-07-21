@@ -74,3 +74,4 @@ reference describe the current public behavior directly.
 - [0057: public documentation entry](0057-public-documentation-entry.md)
 - [0058: single-axis plotting contract](0058-single-axis-plotting-contract.md)
 - [0059: atomic Pi-PLS factor plots](0059-atomic-pipls-factor-plots.md)
+- [0060: atomic prediction-diagnostic plots](0060-atomic-prediction-diagnostic-plots.md)

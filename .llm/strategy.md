@@ -486,8 +486,9 @@ Current status: **release preparation follows plotting refinement**. Decisions 0
 establish the documentation boundary, Decisions 0054--0056 complete compatibility and
 installed-distribution validation, and Decision 0057 removes maintainer decisions from the served
 site while making the method and its component-selection workflow understandable before specialized
-terminology appears. Decisions 0058 and 0059 establish atomic plotting composition and the Pi-PLS
-factor surface; prediction diagnostics remain to be split before the initial version is chosen.
+terminology appears. Decisions 0058--0060 establish atomic plotting composition for the Pi-PLS
+factor surface and prediction diagnostics; one final plotting and example audit remains before the
+initial version is chosen.
 
 ### Current standardization and deferred block-aware variants
 
@@ -538,9 +539,9 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Replace `plot_prediction_diagnostics()` with atomic observed-versus-predicted,
-residual-versus-predicted, and standardized-RMSE plotters, then migrate its callers to compose those
-charts in caller-owned Matplotlib panels.
+Complete the plotting and example-composition audit: use caller-owned panels consistently, remove
+stale composite-plot wording, and enforce structurally that package plotters remain single-axis
+chart primitives.
 
 ## Maintenance protocol
 

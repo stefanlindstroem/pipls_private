@@ -39,4 +39,4 @@ figure-level titles, write PDFs, and close figures.
 
 The public Pi-PLS plotting surface now represents all four factor quantities and is composable with
 ordinary Matplotlib layouts. `src/pipls/plotting.py` owns chart primitives; examples own panel
-composition. The remaining composite plotting target is prediction diagnostics.
+composition. Decision 0060 applies the same boundary to prediction diagnostics.

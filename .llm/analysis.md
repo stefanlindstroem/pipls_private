@@ -91,10 +91,11 @@ creation, placement, and styling. Callers also own subplot grids, mosaics, figur
 layout adjustment, file writing, display, and closing.
 
 Decision 0059 replaces the Pi-PLS decomposition composite with separate one-axis plots for $P$,
-$D$, $Q$, and $QD$. `plot_prediction_diagnostics()` remains the sole temporary composite exception
-and must be replaced before the first release. Plotting functions do not call `show()`, write files,
-retain models, or change supplied arrays. The names remain under `pipls.plotting`; they are not
-added automatically to `pipls.__all__`.
+$D$, $Q$, and $QD$. Decision 0060 likewise splits prediction diagnostics into observed-versus-
+predicted, residual-versus-predicted, and standardized-RMSE charts. All public plotters now follow
+the single-axis contract. They do not call `show()`, write files, retain models, or change supplied
+arrays. The names remain under `pipls.plotting`; they are not added automatically to
+`pipls.__all__`.
 
 ### `examples/`
 

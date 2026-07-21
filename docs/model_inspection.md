@@ -279,7 +279,9 @@ from pipls.plotting import (
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_prediction_diagnostics,
+    plot_observed_vs_predicted,
+    plot_residuals_vs_predicted,
+    plot_standardized_rmse,
     plot_scores,
     plot_x_loadings,
     plot_y_loadings,
@@ -336,23 +338,45 @@ The supplied coordinate order is preserved, including decreasing wavenumber axes
 not smooth, interpolate, reorder, or infer a spectral representation. Categorical plots require the
 caller to supply predictor or response names.
 
-`plot_prediction_diagnostics()` remains a temporary composite function. It renders standardized
-observed versus predicted responses, standardized residuals versus standardized predictions, and
-response-wise standardized RMSE:
+Three separate functions display prediction diagnostics: standardized observed versus predicted
+responses, standardized residuals versus standardized predictions, and response-wise standardized
+RMSE. Each can create a standalone chart or draw into a caller-owned panel:
 
 ```python
-prediction_figure, prediction_axes = plot_prediction_diagnostics(
+import matplotlib.pyplot as plt
+
+prediction_figure, prediction_axes = plt.subplots(
+    1, 3, figsize=(13, 4.2), layout="constrained"
+)
+plot_observed_vs_predicted(
     diagnostics,
     response_names=target_names,
     responses=[0, 2],
+    include_prediction_kind=False,
+    ax=prediction_axes[0],
 )
+plot_residuals_vs_predicted(
+    diagnostics,
+    response_names=target_names,
+    responses=[0, 2],
+    include_prediction_kind=False,
+    ax=prediction_axes[1],
+)
+plot_standardized_rmse(
+    diagnostics,
+    response_names=target_names,
+    responses=[0, 2],
+    include_prediction_kind=False,
+    ax=prediction_axes[2],
+)
+prediction_axes[0].legend()
+prediction_axes[1].legend()
+prediction_figure.suptitle(diagnostics.prediction_kind)
 ```
 
-The prediction provenance stored in `diagnostics.prediction_kind` is included in the figure title.
-This composite will be split into single-chart functions in the next plotting increment. No plotting
-function calls `show()`, saves files, retains estimators, or modifies supplied arrays. Importing
-`pipls` or `pipls.plotting` does not import Matplotlib; Matplotlib is loaded only when a plotting
-function is called.
+Standalone calls include `diagnostics.prediction_kind` in the axis title by default. In a panel,
+set `include_prediction_kind=False` and report provenance once at figure level. The functions do not
+create legends, panels, or files.
 
 Raw PLS-family observation diagnostics use a separate result object:
 
