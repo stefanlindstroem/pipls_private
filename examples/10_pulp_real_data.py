@@ -63,35 +63,6 @@ rank_cv_mse_fold_sd = np.asarray(cv_results["std_response_standardized_mse"])[ra
     rank_order
 ]
 
-# --8<-- [start:fit-pulp-model]
-model = PiPLSRegression(
-    n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(X, Y)
-# --8<-- [end:fit-pulp-model]
-
-# --8<-- [start:pulp-oof-predictions]
-oof_predictions = cross_val_predict(
-    model,
-    X,
-    Y,
-    cv=KFold(n_splits=5, shuffle=False),
-)
-# --8<-- [end:pulp-oof-predictions]
-
-# --8<-- [start:pulp-inspection-results]
-factors = pipls_display_factors(model.decomposition_)
-structure = latent_structure(model)
-diagnostics = prediction_diagnostics(
-    Y,
-    oof_predictions,
-    prediction_kind="selection-conditioned OOF predictions",
-)
-# --8<-- [end:pulp-inspection-results]
-
-response_index = {name: index for index, name in enumerate(response_names)}
-detailed_response_indices = tuple(response_index[name] for name in DETAILED_RESPONSES)
-
 # --8<-- [start:plot-pulp-component-path]
 figure, axis = plt.subplots(
     figsize=(7.4, 4.8),
@@ -109,26 +80,10 @@ axis.scatter(
     [selected.cv_mse_mean],
     marker="D",
     s=70,
-    label=(
-        f"Chosen: {selected.n_components} components, "
-        f"predictor rank {selected.predictor_rank}"
-    ),
+    label=f"Chosen: {selected.n_components} components",
     zorder=3,
 )
-for n_components, cv_mse, predictor_rank in zip(
-    path.n_components,
-    path.cv_mse_mean,
-    path.predictor_rank,
-    strict=True,
-):
-    axis.annotate(
-        rf"$r_\pi={int(predictor_rank)}$",
-        (n_components, cv_mse),
-        xytext=(0, 8),
-        textcoords="offset points",
-        horizontalalignment="center",
-    )
-axis.set_xlabel("Number of response components")
+axis.set_xlabel("Number of components")
 axis.set_ylabel("Response-standardized CV-MSE")
 axis.set_title("Pulp Pi-PLS component path")
 axis.set_xticks(path.n_components)
@@ -167,6 +122,36 @@ axis.grid(axis="y", alpha=0.25)
 axis.legend()
 figure.savefig(ANALYSIS_DIR / "predictor_rank_profile.pdf")
 plt.close(figure)
+
+# Fit the selected fixed model only after inspecting the selection figures.
+# --8<-- [start:fit-pulp-model]
+model = PiPLSRegression(
+    n_components=selected.n_components,
+    predictor_rank=selected.predictor_rank,
+).fit(X, Y)
+# --8<-- [end:fit-pulp-model]
+
+# --8<-- [start:pulp-oof-predictions]
+oof_predictions = cross_val_predict(
+    model,
+    X,
+    Y,
+    cv=KFold(n_splits=5, shuffle=False),
+)
+# --8<-- [end:pulp-oof-predictions]
+
+# --8<-- [start:pulp-inspection-results]
+factors = pipls_display_factors(model.decomposition_)
+structure = latent_structure(model)
+diagnostics = prediction_diagnostics(
+    Y,
+    oof_predictions,
+    prediction_kind="selection-conditioned OOF predictions",
+)
+# --8<-- [end:pulp-inspection-results]
+
+response_index = {name: index for index, name in enumerate(response_names)}
+detailed_response_indices = tuple(response_index[name] for name in DETAILED_RESPONSES)
 
 # Plot the Pi-PLS factors.
 figure, axes = plt.subplots(

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Refine the Pulp tutorial selection sequence: introduce `for_n_components()` before the component
+  path figure, fit the selected fixed model only after the selection figures, label the horizontal
+  axis as the number of components, and remove per-point predictor-rank annotations.
+
 - Complete the pre-release result and example simplification: remove the duplicate matrix-shaped
   score and response-standardized-MSE path attributes, retain `cv_results_` as the sole detailed
   candidate surface, align documentation with direct in-memory workflows, and add structural tests

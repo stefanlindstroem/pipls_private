@@ -134,8 +134,10 @@ generated figures.
 Pulp is the canonical tutorial analysis. `examples/10_pulp_real_data.py` owns its direct pandas
 loading, `PiPLSPathCV(refit=False)` evaluation, visible three-component choice, conditional
 predictor-rank profile, fixed `PiPLSRegression` fit, five-fold scikit-learn OOF predictions,
-inspection computations, and final PDF composition. It intentionally adds no external scaler
-because `PiPLSRegression` learns predictor and response standardization inside each fit.
+inspection computations, and final PDF composition. The selected component row is retrieved before
+the selection figures, while the fixed estimator is fitted only after those figures have been
+constructed. It intentionally adds no external scaler because `PiPLSRegression` learns predictor
+and response standardization inside each fit.
 
 The tutorial extracts checked snippets directly from example 10. `tools/render_pulp_tutorial.py`
 repeats the small in-memory numerical sequence rather than importing or executing the

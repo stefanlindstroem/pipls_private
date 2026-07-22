@@ -27,7 +27,12 @@ from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 from sklearn.model_selection import KFold, cross_val_predict  # noqa: E402
 
-from pipls import PiPLSComponentPath, PiPLSPathCV, PiPLSRegression  # noqa: E402
+from pipls import (  # noqa: E402
+    PiPLSComponentPath,
+    PiPLSComponentResult,
+    PiPLSPathCV,
+    PiPLSRegression,
+)
 from pipls.inspection import (  # noqa: E402
     biplot_coordinates,
     latent_structure,
@@ -114,14 +119,9 @@ def _response_indices(response_names: Sequence[str]) -> tuple[int, ...]:
 def _render_component_path(
     component_path: PiPLSComponentPath,
     *,
-    chosen_n_components: int,
-    chosen_predictor_rank: int,
+    selected: PiPLSComponentResult,
     output_path: Path,
 ) -> None:
-    selected = component_path.for_n_components(chosen_n_components)
-    if selected.predictor_rank != chosen_predictor_rank:
-        raise RuntimeError("The tutorial component path and selected predictor rank disagree.")
-
     figure, axis = _figure(figsize=(7.4, 4.8))
     axis.errorbar(
         component_path.n_components,
@@ -131,28 +131,15 @@ def _render_component_path(
         capsize=4,
     )
     axis.scatter(
-        [chosen_n_components],
+        [selected.n_components],
         [selected.cv_mse_mean],
         marker="D",
         s=70,
-        label=(f"Chosen: {chosen_n_components} components, predictor rank {chosen_predictor_rank}"),
+        label=f"Chosen: {selected.n_components} components",
         zorder=3,
     )
-    for n_components, mean_mse, predictor_rank in zip(
-        component_path.n_components,
-        component_path.cv_mse_mean,
-        component_path.predictor_rank,
-        strict=True,
-    ):
-        axis.annotate(
-            rf"$r_\pi={int(predictor_rank)}$",
-            (n_components, mean_mse),
-            xytext=(0, 8),
-            textcoords="offset points",
-            horizontalalignment="center",
-        )
     axis.set_title("Pulp component path")
-    axis.set_xlabel("Number of response components")
+    axis.set_xlabel("Number of components")
     axis.set_ylabel("Response-standardized CV-MSE")
     axis.set_xticks(component_path.n_components)
     axis.set_ylim(
@@ -235,6 +222,20 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         rank_order
     ]
 
+    _render_component_path(
+        component_path,
+        selected=selected,
+        output_path=output_dir / "component_path.svg",
+    )
+    _render_predictor_rank_profile(
+        predictor_ranks,
+        rank_cv_mse_mean,
+        rank_cv_mse_fold_sd,
+        chosen_n_components=selected.n_components,
+        chosen_predictor_rank=selected.predictor_rank,
+        output_path=output_dir / "predictor_rank_profile.svg",
+    )
+
     model = PiPLSRegression(
         n_components=selected.n_components,
         predictor_rank=selected.predictor_rank,
@@ -251,21 +252,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         Y,
         oof_predictions,
         prediction_kind=PREDICTION_KIND,
-    )
-
-    _render_component_path(
-        component_path,
-        chosen_n_components=selected.n_components,
-        chosen_predictor_rank=selected.predictor_rank,
-        output_path=output_dir / "component_path.svg",
-    )
-    _render_predictor_rank_profile(
-        predictor_ranks,
-        rank_cv_mse_mean,
-        rank_cv_mse_fold_sd,
-        chosen_n_components=selected.n_components,
-        chosen_predictor_rank=selected.predictor_rank,
-        output_path=output_dir / "predictor_rank_profile.svg",
     )
 
     figure, axis = _figure(figsize=(6.4, 5.0))

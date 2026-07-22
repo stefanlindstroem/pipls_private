@@ -208,6 +208,30 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     for function_name in plotting_functions:
         assert f"../api/plotting.md#pipls.plotting.{function_name}" in tutorial
 
+    select_snippet = 'examples/10_pulp_real_data.py:select-pulp-parameters'
+    plot_snippet = 'examples/10_pulp_real_data.py:plot-pulp-component-path'
+    fit_snippet = 'examples/10_pulp_real_data.py:fit-pulp-model'
+    assert (
+        tutorial.index(select_snippet)
+        < tutorial.index(plot_snippet)
+        < tutorial.index(fit_snippet)
+    )
+
+    selected_line = "selected = path.for_n_components(CHOSEN_N_COMPONENTS)"
+    component_plot = '# --8<-- [start:plot-pulp-component-path]'
+    model_fit = "model = PiPLSRegression("
+    assert example.index(selected_line) < example.index(component_plot) < example.index(model_fit)
+    renderer_selected = renderer.index("selected = component_path.for_n_components(")
+    renderer_plot = renderer.index("    _render_component_path(", renderer_selected)
+    assert renderer_selected < renderer_plot < renderer.index("model = PiPLSRegression(")
+
+    for source in (tutorial, example, renderer):
+        assert "Number of response components" not in source
+    assert 'axis.set_xlabel("Number of components")' in example
+    assert 'axis.set_xlabel("Number of components")' in renderer
+    assert "for n_components, cv_mse, predictor_rank in zip(" not in example
+    assert "for n_components, mean_mse, predictor_rank in zip(" not in renderer
+
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
     assert "run_pulp_workflow" not in renderer

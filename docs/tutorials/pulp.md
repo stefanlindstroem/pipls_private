@@ -57,7 +57,18 @@ The default `n_components_values="all"` evaluates every admissible component cou
 the search records the conditionally selected predictor rank, mean response-standardized CV-MSE,
 and fold-to-fold standard deviation.
 
-The path is an immutable in-memory result and can be plotted with ordinary Matplotlib:
+The purpose of the component-path figure is to choose the number of components. This tutorial uses
+`CHOSEN_N_COMPONENTS=3` as an explicit elbow-based choice. Before drawing the figure, the matching
+immutable row is retrieved so that the chosen point can be marked:
+
+```python
+--8<-- "examples/10_pulp_real_data.py:select-pulp-parameters"
+```
+
+`for_n_components()` does not fit a model. It returns the values already evaluated for the stated
+component count. The same scalar result is used later when the fixed model is fitted.
+
+The path can then be plotted with ordinary Matplotlib:
 
 ```python
 --8<-- "examples/10_pulp_real_data.py:plot-pulp-component-path"
@@ -65,19 +76,19 @@ The path is an immutable in-memory result and can be plotted with ordinary Matpl
 
 ![Pulp component path](../assets/generated/pulp/component_path.svg)
 
-The curve falls substantially through three components and then changes little. The tutorial uses
-the visible elbow at `n_components=3`. The selected predictor rank on that row is
-`predictor_rank=10`.
+The curve falls substantially through three components and then changes little. The marker shows
+the tutorial's choice of `n_components=3`. This is a stated modeling choice, not an automatic rule
+that three components are always optimal. The absolute minimum, fold variation, parsimony, and
+scientific purpose should all be considered.
 
-This is a stated modeling choice, not an automatic rule that three components are always optimal.
-The absolute minimum, fold variation, parsimony, and scientific purpose should all be considered.
-The predictor rank must be taken from the same row as the chosen component count. See
-[Parameter selection](../parameter_selection.md) and the
+The selected row also records `predictor_rank=10`. That conditional choice is examined next and is
+used only when the fixed model is fitted. The predictor rank must be taken from the same row as the
+chosen component count. See [Parameter selection](../parameter_selection.md) and the
 [`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV).
 
 ## Inspect the conditional predictor-rank profile
 
-The selected row summarizes a second calculation: for three response components, the path evaluates
+The selected row summarizes a second calculation: for three components, the path evaluates
 predictor ranks 3 through 10 and chooses the rank with the lowest mean CV-MSE.
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
@@ -94,15 +105,11 @@ dimension of the predictor basis available when those three pairs are estimated;
 that the factor plots contain ten paired components. See
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
-## Choose and fit the fixed model
+## Fit the selected model
 
-The selected scalar result supplies both members of the fixed rank pair:
-
-```python
---8<-- "examples/10_pulp_real_data.py:select-pulp-parameters"
-```
-
-A new fixed estimator is then fitted to all 46 samples:
+Only after the component-path and predictor-rank figures have been inspected is a new fixed
+estimator fitted to all 46 samples. The previously retrieved scalar result supplies both members of
+the fixed rank pair:
 
 ```python
 --8<-- "examples/10_pulp_real_data.py:fit-pulp-model"
