@@ -60,6 +60,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   from the same public-API sequence;
 - direct Tobacco response pagination through two caller-owned multipage PDFs, with full predictor
   SVD, decreasing-wavenumber spectral axes, and raw observation diagnostics;
+- a direct Pi-PLS/ordinary-PLS comparison whose two immutable component paths are plotted together
+  in example 09 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
 - a tutorial-first served site whose primary Pulp walkthrough includes every generated chart
   separately and links each interpretation to the general inspection, plotting, and theory references.
 
@@ -234,14 +236,14 @@ implemented independently:
 
 The earlier real-data smoke-check scripts and full example-execution tests were removed because they
 duplicated the numbered analyses. `make examples` runs every numbered example as an explicit
-application-validation action. Example 09 writes separate Pi-PLS and standard PLS (NIPALS) path
-CSVs for the same folds and component counts and generates the overlaid comparison PDFs. Examples
-10–12 plot `component_path_` without table conversion, fit selected fixed estimators, use
+application-validation action. Example 09 keeps immutable Pi-PLS and standard PLS (NIPALS) paths
+in memory and generates the overlaid comparison PDFs directly. Examples 10–12 plot
+`component_path_` without table conversion, fit selected fixed estimators, use
 scikit-learn `cross_val_predict`, calculate inspection results in memory, and write only final PDF
 figures. Pulp additionally plots the evaluated predictor-rank profile at three components. Tobacco
 writes three-page prediction-diagnostic and coefficient PDFs while preserving source-order response
 pagination. Required result directories are tracked and preserved by `make clean`. Default tests
-retain dataset-layout, component-path API, PLS-helper, plotting, and workflow-structure contracts
+retain dataset-layout, component-path API, immutable PLS-helper, and workflow-structure contracts
 without executing the artifact-producing real-data scripts.
 
 ## Legacy dataset licensing review
@@ -274,16 +276,16 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Patch 20e: replace the example-09 Pi-PLS and ordinary-PLS path DataFrames and CSV-driven plotting
-with small immutable in-memory path results and direct Matplotlib comparison figures.
+Patch 20f: complete the package-wide result-surface and CSV-policy audit, remove stale documentation
+and helper references, decide the detailed matrix-path attribute boundary, and add structural
+enforcement for direct in-memory numbered examples.
 
 ## Subsequent roadmap
 
-1. **Patch 20e:** in-memory Pi-PLS/PLS path comparison.
-2. **Patch 20f:** package-wide CSV-policy cleanup, documentation migration, and structural enforcement.
-3. **First-release preparation:** choose the initial version, complete metadata and release notes,
+1. **Patch 20f:** package-wide cleanup, documentation migration, and structural enforcement.
+2. **First-release preparation:** choose the initial version, complete metadata and release notes,
    and rehearse the tag and publication checklist.
-4. **First tagged release:** publish only after the rehearsal and checklist pass.
+3. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

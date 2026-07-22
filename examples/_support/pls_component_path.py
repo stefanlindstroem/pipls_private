@@ -2,19 +2,80 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
+from numpy.typing import ArrayLike, NDArray
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.model_selection import KFold
 
 ALGORITHM = "NIPALS"
-RESULT_COLUMNS = (
-    "n_components",
-    "algorithm",
-    "response_standardized_cv_mse_mean",
-    "response_standardized_cv_mse_fold_sd",
-    "n_splits",
-)
+FloatArray = NDArray[np.float64]
+IntArray = NDArray[np.intp]
+
+
+@dataclass(frozen=True)
+class PLSComponentPath:
+    """Immutable ordinary-PLS component-path results.
+
+    Arrays contain one result per evaluated component count and are defensive,
+    read-only copies aligned by row.
+    """
+
+    n_components: IntArray
+    cv_mse_mean: FloatArray
+    cv_mse_fold_sd: FloatArray
+    algorithm: str
+    n_splits: int
+
+    def __post_init__(self) -> None:
+        n_components = _read_only_int_array(self.n_components, name="n_components")
+        cv_mse_mean = _read_only_float_array(self.cv_mse_mean, name="cv_mse_mean")
+        cv_mse_fold_sd = _read_only_float_array(
+            self.cv_mse_fold_sd,
+            name="cv_mse_fold_sd",
+        )
+        if n_components.size == 0:
+            raise ValueError("A PLS component path must contain at least one result.")
+        if cv_mse_mean.size != n_components.size or cv_mse_fold_sd.size != n_components.size:
+            raise ValueError("All PLS component-path arrays must have the same length.")
+        if np.any(n_components <= 0):
+            raise ValueError("n_components must contain positive integers.")
+        if np.any(np.diff(n_components) <= 0):
+            raise ValueError("n_components must be unique and strictly ascending.")
+        if not np.isfinite(cv_mse_mean).all():
+            raise ValueError("cv_mse_mean must contain only finite values.")
+        if not np.isfinite(cv_mse_fold_sd).all() or np.any(cv_mse_fold_sd < 0.0):
+            raise ValueError("cv_mse_fold_sd must contain finite nonnegative values.")
+        algorithm = str(self.algorithm).strip()
+        if not algorithm:
+            raise ValueError("algorithm must be a nonempty string.")
+        if isinstance(self.n_splits, bool) or not isinstance(self.n_splits, (int, np.integer)):
+            raise ValueError("n_splits must be a positive integer.")
+        n_splits = int(self.n_splits)
+        if n_splits <= 0:
+            raise ValueError("n_splits must be a positive integer.")
+
+        object.__setattr__(self, "n_components", n_components)
+        object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
+        object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
+        object.__setattr__(self, "algorithm", algorithm)
+        object.__setattr__(self, "n_splits", n_splits)
+
+    def __reduce__(self) -> tuple[type[PLSComponentPath], tuple[object, ...]]:
+        """Reconstruct through validation so unpickled arrays remain read-only."""
+
+        return (
+            type(self),
+            (
+                self.n_components,
+                self.cv_mse_mean,
+                self.cv_mse_fold_sd,
+                self.algorithm,
+                self.n_splits,
+            ),
+        )
 
 
 def evaluate_pls_component_path(
@@ -23,7 +84,7 @@ def evaluate_pls_component_path(
     *,
     max_n_components: int,
     n_splits: int = 5,
-) -> pd.DataFrame:
+) -> PLSComponentPath:
     """Return fold-local response-standardized CV-MSE for standard PLS.
 
     One maximum-component ``PLSRegression`` fit is evaluated per fold. NIPALS
@@ -74,16 +135,26 @@ def evaluate_pls_component_path(
                 np.mean((Y_validation_scaled - prediction_scaled) ** 2)
             )
 
-    rows: list[dict[str, int | float | str]] = []
-    for n_components in range(1, max_n_components + 1):
-        values = split_mse[n_components - 1]
-        rows.append(
-            {
-                "n_components": n_components,
-                "algorithm": ALGORITHM,
-                "response_standardized_cv_mse_mean": float(np.mean(values)),
-                "response_standardized_cv_mse_fold_sd": float(np.std(values)),
-                "n_splits": n_splits,
-            }
-        )
-    return pd.DataFrame(rows, columns=RESULT_COLUMNS)
+    return PLSComponentPath(
+        n_components=np.arange(1, max_n_components + 1, dtype=np.intp),
+        cv_mse_mean=np.mean(split_mse, axis=1),
+        cv_mse_fold_sd=np.std(split_mse, axis=1),
+        algorithm=ALGORITHM,
+        n_splits=n_splits,
+    )
+
+
+def _read_only_int_array(value: ArrayLike, *, name: str) -> IntArray:
+    array = np.array(value, dtype=np.intp, copy=True)
+    if array.ndim != 1:
+        raise ValueError(f"{name} must be one-dimensional; got shape {array.shape}.")
+    array.setflags(write=False)
+    return array
+
+
+def _read_only_float_array(value: ArrayLike, *, name: str) -> FloatArray:
+    array = np.array(value, dtype=np.float64, copy=True)
+    if array.ndim != 1:
+        raise ValueError(f"{name} must be one-dimensional; got shape {array.shape}.")
+    array.setflags(write=False)
+    return array

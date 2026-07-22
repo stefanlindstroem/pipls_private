@@ -135,12 +135,11 @@ Do not introduce merely for repository examples:
 ## Analysis artifact transparency
 
 Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize intermediate
-analysis results. The direct Pulp and Sugarcane workflows read those two tables and then keep
-`component_path_`, fixed-model OOF predictions, and immutable inspection results in memory. They
-create figures directly and write only final PDF outputs. Pulp additionally exposes the conditional
-predictor-rank profile for its chosen component count, while Tobacco owns deterministic source-order
-response pagination through multipage PDFs. New numbered-example work should follow that pattern.
-The explicit comparison example retains its generated CSV contract only until Patch 20e.
+analysis results. Every numbered real-data workflow keeps its path and inspection results in memory,
+creates figures directly, and writes only final PDF outputs. Example 09 compares immutable Pi-PLS and
+ordinary-PLS paths; Pulp additionally exposes the conditional predictor-rank profile for its chosen
+component count; Tobacco owns deterministic source-order response pagination through multipage PDFs.
+New numbered-example work should follow that pattern.
 
 ## Publication boundary
 

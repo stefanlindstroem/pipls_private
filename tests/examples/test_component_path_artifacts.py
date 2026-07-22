@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import pickle
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -27,90 +28,10 @@ def _load_example_module(relative_path: str, module_name: str) -> ModuleType:
     return module
 
 
-PLOT = _load_example_module("_support/plot_component_path.py", "plot_component_path_example")
 PLS_PATH = _load_example_module("_support/pls_component_path.py", "pls_component_path_example")
 
 
-def _write_component_path(path: Path) -> None:
-    pd.DataFrame(
-        {
-            "n_components": [1, 2, 3],
-            "predictor_rank": [4, 5, 5],
-            "predictor_rank_policy": ["optimized"] * 3,
-            "response_standardized_cv_mse_mean": [0.8, 0.5, 0.45],
-            "response_standardized_cv_mse_fold_sd": [0.1, 0.08, 0.07],
-            "n_splits": [5, 5, 5],
-        }
-    ).to_csv(path, index=False)
-
-
-def _write_pls_component_path(path: Path, components: list[int] | None = None) -> None:
-    values = [1, 2, 3] if components is None else components
-    pd.DataFrame(
-        {
-            "n_components": values,
-            "algorithm": ["NIPALS"] * len(values),
-            "response_standardized_cv_mse_mean": [0.9, 0.6, 0.55][: len(values)],
-            "response_standardized_cv_mse_fold_sd": [0.12, 0.09, 0.08][: len(values)],
-            "n_splits": [5] * len(values),
-        }
-    ).to_csv(path, index=False)
-
-
-def test_pipls_plot_is_generated_from_one_canonical_csv(tmp_path: Path) -> None:
-    csv_path = tmp_path / "component_path.csv"
-    pdf_path = tmp_path / "component_path.pdf"
-    _write_component_path(csv_path)
-
-    PLOT.plot_pipls_component_path(csv_path, pdf_path, title="Test Pi-PLS path")
-
-    assert pdf_path.read_bytes().startswith(b"%PDF")
-    assert pdf_path.stat().st_size > 1_000
-
-
-def test_comparison_plot_is_generated_from_two_canonical_csvs(tmp_path: Path) -> None:
-    csv_path = tmp_path / "component_path.csv"
-    pls_csv_path = tmp_path / "pls_component_path.csv"
-    pdf_path = tmp_path / "component_path_comparison.pdf"
-    _write_component_path(csv_path)
-    _write_pls_component_path(pls_csv_path)
-
-    PLOT.plot_component_path_comparison(
-        csv_path,
-        pls_csv_path,
-        pdf_path,
-        title="Test component-path comparison",
-    )
-
-    assert pdf_path.read_bytes().startswith(b"%PDF")
-    assert pdf_path.stat().st_size > 1_000
-
-
-def test_plot_reader_rejects_missing_columns(tmp_path: Path) -> None:
-    csv_path = tmp_path / "incomplete.csv"
-    pd.DataFrame({"n_components": [1]}).to_csv(csv_path, index=False)
-
-    with pytest.raises(ValueError, match="missing columns"):
-        PLOT.read_component_path(csv_path)
-
-
-def test_comparison_plot_rejects_mismatched_component_counts(tmp_path: Path) -> None:
-    csv_path = tmp_path / "component_path.csv"
-    pls_csv_path = tmp_path / "pls_component_path.csv"
-    pdf_path = tmp_path / "component_path_comparison.pdf"
-    _write_component_path(csv_path)
-    _write_pls_component_path(pls_csv_path, [1, 2])
-
-    with pytest.raises(ValueError, match="same component counts"):
-        PLOT.plot_component_path_comparison(
-            csv_path,
-            pls_csv_path,
-            pdf_path,
-            title="Test component-path comparison",
-        )
-
-
-def test_standard_pls_path_is_deterministic_and_machine_readable() -> None:
+def test_standard_pls_path_is_deterministic_and_immutable() -> None:
     rng = np.random.default_rng(1729)
     X = pd.DataFrame(rng.normal(size=(30, 6)))
     Y = pd.DataFrame(rng.normal(size=(30, 3)))
@@ -118,13 +39,75 @@ def test_standard_pls_path_is_deterministic_and_machine_readable() -> None:
     first = PLS_PATH.evaluate_pls_component_path(X, Y, max_n_components=3)
     second = PLS_PATH.evaluate_pls_component_path(X, Y, max_n_components=3)
 
-    pd.testing.assert_frame_equal(first, second)
-    assert tuple(first.columns) == PLS_PATH.RESULT_COLUMNS
-    assert first["n_components"].tolist() == [1, 2, 3]
-    assert first["algorithm"].tolist() == ["NIPALS"] * 3
-    assert first["n_splits"].tolist() == [5] * 3
-    assert np.isfinite(first["response_standardized_cv_mse_mean"]).all()
-    assert (first["response_standardized_cv_mse_fold_sd"] >= 0.0).all()
+    np.testing.assert_array_equal(first.n_components, second.n_components)
+    np.testing.assert_allclose(first.cv_mse_mean, second.cv_mse_mean)
+    np.testing.assert_allclose(first.cv_mse_fold_sd, second.cv_mse_fold_sd)
+    assert first.n_components.tolist() == [1, 2, 3]
+    assert first.algorithm == "NIPALS"
+    assert first.n_splits == 5
+    assert first.n_components.dtype == np.dtype(np.intp)
+    assert first.cv_mse_mean.dtype == np.dtype(np.float64)
+    assert first.cv_mse_fold_sd.dtype == np.dtype(np.float64)
+    assert np.isfinite(first.cv_mse_mean).all()
+    assert (first.cv_mse_fold_sd >= 0.0).all()
+    assert not first.n_components.flags.writeable
+    assert not first.cv_mse_mean.flags.writeable
+    assert not first.cv_mse_fold_sd.flags.writeable
+
+
+def test_standard_pls_path_defensively_copies_and_pickles() -> None:
+    components = np.array([1, 2, 3])
+    means = np.array([0.9, 0.6, 0.55])
+    fold_sd = np.array([0.12, 0.09, 0.08])
+    path = PLS_PATH.PLSComponentPath(
+        n_components=components,
+        cv_mse_mean=means,
+        cv_mse_fold_sd=fold_sd,
+        algorithm="NIPALS",
+        n_splits=5,
+    )
+
+    components[0] = 7
+    means[0] = 7.0
+    fold_sd[0] = 7.0
+    assert path.n_components.tolist() == [1, 2, 3]
+    assert path.cv_mse_mean.tolist() == [0.9, 0.6, 0.55]
+    assert path.cv_mse_fold_sd.tolist() == [0.12, 0.09, 0.08]
+
+    restored = pickle.loads(pickle.dumps(path))
+    np.testing.assert_array_equal(restored.n_components, path.n_components)
+    np.testing.assert_allclose(restored.cv_mse_mean, path.cv_mse_mean)
+    np.testing.assert_allclose(restored.cv_mse_fold_sd, path.cv_mse_fold_sd)
+    assert not restored.n_components.flags.writeable
+    assert not restored.cv_mse_mean.flags.writeable
+    assert not restored.cv_mse_fold_sd.flags.writeable
+
+
+def test_standard_pls_path_rejects_invalid_arrays() -> None:
+    with pytest.raises(ValueError, match="same length"):
+        PLS_PATH.PLSComponentPath(
+            n_components=[1, 2],
+            cv_mse_mean=[0.9],
+            cv_mse_fold_sd=[0.1, 0.1],
+            algorithm="NIPALS",
+            n_splits=5,
+        )
+    with pytest.raises(ValueError, match="strictly ascending"):
+        PLS_PATH.PLSComponentPath(
+            n_components=[1, 1],
+            cv_mse_mean=[0.9, 0.8],
+            cv_mse_fold_sd=[0.1, 0.1],
+            algorithm="NIPALS",
+            n_splits=5,
+        )
+    with pytest.raises(ValueError, match="nonnegative"):
+        PLS_PATH.PLSComponentPath(
+            n_components=[1, 2],
+            cv_mse_mean=[0.9, 0.8],
+            cv_mse_fold_sd=[0.1, -0.1],
+            algorithm="NIPALS",
+            n_splits=5,
+        )
 
 
 def test_nested_pls_path_matches_separate_pls_fits() -> None:
@@ -144,27 +127,32 @@ def test_nested_pls_path_matches_separate_pls_fits() -> None:
             residual = Y.iloc[validation].to_numpy() - prediction
             split_mse.append(float(np.mean((residual / response_scale) ** 2)))
 
-        row = path.loc[path["n_components"] == n_components].iloc[0]
-        assert row["response_standardized_cv_mse_mean"] == pytest.approx(
-            np.mean(split_mse)
-        )
-        assert row["response_standardized_cv_mse_fold_sd"] == pytest.approx(
-            np.std(split_mse)
-        )
+        index = n_components - 1
+        assert path.cv_mse_mean[index] == pytest.approx(np.mean(split_mse))
+        assert path.cv_mse_fold_sd[index] == pytest.approx(np.std(split_mse))
 
 
-def test_dedicated_example_owns_all_pls_path_comparisons() -> None:
-    text = (_repository_root() / "examples" / "09_pls_path_comparison.py").read_text(
-        encoding="utf-8"
-    )
+def test_dedicated_example_compares_paths_directly_in_memory() -> None:
+    examples_dir = _repository_root() / "examples"
+    path = examples_dir / "09_pls_path_comparison.py"
+    text = path.read_text(encoding="utf-8")
 
     assert "evaluate_pls_component_path(" in text
-    assert "plot_component_path_comparison(" in text
+    assert "component_path_" in text
+    assert "pipls_path" in text
+    assert "pls_path" in text
+    assert text.count("axis.errorbar(") == 2
+    assert "plt.subplots(" in text
+    assert "figure.savefig(" in text
+    assert "plt.close(figure)" in text
     assert text.count('("pulp",') == 1
     assert text.count('("sugarcane",') == 1
     assert '"tobacco",' in text
-    assert "component_path_" in text
     assert "refit=False" in text
+    assert ".to_csv(" not in text
+    assert "component_path.csv" not in text
+    assert "plot_component_path" not in text
+    assert not (examples_dir / "_support" / "plot_component_path.py").exists()
 
 
 def test_real_data_examples_use_pipls_only_component_paths() -> None:
@@ -175,7 +163,6 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in pulp_text
     assert 'cv_results["predictor_rank"]' in pulp_text
     assert "axis.errorbar(" in pulp_text
-    assert "plot_pipls_component_path(" not in pulp_text
     assert "component_path.csv" not in pulp_text
     assert "post_analysis.pdf" not in pulp_text
     assert ".to_csv(" not in pulp_text
@@ -188,7 +175,6 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert "refit=False" in sugarcane_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in sugarcane_text
     assert "axis.errorbar(" in sugarcane_text
-    assert "plot_pipls_component_path(" not in sugarcane_text
     assert "component_path.csv" not in sugarcane_text
     assert "post_analysis.pdf" not in sugarcane_text
     assert ".to_csv(" not in sugarcane_text
@@ -198,7 +184,6 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert "refit=False" in tobacco_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in tobacco_text
     assert "axis.errorbar(" in tobacco_text
-    assert "plot_pipls_component_path(" not in tobacco_text
     assert "component_path.csv" not in tobacco_text
     assert "post_analysis.pdf" not in tobacco_text
     assert ".to_csv(" not in tobacco_text
@@ -207,7 +192,6 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
 
     for source in (pulp_text, sugarcane_text, tobacco_text):
         assert "evaluate_pls_component_path(" not in source
-        assert "plot_component_path_comparison(" not in source
         assert "subprocess" not in source
         assert "pooled_oof_r2_" not in source
 
@@ -222,11 +206,15 @@ def test_tobacco_example_uses_full_svd_and_auto_search() -> None:
     assert 'svd_solver="randomized"' not in text
 
 
-def test_example_helpers_are_importable_functions_not_command_line_wrappers() -> None:
-    for filename in ["pls_component_path.py", "plot_component_path.py"]:
-        text = (_repository_root() / "examples" / "_support" / filename).read_text(
-            encoding="utf-8"
-        )
-        assert "argparse" not in text
-        assert "subprocess" not in text
-        assert "if __name__ ==" not in text
+def test_pls_path_helper_is_not_a_command_line_or_table_wrapper() -> None:
+    text = (
+        _repository_root() / "examples" / "_support" / "pls_component_path.py"
+    ).read_text(encoding="utf-8")
+
+    assert "argparse" not in text
+    assert "subprocess" not in text
+    assert "if __name__ ==" not in text
+    assert "-> PLSComponentPath" in text
+    assert "return PLSComponentPath(" in text
+    assert "pd.DataFrame(" not in text
+    assert ".to_csv(" not in text

@@ -9,8 +9,8 @@ diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.in
 Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
 Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
 factorization inspection, and shared PLS-family analysis. Decision 0058 establishes one chart per
-public plotting function and caller-owned figure composition. Decisions 0067–0069 make
-Sugarcane, Pulp, and Tobacco direct in-memory workflows. The shared latent-structure functions use
+public plotting function and caller-owned figure composition. Decisions 0067–0070 make all four
+real-data workflows direct in-memory analyses. The shared latent-structure functions use
 estimator-neutral names and structural fitted-model contracts, and numbered-example post-analysis
 applies them only to the selected Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface remains
 explicitly method-specific.
@@ -22,12 +22,12 @@ Keep these stages separate in code, documentation, filenames, and figure labels.
 ### Model-selection diagnostics
 
 The component-path workflows answer how cross-validated loss changes with component count and, for
-Pi-PLS, the conditional predictor rank. Example 09 owns the canonical Pi-PLS and ordinary PLS path
-CSVs and their overlaid comparison PDFs until Patch 20e. Pulp, Sugarcane, and Tobacco plot
+Pi-PLS, the conditional predictor rank. Example 09 owns the overlaid Pi-PLS and ordinary-PLS
+comparison PDFs and plots both immutable paths directly in memory. Pulp, Sugarcane, and Tobacco plot
 `component_path_` directly in the numbered examples and write final component-path PDFs without CSV
 conversion. Pulp also plots the evaluated predictor-rank profile at its chosen component count.
-`examples/_support/pls_component_path.py` and `examples/_support/plot_component_path.py` remain
-comparison-specific until Patch 20e.
+`examples/_support/pls_component_path.py` remains only for the nontrivial ordinary-PLS fold-local
+path calculation; there is no comparison plotting helper.
 
 A component-path result is not a fitted-model interpretation and is not an unbiased estimate of a
 subsequent user choice made after inspecting that same path. Fold SD is descriptive only, and the

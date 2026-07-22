@@ -75,6 +75,7 @@ This index is navigation, not a substitute for those records.
 | `0067-direct-sugarcane-workflow.md` | direct Sugarcane reference workflow | in-memory path, OOF, inspection, and explicit final-PDF figure composition without generated analytical CSV intermediates |
 | `0068-direct-pulp-workflow.md` | direct Pulp example and tutorial | visible direct path, rank-profile, fixed-fit, OOF, inspection, and final-figure workflow without a shared wrapper or analytical CSV intermediates |
 | `0069-direct-tobacco-workflow.md` | direct Tobacco example | visible full-SVD path, fixed-fit, OOF, inspection, response pagination, and final-PDF workflow without analytical CSV intermediates or report helpers |
+| `0070-direct-pls-path-comparison.md` | direct Pi-PLS/PLS comparison | immutable ordinary-PLS path arrays, direct example-owned Matplotlib composition, and removal of comparison CSV intermediates and plotting helper |
 
 ## Implemented estimator/search transition
 
@@ -147,12 +148,12 @@ plan contains an earlier or more general proposal:
   performance claim before calibration;
 - the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
-- example 09 presents comparison component paths as CSV tables with fold SD until Patch 20e;
-  Pulp, Sugarcane, and Tobacco plot `component_path_` directly in memory; every real-data example
+- example 09 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
+  Sugarcane, and Tobacco plot `component_path_` directly in memory; every complete real-data analysis
   fits a separate fixed model after an explicit user component choice;
 - fold SD is descriptive, while component count remains a visible path-based user choice;
-- example 09 compares separate Pi-PLS and standard PLS component-path CSVs in one PDF per dataset;
-  Pulp, Sugarcane, and Tobacco write final PDFs directly from in-memory Pi-PLS results, with Pulp
+- example 09 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
+  dataset; Pulp, Sugarcane, and Tobacco write final PDFs directly from in-memory Pi-PLS results, with Pulp
   exposing the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,
   source-order response pagination, and raw observation diagnostics; randomized SVD is covered by
   the solver-consistency benchmark;

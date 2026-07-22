@@ -19,8 +19,8 @@ reports held-out $R^2$.
 ## Pi-PLS and ordinary PLS comparison
 
 `examples/09_pls_path_comparison.py` evaluates matched component-count paths for Pulp, Sugarcane,
-and Tobacco. It writes separate Pi-PLS and ordinary-PLS tables and one overlaid CV-MSE figure per
-dataset. This comparison is optional and is not part of routine Pi-PLS fitting.
+and Tobacco. It keeps both immutable paths in memory and writes one overlaid CV-MSE figure per dataset.
+This comparison is optional and is not part of routine Pi-PLS fitting.
 
 ## Complete real-data analyses
 
@@ -43,8 +43,8 @@ example layer owns subplot layouts, legends, figure-level titles, PDF output, an
 plotters render one chart on one supplied axis.
 
 The Pulp tutorial extracts its checked snippets directly from `examples/10_pulp_real_data.py`.
-Modules under `examples/_support/` now serve only the comparison workflow. They are not required
-for ordinary estimator use.
+The sole module under `examples/_support/` evaluates the nontrivial fold-local ordinary-PLS path for
+example 09. It is not required for ordinary estimator use.
 
 ## Run the examples
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Make the Pi-PLS/ordinary-PLS path comparison direct: return immutable ordinary-PLS path arrays,
+  plot both methods in example 09 with ordinary Matplotlib, write only three final PDFs, and remove
+  the comparison CSV intermediates and plotting helper.
+
 - Make Tobacco a direct in-memory workflow: preserve full predictor SVD, adaptive rank scanning,
   decreasing-wavenumber plots, deterministic source-order response pagination, and raw observation
   diagnostics; write five final PDFs, with three-page prediction and coefficient files, and remove

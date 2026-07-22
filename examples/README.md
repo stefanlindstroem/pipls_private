@@ -65,14 +65,14 @@ corresponding figures without a predictor-rank-profile page. Tobacco also writes
 `make examples` runs every numbered example in filename order, including the slower
 real-data workflows. It remains separate from `make check`.
 
-## Example support modules
+## Example support module
 
-The remaining comparison workflow imports implementation support from `examples/_support/`:
+The comparison workflow imports one implementation helper from `examples/_support/`:
 
-- `pls_component_path.py`: ordinary-PLS path evaluation for example 09;
-- `plot_component_path.py`: component-path CSV rendering for example 09.
+- `pls_component_path.py`: immutable ordinary-PLS path evaluation for example 09.
 
-Pulp, Sugarcane, and Tobacco import none of these helpers. Reusable numerical inspection belongs in
+Example 09 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
+comparison helper. Reusable numerical inspection belongs in
 `pipls.inspection`, and optional one-axis rendering belongs in `pipls.plotting`.
 
 ## Real-data workflow contract
@@ -90,8 +90,8 @@ information system, or other domain metadata. The package plotting API does not 
 invent scientific variable names. The committed datasets already have tested headers and ordering,
 so the numbered examples use them directly instead of repeating repository-integrity checks.
 
-Example 09 writes the separate Pi-PLS and ordinary PLS path tables used by the three overlaid
-comparison figures. Sugarcane demonstrates the target direct workflow:
+Example 09 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
+comparison figures directly. Sugarcane demonstrates the complete-analysis workflow:
 
 1. `PiPLSPathCV(refit=False)` returns `component_path_`, which is plotted directly with Matplotlib.
 2. `path.for_n_components(CHOSEN_N_COMPONENTS)` supplies the fixed component count and predictor
@@ -117,6 +117,6 @@ thirteen responses in source order. Generated files under `examples/results/` ar
 
 `examples/results/`, the PLS-path-comparison directory, and the Pulp, Sugarcane, and Tobacco
 post-analysis subdirectories are tracked with placeholder files. The examples therefore write directly to known destinations and do not
-contain directory-creation code. Generated comparison CSV files and all PDF files remain ignored,
+contain directory-creation code. Generated PDF files remain ignored,
 and `make clean`
 removes them while preserving the tracked directory structure.

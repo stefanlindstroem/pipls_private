@@ -389,9 +389,9 @@ consistency are implemented as independent scripts with minimal question-specifi
 ### Phase E4c: representative real-data examples — complete
 
 Pulp, Sugarcane, and Tobacco provide transparent component-path analyses with direct `X.csv` and
-`Y.csv` reading. Example 09 owns the canonical Pi-PLS and standard PLS comparison CSVs and PDFs;
-examples 10–12 perform separate Pi-PLS-only fixed fits after explicit component choices. Phase F4
-subsequently makes all three complete analyses direct in-memory workflows.
+`Y.csv` reading. Example 09 owns the Pi-PLS and standard PLS comparison figures; examples 10–12
+perform separate Pi-PLS-only fixed fits after explicit component choices. Phase F4 subsequently makes
+all four real-data workflows direct in-memory analyses.
 
 The initial real-data smoke benchmark scripts and tests were removed after review because they
 repeated the same Pi-PLS paths, while dataset-specific tests executed the complete examples again.
@@ -491,12 +491,11 @@ Implementation order:
 5. in-memory Pi-PLS/PLS comparison;
 6. package-wide cleanup, documentation migration, and structural enforcement.
 
-Current status: **Patches 20a–20d complete**. Decision 0066 adds `PiPLSComponentPath`,
-`PiPLSComponentResult`, and `PiPLSPathCV.component_path_`. Decision 0067 makes Sugarcane direct.
-Decision 0068 makes the Pulp example and tutorial direct, removes the shared workflow wrapper and
-analytical CSV intermediates, and adds the conditional predictor-rank profile. Decision 0069 makes
-Tobacco direct, preserves its full-SVD spectral and paginated behavior, and removes the post-analysis
-table and fixed-model OOF helpers. Patch 20e, the in-memory comparison workflow, is next.
+Current status: **Patches 20a–20e complete**. Decision 0066 adds `PiPLSComponentPath`,
+`PiPLSComponentResult`, and `PiPLSPathCV.component_path_`. Decisions 0067–0069 make Sugarcane,
+Pulp, and Tobacco direct and remove their analytical CSV/report machinery. Decision 0070 makes the
+Pi-PLS/PLS comparison direct, replaces its DataFrame result with immutable arrays, and removes the
+CSV plotting helper. Patch 20f, package-wide cleanup and enforcement, is next.
 
 ### Product documentation and release hardening
 
@@ -561,9 +560,9 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Patch 20e: make example 09 compare Pi-PLS and ordinary-PLS component paths directly in memory.
-Replace its DataFrame result and CSV-driven plot helper with small immutable arrays and direct
-Matplotlib composition, then remove the comparison plotting helper.
+Patch 20f: complete the package-wide result-surface, documentation, and CSV-policy audit. Remove
+remaining stale references, decide the status of detailed matrix-path attributes, and add structural
+tests that enforce direct in-memory numbered examples and final-output-only artifact contracts.
 
 ## Maintenance protocol
 

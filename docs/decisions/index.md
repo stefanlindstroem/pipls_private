@@ -65,6 +65,7 @@ reference describe the current public behavior directly.
 - [0067: direct Sugarcane workflow](0067-direct-sugarcane-workflow.md)
 - [0068: direct Pulp workflow](0068-direct-pulp-workflow.md)
 - [0069: direct Tobacco workflow](0069-direct-tobacco-workflow.md)
+- [0070: direct Pi-PLS and ordinary-PLS path comparison](0070-direct-pls-path-comparison.md)
 
 ## Repository and documentation policy
 

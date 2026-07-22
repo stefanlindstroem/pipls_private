@@ -111,9 +111,10 @@ public provenance and redistribution terms. Current integrations are:
 - sugarcane LabSpec spectroscopy;
 - tobacco FT-NIR spectroscopy.
 
-Examples read `X.csv` and `Y.csv` directly. Example 09 still uses generated comparison CSV
-artifacts. Pulp, Sugarcane, and Tobacco operate on `component_path_`, scikit-learn OOF predictions,
-and immutable inspection results in memory and write only final PDF figures.
+Examples read `X.csv` and `Y.csv` directly. Example 09 operates on immutable Pi-PLS and ordinary-PLS
+paths in memory. Pulp, Sugarcane, and Tobacco operate on `component_path_`, scikit-learn OOF
+predictions, and immutable inspection results in memory. Every numbered real-data workflow writes only
+final PDF figures.
 Metadata supports repository review but is not required by the runtime API. Dataset-specific
 transformations that matter to users are described publicly; private preparation archives and
 inaccessible paths are not part of the repository.

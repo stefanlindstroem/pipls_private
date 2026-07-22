@@ -350,9 +350,10 @@ search = PiPLSPathCV(refit=False).fit(X, Y)
 path = search.component_path_
 ```
 
-Example 09 writes separate canonical Pi-PLS and standard PLS (NIPALS) component-path CSV
-files for Pulp, Sugarcane, and Tobacco and derives the shared CV-MSE comparison figures from those
-tables. Examples 10–12 then perform Pi-PLS-only analyses. Pulp and Sugarcane are direct workflows:
+Example 09 evaluates immutable Pi-PLS and standard PLS (NIPALS) component paths for Pulp,
+Sugarcane, and Tobacco and plots each shared CV-MSE comparison directly in memory. It writes only the
+three final comparison PDFs. Examples 10–12 then perform Pi-PLS-only analyses. Pulp and Sugarcane are
+direct workflows:
 they read `component_path_`, fit the selected fixed model, calculate selection-conditioned OOF
 predictions with scikit-learn, keep inspection results in memory, and write only final PDF figures.
 The Pulp workflow also plots the conditional predictor-rank profile at three components, showing

@@ -278,8 +278,8 @@ attribute, path-search parameter, or top-level export is added by this plotting 
 
 ## Example workflow boundary
 
-Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and their separate
-canonical CSV files. Pulp, Sugarcane, and Tobacco use `PiPLSPathCV(refit=False)`, plot
+Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
+component paths directly in memory. Pulp, Sugarcane, and Tobacco use `PiPLSPathCV(refit=False)`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn
 `cross_val_predict()`. They pass immutable factors, latent structure, and prediction diagnostics
@@ -289,4 +289,4 @@ full predictor SVD, direct observation diagnostics, and caller-owned source-orde
 pagination through multipage PDFs.
 
 The package exposes no dataset I/O, tutorial workflow, predictor-rank-profile object, or
-component-path plotting helper.
+component-path plotting helper. The comparison-only `PLSComponentPath` remains example-local.

@@ -45,7 +45,9 @@ def test_dedicated_example_owns_the_pls_comparison_path() -> None:
     examples_dir = _repository_root() / "examples"
     comparison = (examples_dir / "09_pls_path_comparison.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" in comparison
-    assert "plot_component_path_comparison(" in comparison
+    assert "axis.errorbar(" in comparison
+    assert "plot_component_path" not in comparison
+    assert ".to_csv(" not in comparison
 
     pulp_text = (examples_dir / "10_pulp_real_data.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" not in pulp_text

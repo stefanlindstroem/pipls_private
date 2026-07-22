@@ -33,8 +33,8 @@ The benchmark layer implements all four focused synthetic questions as separate 
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
 `make examples` runs every numbered example explicitly, beginning with the literal-matrix
 `01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. Example 09
-writes separate Pi-PLS and standard PLS (NIPALS) CSVs and derives the comparison PDFs from those
-canonical tables. Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, keep OOF and
+plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
+Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, keep OOF and
 inspection results in memory, and write only final PDF figures. Pulp also exposes the conditional
 predictor-rank profile at three components. Tobacco owns its full-SVD spectral figures, source-order
 response pagination, and raw observation diagnostics directly.
@@ -124,9 +124,10 @@ implementing or reviewing this surface.
   followed by an explained synthetic train/test use case, one explicit comparison example, and
   complete Pi-PLS real-data analyses. Advanced splitters are documented rather than combined into a
   context-free numbered script.
-  Underscore-prefixed `examples/_support/` contains only comparison-specific helpers rather than
-  primary entry points. Example 09 owns the separate Pi-PLS and standard PLS (NIPALS) paths and
-  comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS paths, scikit-learn OOF
+  Underscore-prefixed `examples/_support/` contains only the ordinary-PLS path evaluator needed by
+  the comparison rather than primary entry points. Example 09 owns the immutable Pi-PLS and standard
+  PLS (NIPALS) paths and direct comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS
+  paths, scikit-learn OOF
   predictions, immutable inspection results, and explicit final figures; Pulp additionally owns its
   conditional predictor-rank profile and tutorial snippets. Their pandas and Matplotlib
   requirements are grouped in the `examples` optional dependency extra.
