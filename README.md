@@ -357,8 +357,9 @@ they read `component_path_`, fit the selected fixed model, calculate selection-c
 predictions with scikit-learn, keep inspection results in memory, and write only final PDF figures.
 The Pulp workflow also plots the conditional predictor-rank profile at three components, showing
 that rank 10 is selected at the upper evaluated boundary and is close to rank 9 relative to fold
-variability. Tobacco retains the transitional CSV and multipage-report machinery until Patch 20d
-and uses adaptive scanning with explicit full predictor SVD. Randomized-SVD behavior is covered by
+variability. Tobacco uses adaptive scanning with explicit full predictor SVD, preserves its
+decreasing wavenumber coordinate, and writes source-order paginated prediction and coefficient PDFs.
+Randomized-SVD behavior is covered by
 the solver-consistency benchmark. Install the `examples` extra to run them. See
 [`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).
 
@@ -374,9 +375,9 @@ scientific question and one minimal CSV output:
 
 The real-data workflows are explicit application runs rather than benchmark or test-suite jobs.
 `make examples` runs every numbered example in order. Example 09 owns the Pulp, Sugarcane, and
-Tobacco Pi-PLS-versus-PLS CV-MSE comparisons. Examples 10–12 are normal Pi-PLS analyses.
-Pulp and Sugarcane write only final PDF figures from in-memory results. Tobacco retains its
-transitional path CSV and post-analysis report artifacts until Patch 20d.
+Tobacco Pi-PLS-versus-PLS CV-MSE comparisons. Examples 10–12 are normal Pi-PLS analyses and
+write only final PDF figures from in-memory results. Tobacco keeps its response pagination in two
+caller-owned multipage PDFs.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
 [`examples/README.md`](examples/README.md).

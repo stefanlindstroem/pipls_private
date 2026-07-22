@@ -234,9 +234,9 @@ accuracy, select ranks, measure runtime or memory, or record software and enviro
 ## Benchmark sequence status
 
 The four focused synthetic benchmarks are implemented. The Pulp, Sugarcane, and Tobacco
-component-path analyses are user-run examples, not package benchmarks. Sugarcane writes final PDF
-figures directly from in-memory results; the comparison, Pulp, and Tobacco workflows retain their
-current CSV products until their scheduled simplification patches.
+component-path analyses are user-run examples, not package benchmarks. Pulp, Sugarcane, and
+Tobacco write final PDF figures directly from in-memory results; only example 09 retains comparison
+CSV products until Patch 20e.
 
 ## Interpretation boundary
 

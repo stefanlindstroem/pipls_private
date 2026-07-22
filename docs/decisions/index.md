@@ -64,6 +64,7 @@ reference describe the current public behavior directly.
 - [0065: documentation layer consolidation](0065-documentation-layer-consolidation.md)
 - [0067: direct Sugarcane workflow](0067-direct-sugarcane-workflow.md)
 - [0068: direct Pulp workflow](0068-direct-pulp-workflow.md)
+- [0069: direct Tobacco workflow](0069-direct-tobacco-workflow.md)
 
 ## Repository and documentation policy
 

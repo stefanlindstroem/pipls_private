@@ -1,161 +1,10 @@
 from __future__ import annotations
 
-import importlib.util
-import sys
 from pathlib import Path
-from types import ModuleType
-
-import numpy as np
-import pandas as pd
-import pytest
-from sklearn.cross_decomposition import PLSRegression
-from sklearn.model_selection import KFold
-
-from pipls import PiPLSRegression
-from pipls.inspection import (
-    latent_structure,
-    observation_diagnostics,
-    pipls_display_factors,
-    prediction_diagnostics,
-)
 
 
 def _repository_root() -> Path:
     return Path(__file__).resolve().parents[2]
-
-
-def _load_example_module(relative_path: str, module_name: str) -> ModuleType:
-    path = _repository_root() / "examples" / relative_path
-    spec = importlib.util.spec_from_file_location(module_name, path)
-    if spec is None or spec.loader is None:
-        raise RuntimeError(f"Could not load example module from {path}.")
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-OOF = _load_example_module("_support/fixed_model_oof.py", "fixed_model_oof_example")
-ARTIFACTS = _load_example_module(
-    "_support/post_analysis_artifacts.py",
-    "post_analysis_artifacts_example",
-)
-
-
-def _example_data() -> tuple[pd.DataFrame, pd.DataFrame]:
-    rng = np.random.default_rng(914)
-    X = pd.DataFrame(
-        rng.normal(size=(30, 5)),
-        columns=[f"Predictor {index}" for index in range(1, 6)],
-    )
-    coefficient = np.array(
-        [
-            [1.0, -0.3],
-            [0.2, 0.7],
-            [-0.5, 0.1],
-            [0.3, -0.4],
-            [0.0, 0.2],
-        ]
-    )
-    Y = pd.DataFrame(
-        X.to_numpy() @ coefficient + 0.1 * rng.normal(size=(30, 2)),
-        columns=["Response A", "Response B"],
-    )
-    return X, Y
-
-
-def test_fixed_model_oof_matches_an_explicit_manual_loop() -> None:
-    X, Y = _example_data()
-    splitter = KFold(n_splits=5, shuffle=False)
-    estimator = PLSRegression(n_components=2, scale=True)
-
-    result = OOF.fixed_model_oof_predictions(estimator, X, Y, splitter=splitter)
-
-    expected = np.empty_like(Y.to_numpy())
-    expected_folds = np.zeros(len(X), dtype=np.int64)
-    for fold, (train, validation) in enumerate(splitter.split(X, Y), start=1):
-        model = PLSRegression(n_components=2, scale=True).fit(X.iloc[train], Y.iloc[train])
-        expected[validation] = model.predict(X.iloc[validation])
-        expected_folds[validation] = fold
-
-    np.testing.assert_allclose(result.predictions, expected)
-    np.testing.assert_array_equal(result.fold_index, expected_folds)
-    assert result.n_splits == 5
-    assert not result.predictions.flags.writeable
-    assert not result.fold_index.flags.writeable
-
-
-def test_fixed_model_oof_requires_exactly_one_validation_assignment() -> None:
-    X, Y = _example_data()
-
-    class IncompleteSplitter:
-        def split(self, X_values: object, Y_values: object) -> list[tuple[np.ndarray, np.ndarray]]:
-            del X_values, Y_values
-            return [(np.arange(15, 30), np.arange(0, 15))]
-
-    with pytest.raises(ValueError, match="exactly one validation fold"):
-        OOF.fixed_model_oof_predictions(
-            PLSRegression(n_components=2),
-            X,
-            Y,
-            splitter=IncompleteSplitter(),
-        )
-
-
-def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) -> None:
-    X, Y = _example_data()
-    pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    pipls_diagnostics = prediction_diagnostics(
-        Y,
-        pipls_model.predict(X),
-        prediction_kind="fixed-parameter OOF predictions",
-    )
-
-    tables = ARTIFACTS.build_post_analysis_tables(
-        factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics=pipls_diagnostics,
-        structure=latent_structure(pipls_model),
-        predictor_names=X.columns.tolist(),
-        response_names=Y.columns.tolist(),
-        sample_names=[str(index) for index in range(1, len(X) + 1)],
-        fold_index=np.repeat(np.arange(1, 6), 6),
-    )
-
-    assert set(tables) == set(ARTIFACTS.REQUIRED_TABLE_NAMES)
-    for name, table in tables.items():
-        assert tuple(table.columns) == ARTIFACTS.TABLE_COLUMNS[name]
-        assert not table.empty
-
-    stale_optional = tmp_path / ARTIFACTS.TABLE_FILENAMES["observation_diagnostics"]
-    stale_optional.write_text("stale\n", encoding="utf-8")
-    paths = ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
-    assert set(paths) == set(ARTIFACTS.REQUIRED_TABLE_NAMES)
-    assert not stale_optional.exists()
-    for stale_name in ARTIFACTS.LEGACY_TABLE_FILENAMES:
-        assert not (tmp_path / stale_name).exists()
-    for path in paths.values():
-        assert path.is_file()
-
-    predictions = pd.read_csv(paths["predictions"])
-    np.testing.assert_allclose(
-        predictions["residual"],
-        predictions["observed"] - predictions["predicted"],
-    )
-    assert "model" not in predictions.columns
-    assert set(predictions["prediction_kind"]) == {"fixed-parameter OOF predictions"}
-
-    pdf_path = tmp_path / "post_analysis.pdf"
-    ARTIFACTS.render_post_analysis_report(
-        tmp_path,
-        pdf_path,
-        dataset_name="Synthetic",
-        score_components=(1, 2),
-        biplot_components=(1, 2),
-        loading_components=(1, 2),
-        coefficient_responses=("Response A",),
-    )
-    assert pdf_path.read_bytes().startswith(b"%PDF")
-    assert pdf_path.stat().st_size > 5_000
 
 
 def test_pulp_example_uses_direct_in_memory_results() -> None:
@@ -185,118 +34,6 @@ def test_pulp_example_uses_direct_in_memory_results() -> None:
     assert "subprocess" not in text
 
 
-def test_post_analysis_report_supports_an_explicit_physical_predictor_axis(
-    tmp_path: Path,
-) -> None:
-    X, Y = _example_data()
-    pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    diagnostics = prediction_diagnostics(
-        Y,
-        pipls_model.predict(X),
-        prediction_kind="fixed-parameter OOF predictions",
-    )
-    wavelength_labels = [str(value) for value in np.linspace(780, 2500, X.shape[1])]
-    tables = ARTIFACTS.build_post_analysis_tables(
-        factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics=diagnostics,
-        structure=latent_structure(pipls_model),
-        predictor_names=wavelength_labels,
-        response_names=Y.columns.tolist(),
-        sample_names=[str(index) for index in range(1, len(X) + 1)],
-        fold_index=np.repeat(np.arange(1, 6), 6),
-    )
-    ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
-
-    pdf_path = tmp_path / "spectral_post_analysis.pdf"
-    ARTIFACTS.render_post_analysis_report(
-        tmp_path,
-        pdf_path,
-        dataset_name="Synthetic spectra",
-        predictor_style="line",
-        predictor_axis=np.linspace(780.0, 2500.0, X.shape[1]),
-        predictor_axis_label="Wavelength (nm)",
-        score_components=(1, 2),
-        loading_components=(1, 2),
-        coefficient_responses=("Response A", "Response B"),
-    )
-
-    assert pdf_path.read_bytes().startswith(b"%PDF")
-    assert pdf_path.stat().st_size > 5_000
-
-
-def test_post_analysis_report_supports_response_pages_and_observation_diagnostics(
-    tmp_path: Path,
-) -> None:
-    X, Y = _example_data()
-    pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    diagnostics = prediction_diagnostics(
-        Y,
-        pipls_model.predict(X),
-        prediction_kind="fixed-parameter OOF predictions",
-    )
-    tables = ARTIFACTS.build_post_analysis_tables(
-        factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics=diagnostics,
-        structure=latent_structure(pipls_model),
-        predictor_names=X.columns.tolist(),
-        response_names=Y.columns.tolist(),
-        sample_names=[str(index) for index in range(1, len(X) + 1)],
-        fold_index=np.repeat(np.arange(1, 6), 6),
-        observation_diagnostics_result=observation_diagnostics(pipls_model, X),
-    )
-    paths = ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
-
-    assert "observation_diagnostics" in paths
-    observation_table = pd.read_csv(paths["observation_diagnostics"])
-    assert tuple(observation_table.columns) == ARTIFACTS.TABLE_COLUMNS[
-        "observation_diagnostics"
-    ]
-    assert len(observation_table) == len(X)
-
-    pdf_path = tmp_path / "paginated_post_analysis.pdf"
-    ARTIFACTS.render_post_analysis_report(
-        tmp_path,
-        pdf_path,
-        dataset_name="Synthetic",
-        score_components=(1, 2),
-        loading_components=(1, 2),
-        response_pages=(("Response A",), ("Response B",)),
-    )
-
-    assert pdf_path.read_bytes().startswith(b"%PDF")
-    assert pdf_path.stat().st_size > 5_000
-
-
-def test_response_pages_must_partition_source_order(tmp_path: Path) -> None:
-    X, Y = _example_data()
-    pipls_model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
-    diagnostics = prediction_diagnostics(
-        Y,
-        pipls_model.predict(X),
-        prediction_kind="fixed-parameter OOF predictions",
-    )
-    tables = ARTIFACTS.build_post_analysis_tables(
-        factors=pipls_display_factors(pipls_model.decomposition_),
-        diagnostics=diagnostics,
-        structure=latent_structure(pipls_model),
-        predictor_names=X.columns.tolist(),
-        response_names=Y.columns.tolist(),
-        sample_names=[str(index) for index in range(1, len(X) + 1)],
-        fold_index=np.repeat(np.arange(1, 6), 6),
-    )
-    ARTIFACTS.write_post_analysis_tables(tmp_path, tables)
-
-    with pytest.raises(ValueError, match="partition response_names"):
-        ARTIFACTS.render_post_analysis_report(
-            tmp_path,
-            tmp_path / "invalid.pdf",
-            dataset_name="Synthetic",
-            score_components=(1, 2),
-            loading_components=(1, 2),
-            response_pages=(("Response B",), ("Response A",)),
-        )
-
-
 def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
     text = (_repository_root() / "examples" / "11_sugarcane_real_data.py").read_text(
         encoding="utf-8"
@@ -322,7 +59,6 @@ def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
     assert "fixed_model_oof_predictions(" not in text
     assert "plot_pipls_component_path(" not in text
     assert ".to_csv(" not in text
-    assert "pd.read_csv" in text
     assert text.count("pd.read_csv") == 2
     assert "subprocess" not in text
 
@@ -342,26 +78,57 @@ def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
     assert text.count("plt.close(figure)") == len(expected_pdfs)
 
 
-def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
-    text = (_repository_root() / "examples" / "12_tobacco_real_data.py").read_text(
-        encoding="utf-8"
-    )
+def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
+    root = _repository_root()
+    text = (root / "examples" / "12_tobacco_real_data.py").read_text(encoding="utf-8")
 
     assert "CHOSEN_N_COMPONENTS = 8" in text
+    assert "DISPLAY_COMPONENTS = (0, 1, 2, 3)" in text
+    assert "RESPONSES_PER_PAGE = 5" in text
     assert "from sklearn.cross_decomposition import PLSRegression" not in text
-    assert "X.columns.tolist()" in text
-    assert "Y.columns.tolist()" in text
     assert "X.columns.to_numpy(dtype=float)" in text
+    assert "Y.columns.tolist()" in text
+    assert "range(0, len(response_names), RESPONSES_PER_PAGE)" in text
+    assert "min(start + RESPONSES_PER_PAGE, len(response_names))" in text
+    assert 'estimator=PiPLSRegression(svd_solver="full")' in text
+    assert 'search_method="auto"' in text
+    assert "path_search.component_path_" in text
+    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in text
+    assert "cross_val_predict(" in text
+    assert "cv=KFold(n_splits=5, shuffle=False)" in text
+    assert "pipls_display_factors(model.decomposition_)" in text
+    assert "latent_structure(model)" in text
+    assert "observation_diagnostics(model, X)" in text
+    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert 'predictor_style="line"' in text
     assert 'predictor_axis_label="Wavenumber (cm$^{-1}$)"' in text
-    assert "loading_components=(1, 2, 3, 4)" in text
-    assert "response_pages=response_pages" in text
-    assert "observation_diagnostics(model, X)" in text
-    assert "fixed_model_oof_predictions(" in text
-    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
-    assert "build_post_analysis_tables(" in text
-    assert "write_post_analysis_tables(" in text
-    assert "render_post_analysis_report(" in text
-    assert "ANALYSIS_DIR" in text
-    assert "biplot_components" not in text
+    assert "components=DISPLAY_COMPONENTS" in text
+    assert text.count("for page_number, responses in enumerate(response_pages, start=1):") == 2
+    assert text.count("include_prediction_kind=False") == 3
+    assert text.count("pd.read_csv") == 2
+    assert ".to_csv(" not in text
+    assert "build_post_analysis_tables(" not in text
+    assert "write_post_analysis_tables(" not in text
+    assert "render_post_analysis_report(" not in text
+    assert "fixed_model_oof_predictions(" not in text
+    assert "plot_pipls_component_path(" not in text
     assert "subprocess" not in text
+
+    expected_pdfs = {
+        "component_path.pdf",
+        "pipls_factors.pdf",
+        "prediction_diagnostics.pdf",
+        "latent_structure.pdf",
+        "coefficients.pdf",
+    }
+    assert {
+        filename
+        for filename in expected_pdfs
+        if f'ANALYSIS_DIR / "{filename}"' in text
+    } == expected_pdfs
+    assert text.count("PdfPages(") == 2
+    assert text.count("figure.savefig(") == 3
+    assert text.count("report.savefig(figure)") == 2
+    assert text.count("plt.close(figure)") == 5
+    assert not (root / "examples" / "_support" / "fixed_model_oof.py").exists()
+    assert not (root / "examples" / "_support" / "post_analysis_artifacts.py").exists()

@@ -74,6 +74,7 @@ This index is navigation, not a substitute for those records.
 | `0066-immutable-component-path-api.md` | concise path-result API | frozen aligned path arrays, scalar component lookup, and removal of redundant fitted mappings |
 | `0067-direct-sugarcane-workflow.md` | direct Sugarcane reference workflow | in-memory path, OOF, inspection, and explicit final-PDF figure composition without generated analytical CSV intermediates |
 | `0068-direct-pulp-workflow.md` | direct Pulp example and tutorial | visible direct path, rank-profile, fixed-fit, OOF, inspection, and final-figure workflow without a shared wrapper or analytical CSV intermediates |
+| `0069-direct-tobacco-workflow.md` | direct Tobacco example | visible full-SVD path, fixed-fit, OOF, inspection, response pagination, and final-PDF workflow without analytical CSV intermediates or report helpers |
 
 ## Implemented estimator/search transition
 
@@ -131,8 +132,8 @@ plan contains an earlier or more general proposal:
   score, loading, coefficient, biplot, observation, and prediction analysis uses estimator-neutral
   APIs and is applied only to the selected Pi-PLS model in numbered examples;
 - Decision 0047 isolates all real-data Pi-PLS-versus-PLS path comparisons in example 09;
-  Decision 0067 subsequently makes Sugarcane a direct Pi-PLS-only in-memory workflow, while Pulp
-  and Tobacco retain transitional path/report artifacts until their scheduled migrations.
+  Decisions 0067–0069 subsequently make Sugarcane, Pulp, and Tobacco direct Pi-PLS-only in-memory
+  workflows.
 - repository tests validate executable behavior and durable file structure rather than pinning
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only
@@ -146,15 +147,15 @@ plan contains an earlier or more general proposal:
   performance claim before calibration;
 - the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
-- example 09 and the not-yet-migrated Tobacco workflow present component paths as CSV tables with
-  fold SD; Pulp and Sugarcane plot `component_path_` directly in memory; every real-data example fits
-  a separate fixed model after an explicit user component choice;
+- example 09 presents comparison component paths as CSV tables with fold SD until Patch 20e;
+  Pulp, Sugarcane, and Tobacco plot `component_path_` directly in memory; every real-data example
+  fits a separate fixed model after an explicit user component choice;
 - fold SD is descriptive, while component count remains a visible path-based user choice;
 - example 09 compares separate Pi-PLS and standard PLS component-path CSVs in one PDF per dataset;
-  Pulp and Sugarcane write final PDFs directly from in-memory Pi-PLS results, with Pulp also exposing
-  the conditional predictor-rank profile; Tobacco retains transitional Pi-PLS-only path/report
-  artifacts and uses adaptive rank scanning with explicit full predictor SVD, while randomized SVD
-  is covered by the solver-consistency benchmark;
+  Pulp, Sugarcane, and Tobacco write final PDFs directly from in-memory Pi-PLS results, with Pulp
+  exposing the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,
+  source-order response pagination, and raw observation diagnostics; randomized SVD is covered by
+  the solver-consistency benchmark;
 - Python 3.10–3.14 are supported; runtime metadata admits NumPy 1.26--2.x,
   scikit-learn 1.4--1.x, and joblib 1.2--1.x; the complete minimum stack is tested only on
   Python 3.10 because its oldest binary releases do not cover every newer interpreter;

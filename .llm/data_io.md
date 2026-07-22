@@ -138,9 +138,9 @@ Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize 
 analysis results. The direct Pulp and Sugarcane workflows read those two tables and then keep
 `component_path_`, fixed-model OOF predictions, and immutable inspection results in memory. They
 create figures directly and write only final PDF outputs. Pulp additionally exposes the conditional
-predictor-rank profile for its chosen component count. New numbered-example work should follow that
-pattern. Tobacco and the explicit comparison example retain their existing generated CSV contracts
-only until their scheduled Phase F4 migrations.
+predictor-rank profile for its chosen component count, while Tobacco owns deterministic source-order
+response pagination through multipage PDFs. New numbered-example work should follow that pattern.
+The explicit comparison example retains its generated CSV contract only until Patch 20e.
 
 ## Publication boundary
 

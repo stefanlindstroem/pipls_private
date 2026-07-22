@@ -196,12 +196,14 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     tobacco_text = (examples_dir / "12_tobacco_real_data.py").read_text(encoding="utf-8")
     assert "component_path_" in tobacco_text
     assert "refit=False" in tobacco_text
-    assert "plot_pipls_component_path(" in tobacco_text
-    assert "component_path.for_n_components(CHOSEN_N_COMPONENTS)" in tobacco_text
-    assert "predictor_rank=chosen_predictor_rank" in tobacco_text
-    assert 'ANALYSIS_DIR / "component_path.csv"' in tobacco_text
-    assert 'ANALYSIS_DIR / "component_path.pdf"' in tobacco_text
-    assert 'ANALYSIS_DIR / "post_analysis.pdf"' in tobacco_text
+    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in tobacco_text
+    assert "axis.errorbar(" in tobacco_text
+    assert "plot_pipls_component_path(" not in tobacco_text
+    assert "component_path.csv" not in tobacco_text
+    assert "post_analysis.pdf" not in tobacco_text
+    assert ".to_csv(" not in tobacco_text
+    assert not (examples_dir / "_support" / "fixed_model_oof.py").exists()
+    assert not (examples_dir / "_support" / "post_analysis_artifacts.py").exists()
 
     for source in (pulp_text, sugarcane_text, tobacco_text):
         assert "evaluate_pls_component_path(" not in source

@@ -82,8 +82,8 @@
   prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
 - Numbered examples migrated under Phase F4 operate directly on `component_path_` and immutable
   inspection results in memory. They must not write generated CSV files as analytical or plotting
-  intermediates. Example 09 and the not-yet-migrated Tobacco workflow retain their current CSV
-  contracts only until their scheduled patches. Every path figure must label fold SD as
+  intermediates. Example 09 retains its comparison CSV contract only until Patch 20e. Every path
+  figure must label fold SD as
   descriptive variability rather than a confidence interval.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory

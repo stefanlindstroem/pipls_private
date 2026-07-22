@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make Tobacco a direct in-memory workflow: preserve full predictor SVD, adaptive rank scanning,
+  decreasing-wavenumber plots, deterministic source-order response pagination, and raw observation
+  diagnostics; write five final PDFs, with three-page prediction and coefficient files, and remove
+  the fixed-model OOF and post-analysis CSV/report helpers.
+
 - Make the Pulp example and tutorial direct: remove the one-step workflow wrapper and generated
   analysis CSV round trips, calculate path selection, fixed fitting, scikit-learn OOF predictions,
   and immutable inspection results visibly in example 10, add a three-component predictor-rank

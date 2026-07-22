@@ -53,28 +53,26 @@ example.
 - `12_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD, one selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions,
   decreasing-wavenumber spectral plots, deterministic response pagination, and raw observation
-  diagnostics through the current transitional CSV/report layer.
+  diagnostics through direct in-memory results and caller-owned multipage PDFs.
 
 These are application analyses rather than introductory snippets. Pulp and Sugarcane expose their
 complete scientific sequences directly in the numbered scripts: path evaluation and plotting,
 fixed fitting, OOF prediction, immutable inspection results, and explicit Matplotlib composition.
 Pulp writes `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
 `latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Sugarcane writes five
-corresponding figures without a predictor-rank-profile page. Tobacco retains shared report support
-until Patch 20d. `make examples` runs every numbered example in filename order, including the slower
+corresponding figures without a predictor-rank-profile page. Tobacco also writes five final PDFs;
+`prediction_diagnostics.pdf` and `coefficients.pdf` each contain three source-order response pages.
+`make examples` runs every numbered example in filename order, including the slower
 real-data workflows. It remains separate from `make check`.
 
 ## Example support modules
 
-The remaining transitional workflows import implementation support from `examples/_support/`:
+The remaining comparison workflow imports implementation support from `examples/_support/`:
 
 - `pls_component_path.py`: ordinary-PLS path evaluation for example 09;
-- `plot_component_path.py`: component-path CSV rendering for example 09 and Tobacco;
-- `fixed_model_oof.py`: cloning and aligned OOF prediction for Tobacco;
-- `post_analysis_artifacts.py`: table construction, CSV round trips, pagination, and multipage
-  report composition for Tobacco.
+- `plot_component_path.py`: component-path CSV rendering for example 09.
 
-Pulp and Sugarcane import none of these helpers. Reusable numerical inspection belongs in
+Pulp, Sugarcane, and Tobacco import none of these helpers. Reusable numerical inspection belongs in
 `pipls.inspection`, and optional one-axis rendering belongs in `pipls.plotting`.
 
 ## Real-data workflow contract
@@ -107,8 +105,8 @@ comparison figures. Sugarcane demonstrates the target direct workflow:
 Pulp is the canonical tutorial workflow. Example 10 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, inspects the rank profile at the chosen component count,
 fits one explicit `PiPLSRegression`, calculates OOF predictions with `cross_val_predict()`, and
-passes immutable inspection objects to public plotters. Tobacco retains direct fixed-estimator
-orchestration plus response pagination through the transitional CSV/report layer.
+passes immutable inspection objects to public plotters. Tobacco follows the same direct pattern
+and owns its full-SVD configuration, response pagination, and multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
 figures retain explicit provenance. Sugarcane reads its strictly increasing wavelength coordinate
@@ -119,5 +117,6 @@ thirteen responses in source order. Generated files under `examples/results/` ar
 
 `examples/results/`, the PLS-path-comparison directory, and the Pulp, Sugarcane, and Tobacco
 post-analysis subdirectories are tracked with placeholder files. The examples therefore write directly to known destinations and do not
-contain directory-creation code. Generated CSV and PDF files remain ignored, and `make clean`
+contain directory-creation code. Generated comparison CSV files and all PDF files remain ignored,
+and `make clean`
 removes them while preserving the tracked directory structure.

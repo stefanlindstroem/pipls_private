@@ -4,13 +4,13 @@
 
 This document is the durable maintainer contract for fitted-model interpretation, prediction
 diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.inspection`,
-`pipls.plotting`, post-analysis example helpers, or the real-data analysis reports.
+`pipls.plotting`, or the real-data analysis workflows.
 
 Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
 Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
 factorization inspection, and shared PLS-family analysis. Decision 0058 establishes one chart per
-public plotting function and caller-owned figure composition. Decisions 0067 and 0068 make
-Sugarcane and Pulp direct in-memory workflows. The shared latent-structure functions use
+public plotting function and caller-owned figure composition. Decisions 0067–0069 make
+Sugarcane, Pulp, and Tobacco direct in-memory workflows. The shared latent-structure functions use
 estimator-neutral names and structural fitted-model contracts, and numbered-example post-analysis
 applies them only to the selected Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface remains
 explicitly method-specific.
@@ -23,11 +23,11 @@ Keep these stages separate in code, documentation, filenames, and figure labels.
 
 The component-path workflows answer how cross-validated loss changes with component count and, for
 Pi-PLS, the conditional predictor rank. Example 09 owns the canonical Pi-PLS and ordinary PLS path
-CSVs and their overlaid comparison PDFs. Pulp and Sugarcane plot `component_path_` directly in the
-numbered examples and write final component-path PDFs without CSV conversion. Pulp also plots the
-evaluated predictor-rank profile at its chosen component count. Tobacco retains one Pi-PLS path CSV
-and PDF until Patch 20d. `examples/_support/pls_component_path.py` remains comparison-specific, and
-`examples/_support/plot_component_path.py` currently serves example 09 and Tobacco only.
+CSVs and their overlaid comparison PDFs until Patch 20e. Pulp, Sugarcane, and Tobacco plot
+`component_path_` directly in the numbered examples and write final component-path PDFs without CSV
+conversion. Pulp also plots the evaluated predictor-rank profile at its chosen component count.
+`examples/_support/pls_component_path.py` and `examples/_support/plot_component_path.py` remain
+comparison-specific until Patch 20e.
 
 A component-path result is not a fitted-model interpretation and is not an unbiased estimate of a
 subsequent user choice made after inspecting that same path. Fold SD is descriptive only, and the
@@ -115,9 +115,8 @@ The complete real-data examples own scientific orchestration:
 - explicit figure, axis, legend, title, saving, and closing operations;
 - dataset-specific physical-axis labels, response subsets, and pagination.
 
-Pulp and Sugarcane keep those stages directly in their numbered scripts and use pandas only for
-committed input files. Tobacco temporarily retains table construction, CSV round trips, and shared
-report support under `examples/_support/`. Do not hide real-data reading behind a package loader.
+Pulp, Sugarcane, and Tobacco keep those stages directly in their numbered scripts and use pandas
+only for committed input files. Do not hide real-data reading behind a package loader.
 Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
 preparation area.
 
@@ -309,72 +308,28 @@ contribution plots, and theoretical outlier thresholds require separate decision
 
 ## Artifact contract
 
-The target Phase F4 contract is direct in-memory analysis with final figures as the only generated
-numbered-example artifacts. Pulp and Sugarcane implement that contract: immutable numerical results
-stay in memory, and the scripts write only final PDF figures. Sugarcane reads physical wavelength
-coordinates from `X.csv`; Pulp uses named scalar predictors and also writes a conditional
-predictor-rank profile. Tobacco temporarily retains the former canonical-CSV and reconstructed-report
-contract described below until Patch 20d. Physical predictor coordinates remain caller-owned and are
-never inferred by `pipls.plotting`.
+Numbered complete-analysis examples keep immutable numerical results in memory and generate only
+final PDF figures. Physical predictor coordinates remain caller-owned and are never inferred by
+`pipls.plotting`.
 
-Prediction tables use long form and retain at least:
+Pulp writes six one-page PDFs because it includes a conditional predictor-rank profile. Sugarcane
+writes five one-page PDFs. Tobacco writes five PDFs; its prediction-diagnostic and coefficient files
+each contain three deterministic source-order response pages. The first two pages contain five
+responses and the last page contains the remaining three.
 
-```text
-sample
-fold
-response
-observed
-predicted
-residual
-observed_standardized
-predicted_standardized
-residual_standardized
-prediction_kind
-```
+A figure page must identify the dataset, model, selected components or responses, and prediction kind
+where predictions are shown. The numbered example controls pagination, panel geometry, legends,
+figure-level titles, PDF writing, and closing; a package plotting function renders one explicit
+selection on one supplied axis at a time. Tobacco retains a $2\times2$ factor figure, one
+$1\times3$ prediction figure per response page, one $2\times2$ latent/observation figure, and one
+full-width coefficient figure per response page.
 
-Pi-PLS response-direction tables retain at least:
-
-```text
-response
-component
-q
-dilation
-weighted_q
-```
-
-Predictor-direction, score, loading, coefficient, and observation-diagnostic tables use explicit
-sample, feature, response, and component identifiers as applicable. Do not serialize estimators as
-part of the result contract.
-
-The seven common tables remain required for the transitional Tobacco post-analysis workflow:
-
-```text
-pipls_predictor_directions.csv
-pipls_response_directions.csv
-predictions.csv
-x_scores.csv
-x_loadings.csv
-y_loadings.csv
-coefficients.csv
-```
-
-A workflow may add `observation_diagnostics.csv` with columns `sample`, `score_distance`, and
-`x_reconstruction_residual`. Tobacco uses this optional eighth table. Response pagination must
-partition the source response names exactly once and preserve their source order.
-
-A figure page must identify the dataset, model, selected components or responses, and prediction
-kind where predictions are shown. The example-level report composer controls page order,
-pagination, panel geometry, legends, figure-level titles, PDF writing, and closing; a package
-plotting function renders one explicit selection on one supplied axis at a time. The maintained
-reports use a $2\times2$ factor page, a $1\times3$ prediction page per response group, one
-dataset-appropriate shared latent-model panel, and full-width coefficient pages.
-
-The Pulp workflow uses five non-shuffled folds through scikit-learn `cross_val_predict()`. Because
-the component count and predictor rank were chosen after inspecting paths computed from the same 46
-observations, the resulting OOF predictions are selection-conditioned rather than independent
-validation. The standardized display values in `PredictionDiagnostics` use the full supplied
-observed-response means and sample standard deviations; they do not reproduce the fold-local scaling
-used by the component-path loss.
+Pulp, Sugarcane, and Tobacco use five non-shuffled folds through scikit-learn
+`cross_val_predict()`. Because component count and predictor rank are chosen after inspecting paths
+computed from the same observations, the resulting OOF predictions are selection-conditioned rather
+than independent validation. The standardized display values in `PredictionDiagnostics` use the
+full supplied observed-response means and sample standard deviations; they do not reproduce the
+fold-local scaling used by the component-path loss.
 
 ## Testing boundary
 
@@ -387,12 +342,12 @@ public plotters accept `ax`, use only the shared one-axis resolver for standalon
 not create legends, panels, files, displays, or closing operations. Do not freeze pixel values,
 exact artist counts unrelated to the contract, or Matplotlib implementation details.
 
-Example-helper tests should use small synthetic tables for the remaining Tobacco helpers. They may
-freeze canonical CSV column names, prediction provenance, sample order, and PDF generation from
-reread tables. Structural Pulp and Sugarcane tests should verify direct `component_path_` access,
+Structural Pulp, Sugarcane, and Tobacco tests should verify direct `component_path_` access,
 scikit-learn OOF prediction, in-memory inspection, explicit `ax=` composition, and final PDF
-filenames without executing the artifact-writing scripts. A focused Pulp numerical test protects the
-selected pair, rank-profile boundary interpretation, OOF dimensions, and inspection alignment.
+filenames without executing the artifact-writing scripts. Tobacco tests additionally protect full
+predictor SVD, decreasing-wavenumber rendering, source-order response pagination, raw observation
+diagnostics, and the two caller-owned multipage PDF loops. A focused Pulp numerical test protects
+the selected pair, rank-profile boundary interpretation, OOF dimensions, and inspection alignment.
 Complete Pulp, Sugarcane, and Tobacco runs remain under `make examples`.
 
 ## Implementation order
@@ -408,4 +363,4 @@ The accepted order after Decision 0042 is:
 7. immutable component-path result simplification — **complete**;
 8. direct Sugarcane in-memory workflow — **complete**;
 9. direct Pulp and tutorial workflow — **complete**;
-10. direct Tobacco workflow and table-helper removal — **next**.
+10. direct Tobacco workflow and table-helper removal — **complete**.

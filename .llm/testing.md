@@ -62,11 +62,12 @@ returned figures and axes, explicit line/bar modes, label validation, and succes
 without pinning pixels or incidental Matplotlib artist counts. Structural tests should enforce the
 single-axis package boundary and example-owned report composition.
 
-Example-helper tests cover the transitional `examples/_support/fixed_model_oof.py` and
-`examples/_support/post_analysis_artifacts.py` for Tobacco. Structural tests for Pulp and Sugarcane
-protect direct `component_path_` access, scikit-learn `cross_val_predict()`, immutable inspection
-results, explicit `ax=` calls, absence of analytical CSV output, and the declared final PDF
-filenames without running the artifact-writing scripts. Tutorial-renderer tests may run the direct
+Structural tests for Pulp, Sugarcane, and Tobacco protect direct `component_path_` access,
+scikit-learn `cross_val_predict()`, immutable inspection results, explicit `ax=` calls, absence of
+analytical CSV output, and the declared final PDF filenames without running the artifact-writing
+scripts. Tobacco tests also protect its full-SVD configuration, source-order response pagination,
+raw observation diagnostics, and caller-owned multipage PDF loops. Tutorial-renderer tests may run
+the direct
 Pulp calculation once in a temporary directory, parse every declared SVG, verify manifest hashes,
 rank-profile metadata, and generated filenames, and enforce Makefile/source-distribution ownership
 without pinning pixels or Matplotlib artist counts. Tutorial structure tests may verify navigation,
@@ -82,10 +83,10 @@ The minimal numbered example may be protected structurally and through the packa
 and plotting tests; do not duplicate its arrays as a frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
 analyses as real-data benchmark scripts. `make examples` is the explicit application-validation
-target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead
-protect repository dataset readability, the direct Pulp numerical workflow, direct Sugarcane
-workflow structure, component-path API, inspection equations, plotting contracts, transitional
-example helpers, and their remaining CSV-to-PDF generation.
+target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset
+readability, the direct Pulp numerical workflow, direct Pulp, Sugarcane, and Tobacco workflow
+structure, component-path API, inspection equations,
+plotting contracts, and the remaining comparison-specific helper contracts.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 

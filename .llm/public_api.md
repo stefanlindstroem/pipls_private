@@ -273,20 +273,20 @@ perform no legend or panel creation, file writing, display, or closing, retain n
 alter supplied arrays. Component-path helpers remain example-local selection diagnostics. Every
 maintained analysis figure is created in the example layer, which passes an explicit axis to each
 package plotter and owns panel geometry, legends, figure-level titles, saving, and closing.
-Pulp and Sugarcane compose directly from immutable results; the remaining pandas-table and CSV
-report layer is transitional support for Tobacco. No estimator method, fitted attribute, path-search
-parameter, or top-level export is added by this plotting layer.
+Pulp, Sugarcane, and Tobacco compose directly from immutable results. No estimator method, fitted
+attribute, path-search parameter, or top-level export is added by this plotting layer.
 
 ## Example workflow boundary
 
 Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and their separate
-canonical CSV files. Pulp and Sugarcane use `PiPLSPathCV(refit=False)`, plot `component_path_`
-directly, read the selected pair through `for_n_components()`, fit one fixed
+canonical CSV files. Pulp, Sugarcane, and Tobacco use `PiPLSPathCV(refit=False)`, plot
+`component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn
 `cross_val_predict()`. They pass immutable factors, latent structure, and prediction diagnostics
 directly to the public one-axis plotters and write only final PDF figures. Pulp also reads the
-conditional predictor-rank profile from `cv_results_` for the chosen component count.
+conditional predictor-rank profile from `cv_results_` for the chosen component count. Tobacco uses
+full predictor SVD, direct observation diagnostics, and caller-owned source-order response
+pagination through multipage PDFs.
 
-Tobacco retains a direct `PiPLSRegression` template and the transitional path/table/report helpers
-until Patch 20d. The package exposes no dataset I/O, tutorial workflow, predictor-rank-profile
-object, or component-path plotting helper.
+The package exposes no dataset I/O, tutorial workflow, predictor-rank-profile object, or
+component-path plotting helper.

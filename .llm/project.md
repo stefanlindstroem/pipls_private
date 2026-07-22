@@ -34,10 +34,10 @@ Sugarcane, and Tobacco are component-path examples rather than benchmark or test
 `make examples` runs every numbered example explicitly, beginning with the literal-matrix
 `01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. Example 09
 writes separate Pi-PLS and standard PLS (NIPALS) CSVs and derives the comparison PDFs from those
-canonical tables. Pulp and Sugarcane now plot their Pi-PLS paths directly, keep OOF and inspection
-results in memory, and write only final PDF figures. Pulp also exposes the conditional predictor-rank
-profile at three components. Tobacco retains transitional path CSV and report orchestration under
-`examples/_support/`.
+canonical tables. Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, keep OOF and
+inspection results in memory, and write only final PDF figures. Pulp also exposes the conditional
+predictor-rank profile at three components. Tobacco owns its full-SVD spectral figures, source-order
+response pagination, and raw observation diagnostics directly.
 No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
@@ -52,7 +52,8 @@ snippets and one generated chart per explanation. Decision 0065 completes the tr
 separating tutorial, task-guide, scientific-reference, and generated-API ownership. Decision 0066
 introduces the immutable concise component-path API. Decision 0067 makes Sugarcane direct, and
 Decision 0068 makes the Pulp example and tutorial direct while removing the shared workflow wrapper.
-The direct Tobacco rewrite is the current next increment.
+Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers. The
+in-memory comparison rewrite is the current next increment.
 
 ## Implemented estimator and selection boundary
 
@@ -69,9 +70,9 @@ Decisions 0042 and 0045 define the staged fitted-model analysis surface. Pi-PLS-
 and $Q$ inspection remains explicitly method-owned. Scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics are shared PLS-family analyses with an
 estimator-neutral API. Ordinary PLS remains the component-path and benchmark comparator. The numbered post-analysis examples apply shared tools only to the selected Pi-PLS model and fit no
-final ordinary PLS model. Pulp and Sugarcane own their OOF prediction and figure composition
-directly; the remaining pandas-table, CSV, pagination, and multipage-report support serves Tobacco
-only until Patch 20d.
+final ordinary PLS model. Pulp, Sugarcane, and Tobacco own their OOF prediction, inspection,
+figure composition, and final PDF output directly. Tobacco additionally owns source-order response
+pagination and raw observation diagnostics.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
@@ -123,12 +124,11 @@ implementing or reviewing this surface.
   followed by an explained synthetic train/test use case, one explicit comparison example, and
   complete Pi-PLS real-data analyses. Advanced splitters are documented rather than combined into a
   context-free numbered script.
-  Underscore-prefixed `examples/_support/` contains transitional report infrastructure rather than
+  Underscore-prefixed `examples/_support/` contains only comparison-specific helpers rather than
   primary entry points. Example 09 owns the separate Pi-PLS and standard PLS (NIPALS) paths and
-  comparison PDFs. Pulp and Sugarcane own direct Pi-PLS paths, scikit-learn OOF predictions,
-  immutable inspection results, and explicit final figures; Pulp additionally owns its conditional
-  predictor-rank profile and tutorial snippets. Tobacco retains the shared CSV/report support until
-  Patch 20d. Their pandas and Matplotlib
+  comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS paths, scikit-learn OOF
+  predictions, immutable inspection results, and explicit final figures; Pulp additionally owns its
+  conditional predictor-rank profile and tutorial snippets. Their pandas and Matplotlib
   requirements are grouped in the `examples` optional dependency extra.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.

@@ -64,7 +64,8 @@ def test_dedicated_example_owns_the_pls_comparison_path() -> None:
 
     tobacco = (examples_dir / "12_tobacco_real_data.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" not in tobacco
-    assert "plot_pipls_component_path(" in tobacco
+    assert "plot_pipls_component_path(" not in tobacco
+    assert "axis.errorbar(" in tobacco
     assert "latent_structure(model)" in tobacco
     assert "PiPLSRegression(" in tobacco
 
@@ -161,17 +162,11 @@ def test_sugarcane_example_owns_direct_figure_composition() -> None:
     assert "plot_component_path" not in source
 
 
-def test_post_analysis_helper_owns_remaining_shared_report_composition() -> None:
-    path = _repository_root() / "examples" / "_support" / "post_analysis_artifacts.py"
+def test_tobacco_example_owns_direct_figure_composition() -> None:
+    path = _repository_root() / "examples" / "12_tobacco_real_data.py"
     source = path.read_text(encoding="utf-8")
     tree = ast.parse(source, filename=str(path))
-    render = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.FunctionDef) and node.name == "render_post_analysis_report"
-    )
-    report_plotters = {
-        "plot_biplot",
+    expected_plotters = {
         "plot_coefficients",
         "plot_observation_diagnostics",
         "plot_observed_vs_predicted",
@@ -187,23 +182,19 @@ def test_post_analysis_helper_owns_remaining_shared_report_composition() -> None
     }
     calls = [
         node
-        for node in ast.walk(render)
+        for node in ast.walk(tree)
         if isinstance(node, ast.Call)
         and isinstance(node.func, ast.Name)
-        and node.func.id in report_plotters
+        and node.func.id in expected_plotters
     ]
 
-    assert {call.func.id for call in calls if isinstance(call.func, ast.Name)} == report_plotters
+    assert {call.func.id for call in calls if isinstance(call.func, ast.Name)} == expected_plotters
     assert all(any(keyword.arg == "ax" for keyword in call.keywords) for call in calls)
-    assert "plot_prediction_diagnostics" not in source
-    assert "plot_pipls_decomposition" not in source
-    assert "plt.subplots(\n            2,\n            2," in source
-    assert "plt.subplots(\n                1,\n                3," in source
-    assert source.count("plt.subplot_mosaic(") == 4
-    assert '["scores", "biplot", "x_loadings"]' in source
-    assert '["y_loadings", "observations", "observations"]' in source
-    assert '[["scores", "biplot"], ["x_loadings", "y_loadings"]]' in source
-    assert '[["scores", "x_loadings"], ["y_loadings", "observations"]]' in source
-    assert '[["scores", "x_loadings", "y_loadings"]]' in source
-    assert source.count("include_prediction_kind=False") == 3
-    assert 'figure.suptitle(f"{dataset_name} Pi-PLS latent-model views")' in source
+    assert source.count("plt.subplots(") == 5
+    assert source.count("PdfPages(") == 2
+    assert source.count("figure.savefig(") == 3
+    assert source.count("report.savefig(figure)") == 2
+    assert source.count("plt.close(figure)") == 5
+    assert "post_analysis_artifacts" not in source
+    assert "fixed_model_oof" not in source
+    assert "plot_component_path" not in source

@@ -157,7 +157,9 @@ The repository adaptation matches the public spectra and chemistry tables one-to
 orders rows by that identifier, and excludes only source metadata columns from the model matrices.
 All samples and chemical responses are retained. No imputation, smoothing, derivatives, scatter
 correction, centering, scaling, or other spectral preprocessing is applied.
-`examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly, evaluates the component
-path with adaptive predictor-rank scanning and full predictor SVD, writes separate Pi-PLS and
-standard PLS (NIPALS) CSV paths plus a comparison PDF, and then fits a separately chosen fixed
-Pi-PLS model.
+`examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly, evaluates a Pi-PLS
+component path with adaptive predictor-rank scanning and full predictor SVD, plots that path in
+memory, and then fits a separately chosen fixed Pi-PLS model. It preserves the decreasing
+wavenumber coordinate, calculates selection-conditioned OOF predictions and raw observation
+diagnostics, and writes five final PDFs. Prediction diagnostics and coefficients are paginated in
+source response order. The separate ordinary-PLS comparison remains in example 09.
