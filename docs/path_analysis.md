@@ -22,16 +22,20 @@ from pipls import PiPLSPathCV
 search = PiPLSPathCV(refit=False).fit(X, Y)
 ```
 
-`component_path_results_` is the concise user-facing view. Its columns are:
+`component_path_` is the immutable concise view. Its aligned read-only arrays are:
 
 ```text
 n_components
 predictor_rank
 predictor_rank_policy
-response_standardized_cv_mse_mean
-response_standardized_cv_mse_fold_sd
+mean_test_score
+cv_mse_mean
+cv_mse_fold_sd
 n_splits
 ```
+
+Use `component_path_.for_n_components(h)` to retrieve one frozen scalar result for an evaluated
+component count.
 
 ## Component-count requests
 
@@ -120,8 +124,8 @@ With `refit=True`, the best evaluated estimator is fitted on all supplied data a
 prediction or transformation methods delegate to it. With `refit=False`, the path diagnostics
 remain available without a fitted final estimator.
 
-The complete search surface is available through `cv_results_`, component-wise best-score and
-best-rank mappings, score and MSE paths, resolved rank grids, candidate counts, and search history.
+The complete search surface is available through `cv_results_`, score and MSE paths, resolved
+rank grids, candidate counts, and search history.
 See the [generated path API](api/path.md) for exact attributes and conditional availability.
 
 ## Splitters and OOF predictions

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pickle
 import warnings
 
 import numpy as np
@@ -8,7 +9,12 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from pipls import PiPLSPathCV, PiPLSRegression, StatisticalSupportWarning
+from pipls import (
+    PiPLSComponentPath,
+    PiPLSPathCV,
+    PiPLSRegression,
+    StatisticalSupportWarning,
+)
 from pipls.metrics import neg_response_standardized_mean_squared_error
 
 
@@ -228,7 +234,12 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
 
     assert search.best_n_components_ == 1
     assert search.best_predictor_rank_ == 1
-    assert search.best_predictor_rank_by_n_components_ == {1: 1, 2: 2}
+    np.testing.assert_array_equal(search.component_path_.predictor_rank, np.array([1, 2]))
+    np.testing.assert_allclose(search.component_path_.mean_test_score, np.array([1.0, 1.0]))
+    assert not np.allclose(
+        search.component_path_.cv_mse_mean,
+        -search.component_path_.mean_test_score,
+    )
 
 
 def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
@@ -370,7 +381,7 @@ def test_invalid_public_controls_are_rejected(
         PiPLSPathCV(**kwargs).fit(X, Y)
 
 
-def test_component_path_results_expose_conditional_rank_mean_and_fold_sd() -> None:
+def test_component_path_exposes_conditional_score_rank_mean_and_fold_sd() -> None:
     X, Y = _data()
     search = PiPLSPathCV(
         n_components_values=[1, 2],
@@ -381,34 +392,37 @@ def test_component_path_results_expose_conditional_rank_mean_and_fold_sd() -> No
         n_jobs=1,
     ).fit(X, Y)
 
-    path = search.component_path_results_
-    assert tuple(path) == (
-        "n_components",
-        "predictor_rank",
-        "predictor_rank_policy",
-        "response_standardized_cv_mse_mean",
-        "response_standardized_cv_mse_fold_sd",
-        "n_splits",
-    )
-    np.testing.assert_array_equal(path["n_components"], np.array([1, 2]))
-    np.testing.assert_array_equal(path["n_splits"], np.array([3, 3]))
-    assert path["predictor_rank_policy"].tolist() == ["optimized", "optimized"]
+    path = search.component_path_
+    assert isinstance(path, PiPLSComponentPath)
+    np.testing.assert_array_equal(path.n_components, np.array([1, 2]))
+    np.testing.assert_array_equal(path.n_splits, np.array([3, 3]))
+    assert path.predictor_rank_policy.tolist() == ["optimized", "optimized"]
 
     for row_index, h in enumerate((1, 2)):
-        rank = int(path["predictor_rank"][row_index])
-        assert rank == search.best_predictor_rank_by_n_components_[h]
+        rank = int(path.predictor_rank[row_index])
         result_index = np.flatnonzero(
             (search.cv_results_["n_components"] == h)
             & (search.cv_results_["predictor_rank"] == rank)
         )
         assert result_index.size == 1
         index = int(result_index[0])
-        assert path["response_standardized_cv_mse_mean"][row_index] == pytest.approx(
+        assert path.mean_test_score[row_index] == pytest.approx(
+            search.cv_results_["mean_test_score"][index]
+        )
+        assert path.cv_mse_mean[row_index] == pytest.approx(
             search.cv_results_["mean_response_standardized_mse"][index]
         )
-        assert path["response_standardized_cv_mse_fold_sd"][row_index] == pytest.approx(
+        assert path.cv_mse_fold_sd[row_index] == pytest.approx(
             search.cv_results_["std_response_standardized_mse"][index]
         )
+
+    selected = path.for_n_components(search.best_n_components_)
+    assert selected.predictor_rank == search.best_predictor_rank_
+    assert selected.mean_test_score == pytest.approx(search.best_score_)
+
+    restored = pickle.loads(pickle.dumps(search))
+    np.testing.assert_array_equal(restored.component_path_.n_components, path.n_components)
+    assert not restored.component_path_.n_components.flags.writeable
 
 
 @pytest.mark.parametrize(
@@ -434,17 +448,18 @@ def test_component_path_records_predictor_rank_policy(
     ).fit(X, Y)
 
     assert search.predictor_rank_policy_ == expected_policy
-    assert search.component_path_results_["predictor_rank_policy"].tolist() == [
+    assert search.component_path_.predictor_rank_policy.tolist() == [
         expected_policy,
         expected_policy,
     ]
     if expected_policy == "fixed":
         np.testing.assert_array_equal(
-            search.component_path_results_["predictor_rank"], np.array([3, 3])
+            search.component_path_.predictor_rank,
+            np.array([3, 3]),
         )
     if expected_policy == "maximum":
         np.testing.assert_array_equal(
-            search.component_path_results_["predictor_rank"],
+            search.component_path_.predictor_rank,
             np.full(2, search.max_predictor_rank_),
         )
 

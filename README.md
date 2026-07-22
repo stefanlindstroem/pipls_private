@@ -147,14 +147,10 @@ A component path is the table or curve obtained by scanning component counts. Ea
 mean CV-MSE and the predictor rank selected for that component count:
 
 ```python
-import pandas as pd
-
 from pipls import PiPLSPathCV, PiPLSRegression
 
 search = PiPLSPathCV(refit=False).fit(X_train, Y_train)
-
-path = pd.DataFrame(search.component_path_results_)
-path.to_csv("component_path.csv", index=False)
+path = search.component_path_
 ```
 
 The default `n_components_values="all"` evaluates every admissible component count. Supply an
@@ -164,12 +160,10 @@ Plot or inspect CV-MSE against component count, choose an elbow, plateau, or oth
 point, and fit both ranks explicitly:
 
 ```python
-chosen_n_components = 3
-path = pd.read_csv("component_path.csv").set_index("n_components")
-chosen_predictor_rank = int(path.loc[chosen_n_components, "predictor_rank"])
+chosen = path.for_n_components(3)
 model = PiPLSRegression(
-    n_components=chosen_n_components,
-    predictor_rank=chosen_predictor_rank,
+    n_components=chosen.n_components,
+    predictor_rank=chosen.predictor_rank,
 ).fit(X_train, Y_train)
 ```
 
@@ -353,7 +347,7 @@ from pipls import PiPLSPathCV
 X = pd.read_csv("datasets/pulp/X.csv")
 Y = pd.read_csv("datasets/pulp/Y.csv")
 search = PiPLSPathCV(refit=False).fit(X, Y)
-path = pd.DataFrame(search.component_path_results_)
+path = search.component_path_
 ```
 
 Example 09 writes separate canonical Pi-PLS and standard PLS (NIPALS) component-path CSV

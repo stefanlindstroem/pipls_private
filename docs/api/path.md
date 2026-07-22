@@ -13,3 +13,14 @@ Methods that delegate to a selected estimator are available only when `refit=Tru
         - inverse_transform
         - score
         - get_feature_names_out
+
+## Concise component path
+
+::: pipls.PiPLSComponentPath
+    options:
+      members:
+        - for_n_components
+
+## One component result
+
+::: pipls.PiPLSComponentResult

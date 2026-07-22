@@ -14,7 +14,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
 
-from pipls import PiPLSDecomposition, PiPLSPathCV, PiPLSRegression
+from pipls import (
+    PiPLSComponentPath,
+    PiPLSDecomposition,
+    PiPLSPathCV,
+    PiPLSRegression,
+)
 from pipls.metrics import neg_response_standardized_mean_squared_error
 
 
@@ -456,14 +461,11 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
         "std_score_time",
     } <= search.cv_results_.keys()
     assert search.predictor_rank_policy_ == "fixed"
-    assert tuple(search.component_path_results_) == (
-        "n_components",
-        "predictor_rank",
-        "predictor_rank_policy",
-        "response_standardized_cv_mse_mean",
-        "response_standardized_cv_mse_fold_sd",
-        "n_splits",
-    )
+    assert isinstance(search.component_path_, PiPLSComponentPath)
+    assert search.component_path_.for_n_components(2).predictor_rank == 3
+    assert not hasattr(search, "component_path_results_")
+    assert not hasattr(search, "best_predictor_rank_by_n_components_")
+    assert not hasattr(search, "best_score_by_n_components_")
     x_scores, y_scores = search.transform(X, Y)
     X_reconstructed, Y_reconstructed = search.inverse_transform(x_scores, y_scores)
     direct_X, direct_Y = search.best_pipls_.inverse_transform(x_scores, y_scores)

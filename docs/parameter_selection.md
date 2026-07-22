@@ -15,13 +15,10 @@ pipeline behavior.
 ## Evaluate the component path
 
 ```python
-import pandas as pd
-
 from pipls import PiPLSPathCV
 
 search = PiPLSPathCV(refit=False).fit(X, Y)
-component_path = pd.DataFrame(search.component_path_results_)
-component_path.to_csv("component_path.csv", index=False)
+component_path = search.component_path_
 ```
 
 The default `n_components_values="all"` evaluates every admissible component count. For each count,
@@ -38,15 +35,11 @@ interval.
 ```python
 from pipls import PiPLSRegression
 
-chosen_n_components = 3
-path_by_component = component_path.set_index("n_components")
-chosen_predictor_rank = int(
-    path_by_component.loc[chosen_n_components, "predictor_rank"]
-)
+chosen = component_path.for_n_components(3)
 
 model = PiPLSRegression(
-    n_components=chosen_n_components,
-    predictor_rank=chosen_predictor_rank,
+    n_components=chosen.n_components,
+    predictor_rank=chosen.predictor_rank,
 ).fit(X, Y)
 ```
 

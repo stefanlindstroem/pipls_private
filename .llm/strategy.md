@@ -473,6 +473,27 @@ the Pi-PLS factor and prediction-diagnostic composites, and make the example lay
 report figure and axis. The real-data reports use caller-owned factor, prediction, and shared
 latent-model panels; coefficient curves remain full-width pages.
 
+### Phase F4: pre-release result and example simplification
+
+Reduce the remaining application-layer indirection before release. Public numerical results should
+be directly accessible as arrays or immutable objects, and numbered examples should operate on
+those results in memory rather than using generated CSV files as analytical or plotting
+intermediates. Committed dataset tables and final focused benchmark CSV products remain outside
+this restriction.
+
+Implementation order:
+
+1. immutable component-path API;
+2. direct Sugarcane reference workflow;
+3. direct Pulp example and tutorial;
+4. direct Tobacco workflow and removal of post-analysis table machinery;
+5. in-memory Pi-PLS/PLS comparison;
+6. package-wide cleanup, documentation migration, and structural enforcement.
+
+Current status: **Patch 20a complete**. Decision 0066 adds `PiPLSComponentPath`,
+`PiPLSComponentResult`, and `PiPLSPathCV.component_path_`, removes the redundant concise fitted
+mappings, and migrates all repository consumers. Patch 20b, the direct Sugarcane workflow, is next.
+
 ### Product documentation and release hardening
 
 Build a user-oriented documentation surface, API reference, compatibility policy, clean-install and
@@ -482,14 +503,10 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **tutorial-first documentation complete**. Decisions 0049--0053 establish the
-documentation boundary, Decisions 0054--0056 complete compatibility and installed-distribution
-validation, and Decision 0057 removes maintainer decisions from the served site. Decisions
-0058--0061 complete atomic plotting and example-owned report composition. Decisions 0062--0064 add
-the canonical Pulp workflow, deterministic generated figures, and complete tutorial. Decision 0065
-separates the remaining page roles: the tutorial owns the worked analysis, task guides own concise
-procedures, model inspection owns stable scientific interpretation, and generated API pages own
-exact signatures. Release metadata is the next increment.
+Current status: **tutorial-first documentation complete**. Decisions 0049--0065 establish the
+self-contained documentation, generated reference, compatibility validation, atomic plotting,
+canonical tutorial workflow, and page ownership. Phase F4 now performs the owner-approved
+pre-release result and example simplification before release metadata is finalized.
 
 ### Current standardization and deferred block-aware variants
 
@@ -540,9 +557,8 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Define the first release: choose the initial version, complete project metadata, condense the
-Unreleased changelog into release notes, and document the tag and publication checklist without
-publishing artifacts yet.
+Patch 20b: make Sugarcane the direct reference workflow. Use `component_path_` and inspection
+results in memory, create figures visibly in example 11, and retain only final PDF outputs.
 
 ## Maintenance protocol
 

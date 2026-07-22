@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented. The real-data benchmark-script and full example-execution-test portions are superseded by Decision 0037.
+Accepted and implemented. The real-data benchmark-script and full example-execution-test portions are superseded by Decision 0037. The concise public result representation is superseded by Decision 0066.
 
 ## Context
 
@@ -18,15 +18,17 @@ Pi-PLS model is then fitted on all observations with both ranks stated explicitl
 
 ## Decision
 
-`PiPLSPathCV` exposes `component_path_results_`, a machine-readable dictionary with one row per
-requested `n_components` value and these columns:
+`PiPLSPathCV` exposes one conditionally selected result per requested `n_components` value.
+Decision 0066 replaces the original dictionary representation with the immutable
+`component_path_` object. Its aligned fields are:
 
 ```text
 n_components
 predictor_rank
 predictor_rank_policy
-response_standardized_cv_mse_mean
-response_standardized_cv_mse_fold_sd
+mean_test_score
+cv_mse_mean
+cv_mse_fold_sd
 n_splits
 ```
 

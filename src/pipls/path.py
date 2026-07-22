@@ -31,6 +31,7 @@ from ._cv_engine import (
     _PiPLSCandidateResult,
 )
 from ._sklearn_compat import _validate_estimator_data
+from .component_path import PiPLSComponentPath, PredictorRankPolicy
 from .exceptions import StatisticalSupportWarning
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
@@ -52,7 +53,6 @@ IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
-PredictorRankPolicy = Literal["optimized", "fixed", "maximum"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING = neg_response_standardized_mean_squared_error
@@ -175,11 +175,9 @@ class PiPLSPathCV(
     cv_results_ : dict of str to array-like
         Full candidate-level results. It includes parameter pairs, split scores,
         response-standardized MSE values, timing summaries, and score ranks.
-    component_path_results_ : dict of str to ndarray
-        One conditionally selected predictor-rank row per component count. The
-        columns are ``n_components``, ``predictor_rank``,
-        ``predictor_rank_policy``, ``response_standardized_cv_mse_mean``,
-        ``response_standardized_cv_mse_fold_sd``, and ``n_splits``.
+    component_path_ : PiPLSComponentPath
+        Immutable concise view with one conditionally selected predictor-rank
+        result per component count.
     response_standardized_mse_path_ : ndarray
         Candidate response-standardized MSE surface. Unevaluated adaptive-search
         cells are NaN.
@@ -200,10 +198,6 @@ class PiPLSPathCV(
         Parameters required to configure the supplied estimator or pipeline.
     best_pipls_params_ : dict of str to int
         Selected direct Pi-PLS parameters with unprefixed keys.
-    best_predictor_rank_by_n_components_ : dict of int to int
-        Conditionally selected predictor rank for each component count.
-    best_score_by_n_components_ : dict of int to float
-        Corresponding conditional mean test score for each component count.
     validation_report_ : PiPLSValidationReport
         Immutable summary of the selected cross-validation result.
     best_estimator_ : estimator
@@ -445,24 +439,15 @@ class PiPLSPathCV(
             predictor_rank_key: self.best_predictor_rank_,
         }
 
-        self.best_predictor_rank_by_n_components_ = {}
-        self.best_score_by_n_components_ = {}
         conditional_indices: list[int] = []
         for h_value in self.n_components_values_:
-            h = int(h_value)
-            indices = np.flatnonzero(self.cv_results_["n_components"] == h)
-            if indices.size == 0:
-                continue
-            local_index = _select_conditional_best_index(self.cv_results_, indices)
-            conditional_indices.append(local_index)
-            self.best_predictor_rank_by_n_components_[h] = int(
-                self.cv_results_["predictor_rank"][local_index]
-            )
-            self.best_score_by_n_components_[h] = float(
-                self.cv_results_["mean_test_score"][local_index]
-            )
+            indices = np.flatnonzero(self.cv_results_["n_components"] == int(h_value))
+            if indices.size:
+                conditional_indices.append(
+                    _select_conditional_best_index(self.cv_results_, indices)
+                )
 
-        self.component_path_results_ = _component_path_results(
+        self.component_path_ = _component_path(
             results=self.cv_results_,
             conditional_indices=np.asarray(conditional_indices, dtype=np.intp),
             predictor_rank_policy=self.predictor_rank_policy_,
@@ -1067,34 +1052,31 @@ def _path_cv_results(
     return results
 
 
-def _component_path_results(
+def _component_path(
     *,
     results: dict[str, Any],
     conditional_indices: IntArray,
     predictor_rank_policy: PredictorRankPolicy,
     n_splits: int,
-) -> dict[str, Any]:
-    """Return one conditionally selected predictor-rank row per component count."""
+) -> PiPLSComponentPath:
+    """Return one conditionally selected predictor-rank result per component count."""
 
     n_rows = int(conditional_indices.size)
-    return {
-        "n_components": cast(IntArray, results["n_components"])[
-            conditional_indices
-        ].copy(),
-        "predictor_rank": cast(IntArray, results["predictor_rank"])[
-            conditional_indices
-        ].copy(),
-        "predictor_rank_policy": np.full(
-            n_rows, predictor_rank_policy, dtype=object
-        ),
-        "response_standardized_cv_mse_mean": cast(
-            FloatArray, results["mean_response_standardized_mse"]
-        )[conditional_indices].copy(),
-        "response_standardized_cv_mse_fold_sd": cast(
-            FloatArray, results["std_response_standardized_mse"]
-        )[conditional_indices].copy(),
-        "n_splits": np.full(n_rows, n_splits, dtype=np.intp),
-    }
+    return PiPLSComponentPath(
+        n_components=cast(IntArray, results["n_components"])[conditional_indices],
+        predictor_rank=cast(IntArray, results["predictor_rank"])[conditional_indices],
+        predictor_rank_policy=np.full(n_rows, predictor_rank_policy, dtype=object),
+        mean_test_score=cast(FloatArray, results["mean_test_score"])[conditional_indices],
+        cv_mse_mean=cast(
+            FloatArray,
+            results["mean_response_standardized_mse"],
+        )[conditional_indices],
+        cv_mse_fold_sd=cast(
+            FloatArray,
+            results["std_response_standardized_mse"],
+        )[conditional_indices],
+        n_splits=np.full(n_rows, n_splits, dtype=np.intp),
+    )
 
 
 def _select_global_best_index(results: dict[str, Any]) -> int:

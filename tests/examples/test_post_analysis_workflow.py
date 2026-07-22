@@ -165,7 +165,8 @@ def test_pulp_example_uses_the_canonical_workflow_and_exports_the_same_artifacts
 
     assert "PULP_CHOSEN_N_COMPONENTS" in text
     assert "run_pulp_workflow(" in text
-    assert "workflow.component_path.to_csv(" in text
+    assert "workflow.component_path.n_components" in text
+    assert ").to_csv(ANALYSIS_DIR / \"component_path.csv\", index=False)" in text
     assert "workflow.factors" in text
     assert "workflow.diagnostics" in text
     assert "workflow.structure" in text

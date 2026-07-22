@@ -27,8 +27,8 @@ import numpy as np  # noqa: E402
 from _support.pulp_workflow import PULP_DATA_DIR, run_pulp_workflow  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
-from pandas import DataFrame  # noqa: E402
 
+from pipls import PiPLSComponentPath  # noqa: E402
 from pipls.inspection import biplot_coordinates  # noqa: E402
 from pipls.plotting import (  # noqa: E402
     plot_biplot,
@@ -104,16 +104,16 @@ def _response_indices(response_names: Sequence[str]) -> tuple[int, ...]:
 
 
 def _render_component_path(
-    component_path: DataFrame,
+    component_path: PiPLSComponentPath,
     *,
     chosen_n_components: int,
     chosen_predictor_rank: int,
     output_path: Path,
 ) -> None:
-    x = component_path["n_components"].to_numpy(dtype=np.int64)
-    mean = component_path["response_standardized_cv_mse_mean"].to_numpy(dtype=np.float64)
-    fold_sd = component_path["response_standardized_cv_mse_fold_sd"].to_numpy(dtype=np.float64)
-    ranks = component_path["predictor_rank"].to_numpy(dtype=np.int64)
+    x = component_path.n_components
+    mean = component_path.cv_mse_mean
+    fold_sd = component_path.cv_mse_fold_sd
+    ranks = component_path.predictor_rank
     selected_rows = np.flatnonzero(x == chosen_n_components)
     if selected_rows.size != 1:
         raise RuntimeError("The tutorial component path must contain one selected component row.")

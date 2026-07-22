@@ -163,7 +163,7 @@ def test_dedicated_example_owns_all_pls_path_comparisons() -> None:
     assert text.count('("pulp",') == 1
     assert text.count('("sugarcane",') == 1
     assert '"tobacco",' in text
-    assert "component_path_results_" in text
+    assert "component_path_" in text
     assert "refit=False" in text
 
 
@@ -173,9 +173,9 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     pulp_workflow = (examples_dir / "_support" / "pulp_workflow.py").read_text(
         encoding="utf-8"
     )
-    assert "component_path_results_" in pulp_workflow
+    assert "component_path_" in pulp_workflow
     assert "refit=False" in pulp_workflow
-    assert 'component_path["n_components"] == n_components' in pulp_workflow
+    assert "component_path.for_n_components(n_components)" in pulp_workflow
     assert "pipls__n_components=n_components" in pulp_workflow
     assert "pipls__predictor_rank=predictor_rank" in pulp_workflow
     assert "plot_pipls_component_path(" in pulp_text
@@ -185,10 +185,10 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
 
     for filename in ("11_sugarcane_real_data.py", "12_tobacco_real_data.py"):
         text = (examples_dir / filename).read_text(encoding="utf-8")
-        assert "component_path_results_" in text
+        assert "component_path_" in text
         assert "refit=False" in text
         assert "plot_pipls_component_path(" in text
-        assert 'pipls_path.set_index("n_components")' in text
+        assert "component_path.for_n_components(CHOSEN_N_COMPONENTS)" in text
         assert "predictor_rank=chosen_predictor_rank" in text
         assert 'ANALYSIS_DIR / "component_path.csv"' in text
         assert 'ANALYSIS_DIR / "component_path.pdf"' in text

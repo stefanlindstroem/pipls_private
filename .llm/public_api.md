@@ -108,8 +108,11 @@ search makes no claim about
 unevaluated admissible pairs.
 
 Public path attributes include standard search results, `best_pipls_`, conditional path and surface
-diagnostics, immutable `validation_report_`, optional OOF outputs, and the canonical
-`component_path_results_` table. The numeric predictor rank is present in every component-path row.
+diagnostics, immutable `validation_report_`, optional OOF outputs, and the canonical immutable
+`component_path_` result. `PiPLSComponentPath` stores aligned read-only `n_components`,
+`predictor_rank`, `predictor_rank_policy`, `mean_test_score`, `cv_mse_mean`, `cv_mse_fold_sd`, and
+`n_splits` arrays. `for_n_components()` returns a frozen `PiPLSComponentResult` with the aligned
+scalar values. The numeric predictor rank is present for every component count.
 Refit-dependent delegated methods are absent when `refit=False`. Output-container configuration is
 owned by the estimator template and preserved through cloning and refit; the path object does not
 add a separate `set_output` layer.

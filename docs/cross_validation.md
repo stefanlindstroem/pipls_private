@@ -49,7 +49,7 @@ search = PiPLSPathCV(scoring=neg_response_standardized_mean_squared_error)
 Ordinary scikit-learn scorer names, other callables, and `scoring=None` remain supported. The
 package does not define a package-local scorer string that could be mistaken for a scorer
 registered globally by scikit-learn. Predictor-rank and overall selections among evaluated
-candidates always maximize the configured mean test score. `component_path_results_` still
+candidates always maximize the configured mean test score. `component_path_` still
 reports response-standardized MSE, so with a nondefault scorer that MSE is diagnostic rather than
 necessarily minimized.
 
@@ -88,8 +88,7 @@ post-selection estimate. Use nested CV or an external test set for unbiased asse
 
 ## Fold variation in component-path tables
 
-`PiPLSPathCV.component_path_results_` reports
-`response_standardized_cv_mse_fold_sd` for each component count. This is the population standard
+`PiPLSPathCV.component_path_` reports `cv_mse_fold_sd` for each component count. This is the population standard
 deviation of the fold-specific MSE values already stored in `cv_results_`. It is useful for seeing
 how much the validation loss varies across the chosen folds.
 

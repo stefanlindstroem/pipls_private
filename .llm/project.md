@@ -16,8 +16,10 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through E4c are implemented. The current public surface includes `PiPLSRegression`,
-`PiPLSPathCV`, `PiPLSDecomposition`, `PiPLSValidationReport`, public selection metrics,
+Phases A through F3 are complete; Phase F4 is underway. The current public surface includes
+`PiPLSRegression`,
+`PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`, `PiPLSDecomposition`,
+`PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
 `pipls.inspection`, and optional Pi-PLS-specific and shared PLS-family figures under `pipls.plotting`.
 
@@ -47,8 +49,9 @@ establishes the canonical Pulp workflow for the tutorial-first documentation pha
 generates its deterministic single-chart SVG assets and manifest. Decision 0064 makes the detailed
 Pulp tutorial the primary pedagogical route through the served documentation, using checked source
 snippets and one generated chart per explanation. Decision 0065 completes the transition by
-separating tutorial, task-guide, scientific-reference, and generated-API ownership. First-release
-definition and metadata are the current next increment.
+separating tutorial, task-guide, scientific-reference, and generated-API ownership. Decision 0066
+introduces the immutable concise component-path API. The direct Sugarcane reference-example rewrite
+is the current next increment.
 
 ## Implemented estimator and selection boundary
 

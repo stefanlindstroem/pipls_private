@@ -28,7 +28,17 @@ Y = pd.read_csv(DATA_DIR / "Y.csv")
 
 # Evaluate the Pi-PLS component path.
 path_search = PiPLSPathCV(refit=False).fit(X, Y)
-pipls_path = pd.DataFrame(path_search.component_path_results_)
+component_path = path_search.component_path_
+pipls_path = pd.DataFrame(
+    {
+        "n_components": component_path.n_components,
+        "predictor_rank": component_path.predictor_rank,
+        "predictor_rank_policy": component_path.predictor_rank_policy,
+        "response_standardized_cv_mse_mean": component_path.cv_mse_mean,
+        "response_standardized_cv_mse_fold_sd": component_path.cv_mse_fold_sd,
+        "n_splits": component_path.n_splits,
+    }
+)
 pipls_path.to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
 plot_pipls_component_path(
     ANALYSIS_DIR / "component_path.csv",
@@ -37,9 +47,8 @@ plot_pipls_component_path(
 )
 
 # Fit the selected Pi-PLS model.
-chosen_predictor_rank = int(
-    pipls_path.set_index("n_components").loc[CHOSEN_N_COMPONENTS, "predictor_rank"]
-)
+selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
+chosen_predictor_rank = selected.predictor_rank
 model = PiPLSRegression(
     n_components=CHOSEN_N_COMPONENTS,
     predictor_rank=chosen_predictor_rank,

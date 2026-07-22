@@ -13,11 +13,12 @@ material alone.
 
 ## Implemented boundary
 
-Numbered examples are self-contained user tasks rather than publication-oriented or context-free API
-demonstrations. Example 07 has been removed; example 08 explains its synthetic latent structure and
-prints labeled independent-test results.
+Numbered examples are self-contained user tasks rather than publication-oriented or
+context-free API demonstrations. Example 07 has been removed; example 08 explains its synthetic
+latent structure and prints labeled independent-test results.
 
-Phases A through E4c are complete and committed. The first broad E4 benchmark implementation was removed and replaced by focused question-specific benchmarks:
+Phases A through F3 are complete and committed; Phase F4 is underway. The first broad E4 benchmark
+implementation was removed and replaced by focused question-specific benchmarks:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
 - fixed-parameter Pi-PLS numerical core;
@@ -27,6 +28,7 @@ Phases A through E4c are complete and committed. The first broad E4 benchmark im
 - hardened public validation and `StatisticalSupportWarning` for direct fixed fits with
   fewer than three observations per retained predictor-rank direction;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
+- immutable `PiPLSComponentPath` arrays and frozen scalar lookup through `component_path_`;
 - a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
 - a public documentation entry that defines paired latent variables, component-count scanning,
   and elbow-based CV-MSE interpretation before specialized terminology;
@@ -71,6 +73,8 @@ The current top-level package exports are:
 
 ```python
 from pipls import (
+    PiPLSComponentPath,
+    PiPLSComponentResult,
     PiPLSDecomposition,
     PiPLSPathCV,
     PiPLSRegression,
@@ -115,7 +119,7 @@ case, or public behavior.
 | Conditional predictor-rank selection | `PiPLSPathCV(search_method="auto")` |
 | Component counts | `n_components_values="all"` by default; explicit integer sequences request a subset |
 | Path search | `PiPLSPathCV(search_method="auto")` by default |
-| Component-path artifact | `component_path_results_`: one row per component count with numeric predictor rank, policy, mean CV-MSE, fold SD, and split count |
+| Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, predictor-rank, policy, and split-count arrays plus scalar lookup |
 | Exhaustive search | explicit `PiPLSPathCV(search_method="optimal")` |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
 | Reproducibility | estimator `random_state` accepts integer, NumPy `RandomState`, or `None`; default `0` is reproducible |
@@ -271,19 +275,21 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Define the first release. Decision 0065 completes the tutorial-first documentation transition: the
-Pulp tutorial owns the worked analysis, task guides remain concise, `model_inspection.md` owns stable
-figure-by-figure interpretation, and generated API pages retain exact signatures.
-
-The next patch should choose the initial version, complete project metadata, condense the Unreleased
-changelog into release notes, and define the tag and publication checklist without publishing
-artifacts.
+Patch 20b: rewrite Sugarcane as the direct reference example. Example 11 should operate on
+`component_path_` and fitted inspection objects in memory, construct its own Matplotlib figures,
+and stop writing or rereading analytical CSV intermediates. Generated outputs should be final PDF
+figures only.
 
 ## Subsequent roadmap
 
-1. **Versioning and release preparation:** replace version `0.0.0`, add release notes and final
-   package metadata, define the first tagged-release checklist, and rehearse publication.
-2. **First tagged release:** publish only after the rehearsal and checklist pass.
+1. **Patch 20b:** direct Sugarcane workflow and final figures only.
+2. **Patch 20c:** direct Pulp example and tutorial workflow.
+3. **Patch 20d:** direct Tobacco workflow and removal of post-analysis table machinery.
+4. **Patch 20e:** in-memory Pi-PLS/PLS path comparison.
+5. **Patch 20f:** package-wide CSV-policy cleanup, documentation migration, and structural enforcement.
+6. **First-release preparation:** choose the initial version, complete metadata and release notes,
+   and rehearse the tag and publication checklist.
+7. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

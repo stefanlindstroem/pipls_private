@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+import pandas as pd
 from _support.plot_component_path import plot_pipls_component_path
 from _support.post_analysis_artifacts import (
     build_post_analysis_tables,
@@ -19,7 +20,16 @@ Y = workflow.Y
 model = workflow.model
 
 # Export the component path and its derived figure.
-workflow.component_path.to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
+pd.DataFrame(
+    {
+        "n_components": workflow.component_path.n_components,
+        "predictor_rank": workflow.component_path.predictor_rank,
+        "predictor_rank_policy": workflow.component_path.predictor_rank_policy,
+        "response_standardized_cv_mse_mean": workflow.component_path.cv_mse_mean,
+        "response_standardized_cv_mse_fold_sd": workflow.component_path.cv_mse_fold_sd,
+        "n_splits": workflow.component_path.n_splits,
+    }
+).to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
 plot_pipls_component_path(
     ANALYSIS_DIR / "component_path.csv",
     ANALYSIS_DIR / "component_path.pdf",

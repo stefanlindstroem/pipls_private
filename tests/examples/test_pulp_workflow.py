@@ -5,12 +5,11 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import pytest
 from sklearn.base import clone
 from sklearn.pipeline import Pipeline
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSComponentPath, PiPLSPathCV, PiPLSRegression
 
 
 def _repository_root() -> Path:
@@ -56,13 +55,10 @@ def test_pulp_workflow_evaluates_the_pipeline_and_transfers_the_selected_pair(
         "pipls__n_components",
         "pipls__predictor_rank",
     }
-    assert tuple(result.component_path.columns) == (
-        "n_components",
-        "predictor_rank",
-        "predictor_rank_policy",
-        "response_standardized_cv_mse_mean",
-        "response_standardized_cv_mse_fold_sd",
-        "n_splits",
+    assert isinstance(result.component_path, PiPLSComponentPath)
+    np.testing.assert_array_equal(
+        result.component_path.n_components,
+        result.path_search.n_components_values_,
     )
     assert result.chosen_n_components == WORKFLOW.PULP_CHOSEN_N_COMPONENTS == 3
     assert result.chosen_predictor_rank == WORKFLOW.select_pulp_predictor_rank(
@@ -94,21 +90,11 @@ def test_pulp_workflow_aligns_oof_and_inspection_outputs(pulp_result: object) ->
     assert result.structure.n_components == result.chosen_n_components
 
 
-def test_pulp_rank_selection_requires_one_admissible_path_row() -> None:
-    duplicate = pd.DataFrame(
-        {
-            "n_components": [2, 2],
-            "predictor_rank": [3, 4],
-        }
-    )
-    with pytest.raises(ValueError, match="exactly one row"):
-        WORKFLOW.select_pulp_predictor_rank(duplicate, n_components=2)
-
-    inadmissible = pd.DataFrame(
-        {
-            "n_components": [3],
-            "predictor_rank": [2],
-        }
-    )
-    with pytest.raises(ValueError, match="must not be smaller"):
-        WORKFLOW.select_pulp_predictor_rank(inadmissible, n_components=3)
+def test_pulp_rank_selection_requires_an_evaluated_component_count(
+    pulp_result: object,
+) -> None:
+    with pytest.raises(ValueError, match="was not evaluated"):
+        WORKFLOW.select_pulp_predictor_rank(
+            pulp_result.component_path,
+            n_components=99,
+        )

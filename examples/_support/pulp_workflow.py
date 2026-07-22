@@ -10,7 +10,7 @@ from sklearn.base import clone
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSComponentPath, PiPLSPathCV, PiPLSRegression
 from pipls.inspection import (
     LatentStructure,
     PiPLSDisplayFactors,
@@ -36,7 +36,7 @@ class PulpWorkflowResult:
     Y: pd.DataFrame
     pipeline_template: Pipeline
     path_search: PiPLSPathCV
-    component_path: pd.DataFrame
+    component_path: PiPLSComponentPath
     chosen_n_components: int
     chosen_predictor_rank: int
     fitted_pipeline: Pipeline
@@ -83,39 +83,26 @@ def evaluate_pulp_component_path(
     pipeline_template: Pipeline,
     X: pd.DataFrame,
     Y: pd.DataFrame,
-) -> tuple[PiPLSPathCV, pd.DataFrame]:
+) -> tuple[PiPLSPathCV, PiPLSComponentPath]:
     """Evaluate the Pi-PLS component path for the complete pipeline."""
 
     path_search = PiPLSPathCV(
         estimator=pipeline_template,
         refit=False,
     ).fit(X, Y)
-    component_path = pd.DataFrame(path_search.component_path_results_)
-    return path_search, component_path
+    return path_search, path_search.component_path_
 # --8<-- [end:evaluate-pulp-component-path]
 
 
 # --8<-- [start:select-pulp-predictor-rank]
 def select_pulp_predictor_rank(
-    component_path: pd.DataFrame,
+    component_path: PiPLSComponentPath,
     *,
     n_components: int,
 ) -> int:
     """Return the path-selected predictor rank for one component count."""
 
-    rows = component_path.loc[component_path["n_components"] == n_components]
-    if len(rows) != 1:
-        raise ValueError(
-            "component_path must contain exactly one row for the chosen component count: "
-            f"n_components={n_components}, matching_rows={len(rows)}."
-        )
-    predictor_rank = int(rows.iloc[0]["predictor_rank"])
-    if predictor_rank < n_components:
-        raise ValueError(
-            "The selected predictor rank must not be smaller than the component count: "
-            f"n_components={n_components}, predictor_rank={predictor_rank}."
-        )
-    return predictor_rank
+    return component_path.for_n_components(n_components).predictor_rank
 # --8<-- [end:select-pulp-predictor-rank]
 
 

@@ -29,7 +29,17 @@ for dataset, path_search in (
 
     pipls_csv = RESULTS_DIR / f"{dataset}_pipls_component_path.csv"
     pls_csv = RESULTS_DIR / f"{dataset}_pls_component_path.csv"
-    pd.DataFrame(path_search.component_path_results_).to_csv(pipls_csv, index=False)
+    component_path = path_search.component_path_
+    pd.DataFrame(
+        {
+            "n_components": component_path.n_components,
+            "predictor_rank": component_path.predictor_rank,
+            "predictor_rank_policy": component_path.predictor_rank_policy,
+            "response_standardized_cv_mse_mean": component_path.cv_mse_mean,
+            "response_standardized_cv_mse_fold_sd": component_path.cv_mse_fold_sd,
+            "n_splits": component_path.n_splits,
+        }
+    ).to_csv(pipls_csv, index=False)
     evaluate_pls_component_path(
         X,
         Y,

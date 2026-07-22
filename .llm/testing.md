@@ -49,8 +49,9 @@ the source of record for those contents.
 Focused synthetic package benchmarks are executable contracts once implemented. Tests may validate
 the question-specific script, deterministic generation, finite metrics, metric domains, exact
 minimal CSV header, and repeatability of scientific values. Component-path API tests may verify one
-ordered row per requested component count, a numeric predictor rank and explicit policy in every
-row, and agreement with conditional rows in `cv_results_`. Plot and standard-PLS helper tests should
+ordered result per requested component count, aligned read-only arrays with stable dtypes, a numeric
+predictor rank and explicit policy for every count, scalar lookup, pickling, and agreement with
+conditional rows in `cv_results_`. Plot and standard-PLS helper tests should
 use small synthetic tables and verify canonical CSV/PDF contracts without freezing visual pixel
 output.
 

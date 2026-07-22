@@ -24,6 +24,7 @@ reference describe the current public behavior directly.
 - [0032: full-sample rank support](0032-full-sample-rank-support.md)
 - [0039: fixed estimator and path search](0039-fixed-estimator-path-search-boundary.md)
 - [0040: scikit-learn API polish](0040-sklearn-api-polish.md)
+- [0066: immutable component-path API](0066-immutable-component-path-api.md)
 
 ## Validation, data, and benchmarks
 

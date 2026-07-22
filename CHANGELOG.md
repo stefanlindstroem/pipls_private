@@ -148,7 +148,7 @@
 - Compare the Pulp, Sugarcane, and Tobacco Pi-PLS component paths with separate standard PLS (NIPALS) CSV paths and CSV-derived overlaid PDFs; use explicit full predictor SVD for the Tobacco path while retaining adaptive predictor-rank scanning.
 - Add a dedicated `examples` dependency extra containing pandas and Matplotlib, and document how to refresh an existing development virtual environment after dependency changes.
 - Present real-data model development as a two-stage component-path workflow: add the public
-  `component_path_results_` table, explicit optimized/fixed/maximum predictor-rank policies,
+  `component_path_` immutable result, explicit optimized/fixed/maximum predictor-rank policies,
   four-row Pulp and Sugarcane benchmark CSVs with fold SD, CSV-derived example PDFs, and separate
   fixed final-model fits chosen through visible component-count constants.
 - Add the Sugarcane high-dimensional component-path smoke check using direct pandas tables and the ordinary public `PiPLSPathCV` defaults.
