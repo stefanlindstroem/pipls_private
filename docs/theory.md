@@ -148,8 +148,7 @@ chosen component count and the predictor rank reported for that row. Prediction 
 state whether they use fitted values, fixed-parameter out-of-fold predictions, selection-conditioned
 out-of-fold predictions, or an independent test set.
 
-See the [Pulp tutorial](tutorials/pulp.md) for a complete worked analysis.
-The [Pulp tutorial](tutorials/pulp.md#evaluate-the-component-path),
+The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#select-the-fixed-rank-pair),
 [advanced path-search reference](path_analysis.md), and
 [cross-validation reference](cross_validation.md) define the general selection and validation
 contracts.

@@ -2,8 +2,8 @@
 
 `pipls.plotting` is the operational reference for optional Matplotlib chart primitives. Scientific
 interpretation belongs in [Model inspection](../model_inspection.md), and the
-[Pulp tutorial](../tutorials/pulp.md#interpret-the-fitted-model) shows the complete maintained
-plotting surface.
+[Pulp tutorial](../tutorials/pulp.md#interpret-representative-fitted-model-plots) shows a maintained
+representative plotting workflow.
 
 Every function renders one chart on one optional caller-supplied `ax` and returns `(figure, axis)`.
 Plotters do not create panels, legends, figure-level titles, files, displays, or closing operations.

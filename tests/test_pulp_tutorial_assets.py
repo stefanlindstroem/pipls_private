@@ -20,16 +20,9 @@ except ModuleNotFoundError:  # pragma: no cover - Python 3.10
 FIGURE_FILENAMES = (
     "component_path.svg",
     "predictor_rank_profile.svg",
-    "scores.svg",
     "biplot.svg",
-    "x_loadings.svg",
-    "y_loadings.svg",
     "predictor_directions.svg",
-    "dilation.svg",
-    "response_directions.svg",
-    "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
-    "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
 )
 
@@ -198,16 +191,9 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         assert f"../assets/generated/pulp/{filename}" in tutorial
 
     plotting_functions = {
-        "plot_scores",
         "plot_biplot",
-        "plot_x_loadings",
-        "plot_y_loadings",
         "plot_pipls_predictor_directions",
-        "plot_pipls_dilation",
-        "plot_pipls_response_directions",
-        "plot_pipls_weighted_response_directions",
         "plot_observed_vs_predicted",
-        "plot_residuals_vs_predicted",
         "plot_standardized_rmse",
     }
     for function_name in plotting_functions:
@@ -257,9 +243,9 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert "for n_components, cv_mse, predictor_rank in zip(" not in example
     assert "for n_components, mean_mse, predictor_rank in zip(" not in renderer
 
-    assert "selects the rank that minimizes" in tutorial
-    assert "rank that minimized mean CV-MSE conditional on" in tutorial
-    assert "rank 10 gives the lowest evaluated mean CV-MSE" in tutorial
+    assert "lowest evaluated mean CV-MSE" in tutorial
+    assert "upper search boundary" in tutorial
+    assert "for_n_components()` only retrieves" in tutorial
     assert "CV-MSE minimum: rank" in example
     assert "CV-MSE minimum: rank" in renderer
     assert "path_search.predictor_rank_profile(selected.n_components)" in example
@@ -270,18 +256,42 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert 'legend(title="Component")' not in example
     assert 'legend(title="Component")' not in renderer
 
-    standard_structure = "### Standard PLS-family latent-structure plots"
-    pipls_specific = "### Pi-PLS-specific factorization plots"
+    standard_structure = "### Standard PLS-family latent-structure plot"
+    pipls_specific = "### Pi-PLS-specific factorization plot"
     standard_prediction = "### Standard PLS-family prediction plots"
     assert (
         tutorial.index(standard_structure)
         < tutorial.index(pipls_specific)
         < tutorial.index(standard_prediction)
     )
+    assert "## Common variations" not in tutorial
+    assert "The plots below are representative rather than exhaustive" in tutorial
+    omitted_figures = {
+        "scores.svg",
+        "x_loadings.svg",
+        "y_loadings.svg",
+        "dilation.svg",
+        "response_directions.svg",
+        "weighted_response_directions.svg",
+        "residuals_vs_predicted.svg",
+    }
+    for filename in omitted_figures:
+        assert filename not in tutorial
+        assert filename not in renderer
     assert "### Regression coefficients" not in tutorial
     assert "coefficients.svg" not in tutorial
     assert "plot_coefficients()" not in tutorial
     assert "plot_coefficients" not in renderer
+    for function_name in {
+        "plot_scores",
+        "plot_x_loadings",
+        "plot_y_loadings",
+        "plot_pipls_dilation",
+        "plot_pipls_response_directions",
+        "plot_pipls_weighted_response_directions",
+        "plot_residuals_vs_predicted",
+    }:
+        assert function_name not in renderer
 
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
@@ -331,9 +341,11 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     for anchor in inspection_anchors:
         assert f"{{ #{anchor} }}" in inspection
 
-    tutorial_anchors = inspection_anchors - {
-        "observation-diagnostics",
-        "regression-coefficients",
+    tutorial_anchors = {
+        "score-loading-biplot",
+        "predictor-directions",
+        "observed-versus-predicted",
+        "standardized-rmse",
     }
     for anchor in tutorial_anchors:
         assert f"../model_inspection.md#{anchor}" in tutorial

@@ -81,6 +81,7 @@ This index is navigation, not a substitute for those records.
 | `0073-public-fit-safety.md` | public fit-state and finite-output safety | transactional fits, boundary-safe scaling, safe `copy=False`, and explicit rejection of nonfinite public results |
 | `0074-tutorial-owned-user-workflow.md` | consolidated user documentation | tutorial owns normal use, generated API pages own exact estimator contracts, and advanced guides retain only specialized behavior |
 | `0075-two-tier-tutorial-route.md` | staged programming-user tutorials | synthetic selection and prediction first; complete Pulp analysis second |
+| `0076-focused-pulp-tutorial.md` | focused second-stage tutorial | real-data selection qualification, selection-conditioned OOF analysis, and representative fitted-model plots |
 
 ## Implemented estimator/search transition
 

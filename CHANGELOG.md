@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Shorten and reposition the Pulp tutorial as the second-stage real-data analysis: assume the
+  synthetic selection tutorial, retain the upper-boundary rank qualification and
+  selection-conditioned OOF workflow, show six representative figures instead of the full plotting
+  catalogue, and route advanced variations to the reference pages.
+
 - Add a short first tutorial built from deterministic synthetic train/test data: expose the complete
   component-path and conditional predictor-rank selection contract, fit one fixed model, assess an
   independent test block, generate three tutorial figures, and route readers to the complete Pulp

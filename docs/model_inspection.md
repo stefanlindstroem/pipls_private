@@ -1,9 +1,10 @@
 # Model inspection
 
 `pipls.inspection` computes immutable numerical results from fitted models or explicit predictions.
-`pipls.plotting` renders those results without changing the estimator. This page defines the
-quantities and their interpretation. The [Pulp tutorial](tutorials/pulp.md#interpret-the-fitted-model)
-shows them in one complete analysis; the [plotting API](api/plotting.md) gives exact signatures.
+`pipls.plotting` renders those results without changing the estimator. This page defines the full
+inspection and plotting catalogue. The [Pulp tutorial](tutorials/pulp.md#interpret-representative-fitted-model-plots)
+uses a small representative subset in one real-data analysis; the
+[plotting API](api/plotting.md) gives exact signatures.
 
 Pi-PLS-specific inspection covers $P$, $D$, $Q$, and $QD$. Scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics use estimator-neutral PLS-family objects.

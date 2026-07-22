@@ -90,3 +90,4 @@ reference describe the current public behavior directly.
 - [0061: example-owned report composition](0061-example-owned-report-composition.md)
 - [0074: tutorial-owned user workflow](0074-tutorial-owned-user-workflow.md)
 - [0075: two-tier tutorial route](0075-two-tier-tutorial-route.md)
+- [0076: focused Pulp tutorial](0076-focused-pulp-tutorial.md)

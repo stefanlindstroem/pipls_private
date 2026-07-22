@@ -22,16 +22,9 @@ SYNTHETIC_TUTORIAL_FIGURES = (
 PULP_TUTORIAL_FIGURES = (
     "component_path.svg",
     "predictor_rank_profile.svg",
-    "scores.svg",
     "biplot.svg",
-    "x_loadings.svg",
-    "y_loadings.svg",
     "predictor_directions.svg",
-    "dilation.svg",
-    "response_directions.svg",
-    "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
-    "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
 )
 

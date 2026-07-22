@@ -43,15 +43,8 @@ from pipls.inspection import (  # noqa: E402
 from pipls.plotting import (  # noqa: E402
     plot_biplot,
     plot_observed_vs_predicted,
-    plot_pipls_dilation,
     plot_pipls_predictor_directions,
-    plot_pipls_response_directions,
-    plot_pipls_weighted_response_directions,
-    plot_residuals_vs_predicted,
-    plot_scores,
     plot_standardized_rmse,
-    plot_x_loadings,
-    plot_y_loadings,
 )
 
 PULP_DATA_DIR = REPOSITORY_ROOT / "datasets" / "pulp"
@@ -63,16 +56,9 @@ PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
     "component_path.svg",
     "predictor_rank_profile.svg",
-    "scores.svg",
     "biplot.svg",
-    "x_loadings.svg",
-    "y_loadings.svg",
     "predictor_directions.svg",
-    "dilation.svg",
-    "response_directions.svg",
-    "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
-    "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
 )
 
@@ -186,7 +172,7 @@ def _render_predictor_rank_profile(
 
 
 def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
-    """Generate all Pulp tutorial figures and return the manifest path."""
+    """Generate the representative Pulp tutorial figures and return the manifest path."""
 
     output_dir = output_dir.resolve()
     if output_dir.exists():
@@ -232,15 +218,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         prediction_kind=PREDICTION_KIND,
     )
 
-    figure, axis = _figure(figsize=(6.4, 5.0))
-    plot_scores(
-        structure,
-        components=(0, 1),
-        title="Pulp X scores",
-        ax=axis,
-    )
-    _save_svg(figure, output_dir / "scores.svg")
-
     figure, axis = _figure(figsize=(8.0, 6.2))
     plot_biplot(
         biplot_coordinates(structure, components=(0, 1)),
@@ -250,31 +227,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     )
     axis.legend()
     _save_svg(figure, output_dir / "biplot.svg")
-
-    figure, axis = _figure(figsize=(10.0, 5.4))
-    plot_x_loadings(
-        structure,
-        predictor_style="bar",
-        predictor_names=predictor_names,
-        components=DISPLAY_COMPONENTS,
-        title="Pulp X loadings",
-        ax=axis,
-    )
-    axis.legend()
-    _rotate_category_labels(axis)
-    _save_svg(figure, output_dir / "x_loadings.svg")
-
-    figure, axis = _figure(figsize=(8.8, 5.2))
-    plot_y_loadings(
-        structure,
-        response_names=response_names,
-        components=DISPLAY_COMPONENTS,
-        title="Pulp Y loadings",
-        ax=axis,
-    )
-    axis.legend()
-    _rotate_category_labels(axis)
-    _save_svg(figure, output_dir / "y_loadings.svg")
 
     figure, axis = _figure(figsize=(10.0, 5.4))
     plot_pipls_predictor_directions(
@@ -289,39 +241,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "predictor_directions.svg")
 
-    figure, axis = _figure(figsize=(6.4, 4.6))
-    plot_pipls_dilation(
-        factors,
-        components=DISPLAY_COMPONENTS,
-        title=r"Pulp dilation $D$",
-        ax=axis,
-    )
-    _save_svg(figure, output_dir / "dilation.svg")
-
-    figure, axis = _figure(figsize=(8.8, 5.2))
-    plot_pipls_response_directions(
-        factors,
-        response_names=response_names,
-        components=DISPLAY_COMPONENTS,
-        title=r"Pulp response directions $Q$",
-        ax=axis,
-    )
-    axis.legend()
-    _rotate_category_labels(axis)
-    _save_svg(figure, output_dir / "response_directions.svg")
-
-    figure, axis = _figure(figsize=(8.8, 5.2))
-    plot_pipls_weighted_response_directions(
-        factors,
-        response_names=response_names,
-        components=DISPLAY_COMPONENTS,
-        title=r"Pulp weighted response directions $QD$",
-        ax=axis,
-    )
-    axis.legend()
-    _rotate_category_labels(axis)
-    _save_svg(figure, output_dir / "weighted_response_directions.svg")
-
     figure, axis = _figure(figsize=(6.4, 5.0))
     plot_observed_vs_predicted(
         diagnostics,
@@ -332,17 +251,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     )
     axis.legend(title="Response")
     _save_svg(figure, output_dir / "observed_vs_predicted.svg")
-
-    figure, axis = _figure(figsize=(6.4, 5.0))
-    plot_residuals_vs_predicted(
-        diagnostics,
-        response_names=response_names,
-        responses=detailed_response_indices,
-        title="Pulp residuals versus predicted",
-        ax=axis,
-    )
-    axis.legend(title="Response")
-    _save_svg(figure, output_dir / "residuals_vs_predicted.svg")
 
     figure, axis = _figure(figsize=(7.4, 5.0))
     plot_standardized_rmse(

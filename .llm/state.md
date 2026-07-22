@@ -60,15 +60,16 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
   OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
 - a two-tier tutorial route: a short deterministic synthetic selection-and-prediction workflow
-  from example 02, followed by the complete Pulp real-data workflow from example 10; both use
+  from example 02, followed by a focused Pulp real-data workflow from example 10; both use
   checked snippets and deterministic single-chart SVG assets;
 - direct Tobacco response pagination through two caller-owned multipage PDFs, with full predictor
   SVD, decreasing-wavenumber spectral axes, and raw observation diagnostics;
 - a direct Pi-PLS/ordinary-PLS comparison whose two immutable component paths are plotted together
   in example 09 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
 - a tutorial-first served site whose synthetic entry tutorial owns the minimum selection contract
-  and whose second Pulp tutorial owns complete real-data OOF and interpretation; both link to the
-  generated API and advanced references;
+  and whose second Pulp tutorial owns real-data selection qualification, selection-conditioned
+  OOF analysis, and representative interpretation plots; both link to the generated API and
+  advanced references;
 - a compact documentation navigation without separate quickstart, estimator, parameter-selection,
   or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
   exact estimator contracts, and retained path and validation pages cover advanced behavior.
@@ -286,9 +287,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Documentation Patch D2: shorten and reposition the Pulp tutorial now that the synthetic entry
-tutorial owns the minimum selection-and-prediction contract. Retain the real-data qualifications,
-fixed-parameter OOF workflow, and the most informative fitted-model plots.
+Documentation Patch D3: reduce the README to orientation, installation, two compact workflows, and
+clear tutorial routes; move repository-maintenance detail to contributor-facing documentation and
+finish the audience-oriented navigation.
 
 ## Subsequent roadmap
 
