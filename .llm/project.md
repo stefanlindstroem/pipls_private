@@ -19,7 +19,8 @@ implemented boundary and next increment; this file records where responsibilitie
 Phases A through F4 are complete; first-release preparation is next. The current public
 surface includes
 `PiPLSRegression`,
-`PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`, `PiPLSDecomposition`,
+`PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
+`PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
 `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
 `pipls.inspection`, and optional Pi-PLS-specific and shared PLS-family figures under `pipls.plotting`.
@@ -56,6 +57,7 @@ Decision 0068 makes the Pulp example and tutorial direct while removing the shar
 Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers.
 Decision 0070 makes the Pi-PLS/ordinary-PLS comparison direct. Decision 0071 removes duplicate
 matrix-path aliases and completes structural enforcement of in-memory numbered examples.
+Decision 0072 adds an on-demand immutable predictor-rank profile derived from `cv_results_`.
 
 ## Implemented estimator and selection boundary
 

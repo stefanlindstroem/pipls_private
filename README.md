@@ -170,9 +170,18 @@ model = PiPLSRegression(
 `best_params_` identifies the best evaluated pair under the configured scorer. With the default
 negative response-standardized MSE scorer, this is the evaluated pair with the smallest mean
 CV-MSE. Adaptive search may leave admissible pairs unevaluated, and the examples still present
-component-count selection as a user decision. `cv_results_` retains the complete candidate-level
-arrays; `component_path_` is the concise immutable component-count view. For explicit validation
-reporting:
+component-count selection as a user decision. `component_path_` is the concise immutable
+component-count view. Inspect every evaluated predictor rank at one count without filtering the
+detailed table manually:
+
+```python
+rank_profile = search.predictor_rank_profile(chosen.n_components)
+print(rank_profile.predictor_rank)
+print(rank_profile.cv_mse_mean)
+```
+
+`cv_results_` retains the complete candidate-level arrays, including split scores and timing. For
+explicit validation reporting:
 
 ```python
 from sklearn.model_selection import LeaveOneOut
@@ -358,7 +367,8 @@ three final comparison PDFs. Examples 10–12 then perform Pi-PLS-only analyses.
 direct workflows:
 they read `component_path_`, fit the selected fixed model, calculate selection-conditioned OOF
 predictions with scikit-learn, keep inspection results in memory, and write only final PDF figures.
-The Pulp workflow also plots the conditional predictor-rank profile at three components, showing
+The Pulp workflow also retrieves and plots the immutable conditional predictor-rank profile at
+three components, showing
 that rank 10 is selected at the upper evaluated boundary and is close to rank 9 relative to fold
 variability. Tobacco uses adaptive scanning with explicit full predictor SVD, preserves its
 decreasing wavenumber coordinate, and writes source-order paginated prediction and coefficient PDFs.

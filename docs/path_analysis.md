@@ -124,7 +124,13 @@ With `refit=True`, the best evaluated estimator is fitted on all supplied data a
 prediction or transformation methods delegate to it. With `refit=False`, the path diagnostics
 remain available without a fitted final estimator.
 
-The complete evaluated search surface is available through the aligned candidate arrays in
+Use `predictor_rank_profile(h)` for the one-dimensional candidate profile at an evaluated component
+count. It returns only ranks actually evaluated by the fitted search, sorted in ascending order,
+together with aligned mean scores, CV-MSE summaries, fold standard deviations, and the conditionally
+selected scalar row. The method derives this immutable view on demand; it does not add another fitted
+representation that must remain synchronized.
+
+The complete evaluated search surface remains available through the aligned candidate arrays in
 `cv_results_`, together with resolved rank grids, candidate counts, and search history.
 Matrix-shaped score aliases are intentionally not duplicated: advanced analysis can reshape the
 `cv_results_` columns when a dense surface is useful.

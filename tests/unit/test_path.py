@@ -6,12 +6,14 @@ import warnings
 import numpy as np
 import pytest
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from pipls import (
     PiPLSComponentPath,
     PiPLSPathCV,
+    PiPLSPredictorRankProfile,
     PiPLSRegression,
     StatisticalSupportWarning,
 )
@@ -226,6 +228,14 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
     assert not search.path_search_exhaustive_
     assert search.path_search_history_[1]
 
+    profile = search.predictor_rank_profile(1)
+    np.testing.assert_array_equal(
+        profile.predictor_rank,
+        np.sort(search.cv_results_["predictor_rank"]),
+    )
+    assert profile.predictor_rank.size == search.n_path_candidates_evaluated_
+    assert profile.selected.predictor_rank == 1
+
 
 def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
     X, Y = _data()
@@ -249,6 +259,11 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
         search.component_path_.cv_mse_mean,
         -search.component_path_.mean_test_score,
     )
+
+    profile = search.predictor_rank_profile(2)
+    assert profile.selected.predictor_rank == 2
+    assert np.all(profile.mean_test_score == 1.0)
+    assert not np.allclose(profile.cv_mse_mean, -profile.mean_test_score)
 
 
 def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
@@ -434,6 +449,64 @@ def test_component_path_exposes_conditional_score_rank_mean_and_fold_sd() -> Non
     assert not restored.component_path_.n_components.flags.writeable
 
 
+def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> None:
+    X, Y = _data()
+    search = PiPLSPathCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=3,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    profile = search.predictor_rank_profile(2)
+
+    assert isinstance(profile, PiPLSPredictorRankProfile)
+    assert profile.n_components == 2
+    assert profile.n_splits == 3
+    np.testing.assert_array_equal(profile.predictor_rank, np.array([2, 3, 4]))
+    assert all(
+        not array.flags.writeable
+        for array in (
+            profile.predictor_rank,
+            profile.mean_test_score,
+            profile.cv_mse_mean,
+            profile.cv_mse_fold_sd,
+        )
+    )
+    rows = np.flatnonzero(search.cv_results_["n_components"] == 2)
+    order = np.argsort(search.cv_results_["predictor_rank"][rows])
+    indices = rows[order]
+    np.testing.assert_allclose(
+        profile.mean_test_score,
+        search.cv_results_["mean_test_score"][indices],
+    )
+    np.testing.assert_allclose(
+        profile.cv_mse_mean,
+        search.cv_results_["mean_response_standardized_mse"][indices],
+    )
+    np.testing.assert_allclose(
+        profile.cv_mse_fold_sd,
+        search.cv_results_["std_response_standardized_mse"][indices],
+    )
+    assert profile.selected == search.component_path_.for_n_components(2)
+
+
+def test_predictor_rank_profile_requires_fitted_evaluated_component_count() -> None:
+    search = PiPLSPathCV(refit=False)
+
+    with pytest.raises(NotFittedError):
+        search.predictor_rank_profile(1)
+
+    X, Y = _data()
+    search.set_params(n_components_values=[1, 2], cv=3).fit(X, Y)
+    with pytest.raises(ValueError, match="was not evaluated"):
+        search.predictor_rank_profile(3)
+    with pytest.raises(ValueError, match="must be an integer"):
+        search.predictor_rank_profile(2.0)  # type: ignore[arg-type]
+
+
 @pytest.mark.parametrize(
     ("predictor_rank_values", "expected_policy"),
     [
@@ -471,6 +544,13 @@ def test_component_path_records_predictor_rank_policy(
             search.component_path_.predictor_rank,
             np.full(2, search.max_predictor_rank_),
         )
+
+    profile = search.predictor_rank_profile(2)
+    assert profile.selected.predictor_rank == search.component_path_.for_n_components(
+        2
+    ).predictor_rank
+    if expected_policy in {"fixed", "maximum"}:
+        assert profile.predictor_rank.size == 1
 
 
 def test_fixed_predictor_rank_must_support_every_component_count() -> None:

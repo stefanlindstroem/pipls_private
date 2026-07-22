@@ -25,7 +25,8 @@ The component-path workflows answer how cross-validated loss changes with compon
 Pi-PLS, the conditional predictor rank. Example 09 owns the overlaid Pi-PLS and ordinary-PLS
 comparison PDFs and plots both immutable paths directly in memory. Pulp, Sugarcane, and Tobacco plot
 `component_path_` directly in the numbered examples and write final component-path PDFs without CSV
-conversion. Pulp also plots the evaluated predictor-rank profile at its chosen component count.
+conversion. Pulp also plots an immutable predictor-rank profile derived on demand at its chosen
+component count.
 `examples/_support/pls_component_path.py` remains only for the nontrivial ordinary-PLS fold-local
 path calculation; there is no comparison plotting helper.
 

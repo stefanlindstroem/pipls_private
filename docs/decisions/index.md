@@ -25,6 +25,7 @@ reference describe the current public behavior directly.
 - [0039: fixed estimator and path search](0039-fixed-estimator-path-search-boundary.md)
 - [0040: scikit-learn API polish](0040-sklearn-api-polish.md)
 - [0066: immutable component-path API](0066-immutable-component-path-api.md)
+- [0072: conditional predictor-rank profile](0072-conditional-predictor-rank-profile.md)
 
 ## Validation, data, and benchmarks
 

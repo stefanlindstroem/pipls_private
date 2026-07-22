@@ -31,7 +31,11 @@ from ._cv_engine import (
     _PiPLSCandidateResult,
 )
 from ._sklearn_compat import _validate_estimator_data
-from .component_path import PiPLSComponentPath, PredictorRankPolicy
+from .component_path import (
+    PiPLSComponentPath,
+    PiPLSPredictorRankProfile,
+    PredictorRankPolicy,
+)
 from .exceptions import StatisticalSupportWarning
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
@@ -177,7 +181,8 @@ class PiPLSPathCV(
         response-standardized MSE values, timing summaries, and score ranks.
     component_path_ : PiPLSComponentPath
         Immutable concise view with one conditionally selected predictor-rank
-        result per component count.
+        result per component count. Use :meth:`predictor_rank_profile` for the
+        evaluated rank candidates at one component count.
     best_index_ : int
         Row of ``cv_results_`` selected by maximum mean test score, with smaller
         component count and predictor rank used as deterministic tie-breakers.
@@ -514,6 +519,61 @@ class PiPLSPathCV(
                 if hasattr(self, name):
                     delattr(self, name)
         return self
+
+    def predictor_rank_profile(
+        self,
+        n_components: int,
+    ) -> PiPLSPredictorRankProfile:
+        """Return evaluated predictor-rank results for one component count.
+
+        Rows are sorted by ascending predictor rank and include only candidates
+        actually evaluated by the fitted search. The selected scalar result
+        maximizes the configured mean test score, with the fitted conditional
+        tie-breaking rule. Under the default scorer, this is equivalent to
+        minimizing mean response-standardized CV-MSE.
+
+        Parameters
+        ----------
+        n_components : int
+            Evaluated component count whose predictor-rank profile is requested.
+
+        Returns
+        -------
+        PiPLSPredictorRankProfile
+            Frozen result containing aligned read-only candidate arrays and the
+            conditionally selected scalar result.
+
+        Raises
+        ------
+        sklearn.exceptions.NotFittedError
+            If the search has not been fitted.
+        ValueError
+            If ``n_components`` is not an integer or was not evaluated.
+        """
+
+        check_is_fitted(self, attributes=["cv_results_", "component_path_", "n_splits_"])
+        selected = self.component_path_.for_n_components(n_components)
+        rows = np.flatnonzero(
+            cast(IntArray, self.cv_results_["n_components"]) == selected.n_components
+        )
+        ranks = cast(IntArray, self.cv_results_["predictor_rank"])[rows]
+        order = np.argsort(ranks)
+        indices = rows[order]
+        return PiPLSPredictorRankProfile(
+            n_components=selected.n_components,
+            predictor_rank=cast(IntArray, self.cv_results_["predictor_rank"])[indices],
+            mean_test_score=cast(FloatArray, self.cv_results_["mean_test_score"])[indices],
+            cv_mse_mean=cast(
+                FloatArray,
+                self.cv_results_["mean_response_standardized_mse"],
+            )[indices],
+            cv_mse_fold_sd=cast(
+                FloatArray,
+                self.cv_results_["std_response_standardized_mse"],
+            )[indices],
+            n_splits=self.n_splits_,
+            selected=selected,
+        )
 
     @available_if(_estimator_supports("predict"))  # type: ignore[untyped-decorator]
     def predict(self, X: ArrayLike, copy: bool = True) -> FloatArray:

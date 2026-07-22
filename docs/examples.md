@@ -27,7 +27,8 @@ This comparison is optional and is not part of routine Pi-PLS fitting.
 The three complete analyses evaluate one Pi-PLS component path and fit one selected fixed model:
 
 - `examples/10_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
-  responses, including the component path, conditional predictor-rank profile, score-loading
+  responses, including the component path, an immutable conditional predictor-rank profile from
+  `predictor_rank_profile()`, score-loading
   biplot, fixed-model inspection, and OOF diagnostics;
 - `examples/11_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
   component path, scikit-learn OOF prediction, wavelength-aware inspection, and five final PDF

@@ -95,7 +95,16 @@ See
 ## Inspect the conditional predictor-rank profile
 
 The selected row summarizes a second calculation: for three components, the path evaluates
-predictor ranks 3 through 10 and chooses the rank with the lowest mean CV-MSE.
+predictor ranks 3 through 10 and chooses the rank with the lowest mean CV-MSE. The complete
+one-dimensional profile is retrieved without filtering `cv_results_` manually:
+
+```python
+--8<-- "examples/10_pulp_real_data.py:extract-pulp-rank-profile"
+```
+
+The returned arrays are sorted by predictor rank and are read-only. `rank_profile.selected` is the
+same conditional scalar result already stored in `selected`. Under a non-default scorer, the
+selected row maximizes the configured mean score; the CV-MSE arrays remain descriptive diagnostics.
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 

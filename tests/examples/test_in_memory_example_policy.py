@@ -121,6 +121,7 @@ def test_tutorial_renderer_uses_the_direct_in_memory_public_sequence() -> None:
 
     assert "PiPLSPathCV(refit=False).fit(X, Y)" in source
     assert "component_path_" in source
+    assert "predictor_rank_profile(" in source
     assert "cross_val_predict(" in source
     for name in _OLD_HELPER_NAMES:
         assert name not in source

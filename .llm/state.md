@@ -29,6 +29,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   fewer than three observations per retained predictor-rank direction;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
 - immutable `PiPLSComponentPath` arrays and frozen scalar lookup through `component_path_`;
+- on-demand immutable `PiPLSPredictorRankProfile` results through
+  `predictor_rank_profile(n_components)`, derived from `cv_results_`;
 - a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
 - a public documentation entry that defines paired latent variables, component-count scanning,
   and elbow-based CV-MSE interpretation before specialized terminology;
@@ -79,6 +81,7 @@ from pipls import (
     PiPLSComponentResult,
     PiPLSDecomposition,
     PiPLSPathCV,
+    PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSValidationReport,
     StatisticalSupportWarning,
@@ -122,6 +125,7 @@ case, or public behavior.
 | Component counts | `n_components_values="all"` by default; explicit integer sequences request a subset |
 | Path search | `PiPLSPathCV(search_method="auto")` by default |
 | Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, predictor-rank, policy, and split-count arrays plus scalar lookup |
+| Conditional rank profile | `predictor_rank_profile(h)` returns evaluated ranks and aligned score/CV-MSE arrays on demand, plus the selected scalar row |
 | Exhaustive search | explicit `PiPLSPathCV(search_method="optimal")` |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
 | Reproducibility | estimator `random_state` accepts integer, NumPy `RandomState`, or `None`; default `0` is reproducible |

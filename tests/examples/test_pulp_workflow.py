@@ -8,7 +8,12 @@ import pandas as pd
 import pytest
 from sklearn.model_selection import KFold, cross_val_predict
 
-from pipls import PiPLSComponentPath, PiPLSPathCV, PiPLSRegression
+from pipls import (
+    PiPLSComponentPath,
+    PiPLSPathCV,
+    PiPLSPredictorRankProfile,
+    PiPLSRegression,
+)
 from pipls.inspection import (
     latent_structure,
     pipls_display_factors,
@@ -30,16 +35,7 @@ def pulp_result() -> SimpleNamespace:
     component_path = path_search.component_path_
     selected = component_path.for_n_components(3)
 
-    cv_results = path_search.cv_results_
-    rank_rows = np.asarray(cv_results["n_components"]) == selected.n_components
-    rank_order = np.argsort(np.asarray(cv_results["predictor_rank"])[rank_rows])
-    predictor_ranks = np.asarray(cv_results["predictor_rank"])[rank_rows][rank_order]
-    rank_cv_mse_mean = np.asarray(cv_results["mean_response_standardized_mse"])[rank_rows][
-        rank_order
-    ]
-    rank_cv_mse_fold_sd = np.asarray(cv_results["std_response_standardized_mse"])[rank_rows][
-        rank_order
-    ]
+    rank_profile = path_search.predictor_rank_profile(selected.n_components)
 
     model = PiPLSRegression(
         n_components=selected.n_components,
@@ -64,9 +60,7 @@ def pulp_result() -> SimpleNamespace:
         path_search=path_search,
         component_path=component_path,
         selected=selected,
-        predictor_ranks=predictor_ranks,
-        rank_cv_mse_mean=rank_cv_mse_mean,
-        rank_cv_mse_fold_sd=rank_cv_mse_fold_sd,
+        rank_profile=rank_profile,
         model=model,
         oof_predictions=oof_predictions,
         factors=factors,
@@ -94,12 +88,15 @@ def test_pulp_rank_profile_exposes_the_upper_boundary_selection(
 ) -> None:
     result = pulp_result
 
-    np.testing.assert_array_equal(result.predictor_ranks, np.arange(3, 11))
-    assert result.selected.predictor_rank == int(result.predictor_ranks[-1])
-    assert result.rank_cv_mse_mean[-1] < result.rank_cv_mse_mean[-2]
-    assert result.rank_cv_mse_mean[-2] - result.rank_cv_mse_mean[-1] < min(
-        result.rank_cv_mse_fold_sd[-2],
-        result.rank_cv_mse_fold_sd[-1],
+    profile = result.rank_profile
+    assert isinstance(profile, PiPLSPredictorRankProfile)
+    np.testing.assert_array_equal(profile.predictor_rank, np.arange(3, 11))
+    assert profile.selected == result.selected
+    assert profile.selected.predictor_rank == int(profile.predictor_rank[-1])
+    assert profile.cv_mse_mean[-1] < profile.cv_mse_mean[-2]
+    assert profile.cv_mse_mean[-2] - profile.cv_mse_mean[-1] < min(
+        profile.cv_mse_fold_sd[-2],
+        profile.cv_mse_fold_sd[-1],
     )
 
 

@@ -115,6 +115,14 @@ contract; advanced users can reshape aligned `cv_results_` columns when needed.
 `predictor_rank`, `predictor_rank_policy`, `mean_test_score`, `cv_mse_mean`, `cv_mse_fold_sd`, and
 `n_splits` arrays. `for_n_components()` returns a frozen `PiPLSComponentResult` with the aligned
 scalar values. The numeric predictor rank is present for every component count.
+
+`PiPLSPathCV.predictor_rank_profile(h)` derives an immutable
+`PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
+predictor ranks actually evaluated at `h`, sorted in ascending order, and its `selected` field is
+the same scalar result returned by `component_path_.for_n_components(h)`. The profile does not add
+another fitted attribute or stored search representation. Selection maximizes the configured mean
+test score; only the default scorer makes this equivalent to minimizing mean response-standardized
+CV-MSE.
 Refit-dependent delegated methods are absent when `refit=False`. Output-container configuration is
 owned by the estimator template and preserved through cloning and refit; the path object does not
 add a separate `set_output` layer.

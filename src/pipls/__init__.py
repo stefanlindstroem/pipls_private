@@ -1,6 +1,10 @@
 """Pi-PLS multivariate regression."""
 
-from .component_path import PiPLSComponentPath, PiPLSComponentResult
+from .component_path import (
+    PiPLSComponentPath,
+    PiPLSComponentResult,
+    PiPLSPredictorRankProfile,
+)
 from .decomposition import PiPLSDecomposition
 from .exceptions import StatisticalSupportWarning
 from .path import PiPLSPathCV
@@ -10,6 +14,7 @@ from .validation import PiPLSValidationReport
 __all__ = [
     "PiPLSComponentPath",
     "PiPLSComponentResult",
+    "PiPLSPredictorRankProfile",
     "PiPLSDecomposition",
     "PiPLSPathCV",
     "PiPLSRegression",

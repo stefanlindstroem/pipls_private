@@ -161,7 +161,8 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert "component_path_" in pulp_text
     assert "refit=False" in pulp_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in pulp_text
-    assert 'cv_results["predictor_rank"]' in pulp_text
+    assert "path_search.predictor_rank_profile(selected.n_components)" in pulp_text
+    assert 'cv_results["predictor_rank"]' not in pulp_text
     assert "axis.errorbar(" in pulp_text
     assert "component_path.csv" not in pulp_text
     assert "post_analysis.pdf" not in pulp_text

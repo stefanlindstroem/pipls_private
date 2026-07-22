@@ -31,6 +31,7 @@ from pipls import (  # noqa: E402
     PiPLSComponentPath,
     PiPLSComponentResult,
     PiPLSPathCV,
+    PiPLSPredictorRankProfile,
     PiPLSRegression,
 )
 from pipls.inspection import (  # noqa: E402
@@ -155,39 +156,32 @@ def _render_component_path(
 
 
 def _render_predictor_rank_profile(
-    predictor_ranks: np.ndarray,
-    cv_mse_mean: np.ndarray,
-    cv_mse_fold_sd: np.ndarray,
+    profile: PiPLSPredictorRankProfile,
     *,
-    chosen_n_components: int,
-    chosen_predictor_rank: int,
     output_path: Path,
 ) -> None:
-    selected_rows = np.flatnonzero(predictor_ranks == chosen_predictor_rank)
-    if selected_rows.size != 1:
-        raise RuntimeError("The tutorial rank profile must contain one selected predictor rank.")
-    selected = int(selected_rows[0])
-
     figure, axis = _figure(figsize=(7.4, 4.8))
     axis.errorbar(
-        predictor_ranks,
-        cv_mse_mean,
-        yerr=cv_mse_fold_sd,
+        profile.predictor_rank,
+        profile.cv_mse_mean,
+        yerr=profile.cv_mse_fold_sd,
         fmt="o-",
         capsize=4,
     )
     axis.scatter(
-        [chosen_predictor_rank],
-        [cv_mse_mean[selected]],
+        [profile.selected.predictor_rank],
+        [profile.selected.cv_mse_mean],
         marker="D",
         s=70,
-        label=f"CV-MSE minimum: rank {chosen_predictor_rank}",
+        label=f"CV-MSE minimum: rank {profile.selected.predictor_rank}",
         zorder=3,
     )
-    axis.set_title(f"Pulp predictor-rank profile at {chosen_n_components} components")
+    axis.set_title(
+        f"Pulp predictor-rank profile at {profile.n_components} components"
+    )
     axis.set_xlabel("Predictor rank")
     axis.set_ylabel("Response-standardized CV-MSE")
-    axis.set_xticks(predictor_ranks)
+    axis.set_xticks(profile.predictor_rank)
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
     _save_svg(figure, output_path)
@@ -211,28 +205,14 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     component_path = path_search.component_path_
     selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
 
-    cv_results = path_search.cv_results_
-    rank_rows = np.asarray(cv_results["n_components"]) == selected.n_components
-    rank_order = np.argsort(np.asarray(cv_results["predictor_rank"])[rank_rows])
-    predictor_ranks = np.asarray(cv_results["predictor_rank"])[rank_rows][rank_order]
-    rank_cv_mse_mean = np.asarray(cv_results["mean_response_standardized_mse"])[rank_rows][
-        rank_order
-    ]
-    rank_cv_mse_fold_sd = np.asarray(cv_results["std_response_standardized_mse"])[rank_rows][
-        rank_order
-    ]
-
     _render_component_path(
         component_path,
         selected=selected,
         output_path=output_dir / "component_path.svg",
     )
+    rank_profile = path_search.predictor_rank_profile(selected.n_components)
     _render_predictor_rank_profile(
-        predictor_ranks,
-        rank_cv_mse_mean,
-        rank_cv_mse_fold_sd,
-        chosen_n_components=selected.n_components,
-        chosen_predictor_rank=selected.predictor_rank,
+        rank_profile,
         output_path=output_dir / "predictor_rank_profile.svg",
     )
 
@@ -409,9 +389,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         "analysis": {
             "chosen_n_components": selected.n_components,
             "chosen_predictor_rank": selected.predictor_rank,
-            "evaluated_predictor_ranks": predictor_ranks.tolist(),
+            "evaluated_predictor_ranks": rank_profile.predictor_rank.tolist(),
             "predictor_rank_at_upper_boundary": bool(
-                selected.predictor_rank == int(predictor_ranks[-1])
+                selected.predictor_rank == int(rank_profile.predictor_rank[-1])
             ),
             "displayed_components": [component + 1 for component in DISPLAY_COMPONENTS],
             "detailed_responses": list(DETAILED_RESPONSES),

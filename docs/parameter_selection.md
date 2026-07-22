@@ -28,8 +28,17 @@ standard deviation.
 Plot CV-MSE against component count and choose an elbow, plateau, or other scientifically justified
 point. The smallest evaluated CV-MSE is informative, but it is not an automatic scientific choice.
 The fold standard deviation describes variation among the realized folds; it is not a confidence
-interval. Candidate-level rank details remain available in `search.cv_results_`; no second
-matrix-path result needs to be synchronized with those aligned arrays.
+interval. To inspect every predictor rank evaluated at one component count, request an immutable
+profile directly from the fitted search:
+
+```python
+profile = search.predictor_rank_profile(3)
+```
+
+`profile.predictor_rank`, `profile.cv_mse_mean`, and `profile.cv_mse_fold_sd` are aligned
+read-only arrays sorted by predictor rank. `profile.selected` is the same conditional result
+returned by `component_path.for_n_components(3)`. The complete candidate table remains available
+in `search.cv_results_` for analyses requiring timing, split-level values, or other columns.
 
 ## Fit the chosen fixed model
 

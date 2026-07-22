@@ -7,6 +7,7 @@ Methods that delegate to a selected estimator are available only when `refit=Tru
     options:
       members:
         - fit
+        - predictor_rank_profile
         - predict
         - transform
         - fit_transform
@@ -24,3 +25,8 @@ Methods that delegate to a selected estimator are available only when `refit=Tru
 ## One component result
 
 ::: pipls.PiPLSComponentResult
+
+
+## Predictor-rank profile
+
+::: pipls.PiPLSPredictorRankProfile

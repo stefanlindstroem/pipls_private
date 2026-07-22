@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, cross_val_predict
 
@@ -52,18 +51,6 @@ path = path_search.component_path_
 selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 # --8<-- [end:select-pulp-parameters]
 
-# Extract the evaluated predictor-rank profile for the chosen component count.
-cv_results = path_search.cv_results_
-rank_rows = np.asarray(cv_results["n_components"]) == selected.n_components
-rank_order = np.argsort(np.asarray(cv_results["predictor_rank"])[rank_rows])
-predictor_ranks = np.asarray(cv_results["predictor_rank"])[rank_rows][rank_order]
-rank_cv_mse_mean = np.asarray(cv_results["mean_response_standardized_mse"])[rank_rows][
-    rank_order
-]
-rank_cv_mse_fold_sd = np.asarray(cv_results["std_response_standardized_mse"])[rank_rows][
-    rank_order
-]
-
 # --8<-- [start:plot-pulp-component-path]
 figure, axis = plt.subplots(
     figsize=(7.4, 4.8),
@@ -94,31 +81,35 @@ figure.savefig(ANALYSIS_DIR / "component_path.pdf")
 plt.close(figure)
 # --8<-- [end:plot-pulp-component-path]
 
+# --8<-- [start:extract-pulp-rank-profile]
+# Retrieve every predictor rank evaluated at the chosen component count.
+rank_profile = path_search.predictor_rank_profile(selected.n_components)
+# --8<-- [end:extract-pulp-rank-profile]
+
 # Plot the conditional predictor-rank profile at the chosen component count.
 figure, axis = plt.subplots(
     figsize=(7.4, 4.8),
     layout="constrained",
 )
 axis.errorbar(
-    predictor_ranks,
-    rank_cv_mse_mean,
-    yerr=rank_cv_mse_fold_sd,
+    rank_profile.predictor_rank,
+    rank_profile.cv_mse_mean,
+    yerr=rank_profile.cv_mse_fold_sd,
     fmt="o-",
     capsize=4,
 )
-selected_rank_row = int(np.flatnonzero(predictor_ranks == selected.predictor_rank)[0])
 axis.scatter(
-    [selected.predictor_rank],
-    [rank_cv_mse_mean[selected_rank_row]],
+    [rank_profile.selected.predictor_rank],
+    [rank_profile.selected.cv_mse_mean],
     marker="D",
     s=70,
-    label=f"CV-MSE minimum: rank {selected.predictor_rank}",
+    label=f"CV-MSE minimum: rank {rank_profile.selected.predictor_rank}",
     zorder=3,
 )
 axis.set_xlabel("Predictor rank")
 axis.set_ylabel("Response-standardized CV-MSE")
 axis.set_title(f"Pulp predictor-rank profile at {selected.n_components} components")
-axis.set_xticks(predictor_ranks)
+axis.set_xticks(rank_profile.predictor_rank)
 axis.grid(axis="y", alpha=0.25)
 axis.legend()
 figure.savefig(ANALYSIS_DIR / "predictor_rank_profile.pdf")
@@ -312,7 +303,8 @@ print(
 )
 print(
     "Predictor-rank profile: "
-    f"evaluated {predictor_ranks[0]} to {predictor_ranks[-1]}; "
+    f"evaluated {rank_profile.predictor_rank[0]} to "
+    f"{rank_profile.predictor_rank[-1]}; "
     f"selected rank {selected.predictor_rank}"
 )
 print(f"Wrote PDF figures to {ANALYSIS_DIR}")

@@ -497,6 +497,9 @@ Pulp, and Tobacco direct and remove their analytical CSV/report machinery. Decis
 Pi-PLS/PLS comparison direct, replaces its DataFrame result with immutable arrays, and removes the
 CSV plotting helper. Decision 0071 removes duplicate matrix-path aliases, makes `cv_results_` the
 sole detailed candidate surface, and enforces the direct in-memory example policy structurally.
+Decision 0072 adds a derived immutable one-component predictor-rank profile so ordinary inspection
+does not require manual `cv_results_` masking while preserving that dictionary as the source of
+truth.
 
 ### Product documentation and release hardening
 

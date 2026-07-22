@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `PiPLSPathCV.predictor_rank_profile()` and the immutable `PiPLSPredictorRankProfile` result, replacing manual `cv_results_` masking and sorting in the Pulp example and tutorial renderer.
+
 - Clarify that each component-path predictor rank is selected by minimizing mean CV-MSE conditional
   on the component count, label the Pulp rank-profile minimum explicitly, and remove redundant
   component legend titles from the Pulp example and tutorial figures.

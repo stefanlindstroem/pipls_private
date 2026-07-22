@@ -103,9 +103,9 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 5. The script creates and saves the five final figures itself.
 
 Pulp is the canonical tutorial workflow. Example 10 performs the same direct analysis shown in
-the tutorial: it uses `component_path_`, inspects the rank profile at the chosen component count,
-fits one explicit `PiPLSRegression`, calculates OOF predictions with `cross_val_predict()`, and
-passes immutable inspection objects to public plotters. Tobacco follows the same direct pattern
+the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
+`predictor_rank_profile()`, fits one explicit `PiPLSRegression`, calculates OOF predictions with
+`cross_val_predict()`, and passes immutable inspection objects to public plotters. Tobacco follows the same direct pattern
 and owns its full-SVD configuration, response pagination, and multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual

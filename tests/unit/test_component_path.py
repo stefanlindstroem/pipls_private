@@ -6,7 +6,11 @@ from dataclasses import FrozenInstanceError
 import numpy as np
 import pytest
 
-from pipls import PiPLSComponentPath, PiPLSComponentResult
+from pipls import (
+    PiPLSComponentPath,
+    PiPLSComponentResult,
+    PiPLSPredictorRankProfile,
+)
 
 
 def _component_path() -> PiPLSComponentPath:
@@ -136,3 +140,114 @@ def test_component_path_is_pickleable_with_read_only_arrays() -> None:
     np.testing.assert_array_equal(restored.n_components, np.array([1, 2, 4]))
     assert not restored.n_components.flags.writeable
     assert restored.for_n_components(4).predictor_rank == 5
+
+
+def _predictor_rank_profile() -> PiPLSPredictorRankProfile:
+    selected = PiPLSComponentResult(
+        n_components=2,
+        predictor_rank=4,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.4,
+        cv_mse_mean=0.4,
+        cv_mse_fold_sd=0.08,
+        n_splits=5,
+    )
+    return PiPLSPredictorRankProfile(
+        n_components=2,
+        predictor_rank=np.array([2, 3, 4], dtype=np.int64),
+        mean_test_score=np.array([-0.6, -0.5, -0.4], dtype=np.float32),
+        cv_mse_mean=np.array([0.6, 0.5, 0.4], dtype=np.float32),
+        cv_mse_fold_sd=np.array([0.10, 0.09, 0.08], dtype=np.float32),
+        n_splits=5,
+        selected=selected,
+    )
+
+
+def test_predictor_rank_profile_makes_read_only_defensive_copies() -> None:
+    predictor_rank = np.array([2, 3], dtype=np.int64)
+    mean_test_score = np.array([-0.6, -0.4], dtype=np.float32)
+    cv_mse_mean = np.array([0.6, 0.4], dtype=np.float32)
+    cv_mse_fold_sd = np.array([0.2, 0.1], dtype=np.float32)
+    selected = PiPLSComponentResult(
+        n_components=2,
+        predictor_rank=3,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.4,
+        cv_mse_mean=0.4,
+        cv_mse_fold_sd=0.1,
+        n_splits=4,
+    )
+
+    profile = PiPLSPredictorRankProfile(
+        n_components=np.int64(2),
+        predictor_rank=predictor_rank,
+        mean_test_score=mean_test_score,
+        cv_mse_mean=cv_mse_mean,
+        cv_mse_fold_sd=cv_mse_fold_sd,
+        n_splits=np.int64(4),
+        selected=selected,
+    )
+    predictor_rank[0] = 99
+    mean_test_score[0] = 99.0
+    cv_mse_mean[0] = 99.0
+    cv_mse_fold_sd[0] = 99.0
+
+    arrays = (
+        profile.predictor_rank,
+        profile.mean_test_score,
+        profile.cv_mse_mean,
+        profile.cv_mse_fold_sd,
+    )
+    assert all(array.shape == (2,) for array in arrays)
+    assert all(not array.flags.writeable for array in arrays)
+    assert profile.n_components == 2
+    assert type(profile.n_components) is int
+    assert profile.n_splits == 4
+    assert type(profile.n_splits) is int
+    np.testing.assert_array_equal(profile.predictor_rank, np.array([2, 3]))
+    np.testing.assert_allclose(profile.cv_mse_mean, np.array([0.6, 0.4]))
+
+    with pytest.raises(ValueError, match="read-only"):
+        profile.cv_mse_mean[0] = 0.0
+    with pytest.raises(FrozenInstanceError):
+        profile.n_components = 3  # type: ignore[misc]
+
+
+def test_predictor_rank_profile_validates_alignment_and_selected_row() -> None:
+    profile = _predictor_rank_profile()
+    kwargs = {
+        "n_components": profile.n_components,
+        "predictor_rank": profile.predictor_rank,
+        "mean_test_score": profile.mean_test_score,
+        "cv_mse_mean": profile.cv_mse_mean,
+        "cv_mse_fold_sd": profile.cv_mse_fold_sd,
+        "n_splits": profile.n_splits,
+        "selected": profile.selected,
+    }
+
+    with pytest.raises(ValueError, match="same length"):
+        PiPLSPredictorRankProfile(**{**kwargs, "cv_mse_mean": [0.6, 0.5]})
+    with pytest.raises(ValueError, match="strictly ascending"):
+        PiPLSPredictorRankProfile(**{**kwargs, "predictor_rank": [2, 4, 3]})
+    with pytest.raises(ValueError, match="must match n_components"):
+        PiPLSPredictorRankProfile(**{**kwargs, "n_components": 1})
+    inconsistent = PiPLSComponentResult(
+        n_components=2,
+        predictor_rank=4,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.3,
+        cv_mse_mean=0.4,
+        cv_mse_fold_sd=0.08,
+        n_splits=5,
+    )
+    with pytest.raises(ValueError, match="score values must match"):
+        PiPLSPredictorRankProfile(**{**kwargs, "selected": inconsistent})
+
+
+def test_predictor_rank_profile_is_pickleable_with_read_only_arrays() -> None:
+    restored = pickle.loads(pickle.dumps(_predictor_rank_profile()))
+
+    assert isinstance(restored, PiPLSPredictorRankProfile)
+    np.testing.assert_array_equal(restored.predictor_rank, np.array([2, 3, 4]))
+    assert not restored.predictor_rank.flags.writeable
+    assert restored.selected.predictor_rank == 4

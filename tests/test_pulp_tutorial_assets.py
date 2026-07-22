@@ -219,11 +219,31 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
 
     selected_line = "selected = path.for_n_components(CHOSEN_N_COMPONENTS)"
     component_plot = '# --8<-- [start:plot-pulp-component-path]'
+    profile_line = "rank_profile = path_search.predictor_rank_profile("
     model_fit = "model = PiPLSRegression("
-    assert example.index(selected_line) < example.index(component_plot) < example.index(model_fit)
+    assert (
+        example.index(selected_line)
+        < example.index(component_plot)
+        < example.index(profile_line)
+        < example.index(model_fit)
+    )
     renderer_selected = renderer.index("selected = component_path.for_n_components(")
     renderer_plot = renderer.index("    _render_component_path(", renderer_selected)
-    assert renderer_selected < renderer_plot < renderer.index("model = PiPLSRegression(")
+    renderer_profile = renderer.index(
+        "rank_profile = path_search.predictor_rank_profile(",
+        renderer_plot,
+    )
+    renderer_rank_plot = renderer.index(
+        "    _render_predictor_rank_profile(",
+        renderer_profile,
+    )
+    assert (
+        renderer_selected
+        < renderer_plot
+        < renderer_profile
+        < renderer_rank_plot
+        < renderer.index("model = PiPLSRegression(")
+    )
 
     for source in (tutorial, example, renderer):
         assert "Number of response components" not in source
@@ -237,6 +257,10 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     assert "rank 10 gives the lowest evaluated mean CV-MSE" in tutorial
     assert "CV-MSE minimum: rank" in example
     assert "CV-MSE minimum: rank" in renderer
+    assert "path_search.predictor_rank_profile(selected.n_components)" in example
+    assert "path_search.predictor_rank_profile(selected.n_components)" in renderer
+    assert 'cv_results["predictor_rank"]' not in example
+    assert 'cv_results["predictor_rank"]' not in renderer
     assert 'legend(title="Component")' not in example
     assert 'legend(title="Component")' not in renderer
 

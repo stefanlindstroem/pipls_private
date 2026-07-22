@@ -51,7 +51,10 @@ the question-specific script, deterministic generation, finite metrics, metric d
 minimal CSV header, and repeatability of scientific values. Component-path API tests may verify one
 ordered result per requested component count, aligned read-only arrays with stable dtypes, a numeric
 predictor rank and explicit policy for every count, scalar lookup, pickling, and agreement with
-conditional rows in `cv_results_`. Plot and standard-PLS helper tests should use small
+conditional rows in `cv_results_`. Predictor-rank-profile tests should verify evaluated-only
+ascending ranks, aligned defensive read-only arrays, scorer-general selection, invalid lookup,
+pickling, and consistency with both `cv_results_` and `component_path_`. Plot and standard-PLS
+helper tests should use small
 synthetic inputs and verify immutable result arrays and final PDF rendering without freezing visual
 pixel output.
 
