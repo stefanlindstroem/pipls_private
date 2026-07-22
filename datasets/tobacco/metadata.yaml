@@ -81,16 +81,19 @@ source:
       Chemical Composition Prediction and Origin Identification of Tobacco Leaves. Mendeley Data,
       Version 1.
     doi: 10.17632/9z7dgdtggk.1
+    url: https://doi.org/10.17632/9z7dgdtggk.1
     repository: Mendeley Data
     public_assets:
       predictors: Raw-nir-spectra-data workbook
       responses: 13-Chemical-Components-data workbook
   related_publication:
     citation: >-
-      Chen, H., Guo, J., Wang, H., and Zhao, L. (2026). A dataset for geographical origin
-      identification of tobacco leaves from multiple countries using near-infrared spectroscopy
-      and chemometric analysis. Data in Brief, 60, 112418.
+      Chen, H., Guo, J., Li, B., Wan, R., Wang, C., Su, M., Wang, X., Liu, R., Wang, S., Liu, K.,
+      Chen, L., Yang, S., Xie, F., Nie, C., Zhao, L., Wang, H., and Liu, Z. (2026). A dataset for
+      geographical origin identification of tobacco leaves from multiple countries using
+      near-infrared spectroscopy and chemometric analysis. Data in Brief, 64, 112418.
     doi: 10.1016/j.dib.2025.112418
+    url: https://doi.org/10.1016/j.dib.2025.112418
   access_note: >-
     The Mendeley Data DOI resolves to the public workbooks. The committed X.csv and Y.csv files are
     the complete analysis-facing regression matrices described below.

@@ -125,7 +125,17 @@ of the runtime API.
 ## Pulp real-data integration
 
 `datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses adapted
-from the public supplementary material identified by DOI `10.1016/j.compchemeng.2025.109143`.
+from the supplementary material for the following article:
+
+> Lindström, S. B., Ferritsius, R., Carlson, J. E., Persson, J., and Nilsson, F. (2025).
+> Predicting handsheet properties and enhancing refiner control using fiber analyzer data and
+> latent variable modeling. *Computers & Chemical Engineering*, **199**, 109143.
+> [doi:10.1016/j.compchemeng.2025.109143](https://doi.org/10.1016/j.compchemeng.2025.109143).
+
+The article identifies the refiner controls, internal state variables, pulp descriptions, and
+handsheet properties as supplementary data. The repository selects the documented fiber-property
+and response columns from that public supplementary table.
+
 `examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly with pandas and then relies on
 ordinary estimator validation when fitting `PiPLSPathCV` with its adaptive defaults. It does not
 repeat repository-table validation, set a predictor-rank ceiling, parse `metadata.yaml`, or call a
@@ -135,31 +145,56 @@ package loader.
 
 `datasets/sugarcane/` contains 57 samples, 1,721 LabSpec absorbance predictors spanning 780
 through 2500 nm, and four responses: total sugar, crude protein, acid detergent fiber, and in vitro
-organic matter digestibility. The public source is Mendeley Data DOI `10.17632/mjttsjfj2s.1`,
-licensed CC BY 4.0.
+organic matter digestibility. The original public dataset is:
 
-The repository adaptation matches the public LabSpec and response tables by `Sample`, removes three
-rows whose total-sugar response is missing, and applies no imputation or spectral preprocessing.
-`examples/11_sugarcane_real_data.py` reads `X.csv` and `Y.csv` directly, evaluates
-`PiPLSPathCV(refit=False)`, plots `component_path_` in memory, and fits a separate fixed model after
-a visible user component choice. It calculates selection-conditioned OOF predictions with
-scikit-learn and writes five final PDF figures directly from immutable inspection results. The
-compact spectral-axis description in `metadata.yaml` avoids repeating 1,721 equivalent
-per-wavelength descriptions while still defining every predictor column exactly.
+> Chaix, G., Bendoula, R., and Zgouz, A. (2021). Data set of Visible-Near Infrared handled and
+> micro-spectrometers -- comparison of their accuracy for predicting some sugarcane properties.
+> *Mendeley Data*, Version 1.
+> [doi:10.17632/mjttsjfj2s.1](https://doi.org/10.17632/mjttsjfj2s.1).
+
+The accompanying data paper is:
+
+> Zgouz, A., Héran, D., Barthès, B., Bastianelli, D., Bonnal, L., Baeten, V., Lurol, S.,
+> Bonin, M., Roger, J.-M., Bendoula, R., and Chaix, G. (2020). Dataset of visible-near infrared
+> handheld and micro-spectrometers -- comparison of the prediction accuracy of sugarcane
+> properties. *Data in Brief*, **31**, 106013.
+> [doi:10.1016/j.dib.2020.106013](https://doi.org/10.1016/j.dib.2020.106013).
+
+The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches the public
+LabSpec and response tables by `Sample`, removes three rows whose total-sugar response is missing,
+and applies no imputation or spectral preprocessing. `examples/11_sugarcane_real_data.py` reads
+`X.csv` and `Y.csv` directly, evaluates `PiPLSPathCV(refit=False)`, plots `component_path_` in
+memory, and fits a separate fixed model after a visible user component choice. It calculates
+selection-conditioned OOF predictions with scikit-learn and writes five final PDF figures directly
+from immutable inspection results. The compact spectral-axis description in `metadata.yaml` avoids
+repeating 1,721 equivalent per-wavelength descriptions while still defining every predictor column
+exactly.
 
 ## Tobacco spectral integration
 
 `datasets/tobacco/` contains 347 samples, 1,557 raw FT-NIR absorbance predictors spanning
-approximately 10,001 through 4,000 `cm^-1`, and 13 chemical-component responses. The public source
-is Mendeley Data DOI `10.17632/9z7dgdtggk.1`, licensed CC BY 4.0.
+approximately 10,001 through 4,000 `cm^-1`, and 13 chemical-component responses. The original
+public dataset is:
 
-The repository adaptation matches the public spectra and chemistry tables one-to-one by sample ID,
-orders rows by that identifier, and excludes only source metadata columns from the model matrices.
-All samples and chemical responses are retained. No imputation, smoothing, derivatives, scatter
-correction, centering, scaling, or other spectral preprocessing is applied.
-`examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly, evaluates a Pi-PLS
-component path with adaptive predictor-rank scanning and full predictor SVD, plots that path in
-memory, and then fits a separately chosen fixed Pi-PLS model. It preserves the decreasing
-wavenumber coordinate, calculates selection-conditioned OOF predictions and raw observation
-diagnostics, and writes five final PDFs. Prediction diagnostics and coefficients are paginated in
-source response order. The separate ordinary-PLS comparison remains in example 09.
+> Chen, H., Guo, J., Wang, H., and Zhao, L. (2025). A Near-Infrared Spectroscopy Dataset for
+> Chemical Composition Prediction and Origin Identification of Tobacco Leaves. *Mendeley Data*,
+> Version 1. [doi:10.17632/9z7dgdtggk.1](https://doi.org/10.17632/9z7dgdtggk.1).
+
+The related data paper is:
+
+> Chen, H., Guo, J., Li, B., Wan, R., Wang, C., Su, M., Wang, X., Liu, R., Wang, S., Liu, K.,
+> Chen, L., Yang, S., Xie, F., Nie, C., Zhao, L., Wang, H., and Liu, Z. (2026). A dataset for
+> geographical origin identification of tobacco leaves from multiple countries using near-infrared
+> spectroscopy and chemometric analysis. *Data in Brief*, **64**, 112418.
+> [doi:10.1016/j.dib.2025.112418](https://doi.org/10.1016/j.dib.2025.112418).
+
+The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches the public spectra
+and chemistry tables one-to-one by sample ID, orders rows by that identifier, and excludes only
+source metadata columns from the model matrices. All samples and chemical responses are retained.
+No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
+preprocessing is applied. `examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly,
+evaluates a Pi-PLS component path with adaptive predictor-rank scanning and full predictor SVD,
+plots that path in memory, and then fits a separately chosen fixed Pi-PLS model. It preserves the
+decreasing wavenumber coordinate, calculates selection-conditioned OOF predictions and raw
+observation diagnostics, and writes five final PDFs. Prediction diagnostics and coefficients are
+paginated in source response order. The separate ordinary-PLS comparison remains in example 09.

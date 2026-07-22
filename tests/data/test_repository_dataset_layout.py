@@ -56,3 +56,38 @@ def test_all_repository_dataset_files_have_supported_formats() -> None:
         Y = _assert_numeric_csv_format(data_dir / "Y.csv")
         _load_metadata(data_dir / "metadata.yaml")
         assert len(X) == len(Y)
+
+
+def _collect_named_strings(value: object, name: str) -> set[str]:
+    if isinstance(value, dict):
+        collected: set[str] = set()
+        for key, child in value.items():
+            if key == name and isinstance(child, str) and child.strip():
+                collected.add(child.strip())
+            collected.update(_collect_named_strings(child, name))
+        return collected
+    if isinstance(value, list):
+        collected: set[str] = set()
+        for child in value:
+            collected.update(_collect_named_strings(child, name))
+        return collected
+    return set()
+
+
+def test_public_dataset_guide_links_metadata_source_dois() -> None:
+    root = Path(__file__).resolve().parents[2]
+    guide = (root / "docs" / "datasets.md").read_text(encoding="utf-8")
+
+    for data_dir in _dataset_directories():
+        metadata = _load_metadata(data_dir / "metadata.yaml")
+        source = metadata.get("source")
+        assert isinstance(source, dict), data_dir
+
+        dois = _collect_named_strings(source, "doi")
+        urls = _collect_named_strings(source, "url")
+        assert dois, data_dir
+
+        for doi in dois:
+            url = f"https://doi.org/{doi}"
+            assert url in urls, (data_dir, doi)
+            assert f"]({url})" in guide, (data_dir, doi)

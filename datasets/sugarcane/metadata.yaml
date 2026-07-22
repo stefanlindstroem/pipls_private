@@ -61,6 +61,7 @@ source:
       micro-spectrometers - comparison of their accuracy for predicting some sugarcane properties.
       Mendeley Data, Version 1.
     doi: 10.17632/mjttsjfj2s.1
+    url: https://doi.org/10.17632/mjttsjfj2s.1
     repository: Mendeley Data
     public_files:
       predictors: LabSpec.csv
@@ -72,6 +73,7 @@ source:
       infrared handheld and micro-spectrometers - comparison of the prediction accuracy of
       sugarcane properties. Data in Brief, 31, 106013.
     doi: 10.1016/j.dib.2020.106013
+    url: https://doi.org/10.1016/j.dib.2020.106013
   access_note: >-
     The Mendeley Data DOI resolves to the public raw CSV collection. The committed X.csv and Y.csv
     are the analysis-facing LabSpec subset described below.

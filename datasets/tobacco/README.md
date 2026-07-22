@@ -14,10 +14,15 @@ components from raw Fourier-transform near-infrared spectra of 347 tobacco leaf 
 
 ## Public source
 
-The source is the Mendeley Data collection *A Near-Infrared Spectroscopy Dataset for Chemical
-Composition Prediction and Origin Identification of Tobacco Leaves*, Version 1,
-DOI `10.17632/9z7dgdtggk.1`. The related Data in Brief article is identified by
-DOI `10.1016/j.dib.2025.112418`.
+The original source is Chen, Guo, Wang, and Zhao (2025), *A Near-Infrared Spectroscopy
+Dataset for Chemical Composition Prediction and Origin Identification of Tobacco Leaves*,
+*Mendeley Data*, Version 1,
+[doi:10.17632/9z7dgdtggk.1](https://doi.org/10.17632/9z7dgdtggk.1).
+
+The related article is Chen et al. (2026), *A dataset for geographical origin identification of
+tobacco leaves from multiple countries using near-infrared spectroscopy and chemometric
+analysis*, *Data in Brief*, **64**, 112418,
+[doi:10.1016/j.dib.2025.112418](https://doi.org/10.1016/j.dib.2025.112418).
 
 The public collection provides one workbook containing spectra and sample metadata and one
 workbook containing the 13 quantitative chemical reference values. The source collection is

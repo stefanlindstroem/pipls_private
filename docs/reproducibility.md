@@ -111,6 +111,9 @@ public provenance and redistribution terms. Current integrations are:
 - sugarcane LabSpec spectroscopy;
 - tobacco FT-NIR spectroscopy.
 
+The [dataset documentation](datasets.md) gives the original-source citation and resolvable DOI link
+for every integration, together with related data papers where applicable.
+
 Examples read `X.csv` and `Y.csv` directly. Example 09 operates on immutable Pi-PLS and ordinary-PLS
 paths in memory. Pulp, Sugarcane, and Tobacco operate on `component_path_`, scikit-learn OOF
 predictions, and immutable inspection results in memory. Every numbered real-data workflow writes only

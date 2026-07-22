@@ -16,8 +16,16 @@ Private development paths and preparation-only scripts are not part of dataset i
 
 ## Included datasets
 
-- `pulp/`: CC BY 4.0 thermomechanical-pulp fiber-property and handsheet dataset.
-- `sugarcane/`: CC BY 4.0 LabSpec absorbance spectra with four sugarcane quality responses.
-- `tobacco/`: CC BY 4.0 raw FT-NIR spectra with 13 tobacco chemical responses.
+- `pulp/`: CC BY 4.0 thermomechanical-pulp fiber-property and handsheet dataset adapted from
+  supplementary material for
+  [Lindström et al. (2025)](https://doi.org/10.1016/j.compchemeng.2025.109143).
+- `sugarcane/`: CC BY 4.0 LabSpec absorbance spectra with four sugarcane quality responses from
+  [Chaix, Bendoula, and Zgouz (2021)](https://doi.org/10.17632/mjttsjfj2s.1); see also the
+  [related data paper](https://doi.org/10.1016/j.dib.2020.106013).
+- `tobacco/`: CC BY 4.0 raw FT-NIR spectra with 13 tobacco chemical responses from
+  [Chen, Guo, Wang, and Zhao (2025)](https://doi.org/10.17632/9z7dgdtggk.1); see also the
+  [related data paper](https://doi.org/10.1016/j.dib.2025.112418).
 
-Each example reads `X.csv` and `Y.csv` directly. `metadata.yaml` documents the repository asset but is not a runtime model input.
+Each example reads `X.csv` and `Y.csv` directly. `metadata.yaml` documents the repository asset but
+is not a runtime model input. Full source citations and preparation details are given in the
+individual dataset README and metadata files.

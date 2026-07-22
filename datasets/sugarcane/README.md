@@ -1,7 +1,15 @@
 # Sugarcane LabSpec regression data
 
-This directory contains analysis-facing matrices derived from the public sugarcane spectroscopy
-collection at Mendeley Data DOI `10.17632/mjttsjfj2s.1`.
+This directory contains analysis-facing matrices derived from the following public sugarcane
+spectroscopy collection:
+
+> Chaix, G., Bendoula, R., and Zgouz, A. (2021). Data set of Visible-Near Infrared handled and
+> micro-spectrometers -- comparison of their accuracy for predicting some sugarcane properties.
+> *Mendeley Data*, Version 1.
+> [doi:10.17632/mjttsjfj2s.1](https://doi.org/10.17632/mjttsjfj2s.1).
+
+The related data paper is Zgouz et al. (2020),
+[doi:10.1016/j.dib.2020.106013](https://doi.org/10.1016/j.dib.2020.106013).
 
 - `X.csv` contains LabSpec absorbance values at integer wavelengths from 780 through 2500 nm.
 - `Y.csv` contains total sugar (`TS`), crude protein (`CP`), acid detergent fiber (`ADF`), and in

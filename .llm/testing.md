@@ -37,7 +37,9 @@ Tests must not assert current prose fragments or individual documentary field va
 
 The repository may still document required metadata sections in `.llm/dataset_layout.md`. Review
 and schema evolution govern that documentary contract; ordinary tests check that each metadata
-file exists and parses as a non-empty YAML mapping rather than pinning its contents.
+file exists and parses as a non-empty YAML mapping rather than pinning its contents. A generic
+consistency test may collect DOI values from each metadata source block and require matching
+resolvable links in the served dataset guide; it must not hard-code the current DOI values.
 
 ## Dataset boundary
 

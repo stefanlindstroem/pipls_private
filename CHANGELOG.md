@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add full original-source references and resolvable DOI links for every documented real dataset,
+  correct the Tobacco related-publication citation, and keep the public dataset guide synchronized
+  generically with DOI values recorded in each `metadata.yaml`.
+
 - Consolidate the user documentation around the Pulp tutorial: add common estimator variations to
   the tutorial, move exact preprocessing, solver, fit-state, and result contracts beside the
   generated API, retain only advanced path and validation references, flatten the site navigation,

@@ -64,7 +64,7 @@ Everything committed with a repository dataset is potentially visible to program
 Dataset metadata, README files, examples, licenses, and decision records therefore use only:
 
 - publicly accessible publications, repositories, archives, or included raw files;
-- public citations, DOI values, URLs, and license statements;
+- public citations, DOI values, resolvable DOI URLs, and license statements;
 - analysis-facing transformations that a user can understand from the committed materials.
 
 Do not publish personal delivery details, private archive names, inaccessible local paths,
@@ -96,6 +96,8 @@ Every committed real dataset follows `.llm/dataset_layout.md`:
 - human-readable descriptions and license files may accompany the standard files.
 
 Repository metadata standardizes scientific assets; it does not create a public registry or loader.
+The served dataset guide reproduces each original-source citation and DOI link so provenance is
+available without opening the documentary YAML file.
 
 ## Public reconstruction exception
 

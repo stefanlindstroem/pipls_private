@@ -353,7 +353,8 @@ print(model.score(test.X, test.Y))
 
 The repository includes transparent examples for pulp, sugarcane, and tobacco. Each example
 reads comma-delimited `X.csv` and `Y.csv` files directly with pandas and shows all analysis-facing
-matrix construction in ordinary user code.
+matrix construction in ordinary user code. Full original-source citations and DOI links are listed
+in the [dataset documentation](docs/datasets.md).
 
 ```python
 import pandas as pd

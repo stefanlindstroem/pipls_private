@@ -45,7 +45,8 @@ use `schema_version: 1` and contain these top-level fields:
 - `responses`: ordered names and non-empty descriptions;
 - `sample_alignment`: row-alignment method and explanation;
 - `missing_values`: declared policy for predictors and responses;
-- `source`: public publication, repository, archive, or included-raw-data references;
+- `source`: public publication, repository, archive, or included-raw-data references, including
+  DOI values and resolvable DOI URLs when available;
 - `license`: identifier, local license file when applicable, and redistribution status;
 - `preparation`: transparent analysis-facing transformations from public source material to the
   committed model tables;
@@ -80,8 +81,10 @@ Do not include:
 - references to internal preparation scripts.
 
 When committed `X.csv` and `Y.csv` are adapted from public supplementary material, cite that public
-material and describe the named selections or transformations directly. Development-only lineage
-must not leak into repository metadata.
+material and describe the named selections or transformations directly. The served dataset
+documentation must reproduce the original-source citation and provide a resolvable DOI link for
+each integration; related publications are identified separately and must not replace the original
+data source. Development-only lineage must not leak into repository metadata.
 
 ## Reconstruction and preprocessing code
 

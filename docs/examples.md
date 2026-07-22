@@ -25,7 +25,9 @@ This comparison is optional and is not part of routine Pi-PLS fitting.
 
 ## Complete real-data analyses
 
-The three complete analyses evaluate one Pi-PLS component path and fit one selected fixed model:
+The [dataset documentation](datasets.md) gives the original source, DOI, license, and repository
+adaptation for each real-data integration. The three complete analyses evaluate one Pi-PLS
+component path and fit one selected fixed model:
 
 - `examples/10_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
   responses, including the component path, an immutable conditional predictor-rank profile from
