@@ -42,7 +42,6 @@ from pipls.inspection import (  # noqa: E402
 )
 from pipls.plotting import (  # noqa: E402
     plot_biplot,
-    plot_coefficients,
     plot_observed_vs_predicted,
     plot_pipls_dilation,
     plot_pipls_predictor_directions,
@@ -72,7 +71,6 @@ FIGURE_FILENAMES = (
     "dilation.svg",
     "response_directions.svg",
     "weighted_response_directions.svg",
-    "coefficients.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
@@ -323,20 +321,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.legend()
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "weighted_response_directions.svg")
-
-    figure, axis = _figure(figsize=(10.0, 5.4))
-    plot_coefficients(
-        structure,
-        predictor_style="bar",
-        predictor_names=predictor_names,
-        response_names=response_names,
-        responses=detailed_response_indices,
-        title="Pulp regression coefficients",
-        ax=axis,
-    )
-    axis.legend(title="Response")
-    _rotate_category_labels(axis)
-    _save_svg(figure, output_dir / "coefficients.svg")
 
     figure, axis = _figure(figsize=(6.4, 5.0))
     plot_observed_vs_predicted(

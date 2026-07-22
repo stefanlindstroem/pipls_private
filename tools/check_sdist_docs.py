@@ -24,7 +24,6 @@ PULP_TUTORIAL_FIGURES = (
     "dilation.svg",
     "response_directions.svg",
     "weighted_response_directions.svg",
-    "coefficients.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",

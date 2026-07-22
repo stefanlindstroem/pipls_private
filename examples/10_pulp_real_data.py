@@ -86,6 +86,7 @@ plt.close(figure)
 rank_profile = path_search.predictor_rank_profile(selected.n_components)
 # --8<-- [end:extract-pulp-rank-profile]
 
+# --8<-- [start:plot-pulp-rank-profile]
 # Plot the conditional predictor-rank profile at the chosen component count.
 figure, axis = plt.subplots(
     figsize=(7.4, 4.8),
@@ -114,6 +115,7 @@ axis.grid(axis="y", alpha=0.25)
 axis.legend()
 figure.savefig(ANALYSIS_DIR / "predictor_rank_profile.pdf")
 plt.close(figure)
+# --8<-- [end:plot-pulp-rank-profile]
 
 # Fit the selected fixed model only after inspecting the selection figures.
 # --8<-- [start:fit-pulp-model]

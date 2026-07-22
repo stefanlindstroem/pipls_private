@@ -28,7 +28,6 @@ FIGURE_FILENAMES = (
     "dilation.svg",
     "response_directions.svg",
     "weighted_response_directions.svg",
-    "coefficients.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
@@ -182,6 +181,8 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
         "pulp-oof-predictions",
         "pulp-inspection-results",
         "plot-pulp-component-path",
+        "extract-pulp-rank-profile",
+        "plot-pulp-rank-profile",
     }
     for section in snippet_sections:
         assert f"examples/10_pulp_real_data.py:{section}" in tutorial
@@ -200,7 +201,6 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
         "plot_pipls_dilation",
         "plot_pipls_response_directions",
         "plot_pipls_weighted_response_directions",
-        "plot_coefficients",
         "plot_observed_vs_predicted",
         "plot_residuals_vs_predicted",
         "plot_standardized_rmse",
@@ -259,10 +259,24 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     assert "CV-MSE minimum: rank" in renderer
     assert "path_search.predictor_rank_profile(selected.n_components)" in example
     assert "path_search.predictor_rank_profile(selected.n_components)" in renderer
+    assert "examples/10_pulp_real_data.py:plot-pulp-rank-profile" in tutorial
     assert 'cv_results["predictor_rank"]' not in example
     assert 'cv_results["predictor_rank"]' not in renderer
     assert 'legend(title="Component")' not in example
     assert 'legend(title="Component")' not in renderer
+
+    standard_structure = "### Standard PLS-family latent-structure plots"
+    pipls_specific = "### Pi-PLS-specific factorization plots"
+    standard_prediction = "### Standard PLS-family prediction plots"
+    assert (
+        tutorial.index(standard_structure)
+        < tutorial.index(pipls_specific)
+        < tutorial.index(standard_prediction)
+    )
+    assert "### Regression coefficients" not in tutorial
+    assert "coefficients.svg" not in tutorial
+    assert "plot_coefficients()" not in tutorial
+    assert "plot_coefficients" not in renderer
 
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
@@ -310,9 +324,15 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     for anchor in inspection_anchors:
         assert f"{{ #{anchor} }}" in inspection
 
-    tutorial_anchors = inspection_anchors - {"observation-diagnostics"}
+    tutorial_anchors = inspection_anchors - {
+        "observation-diagnostics",
+        "regression-coefficients",
+    }
     for anchor in tutorial_anchors:
         assert f"../model_inspection.md#{anchor}" in tutorial
+
+    assert "../model_inspection.md#regression-coefficients" not in tutorial
+    assert "pipls.plotting.plot_coefficients" in plotting_reference
 
     assert "examples/results/" not in inspection
     assert "post_analysis.pdf" not in inspection

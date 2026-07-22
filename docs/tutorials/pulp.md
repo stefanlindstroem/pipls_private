@@ -106,6 +106,12 @@ The returned arrays are sorted by predictor rank and are read-only. `rank_profil
 same conditional scalar result already stored in `selected`. Under a non-default scorer, the
 selected row maximizes the configured mean score; the CV-MSE arrays remain descriptive diagnostics.
 
+The conditional profile is plotted directly from those immutable arrays:
+
+```python
+--8<-- "examples/10_pulp_real_data.py:plot-pulp-rank-profile"
+```
+
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
 Rank 10 has the lowest mean loss within the evaluated range, but it is also the upper search
@@ -175,7 +181,12 @@ associated directions may change sign together without changing predictions. Int
 focus on relative patterns, paired quantities, predictions, and reconstruction rather than on an
 isolated sign.
 
-### Scores
+### Standard PLS-family latent-structure plots
+
+These plots use the estimator-neutral `LatentStructure` result and apply to compatible fitted
+PLS-family models, including both Pi-PLS and ordinary PLS.
+
+#### Scores
 
 ![Pulp X scores](../assets/generated/pulp/scores.svg)
 
@@ -188,7 +199,7 @@ See [Scores](../model_inspection.md#scores),
 [`latent_structure()`](../api/inspection.md#pipls.inspection.latent_structure), and
 [`plot_scores()`](../api/plotting.md#pipls.plotting.plot_scores).
 
-### Score-loading biplot
+#### Score-loading biplot
 
 ![Pulp score-loading biplot](../assets/generated/pulp/biplot.svg)
 
@@ -202,7 +213,7 @@ See [Score-loading biplot](../model_inspection.md#score-loading-biplot),
 [`biplot_coordinates()`](../api/inspection.md#pipls.inspection.biplot_coordinates), and
 [`plot_biplot()`](../api/plotting.md#pipls.plotting.plot_biplot).
 
-### X loadings
+#### X loadings
 
 ![Pulp X loadings](../assets/generated/pulp/x_loadings.svg)
 
@@ -215,7 +226,7 @@ measure predictive importance.
 See [X loadings](../model_inspection.md#x-loadings)
 and [`plot_x_loadings()`](../api/plotting.md#pipls.plotting.plot_x_loadings).
 
-### Y loadings
+#### Y loadings
 
 ![Pulp Y loadings](../assets/generated/pulp/y_loadings.svg)
 
@@ -227,7 +238,12 @@ rather than response values in their original units.
 See [Y loadings](../model_inspection.md#y-loadings)
 and [`plot_y_loadings()`](../api/plotting.md#pipls.plotting.plot_y_loadings).
 
-### Predictor directions $P$
+### Pi-PLS-specific factorization plots
+
+These plots use `PiPLSDisplayFactors` and expose quantities specific to the Pi-PLS factorization.
+They do not have direct counterparts in ordinary PLS.
+
+#### Predictor directions $P$
 
 ![Pulp predictor directions](../assets/generated/pulp/predictor_directions.svg)
 
@@ -239,7 +255,7 @@ See [Predictor directions](../model_inspection.md#predictor-directions),
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling), and
 [`plot_pipls_predictor_directions()`](../api/plotting.md#pipls.plotting.plot_pipls_predictor_directions).
 
-### Dilation $D$
+#### Dilation $D$
 
 ![Pulp dilation](../assets/generated/pulp/dilation.svg)
 
@@ -251,7 +267,7 @@ mode; its scientific effect must be read together with the corresponding columns
 See [Dilation](../model_inspection.md#dilation) and
 [`plot_pipls_dilation()`](../api/plotting.md#pipls.plotting.plot_pipls_dilation).
 
-### Response directions $Q$
+#### Response directions $Q$
 
 ![Pulp response directions](../assets/generated/pulp/response_directions.svg)
 
@@ -262,7 +278,7 @@ even when its corresponding dilation is modest.
 See [Response directions](../model_inspection.md#response-directions) and
 [`plot_pipls_response_directions()`](../api/plotting.md#pipls.plotting.plot_pipls_response_directions).
 
-### Weighted response directions $QD$
+#### Weighted response directions $QD$
 
 ![Pulp weighted response directions](../assets/generated/pulp/weighted_response_directions.svg)
 
@@ -273,22 +289,12 @@ map, while $Q$ remains the clearer view of direction alone.
 See [Weighted response directions](../model_inspection.md#weighted-response-directions) and
 [`plot_pipls_weighted_response_directions()`](../api/plotting.md#pipls.plotting.plot_pipls_weighted_response_directions).
 
-### Regression coefficients
+### Standard PLS-family prediction plots
 
-![Pulp regression coefficients](../assets/generated/pulp/coefficients.svg)
+These plots use `PredictionDiagnostics` and are standard prediction checks for a fitted PLS-family
+model. Here they retain the explicit selection-conditioned OOF provenance described above.
 
-The coefficient plot shows the fitted linear map in the original predictor and response units for
-`CSF`, `Density`, and `TI`. A coefficient gives the modeled response change associated with one
-predictor-unit change while the other predictors are held fixed in the linear model. Because the
-predictors and responses use different physical units, raw coefficient magnitudes should not be
-compared across variables as a universal importance ranking. Correlated predictors can also share
-or exchange coefficient weight.
-
-The response subset is only a display choice; all eight responses were fitted. See
-[Regression coefficients](../model_inspection.md#regression-coefficients) and
-[`plot_coefficients()`](../api/plotting.md#pipls.plotting.plot_coefficients).
-
-### Observed versus predicted
+#### Observed versus predicted
 
 ![Pulp observed versus predicted](../assets/generated/pulp/observed_vs_predicted.svg)
 
@@ -300,7 +306,7 @@ predictions into an independent test set.
 See [Observed versus predicted](../model_inspection.md#observed-versus-predicted) and
 [`plot_observed_vs_predicted()`](../api/plotting.md#pipls.plotting.plot_observed_vs_predicted).
 
-### Residuals versus predicted
+#### Residuals versus predicted
 
 ![Pulp residuals versus predicted](../assets/generated/pulp/residuals_vs_predicted.svg)
 
@@ -312,7 +318,7 @@ this plot alone.
 See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted) and
 [`plot_residuals_vs_predicted()`](../api/plotting.md#pipls.plotting.plot_residuals_vs_predicted).
 
-### Standardized RMSE
+#### Standardized RMSE
 
 ![Pulp standardized RMSE](../assets/generated/pulp/standardized_rmse.svg)
 
@@ -339,8 +345,10 @@ python examples/10_pulp_real_data.py
 ```
 
 The generated tutorial SVGs and the example PDFs serve different purposes. The tutorial uses one
-chart per SVG for explanation. The numbered example groups related charts into six caller-owned PDF
-figures: `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
+chart per SVG for explanation and omits the raw regression-coefficient chart because the predictors
+and responses use heterogeneous original units that make a single tutorial figure difficult to
+read. The numbered example still demonstrates that plotting API and groups related charts into six
+caller-owned PDF figures: `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
 `latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Both routes calculate
 from in-memory results and write no generated analytical CSV files.
 

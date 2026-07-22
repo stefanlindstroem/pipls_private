@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Complete the Pulp tutorial selection display by showing the conditional predictor-rank plotting
+  code, separate estimator-neutral PLS-family plots from Pi-PLS-specific factorization plots, and
+  omit the unreadable heterogeneous-unit regression-coefficient figure from the tutorial while
+  retaining the plotting API and numbered-example output.
+
 - Add `PiPLSPathCV.predictor_rank_profile()` and the immutable `PiPLSPredictorRankProfile` result, replacing manual `cv_results_` masking and sorting in the Pulp example and tutorial renderer.
 
 - Clarify that each component-path predictor rank is selected by minimizing mean CV-MSE conditional

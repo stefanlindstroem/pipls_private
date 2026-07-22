@@ -122,9 +122,13 @@ Do not place user analysis helpers under `scripts/`, which remains the repositor
 preparation area.
 
 The served Pulp tutorial is the primary pedagogical analysis. It extracts executable snippets from
-that workflow and presents each deterministic generated figure separately. Plot-specific sections
-link to the general inspection and plotting references rather than duplicating API contracts.
-Prediction figures must retain the selection-conditioned OOF provenance.
+that workflow, including the direct conditional predictor-rank plot, and presents each retained
+deterministic figure separately. Clear section headings distinguish estimator-neutral PLS-family
+latent-structure and prediction plots from Pi-PLS-specific factorization plots. The tutorial omits
+raw regression-coefficient visualization because heterogeneous original units make that single
+figure unsuitable for the walkthrough; the plotting API and numbered-example figure remain.
+Plot-specific sections link to the general inspection and plotting references rather than
+duplicating API contracts. Prediction figures must retain the selection-conditioned OOF provenance.
 
 Documentation ownership is fixed by Decision 0065. The tutorial owns the linear Pulp narrative and
 all generated Pulp figures. `model_inspection.md` owns general figure-by-figure interpretation with
