@@ -510,13 +510,14 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **tutorial-first documentation consolidated**. Decisions 0049--0065 establish the
+Current status: **two-tier tutorial route implemented**. Decisions 0049--0065 establish the
 self-contained documentation, generated reference, compatibility validation, atomic plotting, and
-canonical tutorial workflow. Decision 0074 removes the redundant quickstart, estimator, selection,
-and preprocessing guide pages: the tutorial owns normal use, generated API pages own exact estimator
-contracts, and the retained path and validation guides cover advanced behavior. Phase F4 has
-completed the owner-approved pre-release result and example simplification; release metadata is the
-next concern.
+canonical Pulp workflow. Decision 0074 removes redundant task guides. Decision 0075 adds the short
+synthetic selection-and-prediction tutorial before the complete Pulp analysis while preserving API
+and advanced-guide ownership. Phase F4 has completed the owner-approved pre-release result and
+example simplification. Documentation Patch D2, shortening and repositioning the Pulp tutorial,
+is the next owner-approved increment; README reduction and reference cleanup follow before release
+metadata.
 
 ### Current standardization and deferred block-aware variants
 
@@ -570,8 +571,9 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-First-release preparation: choose the initial version, complete metadata and release notes, and
-rehearse the tag and publication checklist.
+Documentation Patch D2: shorten and reposition the Pulp tutorial around its distinctive real-data,
+OOF-validation, and fitted-model interpretation content. README reduction and reference cleanup
+follow before first-release preparation.
 
 ## Maintenance protocol
 

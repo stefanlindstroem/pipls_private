@@ -1,8 +1,9 @@
 # Examples
 
 The numbered examples are executable workflows organized by purpose. Start with the
-[Pulp tutorial](tutorials/pulp.md) when learning the complete model-development process; this page
-is a catalogue of the maintained scripts.
+[synthetic tutorial](tutorials/synthetic.md) for the short selection-and-prediction sequence, then
+continue with the [Pulp tutorial](tutorials/pulp.md) for a complete real-data analysis. This page is
+a catalogue of the maintained scripts.
 
 ## Fixed fit
 
@@ -11,11 +12,13 @@ is a catalogue of the maintained scripts.
 not perform parameter selection. The [fixed-regression reference](api/regression.md) documents
 its estimator contract.
 
-## Synthetic train/test problem
+## Synthetic path selection
 
-`examples/08_synthetic_data.py` generates independent training and test blocks with known shared,
-predictor-specific, and response-specific latent structure. It fits one fixed Pi-PLS model and
-reports held-out $R^2$.
+`examples/02_synthetic_path_selection.py` generates independent training and test blocks with known
+shared, predictor-specific, and response-specific latent structure. It evaluates the component path,
+inspects the conditional predictor-rank profile, fits one selected fixed model, reports held-out
+$R^2$, and writes three final PDF figures. The [synthetic tutorial](tutorials/synthetic.md) extracts
+its maintained code directly.
 
 ## Pi-PLS and ordinary PLS comparison
 

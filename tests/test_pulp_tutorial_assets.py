@@ -137,7 +137,7 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert "PULP_TUTORIAL_FIGURES" in sdist_checker
 
 
-def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
+def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     repository = _repository_root()
     tutorial_path = repository / "docs" / "tutorials" / "pulp.md"
     tutorial = tutorial_path.read_text(encoding="utf-8")
@@ -150,8 +150,11 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
         mkdocs = yaml.safe_load(stream)
 
-    tutorial_nav = next(item["Tutorial"] for item in mkdocs["nav"] if "Tutorial" in item)
-    assert tutorial_nav == [{"Pulp workflow": "tutorials/pulp.md"}]
+    tutorial_nav = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
+    assert tutorial_nav == [
+        {"1. First model with synthetic data": "tutorials/synthetic.md"},
+        {"2. Complete Pulp analysis": "tutorials/pulp.md"},
+    ]
     snippets = next(
         extension["pymdownx.snippets"]
         for extension in mkdocs["markdown_extensions"]
@@ -165,7 +168,7 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
 
     linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
     assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(encoding="utf-8")
-    assert "tutorials/pulp.md" in (
+    assert "tutorials/synthetic.md" in (
         repository / "docs" / "api" / "regression.md"
     ).read_text(encoding="utf-8")
     assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(encoding="utf-8")
@@ -356,14 +359,14 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     assert not any(filename in navigation_text for filename in removed_guides)
     assert [next(iter(item)) for item in mkdocs["nav"]] == [
         "Home",
-        "Tutorial",
+        "Tutorials",
         "Examples",
         "Reference",
         "Data and validation",
         "Scientific background",
     ]
 
-    assert "tutorials/pulp.md" in regression_reference
-    assert "tutorials/pulp.md" in path_reference
+    assert "tutorials/synthetic.md" in regression_reference
+    assert "tutorials/synthetic.md" in path_reference
     assert "Example 09" not in path_reference
     assert "Examples 10" not in path_reference

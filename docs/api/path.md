@@ -1,7 +1,7 @@
 # Pi-PLS path selection
 
 Use `PiPLSPathCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
-The [Pulp tutorial](../tutorials/pulp.md#evaluate-the-component-path) shows the ordinary sequence:
+The [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path) shows the ordinary sequence:
 inspect `component_path_`, choose a component count, retrieve its conditional predictor rank, and
 fit a separate fixed estimator.
 

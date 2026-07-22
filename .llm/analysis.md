@@ -121,17 +121,20 @@ only for committed input files. Do not hide real-data reading behind a package l
 Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
 preparation area.
 
-The served Pulp tutorial is the primary pedagogical analysis. It extracts executable snippets from
-that workflow, including the direct conditional predictor-rank plot, and presents each retained
-deterministic figure separately. Clear section headings distinguish estimator-neutral PLS-family
+The served tutorial route has two levels. The synthetic tutorial extracts executable snippets from
+example 02 and owns the minimum component-path, conditional-rank, fixed-fit, and external-test
+prediction sequence. The Pulp tutorial follows with the complete real-data analysis, including the
+direct conditional predictor-rank plot, fixed-parameter OOF diagnostics, and retained deterministic
+inspection figures. Clear section headings distinguish estimator-neutral PLS-family
 latent-structure and prediction plots from Pi-PLS-specific factorization plots. The tutorial omits
 raw regression-coefficient visualization because heterogeneous original units make that single
 figure unsuitable for the walkthrough; the plotting API and numbered-example figure remain.
 Plot-specific sections link to the general inspection and plotting references rather than
 duplicating API contracts. Prediction figures must retain the selection-conditioned OOF provenance.
 
-Documentation ownership is fixed by Decision 0074. The tutorial owns the normal user workflow,
-common estimator variations, the linear Pulp narrative, and all generated Pulp figures. The home
+Documentation ownership is fixed by Decisions 0074 and 0075. The synthetic tutorial owns the
+minimum normal workflow; the Pulp tutorial owns the complete real-data narrative, common variations,
+and all generated Pulp inspection figures. The home
 page owns only a minimal fixed-fit entry. Generated fixed-regression and path pages own exact
 estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md` and
 `cross_validation.md` retain only advanced search and validation behavior. `model_inspection.md`

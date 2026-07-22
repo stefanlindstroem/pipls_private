@@ -11,10 +11,10 @@ point, often an elbow or plateau in the CV-MSE curve, and fits one fixed `PiPLSR
 The public interfaces follow scikit-learn conventions and also provide validation diagnostics, fitted-model inspection, synthetic data, and
 transparent reference datasets. See the [theory overview](docs/theory.md) for the construction.
 
-The recommended documentation entry point is the
-[complete Pulp tutorial](docs/tutorials/pulp.md), which covers data loading, parameter selection,
-fixed fitting, common estimator variations, out-of-fold prediction, and figure-by-figure
-interpretation.
+Start with [First Pi-PLS model with synthetic data](docs/tutorials/synthetic.md) for the
+short selection-and-prediction workflow. Continue with the
+[complete Pulp tutorial](docs/tutorials/pulp.md) for real-data loading, fixed-parameter OOF
+prediction, and fitted-model interpretation.
 
 ## Installation
 
@@ -432,6 +432,7 @@ This builds the wheel and source distribution once, installs each into its own c
 environment outside the checkout, and runs the same public-import, metadata, fit, and prediction
 smoke test against both artifacts.
 
+- [Synthetic selection tutorial](docs/tutorials/synthetic.md)
 - [Complete Pulp tutorial](docs/tutorials/pulp.md)
 - [Examples](docs/examples.md)
 - [Documentation index](docs/index.md)

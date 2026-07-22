@@ -16,7 +16,7 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4 are complete; first-release preparation is next. The current public
+Phases A through F4 are complete; documentation Patch D2 is next. The current public
 surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
@@ -34,7 +34,8 @@ The over-general synthetic manifest, universal result schema, and broad CI runne
 The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
 `make examples` runs every numbered example explicitly, beginning with the literal-matrix
-`01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. Example 09
+`01_minimal_fit_and_plot.py`, followed by the synthetic path-selection tutorial example 02, and
+including the complete real-data analyses. Example 09
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
 Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, keep OOF and
 inspection results in memory, and write only final PDF figures. Pulp also exposes the conditional
@@ -48,12 +49,11 @@ source-distribution validation. Decisions 0058--0061 make every public plotter a
 one-axis primitive, replace the former factor and prediction composites, and make the example layer
 own every report figure, panel, legend, title, PDF operation, and close. Decision 0062
 establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
-generates its deterministic single-chart SVG assets and manifest. Decision 0064 makes the detailed
-Pulp tutorial the primary pedagogical route through the served documentation, using checked source
-snippets and one generated chart per explanation. Decision 0065 first separates tutorial,
-scientific-reference, and generated-API ownership. Decision 0074 then removes the redundant task-
-guide layer: the tutorial owns normal use, generated API pages own exact estimator contracts, and
-advanced path and validation pages retain specialized behavior. Decision 0066 introduces the
+generates its deterministic single-chart SVG assets and manifest. Decision 0064 established the detailed Pulp tutorial as the first pedagogical route. Decision 0065
+separates tutorial, scientific-reference, and generated-API ownership. Decision 0074 removes the
+redundant task-guide layer. Decision 0075 refines the learning order: a short synthetic tutorial
+introduces selection and external-test prediction before the complete Pulp analysis; generated API
+pages and advanced guides retain their existing ownership. Decision 0066 introduces the
 immutable concise component-path API. Decision 0067 makes Sugarcane direct, and
 Decision 0068 makes the Pulp example and tutorial direct while removing the shared workflow wrapper.
 Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers.

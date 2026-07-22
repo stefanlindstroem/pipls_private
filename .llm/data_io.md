@@ -149,10 +149,14 @@ Paper-specific data orchestration belongs in downstream reproduction repositorie
 tagged `pipls` release. This repository's examples remain concise package-use examples and should
 not grow into manuscript pipelines, figure generation, or complete comparison grids.
 
-## Pulp tutorial assets
+## Tutorial assets
+
+The synthetic tutorial uses `make_pipls_train_test()` directly in example 02 and its renderer. Its
+manifest records the deterministic generator configuration, selected rank pair, external-test
+provenance, and SVG hashes. No generated table is an input to fitting or plotting.
 
 The direct Pulp example and tutorial renderer both read the committed `datasets/pulp/X.csv` and
 `Y.csv` tables directly. The renderer records their SHA-256 values, selected rank pair, evaluated
 predictor ranks, and boundary status in a generated manifest and derives SVG figures from in-memory
-results. The figures and manifest are ignored build products, not alternative dataset
+results. All tutorial figures and manifests are ignored build products, not alternative dataset
 representations or package inputs.

@@ -128,6 +128,19 @@ def test_tutorial_renderer_uses_the_direct_in_memory_public_sequence() -> None:
     assert ".to_csv(" not in source
 
 
+
+def test_synthetic_tutorial_renderer_uses_the_direct_in_memory_public_sequence() -> None:
+    source = (_repository_root() / "tools" / "render_synthetic_tutorial.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "PiPLSPathCV(refit=False).fit(train.X, train.Y)" in source
+    assert "component_path_" in source
+    assert "predictor_rank_profile(" in source
+    assert "PiPLSRegression(" in source
+    assert "model.predict(test.X)" in source
+    assert ".to_csv(" not in source
+
 def test_removed_result_attributes_and_helpers_are_absent() -> None:
     root = _repository_root()
     maintained_sources = [

@@ -15,7 +15,7 @@ Y_pred = model.predict(X_test)
 ```
 
 For the normal path-selection workflow, begin with the
-[Pulp tutorial](../tutorials/pulp.md). Use `PiPLSPathCV` when the rank pair is not already fixed.
+[synthetic tutorial](../tutorials/synthetic.md). Use `PiPLSPathCV` when the rank pair is not already fixed.
 
 ## Preprocessing and fit safety
 

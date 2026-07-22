@@ -25,6 +25,8 @@ examples/results/*
 !examples/results/.gitkeep
 !examples/results/pls_path_comparison/
 !examples/results/pls_path_comparison/.gitkeep
+!examples/results/synthetic_tutorial/
+!examples/results/synthetic_tutorial/.gitkeep
 !examples/results/pulp_post_analysis/
 !examples/results/pulp_post_analysis/.gitkeep
 !examples/results/sugarcane_post_analysis/

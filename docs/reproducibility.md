@@ -63,11 +63,12 @@ make docs
 make docs-serve
 ```
 
-The Pulp tutorial figures are generated from the same direct calculation shown in example 10
-before the strict build or preview starts. Each SVG contains one chart, while `manifest.json`
-records the dataset hashes, selected rank pair, evaluated predictor ranks, upper-boundary status,
-display subset, prediction provenance, filenames, and SVG hashes. The generated directory is
-ignored by Git and removed by `make clean`.
+The synthetic tutorial figures are generated from the same deterministic calculation shown in
+example 02. Its manifest records the generator configuration, selected rank pair, external-test
+provenance, filenames, and SVG hashes. The Pulp figures are generated from example 10's direct
+calculation; their manifest additionally records dataset hashes, evaluated ranks, boundary status,
+and display subsets. Every SVG contains one chart. Generated directories are ignored by Git and
+removed by `make clean`.
 
 The preview is served at `http://127.0.0.1:8000/` and updates as documentation files change. Stop it
 with `Ctrl+C`. The stronger distribution check is:
@@ -79,8 +80,8 @@ make docs-dist
 It builds a source distribution, unpacks it, creates a clean virtual environment, installs the
 unpacked package with its documentation extra, and runs the same strict site build. This verifies
 that `mkdocs.yml`, the Makefile, Markdown sources, JavaScript assets, generated-reference inputs,
-package source, Pulp data, direct numbered example, and tutorial renderer are shipped together. The
-clean build regenerates and parses the declared SVG assets. Generated tutorial assets and `site/` output
+package source, synthetic and Pulp tutorial examples, Pulp data, and both renderers are shipped
+together. The clean build regenerates and parses the declared SVG assets. Generated tutorial assets and `site/` output
 are temporary and are not part of the source distribution.
 
 ## Model-fitting reproducibility

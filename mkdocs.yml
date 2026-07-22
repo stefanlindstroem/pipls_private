@@ -12,8 +12,9 @@ theme:
 
 nav:
   - Home: index.md
-  - Tutorial:
-      - Pulp workflow: tutorials/pulp.md
+  - Tutorials:
+      - 1. First model with synthetic data: tutorials/synthetic.md
+      - 2. Complete Pulp analysis: tutorials/pulp.md
   - Examples: examples.md
   - Reference:
       - API overview: api/index.md

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import shutil
 import subprocess
@@ -13,6 +14,11 @@ import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+SYNTHETIC_TUTORIAL_FIGURES = (
+    "component_path.svg",
+    "predictor_rank_profile.svg",
+    "observed_vs_predicted.svg",
+)
 PULP_TUTORIAL_FIGURES = (
     "component_path.svg",
     "predictor_rank_profile.svg",
@@ -76,6 +82,32 @@ def _venv_python(venv: Path) -> Path:
     return venv / "bin" / "python"
 
 
+def _validate_figure_manifest(
+    generated_dir: Path,
+    expected_figures: tuple[str, ...],
+    *,
+    tutorial_name: str,
+) -> dict[str, object]:
+    manifest_path = generated_dir / "manifest.json"
+    if not manifest_path.is_file():
+        raise RuntimeError(f"Documentation build did not generate the {tutorial_name} manifest.")
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    declared = tuple(item["filename"] for item in manifest.get("figures", []))
+    if declared != expected_figures:
+        raise RuntimeError(
+            f"{tutorial_name} manifest does not declare the expected figures: {declared!r}."
+        )
+    figure_records = {item["filename"]: item for item in manifest["figures"]}
+    for filename in expected_figures:
+        figure_path = generated_dir / filename
+        if not figure_path.is_file():
+            raise RuntimeError(f"Missing generated {tutorial_name} figure: {filename}")
+        ET.parse(figure_path)
+        if figure_records[filename]["sha256"] != _sha256(figure_path):
+            raise RuntimeError(f"Generated {tutorial_name} figure hash disagrees: {filename}")
+    return manifest
+
+
 def main() -> None:
     repository = Path(__file__).resolve().parents[1]
     make = shutil.which("make")
@@ -113,10 +145,13 @@ def main() -> None:
             source / "Makefile",
             source / "mkdocs.yml",
             source / "docs" / "index.md",
+            source / "docs" / "tutorials" / "synthetic.md",
             source / "docs" / "tutorials" / "pulp.md",
             source / "docs" / "api" / "index.md",
             source / "docs" / "javascripts" / "mathjax.js",
+            source / "tools" / "render_synthetic_tutorial.py",
             source / "tools" / "render_pulp_tutorial.py",
+            source / "examples" / "02_synthetic_path_selection.py",
             source / "examples" / "10_pulp_real_data.py",
             source / "datasets" / "pulp" / "X.csv",
             source / "datasets" / "pulp" / "Y.csv",
@@ -146,25 +181,27 @@ def main() -> None:
         )
         _run([make, "docs", f"PYTHON={python}"], cwd=source)
 
-        generated_dir = source / "docs" / "assets" / "generated" / "pulp"
-        manifest_path = generated_dir / "manifest.json"
-        if not manifest_path.is_file():
-            raise RuntimeError("Documentation build did not generate the Pulp tutorial manifest.")
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        declared = tuple(item["filename"] for item in manifest.get("figures", []))
-        if declared != PULP_TUTORIAL_FIGURES:
-            raise RuntimeError(
-                f"Pulp tutorial manifest does not declare the expected figures: {declared!r}."
-            )
-        figure_records = {item["filename"]: item for item in manifest["figures"]}
-        for filename in PULP_TUTORIAL_FIGURES:
-            figure_path = generated_dir / filename
-            if not figure_path.is_file():
-                raise RuntimeError(f"Missing generated Pulp tutorial figure: {filename}")
-            ET.parse(figure_path)
-            if figure_records[filename]["sha256"] != _sha256(figure_path):
-                raise RuntimeError(f"Generated Pulp tutorial figure hash disagrees: {filename}")
-        dataset_hashes = manifest.get("dataset", {}).get("files", {})
+        synthetic_dir = source / "docs" / "assets" / "generated" / "synthetic"
+        synthetic_manifest = _validate_figure_manifest(
+            synthetic_dir,
+            SYNTHETIC_TUTORIAL_FIGURES,
+            tutorial_name="synthetic tutorial",
+        )
+        synthetic_analysis = synthetic_manifest.get("analysis", {})
+        if synthetic_analysis.get("chosen_n_components") != 2:
+            raise RuntimeError("Synthetic tutorial component selection changed unexpectedly.")
+        if synthetic_analysis.get("chosen_predictor_rank") != 4:
+            raise RuntimeError("Synthetic tutorial predictor-rank selection changed unexpectedly.")
+        if not math.isfinite(float(synthetic_analysis.get("external_test_r2", math.nan))):
+            raise RuntimeError("Synthetic tutorial external-test R2 must be finite.")
+
+        pulp_dir = source / "docs" / "assets" / "generated" / "pulp"
+        pulp_manifest = _validate_figure_manifest(
+            pulp_dir,
+            PULP_TUTORIAL_FIGURES,
+            tutorial_name="Pulp tutorial",
+        )
+        dataset_hashes = pulp_manifest.get("dataset", {}).get("files", {})
         for filename in ("X.csv", "Y.csv"):
             dataset_path = source / "datasets" / "pulp" / filename
             if dataset_hashes.get(filename) != _sha256(dataset_path):
@@ -172,9 +209,17 @@ def main() -> None:
 
         rendered = [
             source / "site" / "index.html",
+            source / "site" / "tutorials" / "synthetic" / "index.html",
             source / "site" / "tutorials" / "pulp" / "index.html",
             source / "site" / "api" / "regression" / "index.html",
             source / "site" / "api" / "inspection" / "index.html",
+            source / "site" / "assets" / "generated" / "synthetic" / "component_path.svg",
+            source
+            / "site"
+            / "assets"
+            / "generated"
+            / "synthetic"
+            / "observed_vs_predicted.svg",
             source / "site" / "assets" / "generated" / "pulp" / "component_path.svg",
             source / "site" / "assets" / "generated" / "pulp" / "standardized_rmse.svg",
         ]

@@ -3,12 +3,16 @@
 Pi-PLS is a multivariate linear-regression method that represents the predictive relation through
 paired predictor and response latent variables.
 
-## Start with the Pulp tutorial
+## Start with the synthetic tutorial
 
-[Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) is the recommended introduction. It covers
-data loading, component-path evaluation, conditional predictor-rank selection, fixed-model fitting,
-out-of-fold diagnostics, and figure-by-figure interpretation. Its figures and code excerpts are
-generated from the maintained repository workflow.
+[First Pi-PLS model with synthetic data](tutorials/synthetic.md) is the recommended introduction. It
+shows the complete selection contract in a small deterministic problem: evaluate the component
+path, choose a component count, retrieve its conditionally selected predictor rank, fit one fixed
+model, and predict an independent test set.
+
+Continue with [Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) for real-data loading,
+fixed-parameter OOF predictions, immutable inspection results, and scientific interpretation of
+standard PLS-family and Pi-PLS-specific plots.
 
 ## Fit one known model directly
 

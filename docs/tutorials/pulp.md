@@ -1,9 +1,10 @@
 # Pulp: a complete Pi-PLS workflow
 
 This tutorial develops one Pi-PLS model from data loading through parameter selection, fixed fitting,
-out-of-fold prediction, and fitted-model interpretation. It uses the Pulp dataset because its 14
-named predictors and eight responses are large enough to show the multivariate workflow while the
-plots remain readable.
+out-of-fold prediction, and fitted-model interpretation. Readers new to the package should first
+complete [First Pi-PLS model with synthetic data](synthetic.md), which introduces the same selection
+contract without the real-data interpretation layer. The Pulp dataset has 14 named predictors and
+eight responses, enough to show the multivariate workflow while the plots remain readable.
 
 The repository generates every figure on this page from the same executable workflow used by
 `examples/10_pulp_real_data.py`. Run `make docs-figures` to regenerate the SVG files, or `make docs`

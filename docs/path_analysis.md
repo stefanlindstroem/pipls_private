@@ -1,7 +1,7 @@
 # Advanced path-search behavior
 
-The [Pulp tutorial](tutorials/pulp.md#evaluate-the-component-path) owns the routine selection
-workflow. This page records configuration and edge behavior needed when the defaults are not enough.
+The [synthetic tutorial](tutorials/synthetic.md#evaluate-the-component-path) owns the routine
+selection workflow. This page records configuration and edge behavior needed when the defaults are not enough.
 Exact signatures and fitted attributes are in the [generated path API](api/path.md).
 
 ## Search bounds

@@ -14,8 +14,8 @@ material alone.
 ## Implemented boundary
 
 Numbered examples are self-contained user tasks rather than publication-oriented or
-context-free API demonstrations. Example 07 has been removed; example 08 explains its synthetic
-latent structure and prints labeled independent-test results.
+context-free API demonstrations. Example 07 has been removed; example 02 now supplies the short
+synthetic path-selection tutorial and independent-test prediction workflow.
 
 Phases A through F4 are complete and committed. The first broad E4 benchmark
 implementation was removed and replaced by focused question-specific benchmarks:
@@ -59,16 +59,16 @@ implementation was removed and replaced by focused question-specific benchmarks:
   `(figure, axis)` returns, and caller-owned legends and panel composition;
 - direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
   OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
-- a direct Pulp tutorial workflow with checked snippets from example 10, a conditional
-  predictor-rank profile at three components, and deterministic single-chart SVG assets generated
-  from the same public-API sequence;
+- a two-tier tutorial route: a short deterministic synthetic selection-and-prediction workflow
+  from example 02, followed by the complete Pulp real-data workflow from example 10; both use
+  checked snippets and deterministic single-chart SVG assets;
 - direct Tobacco response pagination through two caller-owned multipage PDFs, with full predictor
   SVD, decreasing-wavenumber spectral axes, and raw observation diagnostics;
 - a direct Pi-PLS/ordinary-PLS comparison whose two immutable component paths are plotted together
   in example 09 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
-- a tutorial-first served site whose primary Pulp walkthrough includes every generated chart
-  separately, owns the normal workflow and common estimator variations, and links each
-  interpretation to the general inspection, plotting, and theory references;
+- a tutorial-first served site whose synthetic entry tutorial owns the minimum selection contract
+  and whose second Pulp tutorial owns complete real-data OOF and interpretation; both link to the
+  generated API and advanced references;
 - a compact documentation navigation without separate quickstart, estimator, parameter-selection,
   or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
   exact estimator contracts, and retained path and validation pages cover advanced behavior.
@@ -286,14 +286,18 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-First-release preparation: choose the initial version, complete metadata and release notes, and
-rehearse the tag and publication checklist. Phase F4 and Patches 20a–20f are complete.
+Documentation Patch D2: shorten and reposition the Pulp tutorial now that the synthetic entry
+tutorial owns the minimum selection-and-prediction contract. Retain the real-data qualifications,
+fixed-parameter OOF workflow, and the most informative fitted-model plots.
 
 ## Subsequent roadmap
 
-1. **First-release preparation:** choose the initial version, complete metadata and release notes,
+1. **Documentation Patch D3:** reduce the README and finish the audience-oriented navigation.
+2. **Documentation Patch D4:** clean references and enforce documentation ownership without
+   freezing exact prose.
+3. **First-release preparation:** choose the initial version, complete metadata and release notes,
    and rehearse the tag and publication checklist.
-2. **First tagged release:** publish only after the rehearsal and checklist pass.
+4. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

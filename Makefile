@@ -26,7 +26,8 @@ format: ## Format Python files with Ruff.
 typecheck: ## Run strict mypy checks.
 	$(PYTHON) -m mypy src
 
-docs-figures: ## Generate the Pulp tutorial figures.
+docs-figures: ## Generate tutorial figures.
+	$(EXAMPLE_ENV) $(PYTHON) tools/render_synthetic_tutorial.py
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_pulp_tutorial.py
 
 docs: docs-figures ## Build the strict documentation site.

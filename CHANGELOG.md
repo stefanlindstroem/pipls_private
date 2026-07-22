@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add a short first tutorial built from deterministic synthetic train/test data: expose the complete
+  component-path and conditional predictor-rank selection contract, fit one fixed model, assess an
+  independent test block, generate three tutorial figures, and route readers to the complete Pulp
+  analysis as the second tutorial.
+
 - Add full original-source references and resolvable DOI links for every documented real dataset,
   correct the Tobacco related-publication citation, and keep the public dataset guide synchronized
   generically with DOI values recorded in each `metadata.yaml`.

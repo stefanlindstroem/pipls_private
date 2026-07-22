@@ -2,6 +2,7 @@ include Makefile
 include mkdocs.yml
 include tools/check_sdist_docs.py
 include tools/check_distributions.py
+include tools/render_synthetic_tutorial.py
 include tools/render_pulp_tutorial.py
 include constraints/minimum.txt
 recursive-include docs *.md *.js

@@ -17,6 +17,9 @@ intentionally more extensive than ordinary estimator use.
 - `01_minimal_fit_and_plot.py`: literal NumPy matrices, one fixed `PiPLSRegression` fit, predictions,
   and one caller-composed panel of the $P$, $D$, $Q$, and $QD$ factor plots. It performs no
   cross-validation or parameter selection.
+- `02_synthetic_path_selection.py`: the short tutorial workflow. It generates independent synthetic
+  train/test data, evaluates the component path and conditional predictor-rank profile, fits one
+  selected fixed model, and writes three final PDF figures.
 
 Run it with:
 
@@ -29,11 +32,8 @@ The script writes `examples/results/minimal_fit_and_plot.pdf`. Its predictor and
 ordinary Python lists, demonstrating that plotting labels may come from any explicit metadata
 source rather than from pandas or CSV headers.
 
-## Synthetic data and explicit comparison
+## Explicit comparison
 
-- `08_synthetic_data.py`: generates an independent train/test problem with known shared,
-  predictor-specific, and response-specific latent directions; fits one Pi-PLS model; and prints
-  labeled data, model, and held-out evaluation summaries.
 - `09_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
   component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model.
 
@@ -117,8 +117,8 @@ thirteen responses in source order. Generated files under `examples/results/` ar
 
 ## Output directories
 
-`examples/results/`, the PLS-path-comparison directory, and the Pulp, Sugarcane, and Tobacco
-post-analysis subdirectories are tracked with placeholder files. The examples therefore write directly to known destinations and do not
+`examples/results/`, the synthetic-tutorial and PLS-path-comparison directories, and the Pulp,
+Sugarcane, and Tobacco post-analysis subdirectories are tracked with placeholder files. The examples therefore write directly to known destinations and do not
 contain directory-creation code. Generated PDF files remain ignored,
 and `make clean`
 removes them while preserving the tracked directory structure.

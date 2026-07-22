@@ -89,3 +89,4 @@ reference describe the current public behavior directly.
 - [0060: atomic prediction-diagnostic plots](0060-atomic-prediction-diagnostic-plots.md)
 - [0061: example-owned report composition](0061-example-owned-report-composition.md)
 - [0074: tutorial-owned user workflow](0074-tutorial-owned-user-workflow.md)
+- [0075: two-tier tutorial route](0075-two-tier-tutorial-route.md)

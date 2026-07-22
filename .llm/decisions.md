@@ -80,6 +80,7 @@ This index is navigation, not a substitute for those records.
 | `0072-conditional-predictor-rank-profile.md` | conditional predictor-rank inspection | derive one immutable sorted rank profile on demand from `cv_results_` without another fitted representation |
 | `0073-public-fit-safety.md` | public fit-state and finite-output safety | transactional fits, boundary-safe scaling, safe `copy=False`, and explicit rejection of nonfinite public results |
 | `0074-tutorial-owned-user-workflow.md` | consolidated user documentation | tutorial owns normal use, generated API pages own exact estimator contracts, and advanced guides retain only specialized behavior |
+| `0075-two-tier-tutorial-route.md` | staged programming-user tutorials | synthetic selection and prediction first; complete Pulp analysis second |
 
 ## Implemented estimator/search transition
 

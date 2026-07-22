@@ -70,6 +70,8 @@ def test_source_distribution_manifest_includes_documentation_build_inputs() -> N
         "include mkdocs.yml",
         "include tools/check_sdist_docs.py",
         "include tools/check_distributions.py",
+        "include tools/render_synthetic_tutorial.py",
+        "include tools/render_pulp_tutorial.py",
         "recursive-include docs *.md *.js",
     } <= manifest_lines
 
@@ -253,7 +255,7 @@ def test_make_examples_runs_every_numbered_example() -> None:
 
     expected = [
         "examples/01_minimal_fit_and_plot.py",
-        "examples/08_synthetic_data.py",
+        "examples/02_synthetic_path_selection.py",
         "examples/09_pls_path_comparison.py",
         "examples/10_pulp_real_data.py",
         "examples/11_sugarcane_real_data.py",
@@ -354,6 +356,7 @@ def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> Non
     expected_result_placeholders = {
         "examples/results/.gitkeep",
         "examples/results/pls_path_comparison/.gitkeep",
+        "examples/results/synthetic_tutorial/.gitkeep",
         "examples/results/pulp_post_analysis/.gitkeep",
         "examples/results/sugarcane_post_analysis/.gitkeep",
         "examples/results/tobacco_post_analysis/.gitkeep",
