@@ -124,8 +124,10 @@ With `refit=True`, the best evaluated estimator is fitted on all supplied data a
 prediction or transformation methods delegate to it. With `refit=False`, the path diagnostics
 remain available without a fitted final estimator.
 
-The complete search surface is available through `cv_results_`, score and MSE paths, resolved
-rank grids, candidate counts, and search history.
+The complete evaluated search surface is available through the aligned candidate arrays in
+`cv_results_`, together with resolved rank grids, candidate counts, and search history.
+Matrix-shaped score aliases are intentionally not duplicated: advanced analysis can reshape the
+`cv_results_` columns when a dense surface is useful.
 See the [generated path API](api/path.md) for exact attributes and conditional availability.
 
 ## Splitters and OOF predictions

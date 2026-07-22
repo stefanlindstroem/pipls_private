@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Complete the pre-release result and example simplification: remove the duplicate matrix-shaped
+  score and response-standardized-MSE path attributes, retain `cv_results_` as the sole detailed
+  candidate surface, align documentation with direct in-memory workflows, and add structural tests
+  that prevent generated analytical CSV intermediates or file-based plotting in numbered examples.
+
 - Make the Pi-PLS/ordinary-PLS path comparison direct: return immutable ordinary-PLS path arrays,
   plot both methods in example 09 with ordinary Matplotlib, write only three final PDFs, and remove
   the comparison CSV intermediates and plotting helper.

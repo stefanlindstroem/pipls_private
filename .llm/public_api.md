@@ -107,9 +107,11 @@ equivalent to minimizing mean response-standardized MSE among evaluated candidat
 search makes no claim about
 unevaluated admissible pairs.
 
-Public path attributes include standard search results, `best_pipls_`, conditional path and surface
-diagnostics, immutable `validation_report_`, optional OOF outputs, and the canonical immutable
-`component_path_` result. `PiPLSComponentPath` stores aligned read-only `n_components`,
+Public path attributes include standard candidate-level search results in `cv_results_`,
+`best_pipls_`, immutable `validation_report_`, optional OOF outputs, and the canonical immutable
+`component_path_` result. Matrix-shaped score and MSE aliases are not part of the public
+contract; advanced users can reshape aligned `cv_results_` columns when needed.
+`PiPLSComponentPath` stores aligned read-only `n_components`,
 `predictor_rank`, `predictor_rank_policy`, `mean_test_score`, `cv_mse_mean`, `cv_mse_fold_sd`, and
 `n_splits` arrays. `for_n_components()` returns a frozen `PiPLSComponentResult` with the aligned
 scalar values. The numeric predictor rank is present for every component count.

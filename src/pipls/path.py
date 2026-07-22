@@ -178,11 +178,6 @@ class PiPLSPathCV(
     component_path_ : PiPLSComponentPath
         Immutable concise view with one conditionally selected predictor-rank
         result per component count.
-    response_standardized_mse_path_ : ndarray
-        Candidate response-standardized MSE surface. Unevaluated adaptive-search
-        cells are NaN.
-    score_path_ : ndarray
-        Candidate mean-score surface. Unevaluated adaptive-search cells are NaN.
     best_index_ : int
         Row of ``cv_results_`` selected by maximum mean test score, with smaller
         component count and predictor rank used as deterministic tie-breakers.
@@ -452,21 +447,6 @@ class PiPLSPathCV(
             conditional_indices=np.asarray(conditional_indices, dtype=np.intp),
             predictor_rank_policy=self.predictor_rank_policy_,
             n_splits=self.n_splits_,
-        )
-
-        self.response_standardized_mse_path_ = _path_surface(
-            self.n_components_values_,
-            self.predictor_rank_values_,
-            self.cv_results_["n_components"],
-            self.cv_results_["predictor_rank"],
-            self.cv_results_["mean_response_standardized_mse"],
-        )
-        self.score_path_ = _path_surface(
-            self.n_components_values_,
-            self.predictor_rank_values_,
-            self.cv_results_["n_components"],
-            self.cv_results_["predictor_rank"],
-            self.cv_results_["mean_test_score"],
         )
 
         self.best_pipls_params_ = {
@@ -1099,21 +1079,6 @@ def _select_conditional_best_index(results: dict[str, Any], indices: IntArray) -
     tied = indices[tied_local]
     ranks = cast(IntArray, results["predictor_rank"])[tied]
     return int(tied[int(np.argmin(ranks))])
-
-
-def _path_surface(
-    h_values: IntArray,
-    r_values: IntArray,
-    evaluated_h: IntArray,
-    evaluated_r: IntArray,
-    values: FloatArray,
-) -> FloatArray:
-    surface = np.full((h_values.size, r_values.size), np.nan, dtype=np.float64)
-    h_index = {int(value): index for index, value in enumerate(h_values)}
-    r_index = {int(value): index for index, value in enumerate(r_values)}
-    for h, r, value in zip(evaluated_h, evaluated_r, values, strict=True):
-        surface[h_index[int(h)], r_index[int(r)]] = value
-    return surface
 
 
 def _validated_component_values(values: ComponentValues, *, upper: int) -> IntArray:

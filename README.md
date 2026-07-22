@@ -170,7 +170,9 @@ model = PiPLSRegression(
 `best_params_` identifies the best evaluated pair under the configured scorer. With the default
 negative response-standardized MSE scorer, this is the evaluated pair with the smallest mean
 CV-MSE. Adaptive search may leave admissible pairs unevaluated, and the examples still present
-component-count selection as a user decision. For explicit validation reporting:
+component-count selection as a user decision. `cv_results_` retains the complete candidate-level
+arrays; `component_path_` is the concise immutable component-count view. For explicit validation
+reporting:
 
 ```python
 from sklearn.model_selection import LeaveOneOut

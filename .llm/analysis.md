@@ -364,3 +364,5 @@ The accepted order after Decision 0042 is:
 8. direct Sugarcane in-memory workflow — **complete**;
 9. direct Pulp and tutorial workflow — **complete**;
 10. direct Tobacco workflow and table-helper removal — **complete**.
+11. direct Pi-PLS/ordinary-PLS comparison — **complete**;
+12. final result-surface, documentation, and structural-policy cleanup — **complete**.

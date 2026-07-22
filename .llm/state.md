@@ -17,7 +17,7 @@ Numbered examples are self-contained user tasks rather than publication-oriented
 context-free API demonstrations. Example 07 has been removed; example 08 explains its synthetic
 latent structure and prints labeled independent-test results.
 
-Phases A through F3 are complete and committed; Phase F4 is underway. The first broad E4 benchmark
+Phases A through F4 are complete and committed. The first broad E4 benchmark
 implementation was removed and replaced by focused question-specific benchmarks:
 
 - repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
@@ -276,16 +276,14 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Patch 20f: complete the package-wide result-surface and CSV-policy audit, remove stale documentation
-and helper references, decide the detailed matrix-path attribute boundary, and add structural
-enforcement for direct in-memory numbered examples.
+First-release preparation: choose the initial version, complete metadata and release notes, and
+rehearse the tag and publication checklist. Phase F4 and Patches 20a–20f are complete.
 
 ## Subsequent roadmap
 
-1. **Patch 20f:** package-wide cleanup, documentation migration, and structural enforcement.
-2. **First-release preparation:** choose the initial version, complete metadata and release notes,
+1. **First-release preparation:** choose the initial version, complete metadata and release notes,
    and rehearse the tag and publication checklist.
-3. **First tagged release:** publish only after the rehearsal and checklist pass.
+2. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

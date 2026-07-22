@@ -109,7 +109,9 @@ passes immutable inspection objects to public plotters. Tobacco follows the same
 and owns its full-SVD configuration, response pagination, and multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
-figures retain explicit provenance. Sugarcane reads its strictly increasing wavelength coordinate
+figures retain explicit provenance. Numbered examples never serialize analytical results for later
+plotting; CSV use is limited to the committed `X.csv` and `Y.csv` inputs. Sugarcane reads its
+strictly increasing wavelength coordinate
 from the `X.csv` headers. Tobacco preserves its decreasing wavenumber coordinate and partitions all
 thirteen responses in source order. Generated files under `examples/results/` are ignored by Git.
 

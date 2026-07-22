@@ -54,9 +54,18 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     assert search.path_search_method_ == "auto"
     np.testing.assert_array_equal(search.n_components_values_, np.array([1, 2, 3]))
     np.testing.assert_array_equal(search.predictor_rank_values_, np.array([1, 2, 3, 4, 5]))
-    assert np.isnan(search.response_standardized_mse_path_[1, 0])
-    assert np.isnan(search.response_standardized_mse_path_[2, 0])
-    assert np.isnan(search.response_standardized_mse_path_[2, 1])
+    evaluated_pairs = set(
+        zip(
+            search.cv_results_["n_components"],
+            search.cv_results_["predictor_rank"],
+            strict=True,
+        )
+    )
+    assert (2, 1) not in evaluated_pairs
+    assert (3, 1) not in evaluated_pairs
+    assert (3, 2) not in evaluated_pairs
+    assert not hasattr(search, "response_standardized_mse_path_")
+    assert not hasattr(search, "score_path_")
 
 
 def test_all_component_sentinel_matches_explicit_complete_range() -> None:

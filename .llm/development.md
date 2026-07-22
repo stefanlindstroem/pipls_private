@@ -110,7 +110,8 @@
   display subset, or plot behavior used by generated assets.
 - Run `make docs` for changes to public guides, navigation, documentation configuration, public
   docstrings, or generated tutorial assets.
-- Run `make examples` for changes to numbered examples, example-generated CSV/PDF artifacts, or the
+- Run `make examples` for changes to numbered examples, example-generated final PDF
+  artifacts, or the
   application-facing workflow. This target runs all examples, including Tobacco.
 - Run `make build` for a quick artifact build and `make dist-check` for packaging, dependency,
   public-module, or included-data changes before delivery.

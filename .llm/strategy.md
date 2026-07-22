@@ -491,11 +491,12 @@ Implementation order:
 5. in-memory Pi-PLS/PLS comparison;
 6. package-wide cleanup, documentation migration, and structural enforcement.
 
-Current status: **Patches 20a–20e complete**. Decision 0066 adds `PiPLSComponentPath`,
+Current status: **complete**. Decision 0066 adds `PiPLSComponentPath`,
 `PiPLSComponentResult`, and `PiPLSPathCV.component_path_`. Decisions 0067–0069 make Sugarcane,
 Pulp, and Tobacco direct and remove their analytical CSV/report machinery. Decision 0070 makes the
 Pi-PLS/PLS comparison direct, replaces its DataFrame result with immutable arrays, and removes the
-CSV plotting helper. Patch 20f, package-wide cleanup and enforcement, is next.
+CSV plotting helper. Decision 0071 removes duplicate matrix-path aliases, makes `cv_results_` the
+sole detailed candidate surface, and enforces the direct in-memory example policy structurally.
 
 ### Product documentation and release hardening
 
@@ -508,8 +509,8 @@ from current documentation.
 
 Current status: **tutorial-first documentation complete**. Decisions 0049--0065 establish the
 self-contained documentation, generated reference, compatibility validation, atomic plotting,
-canonical tutorial workflow, and page ownership. Phase F4 now performs the owner-approved
-pre-release result and example simplification before release metadata is finalized.
+canonical tutorial workflow, and page ownership. Phase F4 has completed the owner-approved
+pre-release result and example simplification; release metadata is the next concern.
 
 ### Current standardization and deferred block-aware variants
 
@@ -560,9 +561,8 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Patch 20f: complete the package-wide result-surface, documentation, and CSV-policy audit. Remove
-remaining stale references, decide the status of detailed matrix-path attributes, and add structural
-tests that enforce direct in-memory numbered examples and final-output-only artifact contracts.
+First-release preparation: choose the initial version, complete metadata and release notes, and
+rehearse the tag and publication checklist.
 
 ## Maintenance protocol
 

@@ -36,8 +36,9 @@ The three complete analyses evaluate one Pi-PLS component path and fit one selec
   observation diagnostics.
 
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
-Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. All three write no
-generated analytical CSV files and construct every figure directly from `component_path_`,
+Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered
+example writes a generated CSV file: committed `X.csv` and `Y.csv` tables are inputs, while every
+figure is constructed directly from `component_path_`,
 scikit-learn OOF predictions, and immutable inspection results. In every case, the
 example layer owns subplot layouts, legends, figure-level titles, PDF output, and closing; package
 plotters render one chart on one supplied axis.

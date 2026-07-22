@@ -28,7 +28,8 @@ standard deviation.
 Plot CV-MSE against component count and choose an elbow, plateau, or other scientifically justified
 point. The smallest evaluated CV-MSE is informative, but it is not an automatic scientific choice.
 The fold standard deviation describes variation among the realized folds; it is not a confidence
-interval.
+interval. Candidate-level rank details remain available in `search.cv_results_`; no second
+matrix-path result needs to be synchronized with those aligned arrays.
 
 ## Fit the chosen fixed model
 

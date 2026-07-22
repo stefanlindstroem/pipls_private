@@ -51,9 +51,9 @@ the question-specific script, deterministic generation, finite metrics, metric d
 minimal CSV header, and repeatability of scientific values. Component-path API tests may verify one
 ordered result per requested component count, aligned read-only arrays with stable dtypes, a numeric
 predictor rank and explicit policy for every count, scalar lookup, pickling, and agreement with
-conditional rows in `cv_results_`. Plot and standard-PLS helper tests should
-use small synthetic tables and verify canonical CSV/PDF contracts without freezing visual pixel
-output.
+conditional rows in `cv_results_`. Plot and standard-PLS helper tests should use small
+synthetic inputs and verify immutable result arrays and final PDF rendering without freezing visual
+pixel output.
 
 Post-analysis inspection tests should verify mathematical identities, shapes, finite-value
 validation, defensive copying, read-only results, deterministic sign handling, prediction

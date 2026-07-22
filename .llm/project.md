@@ -16,7 +16,8 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F3 are complete; Phase F4 is underway. The current public surface includes
+Phases A through F4 are complete; first-release preparation is next. The current public
+surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`, `PiPLSDecomposition`,
 `PiPLSValidationReport`, public selection metrics,
@@ -52,8 +53,9 @@ snippets and one generated chart per explanation. Decision 0065 completes the tr
 separating tutorial, task-guide, scientific-reference, and generated-API ownership. Decision 0066
 introduces the immutable concise component-path API. Decision 0067 makes Sugarcane direct, and
 Decision 0068 makes the Pulp example and tutorial direct while removing the shared workflow wrapper.
-Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers. The
-in-memory comparison rewrite is the current next increment.
+Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers.
+Decision 0070 makes the Pi-PLS/ordinary-PLS comparison direct. Decision 0071 removes duplicate
+matrix-path aliases and completes structural enforcement of in-memory numbered examples.
 
 ## Implemented estimator and selection boundary
 

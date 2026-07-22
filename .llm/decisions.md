@@ -76,6 +76,7 @@ This index is navigation, not a substitute for those records.
 | `0068-direct-pulp-workflow.md` | direct Pulp example and tutorial | visible direct path, rank-profile, fixed-fit, OOF, inspection, and final-figure workflow without a shared wrapper or analytical CSV intermediates |
 | `0069-direct-tobacco-workflow.md` | direct Tobacco example | visible full-SVD path, fixed-fit, OOF, inspection, response pagination, and final-PDF workflow without analytical CSV intermediates or report helpers |
 | `0070-direct-pls-path-comparison.md` | direct Pi-PLS/PLS comparison | immutable ordinary-PLS path arrays, direct example-owned Matplotlib composition, and removal of comparison CSV intermediates and plotting helper |
+| `0071-final-result-and-example-cleanup.md` | final result and example cleanup | remove duplicate matrix-path aliases, make `cv_results_` the sole detailed surface, and enforce direct in-memory numbered examples |
 
 ## Implemented estimator/search transition
 
