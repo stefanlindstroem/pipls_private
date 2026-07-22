@@ -49,7 +49,7 @@ from .model_selection import (
     _validate_positive_int,
     _validate_singleton_fold_scoring,
 )
-from .regression import PiPLSRegression
+from .regression import PiPLSRegression, _clear_fitted_state
 from .validation import PiPLSValidationReport
 
 FloatArray = NDArray[np.float64]
@@ -271,8 +271,21 @@ class PiPLSPathCV(
             Fitted path-search object.
         """
 
+        _clear_fitted_state(self)
+        try:
+            return self._fit(X, y, groups=groups)
+        except Exception:
+            _clear_fitted_state(self)
+            raise
+
+    def _fit(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        *,
+        groups: ArrayLike | None,
+    ) -> PiPLSPathCV:
         self._validate_constructor_parameters()
-        self._clear_validation_attributes()
         validated = _validate_estimator_data(
             self,
             X,
@@ -813,17 +826,6 @@ class PiPLSPathCV(
                 "require refit=True."
             )
         return self.best_estimator_
-
-    def _clear_validation_attributes(self) -> None:
-        for name in (
-            "validation_report_",
-            "oof_predictions_",
-            "oof_prediction_counts_",
-            "pooled_oof_r2_",
-            "oof_params_",
-        ):
-            if hasattr(self, name):
-                delattr(self, name)
 
     def _validate_constructor_parameters(self) -> None:
         if self.estimator is not None:

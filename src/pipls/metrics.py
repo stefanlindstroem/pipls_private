@@ -86,9 +86,43 @@ def _training_response_scale(y_train: ArrayLike) -> FloatArray:
     """Return training response scales using ``ddof=1`` and unit zero scales."""
 
     y_array = _as_2d_targets(y_train, name="y_train")
-    if y_array.shape[0] <= 1:
-        return np.ones(y_array.shape[1], dtype=np.float64)
-    scale = np.std(y_array, axis=0, ddof=1)
+    centered = y_array - _safe_column_mean(y_array)
+    if not np.all(np.isfinite(centered)):
+        raise ValueError("Centering y_train produced nonfinite values.")
+    return _safe_sample_scale(centered)
+
+
+def _safe_column_mean(values: FloatArray) -> FloatArray:
+    """Return ordinary column means, with a range-safe overflow fallback."""
+
+    with np.errstate(over="ignore", invalid="ignore"):
+        mean = np.mean(values, axis=0)
+    failed = ~np.isfinite(mean)
+    if np.any(failed):
+        magnitude = np.max(np.abs(values[:, failed]), axis=0)
+        mean[failed] = (
+            np.mean(values[:, failed] / magnitude, axis=0) * magnitude
+        )
+    return np.asarray(mean, dtype=np.float64)
+
+
+def _safe_sample_scale(centered: FloatArray) -> FloatArray:
+    """Return ordinary sample scales, with range-safe boundary fallbacks."""
+
+    if centered.shape[0] <= 1:
+        return np.ones(centered.shape[1], dtype=np.float64)
+    with np.errstate(over="ignore", invalid="ignore", under="ignore"):
+        scale = np.std(centered, axis=0, ddof=1)
+    magnitude = np.max(np.abs(centered), axis=0)
+    failed = (~np.isfinite(scale)) | ((scale == 0.0) & (magnitude > 0.0))
+    if np.any(failed):
+        normalized_scale = np.std(
+            centered[:, failed] / magnitude[failed],
+            axis=0,
+            ddof=1,
+        )
+        computed = normalized_scale * magnitude[failed]
+        scale[failed] = np.where(computed > 0.0, computed, magnitude[failed])
     return np.where(scale == 0.0, 1.0, scale).astype(np.float64, copy=False)
 
 
@@ -114,8 +148,14 @@ def _response_standardized_mse(
         )
     if not np.all(np.isfinite(scale)) or np.any(scale <= 0.0):
         raise ValueError("response_scale must contain positive finite values.")
-    standardized_residual = (true_array - pred_array) / scale[None, :]
-    return float(np.mean(np.square(standardized_residual)))
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        standardized_residual = (true_array - pred_array) / scale[None, :]
+        mse = float(np.mean(np.square(standardized_residual)))
+    if not np.isfinite(mse):
+        raise ValueError(
+            "Response-standardized MSE is not representable as a finite float64 value."
+        )
+    return mse
 
 
 def _response_scale_for_scoring(estimator: Any) -> ArrayLike:

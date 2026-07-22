@@ -53,6 +53,11 @@ it does not choose or cap the rank. `PiPLSPathCV` suppresses only this expected 
 controlled feature probes, candidate fits, optional OOF fits, and selected full-data refit. Other
 warning categories remain visible.
 
+Both public `fit()` methods are transactional. A failed initial fit or refit removes all fitted
+attributes, including any state from an earlier successful fit. A successful fixed fit exposes only
+finite fitted arrays. `copy=False` may reuse independent writable arrays, but read-only arrays and
+overlapping predictor/response storage are copied as needed to preserve correctness.
+
 ## Model-internal standardization contract
 
 Every `PiPLSRegression.fit` estimates `x_mean_` and `y_mean_` from the observations supplied to

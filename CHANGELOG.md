@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Harden the public numerical boundary: make fixed and path fits transactional, preserve ordinary preprocessing while adding range-safe boundary fallbacks, accept read-only and overlapping inputs with `copy=False`, and reject nonfinite fitted or predicted results.
+
 - Complete the Pulp tutorial selection display by showing the conditional predictor-rank plotting
   code, separate estimator-neutral PLS-family plots from Pi-PLS-specific factorization plots, and
   omit the unreadable heterogeneous-unit regression-coefficient figure from the tutorial while

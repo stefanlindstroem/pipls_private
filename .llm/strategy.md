@@ -561,6 +561,9 @@ each artifact into a separate clean environment outside the checkout, and runs o
 runtime smoke test with metadata and import-origin checks.
 
 Current status: **compatibility policy, CI matrix, and installed-distribution validation complete**.
+Decision 0073 additionally hardens the public estimator boundary with transactional fits,
+range-safe preprocessing fallbacks, safe `copy=False` handling, and finite-result enforcement
+without expanding the private numerical core.
 
 ## Current next increment
 

@@ -30,6 +30,12 @@ deviations with `ddof=1`. `scale=False` centers without division. Constant colum
 Every fit owns its learned preprocessing statistics. During `PiPLSPathCV`, each fixed estimator
 clone learns them only from its training fold.
 
+Ordinary means and sample standard deviations are retained for ordinary data. Range-safe fallbacks
+are used only when finite values would otherwise overflow mean or scale calculation, or when a
+nonconstant column would underflow to a zero scale. With `copy=False`, independent writable arrays
+may be centered and scaled in place; read-only arrays and overlapping `X`/`y` storage are copied as
+needed.
+
 ## Statistical-support warning
 
 A direct fixed fit emits `StatisticalSupportWarning` when
@@ -77,6 +83,11 @@ available.
 package response-standardized scorer. `predictor_rank_` records the fitted explicit rank, while
 `max_predictor_rank_` records the centered algebraic limit `min(n_features, n_samples - 1)` for the
 supplied training data.
+
+Fits are transactional. If fitting fails, partial fitted attributes and any earlier fitted model are
+removed. Successful fits, predictions, transformations, and inverse reconstructions must be finite;
+values outside float64 range raise a clear numerical exception instead of being returned as `NaN`
+or infinity.
 
 
 ## Generated reference

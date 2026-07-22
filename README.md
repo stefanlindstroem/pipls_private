@@ -134,6 +134,10 @@ figure.suptitle("Minimal Pi-PLS fit")
 
 `PiPLSRegression` fits one explicit `(n_components, predictor_rank)` pair. It centers `X` and
 `Y` during fitting and, with `scale=True`, learns their training-sample standard deviations.
+Public fits are transactional: a failed fit leaves no earlier or partial fitted state, and
+successful fitted and predicted values must be finite. `copy=False` safely accepts read-only or
+overlapping inputs by copying only where mutation would be unsafe.
+
 Fitting, numerical inspection, and plotting remain separate operations. See the runnable
 [`01_minimal_fit_and_plot.py`](examples/01_minimal_fit_and_plot.py) example and the
 [quickstart guide](docs/quickstart.md).

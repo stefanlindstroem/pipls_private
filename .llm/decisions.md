@@ -78,6 +78,7 @@ This index is navigation, not a substitute for those records.
 | `0070-direct-pls-path-comparison.md` | direct Pi-PLS/PLS comparison | immutable ordinary-PLS path arrays, direct example-owned Matplotlib composition, and removal of comparison CSV intermediates and plotting helper |
 | `0071-final-result-and-example-cleanup.md` | final result and example cleanup | remove duplicate matrix-path aliases, make `cv_results_` the sole detailed surface, and enforce direct in-memory numbered examples |
 | `0072-conditional-predictor-rank-profile.md` | conditional predictor-rank inspection | derive one immutable sorted rank profile on demand from `cv_results_` without another fitted representation |
+| `0073-public-fit-safety.md` | public fit-state and finite-output safety | transactional fits, boundary-safe scaling, safe `copy=False`, and explicit rejection of nonfinite public results |
 
 ## Implemented estimator/search transition
 

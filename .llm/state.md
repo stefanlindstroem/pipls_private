@@ -27,6 +27,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - independent full, randomized, and automatic predictor-SVD policies;
 - hardened public validation and `StatisticalSupportWarning` for direct fixed fits with
   fewer than three observations per retained predictor-rank direction;
+- transactional fixed and path fits, range-safe boundary preprocessing, safe read-only or
+  overlapping `copy=False` inputs, and finite public fitted/output values;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
 - immutable `PiPLSComponentPath` arrays and frozen scalar lookup through `component_path_`;
 - on-demand immutable `PiPLSPredictorRankProfile` results through

@@ -25,7 +25,7 @@ from ._core import (
 from ._sklearn_compat import _validate_estimator_data
 from .decomposition import PiPLSDecomposition
 from .exceptions import StatisticalSupportWarning
-from .metrics import _training_response_scale
+from .metrics import _safe_column_mean, _safe_sample_scale, _training_response_scale
 
 FloatArray = NDArray[np.float64]
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 3.0
@@ -150,6 +150,19 @@ class PiPLSRegression(
             Fitted estimator.
         """
 
+        _clear_fitted_state(self)
+        try:
+            return self._fit(X, y)
+        except np.linalg.LinAlgError as error:
+            _clear_fitted_state(self)
+            raise ValueError(
+                "Pi-PLS fitting failed during numerical decomposition."
+            ) from error
+        except Exception:
+            _clear_fitted_state(self)
+            raise
+
+    def _fit(self, X: ArrayLike, y: ArrayLike) -> PiPLSRegression:
         self._validate_constructor_parameters()
         validated = _validate_estimator_data(
             self,
@@ -166,6 +179,10 @@ class PiPLSRegression(
         X_checked, y_checked = cast(tuple[Any, Any], validated)
         X_array = np.asarray(X_checked, dtype=np.float64)
         y_array_raw = np.array(y_checked, dtype=np.float64, copy=self.copy)
+        if not X_array.flags.writeable:
+            X_array = X_array.copy()
+        if not y_array_raw.flags.writeable or np.may_share_memory(X_array, y_array_raw):
+            y_array_raw = y_array_raw.copy()
         self._y_was_1d = y_array_raw.ndim == 1
         y_array = y_array_raw.reshape(-1, 1) if self._y_was_1d else y_array_raw
 
@@ -231,10 +248,12 @@ class PiPLSRegression(
                 copy=copy,
             ),
         )
-        prediction = cast(
-            FloatArray,
-            np.asarray(X_checked, dtype=np.float64) @ self.coef_.T + self.intercept_,
-        )
+        with np.errstate(over="ignore", invalid="ignore"):
+            prediction = (
+                np.asarray(X_checked, dtype=np.float64) @ self.coef_.T
+                + self.intercept_
+            )
+        _require_finite_output(prediction, operation="Prediction")
         if self._y_was_1d:
             return prediction[:, 0]
         return prediction
@@ -277,8 +296,10 @@ class PiPLSRegression(
                 copy=copy,
             ),
         )
-        X_cs = (np.asarray(X_checked, dtype=np.float64) - self.x_mean_) / self.x_scale_
-        x_scores = cast(FloatArray, X_cs @ self.x_rotations_)
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            X_cs = (np.asarray(X_checked, dtype=np.float64) - self.x_mean_) / self.x_scale_
+            x_scores = X_cs @ self.x_rotations_
+        _require_finite_output(x_scores, operation="Predictor transformation")
         if y is None:
             return x_scores
 
@@ -302,8 +323,10 @@ class PiPLSRegression(
                 "y has an incompatible number of targets: "
                 f"expected {self.n_targets_}, got {y_array.shape[1]}."
             )
-        y_cs = (y_array - self.y_mean_) / self.y_scale_
-        y_scores = cast(FloatArray, y_cs @ self.y_rotations_)
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            y_cs = (y_array - self.y_mean_) / self.y_scale_
+            y_scores = y_cs @ self.y_rotations_
+        _require_finite_output(y_scores, operation="Response transformation")
         return x_scores, y_scores
 
     def fit_transform(
@@ -366,7 +389,9 @@ class PiPLSRegression(
                 "X has an incompatible number of latent components: "
                 f"expected {self.n_components}, got {x_scores.shape[1]}."
             )
-        X_original = (x_scores @ self.x_loadings_.T) * self.x_scale_ + self.x_mean_
+        with np.errstate(over="ignore", invalid="ignore"):
+            X_original = (x_scores @ self.x_loadings_.T) * self.x_scale_ + self.x_mean_
+        _require_finite_output(X_original, operation="Predictor reconstruction")
         if y is None:
             return np.asarray(X_original, dtype=np.float64)
 
@@ -383,7 +408,9 @@ class PiPLSRegression(
                 "y has an incompatible number of latent components: "
                 f"expected {self.n_components}, got {y_scores.shape[1]}."
             )
-        y_original = (y_scores @ self.y_loadings_.T) * self.y_scale_ + self.y_mean_
+        with np.errstate(over="ignore", invalid="ignore"):
+            y_original = (y_scores @ self.y_loadings_.T) * self.y_scale_ + self.y_mean_
+        _require_finite_output(y_original, operation="Response reconstruction")
         return (
             np.asarray(X_original, dtype=np.float64),
             np.asarray(y_original, dtype=np.float64),
@@ -442,32 +469,41 @@ class PiPLSRegression(
         predictor_rank: int,
         max_predictor_rank: int,
     ) -> None:
-        self.x_mean_ = np.mean(X, axis=0)
-        self.y_mean_ = np.mean(y, axis=0)
+        self.x_mean_ = _safe_column_mean(X)
+        self.y_mean_ = _safe_column_mean(y)
         self.response_scale_for_scoring_ = _training_response_scale(y)
-        X -= self.x_mean_
-        y -= self.y_mean_
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            X -= self.x_mean_
+            y -= self.y_mean_
+        _require_finite_output(X, operation="Predictor centering")
+        _require_finite_output(y, operation="Response centering")
 
         if self.scale:
             self.x_scale_ = _safe_sample_scale(X)
             self.y_scale_ = _safe_sample_scale(y)
-            X /= self.x_scale_
-            y /= self.y_scale_
+            with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+                X /= self.x_scale_
+                y /= self.y_scale_
+            _require_finite_output(X, operation="Predictor scaling")
+            _require_finite_output(y, operation="Response scaling")
         else:
             self.x_scale_ = np.ones(X.shape[1], dtype=np.float64)
             self.y_scale_ = np.ones(y.shape[1], dtype=np.float64)
 
         X_cs = X
         y_cs = y
-        result = fit_pipls_core(
-            X_cs,
-            y_cs,
-            predictor_rank=predictor_rank,
-            n_components=self.n_components,
-            svd_solver=self.svd_solver,
-            random_state=self.random_state,
-        )
+        _require_safe_core_products(X_cs, y_cs)
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            result = fit_pipls_core(
+                X_cs,
+                y_cs,
+                predictor_rank=predictor_rank,
+                n_components=self.n_components,
+                svd_solver=self.svd_solver,
+                random_state=self.random_state,
+            )
 
+        _require_finite_core_result(result)
         self.predictor_rank_ = predictor_rank
         self.max_predictor_rank_ = max_predictor_rank
         self.decomposition_ = PiPLSDecomposition._from_core_result(result)
@@ -477,15 +513,24 @@ class PiPLSRegression(
         self.y_weights_ = self.y_rotations_
         self._n_features_out = self.n_components
 
-        coef_matrix = result.regression_map * self.y_scale_[None, :] / self.x_scale_[:, None]
-        self.coef_ = np.asarray(coef_matrix.T, dtype=np.float64)
-        self.intercept_ = self.y_mean_ - self.x_mean_ @ coef_matrix
-        self.x_scores_ = X_cs @ self.x_rotations_
-        self.y_scores_ = y_cs @ self.y_rotations_
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            coef_matrix = (
+                result.regression_map
+                * self.y_scale_[None, :]
+                / self.x_scale_[:, None]
+            )
+            self.coef_ = np.asarray(coef_matrix.T, dtype=np.float64)
+            self.intercept_ = self.y_mean_ - self.x_mean_ @ coef_matrix
+            self.x_scores_ = X_cs @ self.x_rotations_
+            self.y_scores_ = y_cs @ self.y_rotations_
+        for name in ("coef_", "intercept_", "x_scores_", "y_scores_"):
+            _require_finite_output(getattr(self, name), operation=f"Fitted {name}")
         x_loadings, _, _, _ = np.linalg.lstsq(self.x_scores_, X_cs, rcond=None)
         y_loadings, _, _, _ = np.linalg.lstsq(self.y_scores_, y_cs, rcond=None)
         self.x_loadings_ = np.asarray(x_loadings.T, dtype=np.float64)
         self.y_loadings_ = np.asarray(y_loadings.T, dtype=np.float64)
+        _require_finite_output(self.x_loadings_, operation="Fitted x_loadings_")
+        _require_finite_output(self.y_loadings_, operation="Fitted y_loadings_")
 
     def _validate_constructor_parameters(self) -> None:
         _validate_positive_int(self.n_components, name="n_components")
@@ -511,9 +556,37 @@ class PiPLSRegression(
         _validate_random_state(self.random_state)
 
 
-def _safe_sample_scale(centered: FloatArray) -> FloatArray:
-    scale = np.std(centered, axis=0, ddof=1)
-    return cast(FloatArray, np.where(scale == 0.0, 1.0, scale))
+def _clear_fitted_state(estimator: BaseEstimator) -> None:
+    for name in tuple(vars(estimator)):
+        if name.endswith("_") or name in {"_n_features_out", "_y_was_1d"}:
+            delattr(estimator, name)
+
+
+def _require_safe_core_products(X: FloatArray, y: FloatArray) -> None:
+    x_max = float(np.max(np.abs(X)))
+    y_max = float(np.max(np.abs(y)))
+    if x_max == 0.0 or y_max == 0.0:
+        return
+    log_bound = np.log(x_max) + np.log(y_max) + np.log(X.shape[0])
+    if log_bound >= np.log(np.finfo(np.float64).max):
+        raise FloatingPointError(
+            "Pi-PLS cross-products may overflow; use scale=True or rescale the input data."
+        )
+
+
+def _require_finite_core_result(result: Any) -> None:
+    for value in (result.Pi, result.C, result.W, result.P, result.D, result.Q):
+        if not np.all(np.isfinite(value)):
+            raise FloatingPointError(
+                "Pi-PLS fitting produced nonfinite factorization values."
+            )
+
+
+def _require_finite_output(value: ArrayLike, *, operation: str) -> None:
+    if not np.all(np.isfinite(np.asarray(value, dtype=np.float64))):
+        raise FloatingPointError(
+            f"{operation} produced values that are not representable as finite float64."
+        )
 
 
 def _validate_positive_int(value: object, *, name: str) -> None:

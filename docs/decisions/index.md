@@ -26,6 +26,7 @@ reference describe the current public behavior directly.
 - [0040: scikit-learn API polish](0040-sklearn-api-polish.md)
 - [0066: immutable component-path API](0066-immutable-component-path-api.md)
 - [0072: conditional predictor-rank profile](0072-conditional-predictor-rank-profile.md)
+- [0073: public fit-state and finite-output safety](0073-public-fit-safety.md)
 
 ## Validation, data, and benchmarks
 

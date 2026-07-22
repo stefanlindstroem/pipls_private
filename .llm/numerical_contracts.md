@@ -12,6 +12,14 @@
 - Singular/eigenvector signs are not identifiers.
 - Basis equality is not required when only the spanned subspace is identifiable.
 - All public fitted arrays must be finite unless an input validation error is raised.
+- Public fixed and path fits are transactional: any failed fit removes previous and partial fitted
+  state, so scikit-learn fitted-state checks report the estimator as unfitted.
+- Ordinary means and sample standard deviations remain the default calculations. Range-safe
+  fallbacks apply only when finite data overflow those calculations or a nonconstant column
+  underflows to a zero sample scale.
+- Public fixed fitting rejects magnitudes that can overflow the core predictor-response
+  cross-product. Prediction, transformation, inverse reconstruction, and response-standardized MSE
+  must either return finite float64 values or raise a clear exception.
 - Invalid requested dimensions raise errors; they are not silently clamped.
 - Numerical changes must include a boundary-case test and state the tolerance used.
 
