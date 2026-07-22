@@ -296,8 +296,9 @@ def test_readme_and_contributing_have_distinct_audiences() -> None:
         assert maintainer_command not in readme
         assert maintainer_command in contributing
 
-    assert "## Repository map" not in readme
-    assert "## Repository map" in contributing
+    repository_paths = ("src/pipls/", "benchmarks/", "constraints/", ".llm/")
+    assert not any(repository_path in readme for repository_path in repository_paths)
+    assert all(repository_path in contributing for repository_path in repository_paths)
 
 
 def test_public_markdown_has_no_ascii_control_characters() -> None:

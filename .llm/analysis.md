@@ -132,7 +132,9 @@ figure unsuitable for the walkthrough; the plotting API and numbered-example fig
 Plot-specific sections link to the general inspection and plotting references rather than
 duplicating API contracts. Prediction figures must retain the selection-conditioned OOF provenance.
 
-Documentation ownership is fixed by Decisions 0074--0077. The synthetic tutorial owns the
+Documentation ownership is fixed by Decisions 0074--0078. The API overview owns the public
+result-object map, and the task-oriented troubleshooting page owns common public-API recovery
+paths without becoming another tutorial. The synthetic tutorial owns the
 minimum normal workflow. The Pulp tutorial owns the real-data selection qualification,
 selection-conditioned OOF boundary, immutable inspection-result handoff, and a representative set
 of generated interpretation figures. The complete plot catalogue belongs to

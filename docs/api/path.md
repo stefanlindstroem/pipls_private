@@ -11,6 +11,7 @@ a selected estimator are available only when `refit=True`.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, tie-breaking, pipelines,
 and detailed result surfaces, see [Advanced path-search behavior](../path_analysis.md).
+For candidate-feasibility, refit, scoring, or metadata problems, see [Troubleshooting](../troubleshooting.md).
 
 ::: pipls.PiPLSPathCV
     options:

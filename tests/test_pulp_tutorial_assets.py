@@ -144,9 +144,9 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         mkdocs = yaml.safe_load(stream)
 
     tutorial_nav = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
-    assert tutorial_nav == [
-        {"1. First model with synthetic data": "tutorials/synthetic.md"},
-        {"2. Complete Pulp analysis": "tutorials/pulp.md"},
+    assert [next(iter(item.values())) for item in tutorial_nav] == [
+        "tutorials/synthetic.md",
+        "tutorials/pulp.md",
     ]
     snippets = next(
         extension["pymdownx.snippets"]
@@ -243,11 +243,8 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert "for n_components, cv_mse, predictor_rank in zip(" not in example
     assert "for n_components, mean_mse, predictor_rank in zip(" not in renderer
 
-    assert "lowest evaluated mean CV-MSE" in tutorial
-    assert "upper search boundary" in tutorial
-    assert "for_n_components()` only retrieves" in tutorial
-    assert "CV-MSE minimum: rank" in example
-    assert "CV-MSE minimum: rank" in renderer
+    assert "rank_profile.selected.predictor_rank" in example
+    assert "profile.selected.predictor_rank" in renderer
     assert "path_search.predictor_rank_profile(selected.n_components)" in example
     assert "path_search.predictor_rank_profile(selected.n_components)" in renderer
     assert "examples/10_pulp_real_data.py:plot-pulp-rank-profile" in tutorial
@@ -256,16 +253,11 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert 'legend(title="Component")' not in example
     assert 'legend(title="Component")' not in renderer
 
-    standard_structure = "### Standard PLS-family latent-structure plot"
-    pipls_specific = "### Pi-PLS-specific factorization plot"
-    standard_prediction = "### Standard PLS-family prediction plots"
     assert (
-        tutorial.index(standard_structure)
-        < tutorial.index(pipls_specific)
-        < tutorial.index(standard_prediction)
+        tutorial.index("biplot.svg")
+        < tutorial.index("predictor_directions.svg")
+        < tutorial.index("observed_vs_predicted.svg")
     )
-    assert "## Common variations" not in tutorial
-    assert "The plots below are representative rather than exhaustive" in tutorial
     omitted_figures = {
         "scores.svg",
         "x_loadings.svg",

@@ -83,6 +83,7 @@ This index is navigation, not a substitute for those records.
 | `0075-two-tier-tutorial-route.md` | staged programming-user tutorials | synthetic selection and prediction first; complete Pulp analysis second |
 | `0076-focused-pulp-tutorial.md` | focused second-stage tutorial | real-data selection qualification, selection-conditioned OOF analysis, and representative fitted-model plots |
 | `0077-audience-oriented-documentation-entry.md` | user and maintainer documentation entry | concise user README, contributor-owned maintenance commands, and project-validation navigation |
+| `0078-documentation-reference-cleanup.md` | documentation reference cleanup | result-object map, troubleshooting, generic link and anchor checks, and tests that avoid freezing living prose |
 
 ## Implemented estimator/search transition
 

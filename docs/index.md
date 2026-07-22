@@ -39,6 +39,7 @@ contracts.
 - [Path selection](api/path.md): search parameters and immutable path results.
 - [Advanced path-search behavior](path_analysis.md): bounds, policies, pipelines, and refitting.
 - [Cross-validation](cross_validation.md): splitters, scoring, OOF output, and provenance.
+- [Troubleshooting](troubleshooting.md): common fit, selection, scoring, and plotting problems.
 - [Model inspection](model_inspection.md): general interpretation of fitted quantities and plots.
 - [Examples](examples.md): maintained executable analyses and their outputs.
 

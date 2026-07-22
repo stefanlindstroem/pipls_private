@@ -56,6 +56,10 @@
   documentation pages instead.
 - User guides describe implemented theory and behavior. Do not preserve rejected or unused options
   merely because they appeared in design discussions.
+- Keep one task-oriented troubleshooting page and one API result-object map. Validate local
+  documentation links and anchors generically; do not duplicate explanatory sentences in tests.
+- Do not expose internal phase or patch labels in served user guides. Maintainer chronology belongs
+  in `.llm` and excluded decision records.
 - Keep the root README focused on package users: orientation, installation, compact fixed and
   selected-model workflows, tutorial routes, and public reference links. Development environments,
   Make targets, distribution checks, repository layout, and snapshot instructions belong in

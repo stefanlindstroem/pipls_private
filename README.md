@@ -121,6 +121,7 @@ Install the `examples` extra before running them.
 - [API overview](docs/api/index.md)
 - [Advanced path-search behavior](docs/path_analysis.md)
 - [Cross-validation and OOF reporting](docs/cross_validation.md)
+- [Troubleshooting](docs/troubleshooting.md)
 - [Model inspection](docs/model_inspection.md)
 - [Reference datasets](docs/datasets.md)
 - [Theory](docs/theory.md)

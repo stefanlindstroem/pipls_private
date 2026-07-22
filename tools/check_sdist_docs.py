@@ -141,6 +141,7 @@ def main() -> None:
             source / "docs" / "tutorials" / "synthetic.md",
             source / "docs" / "tutorials" / "pulp.md",
             source / "docs" / "api" / "index.md",
+            source / "docs" / "troubleshooting.md",
             source / "docs" / "javascripts" / "mathjax.js",
             source / "tools" / "render_synthetic_tutorial.py",
             source / "tools" / "render_pulp_tutorial.py",
@@ -205,6 +206,7 @@ def main() -> None:
             source / "site" / "tutorials" / "synthetic" / "index.html",
             source / "site" / "tutorials" / "pulp" / "index.html",
             source / "site" / "api" / "regression" / "index.html",
+            source / "site" / "troubleshooting" / "index.html",
             source / "site" / "api" / "inspection" / "index.html",
             source / "site" / "assets" / "generated" / "synthetic" / "component_path.svg",
             source

@@ -78,7 +78,10 @@ snippet sections from examples 02 and 10, links to stable API objects, and links
 model-inspection anchors without freezing narrative wording. Documentation-entry tests may verify
 that the README contains the two compact public workflows and tutorial routes while maintainer-only
 commands and the repository map remain in `CONTRIBUTING.md`; do not pin line counts or exact
-prose. Structural
+prose. Generic served-Markdown tests should resolve local files and anchors, including explicit and
+mkdocstrings-generated object anchors. The API overview should keep one discoverable map of public
+result objects, and troubleshooting should remain a task-oriented reference rather than a third
+tutorial. Structural
 tests may also require generated Pulp image references to remain tutorial-owned and keep
 example-specific report implementation out of the general inspection reference. Small synthetic
 matrices protect generic OOF and report contracts. One module-scoped Pulp numerical run may verify

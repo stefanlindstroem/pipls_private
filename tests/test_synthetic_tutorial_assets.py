@@ -140,9 +140,9 @@ def test_synthetic_tutorial_is_the_first_learning_route() -> None:
         mkdocs = yaml.safe_load(stream)
 
     tutorials = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
-    assert tutorials == [
-        {"1. First model with synthetic data": "tutorials/synthetic.md"},
-        {"2. Complete Pulp analysis": "tutorials/pulp.md"},
+    assert [next(iter(item.values())) for item in tutorials] == [
+        "tutorials/synthetic.md",
+        "tutorials/pulp.md",
     ]
 
     for source_path in (repository / "README.md", repository / "docs" / "index.md"):

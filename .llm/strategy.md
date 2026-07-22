@@ -510,16 +510,16 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **two-tier tutorial route, focused Pulp tutorial, and audience-oriented entry
-implemented**. Decisions 0049--0065 establish the self-contained documentation, generated
+Current status: **documentation Patches D1--D4 complete**. Decisions 0049--0065 establish the
+self-contained documentation, generated
 reference, compatibility validation, atomic plotting, and canonical Pulp workflow. Decision 0074
 removes redundant task guides. Decision 0075 adds the short synthetic selection-and-prediction
 tutorial, Decision 0076 repositions the Pulp tutorial around real-data selection qualification,
 selection-conditioned OOF analysis, and six representative plots, and Decision 0077 reduces the
 README while moving maintenance ownership to `CONTRIBUTING.md` and project-validation navigation.
 Phase F4 has completed the owner-approved pre-release result and example simplification.
-Documentation Patch D4, reference cleanup and ownership enforcement, is next before release
-metadata.
+Decision 0078 completes the reference cleanup with a result-object map, troubleshooting,
+link-and-anchor validation, and documentation tests that avoid freezing living prose.
 
 ### Current standardization and deferred block-aware variants
 
@@ -573,8 +573,8 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-Documentation Patch D4: clean remaining references and enforce documentation ownership without
-freezing exact prose. First-release preparation follows.
+First-release preparation is next: choose the initial version, complete metadata and release
+notes, and rehearse the tag and publication checklist.
 
 ## Maintenance protocol
 

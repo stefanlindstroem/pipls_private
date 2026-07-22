@@ -72,12 +72,16 @@ implementation was removed and replaced by focused question-specific benchmarks:
   advanced references;
 - a compact documentation navigation without separate quickstart, estimator, parameter-selection,
   or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
-  exact estimator contracts, and retained path and validation pages cover advanced behavior.
+  exact estimator contracts, and retained path and validation pages cover advanced behavior;
 - an audience-oriented documentation entry: the root README owns package orientation, installation,
   two compact workflows, and tutorial routes; `CONTRIBUTING.md` owns development and repository
-  maintenance; served navigation separates programming reference from project validation.
+  maintenance; served navigation separates programming reference from project validation;
+- a completed documentation reference layer with a public result-object map, task-oriented
+  troubleshooting, generic local-link and anchor validation, and tests that protect structure
+  without freezing explanatory prose.
 
-Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+Decision 0078 completes documentation Patches D1--D4 and advances the roadmap to first-release
+preparation. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
@@ -290,16 +294,14 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Documentation Patch D4: clean remaining references and enforce documentation ownership without
-freezing exact prose.
+First-release preparation: choose the initial version, complete metadata and release notes, and
+rehearse the tag and publication checklist.
 
 ## Subsequent roadmap
 
-1. **Documentation Patch D4:** clean references and enforce documentation ownership without
-   freezing exact prose.
-2. **First-release preparation:** choose the initial version, complete metadata and release notes,
-   and rehearse the tag and publication checklist.
-3. **First tagged release:** publish only after the rehearsal and checklist pass.
+1. **First-release preparation:** choose the initial version, complete metadata and release
+   notes, and rehearse the tag and publication checklist.
+2. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

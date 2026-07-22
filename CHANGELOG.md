@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Complete the documentation cleanup with a public result-object map, a task-oriented troubleshooting page, generic local-link and anchor validation, removal of internal phase language from served guides, and less prose-coupled tutorial tests.
+
 - Reduce the root README to package orientation, installation, two compact workflows, and tutorial
   routes; move development, validation, distribution, snapshot, and repository-layout instructions
   to `CONTRIBUTING.md`; and separate programming reference from project validation in the served

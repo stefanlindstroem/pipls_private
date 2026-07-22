@@ -1,6 +1,6 @@
 # Dataset interface and synthetic generator
 
-Phase E1 introduces an optional structured in-memory dataset boundary for package-owned
+The optional dataset interface provides a structured in-memory boundary for package-owned
 synthetic data and experiments. Real-data users may pass ordinary arrays or data frames directly
 to `fit(X, Y)`; no container or metadata file is required for model fitting. Repository-included
 real datasets nevertheless use a consistent documentary `metadata.yaml`.

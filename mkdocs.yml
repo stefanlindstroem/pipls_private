@@ -22,6 +22,7 @@ nav:
       - Path selection: api/path.md
       - Advanced path-search behavior: path_analysis.md
       - Cross-validation: cross_validation.md
+      - Troubleshooting: troubleshooting.md
       - Model inspection: model_inspection.md
       - Inspection API: api/inspection.md
       - Plotting: api/plotting.md
