@@ -67,7 +67,11 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - a direct Pi-PLS/ordinary-PLS comparison whose two immutable component paths are plotted together
   in example 09 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
 - a tutorial-first served site whose primary Pulp walkthrough includes every generated chart
-  separately and links each interpretation to the general inspection, plotting, and theory references.
+  separately, owns the normal workflow and common estimator variations, and links each
+  interpretation to the general inspection, plotting, and theory references;
+- a compact documentation navigation without separate quickstart, estimator, parameter-selection,
+  or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
+  exact estimator contracts, and retained path and validation pages cover advanced behavior.
 
 Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS

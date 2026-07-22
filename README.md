@@ -12,8 +12,9 @@ The public interfaces follow scikit-learn conventions and also provide validatio
 transparent reference datasets. See the [theory overview](docs/theory.md) for the construction.
 
 The recommended documentation entry point is the
-[complete Pulp tutorial](docs/tutorials/pulp.md), which covers pipeline construction, parameter
-selection, fixed fitting, out-of-fold prediction, and figure-by-figure interpretation.
+[complete Pulp tutorial](docs/tutorials/pulp.md), which covers data loading, parameter selection,
+fixed fitting, common estimator variations, out-of-fold prediction, and figure-by-figure
+interpretation.
 
 ## Installation
 
@@ -140,7 +141,7 @@ overlapping inputs by copying only where mutation would be unsafe.
 
 Fitting, numerical inspection, and plotting remain separate operations. See the runnable
 [`01_minimal_fit_and_plot.py`](examples/01_minimal_fit_and_plot.py) example and the
-[quickstart guide](docs/quickstart.md).
+[fixed-regression reference](docs/api/regression.md).
 
 `PiPLSPathCV` is the separate model-selection interface. It clones and fits fixed estimators inside
 every training fold, then optionally refits the selected pair on the complete training set.
@@ -431,15 +432,13 @@ environment outside the checkout, and runs the same public-import, metadata, fit
 smoke test against both artifacts.
 
 - [Complete Pulp tutorial](docs/tutorials/pulp.md)
-- [Quickstart](docs/quickstart.md)
 - [Examples](docs/examples.md)
 - [Documentation index](docs/index.md)
-- [Estimator API](docs/estimator_api.md)
-- [Parameter selection](docs/parameter_selection.md)
-- [Path analysis](docs/path_analysis.md)
+- [Fixed-regression reference](docs/api/regression.md)
+- [Path-selection reference](docs/api/path.md)
+- [Advanced path-search behavior](docs/path_analysis.md)
 - [Cross-validation and OOF reporting](docs/cross_validation.md)
 - [Numerical model inspection](docs/model_inspection.md)
-- [Model-internal preprocessing](docs/preprocessing.md)
 - [Datasets and synthetic generation](docs/datasets.md)
 - [Lightweight validation benchmarks](docs/benchmarks.md)
 - [Theory](docs/theory.md)

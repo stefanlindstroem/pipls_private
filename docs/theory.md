@@ -149,8 +149,10 @@ state whether they use fitted values, fixed-parameter out-of-fold predictions, s
 out-of-fold predictions, or an independent test set.
 
 See the [Pulp tutorial](tutorials/pulp.md) for a complete worked analysis.
-[`parameter_selection.md`](parameter_selection.md), [`path_analysis.md`](path_analysis.md), and
-[`cross_validation.md`](cross_validation.md) define the general selection and validation contracts.
+The [Pulp tutorial](tutorials/pulp.md#evaluate-the-component-path),
+[advanced path-search reference](path_analysis.md), and
+[cross-validation reference](cross_validation.md) define the general selection and validation
+contracts.
 
 ## Reference and scope
 

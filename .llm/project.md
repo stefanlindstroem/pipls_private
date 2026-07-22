@@ -50,14 +50,17 @@ own every report figure, panel, legend, title, PDF operation, and close. Decisio
 establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
 generates its deterministic single-chart SVG assets and manifest. Decision 0064 makes the detailed
 Pulp tutorial the primary pedagogical route through the served documentation, using checked source
-snippets and one generated chart per explanation. Decision 0065 completes the transition by
-separating tutorial, task-guide, scientific-reference, and generated-API ownership. Decision 0066
-introduces the immutable concise component-path API. Decision 0067 makes Sugarcane direct, and
+snippets and one generated chart per explanation. Decision 0065 first separates tutorial,
+scientific-reference, and generated-API ownership. Decision 0074 then removes the redundant task-
+guide layer: the tutorial owns normal use, generated API pages own exact estimator contracts, and
+advanced path and validation pages retain specialized behavior. Decision 0066 introduces the
+immutable concise component-path API. Decision 0067 makes Sugarcane direct, and
 Decision 0068 makes the Pulp example and tutorial direct while removing the shared workflow wrapper.
 Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers.
 Decision 0070 makes the Pi-PLS/ordinary-PLS comparison direct. Decision 0071 removes duplicate
 matrix-path aliases and completes structural enforcement of in-memory numbered examples.
 Decision 0072 adds an on-demand immutable predictor-rank profile derived from `cv_results_`.
+Decision 0073 hardens the public numerical boundary and fitted-state transaction.
 
 ## Implemented estimator and selection boundary
 

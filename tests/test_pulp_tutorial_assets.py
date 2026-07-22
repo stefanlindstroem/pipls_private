@@ -165,10 +165,12 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
 
     linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
     assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(encoding="utf-8")
-    assert "tutorials/pulp.md" in (repository / "docs" / "quickstart.md").read_text(
-        encoding="utf-8"
-    )
+    assert "tutorials/pulp.md" in (
+        repository / "docs" / "api" / "regression.md"
+    ).read_text(encoding="utf-8")
     assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(encoding="utf-8")
+    assert "../api/regression.md" in linked_targets
+    assert "../path_analysis.md" in linked_targets
     assert "../cross_validation.md" in linked_targets
     assert "../model_inspection.md" in linked_targets
     assert "../theory.md" in linked_targets
@@ -295,8 +297,10 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     inspection = (docs / "model_inspection.md").read_text(encoding="utf-8")
     plotting_reference = (docs / "api" / "plotting.md").read_text(encoding="utf-8")
     examples = (docs / "examples.md").read_text(encoding="utf-8")
-    parameter_selection = (docs / "parameter_selection.md").read_text(encoding="utf-8")
+    regression_reference = (docs / "api" / "regression.md").read_text(encoding="utf-8")
     path_reference = (docs / "path_analysis.md").read_text(encoding="utf-8")
+    with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
+        mkdocs = yaml.safe_load(stream)
 
     image_owners = {
         path.relative_to(docs).as_posix()
@@ -341,7 +345,25 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     assert "```python" not in plotting_reference
     assert "assets/generated/pulp/" not in examples
 
-    assert "path_analysis.md" in parameter_selection
-    assert "tutorials/pulp.md" in parameter_selection
+    removed_guides = {
+        "quickstart.md",
+        "estimator_api.md",
+        "parameter_selection.md",
+        "preprocessing.md",
+    }
+    assert not any((docs / filename).exists() for filename in removed_guides)
+    navigation_text = (repository / "mkdocs.yml").read_text(encoding="utf-8")
+    assert not any(filename in navigation_text for filename in removed_guides)
+    assert [next(iter(item)) for item in mkdocs["nav"]] == [
+        "Home",
+        "Tutorial",
+        "Examples",
+        "Reference",
+        "Data and validation",
+        "Scientific background",
+    ]
+
+    assert "tutorials/pulp.md" in regression_reference
+    assert "tutorials/pulp.md" in path_reference
     assert "Example 09" not in path_reference
     assert "Examples 10" not in path_reference

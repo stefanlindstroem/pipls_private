@@ -79,6 +79,7 @@ This index is navigation, not a substitute for those records.
 | `0071-final-result-and-example-cleanup.md` | final result and example cleanup | remove duplicate matrix-path aliases, make `cv_results_` the sole detailed surface, and enforce direct in-memory numbered examples |
 | `0072-conditional-predictor-rank-profile.md` | conditional predictor-rank inspection | derive one immutable sorted rank profile on demand from `cv_results_` without another fitted representation |
 | `0073-public-fit-safety.md` | public fit-state and finite-output safety | transactional fits, boundary-safe scaling, safe `copy=False`, and explicit rejection of nonfinite public results |
+| `0074-tutorial-owned-user-workflow.md` | consolidated user documentation | tutorial owns normal use, generated API pages own exact estimator contracts, and advanced guides retain only specialized behavior |
 
 ## Implemented estimator/search transition
 

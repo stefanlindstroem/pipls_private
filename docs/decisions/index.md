@@ -88,3 +88,4 @@ reference describe the current public behavior directly.
 - [0059: atomic Pi-PLS factor plots](0059-atomic-pipls-factor-plots.md)
 - [0060: atomic prediction-diagnostic plots](0060-atomic-prediction-diagnostic-plots.md)
 - [0061: example-owned report composition](0061-example-owned-report-composition.md)
+- [0074: tutorial-owned user workflow](0074-tutorial-owned-user-workflow.md)

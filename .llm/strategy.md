@@ -510,10 +510,13 @@ Decision 0049 establishes `docs/` as the self-contained public source, adds publ
 decision navigation, makes the theory guide independent of `.llm`, and removes unused alternatives
 from current documentation.
 
-Current status: **tutorial-first documentation complete**. Decisions 0049--0065 establish the
-self-contained documentation, generated reference, compatibility validation, atomic plotting,
-canonical tutorial workflow, and page ownership. Phase F4 has completed the owner-approved
-pre-release result and example simplification; release metadata is the next concern.
+Current status: **tutorial-first documentation consolidated**. Decisions 0049--0065 establish the
+self-contained documentation, generated reference, compatibility validation, atomic plotting, and
+canonical tutorial workflow. Decision 0074 removes the redundant quickstart, estimator, selection,
+and preprocessing guide pages: the tutorial owns normal use, generated API pages own exact estimator
+contracts, and the retained path and validation guides cover advanced behavior. Phase F4 has
+completed the owner-approved pre-release result and example simplification; release metadata is the
+next concern.
 
 ### Current standardization and deferred block-aware variants
 

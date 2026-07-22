@@ -14,28 +14,22 @@ nav:
   - Home: index.md
   - Tutorial:
       - Pulp workflow: tutorials/pulp.md
-  - Getting started:
-      - Quickstart: quickstart.md
-      - Compatibility: compatibility.md
-      - Examples: examples.md
-      - Estimator API: estimator_api.md
-  - Using Pi-PLS:
-      - Parameter selection: parameter_selection.md
-      - Path-search reference: path_analysis.md
-      - Cross-validation: cross_validation.md
-      - Preprocessing: preprocessing.md
-  - Model inspection: model_inspection.md
-  - API reference:
-      - Overview: api/index.md
+  - Examples: examples.md
+  - Reference:
+      - API overview: api/index.md
       - Fixed regression: api/regression.md
       - Path selection: api/path.md
+      - Advanced path-search behavior: path_analysis.md
+      - Cross-validation: cross_validation.md
+      - Model inspection: model_inspection.md
+      - Inspection API: api/inspection.md
+      - Plotting: api/plotting.md
       - Decomposition: api/decomposition.md
       - Validation report: api/validation.md
       - Warnings: api/exceptions.md
-      - Inspection: api/inspection.md
-      - Plotting: api/plotting.md
       - Datasets and synthetic data: api/datasets.md
       - Metrics: api/metrics.md
+      - Compatibility: compatibility.md
   - Data and validation:
       - Datasets: datasets.md
       - Benchmarks: benchmarks.md

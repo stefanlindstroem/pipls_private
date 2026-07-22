@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Consolidate the user documentation around the Pulp tutorial: add common estimator variations to
+  the tutorial, move exact preprocessing, solver, fit-state, and result contracts beside the
+  generated API, retain only advanced path and validation references, flatten the site navigation,
+  and remove the redundant quickstart, estimator, parameter-selection, and preprocessing pages.
+
 - Harden the public numerical boundary: make fixed and path fits transactional, preserve ordinary preprocessing while adding range-safe boundary fallbacks, accept read-only and overlapping inputs with `copy=False`, and reject nonfinite fitted or predicted results.
 
 - Complete the Pulp tutorial selection display by showing the conditional predictor-rank plotting

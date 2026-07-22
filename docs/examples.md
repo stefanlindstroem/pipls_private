@@ -8,7 +8,8 @@ is a catalogue of the maintained scripts.
 
 `examples/01_minimal_fit_and_plot.py` uses literal NumPy arrays, fits one fixed
 `PiPLSRegression`, predicts responses, and creates a caller-owned $2\times2$ factor panel. It does
-not perform parameter selection. The same calculation appears in the [quickstart](quickstart.md).
+not perform parameter selection. The [fixed-regression reference](api/regression.md) documents
+its estimator contract.
 
 ## Synthetic train/test problem
 

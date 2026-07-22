@@ -130,11 +130,14 @@ figure unsuitable for the walkthrough; the plotting API and numbered-example fig
 Plot-specific sections link to the general inspection and plotting references rather than
 duplicating API contracts. Prediction figures must retain the selection-conditioned OOF provenance.
 
-Documentation ownership is fixed by Decision 0065. The tutorial owns the linear Pulp narrative and
-all generated Pulp figures. `model_inspection.md` owns general figure-by-figure interpretation with
-stable anchors. `docs/api/plotting.md` owns signatures and operational contracts only. Example pages
-may describe script purpose and artifacts but must not reproduce the tutorial analysis or embed its
-generated figures.
+Documentation ownership is fixed by Decision 0074. The tutorial owns the normal user workflow,
+common estimator variations, the linear Pulp narrative, and all generated Pulp figures. The home
+page owns only a minimal fixed-fit entry. Generated fixed-regression and path pages own exact
+estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md` and
+`cross_validation.md` retain only advanced search and validation behavior. `model_inspection.md`
+owns general figure-by-figure interpretation with stable anchors, while `docs/api/plotting.md` owns
+signatures and operational contracts only. Example pages may describe script purpose and artifacts
+but must not reproduce the tutorial analysis or embed its generated figures.
 
 Pulp is the canonical tutorial analysis. `examples/10_pulp_real_data.py` owns its direct pandas
 loading, `PiPLSPathCV(refit=False)` evaluation, visible three-component choice, conditional

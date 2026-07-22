@@ -88,9 +88,8 @@ scientific purpose should all be considered.
 The selected row records `predictor_rank=10` because rank 10 gives the lowest evaluated mean CV-MSE
 for three components. That conditional minimum is examined next and is used only when the fixed
 model is fitted. The predictor rank must be taken from the same row as the chosen component count.
-See
-[Parameter selection](../parameter_selection.md) and the
-[`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV).
+See [Advanced path-search behavior](../path_analysis.md) for nondefault search policies and the
+[`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV) for the exact result contract.
 
 ## Inspect the conditional predictor-rank profile
 
@@ -139,8 +138,9 @@ the fixed rank pair:
 The path-search object and the fitted estimator have different roles: the first supports model
 selection, while the second represents the chosen model and supplies predictions and inspection
 results. `PiPLSRegression` learns predictor and response centering and scaling inside every fit; no
-external scaler is used here. See [Preprocessing](../preprocessing.md) and the
-[`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression).
+external scaler is used here. The
+[`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression) documents preprocessing,
+solver, fitted-state, and method contracts.
 
 ## Generate out-of-fold predictions
 
@@ -330,6 +330,72 @@ identical to the fold-local standardized losses used during component-path selec
 See [Standardized RMSE](../model_inspection.md#standardized-rmse) and
 [`plot_standardized_rmse()`](../api/plotting.md#pipls.plotting.plot_standardized_rmse).
 
+## Common variations
+
+The workflow above keeps the model-selection sequence explicit. The same public estimators also
+cover several common variations without introducing a second package-specific workflow.
+
+### Fit one known rank pair directly
+
+When both ranks are already fixed by an external protocol, fit `PiPLSRegression` directly:
+
+```python
+from pipls import PiPLSRegression
+
+model = PiPLSRegression(
+    n_components=2,
+    predictor_rank=4,
+).fit(X_train, Y_train)
+
+Y_pred = model.predict(X_test)
+```
+
+This estimator performs no internal parameter selection. It always centers predictors and
+responses and, with `scale=True`, learns sample standard deviations from the current training data.
+A failed fit leaves the estimator unfitted rather than preserving partial or earlier fitted state.
+
+### Change the validation design or scorer
+
+`cv=` accepts ordinary scikit-learn splitters, and group-aware splitters receive `groups` through
+`fit()`:
+
+```python
+from sklearn.model_selection import GroupKFold
+
+search = PiPLSPathCV(
+    cv=GroupKFold(n_splits=5),
+    scoring="neg_mean_absolute_error",
+    refit=False,
+).fit(X, Y, groups=sample_groups)
+```
+
+Selection always maximizes the configured mean test score. The CV-MSE-minimization interpretation
+used throughout this tutorial is specific to the default negative response-standardized-MSE scorer.
+See [Cross-validation](../cross_validation.md) for OOF coverage, repeated folds, temporal splits,
+and leave-one-out interpretation.
+
+### Add learned preprocessing
+
+Pi-PLS centering and optional scaling already occur inside every estimator fit. Additional learned
+preprocessing should be placed before `PiPLSRegression` in a supported scikit-learn pipeline so that
+the complete pipeline is cloned and fitted separately inside every validation fold. Do not fit such
+preprocessing on the complete dataset before path evaluation. See
+[Advanced path-search behavior](../path_analysis.md#pipelines-and-fold-local-preprocessing).
+
+### Refit the globally best evaluated pair
+
+Set `refit=True` when the scorer-defined global best evaluated candidate should be fitted
+automatically on all supplied data:
+
+```python
+search = PiPLSPathCV(refit=True).fit(X, Y)
+Y_pred = search.predict(X_new)
+```
+
+The tutorial uses `refit=False` because it chooses the component count from the path explicitly and
+then fits one fixed model. With `refit=True`, the selected pair is determined entirely by the
+configured scorer and tie-breaking rules.
+
 ## Complete executable example
 
 The maintained example contains the complete calculation and figure composition directly:
@@ -354,8 +420,8 @@ from in-memory results and write no generated analytical CSV files.
 
 ## Next steps
 
-- Use [Parameter selection](../parameter_selection.md) for all path-search options and tie-breaking
-  rules.
+- Use [Advanced path-search behavior](../path_analysis.md) for nondefault bounds, policies,
+  pipelines, refitting, and detailed result surfaces.
 - Use [Model inspection](../model_inspection.md) for general definitions that are not specific to
   Pulp.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, synthetic data, and the ordinary-PLS path
