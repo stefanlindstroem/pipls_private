@@ -48,6 +48,7 @@ path = path_search.component_path_
 # --8<-- [end:evaluate-pulp-component-path]
 
 # --8<-- [start:select-pulp-parameters]
+# The stored predictor rank minimizes mean CV-MSE for this component count.
 selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 # --8<-- [end:select-pulp-parameters]
 
@@ -111,7 +112,7 @@ axis.scatter(
     [rank_cv_mse_mean[selected_rank_row]],
     marker="D",
     s=70,
-    label=f"Selected predictor rank {selected.predictor_rank}",
+    label=f"CV-MSE minimum: rank {selected.predictor_rank}",
     zorder=3,
 )
 axis.set_xlabel("Predictor rank")
@@ -188,9 +189,9 @@ plot_pipls_weighted_response_directions(
     title=r"Weighted response directions $QD$",
     ax=axes[1, 1],
 )
-axes[0, 0].legend(title="Component")
-axes[1, 0].legend(title="Component")
-axes[1, 1].legend(title="Component")
+axes[0, 0].legend()
+axes[1, 0].legend()
+axes[1, 1].legend()
 for axis in (axes[0, 0], axes[1, 0], axes[1, 1]):
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
@@ -237,8 +238,8 @@ plot_y_loadings(
     ax=axes[1, 1],
 )
 axes[0, 1].legend()
-axes[1, 0].legend(title="Component")
-axes[1, 1].legend(title="Component")
+axes[1, 0].legend()
+axes[1, 1].legend()
 for axis in (axes[1, 0], axes[1, 1]):
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():

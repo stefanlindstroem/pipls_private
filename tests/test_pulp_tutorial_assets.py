@@ -232,6 +232,14 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     assert "for n_components, cv_mse, predictor_rank in zip(" not in example
     assert "for n_components, mean_mse, predictor_rank in zip(" not in renderer
 
+    assert "selects the rank that minimizes" in tutorial
+    assert "rank that minimized mean CV-MSE conditional on" in tutorial
+    assert "rank 10 gives the lowest evaluated mean CV-MSE" in tutorial
+    assert "CV-MSE minimum: rank" in example
+    assert "CV-MSE minimum: rank" in renderer
+    assert 'legend(title="Component")' not in example
+    assert 'legend(title="Component")' not in renderer
+
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
     assert "run_pulp_workflow" not in renderer

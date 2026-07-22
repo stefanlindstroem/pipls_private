@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Clarify that each component-path predictor rank is selected by minimizing mean CV-MSE conditional
+  on the component count, label the Pulp rank-profile minimum explicitly, and remove redundant
+  component legend titles from the Pulp example and tutorial figures.
+
 - Refine the Pulp tutorial selection sequence: introduce `for_n_components()` before the component
   path figure, fit the selected fixed model only after the selection figures, label the horizontal
   axis as the number of components, and remove per-point predictor-rank annotations.

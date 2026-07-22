@@ -28,10 +28,9 @@ Two parameters control the fitted model:
 - `predictor_rank` is the dimension of the predictor subspace available when those pairs are
   estimated.
 
-The two values are selected together. The workflow first evaluates candidate component counts. At
-each count, `PiPLSPathCV` computes response-standardized MSE for every admissible predictor rank in
-each validation fold and selects the rank that minimizes the mean across folds. This mean is the
-reported CV-MSE. The final model is then fitted with one explicit rank pair. See the
+The two values are selected together. The workflow first evaluates candidate component counts. For
+each count, `PiPLSPathCV` selects a predictor rank and reports response-standardized cross-validated
+mean squared error (CV-MSE). The final model is then fitted with one explicit rank pair. See the
 [theory overview](../theory.md#interpretation-of-the-ranks) for the mathematical distinction.
 
 ## Load the data
@@ -54,10 +53,9 @@ The path search is fitted directly to the two response and predictor tables:
 --8<-- "examples/10_pulp_real_data.py:evaluate-pulp-component-path"
 ```
 
-The default `n_components_values="all"` evaluates every admissible component count. For each count,
-the search compares the admissible predictor ranks by mean response-standardized CV-MSE. The path
-row records the rank attaining the lowest evaluated mean, that minimum CV-MSE, and the fold-to-fold
-standard deviation at the minimizing rank.
+The default `n_components_values="all"` evaluates every admissible component count. For each row,
+the search records the conditionally selected predictor rank, mean response-standardized CV-MSE,
+and fold-to-fold standard deviation.
 
 The purpose of the component-path figure is to choose the number of components. This tutorial uses
 `CHOSEN_N_COMPONENTS=3` as an explicit elbow-based choice. Before drawing the figure, the matching
@@ -67,10 +65,8 @@ immutable row is retrieved so that the chosen point can be marked:
 --8<-- "examples/10_pulp_real_data.py:select-pulp-parameters"
 ```
 
-`for_n_components()` does not fit a model or repeat the minimization. It returns the row already
-evaluated for the stated component count. Consequently, `selected.predictor_rank` is the predictor
-rank that minimized mean CV-MSE conditional on `selected.n_components`. The same scalar result is
-used later when the fixed model is fitted.
+`for_n_components()` does not fit a model. It returns the values already evaluated for the stated
+component count. The same scalar result is used later when the fixed model is fitted.
 
 The path can then be plotted with ordinary Matplotlib:
 
@@ -85,11 +81,9 @@ the tutorial's choice of `n_components=3`. This is a stated modeling choice, not
 that three components are always optimal. The absolute minimum, fold variation, parsimony, and
 scientific purpose should all be considered.
 
-The selected row records `predictor_rank=10` because rank 10 gives the lowest evaluated mean CV-MSE
-for three components. That conditional minimum is examined next and is used only when the fixed
-model is fitted. The predictor rank must be taken from the same row as the chosen component count.
-See
-[Parameter selection](../parameter_selection.md) and the
+The selected row also records `predictor_rank=10`. That conditional choice is examined next and is
+used only when the fixed model is fitted. The predictor rank must be taken from the same row as the
+chosen component count. See [Parameter selection](../parameter_selection.md) and the
 [`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV).
 
 ## Inspect the conditional predictor-rank profile

@@ -181,7 +181,7 @@ def _render_predictor_rank_profile(
         [cv_mse_mean[selected]],
         marker="D",
         s=70,
-        label=f"Selected predictor rank {chosen_predictor_rank}",
+        label=f"CV-MSE minimum: rank {chosen_predictor_rank}",
         zorder=3,
     )
     axis.set_title(f"Pulp predictor-rank profile at {chosen_n_components} components")
@@ -282,7 +282,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         title="Pulp X loadings",
         ax=axis,
     )
-    axis.legend(title="Component")
+    axis.legend()
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "x_loadings.svg")
 
@@ -294,7 +294,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         title="Pulp Y loadings",
         ax=axis,
     )
-    axis.legend(title="Component")
+    axis.legend()
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "y_loadings.svg")
 
@@ -307,7 +307,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         title=r"Pulp predictor directions $P$",
         ax=axis,
     )
-    axis.legend(title="Component")
+    axis.legend()
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "predictor_directions.svg")
 
@@ -328,7 +328,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         title=r"Pulp response directions $Q$",
         ax=axis,
     )
-    axis.legend(title="Component")
+    axis.legend()
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "response_directions.svg")
 
@@ -340,7 +340,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         title=r"Pulp weighted response directions $QD$",
         ax=axis,
     )
-    axis.legend(title="Component")
+    axis.legend()
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "weighted_response_directions.svg")
 
