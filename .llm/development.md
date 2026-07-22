@@ -56,6 +56,10 @@
   documentation pages instead.
 - User guides describe implemented theory and behavior. Do not preserve rejected or unused options
   merely because they appeared in design discussions.
+- Keep the root README focused on package users: orientation, installation, compact fixed and
+  selected-model workflows, tutorial routes, and public reference links. Development environments,
+  Make targets, distribution checks, repository layout, and snapshot instructions belong in
+  `CONTRIBUTING.md`.
 - Keep repository commands discoverable through the self-documenting Makefile. `make` and
   `make help` list the maintained targets; each public target carries one `##` description.
 - Build public documentation with the dedicated `docs` dependency extra and `make docs`. Use

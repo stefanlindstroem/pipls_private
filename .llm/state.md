@@ -73,6 +73,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - a compact documentation navigation without separate quickstart, estimator, parameter-selection,
   or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
   exact estimator contracts, and retained path and validation pages cover advanced behavior.
+- an audience-oriented documentation entry: the root README owns package orientation, installation,
+  two compact workflows, and tutorial routes; `CONTRIBUTING.md` owns development and repository
+  maintenance; served navigation separates programming reference from project validation.
 
 Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
@@ -287,18 +290,16 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Documentation Patch D3: reduce the README to orientation, installation, two compact workflows, and
-clear tutorial routes; move repository-maintenance detail to contributor-facing documentation and
-finish the audience-oriented navigation.
+Documentation Patch D4: clean remaining references and enforce documentation ownership without
+freezing exact prose.
 
 ## Subsequent roadmap
 
-1. **Documentation Patch D3:** reduce the README and finish the audience-oriented navigation.
-2. **Documentation Patch D4:** clean references and enforce documentation ownership without
+1. **Documentation Patch D4:** clean references and enforce documentation ownership without
    freezing exact prose.
-3. **First-release preparation:** choose the initial version, complete metadata and release notes,
+2. **First-release preparation:** choose the initial version, complete metadata and release notes,
    and rehearse the tag and publication checklist.
-4. **First tagged release:** publish only after the rehearsal and checklist pass.
+3. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

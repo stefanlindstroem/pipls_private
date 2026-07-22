@@ -132,12 +132,15 @@ figure unsuitable for the walkthrough; the plotting API and numbered-example fig
 Plot-specific sections link to the general inspection and plotting references rather than
 duplicating API contracts. Prediction figures must retain the selection-conditioned OOF provenance.
 
-Documentation ownership is fixed by Decisions 0074--0076. The synthetic tutorial owns the
+Documentation ownership is fixed by Decisions 0074--0077. The synthetic tutorial owns the
 minimum normal workflow. The Pulp tutorial owns the real-data selection qualification,
 selection-conditioned OOF boundary, immutable inspection-result handoff, and a representative set
 of generated interpretation figures. The complete plot catalogue belongs to
 `model_inspection.md`, while common variations belong to the generated API and advanced guides. The
-home page owns only a minimal fixed-fit entry. Generated fixed-regression and path pages own exact
+home page owns the minimal fixed-fit entry and audience routes. The root README owns package
+orientation, installation, two compact workflows, and tutorial links; contributor commands and
+repository maintenance belong only in `CONTRIBUTING.md`. Generated fixed-regression and path
+pages own exact
 estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md` and
 `cross_validation.md` retain only advanced search and validation behavior. `model_inspection.md`
 owns general figure-by-figure interpretation with stable anchors, while `docs/api/plotting.md` owns

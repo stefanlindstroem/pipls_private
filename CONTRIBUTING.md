@@ -8,43 +8,139 @@ lightweight validation benchmarks, tests, packaging, or release maintenance. Pap
 pipelines, complete publication grids, manuscript tables, and paper-only comparator workflows
 belong in downstream reproduction repositories.
 
-Run `make help` to see the maintained repository commands. Before submitting a patch, run:
+## Development setup
+
+Create and activate a development environment from the repository root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[dev]"
+make check
+```
+
+For a later terminal session:
+
+```bash
+cd /path/to/pipls
+source .venv/bin/activate
+git status
+make check
+```
+
+Refresh the editable installation after dependency changes:
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+Run `make help` for the maintained command index.
+
+## Validation commands
+
+The standard source checks are:
 
 ```bash
 make check
 ```
 
-Run `make examples` when changing executable example behavior, example artifacts, or the
-application-facing workflow. This target intentionally runs every numbered example, including the
-slower Tobacco analysis. Run `make docs-figures` when changing the canonical Pulp workflow,
-tutorial rendering choices, plotting behavior used by the tutorial, or generated-asset contracts.
-Run `make docs` after installing `.[docs]` when changing public documentation, navigation,
-docstrings, or tutorial assets. Use `make docs-serve` for a live local preview; it serves
-`http://127.0.0.1:8000/` until stopped with `Ctrl+C`. Run `make docs-dist` when changing
-documentation packaging, documentation dependencies, `MANIFEST.in`, or the source-distribution
-documentation boundary. Run `make build` for a quick artifact build when changing packaging,
-dependencies, included data, or public modules, and run `make dist-check` before submitting such a
-change. The stronger target builds the artifacts once, installs the wheel and source distribution
-into separate clean virtual environments, and exercises the same installed-package smoke test from
-outside the checkout. When changing core dependency bounds or compatibility code, also verify a
-fresh Python 3.10 environment with:
+This runs tests, Ruff, and strict mypy checks. Use the more specific targets while developing:
+
+```text
+make test          run the test suite
+make lint          run Ruff checks
+make format        format Python files with Ruff
+make typecheck     run strict mypy checks
+make examples      run every numbered example
+make docs-figures  regenerate both tutorial figure sets
+make docs          build the strict MkDocs site
+make docs-serve    preview the site locally
+make docs-dist     rebuild the site from a clean source distribution
+make build         build the wheel and source distribution
+make dist-check    verify clean wheel and source-distribution installations
+make clean         remove generated files and caches
+make snapshot      create an uploadable repository snapshot
+```
+
+Run `make examples` when changing executable example behavior, example artifacts, or an
+application-facing workflow. It intentionally includes the slower real-data analyses.
+
+Run `make docs-figures` when changing tutorial workflows, tutorial rendering, or plotting behavior
+used by generated assets. Run `make docs` for public guides, navigation, docstrings, or tutorial
+assets. `make docs-serve` serves `http://127.0.0.1:8000/` until stopped with `Ctrl+C`.
+
+Run `make docs-dist` when changing documentation packaging, documentation dependencies,
+`MANIFEST.in`, or the source-distribution documentation boundary.
+
+Run `make build` for a quick artifact build when changing packaging, dependencies, included data,
+or public modules. Run `make dist-check` before submitting such a change. It builds the artifacts
+once, installs the wheel and source distribution into separate clean environments, and exercises
+the same installed-package smoke test outside the checkout.
+
+## Compatibility checks
+
+When changing core dependency bounds or compatibility code, also verify the minimum supported
+stack in a fresh Python 3.10 environment:
 
 ```bash
 python -m pip install -c constraints/minimum.txt -e ".[dev]"
 make check
 ```
 
-The constraint file represents the minimum supported dependency lines; it is not the normal user
-installation command or an application lock file. CI separately exercises normal dependency
-resolution on every supported Python version and explicit latest-compatible runtime upgrades on
-Python 3.14. Each compatibility job prints the resolved interpreter and runtime dependency
-versions before running `make check`.
+The constraint file represents the minimum supported dependency lines; it is not an application
+lock file. CI separately exercises normal dependency resolution on every supported Python version
+and explicit latest-compatible upgrades on Python 3.14.
+
+## Documentation and examples
+
+The root README is a package landing page. Keep repository build, distribution, and maintenance
+instructions here in `CONTRIBUTING.md` rather than duplicating them in the README.
+
+Served documentation lives under `docs/`. The strict build checks navigation, internal links,
+anchors, mathematical rendering, generated API targets, and tutorial snippets.
+
+Tutorial code excerpts use checked `pymdownx.snippets` sections from maintained numbered examples.
+Edit the executable example rather than copying analysis code into Markdown. Tutorial figures under
+`docs/assets/generated/` are regenerated by documentation targets and are not committed.
+
+The two tutorial roles are fixed:
+
+- the synthetic tutorial owns the minimum selection and independent-test workflow;
+- the Pulp tutorial owns the complete real-data, selection-conditioned OOF, and representative
+  interpretation workflow.
+
+The served reference pages own exact API behavior and advanced alternatives. Avoid repeating those
+contracts in tutorial prose.
+
+## Data, benchmarks, and generated files
 
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
 Benchmark changes must follow `.llm/benchmarking.md`: one question, one readable script, and one
-minimal CSV output. Do not introduce a universal manifest or result schema, and do not commit
-generated result files without an explicit fixture decision. Generated result files, tutorial
-figures, datasets without verified redistribution terms, and archive clutter must not be committed.
-Tutorial figures under `docs/assets/generated/` are regenerated by the documentation targets.
-Tutorial code excerpts use checked `pymdownx.snippets` sections from the canonical workflow; edit
-the executable source rather than copying analysis code into Markdown.
+minimal CSV output. Do not introduce a universal manifest or result schema.
+
+Do not commit generated result files without an explicit fixture decision. Generated example
+figures, benchmark results, tutorial assets, build artifacts, caches, and archive clutter are
+ignored. Do not add datasets without verified redistribution and adaptation terms.
+
+## Repository map
+
+- `src/pipls/`: installable package and public API;
+- `docs/`: served documentation and excluded maintainer decision records;
+- `examples/`: numbered user workflows and their small support layer;
+- `datasets/`: transparent redistributable reference datasets;
+- `benchmarks/`: focused package-validation scripts;
+- `tests/`: numerical, API, integration, documentation, and repository tests;
+- `tools/`: documentation and distribution validation helpers;
+- `constraints/`: the maintainer-only minimum-dependency environment;
+- `.llm/`: tracked maintenance contracts for LLM-assisted development.
+
+## LLM-assisted maintenance
+
+Read [`.llm/README.md`](.llm/README.md), [`.llm/state.md`](.llm/state.md), and the relevant
+contracts before preparing a change. Return root-relative unified Git patches and create a clean
+uploadable
+snapshot with:
+
+```bash
+make snapshot
+```

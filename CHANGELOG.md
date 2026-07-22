@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Reduce the root README to package orientation, installation, two compact workflows, and tutorial
+  routes; move development, validation, distribution, snapshot, and repository-layout instructions
+  to `CONTRIBUTING.md`; and separate programming reference from project validation in the served
+  navigation.
+
 - Shorten and reposition the Pulp tutorial as the second-stage real-data analysis: assume the
   synthetic selection tutorial, retain the upper-boundary rank qualification and
   selection-conditioned OOF workflow, show six representative figures instead of the full plotting

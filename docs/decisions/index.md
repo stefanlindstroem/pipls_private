@@ -91,3 +91,4 @@ reference describe the current public behavior directly.
 - [0074: tutorial-owned user workflow](0074-tutorial-owned-user-workflow.md)
 - [0075: two-tier tutorial route](0075-two-tier-tutorial-route.md)
 - [0076: focused Pulp tutorial](0076-focused-pulp-tutorial.md)
+- [0077: audience-oriented documentation entry](0077-audience-oriented-documentation-entry.md)

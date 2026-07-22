@@ -30,11 +30,11 @@ nav:
       - Warnings: api/exceptions.md
       - Datasets and synthetic data: api/datasets.md
       - Metrics: api/metrics.md
-      - Compatibility: compatibility.md
-  - Data and validation:
-      - Datasets: datasets.md
+  - Project validation:
+      - Reference datasets: datasets.md
       - Benchmarks: benchmarks.md
       - Reproducibility: reproducibility.md
+      - Compatibility: compatibility.md
   - Scientific background:
       - Theory: theory.md
 

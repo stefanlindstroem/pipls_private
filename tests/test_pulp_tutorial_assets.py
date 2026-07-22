@@ -374,8 +374,18 @@ def test_documentation_layers_have_distinct_ownership() -> None:
         "Tutorials",
         "Examples",
         "Reference",
-        "Data and validation",
+        "Project validation",
         "Scientific background",
+    ]
+
+    project_validation = next(
+        item["Project validation"] for item in mkdocs["nav"] if "Project validation" in item
+    )
+    assert project_validation == [
+        {"Reference datasets": "datasets.md"},
+        {"Benchmarks": "benchmarks.md"},
+        {"Reproducibility": "reproducibility.md"},
+        {"Compatibility": "compatibility.md"},
     ]
 
     assert "tutorials/synthetic.md" in regression_reference

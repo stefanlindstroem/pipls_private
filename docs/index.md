@@ -3,7 +3,7 @@
 Pi-PLS is a multivariate linear-regression method that represents the predictive relation through
 paired predictor and response latent variables.
 
-## Start with the synthetic tutorial
+## Choose a tutorial
 
 [First Pi-PLS model with synthetic data](tutorials/synthetic.md) is the recommended introduction. It
 shows the complete selection contract in a small deterministic problem: evaluate the component
@@ -11,7 +11,7 @@ path, choose a component count, retrieve its conditionally selected predictor ra
 model, and predict an independent test set.
 
 Continue with [Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) for real-data loading,
-fixed-parameter OOF predictions, immutable inspection results, and scientific interpretation of
+fixed-parameter OOF predictions, immutable inspection results, and representative interpretation of
 standard PLS-family and Pi-PLS-specific plots.
 
 ## Fit one known model directly
@@ -33,14 +33,22 @@ This fit performs no parameter selection. See the
 [fixed-regression reference](api/regression.md) for preprocessing, solver, fitted-state, and method
 contracts.
 
-## Find a specific topic
+## Programming reference
 
-- [Examples](examples.md): the maintained executable analyses and their outputs.
-- [Path-selection API](api/path.md): generated signatures and result objects.
+- [API overview](api/index.md): generated signatures and method contracts.
+- [Path selection](api/path.md): search parameters and immutable path results.
 - [Advanced path-search behavior](path_analysis.md): bounds, policies, pipelines, and refitting.
 - [Cross-validation](cross_validation.md): splitters, scoring, OOF output, and provenance.
 - [Model inspection](model_inspection.md): general interpretation of fitted quantities and plots.
-- [API overview](api/index.md): all generated public signatures and method contracts.
+- [Examples](examples.md): maintained executable analyses and their outputs.
+
+## Project validation
+
+- [Reference datasets](datasets.md): provenance, licensing, adaptation, and matrix dimensions.
+- [Benchmarks](benchmarks.md): focused package-level numerical and selection checks.
+- [Reproducibility](reproducibility.md): software, data, and generated-documentation controls.
 - [Compatibility](compatibility.md): supported Python and dependency versions.
+
+## Scientific background
+
 - [Theory](theory.md): the implemented matrix construction and rank interpretation.
-- [Reproducibility](reproducibility.md): data, software, and generated-documentation controls.

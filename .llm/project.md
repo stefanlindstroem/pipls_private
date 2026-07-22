@@ -16,8 +16,8 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4 and documentation Patches D1--D2 are complete; Patch D3 is next. The current public
-surface includes
+Phases A through F4 and documentation Patches D1--D3 are complete; Patch D4 is next.
+The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
@@ -58,7 +58,10 @@ immutable concise component-path API. Decision 0067 makes Sugarcane direct, and
 Decision 0068 makes the Pulp example and tutorial direct while removing the shared workflow wrapper.
 Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers.
 Decision 0076 shortens the second tutorial to the distinctive Pulp real-data, OOF, and
-representative-interpretation content. Decision 0070 makes the Pi-PLS/ordinary-PLS comparison direct.
+representative-interpretation content. Decision 0077 makes the root README a concise user landing
+page, moves maintenance commands to `CONTRIBUTING.md`, and separates programming reference from
+project validation in the served navigation. Decision 0070 makes the Pi-PLS/ordinary-PLS comparison
+direct.
 Decision 0071 removes duplicate
 matrix-path aliases and completes structural enforcement of in-memory numbered examples.
 Decision 0072 adds an on-demand immutable predictor-rank profile derived from `cv_results_`.

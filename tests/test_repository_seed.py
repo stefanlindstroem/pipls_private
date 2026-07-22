@@ -278,6 +278,28 @@ def test_required_llm_contracts_exist_and_are_formatted() -> None:
             _assert_markdown_format(path)
 
 
+def test_readme_and_contributing_have_distinct_audiences() -> None:
+    root = _repository_root()
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    contributing = (root / "CONTRIBUTING.md").read_text(encoding="utf-8")
+
+    for public_workflow in (
+        "PiPLSRegression",
+        "PiPLSPathCV",
+        "for_n_components",
+        "docs/tutorials/synthetic.md",
+        "docs/tutorials/pulp.md",
+    ):
+        assert public_workflow in readme
+
+    for maintainer_command in ("make docs-dist", "make dist-check", "make snapshot"):
+        assert maintainer_command not in readme
+        assert maintainer_command in contributing
+
+    assert "## Repository map" not in readme
+    assert "## Repository map" in contributing
+
+
 def test_public_markdown_has_no_ascii_control_characters() -> None:
     root = _repository_root()
     markdown_paths = sorted(
