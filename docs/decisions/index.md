@@ -63,6 +63,7 @@ reference describe the current public behavior directly.
 - [0064: tutorial-first documentation](0064-tutorial-first-documentation.md)
 - [0065: documentation layer consolidation](0065-documentation-layer-consolidation.md)
 - [0067: direct Sugarcane workflow](0067-direct-sugarcane-workflow.md)
+- [0068: direct Pulp workflow](0068-direct-pulp-workflow.md)
 
 ## Repository and documentation policy
 

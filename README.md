@@ -311,7 +311,7 @@ accepts compatible fitted `PiPLSRegression` and scikit-learn `PLSRegression` mod
 `predictor_style="line"` with an explicit physical coordinate and axis label for spectra. Install
 with `python -m pip install "pipls[plot]"`.
 See [`docs/model_inspection.md`](docs/model_inspection.md) and the complete
-[Pulp post-analysis example](examples/10_pulp_real_data.py).
+[direct Pulp analysis example](examples/10_pulp_real_data.py).
 
 ## Synthetic data
 
@@ -352,15 +352,15 @@ path = search.component_path_
 
 Example 09 writes separate canonical Pi-PLS and standard PLS (NIPALS) component-path CSV
 files for Pulp, Sugarcane, and Tobacco and derives the shared CV-MSE comparison figures from those
-tables. Examples 10–12 then perform Pi-PLS-only analyses. Sugarcane is the direct reference
-workflow: it reads `component_path_`, fits the selected fixed model, calculates
-selection-conditioned OOF predictions with scikit-learn, keeps all inspection results in memory,
-and writes five explicit final PDF figures without generated analytical CSV intermediates. Pulp and
-Tobacco retain their current canonical CSV and multipage-report machinery until their scheduled
-simplification patches. Tobacco uses adaptive scanning with explicit full predictor SVD;
-randomized-SVD behavior is covered by the solver-consistency benchmark. Install the `examples`
-extra to run them. See [`examples/README.md`](examples/README.md) and
-[`datasets/README.md`](datasets/README.md).
+tables. Examples 10–12 then perform Pi-PLS-only analyses. Pulp and Sugarcane are direct workflows:
+they read `component_path_`, fit the selected fixed model, calculate selection-conditioned OOF
+predictions with scikit-learn, keep inspection results in memory, and write only final PDF figures.
+The Pulp workflow also plots the conditional predictor-rank profile at three components, showing
+that rank 10 is selected at the upper evaluated boundary and is close to rank 9 relative to fold
+variability. Tobacco retains the transitional CSV and multipage-report machinery until Patch 20d
+and uses adaptive scanning with explicit full predictor SVD. Randomized-SVD behavior is covered by
+the solver-consistency benchmark. Install the `examples` extra to run them. See
+[`examples/README.md`](examples/README.md) and [`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks
 
@@ -375,8 +375,8 @@ scientific question and one minimal CSV output:
 The real-data workflows are explicit application runs rather than benchmark or test-suite jobs.
 `make examples` runs every numbered example in order. Example 09 owns the Pulp, Sugarcane, and
 Tobacco Pi-PLS-versus-PLS CV-MSE comparisons. Examples 10–12 are normal Pi-PLS analyses.
-Sugarcane writes only five final PDF figures from in-memory results; Pulp and Tobacco retain their
-transitional path CSV and post-analysis report artifacts until their later Phase F4 migrations.
+Pulp and Sugarcane write only final PDF figures from in-memory results. Tobacco retains its
+transitional path CSV and post-analysis report artifacts until Patch 20d.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
 [`examples/README.md`](examples/README.md).

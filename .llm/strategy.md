@@ -391,7 +391,7 @@ consistency are implemented as independent scripts with minimal question-specifi
 Pulp, Sugarcane, and Tobacco provide transparent component-path analyses with direct `X.csv` and
 `Y.csv` reading. Example 09 owns the canonical Pi-PLS and standard PLS comparison CSVs and PDFs;
 examples 10–12 perform separate Pi-PLS-only fixed fits after explicit component choices. Phase F4
-subsequently makes Sugarcane the first direct in-memory workflow while Pulp and Tobacco remain
+subsequently makes Sugarcane and Pulp direct in-memory workflows while Tobacco remains
 transitional.
 
 The initial real-data smoke benchmark scripts and tests were removed after review because they
@@ -492,10 +492,11 @@ Implementation order:
 5. in-memory Pi-PLS/PLS comparison;
 6. package-wide cleanup, documentation migration, and structural enforcement.
 
-Current status: **Patches 20a and 20b complete**. Decision 0066 adds
-`PiPLSComponentPath`, `PiPLSComponentResult`, and `PiPLSPathCV.component_path_`. Decision 0067 makes
-Sugarcane the direct in-memory reference workflow and removes its generated analytical CSV
-intermediates. Patch 20c, the direct Pulp example and tutorial workflow, is next.
+Current status: **Patches 20a–20c complete**. Decision 0066 adds `PiPLSComponentPath`,
+`PiPLSComponentResult`, and `PiPLSPathCV.component_path_`. Decision 0067 makes Sugarcane direct.
+Decision 0068 makes the Pulp example and tutorial direct, removes the shared workflow wrapper and
+analytical CSV intermediates, and adds the conditional predictor-rank profile. Patch 20d, the direct
+Tobacco workflow and table-helper removal, is next.
 
 ### Product documentation and release hardening
 
@@ -560,9 +561,9 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Patch 20c: make the Pulp example and tutorial workflow direct. Keep path, selected-model, OOF, and
-inspection results in memory; expose the analytical stages in example 10; and generate tutorial
-figures without analytical CSV intermediates.
+Patch 20d: make Tobacco direct while retaining full predictor SVD, decreasing-wavenumber plots,
+response pagination, and raw observation diagnostics. Remove the post-analysis table and fixed-model
+OOF helpers after their final consumer is migrated.
 
 ## Maintenance protocol
 

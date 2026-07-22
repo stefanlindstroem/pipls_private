@@ -43,9 +43,10 @@ example.
 
 ## Complete Pi-PLS reference workflows
 
-- `10_pulp_real_data.py`: the canonical tutorial analysis, using one terminal-Pi-PLS pipeline
-  for component-path evaluation, one selected fixed pipeline, selection-conditioned OOF
-  predictions, a balanced score-loading biplot, and the current transitional CSV/report layer.
+- `10_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the path, inspects
+  the conditional predictor-rank profile at three components, fits the selected fixed model,
+  calculates selection-conditioned OOF predictions, and writes six final PDF figures directly from
+  in-memory results.
 - `11_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
   inspection results in memory, calculates OOF predictions with scikit-learn, and writes five
   wavelength-aware final PDF figures without generated analytical CSV files.
@@ -54,28 +55,26 @@ example.
   decreasing-wavenumber spectral plots, deterministic response pagination, and raw observation
   diagnostics through the current transitional CSV/report layer.
 
-These are application analyses rather than introductory snippets. Sugarcane exposes its complete
-scientific sequence directly in the numbered script: path evaluation and plotting, fixed fitting,
-OOF prediction, immutable inspection results, and explicit Matplotlib composition. Its five figures
-are `component_path.pdf`, `pipls_factors.pdf`, `prediction_diagnostics.pdf`,
-`latent_structure.pdf`, and `coefficients.pdf`. Pulp and Tobacco retain shared report support until
-their scheduled Phase F4 migrations. `make examples` runs every numbered example in filename order,
-including the slower real-data workflows. It remains separate from `make check`.
+These are application analyses rather than introductory snippets. Pulp and Sugarcane expose their
+complete scientific sequences directly in the numbered scripts: path evaluation and plotting,
+fixed fitting, OOF prediction, immutable inspection results, and explicit Matplotlib composition.
+Pulp writes `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
+`latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Sugarcane writes five
+corresponding figures without a predictor-rank-profile page. Tobacco retains shared report support
+until Patch 20d. `make examples` runs every numbered example in filename order, including the slower
+real-data workflows. It remains separate from `make check`.
 
 ## Example support modules
 
 The remaining transitional workflows import implementation support from `examples/_support/`:
 
-- `pls_component_path.py`: ordinary-PLS path evaluation;
-- `plot_component_path.py`: component-path CSV-to-PDF rendering for example 09, Pulp, and Tobacco;
-- `fixed_model_oof.py`: cloning and aligned OOF prediction for fixed models that have not migrated
-  to direct scikit-learn orchestration;
-- `post_analysis_artifacts.py`: canonical table construction, CSV round trips, pagination, and
-  multipage report composition for Pulp and Tobacco;
-- `pulp_workflow.py`: the shared Pulp pipeline, path, fixed-fit, OOF, and inspection workflow used
-  by example 10 and the tutorial assets.
+- `pls_component_path.py`: ordinary-PLS path evaluation for example 09;
+- `plot_component_path.py`: component-path CSV rendering for example 09 and Tobacco;
+- `fixed_model_oof.py`: cloning and aligned OOF prediction for Tobacco;
+- `post_analysis_artifacts.py`: table construction, CSV round trips, pagination, and multipage
+  report composition for Tobacco.
 
-Sugarcane imports none of these helpers. Reusable numerical inspection belongs in
+Pulp and Sugarcane import none of these helpers. Reusable numerical inspection belongs in
 `pipls.inspection`, and optional one-axis rendering belongs in `pipls.plotting`.
 
 ## Real-data workflow contract
@@ -105,11 +104,11 @@ comparison figures. Sugarcane demonstrates the target direct workflow:
    in-memory objects used by the public one-axis plotters.
 5. The script creates and saves the five final figures itself.
 
-Pulp is the canonical tutorial workflow. Its support module evaluates a one-step scikit-learn
-pipeline ending in `PiPLSRegression`, transfers the selected pair with nested pipeline parameters,
-and supplies the fitted estimator and inspection results to example 10. Tobacco retains direct
-fixed-estimator orchestration plus response pagination. Their current CSV round trips remain
-transitional and are not the reference pattern for new examples.
+Pulp is the canonical tutorial workflow. Example 10 performs the same direct analysis shown in
+the tutorial: it uses `component_path_`, inspects the rank profile at the chosen component count,
+fits one explicit `PiPLSRegression`, calculates OOF predictions with `cross_val_predict()`, and
+passes immutable inspection objects to public plotters. Tobacco retains direct fixed-estimator
+orchestration plus response pagination through the transitional CSV/report layer.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
 figures retain explicit provenance. Sugarcane reads its strictly increasing wavelength coordinate

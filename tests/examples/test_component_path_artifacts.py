@@ -170,18 +170,16 @@ def test_dedicated_example_owns_all_pls_path_comparisons() -> None:
 def test_real_data_examples_use_pipls_only_component_paths() -> None:
     examples_dir = _repository_root() / "examples"
     pulp_text = (examples_dir / "10_pulp_real_data.py").read_text(encoding="utf-8")
-    pulp_workflow = (examples_dir / "_support" / "pulp_workflow.py").read_text(
-        encoding="utf-8"
-    )
-    assert "component_path_" in pulp_workflow
-    assert "refit=False" in pulp_workflow
-    assert "component_path.for_n_components(n_components)" in pulp_workflow
-    assert "pipls__n_components=n_components" in pulp_workflow
-    assert "pipls__predictor_rank=predictor_rank" in pulp_workflow
-    assert "plot_pipls_component_path(" in pulp_text
-    assert 'ANALYSIS_DIR / "component_path.csv"' in pulp_text
-    assert 'ANALYSIS_DIR / "component_path.pdf"' in pulp_text
-    assert 'ANALYSIS_DIR / "post_analysis.pdf"' in pulp_text
+    assert "component_path_" in pulp_text
+    assert "refit=False" in pulp_text
+    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in pulp_text
+    assert 'cv_results["predictor_rank"]' in pulp_text
+    assert "axis.errorbar(" in pulp_text
+    assert "plot_pipls_component_path(" not in pulp_text
+    assert "component_path.csv" not in pulp_text
+    assert "post_analysis.pdf" not in pulp_text
+    assert ".to_csv(" not in pulp_text
+    assert not (examples_dir / "_support" / "pulp_workflow.py").exists()
 
     sugarcane_text = (examples_dir / "11_sugarcane_real_data.py").read_text(
         encoding="utf-8"
@@ -205,7 +203,7 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert 'ANALYSIS_DIR / "component_path.pdf"' in tobacco_text
     assert 'ANALYSIS_DIR / "post_analysis.pdf"' in tobacco_text
 
-    for source in (pulp_text, pulp_workflow, sugarcane_text, tobacco_text):
+    for source in (pulp_text, sugarcane_text, tobacco_text):
         assert "evaluate_pls_component_path(" not in source
         assert "plot_component_path_comparison(" not in source
         assert "subprocess" not in source

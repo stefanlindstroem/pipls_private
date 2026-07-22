@@ -62,27 +62,28 @@ returned figures and axes, explicit line/bar modes, label validation, and succes
 without pinning pixels or incidental Matplotlib artist counts. Structural tests should enforce the
 single-axis package boundary and example-owned report composition.
 
-Example-helper tests cover the transitional `examples/_support/fixed_model_oof.py`,
-`examples/_support/post_analysis_artifacts.py`, and the canonical Pulp workflow. Structural tests
-for Sugarcane protect direct `component_path_` access, scikit-learn `cross_val_predict()`, immutable
-inspection results, explicit `ax=` calls, and the five final PDF filenames without running the full
-real-data analysis. Tutorial-renderer tests may run the Pulp workflow once in a temporary directory,
-parse every declared SVG, verify manifest
-hashes and generated filenames, and enforce Makefile/source-distribution ownership without pinning
-pixels or Matplotlib artist counts. Tutorial structure tests may verify navigation, generated-asset references, checked snippet
-sections, links to stable API objects, and links to the stable model-inspection anchors without
-freezing narrative wording. Structural tests may also require generated Pulp image references to
-remain tutorial-owned and keep example-specific report implementation out of the general inspection
-reference. Small synthetic matrices protect generic OOF and report contracts. One module-scoped Pulp numerical run may verify
-pipeline cloning, nested parameter transfer, component-path schema, aligned OOF predictions, and
-inspection shapes without writing application artifacts.
+Example-helper tests cover the transitional `examples/_support/fixed_model_oof.py` and
+`examples/_support/post_analysis_artifacts.py` for Tobacco. Structural tests for Pulp and Sugarcane
+protect direct `component_path_` access, scikit-learn `cross_val_predict()`, immutable inspection
+results, explicit `ax=` calls, absence of analytical CSV output, and the declared final PDF
+filenames without running the artifact-writing scripts. Tutorial-renderer tests may run the direct
+Pulp calculation once in a temporary directory, parse every declared SVG, verify manifest hashes,
+rank-profile metadata, and generated filenames, and enforce Makefile/source-distribution ownership
+without pinning pixels or Matplotlib artist counts. Tutorial structure tests may verify navigation,
+generated-asset references, checked snippet sections from example 10, links to stable API objects,
+and links to the stable model-inspection anchors without freezing narrative wording. Structural
+tests may also require generated Pulp image references to remain tutorial-owned and keep
+example-specific report implementation out of the general inspection reference. Small synthetic
+matrices protect generic OOF and report contracts. One module-scoped Pulp numerical run may verify
+the selected fixed pair, upper-boundary rank profile, aligned OOF predictions, and inspection shapes
+without writing application artifacts.
 
 The minimal numbered example may be protected structurally and through the package-level numerical
 and plotting tests; do not duplicate its arrays as a frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
 analyses as real-data benchmark scripts. `make examples` is the explicit application-validation
 target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead
-protect repository dataset readability, the canonical Pulp numerical workflow, direct Sugarcane
+protect repository dataset readability, the direct Pulp numerical workflow, direct Sugarcane
 workflow structure, component-path API, inspection equations, plotting contracts, transitional
 example helpers, and their remaining CSV-to-PDF generation.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated

@@ -19,6 +19,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python 3.10
 
 FIGURE_FILENAMES = (
     "component_path.svg",
+    "predictor_rank_profile.svg",
     "scores.svg",
     "biplot.svg",
     "x_loadings.svg",
@@ -81,10 +82,10 @@ def test_pulp_tutorial_renderer_writes_declared_parseable_svgs(
 
     assert manifest["schema_version"] == 1
     assert manifest["dataset"]["name"] == "Pulp"
-    assert manifest["analysis"]["chosen_n_components"] >= 1
-    assert (
-        manifest["analysis"]["chosen_predictor_rank"] >= manifest["analysis"]["chosen_n_components"]
-    )
+    assert manifest["analysis"]["chosen_n_components"] == 3
+    assert manifest["analysis"]["chosen_predictor_rank"] == 10
+    assert manifest["analysis"]["evaluated_predictor_ranks"] == list(range(3, 11))
+    assert manifest["analysis"]["predictor_rank_at_upper_boundary"] is True
     assert manifest["analysis"]["displayed_components"] == [1, 2, 3]
     assert manifest["analysis"]["detailed_responses"] == ["CSF", "Density", "TI"]
 
@@ -141,7 +142,10 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     repository = _repository_root()
     tutorial_path = repository / "docs" / "tutorials" / "pulp.md"
     tutorial = tutorial_path.read_text(encoding="utf-8")
-    workflow = (repository / "examples" / "_support" / "pulp_workflow.py").read_text(
+    example = (repository / "examples" / "10_pulp_real_data.py").read_text(
+        encoding="utf-8"
+    )
+    renderer = (repository / "tools" / "render_pulp_tutorial.py").read_text(
         encoding="utf-8"
     )
     with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
@@ -172,17 +176,17 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
 
     snippet_sections = {
         "load-pulp-data",
-        "build-pulp-pipeline",
         "evaluate-pulp-component-path",
-        "select-pulp-predictor-rank",
-        "fit-pulp-pipeline",
+        "select-pulp-parameters",
+        "fit-pulp-model",
         "pulp-oof-predictions",
         "pulp-inspection-results",
+        "plot-pulp-component-path",
     }
     for section in snippet_sections:
-        assert f"examples/_support/pulp_workflow.py:{section}" in tutorial
-        assert f"# --8<-- [start:{section}]" in workflow
-        assert f"# --8<-- [end:{section}]" in workflow
+        assert f"examples/10_pulp_real_data.py:{section}" in tutorial
+        assert f"# --8<-- [start:{section}]" in example
+        assert f"# --8<-- [end:{section}]" in example
 
     for filename in FIGURE_FILENAMES:
         assert f"../assets/generated/pulp/{filename}" in tutorial
@@ -204,10 +208,12 @@ def test_pulp_tutorial_is_the_primary_generated_workflow() -> None:
     for function_name in plotting_functions:
         assert f"../api/plotting.md#pipls.plotting.{function_name}" in tutorial
 
-    prediction_kind = (
-        'PULP_PREDICTION_KIND: PredictionKind = "selection-conditioned OOF predictions"'
-    )
-    assert prediction_kind in workflow
+    assert 'prediction_kind="selection-conditioned OOF predictions"' in example
+    assert "run_pulp_workflow" not in example
+    assert "run_pulp_workflow" not in renderer
+    assert "pulp_workflow" not in renderer
+    assert "PiPLSPathCV(refit=False).fit(X, Y)" in renderer
+    assert "cross_val_predict(" in renderer
     assert "examples/10_pulp_real_data.py" in tutorial
 
 

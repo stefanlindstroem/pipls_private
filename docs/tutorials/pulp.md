@@ -35,86 +35,93 @@ mean squared error (CV-MSE). The final model is then fitted with one explicit ra
 
 ## Load the data
 
-The canonical workflow reads the two committed CSV files directly with pandas:
+The numbered example reads the two committed CSV files directly with pandas:
 
 ```python
---8<-- "examples/_support/pulp_workflow.py:load-pulp-data"
+--8<-- "examples/10_pulp_real_data.py:load-pulp-data"
 ```
 
-The resulting data frames have shapes `(46, 14)` and `(46, 8)`. Their headers are retained as the
-scientific labels used in tables and figures. No package-specific dataset container or hidden loader
-is required.
-
-## Construct the pipeline
-
-The model is placed at the end of a scikit-learn `Pipeline`:
-
-```python
---8<-- "examples/_support/pulp_workflow.py:build-pulp-pipeline"
-```
-
-This is intentionally a one-step pipeline. `PiPLSRegression` learns predictor and response
-centering and scaling inside every fit. Adding an external predictor scaler here would either repeat
-predictor preprocessing or require changing the estimator's response-scaling behavior. Additional
-application-specific transformers may be inserted before the terminal `pipls` step when they are
-scientifically justified.
-
-The initial rank values only make the pipeline cloneable. They are replaced after the component
-path has been examined. The search evaluates the complete pipeline, so any future preprocessing
-steps would also be fitted separately inside each training fold. See
-[Preprocessing](../preprocessing.md) and the
-[`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression).
+The resulting data frames have shapes `(46, 14)` and `(46, 8)`. Their headers become the scientific
+labels used in the figures. No package-specific dataset container or hidden workflow object is
+required.
 
 ## Evaluate the component path
 
-The complete pipeline is supplied to `PiPLSPathCV` with `refit=False`:
+The path search is fitted directly to the two response and predictor tables:
 
 ```python
---8<-- "examples/_support/pulp_workflow.py:evaluate-pulp-component-path"
+--8<-- "examples/10_pulp_real_data.py:evaluate-pulp-component-path"
 ```
 
 The default `n_components_values="all"` evaluates every admissible component count. For each row,
 the search records the conditionally selected predictor rank, mean response-standardized CV-MSE,
 and fold-to-fold standard deviation.
 
+The path is an immutable in-memory result and can be plotted with ordinary Matplotlib:
+
+```python
+--8<-- "examples/10_pulp_real_data.py:plot-pulp-component-path"
+```
+
 ![Pulp component path](../assets/generated/pulp/component_path.svg)
 
-The curve falls substantially through three components and then changes little. The tutorial
-therefore uses the visible elbow at `n_components=3`. The selected predictor rank on that row is
+The curve falls substantially through three components and then changes little. The tutorial uses
+the visible elbow at `n_components=3`. The selected predictor rank on that row is
 `predictor_rank=10`.
 
 This is a stated modeling choice, not an automatic rule that three components are always optimal.
-The absolute minimum, the fold variation, parsimony, and the scientific purpose of the model should
-all be considered. The predictor rank must be taken from the same row as the chosen component count.
-See [Parameter selection](../parameter_selection.md) and the
+The absolute minimum, fold variation, parsimony, and scientific purpose should all be considered.
+The predictor rank must be taken from the same row as the chosen component count. See
+[Parameter selection](../parameter_selection.md) and the
 [`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV).
+
+## Inspect the conditional predictor-rank profile
+
+The selected row summarizes a second calculation: for three response components, the path evaluates
+predictor ranks 3 through 10 and chooses the rank with the lowest mean CV-MSE.
+
+![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
+
+Rank 10 has the lowest mean loss within the evaluated range, but it is also the upper search
+boundary. Ranks 9 and 10 have mean CV-MSE values of approximately 0.347 and 0.331, while their fold
+standard deviations are approximately 0.167 and 0.151. The difference between the two means is
+therefore small relative to the fold variation. Rank 10 is the path-selected value for the fixed
+model, but this profile does not establish that ranks above 10 would be worse or that rank 10 has a
+scientifically distinct advantage over rank 9.
+
+The fitted model still has three paired Pi-PLS components. The predictor rank of 10 describes the
+dimension of the predictor basis available when those three pairs are estimated; it does not mean
+that the factor plots contain ten paired components. See
+[Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 ## Choose and fit the fixed model
 
-The predictor rank is read from the selected path row:
+The selected scalar result supplies both members of the fixed rank pair:
 
 ```python
---8<-- "examples/_support/pulp_workflow.py:select-pulp-predictor-rank"
+--8<-- "examples/10_pulp_real_data.py:select-pulp-parameters"
 ```
 
-The pipeline template is then cloned, assigned the fixed rank pair through nested pipeline
-parameters, and fitted to all 46 samples:
+A new fixed estimator is then fitted to all 46 samples:
 
 ```python
---8<-- "examples/_support/pulp_workflow.py:fit-pulp-pipeline"
+--8<-- "examples/10_pulp_real_data.py:fit-pulp-model"
 ```
 
-The fitted pipeline is the object used for prediction. Its terminal fitted estimator is available as
-`fitted_pipeline.named_steps["pipls"]`. The path-search object and the fixed fitted pipeline have
-different roles: the first supports model selection, while the second represents the chosen model.
+The path-search object and the fitted estimator have different roles: the first supports model
+selection, while the second represents the chosen model and supplies predictions and inspection
+results. `PiPLSRegression` learns predictor and response centering and scaling inside every fit; no
+external scaler is used here. See [Preprocessing](../preprocessing.md) and the
+[`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression).
 
 ## Generate out-of-fold predictions
 
-Fitted values are unsuitable for judging predictive residuals. The tutorial therefore clones the
-fixed pipeline inside five non-shuffled folds and predicts each held-out observation once:
+Fitted values are unsuitable for judging predictive residuals. The example therefore uses the
+standard scikit-learn mechanism to clone the fixed estimator inside five non-shuffled folds and
+predict each held-out observation once:
 
 ```python
---8<-- "examples/_support/pulp_workflow.py:pulp-oof-predictions"
+--8<-- "examples/10_pulp_real_data.py:pulp-oof-predictions"
 ```
 
 These are labeled **selection-conditioned OOF predictions**. The rank pair is fixed during this
@@ -130,7 +137,7 @@ The fitted estimator and OOF predictions are converted to immutable inspection r
 plotting takes place:
 
 ```python
---8<-- "examples/_support/pulp_workflow.py:pulp-inspection-results"
+--8<-- "examples/10_pulp_real_data.py:pulp-inspection-results"
 ```
 
 `LatentStructure` contains the shared PLS-family scores, loadings, and regression coefficients.
@@ -297,8 +304,7 @@ See [Standardized RMSE](../model_inspection.md#standardized-rmse) and
 
 ## Complete executable example
 
-The maintained example calls the same canonical workflow and then writes the component path,
-post-analysis tables, and a multipage PDF report:
+The maintained example contains the complete calculation and figure composition directly:
 
 ```python
 --8<-- "examples/10_pulp_real_data.py"
@@ -310,9 +316,11 @@ Run it from the repository root with:
 python examples/10_pulp_real_data.py
 ```
 
-The generated tutorial SVGs and the example's PDF report serve different purposes. The tutorial uses
-one chart per SVG for explanation. The numbered example demonstrates caller-owned panel composition
-and canonical analysis artifacts.
+The generated tutorial SVGs and the example PDFs serve different purposes. The tutorial uses one
+chart per SVG for explanation. The numbered example groups related charts into six caller-owned PDF
+figures: `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
+`latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Both routes calculate
+from in-memory results and write no generated analytical CSV files.
 
 ## Next steps
 

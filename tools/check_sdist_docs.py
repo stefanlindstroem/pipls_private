@@ -15,6 +15,7 @@ from pathlib import Path
 
 PULP_TUTORIAL_FIGURES = (
     "component_path.svg",
+    "predictor_rank_profile.svg",
     "scores.svg",
     "biplot.svg",
     "x_loadings.svg",
@@ -117,7 +118,6 @@ def main() -> None:
             source / "docs" / "api" / "index.md",
             source / "docs" / "javascripts" / "mathjax.js",
             source / "tools" / "render_pulp_tutorial.py",
-            source / "examples" / "_support" / "pulp_workflow.py",
             source / "examples" / "10_pulp_real_data.py",
             source / "datasets" / "pulp" / "X.csv",
             source / "datasets" / "pulp" / "Y.csv",

@@ -158,31 +158,30 @@ def test_post_analysis_tables_and_report_round_trip_through_csv(tmp_path: Path) 
     assert pdf_path.stat().st_size > 5_000
 
 
-def test_pulp_example_uses_the_canonical_workflow_and_exports_the_same_artifacts() -> None:
+def test_pulp_example_uses_direct_in_memory_results() -> None:
     text = (_repository_root() / "examples" / "10_pulp_real_data.py").read_text(
         encoding="utf-8"
     )
 
-    assert "PULP_CHOSEN_N_COMPONENTS" in text
-    assert "run_pulp_workflow(" in text
-    assert "workflow.component_path.n_components" in text
-    assert ").to_csv(ANALYSIS_DIR / \"component_path.csv\", index=False)" in text
-    assert "workflow.factors" in text
-    assert "workflow.diagnostics" in text
-    assert "workflow.structure" in text
-    assert "workflow.oof.fold_index" in text
-    assert "X.columns.tolist()" in text
-    assert "Y.columns.tolist()" in text
-    assert "build_post_analysis_tables(" in text
-    assert "write_post_analysis_tables(" in text
-    assert "render_post_analysis_report(" in text
-    assert "biplot_components=(1, 2)" in text
-    assert "loading_components=(1, 2, 3)" in text
-    assert "ANALYSIS_DIR" in text
-    assert "PiPLSPathCV" not in text
-    assert "PiPLSRegression" not in text
+    assert "PiPLSPathCV(refit=False).fit(X, Y)" in text
+    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in text
+    assert "PiPLSRegression(" in text
+    assert "cross_val_predict(" in text
+    assert "pipls_display_factors(model.decomposition_)" in text
+    assert "latent_structure(model)" in text
+    assert "prediction_diagnostics(" in text
+    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
+    assert 'ANALYSIS_DIR / "predictor_rank_profile.pdf"' in text
+    assert 'ANALYSIS_DIR / "pipls_factors.pdf"' in text
+    assert 'ANALYSIS_DIR / "latent_structure.pdf"' in text
+    assert 'ANALYSIS_DIR / "coefficients.pdf"' in text
+    assert 'ANALYSIS_DIR / "prediction_diagnostics.pdf"' in text
+    assert "build_post_analysis_tables(" not in text
+    assert "write_post_analysis_tables(" not in text
+    assert "render_post_analysis_report(" not in text
     assert "fixed_model_oof_predictions" not in text
-    assert 'prediction_kind="fitted values"' not in text
+    assert "run_pulp_workflow(" not in text
+    assert ".to_csv(" not in text
     assert "subprocess" not in text
 
 

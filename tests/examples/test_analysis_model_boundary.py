@@ -48,14 +48,12 @@ def test_dedicated_example_owns_the_pls_comparison_path() -> None:
     assert "plot_component_path_comparison(" in comparison
 
     pulp_text = (examples_dir / "10_pulp_real_data.py").read_text(encoding="utf-8")
-    pulp_workflow = (examples_dir / "_support" / "pulp_workflow.py").read_text(
-        encoding="utf-8"
-    )
     assert "evaluate_pls_component_path(" not in pulp_text
-    assert "plot_pipls_component_path(" in pulp_text
-    assert "run_pulp_workflow(" in pulp_text
-    assert "latent_structure(model)" in pulp_workflow
-    assert "PiPLSRegression(" in pulp_workflow
+    assert "plot_pipls_component_path(" not in pulp_text
+    assert "axis.errorbar(" in pulp_text
+    assert "latent_structure(model)" in pulp_text
+    assert "PiPLSRegression(" in pulp_text
+    assert "run_pulp_workflow(" not in pulp_text
 
     sugarcane = (examples_dir / "11_sugarcane_real_data.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" not in sugarcane

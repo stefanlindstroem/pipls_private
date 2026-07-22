@@ -82,8 +82,8 @@
   prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
 - Numbered examples migrated under Phase F4 operate directly on `component_path_` and immutable
   inspection results in memory. They must not write generated CSV files as analytical or plotting
-  intermediates. Example 09 and the not-yet-migrated Pulp and Tobacco workflows retain their
-  current CSV contracts only until their scheduled patches. Every path figure must label fold SD as
+  intermediates. Example 09 and the not-yet-migrated Tobacco workflow retain their current CSV
+  contracts only until their scheduled patches. Every path figure must label fold SD as
   descriptive variability rather than a confidence interval.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
@@ -107,7 +107,7 @@
 - Report each applicable target as passed, failed, or not run; never describe inspection alone as
   validation.
 - Run focused tests while developing, then `make check` before delivery.
-- Run `make docs-figures` for changes to the canonical Pulp workflow, tutorial renderer, tutorial
+- Run `make docs-figures` for changes to the direct Pulp example, tutorial renderer, tutorial
   display subset, or plot behavior used by generated assets.
 - Run `make docs` for changes to public guides, navigation, documentation configuration, public
   docstrings, or generated tutorial assets.

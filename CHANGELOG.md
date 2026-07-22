@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make the Pulp example and tutorial direct: remove the one-step workflow wrapper and generated
+  analysis CSV round trips, calculate path selection, fixed fitting, scikit-learn OOF predictions,
+  and immutable inspection results visibly in example 10, add a three-component predictor-rank
+  profile, and write six final PDF figures from in-memory results.
+
 - Make Sugarcane the direct reference workflow: plot `component_path_` in memory, use
   scikit-learn `cross_val_predict()` for the selected fixed model, pass immutable inspection results
   directly to atomic plotters, and write five final PDF figures without generated analytical CSV

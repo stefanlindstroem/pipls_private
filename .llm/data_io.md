@@ -135,11 +135,12 @@ Do not introduce merely for repository examples:
 ## Analysis artifact transparency
 
 Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize intermediate
-analysis results. The direct Sugarcane reference workflow reads those two tables and then keeps
-`component_path_`, fixed-model OOF predictions, and immutable inspection results in memory. It
-creates figures directly and writes only final PDF outputs. New numbered-example work should follow
-that pattern. Pulp, Tobacco, and the explicit comparison example retain their existing generated CSV
-contracts only until their scheduled Phase F4 migrations.
+analysis results. The direct Pulp and Sugarcane workflows read those two tables and then keep
+`component_path_`, fixed-model OOF predictions, and immutable inspection results in memory. They
+create figures directly and write only final PDF outputs. Pulp additionally exposes the conditional
+predictor-rank profile for its chosen component count. New numbered-example work should follow that
+pattern. Tobacco and the explicit comparison example retain their existing generated CSV contracts
+only until their scheduled Phase F4 migrations.
 
 ## Publication boundary
 
@@ -149,7 +150,8 @@ not grow into manuscript pipelines, figure generation, or complete comparison gr
 
 ## Pulp tutorial assets
 
-The canonical Pulp workflow reads the committed `datasets/pulp/X.csv` and `Y.csv` tables directly.
-The documentation renderer records their SHA-256 values in a generated manifest and derives SVG
-figures from the workflow. The figures and manifest are ignored build products, not alternative
-dataset representations or package inputs.
+The direct Pulp example and tutorial renderer both read the committed `datasets/pulp/X.csv` and
+`Y.csv` tables directly. The renderer records their SHA-256 values, selected rank pair, evaluated
+predictor ranks, and boundary status in a generated manifest and derives SVG figures from in-memory
+results. The figures and manifest are ignored build products, not alternative dataset
+representations or package inputs.

@@ -73,6 +73,7 @@ This index is navigation, not a substitute for those records.
 | `0065-documentation-layer-consolidation.md` | tutorial, guide, and reference ownership | tutorial owns the worked Pulp analysis; guides own procedures; model inspection and generated API pages own general interpretation and signatures |
 | `0066-immutable-component-path-api.md` | concise path-result API | frozen aligned path arrays, scalar component lookup, and removal of redundant fitted mappings |
 | `0067-direct-sugarcane-workflow.md` | direct Sugarcane reference workflow | in-memory path, OOF, inspection, and explicit final-PDF figure composition without generated analytical CSV intermediates |
+| `0068-direct-pulp-workflow.md` | direct Pulp example and tutorial | visible direct path, rank-profile, fixed-fit, OOF, inspection, and final-figure workflow without a shared wrapper or analytical CSV intermediates |
 
 ## Implemented estimator/search transition
 
@@ -145,14 +146,15 @@ plan contains an earlier or more general proposal:
   performance claim before calibration;
 - the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
-- example 09 and the not-yet-migrated Pulp and Tobacco workflows present component paths as CSV
-  tables with fold SD; Sugarcane plots `component_path_` directly in memory; every real-data example
-  fits a separate fixed model after an explicit user component choice;
+- example 09 and the not-yet-migrated Tobacco workflow present component paths as CSV tables with
+  fold SD; Pulp and Sugarcane plot `component_path_` directly in memory; every real-data example fits
+  a separate fixed model after an explicit user component choice;
 - fold SD is descriptive, while component count remains a visible path-based user choice;
-- example 09 compares separate Pi-PLS and standard PLS component-path CSVs in one PDF per
-  dataset; Sugarcane writes five final PDFs directly from in-memory Pi-PLS results; Pulp and Tobacco
-  retain transitional Pi-PLS-only path/report artifacts; Tobacco uses adaptive rank scanning with
-  explicit full predictor SVD, while randomized SVD is covered by the solver-consistency benchmark;
+- example 09 compares separate Pi-PLS and standard PLS component-path CSVs in one PDF per dataset;
+  Pulp and Sugarcane write final PDFs directly from in-memory Pi-PLS results, with Pulp also exposing
+  the conditional predictor-rank profile; Tobacco retains transitional Pi-PLS-only path/report
+  artifacts and uses adaptive rank scanning with explicit full predictor SVD, while randomized SVD
+  is covered by the solver-consistency benchmark;
 - Python 3.10–3.14 are supported; runtime metadata admits NumPy 1.26--2.x,
   scikit-learn 1.4--1.x, and joblib 1.2--1.x; the complete minimum stack is tested only on
   Python 3.10 because its oldest binary releases do not cover every newer interpreter;

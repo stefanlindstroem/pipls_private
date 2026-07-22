@@ -126,8 +126,9 @@ paired predictor-nuisance, and solver-consistency benchmarks, each with one mini
 output. Pulp, Sugarcane, and Tobacco are transparent user-run examples rather than benchmark or
 default-test jobs. Example 09 reads the public tables and writes the separate Pi-PLS and standard
 PLS (NIPALS) comparison paths. Sugarcane now keeps its Pi-PLS path, fixed-model OOF predictions,
-and inspection results in memory and writes only final PDF figures. Pulp and Tobacco retain their
-transitional CSV/report artifacts until their scheduled migrations. Every workflow fits a fixed
+and inspection results in memory and writes only final PDF figures. Pulp now follows the same
+direct boundary and adds a conditional predictor-rank-profile figure. Tobacco retains its
+transitional CSV/report artifacts until Patch 20d. Every workflow fits a fixed
 Pi-PLS model only after a visible user component choice. None of this includes a block-aware
 standardization API design; future block-aware variants remain deferred for months or until the
 project owner explicitly starts a separate phase.

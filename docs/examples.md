@@ -26,25 +26,25 @@ dataset. This comparison is optional and is not part of routine Pi-PLS fitting.
 
 The three complete analyses evaluate one Pi-PLS component path and fit one selected fixed model:
 
-- `examples/10_pulp_real_data.py`: named scalar predictors and responses, including the maintained
-  score-loading biplot;
+- `examples/10_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
+  responses, including the component path, conditional predictor-rank profile, score-loading
+  biplot, fixed-model inspection, and OOF diagnostics;
 - `examples/11_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
   component path, scikit-learn OOF prediction, wavelength-aware inspection, and five final PDF
   figures;
 - `examples/12_tobacco_real_data.py`: decreasing-wavenumber plots, response pagination, and raw
   observation diagnostics.
 
-Sugarcane writes `component_path.pdf`, `pipls_factors.pdf`, `prediction_diagnostics.pdf`,
-`latent_structure.pdf`, and `coefficients.pdf`. It writes no generated analytical CSV files and
-constructs every figure directly from `component_path_` and immutable inspection results. Pulp and
-Tobacco retain their transitional canonical CSV and multipage-report workflow until their scheduled
-simplification patches. In every case, the example layer owns subplot layouts, legends,
-figure-level titles, PDF output, and closing; package plotters render one chart on one supplied axis.
+Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five.
+Both write no generated analytical CSV files and construct every figure directly from
+`component_path_`, scikit-learn OOF predictions, and immutable inspection results. Tobacco retains
+its transitional canonical CSV and multipage-report workflow until Patch 20d. In every case, the
+example layer owns subplot layouts, legends, figure-level titles, PDF output, and closing; package
+plotters render one chart on one supplied axis.
 
-The Pulp script and tutorial share the numerical workflow in
-`examples/_support/pulp_workflow.py`. Other modules under `examples/_support/` still provide
-example-only orchestration for the workflows that have not yet migrated. They are not required for
-ordinary estimator use.
+The Pulp tutorial extracts its checked snippets directly from `examples/10_pulp_real_data.py`.
+Modules under `examples/_support/` now serve only the comparison and not-yet-migrated Tobacco
+workflows. They are not required for ordinary estimator use.
 
 ## Run the examples
 
