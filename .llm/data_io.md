@@ -132,6 +132,15 @@ Do not introduce merely for repository examples:
 - preparation-only scripts whose required source is unavailable to users;
 - preprocessing learned across train/test or cross-validation boundaries.
 
+## Analysis artifact transparency
+
+Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize intermediate
+analysis results. The direct Sugarcane reference workflow reads those two tables and then keeps
+`component_path_`, fixed-model OOF predictions, and immutable inspection results in memory. It
+creates figures directly and writes only final PDF outputs. New numbered-example work should follow
+that pattern. Pulp, Tobacco, and the explicit comparison example retain their existing generated CSV
+contracts only until their scheduled Phase F4 migrations.
+
 ## Publication boundary
 
 Paper-specific data orchestration belongs in downstream reproduction repositories that depend on a

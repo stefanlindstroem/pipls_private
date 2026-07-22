@@ -352,18 +352,14 @@ path = search.component_path_
 
 Example 09 writes separate canonical Pi-PLS and standard PLS (NIPALS) component-path CSV
 files for Pulp, Sugarcane, and Tobacco and derives the shared CV-MSE comparison figures from those
-tables. Examples 10–12 then perform Pi-PLS-only analyses. Each writes one Pi-PLS path, fits one
-selected Pi-PLS model, and uses that model for selection-conditioned OOF predictions and all shared
-score, loading, coefficient, biplot, and observation analyses. Seven common canonical post-analysis
-CSV files are rebuilt into multipage reports whose figures are composed entirely in the example
-layer. Pulp groups scores, its balanced two-component biplot, X loadings, and Y loadings in one
-$2\times2$ page. Sugarcane uses a $1\times3$ scores/loading page. Tobacco adds an eighth table with
-raw score-distance and X-reconstruction-residual diagnostics, places those diagnostics with scores
-and loadings in a $2\times2$ page, preserves the decreasing wavenumber axis from `X.csv`, and
-paginates all thirteen responses in source order. Every Pi-PLS
-path CSV records the selected predictor rank. Tobacco uses adaptive scanning with explicit full
-predictor SVD; randomized-SVD behavior is covered by the solver-consistency benchmark. Install the
-`examples` extra to run them. See [`examples/README.md`](examples/README.md) and
+tables. Examples 10–12 then perform Pi-PLS-only analyses. Sugarcane is the direct reference
+workflow: it reads `component_path_`, fits the selected fixed model, calculates
+selection-conditioned OOF predictions with scikit-learn, keeps all inspection results in memory,
+and writes five explicit final PDF figures without generated analytical CSV intermediates. Pulp and
+Tobacco retain their current canonical CSV and multipage-report machinery until their scheduled
+simplification patches. Tobacco uses adaptive scanning with explicit full predictor SVD;
+randomized-SVD behavior is covered by the solver-consistency benchmark. Install the `examples`
+extra to run them. See [`examples/README.md`](examples/README.md) and
 [`datasets/README.md`](datasets/README.md).
 
 ## Lightweight benchmarks
@@ -378,9 +374,9 @@ scientific question and one minimal CSV output:
 
 The real-data workflows are explicit application runs rather than benchmark or test-suite jobs.
 `make examples` runs every numbered example in order. Example 09 owns the Pulp, Sugarcane, and
-Tobacco Pi-PLS-versus-PLS CV-MSE comparisons. Examples 10–12 are normal Pi-PLS analyses: each
-writes one Pi-PLS `component_path.csv` and `component_path.pdf` beside its separate
-`post_analysis.pdf`, then fits and interprets one selected Pi-PLS model.
+Tobacco Pi-PLS-versus-PLS CV-MSE comparisons. Examples 10–12 are normal Pi-PLS analyses.
+Sugarcane writes only five final PDF figures from in-memory results; Pulp and Tobacco retain their
+transitional path CSV and post-analysis report artifacts until their later Phase F4 migrations.
 
 See [`docs/benchmarks.md`](docs/benchmarks.md), [`benchmarks/README.md`](benchmarks/README.md), and
 [`examples/README.md`](examples/README.md).

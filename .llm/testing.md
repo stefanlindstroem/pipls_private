@@ -62,9 +62,12 @@ returned figures and axes, explicit line/bar modes, label validation, and succes
 without pinning pixels or incidental Matplotlib artist counts. Structural tests should enforce the
 single-axis package boundary and example-owned report composition.
 
-Example-helper tests cover `examples/_support/fixed_model_oof.py`,
-`examples/_support/post_analysis_artifacts.py`, and the canonical Pulp workflow. Tutorial-renderer
-tests may run that workflow once in a temporary directory, parse every declared SVG, verify manifest
+Example-helper tests cover the transitional `examples/_support/fixed_model_oof.py`,
+`examples/_support/post_analysis_artifacts.py`, and the canonical Pulp workflow. Structural tests
+for Sugarcane protect direct `component_path_` access, scikit-learn `cross_val_predict()`, immutable
+inspection results, explicit `ax=` calls, and the five final PDF filenames without running the full
+real-data analysis. Tutorial-renderer tests may run the Pulp workflow once in a temporary directory,
+parse every declared SVG, verify manifest
 hashes and generated filenames, and enforce Makefile/source-distribution ownership without pinning
 pixels or Matplotlib artist counts. Tutorial structure tests may verify navigation, generated-asset references, checked snippet
 sections, links to stable API objects, and links to the stable model-inspection anchors without
@@ -79,9 +82,9 @@ and plotting tests; do not duplicate its arrays as a frozen scientific fixture. 
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
 analyses as real-data benchmark scripts. `make examples` is the explicit application-validation
 target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead
-protect repository dataset readability, the canonical Pulp numerical workflow, staged workflow
-structure, component-path API, inspection equations, plotting contracts, example helpers, and
-CSV-to-PDF generation.
+protect repository dataset readability, the canonical Pulp numerical workflow, direct Sugarcane
+workflow structure, component-path API, inspection equations, plotting contracts, transitional
+example helpers, and their remaining CSV-to-PDF generation.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 

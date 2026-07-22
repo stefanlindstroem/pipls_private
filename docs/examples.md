@@ -24,24 +24,26 @@ dataset. This comparison is optional and is not part of routine Pi-PLS fitting.
 
 ## Complete real-data analyses
 
-The three complete analyses evaluate one Pi-PLS component path, fit one selected fixed model, and
-write interpretation and prediction-diagnostic artifacts:
+The three complete analyses evaluate one Pi-PLS component path and fit one selected fixed model:
 
 - `examples/10_pulp_real_data.py`: named scalar predictors and responses, including the maintained
   score-loading biplot;
-- `examples/11_sugarcane_real_data.py`: wavelength-aware spectral directions, loadings, and
-  coefficients;
+- `examples/11_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
+  component path, scikit-learn OOF prediction, wavelength-aware inspection, and five final PDF
+  figures;
 - `examples/12_tobacco_real_data.py`: decreasing-wavenumber plots, response pagination, and raw
   observation diagnostics.
 
-Each analysis writes `component_path.csv`, `component_path.pdf`, canonical post-analysis CSV tables,
-and `post_analysis.pdf`. Selection and fitted-model interpretation remain separate artifacts. The
-example layer owns subplot layouts, legends, figure-level titles, PDF output, and closing; package
-plotters render one chart on one supplied axis.
+Sugarcane writes `component_path.pdf`, `pipls_factors.pdf`, `prediction_diagnostics.pdf`,
+`latent_structure.pdf`, and `coefficients.pdf`. It writes no generated analytical CSV files and
+constructs every figure directly from `component_path_` and immutable inspection results. Pulp and
+Tobacco retain their transitional canonical CSV and multipage-report workflow until their scheduled
+simplification patches. In every case, the example layer owns subplot layouts, legends,
+figure-level titles, PDF output, and closing; package plotters render one chart on one supplied axis.
 
 The Pulp script and tutorial share the numerical workflow in
-`examples/_support/pulp_workflow.py`. Other modules under `examples/_support/` provide example-only
-OOF orchestration, path plotting, table writing, and report composition. They are not required for
+`examples/_support/pulp_workflow.py`. Other modules under `examples/_support/` still provide
+example-only orchestration for the workflows that have not yet migrated. They are not required for
 ordinary estimator use.
 
 ## Run the examples

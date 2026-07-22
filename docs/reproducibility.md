@@ -110,8 +110,9 @@ public provenance and redistribution terms. Current integrations are:
 - sugarcane LabSpec spectroscopy;
 - tobacco FT-NIR spectroscopy.
 
-Examples read `X.csv` and `Y.csv` directly. Their comparison and plotting helpers are imported
-Python functions, while the generated CSV files remain the artifact boundary used by the PDF.
+Examples read `X.csv` and `Y.csv` directly. Example 09 and the not-yet-migrated Pulp and
+Tobacco workflows still use generated CSV artifacts. Sugarcane instead operates on
+`component_path_` and immutable inspection results in memory and writes only final PDF figures.
 Metadata supports repository review but is not required by the runtime API. Dataset-specific
 transformations that matter to users are described publicly; private preparation archives and
 inaccessible paths are not part of the repository.

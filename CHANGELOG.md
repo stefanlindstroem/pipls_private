@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make Sugarcane the direct reference workflow: plot `component_path_` in memory, use
+  scikit-learn `cross_val_predict()` for the selected fixed model, pass immutable inspection results
+  directly to atomic plotters, and write five final PDF figures without generated analytical CSV
+  intermediates.
+
 - Complete the tutorial-first documentation transition: make the Pulp tutorial the sole worked analysis, shorten task guides, separate the path-search reference from the selection how-to, and turn model inspection into the stable figure-by-figure interpretation reference.
 
 - Add a tutorial-first documentation route built around the canonical Pulp workflow: include checked source snippets, all generated figures one chart at a time, explicit selection and validation provenance, and links to the general inspection, plotting, and theory references.

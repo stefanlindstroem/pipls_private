@@ -9,10 +9,11 @@ diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.in
 Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
 Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
 factorization inspection, and shared PLS-family analysis. Decision 0058 establishes one chart per
-public plotting function and caller-owned figure composition. The shared latent-structure functions
-use estimator-neutral names and structural fitted-model contracts, and numbered-example
-post-analysis applies them only to the selected Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface
-remains explicitly method-specific.
+public plotting function and caller-owned figure composition. Decision 0067 makes Sugarcane the
+first direct in-memory reference workflow. The shared latent-structure functions use
+estimator-neutral names and structural fitted-model contracts, and numbered-example post-analysis
+applies them only to the selected Pi-PLS model. The Pi-PLS $P$, $D$, and $Q$ surface remains
+explicitly method-specific.
 
 ## Analysis stages
 
@@ -22,11 +23,11 @@ Keep these stages separate in code, documentation, filenames, and figure labels.
 
 The component-path workflows answer how cross-validated loss changes with component count and, for
 Pi-PLS, the conditional predictor rank. Example 09 owns the canonical Pi-PLS and ordinary PLS path
-CSVs and their overlaid comparison PDFs. Examples 10–12 own one Pi-PLS `component_path.csv` and
-`component_path.pdf` beside each dataset post-analysis report.
-`examples/_support/pls_component_path.py` remains comparison-specific;
-`examples/_support/plot_component_path.py` renders both single Pi-PLS paths and explicit
-comparisons from canonical CSV files.
+CSVs and their overlaid comparison PDFs. Sugarcane plots `component_path_` directly in the numbered
+example and writes only `component_path.pdf`; Pulp and Tobacco retain one Pi-PLS path CSV and PDF
+until their scheduled migrations. `examples/_support/pls_component_path.py` remains
+comparison-specific, and `examples/_support/plot_component_path.py` currently serves example 09,
+Pulp, and Tobacco but not Sugarcane.
 
 A component-path result is not a fitted-model interpretation and is not an unbiased estimate of a
 subsequent user choice made after inspecting that same path. Fold SD is descriptive only, and the
@@ -109,15 +110,16 @@ The complete real-data examples own scientific orchestration:
 - direct dataset reading and alignment;
 - visible fixed component and predictor-rank choices;
 - explicit cross-validation splitters;
-- fixed-parameter OOF loops;
-- pandas table construction;
-- canonical CSV writing;
-- CSV rereading and multipage PDF composition;
+- fixed-parameter OOF prediction;
+- immutable inspection-result construction;
+- explicit figure, axis, legend, title, saving, and closing operations;
 - dataset-specific physical-axis labels, response subsets, and pagination.
 
-Their support modules live under `examples/_support/` so they are visibly separate from numbered
-user entry points. Do not hide real-data reading behind a package loader. Do not place user analysis
-helpers under `scripts/`, which remains the repository-maintenance and preparation area.
+Sugarcane keeps those stages directly in the numbered script and uses pandas only for committed
+input files. Pulp and Tobacco temporarily retain table construction, CSV round trips, and shared
+report support under `examples/_support/`. Do not hide real-data reading behind a package loader.
+Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
+preparation area.
 
 The served Pulp tutorial is the primary pedagogical analysis. It extracts executable snippets from
 that workflow and presents each deterministic generated figure separately. Plot-specific sections
@@ -306,10 +308,12 @@ contribution plots, and theoretical outlier thresholds require separate decision
 
 ## Artifact contract
 
-For real-data post-analysis, CSV is canonical and PDF is a derived view. Physical predictor
-coordinates are caller-owned metadata read during example input handling and passed explicitly to
-the report renderer; they are not inferred by `pipls.plotting`. The example writes numeric
-tables, reads them back, and constructs the report from those reread tables.
+The target Phase F4 contract is direct in-memory analysis with final figures as the only generated
+numbered-example artifacts. Sugarcane implements that contract: physical wavelength coordinates are
+read from `X.csv`, immutable numerical results stay in memory, and the script writes only final PDF
+figures. Pulp and Tobacco temporarily retain the former canonical-CSV and reconstructed-report
+contract described below until Patches 20c and 20d. Physical predictor coordinates remain
+caller-owned and are never inferred by `pipls.plotting`.
 
 Prediction tables use long form and retain at least:
 
@@ -340,7 +344,7 @@ Predictor-direction, score, loading, coefficient, and observation-diagnostic tab
 sample, feature, response, and component identifiers as applicable. Do not serialize estimators as
 part of the result contract.
 
-The seven common tables are required for every complete post-analysis workflow:
+The seven common tables remain required for the transitional Pulp and Tobacco post-analysis workflows:
 
 ```text
 pipls_predictor_directions.csv
@@ -383,10 +387,12 @@ public plotters accept `ax`, use only the shared one-axis resolver for standalon
 not create legends, panels, files, displays, or closing operations. Do not freeze pixel values,
 exact artist counts unrelated to the contract, or Matplotlib implementation details.
 
-Example-helper tests should use small synthetic tables. They may freeze canonical CSV column names,
-prediction provenance, sample order, and PDF generation from reread tables. They must not execute
-the complete Pulp, Sugarcane, or Tobacco analyses in `make check`; those remain under
-`make examples`.
+Example-helper tests should use small synthetic tables for the remaining transitional helpers. They
+may freeze canonical CSV column names, prediction provenance, sample order, and PDF generation from
+reread tables. Structural Sugarcane tests should verify direct `component_path_` access,
+scikit-learn OOF prediction, in-memory inspection, explicit `ax=` composition, and the five final
+PDF filenames without executing the full dataset analysis. Complete Pulp, Sugarcane, and Tobacco
+runs remain under `make examples`.
 
 ## Implementation order
 
@@ -398,4 +404,6 @@ The accepted order after Decision 0042 is:
 4. estimator-neutral shared inspection and plotting API — **complete**;
 5. Pi-PLS-only Pulp, Sugarcane, and Tobacco post-analysis migration — **complete**;
 6. stale-name, artifact, documentation, and boundary-test cleanup — **complete**;
-7. return to product documentation and release hardening — **next**.
+7. immutable component-path result simplification — **complete**;
+8. direct Sugarcane in-memory workflow — **complete**;
+9. direct Pulp and tutorial workflow — **next**.

@@ -389,8 +389,10 @@ consistency are implemented as independent scripts with minimal question-specifi
 ### Phase E4c: representative real-data examples — complete
 
 Pulp, Sugarcane, and Tobacco provide transparent component-path analyses with direct `X.csv` and
-`Y.csv` reading. Each example writes canonical Pi-PLS and standard PLS CSVs, derives a comparison
-PDF from those tables, and performs a separate fixed Pi-PLS fit after an explicit component choice.
+`Y.csv` reading. Example 09 owns the canonical Pi-PLS and standard PLS comparison CSVs and PDFs;
+examples 10–12 perform separate Pi-PLS-only fixed fits after explicit component choices. Phase F4
+subsequently makes Sugarcane the first direct in-memory workflow while Pulp and Tobacco remain
+transitional.
 
 The initial real-data smoke benchmark scripts and tests were removed after review because they
 repeated the same Pi-PLS paths, while dataset-specific tests executed the complete examples again.
@@ -437,8 +439,8 @@ Acceptance conditions:
   from supplied observed responses with `ddof=1`, and record prediction provenance;
 - established PLS coverage begins with scores, X/Y loadings, coefficients, one low-dimensional
   biplot, and raw observation diagnostics;
-- real-data examples own OOF loops, pandas tables, canonical CSV files, physical-axis semantics,
-  pagination, and multipage report composition;
+- real-data examples own OOF prediction, physical-axis semantics, pagination, and report
+  composition; the F2 table/CSV implementation is subject to the later F4 in-memory simplification;
 - complete real-data post-analysis remains under `make examples`, while `make check` uses small
   synthetic contracts;
 - VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation
@@ -490,9 +492,10 @@ Implementation order:
 5. in-memory Pi-PLS/PLS comparison;
 6. package-wide cleanup, documentation migration, and structural enforcement.
 
-Current status: **Patch 20a complete**. Decision 0066 adds `PiPLSComponentPath`,
-`PiPLSComponentResult`, and `PiPLSPathCV.component_path_`, removes the redundant concise fitted
-mappings, and migrates all repository consumers. Patch 20b, the direct Sugarcane workflow, is next.
+Current status: **Patches 20a and 20b complete**. Decision 0066 adds
+`PiPLSComponentPath`, `PiPLSComponentResult`, and `PiPLSPathCV.component_path_`. Decision 0067 makes
+Sugarcane the direct in-memory reference workflow and removes its generated analytical CSV
+intermediates. Patch 20c, the direct Pulp example and tutorial workflow, is next.
 
 ### Product documentation and release hardening
 
@@ -557,8 +560,9 @@ Current status: **compatibility policy, CI matrix, and installed-distribution va
 
 ## Current next increment
 
-Patch 20b: make Sugarcane the direct reference workflow. Use `component_path_` and inspection
-results in memory, create figures visibly in example 11, and retain only final PDF outputs.
+Patch 20c: make the Pulp example and tutorial workflow direct. Keep path, selected-model, OOF, and
+inspection results in memory; expose the analytical stages in example 10; and generate tutorial
+figures without analytical CSV intermediates.
 
 ## Maintenance protocol
 

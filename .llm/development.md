@@ -80,9 +80,11 @@
   explicitly freezes a narrow fixture.
 - Design files and command outputs for both humans and machines. When results are naturally tabular,
   prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
-- For component-path examples, treat CSV as canonical. Any PDF view must read the written CSV rather
-  than the fitted estimator, and its uncertainty label must distinguish fold SD from a confidence
-  interval.
+- Numbered examples migrated under Phase F4 operate directly on `component_path_` and immutable
+  inspection results in memory. They must not write generated CSV files as analytical or plotting
+  intermediates. Example 09 and the not-yet-migrated Pulp and Tobacco workflows retain their
+  current CSV contracts only until their scheduled patches. Every path figure must label fold SD as
+  descriptive variability rather than a confidence interval.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

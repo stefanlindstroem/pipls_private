@@ -183,22 +183,33 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert 'ANALYSIS_DIR / "component_path.pdf"' in pulp_text
     assert 'ANALYSIS_DIR / "post_analysis.pdf"' in pulp_text
 
-    for filename in ("11_sugarcane_real_data.py", "12_tobacco_real_data.py"):
-        text = (examples_dir / filename).read_text(encoding="utf-8")
-        assert "component_path_" in text
-        assert "refit=False" in text
-        assert "plot_pipls_component_path(" in text
-        assert "component_path.for_n_components(CHOSEN_N_COMPONENTS)" in text
-        assert "predictor_rank=chosen_predictor_rank" in text
-        assert 'ANALYSIS_DIR / "component_path.csv"' in text
-        assert 'ANALYSIS_DIR / "component_path.pdf"' in text
-        assert 'ANALYSIS_DIR / "post_analysis.pdf"' in text
+    sugarcane_text = (examples_dir / "11_sugarcane_real_data.py").read_text(
+        encoding="utf-8"
+    )
+    assert "component_path_" in sugarcane_text
+    assert "refit=False" in sugarcane_text
+    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in sugarcane_text
+    assert "axis.errorbar(" in sugarcane_text
+    assert "plot_pipls_component_path(" not in sugarcane_text
+    assert "component_path.csv" not in sugarcane_text
+    assert "post_analysis.pdf" not in sugarcane_text
+    assert ".to_csv(" not in sugarcane_text
 
-    for text in (pulp_text, pulp_workflow):
-        assert "evaluate_pls_component_path(" not in text
-        assert "plot_component_path_comparison(" not in text
-        assert "subprocess" not in text
-        assert "pooled_oof_r2_" not in text
+    tobacco_text = (examples_dir / "12_tobacco_real_data.py").read_text(encoding="utf-8")
+    assert "component_path_" in tobacco_text
+    assert "refit=False" in tobacco_text
+    assert "plot_pipls_component_path(" in tobacco_text
+    assert "component_path.for_n_components(CHOSEN_N_COMPONENTS)" in tobacco_text
+    assert "predictor_rank=chosen_predictor_rank" in tobacco_text
+    assert 'ANALYSIS_DIR / "component_path.csv"' in tobacco_text
+    assert 'ANALYSIS_DIR / "component_path.pdf"' in tobacco_text
+    assert 'ANALYSIS_DIR / "post_analysis.pdf"' in tobacco_text
+
+    for source in (pulp_text, pulp_workflow, sugarcane_text, tobacco_text):
+        assert "evaluate_pls_component_path(" not in source
+        assert "plot_component_path_comparison(" not in source
+        assert "subprocess" not in source
+        assert "pooled_oof_r2_" not in source
 
 
 def test_tobacco_example_uses_full_svd_and_auto_search() -> None:

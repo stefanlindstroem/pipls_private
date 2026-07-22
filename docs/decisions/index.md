@@ -62,6 +62,7 @@ reference describe the current public behavior directly.
 - [0063: repository-generated Pulp tutorial figures](0063-repository-generated-pulp-tutorial-figures.md)
 - [0064: tutorial-first documentation](0064-tutorial-first-documentation.md)
 - [0065: documentation layer consolidation](0065-documentation-layer-consolidation.md)
+- [0067: direct Sugarcane workflow](0067-direct-sugarcane-workflow.md)
 
 ## Repository and documentation policy
 

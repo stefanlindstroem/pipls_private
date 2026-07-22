@@ -271,18 +271,24 @@ labels.
 Matplotlib remains optional and is imported only when a plotting function is called. The functions
 perform no legend or panel creation, file writing, display, or closing, retain no models, and do not
 alter supplied arrays. Component-path helpers remain example-local selection diagnostics. Every
-maintained post-analysis report figure is created in the example layer, which passes an explicit
-axis to each package plotter and owns panel geometry, legends, figure-level titles, pandas tables,
-canonical CSV files, and PDF composition. No estimator method, fitted attribute, path-search
+maintained analysis figure is created in the example layer, which passes an explicit axis to each
+package plotter and owns panel geometry, legends, figure-level titles, saving, and closing.
+Sugarcane composes directly from immutable results; the remaining pandas-table and CSV report layer
+is transitional support for Pulp and Tobacco. No estimator method, fitted attribute, path-search
 parameter, or top-level export is added by this plotting layer.
 
 ## Example workflow boundary
 
 Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and their separate
-canonical CSV files. Examples 10–12 use `PiPLSPathCV(refit=False)` to produce one Pi-PLS path, write
-`component_path.csv` and `component_path.pdf` beside the post-analysis report, and fit a separate
-fixed model with the numeric predictor rank read from the chosen Pi-PLS row. Pulp evaluates a
-cloneable `Pipeline` whose terminal step is `PiPLSRegression`, transfers the chosen pair through
-`pipls__n_components` and `pipls__predictor_rank`, and exposes the fitted terminal estimator only in
-its example-owned workflow result. Sugarcane and Tobacco retain direct `PiPLSRegression` templates.
-The package exposes no dataset I/O, tutorial workflow, or component-path plotting helper.
+canonical CSV files. Sugarcane uses `PiPLSPathCV(refit=False)`, plots `component_path_` directly,
+reads the selected pair through `for_n_components()`, fits one fixed `PiPLSRegression`, and
+calculates five-fold non-shuffled predictions through scikit-learn `cross_val_predict()`. It passes
+immutable factors, latent structure, and prediction diagnostics directly to the public one-axis
+plotters and writes five final PDF figures without generated analytical CSV files.
+
+Pulp evaluates a cloneable `Pipeline` whose terminal step is `PiPLSRegression`, transfers the
+chosen pair through `pipls__n_components` and `pipls__predictor_rank`, and exposes the fitted
+terminal estimator only in its example-owned workflow result. Tobacco retains a direct
+`PiPLSRegression` template. Both still use transitional path/table/report helpers until their
+scheduled migrations. The package exposes no dataset I/O, tutorial workflow, or component-path
+plotting helper.

@@ -125,7 +125,9 @@ focused synthetic sequence now includes implemented fixed-structure recovery, ra
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
 output. Pulp, Sugarcane, and Tobacco are transparent user-run examples rather than benchmark or
 default-test jobs. Example 09 reads the public tables and writes the separate Pi-PLS and standard
-PLS (NIPALS) comparison paths. Examples 10–12 write Pi-PLS-only paths beside their post-analysis
-reports and fit a fixed Pi-PLS model only after a visible user component choice. None of this includes a block-aware standardization API design;
-future block-aware variants remain deferred for months or until the project owner explicitly starts
-a separate phase.
+PLS (NIPALS) comparison paths. Sugarcane now keeps its Pi-PLS path, fixed-model OOF predictions,
+and inspection results in memory and writes only final PDF figures. Pulp and Tobacco retain their
+transitional CSV/report artifacts until their scheduled migrations. Every workflow fits a fixed
+Pi-PLS model only after a visible user component choice. None of this includes a block-aware
+standardization API design; future block-aware variants remain deferred for months or until the
+project owner explicitly starts a separate phase.

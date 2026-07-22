@@ -185,6 +185,7 @@ def test_pulp_example_uses_the_canonical_workflow_and_exports_the_same_artifacts
     assert 'prediction_kind="fitted values"' not in text
     assert "subprocess" not in text
 
+
 def test_post_analysis_report_supports_an_explicit_physical_predictor_axis(
     tmp_path: Path,
 ) -> None:
@@ -297,28 +298,50 @@ def test_response_pages_must_partition_source_order(tmp_path: Path) -> None:
         )
 
 
-def test_sugarcane_example_contains_complete_spectral_post_analysis() -> None:
+def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
     text = (_repository_root() / "examples" / "11_sugarcane_real_data.py").read_text(
         encoding="utf-8"
     )
 
     assert "CHOSEN_N_COMPONENTS = 2" in text
     assert "from sklearn.cross_decomposition import PLSRegression" not in text
-    assert "X.columns.tolist()" in text
-    assert "Y.columns.tolist()" in text
     assert "X.columns.to_numpy(dtype=float)" in text
+    assert "Y.columns.tolist()" in text
+    assert "path_search.component_path_" in text
+    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in text
+    assert "cross_val_predict(" in text
+    assert "cv=KFold(n_splits=5, shuffle=False)" in text
+    assert "pipls_display_factors(model.decomposition_)" in text
+    assert "latent_structure(model)" in text
+    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert 'predictor_style="line"' in text
     assert 'predictor_axis_label="Wavelength (nm)"' in text
-    assert "loading_components=(1, 2)" in text
-    assert 'coefficient_responses=("TS", "CP", "ADF", "IVOMD")' in text
-    assert "fixed_model_oof_predictions(" in text
-    assert 'prediction_kind="selection-conditioned OOF predictions"' in text
-    assert "build_post_analysis_tables(" in text
-    assert "write_post_analysis_tables(" in text
-    assert "render_post_analysis_report(" in text
-    assert "ANALYSIS_DIR" in text
-    assert "biplot_components" not in text
+    assert "include_prediction_kind=False" in text
+    assert "build_post_analysis_tables(" not in text
+    assert "write_post_analysis_tables(" not in text
+    assert "render_post_analysis_report(" not in text
+    assert "fixed_model_oof_predictions(" not in text
+    assert "plot_pipls_component_path(" not in text
+    assert ".to_csv(" not in text
+    assert "pd.read_csv" in text
+    assert text.count("pd.read_csv") == 2
     assert "subprocess" not in text
+
+    expected_pdfs = {
+        "component_path.pdf",
+        "pipls_factors.pdf",
+        "prediction_diagnostics.pdf",
+        "latent_structure.pdf",
+        "coefficients.pdf",
+    }
+    assert {
+        filename
+        for filename in expected_pdfs
+        if f'ANALYSIS_DIR / "{filename}"' in text
+    } == expected_pdfs
+    assert text.count("figure.savefig(") == len(expected_pdfs)
+    assert text.count("plt.close(figure)") == len(expected_pdfs)
+
 
 def test_tobacco_example_contains_paginated_spectral_post_analysis() -> None:
     text = (_repository_root() / "examples" / "12_tobacco_real_data.py").read_text(

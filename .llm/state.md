@@ -53,10 +53,10 @@ implementation was removed and replaced by focused question-specific benchmarks:
   accept compatible fitted Pi-PLS and ordinary PLS models;
 - a single-axis contract for the existing atomic plotters: optional caller-supplied axes,
   `(figure, axis)` returns, and caller-owned legends and panel composition;
-- complete Pulp, Sugarcane, and Tobacco post-analysis workflows with fixed-estimator OOF prediction
-  helpers, seven common canonical long-form CSV tables, an optional Tobacco observation-diagnostic
-  table, scientific labels obtained at the file-reading boundary, and multipage reports
-  reconstructed from those tables;
+- a direct Sugarcane reference workflow that keeps `component_path_`, fixed-model OOF predictions,
+  and immutable inspection results in memory and writes five explicit final PDF figures;
+- transitional Pulp and Tobacco post-analysis workflows with fixed-estimator OOF prediction helpers,
+  canonical long-form CSV tables, and multipage reports reconstructed from those tables;
 - a canonical example-owned Pulp pipeline workflow that supplies path evaluation, explicit
   component-count selection, fixed fitting, selection-conditioned OOF prediction, and inspection
   results to example 10, the deterministic tutorial renderer, and checked documentation snippets;
@@ -157,10 +157,11 @@ Additional fixed decisions:
   carried by the estimator template rather than a second path-level `set_output` layer.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
-- Real-data examples use `PiPLSPathCV(refit=False)` for the path, treat CSV as canonical,
-  derive PDFs from the CSV, and fit a separate fixed model after an explicit component choice.
-  Pulp evaluates and fits a one-step pipeline ending in `PiPLSRegression`; Sugarcane and Tobacco
-  retain direct estimators. `best_params_` remains a convenience, not the required user decision.
+- Real-data examples use `PiPLSPathCV(refit=False)` for the path and fit a separate fixed model
+  after an explicit component choice. Sugarcane uses `component_path_` and inspection results
+  directly in memory; Pulp and Tobacco retain transitional CSV/report artifacts. Pulp evaluates and
+  fits a one-step pipeline ending in `PiPLSRegression`; Sugarcane and Tobacco use direct estimators.
+  `best_params_` remains a convenience, not the required user decision.
 - Path coefficients are accessed through `best_pipls_` or `best_estimator_`; they are not flattened
   onto `PiPLSPathCV` when preprocessing may change the feature space.
 - OOF results produced after using the same splits for model selection are labeled
@@ -235,15 +236,14 @@ implemented independently:
 The earlier real-data smoke-check scripts and full example-execution tests were removed because they
 duplicated the numbered analyses. `make examples` runs every numbered example as an explicit
 application-validation action. Example 09 writes separate Pi-PLS and standard PLS (NIPALS) path
-CSVs for the same folds and component counts and generates the overlaid comparison PDFs. Examples
-10–12 write Pi-PLS-only path artifacts beside their post-analysis reports, expose a visible
-component choice, and fit a separate fixed model with both Pi-PLS ranks recorded explicitly. Pulp
-uses a one-step pipeline ending in `PiPLSRegression`; Sugarcane and Tobacco use direct estimators.
-The scripts contain no subprocess wrappers, repeated table-validation boilerplate, one-use
-configuration constants, redundant committed-data checks, or directory-creation scaffolding.
-Required result directories are tracked and preserved by `make clean`. Default tests retain
-dataset-layout, component-path API, PLS-helper, plotting, workflow-structure, and one canonical Pulp
-numerical-workflow contract without executing the artifact-producing real-data scripts.
+CSVs for the same folds and component counts and generates the overlaid comparison PDFs. Example 11
+is now the direct reference workflow: it plots `component_path_` without a table conversion, fits a
+selected fixed estimator, uses scikit-learn `cross_val_predict`, calculates inspection results in
+memory, and writes five final PDF figures. Pulp and Tobacco retain their current path CSV and
+post-analysis report machinery until Patches 20c and 20d. Required result directories are tracked
+and preserved by `make clean`. Default tests retain dataset-layout, component-path API, PLS-helper,
+plotting, workflow-structure, and one canonical Pulp numerical-workflow contract without executing
+the artifact-producing real-data scripts.
 
 ## Legacy dataset licensing review
 
@@ -275,21 +275,19 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Patch 20b: rewrite Sugarcane as the direct reference example. Example 11 should operate on
-`component_path_` and fitted inspection objects in memory, construct its own Matplotlib figures,
-and stop writing or rereading analytical CSV intermediates. Generated outputs should be final PDF
-figures only.
+Patch 20c: rewrite the Pulp example and tutorial workflow in the same direct style. The numbered
+example should own the visible path, fixed fit, OOF prediction, inspection, and figure sequence;
+tutorial assets should consume the same in-memory results without generated analytical CSV files.
 
 ## Subsequent roadmap
 
-1. **Patch 20b:** direct Sugarcane workflow and final figures only.
-2. **Patch 20c:** direct Pulp example and tutorial workflow.
-3. **Patch 20d:** direct Tobacco workflow and removal of post-analysis table machinery.
-4. **Patch 20e:** in-memory Pi-PLS/PLS path comparison.
-5. **Patch 20f:** package-wide CSV-policy cleanup, documentation migration, and structural enforcement.
-6. **First-release preparation:** choose the initial version, complete metadata and release notes,
+1. **Patch 20c:** direct Pulp example and tutorial workflow.
+2. **Patch 20d:** direct Tobacco workflow and removal of post-analysis table machinery.
+3. **Patch 20e:** in-memory Pi-PLS/PLS path comparison.
+4. **Patch 20f:** package-wide CSV-policy cleanup, documentation migration, and structural enforcement.
+5. **First-release preparation:** choose the initial version, complete metadata and release notes,
    and rehearse the tag and publication checklist.
-7. **First tagged release:** publish only after the rehearsal and checklist pass.
+6. **First tagged release:** publish only after the rehearsal and checklist pass.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

@@ -34,10 +34,11 @@ Sugarcane, and Tobacco are component-path examples rather than benchmark or test
 `make examples` runs every numbered example explicitly, beginning with the literal-matrix
 `01_minimal_fit_and_plot.py` quickstart and including the complete real-data analyses. Example 09
 writes separate Pi-PLS and standard PLS (NIPALS) CSVs and derives the comparison PDFs from those
-canonical tables. Examples 10–12 write Pi-PLS-only paths in their analysis directories and then fit
-a separately chosen fixed model. Pulp now uses a shared example-owned pipeline workflow for path
-evaluation, nested fixed fitting, OOF prediction, and inspection; artifact orchestration remains
-in example 10. Other shared orchestration remains under `examples/_support/`.
+canonical tables. Sugarcane now plots its Pi-PLS path directly, keeps OOF and inspection results in
+memory, and writes five final PDF figures. Pulp and Tobacco retain transitional path CSV and report
+orchestration. Pulp uses a shared example-owned pipeline workflow for path evaluation, nested fixed
+fitting, OOF prediction, and inspection; artifact orchestration remains in example 10. Other shared
+orchestration remains under `examples/_support/`.
 No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
@@ -50,8 +51,9 @@ generates its deterministic single-chart SVG assets and manifest. Decision 0064 
 Pulp tutorial the primary pedagogical route through the served documentation, using checked source
 snippets and one generated chart per explanation. Decision 0065 completes the transition by
 separating tutorial, task-guide, scientific-reference, and generated-API ownership. Decision 0066
-introduces the immutable concise component-path API. The direct Sugarcane reference-example rewrite
-is the current next increment.
+introduces the immutable concise component-path API. Decision 0067 makes Sugarcane the direct
+in-memory reference example. The direct Pulp example and tutorial rewrite is the current next
+increment.
 
 ## Implemented estimator and selection boundary
 
@@ -67,9 +69,10 @@ carry their own output-container configuration through cloning and refit.
 Decisions 0042 and 0045 define the staged fitted-model analysis surface. Pi-PLS-specific $P$, $D$,
 and $Q$ inspection remains explicitly method-owned. Scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics are shared PLS-family analyses with an
-estimator-neutral API. Ordinary PLS remains the component-path and benchmark comparator. The numbered post-analysis
-examples apply shared tools only to the selected Pi-PLS model and fit no final ordinary PLS model. Dataset-specific choices, OOF
-loops, pandas tables, CSV writing, and multipage reports remain in `examples/_support/`.
+estimator-neutral API. Ordinary PLS remains the component-path and benchmark comparator. The numbered post-analysis examples apply shared tools only to the selected Pi-PLS model and fit no
+final ordinary PLS model. Sugarcane owns its OOF prediction and figure composition directly; the
+remaining pandas-table, CSV, pagination, and multipage-report support serves Pulp and Tobacco only
+until their scheduled migrations.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
@@ -121,11 +124,12 @@ implementing or reviewing this surface.
   followed by an explained synthetic train/test use case, one explicit comparison example, and
   complete Pi-PLS real-data analyses. Advanced splitters are documented rather than combined into a
   context-free numbered script.
-  Underscore-prefixed `examples/_support/` contains report infrastructure rather than primary entry
-  points. Example 09 owns the separate Pi-PLS and standard PLS (NIPALS) paths and comparison PDFs.
-  Examples 10–12 own Pi-PLS-only paths, fixed-model OOF loops, canonical tables, physical-axis
-  semantics, pagination, and report composition. Their pandas and Matplotlib requirements are
-  grouped in the `examples` optional dependency extra.
+  Underscore-prefixed `examples/_support/` contains transitional report infrastructure rather than
+  primary entry points. Example 09 owns the separate Pi-PLS and standard PLS (NIPALS) paths and
+  comparison PDFs. Sugarcane owns its direct Pi-PLS path, scikit-learn OOF prediction, immutable
+  inspection results, physical wavelength axis, and five explicit figures. Pulp and Tobacco retain
+  the shared CSV/report support until later Phase F4 patches. Their pandas and Matplotlib
+  requirements are grouped in the `examples` optional dependency extra.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
 - `docs/`: the self-contained documentation source, including served user guides, implemented

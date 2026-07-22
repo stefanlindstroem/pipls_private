@@ -57,12 +57,18 @@ def test_dedicated_example_owns_the_pls_comparison_path() -> None:
     assert "latent_structure(model)" in pulp_workflow
     assert "PiPLSRegression(" in pulp_workflow
 
-    for filename in ("11_sugarcane_real_data.py", "12_tobacco_real_data.py"):
-        text = (examples_dir / filename).read_text(encoding="utf-8")
-        assert "evaluate_pls_component_path(" not in text
-        assert "plot_pipls_component_path(" in text
-        assert "latent_structure(model)" in text
-        assert "PiPLSRegression(" in text
+    sugarcane = (examples_dir / "11_sugarcane_real_data.py").read_text(encoding="utf-8")
+    assert "evaluate_pls_component_path(" not in sugarcane
+    assert "plot_pipls_component_path(" not in sugarcane
+    assert "axis.errorbar(" in sugarcane
+    assert "latent_structure(model)" in sugarcane
+    assert "PiPLSRegression(" in sugarcane
+
+    tobacco = (examples_dir / "12_tobacco_real_data.py").read_text(encoding="utf-8")
+    assert "evaluate_pls_component_path(" not in tobacco
+    assert "plot_pipls_component_path(" in tobacco
+    assert "latent_structure(model)" in tobacco
+    assert "PiPLSRegression(" in tobacco
 
 
 def test_ordinary_pls_is_confined_to_the_example_comparison_helper() -> None:
@@ -122,7 +128,42 @@ def test_shared_inspection_uses_no_concrete_plsregression_restriction() -> None:
     assert "isinstance(model, PLSRegression)" not in source
 
 
-def test_post_analysis_helper_owns_all_report_composition() -> None:
+def test_sugarcane_example_owns_direct_figure_composition() -> None:
+    path = _repository_root() / "examples" / "11_sugarcane_real_data.py"
+    source = path.read_text(encoding="utf-8")
+    tree = ast.parse(source, filename=str(path))
+    expected_plotters = {
+        "plot_coefficients",
+        "plot_observed_vs_predicted",
+        "plot_pipls_dilation",
+        "plot_pipls_predictor_directions",
+        "plot_pipls_response_directions",
+        "plot_pipls_weighted_response_directions",
+        "plot_residuals_vs_predicted",
+        "plot_scores",
+        "plot_standardized_rmse",
+        "plot_x_loadings",
+        "plot_y_loadings",
+    }
+    calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id in expected_plotters
+    ]
+
+    assert {call.func.id for call in calls if isinstance(call.func, ast.Name)} == expected_plotters
+    assert all(any(keyword.arg == "ax" for keyword in call.keywords) for call in calls)
+    assert source.count("plt.subplots(") == 5
+    assert source.count("figure.savefig(") == 5
+    assert source.count("plt.close(figure)") == 5
+    assert "post_analysis_artifacts" not in source
+    assert "fixed_model_oof" not in source
+    assert "plot_component_path" not in source
+
+
+def test_post_analysis_helper_owns_remaining_shared_report_composition() -> None:
     path = _repository_root() / "examples" / "_support" / "post_analysis_artifacts.py"
     source = path.read_text(encoding="utf-8")
     tree = ast.parse(source, filename=str(path))

@@ -1,22 +1,29 @@
-"""Create a Sugarcane Pi-PLS component path and spectral post-analysis."""
+"""Fit and inspect a Sugarcane Pi-PLS model directly in memory."""
 
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import pandas as pd
-from _support.fixed_model_oof import fixed_model_oof_predictions
-from _support.plot_component_path import plot_pipls_component_path
-from _support.post_analysis_artifacts import (
-    build_post_analysis_tables,
-    render_post_analysis_report,
-    write_post_analysis_tables,
-)
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, cross_val_predict
 
 from pipls import PiPLSPathCV, PiPLSRegression
 from pipls.inspection import (
     latent_structure,
     pipls_display_factors,
     prediction_diagnostics,
+)
+from pipls.plotting import (
+    plot_coefficients,
+    plot_observed_vs_predicted,
+    plot_pipls_dilation,
+    plot_pipls_predictor_directions,
+    plot_pipls_response_directions,
+    plot_pipls_weighted_response_directions,
+    plot_residuals_vs_predicted,
+    plot_scores,
+    plot_standardized_rmse,
+    plot_x_loadings,
+    plot_y_loadings,
 )
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "sugarcane"
@@ -25,73 +32,180 @@ CHOSEN_N_COMPONENTS = 2
 
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
+wavelengths = X.columns.to_numpy(dtype=float)
+response_names = Y.columns.tolist()
 
-# Evaluate the Pi-PLS component path.
+# Evaluate and plot the Pi-PLS component path.
 path_search = PiPLSPathCV(refit=False).fit(X, Y)
-component_path = path_search.component_path_
-pipls_path = pd.DataFrame(
-    {
-        "n_components": component_path.n_components,
-        "predictor_rank": component_path.predictor_rank,
-        "predictor_rank_policy": component_path.predictor_rank_policy,
-        "response_standardized_cv_mse_mean": component_path.cv_mse_mean,
-        "response_standardized_cv_mse_fold_sd": component_path.cv_mse_fold_sd,
-        "n_splits": component_path.n_splits,
-    }
-)
-pipls_path.to_csv(ANALYSIS_DIR / "component_path.csv", index=False)
-plot_pipls_component_path(
-    ANALYSIS_DIR / "component_path.csv",
-    ANALYSIS_DIR / "component_path.pdf",
-    title="Sugarcane Pi-PLS component path",
-)
+path = path_search.component_path_
 
-# Fit the selected Pi-PLS model.
-selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
-chosen_predictor_rank = selected.predictor_rank
+figure, axis = plt.subplots(
+    figsize=(7.0, 4.5),
+    layout="constrained",
+)
+axis.errorbar(
+    path.n_components,
+    path.cv_mse_mean,
+    yerr=path.cv_mse_fold_sd,
+    fmt="o-",
+    capsize=4,
+)
+axis.set_xlabel("Number of components")
+axis.set_ylabel("Response-standardized CV-MSE")
+axis.set_title("Sugarcane Pi-PLS component path")
+figure.savefig(ANALYSIS_DIR / "component_path.pdf")
+plt.close(figure)
+
+# Fit the selected full-data model.
+selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 model = PiPLSRegression(
-    n_components=CHOSEN_N_COMPONENTS,
-    predictor_rank=chosen_predictor_rank,
+    n_components=selected.n_components,
+    predictor_rank=selected.predictor_rank,
 ).fit(X, Y)
 
-# Export OOF predictions and fitted-model inspection tables.
-oof = fixed_model_oof_predictions(
+# Calculate selection-conditioned out-of-fold predictions.
+oof_predictions = cross_val_predict(
     model,
     X,
     Y,
-    splitter=KFold(n_splits=5, shuffle=False),
+    cv=KFold(n_splits=5, shuffle=False),
 )
-write_post_analysis_tables(
-    ANALYSIS_DIR,
-    build_post_analysis_tables(
-        factors=pipls_display_factors(model.decomposition_),
-        diagnostics=prediction_diagnostics(
-            Y,
-            oof.predictions,
-            prediction_kind="selection-conditioned OOF predictions",
-        ),
-        structure=latent_structure(model),
-        predictor_names=X.columns.tolist(),
-        response_names=Y.columns.tolist(),
-        sample_names=[str(index) for index in range(1, len(X) + 1)],
-        fold_index=oof.fold_index,
-    ),
+
+# Calculate fitted-model and prediction inspection results.
+factors = pipls_display_factors(model.decomposition_)
+structure = latent_structure(model)
+diagnostics = prediction_diagnostics(
+    Y,
+    oof_predictions,
+    prediction_kind="selection-conditioned OOF predictions",
 )
-render_post_analysis_report(
-    ANALYSIS_DIR,
-    ANALYSIS_DIR / "post_analysis.pdf",
-    dataset_name="Sugarcane",
+
+# Plot the Pi-PLS factors.
+figure, axes = plt.subplots(
+    2,
+    2,
+    figsize=(12.0, 9.0),
+    layout="constrained",
+)
+plot_pipls_predictor_directions(
+    factors,
     predictor_style="line",
-    predictor_axis=X.columns.to_numpy(dtype=float),
+    predictor_axis=wavelengths,
     predictor_axis_label="Wavelength (nm)",
-    score_components=(1, 2),
-    loading_components=(1, 2),
-    coefficient_responses=("TS", "CP", "ADF", "IVOMD"),
+    ax=axes[0, 0],
 )
+plot_pipls_dilation(factors, ax=axes[0, 1])
+plot_pipls_response_directions(
+    factors,
+    response_names=response_names,
+    ax=axes[1, 0],
+)
+plot_pipls_weighted_response_directions(
+    factors,
+    response_names=response_names,
+    ax=axes[1, 1],
+)
+axes[0, 0].legend(title="Component")
+axes[1, 0].legend(title="Component")
+axes[1, 1].legend(title="Component")
+figure.suptitle(
+    "Sugarcane Pi-PLS factors "
+    f"({selected.n_components} components, predictor rank {selected.predictor_rank})"
+)
+figure.savefig(ANALYSIS_DIR / "pipls_factors.pdf")
+plt.close(figure)
+
+# Plot selection-conditioned prediction diagnostics.
+figure, axes = plt.subplots(
+    1,
+    3,
+    figsize=(13.0, 4.2),
+    layout="constrained",
+)
+plot_observed_vs_predicted(
+    diagnostics,
+    response_names=response_names,
+    include_prediction_kind=False,
+    ax=axes[0],
+)
+plot_residuals_vs_predicted(
+    diagnostics,
+    response_names=response_names,
+    include_prediction_kind=False,
+    ax=axes[1],
+)
+plot_standardized_rmse(
+    diagnostics,
+    response_names=response_names,
+    include_prediction_kind=False,
+    ax=axes[2],
+)
+axes[0].legend()
+axes[1].legend()
+figure.suptitle(
+    "Sugarcane Pi-PLS prediction diagnostics\n"
+    f"{diagnostics.prediction_kind}"
+)
+figure.savefig(ANALYSIS_DIR / "prediction_diagnostics.pdf")
+plt.close(figure)
+
+# Plot scores and loadings from the selected full-data model.
+figure, axes = plt.subplots(
+    1,
+    3,
+    figsize=(15.0, 4.5),
+    layout="constrained",
+    gridspec_kw={"width_ratios": (1.0, 1.6, 1.0)},
+)
+plot_scores(
+    structure,
+    components=(0, 1),
+    title="X scores",
+    ax=axes[0],
+)
+plot_x_loadings(
+    structure,
+    predictor_style="line",
+    predictor_axis=wavelengths,
+    predictor_axis_label="Wavelength (nm)",
+    components=(0, 1),
+    title="X loadings",
+    ax=axes[1],
+)
+plot_y_loadings(
+    structure,
+    response_names=response_names,
+    components=(0, 1),
+    title="Y loadings",
+    ax=axes[2],
+)
+axes[1].legend(title="Component")
+axes[2].legend(title="Component")
+figure.suptitle("Sugarcane Pi-PLS latent structure")
+figure.savefig(ANALYSIS_DIR / "latent_structure.pdf")
+plt.close(figure)
+
+# Plot response-specific regression coefficients.
+figure, axis = plt.subplots(
+    figsize=(10.0, 5.0),
+    layout="constrained",
+)
+plot_coefficients(
+    structure,
+    predictor_style="line",
+    response_names=response_names,
+    predictor_axis=wavelengths,
+    predictor_axis_label="Wavelength (nm)",
+    title="Sugarcane Pi-PLS coefficients",
+    ax=axis,
+)
+axis.legend(title="Response")
+figure.savefig(ANALYSIS_DIR / "coefficients.pdf")
+plt.close(figure)
 
 print(f"X shape: {X.shape}; Y shape: {Y.shape}")
 print(
     "Selected Pi-PLS: "
     f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
 )
-print(f"Wrote results to {ANALYSIS_DIR}")
+print(f"Wrote PDF figures to {ANALYSIS_DIR}")

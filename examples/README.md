@@ -45,42 +45,38 @@ example.
 
 - `10_pulp_real_data.py`: the canonical tutorial analysis, using one terminal-Pi-PLS pipeline
   for component-path evaluation, one selected fixed pipeline, selection-conditioned OOF
-  predictions, seven canonical post-analysis CSV files, a balanced score-loading biplot, and a
-  multipage report.
-- `11_sugarcane_real_data.py`: direct pandas reading, one Pi-PLS component path, one selected
-  Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions, seven canonical
-  post-analysis CSV files, and a wavelength-aware report.
+  predictions, a balanced score-loading biplot, and the current transitional CSV/report layer.
+- `11_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
+  inspection results in memory, calculates OOF predictions with scikit-learn, and writes five
+  wavelength-aware final PDF figures without generated analytical CSV files.
 - `12_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD, one selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions,
-  decreasing-wavenumber spectral plots, deterministic response pagination, eight canonical
-  post-analysis CSV files, and raw observation diagnostics.
+  decreasing-wavenumber spectral plots, deterministic response pagination, and raw observation
+  diagnostics through the current transitional CSV/report layer.
 
-These are application analyses rather than introductory snippets, but the numbered scripts keep
-only their scientific stages visible. Their PDF reports compose the separate $P$, $D$, $Q$, and
-$QD$ charts in a $2\times2$ factor panel and the three prediction diagnostics in a $1\times3$
-panel. A later page groups shared latent-model views: Pulp uses scores, biplot, X loadings, and Y
-loadings in a $2\times2$ panel; Sugarcane uses scores and the two loading views in a $1\times3$
-panel; Tobacco replaces the biplot with observation diagnostics in a $2\times2$ panel.
-Coefficient curves retain full-width response pages. Reusable validation, CSV reconstruction, and
-report composition remain in `_support`. `make examples` runs every numbered example in filename
-order, including the slower real-data workflows. It remains separate from `make check`.
+These are application analyses rather than introductory snippets. Sugarcane exposes its complete
+scientific sequence directly in the numbered script: path evaluation and plotting, fixed fitting,
+OOF prediction, immutable inspection results, and explicit Matplotlib composition. Its five figures
+are `component_path.pdf`, `pipls_factors.pdf`, `prediction_diagnostics.pdf`,
+`latent_structure.pdf`, and `coefficients.pdf`. Pulp and Tobacco retain shared report support until
+their scheduled Phase F4 migrations. `make examples` runs every numbered example in filename order,
+including the slower real-data workflows. It remains separate from `make check`.
 
 ## Example support modules
 
-The complete workflows import implementation support from `examples/_support/`:
+The remaining transitional workflows import implementation support from `examples/_support/`:
 
 - `pls_component_path.py`: ordinary-PLS path evaluation;
-- `plot_component_path.py`: component-path CSV-to-PDF rendering;
-- `fixed_model_oof.py`: cloning and aligned OOF prediction for already fixed models;
+- `plot_component_path.py`: component-path CSV-to-PDF rendering for example 09, Pulp, and Tobacco;
+- `fixed_model_oof.py`: cloning and aligned OOF prediction for fixed models that have not migrated
+  to direct scikit-learn orchestration;
 - `post_analysis_artifacts.py`: canonical table construction, CSV round trips, pagination, and
-  multipage report composition;
+  multipage report composition for Pulp and Tobacco;
 - `pulp_workflow.py`: the shared Pulp pipeline, path, fixed-fit, OOF, and inspection workflow used
-  by example 10 and the planned tutorial assets.
+  by example 10 and the tutorial assets.
 
-The underscore-prefixed directory marks these files as support for the complete examples, not as
-the shortest route to fitting Pi-PLS. They remain example-owned because they contain pandas I/O,
-fixed-model OOF orchestration, physical-axis handling, and report composition. Reusable numerical
-inspection belongs in `pipls.inspection`, and optional rendering belongs in `pipls.plotting`.
+Sugarcane imports none of these helpers. Reusable numerical inspection belongs in
+`pipls.inspection`, and optional one-axis rendering belongs in `pipls.plotting`.
 
 ## Real-data workflow contract
 
@@ -89,7 +85,6 @@ The Pulp, Sugarcane, and Tobacco examples show label acquisition as a separate I
 ```python
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
-predictor_names = X.columns.tolist()
 response_names = Y.columns.tolist()
 ```
 
@@ -99,33 +94,27 @@ invent scientific variable names. The committed datasets already have tested hea
 so the numbered examples use them directly instead of repeating repository-integrity checks.
 
 Example 09 writes the separate Pi-PLS and ordinary PLS path tables used by the three overlaid
-comparison figures. Examples 10–12 retain the same three scientific stages:
+comparison figures. Sugarcane demonstrates the target direct workflow:
 
-1. `PiPLSPathCV(refit=False)` produces one Pi-PLS row per admissible component count.
-   `component_path.csv` is written before `component_path.pdf` is rendered from it.
-2. A visible component-count choice selects one fixed full-data Pi-PLS model for interpretation.
-3. The selected parameters are cloned inside five non-shuffled folds to produce
-   `selection-conditioned OOF predictions`. Seven common long-form CSV files are written and
-   reread before report generation.
+1. `PiPLSPathCV(refit=False)` returns `component_path_`, which is plotted directly with Matplotlib.
+2. `path.for_n_components(CHOSEN_N_COMPONENTS)` supplies the fixed component count and predictor
+   rank.
+3. `cross_val_predict()` with five non-shuffled folds produces
+   `selection-conditioned OOF predictions`.
+4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return the
+   in-memory objects used by the public one-axis plotters.
+5. The script creates and saves the five final figures itself.
 
 Pulp is the canonical tutorial workflow. Its support module evaluates a one-step scikit-learn
 pipeline ending in `PiPLSRegression`, transfers the selected pair with nested pipeline parameters,
-and supplies the fitted estimator and inspection results to example 10. The one-step pipeline adds
-no external preprocessing because Pi-PLS already learns predictor and response standardization
-inside each fit. Sugarcane and Tobacco retain direct fixed-estimator orchestration.
+and supplies the fitted estimator and inspection results to example 10. Tobacco retains direct
+fixed-estimator orchestration plus response pagination. Their current CSV round trips remain
+transitional and are not the reference pattern for new examples.
 
-Each dataset keeps `component_path.pdf` and `post_analysis.pdf` as separate files in the same
-analysis directory.
-
-Full-data decomposition, score, loading, coefficient, biplot, and observation-diagnostic figures
-are interpretive. Prediction and residual figures retain explicit provenance. The display-standardized
-columns in `predictions.csv` use the complete observed-response matrix and do not reproduce the
-fold-local scaling used by the component-path loss.
-
-Pulp reconstructs its biplot from `x_scores.csv` and `x_loadings.csv`. Sugarcane reads its
-strictly increasing wavelength coordinate from `X.csv`. Tobacco preserves its decreasing
-wavenumber coordinate, partitions all thirteen responses in source order, and adds
-`observation_diagnostics.csv`. Generated files under `examples/results/` are ignored by Git.
+Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
+figures retain explicit provenance. Sugarcane reads its strictly increasing wavelength coordinate
+from the `X.csv` headers. Tobacco preserves its decreasing wavenumber coordinate and partitions all
+thirteen responses in source order. Generated files under `examples/results/` are ignored by Git.
 
 ## Output directories
 
