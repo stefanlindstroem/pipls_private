@@ -234,10 +234,10 @@ def _search_predictor_ranks(
     *,
     allowed_ranks: ArrayLike,
     search_method: Literal["optimal", "auto"],
-    evaluate: Callable[[IntArray], IntArray],
+    evaluate: Callable[[IntArray], None],
     evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
-) -> tuple[IntArray, ...]:
-    """Return the evaluated batches from one rank search."""
+) -> None:
+    """Evaluate predictor ranks according to one search policy."""
 
     allowed = np.asarray(allowed_ranks)
     if allowed.ndim != 1 or allowed.size == 0 or allowed.dtype.kind not in "iu":
@@ -248,7 +248,6 @@ def _search_predictor_ranks(
     if search_method not in ("optimal", "auto"):
         raise ValueError('search_method must be "optimal" or "auto".')
 
-    history: list[IntArray] = []
     interval = allowed
     while True:
         if search_method == "optimal" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
@@ -261,9 +260,7 @@ def _search_predictor_ranks(
             indices = np.abs(interval[:, None] - logarithmic[None, :]).argmin(axis=0)
             proposed = np.asarray(np.unique(interval[indices]), dtype=np.intp)
 
-        evaluated = evaluate(proposed)
-        if evaluated.size:
-            history.append(evaluated.copy())
+        evaluate(proposed)
 
         if search_method == "optimal" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
             break
@@ -277,13 +274,9 @@ def _search_predictor_ranks(
                 [rank for rank in interval if int(rank) not in evaluated_set],
                 dtype=np.intp,
             )
-            evaluated = evaluate(remaining)
-            if evaluated.size:
-                history.append(evaluated.copy())
+            evaluate(remaining)
             break
         interval = refined
-
-    return tuple(history)
 
 
 def _rank_test_scores(

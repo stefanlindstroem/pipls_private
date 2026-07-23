@@ -168,6 +168,26 @@ def test_refit_false_hides_refit_dependent_methods() -> None:
         assert not hasattr(search, method_name)
 
 
+def test_refit_false_clears_state_from_an_earlier_refitted_fit() -> None:
+    X, Y = _data()
+    search = PiPLSPathCV(
+        n_components_values=[1],
+        predictor_rank_values=[1, 2],
+        cv=3,
+    ).fit(X, Y)
+
+    assert hasattr(search, "best_estimator_")
+    assert hasattr(search, "best_pipls_")
+    assert hasattr(search, "refit_time_")
+
+    search.set_params(refit=False).fit(X, Y)
+
+    assert not hasattr(search, "best_estimator_")
+    assert not hasattr(search, "best_pipls_")
+    assert not hasattr(search, "refit_time_")
+    assert not hasattr(search, "predict")
+
+
 def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
     X, Y = _data(18)
     splits = [

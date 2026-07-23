@@ -24,11 +24,11 @@ from sklearn.utils.metaestimators import available_if
 from sklearn.utils.validation import check_is_fitted
 
 from ._cv_engine import (
+    CandidateCache,
     _evaluate_candidate_batch,
     _fit_with_ignored_warnings,
     _ordered_oof_predictions,
     _PiPLSCandidate,
-    _PiPLSCandidateResult,
 )
 from ._sklearn_compat import _validate_estimator_data
 from .component_path import (
@@ -39,6 +39,7 @@ from .component_path import (
 from .exceptions import StatisticalSupportWarning
 from .metrics import neg_response_standardized_mean_squared_error
 from .model_selection import (
+    CVSplit,
     _as_positive_float,
     _is_leave_one_out_splits,
     _materialize_cv_splits,
@@ -343,7 +344,7 @@ class PiPLSPathCV(
             )
         scorer = _resolve_path_scorer(self.scoring, template)
         self.scorer_ = scorer
-        cache: dict[tuple[int, int], _PiPLSCandidateResult] = {}
+        cache: CandidateCache = {}
         if self.search_method == "optimal":
             _evaluate_path_batch(
                 pairs=admissible,
@@ -389,7 +390,7 @@ class PiPLSPathCV(
             n_components_key=n_components_key,
             predictor_rank_key=predictor_rank_key,
         )
-        self.best_index_ = _select_global_best_index(self.cv_results_)
+        self.best_index_ = _select_best_index(self.cv_results_)
         self.best_score_ = float(self.cv_results_["mean_test_score"][self.best_index_])
         best_response_standardized_mse = float(
             self.cv_results_["mean_response_standardized_mse"][self.best_index_]
@@ -410,7 +411,7 @@ class PiPLSPathCV(
             indices = np.flatnonzero(self.cv_results_["n_components"] == int(h_value))
             if indices.size:
                 conditional_indices.append(
-                    _select_conditional_best_index(self.cv_results_, indices)
+                    _select_best_index(self.cv_results_, indices)
                 )
 
         self.component_path_ = _component_path(
@@ -468,10 +469,6 @@ class PiPLSPathCV(
                 self.best_estimator_,
                 pipls_param_prefix,
             )
-        else:
-            for name in ("best_estimator_", "best_pipls_", "refit_time_"):
-                if hasattr(self, name):
-                    delattr(self, name)
         return self
 
     def predictor_rank_profile(
@@ -842,11 +839,6 @@ def _pipls_parameter_keys(prefix: str) -> tuple[str, str]:
     )
 
 
-def _pipls_parameter_key(prefix: str, parameter: str) -> str:
-    separator = "__" if prefix else ""
-    return f"{prefix}{separator}{parameter}"
-
-
 def _extract_fitted_pipls(estimator: Any, prefix: str) -> PiPLSRegression:
     if isinstance(estimator, PiPLSRegression):
         if prefix != "":
@@ -868,7 +860,7 @@ def _fold_safe_feature_limit(
     prefix: str,
     X: ArrayLike,
     y: ArrayLike,
-    splits: tuple[tuple[IntArray, IntArray], ...],
+    splits: tuple[CVSplit, ...],
 ) -> int:
     if prefix == "" and isinstance(template, PiPLSRegression):
         return int(np.asarray(X).shape[1])
@@ -888,7 +880,7 @@ def _fold_safe_feature_limit(
 def _evaluate_path_batch(
     *,
     pairs: Iterable[tuple[int, int]],
-    cache: dict[tuple[int, int], _PiPLSCandidateResult],
+    cache: CandidateCache,
     template: Any,
     n_components_key: str,
     predictor_rank_key: str,
@@ -896,14 +888,13 @@ def _evaluate_path_batch(
     scoring: Scoring,
     X: ArrayLike,
     y: ArrayLike,
-    splits: tuple[tuple[IntArray, IntArray], ...],
+    splits: tuple[CVSplit, ...],
     n_jobs: int | None,
-) -> tuple[int, ...]:
-    candidates = tuple(
-        _PiPLSCandidate(n_components=h, predictor_rank=r) for h, r in pairs
-    )
-    evaluated = _evaluate_candidate_batch(
-        candidates=candidates,
+) -> None:
+    _evaluate_candidate_batch(
+        candidates=(
+            _PiPLSCandidate(n_components=h, predictor_rank=r) for h, r in pairs
+        ),
         cache=cache,
         template=template,
         n_components_key=n_components_key,
@@ -916,13 +907,12 @@ def _evaluate_path_batch(
         n_jobs=n_jobs,
         ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
     )
-    return tuple(candidate.predictor_rank for candidate in evaluated)
 
 
-def _fit_controlled_estimator(estimator: Any, X: ArrayLike, y: ArrayLike) -> Any:
+def _fit_controlled_estimator(estimator: Any, X: ArrayLike, y: ArrayLike) -> None:
     """Fit one path-owned estimator while suppressing only the support diagnostic."""
 
-    return _fit_with_ignored_warnings(
+    _fit_with_ignored_warnings(
         estimator,
         X,
         y,
@@ -934,7 +924,7 @@ def _adaptive_path_search(
     *,
     n_components: int,
     allowed_ranks: IntArray,
-    cache: dict[tuple[int, int], _PiPLSCandidateResult],
+    cache: CandidateCache,
     template: Any,
     n_components_key: str,
     predictor_rank_key: str,
@@ -942,11 +932,11 @@ def _adaptive_path_search(
     scoring: Scoring,
     X: ArrayLike,
     y: ArrayLike,
-    splits: tuple[tuple[IntArray, IntArray], ...],
+    splits: tuple[CVSplit, ...],
     n_jobs: int | None,
-) -> tuple[tuple[int, ...], ...]:
-    def evaluate(ranks: IntArray) -> IntArray:
-        evaluated = _evaluate_path_batch(
+) -> None:
+    def evaluate(ranks: IntArray) -> None:
+        _evaluate_path_batch(
             pairs=((n_components, int(rank)) for rank in ranks),
             cache=cache,
             template=template,
@@ -959,7 +949,6 @@ def _adaptive_path_search(
             splits=splits,
             n_jobs=n_jobs,
         )
-        return np.asarray(evaluated, dtype=np.intp)
 
     def evaluated_scores() -> tuple[IntArray, FloatArray]:
         ranks = np.asarray(
@@ -975,14 +964,11 @@ def _adaptive_path_search(
         )
         return ranks, scores
 
-    history = _search_predictor_ranks(
+    _search_predictor_ranks(
         allowed_ranks=allowed_ranks,
         search_method="auto",
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
-    )
-    return tuple(
-        tuple(int(rank) for rank in batch) for batch in history
     )
 
 
@@ -994,7 +980,7 @@ def _uses_default_path_scoring(scoring: Scoring) -> bool:
 
 def _path_cv_results(
     *,
-    cache: dict[tuple[int, int], _PiPLSCandidateResult],
+    cache: CandidateCache,
     evaluated_pairs: tuple[tuple[int, int], ...],
     n_components_key: str,
     predictor_rank_key: str,
@@ -1062,26 +1048,22 @@ def _component_path(
     )
 
 
-def _select_global_best_index(results: dict[str, Any]) -> int:
-    scores = cast(FloatArray, results["mean_test_score"])
-    maximum = float(np.max(scores))
-    tied = np.flatnonzero(
-        np.isclose(scores, maximum, rtol=_SELECTION_RTOL, atol=_SELECTION_ATOL)
+def _select_best_index(
+    results: dict[str, Any],
+    indices: IntArray | None = None,
+) -> int:
+    all_scores = cast(FloatArray, results["mean_test_score"])
+    candidate_indices = (
+        np.arange(all_scores.size, dtype=np.intp) if indices is None else indices
     )
-    h = cast(IntArray, results["n_components"])[tied]
-    r = cast(IntArray, results["predictor_rank"])[tied]
-    return int(tied[np.lexsort((r, h))[0]])
-
-
-def _select_conditional_best_index(results: dict[str, Any], indices: IntArray) -> int:
-    scores = cast(FloatArray, results["mean_test_score"])[indices]
+    scores = all_scores[candidate_indices]
     maximum = float(np.max(scores))
-    tied_local = np.flatnonzero(
+    tied = candidate_indices[
         np.isclose(scores, maximum, rtol=_SELECTION_RTOL, atol=_SELECTION_ATOL)
-    )
-    tied = indices[tied_local]
-    ranks = cast(IntArray, results["predictor_rank"])[tied]
-    return int(tied[int(np.argmin(ranks))])
+    ]
+    n_components = cast(IntArray, results["n_components"])[tied]
+    predictor_rank = cast(IntArray, results["predictor_rank"])[tied]
+    return int(tied[np.lexsort((predictor_rank, n_components))[0]])
 
 
 def _validated_component_values(values: ComponentValues, *, upper: int) -> IntArray:

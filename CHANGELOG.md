@@ -1,5 +1,9 @@
 # Changelog
 
+- Simplify private path-search orchestration by removing discarded adaptive-search histories and
+  fit return values, consolidating best-candidate selection, and relying on transactional
+  fitted-state cleanup instead of a second refit-specific deletion path.
+
 - Complete public result-record cleanup: remove sign-canonicalization bookkeeping from
   `PiPLSDisplayFactors`, omit structurally impossible zero loading blocks from
   `PiPLSSyntheticTruth`, and present returned immutable records without constructor-first generated

@@ -63,7 +63,7 @@ def _evaluate_candidate_batch(
     splits: tuple[CVSplit, ...],
     n_jobs: int | None,
     ignored_warning_categories: tuple[WarningCategory, ...] = (),
-) -> tuple[_PiPLSCandidate, ...]:
+) -> None:
     """Evaluate uncached candidates and update ``cache`` in input order."""
 
     pending: list[_PiPLSCandidate] = []
@@ -74,7 +74,7 @@ def _evaluate_candidate_batch(
         pending.append(candidate)
         seen.add(candidate.key)
     if not pending:
-        return ()
+        return
 
     results = cast(
         list[_PiPLSCandidateResult],
@@ -96,7 +96,6 @@ def _evaluate_candidate_batch(
     )
     for candidate, result in zip(pending, results, strict=True):
         cache[candidate.key] = result
-    return tuple(pending)
 
 
 def _evaluate_candidate(
@@ -257,10 +256,10 @@ def _fit_with_ignored_warnings(
     y: ArrayLike,
     *,
     ignored_warning_categories: tuple[WarningCategory, ...] = (),
-) -> Any:
+) -> None:
     """Fit one estimator while ignoring only caller-owned warning categories."""
 
     with warnings.catch_warnings():
         for category in ignored_warning_categories:
             warnings.simplefilter("ignore", category)
-        return estimator.fit(X, y)
+        estimator.fit(X, y)
