@@ -49,13 +49,16 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     ).fit(X, Y)
 
     assert search.max_predictor_rank_ == 5
-    assert search.n_path_candidates_ == 12
-    assert search.n_path_candidates_evaluated_ == 12
-    assert search.n_path_candidates_skipped_ == 0
     assert search.path_search_exhaustive_
-    assert search.path_search_method_ == "auto"
-    np.testing.assert_array_equal(search.n_components_values_, np.array([1, 2, 3]))
-    np.testing.assert_array_equal(search.predictor_rank_values_, np.array([1, 2, 3, 4, 5]))
+    assert search.cv_results_["n_components"].size == 12
+    np.testing.assert_array_equal(
+        search.component_path_.n_components,
+        np.array([1, 2, 3]),
+    )
+    np.testing.assert_array_equal(
+        search.predictor_rank_profile(1).predictor_rank,
+        np.array([1, 2, 3, 4, 5]),
+    )
     evaluated_pairs = set(
         zip(
             search.cv_results_["n_components"],
@@ -89,7 +92,10 @@ def test_all_component_sentinel_matches_explicit_complete_range() -> None:
         refit=False,
     ).fit(X, Y)
 
-    np.testing.assert_array_equal(all_search.n_components_values_, np.array([1, 2, 3]))
+    np.testing.assert_array_equal(
+        all_search.component_path_.n_components,
+        np.array([1, 2, 3]),
+    )
     np.testing.assert_allclose(
         all_search.cv_results_["mean_test_score"],
         explicit_search.cv_results_["mean_test_score"],
@@ -222,18 +228,15 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
 
     assert search.best_n_components_ == 1
     assert search.best_predictor_rank_ == 1
-    assert search.n_path_candidates_ == 12
-    assert search.n_path_candidates_evaluated_ < 12
-    assert search.n_path_candidates_skipped_ > 0
+    assert search.cv_results_["predictor_rank"].size < 12
     assert not search.path_search_exhaustive_
-    assert search.path_search_history_[1]
 
     profile = search.predictor_rank_profile(1)
     np.testing.assert_array_equal(
         profile.predictor_rank,
         np.sort(search.cv_results_["predictor_rank"]),
     )
-    assert profile.predictor_rank.size == search.n_path_candidates_evaluated_
+    assert profile.predictor_rank.size == search.cv_results_["predictor_rank"].size
     assert profile.selected.predictor_rank == 1
 
 
@@ -277,7 +280,10 @@ def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
     ).fit(X, Y)
 
     assert search.max_predictor_rank_ == 3
-    np.testing.assert_array_equal(search.predictor_rank_values_, np.array([1, 2, 3]))
+    np.testing.assert_array_equal(
+        search.predictor_rank_profile(1).predictor_rank,
+        np.array([1, 2, 3]),
+    )
 
 
 def test_low_samples_per_predictor_rank_warns() -> None:
@@ -335,7 +341,9 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> N
 
     assert search.best_predictor_rank_ == 4
     assert search.best_pipls_.predictor_rank_ == 4
-    np.testing.assert_array_equal(search.oof_prediction_counts_, np.ones(X.shape[0]))
+    report = search.validation_report_
+    assert report.oof_prediction_counts is not None
+    np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
 
 
 def test_path_does_not_suppress_unrelated_estimator_warnings() -> None:
@@ -529,7 +537,6 @@ def test_component_path_records_predictor_rank_policy(
         n_jobs=1,
     ).fit(X, Y)
 
-    assert search.predictor_rank_policy_ == expected_policy
     assert search.component_path_.predictor_rank_policy.tolist() == [
         expected_policy,
         expected_policy,

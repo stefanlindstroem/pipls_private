@@ -93,14 +93,10 @@ class PiPLSRegression(
     y_scale_ : ndarray of shape (n_targets_,)
         Response scales learned from the training data, or ones when
         ``scale=False``. Constant columns receive scale one.
-    response_scale_for_scoring_ : ndarray of shape (n_targets_,)
-        Training-response scales used by the response-standardized MSE scorer.
-    x_rotations_, x_weights_ : ndarray of shape (n_features_in_, n_components)
-        Predictor directions. ``x_weights_`` is the PLS-style alias of
-        ``x_rotations_``.
-    y_rotations_, y_weights_ : ndarray of shape (n_targets_, n_components)
-        Response directions. ``y_weights_`` is the PLS-style alias of
-        ``y_rotations_``.
+    x_rotations_ : ndarray of shape (n_features_in_, n_components)
+        Predictor directions.
+    y_rotations_ : ndarray of shape (n_targets_, n_components)
+        Response directions.
     x_scores_ : ndarray of shape (n_samples, n_components)
         Training predictor scores.
     y_scores_ : ndarray of shape (n_samples, n_components)
@@ -471,7 +467,7 @@ class PiPLSRegression(
     ) -> None:
         self.x_mean_ = _safe_column_mean(X)
         self.y_mean_ = _safe_column_mean(y)
-        self.response_scale_for_scoring_ = _training_response_scale(y)
+        self._response_scale_for_scoring_ = _training_response_scale(y)
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
             X -= self.x_mean_
             y -= self.y_mean_
@@ -509,8 +505,6 @@ class PiPLSRegression(
         self.decomposition_ = PiPLSDecomposition._from_core_result(result)
         self.x_rotations_ = self.decomposition_.predictor_rotations
         self.y_rotations_ = self.decomposition_.response_rotations
-        self.x_weights_ = self.x_rotations_
-        self.y_weights_ = self.y_rotations_
         self._n_features_out = self.n_components
 
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):

@@ -142,10 +142,8 @@ def test_standard_pls_style_attributes_have_documented_meaning() -> None:
     X_cs = (X - model.x_mean_) / model.x_scale_
     Y_cs = (Y - model.y_mean_) / model.y_scale_
 
-    np.testing.assert_allclose(model.x_scores_, X_cs @ model.x_weights_)
-    np.testing.assert_allclose(model.y_scores_, Y_cs @ model.y_weights_)
-    np.testing.assert_allclose(model.x_weights_, model.x_rotations_)
-    np.testing.assert_allclose(model.y_weights_, model.y_rotations_)
+    np.testing.assert_allclose(model.x_scores_, X_cs @ model.x_rotations_)
+    np.testing.assert_allclose(model.y_scores_, Y_cs @ model.y_rotations_)
     assert model.x_loadings_.shape == (X.shape[1], model.n_components)
     assert model.y_loadings_.shape == (Y.shape[1], model.n_components)
 
@@ -262,7 +260,8 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    assert path.best_pipls_params_ == {"n_components": 2, "predictor_rank": 3}
+    assert path.best_n_components_ == 2
+    assert path.best_predictor_rank_ == 3
     assert path.best_pipls_ is path.best_estimator_
     np.testing.assert_allclose(path.predict(X), direct.predict(X))
     np.testing.assert_allclose(path.best_pipls_.coef_, direct.coef_)
@@ -439,8 +438,6 @@ def test_decomposition_is_single_source_of_truth_for_pipls_specific_arrays() -> 
     X, Y = _data()
     model = _fixed_estimator().fit(X, Y)
 
-    assert model.x_weights_ is model.decomposition_.predictor_rotations
-    assert model.y_weights_ is model.decomposition_.response_rotations
     assert model.x_rotations_ is model.decomposition_.predictor_rotations
     assert model.y_rotations_ is model.decomposition_.response_rotations
     assert not model.x_rotations_.flags.writeable
@@ -479,7 +476,7 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
         "mean_score_time",
         "std_score_time",
     } <= search.cv_results_.keys()
-    assert search.predictor_rank_policy_ == "fixed"
+    assert search.component_path_.predictor_rank_policy.tolist() == ["fixed"]
     assert isinstance(search.component_path_, PiPLSComponentPath)
     assert search.component_path_.for_n_components(2).predictor_rank == 3
     assert not hasattr(search, "component_path_results_")
@@ -509,3 +506,49 @@ def test_path_inverse_transform_is_conditionally_available_for_pipeline() -> Non
 
     assert hasattr(search, "transform")
     assert not hasattr(search, "inverse_transform")
+
+
+def test_removed_fixed_estimator_aliases_are_absent() -> None:
+    X, Y = _data()
+    model = _fixed_estimator().fit(X, Y)
+
+    for name in (
+        "response_scale_for_scoring_",
+        "x_weights_",
+        "y_weights_",
+    ):
+        assert not hasattr(model, name)
+
+
+def test_removed_path_aliases_and_search_bookkeeping_are_absent() -> None:
+    X, Y = _data()
+    search = PiPLSPathCV(
+        estimator=_fixed_estimator(),
+        n_components_values=[1, 2],
+        predictor_rank_values=[2, 3],
+        max_predictor_rank=3,
+        cv=3,
+        refit=False,
+        return_oof_predictions=True,
+    ).fit(X, Y)
+
+    for name in (
+        "n_components_values_",
+        "predictor_rank_values_",
+        "predictor_rank_policy_",
+        "n_path_candidates_",
+        "n_path_candidates_evaluated_",
+        "n_path_candidates_skipped_",
+        "path_search_method_",
+        "path_search_history_",
+        "best_response_standardized_mse_",
+        "best_pipls_params_",
+        "oof_predictions_",
+        "oof_prediction_counts_",
+        "oof_params_",
+        "pooled_oof_r2_",
+    ):
+        assert not hasattr(search, name)
+
+    assert search.validation_report_.oof_predictions is not None
+    assert search.validation_report_.oof_prediction_counts is not None

@@ -32,16 +32,18 @@ does not define a private scorer-name registry.
 ## Ordered out-of-fold predictions
 
 Set `return_oof_predictions=True` to fit the selected fixed parameterization once per training fold
-after selection. `oof_predictions_` preserves input row order.
+after selection. The immutable `validation_report_` then owns the row-ordered OOF results.
 
+- `validation_report_.oof_predictions` preserves input row order.
 - Rows validated once have count 1.
-- Repeated validation predictions are averaged and recorded in `oof_prediction_counts_`.
+- Repeated validation predictions are averaged and recorded in
+  `validation_report_.oof_prediction_counts`.
 - Rows never used for validation have count 0 and a NaN OOF prediction.
-- `oof_params_` identifies the parameterization that generated the predictions.
-- `pooled_oof_r2_` is calculated only on rows with at least one OOF prediction.
+- `validation_report_.n_components` and `predictor_rank` identify the fitted pair.
+- `validation_report_.pooled_oof_r2` is calculated only on rows with OOF coverage.
 
-The immutable `validation_report_` records the selected ranks, split count, mean score, CV-MSE, OOF
-coverage, pooled OOF $R^2$, and whether the splitter is structurally leave-one-out.
+The same report records the split count, mean score, CV-MSE, OOF coverage, pooled OOF $R^2$, and
+whether the splitter is structurally leave-one-out.
 
 These results are selection-conditioned because the same path search selected the parameters. They
 are not an unbiased post-selection estimate. Use nested cross-validation or an external test set
@@ -54,8 +56,8 @@ feasibility is capped by $n-2$. The default standardized MSE remains defined for
 validation folds because response scales are estimated from each training fold.
 
 Mean foldwise $R^2$ is rejected when validation folds contain one sample. When OOF predictions are
-requested, `pooled_oof_r2_` may be reported as $R^2$ from pooled LOO predictions; it is not mean
-foldwise $R^2$.
+requested, `validation_report_.pooled_oof_r2` may report $R^2$ from pooled LOO predictions; it is
+not mean foldwise $R^2$.
 
 ## Fold variation
 

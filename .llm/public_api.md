@@ -85,9 +85,10 @@ construction matrices $\Pi$, $C$, and $W$, the redundant diagonal matrix $D$, an
 remain private.
 
 The fixed estimator does not expose `cv_results_`, `best_params_`, OOF predictions, validation
-reports, or predictor-rank search diagnostics. `response_scale_for_scoring_` remains available for
-package scorers. `predictor_rank_` is the requested fitted integer and `max_predictor_rank_` is
-`min(n_features, n_samples - 1)` for the supplied centered training data.
+reports, predictor-rank search diagnostics, or scorer plumbing. The response scale required by the
+default scorer is private fitted state. `predictor_rank_` is the requested fitted integer and
+`max_predictor_rank_` is `min(n_features, n_samples - 1)` for the supplied centered training
+data.
 
 ## Path-analysis API
 
@@ -114,10 +115,12 @@ equivalent to minimizing mean response-standardized MSE among evaluated candidat
 search makes no claim about
 unevaluated admissible pairs.
 
-Public path attributes include standard candidate-level search results in `cv_results_`,
-`best_pipls_`, immutable `validation_report_`, optional OOF outputs, and the canonical immutable
-`component_path_` result. Matrix-shaped score and MSE aliases are not part of the public
-contract; advanced users can reshape aligned `cv_results_` columns when needed.
+Public path attributes include standard candidate-level search results in `cv_results_`, global
+`best_*` selection attributes, `path_search_exhaustive_`, optional refitted estimators, immutable
+`validation_report_`, and the canonical immutable `component_path_` result. OOF arrays and their
+coverage counts live only in `validation_report_`. Validated input grids, adaptive-search batch
+history, candidate counters, direct-rank parameter aliases, and matrix-shaped score/MSE aliases are
+not public fitted state; advanced users can inspect aligned `cv_results_` columns when needed.
 `PiPLSComponentPath` stores aligned read-only `n_components`,
 `predictor_rank`, `predictor_rank_policy`, `mean_test_score`, `cv_mse_mean`, `cv_mse_fold_sd`, and
 `n_splits` arrays. `for_n_components()` returns a frozen `PiPLSComponentResult` with the aligned

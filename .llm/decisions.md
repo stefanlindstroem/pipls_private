@@ -185,3 +185,4 @@ record and add it to this index in the same patch.
 | `0084-complete-pulp-prediction-diagnostics.md` | complete Pulp prediction diagnostics | Tutorial 2 displays the residual figure represented by the middle axis of its maintained three-panel prediction snippet |
 | `0085-self-contained-pulp-tutorial.md` | self-contained Pulp tutorial | setup and display choices precede use; each shown figure has a matching standalone recipe |
 | `0086-public-decomposition-boundary.md` | public decomposition boundary | public result exposes final rotations, dilation, rank/solver diagnostics, and standardized map; construction matrices remain private |
+| `0087-public-fitted-surface-cleanup.md` | public fitted-surface cleanup | remove scorer plumbing, exact rotation aliases, path execution bookkeeping, and flat OOF duplicates |

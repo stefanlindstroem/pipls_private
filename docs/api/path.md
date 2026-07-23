@@ -13,6 +13,12 @@ For nondefault component requests, predictor-rank policies, rank ceilings, tie-b
 and detailed result surfaces, see [Advanced path-search behavior](../path_analysis.md).
 For candidate-feasibility, refit, scoring, or metadata problems, see [Troubleshooting](../troubleshooting.md).
 
+The public fitted surface is deliberately compact. `cv_results_` is the complete candidate-level
+record; `component_path_` and `predictor_rank_profile()` provide concise immutable views;
+`validation_report_` owns optional OOF arrays and coverage counts; and standard `best_*` attributes
+identify the global selected candidate. Adaptive-search batch history and duplicate OOF aliases are
+not retained as public fitted attributes.
+
 ::: pipls.PiPLSPathCV
     options:
       members:

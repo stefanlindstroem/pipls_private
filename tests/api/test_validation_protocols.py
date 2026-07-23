@@ -53,16 +53,20 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
     for train, validation in splitter.split(X, Y):
         expected[validation] = clone(_fixed()).fit(X[train], Y[train]).predict(X[validation])
 
-    np.testing.assert_allclose(search.oof_predictions_, expected)
-    np.testing.assert_array_equal(search.oof_prediction_counts_, np.ones(X.shape[0]))
-    assert search.oof_params_ == search.best_params_
-    assert search.validation_report_.selection_conditioned
-    assert search.validation_report_.is_leave_one_out
-    assert search.validation_report_.complete_oof_coverage
-    assert search.validation_report_.mean_response_standardized_mse == pytest.approx(
-        search.best_response_standardized_mse_
+    report = search.validation_report_
+    assert report.oof_predictions is not None
+    assert report.oof_prediction_counts is not None
+    np.testing.assert_allclose(report.oof_predictions, expected)
+    np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
+    assert report.n_components == search.best_n_components_
+    assert report.predictor_rank == search.best_predictor_rank_
+    assert report.selection_conditioned
+    assert report.is_leave_one_out
+    assert report.complete_oof_coverage
+    assert report.mean_response_standardized_mse == pytest.approx(
+        search.cv_results_["mean_response_standardized_mse"][search.best_index_]
     )
-    assert search.pooled_oof_r2_ == pytest.approx(
+    assert report.pooled_oof_r2 == pytest.approx(
         r2_score(Y, expected, multioutput="uniform_average")
     )
 
@@ -81,12 +85,15 @@ def test_repeated_kfold_averages_predictions_and_records_counts() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
+    report = search.validation_report_
+    assert report.oof_prediction_counts is not None
+    assert report.oof_predictions is not None
     np.testing.assert_array_equal(
-        search.oof_prediction_counts_,
+        report.oof_prediction_counts,
         np.full(X.shape[0], 2, dtype=np.intp),
     )
-    assert search.validation_report_.complete_oof_coverage
-    assert np.all(np.isfinite(search.oof_predictions_))
+    assert report.complete_oof_coverage
+    assert np.all(np.isfinite(report.oof_predictions))
 
 
 def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
@@ -108,12 +115,19 @@ def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
         return_oof_predictions=True,
     ).fit(X, Y)
 
-    np.testing.assert_array_equal(predefined.oof_prediction_counts_[:9], 0)
-    assert np.isnan(predefined.oof_predictions_[:9]).all()
-    assert not predefined.validation_report_.complete_oof_coverage
-    assert np.any(temporal.oof_prediction_counts_ == 0)
-    assert np.isnan(temporal.oof_predictions_[temporal.oof_prediction_counts_ == 0]).all()
-    assert not temporal.validation_report_.complete_oof_coverage
+    predefined_report = predefined.validation_report_
+    temporal_report = temporal.validation_report_
+    assert predefined_report.oof_prediction_counts is not None
+    assert predefined_report.oof_predictions is not None
+    assert temporal_report.oof_prediction_counts is not None
+    assert temporal_report.oof_predictions is not None
+    np.testing.assert_array_equal(predefined_report.oof_prediction_counts[:9], 0)
+    assert np.isnan(predefined_report.oof_predictions[:9]).all()
+    assert not predefined_report.complete_oof_coverage
+    assert np.any(temporal_report.oof_prediction_counts == 0)
+    uncovered = temporal_report.oof_prediction_counts == 0
+    assert np.isnan(temporal_report.oof_predictions[uncovered]).all()
+    assert not temporal_report.complete_oof_coverage
 
 
 def test_grouped_splitters_are_supported_by_path_interface() -> None:
@@ -181,11 +195,14 @@ def test_oof_arrays_are_read_only_and_one_dimensional_targets_stay_one_dimension
         return_oof_predictions=True,
     ).fit(X, y)
 
-    assert search.oof_predictions_.shape == (X.shape[0],)
-    assert not search.oof_predictions_.flags.writeable
-    assert not search.oof_prediction_counts_.flags.writeable
+    report = search.validation_report_
+    assert report.oof_predictions is not None
+    assert report.oof_prediction_counts is not None
+    assert report.oof_predictions.shape == (X.shape[0],)
+    assert not report.oof_predictions.flags.writeable
+    assert not report.oof_prediction_counts.flags.writeable
     with pytest.raises(ValueError, match="read-only"):
-        search.oof_predictions_[0] = 0.0
+        report.oof_predictions[0] = 0.0
 
 
 def test_return_oof_predictions_requires_boolean() -> None:

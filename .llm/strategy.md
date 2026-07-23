@@ -577,9 +577,9 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-Plotting migration G1--G5 is complete. Decision 0083 establishes the final data-first rendering
-policy and structural enforcement after plotting-module removal. First-release preparation is the
-next increment.
+Public-result cleanup steps API1--API2 are complete under Decisions 0086--0087. API3 should next
+remove remaining nonessential result-record fields and improve generated presentation of returned
+immutable records.
 
 ## Maintenance protocol
 
@@ -599,8 +599,10 @@ For every patch, the LLM maintainer should:
 
 ## Public-result API cleanup
 
-API1 is complete under Decision 0086. `PiPLSDecomposition` now exposes descriptive predictor and
-response rotations, the dilation vector, numerical-rank and solver diagnostics, and the derived
-standardized regression map. The private core retains $\Pi$, $C$, $W$, and the diagonal matrix
-$D$. API2 should next remove redundant fixed-estimator and path-result aliases while preserving
-standard scikit-learn fitted attributes and the concise immutable path and validation objects.
+API1 is complete under Decision 0086. `PiPLSDecomposition` exposes descriptive final factors and
+rank/solver diagnostics while the private core retains construction matrices. API2 is complete
+under Decision 0087: scorer state is private, exact weight aliases are removed, and
+`PiPLSPathCV` retains `cv_results_`, concise immutable path/profile results, standard `best_*`
+attributes, `path_search_exhaustive_`, and `validation_report_` without execution-history or flat
+OOF duplicates. API3 should next clean the remaining immutable result records and generated
+constructor presentation.

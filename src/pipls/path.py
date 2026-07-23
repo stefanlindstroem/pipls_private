@@ -156,24 +156,8 @@ class PiPLSPathCV(
     max_predictor_rank_ : int
         Effective predictor-rank upper bound after support and fold-feasibility
         constraints.
-    n_components_values_ : ndarray of shape (n_component_values,)
-        Validated component counts in ascending order.
-    predictor_rank_values_ : ndarray of shape (n_predictor_rank_values,)
-        Validated predictor ranks defining the available path surface.
-    predictor_rank_policy_ : {"optimized", "fixed", "maximum"}
-        Interpretation of the predictor-rank specification.
-    n_path_candidates_ : int
-        Number of admissible candidate pairs.
-    n_path_candidates_evaluated_ : int
-        Number of candidate pairs actually evaluated.
-    n_path_candidates_skipped_ : int
-        Number of admissible pairs skipped by adaptive search.
     path_search_exhaustive_ : bool
         Whether every admissible pair was evaluated.
-    path_search_method_ : {"auto", "optimal"}
-        Search method used by the fitted object.
-    path_search_history_ : dict of int to tuple of tuple of int
-        Predictor-rank batches evaluated for each component count.
     scorer_ : callable
         Validated scikit-learn scorer used during fitting.
     cv_results_ : dict of str to array-like
@@ -188,16 +172,12 @@ class PiPLSPathCV(
         component count and predictor rank used as deterministic tie-breakers.
     best_score_ : float
         Mean cross-validation score at ``best_index_``.
-    best_response_standardized_mse_ : float
-        Mean response-standardized CV-MSE at ``best_index_``.
     best_n_components_ : int
         Selected component count.
     best_predictor_rank_ : int
         Selected predictor rank.
     best_params_ : dict of str to int
         Parameters required to configure the supplied estimator or pipeline.
-    best_pipls_params_ : dict of str to int
-        Selected direct Pi-PLS parameters with unprefixed keys.
     validation_report_ : PiPLSValidationReport
         Immutable summary of the selected cross-validation result.
     best_estimator_ : estimator
@@ -206,18 +186,6 @@ class PiPLSPathCV(
         Fitted terminal Pi-PLS estimator. Defined only when ``refit=True``.
     refit_time_ : float
         Full-data refit time in seconds. Defined only when ``refit=True``.
-    oof_predictions_ : ndarray
-        Ordered out-of-fold predictions. Defined only when
-        ``return_oof_predictions=True``.
-    oof_prediction_counts_ : ndarray of shape (n_samples,)
-        Number of validation predictions contributing to each OOF row. Defined
-        only when ``return_oof_predictions=True``.
-    oof_params_ : dict of str to int
-        Parameterization used for the OOF fits. Defined only when
-        ``return_oof_predictions=True``.
-    pooled_oof_r2_ : float or None
-        Pooled $R^2$ over rows with OOF coverage. Defined only when
-        ``return_oof_predictions=True``.
     """
 
     def __init__(
@@ -335,19 +303,17 @@ class PiPLSPathCV(
             self.max_predictor_rank_ = min(int(self.max_predictor_rank), algebraic_limit)
 
         h_limit = min(self.n_targets_, self.max_predictor_rank_)
-        self.n_components_values_ = _validated_component_values(
+        component_values = _validated_component_values(
             self.n_components_values,
             upper=h_limit,
         )
-        self.predictor_rank_policy_ = _predictor_rank_policy(
-            self.predictor_rank_values
-        )
+        predictor_rank_policy = _predictor_rank_policy(self.predictor_rank_values)
         if isinstance(self.predictor_rank_values, str):
-            self.predictor_rank_values_ = np.asarray(
+            predictor_rank_values = np.asarray(
                 [self.max_predictor_rank_], dtype=np.intp
             )
         else:
-            self.predictor_rank_values_ = _validated_integer_values(
+            predictor_rank_values = _validated_integer_values(
                 self.predictor_rank_values,
                 name="predictor_rank_values",
                 lower=1,
@@ -355,8 +321,8 @@ class PiPLSPathCV(
             )
         admissible = tuple(
             (int(h), int(r))
-            for h in self.n_components_values_
-            for r in self.predictor_rank_values_
+            for h in component_values
+            for r in predictor_rank_values
             if h <= r
         )
         if not admissible:
@@ -366,7 +332,7 @@ class PiPLSPathCV(
             )
         missing_components = [
             int(h)
-            for h in self.n_components_values_
+            for h in component_values
             if not any(hh == int(h) for hh, _ in admissible)
         ]
         if missing_components:
@@ -375,12 +341,9 @@ class PiPLSPathCV(
                 "Every n_components value must have at least one admissible predictor "
                 f"rank; missing ranks for {missing}."
             )
-        self.n_path_candidates_ = len(admissible)
-
         scorer = _resolve_path_scorer(self.scoring, template)
         self.scorer_ = scorer
         cache: dict[tuple[int, int], _PiPLSCandidateResult] = {}
-        history: dict[int, tuple[tuple[int, ...], ...]] = {}
         if self.search_method == "optimal":
             _evaluate_path_batch(
                 pairs=admissible,
@@ -395,18 +358,14 @@ class PiPLSPathCV(
                 splits=materialized.splits,
                 n_jobs=self.n_jobs,
             )
-            for h in self.n_components_values_:
-                history[int(h)] = (
-                    tuple(r for hh, r in admissible if hh == int(h)),
-                )
         else:
-            for h_value in self.n_components_values_:
+            for h_value in component_values:
                 h = int(h_value)
                 allowed = np.asarray(
                     [r for hh, r in admissible if hh == h],
                     dtype=np.intp,
                 )
-                history[h] = _adaptive_path_search(
+                _adaptive_path_search(
                     n_components=h,
                     allowed_ranks=allowed,
                     cache=cache,
@@ -422,13 +381,7 @@ class PiPLSPathCV(
                 )
 
         evaluated_pairs = tuple(sorted(cache))
-        self.n_path_candidates_evaluated_ = len(evaluated_pairs)
-        self.n_path_candidates_skipped_ = (
-            self.n_path_candidates_ - self.n_path_candidates_evaluated_
-        )
-        self.path_search_exhaustive_ = self.n_path_candidates_skipped_ == 0
-        self.path_search_method_ = self.search_method
-        self.path_search_history_ = history
+        self.path_search_exhaustive_ = len(evaluated_pairs) == len(admissible)
 
         self.cv_results_ = _path_cv_results(
             cache=cache,
@@ -438,7 +391,7 @@ class PiPLSPathCV(
         )
         self.best_index_ = _select_global_best_index(self.cv_results_)
         self.best_score_ = float(self.cv_results_["mean_test_score"][self.best_index_])
-        self.best_response_standardized_mse_ = float(
+        best_response_standardized_mse = float(
             self.cv_results_["mean_response_standardized_mse"][self.best_index_]
         )
         self.best_n_components_ = int(
@@ -453,7 +406,7 @@ class PiPLSPathCV(
         }
 
         conditional_indices: list[int] = []
-        for h_value in self.n_components_values_:
+        for h_value in component_values:
             indices = np.flatnonzero(self.cv_results_["n_components"] == int(h_value))
             if indices.size:
                 conditional_indices.append(
@@ -463,14 +416,10 @@ class PiPLSPathCV(
         self.component_path_ = _component_path(
             results=self.cv_results_,
             conditional_indices=np.asarray(conditional_indices, dtype=np.intp),
-            predictor_rank_policy=self.predictor_rank_policy_,
+            predictor_rank_policy=predictor_rank_policy,
             n_splits=self.n_splits_,
         )
 
-        self.best_pipls_params_ = {
-            "n_components": self.best_n_components_,
-            "predictor_rank": self.best_predictor_rank_,
-        }
         predictions: FloatArray | None = None
         counts: IntArray | None = None
         pooled_r2: float | None = None
@@ -500,7 +449,7 @@ class PiPLSPathCV(
             predictor_rank=self.best_predictor_rank_,
             n_splits=self.n_splits_,
             mean_test_score=self.best_score_,
-            mean_response_standardized_mse=self.best_response_standardized_mse_,
+            mean_response_standardized_mse=best_response_standardized_mse,
             estimate_kind="selection-conditioned",
             is_leave_one_out=_is_leave_one_out_splits(
                 materialized.splits,
@@ -510,14 +459,6 @@ class PiPLSPathCV(
             oof_prediction_counts=counts,
             pooled_oof_r2=pooled_r2,
         )
-        if self.return_oof_predictions:
-            assert self.validation_report_.oof_predictions is not None
-            assert self.validation_report_.oof_prediction_counts is not None
-            self.oof_predictions_ = self.validation_report_.oof_predictions
-            self.oof_prediction_counts_ = self.validation_report_.oof_prediction_counts
-            self.pooled_oof_r2_ = self.validation_report_.pooled_oof_r2
-            self.oof_params_ = self.best_params_.copy()
-
         if self.refit:
             refit_started = perf_counter()
             self.best_estimator_ = clone(template).set_params(**self.best_params_)

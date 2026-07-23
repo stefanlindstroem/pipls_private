@@ -28,6 +28,7 @@ reference describe the current public behavior directly.
 - [0072: conditional predictor-rank profile](0072-conditional-predictor-rank-profile.md)
 - [0073: public fit-state and finite-output safety](0073-public-fit-safety.md)
 - [0086: public decomposition boundary](0086-public-decomposition-boundary.md)
+- [0087: public fitted-surface cleanup](0087-public-fitted-surface-cleanup.md)
 
 ## Validation, data, and benchmarks
 

@@ -16,8 +16,8 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4, documentation Patches D1--D4, and plotting migrations G1--G5 are complete.
-First-release preparation is next.
+Phases A through F4, documentation Patches D1--D4, plotting migrations G1--G5, and public-result
+cleanup steps API1--API2 are complete. API3 result-record cleanup is next.
 The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
@@ -72,6 +72,9 @@ Decision 0072 adds an on-demand immutable predictor-rank profile derived from `c
 Decision 0073 hardens the public numerical boundary and fitted-state transaction.
 Decision 0086 limits `PiPLSDecomposition` to interpretable rotations, dilation, rank/solver
 diagnostics, and the derived standardized regression map.
+Decision 0087 limits fitted estimator and path surfaces to independent numerical results:
+rotation aliases, scorer plumbing, adaptive-search execution history, and flat OOF duplicates are
+not public API.
 
 ## Implemented estimator and selection boundary
 

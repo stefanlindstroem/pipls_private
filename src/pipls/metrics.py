@@ -32,8 +32,8 @@ def response_standardized_mean_squared_error(
     Parameters
     ----------
     estimator : estimator
-        Fitted Pi-PLS estimator, or pipeline whose final estimator exposes
-        ``response_scale_for_scoring_``.
+        Fitted Pi-PLS estimator, or pipeline ending in one. The scorer uses
+        private response-scale state learned during fitting.
     X : array-like of shape (n_samples, n_features)
         Predictor observations to score.
     y : array-like of shape (n_samples,) or (n_samples, n_targets)
@@ -161,15 +161,15 @@ def _response_standardized_mse(
 def _response_scale_for_scoring(estimator: Any) -> ArrayLike:
     """Return the fitted response scale from a direct estimator or final pipeline step."""
 
-    if hasattr(estimator, "response_scale_for_scoring_"):
-        check_is_fitted(estimator, attributes=["response_scale_for_scoring_"])
-        return cast(ArrayLike, estimator.response_scale_for_scoring_)
+    if hasattr(estimator, "_response_scale_for_scoring_"):
+        check_is_fitted(estimator, attributes=["_response_scale_for_scoring_"])
+        return cast(ArrayLike, estimator._response_scale_for_scoring_)
     steps = getattr(estimator, "steps", None)
     if steps:
         final_estimator = steps[-1][1]
-        check_is_fitted(final_estimator, attributes=["response_scale_for_scoring_"])
-        return cast(ArrayLike, final_estimator.response_scale_for_scoring_)
-    raise ValueError("The estimator does not expose a fitted Pi-PLS response scale for scoring.")
+        check_is_fitted(final_estimator, attributes=["_response_scale_for_scoring_"])
+        return cast(ArrayLike, final_estimator._response_scale_for_scoring_)
+    raise ValueError("The estimator does not contain fitted Pi-PLS response scaling state.")
 
 
 def _as_2d_targets(values: ArrayLike, *, name: str) -> FloatArray:

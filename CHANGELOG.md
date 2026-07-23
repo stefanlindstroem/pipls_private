@@ -1,5 +1,9 @@
 # Changelog
 
+- Reduce the fitted estimator and path-search surfaces: keep rotations without duplicate weight
+  aliases, make scorer response scaling private, retain standard and immutable path results, and
+  move optional OOF arrays and coverage exclusively into `validation_report_`.
+
 - Reduce `PiPLSDecomposition` to the interpretable fitted factorization: descriptive predictor and
   response rotations, a dilation vector, numerical-rank and solver diagnostics, and the derived
   centered/scaled regression map. Keep $\Pi$, $C$, $W$, and the redundant diagonal matrix $D$

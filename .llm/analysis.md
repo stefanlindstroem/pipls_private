@@ -382,3 +382,12 @@ exposes `predictor_rotations`, `dilation`, `response_rotations`, rank/solver dia
 and $Q$ because numerical invariants and algorithm implementation still require the complete
 construction. Benchmarks that need the truncated predictor basis must reconstruct it within the
 benchmark rather than depend on a public intermediate matrix.
+## Public fitted-surface cleanup
+
+Decision 0087 distinguishes independent fitted results from exact aliases and execution traces.
+`PiPLSRegression` exposes rotations rather than duplicate weight aliases, and its scorer-specific
+response scale is private. `PiPLSPathCV` keeps standard candidate results, concise immutable path
+and rank-profile objects, global selection attributes, exhaustive-search qualification, validation
+reporting, and optional refitted estimators. OOF arrays live only in `validation_report_`; validated
+input grids, adaptive batches, candidate counters, search-method echoes, and duplicate direct-rank
+parameter dictionaries are private implementation details.
