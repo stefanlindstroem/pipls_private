@@ -1,5 +1,9 @@
 # Changelog
 
+- Balance Tutorial 2's Pi-PLS-specific factorization section by displaying both predictor
+  directions $P$ and weighted response directions $QD$, while keeping the separate $D$ and $Q$
+  plots in the complete Pulp example.
+
 - Simplify private path-search orchestration by removing discarded adaptive-search histories and
   fit return values, consolidating best-candidate selection, and relying on transactional
   fitted-state cleanup instead of a second refit-specific deletion path.

@@ -24,6 +24,7 @@ PULP_TUTORIAL_FIGURES = (
     "predictor_rank_profile.svg",
     "biplot.svg",
     "predictor_directions.svg",
+    "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
@@ -217,6 +218,12 @@ def main() -> None:
             / "synthetic"
             / "observed_vs_predicted.svg",
             source / "site" / "assets" / "generated" / "pulp" / "component_path.svg",
+            source
+            / "site"
+            / "assets"
+            / "generated"
+            / "pulp"
+            / "weighted_response_directions.svg",
             source
             / "site"
             / "assets"

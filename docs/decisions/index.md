@@ -103,3 +103,4 @@ reference describe the current public behavior directly.
 - [0083: final data-first rendering policy](0083-data-first-rendering-policy.md)
 - [0084: complete Pulp prediction diagnostics](0084-complete-pulp-prediction-diagnostics.md)
 - [0085: self-contained Pulp tutorial](0085-self-contained-pulp-tutorial.md)
+- [0089: balanced Pulp factorization views](0089-balanced-pulp-factorization-views.md)

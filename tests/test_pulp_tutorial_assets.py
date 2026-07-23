@@ -22,6 +22,7 @@ FIGURE_FILENAMES = (
     "predictor_rank_profile.svg",
     "biplot.svg",
     "predictor_directions.svg",
+    "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
@@ -198,6 +199,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     renderer_sections = {
         "render-pulp-biplot",
         "render-pulp-predictor-directions",
+        "render-pulp-weighted-response-directions",
         "render-pulp-observed-vs-predicted",
         "render-pulp-residuals-vs-predicted",
         "render-pulp-standardized-rmse",
@@ -284,6 +286,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert (
         tutorial.index("biplot.svg")
         < tutorial.index("predictor_directions.svg")
+        < tutorial.index("weighted_response_directions.svg")
         < tutorial.index("observed_vs_predicted.svg")
         < tutorial.index("residuals_vs_predicted.svg")
         < tutorial.index("standardized_rmse.svg")
@@ -294,11 +297,10 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "y_loadings.svg",
         "dilation.svg",
         "response_directions.svg",
-        "weighted_response_directions.svg",
     }
     for filename in omitted_figures:
-        assert filename not in tutorial
-        assert filename not in renderer
+        assert f"../assets/generated/pulp/{filename}" not in tutorial
+        assert f'"{filename}"' not in renderer
     assert "### Regression coefficients" not in tutorial
     assert "coefficients.svg" not in tutorial
     assert "plot_coefficients" not in renderer
@@ -307,6 +309,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert "pipls.plotting" not in renderer
     assert "factors.predictor_directions" in example
     assert "factors.predictor_directions" in renderer
+    assert "factors.weighted_response_directions" in renderer
     assert "factors.dilation" in example
     assert "factors.response_directions" in example
     assert "factors.weighted_response_directions" in example

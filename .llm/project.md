@@ -77,7 +77,9 @@ rotation aliases, scorer plumbing, adaptive-search execution history, and flat O
 not public API.
 Decision 0088 removes display-sign bookkeeping and structurally impossible synthetic loading
 blocks from public records and makes generated reference pages field-oriented for returned
-immutable results.
+immutable results. Decision 0089 adds the weighted response directions $QD$ to Tutorial 2 beside
+the retained predictor directions $P$, while the complete Pulp example retains all four
+factorization views.
 
 ## Implemented estimator and selection boundary
 

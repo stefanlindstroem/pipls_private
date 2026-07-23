@@ -73,8 +73,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   in example 09 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
 - a tutorial-first served site whose synthetic entry tutorial owns the minimum selection contract
   and whose second Pulp tutorial owns real-data selection qualification, selection-conditioned
-  OOF analysis, and representative interpretation plots; both link to the generated API and
-  advanced references;
+  OOF analysis, and representative interpretation plots including both $P$ and $QD$ factor views;
+  both link to the generated API and advanced references;
 - a compact documentation navigation without separate quickstart, estimator, parameter-selection,
   or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
   exact estimator contracts, and retained path and validation pages cover advanced behavior;
@@ -95,7 +95,9 @@ Decisions 0079--0083 establish and enforce data-first rendering for biplots, pre
 diagnostics, standard PLS-family inspection, and Pi-PLS factors. Decision 0084 completes the
 prediction-diagnostic figure trio. Decision 0085 makes Tutorial 2 sequential and self-contained:
 setup and display choices precede use, and every displayed interpretation figure has a matching
-standalone renderer snippet. Plotting migration G1--G5 and public-result cleanup API1--API3 are
+standalone renderer snippet. Decision 0089 balances the tutorial's Pi-PLS-specific section by
+displaying both $P$ and $QD$, while the complete example retains the separate $D$ and $Q$ plots.
+Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS

@@ -53,6 +53,7 @@ FIGURE_FILENAMES = (
     "predictor_rank_profile.svg",
     "biplot.svg",
     "predictor_directions.svg",
+    "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
@@ -278,6 +279,31 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         label.set_horizontalalignment("right")
     # --8<-- [end:render-pulp-predictor-directions]
     _save_svg(figure, output_dir / "predictor_directions.svg")
+
+    # --8<-- [start:render-pulp-weighted-response-directions]
+    figure, axis = plt.subplots(figsize=(8.2, 5.4), layout="constrained")
+    response_positions = np.arange(len(response_names))
+    response_width = 0.8 / len(DISPLAY_COMPONENTS)
+    for series, component in enumerate(DISPLAY_COMPONENTS):
+        offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2.0) * response_width
+        axis.bar(
+            response_positions + offset,
+            factors.weighted_response_directions[:, component],
+            width=response_width,
+            label=f"Component {component + 1}",
+        )
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xticks(response_positions)
+    axis.set_xticklabels(response_names)
+    axis.set_xlabel("Response")
+    axis.set_ylabel(r"Weighted response direction $d_kq_{:k}$")
+    axis.set_title(r"Pulp weighted response directions $QD$")
+    axis.legend()
+    axis.tick_params(axis="x", labelrotation=45)
+    for label in axis.get_xticklabels():
+        label.set_horizontalalignment("right")
+    # --8<-- [end:render-pulp-weighted-response-directions]
+    _save_svg(figure, output_dir / "weighted_response_directions.svg")
 
     # --8<-- [start:render-pulp-observed-vs-predicted]
     figure, axis = plt.subplots(figsize=(6.4, 5.0), layout="constrained")

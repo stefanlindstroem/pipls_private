@@ -7,7 +7,7 @@ with real data: an upper-boundary predictor-rank result, selection-conditioned o
 predictions, and interpretation of a selected model.
 
 Analysis and selection snippets come from `examples/10_pulp_real_data.py`. Standalone
-interpretation-figure recipes come from `tools/render_pulp_tutorial.py`, which generates the seven
+interpretation-figure recipes come from `tools/render_pulp_tutorial.py`, which generates the eight
 SVG figures displayed here. Install the
 example dependencies before running either route:
 
@@ -219,6 +219,26 @@ predictor rank 10 does not create ten plotted components. See
 [Predictor directions](../model_inspection.md#predictor-directions) and
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
 
+#### Weighted response directions $QD$
+
+The grouped bars are constructed directly from `factors.weighted_response_directions`:
+
+```python
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-weighted-response-directions"
+```
+
+![Pulp weighted response directions](../assets/generated/pulp/weighted_response_directions.svg)
+
+The first component has its largest absolute entries for `TI`, `TEA`, `Tear index`, and `TSI`.
+The second component is most pronounced for `Tear index` and `s`, while the third contrasts `CSF`
+with `Elongation`. Because $QD$ combines each response direction with its dilation, it shows the
+response-side orientation and strength of the paired modes rather than $Q$ alone.
+
+The complete example includes separate $D$ and $Q$ plots in the same four-panel Pi-PLS
+factorization figure. See [Dilation](../model_inspection.md#dilation),
+[Response directions](../model_inspection.md#response-directions), and
+[Weighted response directions](../model_inspection.md#weighted-response-directions).
+
 ### Standard PLS-family prediction diagnostics
 
 The pointwise figures show the first three response columns (`CSF`, `Density`, and `TI`) solely for
@@ -274,7 +294,7 @@ The maintained source is `examples/10_pulp_real_data.py`. Run it from the reposi
 python examples/10_pulp_real_data.py
 ```
 
-The tutorial renderer writes seven representative single-chart SVGs. The numbered example writes
+The tutorial renderer writes eight representative single-chart SVGs. The numbered example writes
 six caller-owned PDFs, including additional score, loading, factorization, and coefficient views.
 Both routes calculate directly from in-memory results and write no analytical CSV intermediates.
 

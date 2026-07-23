@@ -187,3 +187,4 @@ record and add it to this index in the same patch.
 | `0086-public-decomposition-boundary.md` | public decomposition boundary | public result exposes final rotations, dilation, rank/solver diagnostics, and standardized map; construction matrices remain private |
 | `0087-public-fitted-surface-cleanup.md` | public fitted-surface cleanup | remove scorer plumbing, exact rotation aliases, path execution bookkeeping, and flat OOF duplicates |
 | `0088-public-result-record-cleanup.md` | public result-record cleanup | remove display-sign bookkeeping and impossible zero loading blocks; hide constructors for returned records |
+| `0089-balanced-pulp-factorization-views.md` | balanced Pulp factorization views | Tutorial 2 displays both $P$ and $QD$; the complete example retains the separate $D$ and $Q$ plots |
