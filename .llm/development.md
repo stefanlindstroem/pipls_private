@@ -115,6 +115,9 @@
   `docs/decisions/` and an entry in `.llm/decisions.md`.
 - Do not edit generated files or commit caches, build products, archive clutter, or unverified
   datasets.
+- Create handoff snapshots only from a clean committed Git tree. `make snapshot` must refuse
+  tracked, staged, or nonignored untracked changes and must archive `HEAD`, so ignored generated
+  files cannot enter the handoff.
 
 ## Delivery and validation
 

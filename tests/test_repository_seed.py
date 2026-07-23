@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 import tarfile
 from pathlib import Path
@@ -362,12 +363,50 @@ def test_llm_layer_is_outside_installable_package() -> None:
     assert ".llm" not in {part.name for part in package_root.parents}
 
 
-def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> None:
-    root = _repository_root()
-    archive = tmp_path / "snapshot.tar.gz"
+def _create_snapshot_test_repository(path: Path) -> Path:
+    root = path / "repository"
+    (root / ".llm").mkdir(parents=True)
+    shutil.copy2(_repository_root() / ".llm" / "snapshot.sh", root / ".llm" / "snapshot.sh")
+    (root / "README.md").write_text("# Snapshot fixture\n", encoding="utf-8")
+    (root / ".gitignore").write_text(
+        "benchmarks/results/\ndocs/assets/generated/\n.pytest_cache/\n"
+        "*-snapshot.tar.gz\n",
+        encoding="utf-8",
+    )
+
+    result_directories = (
+        "examples/results",
+        "examples/results/pls_path_comparison",
+        "examples/results/synthetic_tutorial",
+        "examples/results/pulp_post_analysis",
+        "examples/results/sugarcane_post_analysis",
+        "examples/results/tobacco_post_analysis",
+    )
+    for relative in result_directories:
+        directory = root / relative
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / ".gitkeep").touch()
+
+    subprocess.run(["git", "init", "--quiet"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "config", "user.email", "snapshot@example.invalid"], cwd=root, check=True
+    )
+    subprocess.run(["git", "config", "user.name", "Snapshot Test"], cwd=root, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "commit", "--quiet", "-m", "Create snapshot fixture"],
+        cwd=root,
+        check=True,
+    )
+    return root
+
+
+def test_snapshot_has_committed_repository_contents_at_archive_root(tmp_path: Path) -> None:
+    root = _create_snapshot_test_repository(tmp_path)
+    archive = root / "fixture-snapshot.tar.gz"
 
     subprocess.run(
-        [str(root / ".llm" / "snapshot.sh"), str(archive)],
+        [str(root / ".llm" / "snapshot.sh"), archive.name],
         cwd=root,
         check=True,
         capture_output=True,
@@ -377,11 +416,22 @@ def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> Non
     with tarfile.open(archive, "r:gz") as handle:
         members = handle.getmembers()
         names = {member.name.removeprefix("./") for member in members}
+        metadata_member = handle.extractfile(".llm/SNAPSHOT_INFO")
+        assert metadata_member is not None
+        metadata = metadata_member.read().decode("utf-8")
 
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
     assert "README.md" in names
     assert ".llm/SNAPSHOT_INFO" in names
     assert not any(name.startswith(f"{root.name}/") for name in names)
-    assert not any(name == "site" or name.startswith("site/") for name in names)
+    assert f"commit: {commit}" in metadata
+    assert "dirty: false" in metadata
     expected_result_placeholders = {
         "examples/results/.gitkeep",
         "examples/results/pls_path_comparison/.gitkeep",
@@ -396,6 +446,58 @@ def test_snapshot_has_repository_contents_at_archive_root(tmp_path: Path) -> Non
         if member.isfile() and member.name.removeprefix("./").startswith("examples/results/")
     }
     assert archived_results == expected_result_placeholders
+
+
+def test_snapshot_refuses_modified_staged_and_untracked_files(tmp_path: Path) -> None:
+    for state in ("modified", "staged", "untracked"):
+        root = _create_snapshot_test_repository(tmp_path / state)
+        if state == "untracked":
+            (root / "notes.txt").write_text("untracked\n", encoding="utf-8")
+        else:
+            (root / "README.md").write_text(f"# {state}\n", encoding="utf-8")
+            if state == "staged":
+                subprocess.run(["git", "add", "README.md"], cwd=root, check=True)
+
+        archive = tmp_path / f"{state}.tar.gz"
+        completed = subprocess.run(
+            [str(root / ".llm" / "snapshot.sh"), str(archive)],
+            cwd=root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+
+        assert completed.returncode != 0
+        assert "Refusing to create a snapshot from a dirty worktree" in completed.stderr
+        assert not archive.exists()
+
+
+def test_snapshot_ignores_ignored_generated_files(tmp_path: Path) -> None:
+    root = _create_snapshot_test_repository(tmp_path)
+    generated = root / "docs" / "assets" / "generated" / "tutorial.svg"
+    generated.parent.mkdir(parents=True)
+    generated.write_text("<svg/>\n", encoding="utf-8")
+    cache = root / ".pytest_cache" / "state"
+    cache.parent.mkdir()
+    cache.write_text("cache\n", encoding="utf-8")
+    benchmark_result = root / "benchmarks" / "results" / "result.csv"
+    benchmark_result.parent.mkdir(parents=True)
+    benchmark_result.write_text("generated\n", encoding="utf-8")
+    archive = tmp_path / "snapshot.tar.gz"
+
+    subprocess.run(
+        [str(root / ".llm" / "snapshot.sh"), str(archive)],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    with tarfile.open(archive, "r:gz") as handle:
+        names = {member.name.removeprefix("./") for member in handle.getmembers()}
+    assert not any(name.startswith("docs/assets/generated/") for name in names)
+    assert not any(name.startswith(".pytest_cache/") for name in names)
+    assert not any(name.startswith("benchmarks/results/") for name in names)
 
 
 def test_llm_workflow_scripts_are_executable() -> None:

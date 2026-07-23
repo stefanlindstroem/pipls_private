@@ -43,4 +43,5 @@ tutorial link targets, but no longer duplicates routine Matplotlib syntax. Docum
 protect public-object coverage, merged navigation, stable links and anchors, and the absence of the
 retired wrapper pages.
 
-First-release preparation remains the next repository increment.
+A later owner-directed audit inserted a six-patch hardening series before any release work;
+Decision 0091 begins that series.

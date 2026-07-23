@@ -83,7 +83,9 @@ restate decisions already captured in the repository.
 
 ## User workflow
 
-Start from a clean committed worktree. Create and upload a snapshot:
+Start from a clean committed worktree. Snapshot creation fails when tracked, staged, or
+nonignored untracked changes remain. Ignored local outputs do not enter the archive. Create and
+upload a snapshot:
 
 ```bash
 make snapshot
@@ -151,7 +153,9 @@ commit clean state -> make snapshot -> upload -> receive patch -> git apply --ch
 
 ## Helper scripts
 
-- `snapshot.sh [OUTPUT]`: create a clean deterministic upload tarball.
+- `snapshot.sh [OUTPUT]`: create an upload tarball from a clean committed Git tree. The helper
+  refuses tracked, staged, or nonignored untracked changes; ignored generated files are excluded
+  because only `HEAD` is archived.
 - `create_patch.sh [OUTPUT]`: optionally export current unstaged changes as a root-relative patch.
 
 Patch application and committing deliberately use ordinary Git commands. This keeps behavior

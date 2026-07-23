@@ -1,5 +1,9 @@
 # Changelog
 
+- Make repository snapshots faithful to one clean committed Git tree: refuse tracked, staged, or
+  nonignored untracked changes; archive `HEAD` rather than the worktree; and exclude ignored
+  generated assets and caches by construction.
+
 - Consolidate the programming reference from thirteen navigation entries to eight: colocate small
   generated result and utility groups with their owning estimators, merge path-search and
   cross-validation details, correct the documented `cv_results_` contents, and shorten model

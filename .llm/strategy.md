@@ -577,10 +577,29 @@ Decision 0073 additionally hardens the public estimator boundary with transactio
 range-safe preprocessing fallbacks, safe `copy=False` handling, and finite-result enforcement
 without expanding the private numerical core.
 
+### Pre-release audit hardening
+
+An owner-directed package audit identified six focused corrections to complete before a separate
+human review. They must be implemented and snapshotted one at a time:
+
+1. clean committed-tree snapshot integrity;
+2. fold-level numerical-rank feasibility in path selection;
+3. consistent tolerant score ranking;
+4. core public-result invariants;
+5. inspection-result invariants and numerical safety;
+6. dataset metadata closure.
+
+Decision 0091 completes the first increment by replacing worktree copying with a clean `HEAD`
+archive and tests for modified, staged, nonignored untracked, and ignored files. Release preparation and
+publication are explicitly outside this series and remain deferred until the owner completes a
+human audit.
+
+Current status: **increment 1/6 complete; fold-level numerical-rank feasibility next**.
+
 ## Current next increment
 
-First-release preparation: choose the initial version, complete metadata and release notes, and
-rehearse the tag and publication checklist.
+Pre-release audit hardening 2/6: determine the minimum verified numerical rank across training
+folds before `PiPLSPathCV` constructs or evaluates its candidate path.
 
 ## Maintenance protocol
 

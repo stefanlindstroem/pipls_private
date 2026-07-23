@@ -20,7 +20,8 @@ synthetic path-selection tutorial and independent-test prediction workflow.
 Phases A through F4 are complete and committed. The first broad E4 benchmark
 implementation was removed and replaced by focused question-specific benchmarks:
 
-- repository, packaging, deterministic root-relative snapshots, and direct Git patch workflow;
+- repository, packaging, clean committed-tree root-relative snapshots, and direct Git patch
+  workflow;
 - fixed-parameter Pi-PLS numerical core;
 - scikit-learn-compatible fixed-model `PiPLSRegression` for one explicit
   `(n_components, predictor_rank)` pair;
@@ -103,6 +104,9 @@ standalone renderer snippet. Decision 0089 balances the tutorial's Pi-PLS-specif
 displaying both $P$ and $QD$, while the complete example retains the separate $D$ and $Q$ plots.
 Decision 0090 consolidates the programming reference without changing public objects or numerical
 behavior.
+Decision 0091 makes every successful handoff snapshot a clean `HEAD` archive: tracked, staged, and
+nonignored untracked changes are refused, while ignored generated files are excluded by
+construction.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -319,14 +323,20 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-First-release preparation: choose the initial version, complete metadata and release notes, and
-rehearse the tag and publication checklist.
+Pre-release audit hardening 2/6: make `PiPLSPathCV` respect the minimum verified numerical rank of
+its training folds before candidate evaluation.
 
 ## Subsequent roadmap
 
-1. **First-release preparation:** choose the initial version, complete metadata and release
-   notes, and rehearse the tag and publication checklist.
-2. **First tagged release:** publish only after the rehearsal and checklist pass.
+1. **Tolerant score ranking:** align `rank_test_score` groups with the selector's best-score tie
+   rule.
+2. **Core public-result invariants:** make estimator and path result records uniformly defensive
+   and validated.
+3. **Inspection numerical safety:** make inspection records and extreme finite calculations obey
+   the same finite-result policy.
+4. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
+5. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
+   publication are outside the current sequence.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

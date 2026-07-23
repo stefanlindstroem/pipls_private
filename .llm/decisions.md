@@ -96,6 +96,7 @@ This index is navigation, not a substitute for those records.
 | `0088-public-result-record-cleanup.md` | public result-record cleanup | remove display-sign bookkeeping and impossible zero loading blocks; hide constructors for returned records |
 | `0089-balanced-pulp-factorization-views.md` | balanced Pulp factorization views | Tutorial 2 displays both $P$ and $QD$; the complete example retains the separate $D$ and $Q$ plots |
 | `0090-reference-consolidation.md` | programming-reference consolidation | merge validation with path details, colocate small generated API groups, and shorten inspection prose while preserving public objects and anchors |
+| `0091-clean-git-snapshots.md` | clean committed-tree snapshots | refuse tracked, staged, or nonignored untracked changes and archive `HEAD` so ignored local files cannot enter handoffs |
 
 ## Implemented estimator/search transition
 

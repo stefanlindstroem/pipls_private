@@ -20,6 +20,8 @@ Tests may verify:
   shell files;
 - generic consistency rules, such as every indexed decision record existing and every shipped
   decision record appearing in the index;
+- snapshot integrity in isolated Git repositories: clean committed-tree contents, refusal of
+  tracked/staged/nonignored-untracked changes, exclusion of ignored files, and truthful metadata;
 - repository dataset tables being readable numeric comma-separated files with aligned rows;
 - explicitly frozen package-benchmark results after a separate decision defines their scientific
   meaning, tolerances, and update procedure.

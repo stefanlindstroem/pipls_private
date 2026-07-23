@@ -142,10 +142,13 @@ ignored. Do not add datasets without verified redistribution and adaptation term
 ## LLM-assisted maintenance
 
 Read [`.llm/README.md`](.llm/README.md), [`.llm/state.md`](.llm/state.md), and the relevant
-contracts before preparing a change. Return root-relative unified Git patches and create a clean
-uploadable
-snapshot with:
+contracts before preparing a change. Return root-relative unified Git patches and create an
+uploadable snapshot with:
 
 ```bash
 make snapshot
 ```
+
+The snapshot target requires a clean committed worktree. It refuses tracked, staged, and
+nonignored untracked changes and archives only `HEAD`, so ignored generated files and caches are
+not included.
