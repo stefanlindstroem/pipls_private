@@ -189,7 +189,15 @@ The model-inspection guide covers the complementary $D$, $Q$, and $QD$ views.
 
 ### Standard PLS-family prediction plots
 
-These figures use `PredictionDiagnostics` and retain the selection-conditioned OOF provenance.
+These figures use the arrays stored in `PredictionDiagnostics` directly. The example owns the
+Matplotlib series, reference lines, labels, and response selection:
+
+```python
+--8<-- "examples/10_pulp_real_data.py:plot-pulp-prediction-diagnostics"
+```
+
+The relevant fields are `observed_standardized`, `predicted_standardized`,
+`residual_standardized`, `standardized_rmse`, and `prediction_kind`.
 
 #### Observed versus predicted
 
@@ -199,8 +207,7 @@ Observed and OOF-predicted values are standardized response by response so that 
 and `TI` can share one axis. Agreement is read relative to the identity line. The spread describes
 selection-conditioned OOF error for the displayed responses, not independent-test performance.
 
-See [Observed versus predicted](../model_inspection.md#observed-versus-predicted) and
-[`plot_observed_vs_predicted()`](../api/plotting.md#pipls.plotting.plot_observed_vs_predicted).
+See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
 
 #### Standardized RMSE
 
@@ -210,8 +217,7 @@ Response-wise RMSE is divided by the observed sample standard deviation of each 
 descriptive comparison across all eight responses. These values are not identical to the fold-local
 standardized losses used during component-path selection.
 
-See [Standardized RMSE](../model_inspection.md#standardized-rmse) and
-[`plot_standardized_rmse()`](../api/plotting.md#pipls.plotting.plot_standardized_rmse).
+See [Standardized RMSE](../model_inspection.md#standardized-rmse).
 
 ## Complete executable example
 

@@ -196,29 +196,27 @@ API: [`plot_coefficients()`](api/plotting.md#pipls.plotting.plot_coefficients).
 
 ### Observed versus predicted { #observed-versus-predicted }
 
-`plot_observed_vs_predicted()` standardizes each displayed response and compares observations with
-predictions relative to the identity line. The provenance label determines whether the plot shows
-fitted values, fixed-parameter OOF predictions, selection-conditioned OOF predictions, or external
-test predictions.
+Use `PredictionDiagnostics.observed_standardized` and
+`PredictionDiagnostics.predicted_standardized` with `Axes.scatter()`. Plot an identity line with
+`Axes.plot()` after calculating limits from the displayed responses. The provenance string in
+`prediction_kind` should remain visible in the title, caption, or surrounding report.
 
-API: [`plot_observed_vs_predicted()`](api/plotting.md#pipls.plotting.plot_observed_vs_predicted).
+The standardized arrays allow responses with different units to share one chart without hiding the
+underlying numerical values.
 
 ### Residuals versus predicted { #residuals-versus-predicted }
 
-`plot_residuals_vs_predicted()` places standardized residuals against standardized predictions.
-Curvature, changing spread, or response-specific bands can indicate structure not captured by the
-linear model. The plot alone does not justify labeling individual samples as anomalous.
-
-API: [`plot_residuals_vs_predicted()`](api/plotting.md#pipls.plotting.plot_residuals_vs_predicted).
+Use `PredictionDiagnostics.predicted_standardized` on the horizontal axis and
+`PredictionDiagnostics.residual_standardized` on the vertical axis. Add the zero-residual reference
+with `Axes.axhline()`. Curvature, changing spread, or response-specific bands can indicate structure
+not captured by the linear model. The chart alone does not justify labeling individual samples as
+anomalous.
 
 ### Standardized RMSE { #standardized-rmse }
 
-`plot_standardized_rmse()` compares response-wise RMSE after division by the sample standard
-deviation of the supplied observed response. Lower values mean smaller error relative to that
-response's observed spread. These display values are not generally equal to the mean fold-local
-standardized loss used during path selection.
-
-API: [`plot_standardized_rmse()`](api/plotting.md#pipls.plotting.plot_standardized_rmse).
+Use `PredictionDiagnostics.standardized_rmse` with `Axes.bar()` or another caller-chosen summary.
+Lower values mean smaller error relative to that response's observed spread. These display values
+are not generally equal to the mean fold-local standardized loss used during path selection.
 
 ### Observation diagnostics { #observation-diagnostics }
 

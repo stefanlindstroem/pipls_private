@@ -52,7 +52,10 @@ def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
     assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert 'predictor_style="line"' in text
     assert 'predictor_axis_label="Wavelength (nm)"' in text
-    assert "include_prediction_kind=False" in text
+    assert "diagnostics.observed_standardized" in text
+    assert "diagnostics.predicted_standardized" in text
+    assert "diagnostics.residual_standardized" in text
+    assert "diagnostics.standardized_rmse" in text
     assert "build_post_analysis_tables(" not in text
     assert "write_post_analysis_tables(" not in text
     assert "render_post_analysis_report(" not in text
@@ -104,7 +107,10 @@ def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
     assert 'predictor_axis_label="Wavenumber (cm$^{-1}$)"' in text
     assert "components=DISPLAY_COMPONENTS" in text
     assert text.count("for page_number, responses in enumerate(response_pages, start=1):") == 2
-    assert text.count("include_prediction_kind=False") == 3
+    assert "diagnostics.observed_standardized" in text
+    assert "diagnostics.predicted_standardized" in text
+    assert "diagnostics.residual_standardized" in text
+    assert "diagnostics.standardized_rmse" in text
     assert text.count("pd.read_csv") == 2
     assert ".to_csv(" not in text
     assert "build_post_analysis_tables(" not in text

@@ -43,9 +43,7 @@ from pipls.inspection import (  # noqa: E402
     prediction_diagnostics,
 )
 from pipls.plotting import (  # noqa: E402
-    plot_observed_vs_predicted,
     plot_pipls_predictor_directions,
-    plot_standardized_rmse,
 )
 
 PULP_DATA_DIR = REPOSITORY_ROOT / "datasets" / "pulp"
@@ -285,23 +283,41 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     _save_svg(figure, output_dir / "predictor_directions.svg")
 
     figure, axis = _figure(figsize=(6.4, 5.0))
-    plot_observed_vs_predicted(
-        diagnostics,
-        response_names=response_names,
-        responses=detailed_response_indices,
-        title="Pulp observed versus predicted",
-        ax=axis,
+    detailed_array = np.array(detailed_response_indices, dtype=np.int64)
+    for response in detailed_response_indices:
+        axis.scatter(
+            diagnostics.observed_standardized[:, response],
+            diagnostics.predicted_standardized[:, response],
+            label=response_names[response],
+            alpha=0.75,
+        )
+    values = np.concatenate(
+        [
+            diagnostics.observed_standardized[:, detailed_array].ravel(),
+            diagnostics.predicted_standardized[:, detailed_array].ravel(),
+        ]
     )
+    lower = float(values.min())
+    upper = float(values.max())
+    margin = 0.05 * (upper - lower) if upper > lower else 1.0
+    limits = (lower - margin, upper + margin)
+    axis.plot(limits, limits, linewidth=1.0, linestyle="--", color="0.35")
+    axis.set_xlim(limits)
+    axis.set_ylim(limits)
+    axis.set_xlabel("Observed response (standardized)")
+    axis.set_ylabel("Predicted response (standardized)")
+    axis.set_title(f"Pulp observed versus predicted\n{diagnostics.prediction_kind}")
     axis.legend(title="Response")
     _save_svg(figure, output_dir / "observed_vs_predicted.svg")
 
     figure, axis = _figure(figsize=(7.4, 5.0))
-    plot_standardized_rmse(
-        diagnostics,
-        response_names=response_names,
-        title="Pulp standardized RMSE",
-        ax=axis,
-    )
+    positions = np.arange(len(response_names))
+    axis.bar(positions, diagnostics.standardized_rmse)
+    axis.set_xticks(positions)
+    axis.set_xticklabels(response_names)
+    axis.set_xlabel("Response")
+    axis.set_ylabel("Standardized RMSE")
+    axis.set_title(f"Pulp standardized RMSE\n{diagnostics.prediction_kind}")
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "standardized_rmse.svg")
 

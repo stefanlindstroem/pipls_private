@@ -573,7 +573,7 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-Plotting migration G2 is next: render prediction diagnostics directly from immutable arrays and remove the three corresponding convenience plotters. First-release preparation follows G5.
+Plotting migration G3 is next: render standard latent-structure and observation diagnostics directly from immutable arrays. First-release preparation follows G5.
 
 ## Maintenance protocol
 

@@ -247,9 +247,6 @@ from pipls.plotting import (
     plot_scores,
     plot_x_loadings,
     plot_y_loadings,
-    plot_observed_vs_predicted,
-    plot_residuals_vs_predicted,
-    plot_standardized_rmse,
 )
 ```
 
@@ -267,11 +264,10 @@ The Pi-PLS-specific functions accept `PiPLSDisplayFactors` and render one factor
 `"bar"` or `"line"` style and caller-supplied labels or a physical predictor coordinate. Response
 plots require caller-supplied response names. All component subsets use zero-based indices.
 
-Prediction diagnostics are split into `plot_observed_vs_predicted()`,
-`plot_residuals_vs_predicted()`, and `plot_standardized_rmse()`. Each follows the same one-axis
-contract. Standalone calls include the stored prediction provenance in the axis title by default;
-caller-owned panels may set `include_prediction_kind=False` and report provenance once at figure
-level. Scatter artists carry response labels, but legends remain caller-owned.
+Prediction diagnostics are numerical rather than graphical. `PredictionDiagnostics` exposes
+standardized observed, predicted, and residual matrices, response-wise standardized RMSE, and
+explicit prediction provenance. Maintained tutorials and examples render those arrays directly with
+Matplotlib; no public prediction-diagnostic plotter is retained.
 
 `plot_scores()` renders exactly two selected X-score columns. X and Y loadings place selected
 components together on one axis; coefficient plots place selected responses together on one axis.

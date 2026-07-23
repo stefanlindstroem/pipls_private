@@ -101,9 +101,6 @@ def test_shared_public_analysis_names_are_estimator_neutral() -> None:
         "PredictorStyle",
         "plot_coefficients",
         "plot_observation_diagnostics",
-        "plot_observed_vs_predicted",
-        "plot_residuals_vs_predicted",
-        "plot_standardized_rmse",
         "plot_scores",
         "plot_x_loadings",
         "plot_y_loadings",
@@ -134,14 +131,11 @@ def test_sugarcane_example_owns_direct_figure_composition() -> None:
     tree = ast.parse(source, filename=str(path))
     expected_plotters = {
         "plot_coefficients",
-        "plot_observed_vs_predicted",
         "plot_pipls_dilation",
         "plot_pipls_predictor_directions",
         "plot_pipls_response_directions",
         "plot_pipls_weighted_response_directions",
-        "plot_residuals_vs_predicted",
         "plot_scores",
-        "plot_standardized_rmse",
         "plot_x_loadings",
         "plot_y_loadings",
     }
@@ -155,6 +149,13 @@ def test_sugarcane_example_owns_direct_figure_composition() -> None:
 
     assert {call.func.id for call in calls if isinstance(call.func, ast.Name)} == expected_plotters
     assert all(any(keyword.arg == "ax" for keyword in call.keywords) for call in calls)
+    assert "diagnostics.observed_standardized" in source
+    assert "diagnostics.predicted_standardized" in source
+    assert "diagnostics.residual_standardized" in source
+    assert "diagnostics.standardized_rmse" in source
+    assert "axes[0].scatter(" in source
+    assert "axes[1].scatter(" in source
+    assert "axes[2].bar(" in source
     assert source.count("plt.subplots(") == 5
     assert source.count("figure.savefig(") == 5
     assert source.count("plt.close(figure)") == 5
@@ -170,14 +171,11 @@ def test_tobacco_example_owns_direct_figure_composition() -> None:
     expected_plotters = {
         "plot_coefficients",
         "plot_observation_diagnostics",
-        "plot_observed_vs_predicted",
         "plot_pipls_dilation",
         "plot_pipls_predictor_directions",
         "plot_pipls_response_directions",
         "plot_pipls_weighted_response_directions",
-        "plot_residuals_vs_predicted",
         "plot_scores",
-        "plot_standardized_rmse",
         "plot_x_loadings",
         "plot_y_loadings",
     }
@@ -191,6 +189,13 @@ def test_tobacco_example_owns_direct_figure_composition() -> None:
 
     assert {call.func.id for call in calls if isinstance(call.func, ast.Name)} == expected_plotters
     assert all(any(keyword.arg == "ax" for keyword in call.keywords) for call in calls)
+    assert "diagnostics.observed_standardized" in source
+    assert "diagnostics.predicted_standardized" in source
+    assert "diagnostics.residual_standardized" in source
+    assert "diagnostics.standardized_rmse" in source
+    assert "axes[0].scatter(" in source
+    assert "axes[1].scatter(" in source
+    assert "axes[2].bar(" in source
     assert source.count("plt.subplots(") == 5
     assert source.count("PdfPages(") == 2
     assert source.count("figure.savefig(") == 3

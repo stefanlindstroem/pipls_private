@@ -38,18 +38,6 @@ Conceptual reference: [scores](../model_inspection.md#scores),
     options:
       members: false
 
-::: pipls.plotting.plot_observed_vs_predicted
-    options:
-      members: false
-
-::: pipls.plotting.plot_residuals_vs_predicted
-    options:
-      members: false
-
-::: pipls.plotting.plot_standardized_rmse
-    options:
-      members: false
-
 ::: pipls.plotting.plot_scores
     options:
       members: false

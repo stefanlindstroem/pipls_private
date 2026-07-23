@@ -82,8 +82,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
 
-Decision 0079 starts the accepted plotting migration. Direct prediction-diagnostic rendering is the
-next increment; first-release preparation follows completion of the plotting sequence. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+Decisions 0079 and 0080 establish data-first biplot and prediction-diagnostic rendering.
+Direct standard PLS-family latent and observation plots are the next increment; first-release preparation follows completion of the plotting sequence. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS

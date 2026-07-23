@@ -94,3 +94,4 @@ reference describe the current public behavior directly.
 - [0077: audience-oriented documentation entry](0077-audience-oriented-documentation-entry.md)
 - [0078: documentation reference cleanup](0078-documentation-reference-cleanup.md)
 - [0079: data-first biplot rendering](0079-data-first-biplot-rendering.md)
+- [0080: direct prediction-diagnostic rendering](0080-direct-prediction-diagnostic-rendering.md)

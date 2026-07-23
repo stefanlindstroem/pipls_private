@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 from sklearn.model_selection import KFold, cross_val_predict
@@ -17,14 +18,11 @@ from pipls.inspection import (
 from pipls.plotting import (
     plot_coefficients,
     plot_observation_diagnostics,
-    plot_observed_vs_predicted,
     plot_pipls_dilation,
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_residuals_vs_predicted,
     plot_scores,
-    plot_standardized_rmse,
     plot_x_loadings,
     plot_y_loadings,
 )
@@ -152,27 +150,60 @@ with PdfPages(ANALYSIS_DIR / "prediction_diagnostics.pdf") as report:
             figsize=(13.0, 4.2),
             layout="constrained",
         )
-        plot_observed_vs_predicted(
-            diagnostics,
-            response_names=response_names,
-            responses=responses,
-            include_prediction_kind=False,
-            ax=axes[0],
+        response_array = np.array(responses, dtype=np.int64)
+        for response in responses:
+            axes[0].scatter(
+                diagnostics.observed_standardized[:, response],
+                diagnostics.predicted_standardized[:, response],
+                label=response_names[response],
+                alpha=0.75,
+            )
+            axes[1].scatter(
+                diagnostics.predicted_standardized[:, response],
+                diagnostics.residual_standardized[:, response],
+                label=response_names[response],
+                alpha=0.75,
+            )
+        identity_values = np.concatenate(
+            [
+                diagnostics.observed_standardized[:, response_array].ravel(),
+                diagnostics.predicted_standardized[:, response_array].ravel(),
+            ]
         )
-        plot_residuals_vs_predicted(
-            diagnostics,
-            response_names=response_names,
-            responses=responses,
-            include_prediction_kind=False,
-            ax=axes[1],
+        identity_lower = float(identity_values.min())
+        identity_upper = float(identity_values.max())
+        identity_margin = (
+            0.05 * (identity_upper - identity_lower)
+            if identity_upper > identity_lower
+            else 1.0
         )
-        plot_standardized_rmse(
-            diagnostics,
-            response_names=response_names,
-            responses=responses,
-            include_prediction_kind=False,
-            ax=axes[2],
+        identity_limits = (
+            identity_lower - identity_margin,
+            identity_upper + identity_margin,
         )
+        axes[0].plot(
+            identity_limits,
+            identity_limits,
+            linewidth=1.0,
+            linestyle="--",
+            color="0.35",
+        )
+        axes[0].set_xlim(identity_limits)
+        axes[0].set_ylim(identity_limits)
+        axes[0].set_xlabel("Observed response (standardized)")
+        axes[0].set_ylabel("Predicted response (standardized)")
+        axes[0].set_title("Observed versus predicted")
+        axes[1].axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
+        axes[1].set_xlabel("Predicted response (standardized)")
+        axes[1].set_ylabel(r"Residual $y-\hat y$ (standardized)")
+        axes[1].set_title("Residual versus predicted")
+        positions = np.arange(len(responses))
+        axes[2].bar(positions, diagnostics.standardized_rmse[response_array])
+        axes[2].set_xticks(positions)
+        axes[2].set_xticklabels([response_names[index] for index in responses])
+        axes[2].set_xlabel("Response")
+        axes[2].set_ylabel("Standardized RMSE")
+        axes[2].set_title("Response-wise standardized RMSE")
         if len(responses) > 1:
             axes[0].legend()
             axes[1].legend()

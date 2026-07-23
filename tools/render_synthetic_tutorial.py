@@ -20,12 +20,12 @@ import matplotlib  # noqa: E402
 matplotlib.use("Agg")
 matplotlib.rcParams["svg.hashsalt"] = "pipls-synthetic-tutorial"
 import matplotlib.pyplot as plt  # noqa: E402
+import numpy as np  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 
 from pipls import PiPLSPathCV, PiPLSRegression  # noqa: E402
 from pipls.datasets import make_pipls_train_test  # noqa: E402
 from pipls.inspection import prediction_diagnostics  # noqa: E402
-from pipls.plotting import plot_observed_vs_predicted  # noqa: E402
 
 DEFAULT_OUTPUT_DIR = (
     REPOSITORY_ROOT / "docs" / "assets" / "generated" / "synthetic"
@@ -141,12 +141,29 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         prediction_kind="external test predictions",
     )
     figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
-    plot_observed_vs_predicted(
-        diagnostics,
-        response_names=test.target_names,
-        title="Synthetic external-test predictions",
-        ax=axis,
+    for response, name in enumerate(test.target_names):
+        axis.scatter(
+            diagnostics.observed_standardized[:, response],
+            diagnostics.predicted_standardized[:, response],
+            label=name,
+            alpha=0.75,
+        )
+    values = np.concatenate(
+        [
+            diagnostics.observed_standardized.ravel(),
+            diagnostics.predicted_standardized.ravel(),
+        ]
     )
+    lower = float(values.min())
+    upper = float(values.max())
+    margin = 0.05 * (upper - lower) if upper > lower else 1.0
+    limits = (lower - margin, upper + margin)
+    axis.plot(limits, limits, linewidth=1.0, linestyle="--", color="0.35")
+    axis.set_xlim(limits)
+    axis.set_ylim(limits)
+    axis.set_xlabel("Observed response (standardized)")
+    axis.set_ylabel("Predicted response (standardized)")
+    axis.set_title(f"Synthetic external-test predictions\n{diagnostics.prediction_kind}")
     axis.legend(title="Response")
     _save_svg(figure, output_dir / "observed_vs_predicted.svg")
 

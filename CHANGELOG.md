@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Render prediction diagnostics directly from immutable arrays in maintained examples and tutorials, and remove the three public prediction-diagnostic convenience plotters.
 - Start the data-first plotting migration: retain balanced biplot coordinates, remove the public `plot_biplot()` renderer, draw the maintained Pulp biplots directly with Matplotlib, and use optional `adjustText` label placement.
 
 - Complete the documentation cleanup with a public result-object map, a task-oriented troubleshooting page, generic local-link and anchor validation, removal of internal phase language from served guides, and less prose-coupled tutorial tests.

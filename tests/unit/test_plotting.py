@@ -15,7 +15,7 @@ import pytest
 import pipls
 import pipls.plotting as plotting
 from pipls import PiPLSDecomposition
-from pipls.inspection import pipls_display_factors, prediction_diagnostics
+from pipls.inspection import pipls_display_factors
 
 matplotlib.use("Agg")
 
@@ -54,30 +54,6 @@ def _factors() -> object:
     return pipls_display_factors(decomposition)
 
 
-def _diagnostics() -> object:
-    observed = np.array(
-        [
-            [1.0, 10.0, -2.0],
-            [2.0, 12.0, -1.0],
-            [4.0, 14.0, 1.0],
-            [5.0, 18.0, 2.0],
-        ]
-    )
-    predicted = observed + np.array(
-        [
-            [0.2, -1.0, 0.1],
-            [-0.1, 0.5, -0.2],
-            [0.3, -0.5, 0.2],
-            [-0.2, 1.0, -0.1],
-        ]
-    )
-    return prediction_diagnostics(
-        observed,
-        predicted,
-        prediction_kind="external test predictions",
-    )
-
-
 def test_plotting_names_are_submodule_exports_only() -> None:
     expected = {
         "PredictorStyle",
@@ -90,9 +66,6 @@ def test_plotting_names_are_submodule_exports_only() -> None:
         "plot_scores",
         "plot_x_loadings",
         "plot_y_loadings",
-        "plot_observed_vs_predicted",
-        "plot_residuals_vs_predicted",
-        "plot_standardized_rmse",
     }
 
     assert set(plotting.__all__) == expected
@@ -359,219 +332,6 @@ def test_atomic_pipls_factor_plotters_reject_figsize_with_supplied_axis() -> Non
     with pytest.raises(ValueError, match="figsize cannot be supplied"):
         plotting.plot_pipls_dilation(
             _factors(),  # type: ignore[arg-type]
-            figsize=(5.0, 4.0),
-            ax=axis,
-        )
-
-
-def test_atomic_prediction_plotters_render_one_chart_with_provenance() -> None:
-    diagnostics = _diagnostics()
-    residual_before = diagnostics.residual.copy()  # type: ignore[union-attr]
-    response_names = ["Yield", "Purity", "Energy demand"]
-
-    observed_figure, observed_axis = plotting.plot_observed_vs_predicted(
-        diagnostics,  # type: ignore[arg-type]
-        response_names=response_names,
-        responses=[0, 2],
-    )
-    residual_figure, residual_axis = plotting.plot_residuals_vs_predicted(
-        diagnostics,  # type: ignore[arg-type]
-        response_names=response_names,
-        responses=[0, 2],
-    )
-    rmse_figure, rmse_axis = plotting.plot_standardized_rmse(
-        diagnostics,  # type: ignore[arg-type]
-        response_names=response_names,
-        responses=[0, 2],
-    )
-
-    assert observed_figure.axes == [observed_axis]
-    assert residual_figure.axes == [residual_axis]
-    assert rmse_figure.axes == [rmse_axis]
-    assert observed_axis.get_title() == "Observed versus predicted\nexternal test predictions"
-    assert residual_axis.get_title() == "Residual versus predicted\nexternal test predictions"
-    assert rmse_axis.get_title() == ("Response-wise standardized RMSE\nexternal test predictions")
-    assert observed_axis.get_legend() is None
-    assert residual_axis.get_legend() is None
-    assert observed_axis.get_legend_handles_labels()[1] == ["Yield", "Energy demand"]
-    assert residual_axis.get_legend_handles_labels()[1] == ["Yield", "Energy demand"]
-    np.testing.assert_allclose(
-        observed_axis.lines[0].get_xdata(), observed_axis.lines[0].get_ydata()
-    )
-    np.testing.assert_allclose(residual_axis.lines[0].get_ydata(), [0.0, 0.0])
-    assert [tick.get_text() for tick in rmse_axis.get_xticklabels()] == [
-        "Yield",
-        "Energy demand",
-    ]
-    np.testing.assert_allclose(
-        [patch.get_height() for patch in rmse_axis.patches],
-        diagnostics.standardized_rmse[[0, 2]],  # type: ignore[union-attr]
-    )
-    np.testing.assert_array_equal(diagnostics.residual, residual_before)  # type: ignore[union-attr]
-
-
-def test_atomic_prediction_plotters_compose_in_a_caller_owned_panel() -> None:
-    import matplotlib.pyplot as plt
-
-    diagnostics = _diagnostics()
-    response_names = ["Yield", "Purity", "Energy demand"]
-    figure, axes = plt.subplots(1, 3, figsize=(13.0, 4.2))
-    figure_numbers = plt.get_fignums()
-
-    calls = (
-        plotting.plot_observed_vs_predicted(
-            diagnostics,  # type: ignore[arg-type]
-            response_names=response_names,
-            responses=[0, 2],
-            include_prediction_kind=False,
-            ax=axes[0],
-        ),
-        plotting.plot_residuals_vs_predicted(
-            diagnostics,  # type: ignore[arg-type]
-            response_names=response_names,
-            responses=[0, 2],
-            include_prediction_kind=False,
-            ax=axes[1],
-        ),
-        plotting.plot_standardized_rmse(
-            diagnostics,  # type: ignore[arg-type]
-            response_names=response_names,
-            responses=[0, 2],
-            include_prediction_kind=False,
-            ax=axes[2],
-        ),
-    )
-
-    assert all(returned_figure is figure for returned_figure, _ in calls)
-    assert [returned_axis for _, returned_axis in calls] == list(axes)
-    assert figure.axes == list(axes)
-    assert plt.get_fignums() == figure_numbers
-    assert [axis.get_title() for axis in axes] == [
-        "Observed versus predicted",
-        "Residual versus predicted",
-        "Response-wise standardized RMSE",
-    ]
-
-
-def test_atomic_prediction_panel_writes_pdf(tmp_path: Path) -> None:
-    import matplotlib.pyplot as plt
-
-    diagnostics = _diagnostics()
-    response_names = ["Yield", "Purity", "Energy demand"]
-    figure, axes = plt.subplots(1, 3, figsize=(13.0, 4.2), layout="constrained")
-    plotting.plot_observed_vs_predicted(
-        diagnostics,  # type: ignore[arg-type]
-        response_names=response_names,
-        ax=axes[0],
-    )
-    plotting.plot_residuals_vs_predicted(
-        diagnostics,  # type: ignore[arg-type]
-        response_names=response_names,
-        ax=axes[1],
-    )
-    plotting.plot_standardized_rmse(
-        diagnostics,  # type: ignore[arg-type]
-        response_names=response_names,
-        ax=axes[2],
-    )
-    output = tmp_path / "diagnostics.pdf"
-
-    figure.savefig(output)
-
-    assert output.is_file()
-    assert output.stat().st_size > 0
-
-
-@pytest.mark.parametrize(
-    ("call", "error", "message"),
-    [
-        (
-            lambda: plotting.plot_observed_vs_predicted(
-                _diagnostics(),  # type: ignore[arg-type]
-            ),
-            ValueError,
-            "response_names is required",
-        ),
-        (
-            lambda: plotting.plot_residuals_vs_predicted(
-                _diagnostics(),  # type: ignore[arg-type]
-                response_names=["a"],
-            ),
-            ValueError,
-            "Expected 3",
-        ),
-        (
-            lambda: plotting.plot_standardized_rmse(
-                _diagnostics(),  # type: ignore[arg-type]
-                response_names=["a", "b", "c"],
-                responses=[],
-            ),
-            ValueError,
-            "at least one",
-        ),
-        (
-            lambda: plotting.plot_observed_vs_predicted(
-                _diagnostics(),  # type: ignore[arg-type]
-                response_names=["a", "b", "c"],
-                responses=[3],
-            ),
-            ValueError,
-            "0 <= index < 3",
-        ),
-        (
-            lambda: plotting.plot_residuals_vs_predicted(
-                _diagnostics(),  # type: ignore[arg-type]
-                response_names=["a", "b", "c"],
-                responses=[True],
-            ),
-            ValueError,
-            "integer indices",
-        ),
-        (
-            lambda: plotting.plot_standardized_rmse(
-                _diagnostics(),  # type: ignore[arg-type]
-                response_names=["a", "b", "c"],
-                responses=[0, 0],
-            ),
-            ValueError,
-            "duplicate",
-        ),
-        (
-            lambda: plotting.plot_observed_vs_predicted(
-                _diagnostics(),  # type: ignore[arg-type]
-                response_names=["a", "b", "c"],
-                include_prediction_kind="yes",  # type: ignore[arg-type]
-            ),
-            TypeError,
-            "must be a boolean",
-        ),
-        (
-            lambda: plotting.plot_residuals_vs_predicted(
-                object(),  # type: ignore[arg-type]
-                response_names=["a", "b", "c"],
-            ),
-            TypeError,
-            "PredictionDiagnostics",
-        ),
-    ],
-)
-def test_atomic_prediction_plotters_reject_invalid_arguments(
-    call: Callable[[], object],
-    error: type[Exception],
-    message: str,
-) -> None:
-    with pytest.raises(error, match=message):
-        call()
-
-
-def test_atomic_prediction_plotters_reject_figsize_with_supplied_axis() -> None:
-    import matplotlib.pyplot as plt
-
-    _, axis = plt.subplots()
-    with pytest.raises(ValueError, match="figsize cannot be supplied"):
-        plotting.plot_standardized_rmse(
-            _diagnostics(),  # type: ignore[arg-type]
-            response_names=["a", "b", "c"],
             figsize=(5.0, 4.0),
             ax=axis,
         )

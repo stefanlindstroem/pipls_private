@@ -183,6 +183,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "extract-pulp-rank-profile",
         "plot-pulp-rank-profile",
         "plot-pulp-biplot",
+        "plot-pulp-prediction-diagnostics",
     }
     for section in snippet_sections:
         assert f"examples/10_pulp_real_data.py:{section}" in tutorial
@@ -194,8 +195,6 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
 
     plotting_functions = {
         "plot_pipls_predictor_directions",
-        "plot_observed_vs_predicted",
-        "plot_standardized_rmse",
     }
     for function_name in plotting_functions:
         assert f"../api/plotting.md#pipls.plotting.{function_name}" in tutorial
@@ -296,10 +295,27 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "plot_pipls_dilation",
         "plot_pipls_response_directions",
         "plot_pipls_weighted_response_directions",
-        "plot_residuals_vs_predicted",
     }:
         assert function_name not in renderer
 
+    for field in {
+        "diagnostics.observed_standardized",
+        "diagnostics.predicted_standardized",
+        "diagnostics.residual_standardized",
+        "diagnostics.standardized_rmse",
+    }:
+        assert field in example
+    for field in {
+        "diagnostics.observed_standardized",
+        "diagnostics.predicted_standardized",
+        "diagnostics.standardized_rmse",
+    }:
+        assert field in renderer
+    assert "axes[0].scatter(" in example
+    assert "axes[1].scatter(" in example
+    assert "axes[2].bar(" in example
+    assert "axis.scatter(" in renderer
+    assert "axis.bar(" in renderer
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
     assert "run_pulp_workflow" not in renderer

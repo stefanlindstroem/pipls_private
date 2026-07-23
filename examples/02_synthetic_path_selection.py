@@ -3,11 +3,11 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from pipls import PiPLSPathCV, PiPLSRegression
 from pipls.datasets import make_pipls_train_test
 from pipls.inspection import prediction_diagnostics
-from pipls.plotting import plot_observed_vs_predicted
 
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "synthetic_tutorial"
 CHOSEN_N_COMPONENTS = 2
@@ -103,12 +103,29 @@ diagnostics = prediction_diagnostics(
 )
 
 figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
-plot_observed_vs_predicted(
-    diagnostics,
-    response_names=test.target_names,
-    title="Synthetic external-test predictions",
-    ax=axis,
+for response, name in enumerate(test.target_names):
+    axis.scatter(
+        diagnostics.observed_standardized[:, response],
+        diagnostics.predicted_standardized[:, response],
+        label=name,
+        alpha=0.75,
+    )
+values = np.concatenate(
+    [
+        diagnostics.observed_standardized.ravel(),
+        diagnostics.predicted_standardized.ravel(),
+    ]
 )
+lower = float(values.min())
+upper = float(values.max())
+margin = 0.05 * (upper - lower) if upper > lower else 1.0
+limits = (lower - margin, upper + margin)
+axis.plot(limits, limits, linewidth=1.0, linestyle="--", color="0.35")
+axis.set_xlim(limits)
+axis.set_ylim(limits)
+axis.set_xlabel("Observed response (standardized)")
+axis.set_ylabel("Predicted response (standardized)")
+axis.set_title(f"Synthetic external-test predictions\n{diagnostics.prediction_kind}")
 axis.legend(title="Response")
 figure.savefig(ANALYSIS_DIR / "observed_vs_predicted.pdf")
 plt.close(figure)

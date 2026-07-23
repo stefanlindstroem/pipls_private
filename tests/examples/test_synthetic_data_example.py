@@ -44,7 +44,10 @@ def test_synthetic_example_owns_the_short_selection_workflow() -> None:
     assert "model = PiPLSRegression(" in source
     assert "model.predict(test.X)" in source
     assert 'prediction_kind="external test predictions"' in source
-    assert "plot_observed_vs_predicted(" in source
+    assert "diagnostics.observed_standardized" in source
+    assert "diagnostics.predicted_standardized" in source
+    assert "axis.scatter(" in source
+    assert "axis.plot(limits, limits" in source
     assert source.count("figure.savefig(") == 3
     assert ".to_csv(" not in source
     assert "pandas" not in source

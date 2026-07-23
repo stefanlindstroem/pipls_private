@@ -16,7 +16,7 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4 and documentation Patches D1--D4 are complete. Plotting migration G1 is complete; G2 is next.
+Phases A through F4 and documentation Patches D1--D4 are complete. Plotting migrations G1 and G2 are complete; G3 is next.
 The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,

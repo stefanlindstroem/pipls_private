@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from adjustText import adjust_text
 from matplotlib.patches import FancyArrowPatch
@@ -17,14 +18,11 @@ from pipls.inspection import (
 )
 from pipls.plotting import (
     plot_coefficients,
-    plot_observed_vs_predicted,
     plot_pipls_dilation,
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_residuals_vs_predicted,
     plot_scores,
-    plot_standardized_rmse,
     plot_x_loadings,
     plot_y_loadings,
 )
@@ -311,6 +309,7 @@ for label in axis.get_xticklabels():
 figure.savefig(ANALYSIS_DIR / "coefficients.pdf")
 plt.close(figure)
 
+# --8<-- [start:plot-pulp-prediction-diagnostics]
 # Plot selection-conditioned prediction diagnostics.
 figure, axes = plt.subplots(
     1,
@@ -318,26 +317,74 @@ figure, axes = plt.subplots(
     figsize=(14.0, 4.6),
     layout="constrained",
 )
-plot_observed_vs_predicted(
-    diagnostics,
-    response_names=response_names,
-    responses=detailed_response_indices,
-    include_prediction_kind=False,
-    ax=axes[0],
+detailed_array = np.array(detailed_response_indices, dtype=np.int64)
+for response in detailed_response_indices:
+    axes[0].scatter(
+        diagnostics.observed_standardized[:, response],
+        diagnostics.predicted_standardized[:, response],
+        label=response_names[response],
+        alpha=0.75,
+    )
+    axes[1].scatter(
+        diagnostics.predicted_standardized[:, response],
+        diagnostics.residual_standardized[:, response],
+        label=response_names[response],
+        alpha=0.75,
+    )
+identity_values = np.concatenate(
+    [
+        diagnostics.observed_standardized[:, detailed_array].ravel(),
+        diagnostics.predicted_standardized[:, detailed_array].ravel(),
+    ]
 )
-plot_residuals_vs_predicted(
-    diagnostics,
-    response_names=response_names,
-    responses=detailed_response_indices,
-    include_prediction_kind=False,
-    ax=axes[1],
+identity_lower = float(identity_values.min())
+identity_upper = float(identity_values.max())
+identity_margin = (
+    0.05 * (identity_upper - identity_lower)
+    if identity_upper > identity_lower
+    else 1.0
 )
-plot_standardized_rmse(
-    diagnostics,
-    response_names=response_names,
-    include_prediction_kind=False,
-    ax=axes[2],
+identity_limits = (
+    identity_lower - identity_margin,
+    identity_upper + identity_margin,
 )
+axes[0].plot(
+    identity_limits,
+    identity_limits,
+    linewidth=1.0,
+    linestyle="--",
+    color="0.35",
+)
+axes[0].set_xlim(identity_limits)
+axes[0].set_ylim(identity_limits)
+axes[0].set_xlabel("Observed response (standardized)")
+axes[0].set_ylabel("Predicted response (standardized)")
+axes[0].set_title("Observed versus predicted")
+
+predicted = diagnostics.predicted_standardized[:, detailed_array]
+residual = diagnostics.residual_standardized[:, detailed_array]
+predicted_span = float(predicted.max() - predicted.min())
+residual_span = float(residual.max() - residual.min())
+axes[1].set_xlim(
+    float(predicted.min()) - (0.05 * predicted_span if predicted_span > 0.0 else 1.0),
+    float(predicted.max()) + (0.05 * predicted_span if predicted_span > 0.0 else 1.0),
+)
+axes[1].set_ylim(
+    float(residual.min()) - (0.05 * residual_span if residual_span > 0.0 else 1.0),
+    float(residual.max()) + (0.05 * residual_span if residual_span > 0.0 else 1.0),
+)
+axes[1].axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
+axes[1].set_xlabel("Predicted response (standardized)")
+axes[1].set_ylabel(r"Residual $y-\hat y$ (standardized)")
+axes[1].set_title("Residual versus predicted")
+
+positions = np.arange(len(response_names))
+axes[2].bar(positions, diagnostics.standardized_rmse)
+axes[2].set_xticks(positions)
+axes[2].set_xticklabels(response_names)
+axes[2].set_xlabel("Response")
+axes[2].set_ylabel("Standardized RMSE")
+axes[2].set_title("Response-wise standardized RMSE")
 axes[0].legend(title="Response")
 axes[1].legend(title="Response")
 axes[2].tick_params(axis="x", labelrotation=45)
@@ -346,6 +393,7 @@ for label in axes[2].get_xticklabels():
 figure.suptitle(f"Pulp Pi-PLS prediction diagnostics\n{diagnostics.prediction_kind}")
 figure.savefig(ANALYSIS_DIR / "prediction_diagnostics.pdf")
 plt.close(figure)
+# --8<-- [end:plot-pulp-prediction-diagnostics]
 
 print(f"X shape: {X.shape}; Y shape: {Y.shape}")
 print(
