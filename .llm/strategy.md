@@ -430,8 +430,8 @@ Acceptance conditions:
 
 - pure numerical computations and immutable results live in `pipls.inspection` without pandas or
   Matplotlib;
-- optional plotting lives in `pipls.plotting`, returns figures and axes, performs no file writing,
-  and is not exported at package top level;
+- rendering remains outside the runtime package; examples use ordinary Matplotlib from immutable
+  inspection results and perform no analytical file round trips;
 - Pi-PLS decomposition views display $P$, $D$, and $QD$ while preserving $PDQ^\mathsf{T}$ under
   deterministic display-only sign canonicalization;
 - prediction diagnostics accept explicit predictions, use residuals $e=y-\hat y$, standardize
@@ -445,9 +445,10 @@ Acceptance conditions:
 - VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation
   tests, theoretical outlier limits, and contribution plots remain deferred.
 
-Decision 0045 corrected the model-ownership boundary. The estimator-neutral shared inspection and
-plotting API, Pi-PLS-only numbered-example post-analysis, quantity-based artifacts, and static
-boundary enforcement are complete.
+Decision 0045 corrected the model-ownership boundary. The estimator-neutral shared inspection API,
+Pi-PLS-only numbered-example post-analysis, quantity-based artifacts, and static boundary
+enforcement are complete. Decisions 0079--0082 later remove the plotting API in favor of direct
+Matplotlib rendering from immutable results.
 Decision 0046 then reduced the numbered scripts to their scientific stages, moved repository-layout validation out of the scripts, and made the required result directories tracked repository structure.
 
 Current status: **complete**.
@@ -546,8 +547,9 @@ Material; `make docs` performs a strict build; PyMdown Extensions and MathJax re
 notation; navigation follows the user journey; and generated `site/` output is ignored and cleaned.
 Decision 0051 adds mkdocstrings and generated pages for every supported top-level object, with
 source docstrings covering signatures, parameters, fitted attributes, shapes, and conditional
-refit and OOF behavior. Decision 0052 completes the generated reference for inspection, plotting,
-datasets, and metrics, with exact submodule coverage and optional Matplotlib imports. Decision 0053
+refit and OOF behavior. Decision 0052 originally completed the generated reference for inspection, plotting, datasets, and
+metrics. Decision 0082 removes the plotting module and page; exact submodule coverage now applies to
+inspection, datasets, and metrics. Decision 0053
 validates the strict site in CI from both the checkout and a clean installation of the unpacked
 source distribution.
 
@@ -573,7 +575,8 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-Plotting migration G4 is next: render Pi-PLS factors directly, remove `pipls.plotting`, and retain only numerical inspection results. First-release preparation follows G5.
+Plotting migration G5 is next: complete documentation, policy, dependency, and structural
+enforcement after plotting-module removal. First-release preparation follows G5.
 
 ## Maintenance protocol
 

@@ -26,10 +26,9 @@ source .venv/bin/activate
 python -m pip install -e .
 ```
 
-Install optional plotting or complete example dependencies when needed:
+Install the complete example and tutorial plotting dependencies when needed:
 
 ```bash
-python -m pip install -e ".[plot]"
 python -m pip install -e ".[examples]"
 ```
 
@@ -98,7 +97,7 @@ protocols.
 | `component_path_` | Inspect one selected predictor rank for each component count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one count |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
-| `pipls.plotting` | Temporary Pi-PLS factor renderers during the plotting migration |
+| Matplotlib | Render inspection arrays with caller-controlled figures and styling |
 | `pipls.datasets` | Generate deterministic synthetic Pi-PLS data |
 
 Generated signatures, fitted attributes, result shapes, and method contracts are collected in the

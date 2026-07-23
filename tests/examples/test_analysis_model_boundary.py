@@ -4,7 +4,6 @@ import ast
 from pathlib import Path
 
 import pipls.inspection as inspection
-import pipls.plotting as plotting
 
 
 def _repository_root() -> Path:
@@ -97,19 +96,28 @@ def test_shared_public_analysis_names_are_estimator_neutral() -> None:
     pipls_specific_inspection = {"PiPLSDisplayFactors", "pipls_display_factors"}
     assert set(inspection.__all__) == shared_inspection | pipls_specific_inspection
 
-    shared_plotting = {"PredictorStyle"}
-    pipls_specific_plotting = {
-        "plot_pipls_dilation",
-        "plot_pipls_predictor_directions",
-        "plot_pipls_response_directions",
-        "plot_pipls_weighted_response_directions",
-    }
-    assert set(plotting.__all__) == shared_plotting | pipls_specific_plotting
-
-    for name in shared_inspection | shared_plotting:
+    for name in shared_inspection:
         assert "pipls" not in name.lower()
         assert not name.lower().startswith("pls")
-        assert not name.lower().startswith("plot_pls")
+
+
+def test_plotting_module_is_removed_and_examples_use_factor_arrays_directly() -> None:
+    root = _repository_root()
+    assert not (root / "src" / "pipls" / "plotting.py").exists()
+
+    for filename in (
+        "01_minimal_fit_and_plot.py",
+        "10_pulp_real_data.py",
+        "11_sugarcane_real_data.py",
+        "12_tobacco_real_data.py",
+    ):
+        source = (root / "examples" / filename).read_text(encoding="utf-8")
+        assert "pipls.plotting" not in source
+        assert "factors.predictor_directions" in source
+        assert "factors.dilation" in source
+        assert "factors.response_directions" in source
+        assert "factors.weighted_response_directions" in source
+        assert ".bar(" in source
 
 
 def test_shared_inspection_uses_no_concrete_plsregression_restriction() -> None:

@@ -3,8 +3,8 @@
 ## Purpose
 
 This document is the durable maintainer contract for fitted-model interpretation, prediction
-diagnostics, plotting, and analysis artifacts. Read it before changing `pipls.inspection`,
-`pipls.plotting`, or the real-data analysis workflows.
+diagnostics, rendering, and analysis artifacts. Read it before changing `pipls.inspection` or the
+real-data analysis workflows.
 
 Decisions 0042 and 0043 establish the original architecture and mathematical plotting contracts.
 Decision 0045 corrects the ownership boundary between comparison models, Pi-PLS-specific
@@ -74,31 +74,16 @@ Implemented responsibilities are:
 The estimator-neutral names and structural fitted-model validation required by Decision 0045 are
 implemented. Compatible `PiPLSRegression` and `PLSRegression` models are covered by focused tests.
 
-### `pipls.plotting`
+### Rendering boundary
 
-The plotting submodule owns reusable Matplotlib figures for computed analysis results. It imports
-Matplotlib inside plotting code so that importing `pipls` and `pipls.inspection` does not require
-the optional plotting dependency.
+The package owns no plotting submodule. Immutable numerical inspection objects are the durable
+interface, and maintained examples render their arrays with ordinary Matplotlib. The example layer
+owns chart type, component and response selection, categorical positions, physical coordinates,
+labels, reference lines, legends, panel geometry, file writing, and closing.
 
-A public single-chart plotting function draws exactly one scientific chart on exactly one
-Matplotlib `Axes`. It accepts `ax=None` and returns `(figure, axis)`. With no axis it creates one
-figure containing one axis. With a supplied axis it draws without clearing the axis, changing the
-figure layout, or creating another figure. `figsize` applies only to standalone creation and is
-rejected together with `ax`.
-
-The plotting function owns the chart geometry and may provide concise semantic axis labels and an
-axis title. The caller may replace or remove them through the returned axis. Multi-series artists
-carry labels, but the plotting function does not create a legend; callers and examples own legend
-creation, placement, and styling. Callers also own subplot grids, mosaics, figure-level titles,
-layout adjustment, file writing, display, and closing.
-
-Decision 0059 replaces the Pi-PLS decomposition composite with separate one-axis plots for $P$,
-$D$, $Q$, and $QD$. Decision 0060 likewise splits prediction diagnostics into observed-versus-
-predicted, residual-versus-predicted, and standardized-RMSE charts. Decision 0061 completes the
-boundary: the example layer creates every report figure and axis and passes `ax` explicitly to each
-package plotter. All public plotters follow the single-axis contract. They do not create legends or
-panels, call `show()`, write files, retain models, or change supplied arrays. The names remain under
-`pipls.plotting`; they are not added automatically to `pipls.__all__`.
+`biplot_coordinates()` remains package-owned because balancing score and loading coordinates is a
+numerical operation. Annotated biplots use optional `adjustText` only after final axis configuration.
+The runtime package imports neither Matplotlib nor `adjustText`.
 
 ### `examples/`
 
@@ -128,9 +113,8 @@ direct conditional predictor-rank plot, fixed-parameter OOF diagnostics, and ret
 inspection figures. Clear section headings distinguish estimator-neutral PLS-family
 latent-structure and prediction plots from Pi-PLS-specific factorization plots. The tutorial omits
 raw regression-coefficient visualization because heterogeneous original units make that single
-figure unsuitable for the walkthrough; the plotting API and numbered-example figure remain.
-Plot-specific sections link to the general inspection and plotting references rather than
-duplicating API contracts. Prediction figures must retain the selection-conditioned OOF provenance.
+figure unsuitable for the walkthrough; the numbered-example figure remains. Plot-specific
+sections link to the general inspection reference rather than duplicating numerical contracts. Prediction figures must retain the selection-conditioned OOF provenance.
 
 Documentation ownership is fixed by Decisions 0074--0078. The API overview owns the public
 result-object map, and the task-oriented troubleshooting page owns common public-API recovery
@@ -144,9 +128,8 @@ orientation, installation, two compact workflows, and tutorial links; contributo
 repository maintenance belong only in `CONTRIBUTING.md`. Generated fixed-regression and path
 pages own exact
 estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md` and
-`cross_validation.md` retain only advanced search and validation behavior. `model_inspection.md`
-owns general figure-by-figure interpretation with stable anchors, while `docs/api/plotting.md` owns
-signatures and operational contracts only. Example pages may describe script purpose and artifacts
+`cross_validation.md` retain only advanced search and validation behavior. `model_inspection.md` owns the bridge from immutable numerical fields to ordinary Matplotlib
+primitives with stable interpretation anchors. Example pages may describe script purpose and artifacts
 but must not reproduce the tutorial analysis or embed its generated figures.
 
 Pulp is the canonical tutorial analysis. `examples/10_pulp_real_data.py` owns its direct pandas
@@ -159,9 +142,8 @@ and response standardization inside each fit.
 
 The tutorial extracts checked snippets directly from example 10. `tools/render_pulp_tutorial.py`
 repeats the small in-memory numerical sequence rather than importing or executing the
-artifact-writing example. It owns tutorial-specific figure dimensions, titles, legends, selected
-display components and responses, SVG writing, closing, and the generated manifest. It must call the
-public one-axis plotters rather than reproduce plotting logic. Generated tutorial files remain
+artifact-writing example. It owns tutorial-specific figure dimensions, titles, legends, selected display components and responses, direct Matplotlib
+construction, SVG writing, closing, and the generated manifest. Generated tutorial files remain
 derived documentation assets and are not committed.
 
 Numbered examples are pedagogical scripts, not production applications. Each one must demonstrate a
@@ -177,9 +159,9 @@ repeated dtype, ordering, missing-value, or directory-creation checks to the scr
 contracts remain tested separately. Brevity removes scaffolding, not explanatory context.
 
 Variable-name acquisition is also example-owned. When a table has meaningful headers, examples
-should derive names visibly from `X.columns` and `Y.columns` and pass them to plotting functions.
-Users without header-bearing tables may supply names from any explicit metadata source. Package
-plotting code must neither read files nor generate scientific-looking fallback names.
+should derive names visibly from `X.columns` and `Y.columns` and use them in direct rendering. Users
+without header-bearing tables may supply names from any explicit metadata source. The package must
+neither read files nor generate scientific-looking fallback names.
 
 ## Pi-PLS factorization display
 
@@ -329,8 +311,7 @@ contribution plots, and theoretical outlier thresholds require separate decision
 ## Artifact contract
 
 Numbered complete-analysis examples keep immutable numerical results in memory and generate only
-final PDF figures. Physical predictor coordinates remain caller-owned and are never inferred by
-`pipls.plotting`.
+final PDF figures. Physical predictor coordinates remain caller-owned and are never inferred by the package.
 
 Pulp writes six one-page PDFs because it includes a conditional predictor-rank profile. Sugarcane
 writes five one-page PDFs. Tobacco writes five PDFs; its prediction-diagnostic and coefficient files
@@ -339,8 +320,7 @@ responses and the last page contains the remaining three.
 
 A figure page must identify the dataset, model, selected components or responses, and prediction kind
 where predictions are shown. The numbered example controls pagination, panel geometry, legends,
-figure-level titles, PDF writing, and closing; a package plotting function renders one explicit
-selection on one supplied axis at a time. Tobacco retains a $2\times2$ factor figure, one
+figure-level titles, PDF writing, closing, and each direct Matplotlib selection. Tobacco retains a $2\times2$ factor figure, one
 $1\times3$ prediction figure per response page, one $2\times2$ latent/observation figure, and one
 full-width coefficient figure per response page.
 
@@ -356,14 +336,14 @@ fold-local scaling used by the component-path loss.
 Pure inspection tests should verify equations, shapes, finite-value validation, defensive copying,
 read-only results, sign preservation, and no estimator mutation.
 
-Plot tests should use a headless Matplotlib backend and verify returned figures and axes, line and
-bar modes, label validation, and successful PDF rendering. Structural tests should verify that
-public plotters accept `ax`, use only the shared one-axis resolver for standalone creation, and do
-not create legends, panels, files, displays, or closing operations. Do not freeze pixel values,
-exact artist counts unrelated to the contract, or Matplotlib implementation details.
+Rendering tests should use a headless Matplotlib backend and protect only durable example contracts:
+direct access to named immutable arrays, explicit figure and axis construction, physical coordinate
+order, expected output files, and successful tutorial SVG generation. Do not freeze pixel values,
+automatically adjusted label coordinates, exact artist counts unrelated to the contract, or
+Matplotlib implementation details.
 
 Structural Pulp, Sugarcane, and Tobacco tests should verify direct `component_path_` access,
-scikit-learn OOF prediction, in-memory inspection, explicit `ax=` composition, and final PDF
+scikit-learn OOF prediction, in-memory inspection, direct Matplotlib composition, and final PDF
 filenames without executing the artifact-writing scripts. Tobacco tests additionally protect full
 predictor SVD, decreasing-wavenumber rendering, source-order response pagination, raw observation
 diagnostics, and the two caller-owned multipage PDF loops. A focused Pulp numerical test protects
@@ -377,7 +357,7 @@ The accepted order after Decision 0042 is:
 1. pure Pi-PLS display-factor and prediction-diagnostic computations — **complete**;
 2. Pi-PLS decomposition and prediction plotting — **complete**;
 3. estimator-neutral shared PLS-family analysis — **implemented**;
-4. estimator-neutral shared inspection and plotting API — **complete**;
+4. estimator-neutral shared inspection API and direct-rendering boundary — **complete**;
 5. Pi-PLS-only Pulp, Sugarcane, and Tobacco post-analysis migration — **complete**;
 6. stale-name, artifact, documentation, and boundary-test cleanup — **complete**;
 7. immutable component-path result simplification — **complete**;

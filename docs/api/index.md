@@ -1,8 +1,8 @@
 # API reference
 
 The generated reference documents supported public objects directly from their Python docstrings.
-Core estimators are available from `pipls`; focused analysis, plotting, dataset, and metric tools
-live in dedicated submodules.
+Core estimators are available from `pipls`; focused numerical inspection, dataset, and metric
+tools live in dedicated submodules. Rendering is caller-owned Matplotlib code.
 
 ## Start with the estimators
 
@@ -33,6 +33,5 @@ live in dedicated submodules.
 - [Validation report](validation.md)
 - [Warnings](exceptions.md)
 - [Inspection](inspection.md)
-- [Plotting](plotting.md)
 - [Dataset containers and synthetic data](datasets.md)
 - [Metrics](metrics.md)

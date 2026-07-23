@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import importlib
 import re
-import subprocess
-import sys
 from pathlib import Path
 
 import pipls
@@ -47,7 +45,6 @@ def test_submodule_api_pages_cover_declared_public_objects() -> None:
             "pipls.datasets",
             "pipls.inspection",
             "pipls.metrics",
-            "pipls.plotting",
         )
     }
 
@@ -62,25 +59,7 @@ def test_api_pages_reference_only_public_import_paths() -> None:
     assert "pipls.model_selection" not in api_text
 
 
-def test_plotting_module_import_does_not_require_matplotlib() -> None:
-    script = r"""
-import builtins
 
-original_import = builtins.__import__
-
-def blocked_import(name, globals=None, locals=None, fromlist=(), level=0):
-    if name == "matplotlib" or name.startswith("matplotlib."):
-        raise ModuleNotFoundError("Matplotlib intentionally blocked")
-    return original_import(name, globals, locals, fromlist, level)
-
-builtins.__import__ = blocked_import
-import pipls.plotting
-"""
-    subprocess.run(
-        [sys.executable, "-c", script],
-        cwd=_repository_root(),
-        check=True,
-        capture_output=True,
-        text=True,
-        env={"PYTHONPATH": str(_repository_root() / "src")},
-    )
+def test_removed_plotting_module_is_absent() -> None:
+    assert importlib.util.find_spec("pipls.plotting") is None
+    assert not (_repository_root() / "docs" / "api" / "plotting.md").exists()

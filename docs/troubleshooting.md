@@ -100,13 +100,16 @@ rule is more conservative. See [Warnings](api/exceptions.md).
 `copy=True` when input preservation matters. Read-only arrays and overlapping predictor/response
 storage are copied internally when mutation would be unsafe.
 
-## Plotting cannot import Matplotlib
+## An example cannot import Matplotlib or `adjustText`
 
-Plotting is optional. Install the plotting extra:
+Numerical estimators and inspection results do not require plotting dependencies. Install the
+example extra before running the maintained plotting workflows:
 
 ```bash
-python -m pip install -e ".[plot]"
+python -m pip install -e ".[examples]"
 ```
 
-Numerical estimators and inspection results do not require Matplotlib. See the
-[plotting reference](api/plotting.md).
+The examples render immutable inspection arrays with ordinary Matplotlib. Annotated biplots also
+use `adjustText`; call `adjust_text()` only after the final axis labels, limits, aspect, and legend
+have been configured. Automatic label placement is heuristic and may need application-specific
+tuning for dense diagrams.

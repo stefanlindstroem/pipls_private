@@ -47,8 +47,8 @@ Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs.
 example writes a generated CSV file: committed `X.csv` and `Y.csv` tables are inputs, while every
 figure is constructed directly from `component_path_`, scikit-learn OOF predictions, and
 immutable inspection results. The example layer owns Matplotlib chart construction, physical
-coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Only the
-Pi-PLS factor panels still use temporary one-axis convenience plotters.
+coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Pi-PLS factor
+panels use the same direct array-to-Matplotlib boundary.
 
 The Pulp tutorial extracts its checked snippets directly from `examples/10_pulp_real_data.py`.
 The sole module under `examples/_support/` evaluates the nontrivial fold-local ordinary-PLS path for

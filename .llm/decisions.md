@@ -171,11 +171,12 @@ plan contains an earlier or more general proposal:
   Python 3.10 because its oldest binary releases do not cover every newer interpreter;
 - complete Pulp, Sugarcane, and Tobacco analyses are not duplicated as real-data benchmark scripts
   or executed by the default test suite; `make examples` runs all numbered examples explicitly;
-- every public package plotter renders one chart on one axis; maintained reports create all figures
-  in the example layer, pass explicit axes to package plotters, group related charts in
-  dataset-appropriate panels, and retain full-width coefficient pages;
+- the package exposes no public plotting module; maintained reports render immutable inspection
+  arrays directly with Matplotlib, group related charts in dataset-appropriate panels, and retain
+  full-width coefficient pages;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.
 | `0080-direct-prediction-diagnostic-rendering.md` | direct prediction-diagnostic rendering | immutable diagnostic arrays are primary; examples use direct Matplotlib; three convenience plotters removed |
 | `0081-direct-standard-inspection-rendering.md` | direct standard inspection rendering | immutable latent and observation arrays are primary; examples use direct Matplotlib; five convenience plotters removed |
+| `0082-direct-pipls-factor-rendering.md` | direct Pi-PLS factor rendering | immutable factor arrays are primary; plotting module and plot extra removed |

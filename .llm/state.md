@@ -59,8 +59,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   the Pulp example and tutorial use direct Matplotlib arrows and optional `adjustText` label layout;
 - direct standard PLS-family inspection rendering: scores, loadings, coefficients, and raw
   observation diagnostics are plotted from immutable arrays with ordinary Matplotlib;
-- a single-axis contract for the remaining Pi-PLS factor plotters: optional caller-supplied axes,
-  `(figure, axis)` returns, and caller-owned legends and panel composition;
+- direct Pi-PLS factor rendering from immutable `PiPLSDisplayFactors` arrays with ordinary
+  Matplotlib; the package exposes no plotting submodule or convenience renderer;
 - direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
   OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
 - a two-tier tutorial route: a short deterministic synthetic selection-and-prediction workflow
@@ -84,9 +84,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
 
-Decisions 0079--0081 establish data-first biplot, prediction-diagnostic, and standard
-PLS-family inspection rendering. Direct Pi-PLS factor rendering and plotting-module removal are the
-next increment; first-release preparation follows completion of the plotting sequence. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+Decisions 0079--0082 establish data-first rendering for biplots, prediction diagnostics, standard
+PLS-family inspection, and Pi-PLS factors. Plotting-module removal is complete; final plotting
+policy cleanup and enforcement are the next increment before first-release preparation. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
@@ -163,7 +163,7 @@ case, or public behavior.
 | Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | inspection and atomic plotting are implemented; package plotters render one axis, while examples own all panel and report composition |
+| Model inspection | immutable numerical inspection is implemented; examples render every chart directly with Matplotlib and own all panel and report composition |
 | Python compatibility | supported and classified on Python 3.10–3.14; metadata keeps `requires-python = ">=3.10"` without an upper bound |
 | Runtime dependencies | `numpy>=1.26,<3`, `scikit-learn>=1.4,<2`, and `joblib>=1.2,<2`; the minimum lines are constrained together on Python 3.10 |
 | Compatibility CI | separate minimum, supported-Python, and latest-compatible jobs; every job prints resolved interpreter and runtime dependency versions |

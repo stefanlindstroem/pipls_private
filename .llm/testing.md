@@ -93,13 +93,13 @@ the selected fixed pair, upper-boundary rank profile, aligned OOF predictions, a
 without writing application artifacts.
 
 The minimal numbered example may be protected structurally and through the package-level numerical
-and plotting tests; do not duplicate its arrays as a frozen scientific fixture. Do not execute the
+and direct-rendering tests; do not duplicate its arrays as a frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
 analyses as real-data benchmark scripts. `make examples` is the explicit application-validation
 target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset
 readability, the direct Pulp numerical workflow, direct Pulp, Sugarcane, and Tobacco workflow
 structure, component-path API, inspection equations,
-direct inspection rendering, remaining Pi-PLS factor-plotting contracts, and the immutable ordinary-PLS comparison-helper contract.
+direct rendering from immutable inspection arrays and the immutable ordinary-PLS comparison-helper contract.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 

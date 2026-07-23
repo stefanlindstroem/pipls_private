@@ -45,8 +45,8 @@ virtual environment for each artifact, and installs each exact artifact path whi
 the repository checkout. Both environments execute the same smoke test: public package and
 submodule imports, installed version-metadata agreement, a representative fixed Pi-PLS fit and
 prediction, and an explicit check that imports resolve from the temporary installation rather than
-`src/`. The check imports `pipls.plotting` but does not call optional plotting functions, so it also
-protects the plotting module's import-time independence from Matplotlib.
+`src/`. Matplotlib and `adjustText` remain optional example dependencies and are not imported by
+the runtime package.
 
 The temporary environments and artifacts are removed after the check. This target validates
 installation behavior; `make check` remains the ordinary source-checkout test suite, and

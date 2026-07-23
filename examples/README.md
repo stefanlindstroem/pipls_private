@@ -72,9 +72,8 @@ The comparison workflow imports one implementation helper from `examples/_suppor
 - `pls_component_path.py`: immutable ordinary-PLS path evaluation for example 09.
 
 Example 09 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
-comparison helper. Reusable numerical inspection belongs in `pipls.inspection`. Standard PLS-family results are
-rendered directly with Matplotlib; only Pi-PLS factor rendering remains temporarily in
-`pipls.plotting`.
+comparison helper. Reusable numerical inspection belongs in `pipls.inspection`; every maintained
+figure is rendered directly from immutable arrays with ordinary Matplotlib.
 
 ## Real-data workflow contract
 
@@ -87,8 +86,7 @@ response_names = Y.columns.tolist()
 ```
 
 Users whose arrays do not carry column headers can supply equivalent lists from a schema, laboratory
-information system, or other domain metadata. The package plotting API does not read files or
-invent scientific variable names. The committed datasets already have tested headers and ordering,
+information system, or other domain metadata. The package inspection API does not read files or invent scientific variable names. The committed datasets already have tested headers and ordering,
 so the numbered examples use them directly instead of repeating repository-integrity checks.
 
 Example 09 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
@@ -101,8 +99,8 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
    `selection-conditioned OOF predictions`.
 4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return
    immutable in-memory results.
-5. The script plots latent structure and prediction arrays directly with Matplotlib, uses temporary
-   factor plotters for $P$, $D$, $Q$, and $QD$, and saves the five final figures itself.
+5. The script plots latent structure, prediction diagnostics, and $P$, $D$, $Q$, and $QD$ factors
+   directly with Matplotlib and saves the five final figures itself.
 
 Pulp is the canonical tutorial workflow. Example 10 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with

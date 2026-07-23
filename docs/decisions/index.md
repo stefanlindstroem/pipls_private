@@ -96,3 +96,4 @@ reference describe the current public behavior directly.
 - [0079: data-first biplot rendering](0079-data-first-biplot-rendering.md)
 - [0080: direct prediction-diagnostic rendering](0080-direct-prediction-diagnostic-rendering.md)
 - [0081: direct standard inspection rendering](0081-direct-standard-inspection-rendering.md)
+- [0082: direct Pi-PLS factor rendering](0082-direct-pipls-factor-rendering.md)

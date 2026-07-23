@@ -50,8 +50,9 @@ def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
     assert "pipls_display_factors(model.decomposition_)" in text
     assert "latent_structure(model)" in text
     assert 'prediction_kind="selection-conditioned OOF predictions"' in text
-    assert 'predictor_style="line"' in text
-    assert 'predictor_axis_label="Wavelength (nm)"' in text
+    assert "factors.predictor_directions[:, component]" in text
+    assert 'set_xlabel("Wavelength (nm)")' in text
+    assert "set_xlim(float(wavelengths[0]), float(wavelengths[-1]))" in text
     assert "diagnostics.observed_standardized" in text
     assert "diagnostics.predicted_standardized" in text
     assert "diagnostics.residual_standardized" in text

@@ -193,12 +193,6 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     for filename in FIGURE_FILENAMES:
         assert f"../assets/generated/pulp/{filename}" in tutorial
 
-    plotting_functions = {
-        "plot_pipls_predictor_directions",
-    }
-    for function_name in plotting_functions:
-        assert f"../api/plotting.md#pipls.plotting.{function_name}" in tutorial
-
     select_snippet = 'examples/10_pulp_real_data.py:select-pulp-parameters'
     plot_snippet = 'examples/10_pulp_real_data.py:plot-pulp-component-path'
     fit_snippet = 'examples/10_pulp_real_data.py:fit-pulp-model'
@@ -298,6 +292,14 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     }:
         assert function_name not in renderer
 
+    assert "pipls.plotting" not in example
+    assert "pipls.plotting" not in renderer
+    assert "factors.predictor_directions" in example
+    assert "factors.predictor_directions" in renderer
+    assert "factors.dilation" in example
+    assert "factors.response_directions" in example
+    assert "factors.weighted_response_directions" in example
+
     for field in {
         "diagnostics.observed_standardized",
         "diagnostics.predicted_standardized",
@@ -331,7 +333,6 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     tutorial_path = docs / "tutorials" / "pulp.md"
     tutorial = tutorial_path.read_text(encoding="utf-8")
     inspection = (docs / "model_inspection.md").read_text(encoding="utf-8")
-    plotting_reference = (docs / "api" / "plotting.md").read_text(encoding="utf-8")
     examples = (docs / "examples.md").read_text(encoding="utf-8")
     regression_reference = (docs / "api" / "regression.md").read_text(encoding="utf-8")
     path_reference = (docs / "path_analysis.md").read_text(encoding="utf-8")
@@ -374,13 +375,12 @@ def test_documentation_layers_have_distinct_ownership() -> None:
         assert f"../model_inspection.md#{anchor}" in tutorial
 
     assert "../model_inspection.md#regression-coefficients" not in tutorial
-    assert "pipls.plotting.plot_coefficients" not in plotting_reference
+    assert not (docs / "api" / "plotting.md").exists()
 
     assert "examples/results/" not in inspection
     assert "post_analysis.pdf" not in inspection
     assert "Sugarcane workflow" not in inspection
     assert "Tobacco workflow" not in inspection
-    assert "```python" not in plotting_reference
     assert "assets/generated/pulp/" not in examples
 
     removed_guides = {

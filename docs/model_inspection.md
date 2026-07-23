@@ -176,35 +176,61 @@ response values in original units.
 
 ### Predictor directions $P$ { #predictor-directions }
 
-`plot_pipls_predictor_directions()` remains temporarily available during the plotting migration.
-It shows the columns of $P$, which define predictor rotations paired with the response rotations in
+Use columns of `factors.predictor_directions` directly. Named predictors can be grouped with
+`Axes.bar()`; spectral predictors can be plotted against their physical coordinate with
+`Axes.plot()`:
+
+```python
+for component in components:
+    axis.plot(
+        predictor_coordinate,
+        factors.predictor_directions[:, component],
+        label=f"Component {component + 1}",
+    )
+```
+
+The columns of $P$ define predictor rotations paired with response rotations in
 $PDQ^{\mathsf T}$. They are distinct from X loadings because they belong to the regression
 factorization rather than score reconstruction.
 
-API: [`plot_pipls_predictor_directions()`](api/plotting.md#pipls.plotting.plot_pipls_predictor_directions).
 Theory: [Diagonal latent coupling](theory.md#diagonal-latent-coupling).
 
 ### Dilation $D$ { #dilation }
 
-`plot_pipls_dilation()` remains temporarily available. Each value $d_k=D_{kk}$ scales one paired
-predictor-response mode and should be interpreted together with the matching columns of $P$ and
-$Q$.
+Plot `factors.dilation` with `Axes.bar()`, using component numbers on the categorical axis. Each
+value $d_k=D_{kk}$ scales one paired predictor-response mode and should be interpreted together with
+the matching columns of $P$ and $Q$.
 
-API: [`plot_pipls_dilation()`](api/plotting.md#pipls.plotting.plot_pipls_dilation).
+```python
+positions = np.arange(factors.n_components)
+axis.bar(positions, factors.dilation)
+axis.set_xticks(positions)
+axis.set_xticklabels([f"Component {index + 1}" for index in positions])
+```
 
 ### Response directions $Q$ { #response-directions }
 
-`plot_pipls_response_directions()` remains temporarily available. It displays the response rotation
-of each paired mode before dilation.
+Use columns of `factors.response_directions` with explicit response labels. Grouped bars make the
+component comparison visible without hiding the chosen widths or offsets:
 
-API: [`plot_pipls_response_directions()`](api/plotting.md#pipls.plotting.plot_pipls_response_directions).
+```python
+for series, component in enumerate(components):
+    offset = (series - (len(components) - 1) / 2.0) * width
+    axis.bar(
+        response_positions + offset,
+        factors.response_directions[:, component],
+        width=width,
+        label=f"Component {component + 1}",
+    )
+```
+
+The columns of $Q$ describe the response rotation of each paired mode before dilation.
 
 ### Weighted response directions $QD$ { #weighted-response-directions }
 
-`plot_pipls_weighted_response_directions()` remains temporarily available. It combines response-side
-orientation and mode strength.
-
-API: [`plot_pipls_weighted_response_directions()`](api/plotting.md#pipls.plotting.plot_pipls_weighted_response_directions).
+Plot `factors.weighted_response_directions` with the same response positions, widths, and component
+selection used for $Q$. The array combines response-side orientation and mode strength through
+$d_kq_{:k}$.
 
 ### Regression coefficients { #regression-coefficients }
 
@@ -261,9 +287,8 @@ in predictor space, or both. The package supplies no automatic thresholds or lab
 ## Plot ownership
 
 The caller owns figure construction, subplot geometry, scientific coordinates, labels, legends,
-layout, saving, and closing. Matplotlib receives the immutable numerical arrays directly. The
-remaining functions in `pipls.plotting` cover only Pi-PLS factor displays and will be removed in the
-final plotting migration.
+layout, saving, and closing. Matplotlib receives the immutable numerical arrays directly. Pi-PLS
+provides no plotting submodule or hidden rendering layer.
 
 For header-bearing CSV files, names can be retained with ordinary pandas operations:
 

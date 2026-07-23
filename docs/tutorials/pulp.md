@@ -182,10 +182,10 @@ factorization $PDQ^{\mathsf T}$. They are distinct from ordinary X loadings, whi
 reconstruction. The figure shows all three selected paired components; predictor rank 10 does not
 create ten plotted components.
 
-See [Predictor directions](../model_inspection.md#predictor-directions),
-[Diagonal latent coupling](../theory.md#diagonal-latent-coupling), and
-[`plot_pipls_predictor_directions()`](../api/plotting.md#pipls.plotting.plot_pipls_predictor_directions).
-The model-inspection guide covers the complementary $D$, $Q$, and $QD$ views.
+See [Predictor directions](../model_inspection.md#predictor-directions) and
+[Diagonal latent coupling](../theory.md#diagonal-latent-coupling). The numbered example plots
+$P$, $D$, $Q$, and $QD$ directly from `PiPLSDisplayFactors`; the model-inspection guide explains
+the complementary views.
 
 ### Standard PLS-family prediction plots
 
@@ -248,7 +248,7 @@ results and write no generated analytical CSV files.
   OOF-coverage details.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
 - Use the [`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV) and
-  [plotting API](../api/plotting.md) for exact signatures.
+  [inspection API](../api/inspection.md) for exact numerical-result signatures.
 
 ## Reference
 

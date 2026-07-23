@@ -42,9 +42,6 @@ from pipls.inspection import (  # noqa: E402
     pipls_display_factors,
     prediction_diagnostics,
 )
-from pipls.plotting import (  # noqa: E402
-    plot_pipls_predictor_directions,
-)
 
 PULP_DATA_DIR = REPOSITORY_ROOT / "datasets" / "pulp"
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
@@ -270,14 +267,22 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     _save_svg(figure, output_dir / "biplot.svg")
 
     figure, axis = _figure(figsize=(10.0, 5.4))
-    plot_pipls_predictor_directions(
-        factors,
-        predictor_style="bar",
-        predictor_names=predictor_names,
-        components=DISPLAY_COMPONENTS,
-        title=r"Pulp predictor directions $P$",
-        ax=axis,
-    )
+    predictor_positions = np.arange(len(predictor_names))
+    predictor_width = 0.8 / len(DISPLAY_COMPONENTS)
+    for series, component in enumerate(DISPLAY_COMPONENTS):
+        offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2.0) * predictor_width
+        axis.bar(
+            predictor_positions + offset,
+            factors.predictor_directions[:, component],
+            width=predictor_width,
+            label=f"Component {component + 1}",
+        )
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xticks(predictor_positions)
+    axis.set_xticklabels(predictor_names)
+    axis.set_xlabel("Predictor")
+    axis.set_ylabel(r"Predictor direction $P_{:k}$")
+    axis.set_title(r"Pulp predictor directions $P$")
     axis.legend()
     _rotate_category_labels(axis)
     _save_svg(figure, output_dir / "predictor_directions.svg")

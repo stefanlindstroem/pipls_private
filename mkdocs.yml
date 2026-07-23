@@ -25,7 +25,6 @@ nav:
       - Troubleshooting: troubleshooting.md
       - Model inspection: model_inspection.md
       - Inspection API: api/inspection.md
-      - Plotting: api/plotting.md
       - Decomposition: api/decomposition.md
       - Validation report: api/validation.md
       - Warnings: api/exceptions.md

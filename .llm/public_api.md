@@ -13,8 +13,8 @@ from pipls import (
 ```
 
 The generated reference under `docs/api/` documents exactly these supported top-level objects and
-the declared public names from `pipls.inspection`, `pipls.plotting`, `pipls.datasets`, and
-`pipls.metrics`; `__version__` remains package metadata rather than an API reference page.
+the declared public names from `pipls.inspection`, `pipls.datasets`, and `pipls.metrics`;
+`__version__` remains package metadata rather than an API reference page.
 Private modules and `pipls.model_selection` are not reference surfaces.
 
 `PiPLSRegression` fits one explicit fixed pair `(n_components, predictor_rank)` and performs no
@@ -184,10 +184,9 @@ estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiP
 objects. Numbered examples apply these shared tools only to the selected Pi-PLS model. Ordinary PLS
 remains available in the dedicated component-path comparison example and declared comparator benchmarks. Examples 10–12 evaluate only Pi-PLS paths.
 
-Decision 0042 accepts two public submodules for staged implementation:
-
-- `pipls.inspection` for pure NumPy computations and immutable result objects;
-- `pipls.plotting` for optional Matplotlib figures built from explicit computed results.
+Decision 0042 introduced a staged inspection and plotting design. Decisions 0079--0082 establish
+the final boundary: `pipls.inspection` owns pure NumPy computations and immutable result objects,
+while examples and users render those arrays directly with Matplotlib.
 
 `pipls.inspection` is implemented and exports from its own namespace:
 
@@ -233,39 +232,16 @@ probability limits.
 `biplot_coordinates()` accepts a `LatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
 $TP^\mathsf{T}$ reconstruction.
 
-`pipls.plotting` is transitional and currently exports only Pi-PLS factor renderers:
+The package exposes no `pipls.plotting` module and no public `plot_*` convenience functions.
+`PiPLSDisplayFactors`, `LatentStructure`, `ObservationDiagnostics`, `PredictionDiagnostics`, and
+`BiplotCoordinates` expose the numerical quantities required for rendering. Maintained examples
+create Matplotlib figures and axes directly, including component and response selection, physical
+coordinates, grouped-bar widths, labels, legends, titles, saving, and closing.
 
-```python
-from pipls.plotting import (
-    PredictorStyle,
-    plot_pipls_dilation,
-    plot_pipls_predictor_directions,
-    plot_pipls_response_directions,
-    plot_pipls_weighted_response_directions,
-)
-```
-
-The functions accept `PiPLSDisplayFactors` and render one factor quantity each: $P$, $D$, $Q$, or
-$QD$. Every function accepts `ax=None` and returns `(figure, axis)`. With a supplied Matplotlib
-axis, it draws on that axis without clearing it, resizing its figure, or creating another figure.
-Supplying both `ax` and `figsize` is an error. Predictor directions require an explicit `"bar"` or
-`"line"` style and caller-supplied labels or a physical predictor coordinate. Response plots require
-caller-supplied response names. All component subsets use zero-based indices.
-
-Standard PLS-family results are numerical rather than graphical. `LatentStructure`,
-`ObservationDiagnostics`, and `PredictionDiagnostics` expose scores, loadings, coefficients, raw
-observation diagnostics, standardized prediction arrays, response-wise RMSE, and prediction
-provenance. Maintained examples render those arrays directly with ordinary Matplotlib. No public
-plotter is retained for scores, X or Y loadings, coefficients, observation diagnostics, biplots, or
-prediction diagnostics.
-
-Biplots are rendered directly from `BiplotCoordinates`; maintained Pulp figures use optional
-`adjustText` label placement. Matplotlib remains optional and is imported only when a remaining
-plotting function is called. `adjustText` is optional under the examples, docs, and development
-extras and is not imported by the package. Every maintained analysis figure is created in the
-example layer, which owns panel geometry, scientific coordinates, legends, titles, saving, and
-closing. No estimator method, fitted attribute, path-search parameter, or top-level export is added
-by this plotting layer.
+Annotated biplots are rendered from `BiplotCoordinates` with optional `adjustText` label placement.
+Matplotlib and `adjustText` remain optional under the examples, docs, and development extras and are
+not imported by the runtime package. No estimator method, fitted attribute, path-search parameter,
+or top-level export is added by the rendering layer.
 
 ## Example workflow boundary
 
@@ -273,9 +249,8 @@ Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plo
 component paths directly in memory. Pulp, Sugarcane, and Tobacco use `PiPLSPathCV(refit=False)`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn
-`cross_val_predict()`. They render immutable latent structure, observation diagnostics, and prediction diagnostics
-directly with Matplotlib, while temporarily using the remaining Pi-PLS factor plotters, and write
-only final PDF figures. Pulp also reads the
+`cross_val_predict()`. They render immutable Pi-PLS factors, latent structure, observation diagnostics, and prediction
+diagnostics directly with Matplotlib and write only final PDF figures. Pulp also reads the
 conditional predictor-rank profile from `cv_results_` for the chosen component count. Tobacco uses
 full predictor SVD, direct observation diagnostics, and caller-owned source-order response
 pagination through multipage PDFs.

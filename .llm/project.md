@@ -16,14 +16,15 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4 and documentation Patches D1--D4 are complete. Plotting migrations G1--G3 are complete; G4 is next.
+Phases A through F4, documentation Patches D1--D4, and plotting migrations G1--G4 are complete; G5 is next.
 The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
 `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
-`pipls.inspection`, and immutable inspection results. The remaining convenience figures stay under `pipls.plotting`, while biplots are rendered directly from balanced coordinates.
+`pipls.inspection`, and immutable inspection results. All maintained figures are rendered directly
+from those results with Matplotlib; annotated biplots use optional `adjustText`.
 
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
@@ -45,9 +46,9 @@ No block-aware scaling API is designed or scheduled. Decision 0054 defines Pytho
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
 environments with resolved-version diagnostics. Decision 0056 adds clean installed wheel and
-source-distribution validation. Decisions 0058--0061 make every public plotter a caller-embeddable
-one-axis primitive, replace the former factor and prediction composites, and make the example layer
-own every report figure, panel, legend, title, PDF operation, and close. Decision 0062
+source-distribution validation. Decisions 0058--0061 established caller-embeddable one-axis primitives and example-owned reports;
+Decisions 0079--0082 subsequently replace those plotters with direct Matplotlib rendering from
+immutable results. Decision 0062
 establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
 generates its deterministic single-chart SVG assets and manifest. Decision 0064 established the detailed Pulp tutorial as the first pedagogical route. Decision 0065
 separates tutorial, scientific-reference, and generated-API ownership. Decision 0074 removes the
@@ -105,8 +106,6 @@ implementing or reviewing this surface.
 - `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `src/pipls/inspection.py`: pure immutable fitted-model inspection computations.
-- `src/pipls/plotting.py`: optional single-chart Matplotlib functions for explicit inspection
-  results; callers own axes composition, legends, figure-level layout, and output.
 - `src/pipls/model_selection.py`: path-owned rank limits, split materialization, and rank-search
   orchestration.
 - `src/pipls/path.py`: pipeline-aware `PiPLSPathCV` meta-estimator.

@@ -19,7 +19,6 @@ import pipls
 import pipls.datasets
 import pipls.inspection
 import pipls.metrics
-import pipls.plotting
 from pipls import PiPLSPathCV, PiPLSRegression
 
 repository = Path(sys.argv[1]).resolve()

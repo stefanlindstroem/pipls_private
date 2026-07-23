@@ -51,7 +51,6 @@ docs = [
   "ruff>=0.6",
 ]
 data = ["pandas>=2.0", "scipy>=1.11", "openpyxl>=3.1", "PyYAML>=6"]
-plot = ["matplotlib>=3.8"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

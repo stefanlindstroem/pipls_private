@@ -17,12 +17,13 @@ def test_minimal_example_is_a_literal_fixed_model_workflow() -> None:
     assert "model.predict(X)" in text
     assert "pipls_display_factors(model.decomposition_)" in text
     assert "plt.subplots(2, 2" in text
-    assert "plot_pipls_predictor_directions(" in text
-    assert "plot_pipls_dilation(" in text
-    assert "plot_pipls_response_directions(" in text
-    assert "plot_pipls_weighted_response_directions(" in text
-    assert 'predictor_names=["Temperature", "Pressure", "Flow rate"]' in text
-    assert 'response_names=["Yield", "Purity"]' in text
+    assert "factors.predictor_directions[:, 0]" in text
+    assert "factors.dilation[0]" in text
+    assert "factors.response_directions[:, 0]" in text
+    assert "factors.weighted_response_directions[:, 0]" in text
+    assert 'predictor_names = ["Temperature", "Pressure", "Flow rate"]' in text
+    assert 'response_names = ["Yield", "Purity"]' in text
+    assert "pipls.plotting" not in text
     assert "plot_pipls_decomposition" not in text
     assert "PiPLSPathCV" not in text
     assert "KFold" not in text

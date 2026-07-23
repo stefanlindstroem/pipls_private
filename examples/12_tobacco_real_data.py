@@ -15,12 +15,6 @@ from pipls.inspection import (
     pipls_display_factors,
     prediction_diagnostics,
 )
-from pipls.plotting import (
-    plot_pipls_dilation,
-    plot_pipls_predictor_directions,
-    plot_pipls_response_directions,
-    plot_pipls_weighted_response_directions,
-)
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "tobacco"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analysis"
@@ -101,34 +95,67 @@ diagnostics = prediction_diagnostics(
 )
 observations = observation_diagnostics(model, X)
 
-# Plot the Pi-PLS factors.
+# Plot the Pi-PLS factors directly from their immutable arrays.
 figure, axes = plt.subplots(
     2,
     2,
     figsize=(12.0, 9.0),
     layout="constrained",
 )
-plot_pipls_predictor_directions(
-    factors,
-    predictor_style="line",
-    predictor_axis=wavenumbers,
-    predictor_axis_label="Wavenumber (cm$^{-1}$)",
-    ax=axes[0, 0],
-)
-plot_pipls_dilation(factors, ax=axes[0, 1])
-plot_pipls_response_directions(
-    factors,
-    response_names=response_names,
-    ax=axes[1, 0],
-)
-plot_pipls_weighted_response_directions(
-    factors,
-    response_names=response_names,
-    ax=axes[1, 1],
-)
-axes[0, 0].legend(title="Component")
-axes[1, 0].legend(title="Component")
-axes[1, 1].legend(title="Component")
+components = tuple(range(factors.n_components))
+component_labels = [f"Component {component + 1}" for component in components]
+for component, label in zip(components, component_labels, strict=True):
+    axes[0, 0].plot(
+        wavenumbers,
+        factors.predictor_directions[:, component],
+        label=label,
+    )
+axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0, 0].set_xlim(float(wavenumbers[0]), float(wavenumbers[-1]))
+axes[0, 0].set_xlabel("Wavenumber (cm$^{-1}$)")
+axes[0, 0].set_ylabel(r"Predictor direction $P_{:k}$")
+axes[0, 0].set_title(r"Predictor directions $P$")
+axes[0, 0].legend()
+
+dilation_positions = np.arange(factors.n_components)
+axes[0, 1].bar(dilation_positions, factors.dilation)
+axes[0, 1].set_xticks(dilation_positions)
+axes[0, 1].set_xticklabels(component_labels)
+axes[0, 1].set_xlabel("Component")
+axes[0, 1].set_ylabel(r"Dilation $d_k$")
+axes[0, 1].set_title(r"Dilation $D$")
+
+response_positions = np.arange(len(response_names))
+response_width = 0.8 / factors.n_components
+for component, label in zip(components, component_labels, strict=True):
+    offset = (component - (factors.n_components - 1) / 2.0) * response_width
+    axes[1, 0].bar(
+        response_positions + offset,
+        factors.response_directions[:, component],
+        width=response_width,
+        label=label,
+    )
+    axes[1, 1].bar(
+        response_positions + offset,
+        factors.weighted_response_directions[:, component],
+        width=response_width,
+        label=label,
+    )
+for axis, ylabel, title in (
+    (axes[1, 0], r"Response direction $q_{:k}$", r"Response directions $Q$"),
+    (
+        axes[1, 1],
+        r"Weighted response direction $d_kq_{:k}$",
+        r"Weighted response directions $QD$",
+    ),
+):
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xticks(response_positions)
+    axis.set_xticklabels(response_names, rotation=45, ha="right")
+    axis.set_xlabel("Response")
+    axis.set_ylabel(ylabel)
+    axis.set_title(title)
+    axis.legend()
 figure.suptitle(
     "Tobacco Pi-PLS factors "
     f"({selected.n_components} components, predictor rank {selected.predictor_rank})"

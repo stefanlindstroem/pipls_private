@@ -245,7 +245,8 @@ def test_examples_extra_declares_data_and_plotting_dependencies() -> None:
     assert '"adjustText>=1.4,<2"' in dev_dependencies
     runtime_dependencies = pyproject.split("dependencies = [", 1)[1].split("]", 1)[0]
     assert "adjustText" not in runtime_dependencies
-    assert 'plot = ["matplotlib>=3.8"]' in pyproject
+    assert "matplotlib" not in runtime_dependencies
+    assert "plot =" not in pyproject
 
 
 def test_make_examples_runs_every_numbered_example() -> None:

@@ -52,7 +52,6 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
         "import pipls.datasets",
         "import pipls.inspection",
         "import pipls.metrics",
-        "import pipls.plotting",
         "from pipls import PiPLSPathCV, PiPLSRegression",
     ):
         assert public_import in helper
