@@ -95,12 +95,15 @@ The user then fits a separate fixed model with both selected values stated expli
 
 A fitted estimator exposes two related analysis surfaces.
 
-Pi-PLS-specific quantities are stored in `decomposition_`:
+Pi-PLS-specific quantities are stored in `decomposition_` with descriptive field names:
 
-- $P$: predictor rotations;
-- $D$: nonnegative dilation values;
-- $Q$: response rotations;
-- $PDQ^{\mathsf T}$: the centered and scaled regression map.
+- `predictor_rotations`: $P$;
+- `dilation`: the nonnegative diagonal values of $D$;
+- `response_rotations`: $Q$;
+- `standardized_regression_map`: $PDQ^{\mathsf T}$.
+
+The intermediate construction matrices $\Pi$, $C$, and $W$ remain private. They define the method
+above but are not required for fitted-model interpretation or downstream prediction.
 
 The estimator also exposes conventional PLS-family quantities:
 

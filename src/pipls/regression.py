@@ -507,8 +507,8 @@ class PiPLSRegression(
         self.predictor_rank_ = predictor_rank
         self.max_predictor_rank_ = max_predictor_rank
         self.decomposition_ = PiPLSDecomposition._from_core_result(result)
-        self.x_rotations_ = self.decomposition_.P
-        self.y_rotations_ = self.decomposition_.Q
+        self.x_rotations_ = self.decomposition_.predictor_rotations
+        self.y_rotations_ = self.decomposition_.response_rotations
         self.x_weights_ = self.x_rotations_
         self.y_weights_ = self.y_rotations_
         self._n_features_out = self.n_components

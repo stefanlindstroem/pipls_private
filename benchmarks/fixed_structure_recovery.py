@@ -115,6 +115,14 @@ def _scaled_truth_basis(
     return np.asarray(coordinate_scale[:, None] * loadings, dtype=np.float64)
 
 
+def _fitted_predictor_basis(model: PiPLSRegression, X: FloatArray) -> FloatArray:
+    """Reconstruct the retained predictor basis for this benchmark only."""
+
+    X_standardized = (X - model.x_mean_) / model.x_scale_
+    _, _, x_vt = np.linalg.svd(X_standardized, full_matrices=False)
+    return np.asarray(x_vt[: model.predictor_rank_].T, dtype=np.float64)
+
+
 def evaluate_scenario(scenario: Scenario, seed: int) -> dict[str, ResultValue]:
     """Fit fixed oracle-rank Pi-PLS and return one benchmark result row."""
 
@@ -157,15 +165,15 @@ def evaluate_scenario(scenario: Scenario, seed: int) -> dict[str, ResultValue]:
         "test_mse": test_mse,
         "predictor_shared_capture": _subspace_capture(
             predictor_shared_truth,
-            model.decomposition_.P,
+            model.decomposition_.predictor_rotations,
         ),
         "predictor_signal_capture": _subspace_capture(
             predictor_signal_truth,
-            model.decomposition_.Pi,
+            _fitted_predictor_basis(model, train.X),
         ),
         "response_shared_capture": _subspace_capture(
             response_shared_truth,
-            model.decomposition_.Q,
+            model.decomposition_.response_rotations,
         ),
     }
 

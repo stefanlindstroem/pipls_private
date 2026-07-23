@@ -70,14 +70,16 @@ Decision 0071 removes duplicate
 matrix-path aliases and completes structural enforcement of in-memory numbered examples.
 Decision 0072 adds an on-demand immutable predictor-rank profile derived from `cv_results_`.
 Decision 0073 hardens the public numerical boundary and fitted-state transaction.
+Decision 0086 limits `PiPLSDecomposition` to interpretable rotations, dilation, rank/solver
+diagnostics, and the derived standardized regression map.
 
 ## Implemented estimator and selection boundary
 
 Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` owns one explicit fixed rank
 pair and no cross-validation or selection results. `PiPLSPathCV` owns the complete triangular-
 selection lifecycle and defaults to the explicit complete-component sentinel `"all"`. Obsolete
-private selection machinery and duplicate fitted aliases have been removed; Pi-PLS-specific output
-is canonical in `decomposition_`. Supported pipelines infer their unique terminal Pi-PLS step and
+private selection machinery and duplicate fitted aliases have been removed; interpretable
+Pi-PLS-specific output is canonical in `decomposition_`, while construction matrices remain private. Supported pipelines infer their unique terminal Pi-PLS step and
 carry their own output-container configuration through cloning and refit.
 
 ## Accepted analysis ownership

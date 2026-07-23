@@ -20,12 +20,9 @@ def test_fit_exposes_expected_fixed_rank_attributes() -> None:
 
     assert model.predictor_rank_ == 4
     assert model.max_predictor_rank_ == min(X.shape[1], X.shape[0] - 1)
-    assert model.decomposition_.Pi.shape == (8, 4)
-    assert model.decomposition_.C.shape == (3, 2)
-    assert model.decomposition_.W.shape == (4, 2)
-    assert model.decomposition_.P.shape == (8, 2)
-    assert model.decomposition_.D.shape == (2, 2)
-    assert model.decomposition_.Q.shape == (3, 2)
+    assert model.decomposition_.predictor_rotations.shape == (8, 2)
+    assert model.decomposition_.dilation.shape == (2,)
+    assert model.decomposition_.response_rotations.shape == (3, 2)
     assert model.coef_.shape == (3, 8)
     assert model.intercept_.shape == (3,)
     assert model.x_scores_.shape == (40, 2)
@@ -151,7 +148,7 @@ def test_small_auto_svd_uses_full_solver_and_reports_exact_rank() -> None:
     ).fit(X, Y)
 
     assert model.decomposition_.predictor_svd_solver == "full"
-    assert model.decomposition_.x_rank_is_exact
+    assert model.decomposition_.predictor_numerical_rank_is_exact
 
 
 def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
@@ -184,7 +181,7 @@ def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
     ).fit(X, Y)
 
     assert first.decomposition_.predictor_svd_solver == "randomized"
-    assert not first.decomposition_.x_rank_is_exact
+    assert not first.decomposition_.predictor_numerical_rank_is_exact
     np.testing.assert_allclose(first.coef_, second.coef_)
     np.testing.assert_allclose(first.predict(X), second.predict(X))
     np.testing.assert_allclose(first.predict(X), full.predict(X), rtol=1e-6, atol=1e-8)

@@ -372,3 +372,13 @@ The accepted order after Decision 0042 is:
 11. direct Pi-PLS/ordinary-PLS comparison — **complete**;
 12. final result-surface, documentation, and structural-policy cleanup — **complete**;
 13. final data-first rendering policy and structural enforcement — **complete**.
+
+
+## Public decomposition boundary
+
+`PiPLSDecomposition` is an interpretation result, not a copy of the private construction record. It
+exposes `predictor_rotations`, `dilation`, `response_rotations`, rank/solver diagnostics, and
+`standardized_regression_map`. The private `PiPLSCoreResult` retains $\Pi$, $C$, $W$, $P$, $D$,
+and $Q$ because numerical invariants and algorithm implementation still require the complete
+construction. Benchmarks that need the truncated predictor basis must reconstruct it within the
+benchmark rather than depend on a public intermediate matrix.

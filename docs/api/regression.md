@@ -49,8 +49,8 @@ standard path search uses its more conservative default support ceiling.
 ## Fitted results
 
 Standard PLS-family fitted attributes include scores, weights, loadings, rotations, coefficients,
-and intercepts. Pi-PLS-specific matrices and numerical-rank diagnostics are grouped in the frozen,
-read-only `decomposition_` result. The exact attribute shapes and conditional method behavior are
+and intercepts. Interpretable Pi-PLS rotations, dilation values, and numerical-rank diagnostics are grouped in the
+frozen, read-only `decomposition_` result. Intermediate construction matrices remain private. The exact attribute shapes and conditional method behavior are
 documented below.
 
 ::: pipls.PiPLSRegression

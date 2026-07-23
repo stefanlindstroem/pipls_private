@@ -27,6 +27,7 @@ reference describe the current public behavior directly.
 - [0066: immutable component-path API](0066-immutable-component-path-api.md)
 - [0072: conditional predictor-rank profile](0072-conditional-predictor-rank-profile.md)
 - [0073: public fit-state and finite-output safety](0073-public-fit-safety.md)
+- [0086: public decomposition boundary](0086-public-decomposition-boundary.md)
 
 ## Validation, data, and benchmarks
 

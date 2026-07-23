@@ -37,8 +37,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - a public documentation entry that defines paired latent variables, component-count scanning,
   and elbow-based CV-MSE interpretation before specialized terminology;
 - shared private fold-evaluation and adaptive-search machinery;
-- PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and public
-  immutable `PiPLSDecomposition`;
+- PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and a public
+  immutable `PiPLSDecomposition` limited to interpretable rotations, dilation, rank diagnostics,
+  solver provenance, and the derived centered/scaled regression map;
 - grouped, repeated, predefined, temporal, and leave-one-out split workflows;
 - optional ordered OOF predictions and immutable `PiPLSValidationReport` with explicit
   fixed-parameter versus selection-conditioned labeling;
@@ -83,6 +84,10 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - a completed documentation reference layer with a public result-object map, task-oriented
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
+
+Decision 0086 reduces the public decomposition to quantities used for fitted-model interpretation;
+private construction matrices remain in `PiPLSCoreResult`. API cleanup step API2 is the next
+increment.
 
 Decisions 0079--0083 establish and enforce data-first rendering for biplots, prediction
 diagnostics, standard PLS-family inspection, and Pi-PLS factors. Decision 0084 completes the
@@ -180,8 +185,9 @@ Additional fixed decisions:
   final small integer interval. `"optimal"` is exhaustive over the complete admissible range.
 - Randomized SVD affects only the initial predictor-matrix decomposition. Response and coupling
   decompositions remain exact.
-- Pi-PLS-specific factorization and numerical diagnostics live only in the read-only
-  `decomposition_` object; standard PLS-style fitted attributes remain top-level.
+- interpretable Pi-PLS rotations, dilation, rank/solver diagnostics, and the standardized map live
+  in the read-only `decomposition_` object; construction matrices remain private and standard
+  PLS-style fitted attributes remain top-level.
 - Refit-dependent path methods are absent when `refit=False`; output-container configuration is
   carried by the estimator template rather than a second path-level `set_output` layer.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;

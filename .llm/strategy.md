@@ -595,3 +595,12 @@ For every patch, the LLM maintainer should:
    documentary field values;
 8. return a root-relative patch and provide the exact direct Git commands for checking, applying,
    inspecting, staging, and committing it.
+
+
+## Public-result API cleanup
+
+API1 is complete under Decision 0086. `PiPLSDecomposition` now exposes descriptive predictor and
+response rotations, the dilation vector, numerical-rank and solver diagnostics, and the derived
+standardized regression map. The private core retains $\Pi$, $C$, $W$, and the diagonal matrix
+$D$. API2 should next remove redundant fixed-estimator and path-result aliases while preserving
+standard scikit-learn fitted attributes and the concise immutable path and validation objects.

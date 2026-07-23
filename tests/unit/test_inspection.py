@@ -16,18 +16,13 @@ def _decomposition(
     response_directions: np.ndarray,
     dilation: np.ndarray,
 ) -> PiPLSDecomposition:
-    n_features, n_components = predictor_directions.shape
-    n_targets = response_directions.shape[0]
+    _, n_components = predictor_directions.shape
     return PiPLSDecomposition(
-        Pi=np.eye(n_features, n_components),
-        C=np.eye(n_targets, n_components),
-        W=np.eye(n_components),
-        P=predictor_directions,
-        D=np.diag(dilation),
-        Q=response_directions,
+        predictor_rotations=predictor_directions,
         dilation=dilation,
-        x_rank=n_components,
-        x_rank_is_exact=True,
+        response_rotations=response_directions,
+        predictor_numerical_rank=n_components,
+        predictor_numerical_rank_is_exact=True,
         rank_tolerance=1e-12,
         predictor_svd_solver="full",
     )
@@ -105,8 +100,8 @@ def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
         factors.component_signs,
     ):
         assert not values.flags.writeable
-    assert not np.shares_memory(factors.predictor_directions, decomposition.P)
-    assert not np.shares_memory(factors.response_directions, decomposition.Q)
+    assert not np.shares_memory(factors.predictor_directions, decomposition.predictor_rotations)
+    assert not np.shares_memory(factors.response_directions, decomposition.response_rotations)
     assert not np.shares_memory(factors.dilation, decomposition.dilation)
 
     predictor_directions[0, 0] = 7.0
@@ -122,11 +117,10 @@ def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
         factors.dilation = np.ones(2)  # type: ignore[misc]
 
 
-def test_pipls_display_factors_reject_inconsistent_diagonal() -> None:
-    decomposition = _decomposition(np.eye(2), np.eye(2), np.array([2.0, 1.0]))
-    object.__setattr__(decomposition, "D", np.array([[2.0, 1.0], [0.0, 1.0]]))
+def test_pipls_display_factors_reject_negative_dilation() -> None:
+    decomposition = _decomposition(np.eye(2), np.eye(2), np.array([2.0, -1.0]))
 
-    with pytest.raises(ValueError, match="must equal diag"):
+    with pytest.raises(ValueError, match="nonnegative"):
         pipls_display_factors(decomposition)
 
 

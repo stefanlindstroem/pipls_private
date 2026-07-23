@@ -18,7 +18,7 @@ tools live in dedicated submodules. Rendering is caller-owned Matplotlib code.
 | [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | `path.for_n_components(h)` | Retrieve one evaluated fixed rank pair |
 | [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one component count |
 | [`PiPLSValidationReport`](validation.md#pipls.PiPLSValidationReport) | `search.validation_report_` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
-| [`PiPLSDecomposition`](decomposition.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access the Pi-PLS-specific fitted factorization |
+| [`PiPLSDecomposition`](decomposition.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access interpretable predictor rotations, dilation, response rotations, and rank diagnostics |
 | [`LatentStructure`](inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, rotations, and coefficients for PLS-family inspection |
 | [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $P$, $D$, $Q$, and $QD$ factors |
 | [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |

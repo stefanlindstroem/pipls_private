@@ -78,9 +78,11 @@ response-subspace and coupling SVDs remain exact.
 The estimator provides PLS-style `fit`, `predict(X, copy=True)`,
 `transform(X, y=None, copy=True)`, tuple-valued `fit_transform(X, y)`, `inverse_transform`, and
 scalar R2 `score`. It supports feature names and pandas output. Standard PLS-style fitted
-attributes, coefficients, and scores remain available. Pi-PLS factorization matrices, dilation
-values, numerical-rank diagnostics, and the resolved predictor solver are canonicalized only in the
-frozen `decomposition_` object; duplicate top-level symbolic and diagnostic aliases are not public.
+attributes, coefficients, and scores remain available. The frozen `decomposition_` object exposes
+only interpretable predictor rotations, dilation values, response rotations, numerical-rank
+diagnostics, the resolved predictor solver, and the derived centered/scaled regression map. The
+construction matrices $\Pi$, $C$, and $W$, the redundant diagonal matrix $D$, and symbolic aliases
+remain private.
 
 The fixed estimator does not expose `cv_results_`, `best_params_`, OOF predictions, validation
 reports, or predictor-rank search diagnostics. `response_scale_for_scoring_` remains available for

@@ -493,32 +493,31 @@ def pipls_display_factors(decomposition: PiPLSDecomposition) -> PiPLSDisplayFact
     if not isinstance(decomposition, PiPLSDecomposition):
         raise TypeError("decomposition must be a PiPLSDecomposition.")
 
-    predictor_directions = _finite_matrix(decomposition.P, name="decomposition.P")
-    response_directions = _finite_matrix(decomposition.Q, name="decomposition.Q")
+    predictor_directions = _finite_matrix(
+        decomposition.predictor_rotations,
+        name="decomposition.predictor_rotations",
+    )
+    response_directions = _finite_matrix(
+        decomposition.response_rotations,
+        name="decomposition.response_rotations",
+    )
     dilation = _finite_vector(decomposition.dilation, name="decomposition.dilation")
-    dilation_matrix = _finite_matrix(decomposition.D, name="decomposition.D")
 
     n_components = predictor_directions.shape[1]
     if n_components == 0:
         raise ValueError("decomposition must contain at least one component.")
     if response_directions.shape[1] != n_components:
         raise ValueError(
-            "decomposition.P and decomposition.Q must contain the same number of components."
+            "decomposition predictor and response rotations must contain "
+            "the same number of components."
         )
     if dilation.shape != (n_components,):
         raise ValueError(
             "decomposition.dilation must contain one value per component: "
             f"expected {(n_components,)}, got {dilation.shape}."
         )
-    if dilation_matrix.shape != (n_components, n_components):
-        raise ValueError(
-            "decomposition.D must be square with one row and column per component: "
-            f"expected {(n_components, n_components)}, got {dilation_matrix.shape}."
-        )
     if np.any(dilation < 0.0):
         raise ValueError("decomposition.dilation must contain nonnegative values.")
-    if not np.array_equal(dilation_matrix, np.diag(dilation)):
-        raise ValueError("decomposition.D must equal diag(decomposition.dilation).")
 
     component_signs = np.ones(n_components, dtype=np.int8)
     for component in range(n_components):

@@ -162,21 +162,20 @@ def test_public_decomposition_is_read_only_and_replaces_symbolic_aliases() -> No
 
     assert isinstance(decomposition, PiPLSDecomposition)
     for matrix in (
-        decomposition.Pi,
-        decomposition.C,
-        decomposition.W,
-        decomposition.P,
-        decomposition.D,
-        decomposition.Q,
+        decomposition.predictor_rotations,
         decomposition.dilation,
+        decomposition.response_rotations,
     ):
         assert not matrix.flags.writeable
+    standardized_map = decomposition.standardized_regression_map
+    assert not standardized_map.flags.writeable
     np.testing.assert_allclose(
-        decomposition.regression_map,
-        decomposition.P @ decomposition.D @ decomposition.Q.T,
+        standardized_map,
+        (decomposition.predictor_rotations * decomposition.dilation[None, :])
+        @ decomposition.response_rotations.T,
     )
-    assert model.x_rotations_ is decomposition.P
-    assert model.y_rotations_ is decomposition.Q
+    assert model.x_rotations_ is decomposition.predictor_rotations
+    assert model.y_rotations_ is decomposition.response_rotations
 
     for removed_alias in (
         "Pi_",
@@ -194,10 +193,27 @@ def test_public_decomposition_is_read_only_and_replaces_symbolic_aliases() -> No
     ):
         assert not hasattr(model, removed_alias)
 
+    for removed_field in (
+        "Pi",
+        "C",
+        "W",
+        "P",
+        "D",
+        "Q",
+        "predictor_basis",
+        "response_basis",
+        "least_squares_map",
+        "dilation_matrix",
+        "regression_map",
+        "x_rank",
+        "x_rank_is_exact",
+    ):
+        assert not hasattr(decomposition, removed_field)
+
     with pytest.raises(ValueError, match="read-only"):
-        decomposition.P[0, 0] = 0.0
+        decomposition.predictor_rotations[0, 0] = 0.0
     with pytest.raises(FrozenInstanceError):
-        decomposition.x_rank = 0  # type: ignore[misc]
+        decomposition.predictor_numerical_rank = 0  # type: ignore[misc]
 
 
 def test_copy_parameter_matches_pls_fit_semantics() -> None:
@@ -250,7 +266,10 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
     assert path.best_pipls_ is path.best_estimator_
     np.testing.assert_allclose(path.predict(X), direct.predict(X))
     np.testing.assert_allclose(path.best_pipls_.coef_, direct.coef_)
-    np.testing.assert_allclose(path.best_pipls_.decomposition_.D, direct.decomposition_.D)
+    np.testing.assert_allclose(
+        path.best_pipls_.decomposition_.dilation,
+        direct.decomposition_.dilation,
+    )
     x_path, y_path = path.transform(X, Y)
     x_direct, y_direct = direct.transform(X, Y)
     np.testing.assert_allclose(x_path, x_direct)
@@ -420,10 +439,10 @@ def test_decomposition_is_single_source_of_truth_for_pipls_specific_arrays() -> 
     X, Y = _data()
     model = _fixed_estimator().fit(X, Y)
 
-    assert model.x_weights_ is model.decomposition_.P
-    assert model.y_weights_ is model.decomposition_.Q
-    assert model.x_rotations_ is model.decomposition_.P
-    assert model.y_rotations_ is model.decomposition_.Q
+    assert model.x_weights_ is model.decomposition_.predictor_rotations
+    assert model.y_weights_ is model.decomposition_.response_rotations
+    assert model.x_rotations_ is model.decomposition_.predictor_rotations
+    assert model.y_rotations_ is model.decomposition_.response_rotations
     assert not model.x_rotations_.flags.writeable
 
 

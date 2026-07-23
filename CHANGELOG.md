@@ -1,5 +1,10 @@
 # Changelog
 
+- Reduce `PiPLSDecomposition` to the interpretable fitted factorization: descriptive predictor and
+  response rotations, a dilation vector, numerical-rank and solver diagnostics, and the derived
+  centered/scaled regression map. Keep $\Pi$, $C$, $W$, and the redundant diagonal matrix $D$
+  private, and reconstruct the benchmark-only predictor basis inside its benchmark.
+
 - Make Tutorial 2 sequential and self-contained without restoring its former length: define setup
   and the first-three-response display choice before use, show standalone code for every displayed
   interpretation figure, explain the Pulp rank ceiling and splitter choice, and link rather than
