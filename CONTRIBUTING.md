@@ -109,6 +109,11 @@ The two tutorial roles are fixed:
 - the Pulp tutorial owns the complete real-data, selection-conditioned OOF, and representative
   interpretation workflow.
 
+Rendering follows one data-first rule: package code computes immutable numerical results, while
+numbered examples and tutorial renderers show ordinary Matplotlib construction directly. Keep
+`adjustText` optional and confined to annotated biplot label layout after final axis configuration.
+Do not add a replacement plotting submodule or hide chart construction in `examples/_support/`.
+
 The served reference pages own exact API behavior and advanced alternatives. Avoid repeating those
 contracts in tutorial prose.
 

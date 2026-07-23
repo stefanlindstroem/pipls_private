@@ -16,7 +16,8 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4, documentation Patches D1--D4, and plotting migrations G1--G4 are complete; G5 is next.
+Phases A through F4, documentation Patches D1--D4, and plotting migrations G1--G5 are complete.
+First-release preparation is next.
 The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
@@ -47,8 +48,8 @@ support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
 environments with resolved-version diagnostics. Decision 0056 adds clean installed wheel and
 source-distribution validation. Decisions 0058--0061 established caller-embeddable one-axis primitives and example-owned reports;
-Decisions 0079--0082 subsequently replace those plotters with direct Matplotlib rendering from
-immutable results. Decision 0062
+Decisions 0079--0083 subsequently replace those plotters with direct Matplotlib rendering from
+immutable results and establish the final optional-dependency and structural policy. Decision 0062
 establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
 generates its deterministic single-chart SVG assets and manifest. Decision 0064 established the detailed Pulp tutorial as the first pedagogical route. Decision 0065
 separates tutorial, scientific-reference, and generated-API ownership. Decision 0074 removes the

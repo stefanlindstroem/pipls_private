@@ -97,10 +97,12 @@ protocols.
 | `component_path_` | Inspect one selected predictor rank for each component count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one count |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
-| Matplotlib | Render inspection arrays with caller-controlled figures and styling |
+| Matplotlib | Optionally render those arrays with caller-controlled figures and styling |
 | `pipls.datasets` | Generate deterministic synthetic Pi-PLS data |
 
-Generated signatures, fitted attributes, result shapes, and method contracts are collected in the
+Pi-PLS intentionally provides no plotting submodule: numerical inspection objects are the stable
+interface, while rendering remains optional and caller-owned. Generated signatures, fitted
+attributes, result shapes, and method contracts are collected in the
 [API overview](docs/api/index.md).
 
 ## Examples and reference data

@@ -575,8 +575,9 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-Plotting migration G5 is next: complete documentation, policy, dependency, and structural
-enforcement after plotting-module removal. First-release preparation follows G5.
+Plotting migration G1--G5 is complete. Decision 0083 establishes the final data-first rendering
+policy and structural enforcement after plotting-module removal. First-release preparation is the
+next increment.
 
 ## Maintenance protocol
 

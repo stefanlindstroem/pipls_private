@@ -22,7 +22,8 @@ structure. `make examples` is the separate application-validation target and run
 example, including the complete real-data analyses. Randomized numerical paths and synthetic
 generators expose explicit random-state controls.
 
-The executable real-data examples require pandas and Matplotlib. Install their dedicated extra with:
+The executable real-data examples require pandas and Matplotlib; the annotated Pulp biplot also
+uses `adjustText`. Install their dedicated extra with:
 
 ```bash
 python -m pip install -e ".[examples]"

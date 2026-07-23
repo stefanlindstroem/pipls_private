@@ -1,5 +1,8 @@
 # Changelog
 
+- Complete the data-first rendering migration: define immutable inspection results as the
+  compatibility surface, keep Matplotlib and `adjustText` optional, document caller-owned
+  rendering, and enforce the absence of package plotters and hidden chart helpers.
 ## Unreleased
 
 - Render Pi-PLS $P$, $D$, $Q$, and $QD$ factors directly from immutable arrays, remove the complete `pipls.plotting` module and its generated API page, and retire the `plot` optional dependency extra.

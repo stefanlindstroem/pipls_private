@@ -55,23 +55,25 @@ ordered result per requested component count, aligned read-only arrays with stab
 predictor rank and explicit policy for every count, scalar lookup, pickling, and agreement with
 conditional rows in `cv_results_`. Predictor-rank-profile tests should verify evaluated-only
 ascending ranks, aligned defensive read-only arrays, scorer-general selection, invalid lookup,
-pickling, and consistency with both `cv_results_` and `component_path_`. Plot and standard-PLS
-helper tests should use small
-synthetic inputs and verify immutable result arrays and final PDF rendering without freezing visual
-pixel output.
+pickling, and consistency with both `cv_results_` and `component_path_`.
 
 Post-analysis inspection tests should verify mathematical identities, shapes, finite-value
 validation, defensive copying, read-only results, deterministic sign handling, prediction
-provenance, and absence of estimator mutation. Plot tests should use a headless backend and verify
-returned figures and axes, explicit line/bar modes, label validation, and successful rendering
-without pinning pixels or incidental Matplotlib artist counts. Structural tests should enforce the
-single-axis package boundary and example-owned report composition.
+provenance, and absence of estimator mutation. Rendering tests belong at the example or tutorial
+boundary and should use a headless Matplotlib backend. Protect named result-field access, direct
+figure and axis construction, physical coordinate order, final files, and successful SVG or PDF
+creation without pinning pixels, exact styling, automatically adjusted label positions, or
+incidental artist counts. Structural tests should require the absence of a package plotting module
+and public `plot_*` functions, keep Matplotlib and `adjustText` optional, and ensure that example
+support code does not hide chart construction.
 
 Structural tests for Pulp, Sugarcane, and Tobacco protect direct `component_path_` access,
-scikit-learn `cross_val_predict()`, immutable inspection results, explicit `ax=` calls, absence of
+scikit-learn `cross_val_predict()`, immutable inspection results, explicit Matplotlib
+construction, absence of
 analytical CSV output, and the declared final PDF filenames without running the artifact-writing
 scripts. Tobacco tests also protect its full-SVD configuration, source-order response pagination,
-raw observation diagnostics, and caller-owned multipage PDF loops. Biplot tests protect balanced-coordinate numerics in `pipls.inspection`; maintained example and
+raw observation diagnostics, and caller-owned multipage PDF loops. Biplot tests protect
+balanced-coordinate numerics in `pipls.inspection`; maintained example and
 renderer structure must expose direct Matplotlib arrows and labels, call `adjust_text()` after axis
 configuration, and avoid pinning adjusted label coordinates.
 

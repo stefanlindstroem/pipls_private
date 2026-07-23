@@ -27,6 +27,13 @@ tools live in dedicated submodules. Rendering is caller-owned Matplotlib code.
 | [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | dataset construction or generator output | Carry validated arrays, labels, provenance, and metadata |
 | [`PiPLSSyntheticTruth`](datasets.md#pipls.datasets.PiPLSSyntheticTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
 
+## Rendering boundary
+
+The API ends at immutable numerical results. Pi-PLS provides no plotting submodule or public
+`plot_*` functions. Maintained examples pass result arrays to ordinary Matplotlib calls.
+`biplot_coordinates()` is retained because coordinate balancing is numerical; optional
+`adjustText` placement operates on the resulting Matplotlib text artists.
+
 ## Other reference pages
 
 - [Decomposition](decomposition.md)

@@ -53,8 +53,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
   diagnostics under `pipls.inspection`;
-- estimator-neutral latent-structure, biplot, observation-diagnostic, and plotting names that
-  accept compatible fitted Pi-PLS and ordinary PLS models;
+- estimator-neutral latent-structure, biplot, observation-diagnostic, and prediction-diagnostic
+  names that accept compatible fitted Pi-PLS and ordinary PLS models;
 - a data-first biplot boundary: `biplot_coordinates()` owns balanced numerical coordinates, while
   the Pulp example and tutorial use direct Matplotlib arrows and optional `adjustText` label layout;
 - direct standard PLS-family inspection rendering: scores, loadings, coefficients, and raw
@@ -84,9 +84,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
 
-Decisions 0079--0082 establish data-first rendering for biplots, prediction diagnostics, standard
-PLS-family inspection, and Pi-PLS factors. Plotting-module removal is complete; final plotting
-policy cleanup and enforcement are the next increment before first-release preparation. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+Decisions 0079--0083 establish and enforce data-first rendering for biplots, prediction
+diagnostics, standard PLS-family inspection, and Pi-PLS factors. Plotting migration G1--G5 is
+complete. First-release preparation is the next increment. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS

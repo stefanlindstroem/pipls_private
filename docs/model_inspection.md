@@ -5,6 +5,10 @@ These arrays are the primary inspection interface. Maintained examples render th
 Matplotlib so the reader can see which quantities are displayed and can control every graphical
 choice directly.
 
+Pi-PLS deliberately provides no plotting submodule. The numerical objects can be rendered with
+Matplotlib, another graphics system, or not rendered at all. `adjustText` is an optional external
+label-layout aid for annotated biplots; it is not part of the numerical result contract.
+
 Pi-PLS-specific inspection covers $P$, $D$, $Q$, and $QD$. Scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics use estimator-neutral PLS-family objects.
 The [Pulp tutorial](tutorials/pulp.md#interpret-representative-fitted-model-plots) uses a small
@@ -298,7 +302,8 @@ response_names = Y.columns.astype(str).tolist()
 ```
 
 For spectral line plots, use the physical coordinate in its existing order. Pi-PLS does not smooth,
-interpolate, or reorder it.
+interpolate, or reorder it. Do not move chart construction into an example support helper: the
+maintained example should show which result fields and Matplotlib operations produce the figure.
 
 ## Interpretation boundary
 

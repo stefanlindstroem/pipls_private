@@ -112,4 +112,6 @@ python -m pip install -e ".[examples]"
 The examples render immutable inspection arrays with ordinary Matplotlib. Annotated biplots also
 use `adjustText`; call `adjust_text()` only after the final axis labels, limits, aspect, and legend
 have been configured. Automatic label placement is heuristic and may need application-specific
-tuning for dense diagrams.
+tuning for dense
+diagrams. It does not change `BiplotCoordinates`; inspect or export those arrays directly when a
+non-graphical workflow is preferable.

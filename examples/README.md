@@ -73,7 +73,8 @@ The comparison workflow imports one implementation helper from `examples/_suppor
 
 Example 09 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
 comparison helper. Reusable numerical inspection belongs in `pipls.inspection`; every maintained
-figure is rendered directly from immutable arrays with ordinary Matplotlib.
+figure is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot
+uses optional `adjustText` only to reposition its Matplotlib text labels.
 
 ## Real-data workflow contract
 

@@ -135,8 +135,9 @@ plan contains an earlier or more general proposal:
   Decision 0041; separately licensed derivatives are new candidate datasets, not retroactive
   clearance of the companion-analysis files;
 - fitted-model analysis is separated into selection diagnostics, full-data interpretation, and
-  prediction diagnostics under Decision 0042; numerical inspection is package-owned, optional
-  plotting is submodule-owned, and dataset-specific artifacts remain example-owned;
+  prediction diagnostics under Decision 0042; numerical inspection is package-owned and
+  dataset-specific artifacts remain example-owned; Decisions 0079--0083 supersede the former
+  package plotting layer with direct caller-owned rendering;
 - Decision 0045 further separates model roles: ordinary PLS remains in component-path comparisons
   and declared comparator benchmarks; $P$, $D$, and $Q$ inspection stays Pi-PLS-specific; shared
   score, loading, coefficient, biplot, observation, and prediction analysis uses estimator-neutral
@@ -180,3 +181,4 @@ record and add it to this index in the same patch.
 | `0080-direct-prediction-diagnostic-rendering.md` | direct prediction-diagnostic rendering | immutable diagnostic arrays are primary; examples use direct Matplotlib; three convenience plotters removed |
 | `0081-direct-standard-inspection-rendering.md` | direct standard inspection rendering | immutable latent and observation arrays are primary; examples use direct Matplotlib; five convenience plotters removed |
 | `0082-direct-pipls-factor-rendering.md` | direct Pi-PLS factor rendering | immutable factor arrays are primary; plotting module and plot extra removed |
+| `0083-data-first-rendering-policy.md` | final data-first rendering policy | immutable results are the compatibility surface; rendering remains optional and caller-owned |

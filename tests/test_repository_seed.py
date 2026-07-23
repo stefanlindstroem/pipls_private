@@ -235,7 +235,7 @@ def test_documentation_ci_builds_checkout_and_source_distribution() -> None:
     assert "make docs-dist" in commands
 
 
-def test_examples_extra_declares_data_and_plotting_dependencies() -> None:
+def test_examples_extra_declares_data_and_rendering_dependencies() -> None:
     pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
 
     assert 'examples = ["pandas>=2.0", "matplotlib>=3.8", "adjustText>=1.4,<2"]' in pyproject

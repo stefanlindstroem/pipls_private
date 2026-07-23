@@ -76,14 +76,16 @@ implemented. Compatible `PiPLSRegression` and `PLSRegression` models are covered
 
 ### Rendering boundary
 
-The package owns no plotting submodule. Immutable numerical inspection objects are the durable
+The package owns no plotting submodule and exposes no public `plot_*` convenience functions.
+Immutable numerical inspection objects are the durable
 interface, and maintained examples render their arrays with ordinary Matplotlib. The example layer
 owns chart type, component and response selection, categorical positions, physical coordinates,
 labels, reference lines, legends, panel geometry, file writing, and closing.
 
 `biplot_coordinates()` remains package-owned because balancing score and loading coordinates is a
 numerical operation. Annotated biplots use optional `adjustText` only after final axis configuration.
-The runtime package imports neither Matplotlib nor `adjustText`.
+The runtime package imports neither Matplotlib nor `adjustText`. Maintained examples and
+renderers must not hide chart construction in support helpers.
 
 ### `examples/`
 
@@ -365,4 +367,5 @@ The accepted order after Decision 0042 is:
 9. direct Pulp and tutorial workflow — **complete**;
 10. direct Tobacco workflow and table-helper removal — **complete**.
 11. direct Pi-PLS/ordinary-PLS comparison — **complete**;
-12. final result-surface, documentation, and structural-policy cleanup — **complete**.
+12. final result-surface, documentation, and structural-policy cleanup — **complete**;
+13. final data-first rendering policy and structural enforcement — **complete**.
