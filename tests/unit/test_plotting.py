@@ -85,7 +85,6 @@ def test_plotting_names_are_submodule_exports_only() -> None:
         "plot_pipls_predictor_directions",
         "plot_pipls_response_directions",
         "plot_pipls_weighted_response_directions",
-        "plot_biplot",
         "plot_coefficients",
         "plot_observation_diagnostics",
         "plot_scores",

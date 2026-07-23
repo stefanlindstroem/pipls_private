@@ -9,7 +9,6 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from .inspection import (
-    BiplotCoordinates,
     LatentStructure,
     ObservationDiagnostics,
     PiPLSDisplayFactors,
@@ -26,7 +25,6 @@ PredictorStyle: TypeAlias = Literal["bar", "line"]
 
 __all__ = [
     "PredictorStyle",
-    "plot_biplot",
     "plot_coefficients",
     "plot_observation_diagnostics",
     "plot_scores",
@@ -41,116 +39,6 @@ __all__ = [
     "plot_standardized_rmse",
 ]
 
-
-def plot_biplot(
-    coordinates: BiplotCoordinates,
-    *,
-    predictor_names: Sequence[object],
-    sample_names: Sequence[object] | None = None,
-    title: str = "PLS-family score-loading biplot",
-    figsize: tuple[float, float] | None = None,
-    ax: Axes | None = None,
-) -> tuple[Figure | SubFigure, Axes]:
-    r"""Plot balanced sample scores and predictor-loading arrows on one axis.
-
-    The coordinates are calculated by
-    :func:`pipls.inspection.biplot_coordinates`. The chart adds no response
-    arrows, confidence regions, grouping, or automatic scientific labels. It
-    labels the sample artist but does not create a legend; callers may compose
-    legends and replace labels or titles through the returned axis.
-
-    Parameters
-    ----------
-    coordinates : pipls.inspection.BiplotCoordinates
-        Balanced coordinates for two components.
-    predictor_names : sequence of object
-        Required labels for all predictor arrows.
-    sample_names : sequence of object or None, default=None
-        Optional labels for all sample points.
-    title : str, default="PLS-family score-loading biplot"
-        Axis title.
-    figsize : tuple of float or None, default=None
-        Figure size in inches when the function creates the axis. ``None`` uses
-        the chart default. It cannot be supplied together with ``ax``.
-    ax : matplotlib.axes.Axes or None, default=None
-        Existing axis on which to draw. ``None`` creates one figure with one
-        axis.
-
-    Returns
-    -------
-    figure : matplotlib.figure.Figure
-        Created figure, or the supplied axis container when ``ax`` is supplied.
-    axis : matplotlib.axes.Axes
-        Axis containing the chart.
-    """
-
-    if not isinstance(coordinates, BiplotCoordinates):
-        raise TypeError("coordinates must be a BiplotCoordinates instance.")
-    predictor_labels = _categorical_labels(
-        predictor_names,
-        size=coordinates.n_features,
-        argument_name="predictor_names",
-        required=True,
-    )
-    assert predictor_labels is not None
-    sample_labels = _optional_labels(
-        sample_names,
-        size=coordinates.n_samples,
-        argument_name="sample_names",
-    )
-
-    figure, axis = _resolve_axis(
-        ax,
-        figsize=figsize,
-        default_figsize=(8.0, 6.5),
-    )
-    axis.scatter(
-        coordinates.sample_coordinates[:, 0],
-        coordinates.sample_coordinates[:, 1],
-        alpha=0.75,
-        label="Samples",
-    )
-    if sample_labels is not None:
-        for row, label in enumerate(sample_labels):
-            axis.annotate(
-                label,
-                (
-                    coordinates.sample_coordinates[row, 0],
-                    coordinates.sample_coordinates[row, 1],
-                ),
-            )
-
-    from matplotlib.patches import FancyArrowPatch
-
-    for row, label in enumerate(predictor_labels):
-        endpoint = coordinates.predictor_coordinates[row, :]
-        axis.add_patch(
-            FancyArrowPatch(
-                (0.0, 0.0),
-                (float(endpoint[0]), float(endpoint[1])),
-                arrowstyle="->",
-                mutation_scale=10.0,
-                linewidth=1.0,
-            )
-        )
-        axis.annotate(
-            label,
-            (endpoint[0], endpoint[1]),
-            xytext=(3.0 if endpoint[0] >= 0.0 else -3.0, 3.0 if endpoint[1] >= 0.0 else -3.0),
-            textcoords="offset points",
-            horizontalalignment="left" if endpoint[0] >= 0.0 else "right",
-            verticalalignment="bottom" if endpoint[1] >= 0.0 else "top",
-            fontsize="small",
-        )
-
-    first, second = (int(value) for value in coordinates.component_indices)
-    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    axis.set_xlabel(f"Balanced component {first + 1}")
-    axis.set_ylabel(f"Balanced component {second + 1}")
-    axis.set_title(title)
-    axis.set_aspect("equal", adjustable="datalim")
-    return figure, axis
 
 
 def plot_observation_diagnostics(

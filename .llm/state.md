@@ -55,7 +55,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   diagnostics under `pipls.inspection`;
 - estimator-neutral latent-structure, biplot, observation-diagnostic, and plotting names that
   accept compatible fitted Pi-PLS and ordinary PLS models;
-- a single-axis contract for the existing atomic plotters: optional caller-supplied axes,
+- a data-first biplot boundary: `biplot_coordinates()` owns balanced numerical coordinates, while
+  the Pulp example and tutorial use direct Matplotlib arrows and optional `adjustText` label layout;
+- a single-axis contract for the remaining atomic plotters: optional caller-supplied axes,
   `(figure, axis)` returns, and caller-owned legends and panel composition;
 - direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
   OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
@@ -80,8 +82,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
 
-Decision 0078 completes documentation Patches D1--D4 and advances the roadmap to first-release
-preparation. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+Decision 0079 starts the accepted plotting migration. Direct prediction-diagnostic rendering is the
+next increment; first-release preparation follows completion of the plotting sequence. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS

@@ -238,9 +238,14 @@ def test_documentation_ci_builds_checkout_and_source_distribution() -> None:
 def test_examples_extra_declares_data_and_plotting_dependencies() -> None:
     pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
 
-    assert 'examples = ["pandas>=2.0", "matplotlib>=3.8"]' in pyproject
+    assert 'examples = ["pandas>=2.0", "matplotlib>=3.8", "adjustText>=1.4,<2"]' in pyproject
     assert '"pandas>=2.0"' in pyproject.split("dev = [", 1)[1].split("]", 1)[0]
-    assert '"matplotlib>=3.8"' in pyproject.split("dev = [", 1)[1].split("]", 1)[0]
+    dev_dependencies = pyproject.split("dev = [", 1)[1].split("]", 1)[0]
+    assert '"matplotlib>=3.8"' in dev_dependencies
+    assert '"adjustText>=1.4,<2"' in dev_dependencies
+    runtime_dependencies = pyproject.split("dependencies = [", 1)[1].split("]", 1)[0]
+    assert "adjustText" not in runtime_dependencies
+    assert 'plot = ["matplotlib>=3.8"]' in pyproject
 
 
 def test_make_examples_runs_every_numbered_example() -> None:

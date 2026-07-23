@@ -16,14 +16,14 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4 and documentation Patches D1--D4 are complete; first-release preparation is next.
+Phases A through F4 and documentation Patches D1--D4 are complete. Plotting migration G1 is complete; G2 is next.
 The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
 `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
-`pipls.inspection`, and optional Pi-PLS-specific and shared PLS-family figures under `pipls.plotting`.
+`pipls.inspection`, and immutable inspection results. The remaining convenience figures stay under `pipls.plotting`, while biplots are rendered directly from balanced coordinates.
 
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination

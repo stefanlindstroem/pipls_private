@@ -84,6 +84,7 @@ This index is navigation, not a substitute for those records.
 | `0076-focused-pulp-tutorial.md` | focused second-stage tutorial | real-data selection qualification, selection-conditioned OOF analysis, and representative fitted-model plots |
 | `0077-audience-oriented-documentation-entry.md` | user and maintainer documentation entry | concise user README, contributor-owned maintenance commands, and project-validation navigation |
 | `0078-documentation-reference-cleanup.md` | documentation reference cleanup | result-object map, troubleshooting, generic link and anchor checks, and tests that avoid freezing living prose |
+| `0079-data-first-biplot-rendering.md` | data-first biplot rendering | retain balanced coordinates, remove `plot_biplot()`, and use direct Matplotlib with optional `adjustText` label layout |
 
 ## Implemented estimator/search transition
 

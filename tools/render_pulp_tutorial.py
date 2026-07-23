@@ -23,8 +23,10 @@ matplotlib.rcParams["svg.hashsalt"] = "pipls-pulp-tutorial"
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+from adjustText import adjust_text  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
+from matplotlib.patches import FancyArrowPatch  # noqa: E402
 from sklearn.model_selection import KFold, cross_val_predict  # noqa: E402
 
 from pipls import (  # noqa: E402
@@ -41,7 +43,6 @@ from pipls.inspection import (  # noqa: E402
     prediction_diagnostics,
 )
 from pipls.plotting import (  # noqa: E402
-    plot_biplot,
     plot_observed_vs_predicted,
     plot_pipls_predictor_directions,
     plot_standardized_rmse,
@@ -219,13 +220,55 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     )
 
     figure, axis = _figure(figsize=(8.0, 6.2))
-    plot_biplot(
-        biplot_coordinates(structure, components=(0, 1)),
-        predictor_names=predictor_names,
-        title="Pulp score-loading biplot",
-        ax=axis,
+    biplot = biplot_coordinates(structure, components=(0, 1))
+    sample_xy = biplot.sample_coordinates
+    predictor_xy = biplot.predictor_coordinates
+    axis.scatter(
+        sample_xy[:, 0],
+        sample_xy[:, 1],
+        alpha=0.75,
+        label="Samples",
     )
+    for endpoint in predictor_xy:
+        axis.add_patch(
+            FancyArrowPatch(
+                (0.0, 0.0),
+                (float(endpoint[0]), float(endpoint[1])),
+                arrowstyle="->",
+                mutation_scale=10.0,
+                linewidth=1.0,
+            )
+        )
+    labels = [
+        axis.text(
+            float(endpoint[0]),
+            float(endpoint[1]),
+            name,
+            fontsize="small",
+        )
+        for endpoint, name in zip(predictor_xy, predictor_names, strict=True)
+    ]
+    first, second = (int(value) for value in biplot.component_indices)
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axis.set_xlabel(f"Balanced component {first + 1}")
+    axis.set_ylabel(f"Balanced component {second + 1}")
+    axis.set_title("Pulp score-loading biplot")
+    axis.set_aspect("equal", adjustable="datalim")
+    axis.margins(0.1)
     axis.legend()
+    adjust_text(
+        labels,
+        x=sample_xy[:, 0],
+        y=sample_xy[:, 1],
+        target_x=predictor_xy[:, 0],
+        target_y=predictor_xy[:, 1],
+        ax=axis,
+        ensure_inside_axes=True,
+        prevent_crossings=False,
+        iter_lim=200,
+        arrowprops={"arrowstyle": "-", "linewidth": 0.6},
+    )
     _save_svg(figure, output_dir / "biplot.svg")
 
     figure, axis = _figure(figsize=(10.0, 5.4))

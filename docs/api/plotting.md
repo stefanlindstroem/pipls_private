@@ -1,9 +1,9 @@
 # Plotting
 
-`pipls.plotting` is the operational reference for optional Matplotlib chart primitives. Scientific
-interpretation belongs in [Model inspection](../model_inspection.md), and the
-[Pulp tutorial](../tutorials/pulp.md#interpret-representative-fitted-model-plots) shows a maintained
-representative plotting workflow.
+`pipls.plotting` is the transitional reference for the remaining optional Matplotlib chart
+primitives. Scientific interpretation belongs in [Model inspection](../model_inspection.md). The
+[Pulp tutorial](../tutorials/pulp.md#score-loading-biplot) shows the data-first biplot boundary: Pi-PLS
+calculates balanced coordinates, while Matplotlib and `adjustText` own rendering and label layout.
 
 Every function renders one chart on one optional caller-supplied `ax` and returns `(figure, axis)`.
 Plotters do not create panels, legends, figure-level titles, files, displays, or closing operations.
@@ -63,10 +63,6 @@ Conceptual reference: [scores](../model_inspection.md#scores),
       members: false
 
 ::: pipls.plotting.plot_coefficients
-    options:
-      members: false
-
-::: pipls.plotting.plot_biplot
     options:
       members: false
 

@@ -121,13 +121,18 @@ API: [`plot_scores()`](api/plotting.md#pipls.plotting.plot_scores).
 
 ### Score-loading biplot { #score-loading-biplot }
 
-`plot_biplot()` combines balanced score coordinates with X-loading arrows for the same two
-components. Similar arrow directions indicate similar loading patterns in the displayed plane. A
-sample lying in an arrow's direction has a positive coordinate along that displayed predictor
-direction. These are geometric statements, not causal effects or automatic importance measures.
+`biplot_coordinates()` calculates balanced sample and predictor coordinates for two components.
+Plot `sample_coordinates` with `Axes.scatter()`, draw vectors from the origin to
+`predictor_coordinates`, and create predictor labels with `Axes.text()`. For dense labels,
+`adjustText.adjust_text()` can move those text artists after titles, limits, aspect, and legends have
+been configured. Automatic placement is heuristic, so unusually dense diagrams may still need
+manual adjustment.
 
-API: [`biplot_coordinates()`](api/inspection.md#pipls.inspection.biplot_coordinates) and
-[`plot_biplot()`](api/plotting.md#pipls.plotting.plot_biplot).
+Similar arrow directions indicate similar loading patterns in the displayed plane. A sample lying
+in an arrow's direction has a positive coordinate along that displayed predictor direction. These
+are geometric statements, not causal effects or automatic importance measures.
+
+API: [`biplot_coordinates()`](api/inspection.md#pipls.inspection.biplot_coordinates).
 
 ### X loadings { #x-loadings }
 

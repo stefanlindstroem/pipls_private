@@ -99,7 +99,6 @@ def test_shared_public_analysis_names_are_estimator_neutral() -> None:
 
     shared_plotting = {
         "PredictorStyle",
-        "plot_biplot",
         "plot_coefficients",
         "plot_observation_diagnostics",
         "plot_observed_vs_predicted",

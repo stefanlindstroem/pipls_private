@@ -71,7 +71,11 @@ Structural tests for Pulp, Sugarcane, and Tobacco protect direct `component_path
 scikit-learn `cross_val_predict()`, immutable inspection results, explicit `ax=` calls, absence of
 analytical CSV output, and the declared final PDF filenames without running the artifact-writing
 scripts. Tobacco tests also protect its full-SVD configuration, source-order response pagination,
-raw observation diagnostics, and caller-owned multipage PDF loops. Tutorial-renderer tests may run each direct calculation once in a temporary directory, parse every
+raw observation diagnostics, and caller-owned multipage PDF loops. Biplot tests protect balanced-coordinate numerics in `pipls.inspection`; maintained example and
+renderer structure must expose direct Matplotlib arrows and labels, call `adjust_text()` after axis
+configuration, and avoid pinning adjusted label coordinates.
+
+Tutorial-renderer tests may run each direct calculation once in a temporary directory, parse every
 declared SVG, verify manifest hashes, rank-profile metadata, and generated filenames, and enforce
 Makefile/source-distribution ownership without pinning pixels or Matplotlib artist counts. Tutorial structure tests may verify the two-step navigation, generated-asset references, checked
 snippet sections from examples 02 and 10, links to stable API objects, and links to stable

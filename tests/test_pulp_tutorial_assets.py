@@ -123,6 +123,7 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     docs_dependencies = pyproject["project"]["optional-dependencies"]["docs"]
     assert "pandas>=2.0" in docs_dependencies
     assert "matplotlib>=3.8" in docs_dependencies
+    assert "adjustText>=1.4,<2" in docs_dependencies
     assert "render_pulp_tutorial.py" in sdist_checker
     assert 'source / "docs" / "tutorials" / "pulp.md"' in sdist_checker
     assert 'source / "examples" / "10_pulp_real_data.py"' in sdist_checker
@@ -181,6 +182,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "plot-pulp-component-path",
         "extract-pulp-rank-profile",
         "plot-pulp-rank-profile",
+        "plot-pulp-biplot",
     }
     for section in snippet_sections:
         assert f"examples/10_pulp_real_data.py:{section}" in tutorial
@@ -191,7 +193,6 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         assert f"../assets/generated/pulp/{filename}" in tutorial
 
     plotting_functions = {
-        "plot_biplot",
         "plot_pipls_predictor_directions",
         "plot_observed_vs_predicted",
         "plot_standardized_rmse",
@@ -218,6 +219,20 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         < example.index(profile_line)
         < example.index(model_fit)
     )
+
+    biplot_start = example.index("# --8<-- [start:plot-pulp-biplot]")
+    biplot_adjust = example.index("adjust_text(", biplot_start)
+    assert example.index("biplot_axis.set_aspect", biplot_start) < biplot_adjust
+    assert example.index("biplot_axis.legend()", biplot_start) < biplot_adjust
+    assert "from adjustText import adjust_text" in example
+    assert "from matplotlib.patches import FancyArrowPatch" in example
+    renderer_biplot = renderer.index("    biplot = biplot_coordinates(")
+    renderer_adjust = renderer.index("    adjust_text(", renderer_biplot)
+    assert renderer.index("    axis.set_aspect", renderer_biplot) < renderer_adjust
+    assert renderer.index("    axis.legend()", renderer_biplot) < renderer_adjust
+    assert "prevent_crossings=False" in example
+    assert "iter_lim=200" in example
+
     renderer_selected = renderer.index("selected = component_path.for_n_components(")
     renderer_plot = renderer.index("    _render_component_path(", renderer_selected)
     renderer_profile = renderer.index(

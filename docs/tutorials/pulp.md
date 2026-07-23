@@ -152,6 +152,14 @@ patterns and paired quantities, not isolated signs.
 
 #### Score-loading biplot
 
+The balancing calculation remains package-owned, but the chart is ordinary Matplotlib. Predictor
+labels are standard text artists, and `adjustText` moves them after the axis has been fully
+configured:
+
+```python
+--8<-- "examples/10_pulp_real_data.py:plot-pulp-biplot"
+```
+
 ![Pulp score-loading biplot](../assets/generated/pulp/biplot.svg)
 
 The biplot combines balanced sample-score coordinates with predictor arrows from the first two X
@@ -161,7 +169,7 @@ specific to the displayed scaling and should not be read as regression coefficie
 variable importance.
 
 See [Score-loading biplot](../model_inspection.md#score-loading-biplot) and
-[`plot_biplot()`](../api/plotting.md#pipls.plotting.plot_biplot).
+[`biplot_coordinates()`](../api/inspection.md#pipls.inspection.biplot_coordinates).
 
 ### Pi-PLS-specific factorization plot
 

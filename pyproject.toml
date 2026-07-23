@@ -31,6 +31,7 @@ dev = [
   "build>=1.2",
   "pandas>=2.0",
   "matplotlib>=3.8",
+  "adjustText>=1.4,<2",
   "PyYAML>=6",
   "tomli>=2; python_version < '3.11'",
   "mypy>=1.10",
@@ -38,11 +39,12 @@ dev = [
   "pytest-cov>=5",
   "ruff>=0.6",
 ]
-examples = ["pandas>=2.0", "matplotlib>=3.8"]
+examples = ["pandas>=2.0", "matplotlib>=3.8", "adjustText>=1.4,<2"]
 docs = [
   "build>=1.2,<2",
   "pandas>=2.0",
   "matplotlib>=3.8",
+  "adjustText>=1.4,<2",
   "mkdocs>=1.6,<2",
   "mkdocs-material>=9.5,<9.7",
   "mkdocstrings-python>=2,<3",

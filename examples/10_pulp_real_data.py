@@ -4,6 +4,8 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from adjustText import adjust_text
+from matplotlib.patches import FancyArrowPatch
 from sklearn.model_selection import KFold, cross_val_predict
 
 from pipls import PiPLSPathCV, PiPLSRegression
@@ -14,7 +16,6 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 from pipls.plotting import (
-    plot_biplot,
     plot_coefficients,
     plot_observed_vs_predicted,
     plot_pipls_dilation,
@@ -209,12 +210,61 @@ plot_scores(
     title="X scores",
     ax=axes[0, 0],
 )
-plot_biplot(
-    biplot_coordinates(structure, components=(0, 1)),
-    predictor_names=predictor_names,
-    title="Score-loading biplot",
-    ax=axes[0, 1],
+# --8<-- [start:plot-pulp-biplot]
+biplot = biplot_coordinates(structure, components=(0, 1))
+sample_xy = biplot.sample_coordinates
+predictor_xy = biplot.predictor_coordinates
+biplot_axis = axes[0, 1]
+
+biplot_axis.scatter(
+    sample_xy[:, 0],
+    sample_xy[:, 1],
+    alpha=0.75,
+    label="Samples",
 )
+for endpoint in predictor_xy:
+    biplot_axis.add_patch(
+        FancyArrowPatch(
+            (0.0, 0.0),
+            (float(endpoint[0]), float(endpoint[1])),
+            arrowstyle="->",
+            mutation_scale=10.0,
+            linewidth=1.0,
+        )
+    )
+
+predictor_labels = [
+    biplot_axis.text(
+        float(endpoint[0]),
+        float(endpoint[1]),
+        name,
+        fontsize="small",
+    )
+    for endpoint, name in zip(predictor_xy, predictor_names, strict=True)
+]
+first, second = (int(value) for value in biplot.component_indices)
+biplot_axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+biplot_axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+biplot_axis.set_xlabel(f"Balanced component {first + 1}")
+biplot_axis.set_ylabel(f"Balanced component {second + 1}")
+biplot_axis.set_title("Score-loading biplot")
+biplot_axis.set_aspect("equal", adjustable="datalim")
+biplot_axis.margins(0.1)
+biplot_axis.legend()
+
+adjust_text(
+    predictor_labels,
+    x=sample_xy[:, 0],
+    y=sample_xy[:, 1],
+    target_x=predictor_xy[:, 0],
+    target_y=predictor_xy[:, 1],
+    ax=biplot_axis,
+    ensure_inside_axes=True,
+    prevent_crossings=False,
+    iter_lim=200,
+    arrowprops={"arrowstyle": "-", "linewidth": 0.6},
+)
+# --8<-- [end:plot-pulp-biplot]
 plot_x_loadings(
     structure,
     predictor_style="bar",
@@ -230,7 +280,6 @@ plot_y_loadings(
     title="Y loadings",
     ax=axes[1, 1],
 )
-axes[0, 1].legend()
 axes[1, 0].legend()
 axes[1, 1].legend()
 for axis in (axes[1, 0], axes[1, 1]):

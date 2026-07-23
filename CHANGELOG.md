@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Start the data-first plotting migration: retain balanced biplot coordinates, remove the public `plot_biplot()` renderer, draw the maintained Pulp biplots directly with Matplotlib, and use optional `adjustText` label placement.
+
 - Complete the documentation cleanup with a public result-object map, a task-oriented troubleshooting page, generic local-link and anchor validation, removal of internal phase language from served guides, and less prose-coupled tutorial tests.
 
 - Reduce the root README to package orientation, installation, two compact workflows, and tutorial

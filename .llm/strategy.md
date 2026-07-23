@@ -573,8 +573,7 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-First-release preparation is next: choose the initial version, complete metadata and release
-notes, and rehearse the tag and publication checklist.
+Plotting migration G2 is next: render prediction diagnostics directly from immutable arrays and remove the three corresponding convenience plotters. First-release preparation follows G5.
 
 ## Maintenance protocol
 

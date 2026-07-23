@@ -242,7 +242,6 @@ from pipls.plotting import (
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_biplot,
     plot_coefficients,
     plot_observation_diagnostics,
     plot_scores,
@@ -254,8 +253,8 @@ from pipls.plotting import (
 )
 ```
 
-`plot_scores()`, `plot_x_loadings()`, `plot_y_loadings()`, `plot_coefficients()`,
-`plot_biplot()`, and `plot_observation_diagnostics()` each render one chart. Every function accepts
+`plot_scores()`, `plot_x_loadings()`, `plot_y_loadings()`, `plot_coefficients()`, and
+`plot_observation_diagnostics()` each render one chart. Every function accepts
 `ax=None` and returns `(figure, axis)`. With a supplied Matplotlib axis, it draws on that axis without
 clearing it, resizing its figure, or creating another figure. Supplying both `ax` and `figsize` is an
 error. The functions provide concise semantic axis labels and titles that callers may replace.
@@ -278,12 +277,13 @@ level. Scatter artists carry response labels, but legends remain caller-owned.
 components together on one axis; coefficient plots place selected responses together on one axis.
 Categorical displays require caller-supplied variable names, while line displays require an explicit
 physical coordinate and axis label. Components and responses are selected by explicit zero-based
-indices. `plot_biplot()` renders balanced sample scores with named X-loading arrows and no response
-arrows or confidence regions. `plot_observation_diagnostics()` renders one raw score-distance
+indices. Biplots are rendered directly from `BiplotCoordinates` with Matplotlib; maintained Pulp
+figures use optional `adjustText` label placement. `plot_observation_diagnostics()` renders one raw score-distance
 versus X-reconstruction-residual scatter plot without theoretical limits or automatic observation
 labels.
 
-Matplotlib remains optional and is imported only when a plotting function is called. The functions
+Matplotlib remains optional and is imported only when a plotting function is called. `adjustText`
+is optional under the examples, docs, and development extras and is not imported by the package. The functions
 perform no legend or panel creation, file writing, display, or closing, retain no models, and do not
 alter supplied arrays. Component-path helpers remain example-local selection diagnostics. Every
 maintained analysis figure is created in the example layer, which passes an explicit axis to each

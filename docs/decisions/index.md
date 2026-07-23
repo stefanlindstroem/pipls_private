@@ -93,3 +93,4 @@ reference describe the current public behavior directly.
 - [0076: focused Pulp tutorial](0076-focused-pulp-tutorial.md)
 - [0077: audience-oriented documentation entry](0077-audience-oriented-documentation-entry.md)
 - [0078: documentation reference cleanup](0078-documentation-reference-cleanup.md)
+- [0079: data-first biplot rendering](0079-data-first-biplot-rendering.md)
