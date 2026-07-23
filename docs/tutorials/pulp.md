@@ -209,6 +209,17 @@ selection-conditioned OOF error for the displayed responses, not independent-tes
 
 See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
 
+#### Residual versus predicted
+
+![Pulp residual versus predicted](../assets/generated/pulp/residuals_vs_predicted.svg)
+
+Standardized residuals are plotted against standardized OOF predictions for the same three
+responses. The zero line helps reveal systematic bias, curvature, or changing residual spread over
+the prediction range. The figure remains descriptive: it does not establish a formal variance model
+or independent-test calibration.
+
+See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted).
+
 #### Standardized RMSE
 
 ![Pulp standardized RMSE](../assets/generated/pulp/standardized_rmse.svg)
@@ -233,10 +244,10 @@ Run it from the repository root with:
 python examples/10_pulp_real_data.py
 ```
 
-The tutorial renderer writes six representative single-chart SVGs. The numbered example remains a
+The tutorial renderer writes seven representative single-chart SVGs. The numbered example remains a
 complete API demonstration and writes six caller-owned PDFs, including additional score, loading,
-factorization, residual, and coefficient views. Both routes calculate directly from in-memory
-results and write no generated analytical CSV files.
+factorization, and coefficient views. Both routes calculate directly from in-memory results and write
+no generated analytical CSV files.
 
 ## Next steps
 

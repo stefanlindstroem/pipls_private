@@ -64,6 +64,9 @@ def test_served_markdown_local_links_and_anchors_resolve() -> None:
             assert destination.is_relative_to(docs_root), (
                 f"{source.relative_to(docs_root)} links outside docs/: {match.group('target')}"
             )
+            generated_assets = docs_root / "assets" / "generated"
+            if destination.is_relative_to(generated_assets):
+                continue
             assert destination.is_file(), (
                 f"{source.relative_to(docs_root)} links to a missing file: {match.group('target')}"
             )

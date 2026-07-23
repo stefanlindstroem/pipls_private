@@ -520,7 +520,9 @@ selection-conditioned OOF analysis, and six representative plots, and Decision 0
 README while moving maintenance ownership to `CONTRIBUTING.md` and project-validation navigation.
 Phase F4 has completed the owner-approved pre-release result and example simplification.
 Decision 0078 completes the reference cleanup with a result-object map, troubleshooting,
-link-and-anchor validation, and documentation tests that avoid freezing living prose.
+link-and-anchor validation, and documentation tests that avoid freezing living prose. Decision
+0084 completes the focused Pulp prediction section by displaying the residual-versus-predicted
+figure represented by the middle axis of the maintained three-panel snippet.
 
 ### Current standardization and deferred block-aware variants
 

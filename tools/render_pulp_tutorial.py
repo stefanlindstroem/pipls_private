@@ -55,6 +55,7 @@ FIGURE_FILENAMES = (
     "biplot.svg",
     "predictor_directions.svg",
     "observed_vs_predicted.svg",
+    "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
 )
 
@@ -314,6 +315,37 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_title(f"Pulp observed versus predicted\n{diagnostics.prediction_kind}")
     axis.legend(title="Response")
     _save_svg(figure, output_dir / "observed_vs_predicted.svg")
+
+    figure, axis = _figure(figsize=(6.4, 5.0))
+    for response in detailed_response_indices:
+        axis.scatter(
+            diagnostics.predicted_standardized[:, response],
+            diagnostics.residual_standardized[:, response],
+            label=response_names[response],
+            alpha=0.75,
+        )
+    predicted = diagnostics.predicted_standardized[:, detailed_array]
+    residual = diagnostics.residual_standardized[:, detailed_array]
+    predicted_span = float(predicted.max() - predicted.min())
+    residual_span = float(residual.max() - residual.min())
+    axis.set_xlim(
+        float(predicted.min())
+        - (0.05 * predicted_span if predicted_span > 0.0 else 1.0),
+        float(predicted.max())
+        + (0.05 * predicted_span if predicted_span > 0.0 else 1.0),
+    )
+    axis.set_ylim(
+        float(residual.min())
+        - (0.05 * residual_span if residual_span > 0.0 else 1.0),
+        float(residual.max())
+        + (0.05 * residual_span if residual_span > 0.0 else 1.0),
+    )
+    axis.axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
+    axis.set_xlabel("Predicted response (standardized)")
+    axis.set_ylabel(r"Residual $y-\hat y$ (standardized)")
+    axis.set_title(f"Pulp residual versus predicted\n{diagnostics.prediction_kind}")
+    axis.legend(title="Response")
+    _save_svg(figure, output_dir / "residuals_vs_predicted.svg")
 
     figure, axis = _figure(figsize=(7.4, 5.0))
     positions = np.arange(len(response_names))

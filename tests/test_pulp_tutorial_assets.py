@@ -23,6 +23,7 @@ FIGURE_FILENAMES = (
     "biplot.svg",
     "predictor_directions.svg",
     "observed_vs_predicted.svg",
+    "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
 )
 
@@ -265,6 +266,8 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         tutorial.index("biplot.svg")
         < tutorial.index("predictor_directions.svg")
         < tutorial.index("observed_vs_predicted.svg")
+        < tutorial.index("residuals_vs_predicted.svg")
+        < tutorial.index("standardized_rmse.svg")
     )
     omitted_figures = {
         "scores.svg",
@@ -273,7 +276,6 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "dilation.svg",
         "response_directions.svg",
         "weighted_response_directions.svg",
-        "residuals_vs_predicted.svg",
     }
     for filename in omitted_figures:
         assert filename not in tutorial
@@ -310,6 +312,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     for field in {
         "diagnostics.observed_standardized",
         "diagnostics.predicted_standardized",
+        "diagnostics.residual_standardized",
         "diagnostics.standardized_rmse",
     }:
         assert field in renderer
@@ -369,6 +372,7 @@ def test_documentation_layers_have_distinct_ownership() -> None:
         "score-loading-biplot",
         "predictor-directions",
         "observed-versus-predicted",
+        "residuals-versus-predicted",
         "standardized-rmse",
     }
     for anchor in tutorial_anchors:

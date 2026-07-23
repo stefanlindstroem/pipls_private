@@ -25,6 +25,7 @@ PULP_TUTORIAL_FIGURES = (
     "biplot.svg",
     "predictor_directions.svg",
     "observed_vs_predicted.svg",
+    "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
 )
 
@@ -216,6 +217,12 @@ def main() -> None:
             / "synthetic"
             / "observed_vs_predicted.svg",
             source / "site" / "assets" / "generated" / "pulp" / "component_path.svg",
+            source
+            / "site"
+            / "assets"
+            / "generated"
+            / "pulp"
+            / "residuals_vs_predicted.svg",
             source / "site" / "assets" / "generated" / "pulp" / "standardized_rmse.svg",
         ]
         missing_rendered = [

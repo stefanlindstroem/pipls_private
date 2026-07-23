@@ -85,8 +85,10 @@ implementation was removed and replaced by focused question-specific benchmarks:
   without freezing explanatory prose.
 
 Decisions 0079--0083 establish and enforce data-first rendering for biplots, prediction
-diagnostics, standard PLS-family inspection, and Pi-PLS factors. Plotting migration G1--G5 is
-complete. First-release preparation is the next increment. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+diagnostics, standard PLS-family inspection, and Pi-PLS factors. Decision 0084 aligns Tutorial 2
+with its maintained three-axis prediction snippet by displaying observed-versus-predicted,
+residual-versus-predicted, and standardized-RMSE figures. Plotting migration G1--G5 is complete.
+First-release preparation is the next increment. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS

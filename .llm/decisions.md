@@ -182,3 +182,4 @@ record and add it to this index in the same patch.
 | `0081-direct-standard-inspection-rendering.md` | direct standard inspection rendering | immutable latent and observation arrays are primary; examples use direct Matplotlib; five convenience plotters removed |
 | `0082-direct-pipls-factor-rendering.md` | direct Pi-PLS factor rendering | immutable factor arrays are primary; plotting module and plot extra removed |
 | `0083-data-first-rendering-policy.md` | final data-first rendering policy | immutable results are the compatibility surface; rendering remains optional and caller-owned |
+| `0084-complete-pulp-prediction-diagnostics.md` | complete Pulp prediction diagnostics | Tutorial 2 displays the residual figure represented by the middle axis of its maintained three-panel prediction snippet |

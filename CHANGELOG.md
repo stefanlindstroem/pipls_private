@@ -1,5 +1,7 @@
 # Changelog
 
+- Complete Tutorial 2 prediction diagnostics by generating and displaying the
+  residual-versus-predicted figure already present in the maintained three-panel example code.
 - Complete the data-first rendering migration: define immutable inspection results as the
   compatibility surface, keep Matplotlib and `adjustText` optional, document caller-owned
   rendering, and enforce the absence of package plotters and hidden chart helpers.
