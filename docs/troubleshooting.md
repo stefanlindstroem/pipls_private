@@ -27,14 +27,16 @@ search.predictor_rank_profile(h).predictor_rank
 ```
 
 An explicit component request must have at least one admissible predictor rank. Candidate limits
-also depend on sample count, centered training-fold dimensions, configured rank bounds, and the
-selected search policy. See [Path-selection details](path_analysis.md).
+also depend on sample count, transformed training-fold dimensions, the minimum numerical rank
+verified across those folds, configured rank bounds, and the selected search policy. See
+[Path-selection details](path_analysis.md).
 
 ## The path search has no admissible candidate
 
-Reduce the requested component count or predictor-rank range, provide more observations, or review
-`max_predictor_rank` and `samples_per_predictor_rank`. Grouped, temporal, and other specialized
-splitters can reduce the smallest training-fold size and therefore the feasible rank.
+Reduce the requested component count or predictor-rank range, provide more observations, remove
+redundant predictors, or review `max_predictor_rank` and `samples_per_predictor_rank`. Grouped,
+temporal, and other specialized splitters can reduce the smallest training-fold size or the minimum
+verified fold rank and therefore the feasible path.
 
 The [cross-validation protocols](path_analysis.md#cross-validation-protocols-and-metadata)
 section explains splitter-dependent feasibility and metadata such as `groups`.

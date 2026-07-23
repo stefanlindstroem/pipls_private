@@ -106,7 +106,9 @@ Decision 0090 consolidates the programming reference without changing public obj
 behavior.
 Decision 0091 makes every successful handoff snapshot a clean `HEAD` archive: tracked, staged, and
 nonignored untracked changes are refused, while ignored generated files are excluded by
-construction.
+construction. Decision 0092 makes the path ceiling respect the minimum predictor rank verified
+after fold-local preprocessing, so rank-deficient folds bound the candidate path instead of
+aborting it.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -323,19 +325,17 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Pre-release audit hardening 2/6: make `PiPLSPathCV` respect the minimum verified numerical rank of
-its training folds before candidate evaluation.
+Pre-release audit hardening 3/6: align `rank_test_score` groups with the selector's tolerant
+best-score rule.
 
 ## Subsequent roadmap
 
-1. **Tolerant score ranking:** align `rank_test_score` groups with the selector's best-score tie
-   rule.
-2. **Core public-result invariants:** make estimator and path result records uniformly defensive
+1. **Core public-result invariants:** make estimator and path result records uniformly defensive
    and validated.
-3. **Inspection numerical safety:** make inspection records and extreme finite calculations obey
+2. **Inspection numerical safety:** make inspection records and extreme finite calculations obey
    the same finite-result policy.
-4. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
-5. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
+3. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
+4. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
    publication are outside the current sequence.
 
 Future datasets still require a distinct package-level use case and verified source-level

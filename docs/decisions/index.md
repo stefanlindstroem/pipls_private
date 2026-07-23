@@ -30,6 +30,7 @@ reference describe the current public behavior directly.
 - [0086: public decomposition boundary](0086-public-decomposition-boundary.md)
 - [0087: public fitted-surface cleanup](0087-public-fitted-surface-cleanup.md)
 - [0088: public result-record cleanup](0088-public-result-record-cleanup.md)
+- [0092: fold numerical-rank feasibility](0092-fold-numerical-rank-feasibility.md)
 
 ## Validation, data, and benchmarks
 

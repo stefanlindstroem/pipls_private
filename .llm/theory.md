@@ -456,8 +456,9 @@ $$
 r_{\pi,\max}
 =
 \min\left(
- p,
+ p_{\min},
  n_{\mathrm{train,min}}-1,
+ r_{\mathrm{num,min}},
  \left\lceil
  \frac{n}
  {\texttt{samples\_per\_predictor\_rank}}
@@ -467,10 +468,11 @@ $$
 
 This bound is an API and regularization policy, not a theorem of Pi-PLS. The total supplied sample
 count $n$ defines statistical support for the final model, which is refitted on all supplied rows.
-For internal CV, $n_{\mathrm{train,min}}$ is the smallest materialized training-fold size. Because
-each candidate centers its training predictors, $n_{\mathrm{train,min}}-1$ is a hard feasibility
-cap. Using the public sample count in the support term does not fit any quantity from $X$ or $Y$
-outside the training folds.
+For internal CV, $p_{\min}$ is the minimum predictor count after fold-local pipeline preprocessing,
+$n_{\mathrm{train,min}}$ is the smallest materialized training-fold size, and
+$r_{\mathrm{num,min}}$ is the minimum predictor rank verified after terminal-estimator centering
+and optional scaling. These are hard feasibility caps. Using the public sample count in the support
+term does not fit any quantity from $X$ or $Y$ outside the training folds.
 
 The fixed estimator accepts one explicit integer $r_\pi$. Rule-derived ceilings and adaptive or
 exhaustive rank search belong to `PiPLSPathCV`, which evaluates fixed-estimator clones on the

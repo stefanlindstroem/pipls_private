@@ -45,3 +45,12 @@ or $\mathbf{Z}\mathbf{W}\mathbf{C}^{\mathsf{T}}$.
 Repeated or nearly repeated singular values identify invariant subspaces, not intrinsically
 numbered basis vectors. Tests must compare projection matrices, principal angles, singular
 values, regression maps, or predictions rather than raw basis columns.
+
+For path selection, let $r_{\mathrm{num,min}}$ be the minimum predictor rank verified after
+fold-local pipeline preprocessing and terminal-estimator centering/scaling. The default path ceiling
+is
+
+\begin{equation}
+r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
+r_{\mathrm{num,min}},\left\lceil\frac{n}{c}\right\rceil\right].
+\end{equation}

@@ -103,9 +103,11 @@ surface satisfies
 \]
 
 The default ceiling uses total supplied $n$ for the support term with
-`samples_per_predictor_rank=5`, while centered fold dimensions remain hard feasibility caps. The
-class accepts a direct fixed `PiPLSRegression` or a pipeline ending in one, materializes one CV
-split set, clones fixed candidates, and optionally refits the selected pair.
+`samples_per_predictor_rank=5`. Centered fold dimensions and the minimum predictor rank verified
+after fold-local pipeline preprocessing and terminal-estimator preprocessing are hard feasibility
+caps. Explicit component and predictor-rank sequences are validated against the resolved ceiling
+before scoring. The class accepts a direct fixed `PiPLSRegression` or a pipeline ending in one,
+materializes one CV split set, clones fixed candidates, and optionally refits the selected pair.
 
 The default `scoring` value is the public callable
 `pipls.metrics.neg_response_standardized_mean_squared_error`. Ordinary scikit-learn scorer names,

@@ -6,8 +6,9 @@ sequence: inspect `component_path_`, choose a component count, retrieve its cond
 rank, and fit a separate fixed estimator.
 
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
-preprocessing is fitted independently inside each training fold. Methods that delegate to a
-selected estimator are available only when `refit=True`.
+preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
+selector caps the path by the minimum predictor rank verified across those transformed folds.
+Methods that delegate to a selected estimator are available only when `refit=True`.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see

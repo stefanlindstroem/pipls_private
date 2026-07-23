@@ -23,6 +23,7 @@ from sklearn.utils import _safe_indexing, indexable
 from sklearn.utils.metaestimators import available_if
 from sklearn.utils.validation import check_is_fitted
 
+from ._core import _PredictorRankInfeasibleError
 from ._cv_engine import (
     CandidateCache,
     _evaluate_candidate_batch,
@@ -115,8 +116,10 @@ class PiPLSPathCV(
         defines an explicit set, and ``"max"`` uses ``max_predictor_rank_`` for
         every component count.
     max_predictor_rank : int or "rule", default="rule"
-        ``"rule"`` applies the total-sample support rule and fold-feasibility
-        caps. A positive integer imposes an additional upper bound.
+        ``"rule"`` applies the total-sample support rule together with
+        dimensional and verified numerical-rank caps from every training fold.
+        A positive integer imposes an additional upper bound but bypasses only
+        the support rule.
     search_method : {"auto", "optimal"}, default="auto"
         ``"optimal"`` evaluates every admissible pair. ``"auto"`` uses the
         deterministic adaptive search and may skip pairs.
@@ -155,8 +158,8 @@ class PiPLSPathCV(
     cv_n_train_min_ : int
         Smallest training-fold size.
     max_predictor_rank_ : int
-        Effective predictor-rank upper bound after support and fold-feasibility
-        constraints.
+        Effective predictor-rank upper bound after support, dimensional, and
+        verified fold-numerical-rank constraints.
     path_search_exhaustive_ : bool
         Whether every admissible pair was evaluated.
     scorer_ : callable
@@ -285,23 +288,30 @@ class PiPLSPathCV(
         self.n_splits_ = len(materialized.splits)
         self.cv_n_train_min_ = materialized.n_train_min
 
-        fold_feature_limit = _fold_safe_feature_limit(
+        fold_feature_limit, fold_numerical_rank_limit = _fold_predictor_limits(
             template=template,
-            prefix=pipls_param_prefix,
             X=X_indexable,
             y=y_indexable,
             splits=materialized.splits,
         )
         algebraic_limit = min(fold_feature_limit, materialized.n_train_min - 1)
         if self.max_predictor_rank == "rule":
-            self.max_predictor_rank_ = _max_predictor_rank(
+            support_limit = _max_predictor_rank(
                 n_features=fold_feature_limit,
                 n_samples=int(X_array.shape[0]),
                 n_train_min=materialized.n_train_min,
                 samples_per_predictor_rank=self.samples_per_predictor_rank,
             )
+            self.max_predictor_rank_ = min(
+                support_limit,
+                fold_numerical_rank_limit,
+            )
         else:
-            self.max_predictor_rank_ = min(int(self.max_predictor_rank), algebraic_limit)
+            self.max_predictor_rank_ = min(
+                int(self.max_predictor_rank),
+                algebraic_limit,
+                fold_numerical_rank_limit,
+            )
 
         h_limit = min(self.n_targets_, self.max_predictor_rank_)
         component_values = _validated_component_values(
@@ -854,27 +864,80 @@ def _extract_fitted_pipls(estimator: Any, prefix: str) -> PiPLSRegression:
     )
 
 
-def _fold_safe_feature_limit(
+def _fold_predictor_limits(
     *,
     template: Any,
-    prefix: str,
     X: ArrayLike,
     y: ArrayLike,
     splits: tuple[CVSplit, ...],
-) -> int:
-    if prefix == "" and isinstance(template, PiPLSRegression):
-        return int(np.asarray(X).shape[1])
-    n_key, r_key = _pipls_parameter_keys(prefix)
+) -> tuple[int, int]:
+    """Return minimum transformed feature count and verified rank across folds."""
+
     feature_counts: list[int] = []
-    for train, _ in splits:
-        probe = clone(template).set_params(**{n_key: 1, r_key: 1})
-        _fit_controlled_estimator(
-            probe,
-            _safe_indexing(X, train),
-            _safe_indexing(y, train),
-        )
-        feature_counts.append(_extract_fitted_pipls(probe, prefix).n_features_in_)
-    return min(feature_counts)
+    numerical_ranks: list[int] = []
+    global_random_state = np.random.get_state()
+    try:
+        for split_index, (train, _) in enumerate(splits):
+            X_train = _safe_indexing(X, train)
+            y_train = _safe_indexing(y, train)
+            final_estimator, X_transformed = _fold_final_estimator_and_predictors(
+                template=template,
+                X=X_train,
+                y=y_train,
+            )
+            transformed_shape = np.shape(X_transformed)
+            if len(transformed_shape) != 2:
+                raise ValueError(
+                    "Pipeline preprocessing must produce a two-dimensional predictor "
+                    f"matrix; got shape={transformed_shape}."
+                )
+            n_samples, n_features = transformed_shape
+            feature_counts.append(int(n_features))
+            algebraic_limit = min(int(n_features), int(n_samples) - 1)
+            if algebraic_limit < 1:
+                raise ValueError(
+                    "No positive predictor rank is feasible after preprocessing in "
+                    f"training split {split_index}."
+                )
+            probe = final_estimator.set_params(
+                n_components=1,
+                predictor_rank=algebraic_limit,
+            )
+            try:
+                _fit_controlled_estimator(probe, X_transformed, y_train)
+            except _PredictorRankInfeasibleError as error:
+                verified_rank = error.verified_rank
+            else:
+                verified_rank = algebraic_limit
+            if verified_rank < 1:
+                raise ValueError(
+                    "No positive predictor rank is numerically feasible after "
+                    f"preprocessing in training split {split_index}."
+                )
+            numerical_ranks.append(verified_rank)
+    finally:
+        np.random.set_state(global_random_state)
+    return min(feature_counts), min(numerical_ranks)
+
+
+def _fold_final_estimator_and_predictors(
+    *,
+    template: Any,
+    X: ArrayLike,
+    y: ArrayLike,
+) -> tuple[PiPLSRegression, Any]:
+    """Fit fold-local preprocessing and return its final Pi-PLS template and X."""
+
+    if isinstance(template, PiPLSRegression):
+        return clone(template), X
+
+    assert isinstance(template, Pipeline)
+    final_estimator = cast(PiPLSRegression, clone(template.steps[-1][1]))
+    if len(template.steps) == 1:
+        return final_estimator, X
+    preprocessor = clone(template[:-1])
+    X_transformed = preprocessor.fit_transform(X, y)
+    return final_estimator, X_transformed
 
 
 def _evaluate_path_batch(

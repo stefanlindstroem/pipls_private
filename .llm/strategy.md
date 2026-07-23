@@ -590,16 +590,17 @@ human review. They must be implemented and snapshotted one at a time:
 6. dataset metadata closure.
 
 Decision 0091 completes the first increment by replacing worktree copying with a clean `HEAD`
-archive and tests for modified, staged, nonignored untracked, and ignored files. Release preparation and
-publication are explicitly outside this series and remain deferred until the owner completes a
-human audit.
+archive and tests for modified, staged, nonignored untracked, and ignored files. Decision 0092
+completes the second increment by capping the path with the minimum rank verified after fold-local
+preprocessing. Release preparation and publication are explicitly outside this series and remain
+deferred until the owner completes a human audit.
 
-Current status: **increment 1/6 complete; fold-level numerical-rank feasibility next**.
+Current status: **increment 2/6 complete; consistent tolerant score ranking next**.
 
 ## Current next increment
 
-Pre-release audit hardening 2/6: determine the minimum verified numerical rank across training
-folds before `PiPLSPathCV` constructs or evaluates its candidate path.
+Pre-release audit hardening 3/6: make `rank_test_score` use the same tolerant score grouping as
+best-candidate selection.
 
 ## Maintenance protocol
 

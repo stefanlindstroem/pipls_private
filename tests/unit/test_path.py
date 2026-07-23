@@ -32,11 +32,45 @@ class _WarningTransformer(TransformerMixin, BaseEstimator):  # type: ignore[misc
         return X
 
 
+class _RankTwoTransformer(TransformerMixin, BaseEstimator):  # type: ignore[misc]
+    """Return three columns whose numerical rank is at most two."""
+
+    def fit(self, X: object, y: object = None) -> _RankTwoTransformer:
+        del X, y
+        return self
+
+    def transform(self, X: object) -> np.ndarray:
+        array = np.asarray(X, dtype=np.float64)
+        return np.column_stack([array[:, 0], array[:, 1], array[:, 0] + array[:, 1]])
+
+
 def _data(n_samples: int = 36) -> tuple[np.ndarray, np.ndarray]:
     rng = np.random.default_rng(20260716)
     X = rng.normal(size=(n_samples, 8))
     B = rng.normal(size=(8, 3))
     Y = X @ B + 0.05 * rng.normal(size=(n_samples, 3))
+    return X, Y
+
+
+def _rank_two_data(n_samples: int = 30) -> tuple[np.ndarray, np.ndarray]:
+    rng = np.random.default_rng(20260723)
+    latent = rng.normal(size=(n_samples, 2))
+    X = np.column_stack(
+        [
+            latent[:, 0],
+            latent[:, 1],
+            latent[:, 0] + latent[:, 1],
+            2.0 * latent[:, 0],
+            np.ones(n_samples),
+        ]
+    )
+    Y = np.column_stack(
+        [
+            latent[:, 0] + 0.05 * rng.normal(size=n_samples),
+            latent[:, 1] + 0.05 * rng.normal(size=n_samples),
+            latent.sum(axis=1) + 0.05 * rng.normal(size=n_samples),
+        ]
+    )
     return X, Y
 
 
@@ -71,6 +105,140 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     assert (3, 2) not in evaluated_pairs
     assert not hasattr(search, "response_standardized_mse_path_")
     assert not hasattr(search, "score_path_")
+
+
+@pytest.mark.parametrize("svd_solver", ["full", "randomized"])
+def test_path_caps_candidates_at_minimum_fold_numerical_rank(
+    svd_solver: str,
+) -> None:
+    X, Y = _rank_two_data()
+    search = PiPLSPathCV(
+        estimator=PiPLSRegression(svd_solver=svd_solver, random_state=0),
+        search_method="optimal",
+        cv=3,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.max_predictor_rank_ == 2
+    np.testing.assert_array_equal(
+        search.component_path_.n_components,
+        np.array([1, 2]),
+    )
+    assert np.max(search.cv_results_["predictor_rank"]) == 2
+    assert set(
+        zip(
+            search.cv_results_["n_components"],
+            search.cv_results_["predictor_rank"],
+            strict=True,
+        )
+    ) == {(1, 1), (1, 2), (2, 2)}
+
+
+def test_path_uses_the_minimum_numerical_rank_across_training_folds() -> None:
+    X = np.asarray(
+        [
+            [0.0, 0.0, 0.0],
+            [1.0, 1.0, 2.0],
+            [2.0, 2.0, 4.0],
+            [3.0, 3.0, 6.0],
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 1.0],
+            [0.0, 1.0, 1.0],
+            [1.0, 1.0, 2.0],
+        ]
+    )
+    Y = np.column_stack([X[:, 0] + X[:, 1], X[:, 0] - X[:, 1]])
+    splits = (
+        (np.arange(0, 4), np.arange(4, 8)),
+        (np.arange(4, 8), np.arange(0, 4)),
+    )
+
+    search = PiPLSPathCV(
+        estimator=PiPLSRegression(scale=False, svd_solver="full"),
+        max_predictor_rank=3,
+        search_method="optimal",
+        cv=splits,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.max_predictor_rank_ == 1
+    np.testing.assert_array_equal(search.cv_results_["predictor_rank"], np.array([1]))
+
+
+def test_pipeline_rank_preflight_uses_fold_local_transformed_predictors() -> None:
+    X, Y = _data(30)
+    pipeline = Pipeline(
+        [
+            ("rank_two", _RankTwoTransformer()),
+            ("regression", PiPLSRegression(scale=False, svd_solver="full")),
+        ]
+    )
+
+    search = PiPLSPathCV(
+        estimator=pipeline,
+        search_method="optimal",
+        max_predictor_rank=4,
+        cv=3,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.max_predictor_rank_ == 2
+    assert np.max(search.cv_results_["predictor_rank"]) == 2
+
+
+def test_explicit_rank_above_fold_numerical_limit_is_rejected_before_scoring() -> None:
+    X, Y = _rank_two_data()
+    score_calls = 0
+
+    def counting_scorer(
+        estimator: object,
+        X_validation: object,
+        y_validation: object,
+    ) -> float:
+        nonlocal score_calls
+        del estimator, X_validation, y_validation
+        score_calls += 1
+        return 0.0
+
+    message = r"predictor_rank_values values must lie in \[1, 2\]"
+    with pytest.raises(ValueError, match=message):
+        PiPLSPathCV(
+            predictor_rank_values=[3],
+            max_predictor_rank=5,
+            search_method="optimal",
+            cv=3,
+            scoring=counting_scorer,
+            refit=False,
+            n_jobs=1,
+        ).fit(X, Y)
+
+    assert score_calls == 0
+
+
+def test_no_positive_fold_numerical_rank_fails_transactionally() -> None:
+    X, Y = _data(24)
+    search = PiPLSPathCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        max_predictor_rank=1,
+        cv=3,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    with pytest.raises(ValueError, match="No positive predictor rank is numerically feasible"):
+        search.fit(np.ones_like(X), Y)
+
+    for name in (
+        "max_predictor_rank_",
+        "cv_results_",
+        "component_path_",
+        "best_params_",
+    ):
+        assert not hasattr(search, name)
 
 
 def test_all_component_sentinel_matches_explicit_complete_range() -> None:

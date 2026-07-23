@@ -43,12 +43,17 @@ The default upper rank is
 
 \begin{equation}
 r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
+r_{\mathrm{num,min}},
 \left\lceil\frac{n}{\texttt{samples_per_predictor_rank}}\right\rceil\right].
 \end{equation}
 
-Here $n$ is the total number of observations supplied to `fit()`, while fold dimensions impose hard
-feasibility limits. An integer `max_predictor_rank` bypasses the statistical support rule but remains
-capped by centered fold-feasible dimensions.
+Here $n$ is the total number of observations supplied to `fit()`, $p_{\min}$ is the minimum
+predictor count after fold-local pipeline preprocessing, and $r_{\mathrm{num,min}}$ is the minimum
+verified predictor rank after terminal-estimator centering and optional scaling. The selector fits
+pipeline preprocessing separately inside each fold before this rank preflight. An integer
+`max_predictor_rank` bypasses the statistical support rule but remains capped by fold dimensions and
+numerical rank. Explicit component or predictor-rank values above the resolved ceiling are rejected
+before candidate evaluation.
 
 ## Scoring and the best evaluated pair
 

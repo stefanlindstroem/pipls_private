@@ -97,6 +97,7 @@ This index is navigation, not a substitute for those records.
 | `0089-balanced-pulp-factorization-views.md` | balanced Pulp factorization views | Tutorial 2 displays both $P$ and $QD$; the complete example retains the separate $D$ and $Q$ plots |
 | `0090-reference-consolidation.md` | programming-reference consolidation | merge validation with path details, colocate small generated API groups, and shorten inspection prose while preserving public objects and anchors |
 | `0091-clean-git-snapshots.md` | clean committed-tree snapshots | refuse tracked, staged, or nonignored untracked changes and archive `HEAD` so ignored local files cannot enter handoffs |
+| `0092-fold-numerical-rank-feasibility.md` | fold numerical-rank feasibility | cap path candidates by the minimum rank verified after fold-local preprocessing before scoring |
 
 ## Implemented estimator/search transition
 
@@ -115,7 +116,8 @@ plan contains an earlier or more general proposal:
 - `PiPLSPathCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
 - `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
-  while centered training-fold dimensions remain hard candidate-feasibility caps;
+  while transformed feature count, centered training-fold dimensions, and minimum verified
+  fold numerical rank remain hard candidate-feasibility caps;
 - randomized SVD is controlled independently and follows the same policy inside regression and
   path candidate fits;
 - `PiPLSRegression` fits explicit ranks only; `PiPLSPathCV` owns package selection and fits fixed

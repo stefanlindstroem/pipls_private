@@ -23,6 +23,32 @@ _AUTO_RANDOMIZED_MAX_RANK_FRACTION = 0.2
 _MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
 
 
+class _PredictorRankInfeasibleError(ValueError):
+    """Report a requested rank above the predictor rank verified by the SVD."""
+
+    def __init__(
+        self,
+        *,
+        requested_rank: int,
+        verified_rank: int,
+        rank_is_exact: bool,
+        tolerance: float,
+    ) -> None:
+        self.requested_rank = requested_rank
+        self.verified_rank = verified_rank
+        self.rank_is_exact = rank_is_exact
+        self.tolerance = tolerance
+        rank_description = (
+            "numerical rank" if rank_is_exact else "verified retained rank"
+        )
+        super().__init__(
+            f"predictor_rank exceeds the {rank_description} of X: "
+            f"predictor_rank={requested_rank}, "
+            f"{rank_description.replace(' ', '_')}={verified_rank}, "
+            f"tolerance={tolerance:.6g}."
+        )
+
+
 @dataclass(frozen=True)
 class PiPLSCoreResult:
     """Result of the fixed-parameter Pi-PLS construction.
@@ -183,11 +209,11 @@ def fit_pipls_core(
     rank_tolerance = _svd_rank_tolerance(x_shape, x_singular_values)
     x_rank = int(np.count_nonzero(x_singular_values > rank_tolerance))
     if r_pi > x_rank:
-        rank_description = "numerical rank" if x_rank_is_exact else "verified retained rank"
-        raise ValueError(
-            f"predictor_rank exceeds the {rank_description} of X: "
-            f"predictor_rank={r_pi}, {rank_description.replace(' ', '_')}={x_rank}, "
-            f"tolerance={rank_tolerance:.6g}."
+        raise _PredictorRankInfeasibleError(
+            requested_rank=r_pi,
+            verified_rank=x_rank,
+            rank_is_exact=x_rank_is_exact,
+            tolerance=rank_tolerance,
         )
 
     Pi = np.asarray(x_vt[:r_pi, :].T, dtype=np.float64)

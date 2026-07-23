@@ -1,5 +1,9 @@
 # Changelog
 
+- Bound `PiPLSPathCV` by the minimum predictor rank verified across fold-local preprocessed
+  training data, so rank-deficient folds reduce the admissible path instead of aborting candidate
+  evaluation.
+
 - Make repository snapshots faithful to one clean committed Git tree: refuse tracked, staged, or
   nonignored untracked changes; archive `HEAD` rather than the worktree; and exclude ignored
   generated assets and caches by construction.
