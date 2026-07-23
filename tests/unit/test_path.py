@@ -428,6 +428,46 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
     assert profile.selected.predictor_rank == 1
 
 
+def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
+    X, Y = _data()
+    score_by_rank = {
+        1: 1.0,
+        2: 1.0 - 0.75e-12,
+        3: 1.0 - 1.50e-12,
+    }
+
+    def chained_scores(
+        estimator: object,
+        X_validation: object,
+        y_validation: object,
+    ) -> float:
+        del X_validation, y_validation
+        predictor_rank = int(getattr(estimator, "predictor_rank"))
+        return score_by_rank[predictor_rank]
+
+    search = PiPLSPathCV(
+        n_components_values=[1],
+        predictor_rank_values=[1, 2, 3],
+        max_predictor_rank=3,
+        search_method="optimal",
+        scoring=chained_scores,
+        cv=3,
+        refit=False,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    np.testing.assert_array_equal(
+        search.cv_results_["predictor_rank"],
+        np.array([1, 2, 3]),
+    )
+    np.testing.assert_array_equal(
+        search.cv_results_["rank_test_score"],
+        np.array([1, 1, 3]),
+    )
+    assert search.best_predictor_rank_ == 1
+    assert search.best_index_ == 0
+
+
 def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
     X, Y = _data()
 

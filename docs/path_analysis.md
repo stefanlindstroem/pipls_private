@@ -63,9 +63,13 @@ minimizing mean response-standardized CV-MSE. With another scorer, the CV-MSE co
 diagnostics and need not identify the selected candidate.
 
 Ordinary scikit-learn scorer names, other callables, and `scoring=None` are accepted.
-`best_params_`, `best_score_`, and `best_index_` describe the best evaluated pair. Adaptive search
-makes no claim about pairs it did not evaluate. The component path remains a model-selection
-diagnostic; its numerical minimum does not replace a scientifically justified complexity choice.
+`best_params_`, `best_score_`, and `best_index_` describe the best evaluated pair.
+`rank_test_score` uses minimum ranks with the same `rtol=1e-12` and `atol=1e-15` comparison as
+selection. Every rank-1 candidate is tied directly with the maximum score; lower rank groups are
+likewise anchored to their leading score rather than formed through adjacent-score chaining.
+Adaptive search makes no claim about pairs it did not evaluate. The component path remains a
+model-selection diagnostic; its numerical minimum does not replace a scientifically justified
+complexity choice.
 
 ## Pipelines and fold-local preprocessing
 

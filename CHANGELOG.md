@@ -1,5 +1,8 @@
 # Changelog
 
+- Align `rank_test_score` with Pi-PLS candidate selection by using one reference-anchored
+  tolerant score comparison, preventing adjacent near-ties from chaining into a wider rank group.
+
 - Bound `PiPLSPathCV` by the minimum predictor rank verified across fold-local preprocessed
   training data, so rank-deficient folds reduce the admissible path instead of aborting candidate
   evaluation.

@@ -28,7 +28,11 @@
 
 - Automatic-selection response scales are estimated from the matching training fold with `ddof=1`; zero scales and singleton-training-fold scales are replaced by 1.0.
 - Response-standardized MSE uniformly averages squared residuals over validation samples and response columns after division by the matching fold-local response scales.
-- Conditional predictor-rank ties use `numpy.isclose` with `rtol=1e-12` and `atol=1e-15`, then choose the smallest tied predictor rank.
+- Candidate score ties use `numpy.isclose` with `rtol=1e-12` and `atol=1e-15`. Global
+  and conditional selection compare every candidate directly with the relevant maximum score, then
+  choose the lexicographically smallest tied complexity. `rank_test_score` uses minimum ranks and
+  anchors each tolerant group to its leading score; adjacent near-ties must not chain candidates
+  that are not tied with the same group reference.
 - CV splits are materialized once, validated, copied, and reused for rank preflight and every
   candidate. The samples-per-rank term uses total `n`; the smallest centered training fold supplies
   the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical

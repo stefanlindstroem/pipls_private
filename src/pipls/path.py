@@ -48,6 +48,7 @@ from .model_selection import (
     _pooled_oof_r2,
     _rank_test_scores,
     _search_predictor_ranks,
+    _tied_score_mask,
     _validate_positive_int,
     _validate_singleton_fold_scoring,
 )
@@ -63,8 +64,6 @@ ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING = neg_response_standardized_mean_squared_error
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
-_SELECTION_RTOL = 1e-12
-_SELECTION_ATOL = 1e-15
 _CONTROLLED_FIT_WARNING_CATEGORIES = (StatisticalSupportWarning,)
 
 
@@ -166,7 +165,8 @@ class PiPLSPathCV(
         Validated scikit-learn scorer used during fitting.
     cv_results_ : dict of str to array-like
         Full candidate-level results. It includes parameter pairs, split scores,
-        response-standardized MSE values, timing summaries, and score ranks.
+        response-standardized MSE values, timing summaries, and minimum score
+        ranks formed with the same tolerant comparison used for selection.
     component_path_ : PiPLSComponentPath
         Immutable concise view with one conditionally selected predictor-rank
         result per component count. Use :meth:`predictor_rank_profile` for the
@@ -1121,9 +1121,7 @@ def _select_best_index(
     )
     scores = all_scores[candidate_indices]
     maximum = float(np.max(scores))
-    tied = candidate_indices[
-        np.isclose(scores, maximum, rtol=_SELECTION_RTOL, atol=_SELECTION_ATOL)
-    ]
+    tied = candidate_indices[_tied_score_mask(scores, maximum)]
     n_components = cast(IntArray, results["n_components"])[tied]
     predictor_rank = cast(IntArray, results["predictor_rank"])[tied]
     return int(tied[np.lexsort((predictor_rank, n_components))[0]])

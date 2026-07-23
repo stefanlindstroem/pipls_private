@@ -9,7 +9,9 @@ from pipls.model_selection import (
     _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
     _max_predictor_rank,
+    _rank_test_scores,
     _select_predictor_rank,
+    _tied_score_mask,
 )
 
 
@@ -233,7 +235,27 @@ def test_adaptive_refinement_interval_respects_lower_rank_ties() -> None:
 
 
 def test_rank_test_scores_assigns_minimum_rank_to_ties() -> None:
-    from pipls.model_selection import _rank_test_scores
-
     ranks = _rank_test_scores(np.array([0.5, 0.5, 0.2, 0.1, 0.2]))
+
     np.testing.assert_array_equal(ranks, np.array([1, 1, 3, 5, 3]))
+
+
+def test_rank_test_scores_do_not_chain_adjacent_tolerant_comparisons() -> None:
+    ranks = _rank_test_scores(
+        np.array([10.0, 9.4, 8.8, 8.2]),
+        rtol=0.0,
+        atol=0.75,
+    )
+
+    np.testing.assert_array_equal(ranks, np.array([1, 1, 3, 3]))
+
+
+def test_tied_score_mask_uses_one_reference_score() -> None:
+    tied = _tied_score_mask(
+        np.array([10.0, 9.4, 8.8]),
+        10.0,
+        rtol=0.0,
+        atol=0.75,
+    )
+
+    np.testing.assert_array_equal(tied, np.array([True, True, False]))

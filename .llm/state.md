@@ -108,7 +108,8 @@ Decision 0091 makes every successful handoff snapshot a clean `HEAD` archive: tr
 nonignored untracked changes are refused, while ignored generated files are excluded by
 construction. Decision 0092 makes the path ceiling respect the minimum predictor rank verified
 after fold-local preprocessing, so rank-deficient folds bound the candidate path instead of
-aborting it.
+aborting it. The third pre-release hardening increment aligns `rank_test_score` with selection by
+using one reference-anchored tolerant comparison and forbidding adjacent near-tie chaining.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -325,17 +326,15 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Pre-release audit hardening 3/6: align `rank_test_score` groups with the selector's tolerant
-best-score rule.
+Pre-release audit hardening 4/6: make core estimator and path result records uniformly defensive
+and validated.
 
 ## Subsequent roadmap
 
-1. **Core public-result invariants:** make estimator and path result records uniformly defensive
-   and validated.
-2. **Inspection numerical safety:** make inspection records and extreme finite calculations obey
+1. **Inspection numerical safety:** make inspection records and extreme finite calculations obey
    the same finite-result policy.
-3. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
-4. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
+2. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
+3. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
    publication are outside the current sequence.
 
 Future datasets still require a distinct package-level use case and verified source-level

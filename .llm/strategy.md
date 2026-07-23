@@ -592,15 +592,17 @@ human review. They must be implemented and snapshotted one at a time:
 Decision 0091 completes the first increment by replacing worktree copying with a clean `HEAD`
 archive and tests for modified, staged, nonignored untracked, and ignored files. Decision 0092
 completes the second increment by capping the path with the minimum rank verified after fold-local
-preprocessing. Release preparation and publication are explicitly outside this series and remain
-deferred until the owner completes a human audit.
+preprocessing. The third increment uses one reference-anchored tolerant comparison for selection
+and score ranking, so rank groups cannot expand through adjacent near-ties. Release preparation and
+publication are explicitly outside this series and remain deferred until the owner completes a
+human audit.
 
-Current status: **increment 2/6 complete; consistent tolerant score ranking next**.
+Current status: **increment 3/6 complete; core public-result invariants next**.
 
 ## Current next increment
 
-Pre-release audit hardening 3/6: make `rank_test_score` use the same tolerant score grouping as
-best-candidate selection.
+Pre-release audit hardening 4/6: make core estimator and path result records uniformly defensive
+and validated.
 
 ## Maintenance protocol
 

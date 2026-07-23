@@ -14,6 +14,7 @@ from sklearn.model_selection import check_cv
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
+BoolArray = NDArray[np.bool_]
 CVSplit = tuple[IntArray, IntArray]
 
 _SELECTION_RTOL = 1e-12
@@ -279,13 +280,39 @@ def _search_predictor_ranks(
         interval = refined
 
 
+def _tied_score_mask(
+    scores: ArrayLike,
+    reference: float,
+    *,
+    rtol: float = _SELECTION_RTOL,
+    atol: float = _SELECTION_ATOL,
+) -> BoolArray:
+    """Return scores tied with one reference under the selection tolerance."""
+
+    score_array = np.asarray(scores, dtype=np.float64)
+    reference_value = float(reference)
+    if not np.all(np.isfinite(score_array)) or not np.isfinite(reference_value):
+        raise ValueError("scores and reference must contain only finite values.")
+    if not np.isfinite(rtol) or rtol < 0.0 or not np.isfinite(atol) or atol < 0.0:
+        raise ValueError("rtol and atol must be nonnegative finite values.")
+    return np.asarray(
+        np.isclose(
+            score_array,
+            reference_value,
+            rtol=rtol,
+            atol=atol,
+        ),
+        dtype=np.bool_,
+    )
+
+
 def _rank_test_scores(
     mean_scores: ArrayLike,
     *,
     rtol: float = _SELECTION_RTOL,
     atol: float = _SELECTION_ATOL,
 ) -> IntArray:
-    """Return scikit-learn-style minimum ranks with tolerant score ties."""
+    """Return minimum ranks using reference-anchored tolerant score groups."""
 
     scores = np.asarray(mean_scores, dtype=np.float64)
     if scores.ndim != 1 or scores.size == 0 or not np.all(np.isfinite(scores)):
@@ -293,14 +320,18 @@ def _rank_test_scores(
     order = np.argsort(-scores, kind="mergesort")
     ranks = np.empty(scores.size, dtype=np.intp)
     group_start = 0
+    group_reference = float(scores[order[0]])
     for position, index in enumerate(order):
-        if position > 0 and not np.isclose(
-            scores[index],
-            scores[order[position - 1]],
-            rtol=rtol,
-            atol=atol,
+        if position > 0 and not bool(
+            _tied_score_mask(
+                scores[index],
+                group_reference,
+                rtol=rtol,
+                atol=atol,
+            )
         ):
             group_start = position
+            group_reference = float(scores[index])
         ranks[index] = group_start + 1
     return ranks
 
@@ -326,11 +357,9 @@ def _select_predictor_rank(
         raise ValueError("mean_losses must be one-dimensional with one value per predictor rank.")
     if not np.all(np.isfinite(losses)):
         raise ValueError("mean_losses must contain only finite values.")
-    if not np.isfinite(rtol) or rtol < 0.0 or not np.isfinite(atol) or atol < 0.0:
-        raise ValueError("rtol and atol must be nonnegative finite values.")
 
     minimum_loss = float(np.min(losses))
-    tied = np.isclose(losses, minimum_loss, rtol=rtol, atol=atol)
+    tied = _tied_score_mask(losses, minimum_loss, rtol=rtol, atol=atol)
     selected_rank = int(np.min(ranks[tied]))
     selected_index = int(np.flatnonzero(ranks == selected_rank)[0])
     return selected_rank, float(losses[selected_index])
