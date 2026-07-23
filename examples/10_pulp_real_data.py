@@ -1,5 +1,6 @@
 """Fit and inspect a Pulp Pi-PLS model directly in memory."""
 
+# --8<-- [start:pulp-tutorial-setup]
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -21,13 +22,16 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "pulp"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
 CHOSEN_N_COMPONENTS = 3
 DISPLAY_COMPONENTS = (0, 1, 2)
-DETAILED_RESPONSES = ("CSF", "Density", "TI")
+DETAILED_RESPONSE_COUNT = 3
+# --8<-- [end:pulp-tutorial-setup]
 
 # --8<-- [start:load-pulp-data]
 X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
 predictor_names = X.columns.tolist()
 response_names = Y.columns.tolist()
+# Show the first three responses only to keep pointwise diagnostic plots legible.
+detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:evaluate-pulp-component-path]
@@ -133,8 +137,6 @@ diagnostics = prediction_diagnostics(
 )
 # --8<-- [end:pulp-inspection-results]
 
-response_index = {name: index for index, name in enumerate(response_names)}
-detailed_response_indices = tuple(response_index[name] for name in DETAILED_RESPONSES)
 
 # Plot the Pi-PLS factors directly from their immutable arrays.
 figure, axes = plt.subplots(

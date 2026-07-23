@@ -1,13 +1,33 @@
-# Pulp: a complete real-data analysis
+# Pulp: a complete Pi-PLS workflow
 
-This tutorial applies the workflow from [First Pi-PLS model with synthetic data](synthetic.md) to a
-real multivariate dataset. It assumes that the roles of `PiPLSPathCV`, `component_path_`,
-`predictor_rank_profile()`, and the fixed `PiPLSRegression` estimator are already familiar. The focus
-here is what changes with real data: an upper-boundary predictor-rank choice, selection-conditioned
-out-of-fold predictions, and scientific interpretation of a selected model.
+This tutorial applies [First Pi-PLS model with synthetic data](synthetic.md) to a real
+multivariate dataset. It assumes that `PiPLSPathCV`, `component_path_`,
+`predictor_rank_profile()`, and fixed-model fitting are already familiar. The focus is what changes
+with real data: an upper-boundary predictor-rank result, selection-conditioned out-of-fold (OOF)
+predictions, and interpretation of a selected model.
 
-Every code snippet comes from `examples/10_pulp_real_data.py`. Run `make docs-figures` to regenerate
-the six SVG figures on this page, or `make docs` to regenerate them and build the complete site.
+Analysis and selection snippets come from `examples/10_pulp_real_data.py`. Standalone
+interpretation-figure recipes come from `tools/render_pulp_tutorial.py`, which generates the seven
+SVG figures displayed here. Install the
+example dependencies before running either route:
+
+```bash
+python -m pip install -e ".[examples]"
+```
+
+## Setup
+
+The example imports the estimators, numerical inspection functions, Matplotlib, and `adjustText`,
+then states the component and display choices used below:
+
+```python
+--8<-- "examples/10_pulp_real_data.py:pulp-tutorial-setup"
+```
+
+`CHOSEN_N_COMPONENTS=3` is the user choice made from the component path.
+`DISPLAY_COMPONENTS=(0, 1, 2)` uses Python's zero-based indices for the three fitted components.
+The first three response columns are shown in pointwise diagnostic figures only to keep the
+demonstration legible; the RMSE summary still includes all eight responses.
 
 ## The data and modeling question
 
@@ -21,36 +41,41 @@ repository preserves all rows and applies no imputation or learned preprocessing
 See the [dataset description](../datasets.md#pulp-real-data-integration) and the
 [reference](#reference) for provenance.
 
+Predictor labels retain the source notation: `L` is contour length, `W` is width, `C` is the source
+FiberLab C descriptor, and `F` is fibrillation. The suffixes `arith`, `lw`, and `llw` denote
+arithmetic, length-weighted, and length-length-weighted means. The response labels are `CSF`
+(Canadian Standard Freeness), `Density`, `TI` (tensile index), `Elongation`, `TEA` (tensile
+energy absorption), `TSI` (tensile stiffness index), `Tear index`, and `s` (light-scattering
+coefficient).
+
 The analysis asks for a parsimonious number of paired Pi-PLS components, then uses the predictor
-rank selected conditionally at that component count. The mathematical distinction between these
-ranks is summarized in [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
+rank selected conditionally at that component count. The distinction is summarized in
+[Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 ## Load the data
 
-The example reads the committed predictor and response tables directly with pandas:
+The committed tables are read directly with pandas. Their headers supply the scientific labels, and
+the first three response indices are selected explicitly for the pointwise displays:
 
 ```python
 --8<-- "examples/10_pulp_real_data.py:load-pulp-data"
 ```
 
-The resulting data frames have shapes `(46, 14)` and `(46, 8)`. Their headers supply the scientific
-labels used in the plots. No package-specific loader or workflow object is required.
+The resulting data frames have shapes `(46, 14)` and `(46, 8)`. No package-specific loader or
+workflow object is required.
 
 ## Select the fixed rank pair
 
-The synthetic tutorial introduced the selection contract. The same two plots are retained here
-because the real-data choice requires additional qualification.
-
 ### Component path
 
-The search evaluates the admissible component counts and their conditional predictor-rank minima:
+The search evaluates admissible component counts and selects one predictor rank conditionally at
+each count:
 
 ```python
 --8<-- "examples/10_pulp_real_data.py:evaluate-pulp-component-path"
 ```
 
-This tutorial uses `CHOSEN_N_COMPONENTS=3` as an explicit elbow-based choice. The matching immutable
-row is retrieved before plotting so that the selected point can be marked:
+The matching immutable row is retrieved before plotting so that the chosen point can be marked:
 
 ```python
 --8<-- "examples/10_pulp_real_data.py:select-pulp-parameters"
@@ -62,17 +87,18 @@ row is retrieved before plotting so that the selected point can be marked:
 
 ![Pulp component path](../assets/generated/pulp/component_path.svg)
 
-The mean CV-MSE falls substantially through three components and then changes little. The diamond
-marks the stated choice of three components; it is not an automatic rule. Fold standard deviation
+The mean CV-MSE falls substantially through three components and is nearly flat thereafter. The
+diamond marks the stated elbow-based choice; it is not an automatic rule. Fold standard deviation
 is descriptive variability rather than a confidence interval.
 
 The selected row contains `predictor_rank=10`, the rank with the lowest evaluated mean CV-MSE at
-three components. `for_n_components()` only retrieves that evaluated row; it does not repeat the
+three components. `for_n_components()` retrieves that evaluated row; it does not repeat the
 optimization or fit the final model.
 
 ### Conditional predictor-rank profile
 
-The complete rank profile at three components is available without filtering `cv_results_`:
+The complete evaluated rank profile at three components is available without filtering
+`cv_results_`:
 
 ```python
 --8<-- "examples/10_pulp_real_data.py:extract-pulp-rank-profile"
@@ -84,19 +110,21 @@ The complete rank profile at three components is available without filtering `cv
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
-Rank 10 has the lowest evaluated mean CV-MSE, but it is also the upper search boundary. Ranks 9 and
-10 have mean CV-MSE values of approximately 0.347 and 0.331, with fold standard deviations of
-approximately 0.167 and 0.151. Their mean difference is small relative to the fold variation. The
-profile supports using rank 10 for this fitted model, but it does not establish that ranks above 10
-would be worse or that rank 10 has a distinct scientific advantage over rank 9.
+Rank 10 has the lowest evaluated mean CV-MSE, but it is also the upper default boundary. For these
+46 rows, 14 predictors, and five-fold CV, the support rule gives
+$r_{\pi,\max}=\min[14,35,\lceil46/5\rceil]=10$. Ranks 9 and 10 have mean CV-MSE values of
+approximately 0.347 and 0.331, with fold standard deviations of approximately 0.167 and 0.151.
+Their mean difference is small relative to the fold variation.
 
-The fixed model still contains three paired components. Predictor rank 10 is the dimension of the
-predictor basis used to estimate those pairs; it is not the number of displayed components. See
-[Advanced path-search behavior](../path_analysis.md) for alternative search policies.
+The profile supports rank 10 for this fitted model, but it does not establish that ranks above 10
+would be worse or that rank 10 has a distinct scientific advantage over rank 9. The fixed model
+still contains three paired components; predictor rank 10 is the dimension of the predictor basis
+used to estimate those pairs. See [Advanced path-search behavior](../path_analysis.md) for other
+bounds and policies.
 
 ## Fit the selected model
 
-Only after the two selection plots have been inspected is a new fixed estimator fitted to all 46
+Only after the two selection plots have been inspected is a fixed estimator fitted to all 46
 samples:
 
 ```python
@@ -105,8 +133,7 @@ samples:
 
 The search object supports model selection; the fixed estimator supplies predictions and fitted
 results. `PiPLSRegression` learns predictor and response centering and scaling inside the fit. The
-[`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression) gives the exact estimator
-contract.
+[`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression) gives the exact contract.
 
 ## Generate selection-conditioned OOF predictions
 
@@ -117,11 +144,14 @@ fixed estimator inside five non-shuffled folds and predicts each held-out observ
 --8<-- "examples/10_pulp_real_data.py:pulp-oof-predictions"
 ```
 
-These are **selection-conditioned OOF predictions**. The rank pair is fixed during this second
-cross-validation calculation, but the same 46 observations were already used to inspect the
-selection path. The diagnostics describe the selected model on these data; they are not an
-independent estimate of post-selection performance. Nested cross-validation or an external test set
-is required for that stronger claim. See [Cross-validation](../cross_validation.md).
+The non-shuffled splitter is used here for a deterministic demonstration. Replace it with a grouped,
+temporal, or otherwise appropriate splitter when row order carries experimental structure.
+
+!!! important "Validation scope"
+    These are **selection-conditioned OOF predictions**. The rank pair is fixed during this second
+    cross-validation calculation, but the same observations were already used to inspect the
+    selection path. Nested cross-validation or an external test set is required for an independent
+    estimate of post-selection performance. See [Cross-validation](../cross_validation.md).
 
 ## Compute immutable inspection results
 
@@ -137,133 +167,133 @@ The fitted estimator and OOF predictions are converted to numerical result objec
 | `PiPLSDisplayFactors` | What are the Pi-PLS-specific $P$, $D$, $Q$, and $QD$ factors? |
 | `PredictionDiagnostics` | How do the selection-conditioned OOF predictions and residuals behave? |
 
-At this point the programming workflow is complete: the rank pair has been selected, the fixed model
-has been fitted, OOF predictions have been calculated, and reusable numerical results are available.
-The remaining figures are optional interpretation views. The full catalogue is in
-[Model inspection](../model_inspection.md).
+At this point the programming workflow is complete. The remaining figures are optional
+interpretation views; the full catalogue is in [Model inspection](../model_inspection.md).
 
 ## Interpret representative fitted-model plots
 
-The plots below are representative rather than exhaustive. Singular-vector signs are arbitrary, so
-paired quantities may change sign together without changing predictions. Interpret relative
-patterns and paired quantities, not isolated signs.
+Singular-vector signs are arbitrary, so paired quantities may change sign together without changing
+predictions. Interpret relative patterns and paired quantities, not isolated signs.
 
-### Standard PLS-family latent-structure plot
+### Standard PLS-family latent structure
 
 #### Score-loading biplot
 
-The balancing calculation remains package-owned, but the chart is ordinary Matplotlib. Predictor
-labels are standard text artists, and `adjustText` moves them after the axis has been fully
-configured:
+`biplot_coordinates()` supplies balanced numerical coordinates. Matplotlib draws samples and
+predictor arrows, and [`adjustText`](https://adjusttext.readthedocs.io/) moves the labels after
+the axis has been configured:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:plot-pulp-biplot"
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-biplot"
 ```
 
 ![Pulp score-loading biplot](../assets/generated/pulp/biplot.svg)
 
-The biplot combines balanced sample-score coordinates with predictor arrows from the first two X
-loading columns. Nearby samples have similar displayed latent coordinates, while predictors pointing
-in similar directions have similar loading patterns in this plane. Arrow length and angle are
-specific to the displayed scaling and should not be read as regression coefficients or formal
-variable importance.
+The three length descriptors point in closely similar directions in the displayed plane, while
+`Shives` contrasts with several C descriptors. These are loading-pattern relationships under the
+chosen biplot scaling, not regression coefficients or formal variable importance.
 
 See [Score-loading biplot](../model_inspection.md#score-loading-biplot) and
 [`biplot_coordinates()`](../api/inspection.md#pipls.inspection.biplot_coordinates).
 
-### Pi-PLS-specific factorization plot
+### Pi-PLS-specific factorization
 
 #### Predictor directions $P$
 
-![Pulp predictor directions](../assets/generated/pulp/predictor_directions.svg)
-
-The columns of $P$ are Pi-PLS predictor rotations paired with response directions in the regression
-factorization $PDQ^{\mathsf T}$. They are distinct from ordinary X loadings, which describe score
-reconstruction. The figure shows all three selected paired components; predictor rank 10 does not
-create ten plotted components.
-
-See [Predictor directions](../model_inspection.md#predictor-directions) and
-[Diagonal latent coupling](../theory.md#diagonal-latent-coupling). The numbered example plots
-$P$, $D$, $Q$, and $QD$ directly from `PiPLSDisplayFactors`; the model-inspection guide explains
-the complementary views.
-
-### Standard PLS-family prediction plots
-
-These figures use the arrays stored in `PredictionDiagnostics` directly. The example owns the
-Matplotlib series, reference lines, labels, and response selection:
+The grouped bars are constructed directly from `factors.predictor_directions`:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:plot-pulp-prediction-diagnostics"
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-predictor-directions"
 ```
 
-The relevant fields are `observed_standardized`, `predicted_standardized`,
-`residual_standardized`, `standardized_rmse`, and `prediction_kind`.
+![Pulp predictor directions](../assets/generated/pulp/predictor_directions.svg)
+
+The dominant entries differ by component: the first direction emphasizes `Shives` and selected
+fibrillation or length descriptors, the second emphasizes length descriptors, and the third is
+strongly associated with `Fines B`. Only relative within-component patterns should be interpreted;
+signs may reverse together.
+
+The columns of $P$ are predictor rotations paired with response directions in $PDQ^{\mathsf T}$.
+They are distinct from ordinary X loadings. The figure shows all three selected paired components;
+predictor rank 10 does not create ten plotted components. See
+[Predictor directions](../model_inspection.md#predictor-directions) and
+[Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
+
+### Standard PLS-family prediction diagnostics
+
+The pointwise figures show the first three response columns (`CSF`, `Density`, and `TI`) solely for
+visibility. The summary retains all responses. All charts use named arrays from
+`PredictionDiagnostics` directly.
 
 #### Observed versus predicted
 
+```python
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-observed-vs-predicted"
+```
+
 ![Pulp observed versus predicted](../assets/generated/pulp/observed_vs_predicted.svg)
 
-Observed and OOF-predicted values are standardized response by response so that `CSF`, `Density`,
-and `TI` can share one axis. Agreement is read relative to the identity line. The spread describes
-selection-conditioned OOF error for the displayed responses, not independent-test performance.
+`CSF` lies more tightly around the identity line than `Density` and `TI`; all three figures remain
+selection-conditioned rather than independent-test results.
 
 See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
 
 #### Residual versus predicted
 
+```python
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-residuals-vs-predicted"
+```
+
 ![Pulp residual versus predicted](../assets/generated/pulp/residuals_vs_predicted.svg)
 
-Standardized residuals are plotted against standardized OOF predictions for the same three
-responses. The zero line helps reveal systematic bias, curvature, or changing residual spread over
-the prediction range. The figure remains descriptive: it does not establish a formal variance model
-or independent-test calibration.
+No dominant global curvature is apparent in the displayed responses, although `TI` has the largest
+residual excursions. The zero line is descriptive; it does not establish a formal variance model or
+calibration claim.
 
 See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted).
 
 #### Standardized RMSE
 
+```python
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-standardized-rmse"
+```
+
 ![Pulp standardized RMSE](../assets/generated/pulp/standardized_rmse.svg)
 
-Response-wise RMSE is divided by the observed sample standard deviation of each response, allowing a
-descriptive comparison across all eight responses. These values are not identical to the fold-local
-standardized losses used during component-path selection.
+Response-wise RMSE is divided by the observed sample standard deviation. `CSF` has the lowest value
+(approximately 0.30), while `Tear index` has the highest (approximately 0.68). These values are not
+identical to the fold-local standardized losses used during path selection.
 
 See [Standardized RMSE](../model_inspection.md#standardized-rmse).
 
-## Complete executable example
+## Run the complete example
 
-The maintained example contains the full calculation and a broader plotting demonstration:
-
-```python
---8<-- "examples/10_pulp_real_data.py"
-```
-
-Run it from the repository root with:
+The maintained source is `examples/10_pulp_real_data.py`. Run it from the repository root:
 
 ```bash
 python examples/10_pulp_real_data.py
 ```
 
-The tutorial renderer writes seven representative single-chart SVGs. The numbered example remains a
-complete API demonstration and writes six caller-owned PDFs, including additional score, loading,
-factorization, and coefficient views. Both routes calculate directly from in-memory results and write
-no generated analytical CSV files.
+The tutorial renderer writes seven representative single-chart SVGs. The numbered example writes
+six caller-owned PDFs, including additional score, loading, factorization, and coefficient views.
+Both routes calculate directly from in-memory results and write no analytical CSV intermediates.
 
 ## Next steps
 
-- Use [Model inspection](../model_inspection.md) for the complete plot catalogue and interpretation
-  boundaries.
+- Use [Model inspection](../model_inspection.md) for the complete quantity catalogue and
+  interpretation boundaries.
 - Use [Advanced path-search behavior](../path_analysis.md) for nondefault bounds, policies,
   pipelines, scorer behavior, and automatic refitting.
 - Use [Cross-validation](../cross_validation.md) for grouped, repeated, temporal, leave-one-out, and
   OOF-coverage details.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
 - Use the [`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV) and
-  [inspection API](../api/inspection.md) for exact numerical-result signatures.
+  [inspection API](../api/inspection.md) for exact signatures.
 
 ## Reference
 
 Stefan B. Lindström, Rita Ferritsius, Johan E. Carlson, Johan Persson, and Fritjof Nilsson,
-“Predicting handsheet properties and enhancing refiner control using fiber analyzer data and latent
+“Predicting handsheet properties and enhancing refiner control using fiber analyzer data and
+latent
 variable modeling,” *Computers & Chemical Engineering* **199** (2025), 109143,
 [doi:10.1016/j.compchemeng.2025.109143](https://doi.org/10.1016/j.compchemeng.2025.109143).

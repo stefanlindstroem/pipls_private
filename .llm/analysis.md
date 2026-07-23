@@ -110,12 +110,13 @@ preparation area.
 
 The served tutorial route has two levels. The synthetic tutorial extracts executable snippets from
 example 02 and owns the minimum component-path, conditional-rank, fixed-fit, and external-test
-prediction sequence. The Pulp tutorial follows with the complete real-data analysis, including the
-direct conditional predictor-rank plot, fixed-parameter OOF diagnostics, and retained deterministic
-inspection figures. Its prediction section displays observed-versus-predicted,
-residual-versus-predicted, and standardized-RMSE figures so the maintained three-axis snippet and
-tutorial assets agree. Clear section headings distinguish estimator-neutral PLS-family
-latent-structure and prediction plots from Pi-PLS-specific factorization plots. The tutorial omits
+prediction sequence. The Pulp tutorial follows with the complete real-data analysis, including
+the direct conditional predictor-rank plot, fixed-parameter OOF diagnostics, and deterministic
+inspection figures. It shows
+one setup block before use, selects the first three response columns only for pointwise-plot
+legibility, and sources each displayed interpretation figure from a matching standalone renderer
+block. Clear section headings distinguish estimator-neutral PLS-family latent-structure and
+prediction plots from Pi-PLS-specific factorization plots. The tutorial omits
 raw regression-coefficient visualization because heterogeneous original units make that single
 figure unsuitable for the walkthrough; the numbered-example figure remains. Plot-specific
 sections link to the general inspection reference rather than duplicating numerical contracts. Prediction figures must retain the selection-conditioned OOF provenance.

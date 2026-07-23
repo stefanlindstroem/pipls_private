@@ -99,3 +99,4 @@ reference describe the current public behavior directly.
 - [0082: direct Pi-PLS factor rendering](0082-direct-pipls-factor-rendering.md)
 - [0083: final data-first rendering policy](0083-data-first-rendering-policy.md)
 - [0084: complete Pulp prediction diagnostics](0084-complete-pulp-prediction-diagnostics.md)
+- [0085: self-contained Pulp tutorial](0085-self-contained-pulp-tutorial.md)

@@ -516,7 +516,7 @@ self-contained documentation, generated
 reference, compatibility validation, atomic plotting, and canonical Pulp workflow. Decision 0074
 removes redundant task guides. Decision 0075 adds the short synthetic selection-and-prediction
 tutorial, Decision 0076 repositions the Pulp tutorial around real-data selection qualification,
-selection-conditioned OOF analysis, and six representative plots, and Decision 0077 reduces the
+selection-conditioned OOF analysis, and representative plots, and Decision 0077 reduces the
 README while moving maintenance ownership to `CONTRIBUTING.md` and project-validation navigation.
 Phase F4 has completed the owner-approved pre-release result and example simplification.
 Decision 0078 completes the reference cleanup with a result-object map, troubleshooting,

@@ -134,8 +134,9 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
 
 def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     repository = _repository_root()
-    tutorial_path = repository / "docs" / "tutorials" / "pulp.md"
-    tutorial = tutorial_path.read_text(encoding="utf-8")
+    tutorial = (repository / "docs" / "tutorials" / "pulp.md").read_text(
+        encoding="utf-8"
+    )
     example = (repository / "examples" / "10_pulp_real_data.py").read_text(
         encoding="utf-8"
     )
@@ -162,18 +163,23 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     }
 
     linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
-    assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(encoding="utf-8")
+    assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(
+        encoding="utf-8"
+    )
     assert "tutorials/synthetic.md" in (
         repository / "docs" / "api" / "regression.md"
     ).read_text(encoding="utf-8")
-    assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(encoding="utf-8")
+    assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(
+        encoding="utf-8"
+    )
     assert "../api/regression.md" in linked_targets
     assert "../path_analysis.md" in linked_targets
     assert "../cross_validation.md" in linked_targets
     assert "../model_inspection.md" in linked_targets
     assert "../theory.md" in linked_targets
 
-    snippet_sections = {
+    example_sections = {
+        "pulp-tutorial-setup",
         "load-pulp-data",
         "evaluate-pulp-component-path",
         "select-pulp-parameters",
@@ -183,25 +189,33 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "plot-pulp-component-path",
         "extract-pulp-rank-profile",
         "plot-pulp-rank-profile",
-        "plot-pulp-biplot",
-        "plot-pulp-prediction-diagnostics",
     }
-    for section in snippet_sections:
+    for section in example_sections:
         assert f"examples/10_pulp_real_data.py:{section}" in tutorial
         assert f"# --8<-- [start:{section}]" in example
         assert f"# --8<-- [end:{section}]" in example
 
+    renderer_sections = {
+        "render-pulp-biplot",
+        "render-pulp-predictor-directions",
+        "render-pulp-observed-vs-predicted",
+        "render-pulp-residuals-vs-predicted",
+        "render-pulp-standardized-rmse",
+    }
+    for section in renderer_sections:
+        assert f"tools/render_pulp_tutorial.py:{section}" in tutorial
+        assert f"# --8<-- [start:{section}]" in renderer
+        assert f"# --8<-- [end:{section}]" in renderer
+
     for filename in FIGURE_FILENAMES:
         assert f"../assets/generated/pulp/{filename}" in tutorial
 
-    select_snippet = 'examples/10_pulp_real_data.py:select-pulp-parameters'
-    plot_snippet = 'examples/10_pulp_real_data.py:plot-pulp-component-path'
-    fit_snippet = 'examples/10_pulp_real_data.py:fit-pulp-model'
-    assert (
-        tutorial.index(select_snippet)
-        < tutorial.index(plot_snippet)
-        < tutorial.index(fit_snippet)
-    )
+    assert tutorial.index("pulp-tutorial-setup") < tutorial.index("load-pulp-data")
+    assert tutorial.index("select-pulp-parameters") < tutorial.index(
+        "plot-pulp-component-path"
+    ) < tutorial.index("fit-pulp-model")
+    assert '--8<-- "examples/10_pulp_real_data.py"' not in tutorial
+    assert "six SVG figures" not in tutorial
 
     selected_line = "selected = path.for_n_components(CHOSEN_N_COMPONENTS)"
     component_plot = '# --8<-- [start:plot-pulp-component-path]'
@@ -213,29 +227,42 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         < example.index(profile_line)
         < example.index(model_fit)
     )
+    assert "DETAILED_RESPONSE_COUNT = 3" in example
+    assert "tuple(range(DETAILED_RESPONSE_COUNT))" in example
+    assert "DETAILED_RESPONSES" not in example
+    assert "DETAILED_RESPONSES" not in renderer
 
-    biplot_start = example.index("# --8<-- [start:plot-pulp-biplot]")
-    biplot_adjust = example.index("adjust_text(", biplot_start)
-    assert example.index("biplot_axis.set_aspect", biplot_start) < biplot_adjust
-    assert example.index("biplot_axis.legend()", biplot_start) < biplot_adjust
-    assert "from adjustText import adjust_text" in example
-    assert "from matplotlib.patches import FancyArrowPatch" in example
-    renderer_biplot = renderer.index("    biplot = biplot_coordinates(")
+    renderer_biplot = renderer.index("# --8<-- [start:render-pulp-biplot]")
     renderer_adjust = renderer.index("    adjust_text(", renderer_biplot)
     assert renderer.index("    axis.set_aspect", renderer_biplot) < renderer_adjust
     assert renderer.index("    axis.legend()", renderer_biplot) < renderer_adjust
-    assert "prevent_crossings=False" in example
-    assert "iter_lim=200" in example
+    assert "from adjustText import adjust_text" in example
+    assert "from matplotlib.patches import FancyArrowPatch" in example
+    assert "prevent_crossings=False" in renderer
+    assert "iter_lim=200" in renderer
+
+    for section in renderer_sections:
+        section_start = renderer.index(f"# --8<-- [start:{section}]")
+        section_end = renderer.index(f"# --8<-- [end:{section}]", section_start)
+        snippet = renderer[section_start:section_end]
+        assert "plt.subplots(" in snippet
+        assert "_figure(" not in snippet
+
+    residual_start = renderer.index(
+        "# --8<-- [start:render-pulp-residuals-vs-predicted]"
+    )
+    residual_end = renderer.index(
+        "# --8<-- [end:render-pulp-residuals-vs-predicted]", residual_start
+    )
+    assert "detailed_array = np.array(" in renderer[residual_start:residual_end]
 
     renderer_selected = renderer.index("selected = component_path.for_n_components(")
     renderer_plot = renderer.index("    _render_component_path(", renderer_selected)
     renderer_profile = renderer.index(
-        "rank_profile = path_search.predictor_rank_profile(",
-        renderer_plot,
+        "rank_profile = path_search.predictor_rank_profile(", renderer_plot
     )
     renderer_rank_plot = renderer.index(
-        "    _render_predictor_rank_profile(",
-        renderer_profile,
+        "    _render_predictor_rank_profile(", renderer_profile
     )
     assert (
         renderer_selected
@@ -249,18 +276,10 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         assert "Number of response components" not in source
     assert 'axis.set_xlabel("Number of components")' in example
     assert 'axis.set_xlabel("Number of components")' in renderer
-    assert "for n_components, cv_mse, predictor_rank in zip(" not in example
-    assert "for n_components, mean_mse, predictor_rank in zip(" not in renderer
-
-    assert "rank_profile.selected.predictor_rank" in example
-    assert "profile.selected.predictor_rank" in renderer
-    assert "path_search.predictor_rank_profile(selected.n_components)" in example
-    assert "path_search.predictor_rank_profile(selected.n_components)" in renderer
-    assert "examples/10_pulp_real_data.py:plot-pulp-rank-profile" in tutorial
-    assert 'cv_results["predictor_rank"]' not in example
-    assert 'cv_results["predictor_rank"]' not in renderer
     assert 'legend(title="Component")' not in example
     assert 'legend(title="Component")' not in renderer
+    assert 'cv_results["predictor_rank"]' not in example
+    assert 'cv_results["predictor_rank"]' not in renderer
 
     assert (
         tutorial.index("biplot.svg")
@@ -282,17 +301,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         assert filename not in renderer
     assert "### Regression coefficients" not in tutorial
     assert "coefficients.svg" not in tutorial
-    assert "plot_coefficients()" not in tutorial
     assert "plot_coefficients" not in renderer
-    for function_name in {
-        "plot_scores",
-        "plot_x_loadings",
-        "plot_y_loadings",
-        "plot_pipls_dilation",
-        "plot_pipls_response_directions",
-        "plot_pipls_weighted_response_directions",
-    }:
-        assert function_name not in renderer
 
     assert "pipls.plotting" not in example
     assert "pipls.plotting" not in renderer
@@ -309,26 +318,15 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "diagnostics.standardized_rmse",
     }:
         assert field in example
-    for field in {
-        "diagnostics.observed_standardized",
-        "diagnostics.predicted_standardized",
-        "diagnostics.residual_standardized",
-        "diagnostics.standardized_rmse",
-    }:
         assert field in renderer
     assert "axes[0].scatter(" in example
     assert "axes[1].scatter(" in example
     assert "axes[2].bar(" in example
-    assert "axis.scatter(" in renderer
-    assert "axis.bar(" in renderer
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
     assert "run_pulp_workflow" not in renderer
-    assert "pulp_workflow" not in renderer
     assert "PiPLSPathCV(refit=False).fit(X, Y)" in renderer
     assert "cross_val_predict(" in renderer
-    assert "examples/10_pulp_real_data.py" in tutorial
-
 
 def test_documentation_layers_have_distinct_ownership() -> None:
     repository = _repository_root()

@@ -7,7 +7,6 @@ import hashlib
 import json
 import shutil
 import sys
-from collections.abc import Sequence
 from pathlib import Path
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -47,7 +46,7 @@ PULP_DATA_DIR = REPOSITORY_ROOT / "datasets" / "pulp"
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 CHOSEN_N_COMPONENTS = 3
 DISPLAY_COMPONENTS = (0, 1, 2)
-DETAILED_RESPONSES = ("CSF", "Density", "TI")
+DETAILED_RESPONSE_COUNT = 3
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
     "component_path.svg",
@@ -82,20 +81,6 @@ def _save_svg(figure: Figure, path: Path) -> None:
         metadata={"Creator": "Pi-PLS repository", "Date": None},
     )
     plt.close(figure)
-
-
-def _rotate_category_labels(axis: Axes) -> None:
-    axis.tick_params(axis="x", labelrotation=45)
-    for label in axis.get_xticklabels():
-        label.set_horizontalalignment("right")
-
-
-def _response_indices(response_names: Sequence[str]) -> tuple[int, ...]:
-    index_by_name = {name: index for index, name in enumerate(response_names)}
-    missing = [name for name in DETAILED_RESPONSES if name not in index_by_name]
-    if missing:
-        raise RuntimeError(f"Pulp response table is missing tutorial responses: {missing!r}.")
-    return tuple(index_by_name[name] for name in DETAILED_RESPONSES)
 
 
 def _render_component_path(
@@ -180,7 +165,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     Y = pd.read_csv(PULP_DATA_DIR / "Y.csv")
     predictor_names = tuple(str(name) for name in X.columns)
     response_names = tuple(str(name) for name in Y.columns)
-    detailed_response_indices = _response_indices(response_names)
+    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 
     path_search = PiPLSPathCV(refit=False).fit(X, Y)
     component_path = path_search.component_path_
@@ -215,7 +200,8 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         prediction_kind=PREDICTION_KIND,
     )
 
-    figure, axis = _figure(figsize=(8.0, 6.2))
+    # --8<-- [start:render-pulp-biplot]
+    figure, axis = plt.subplots(figsize=(9.0, 7.0), layout="constrained")
     biplot = biplot_coordinates(structure, components=(0, 1))
     sample_xy = biplot.sample_coordinates
     predictor_xy = biplot.predictor_coordinates
@@ -265,9 +251,11 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         iter_lim=200,
         arrowprops={"arrowstyle": "-", "linewidth": 0.6},
     )
+    # --8<-- [end:render-pulp-biplot]
     _save_svg(figure, output_dir / "biplot.svg")
 
-    figure, axis = _figure(figsize=(10.0, 5.4))
+    # --8<-- [start:render-pulp-predictor-directions]
+    figure, axis = plt.subplots(figsize=(10.0, 5.4), layout="constrained")
     predictor_positions = np.arange(len(predictor_names))
     predictor_width = 0.8 / len(DISPLAY_COMPONENTS)
     for series, component in enumerate(DISPLAY_COMPONENTS):
@@ -285,10 +273,14 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_ylabel(r"Predictor direction $P_{:k}$")
     axis.set_title(r"Pulp predictor directions $P$")
     axis.legend()
-    _rotate_category_labels(axis)
+    axis.tick_params(axis="x", labelrotation=45)
+    for label in axis.get_xticklabels():
+        label.set_horizontalalignment("right")
+    # --8<-- [end:render-pulp-predictor-directions]
     _save_svg(figure, output_dir / "predictor_directions.svg")
 
-    figure, axis = _figure(figsize=(6.4, 5.0))
+    # --8<-- [start:render-pulp-observed-vs-predicted]
+    figure, axis = plt.subplots(figsize=(6.4, 5.0), layout="constrained")
     detailed_array = np.array(detailed_response_indices, dtype=np.int64)
     for response in detailed_response_indices:
         axis.scatter(
@@ -314,9 +306,12 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_ylabel("Predicted response (standardized)")
     axis.set_title(f"Pulp observed versus predicted\n{diagnostics.prediction_kind}")
     axis.legend(title="Response")
+    # --8<-- [end:render-pulp-observed-vs-predicted]
     _save_svg(figure, output_dir / "observed_vs_predicted.svg")
 
-    figure, axis = _figure(figsize=(6.4, 5.0))
+    # --8<-- [start:render-pulp-residuals-vs-predicted]
+    figure, axis = plt.subplots(figsize=(6.4, 5.0), layout="constrained")
+    detailed_array = np.array(detailed_response_indices, dtype=np.int64)
     for response in detailed_response_indices:
         axis.scatter(
             diagnostics.predicted_standardized[:, response],
@@ -345,9 +340,11 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_ylabel(r"Residual $y-\hat y$ (standardized)")
     axis.set_title(f"Pulp residual versus predicted\n{diagnostics.prediction_kind}")
     axis.legend(title="Response")
+    # --8<-- [end:render-pulp-residuals-vs-predicted]
     _save_svg(figure, output_dir / "residuals_vs_predicted.svg")
 
-    figure, axis = _figure(figsize=(7.4, 5.0))
+    # --8<-- [start:render-pulp-standardized-rmse]
+    figure, axis = plt.subplots(figsize=(7.4, 5.0), layout="constrained")
     positions = np.arange(len(response_names))
     axis.bar(positions, diagnostics.standardized_rmse)
     axis.set_xticks(positions)
@@ -355,7 +352,10 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_xlabel("Response")
     axis.set_ylabel("Standardized RMSE")
     axis.set_title(f"Pulp standardized RMSE\n{diagnostics.prediction_kind}")
-    _rotate_category_labels(axis)
+    axis.tick_params(axis="x", labelrotation=45)
+    for label in axis.get_xticklabels():
+        label.set_horizontalalignment("right")
+    # --8<-- [end:render-pulp-standardized-rmse]
     _save_svg(figure, output_dir / "standardized_rmse.svg")
 
     figures = [
@@ -382,7 +382,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
                 selected.predictor_rank == int(rank_profile.predictor_rank[-1])
             ),
             "displayed_components": [component + 1 for component in DISPLAY_COMPONENTS],
-            "detailed_responses": list(DETAILED_RESPONSES),
+            "detailed_responses": [
+                response_names[index] for index in detailed_response_indices
+            ],
             "prediction_kind": diagnostics.prediction_kind,
         },
         "figures": figures,

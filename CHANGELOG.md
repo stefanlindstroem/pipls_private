@@ -1,5 +1,9 @@
 # Changelog
 
+- Make Tutorial 2 sequential and self-contained without restoring its former length: define setup
+  and the first-three-response display choice before use, show standalone code for every displayed
+  interpretation figure, explain the Pulp rank ceiling and splitter choice, and link rather than
+  embed the complete example.
 - Complete Tutorial 2 prediction diagnostics by generating and displaying the
   residual-versus-predicted figure already present in the maintained three-panel example code.
 - Complete the data-first rendering migration: define immutable inspection results as the
