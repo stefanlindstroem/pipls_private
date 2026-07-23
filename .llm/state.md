@@ -84,6 +84,10 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - a completed documentation reference layer with a public result-object map, task-oriented
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
+- a consolidated programming reference with eight navigation entries: small generated result and
+  utility groups live with their owning estimators, path selection and cross-validation share one
+  advanced page, and model inspection retains all stable interpretation anchors without repeating
+  elementary plotting recipes.
 
 Decision 0086 reduces the public decomposition to quantities used for fitted-model interpretation;
 private construction matrices remain in `PiPLSCoreResult`. Decision 0087 removes scorer plumbing,
@@ -97,6 +101,8 @@ prediction-diagnostic figure trio. Decision 0085 makes Tutorial 2 sequential and
 setup and display choices precede use, and every displayed interpretation figure has a matching
 standalone renderer snippet. Decision 0089 balances the tutorial's Pi-PLS-specific section by
 displaying both $P$ and $QD$, while the complete example retains the separate $D$ and $Q$ plots.
+Decision 0090 consolidates the programming reference without changing public objects or numerical
+behavior.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the

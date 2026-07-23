@@ -85,6 +85,17 @@ This index is navigation, not a substitute for those records.
 | `0077-audience-oriented-documentation-entry.md` | user and maintainer documentation entry | concise user README, contributor-owned maintenance commands, and project-validation navigation |
 | `0078-documentation-reference-cleanup.md` | documentation reference cleanup | result-object map, troubleshooting, generic link and anchor checks, and tests that avoid freezing living prose |
 | `0079-data-first-biplot-rendering.md` | data-first biplot rendering | retain balanced coordinates, remove `plot_biplot()`, and use direct Matplotlib with optional `adjustText` label layout |
+| `0080-direct-prediction-diagnostic-rendering.md` | direct prediction-diagnostic rendering | immutable diagnostic arrays are primary; examples use direct Matplotlib; three convenience plotters removed |
+| `0081-direct-standard-inspection-rendering.md` | direct standard inspection rendering | immutable latent and observation arrays are primary; examples use direct Matplotlib; five convenience plotters removed |
+| `0082-direct-pipls-factor-rendering.md` | direct Pi-PLS factor rendering | immutable factor arrays are primary; plotting module and plot extra removed |
+| `0083-data-first-rendering-policy.md` | final data-first rendering policy | immutable results are the compatibility surface; rendering remains optional and caller-owned |
+| `0084-complete-pulp-prediction-diagnostics.md` | complete Pulp prediction diagnostics | Tutorial 2 displays the residual figure represented by the middle axis of its maintained three-panel prediction snippet |
+| `0085-self-contained-pulp-tutorial.md` | self-contained Pulp tutorial | setup and display choices precede use; each shown figure has a matching standalone recipe |
+| `0086-public-decomposition-boundary.md` | public decomposition boundary | public result exposes final rotations, dilation, rank/solver diagnostics, and standardized map; construction matrices remain private |
+| `0087-public-fitted-surface-cleanup.md` | public fitted-surface cleanup | remove scorer plumbing, exact rotation aliases, path execution bookkeeping, and flat OOF duplicates |
+| `0088-public-result-record-cleanup.md` | public result-record cleanup | remove display-sign bookkeeping and impossible zero loading blocks; hide constructors for returned records |
+| `0089-balanced-pulp-factorization-views.md` | balanced Pulp factorization views | Tutorial 2 displays both $P$ and $QD$; the complete example retains the separate $D$ and $Q$ plots |
+| `0090-reference-consolidation.md` | programming-reference consolidation | merge validation with path details, colocate small generated API groups, and shorten inspection prose while preserving public objects and anchors |
 
 ## Implemented estimator/search transition
 
@@ -178,13 +189,3 @@ plan contains an earlier or more general proposal:
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.
-| `0080-direct-prediction-diagnostic-rendering.md` | direct prediction-diagnostic rendering | immutable diagnostic arrays are primary; examples use direct Matplotlib; three convenience plotters removed |
-| `0081-direct-standard-inspection-rendering.md` | direct standard inspection rendering | immutable latent and observation arrays are primary; examples use direct Matplotlib; five convenience plotters removed |
-| `0082-direct-pipls-factor-rendering.md` | direct Pi-PLS factor rendering | immutable factor arrays are primary; plotting module and plot extra removed |
-| `0083-data-first-rendering-policy.md` | final data-first rendering policy | immutable results are the compatibility surface; rendering remains optional and caller-owned |
-| `0084-complete-pulp-prediction-diagnostics.md` | complete Pulp prediction diagnostics | Tutorial 2 displays the residual figure represented by the middle axis of its maintained three-panel prediction snippet |
-| `0085-self-contained-pulp-tutorial.md` | self-contained Pulp tutorial | setup and display choices precede use; each shown figure has a matching standalone recipe |
-| `0086-public-decomposition-boundary.md` | public decomposition boundary | public result exposes final rotations, dilation, rank/solver diagnostics, and standardized map; construction matrices remain private |
-| `0087-public-fitted-surface-cleanup.md` | public fitted-surface cleanup | remove scorer plumbing, exact rotation aliases, path execution bookkeeping, and flat OOF duplicates |
-| `0088-public-result-record-cleanup.md` | public result-record cleanup | remove display-sign bookkeeping and impossible zero loading blocks; hide constructors for returned records |
-| `0089-balanced-pulp-factorization-views.md` | balanced Pulp factorization views | Tutorial 2 displays both $P$ and $QD$; the complete example retains the separate $D$ and $Q$ plots |

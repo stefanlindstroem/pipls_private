@@ -83,10 +83,9 @@ repeat the optimization. Use `search.predictor_rank_profile(h)` to inspect all r
 one component count.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
-predictor-rank plots. The [path-selection reference](docs/api/path.md),
-[advanced path-search guide](docs/path_analysis.md), and
-[cross-validation guide](docs/cross_validation.md) cover alternative policies and validation
-protocols.
+predictor-rank plots. The [path-selection reference](docs/api/path.md) and
+[path-selection details](docs/path_analysis.md) cover alternative policies, splitters, and
+validation protocols.
 
 ## Main interfaces
 
@@ -120,8 +119,7 @@ Install the `examples` extra before running them.
 - [Tutorial 1: synthetic selection and prediction](docs/tutorials/synthetic.md)
 - [Tutorial 2: complete Pulp analysis](docs/tutorials/pulp.md)
 - [API overview](docs/api/index.md)
-- [Advanced path-search behavior](docs/path_analysis.md)
-- [Cross-validation and OOF reporting](docs/cross_validation.md)
+- [Path-selection details](docs/path_analysis.md)
 - [Troubleshooting](docs/troubleshooting.md)
 - [Model inspection](docs/model_inspection.md)
 - [Reference datasets](docs/datasets.md)

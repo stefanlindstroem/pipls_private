@@ -558,7 +558,9 @@ source distribution.
 Current status: **complete**. Decisions 0049--0053 define the self-contained source, strict site
 build, generated public reference, distributed documentation inputs, and CI validation. Decision
 0057 excludes maintainer decision records from the served site and requires concise, theory-linked
-onboarding before path and factorization terminology.
+onboarding before path and factorization terminology. Decision 0090 consolidates the programming
+reference into eight navigation entries while preserving generated coverage, stable interpretation
+anchors, and all advanced selection and validation contracts.
 
 ## Compatibility policy status
 

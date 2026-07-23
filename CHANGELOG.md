@@ -1,5 +1,10 @@
 # Changelog
 
+- Consolidate the programming reference from thirteen navigation entries to eight: colocate small
+  generated result and utility groups with their owning estimators, merge path-search and
+  cross-validation details, correct the documented `cv_results_` contents, and shorten model
+  inspection while preserving every public object, stable anchor, and scientific qualification.
+
 - Balance Tutorial 2's Pi-PLS-specific factorization section by displaying both predictor
   directions $P$ and weighted response directions $QD$, while keeping the separate $D$ and $Q$
   plots in the complete Pulp example.

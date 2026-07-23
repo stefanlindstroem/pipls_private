@@ -114,9 +114,7 @@ def test_troubleshooting_is_a_programming_reference_page() -> None:
     required_targets = {
         "api/regression.md",
         "api/path.md",
-        "api/exceptions.md",
         "path_analysis.md",
-        "cross_validation.md",
     }
     linked_targets = {
         parsed[0]
@@ -136,3 +134,38 @@ def test_served_guides_do_not_expose_internal_phase_or_patch_labels() -> None:
         if "decisions" in path.relative_to(docs_root).parts:
             continue
         assert internal_label.search(path.read_text(encoding="utf-8")) is None, path
+
+
+def test_reference_navigation_is_consolidated_around_owning_pages() -> None:
+    root = _repository_root()
+    with (root / "mkdocs.yml").open(encoding="utf-8") as stream:
+        navigation = yaml.safe_load(stream)["nav"]
+
+    reference = next(item["Reference"] for item in navigation if "Reference" in item)
+    assert [next(iter(item.values())) for item in reference] == [
+        "api/index.md",
+        "api/regression.md",
+        "api/path.md",
+        "path_analysis.md",
+        "troubleshooting.md",
+        "model_inspection.md",
+        "api/inspection.md",
+        "api/datasets.md",
+    ]
+
+    retired_wrappers = {
+        "cross_validation.md",
+        "api/decomposition.md",
+        "api/validation.md",
+        "api/exceptions.md",
+        "api/metrics.md",
+    }
+    assert not any((root / "docs" / relative).exists() for relative in retired_wrappers)
+
+    regression = (root / "docs" / "api" / "regression.md").read_text(encoding="utf-8")
+    path = (root / "docs" / "api" / "path.md").read_text(encoding="utf-8")
+    assert "::: pipls.PiPLSDecomposition" in regression
+    assert "::: pipls.StatisticalSupportWarning" in regression
+    assert "::: pipls.PiPLSValidationReport" in path
+    assert "::: pipls.metrics.response_standardized_mean_squared_error" in path
+    assert "::: pipls.metrics.neg_response_standardized_mean_squared_error" in path

@@ -152,9 +152,7 @@ state whether they use fitted values, fixed-parameter out-of-fold predictions, s
 out-of-fold predictions, or an independent test set.
 
 The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#select-the-fixed-rank-pair),
-[advanced path-search reference](path_analysis.md), and
-[cross-validation reference](cross_validation.md) define the general selection and validation
-contracts.
+[path-selection details](path_analysis.md) define the general selection and validation contracts.
 
 ## Reference and scope
 

@@ -148,5 +148,4 @@ For exact signatures and advanced behavior, see:
 
 - [`PiPLSPathCV`](../api/path.md#pipls.PiPLSPathCV);
 - [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression);
-- [Advanced path-search behavior](../path_analysis.md);
-- [Cross-validation](../cross_validation.md).
+- [Path-selection details](../path_analysis.md).

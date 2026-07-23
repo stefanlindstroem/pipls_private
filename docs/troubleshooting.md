@@ -28,7 +28,7 @@ search.predictor_rank_profile(h).predictor_rank
 
 An explicit component request must have at least one admissible predictor rank. Candidate limits
 also depend on sample count, centered training-fold dimensions, configured rank bounds, and the
-selected search policy. See [Advanced path-search behavior](path_analysis.md).
+selected search policy. See [Path-selection details](path_analysis.md).
 
 ## The path search has no admissible candidate
 
@@ -36,8 +36,8 @@ Reduce the requested component count or predictor-rank range, provide more obser
 `max_predictor_rank` and `samples_per_predictor_rank`. Grouped, temporal, and other specialized
 splitters can reduce the smallest training-fold size and therefore the feasible rank.
 
-The [cross-validation guide](cross_validation.md) explains splitter-dependent feasibility and
-metadata such as `groups`.
+The [cross-validation protocols](path_analysis.md#cross-validation-protocols-and-metadata)
+section explains splitter-dependent feasibility and metadata such as `groups`.
 
 ## `predict()` is unavailable after path selection
 
@@ -73,7 +73,8 @@ search.fit(X, Y, groups=sample_groups)
 ```
 
 Do not pass split metadata to `PiPLSRegression.fit()`, which fits one fixed pair and performs no
-cross-validation. See [Cross-validation protocols and OOF reporting](cross_validation.md).
+cross-validation. See
+[cross-validation protocols and metadata](path_analysis.md#cross-validation-protocols-and-metadata).
 
 ## Fitting rejects the data or leaves the estimator unfitted
 
@@ -92,7 +93,8 @@ predictor rank. The warning does not change the requested model. It indicates we
 support, while algebraically or numerically infeasible ranks remain errors.
 
 Use a lower predictor rank, provide more observations, or use `PiPLSPathCV`, whose default support
-rule is more conservative. See [Warnings](api/exceptions.md).
+rule is more conservative. See
+[Solver and statistical support](api/regression.md#solver-and-statistical-support).
 
 ## `copy=False` changed an input array
 

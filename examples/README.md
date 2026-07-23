@@ -38,7 +38,7 @@ source rather than from pandas or CSV headers.
   component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model.
 
 Grouped, leave-one-out, and temporal validation require application-specific sampling semantics.
-They are documented in `docs/cross_validation.md` rather than combined into a context-free numbered
+They are documented in `docs/path_analysis.md` rather than combined into a context-free numbered
 example.
 
 ## Complete Pi-PLS reference workflows

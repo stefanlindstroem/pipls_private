@@ -174,7 +174,6 @@ def test_synthetic_tutorial_is_the_first_learning_route() -> None:
     assert "../api/path.md" in linked_targets
     assert "../api/regression.md" in linked_targets
     assert "../path_analysis.md" in linked_targets
-    assert "../cross_validation.md" in linked_targets
 
     selected_line = "selected = path.for_n_components(CHOSEN_N_COMPONENTS)"
     component_plot = '# --8<-- [start:plot-synthetic-component-path]'

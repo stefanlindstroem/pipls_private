@@ -20,16 +20,11 @@ nav:
       - API overview: api/index.md
       - Fixed regression: api/regression.md
       - Path selection: api/path.md
-      - Advanced path-search behavior: path_analysis.md
-      - Cross-validation: cross_validation.md
+      - Path-selection details: path_analysis.md
       - Troubleshooting: troubleshooting.md
       - Model inspection: model_inspection.md
       - Inspection API: api/inspection.md
-      - Decomposition: api/decomposition.md
-      - Validation report: api/validation.md
-      - Warnings: api/exceptions.md
       - Datasets and synthetic data: api/datasets.md
-      - Metrics: api/metrics.md
   - Project validation:
       - Reference datasets: datasets.md
       - Benchmarks: benchmarks.md

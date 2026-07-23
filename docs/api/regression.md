@@ -15,8 +15,8 @@ Y_pred = model.predict(X_test)
 ```
 
 For the normal path-selection workflow, begin with the
-[synthetic tutorial](../tutorials/synthetic.md). Use `PiPLSPathCV` when the rank pair is not
-already fixed. Common fit and data problems are summarized in
+[synthetic tutorial](../tutorials/synthetic.md). Use `PiPLSPathCV` when the rank pair is not already
+fixed. Common fit and data problems are summarized in
 [Troubleshooting](../troubleshooting.md).
 
 ## Preprocessing and fit safety
@@ -24,10 +24,6 @@ already fixed. Common fit and data problems are summarized in
 Every fit centers predictors and responses using statistics learned from that fit's training data.
 With `scale=True`, centered columns are divided by sample standard deviations with `ddof=1`;
 constant columns use scale 1. With `scale=False`, centering remains active without division.
-
-During `PiPLSPathCV`, every candidate clone learns these statistics inside its training fold. Any
-additional learned preprocessing should therefore be placed in a supported scikit-learn pipeline,
-not fitted on the complete dataset before path evaluation.
 
 Ordinary means and standard deviations are retained for ordinary data. Range-safe fallbacks are
 used only when finite values would otherwise overflow or when a nonconstant scale would underflow
@@ -46,13 +42,16 @@ A direct fixed fit emits `StatisticalSupportWarning` when $n/r_\pi<3$. The warni
 does not alter the requested rank. Algebraically or numerically infeasible ranks remain errors. The
 standard path search uses its more conservative default support ceiling.
 
+::: pipls.StatisticalSupportWarning
+    options:
+      members: false
+
 ## Fitted results
 
 Standard PLS-family fitted attributes include scores, loadings, rotations, coefficients, and
-intercepts. Exact weight aliases are not duplicated when they would contain the same arrays as the
-rotations. Interpretable Pi-PLS rotations, dilation values, and numerical-rank diagnostics are
-grouped in the frozen, read-only `decomposition_` result. Intermediate construction matrices remain
-private. The exact attribute shapes and conditional method behavior are documented below.
+intercepts. The frozen, read-only `decomposition_` result groups the Pi-PLS factorization and
+numerical-rank diagnostics. The exact attribute shapes and conditional method behavior are
+documented below.
 
 ::: pipls.PiPLSRegression
     options:
@@ -64,3 +63,24 @@ private. The exact attribute shapes and conditional method behavior are document
         - inverse_transform
         - score
         - get_feature_names_out
+
+## Pi-PLS decomposition
+
+`PiPLSRegression.decomposition_` is normally obtained from a fitted estimator. Its public fields
+use descriptive Python names:
+
+| Field | Method notation | Meaning |
+|---|---|---|
+| `predictor_rotations` | $P$ | orthogonal predictor directions |
+| `dilation` | $\operatorname{diag}(D)$ | nonnegative strength of each paired mode |
+| `response_rotations` | $Q$ | orthogonal response directions |
+| `standardized_regression_map` | $PDQ^{\mathsf T}$ | regression map in centered/scaled coordinates |
+
+The estimator transforms the centered/scaled map back to original predictor and response units
+when constructing `coef_`, `intercept_`, and prediction output.
+
+::: pipls.PiPLSDecomposition
+    options:
+      show_signature: false
+      members:
+        - standardized_regression_map

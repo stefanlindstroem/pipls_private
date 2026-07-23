@@ -175,7 +175,6 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     )
     assert "../api/regression.md" in linked_targets
     assert "../path_analysis.md" in linked_targets
-    assert "../cross_validation.md" in linked_targets
     assert "../model_inspection.md" in linked_targets
     assert "../theory.md" in linked_targets
 

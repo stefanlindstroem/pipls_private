@@ -1,8 +1,8 @@
 # API reference
 
 The generated reference documents supported public objects directly from their Python docstrings.
-Core estimators are available from `pipls`; focused numerical inspection, dataset, and metric
-tools live in dedicated submodules. Rendering is caller-owned Matplotlib code.
+Core estimators are available from `pipls`; numerical inspection, dataset, and metric tools live in
+focused submodules. Rendering is caller-owned.
 
 ## Start with the estimators
 
@@ -17,8 +17,8 @@ tools live in dedicated submodules. Rendering is caller-owned Matplotlib code.
 | [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare component counts and their conditionally selected predictor ranks |
 | [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | `path.for_n_components(h)` | Retrieve one evaluated fixed rank pair |
 | [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one component count |
-| [`PiPLSValidationReport`](validation.md#pipls.PiPLSValidationReport) | `search.validation_report_` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
-| [`PiPLSDecomposition`](decomposition.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access interpretable predictor rotations, dilation, response rotations, and rank diagnostics |
+| [`PiPLSValidationReport`](path.md#pipls.PiPLSValidationReport) | `search.validation_report_` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
+| [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access interpretable predictor rotations, dilation, response rotations, and rank diagnostics |
 | [`LatentStructure`](inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, rotations, and coefficients for PLS-family inspection |
 | [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $P$, $D$, $Q$, and $QD$ factors |
 | [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |
@@ -29,16 +29,7 @@ tools live in dedicated submodules. Rendering is caller-owned Matplotlib code.
 
 ## Rendering boundary
 
-The API ends at immutable numerical results. Pi-PLS provides no plotting submodule or public
-`plot_*` functions. Maintained examples pass result arrays to ordinary Matplotlib calls.
-`biplot_coordinates()` is retained because coordinate balancing is numerical; optional
-`adjustText` placement operates on the resulting Matplotlib text artists.
-
-## Other reference pages
-
-- [Decomposition](decomposition.md)
-- [Validation report](validation.md)
-- [Warnings](exceptions.md)
-- [Inspection](inspection.md)
-- [Dataset containers and synthetic data](datasets.md)
-- [Metrics](metrics.md)
+The API ends at immutable numerical results. Pi-PLS provides no plotting submodule. Maintained
+examples pass result arrays to ordinary Matplotlib calls. `biplot_coordinates()` is retained because
+coordinate balancing is numerical; optional `adjustText` placement operates on the resulting text
+artists.

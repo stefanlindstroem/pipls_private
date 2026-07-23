@@ -104,3 +104,4 @@ reference describe the current public behavior directly.
 - [0084: complete Pulp prediction diagnostics](0084-complete-pulp-prediction-diagnostics.md)
 - [0085: self-contained Pulp tutorial](0085-self-contained-pulp-tutorial.md)
 - [0089: balanced Pulp factorization views](0089-balanced-pulp-factorization-views.md)
+- [0090: programming-reference consolidation](0090-reference-consolidation.md)

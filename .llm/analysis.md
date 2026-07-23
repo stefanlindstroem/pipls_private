@@ -134,9 +134,9 @@ home page owns the minimal fixed-fit entry and audience routes. The root README 
 orientation, installation, two compact workflows, and tutorial links; contributor commands and
 repository maintenance belong only in `CONTRIBUTING.md`. Generated fixed-regression and path
 pages own exact
-estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md` and
-`cross_validation.md` retain only advanced search and validation behavior. `model_inspection.md` owns the bridge from immutable numerical fields to ordinary Matplotlib
-primitives with stable interpretation anchors. Example pages may describe script purpose and artifacts
+estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md` owns advanced search, splitter, OOF, and validation behavior in one place.
+`model_inspection.md` owns the bridge from immutable numerical fields to caller-owned rendering
+with stable interpretation anchors and without repeating elementary Matplotlib recipes. Example pages may describe script purpose and artifacts
 but must not reproduce the tutorial analysis or embed its generated figures.
 
 Pulp is the canonical tutorial analysis. `examples/10_pulp_real_data.py` owns its direct pandas

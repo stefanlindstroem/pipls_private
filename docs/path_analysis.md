@@ -1,8 +1,9 @@
-# Advanced path-search behavior
+# Path-selection details
 
 The [synthetic tutorial](tutorials/synthetic.md#evaluate-the-component-path) owns the routine
-selection workflow. This page records configuration and edge behavior needed when the defaults are not enough.
-Exact signatures and fitted attributes are in the [generated path API](api/path.md).
+selection workflow. This page records configuration, cross-validation, and edge behavior needed
+when the defaults are not enough. Exact signatures and fitted attributes are in the
+[generated path API](api/path.md).
 
 ## Search bounds
 
@@ -30,14 +31,6 @@ With `predictor_rank_values=None`, predictor rank is selected independently for 
 count. A one-element sequence fixes one rank across the path, a longer sequence defines the
 admissible set, and `predictor_rank_values="max"` uses the rule-derived maximum directly.
 
-```python
-fixed_rank_path = PiPLSPathCV(
-    n_components_values=[1, 2, 3],
-    predictor_rank_values=[8],
-    refit=False,
-).fit(X, Y)
-```
-
 `search_method="optimal"` evaluates every admissible pair. `search_method="auto"` performs a
 deterministic adaptive coarse-to-fine search independently for each component count and may leave
 admissible ranks unevaluated. Score ties within numerical tolerance favor the smaller predictor
@@ -64,6 +57,7 @@ Candidate selection maximizes the configured mean test score. The default scorer
 minimizing mean response-standardized CV-MSE. With another scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 
+Ordinary scikit-learn scorer names, other callables, and `scoring=None` are accepted.
 `best_params_`, `best_score_`, and `best_index_` describe the best evaluated pair. Adaptive search
 makes no claim about pairs it did not evaluate. The component path remains a model-selection
 diagnostic; its numerical minimum does not replace a scientifically justified complexity choice.
@@ -74,8 +68,8 @@ The supported estimator is either a direct `PiPLSRegression` or a scikit-learn `
 final step is `PiPLSRegression`. The complete estimator is cloned and fitted inside every fold.
 
 ```python
-from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
 
 from pipls import PiPLSPathCV, PiPLSRegression
 
@@ -90,6 +84,55 @@ search = PiPLSPathCV(estimator=pipeline, refit=False).fit(X, Y)
 
 Do not fit learned preprocessing on the complete dataset before path evaluation.
 
+## Cross-validation protocols and metadata
+
+`PiPLSPathCV` accepts scikit-learn splitters for grouped, repeated, predefined, temporal, or
+leave-one-out protocols when their scientific assumptions match the data. Suitable examples include
+`GroupKFold`, `RepeatedKFold`, `PredefinedSplit`, `TimeSeriesSplit`, and `LeaveOneOut`.
+
+```python
+from sklearn.model_selection import GroupKFold
+
+search = PiPLSPathCV(cv=GroupKFold(n_splits=5), refit=False)
+search.fit(X, Y, groups=sample_groups)
+```
+
+`groups` is an explicit `PiPLSPathCV.fit()` parameter and participates in scikit-learn metadata
+routing when routing is enabled and requested. Split metadata belongs to the path selector;
+`PiPLSRegression.fit(X, Y)` fits one explicit pair and accepts none.
+
+## Ordered out-of-fold predictions
+
+Set `return_oof_predictions=True` to fit the selected fixed parameterization once per training fold
+after selection. The immutable `validation_report_` then owns row-ordered OOF results:
+
+- `oof_predictions` preserves input row order;
+- repeated validation predictions are averaged and their counts are recorded;
+- rows without validation coverage have count 0 and a NaN prediction;
+- `n_components` and `predictor_rank` identify the fitted pair;
+- `pooled_oof_r2` uses only rows with OOF coverage.
+
+The report also records the split count, mean score, CV-MSE, OOF coverage, and whether the splitter
+is structurally leave-one-out. These results are selection-conditioned because the same path search
+selected the parameters. Use nested cross-validation or an external test set when an unbiased
+post-selection estimate is required.
+
+## Leave-one-out interpretation
+
+`LeaveOneOut()` is not a special Pi-PLS mode. The support term uses the full $n$, while centered-fold
+feasibility is capped by $n-2$. The default standardized MSE remains defined for singleton
+validation folds because response scales are estimated from each training fold.
+
+Mean foldwise $R^2$ is rejected when validation folds contain one sample. When OOF predictions are
+requested, `validation_report_.pooled_oof_r2` may report $R^2$ from pooled LOO predictions; it is
+not mean foldwise $R^2$.
+
+## Fold variation
+
+`component_path_.cv_mse_fold_sd` is the population standard deviation of the realized fold-specific
+MSE values. It describes fold variation, not a confidence interval. Formal uncertainty statements
+require a separately designed repeated or nested resampling procedure.
+
 ## Refit and detailed diagnostics
 
 With `refit=True`, the globally best evaluated candidate under the configured scorer is fitted on
@@ -98,10 +141,6 @@ uses `refit=False` because it makes the component-count choice visible before fi
 fixed model.
 
 Use `component_path_` for the concise component-count curve and `predictor_rank_profile(h)` for the
-evaluated ranks at one count. The complete candidate-level arrays, split values, timings, resolved
-grids, and search history remain in `cv_results_`. No duplicate matrix-shaped path surface is
-stored.
-
-Group-aware and advanced splitters are accepted. Set `return_oof_predictions=True` only when
-row-aligned OOF predictions for the selected evaluated pair are required. See
-[Cross-validation protocols and OOF reporting](cross_validation.md).
+evaluated ranks at one count. `cv_results_` contains candidate parameters, split test scores,
+response-standardized MSE diagnostics, score ranks, and fit/score timing summaries. It contains only
+evaluated candidates.

@@ -119,7 +119,7 @@ Their mean difference is small relative to the fold variation.
 The profile supports rank 10 for this fitted model, but it does not establish that ranks above 10
 would be worse or that rank 10 has a distinct scientific advantage over rank 9. The fixed model
 still contains three paired components; predictor rank 10 is the dimension of the predictor basis
-used to estimate those pairs. See [Advanced path-search behavior](../path_analysis.md) for other
+used to estimate those pairs. See [Path-selection details](../path_analysis.md) for other
 bounds and policies.
 
 ## Fit the selected model
@@ -151,7 +151,8 @@ temporal, or otherwise appropriate splitter when row order carries experimental 
     These are **selection-conditioned OOF predictions**. The rank pair is fixed during this second
     cross-validation calculation, but the same observations were already used to inspect the
     selection path. Nested cross-validation or an external test set is required for an independent
-    estimate of post-selection performance. See [Cross-validation](../cross_validation.md).
+    estimate of post-selection performance. See
+    [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
 
 ## Compute immutable inspection results
 
@@ -302,10 +303,9 @@ Both routes calculate directly from in-memory results and write no analytical CS
 
 - Use [Model inspection](../model_inspection.md) for the complete quantity catalogue and
   interpretation boundaries.
-- Use [Advanced path-search behavior](../path_analysis.md) for nondefault bounds, policies,
-  pipelines, scorer behavior, and automatic refitting.
-- Use [Cross-validation](../cross_validation.md) for grouped, repeated, temporal, leave-one-out, and
-  OOF-coverage details.
+- Use [Path-selection details](../path_analysis.md) for nondefault bounds, policies, pipelines,
+  scorer behavior, grouped or temporal splitters, leave-one-out interpretation, OOF coverage,
+  and automatic refitting.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
 - Use the [`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV) and
   [inspection API](../api/inspection.md) for exact signatures.
