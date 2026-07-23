@@ -1,7 +1,8 @@
 # Inspection
 
 `pipls.inspection` contains pure numerical analysis helpers. It has no pandas or Matplotlib
-requirement, returns immutable defensive copies, and performs no file writing.
+requirement, returns immutable defensive copies, and performs no file writing. Result records are
+obtained from these helpers; the reference emphasizes their fields rather than manual construction.
 
 The Pi-PLS factorization helper is method-specific. The latent-structure, biplot, observation, and
 prediction helpers use PLS-family quantities and can therefore be applied to a compatible fitted
@@ -15,12 +16,14 @@ Pi-PLS or ordinary PLS estimator.
 
 ::: pipls.inspection.BiplotCoordinates
     options:
+      show_signature: false
       members:
         - n_samples
         - n_features
 
 ::: pipls.inspection.LatentStructure
     options:
+      show_signature: false
       members:
         - n_samples
         - n_features
@@ -29,11 +32,13 @@ Pi-PLS or ordinary PLS estimator.
 
 ::: pipls.inspection.ObservationDiagnostics
     options:
+      show_signature: false
       members:
         - n_samples
 
 ::: pipls.inspection.PiPLSDisplayFactors
     options:
+      show_signature: false
       members:
         - n_features
         - n_targets
@@ -41,6 +46,7 @@ Pi-PLS or ordinary PLS estimator.
 
 ::: pipls.inspection.PredictionDiagnostics
     options:
+      show_signature: false
       members:
         - n_samples
         - n_targets

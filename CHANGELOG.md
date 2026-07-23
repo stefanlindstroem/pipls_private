@@ -1,5 +1,10 @@
 # Changelog
 
+- Complete public result-record cleanup: remove sign-canonicalization bookkeeping from
+  `PiPLSDisplayFactors`, omit structurally impossible zero loading blocks from
+  `PiPLSSyntheticTruth`, and present returned immutable records without constructor-first generated
+  signatures.
+
 - Reduce the fitted estimator and path-search surfaces: keep rotations without duplicate weight
   aliases, make scorer response scaling private, retain standard and immutable path results, and
   move optional OOF arrays and coverage exclusively into `validation_report_`.

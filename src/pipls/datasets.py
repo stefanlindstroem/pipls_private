@@ -56,8 +56,8 @@ _UINT32_MAX = 2**32 - 1
 class PiPLSSyntheticTruth:
     r"""Immutable latent structure used to generate a synthetic dataset.
 
-    All arrays are read-only copies. Loading blocks that cannot affect one side of
-    the regression are represented explicitly by zero-width or zero arrays.
+    All arrays are read-only copies. The result stores only loading blocks that
+    contribute to the generated predictor or response signal.
 
     Attributes
     ----------
@@ -73,8 +73,6 @@ class PiPLSSyntheticTruth:
         Predictor-specific loading block.
     y_response_specific_loadings : ndarray of shape (n_targets, n_response_specific)
         Response-specific loading block.
-    x_response_specific_loadings, y_predictor_specific_loadings : ndarray
-        Explicit zero blocks for structurally absent effects.
     x_signal, x_noise : ndarray of shape (n_samples, n_features)
         Predictor signal and additive noise, whose sum is the generated ``X``.
     y_signal, y_noise : ndarray of shape (n_samples, n_targets)
@@ -92,9 +90,7 @@ class PiPLSSyntheticTruth:
     response_specific_scores: FloatArray
     x_shared_loadings: FloatArray
     x_predictor_specific_loadings: FloatArray
-    x_response_specific_loadings: FloatArray
     y_shared_loadings: FloatArray
-    y_predictor_specific_loadings: FloatArray
     y_response_specific_loadings: FloatArray
     x_signal: FloatArray
     y_signal: FloatArray
@@ -686,15 +682,7 @@ def _draw_dataset_block(
         response_specific_scores=response_specific_scores,
         x_shared_loadings=model.x_shared_loadings,
         x_predictor_specific_loadings=model.x_predictor_specific_loadings,
-        x_response_specific_loadings=np.zeros(
-            (config.n_features, config.n_response_specific),
-            dtype=np.float64,
-        ),
         y_shared_loadings=model.y_shared_loadings,
-        y_predictor_specific_loadings=np.zeros(
-            (config.n_targets, config.n_predictor_specific),
-            dtype=np.float64,
-        ),
         y_response_specific_loadings=model.y_response_specific_loadings,
         x_signal=x_signal,
         y_signal=y_signal,
@@ -892,9 +880,7 @@ def _validate_truth(
         "response_specific_scores": (n_samples, n_response_specific),
         "x_shared_loadings": (n_features, n_shared),
         "x_predictor_specific_loadings": (n_features, n_predictor_specific),
-        "x_response_specific_loadings": (n_features, n_response_specific),
         "y_shared_loadings": (n_targets, n_shared),
-        "y_predictor_specific_loadings": (n_targets, n_predictor_specific),
         "y_response_specific_loadings": (n_targets, n_response_specific),
         "x_signal": (n_samples, n_features),
         "y_signal": (n_samples, n_targets),
@@ -909,10 +895,6 @@ def _validate_truth(
     for name, expected in expected_shapes.items():
         if getattr(truth, name).shape != expected:
             raise ValueError(f"truth.{name} must have shape {expected}.")
-    if np.any(truth.x_response_specific_loadings != 0.0):
-        raise ValueError("truth.x_response_specific_loadings must be zero.")
-    if np.any(truth.y_predictor_specific_loadings != 0.0):
-        raise ValueError("truth.y_predictor_specific_loadings must be zero.")
     if np.any(truth.feature_scale <= 0.0) or np.any(truth.target_scale <= 0.0):
         raise ValueError("truth observed-variable scales must be positive.")
     strength_arrays = (

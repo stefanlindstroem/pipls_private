@@ -87,9 +87,10 @@ columns are orthonormal within each observed block. Latent score columns are cen
 to unit sample standard deviation after being drawn from the selected normal or uniform source
 distribution.
 
-`synthetic.truth` is a read-only `PiPLSSyntheticTruth` containing latent scores, loading blocks,
-signal matrices, noise matrices, strengths, and observed-variable scales. Structurally impossible
-loading blocks are present as explicit zeros, which makes invariants directly testable.
+`synthetic.truth` is a read-only `PiPLSSyntheticTruth` containing latent scores, contributing
+loading blocks, signal matrices, noise matrices, strengths, and observed-variable scales. Effects
+that are structurally absent from one observed block are described by the declared latent ranks;
+they are not stored as redundant zero loading arrays.
 
 ## Leakage-free train/test generation
 

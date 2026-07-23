@@ -173,8 +173,9 @@ centered latent rank requested for `X` or `Y`.
 independent train/test score and noise draws. It performs no fitted preprocessing and the training
 block does not depend on the requested test size.
 
-`PiPLSSyntheticTruth` exposes read-only latent scores, loading blocks, signal/noise matrices,
-strengths, and scales. Loading blocks that are structurally absent are explicit zeros.
+`PiPLSSyntheticTruth` exposes read-only latent scores, contributing loading blocks, signal/noise
+matrices, strengths, and scales. Structurally absent cross-side loading blocks are not stored as
+redundant zero arrays.
 
 No metadata file, registry lookup, or package-owned loader is required for real-data fitting.
 Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Repository examples
@@ -214,7 +215,7 @@ from pipls.inspection import (
 These names are not top-level `pipls` exports. `pipls_display_factors()` accepts a
 `PiPLSDecomposition`, copies $P$, $D$, and $Q$, chooses deterministic display signs from the first
 largest-magnitude predictor entry, and preserves $PDQ^\mathsf{T}$. It returns $P$, the dilation
-vector, $Q$, $QD$, and the applied signs as read-only arrays.
+vector, $Q$, and $QD$ as read-only arrays; the sign bookkeeping remains internal.
 
 `prediction_diagnostics()` accepts one- or two-dimensional observed and predicted responses,
 normalizes outputs to two dimensions, uses residuals $y-\hat y$, and applies observed-response

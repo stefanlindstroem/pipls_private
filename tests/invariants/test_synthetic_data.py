@@ -6,7 +6,7 @@ from numpy.testing import assert_allclose
 from pipls.datasets import make_pipls_regression, make_pipls_train_test
 
 
-def test_synthetic_shapes_zero_blocks_and_reconstruction_identity() -> None:
+def test_synthetic_shapes_and_reconstruction_identity() -> None:
     dataset = make_pipls_regression(
         n_samples=40,
         n_features=8,
@@ -25,10 +25,8 @@ def test_synthetic_shapes_zero_blocks_and_reconstruction_identity() -> None:
     assert truth.shared_scores.shape == (40, 2)
     assert truth.predictor_specific_scores.shape == (40, 3)
     assert truth.response_specific_scores.shape == (40, 2)
-    assert truth.x_response_specific_loadings.shape == (8, 2)
-    assert truth.y_predictor_specific_loadings.shape == (5, 3)
-    assert_allclose(truth.x_response_specific_loadings, 0.0)
-    assert_allclose(truth.y_predictor_specific_loadings, 0.0)
+    assert not hasattr(truth, "x_response_specific_loadings")
+    assert not hasattr(truth, "y_predictor_specific_loadings")
     assert_allclose(dataset.X, truth.x_signal + truth.x_noise)
     assert_allclose(dataset.Y, truth.y_signal + truth.y_noise)
 

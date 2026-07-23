@@ -63,6 +63,9 @@
   merely because they appeared in design discussions.
 - Keep one task-oriented troubleshooting page and one API result-object map. Validate local
   documentation links and anchors generically; do not duplicate explanatory sentences in tests.
+- Present estimator- and helper-returned immutable records as fields to inspect rather than
+  constructors to call. Keep constructor signatures visible only for records whose direct user
+  construction is part of the supported workflow.
 - Do not expose internal phase or patch labels in served user guides. Maintainer chronology belongs
   in `.llm` and excluded decision records.
 - Keep the root README focused on package users: orientation, installation, compact fixed and

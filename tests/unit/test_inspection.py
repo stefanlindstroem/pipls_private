@@ -66,7 +66,6 @@ def test_pipls_display_factors_use_first_largest_predictor_entry_for_sign() -> N
 
     factors = pipls_display_factors(decomposition)
 
-    np.testing.assert_array_equal(factors.component_signs, np.array([-1, -1, 1]))
     np.testing.assert_array_equal(
         factors.predictor_directions,
         predictor_directions * np.array([-1.0, -1.0, 1.0]),
@@ -82,6 +81,7 @@ def test_pipls_display_factors_use_first_largest_predictor_entry_for_sign() -> N
     assert factors.n_features == 3
     assert factors.n_targets == 2
     assert factors.n_components == 3
+    assert not hasattr(factors, "component_signs")
 
 
 def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
@@ -97,7 +97,6 @@ def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
         factors.dilation,
         factors.response_directions,
         factors.weighted_response_directions,
-        factors.component_signs,
     ):
         assert not values.flags.writeable
     assert not np.shares_memory(factors.predictor_directions, decomposition.predictor_rotations)

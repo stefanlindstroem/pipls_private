@@ -14,7 +14,6 @@ from .decomposition import PiPLSDecomposition
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.int64]
-SignArray = NDArray[np.int8]
 PredictionKind: TypeAlias = Literal[
     "fitted values",
     "fixed-parameter OOF predictions",
@@ -202,15 +201,12 @@ class PiPLSDisplayFactors:
         Display-signed copy of $Q$.
     weighted_response_directions : ndarray of shape (n_targets, n_components)
         Columns $d_k q_{:k}$, equal to ``response_directions * dilation``.
-    component_signs : ndarray of shape (n_components,)
-        Applied signs, each equal to ``-1`` or ``1``.
     """
 
     predictor_directions: FloatArray
     dilation: FloatArray
     response_directions: FloatArray
     weighted_response_directions: FloatArray
-    component_signs: SignArray
 
     @property
     def n_features(self) -> int:
@@ -535,7 +531,6 @@ def pipls_display_factors(decomposition: PiPLSDecomposition) -> PiPLSDisplayFact
         dilation=_read_only(dilation),
         response_directions=_read_only(response_directions),
         weighted_response_directions=_read_only(weighted_response_directions),
-        component_signs=_read_only_signs(component_signs),
     )
 
 
@@ -679,10 +674,5 @@ def _read_only(values: FloatArray) -> FloatArray:
 
 
 def _read_only_ints(values: IntArray) -> IntArray:
-    values.setflags(write=False)
-    return values
-
-
-def _read_only_signs(values: SignArray) -> SignArray:
     values.setflags(write=False)
     return values

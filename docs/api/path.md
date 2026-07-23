@@ -35,13 +35,18 @@ not retained as public fitted attributes.
 
 ::: pipls.PiPLSComponentPath
     options:
+      show_signature: false
       members:
         - for_n_components
 
 ## One component result
 
 ::: pipls.PiPLSComponentResult
+    options:
+      show_signature: false
 
 ## Predictor-rank profile
 
 ::: pipls.PiPLSPredictorRankProfile
+    options:
+      show_signature: false

@@ -6,6 +6,7 @@ fitted estimator rather than construct it directly.
 
 ::: pipls.PiPLSDecomposition
     options:
+      show_signature: false
       members:
         - standardized_regression_map
 

@@ -27,6 +27,17 @@ def _api_text() -> str:
     )
 
 
+def _directive_options(text: str, object_path: str) -> str:
+    marker = f"::: {object_path}\n"
+    _, remainder = text.split(marker, maxsplit=1)
+    option_lines: list[str] = []
+    for line in remainder.splitlines():
+        if line and not line.startswith(" "):
+            break
+        option_lines.append(line)
+    return "\n".join(option_lines)
+
+
 def test_core_api_pages_cover_the_top_level_public_objects() -> None:
     documented = set(_TOP_LEVEL_DIRECTIVE.findall(_api_text()))
     expected = set(pipls.__all__) - {"__version__"}
@@ -59,7 +70,29 @@ def test_api_pages_reference_only_public_import_paths() -> None:
     assert "pipls.model_selection" not in api_text
 
 
-
 def test_removed_plotting_module_is_absent() -> None:
     assert importlib.util.find_spec("pipls.plotting") is None
     assert not (_repository_root() / "docs" / "api" / "plotting.md").exists()
+
+
+def test_returned_result_records_hide_constructor_signatures() -> None:
+    api_text = _api_text()
+    returned_records = {
+        "pipls.PiPLSComponentPath",
+        "pipls.PiPLSComponentResult",
+        "pipls.PiPLSPredictorRankProfile",
+        "pipls.PiPLSValidationReport",
+        "pipls.PiPLSDecomposition",
+        "pipls.inspection.BiplotCoordinates",
+        "pipls.inspection.LatentStructure",
+        "pipls.inspection.ObservationDiagnostics",
+        "pipls.inspection.PiPLSDisplayFactors",
+        "pipls.inspection.PredictionDiagnostics",
+        "pipls.datasets.PiPLSSyntheticTruth",
+    }
+
+    for object_path in returned_records:
+        assert "show_signature: false" in _directive_options(api_text, object_path)
+
+    dataset_options = _directive_options(api_text, "pipls.datasets.PiPLSDataset")
+    assert "show_signature: false" not in dataset_options

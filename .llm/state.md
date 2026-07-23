@@ -86,16 +86,17 @@ implementation was removed and replaced by focused question-specific benchmarks:
   without freezing explanatory prose.
 
 Decision 0086 reduces the public decomposition to quantities used for fitted-model interpretation;
-private construction matrices remain in `PiPLSCoreResult`. Decision 0087 completes API2 by
-removing scorer plumbing, exact rotation aliases, adaptive-search bookkeeping, and flat OOF
-duplicates from the public fitted surface. API3 result-record cleanup is the next increment.
+private construction matrices remain in `PiPLSCoreResult`. Decision 0087 removes scorer plumbing,
+exact rotation aliases, adaptive-search bookkeeping, and flat OOF duplicates from the public fitted
+surface. Decision 0088 completes API3 by removing result-record bookkeeping and redundant zero
+loading blocks and by presenting returned records without constructor-first generated signatures.
 
 Decisions 0079--0083 establish and enforce data-first rendering for biplots, prediction
 diagnostics, standard PLS-family inspection, and Pi-PLS factors. Decision 0084 completes the
 prediction-diagnostic figure trio. Decision 0085 makes Tutorial 2 sequential and self-contained:
 setup and display choices precede use, and every displayed interpretation figure has a matching
-standalone renderer snippet. Plotting migration G1--G5 is complete. API3 result-record cleanup is
-the next increment. Decision 0042 defines the staged fitted-model architecture, and Decision
+standalone renderer snippet. Plotting migration G1--G5 and public-result cleanup API1--API3 are
+complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples

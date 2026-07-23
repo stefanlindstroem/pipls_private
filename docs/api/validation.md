@@ -5,6 +5,7 @@ its ordered out-of-fold predictions.
 
 ::: pipls.PiPLSValidationReport
     options:
+      show_signature: false
       members:
         - selection_conditioned
         - complete_oof_coverage

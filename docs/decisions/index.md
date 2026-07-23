@@ -29,6 +29,7 @@ reference describe the current public behavior directly.
 - [0073: public fit-state and finite-output safety](0073-public-fit-safety.md)
 - [0086: public decomposition boundary](0086-public-decomposition-boundary.md)
 - [0087: public fitted-surface cleanup](0087-public-fitted-surface-cleanup.md)
+- [0088: public result-record cleanup](0088-public-result-record-cleanup.md)
 
 ## Validation, data, and benchmarks
 

@@ -89,7 +89,10 @@ commands and the repository map remain in `CONTRIBUTING.md`; do not pin line cou
 prose. Generic served-Markdown tests should resolve local files and anchors, including explicit and
 mkdocstrings-generated object anchors. The API overview should keep one discoverable map of public
 result objects, and troubleshooting should remain a task-oriented reference rather than a third
-tutorial. Structural
+tutorial. Generated API pages should suppress constructor signatures for returned immutable result
+records while keeping the directly constructible `PiPLSDataset` signature visible. Tests should
+protect the absence of sign-canonicalization bookkeeping and structurally impossible zero loading
+blocks without pinning private local calculations. Structural
 tests may also require generated Pulp image references to remain tutorial-owned and keep
 example-specific report implementation out of the general inspection reference. Small synthetic
 matrices protect generic OOF and report contracts. One module-scoped Pulp numerical run may verify

@@ -577,9 +577,8 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-Public-result cleanup steps API1--API2 are complete under Decisions 0086--0087. API3 should next
-remove remaining nonessential result-record fields and improve generated presentation of returned
-immutable records.
+First-release preparation: choose the initial version, complete metadata and release notes, and
+rehearse the tag and publication checklist.
 
 ## Maintenance protocol
 
@@ -604,5 +603,5 @@ rank/solver diagnostics while the private core retains construction matrices. AP
 under Decision 0087: scorer state is private, exact weight aliases are removed, and
 `PiPLSPathCV` retains `cv_results_`, concise immutable path/profile results, standard `best_*`
 attributes, `path_search_exhaustive_`, and `validation_report_` without execution-history or flat
-OOF duplicates. API3 should next clean the remaining immutable result records and generated
-constructor presentation.
+OOF duplicates. Decision 0088 completes API3 by removing display-sign bookkeeping and redundant
+synthetic zero blocks and by suppressing constructor signatures for returned immutable records.
