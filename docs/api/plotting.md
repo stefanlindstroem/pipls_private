@@ -11,12 +11,9 @@ They provide concise axis labels and titles that callers may replace. Component 
 selections use zero-based Python indices. Matplotlib is imported only when a plotting function is
 called.
 
-Conceptual reference: [scores](../model_inspection.md#scores),
-[biplots](../model_inspection.md#score-loading-biplot),
-[loadings](../model_inspection.md#x-loadings),
-[Pi-PLS factors](../model_inspection.md#predictor-directions),
-[coefficients](../model_inspection.md#regression-coefficients), and
-[prediction diagnostics](../model_inspection.md#observed-versus-predicted).
+Conceptual reference: [Pi-PLS factors](../model_inspection.md#predictor-directions).
+Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics are
+rendered directly from immutable inspection arrays with ordinary Matplotlib.
 
 ::: pipls.plotting.PredictorStyle
     options:
@@ -35,25 +32,5 @@ Conceptual reference: [scores](../model_inspection.md#scores),
       members: false
 
 ::: pipls.plotting.plot_pipls_weighted_response_directions
-    options:
-      members: false
-
-::: pipls.plotting.plot_scores
-    options:
-      members: false
-
-::: pipls.plotting.plot_x_loadings
-    options:
-      members: false
-
-::: pipls.plotting.plot_y_loadings
-    options:
-      members: false
-
-::: pipls.plotting.plot_coefficients
-    options:
-      members: false
-
-::: pipls.plotting.plot_observation_diagnostics
     options:
       members: false

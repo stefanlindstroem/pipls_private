@@ -98,7 +98,7 @@ protocols.
 | `component_path_` | Inspect one selected predictor rank for each component count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one count |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
-| `pipls.plotting` | Render optional one-axis Matplotlib figures |
+| `pipls.plotting` | Temporary Pi-PLS factor renderers during the plotting migration |
 | `pipls.datasets` | Generate deterministic synthetic Pi-PLS data |
 
 Generated signatures, fitted attributes, result shapes, and method contracts are collected in the

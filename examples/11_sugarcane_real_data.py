@@ -14,14 +14,10 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 from pipls.plotting import (
-    plot_coefficients,
     plot_pipls_dilation,
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_scores,
-    plot_x_loadings,
-    plot_y_loadings,
 )
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "sugarcane"
@@ -186,30 +182,42 @@ figure, axes = plt.subplots(
     layout="constrained",
     gridspec_kw={"width_ratios": (1.0, 1.6, 1.0)},
 )
-plot_scores(
-    structure,
-    components=(0, 1),
-    title="X scores",
-    ax=axes[0],
-)
-plot_x_loadings(
-    structure,
-    predictor_style="line",
-    predictor_axis=wavelengths,
-    predictor_axis_label="Wavelength (nm)",
-    components=(0, 1),
-    title="X loadings",
-    ax=axes[1],
-)
-plot_y_loadings(
-    structure,
-    response_names=response_names,
-    components=(0, 1),
-    title="Y loadings",
-    ax=axes[2],
-)
-axes[1].legend(title="Component")
-axes[2].legend(title="Component")
+axes[0].scatter(structure.x_scores[:, 0], structure.x_scores[:, 1], alpha=0.75)
+axes[0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0].set_xlabel("X score component 1")
+axes[0].set_ylabel("X score component 2")
+axes[0].set_title("X scores")
+
+for component in (0, 1):
+    axes[1].plot(
+        wavelengths,
+        structure.x_loadings[:, component],
+        label=f"Component {component + 1}",
+    )
+axes[1].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[1].set_xlabel("Wavelength (nm)")
+axes[1].set_ylabel("X loading")
+axes[1].set_title("X loadings")
+axes[1].legend()
+
+response_positions = np.arange(len(response_names))
+component_width = 0.8 / 2
+for component in (0, 1):
+    offset = (component - 0.5) * component_width
+    axes[2].bar(
+        response_positions + offset,
+        structure.y_loadings[:, component],
+        width=component_width,
+        label=f"Component {component + 1}",
+    )
+axes[2].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[2].set_xticks(response_positions)
+axes[2].set_xticklabels(response_names)
+axes[2].set_xlabel("Response")
+axes[2].set_ylabel("Y loading")
+axes[2].set_title("Y loadings")
+axes[2].legend()
 figure.suptitle("Sugarcane Pi-PLS latent structure")
 figure.savefig(ANALYSIS_DIR / "latent_structure.pdf")
 plt.close(figure)
@@ -219,15 +227,12 @@ figure, axis = plt.subplots(
     figsize=(10.0, 5.0),
     layout="constrained",
 )
-plot_coefficients(
-    structure,
-    predictor_style="line",
-    response_names=response_names,
-    predictor_axis=wavelengths,
-    predictor_axis_label="Wavelength (nm)",
-    title="Sugarcane Pi-PLS coefficients",
-    ax=axis,
-)
+for response, name in enumerate(response_names):
+    axis.plot(wavelengths, structure.coefficients[response], label=name)
+axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axis.set_xlabel("Wavelength (nm)")
+axis.set_ylabel("Regression coefficient")
+axis.set_title("Sugarcane Pi-PLS coefficients")
 axis.legend(title="Response")
 figure.savefig(ANALYSIS_DIR / "coefficients.pdf")
 plt.close(figure)

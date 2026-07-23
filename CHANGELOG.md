@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Render standard PLS-family scores, loadings, coefficients, and observation diagnostics directly from immutable arrays, and remove their five public convenience plotters.
 - Render prediction diagnostics directly from immutable arrays in maintained examples and tutorials, and remove the three public prediction-diagnostic convenience plotters.
 - Start the data-first plotting migration: retain balanced biplot coordinates, remove the public `plot_biplot()` renderer, draw the maintained Pulp biplots directly with Matplotlib, and use optional `adjustText` label placement.
 

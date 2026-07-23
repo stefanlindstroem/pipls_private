@@ -99,7 +99,7 @@ analyses as real-data benchmark scripts. `make examples` is the explicit applica
 target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset
 readability, the direct Pulp numerical workflow, direct Pulp, Sugarcane, and Tobacco workflow
 structure, component-path API, inspection equations,
-plotting contracts, and the immutable ordinary-PLS comparison-helper contract.
+direct inspection rendering, remaining Pi-PLS factor-plotting contracts, and the immutable ordinary-PLS comparison-helper contract.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 

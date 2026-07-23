@@ -72,8 +72,9 @@ The comparison workflow imports one implementation helper from `examples/_suppor
 - `pls_component_path.py`: immutable ordinary-PLS path evaluation for example 09.
 
 Example 09 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
-comparison helper. Reusable numerical inspection belongs in
-`pipls.inspection`, and optional one-axis rendering belongs in `pipls.plotting`.
+comparison helper. Reusable numerical inspection belongs in `pipls.inspection`. Standard PLS-family results are
+rendered directly with Matplotlib; only Pi-PLS factor rendering remains temporarily in
+`pipls.plotting`.
 
 ## Real-data workflow contract
 
@@ -98,14 +99,15 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
    rank.
 3. `cross_val_predict()` with five non-shuffled folds produces
    `selection-conditioned OOF predictions`.
-4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return the
-   in-memory objects used by the public one-axis plotters.
-5. The script creates and saves the five final figures itself.
+4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return
+   immutable in-memory results.
+5. The script plots latent structure and prediction arrays directly with Matplotlib, uses temporary
+   factor plotters for $P$, $D$, $Q$, and $QD$, and saves the five final figures itself.
 
 Pulp is the canonical tutorial workflow. Example 10 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
 `predictor_rank_profile()`, fits one explicit `PiPLSRegression`, calculates OOF predictions with
-`cross_val_predict()`, and passes immutable inspection objects to public plotters. Tobacco follows the same direct pattern
+`cross_val_predict()`, and renders immutable inspection arrays directly. Tobacco follows the same direct pattern
 and owns its full-SVD configuration, response pagination, and multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual

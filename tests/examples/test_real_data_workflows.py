@@ -103,9 +103,11 @@ def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
     assert "latent_structure(model)" in text
     assert "observation_diagnostics(model, X)" in text
     assert 'prediction_kind="selection-conditioned OOF predictions"' in text
-    assert 'predictor_style="line"' in text
-    assert 'predictor_axis_label="Wavenumber (cm$^{-1}$)"' in text
-    assert "components=DISPLAY_COMPONENTS" in text
+    assert "for component in DISPLAY_COMPONENTS:" in text
+    assert 'set_xlabel("Wavenumber (cm$^{-1}$)")' in text
+    assert "structure.x_loadings[:, component]" in text
+    assert "structure.y_loadings[:, component]" in text
+    assert "structure.coefficients[response]" in text
     assert text.count("for page_number, responses in enumerate(response_pages, start=1):") == 2
     assert "diagnostics.observed_standardized" in text
     assert "diagnostics.predicted_standardized" in text

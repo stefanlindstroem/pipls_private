@@ -17,14 +17,10 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 from pipls.plotting import (
-    plot_coefficients,
     plot_pipls_dilation,
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_scores,
-    plot_x_loadings,
-    plot_y_loadings,
 )
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "pulp"
@@ -202,12 +198,17 @@ figure, axes = plt.subplots(
     figsize=(13.0, 10.0),
     layout="constrained",
 )
-plot_scores(
-    structure,
-    components=(0, 1),
-    title="X scores",
-    ax=axes[0, 0],
+score_components = (0, 1)
+axes[0, 0].scatter(
+    structure.x_scores[:, score_components[0]],
+    structure.x_scores[:, score_components[1]],
+    alpha=0.75,
 )
+axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0, 0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0, 0].set_xlabel(f"X score component {score_components[0] + 1}")
+axes[0, 0].set_ylabel(f"X score component {score_components[1] + 1}")
+axes[0, 0].set_title("X scores")
 # --8<-- [start:plot-pulp-biplot]
 biplot = biplot_coordinates(structure, components=(0, 1))
 sample_xy = biplot.sample_coordinates
@@ -263,22 +264,39 @@ adjust_text(
     arrowprops={"arrowstyle": "-", "linewidth": 0.6},
 )
 # --8<-- [end:plot-pulp-biplot]
-plot_x_loadings(
-    structure,
-    predictor_style="bar",
-    predictor_names=predictor_names,
-    components=DISPLAY_COMPONENTS,
-    title="X loadings",
-    ax=axes[1, 0],
-)
-plot_y_loadings(
-    structure,
-    response_names=response_names,
-    components=DISPLAY_COMPONENTS,
-    title="Y loadings",
-    ax=axes[1, 1],
-)
+predictor_positions = np.arange(len(predictor_names))
+component_width = 0.8 / len(DISPLAY_COMPONENTS)
+for series, component in enumerate(DISPLAY_COMPONENTS):
+    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2) * component_width
+    axes[1, 0].bar(
+        predictor_positions + offset,
+        structure.x_loadings[:, component],
+        width=component_width,
+        label=f"Component {component + 1}",
+    )
+axes[1, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[1, 0].set_xticks(predictor_positions)
+axes[1, 0].set_xticklabels(predictor_names)
+axes[1, 0].set_xlabel("Predictor")
+axes[1, 0].set_ylabel("X loading")
+axes[1, 0].set_title("X loadings")
 axes[1, 0].legend()
+
+response_positions = np.arange(len(response_names))
+for series, component in enumerate(DISPLAY_COMPONENTS):
+    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2) * component_width
+    axes[1, 1].bar(
+        response_positions + offset,
+        structure.y_loadings[:, component],
+        width=component_width,
+        label=f"Component {component + 1}",
+    )
+axes[1, 1].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[1, 1].set_xticks(response_positions)
+axes[1, 1].set_xticklabels(response_names)
+axes[1, 1].set_xlabel("Response")
+axes[1, 1].set_ylabel("Y loading")
+axes[1, 1].set_title("Y loadings")
 axes[1, 1].legend()
 for axis in (axes[1, 0], axes[1, 1]):
     axis.tick_params(axis="x", labelrotation=45)
@@ -293,15 +311,21 @@ figure, axis = plt.subplots(
     figsize=(10.0, 5.4),
     layout="constrained",
 )
-plot_coefficients(
-    structure,
-    predictor_style="bar",
-    predictor_names=predictor_names,
-    response_names=response_names,
-    responses=detailed_response_indices,
-    title="Pulp Pi-PLS regression coefficients",
-    ax=axis,
-)
+response_width = 0.8 / len(detailed_response_indices)
+for series, response in enumerate(detailed_response_indices):
+    offset = (series - (len(detailed_response_indices) - 1) / 2) * response_width
+    axis.bar(
+        predictor_positions + offset,
+        structure.coefficients[response],
+        width=response_width,
+        label=response_names[response],
+    )
+axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axis.set_xticks(predictor_positions)
+axis.set_xticklabels(predictor_names)
+axis.set_xlabel("Predictor")
+axis.set_ylabel("Regression coefficient")
+axis.set_title("Pulp Pi-PLS regression coefficients")
 axis.legend(title="Response")
 axis.tick_params(axis="x", labelrotation=45)
 for label in axis.get_xticklabels():

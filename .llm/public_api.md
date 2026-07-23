@@ -233,7 +233,7 @@ probability limits.
 `biplot_coordinates()` accepts a `LatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
 $TP^\mathsf{T}$ reconstruction.
 
-`pipls.plotting` is implemented and exports from its own namespace:
+`pipls.plotting` is transitional and currently exports only Pi-PLS factor renderers:
 
 ```python
 from pipls.plotting import (
@@ -242,50 +242,30 @@ from pipls.plotting import (
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_coefficients,
-    plot_observation_diagnostics,
-    plot_scores,
-    plot_x_loadings,
-    plot_y_loadings,
 )
 ```
 
-`plot_scores()`, `plot_x_loadings()`, `plot_y_loadings()`, `plot_coefficients()`, and
-`plot_observation_diagnostics()` each render one chart. Every function accepts
-`ax=None` and returns `(figure, axis)`. With a supplied Matplotlib axis, it draws on that axis without
-clearing it, resizing its figure, or creating another figure. Supplying both `ax` and `figsize` is an
-error. The functions provide concise semantic axis labels and titles that callers may replace.
-Multi-series artists carry labels, but legends are caller-owned and are not created automatically.
+The functions accept `PiPLSDisplayFactors` and render one factor quantity each: $P$, $D$, $Q$, or
+$QD$. Every function accepts `ax=None` and returns `(figure, axis)`. With a supplied Matplotlib
+axis, it draws on that axis without clearing it, resizing its figure, or creating another figure.
+Supplying both `ax` and `figsize` is an error. Predictor directions require an explicit `"bar"` or
+`"line"` style and caller-supplied labels or a physical predictor coordinate. Response plots require
+caller-supplied response names. All component subsets use zero-based indices.
 
-The Pi-PLS-specific functions accept `PiPLSDisplayFactors` and render one factor quantity each:
-`plot_pipls_predictor_directions()` for $P$, `plot_pipls_dilation()` for $D$,
-`plot_pipls_response_directions()` for $Q$, and
-`plot_pipls_weighted_response_directions()` for $QD$. Predictor directions require an explicit
-`"bar"` or `"line"` style and caller-supplied labels or a physical predictor coordinate. Response
-plots require caller-supplied response names. All component subsets use zero-based indices.
+Standard PLS-family results are numerical rather than graphical. `LatentStructure`,
+`ObservationDiagnostics`, and `PredictionDiagnostics` expose scores, loadings, coefficients, raw
+observation diagnostics, standardized prediction arrays, response-wise RMSE, and prediction
+provenance. Maintained examples render those arrays directly with ordinary Matplotlib. No public
+plotter is retained for scores, X or Y loadings, coefficients, observation diagnostics, biplots, or
+prediction diagnostics.
 
-Prediction diagnostics are numerical rather than graphical. `PredictionDiagnostics` exposes
-standardized observed, predicted, and residual matrices, response-wise standardized RMSE, and
-explicit prediction provenance. Maintained tutorials and examples render those arrays directly with
-Matplotlib; no public prediction-diagnostic plotter is retained.
-
-`plot_scores()` renders exactly two selected X-score columns. X and Y loadings place selected
-components together on one axis; coefficient plots place selected responses together on one axis.
-Categorical displays require caller-supplied variable names, while line displays require an explicit
-physical coordinate and axis label. Components and responses are selected by explicit zero-based
-indices. Biplots are rendered directly from `BiplotCoordinates` with Matplotlib; maintained Pulp
-figures use optional `adjustText` label placement. `plot_observation_diagnostics()` renders one raw score-distance
-versus X-reconstruction-residual scatter plot without theoretical limits or automatic observation
-labels.
-
-Matplotlib remains optional and is imported only when a plotting function is called. `adjustText`
-is optional under the examples, docs, and development extras and is not imported by the package. The functions
-perform no legend or panel creation, file writing, display, or closing, retain no models, and do not
-alter supplied arrays. Component-path helpers remain example-local selection diagnostics. Every
-maintained analysis figure is created in the example layer, which passes an explicit axis to each
-package plotter and owns panel geometry, legends, figure-level titles, saving, and closing.
-Pulp, Sugarcane, and Tobacco compose directly from immutable results. No estimator method, fitted
-attribute, path-search parameter, or top-level export is added by this plotting layer.
+Biplots are rendered directly from `BiplotCoordinates`; maintained Pulp figures use optional
+`adjustText` label placement. Matplotlib remains optional and is imported only when a remaining
+plotting function is called. `adjustText` is optional under the examples, docs, and development
+extras and is not imported by the package. Every maintained analysis figure is created in the
+example layer, which owns panel geometry, scientific coordinates, legends, titles, saving, and
+closing. No estimator method, fitted attribute, path-search parameter, or top-level export is added
+by this plotting layer.
 
 ## Example workflow boundary
 
@@ -293,8 +273,9 @@ Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plo
 component paths directly in memory. Pulp, Sugarcane, and Tobacco use `PiPLSPathCV(refit=False)`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn
-`cross_val_predict()`. They pass immutable factors, latent structure, and prediction diagnostics
-directly to the public one-axis plotters and write only final PDF figures. Pulp also reads the
+`cross_val_predict()`. They render immutable latent structure, observation diagnostics, and prediction diagnostics
+directly with Matplotlib, while temporarily using the remaining Pi-PLS factor plotters, and write
+only final PDF figures. Pulp also reads the
 conditional predictor-rank profile from `cv_results_` for the chosen component count. Tobacco uses
 full predictor SVD, direct observation diagnostics, and caller-owned source-order response
 pagination through multipage PDFs.

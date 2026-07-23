@@ -1,13 +1,14 @@
 # Model inspection
 
 `pipls.inspection` computes immutable numerical results from fitted models or explicit predictions.
-`pipls.plotting` renders those results without changing the estimator. This page defines the full
-inspection and plotting catalogue. The [Pulp tutorial](tutorials/pulp.md#interpret-representative-fitted-model-plots)
-uses a small representative subset in one real-data analysis; the
-[plotting API](api/plotting.md) gives exact signatures.
+These arrays are the primary inspection interface. Maintained examples render them with ordinary
+Matplotlib so the reader can see which quantities are displayed and can control every graphical
+choice directly.
 
 Pi-PLS-specific inspection covers $P$, $D$, $Q$, and $QD$. Scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics use estimator-neutral PLS-family objects.
+The [Pulp tutorial](tutorials/pulp.md#interpret-representative-fitted-model-plots) uses a small
+representative subset in one real-data analysis.
 
 ## Inspection results
 
@@ -85,13 +86,6 @@ diagnostics = prediction_diagnostics(
 )
 ```
 
-The supported provenance labels are:
-
-- `fitted values`;
-- `fixed-parameter OOF predictions`;
-- `selection-conditioned OOF predictions`;
-- `external test predictions`.
-
 Standardization uses the supplied observed responses and is only for comparable displays. It does
 not change predictions in their original units. Selection-conditioned OOF predictions are
 descriptive post-selection diagnostics, not an independent estimate of future performance.
@@ -108,16 +102,39 @@ model and returns:
 These are raw descriptive quantities. The package does not attach theoretical limits, automatic
 outlier labels, or contribution diagnostics.
 
-## Interpreting plots
+## Data-first plotting recipes
+
+The table summarizes the numerical field and an ordinary Matplotlib primitive. The primitive is a
+suggestion rather than a prescribed chart.
+
+| Question | Numerical data | Typical Matplotlib operation |
+|---|---|---|
+| Where are samples in the latent plane? | `structure.x_scores` | `Axes.scatter()` |
+| How do predictors reconstruct scores? | `structure.x_loadings` | `Axes.plot()` or `Axes.bar()` |
+| How do responses enter the latent representation? | `structure.y_loadings` | `Axes.bar()` |
+| What is the original-unit linear map? | `structure.coefficients` | `Axes.plot()` or `Axes.bar()` |
+| Which observations are distant or poorly reconstructed? | two `ObservationDiagnostics` arrays | `Axes.scatter()` |
+| How well do predictions agree with observations? | `PredictionDiagnostics` arrays | `Axes.scatter()` and `Axes.bar()` |
 
 ### Scores { #scores }
 
-`plot_scores()` shows samples in two selected predictor-score coordinates. Proximity means similar
-coordinates in that displayed latent plane; separation means differences represented by those two
-components. The plot is exploratory and does not establish groups, confidence regions, or
-outliers.
+Select two columns of `structure.x_scores` and pass them directly to `Axes.scatter()`:
 
-API: [`plot_scores()`](api/plotting.md#pipls.plotting.plot_scores).
+```python
+first, second = 0, 1
+axis.scatter(
+    structure.x_scores[:, first],
+    structure.x_scores[:, second],
+    alpha=0.75,
+)
+axis.axhline(0.0, linewidth=0.8, linestyle="--")
+axis.axvline(0.0, linewidth=0.8, linestyle="--")
+axis.set_xlabel(f"X score component {first + 1}")
+axis.set_ylabel(f"X score component {second + 1}")
+```
+
+Proximity means similar coordinates in that displayed latent plane. The chart is exploratory and
+does not establish groups, confidence regions, or outliers.
 
 ### Score-loading biplot { #score-loading-biplot }
 
@@ -125,147 +142,138 @@ API: [`plot_scores()`](api/plotting.md#pipls.plotting.plot_scores).
 Plot `sample_coordinates` with `Axes.scatter()`, draw vectors from the origin to
 `predictor_coordinates`, and create predictor labels with `Axes.text()`. For dense labels,
 `adjustText.adjust_text()` can move those text artists after titles, limits, aspect, and legends have
-been configured. Automatic placement is heuristic, so unusually dense diagrams may still need
-manual adjustment.
+been configured. Automatic placement is heuristic, so dense diagrams may still need manual work.
 
-Similar arrow directions indicate similar loading patterns in the displayed plane. A sample lying
-in an arrow's direction has a positive coordinate along that displayed predictor direction. These
-are geometric statements, not causal effects or automatic importance measures.
+Similar arrow directions indicate similar loading patterns in the displayed plane. These are
+geometric statements, not causal effects or automatic importance measures.
 
 API: [`biplot_coordinates()`](api/inspection.md#pipls.inspection.biplot_coordinates).
 
 ### X loadings { #x-loadings }
 
-`plot_x_loadings()` shows how original predictors reconstruct the selected predictor scores. Large
-absolute values indicate strong participation in that reconstruction. X loadings are not regression
-coefficients and do not by themselves measure predictive importance. Component signs may reverse
-without changing the model.
+Use selected columns of `structure.x_loadings`. A physical predictor coordinate can be passed to
+`Axes.plot()` for spectral data; named predictors can be grouped with `Axes.bar()`.
 
-API: [`plot_x_loadings()`](api/plotting.md#pipls.plotting.plot_x_loadings).
+```python
+for component in (0, 1):
+    axis.plot(
+        wavelengths,
+        structure.x_loadings[:, component],
+        label=f"Component {component + 1}",
+    )
+```
+
+Large absolute values indicate strong participation in score reconstruction. X loadings are not
+regression coefficients and do not by themselves measure predictive importance. Component signs
+may reverse without changing the model.
 
 ### Y loadings { #y-loadings }
 
-`plot_y_loadings()` shows how responses participate in the response-side latent representation.
+Use selected columns of `structure.y_loadings`, normally with response names on a categorical axis.
 Responses with similar patterns are represented similarly across the selected components. When the
 model scales responses, the loadings describe the standardized fitted representation rather than
 response values in original units.
 
-API: [`plot_y_loadings()`](api/plotting.md#pipls.plotting.plot_y_loadings).
-
 ### Predictor directions $P$ { #predictor-directions }
 
-`plot_pipls_predictor_directions()` shows the columns of $P$. These predictor rotations define the
-directions paired with the response rotations in $PDQ^{\mathsf T}$. They are distinct from X
-loadings because they belong to the regression factorization rather than score reconstruction.
+`plot_pipls_predictor_directions()` remains temporarily available during the plotting migration.
+It shows the columns of $P$, which define predictor rotations paired with the response rotations in
+$PDQ^{\mathsf T}$. They are distinct from X loadings because they belong to the regression
+factorization rather than score reconstruction.
 
 API: [`plot_pipls_predictor_directions()`](api/plotting.md#pipls.plotting.plot_pipls_predictor_directions).
 Theory: [Diagonal latent coupling](theory.md#diagonal-latent-coupling).
 
 ### Dilation $D$ { #dilation }
 
-`plot_pipls_dilation()` shows $d_k=D_{kk}$. Each value scales one paired predictor-response mode.
-Dilation should be interpreted together with the matching columns of $P$ and $Q$; it is not a
-standalone variable-importance score.
+`plot_pipls_dilation()` remains temporarily available. Each value $d_k=D_{kk}$ scales one paired
+predictor-response mode and should be interpreted together with the matching columns of $P$ and
+$Q$.
 
 API: [`plot_pipls_dilation()`](api/plotting.md#pipls.plotting.plot_pipls_dilation).
 
 ### Response directions $Q$ { #response-directions }
 
-`plot_pipls_response_directions()` shows the response rotation of each paired mode before dilation.
-It describes response-side orientation. A pronounced direction can still have a modest contribution
-when its dilation is small.
+`plot_pipls_response_directions()` remains temporarily available. It displays the response rotation
+of each paired mode before dilation.
 
 API: [`plot_pipls_response_directions()`](api/plotting.md#pipls.plotting.plot_pipls_response_directions).
 
 ### Weighted response directions $QD$ { #weighted-response-directions }
 
-`plot_pipls_weighted_response_directions()` multiplies each response direction by its dilation. It
-therefore combines response-side orientation and mode strength. Use $Q$ when direction alone is the
-question and $QD$ when the scaled response-side contribution is the question.
+`plot_pipls_weighted_response_directions()` remains temporarily available. It combines response-side
+orientation and mode strength.
 
 API: [`plot_pipls_weighted_response_directions()`](api/plotting.md#pipls.plotting.plot_pipls_weighted_response_directions).
 
 ### Regression coefficients { #regression-coefficients }
 
-`plot_coefficients()` shows the fitted linear map in original predictor and response units. A
-coefficient is the modeled response change associated with one predictor-unit change while the
-other predictors are held fixed in the linear model. Raw magnitudes are not directly comparable
-across variables with different units, and correlated predictors may share coefficient weight.
+Use rows of `structure.coefficients` directly. Each row describes one response in original predictor
+and response units.
 
-API: [`plot_coefficients()`](api/plotting.md#pipls.plotting.plot_coefficients).
+```python
+for response, name in enumerate(response_names):
+    axis.plot(
+        predictor_coordinate,
+        structure.coefficients[response],
+        label=name,
+    )
+```
+
+Raw magnitudes are not directly comparable across variables with different units, and correlated
+predictors may share coefficient weight.
 
 ### Observed versus predicted { #observed-versus-predicted }
 
 Use `PredictionDiagnostics.observed_standardized` and
 `PredictionDiagnostics.predicted_standardized` with `Axes.scatter()`. Plot an identity line with
-`Axes.plot()` after calculating limits from the displayed responses. The provenance string in
-`prediction_kind` should remain visible in the title, caption, or surrounding report.
-
-The standardized arrays allow responses with different units to share one chart without hiding the
-underlying numerical values.
+`Axes.plot()` after calculating limits from the displayed responses. Keep `prediction_kind` visible
+in the title, caption, or surrounding report.
 
 ### Residuals versus predicted { #residuals-versus-predicted }
 
 Use `PredictionDiagnostics.predicted_standardized` on the horizontal axis and
 `PredictionDiagnostics.residual_standardized` on the vertical axis. Add the zero-residual reference
-with `Axes.axhline()`. Curvature, changing spread, or response-specific bands can indicate structure
-not captured by the linear model. The chart alone does not justify labeling individual samples as
-anomalous.
+with `Axes.axhline()`.
 
 ### Standardized RMSE { #standardized-rmse }
 
 Use `PredictionDiagnostics.standardized_rmse` with `Axes.bar()` or another caller-chosen summary.
-Lower values mean smaller error relative to that response's observed spread. These display values
-are not generally equal to the mean fold-local standardized loss used during path selection.
+Lower values mean smaller error relative to that response's observed spread. These values are not
+generally equal to the mean fold-local standardized loss used during path selection.
 
 ### Observation diagnostics { #observation-diagnostics }
 
-`plot_observation_diagnostics()` places squared score distance against squared X-reconstruction
-residual. Large values identify observations that are distant in the fitted score space, poorly
-reconstructed in predictor space, or both. The package supplies no automatic thresholds or labels.
-
-API: [`plot_observation_diagnostics()`](api/plotting.md#pipls.plotting.plot_observation_diagnostics).
-
-## Plotting contract
-
-Every public plotting function renders one chart on one Matplotlib `Axes` and returns
-`(figure, axis)`. With `ax=None`, it creates one standalone figure. With a supplied axis, it draws on
-that axis without clearing it or altering the surrounding figure. Plotters provide concise semantic
-axis labels and titles, but callers may replace them. Multi-series artists are labeled; callers
-create and style legends.
+Plot `ObservationDiagnostics.score_distance` against
+`ObservationDiagnostics.x_reconstruction_residual` with `Axes.scatter()`:
 
 ```python
-import matplotlib.pyplot as plt
-
-figure, axes = plt.subplots(1, 2, figsize=(12, 5), layout="constrained")
-plot_scores(structure, components=(0, 1), ax=axes[0])
-plot_x_loadings(
-    structure,
-    predictor_style="bar",
-    predictor_names=predictor_names,
-    components=[0, 1],
-    ax=axes[1],
+axis.scatter(
+    observations.score_distance,
+    observations.x_reconstruction_residual,
+    alpha=0.75,
 )
-axes[1].legend(title="Component")
-figure.savefig("latent_structure.pdf")
 ```
 
-The caller owns subplot geometry, legends, figure-level titles, layout, display, saving, and closing.
-See the [plotting API](api/plotting.md) for selection and labeling parameters.
+Large values identify observations that are distant in the fitted score space, poorly reconstructed
+in predictor space, or both. The package supplies no automatic thresholds or labels.
 
-## Scientific labels and coordinates
+## Plot ownership
 
-Plotting functions receive predictor names, response names, sample labels, and physical predictor
-coordinates explicitly. They do not read files or infer scientific meaning. For header-bearing
-CSV files, names can be retained with ordinary pandas operations:
+The caller owns figure construction, subplot geometry, scientific coordinates, labels, legends,
+layout, saving, and closing. Matplotlib receives the immutable numerical arrays directly. The
+remaining functions in `pipls.plotting` cover only Pi-PLS factor displays and will be removed in the
+final plotting migration.
+
+For header-bearing CSV files, names can be retained with ordinary pandas operations:
 
 ```python
 predictor_names = X.columns.astype(str).tolist()
 response_names = Y.columns.astype(str).tolist()
 ```
 
-For spectral line plots, pass the physical coordinate and its label explicitly. The plotting
-functions preserve the supplied order and do not smooth, interpolate, or reorder it.
+For spectral line plots, use the physical coordinate in its existing order. Pi-PLS does not smooth,
+interpolate, or reorder it.
 
 ## Interpretation boundary
 

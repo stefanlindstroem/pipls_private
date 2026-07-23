@@ -61,11 +61,6 @@ def test_plotting_names_are_submodule_exports_only() -> None:
         "plot_pipls_predictor_directions",
         "plot_pipls_response_directions",
         "plot_pipls_weighted_response_directions",
-        "plot_coefficients",
-        "plot_observation_diagnostics",
-        "plot_scores",
-        "plot_x_loadings",
-        "plot_y_loadings",
     }
 
     assert set(plotting.__all__) == expected

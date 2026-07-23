@@ -178,3 +178,4 @@ plan contains an earlier or more general proposal:
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.
 | `0080-direct-prediction-diagnostic-rendering.md` | direct prediction-diagnostic rendering | immutable diagnostic arrays are primary; examples use direct Matplotlib; three convenience plotters removed |
+| `0081-direct-standard-inspection-rendering.md` | direct standard inspection rendering | immutable latent and observation arrays are primary; examples use direct Matplotlib; five convenience plotters removed |

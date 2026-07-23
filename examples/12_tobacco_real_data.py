@@ -16,15 +16,10 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 from pipls.plotting import (
-    plot_coefficients,
-    plot_observation_diagnostics,
     plot_pipls_dilation,
     plot_pipls_predictor_directions,
     plot_pipls_response_directions,
     plot_pipls_weighted_response_directions,
-    plot_scores,
-    plot_x_loadings,
-    plot_y_loadings,
 )
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "tobacco"
@@ -222,35 +217,51 @@ figure, axes = plt.subplots(
     figsize=(12.0, 9.0),
     layout="constrained",
 )
-plot_scores(
-    structure,
-    components=(0, 1),
-    title="X scores",
-    ax=axes[0, 0],
+axes[0, 0].scatter(structure.x_scores[:, 0], structure.x_scores[:, 1], alpha=0.75)
+axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0, 0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0, 0].set_xlabel("X score component 1")
+axes[0, 0].set_ylabel("X score component 2")
+axes[0, 0].set_title("X scores")
+
+for component in DISPLAY_COMPONENTS:
+    axes[0, 1].plot(
+        wavenumbers,
+        structure.x_loadings[:, component],
+        label=f"Component {component + 1}",
+    )
+axes[0, 1].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[0, 1].set_xlabel("Wavenumber (cm$^{-1}$)")
+axes[0, 1].set_ylabel("X loading")
+axes[0, 1].set_title("X loadings")
+axes[0, 1].legend()
+
+response_positions = np.arange(len(response_names))
+component_width = 0.8 / len(DISPLAY_COMPONENTS)
+for series, component in enumerate(DISPLAY_COMPONENTS):
+    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2) * component_width
+    axes[1, 0].bar(
+        response_positions + offset,
+        structure.y_loadings[:, component],
+        width=component_width,
+        label=f"Component {component + 1}",
+    )
+axes[1, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axes[1, 0].set_xticks(response_positions)
+axes[1, 0].set_xticklabels(response_names)
+axes[1, 0].set_xlabel("Response")
+axes[1, 0].set_ylabel("Y loading")
+axes[1, 0].set_title("Y loadings")
+axes[1, 0].legend()
+
+axes[1, 1].scatter(
+    observations.score_distance,
+    observations.x_reconstruction_residual,
+    alpha=0.75,
 )
-plot_x_loadings(
-    structure,
-    predictor_style="line",
-    predictor_axis=wavenumbers,
-    predictor_axis_label="Wavenumber (cm$^{-1}$)",
-    components=DISPLAY_COMPONENTS,
-    title="X loadings",
-    ax=axes[0, 1],
-)
-plot_y_loadings(
-    structure,
-    response_names=response_names,
-    components=DISPLAY_COMPONENTS,
-    title="Y loadings",
-    ax=axes[1, 0],
-)
-plot_observation_diagnostics(
-    observations,
-    title="Observation diagnostics",
-    ax=axes[1, 1],
-)
-axes[0, 1].legend(title="Component")
-axes[1, 0].legend(title="Component")
+axes[1, 1].set_xlabel("Score distance")
+axes[1, 1].set_ylabel("Squared X-reconstruction residual")
+axes[1, 1].set_title("Observation diagnostics")
 figure.suptitle("Tobacco Pi-PLS latent structure and observation diagnostics")
 figure.savefig(ANALYSIS_DIR / "latent_structure.pdf")
 plt.close(figure)
@@ -262,18 +273,18 @@ with PdfPages(ANALYSIS_DIR / "coefficients.pdf") as report:
             figsize=(10.0, 5.0),
             layout="constrained",
         )
-        plot_coefficients(
-            structure,
-            predictor_style="line",
-            response_names=response_names,
-            predictor_axis=wavenumbers,
-            predictor_axis_label="Wavenumber (cm$^{-1}$)",
-            responses=responses,
-            title=(
-                "Tobacco Pi-PLS coefficients "
-                f"— response page {page_number}/{len(response_pages)}"
-            ),
-            ax=axis,
+        for response in responses:
+            axis.plot(
+                wavenumbers,
+                structure.coefficients[response],
+                label=response_names[response],
+            )
+        axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+        axis.set_xlabel("Wavenumber (cm$^{-1}$)")
+        axis.set_ylabel("Regression coefficient")
+        axis.set_title(
+            "Tobacco Pi-PLS coefficients "
+            f"— response page {page_number}/{len(response_pages)}"
         )
         axis.legend(title="Response")
         report.savefig(figure)

@@ -45,10 +45,10 @@ component path and fit one selected fixed model:
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
 Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered
 example writes a generated CSV file: committed `X.csv` and `Y.csv` tables are inputs, while every
-figure is constructed directly from `component_path_`,
-scikit-learn OOF predictions, and immutable inspection results. In every case, the
-example layer owns subplot layouts, legends, figure-level titles, PDF output, and closing; package
-plotters render one chart on one supplied axis.
+figure is constructed directly from `component_path_`, scikit-learn OOF predictions, and
+immutable inspection results. The example layer owns Matplotlib chart construction, physical
+coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Only the
+Pi-PLS factor panels still use temporary one-axis convenience plotters.
 
 The Pulp tutorial extracts its checked snippets directly from `examples/10_pulp_real_data.py`.
 The sole module under `examples/_support/` evaluates the nontrivial fold-local ordinary-PLS path for

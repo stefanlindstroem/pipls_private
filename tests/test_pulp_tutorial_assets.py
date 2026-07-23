@@ -374,7 +374,7 @@ def test_documentation_layers_have_distinct_ownership() -> None:
         assert f"../model_inspection.md#{anchor}" in tutorial
 
     assert "../model_inspection.md#regression-coefficients" not in tutorial
-    assert "pipls.plotting.plot_coefficients" in plotting_reference
+    assert "pipls.plotting.plot_coefficients" not in plotting_reference
 
     assert "examples/results/" not in inspection
     assert "post_analysis.pdf" not in inspection

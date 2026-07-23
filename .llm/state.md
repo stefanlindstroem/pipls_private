@@ -57,7 +57,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   accept compatible fitted Pi-PLS and ordinary PLS models;
 - a data-first biplot boundary: `biplot_coordinates()` owns balanced numerical coordinates, while
   the Pulp example and tutorial use direct Matplotlib arrows and optional `adjustText` label layout;
-- a single-axis contract for the remaining atomic plotters: optional caller-supplied axes,
+- direct standard PLS-family inspection rendering: scores, loadings, coefficients, and raw
+  observation diagnostics are plotted from immutable arrays with ordinary Matplotlib;
+- a single-axis contract for the remaining Pi-PLS factor plotters: optional caller-supplied axes,
   `(figure, axis)` returns, and caller-owned legends and panel composition;
 - direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
   OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
@@ -82,8 +84,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
 
-Decisions 0079 and 0080 establish data-first biplot and prediction-diagnostic rendering.
-Direct standard PLS-family latent and observation plots are the next increment; first-release preparation follows completion of the plotting sequence. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
+Decisions 0079--0081 establish data-first biplot, prediction-diagnostic, and standard
+PLS-family inspection rendering. Direct Pi-PLS factor rendering and plotting-module removal are the
+next increment; first-release preparation follows completion of the plotting sequence. Decision 0042 defines the staged fitted-model architecture, and Decision 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS

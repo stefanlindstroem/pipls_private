@@ -573,7 +573,7 @@ without expanding the private numerical core.
 
 ## Current next increment
 
-Plotting migration G3 is next: render standard latent-structure and observation diagnostics directly from immutable arrays. First-release preparation follows G5.
+Plotting migration G4 is next: render Pi-PLS factors directly, remove `pipls.plotting`, and retain only numerical inspection results. First-release preparation follows G5.
 
 ## Maintenance protocol
 
