@@ -148,7 +148,7 @@ def test_dedicated_example_compares_paths_directly_in_memory() -> None:
     assert text.count('("pulp",') == 1
     assert text.count('("sugarcane",') == 1
     assert '"tobacco",' in text
-    assert "refit=False" in text
+    assert "refit=False" not in text
     assert ".to_csv(" not in text
     assert "component_path.csv" not in text
     assert "plot_component_path" not in text
@@ -159,7 +159,7 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     examples_dir = _repository_root() / "examples"
     pulp_text = (examples_dir / "05_pulp_real_data.py").read_text(encoding="utf-8")
     assert "component_path_" in pulp_text
-    assert "refit=False" in pulp_text
+    assert "refit=False" not in pulp_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in pulp_text
     assert "path_search.predictor_rank_profile(selected.n_components)" in pulp_text
     assert 'cv_results["predictor_rank"]' not in pulp_text
@@ -173,7 +173,7 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
         encoding="utf-8"
     )
     assert "component_path_" in sugarcane_text
-    assert "refit=False" in sugarcane_text
+    assert "refit=False" not in sugarcane_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in sugarcane_text
     assert "axis.errorbar(" in sugarcane_text
     assert "component_path.csv" not in sugarcane_text
@@ -182,7 +182,7 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
 
     tobacco_text = (examples_dir / "07_tobacco_real_data.py").read_text(encoding="utf-8")
     assert "component_path_" in tobacco_text
-    assert "refit=False" in tobacco_text
+    assert "refit=False" not in tobacco_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in tobacco_text
     assert "axis.errorbar(" in tobacco_text
     assert "component_path.csv" not in tobacco_text

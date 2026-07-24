@@ -337,7 +337,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
     assert "run_pulp_workflow" not in renderer
-    assert "PiPLSPathCV(refit=False).fit(X, Y)" in renderer
+    assert "PiPLSPathCV().fit(X, Y)" in renderer
     assert "cross_val_predict(" in renderer
 
 def test_documentation_layers_have_distinct_ownership() -> None:

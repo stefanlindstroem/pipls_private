@@ -1,5 +1,10 @@
 # Changelog
 
+- Align the maintained documentation and examples with the current implementation: demonstrate the
+  selection-only `PiPLSPathCV()` default, document complete decomposition diagnostics and fixed-model
+  output configuration, expose adaptive-search completion status, and correct guide-layer profile
+  ownership.
+
 - Refine the new-user documentation route: explain when separate Pi-PLS rank controls may be useful
   without claiming general superiority, and move tutorial source and figure-generation details to
   terminal reproduction sections.

@@ -121,7 +121,7 @@ coefficients of determination.
 For ordinary use, the essential sequence is:
 
 ```python
-search = PiPLSPathCV(refit=False).fit(X_train, Y_train)
+search = PiPLSPathCV().fit(X_train, Y_train)
 selected = search.component_path_.for_n_components(chosen_n_components)
 
 model = PiPLSRegression(

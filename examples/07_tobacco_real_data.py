@@ -39,7 +39,6 @@ path_search = PiPLSPathCV(
         svd_solver="full",
     ),
     search_method="auto",
-    refit=False,
     n_jobs=1,
 ).fit(X, Y)
 path = path_search.component_path_

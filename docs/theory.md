@@ -100,10 +100,16 @@ Pi-PLS-specific quantities are stored in `decomposition_` with descriptive field
 - `predictor_rotations`: $P$;
 - `dilation`: the nonnegative diagonal values of $D$;
 - `response_rotations`: $Q$;
-- `standardized_regression_map`: $PDQ^{\mathsf T}$.
+- `standardized_regression_map`: $PDQ^{\mathsf T}$;
+- `predictor_numerical_rank` and `predictor_numerical_rank_is_exact`: the verified predictor rank and
+  whether it is complete;
+- `rank_tolerance`: the tolerance used for predictor-rank classification;
+- `predictor_svd_solver`: the resolved full or randomized predictor solver.
 
 The intermediate construction matrices $\Pi$, $C$, and $W$ remain private. They define the method
-above but are not required for fitted-model interpretation or downstream prediction.
+above but are not required for fitted-model interpretation or downstream prediction. Under
+randomized predictor SVD, the reported numerical rank is a verified lower bound; under full SVD it
+is exact.
 
 The estimator also exposes conventional PLS-family quantities:
 
@@ -152,8 +158,8 @@ chosen component count and the predictor rank reported for that row. Prediction 
 state whether they use fitted values, fixed-parameter out-of-fold predictions, selection-conditioned
 out-of-fold predictions, or an independent test set.
 
-The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#select-the-fixed-rank-pair),
-[path-selection details](path_analysis.md) define the general selection and validation contracts.
+The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#select-the-fixed-rank-pair)
+and [path-selection details](path_analysis.md) define the general selection and validation contracts.
 
 ## Reference and scope
 

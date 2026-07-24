@@ -168,7 +168,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     response_names = tuple(str(name) for name in Y.columns)
     detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 
-    path_search = PiPLSPathCV(refit=False).fit(X, Y)
+    path_search = PiPLSPathCV().fit(X, Y)
     component_path = path_search.component_path_
     selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
 

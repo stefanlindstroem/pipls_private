@@ -38,7 +38,7 @@ def test_synthetic_example_owns_the_short_selection_workflow() -> None:
     ).read_text(encoding="utf-8")
 
     assert "make_pipls_train_test(" in source
-    assert "PiPLSPathCV(refit=False).fit(train.X, train.Y)" in source
+    assert "PiPLSPathCV().fit(train.X, train.Y)" in source
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in source
     assert "search.predictor_rank_profile(selected.n_components)" in source
     assert "model = PiPLSRegression(" in source

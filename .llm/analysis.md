@@ -143,8 +143,9 @@ with stable interpretation anchors and without repeating elementary Matplotlib r
 but must not reproduce the tutorial analysis or embed its generated figures.
 
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its direct pandas
-loading, `PiPLSPathCV(refit=False)` evaluation, visible three-component choice, conditional
-predictor-rank profile, fixed `PiPLSRegression` fit, five-fold scikit-learn OOF predictions,
+loading, default selection-only `PiPLSPathCV()` evaluation, visible three-component choice,
+conditional predictor-rank profile, fixed `PiPLSRegression` fit, five-fold scikit-learn OOF
+predictions,
 inspection computations, and final PDF composition. The selected component row is retrieved before
 the selection figures, while the fixed estimator is fitted only after those figures have been
 constructed. It intentionally adds no external scaler because `PiPLSRegression` learns predictor

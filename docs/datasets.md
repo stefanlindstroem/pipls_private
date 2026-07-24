@@ -168,9 +168,9 @@ The accompanying data paper is:
 The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches the public
 LabSpec and response tables by `Sample`, removes three rows whose total-sugar response is missing,
 and applies no imputation or spectral preprocessing. `examples/06_sugarcane_real_data.py` reads
-`X.csv` and `Y.csv` directly, evaluates `PiPLSPathCV(refit=False)`, plots `component_path_` in
-memory, and fits a separate fixed model after a visible user component choice. It calculates
-selection-conditioned OOF predictions with scikit-learn and writes five final PDF figures directly
+`X.csv` and `Y.csv` directly, evaluates the default selection-only `PiPLSPathCV()`, plots
+`component_path_` in memory, and fits a separate fixed model after a visible user component choice.
+It calculates selection-conditioned OOF predictions with scikit-learn and writes five final PDF figures directly
 from immutable inspection results. The compact spectral-axis description in `metadata.yaml` avoids
 repeating 1,721 equivalent per-wavelength descriptions while still defining every predictor column
 exactly.

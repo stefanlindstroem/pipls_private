@@ -74,7 +74,7 @@ When the ranks are not known, evaluate the path first:
 ```python
 from pipls import PiPLSPathCV, PiPLSRegression
 
-search = PiPLSPathCV(refit=False).fit(X_train, Y_train)
+search = PiPLSPathCV().fit(X_train, Y_train)
 path = search.component_path_
 
 selected = path.for_n_components(2)

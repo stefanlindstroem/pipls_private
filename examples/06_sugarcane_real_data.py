@@ -24,7 +24,7 @@ wavelengths = X.columns.to_numpy(dtype=float)
 response_names = Y.columns.tolist()
 
 # Evaluate and plot the Pi-PLS component path.
-path_search = PiPLSPathCV(refit=False).fit(X, Y)
+path_search = PiPLSPathCV().fit(X, Y)
 path = path_search.component_path_
 
 figure, axis = plt.subplots(

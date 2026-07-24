@@ -26,7 +26,6 @@ search = PiPLSPathCV(
     search_method="optimal",
     cv=LeaveOneOut(),
     return_oof_predictions=True,
-    refit=False,
     n_jobs=1,
 ).fit(data.X, data.Y)
 

@@ -119,7 +119,7 @@ def test_tutorial_renderer_uses_the_direct_in_memory_public_sequence() -> None:
         encoding="utf-8"
     )
 
-    assert "PiPLSPathCV(refit=False).fit(X, Y)" in source
+    assert "PiPLSPathCV().fit(X, Y)" in source
     assert "component_path_" in source
     assert "predictor_rank_profile(" in source
     assert "cross_val_predict(" in source
@@ -134,7 +134,7 @@ def test_synthetic_tutorial_renderer_uses_the_direct_in_memory_public_sequence()
         encoding="utf-8"
     )
 
-    assert "PiPLSPathCV(refit=False).fit(train.X, train.Y)" in source
+    assert "PiPLSPathCV().fit(train.X, train.Y)" in source
     assert "component_path_" in source
     assert "predictor_rank_profile(" in source
     assert "PiPLSRegression(" in source

@@ -50,7 +50,6 @@ $h_{\max}$. An explicit integer sequence requests a subset:
 ```python
 search = PiPLSPathCV(
     n_components_values=[1, 2, 3, 5],
-    refit=False,
 ).fit(X, Y)
 ```
 
@@ -64,7 +63,8 @@ admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\max}$ directly.
 
 `search_method="optimal"` evaluates every admissible pair. `search_method="auto"` performs a
 deterministic adaptive coarse-to-fine search independently for each component count and may leave
-admissible ranks unevaluated. Score ties within numerical tolerance favor the smaller predictor
+admissible ranks unevaluated. After fitting, `path_search_exhaustive_` states whether every
+admissible pair was evaluated. Score ties within numerical tolerance favor the smaller predictor
 rank for a fixed component count. The global best then favors the smaller component count and the
 smaller predictor rank.
 
@@ -102,7 +102,7 @@ pipeline = Pipeline(
         ("pipls", PiPLSRegression(n_components=1, predictor_rank=1)),
     ]
 )
-search = PiPLSPathCV(estimator=pipeline, refit=False).fit(X, Y)
+search = PiPLSPathCV(estimator=pipeline).fit(X, Y)
 ```
 
 The terminal estimator needs the valid construction seed pair `(1, 1)` because
@@ -122,7 +122,7 @@ leave-one-out protocols when their scientific assumptions match the data. Suitab
 ```python
 from sklearn.model_selection import GroupKFold
 
-search = PiPLSPathCV(cv=GroupKFold(n_splits=5), refit=False)
+search = PiPLSPathCV(cv=GroupKFold(n_splits=5))
 search.fit(X, Y, groups=sample_groups)
 ```
 

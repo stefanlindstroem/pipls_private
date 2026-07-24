@@ -185,7 +185,7 @@ def test_synthetic_tutorial_is_the_first_learning_route() -> None:
         < example.index(rank_profile)
         < example.index(fixed_fit)
     )
-    assert "PiPLSPathCV(refit=False).fit(train.X, train.Y)" in renderer
+    assert "PiPLSPathCV().fit(train.X, train.Y)" in renderer
     assert "predictor_rank_profile(selected.n_components)" in renderer
     assert 'prediction_kind="external test predictions"' in renderer
     assert "cross_val_predict" not in renderer

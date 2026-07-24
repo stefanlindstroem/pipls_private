@@ -68,6 +68,7 @@ documented below.
         - inverse_transform
         - score
         - get_feature_names_out
+        - set_output
 
 ## Pi-PLS decomposition
 
@@ -80,10 +81,17 @@ Its public fields use descriptive Python names:
 | `predictor_rotations` | $P$ | orthogonal predictor directions |
 | `dilation` | $\operatorname{diag}(D)$ | nonnegative strength of each paired mode |
 | `response_rotations` | $Q$ | orthogonal response directions |
+| `predictor_numerical_rank` | — | complete numerical rank under full SVD, or a verified lower bound under randomized SVD |
+| `predictor_numerical_rank_is_exact` | — | whether the reported numerical rank is complete |
+| `rank_tolerance` | — | tolerance used to classify retained predictor singular values |
+| `predictor_svd_solver` | — | predictor SVD implementation actually used |
 | `standardized_regression_map` | $PDQ^{\mathsf T}$ | regression map in centered/scaled coordinates |
 
-The estimator transforms the centered/scaled map back to original predictor and response units
-when constructing `coef_`, `intercept_`, and prediction output.
+The rank fields distinguish the algebraic fixed-fit ceiling `max_predictor_rank_` from the
+numerical rank verified by the fitted decomposition. With randomized predictor SVD, the reported
+rank is a verified lower bound rather than a complete rank calculation. The estimator transforms
+the centered/scaled map back to original predictor and response units when constructing `coef_`,
+`intercept_`, and prediction output.
 
 ::: pipls.PiPLSDecomposition
     options:

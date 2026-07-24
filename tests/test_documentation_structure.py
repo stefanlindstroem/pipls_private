@@ -256,3 +256,31 @@ def test_tutorials_defer_maintenance_details_until_after_the_workflow() -> None:
     assert pulp.index("Standalone interpretation-figure recipes are maintained") > pulp_reproduce
     assert pulp.index("make docs-figures") > pulp_reproduce
     assert pulp.index('python -m pip install ".[examples]"') < pulp_workflow
+
+
+def test_current_user_workflows_rely_on_the_selection_only_path_default() -> None:
+    root = _repository_root()
+    current_sources = [
+        root / "README.md",
+        root / "docs" / "troubleshooting.md",
+        root / "docs" / "path_analysis.md",
+        root / "docs" / "tutorials" / "synthetic.md",
+        root / "docs" / "datasets.md",
+        root / "examples" / "README.md",
+        *sorted((root / "examples").glob("[0-9][0-9]_*.py")),
+        root / "tools" / "render_synthetic_tutorial.py",
+        root / "tools" / "render_pulp_tutorial.py",
+    ]
+
+    combined = "\n".join(path.read_text(encoding="utf-8") for path in current_sources)
+    assert "PiPLSPathCV(refit=False)" not in combined
+    assert "refit=False," not in combined
+    assert "PiPLSPathCV()" in combined
+
+
+def test_path_details_expose_adaptive_search_completion_status() -> None:
+    page = (_repository_root() / "docs" / "path_analysis.md").read_text(encoding="utf-8")
+
+    assert "path_search_exhaustive_" in page
+    assert 'search_method="auto"' in page
+    assert 'search_method="optimal"' in page

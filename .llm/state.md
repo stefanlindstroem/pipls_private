@@ -100,6 +100,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   utility groups live with their owning estimators, path selection and cross-validation share one
   advanced page, and model inspection retains all stable interpretation anchors without repeating
   elementary plotting recipes.
+- documentation and maintained example constructions aligned with the current public defaults:
+  `PiPLSPathCV()` demonstrates selection-only operation, decomposition documentation includes
+  rank/solver diagnostics, and Pulp rank profiles use the public lookup method;
 - a grouped self-documenting maintainer command index that presents `make install` and `make check`
   first, then separates development, documentation/example, and distribution/maintenance targets
   without renaming or changing any recipe.
@@ -242,7 +245,8 @@ Additional fixed decisions:
   configuration remains carried by the estimator template.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
-- Real-data examples use `PiPLSPathCV(refit=False)` for the path and fit a separate fixed model
+- Real-data examples use the default selection-only `PiPLSPathCV()` for the path and fit a
+  separate fixed model
   after an explicit component choice. Pulp, Sugarcane, and Tobacco use `component_path_`,
   scikit-learn OOF prediction, and inspection results directly in memory. All three use direct fixed
   estimators. `best_params_` remains a convenience, not the required user decision.
@@ -359,8 +363,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-All six owner-authorized new-user onboarding patches are complete under Decisions 0099--0104. The
-README and served home page now explain the intended use of the separate Pi-PLS rank controls without
+All six owner-authorized new-user onboarding patches are complete under Decisions 0099--0104.
+Decision 0105 aligns the complete documentation and maintained examples with the resulting
+implementation. The README and served home page now explain the intended use of the separate Pi-PLS rank controls without
 claiming general superiority, and both tutorials defer source and figure-generation provenance until
 a terminal reproduction section. No package release preparation or Python-package publication work
 is authorized.

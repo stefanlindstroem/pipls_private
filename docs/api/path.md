@@ -8,9 +8,9 @@ rank, and fit a separate fixed estimator.
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
 selector caps the path by the minimum predictor rank verified across those transformed folds.
-By default, path evaluation stops after selection: `refit=False` leaves final fixed-model fitting
-as an explicit user step. Methods that delegate to a selected estimator are available only when
-`refit=True`.
+The default constructor is selection-only: `PiPLSPathCV()` uses `refit=False` and leaves final
+fixed-model fitting as an explicit user step. Methods that delegate to a selected estimator are
+available only when `refit=True`.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see

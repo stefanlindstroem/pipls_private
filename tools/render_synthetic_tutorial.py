@@ -75,7 +75,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         noise=(0.2, 0.25),
         random_state=0,
     )
-    search = PiPLSPathCV(refit=False).fit(train.X, train.Y)
+    search = PiPLSPathCV().fit(train.X, train.Y)
     path = search.component_path_
     selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 

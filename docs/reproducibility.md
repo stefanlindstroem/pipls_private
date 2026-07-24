@@ -1,6 +1,6 @@
 # Reproducibility
 
-The `pipls` repository treats reproducibility as a software-product responsibility: released code,
+The `pipls` repository treats reproducibility as a software-product responsibility: distributed code,
 numerical contracts, deterministic synthetic generation, transparent example data, executable
 examples, and lightweight validation benchmarks should be reviewable from the repository itself.
 

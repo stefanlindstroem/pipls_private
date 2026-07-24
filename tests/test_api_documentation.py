@@ -96,3 +96,19 @@ def test_returned_result_records_hide_constructor_signatures() -> None:
 
     dataset_options = _directive_options(api_text, "pipls.datasets.PiPLSDataset")
     assert "show_signature: false" not in dataset_options
+
+
+def test_fixed_regression_reference_covers_output_configuration_and_rank_diagnostics() -> None:
+    regression = (
+        _repository_root() / "docs" / "api" / "regression.md"
+    ).read_text(encoding="utf-8")
+    options = _directive_options(regression, "pipls.PiPLSRegression")
+
+    assert "- set_output" in options
+    for field in (
+        "predictor_numerical_rank",
+        "predictor_numerical_rank_is_exact",
+        "rank_tolerance",
+        "predictor_svd_solver",
+    ):
+        assert f"`{field}`" in regression

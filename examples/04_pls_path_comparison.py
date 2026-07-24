@@ -13,8 +13,8 @@ DATASETS_DIR = Path(__file__).resolve().parents[1] / "datasets"
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
 
 for dataset, path_search in (
-    ("pulp", PiPLSPathCV(refit=False)),
-    ("sugarcane", PiPLSPathCV(refit=False)),
+    ("pulp", PiPLSPathCV()),
+    ("sugarcane", PiPLSPathCV()),
     (
         "tobacco",
         PiPLSPathCV(
@@ -23,7 +23,6 @@ for dataset, path_search in (
                 predictor_rank=1,
                 svd_solver="full",
             ),
-            refit=False,
             n_jobs=1,
         ),
     ),

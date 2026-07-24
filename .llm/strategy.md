@@ -659,6 +659,16 @@ Package release preparation and Python-package publication remain outside this s
 
 Current status: **all six new-user onboarding patches complete**.
 
+### Documentation and implementation alignment
+
+Decision 0105 completes a cross-layer alignment pass after the onboarding series. Maintained
+selection workflows now demonstrate the selection-only `PiPLSPathCV()` default, the generated fixed
+reference includes `set_output()` and all public decomposition diagnostics, path details expose
+`path_search_exhaustive_`, and guide-layer Pulp descriptions use `predictor_rank_profile()` instead
+of direct candidate-column access.
+
+Current status: **documentation aligned with the current implementation**.
+
 ## Current next increment
 
 Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a

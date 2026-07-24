@@ -35,7 +35,7 @@ detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:evaluate-pulp-component-path]
-path_search = PiPLSPathCV(refit=False).fit(X, Y)
+path_search = PiPLSPathCV().fit(X, Y)
 path = path_search.component_path_
 # --8<-- [end:evaluate-pulp-component-path]
 

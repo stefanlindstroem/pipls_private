@@ -286,12 +286,14 @@ rendering layer.
 ## Example workflow boundary
 
 Example 04 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
-component paths directly in memory. Pulp, Sugarcane, and Tobacco use `PiPLSPathCV(refit=False)`, plot
+component paths directly in memory. Pulp, Sugarcane, and Tobacco use the default selection-only
+`PiPLSPathCV()`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn
-`cross_val_predict()`. They render immutable Pi-PLS factors, latent structure, observation diagnostics, and prediction
-diagnostics directly with Matplotlib and write only final PDF figures. Pulp also reads the
-conditional predictor-rank profile from `cv_results_` for the chosen component count. Tobacco uses
+`cross_val_predict()`. They render immutable Pi-PLS factors, latent structure, observation
+diagnostics, and prediction diagnostics directly with Matplotlib and write only final PDF figures.
+Pulp also reads the conditional predictor-rank profile through `predictor_rank_profile()` for the
+chosen component count. Tobacco uses
 full predictor SVD, direct observation diagnostics, and caller-owned source-order response
 pagination through multipage PDFs.
 

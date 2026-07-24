@@ -96,7 +96,8 @@ so the numbered examples use them directly instead of repeating repository-integ
 Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
 comparison figures directly. Sugarcane demonstrates the complete-analysis workflow:
 
-1. `PiPLSPathCV(refit=False)` returns `component_path_`, which is plotted directly with Matplotlib.
+1. the default selection-only `PiPLSPathCV()` returns `component_path_`, which is plotted directly
+   with Matplotlib.
 2. `path.for_n_components(CHOSEN_N_COMPONENTS)` supplies the fixed component count and predictor
    rank.
 3. `cross_val_predict()` with five non-shuffled folds produces

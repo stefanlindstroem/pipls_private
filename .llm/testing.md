@@ -98,7 +98,10 @@ snippet sections from examples 02 and 05, links to stable API objects, and links
 model-inspection anchors without freezing narrative wording. Documentation-entry tests may verify
 that the README contains the two compact public workflows and tutorial routes while maintainer-only
 commands and the repository map remain in `CONTRIBUTING.md`; do not pin line counts or exact
-prose. Generic served-Markdown tests should resolve local files and anchors, including explicit and
+prose. Maintained user-facing examples and tutorial renderers should demonstrate current public
+defaults rather than repeat redundant default arguments; tests may prohibit stale explicit defaults
+while leaving historical decision records unchanged. Generic served-Markdown tests should resolve
+local files and anchors, including explicit and
 mkdocstrings-generated object anchors. The API overview should keep one discoverable map of public
 result objects, and troubleshooting should remain a task-oriented reference rather than a third
 tutorial. Generated API pages should suppress constructor signatures for returned immutable result

@@ -110,6 +110,7 @@ This index is navigation, not a substitute for those records.
 | `0102-path-search-defaults.md` | path-search defaults and scorer presentation | default to selection-only `refit=False`; use a stable package scorer name resolving to the public callable |
 | `0103-installation-and-optional-dependency-boundary.md` | installation and optional dependencies | retain only maintained `dev`, `examples`, and `docs` extras; use noneditable public installation and editable contributor setup |
 | `0104-new-user-documentation-route.md` | new-user documentation route | motivate the separate ranks without performance claims and defer tutorial maintenance details to reproduction sections |
+| `0105-documentation-implementation-alignment.md` | documentation and implementation alignment | demonstrate current path defaults and document complete decomposition, output, and adaptive-search surfaces |
 
 ## Implemented estimator/search transition
 

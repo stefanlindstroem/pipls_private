@@ -10,7 +10,7 @@ Use `PiPLSPathCV` rather than guessing both values. The path selector evaluates 
 component count, and exposes the concise result through `component_path_`.
 
 ```python
-search = PiPLSPathCV(refit=False).fit(X, Y)
+search = PiPLSPathCV().fit(X, Y)
 selected = search.component_path_.for_n_components(2)
 ```
 
