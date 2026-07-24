@@ -23,8 +23,9 @@ structure without changing NumPy's global random state.
 - `Y` is normalized to a two-dimensional array, including single-response datasets.
 - Required provenance keys are `source`, `license`, `citation`, and `version` when the optional
   container is used. They are not prerequisites for fitting plain user-supplied `X` and `Y`.
-- All model arrays and array-valued metadata are copied and made read-only. Nested metadata is
-  recursively frozen and unsupported mutable/object values are rejected.
+- All model arrays and array-valued metadata are copied and made read-only. Metadata NumPy arrays
+  must have a non-object dtype; heterogeneous values use nested sequences or mappings so their
+  contents can be recursively frozen. Unsupported mutable or object values are rejected.
 - `make_pipls_regression` uses a local seeded `numpy.random.Generator` and returns one
   `PiPLSDataset`.
 - `make_pipls_train_test` returns two `PiPLSDataset` objects generated from one shared latent

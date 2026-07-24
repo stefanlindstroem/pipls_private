@@ -149,7 +149,8 @@ class PiPLSDataset:
     provenance : mapping of str to str
         Nonempty ``source``, ``license``, ``citation``, and ``version`` entries.
     metadata : mapping of str to object, default={}
-        Recursively frozen dataset metadata.
+        Recursively frozen dataset metadata. NumPy metadata arrays must not use
+        object dtype, because object-array elements can remain mutable.
     truth : PiPLSSyntheticTruth or None, default=None
         Optional synthetic latent structure consistent with ``X`` and ``Y``.
 
@@ -846,6 +847,11 @@ def _freeze_metadata_value(value: object, *, path: str) -> object:
             raise ValueError(f"{path} must be finite.")
         return value
     if isinstance(value, np.ndarray):
+        if value.dtype.hasobject:
+            raise TypeError(
+                f"{path} must not use an object-dtype NumPy array; "
+                "use nested sequences or mappings for heterogeneous metadata."
+            )
         array = np.array(value, copy=True)
         if array.dtype.kind in "fci" and not np.all(np.isfinite(array)):
             raise ValueError(f"{path} must contain only finite values.")

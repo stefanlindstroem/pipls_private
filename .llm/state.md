@@ -44,7 +44,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - grouped, repeated, predefined, temporal, and leave-one-out split workflows;
 - optional ordered OOF predictions and immutable `PiPLSValidationReport` with explicit
   fixed-parameter versus selection-conditioned labeling;
-- immutable validated `PiPLSDataset` and deterministic synthetic generators with shared,
+- immutable validated `PiPLSDataset` with recursively frozen metadata, explicit rejection of
+  object-dtype metadata arrays, and deterministic synthetic generators with shared,
   predictor-specific, and response-specific latent structure;
 - a transparent real-data input contract: users and examples read `X` and `Y` explicitly, with no
   metadata, registry, or package-owned loader required for fitting;
@@ -330,13 +331,13 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Pre-release audit hardening 6/6: reject mutable object arrays from recursively frozen dataset
-metadata.
+The six-patch pre-release hardening series is complete. Stop for the owner's human audit; no package
+release preparation or publication work is authorized in the current sequence.
 
 ## Subsequent roadmap
 
-1. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
-   publication are outside the current sequence.
+1. **Human audit:** review the complete package and documentation before authorizing another
+   implementation increment.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

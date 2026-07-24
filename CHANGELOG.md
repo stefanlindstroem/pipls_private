@@ -1,5 +1,9 @@
 # Changelog
 
+- Close the immutable dataset-metadata boundary: reject object-dtype NumPy arrays whose elements
+  could remain mutable, retain copied read-only non-object arrays, and route dataset-API readers to
+  the shipped Pulp, Sugarcane, and Tobacco reference datasets and examples.
+
 - Make inspection results uniformly defensive and numerically finite: validate direct construction
   and pickle reconstruction, use range-safe means, scales, norms, covariance products, squared
   residuals, and RMSE calculations, and reject unrepresentable derived float64 quantities.

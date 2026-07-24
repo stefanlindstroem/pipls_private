@@ -598,15 +598,16 @@ the fourth increment by applying one direct-construction, defensive-copy, scalar
 pickle-validation policy to the core estimator and path result records. Decision 0094 completes the
 fifth increment by applying the same boundary to inspection records and using range-safe
 calculations that reject unrepresentable derived values rather than returning nonfinite arrays.
-Release preparation and publication are explicitly outside this series and remain deferred until
-the owner completes a human audit.
+The sixth increment closes the dataset boundary by rejecting object-dtype metadata arrays while
+retaining copied read-only non-object arrays and recursively frozen heterogeneous mappings and
+sequences. Release preparation and publication are explicitly outside this series and remain
+deferred until the owner completes a human audit.
 
-Current status: **increment 5/6 complete; dataset metadata closure next**.
+Current status: **all six pre-release hardening increments complete; owner human audit next**.
 
 ## Current next increment
 
-Pre-release audit hardening 6/6: reject mutable object arrays from recursively frozen dataset
-metadata.
+No implementation increment is authorized. Stop for the owner's human audit.
 
 ## Maintenance protocol
 

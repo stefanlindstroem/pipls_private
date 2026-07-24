@@ -27,6 +27,9 @@ focused submodules. Rendering is caller-owned.
 | [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | dataset construction or generator output | Carry validated arrays, labels, provenance, and metadata |
 | [`PiPLSSyntheticTruth`](datasets.md#pipls.datasets.PiPLSSyntheticTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
 
+The Pulp, Sugarcane, and Tobacco [reference datasets](../datasets.md) are repository CSV assets,
+not `PiPLSDataset` registry entries or package-owned loader results.
+
 ## Rendering boundary
 
 The API ends at immutable numerical results. Pi-PLS provides no plotting submodule. Maintained

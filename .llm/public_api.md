@@ -171,8 +171,10 @@ from pipls.datasets import (
 synthetic data and structured experiments. Plain arrays and data frames passed directly to
 `fit(X, Y)` remain the primary real-data interface. The container stores read-only `float64` `X` and
 2D `Y`, unique feature/target/sample names, required provenance, recursively frozen metadata, and
-optional synthetic truth. `data` and `target` are scikit-learn-style aliases. Required provenance
-keys are `source`, `license`, `citation`, and `version`.
+optional synthetic truth. Metadata arrays preserve non-object dtypes, are copied, and are made
+read-only; object-dtype arrays are rejected because their Python elements cannot be frozen by
+making the array container read-only. `data` and `target` are scikit-learn-style aliases. Required
+provenance keys are `source`, `license`, `citation`, and `version`.
 
 `make_pipls_regression` creates one side-effect-free dataset with local seeded random generation.
 It supports shared, predictor-specific, and response-specific latent ranks; scalar or per-direction

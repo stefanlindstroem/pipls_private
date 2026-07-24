@@ -95,6 +95,44 @@ def test_dataset_rejects_invalid_public_inputs(
         _dataset(**{field: value})
 
 
+def test_dataset_accepts_and_freezes_non_object_metadata_arrays() -> None:
+    source_arrays = {
+        "booleans": np.array([True, False]),
+        "strings": np.array(["alpha", "beta"]),
+        "dates": np.array(["2026-01-01", "2026-01-02"], dtype="datetime64[D]"),
+    }
+    dataset = _dataset(metadata=source_arrays)
+
+    source_arrays["booleans"][0] = False
+    source_arrays["strings"][0] = "changed"
+    source_arrays["dates"][0] = np.datetime64("2030-01-01")
+
+    for name, expected in (
+        ("booleans", np.array([True, False])),
+        ("strings", np.array(["alpha", "beta"])),
+        ("dates", np.array(["2026-01-01", "2026-01-02"], dtype="datetime64[D]")),
+    ):
+        frozen = dataset.metadata[name]
+        assert isinstance(frozen, np.ndarray)
+        assert not frozen.flags.writeable
+        np.testing.assert_array_equal(frozen, expected)
+
+
+@pytest.mark.parametrize(
+    "metadata_array",
+    [
+        np.array([{"items": []}], dtype=object),
+        np.array([[1, 2], [3, 4]], dtype=object),
+        np.array([bytearray(b"mutable")], dtype=object),
+    ],
+)
+def test_dataset_rejects_object_dtype_metadata_arrays(
+    metadata_array: np.ndarray,
+) -> None:
+    with pytest.raises(TypeError, match="object-dtype NumPy array"):
+        _dataset(metadata={"nested": {"array": metadata_array}})
+
+
 def test_synthetic_truth_is_read_only() -> None:
     dataset = make_pipls_regression(
         n_samples=12,

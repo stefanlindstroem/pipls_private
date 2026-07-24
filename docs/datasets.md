@@ -34,8 +34,11 @@ The container validates and then freezes its contents:
 - feature names, target names, and sample identifiers are non-empty, unique strings with matching
   lengths;
 - provenance must contain non-empty `source`, `license`, `citation`, and `version` strings;
-- metadata values may be immutable scalars, sequences, mappings, or NumPy arrays;
-- arrays are copied, converted to `float64`, and made read-only;
+- metadata values may be immutable scalars, sequences, mappings, or non-object NumPy arrays;
+- model arrays are copied, converted to `float64`, and made read-only;
+- metadata arrays are copied with their dtype preserved and made read-only;
+- object-dtype metadata arrays are rejected because their elements can retain mutable Python
+  objects; use nested sequences or mappings instead;
 - nested metadata mappings and sequences are frozen recursively.
 
 The scikit-learn-style aliases `data` and `target` refer to `X` and `Y`. The container also exposes

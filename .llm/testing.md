@@ -47,8 +47,10 @@ resolvable links in the served dataset guide; it must not hard-code the current 
 
 Before benchmark fixtures are introduced, repository dataset tests should check file layout and
 technical readability, not exact scientific values, row examples, column lists, dimensions, or
-metadata checksums. Git history, review, public provenance, and the dataset documentation remain
-the source of record for those contents.
+metadata checksums. Public container tests should verify recursive freezing, defensive array copies,
+acceptance of non-object metadata arrays, and rejection of object-dtype arrays whose elements could
+remain mutable. Git history, review, public provenance, and the dataset documentation remain the
+source of record for documentary contents.
 
 Focused synthetic package benchmarks are executable contracts once implemented. Tests may validate
 the question-specific script, deterministic generation, finite metrics, metric domains, exact

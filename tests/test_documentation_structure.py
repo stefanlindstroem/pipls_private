@@ -100,6 +100,19 @@ def test_api_overview_maps_the_public_result_objects() -> None:
         assert f"`{object_name}`" in api_overview
 
 
+def test_dataset_api_routes_to_repository_reference_datasets() -> None:
+    root = _repository_root()
+    page = (root / "docs" / "api" / "datasets.md").read_text(encoding="utf-8")
+    overview = (root / "docs" / "api" / "index.md").read_text(encoding="utf-8")
+
+    for dataset_name in ("Pulp", "Sugarcane", "Tobacco"):
+        assert dataset_name in page
+        assert dataset_name in overview
+    assert "../datasets.md" in page
+    assert "../examples.md#complete-real-data-analyses" in page
+    assert "../datasets.md" in overview
+
+
 def test_troubleshooting_is_a_programming_reference_page() -> None:
     root = _repository_root()
     page = (root / "docs" / "troubleshooting.md").read_text(encoding="utf-8")

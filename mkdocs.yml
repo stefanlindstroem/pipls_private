@@ -24,7 +24,7 @@ nav:
       - Troubleshooting: troubleshooting.md
       - Model inspection: model_inspection.md
       - Inspection API: api/inspection.md
-      - Datasets and synthetic data: api/datasets.md
+      - Dataset API and generators: api/datasets.md
   - Project validation:
       - Reference datasets: datasets.md
       - Benchmarks: benchmarks.md
