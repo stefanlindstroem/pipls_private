@@ -221,7 +221,7 @@ with PdfPages(ANALYSIS_DIR / "prediction_diagnostics.pdf") as report:
         axes[0].set_title("Observed versus predicted")
         axes[1].axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
         axes[1].set_xlabel("Predicted response (standardized)")
-        axes[1].set_ylabel(r"Residual $y-\hat y$ (standardized)")
+        axes[1].set_ylabel("Standardized residual")
         axes[1].set_title("Residual versus predicted")
         positions = np.arange(len(responses))
         axes[2].bar(positions, diagnostics.standardized_rmse[response_array])

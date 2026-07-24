@@ -20,6 +20,12 @@ the declared public names from `pipls.inspection`, `pipls.datasets`, and `pipls.
 `__version__` remains package metadata rather than an API reference page.
 Private modules and `pipls.model_selection` are not reference surfaces.
 
+Mathematical documentation denotes the response matrix by $Y$. Public estimator methods follow the
+scikit-learn `fit(X, y)` naming convention, so `y` may be a one-dimensional response or a
+two-dimensional multivariate response matrix. Related public names such as `y_pred`, `y_scores_`,
+and `y_loadings_` retain the same convention. User-facing plot labels should describe responses
+and residuals without implying that a multivariate response is scalar.
+
 `PiPLSRegression` fits one explicit fixed pair `(n_components, predictor_rank)` and performs no
 cross-validation or parameter selection. Both rank parameters are required keyword-only
 constructor arguments; neither has a default or accepts a missing-value sentinel. `PiPLSPathCV` is

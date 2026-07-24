@@ -33,6 +33,8 @@ reference describe the current public behavior directly.
 - [0092: fold numerical-rank feasibility](0092-fold-numerical-rank-feasibility.md)
 - [0093: public result invariants](0093-public-result-invariants.md)
 - [0095: required fixed Pi-PLS rank pair](0095-required-fixed-rank-pair.md)
+- [0096: notation, path ceilings, and inspection navigation]
+  (0096-notation-path-ceilings-and-inspection-navigation.md)
 
 ## Validation, data, and benchmarks
 

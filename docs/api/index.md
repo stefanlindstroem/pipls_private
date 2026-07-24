@@ -4,6 +4,13 @@ The generated reference documents supported public objects directly from their P
 Core estimators are available from `pipls`; numerical inspection, dataset, and metric tools live in
 focused submodules. Rendering is caller-owned.
 
+## Mathematical notation and Python names
+
+Mathematical sections use $X$ for the predictor matrix and $Y$ for the response matrix. Python
+call signatures follow the scikit-learn convention `fit(X, y)`: `y` may be either a one-dimensional
+response or a two-dimensional multivariate response matrix. Names such as `y_pred`, `y_scores_`,
+and `y_loadings_` follow the same programming convention and do not imply a scalar response.
+
 ## Start with the estimators
 
 - [Fixed regression](regression.md)

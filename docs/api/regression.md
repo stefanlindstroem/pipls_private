@@ -15,6 +15,10 @@ model = PiPLSRegression(
 Y_pred = model.predict(X_test)
 ```
 
+Equations use $Y$ for the response matrix, while Python signatures use scikit-learn's conventional
+`y` name even for multivariate responses. The
+[API overview](index.md#mathematical-notation-and-python-names) records this notation boundary.
+
 For the normal path-selection workflow, begin with the
 [synthetic tutorial](../tutorials/synthetic.md). Use `PiPLSPathCV` when the rank pair is not already
 fixed. Common fit and data problems are summarized in

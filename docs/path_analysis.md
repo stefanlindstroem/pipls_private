@@ -13,8 +13,39 @@ For component count $h$ and predictor rank $r_\pi$, the admissible pairs are
 \mathcal{G}=\{(h,r_\pi):1\le h\le h_{\max},\ h\le r_\pi\le r_{\pi,\max}\}.
 \end{equation}
 
-The default `n_components_values="all"` evaluates every admissible component count. An explicit
-integer sequence requests a subset:
+### Resolved ceilings
+
+The default upper predictor rank is
+
+\begin{equation}
+r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
+r_{\mathrm{num,min}},
+\left\lceil\frac{n}{\texttt{samples_per_predictor_rank}}\right\rceil\right].
+\end{equation}
+
+Here $n$ is the total number of observations supplied to `fit()`, $p_{\min}$ is the minimum
+predictor count after fold-local pipeline preprocessing, and $r_{\mathrm{num,min}}$ is the minimum
+verified predictor rank after terminal-estimator centering and optional scaling. The selector fits
+pipeline preprocessing separately inside each fold before this rank preflight. An integer
+`max_predictor_rank` bypasses the statistical support rule but remains capped by fold dimensions and
+numerical rank.
+
+If the response matrix has $q$ columns, the resolved component ceiling is
+
+\begin{equation}
+h_{\max}=\min(q,r_{\pi,\max}).
+\end{equation}
+
+This ceiling enforces $h\le q$ and guarantees that at least one predictor rank can satisfy
+$h\le r_\pi$ before an explicit predictor-rank set is applied. Explicit component or predictor-rank
+values above the corresponding resolved ceiling are rejected before candidate evaluation. If an
+explicit predictor-rank set leaves a requested component count without any rank satisfying
+$h\le r_\pi$, the request is rejected rather than silently dropping that component count.
+
+### Component-count requests
+
+The default `n_components_values="all"` evaluates every component count from 1 through
+$h_{\max}$. An explicit integer sequence requests a subset:
 
 ```python
 search = PiPLSPathCV(
@@ -29,31 +60,13 @@ Every requested value must have at least one admissible predictor rank.
 
 With `predictor_rank_values=None`, predictor rank is selected independently for every component
 count. A one-element sequence fixes one rank across the path, a longer sequence defines the
-admissible set, and `predictor_rank_values="max"` uses the rule-derived maximum directly.
+admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\max}$ directly.
 
 `search_method="optimal"` evaluates every admissible pair. `search_method="auto"` performs a
 deterministic adaptive coarse-to-fine search independently for each component count and may leave
 admissible ranks unevaluated. Score ties within numerical tolerance favor the smaller predictor
 rank for a fixed component count. The global best then favors the smaller component count and the
 smaller predictor rank.
-
-## Rank ceiling
-
-The default upper rank is
-
-\begin{equation}
-r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
-r_{\mathrm{num,min}},
-\left\lceil\frac{n}{\texttt{samples_per_predictor_rank}}\right\rceil\right].
-\end{equation}
-
-Here $n$ is the total number of observations supplied to `fit()`, $p_{\min}$ is the minimum
-predictor count after fold-local pipeline preprocessing, and $r_{\mathrm{num,min}}$ is the minimum
-verified predictor rank after terminal-estimator centering and optional scaling. The selector fits
-pipeline preprocessing separately inside each fold before this rank preflight. An integer
-`max_predictor_rank` bypasses the statistical support rule but remains capped by fold dimensions and
-numerical rank. Explicit component or predictor-rank values above the resolved ceiling are rejected
-before candidate evaluation.
 
 ## Scoring and the best evaluated pair
 

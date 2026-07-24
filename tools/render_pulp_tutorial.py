@@ -363,7 +363,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     )
     axis.axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
     axis.set_xlabel("Predicted response (standardized)")
-    axis.set_ylabel(r"Residual $y-\hat y$ (standardized)")
+    axis.set_ylabel("Standardized residual")
     axis.set_title(f"Pulp residual versus predicted\n{diagnostics.prediction_kind}")
     axis.legend(title="Response")
     # --8<-- [end:render-pulp-residuals-vs-predicted]

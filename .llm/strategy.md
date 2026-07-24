@@ -614,16 +614,17 @@ The owner identified three additional focused increments during the human audit:
 2. align notation and path-ceiling documentation and improve inspection navigation;
 3. add one focused small-sample synthetic leave-one-out example.
 
-Decision 0095 completes the first increment. Release preparation and publication remain outside
-this continuation.
+Decision 0095 completes the first increment. Decision 0096 completes the second by separating
+mathematical $Y$ from scikit-learn `y`, defining both resolved path ceilings before policy details,
+using response-neutral residual labels, and grouping inspection concepts with the generated API.
+Release preparation and publication remain outside this continuation.
 
-Current status: **Patch 1/3 complete; Patch 2/3 next**.
+Current status: **Patches 1/3 and 2/3 complete; Patch 3/3 next**.
 
 ## Current next increment
 
-Clarify mathematical $Y$ versus scikit-learn `y`, define $h_{\max}$ beside $r_{\pi,\max}$ before
-predictor-rank policies, use response-neutral residual labeling, and improve reciprocal navigation
-between inspection concepts and the generated inspection API.
+Add one focused small-sample synthetic leave-one-out example and link it from the leave-one-out
+interpretation reference.
 
 ## Maintenance protocol
 

@@ -6,6 +6,11 @@ interpretation, limiting cases, rank roles, and theory-to-implementation consequ
 
 ## Core notation
 
+Mathematical statements use uppercase $X$ and $Y$ for predictor and response matrices. Python
+estimator signatures retain scikit-learn's `X` and `y` convention, including when `y` is a
+two-dimensional multivariate response matrix. The programming name does not change the
+mathematical object.
+
 | Quantity | Shape | Meaning |
 |---|---:|---|
 | $\mathbf{X}_{\mathrm{cs}}$ | $(n,p)$ | centered, optionally scaled predictors |

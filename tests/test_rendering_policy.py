@@ -184,3 +184,18 @@ def test_tutorial_examples_render_named_result_arrays_directly() -> None:
     assert "biplot_coordinates(" in pulp
     assert "adjust_text(" in pulp
     assert pulp.index("biplot_axis.legend()") < pulp.index("adjust_text(")
+
+
+def test_real_data_prediction_plots_use_response_neutral_residual_labels() -> None:
+    root = _repository_root()
+    sources = [
+        root / "examples" / "10_pulp_real_data.py",
+        root / "examples" / "11_sugarcane_real_data.py",
+        root / "examples" / "12_tobacco_real_data.py",
+        root / "tools" / "render_pulp_tutorial.py",
+    ]
+
+    for path in sources:
+        text = path.read_text(encoding="utf-8")
+        assert 'set_ylabel("Standardized residual")' in text
+        assert r"Residual $y-\hat y$ (standardized)" not in text

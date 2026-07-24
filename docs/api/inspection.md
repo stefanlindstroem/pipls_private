@@ -1,4 +1,4 @@
-# Inspection
+# Inspection API
 
 `pipls.inspection` contains pure numerical analysis helpers. It has no pandas or Matplotlib
 requirement, returns immutable defensive copies, and performs no file writing. Result records are
@@ -9,7 +9,8 @@ quantities or raise a clear `ValueError` when a requested derived value is not r
 
 The Pi-PLS factorization helper is method-specific. The latent-structure, biplot, observation, and
 prediction helpers use PLS-family quantities and can therefore be applied to a compatible fitted
-Pi-PLS or ordinary PLS estimator.
+Pi-PLS or ordinary PLS estimator. For interpretation, scientific limitations, and relationships
+between these quantities, begin with [Model inspection concepts](../model_inspection.md).
 
 ## Result objects and labels
 

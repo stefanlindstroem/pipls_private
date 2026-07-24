@@ -22,8 +22,9 @@ nav:
       - Path selection: api/path.md
       - Path-selection details: path_analysis.md
       - Troubleshooting: troubleshooting.md
-      - Model inspection: model_inspection.md
-      - Inspection API: api/inspection.md
+      - Model inspection:
+          - Concepts: model_inspection.md
+          - API: api/inspection.md
       - Dataset API and generators: api/datasets.md
   - Project validation:
       - Reference datasets: datasets.md

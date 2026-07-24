@@ -1,4 +1,4 @@
-# Model inspection
+# Model inspection concepts
 
 `pipls.inspection` computes immutable numerical results from fitted models or explicit predictions.
 Pi-PLS-specific inspection covers $P$, $D$, $Q$, and $QD$; scores, loadings, coefficients, biplots,

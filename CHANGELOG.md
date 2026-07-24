@@ -1,5 +1,8 @@
 # Changelog
 
+- Clarify mathematical $Y$ versus scikit-learn `y`, define both path-selection ceilings before
+  policy details, use response-neutral residual labels, and group inspection concepts with the
+  generated inspection API.
 - Require `PiPLSRegression` callers to provide the fixed `n_components` and `predictor_rank` pair
   as keyword-only arguments, and document why path-search templates use a replaceable `(1, 1)`
   construction seed.

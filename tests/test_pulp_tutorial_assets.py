@@ -330,6 +330,10 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert "axes[0].scatter(" in example
     assert "axes[1].scatter(" in example
     assert "axes[2].bar(" in example
+    assert 'set_ylabel("Standardized residual")' in example
+    assert 'set_ylabel("Standardized residual")' in renderer
+    assert r"Residual $y-\hat y$ (standardized)" not in example
+    assert r"Residual $y-\hat y$ (standardized)" not in renderer
     assert 'prediction_kind="selection-conditioned OOF predictions"' in example
     assert "run_pulp_workflow" not in example
     assert "run_pulp_workflow" not in renderer

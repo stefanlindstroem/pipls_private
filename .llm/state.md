@@ -115,6 +115,9 @@ Decision 0093 makes the core public result records validate direct construction,
 scalar values, aligned arrays, OOF coverage, and pickle reconstruction uniformly. Decision 0094
 applies the same defensive boundary to inspection records and requires inspection helpers to return
 finite float64 quantities or fail explicitly when a derived value is not representable.
+Decision 0095 requires every fixed estimator to state its complete rank pair. Decision 0096
+distinguishes mathematical $Y$ from scikit-learn `y`, defines both resolved path ceilings before
+policy details, and groups inspection concepts with the generated inspection API.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -332,16 +335,15 @@ publication grids, and figure generation remain outside the repository.
 ## Current next increment
 
 The owner-authorized three-patch human-audit continuation is in progress. Patch 1/3 requires the
-fixed `PiPLSRegression` rank pair explicitly and is complete. Patch 2/3 should clarify mathematical
-$Y$ versus scikit-learn `y`, define and order $r_{\pi,\max}$ and $h_{\max}$ in the path reference,
-use a response-neutral residual axis label, and improve the reciprocal inspection-page navigation.
-No package release preparation or publication work is authorized.
+fixed `PiPLSRegression` rank pair explicitly. Patch 2/3 clarifies mathematical $Y$ versus
+scikit-learn `y`, defines and orders $r_{\pi,\max}$ and $h_{\max}$ in the path reference, uses
+response-neutral residual labels, and groups the inspection concepts and API pages. Both are
+complete. No package release preparation or publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Patch 2/3:** notation, path ceilings, residual labeling, and inspection navigation.
-2. **Patch 3/3:** a focused small-sample synthetic leave-one-out example linked from the reference.
-3. **Human audit:** continue reviewing the complete package and documentation before authorizing
+1. **Patch 3/3:** a focused small-sample synthetic leave-one-out example linked from the reference.
+2. **Human audit:** continue reviewing the complete package and documentation before authorizing
    another implementation increment.
 
 Future datasets still require a distinct package-level use case and verified source-level

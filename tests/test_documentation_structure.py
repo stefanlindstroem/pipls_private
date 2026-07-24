@@ -155,15 +155,19 @@ def test_reference_navigation_is_consolidated_around_owning_pages() -> None:
         navigation = yaml.safe_load(stream)["nav"]
 
     reference = next(item["Reference"] for item in navigation if "Reference" in item)
-    assert [next(iter(item.values())) for item in reference] == [
-        "api/index.md",
-        "api/regression.md",
-        "api/path.md",
-        "path_analysis.md",
-        "troubleshooting.md",
-        "model_inspection.md",
-        "api/inspection.md",
-        "api/datasets.md",
+    assert reference == [
+        {"API overview": "api/index.md"},
+        {"Fixed regression": "api/regression.md"},
+        {"Path selection": "api/path.md"},
+        {"Path-selection details": "path_analysis.md"},
+        {"Troubleshooting": "troubleshooting.md"},
+        {
+            "Model inspection": [
+                {"Concepts": "model_inspection.md"},
+                {"API": "api/inspection.md"},
+            ]
+        },
+        {"Dataset API and generators": "api/datasets.md"},
     ]
 
     retired_wrappers = {
@@ -190,3 +194,26 @@ def test_reference_navigation_is_consolidated_around_owning_pages() -> None:
     ):
         section = path.split(heading, maxsplit=1)[1].split(directive, maxsplit=1)[0]
         assert section.strip(), f"{heading} requires explanatory text before its API directive"
+
+    inspection_concepts = (root / "docs" / "model_inspection.md").read_text(
+        encoding="utf-8"
+    )
+    inspection_api = (root / "docs" / "api" / "inspection.md").read_text(
+        encoding="utf-8"
+    )
+    assert "api/inspection.md" in inspection_concepts
+    assert "../model_inspection.md" in inspection_api
+
+
+def test_path_reference_defines_resolved_ceilings_before_rank_policies() -> None:
+    page = (_repository_root() / "docs" / "path_analysis.md").read_text(
+        encoding="utf-8"
+    )
+
+    bounds = page.index("## Search bounds")
+    ceilings = page.index("### Resolved ceilings")
+    component_requests = page.index("### Component-count requests")
+    rank_policies = page.index("## Predictor-rank policies")
+    assert bounds < ceilings < component_requests < rank_policies
+    assert r"r_{\pi,\max}" in page[ceilings:component_requests]
+    assert r"h_{\max}" in page[ceilings:component_requests]
