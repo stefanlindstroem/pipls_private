@@ -155,6 +155,11 @@ Mean foldwise $R^2$ is rejected when validation folds contain one sample. When O
 requested, `validation_report_.pooled_oof_r2` may report $R^2$ from pooled LOO predictions; it is
 not mean foldwise $R^2$.
 
+The [focused small-sample example](examples.md#leave-one-out-validation) uses twelve deterministic
+observations, a compact explicit candidate grid, the singleton-safe default scorer, and ordered OOF
+predictions. Its validation report is selection-conditioned because the same LOO path selects the
+rank pair and supplies the pooled diagnostic.
+
 ## Fold variation
 
 `component_path_.cv_mse_fold_sd` is the population standard deviation of the realized fold-specific

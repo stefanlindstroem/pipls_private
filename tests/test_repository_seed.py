@@ -263,6 +263,7 @@ def test_make_examples_runs_every_numbered_example() -> None:
     expected = [
         "examples/01_minimal_fit_and_plot.py",
         "examples/02_synthetic_path_selection.py",
+        "examples/03_leave_one_out_validation.py",
         "examples/09_pls_path_comparison.py",
         "examples/10_pulp_real_data.py",
         "examples/11_sugarcane_real_data.py",

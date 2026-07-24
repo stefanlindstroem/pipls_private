@@ -14,8 +14,9 @@ material alone.
 ## Implemented boundary
 
 Numbered examples are self-contained user tasks rather than publication-oriented or
-context-free API demonstrations. Example 07 has been removed; example 02 now supplies the short
-synthetic path-selection tutorial and independent-test prediction workflow.
+context-free API demonstrations. Example 07 has been removed; example 02 supplies the short
+synthetic path-selection tutorial and independent-test prediction workflow, while example 03
+gives leave-one-out validation one focused small-calibration use case.
 
 Phases A through F4 are complete and committed. The first broad E4 benchmark
 implementation was removed and replaced by focused question-specific benchmarks:
@@ -41,7 +42,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and a public
   immutable `PiPLSDecomposition` limited to interpretable rotations, dilation, rank diagnostics,
   solver provenance, and the derived centered/scaled regression map;
-- grouped, repeated, predefined, temporal, and leave-one-out split workflows;
+- grouped, repeated, predefined, temporal, and leave-one-out split workflows, with a focused
+  small-sample LOO example reporting ordered OOF predictions and pooled OOF $R^2$;
 - optional ordered OOF predictions and immutable `PiPLSValidationReport` with explicit
   fixed-parameter versus selection-conditioned labeling;
 - immutable validated `PiPLSDataset` with recursively frozen metadata, explicit rejection of
@@ -117,7 +119,9 @@ applies the same defensive boundary to inspection records and requires inspectio
 finite float64 quantities or fail explicitly when a derived value is not representable.
 Decision 0095 requires every fixed estimator to state its complete rank pair. Decision 0096
 distinguishes mathematical $Y$ from scikit-learn `y`, defines both resolved path ceilings before
-policy details, and groups inspection concepts with the generated inspection API.
+policy details, and groups inspection concepts with the generated inspection API. Decision 0097
+adds one focused small-sample leave-one-out workflow without restoring a context-free splitter
+catalogue.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -334,17 +338,15 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-The owner-authorized three-patch human-audit continuation is in progress. Patch 1/3 requires the
-fixed `PiPLSRegression` rank pair explicitly. Patch 2/3 clarifies mathematical $Y$ versus
-scikit-learn `y`, defines and orders $r_{\pi,\max}$ and $h_{\max}$ in the path reference, uses
-response-neutral residual labels, and groups the inspection concepts and API pages. Both are
-complete. No package release preparation or publication work is authorized.
+The owner-authorized three-patch human-audit continuation is complete. No package release
+preparation, publication work, or further implementation increment is authorized. The project
+owner is continuing the human audit.
 
 ## Subsequent roadmap
 
-1. **Patch 3/3:** a focused small-sample synthetic leave-one-out example linked from the reference.
-2. **Human audit:** continue reviewing the complete package and documentation before authorizing
-   another implementation increment.
+1. **Human audit:** continue reviewing the complete package and documentation.
+2. **Owner decision:** define the next focused increment only after that review identifies and
+   authorizes it.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

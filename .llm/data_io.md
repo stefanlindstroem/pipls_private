@@ -142,6 +142,8 @@ creates figures directly, and writes only final PDF outputs. Example 09 compares
 ordinary-PLS paths; Pulp additionally exposes the conditional predictor-rank profile for its chosen
 component count; Tobacco owns deterministic source-order response pagination through multipage PDFs.
 New numbered-example work should follow that pattern.
+The synthetic leave-one-out example writes no artifact: it reports one compact validation result
+directly and leaves application-specific reporting to the user.
 
 ## Publication boundary
 

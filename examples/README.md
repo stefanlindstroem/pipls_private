@@ -20,6 +20,9 @@ intentionally more extensive than ordinary estimator use.
 - `02_synthetic_path_selection.py`: the short tutorial workflow. It generates independent synthetic
   train/test data, evaluates the component path and conditional predictor-rank profile, fits one
   selected fixed model, and writes three final PDF figures.
+- `03_leave_one_out_validation.py`: a focused small-sample calibration workflow. It evaluates a
+  compact explicit path with `LeaveOneOut`, requests ordered OOF predictions, and distinguishes
+  pooled OOF $R^2$ from undefined mean foldwise $R^2$.
 
 Run it with:
 
@@ -37,9 +40,9 @@ source rather than from pandas or CSV headers.
 - `09_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
   component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model.
 
-Grouped, leave-one-out, and temporal validation require application-specific sampling semantics.
-They are documented in `docs/path_analysis.md` rather than combined into a context-free numbered
-example.
+Grouped and temporal validation require application-specific sampling semantics and remain in
+`docs/path_analysis.md`. Example 03 gives leave-one-out validation one concrete small-calibration
+use case rather than combining unrelated split protocols in one context-free script.
 
 ## Complete Pi-PLS reference workflows
 

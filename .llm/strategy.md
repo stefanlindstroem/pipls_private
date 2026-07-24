@@ -617,14 +617,16 @@ The owner identified three additional focused increments during the human audit:
 Decision 0095 completes the first increment. Decision 0096 completes the second by separating
 mathematical $Y$ from scikit-learn `y`, defining both resolved path ceilings before policy details,
 using response-neutral residual labels, and grouping inspection concepts with the generated API.
-Release preparation and publication remain outside this continuation.
+Decision 0097 completes the third with one focused small-calibration leave-one-out workflow,
+ordered OOF reporting, and an explicit pooled-versus-foldwise $R^2$ distinction. Release
+preparation and publication remain outside this continuation.
 
-Current status: **Patches 1/3 and 2/3 complete; Patch 3/3 next**.
+Current status: **all three human-audit continuation patches complete**.
 
 ## Current next increment
 
-Add one focused small-sample synthetic leave-one-out example and link it from the leave-one-out
-interpretation reference.
+No further implementation increment is authorized. Continue the owner-led human audit and record
+a new focused increment only after an explicit owner decision.
 
 ## Maintenance protocol
 

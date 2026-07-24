@@ -20,6 +20,16 @@ inspects the conditional predictor-rank profile, fits one selected fixed model, 
 $R^2$, and writes three final PDF figures. The [synthetic tutorial](tutorials/synthetic.md) extracts
 its maintained code directly.
 
+## Leave-one-out validation
+
+`examples/03_leave_one_out_validation.py` represents a small calibration study with twelve costly
+observations. It evaluates a compact explicit Pi-PLS path with `LeaveOneOut`, requests one ordered
+OOF prediction per observation, and reports the immutable validation summary. The displayed pooled
+OOF $R^2$ is calculated across all held-out predictions; it is not mean foldwise $R^2$, which is
+undefined for singleton validation folds. See the
+[leave-one-out interpretation](path_analysis.md#leave-one-out-interpretation) for the associated
+scoring and selection qualifications.
+
 ## Pi-PLS and ordinary PLS comparison
 
 `examples/09_pls_path_comparison.py` evaluates matched component-count paths for Pulp, Sugarcane,

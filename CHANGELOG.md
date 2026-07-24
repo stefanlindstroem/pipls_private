@@ -1,5 +1,8 @@
 # Changelog
 
+- Add a focused small-sample leave-one-out example with singleton-safe path scoring, ordered OOF
+  predictions, complete coverage reporting, and an explicit distinction between pooled OOF $R^2$
+  and undefined mean foldwise $R^2$.
 - Clarify mathematical $Y$ versus scikit-learn `y`, define both path-selection ceilings before
   policy details, use response-neutral residual labels, and group inspection concepts with the
   generated inspection API.

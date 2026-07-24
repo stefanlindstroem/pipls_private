@@ -102,6 +102,7 @@ This index is navigation, not a substitute for those records.
 | `0094-inspection-result-safety.md` | immutable and finite inspection results | validate direct construction and pickle reconstruction; use range-safe calculations and reject unrepresentable derived values |
 | `0095-required-fixed-rank-pair.md` | required fixed Pi-PLS rank pair | require keyword-only `n_components` and `predictor_rank`; path templates use a replaceable valid seed pair |
 | `0096-notation-path-ceilings-and-inspection-navigation.md` | notation, path ceilings, and inspection navigation | distinguish mathematical $Y$ from scikit-learn `y`, define both path ceilings first, and group inspection concepts with its API |
+| `0097-focused-leave-one-out-example.md` | focused leave-one-out example | show one small calibration workflow with singleton-safe scoring, ordered OOF predictions, and pooled OOF $R^2$ |
 
 ## Implemented estimator/search transition
 

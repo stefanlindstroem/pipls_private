@@ -100,7 +100,9 @@ protect the absence of sign-canonicalization bookkeeping and structurally imposs
 blocks without pinning private local calculations. Structural
 tests may also require generated Pulp image references to remain tutorial-owned and keep
 example-specific report implementation out of the general inspection reference. Small synthetic
-matrices protect generic OOF and report contracts. One module-scoped Pulp numerical run may verify
+matrices protect generic OOF and report contracts. The focused leave-one-out example may be executed
+directly because it is small and artifact-free; tests should check labeled output and semantic
+coverage without freezing exact selected scores. One module-scoped Pulp numerical run may verify
 the selected fixed pair, upper-boundary rank profile, aligned OOF predictions, and inspection shapes
 without writing application artifacts.
 

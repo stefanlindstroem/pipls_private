@@ -123,7 +123,7 @@ assert pipls.PiPLSRegression is not None
     )
 
 
-def test_numbered_examples_own_matplotlib_rendering() -> None:
+def test_numbered_examples_keep_rendering_caller_owned() -> None:
     examples = _numbered_examples()
     assert examples
 
@@ -135,6 +135,11 @@ def test_numbered_examples_own_matplotlib_rendering() -> None:
             for node in ast.walk(tree)
             if isinstance(node, ast.Call) and (name := _call_name(node)) is not None
         }
+
+        if path.name == "03_leave_one_out_validation.py":
+            assert imports.isdisjoint(_RENDERING_PACKAGES)
+            assert calls.isdisjoint(_RENDERING_METHODS)
+            continue
 
         assert "matplotlib" in imports, path
         assert "subplots" in calls, path
