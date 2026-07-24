@@ -66,8 +66,9 @@ documented below.
 
 ## Pi-PLS decomposition
 
-`PiPLSRegression.decomposition_` is normally obtained from a fitted estimator. Its public fields
-use descriptive Python names:
+`PiPLSRegression.decomposition_` is normally obtained from a fitted estimator. Directly
+constructed instances apply the same shape, finite-value, scalar, and read-only-array validation.
+Its public fields use descriptive Python names:
 
 | Field | Method notation | Meaning |
 |---|---|---|

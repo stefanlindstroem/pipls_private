@@ -34,6 +34,10 @@ candidate.
 
 ## Concise component path
 
+`component_path_` contains one conditionally selected predictor-rank result for each evaluated
+component count. Its aligned read-only arrays support complete path plots and comparisons without
+requiring manual masking of `cv_results_`.
+
 ::: pipls.PiPLSComponentPath
     options:
       show_signature: false
@@ -42,11 +46,19 @@ candidate.
 
 ## One component result
 
+`component_path_.for_n_components(h)` returns the frozen scalar row for one evaluated component
+count, including its conditionally selected predictor rank, score, CV-MSE summary, policy, and
+split count.
+
 ::: pipls.PiPLSComponentResult
     options:
       show_signature: false
 
 ## Predictor-rank profile
+
+`predictor_rank_profile(h)` contains every predictor rank actually evaluated for one component
+count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks;
+its `selected` field is the same scalar result returned by `component_path_`.
 
 ::: pipls.PiPLSPredictorRankProfile
     options:

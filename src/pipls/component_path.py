@@ -6,7 +6,17 @@ from dataclasses import dataclass
 from typing import Literal, cast
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import NDArray
+
+from ._result_validation import (
+    _finite_float,
+    _literal_string,
+    _nonnegative_finite_float,
+    _positive_int,
+    _read_only_float_array,
+    _read_only_int_array,
+    _read_only_string_array,
+)
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -45,6 +55,51 @@ class PiPLSComponentResult:
     cv_mse_fold_sd: float
     n_splits: int
 
+    def __post_init__(self) -> None:
+        n_components = _positive_int(self.n_components, name="n_components")
+        predictor_rank = _positive_int(self.predictor_rank, name="predictor_rank")
+        if n_components > predictor_rank:
+            raise ValueError("n_components must not exceed predictor_rank.")
+        predictor_rank_policy = cast(
+            PredictorRankPolicy,
+            _literal_string(
+                self.predictor_rank_policy,
+                name="predictor_rank_policy",
+                allowed=_ALLOWED_PREDICTOR_RANK_POLICIES,
+            ),
+        )
+        mean_test_score = _finite_float(self.mean_test_score, name="mean_test_score")
+        cv_mse_mean = _nonnegative_finite_float(self.cv_mse_mean, name="cv_mse_mean")
+        cv_mse_fold_sd = _nonnegative_finite_float(
+            self.cv_mse_fold_sd,
+            name="cv_mse_fold_sd",
+        )
+        n_splits = _positive_int(self.n_splits, name="n_splits")
+
+        object.__setattr__(self, "n_components", n_components)
+        object.__setattr__(self, "predictor_rank", predictor_rank)
+        object.__setattr__(self, "predictor_rank_policy", predictor_rank_policy)
+        object.__setattr__(self, "mean_test_score", mean_test_score)
+        object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
+        object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
+        object.__setattr__(self, "n_splits", n_splits)
+
+    def __reduce__(self) -> tuple[type[PiPLSComponentResult], tuple[object, ...]]:
+        """Reconstruct through validation during unpickling."""
+
+        return (
+            type(self),
+            (
+                self.n_components,
+                self.predictor_rank,
+                self.predictor_rank_policy,
+                self.mean_test_score,
+                self.cv_mse_mean,
+                self.cv_mse_fold_sd,
+                self.n_splits,
+            ),
+        )
+
 
 @dataclass(frozen=True)
 class PiPLSPredictorRankProfile:
@@ -82,7 +137,7 @@ class PiPLSPredictorRankProfile:
     selected: PiPLSComponentResult
 
     def __post_init__(self) -> None:
-        n_components = _positive_python_int(self.n_components, name="n_components")
+        n_components = _positive_int(self.n_components, name="n_components")
         predictor_rank = _read_only_int_array(
             self.predictor_rank,
             name="predictor_rank",
@@ -96,7 +151,7 @@ class PiPLSPredictorRankProfile:
             self.cv_mse_fold_sd,
             name="cv_mse_fold_sd",
         )
-        n_splits = _positive_python_int(self.n_splits, name="n_splits")
+        n_splits = _positive_int(self.n_splits, name="n_splits")
 
         arrays = (mean_test_score, cv_mse_mean, cv_mse_fold_sd)
         if predictor_rank.size == 0:
@@ -109,8 +164,8 @@ class PiPLSPredictorRankProfile:
             )
         if np.any(np.diff(predictor_rank) <= 0):
             raise ValueError("predictor_rank must be unique and strictly ascending.")
-        if any(not np.all(np.isfinite(array)) for array in arrays):
-            raise ValueError("Predictor-rank-profile score arrays must contain finite values.")
+        if np.any(cv_mse_mean < 0.0):
+            raise ValueError("cv_mse_mean must contain nonnegative values.")
         if np.any(cv_mse_fold_sd < 0.0):
             raise ValueError("cv_mse_fold_sd must contain nonnegative values.")
         if not isinstance(self.selected, PiPLSComponentResult):
@@ -199,7 +254,12 @@ class PiPLSComponentPath:
             self.predictor_rank,
             name="predictor_rank",
         )
-        predictor_rank_policy = _read_only_policy_array(self.predictor_rank_policy)
+        predictor_rank_policy = _read_only_string_array(
+            self.predictor_rank_policy,
+            name="predictor_rank_policy",
+            ndim=1,
+            allowed=_ALLOWED_PREDICTOR_RANK_POLICIES,
+        )
         mean_test_score = _read_only_float_array(
             self.mean_test_score,
             name="mean_test_score",
@@ -233,6 +293,8 @@ class PiPLSComponentPath:
             )
         if np.any(n_splits <= 0):
             raise ValueError("n_splits must contain positive integers.")
+        if np.any(cv_mse_mean < 0.0):
+            raise ValueError("cv_mse_mean must contain nonnegative values.")
         if np.any(cv_mse_fold_sd < 0.0):
             raise ValueError("cv_mse_fold_sd must contain nonnegative values.")
 
@@ -306,45 +368,3 @@ class PiPLSComponentPath:
             cv_mse_fold_sd=float(self.cv_mse_fold_sd[index]),
             n_splits=int(self.n_splits[index]),
         )
-
-
-def _read_only_int_array(value: ArrayLike, *, name: str) -> IntArray:
-    array = np.array(value, dtype=np.intp, copy=True)
-    if array.ndim != 1:
-        raise ValueError(f"{name} must be one-dimensional; got shape {array.shape}.")
-    array.setflags(write=False)
-    return array
-
-
-def _read_only_float_array(value: ArrayLike, *, name: str) -> FloatArray:
-    array = np.array(value, dtype=np.float64, copy=True)
-    if array.ndim != 1:
-        raise ValueError(f"{name} must be one-dimensional; got shape {array.shape}.")
-    array.setflags(write=False)
-    return array
-
-
-def _read_only_policy_array(value: ArrayLike) -> StringArray:
-    array = np.array(value, dtype=np.str_, copy=True)
-    if array.ndim != 1:
-        raise ValueError(
-            "predictor_rank_policy must be one-dimensional; "
-            f"got shape {array.shape}."
-        )
-    invalid = sorted(set(array.tolist()) - _ALLOWED_PREDICTOR_RANK_POLICIES)
-    if invalid:
-        raise ValueError(
-            "predictor_rank_policy contains unsupported values: "
-            f"{invalid}."
-        )
-    array.setflags(write=False)
-    return array
-
-
-def _positive_python_int(value: object, *, name: str) -> int:
-    if isinstance(value, bool) or not isinstance(value, (int, np.integer)):
-        raise ValueError(f"{name} must be a positive integer.")
-    converted = int(value)
-    if converted <= 0:
-        raise ValueError(f"{name} must be a positive integer.")
-    return converted

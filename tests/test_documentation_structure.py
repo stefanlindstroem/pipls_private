@@ -169,3 +169,11 @@ def test_reference_navigation_is_consolidated_around_owning_pages() -> None:
     assert "::: pipls.PiPLSValidationReport" in path
     assert "::: pipls.metrics.response_standardized_mean_squared_error" in path
     assert "::: pipls.metrics.neg_response_standardized_mean_squared_error" in path
+
+    for heading, directive in (
+        ("## Concise component path", "::: pipls.PiPLSComponentPath"),
+        ("## One component result", "::: pipls.PiPLSComponentResult"),
+        ("## Predictor-rank profile", "::: pipls.PiPLSPredictorRankProfile"),
+    ):
+        section = path.split(heading, maxsplit=1)[1].split(directive, maxsplit=1)[0]
+        assert section.strip(), f"{heading} requires explanatory text before its API directive"

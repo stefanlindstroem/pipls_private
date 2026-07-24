@@ -593,16 +593,18 @@ Decision 0091 completes the first increment by replacing worktree copying with a
 archive and tests for modified, staged, nonignored untracked, and ignored files. Decision 0092
 completes the second increment by capping the path with the minimum rank verified after fold-local
 preprocessing. The third increment uses one reference-anchored tolerant comparison for selection
-and score ranking, so rank groups cannot expand through adjacent near-ties. Release preparation and
+and score ranking, so rank groups cannot expand through adjacent near-ties. Decision 0093 completes
+the fourth increment by applying one direct-construction, defensive-copy, scalar, OOF-coverage, and
+pickle-validation policy to the core estimator and path result records. Release preparation and
 publication are explicitly outside this series and remain deferred until the owner completes a
 human audit.
 
-Current status: **increment 3/6 complete; core public-result invariants next**.
+Current status: **increment 4/6 complete; inspection-result hardening next**.
 
 ## Current next increment
 
-Pre-release audit hardening 4/6: make core estimator and path result records uniformly defensive
-and validated.
+Pre-release audit hardening 5/6: make inspection result records uniformly defensive and prevent
+inspection helpers from returning nonfinite derived quantities.
 
 ## Maintenance protocol
 

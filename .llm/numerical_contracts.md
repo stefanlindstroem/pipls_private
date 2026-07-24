@@ -25,6 +25,14 @@
   must either return finite float64 values or raise a clear exception.
 - Invalid requested dimensions raise errors; they are not silently clamped.
 - Numerical changes must include a boundary-case test and state the tolerance used.
+- Core public result records defensively copy arrays, make them read-only, normalize accepted
+  NumPy scalars, and validate direct construction and pickle reconstruction. Component/rank/split
+  counts are positive, `n_components <= predictor_rank`, score-like scalars and arrays are finite,
+  response-standardized MSE and fold-SD values are nonnegative, and decomposition factors are
+  finite and component-aligned.
+- Validation-report OOF rows use one explicit coverage representation: positive counts require
+  finite predictions, while zero counts require NaN predictions across the complete response row.
+  Counts are nonnegative integer arrays and align one-to-one with prediction rows.
 
 - Automatic-selection response scales are estimated from the matching training fold with `ddof=1`; zero scales and singleton-training-fold scales are replaced by 1.0.
 - Response-standardized MSE uniformly averages squared residuals over validation samples and response columns after division by the matching fold-local response scales.

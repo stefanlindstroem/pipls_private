@@ -1,5 +1,9 @@
 # Changelog
 
+- Make the core public result records uniformly defensive and validated: normalize scalar values,
+  copy arrays as read-only, reject invalid dimensions and diagnostics, enforce explicit OOF coverage
+  semantics, and preserve the same invariants through pickle reconstruction.
+
 - Add a concise coverage list to Tutorial 2 so readers can see the complete Pulp workflow before
   entering the setup and analysis sections.
 

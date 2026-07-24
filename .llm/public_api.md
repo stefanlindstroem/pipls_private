@@ -4,8 +4,11 @@
 
 ```python
 from pipls import (
+    PiPLSComponentPath,
+    PiPLSComponentResult,
     PiPLSDecomposition,
     PiPLSPathCV,
+    PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSValidationReport,
     StatisticalSupportWarning,
@@ -135,6 +138,13 @@ the same scalar result returned by `component_path_.for_n_components(h)`. The pr
 another fitted attribute or stored search representation. Selection maximizes the configured mean
 test score; only the default scorer makes this equivalent to minimizing mean response-standardized
 CV-MSE.
+All five top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
+`PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSValidationReport`) validate direct
+construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and
+reconstruct through the same validation path when unpickled. Invalid dimensions, nonfinite scores,
+negative MSE summaries, unsupported policy values, and inconsistent OOF coverage are rejected.
+Generated documentation keeps these records returned-first by suppressing constructor signatures.
+
 Refit-dependent delegated methods are absent when `refit=False`. Output-container configuration is
 owned by the estimator template and preserved through cloning and refit; the path object does not
 add a separate `set_output` layer.

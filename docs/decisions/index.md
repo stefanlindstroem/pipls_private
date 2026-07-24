@@ -31,6 +31,7 @@ reference describe the current public behavior directly.
 - [0087: public fitted-surface cleanup](0087-public-fitted-surface-cleanup.md)
 - [0088: public result-record cleanup](0088-public-result-record-cleanup.md)
 - [0092: fold numerical-rank feasibility](0092-fold-numerical-rank-feasibility.md)
+- [0093: public result invariants](0093-public-result-invariants.md)
 
 ## Validation, data, and benchmarks
 

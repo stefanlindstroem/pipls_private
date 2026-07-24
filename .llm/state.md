@@ -110,6 +110,8 @@ construction. Decision 0092 makes the path ceiling respect the minimum predictor
 after fold-local preprocessing, so rank-deficient folds bound the candidate path instead of
 aborting it. The third pre-release hardening increment aligns `rank_test_score` with selection by
 using one reference-anchored tolerant comparison and forbidding adjacent near-tie chaining.
+Decision 0093 makes the core public result records validate direct construction, defensive copies,
+scalar values, aligned arrays, OOF coverage, and pickle reconstruction uniformly.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -326,15 +328,13 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Pre-release audit hardening 4/6: make core estimator and path result records uniformly defensive
-and validated.
+Pre-release audit hardening 5/6: make inspection result records uniformly defensive and prevent
+inspection helpers from returning nonfinite derived quantities.
 
 ## Subsequent roadmap
 
-1. **Inspection numerical safety:** make inspection records and extreme finite calculations obey
-   the same finite-result policy.
-2. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
-3. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
+1. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
+2. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
    publication are outside the current sequence.
 
 Future datasets still require a distinct package-level use case and verified source-level

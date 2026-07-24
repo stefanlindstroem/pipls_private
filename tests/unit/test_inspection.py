@@ -116,11 +116,9 @@ def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
         factors.dilation = np.ones(2)  # type: ignore[misc]
 
 
-def test_pipls_display_factors_reject_negative_dilation() -> None:
-    decomposition = _decomposition(np.eye(2), np.eye(2), np.array([2.0, -1.0]))
-
+def test_public_decomposition_rejects_negative_dilation() -> None:
     with pytest.raises(ValueError, match="nonnegative"):
-        pipls_display_factors(decomposition)
+        _decomposition(np.eye(2), np.eye(2), np.array([2.0, -1.0]))
 
 
 def test_pipls_display_factors_require_public_decomposition() -> None:
