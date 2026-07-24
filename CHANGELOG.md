@@ -83,6 +83,7 @@
   rendering, and enforce the absence of package plotters and hidden chart helpers.
 ## Unreleased
 
+- Renumber the maintained examples continuously from 01 through 07 and label the first example's terminal output.
 - Render Pi-PLS $P$, $D$, $Q$, and $QD$ factors directly from immutable arrays, remove the complete `pipls.plotting` module and its generated API page, and retire the `plot` optional dependency extra.
 - Render standard PLS-family scores, loadings, coefficients, and observation diagnostics directly from immutable arrays, and remove their five public convenience plotters.
 - Render prediction diagnostics directly from immutable arrays in maintained examples and tutorials, and remove the three public prediction-diagnostic convenience plotters.

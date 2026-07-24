@@ -32,7 +32,7 @@ scoring and selection qualifications.
 
 ## Pi-PLS and ordinary PLS comparison
 
-`examples/09_pls_path_comparison.py` evaluates matched component-count paths for Pulp, Sugarcane,
+`examples/04_pls_path_comparison.py` evaluates matched component-count paths for Pulp, Sugarcane,
 and Tobacco. It keeps both immutable paths in memory and writes one overlaid CV-MSE figure per dataset.
 This comparison is optional and is not part of routine Pi-PLS fitting.
 
@@ -42,14 +42,14 @@ The [dataset documentation](datasets.md) gives the original source, DOI, license
 adaptation for each real-data integration. The three complete analyses evaluate one Pi-PLS
 component path and fit one selected fixed model:
 
-- `examples/10_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
+- `examples/05_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
   responses, including the component path, an immutable conditional predictor-rank profile from
   `predictor_rank_profile()`, score-loading
   biplot, fixed-model inspection, and OOF diagnostics;
-- `examples/11_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
+- `examples/06_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
   component path, scikit-learn OOF prediction, wavelength-aware inspection, and five final PDF
   figures;
-- `examples/12_tobacco_real_data.py`: decreasing-wavenumber plots, response pagination, and raw
+- `examples/07_tobacco_real_data.py`: decreasing-wavenumber plots, response pagination, and raw
   observation diagnostics.
 
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
@@ -60,9 +60,9 @@ immutable inspection results. The example layer owns Matplotlib chart constructi
 coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Pi-PLS factor
 panels use the same direct array-to-Matplotlib boundary.
 
-The Pulp tutorial extracts its checked snippets directly from `examples/10_pulp_real_data.py`.
+The Pulp tutorial extracts its checked snippets directly from `examples/05_pulp_real_data.py`.
 The sole module under `examples/_support/` evaluates the nontrivial fold-local ordinary-PLS path for
-example 09. It is not required for ordinary estimator use.
+example 04. It is not required for ordinary estimator use.
 
 ## Run the examples
 

@@ -124,7 +124,7 @@ review because they combined unrelated questions and produced an unnecessarily w
 focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
 paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
 output. Pulp, Sugarcane, and Tobacco are transparent user-run examples rather than benchmark or
-default-test jobs. Example 09 keeps the Pi-PLS and standard PLS (NIPALS) comparison paths in memory
+default-test jobs. Example 04 keeps the Pi-PLS and standard PLS (NIPALS) comparison paths in memory
 and writes only the overlaid final PDFs. Sugarcane keeps its Pi-PLS path, fixed-model OOF predictions,
 and inspection results in memory and writes only final PDF figures. Pulp follows the same direct
 boundary and adds a conditional predictor-rank-profile figure. Tobacco is also direct while

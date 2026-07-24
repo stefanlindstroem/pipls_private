@@ -34,7 +34,9 @@ Y = np.array(
 )
 
 model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
-print(model.predict(X))
+predictions = model.predict(X)
+print("Predictions:")
+print(predictions)
 
 factors = pipls_display_factors(model.decomposition_)
 predictor_names = ["Temperature", "Pressure", "Flow rate"]
@@ -75,5 +77,7 @@ axes[1, 1].set_ylabel(r"Weighted direction $d_1q_{:1}$")
 axes[1, 1].set_title(r"Weighted response direction $QD$")
 
 figure.suptitle("Minimal Pi-PLS fit")
-figure.savefig(Path(__file__).resolve().parent / "results" / "minimal_fit_and_plot.pdf")
+output_path = Path(__file__).resolve().parent / "results" / "minimal_fit_and_plot.pdf"
+figure.savefig(output_path)
 plt.close(figure)
+print(f"Wrote PDF figure to {output_path}")

@@ -128,7 +128,7 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert "adjustText>=1.4,<2" in docs_dependencies
     assert "render_pulp_tutorial.py" in sdist_checker
     assert 'source / "docs" / "tutorials" / "pulp.md"' in sdist_checker
-    assert 'source / "examples" / "10_pulp_real_data.py"' in sdist_checker
+    assert 'source / "examples" / "05_pulp_real_data.py"' in sdist_checker
     assert 'source / "site" / "tutorials" / "pulp" / "index.html"' in sdist_checker
     assert "PULP_TUTORIAL_FIGURES" in sdist_checker
 
@@ -138,7 +138,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     tutorial = (repository / "docs" / "tutorials" / "pulp.md").read_text(
         encoding="utf-8"
     )
-    example = (repository / "examples" / "10_pulp_real_data.py").read_text(
+    example = (repository / "examples" / "05_pulp_real_data.py").read_text(
         encoding="utf-8"
     )
     renderer = (repository / "tools" / "render_pulp_tutorial.py").read_text(
@@ -191,7 +191,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
         "plot-pulp-rank-profile",
     }
     for section in example_sections:
-        assert f"examples/10_pulp_real_data.py:{section}" in tutorial
+        assert f"examples/05_pulp_real_data.py:{section}" in tutorial
         assert f"# --8<-- [start:{section}]" in example
         assert f"# --8<-- [end:{section}]" in example
 
@@ -221,7 +221,7 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     assert tutorial.index("select-pulp-parameters") < tutorial.index(
         "plot-pulp-component-path"
     ) < tutorial.index("fit-pulp-model")
-    assert '--8<-- "examples/10_pulp_real_data.py"' not in tutorial
+    assert '--8<-- "examples/05_pulp_real_data.py"' not in tutorial
     assert "six SVG figures" not in tutorial
 
     selected_line = "selected = path.for_n_components(CHOSEN_N_COMPONENTS)"
@@ -427,5 +427,5 @@ def test_documentation_layers_have_distinct_ownership() -> None:
 
     assert "tutorials/synthetic.md" in regression_reference
     assert "tutorials/synthetic.md" in path_reference
-    assert "Example 09" not in path_reference
-    assert "Examples 10" not in path_reference
+    assert "Example 04" not in path_reference
+    assert "Examples 05" not in path_reference

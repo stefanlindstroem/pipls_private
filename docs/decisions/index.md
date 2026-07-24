@@ -78,6 +78,7 @@ reference describe the current public behavior directly.
 - [0070: direct Pi-PLS and ordinary-PLS path comparison](0070-direct-pls-path-comparison.md)
 - [0071: final result and example cleanup](0071-final-result-and-example-cleanup.md)
 - [0097: focused leave-one-out example](0097-focused-leave-one-out-example.md)
+- [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 
 ## Repository and documentation policy
 

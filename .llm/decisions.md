@@ -106,6 +106,7 @@ This index is navigation, not a substitute for those records.
 | `0098-grouped-make-help.md` | grouped maintainer command index | highlight setup and routine validation, then group unchanged Make targets by task |
 | `0099-example-artifact-and-sdist-boundary.md` | example artifact and source-distribution boundary | commit and snapshot only result-directory placeholders; include them in sdists and run example 01 from an extracted sdist |
 | `0100-rendered-documentation-deployment.md` | rendered documentation deployment | validate strict docs on pushes and pull requests; deploy the canonical repository-derived GitHub Pages site from `master` |
+| `0101-continuous-numbered-examples.md` | continuous numbered examples | renumber maintained examples 01--07, migrate active consumers, and label example 01 terminal output |
 
 ## Implemented estimator/search transition
 

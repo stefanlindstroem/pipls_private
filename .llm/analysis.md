@@ -22,7 +22,7 @@ Keep these stages separate in code, documentation, filenames, and figure labels.
 ### Model-selection diagnostics
 
 The component-path workflows answer how cross-validated loss changes with component count and, for
-Pi-PLS, the conditional predictor rank. Example 09 owns the overlaid Pi-PLS and ordinary-PLS
+Pi-PLS, the conditional predictor rank. Example 04 owns the overlaid Pi-PLS and ordinary-PLS
 comparison PDFs and plots both immutable paths directly in memory. Pulp, Sugarcane, and Tobacco plot
 `component_path_` directly in the numbered examples and write final component-path PDFs without CSV
 conversion. Pulp also plots an immutable predictor-rank profile derived on demand at its chosen
@@ -139,7 +139,7 @@ estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md`
 with stable interpretation anchors and without repeating elementary Matplotlib recipes. Example pages may describe script purpose and artifacts
 but must not reproduce the tutorial analysis or embed its generated figures.
 
-Pulp is the canonical tutorial analysis. `examples/10_pulp_real_data.py` owns its direct pandas
+Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its direct pandas
 loading, `PiPLSPathCV(refit=False)` evaluation, visible three-component choice, conditional
 predictor-rank profile, fixed `PiPLSRegression` fit, five-fold scikit-learn OOF predictions,
 inspection computations, and final PDF composition. The selected component row is retrieved before
@@ -147,7 +147,7 @@ the selection figures, while the fixed estimator is fitted only after those figu
 constructed. It intentionally adds no external scaler because `PiPLSRegression` learns predictor
 and response standardization inside each fit.
 
-The tutorial extracts checked snippets directly from example 10. `tools/render_pulp_tutorial.py`
+The tutorial extracts checked snippets directly from example 05. `tools/render_pulp_tutorial.py`
 repeats the small in-memory numerical sequence rather than importing or executing the
 artifact-writing example. It owns tutorial-specific figure dimensions, titles, legends, selected display components and responses, direct Matplotlib
 construction, SVG writing, closing, and the generated manifest. Generated tutorial files remain
@@ -279,7 +279,7 @@ methods. The implementation validates this structural contract rather than using
 `isinstance(..., PLSRegression)` restriction. Coefficients retain the public orientation
 `(n_targets, n_features)`.
 
-Example 09 uses ordinary PLS only for the comparative component-path CV-MSE curves. Examples
+Example 04 uses ordinary PLS only for the comparative component-path CV-MSE curves. Examples
 10–12 evaluate Pi-PLS paths only. After a Pi-PLS configuration is selected, one fitted
 `PiPLSRegression` supplies the shared
 scores, loadings, coefficients, biplot coordinates, observation diagnostics, and OOF prediction

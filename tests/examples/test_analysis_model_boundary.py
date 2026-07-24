@@ -42,13 +42,13 @@ def test_numbered_examples_do_not_import_or_fit_ordinary_pls() -> None:
 
 def test_dedicated_example_owns_the_pls_comparison_path() -> None:
     examples_dir = _repository_root() / "examples"
-    comparison = (examples_dir / "09_pls_path_comparison.py").read_text(encoding="utf-8")
+    comparison = (examples_dir / "04_pls_path_comparison.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" in comparison
     assert "axis.errorbar(" in comparison
     assert "plot_component_path" not in comparison
     assert ".to_csv(" not in comparison
 
-    pulp_text = (examples_dir / "10_pulp_real_data.py").read_text(encoding="utf-8")
+    pulp_text = (examples_dir / "05_pulp_real_data.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" not in pulp_text
     assert "plot_pipls_component_path(" not in pulp_text
     assert "axis.errorbar(" in pulp_text
@@ -56,14 +56,14 @@ def test_dedicated_example_owns_the_pls_comparison_path() -> None:
     assert "PiPLSRegression(" in pulp_text
     assert "run_pulp_workflow(" not in pulp_text
 
-    sugarcane = (examples_dir / "11_sugarcane_real_data.py").read_text(encoding="utf-8")
+    sugarcane = (examples_dir / "06_sugarcane_real_data.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" not in sugarcane
     assert "plot_pipls_component_path(" not in sugarcane
     assert "axis.errorbar(" in sugarcane
     assert "latent_structure(model)" in sugarcane
     assert "PiPLSRegression(" in sugarcane
 
-    tobacco = (examples_dir / "12_tobacco_real_data.py").read_text(encoding="utf-8")
+    tobacco = (examples_dir / "07_tobacco_real_data.py").read_text(encoding="utf-8")
     assert "evaluate_pls_component_path(" not in tobacco
     assert "plot_pipls_component_path(" not in tobacco
     assert "axis.errorbar(" in tobacco
@@ -107,9 +107,9 @@ def test_plotting_module_is_removed_and_examples_use_factor_arrays_directly() ->
 
     for filename in (
         "01_minimal_fit_and_plot.py",
-        "10_pulp_real_data.py",
-        "11_sugarcane_real_data.py",
-        "12_tobacco_real_data.py",
+        "05_pulp_real_data.py",
+        "06_sugarcane_real_data.py",
+        "07_tobacco_real_data.py",
     ):
         source = (root / "examples" / filename).read_text(encoding="utf-8")
         assert "pipls.plotting" not in source
@@ -127,7 +127,7 @@ def test_shared_inspection_uses_no_concrete_plsregression_restriction() -> None:
 
 
 def test_sugarcane_example_owns_direct_figure_composition() -> None:
-    path = _repository_root() / "examples" / "11_sugarcane_real_data.py"
+    path = _repository_root() / "examples" / "06_sugarcane_real_data.py"
     source = path.read_text(encoding="utf-8")
 
     for removed in (
@@ -161,7 +161,7 @@ def test_sugarcane_example_owns_direct_figure_composition() -> None:
 
 
 def test_tobacco_example_owns_direct_figure_composition() -> None:
-    path = _repository_root() / "examples" / "12_tobacco_real_data.py"
+    path = _repository_root() / "examples" / "07_tobacco_real_data.py"
     source = path.read_text(encoding="utf-8")
 
     for removed in (

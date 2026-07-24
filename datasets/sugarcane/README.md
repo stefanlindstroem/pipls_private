@@ -25,6 +25,6 @@ from 780 through 2500 nm. The resulting matrices contain 57 aligned rows, 1,721 
 responses.
 
 No response values are imputed. No smoothing, derivative, scatter correction, centering, scaling,
-or other spectral preprocessing is applied. `examples/11_sugarcane_real_data.py` reads `X.csv` and
+or other spectral preprocessing is applied. `examples/06_sugarcane_real_data.py` reads `X.csv` and
 `Y.csv` directly and runs ordinary Pi-PLS path selection; it does not parse the metadata or call a
 package data loader.

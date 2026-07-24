@@ -148,7 +148,7 @@ def main() -> None:
             source / "tools" / "render_synthetic_tutorial.py",
             source / "tools" / "render_pulp_tutorial.py",
             source / "examples" / "02_synthetic_path_selection.py",
-            source / "examples" / "10_pulp_real_data.py",
+            source / "examples" / "05_pulp_real_data.py",
             source / "datasets" / "pulp" / "X.csv",
             source / "datasets" / "pulp" / "Y.csv",
             source / "src" / "pipls" / "__init__.py",

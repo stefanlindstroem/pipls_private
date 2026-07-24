@@ -210,7 +210,7 @@ analysis. Final public names for $P$, $D$, and $Q$ inspection retain an explicit
 Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics use
 estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiPLSRegression`
 objects. Numbered examples apply these shared tools only to the selected Pi-PLS model. Ordinary PLS
-remains available in the dedicated component-path comparison example and declared comparator benchmarks. Examples 10–12 evaluate only Pi-PLS paths.
+remains available in the dedicated component-path comparison example and declared comparator benchmarks. Examples 05–07 evaluate only Pi-PLS paths.
 
 Decision 0042 introduced a staged inspection and plotting design. Decisions 0079--0082 establish
 the final boundary: `pipls.inspection` owns pure NumPy computations and immutable result objects,
@@ -281,7 +281,7 @@ or top-level export is added by the rendering layer.
 
 ## Example workflow boundary
 
-Example 09 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
+Example 04 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
 component paths directly in memory. Pulp, Sugarcane, and Tobacco use `PiPLSPathCV(refit=False)`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn

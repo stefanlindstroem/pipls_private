@@ -321,16 +321,27 @@ def test_make_examples_runs_every_numbered_example() -> None:
     )
 
     expected = [
-        "examples/01_minimal_fit_and_plot.py",
-        "examples/02_synthetic_path_selection.py",
-        "examples/03_leave_one_out_validation.py",
-        "examples/09_pls_path_comparison.py",
-        "examples/10_pulp_real_data.py",
-        "examples/11_sugarcane_real_data.py",
-        "examples/12_tobacco_real_data.py",
+        f"examples/{number:02d}_{name}.py"
+        for number, name in enumerate(
+            (
+                "minimal_fit_and_plot",
+                "synthetic_path_selection",
+                "leave_one_out_validation",
+                "pls_path_comparison",
+                "pulp_real_data",
+                "sugarcane_real_data",
+                "tobacco_real_data",
+            ),
+            start=1,
+        )
+    ]
+    actual = [
+        path.relative_to(root).as_posix()
+        for path in sorted((root / "examples").glob("[0-9][0-9]_*.py"))
     ]
     positions = [completed.stdout.index(filename) for filename in expected]
 
+    assert actual == expected
     assert positions == sorted(positions)
     assert completed.stdout.count("MPLBACKEND=Agg") == 1
 

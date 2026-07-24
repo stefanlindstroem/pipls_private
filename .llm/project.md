@@ -37,7 +37,7 @@ The benchmark layer implements all four focused synthetic questions as separate 
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
 `make examples` runs every numbered example explicitly, beginning with the literal-matrix
 `01_minimal_fit_and_plot.py`, followed by the synthetic path-selection tutorial example 02, and
-including the complete real-data analyses. Example 09
+including the complete real-data analyses. Example 04
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
 Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, keep OOF and
 inspection results in memory, and write only final PDF figures. Pulp also exposes the conditional
@@ -149,7 +149,7 @@ implementing or reviewing this surface.
   complete Pi-PLS real-data analyses. Advanced splitters are documented rather than combined into a
   context-free numbered script.
   Underscore-prefixed `examples/_support/` contains only the ordinary-PLS path evaluator needed by
-  the comparison rather than primary entry points. Example 09 owns the immutable Pi-PLS and standard
+  the comparison rather than primary entry points. Example 04 owns the immutable Pi-PLS and standard
   PLS (NIPALS) paths and direct comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS
   paths, scikit-learn OOF
   predictions, immutable inspection results, and explicit final figures; Pulp additionally owns its

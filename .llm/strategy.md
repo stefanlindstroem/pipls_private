@@ -389,7 +389,7 @@ consistency are implemented as independent scripts with minimal question-specifi
 ### Phase E4c: representative real-data examples — complete
 
 Pulp, Sugarcane, and Tobacco provide transparent component-path analyses with direct `X.csv` and
-`Y.csv` reading. Example 09 owns the Pi-PLS and standard PLS comparison figures; examples 10–12
+`Y.csv` reading. Example 04 owns the Pi-PLS and standard PLS comparison figures; examples 05–07
 perform separate Pi-PLS-only fixed fits after explicit component choices. Phase F4 subsequently makes
 all four real-data workflows direct in-memory analyses.
 
@@ -645,15 +645,17 @@ A whole-package audit from a new user's perspective identified six focused incre
 Decision 0099 completes the first increment by committing and snapshotting only example-result
 placeholders, distributing those placeholders, and running example 01 from an extracted source
 distribution. Decision 0100 completes the second increment with strict documentation validation on
-pushes and pull requests and repository-derived GitHub Pages deployment from `master`. Package
-release preparation and Python-package publication remain outside this series.
+pushes and pull requests and repository-derived GitHub Pages deployment from `master`. Decision
+0101 completes the third increment by renumbering all maintained examples continuously from 01 to
+07, migrating every active consumer, and labeling example 01 terminal output. Package release
+preparation and Python-package publication remain outside this series.
 
-Current status: **patches 1/6 and 2/6 complete**.
+Current status: **patches 1/6 through 3/6 complete**.
 
 ## Current next increment
 
-Renumber the maintained examples continuously and improve example 01 terminal output without
-changing model calculations, datasets, result directories, or PDF filenames.
+Implement the owner-approved `PiPLSPathCV` default-refit and stable default-scorer presentation
+without changing the scoring formula or candidate-selection rule.
 
 ## Maintenance protocol
 

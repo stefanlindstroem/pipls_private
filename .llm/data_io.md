@@ -138,7 +138,7 @@ Do not introduce merely for repository examples:
 
 Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize intermediate
 analysis results. Every numbered real-data workflow keeps its path and inspection results in memory,
-creates figures directly, and writes only final PDF outputs. Example 09 compares immutable Pi-PLS and
+creates figures directly, and writes only final PDF outputs. Example 04 compares immutable Pi-PLS and
 ordinary-PLS paths; Pulp additionally exposes the conditional predictor-rank profile for its chosen
 component count; Tobacco owns deterministic source-order response pagination through multipage PDFs.
 New numbered-example work should follow that pattern. Git and source distributions preserve the

@@ -66,7 +66,7 @@ make docs-serve
 
 The synthetic tutorial figures are generated from the same deterministic calculation shown in
 example 02. Its manifest records the generator configuration, selected rank pair, external-test
-provenance, filenames, and SVG hashes. The Pulp figures are generated from example 10's direct
+provenance, filenames, and SVG hashes. The Pulp figures are generated from example 05's direct
 calculation; their manifest additionally records dataset hashes, evaluated ranks, boundary status,
 and display subsets. Every SVG contains one chart. Generated directories are ignored by Git and
 removed by `make clean`.
@@ -116,7 +116,7 @@ public provenance and redistribution terms. Current integrations are:
 The [dataset documentation](datasets.md) gives the original-source citation and resolvable DOI link
 for every integration, together with related data papers where applicable.
 
-Examples read `X.csv` and `Y.csv` directly. Example 09 operates on immutable Pi-PLS and ordinary-PLS
+Examples read `X.csv` and `Y.csv` directly. Example 04 operates on immutable Pi-PLS and ordinary-PLS
 paths in memory. Pulp, Sugarcane, and Tobacco operate on `component_path_`, scikit-learn OOF
 predictions, and immutable inspection results in memory. Every numbered real-data workflow writes only
 final PDF figures; generated CSV products are reserved for the focused benchmark scripts.

@@ -134,7 +134,7 @@ def test_nested_pls_path_matches_separate_pls_fits() -> None:
 
 def test_dedicated_example_compares_paths_directly_in_memory() -> None:
     examples_dir = _repository_root() / "examples"
-    path = examples_dir / "09_pls_path_comparison.py"
+    path = examples_dir / "04_pls_path_comparison.py"
     text = path.read_text(encoding="utf-8")
 
     assert "evaluate_pls_component_path(" in text
@@ -157,7 +157,7 @@ def test_dedicated_example_compares_paths_directly_in_memory() -> None:
 
 def test_real_data_examples_use_pipls_only_component_paths() -> None:
     examples_dir = _repository_root() / "examples"
-    pulp_text = (examples_dir / "10_pulp_real_data.py").read_text(encoding="utf-8")
+    pulp_text = (examples_dir / "05_pulp_real_data.py").read_text(encoding="utf-8")
     assert "component_path_" in pulp_text
     assert "refit=False" in pulp_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in pulp_text
@@ -169,7 +169,7 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert ".to_csv(" not in pulp_text
     assert not (examples_dir / "_support" / "pulp_workflow.py").exists()
 
-    sugarcane_text = (examples_dir / "11_sugarcane_real_data.py").read_text(
+    sugarcane_text = (examples_dir / "06_sugarcane_real_data.py").read_text(
         encoding="utf-8"
     )
     assert "component_path_" in sugarcane_text
@@ -180,7 +180,7 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     assert "post_analysis.pdf" not in sugarcane_text
     assert ".to_csv(" not in sugarcane_text
 
-    tobacco_text = (examples_dir / "12_tobacco_real_data.py").read_text(encoding="utf-8")
+    tobacco_text = (examples_dir / "07_tobacco_real_data.py").read_text(encoding="utf-8")
     assert "component_path_" in tobacco_text
     assert "refit=False" in tobacco_text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in tobacco_text
@@ -198,7 +198,7 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
 
 
 def test_tobacco_example_uses_full_svd_and_auto_search() -> None:
-    text = (_repository_root() / "examples" / "12_tobacco_real_data.py").read_text(
+    text = (_repository_root() / "examples" / "07_tobacco_real_data.py").read_text(
         encoding="utf-8"
     )
 

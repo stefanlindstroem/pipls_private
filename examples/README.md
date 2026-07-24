@@ -37,7 +37,7 @@ source rather than from pandas or CSV headers.
 
 ## Explicit comparison
 
-- `09_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
+- `04_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
   component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model.
 
 Grouped and temporal validation require application-specific sampling semantics and remain in
@@ -46,14 +46,14 @@ use case rather than combining unrelated split protocols in one context-free scr
 
 ## Complete Pi-PLS reference workflows
 
-- `10_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the path, inspects
+- `05_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the path, inspects
   the conditional predictor-rank profile at three components, fits the selected fixed model,
   calculates selection-conditioned OOF predictions, and writes six final PDF figures directly from
   in-memory results.
-- `11_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
+- `06_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
   inspection results in memory, calculates OOF predictions with scikit-learn, and writes five
   wavelength-aware final PDF figures without generated analytical CSV files.
-- `12_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
+- `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD, one selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions,
   decreasing-wavenumber spectral plots, deterministic response pagination, and raw observation
   diagnostics through direct in-memory results and caller-owned multipage PDFs.
@@ -72,9 +72,9 @@ real-data workflows. It remains separate from `make check`.
 
 The comparison workflow imports one implementation helper from `examples/_support/`:
 
-- `pls_component_path.py`: immutable ordinary-PLS path evaluation for example 09.
+- `pls_component_path.py`: immutable ordinary-PLS path evaluation for example 04.
 
-Example 09 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
+Example 04 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
 comparison helper. Reusable numerical inspection belongs in `pipls.inspection`; every maintained
 figure is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot
 uses optional `adjustText` only to reposition its Matplotlib text labels.
@@ -93,7 +93,7 @@ Users whose arrays do not carry column headers can supply equivalent lists from 
 information system, or other domain metadata. The package inspection API does not read files or invent scientific variable names. The committed datasets already have tested headers and ordering,
 so the numbered examples use them directly instead of repeating repository-integrity checks.
 
-Example 09 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
+Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
 comparison figures directly. Sugarcane demonstrates the complete-analysis workflow:
 
 1. `PiPLSPathCV(refit=False)` returns `component_path_`, which is plotted directly with Matplotlib.
@@ -106,7 +106,7 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 5. The script plots latent structure, prediction diagnostics, and $P$, $D$, $Q$, and $QD$ factors
    directly with Matplotlib and saves the five final figures itself.
 
-Pulp is the canonical tutorial workflow. Example 10 performs the same direct analysis shown in
+Pulp is the canonical tutorial workflow. Example 05 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
 `predictor_rank_profile()`, fits one explicit `PiPLSRegression`, calculates OOF predictions with
 `cross_val_predict()`, and renders immutable inspection arrays directly. Tobacco follows the same direct pattern

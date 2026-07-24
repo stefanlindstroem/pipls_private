@@ -140,7 +140,7 @@ The article identifies the refiner controls, internal state variables, pulp desc
 handsheet properties as supplementary data. The repository selects the documented fiber-property
 and response columns from that public supplementary table.
 
-`examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly with pandas and then relies on
+`examples/05_pulp_real_data.py` reads `X.csv` and `Y.csv` directly with pandas and then relies on
 ordinary estimator validation when fitting `PiPLSPathCV` with its adaptive defaults. It does not
 repeat repository-table validation, set a predictor-rank ceiling, parse `metadata.yaml`, or call a
 package loader.
@@ -166,7 +166,7 @@ The accompanying data paper is:
 
 The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches the public
 LabSpec and response tables by `Sample`, removes three rows whose total-sugar response is missing,
-and applies no imputation or spectral preprocessing. `examples/11_sugarcane_real_data.py` reads
+and applies no imputation or spectral preprocessing. `examples/06_sugarcane_real_data.py` reads
 `X.csv` and `Y.csv` directly, evaluates `PiPLSPathCV(refit=False)`, plots `component_path_` in
 memory, and fits a separate fixed model after a visible user component choice. It calculates
 selection-conditioned OOF predictions with scikit-learn and writes five final PDF figures directly
@@ -196,9 +196,9 @@ The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches
 and chemistry tables one-to-one by sample ID, orders rows by that identifier, and excludes only
 source metadata columns from the model matrices. All samples and chemical responses are retained.
 No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
-preprocessing is applied. `examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly,
+preprocessing is applied. `examples/07_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly,
 evaluates a Pi-PLS component path with adaptive predictor-rank scanning and full predictor SVD,
 plots that path in memory, and then fits a separately chosen fixed Pi-PLS model. It preserves the
 decreasing wavenumber coordinate, calculates selection-conditioned OOF predictions and raw
 observation diagnostics, and writes five final PDFs. Prediction diagnostics and coefficients are
-paginated in source response order. The separate ordinary-PLS comparison remains in example 09.
+paginated in source response order. The separate ordinary-PLS comparison remains in example 04.

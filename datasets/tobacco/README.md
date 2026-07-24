@@ -39,7 +39,7 @@ No smoothing, derivatives, multiplicative scatter correction, standard-normal-va
 centering, scaling, imputation, or other spectral preprocessing was applied. The numeric values and
 source column order are retained.
 
-The executable example `examples/12_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly with
+The executable example `examples/07_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly with
 pandas, evaluates a full-SVD Pi-PLS path, fits one selected fixed model, calculates OOF and
 inspection results in memory, and writes final PDF figures with source-order response pagination.
 It does not use a package loader or parse `metadata.yaml`.

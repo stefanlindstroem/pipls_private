@@ -91,7 +91,7 @@ configuration, and avoid pinning adjusted label coordinates.
 Tutorial-renderer tests may run each direct calculation once in a temporary directory, parse every
 declared SVG, verify manifest hashes, rank-profile metadata, and generated filenames, and enforce
 Makefile/source-distribution ownership without pinning pixels or Matplotlib artist counts. Tutorial structure tests may verify the two-step navigation, generated-asset references, checked
-snippet sections from examples 02 and 10, links to stable API objects, and links to stable
+snippet sections from examples 02 and 05, links to stable API objects, and links to stable
 model-inspection anchors without freezing narrative wording. Documentation-entry tests may verify
 that the README contains the two compact public workflows and tutorial routes while maintainer-only
 commands and the repository map remain in `CONTRIBUTING.md`; do not pin line counts or exact

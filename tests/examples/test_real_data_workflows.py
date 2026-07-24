@@ -8,7 +8,7 @@ def _repository_root() -> Path:
 
 
 def test_pulp_example_uses_direct_in_memory_results() -> None:
-    text = (_repository_root() / "examples" / "10_pulp_real_data.py").read_text(
+    text = (_repository_root() / "examples" / "05_pulp_real_data.py").read_text(
         encoding="utf-8"
     )
 
@@ -35,7 +35,7 @@ def test_pulp_example_uses_direct_in_memory_results() -> None:
 
 
 def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
-    text = (_repository_root() / "examples" / "11_sugarcane_real_data.py").read_text(
+    text = (_repository_root() / "examples" / "06_sugarcane_real_data.py").read_text(
         encoding="utf-8"
     )
 
@@ -84,7 +84,7 @@ def test_sugarcane_example_is_a_direct_in_memory_workflow() -> None:
 
 def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
     root = _repository_root()
-    text = (root / "examples" / "12_tobacco_real_data.py").read_text(encoding="utf-8")
+    text = (root / "examples" / "07_tobacco_real_data.py").read_text(encoding="utf-8")
 
     assert "CHOSEN_N_COMPONENTS = 8" in text
     assert "DISPLAY_COMPONENTS = (0, 1, 2, 3)" in text

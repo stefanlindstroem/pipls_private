@@ -22,5 +22,5 @@ part of the model matrices.
 
 All 46 rows, selected numeric values, column order, and row order are preserved. No imputation,
 centering, scaling, row filtering, or learned preprocessing was applied. The example
-`examples/10_pulp_real_data.py` reads `X.csv` and `Y.csv` directly; it does not parse the metadata
+`examples/05_pulp_real_data.py` reads `X.csv` and `Y.csv` directly; it does not parse the metadata
 file or use a package-owned loader.

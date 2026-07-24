@@ -6,7 +6,7 @@ multivariate dataset. It assumes that `PiPLSPathCV`, `component_path_`,
 with real data: an upper-boundary predictor-rank result, selection-conditioned out-of-fold (OOF)
 predictions, and interpretation of a selected model.
 
-Analysis and selection snippets come from `examples/10_pulp_real_data.py`. Standalone
+Analysis and selection snippets come from `examples/05_pulp_real_data.py`. Standalone
 interpretation-figure recipes come from `tools/render_pulp_tutorial.py`, which generates the eight
 SVG figures displayed here. Install the
 example dependencies before running either route:
@@ -33,7 +33,7 @@ The example imports the estimators, numerical inspection functions, Matplotlib, 
 then states the component and display choices used below:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:pulp-tutorial-setup"
+--8<-- "examples/05_pulp_real_data.py:pulp-tutorial-setup"
 ```
 
 `CHOSEN_N_COMPONENTS=3` is the user choice made from the component path.
@@ -70,7 +70,7 @@ The committed tables are read directly with pandas. Their headers supply the sci
 the first three response indices are selected explicitly for the pointwise displays:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:load-pulp-data"
+--8<-- "examples/05_pulp_real_data.py:load-pulp-data"
 ```
 
 The resulting data frames have shapes `(46, 14)` and `(46, 8)`. No package-specific loader or
@@ -84,17 +84,17 @@ The search evaluates admissible component counts and selects one predictor rank 
 each count:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:evaluate-pulp-component-path"
+--8<-- "examples/05_pulp_real_data.py:evaluate-pulp-component-path"
 ```
 
 The matching immutable row is retrieved before plotting so that the chosen point can be marked:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:select-pulp-parameters"
+--8<-- "examples/05_pulp_real_data.py:select-pulp-parameters"
 ```
 
 ```python
---8<-- "examples/10_pulp_real_data.py:plot-pulp-component-path"
+--8<-- "examples/05_pulp_real_data.py:plot-pulp-component-path"
 ```
 
 ![Pulp component path](../assets/generated/pulp/component_path.svg)
@@ -113,11 +113,11 @@ The complete evaluated rank profile at three components is available without fil
 `cv_results_`:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:extract-pulp-rank-profile"
+--8<-- "examples/05_pulp_real_data.py:extract-pulp-rank-profile"
 ```
 
 ```python
---8<-- "examples/10_pulp_real_data.py:plot-pulp-rank-profile"
+--8<-- "examples/05_pulp_real_data.py:plot-pulp-rank-profile"
 ```
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
@@ -140,7 +140,7 @@ Only after the two selection plots have been inspected is a fixed estimator fitt
 samples:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:fit-pulp-model"
+--8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
 ```
 
 The search object supports model selection; the fixed estimator supplies predictions and fitted
@@ -153,7 +153,7 @@ Fitted values are unsuitable for assessing predictive residuals. The example the
 fixed estimator inside five non-shuffled folds and predicts each held-out observation once:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:pulp-oof-predictions"
+--8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
 ```
 
 The non-shuffled splitter is used here for a deterministic demonstration. Replace it with a grouped,
@@ -171,7 +171,7 @@ temporal, or otherwise appropriate splitter when row order carries experimental 
 The fitted estimator and OOF predictions are converted to numerical result objects before plotting:
 
 ```python
---8<-- "examples/10_pulp_real_data.py:pulp-inspection-results"
+--8<-- "examples/05_pulp_real_data.py:pulp-inspection-results"
 ```
 
 | Result | Question answered |
@@ -301,10 +301,10 @@ See [Standardized RMSE](../model_inspection.md#standardized-rmse).
 
 ## Run the complete example
 
-The maintained source is `examples/10_pulp_real_data.py`. Run it from the repository root:
+The maintained source is `examples/05_pulp_real_data.py`. Run it from the repository root:
 
 ```bash
-python examples/10_pulp_real_data.py
+python examples/05_pulp_real_data.py
 ```
 
 The tutorial renderer writes eight representative single-chart SVGs. The numbered example writes

@@ -5,10 +5,10 @@ from pathlib import Path
 
 _DATASET_FILENAMES = {"X.csv", "Y.csv"}
 _REAL_DATA_EXAMPLES = {
-    "09_pls_path_comparison.py",
-    "10_pulp_real_data.py",
-    "11_sugarcane_real_data.py",
-    "12_tobacco_real_data.py",
+    "04_pls_path_comparison.py",
+    "05_pulp_real_data.py",
+    "06_sugarcane_real_data.py",
+    "07_tobacco_real_data.py",
 }
 _INSPECTION_CALLS = {
     "latent_structure",
@@ -94,7 +94,7 @@ def test_real_data_examples_own_paths_figures_and_inspection_results() -> None:
         assert "subplots" in calls, path
         assert "savefig" in calls, path
 
-        if filename != "09_pls_path_comparison.py":
+        if filename != "04_pls_path_comparison.py":
             assert "cross_val_predict" in calls, path
             assert _INSPECTION_CALLS <= calls, path
 

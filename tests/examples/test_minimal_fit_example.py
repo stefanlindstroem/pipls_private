@@ -14,7 +14,9 @@ def test_minimal_example_is_a_literal_fixed_model_workflow() -> None:
     assert "X = np.array(" in text
     assert "Y = np.array(" in text
     assert "PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)" in text
-    assert "model.predict(X)" in text
+    assert "predictions = model.predict(X)" in text
+    assert 'print("Predictions:")' in text
+    assert 'print(f"Wrote PDF figure to {output_path}")' in text
     assert "pipls_display_factors(model.decomposition_)" in text
     assert "plt.subplots(2, 2" in text
     assert "factors.predictor_directions[:, 0]" in text

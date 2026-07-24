@@ -165,7 +165,7 @@ def test_tutorial_examples_render_named_result_arrays_directly() -> None:
     synthetic = (root / "examples" / "02_synthetic_path_selection.py").read_text(
         encoding="utf-8"
     )
-    pulp = (root / "examples" / "10_pulp_real_data.py").read_text(encoding="utf-8")
+    pulp = (root / "examples" / "05_pulp_real_data.py").read_text(encoding="utf-8")
 
     for field in (
         "path.n_components",
@@ -194,9 +194,9 @@ def test_tutorial_examples_render_named_result_arrays_directly() -> None:
 def test_real_data_prediction_plots_use_response_neutral_residual_labels() -> None:
     root = _repository_root()
     sources = [
-        root / "examples" / "10_pulp_real_data.py",
-        root / "examples" / "11_sugarcane_real_data.py",
-        root / "examples" / "12_tobacco_real_data.py",
+        root / "examples" / "05_pulp_real_data.py",
+        root / "examples" / "06_sugarcane_real_data.py",
+        root / "examples" / "07_tobacco_real_data.py",
         root / "tools" / "render_pulp_tutorial.py",
     ]
 

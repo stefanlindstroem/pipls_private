@@ -14,9 +14,10 @@ material alone.
 ## Implemented boundary
 
 Numbered examples are self-contained user tasks rather than publication-oriented or
-context-free API demonstrations. Example 07 has been removed; example 02 supplies the short
-synthetic path-selection tutorial and independent-test prediction workflow, while example 03
-gives leave-one-out validation one focused small-calibration use case.
+context-free API demonstrations. The former context-free advanced-validation script remains
+removed; example 02 supplies the short synthetic path-selection tutorial and independent-test
+prediction workflow, while example 03 gives leave-one-out validation one focused small-calibration
+use case.
 
 Phases A through F4 are complete and committed. The first broad E4 benchmark
 implementation was removed and replaced by focused question-specific benchmarks:
@@ -72,12 +73,12 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
   OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
 - a two-tier tutorial route: a short deterministic synthetic selection-and-prediction workflow
-  from example 02, followed by a focused Pulp real-data workflow from example 10; both use
+  from example 02, followed by a focused Pulp real-data workflow from example 05; both use
   checked snippets and deterministic single-chart SVG assets;
 - direct Tobacco response pagination through two caller-owned multipage PDFs, with full predictor
   SVD, decreasing-wavenumber spectral axes, and raw observation diagnostics;
 - a direct Pi-PLS/ordinary-PLS comparison whose two immutable component paths are plotted together
-  in example 09 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
+  in example 04 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
 - a tutorial-first served site whose synthetic entry tutorial owns the minimum selection contract
   and whose second Pulp tutorial owns real-data selection qualification, selection-conditioned
   OOF analysis, and representative interpretation plots including both $P$ and $QD$ factor views;
@@ -141,7 +142,7 @@ Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
-is retained only in the dedicated example-09 CV-MSE comparisons and declared benchmarks. Examples
+is retained only in the dedicated example-04 CV-MSE comparisons and declared benchmarks. Examples
 10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
 model.
 
@@ -313,8 +314,8 @@ implemented independently:
 
 The earlier real-data smoke-check scripts and full example-execution tests were removed because they
 duplicated the numbered analyses. `make examples` runs every numbered example as an explicit
-application-validation action. Example 09 keeps immutable Pi-PLS and standard PLS (NIPALS) paths
-in memory and generates the overlaid comparison PDFs directly. Examples 10–12 plot
+application-validation action. Example 04 keeps immutable Pi-PLS and standard PLS (NIPALS) paths
+in memory and generates the overlaid comparison PDFs directly. Examples 05–07 plot
 `component_path_` without table conversion, fit selected fixed estimators, use
 scikit-learn `cross_val_predict`, calculate inspection results in memory, and write only final PDF
 figures. Pulp additionally plots the evaluated predictor-rank profile at three components. Tobacco
@@ -353,21 +354,20 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Patches 1/6 and 2/6 of the owner-authorized new-user onboarding series are complete under Decisions
-0099 and 0100. The strict rendered site is validated on pushes and pull requests and deployed from
-`master` through GitHub Pages with repository-derived canonical URLs. The next planned increment is
-continuous example numbering and improved terminal output from example 01. No package release
-preparation or Python-package publication work is authorized.
+Patches 1/6 through 3/6 of the owner-authorized new-user onboarding series are complete under
+Decisions 0099--0101. The maintained examples now form the continuous sequence 01--07, all active
+repository consumers use the new names, and example 01 labels its predictions and written PDF. The
+next planned increment is the owner-approved path-search default and scorer presentation change. No
+package release preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Continuous examples:** renumber the maintained numbered examples and improve example 01 output.
-2. **Path-search defaults:** resolve the owner-approved `refit` and default-scorer presentation.
-3. **Installation cleanup:** remove unused extras and distinguish source-user installation from
+1. **Path-search defaults:** implement the owner-approved `refit` and default-scorer presentation.
+2. **Installation cleanup:** remove unused extras and distinguish source-user installation from
    contributor setup.
-4. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
+3. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
    workflow.
-5. **Human audit:** continue owner review after each focused snapshot.
+4. **Human audit:** continue owner review after each focused snapshot.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.
