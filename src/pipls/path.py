@@ -62,7 +62,7 @@ Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
-_DEFAULT_SCORING = neg_response_standardized_mean_squared_error
+_DEFAULT_SCORING_NAME = "neg_response_standardized_mean_squared_error"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _CONTROLLED_FIT_WARNING_CATEGORIES = (StatisticalSupportWarning,)
 
@@ -135,14 +135,15 @@ class PiPLSPathCV(
     cv : int, splitter, iterable or None, default=5
         Cross-validation specification. ``None`` requests the standard five-fold
         regression split.
-    scoring : str, callable or None
+    scoring : str, callable or None, default="neg_response_standardized_mean_squared_error"
         Scikit-learn scorer name, scorer callable, or ``None`` to use estimator
-        ``score``. The default is
+        ``score``. The package-specific default name resolves to
         :func:`pipls.metrics.neg_response_standardized_mean_squared_error`.
-    refit : bool, default=True
-        Whether to refit the best evaluated pair on all supplied data. Delegated
-        prediction, transformation, scoring, and feature-name methods require
-        ``refit=True``.
+    refit : bool, default=False
+        Whether to refit the globally best evaluated pair on all supplied data.
+        The default leaves path evaluation and final fixed-model fitting as
+        separate steps. Delegated prediction, transformation, scoring, and
+        feature-name methods require ``refit=True``.
     n_jobs : int or None, default=None
         Joblib parallelism across candidate pairs within each evaluation batch.
     return_oof_predictions : bool, default=False
@@ -209,8 +210,8 @@ class PiPLSPathCV(
         search_method: SearchMethod = "auto",
         samples_per_predictor_rank: float = 5.0,
         cv: object = 5,
-        scoring: Scoring = _DEFAULT_SCORING,
-        refit: bool = True,
+        scoring: Scoring = _DEFAULT_SCORING_NAME,
+        refit: bool = False,
         n_jobs: int | None = None,
         return_oof_predictions: bool = False,
     ) -> None:
@@ -1045,7 +1046,7 @@ def _adaptive_path_search(
 def _uses_default_path_scoring(scoring: Scoring) -> bool:
     """Return whether the public default response-standardized scorer is requested."""
 
-    return scoring is _DEFAULT_SCORING
+    return isinstance(scoring, str) and scoring == _DEFAULT_SCORING_NAME
 
 
 def _path_cv_results(
@@ -1211,6 +1212,8 @@ def _predictor_rank_policy(values: PredictorRankValues) -> PredictorRankPolicy:
 
 
 def _resolve_path_scorer(scoring: Scoring, estimator: Any) -> Scorer:
+    if isinstance(scoring, str) and scoring == _DEFAULT_SCORING_NAME:
+        return neg_response_standardized_mean_squared_error
     if isinstance(scoring, str):
         try:
             return cast(Scorer, get_scorer(scoring))

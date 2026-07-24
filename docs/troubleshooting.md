@@ -43,8 +43,8 @@ section explains splitter-dependent feasibility and metadata such as `groups`.
 
 ## `predict()` is unavailable after path selection
 
-With `refit=False`, `PiPLSPathCV` is a selection object rather than a fitted prediction model. Either
-fit the chosen pair explicitly:
+By default, `PiPLSPathCV` uses `refit=False` and is a selection object rather than a fitted
+prediction model. Either fit the chosen pair explicitly:
 
 ```python
 selected = search.component_path_.for_n_components(h)

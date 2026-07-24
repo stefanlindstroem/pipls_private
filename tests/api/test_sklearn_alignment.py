@@ -20,7 +20,6 @@ from pipls import (
     PiPLSPathCV,
     PiPLSRegression,
 )
-from pipls.metrics import neg_response_standardized_mean_squared_error
 
 
 def _data() -> tuple[np.ndarray, np.ndarray]:
@@ -51,7 +50,22 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert path.samples_per_predictor_rank == 5.0
     assert path.cv == 5
     assert path.n_components_values == "all"
-    assert path.scoring is neg_response_standardized_mean_squared_error
+    assert path.scoring == "neg_response_standardized_mean_squared_error"
+    assert path.refit is False
+
+
+def test_path_defaults_have_stable_signature_and_repr() -> None:
+    signature = inspect.signature(PiPLSPathCV)
+
+    assert signature.parameters["scoring"].default == (
+        "neg_response_standardized_mean_squared_error"
+    )
+    assert signature.parameters["refit"].default is False
+    assert "0x" not in str(signature)
+    path = PiPLSPathCV()
+    assert repr(path) == "PiPLSPathCV()"
+    assert clone(path).scoring == path.scoring
+    assert clone(path).refit is False
 
 
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
@@ -263,6 +277,7 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
         max_predictor_rank=3,
         search_method="optimal",
         cv=3,
+        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -295,6 +310,7 @@ def test_path_exposes_nested_pipls_for_pipeline_without_flattening_coefficients(
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
+        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -311,6 +327,7 @@ def test_path_score_accepts_sample_weight_like_regression() -> None:
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
+        refit=True,
         n_jobs=1,
     ).fit(X, Y)
     weights = np.linspace(1.0, 2.0, X.shape[0])
@@ -331,6 +348,7 @@ def test_path_preserves_refitted_estimator_output_configuration() -> None:
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
+        refit=True,
         n_jobs=1,
     ).fit(X_frame, Y)
 
@@ -372,6 +390,7 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
+        refit=True,
         n_jobs=1,
     ).fit(X_frame, Y)
 
@@ -402,6 +421,7 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
             predictor_rank_values=[1],
             max_predictor_rank=1,
             cv=2,
+            refit=True,
             n_jobs=1,
         ),
     ],
@@ -470,6 +490,7 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
         max_predictor_rank=3,
         cv=None,
         scoring=None,
+        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -508,7 +529,7 @@ def test_path_inverse_transform_is_conditionally_available_for_pipeline() -> Non
             ("regression", _fixed_estimator()),
         ]
     )
-    search = PiPLSPathCV(estimator=pipeline)
+    search = PiPLSPathCV(estimator=pipeline, refit=True)
 
     assert hasattr(search, "transform")
     assert not hasattr(search, "inverse_transform")

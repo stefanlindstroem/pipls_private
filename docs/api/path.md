@@ -8,7 +8,9 @@ rank, and fit a separate fixed estimator.
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
 selector caps the path by the minimum predictor rank verified across those transformed folds.
-Methods that delegate to a selected estimator are available only when `refit=True`.
+By default, path evaluation stops after selection: `refit=False` leaves final fixed-model fitting
+as an explicit user step. Methods that delegate to a selected estimator are available only when
+`refit=True`.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see
@@ -83,7 +85,9 @@ requested, its ordered out-of-fold predictions.
 The public scoring functions standardize each response residual by the corresponding sample
 standard deviation learned from the estimator's training responses. The positive function reports
 an error; the negative function follows the scikit-learn convention that larger scorer values are
-better. `PiPLSPathCV` uses the negative form by default.
+better. `PiPLSPathCV` uses the stable string
+`"neg_response_standardized_mean_squared_error"` by default and resolves it to the public negative
+scorer callable.
 
 ::: pipls.metrics.response_standardized_mean_squared_error
     options:

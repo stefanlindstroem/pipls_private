@@ -107,14 +107,17 @@ This index is navigation, not a substitute for those records.
 | `0099-example-artifact-and-sdist-boundary.md` | example artifact and source-distribution boundary | commit and snapshot only result-directory placeholders; include them in sdists and run example 01 from an extracted sdist |
 | `0100-rendered-documentation-deployment.md` | rendered documentation deployment | validate strict docs on pushes and pull requests; deploy the canonical repository-derived GitHub Pages site from `master` |
 | `0101-continuous-numbered-examples.md` | continuous numbered examples | renumber maintained examples 01--07, migrate active consumers, and label example 01 terminal output |
+| `0102-path-search-defaults.md` | path-search defaults and scorer presentation | default to selection-only `refit=False`; use a stable package scorer name resolving to the public callable |
 
 ## Implemented estimator/search transition
 
 Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` is a fixed-pair estimator with
 the direct-fit support warning at $n/r_\pi<3$. `PiPLSPathCV` owns the complete triangular-selection
 lifecycle and defaults to the explicit complete-component sentinel `n_components_values="all"`.
-The default scorer is a public callable, conventional scikit-learn random-state forms are accepted,
-and Pi-PLS-specific fitted output is canonicalized in `decomposition_`.
+Decision 0102 makes path evaluation selection-only by default and represents the default scorer by
+a stable package string resolving to the existing public callable. Conventional scikit-learn
+random-state forms remain accepted, and Pi-PLS-specific fitted output is canonicalized in
+`decomposition_`.
 
 ## Accepted clarifications after earlier proposals
 
@@ -123,6 +126,8 @@ plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
 - `PiPLSPathCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
+- `PiPLSPathCV` defaults to selection-only `refit=False`; automatic global-best refitting is explicit;
+- the default scoring parameter is the stable package name `"neg_response_standardized_mean_squared_error"`, which resolves to the public scorer callable;
 - `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
   while transformed feature count, centered training-fold dimensions, and minimum verified

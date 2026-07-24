@@ -1,5 +1,8 @@
 # Changelog
 
+- Make `PiPLSPathCV` selection-only by default with `refit=False`, and represent the default
+  response-standardized scorer by a stable package string that resolves to the existing public
+  callable.
 - Deploy the strict rendered documentation through GitHub Pages from `master`, validate it on
   pushes and pull requests, and make the repository deployment the primary README route while
   retaining source-checkout links.

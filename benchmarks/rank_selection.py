@@ -101,6 +101,7 @@ def fit_search(train: PiPLSDataset, seed: int) -> PiPLSPathCV:
         search_method="auto",
         samples_per_predictor_rank=10.0,
         cv=5,
+        refit=True,
         n_jobs=1,
     ).fit(train.X, train.Y)
 

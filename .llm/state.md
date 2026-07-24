@@ -233,8 +233,9 @@ Additional fixed decisions:
 - interpretable Pi-PLS rotations, dilation, rank/solver diagnostics, and the standardized map live
   in the read-only `decomposition_` object; construction matrices remain private and standard
   PLS-style fitted attributes remain top-level.
-- Refit-dependent path methods are absent when `refit=False`; output-container configuration is
-  carried by the estimator template rather than a second path-level `set_output` layer.
+- `PiPLSPathCV` defaults to selection-only `refit=False`; refit-dependent path methods are absent
+  unless automatic global-best refitting is requested explicitly, and output-container
+  configuration remains carried by the estimator template.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
 - Real-data examples use `PiPLSPathCV(refit=False)` for the path and fit a separate fixed model
@@ -354,20 +355,18 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Patches 1/6 through 3/6 of the owner-authorized new-user onboarding series are complete under
-Decisions 0099--0101. The maintained examples now form the continuous sequence 01--07, all active
-repository consumers use the new names, and example 01 labels its predictions and written PDF. The
-next planned increment is the owner-approved path-search default and scorer presentation change. No
-package release preparation or Python-package publication work is authorized.
+Patches 1/6 through 4/6 of the owner-authorized new-user onboarding series are complete under
+Decisions 0099--0102. `PiPLSPathCV` now defaults to selection-only `refit=False`, and its default
+scoring parameter is the stable package name that resolves to the public response-standardized
+scorer. No package release preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Path-search defaults:** implement the owner-approved `refit` and default-scorer presentation.
-2. **Installation cleanup:** remove unused extras and distinguish source-user installation from
+1. **Installation cleanup:** remove unused extras and distinguish source-user installation from
    contributor setup.
-3. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
+2. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
    workflow.
-4. **Human audit:** continue owner review after each focused snapshot.
+3. **Human audit:** continue owner review after each focused snapshot.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

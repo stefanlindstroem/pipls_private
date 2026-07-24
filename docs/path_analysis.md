@@ -70,12 +70,13 @@ smaller predictor rank.
 
 ## Scoring and the best evaluated pair
 
-Candidate selection maximizes the configured mean test score. The default scorer is
-`pipls.metrics.neg_response_standardized_mean_squared_error`, so maximizing score is equivalent to
-minimizing mean response-standardized CV-MSE. With another scorer, the CV-MSE columns remain
+Candidate selection maximizes the configured mean test score. The default scoring parameter is
+the stable package name `"neg_response_standardized_mean_squared_error"`, which resolves to
+`pipls.metrics.neg_response_standardized_mean_squared_error`. Maximizing that score is equivalent
+to minimizing mean response-standardized CV-MSE. With another scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 
-Ordinary scikit-learn scorer names, other callables, and `scoring=None` are accepted.
+Ordinary scikit-learn scorer names, scorer callables, and `scoring=None` are accepted.
 `best_params_`, `best_score_`, and `best_index_` describe the best evaluated pair.
 `rank_test_score` uses minimum ranks with the same `rtol=1e-12` and `atol=1e-15` comparison as
 selection. Every rank-1 candidate is tied directly with the maximum score; lower rank groups are
@@ -168,10 +169,10 @@ require a separately designed repeated or nested resampling procedure.
 
 ## Refit and detailed diagnostics
 
-With `refit=True`, the globally best evaluated candidate under the configured scorer is fitted on
-all supplied data, and supported prediction or transformation methods delegate to it. The tutorial
-uses `refit=False` because it makes the component-count choice visible before fitting one explicit
-fixed model.
+The default `refit=False` leaves path evaluation and final fixed-model fitting as separate steps,
+which keeps the component-count choice visible. With `refit=True`, the globally best evaluated
+candidate under the configured scorer is fitted on all supplied data, and supported prediction or
+transformation methods delegate to it.
 
 Use `component_path_` for the concise component-count curve and `predictor_rank_profile(h)` for the
 evaluated ranks at one count. `cv_results_` contains candidate parameters, split test scores,

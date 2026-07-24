@@ -153,6 +153,7 @@ def test_groups_participate_in_path_metadata_routing() -> None:
         predictor_rank_values=[2],
         max_predictor_rank=2,
         cv=GroupKFold(n_splits=3),
+        refit=True,
     )
 
     with config_context(enable_metadata_routing=True):

@@ -79,6 +79,7 @@ reference describe the current public behavior directly.
 - [0071: final result and example cleanup](0071-final-result-and-example-cleanup.md)
 - [0097: focused leave-one-out example](0097-focused-leave-one-out-example.md)
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
+- [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
 
 ## Repository and documentation policy
 
@@ -117,3 +118,5 @@ reference describe the current public behavior directly.
 - [0098: grouped maintainer command index](0098-grouped-make-help.md)
 - [0099: example artifact and source-distribution boundary](0099-example-artifact-and-sdist-boundary.md)
 - [0100: rendered documentation deployment](0100-rendered-documentation-deployment.md)
+- [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
+- [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)

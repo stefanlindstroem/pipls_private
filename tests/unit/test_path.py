@@ -288,7 +288,7 @@ def test_all_component_sentinel_matches_explicit_complete_range() -> None:
     )
 
 
-def test_default_scorer_is_the_public_callable() -> None:
+def test_default_scorer_name_resolves_to_the_public_callable() -> None:
     X, Y = _data()
     search = PiPLSPathCV(
         n_components_values=[1],
@@ -310,6 +310,7 @@ def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
         cv=3,
+        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -320,12 +321,11 @@ def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
     assert search.score(X, Y) == pytest.approx(search.best_estimator_.score(X, Y))
 
 
-def test_refit_false_hides_refit_dependent_methods() -> None:
+def test_default_selection_hides_refit_dependent_methods() -> None:
     X, Y = _data()
     search = PiPLSPathCV(
         n_components_values=[1],
         predictor_rank_values=[1, 2],
-        refit=False,
         cv=3,
     )
 
@@ -360,6 +360,7 @@ def test_refit_false_clears_state_from_an_earlier_refitted_fit() -> None:
         n_components_values=[1],
         predictor_rank_values=[1, 2],
         cv=3,
+        refit=True,
     ).fit(X, Y)
 
     assert hasattr(search, "best_estimator_")
@@ -400,6 +401,7 @@ def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
         n_components_values=[1],
         predictor_rank_values=[1],
         cv=splits,
+        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -581,6 +583,7 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> N
             predictor_rank_values=[4],
             max_predictor_rank=4,
             cv=3,
+            refit=True,
             return_oof_predictions=True,
             n_jobs=1,
         ).fit(X, Y)
@@ -623,6 +626,7 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
+        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -641,7 +645,7 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         ("n_components_values", [], "must not be empty"),
         ("n_components_values", None, 'must be "all"'),
         ("n_components_values", "everything", 'must be "all"'),
-        ("scoring", "neg_response_standardized_mean_squared_error", "Unknown scoring"),
+        ("scoring", "not_a_scorer", "Unknown scoring"),
         ("predictor_rank_values", [1.0], "positive integer"),
         ("predictor_rank_values", "maximum", "must be None"),
         ("n_jobs", 0, "must not be zero"),

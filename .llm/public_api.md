@@ -119,8 +119,11 @@ after fold-local pipeline preprocessing and terminal-estimator preprocessing are
 caps. Explicit component and predictor-rank sequences are validated against the resolved ceiling
 before scoring. The class accepts a direct fixed `PiPLSRegression` or a pipeline ending in one,
 materializes one CV split set, clones fixed candidates, and optionally refits the selected pair.
+The default `refit=False` keeps path evaluation separate from final fixed-model fitting;
+`refit=True` explicitly requests a full-data fit of the globally best evaluated pair.
 
-The default `scoring` value is the public callable
+The default `scoring` value is the stable package string
+`"neg_response_standardized_mean_squared_error"`, which resolves to the public callable
 `pipls.metrics.neg_response_standardized_mean_squared_error`. Ordinary scikit-learn scorer names,
 other callables, and `None` remain accepted. Conditional and overall selections among evaluated
 candidates maximize the configured mean test score. Under the default scorer this is
@@ -153,9 +156,9 @@ reconstruct through the same validation path when unpickled. Invalid dimensions,
 negative MSE summaries, unsupported policy values, and inconsistent OOF coverage are rejected.
 Generated documentation keeps these records returned-first by suppressing constructor signatures.
 
-Refit-dependent delegated methods are absent when `refit=False`. Output-container configuration is
-owned by the estimator template and preserved through cloning and refit; the path object does not
-add a separate `set_output` layer.
+Refit-dependent delegated methods are absent under the default `refit=False`. Output-container
+configuration is owned by the estimator template and preserved through cloning and explicit refit;
+the path object does not add a separate `set_output` layer.
 
 Group-aware splitters and keyword-only `groups` belong to `PiPLSPathCV.fit`, not to the fixed
 estimator. `return_oof_predictions` and selection-conditioned reporting likewise belong only to the

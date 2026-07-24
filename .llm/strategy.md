@@ -416,9 +416,10 @@ example and guide alignment, then final API/minimality audit.
 
 Current status: **complete**. The final audit removed the redundant path parameter-prefix control,
 confirmed fixed-pair `GridSearchCV` interoperability, and was followed by Decision 0040's final
-public-surface polish: `n_components_values="all"`, conventional random-state forms, a public
-callable default scorer, refit-dependent method availability, and canonical decomposition-only
-Pi-PLS diagnostics.
+public-surface polish: `n_components_values="all"`, conventional random-state forms, a reusable
+public scorer callable, refit-dependent method availability, and canonical decomposition-only
+Pi-PLS diagnostics. Decision 0102 later changes only the constructor presentation and defaults:
+selection-only `refit=False` and a stable package scorer name resolving to that callable.
 
 ### Phase F2: model inspection and post-analysis
 
@@ -645,17 +646,19 @@ A whole-package audit from a new user's perspective identified six focused incre
 Decision 0099 completes the first increment by committing and snapshotting only example-result
 placeholders, distributing those placeholders, and running example 01 from an extracted source
 distribution. Decision 0100 completes the second increment with strict documentation validation on
-pushes and pull requests and repository-derived GitHub Pages deployment from `master`. Decision
-0101 completes the third increment by renumbering all maintained examples continuously from 01 to
-07, migrating every active consumer, and labeling example 01 terminal output. Package release
-preparation and Python-package publication remain outside this series.
+pushes and pull requests and repository-derived GitHub Pages deployment from `master`. Decision 0101 completes the third increment by renumbering all maintained examples continuously
+from 01 to 07, migrating every active consumer, and labeling example 01 terminal output. Decision
+0102 completes the fourth increment by making path evaluation selection-only by default and
+replacing the function-object scoring default with a stable package name that resolves to the same
+public callable. Package release preparation and Python-package publication remain outside this
+series.
 
-Current status: **patches 1/6 through 3/6 complete**.
+Current status: **patches 1/6 through 4/6 complete**.
 
 ## Current next increment
 
-Implement the owner-approved `PiPLSPathCV` default-refit and stable default-scorer presentation
-without changing the scoring formula or candidate-selection rule.
+Simplify optional dependencies and separate ordinary source-user installation from editable
+contributor setup without preparing or publishing a package release.
 
 ## Maintenance protocol
 
