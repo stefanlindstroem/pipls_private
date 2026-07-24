@@ -669,6 +669,16 @@ of direct candidate-column access.
 
 Current status: **documentation aligned with the current implementation**.
 
+### Guide-layer synchronization
+
+A follow-up audit synchronizes the active `.llm` summaries with Decisions 0101--0105 and the
+current repository. It replaces superseded example numbers, records the stable scorer-string
+default, completes runtime and documentation-workflow ownership, and aligns the patch handoff with
+the owner-requested downloadable patch, SHA-256 checksum, and concise five-command workflow. This
+is a maintenance synchronization and introduces no new public or architectural decision.
+
+Current status: **guide layer synchronized with the current repository**.
+
 ## Current next increment
 
 Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a
@@ -686,8 +696,8 @@ For every patch, the LLM maintainer should:
 6. run and report each applicable Makefile validation target;
 7. review tests against `.llm/testing.md` and remove accidental coupling to living prose or
    documentary field values;
-8. return a root-relative patch and provide the exact direct Git commands for checking, applying,
-   inspecting, staging, and committing it.
+8. return a downloadable root-relative patch and SHA-256 checksum, report validation, and provide
+   the concise apply/check/stage/commit/snapshot command sequence requested by the owner.
 
 
 ## Public-result API cleanup

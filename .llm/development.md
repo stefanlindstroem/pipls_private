@@ -24,7 +24,7 @@
 - Fit every additional learned preprocessing operation inside its matching training fold.
 - Add dependencies only when a short, stable NumPy/scikit-learn implementation is insufficient.
 - Keep executable example dependencies under the `examples` extra; the `dev` extra must include
-them so repository validation does not skip example artifacts.
+  them so repository validation does not skip example artifacts.
 - Keep optional dependency groups tied to maintained workflows: `examples` for numbered examples,
   `docs` for strict documentation construction, and `dev` for repository validation. Do not expose
   a dataset-access extra when datasets are ordinary repository files, and do not retain tools that
@@ -140,7 +140,8 @@ them so repository validation does not skip example artifacts.
 
 ## Delivery and validation
 
-- Return one unified Git patch relative to repository root.
+- Return one downloadable unified Git patch relative to repository root and a separate SHA-256
+  checksum file.
 - Report each applicable target as passed, failed, or not run; never describe inspection alone as
   validation.
 - Run focused tests while developing, then `make check` before delivery.
@@ -153,5 +154,6 @@ them so repository validation does not skip example artifacts.
   application-facing workflow. This target runs all examples, including Tobacco.
 - Run `make build` for a quick artifact build and `make dist-check` for packaging, dependency,
   public-module, or included-data changes before delivery.
-- Provide exact direct Git commands for `git apply --check`, application, inspection, validation,
-  staging, committing, and `make snapshot`.
+- Verify `git apply --check` against a clean extraction before delivery. Show the owner the concise
+  routine sequence `git apply`, `make check`, `git add -A`, `git commit`, and `make snapshot`; add
+  inspection or repair commands only when they are specifically needed.

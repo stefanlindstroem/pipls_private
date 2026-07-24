@@ -1,5 +1,10 @@
 # Changelog
 
+- Synchronize the `.llm` guide layer with the current repository: use the maintained 01--07 example
+  numbers, record the stable path-scoring default, complete runtime and documentation-workflow
+  ownership, and standardize downloadable patch handoffs with SHA-256 checksums and the concise
+  five-command owner workflow.
+
 - Align the maintained documentation and examples with the current implementation: demonstrate the
   selection-only `PiPLSPathCV()` default, document complete decomposition diagnostics and fixed-model
   output configuration, expose adaptive-search completion status, and correct guide-layer profile

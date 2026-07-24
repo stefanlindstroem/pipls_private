@@ -144,13 +144,18 @@ validation runs the introductory example from a clean extraction.
 Decision 0100 moves rendered documentation into a dedicated GitHub Pages workflow: every push and
 pull request validates the strict checkout and source-distribution builds, while `master` pushes
 receive repository-derived canonical URLs and deploy the built site. The README routes GitHub users
-through the current Pages deployment without hard-coding an unconfirmed owner name.
+through the current Pages deployment without hard-coding an unconfirmed owner name. Decision 0101
+renumbers maintained examples continuously from 01 to 07. Decision 0102 makes path evaluation
+selection-only by default and gives the default scorer a stable package string. Decision 0103
+retains only the maintained `dev`, `examples`, and `docs` extras. Decision 0104 refines the new-user
+documentation route, and Decision 0105 aligns maintained documentation and examples with the
+resulting implementation.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
 is retained only in the dedicated example-04 CV-MSE comparisons and declared benchmarks. Examples
-10–12 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
+05–07 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
 model.
 
 The current top-level package exports are:
@@ -211,7 +216,7 @@ case, or public behavior.
 | Reproducibility | estimator `random_state` accepts integer, NumPy `RandomState`, or `None`; default `0` is reproducible |
 | Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
 | Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
-| Selection score | public response-standardized negative-MSE callable by default; sklearn scorer names, callables, and `None` accepted |
+| Selection score | stable package string `"neg_response_standardized_mean_squared_error"` by default, resolving to the public callable; sklearn scorer names, callables, and `None` accepted |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | path-only opt-in through `return_oof_predictions=True` |
@@ -274,7 +279,7 @@ Decisions 0039 and 0040 are fully implemented:
   have been removed from the private selection layer.
 - the complete component path is explicit through `n_components_values="all"`;
 - random-state forms and refit-dependent method availability follow scikit-learn conventions;
-- the public response-standardized scorer callable is the default selection metric;
+- the stable package string `"neg_response_standardized_mean_squared_error"` is the default selection parameter and resolves to the public scorer callable;
 - duplicate Pi-PLS-specific fitted aliases are removed in favor of canonical `decomposition_` fields;
 - the public guides distinguish best evaluated score from a global surface optimum, explain that
   response-standardized MSE is diagnostic when a nondefault scorer drives selection, and are
@@ -365,10 +370,12 @@ publication grids, and figure generation remain outside the repository.
 
 All six owner-authorized new-user onboarding patches are complete under Decisions 0099--0104.
 Decision 0105 aligns the complete documentation and maintained examples with the resulting
-implementation. The README and served home page now explain the intended use of the separate Pi-PLS rank controls without
-claiming general superiority, and both tutorials defer source and figure-generation provenance until
-a terminal reproduction section. No package release preparation or Python-package publication work
-is authorized.
+implementation. The README and served home page now explain the intended use of the separate Pi-PLS
+rank controls without claiming general superiority, and both tutorials defer source and
+figure-generation provenance until a terminal reproduction section. The active guide layer is
+synchronized with the maintained example numbers, public defaults, runtime ownership, documentation
+workflow, and owner-requested patch handoff. No package release preparation or Python-package
+publication work is authorized.
 
 ## Subsequent roadmap
 
@@ -417,7 +424,7 @@ From an uploaded snapshot, a maintainer should:
 9. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
 10. verify that the requested work is the current increment or that the owner explicitly changed
     the order;
-11. return one root-relative unified Git patch, validation results, and exact direct Git commands.
+11. return a downloadable root-relative unified Git patch, its SHA-256 checksum, validation results, and the concise apply/check/commit/snapshot command sequence.
 
 Routine package work should not require re-uploading a manuscript. Request external scientific
 material only when the repository contracts identify a genuine unresolved scientific choice.

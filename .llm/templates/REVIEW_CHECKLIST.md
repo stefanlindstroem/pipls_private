@@ -1,7 +1,8 @@
 # Review checklist
 
 - Scope is one coherent increment and follows `.llm/state.md` or an explicit owner reordering.
-- Patch paths are repository-relative and apply cleanly to the uploaded snapshot.
+- Patch paths are repository-relative, apply cleanly to the uploaded snapshot, and are accompanied
+  by a SHA-256 checksum.
 - Source/tests agree with the claimed implemented state.
 - Mathematical dimensions and invariants remain consistent.
 - Numerical tolerances are scale-relative and tested.

@@ -29,8 +29,17 @@
 
 ## Output
 
-Return one unified Git patch relative to repository root, a concise behavioral summary, exact
-direct Git commands, and a validation report:
+Return one downloadable unified Git patch relative to repository root, a separate SHA-256
+checksum, a concise behavioral summary, the routine five-command apply/check/commit/snapshot
+sequence, and a validation report:
+
+```bash
+git apply ~/Downloads/proposed-change.patch
+make check
+git add -A
+git commit -m "Describe the completed increment"
+make snapshot
+```
 
 ```text
 Validation:

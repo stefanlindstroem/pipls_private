@@ -72,11 +72,12 @@ the normative contracts preserve the accepted scientific construction.
 
 For a bounded implementation request, return:
 
-- one unified Git patch relative to repository root;
+- one downloadable unified Git patch relative to repository root;
+- a separate SHA-256 checksum for that patch;
 - a concise description of changed contracts and observable behavior;
 - validation results for every applicable Makefile target, marked passed, failed, or not run;
-- exact direct Git commands for applicability checking, application, inspection, validation,
-  staging, committing, and snapshot creation.
+- the concise routine command sequence for application, validation, staging, committing, and
+  snapshot creation. Add troubleshooting or inspection commands only when the patch needs them.
 
 Do not promise later/background work, bundle unrelated future phases, or require the user to
 restate decisions already captured in the repository.
@@ -96,43 +97,24 @@ tar -tzf ../pipls-snapshot.tar.gz | head
 The snapshot contains the contents of the repository root, without an enclosing project-name
 directory. Archive paths therefore match root-relative Git patch paths.
 
-Request one small, testable increment. The response should provide one root-relative unified Git
-patch and a validation report. Save the patch, normally under `~/Downloads`.
+Request one small, testable increment. The response should provide one downloadable root-relative
+unified Git patch, its SHA-256 checksum, and a validation report. Save both files, normally under
+`~/Downloads`.
 
-From the repository root, check and apply it directly with Git:
+The routine command sequence shown with a patch is intentionally short:
 
 ```bash
-git status --short
-git apply --check ~/Downloads/proposed-change.patch
 git apply ~/Downloads/proposed-change.patch
-```
-
-The first command should normally print nothing. The applicability check and application are
-silent on success. Then inspect and validate:
-
-```bash
-git status
-git diff --check
-git diff
 make check
-```
-
-When satisfied, stage and inspect exactly what will be committed:
-
-```bash
 git add -A
-git diff --cached --check
-git diff --cached --stat
-git diff --cached
-```
-
-Commit only after reviewing the staged diff:
-
-```bash
 git commit -m "Describe the completed increment"
-git status
 make snapshot
 ```
+
+The maintainer producing the patch must already have verified `git apply --check` against a clean
+extraction. The owner may additionally inspect `git status`, `git diff`, or the staged diff at any
+point; include those commands in the response only when a special migration or troubleshooting step
+requires them. The supplied SHA-256 file supports optional patch-integrity verification.
 
 To discard an uncommitted applied patch, use Git rather than a helper script:
 
@@ -146,9 +128,8 @@ git clean -fd   # remove them only after reviewing the preview
 The complete exchange cycle is therefore:
 
 ```text
-commit clean state -> make snapshot -> upload -> receive patch -> git apply --check
--> git apply -> inspect and validate -> git add -> inspect staged diff -> git commit
--> make next snapshot
+commit clean state -> make snapshot -> upload -> receive patch and checksum -> git apply
+-> make check -> git add -A -> git commit -> make next snapshot
 ```
 
 ## Helper scripts

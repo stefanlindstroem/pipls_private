@@ -36,3 +36,7 @@ examples/results/*
 benchmarks/.cache/
 
 .mkdocs-pages.yml
+
+# Generated example figures
+/examples/results/*.pdf
+/examples/results/**/*.pdf

@@ -88,7 +88,8 @@ response-subspace and coupling SVDs remain exact.
 
 The estimator provides PLS-style `fit`, `predict(X, copy=True)`,
 `transform(X, y=None, copy=True)`, tuple-valued `fit_transform(X, y)`, `inverse_transform`, and
-scalar R2 `score`. It supports feature names and pandas output. Standard PLS-style fitted
+scalar R2 `score`. It supports feature names and inherited scikit-learn `set_output()`
+configuration for transform containers, including pandas output. Standard PLS-style fitted
 attributes, coefficients, and scores remain available. The frozen `decomposition_` object exposes
 only interpretable predictor rotations, dilation values, response rotations, numerical-rank
 diagnostics, the resolved predictor solver, and the derived centered/scaled regression map. The

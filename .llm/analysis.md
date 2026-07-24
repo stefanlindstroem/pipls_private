@@ -284,7 +284,7 @@ methods. The implementation validates this structural contract rather than using
 `(n_targets, n_features)`.
 
 Example 04 uses ordinary PLS only for the comparative component-path CV-MSE curves. Examples
-10–12 evaluate Pi-PLS paths only. After a Pi-PLS configuration is selected, one fitted
+05–07 evaluate Pi-PLS paths only. After a Pi-PLS configuration is selected, one fitted
 `PiPLSRegression` supplies the shared
 scores, loadings, coefficients, biplot coordinates, observation diagnostics, and OOF prediction
 diagnostics. No second ordinary PLS model is fitted for post-analysis. Tests may and should apply

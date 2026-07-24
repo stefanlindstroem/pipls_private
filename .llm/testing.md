@@ -23,7 +23,8 @@ Tests may verify:
 - presence, encoding, parsability, and structural format of shipped Markdown, YAML, CSV, TOML, and
   shell files;
 - generic consistency rules, such as every indexed decision record existing and every shipped
-  decision record appearing in the index;
+  decision record appearing in the index, and every top-level runtime Python module appearing in the
+  project ownership map;
 - snapshot integrity in isolated Git repositories: clean committed-tree contents, refusal of
   tracked/staged/nonignored-untracked changes, exclusion of ignored files, truthful metadata, and
   refusal of committed generated files below `examples/results/`;

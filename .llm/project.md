@@ -16,8 +16,9 @@ implemented boundary and next increment; this file records where responsibilitie
 
 ## Current state
 
-Phases A through F4, documentation Patches D1--D4, plotting migrations G1--G5, and public-result
-cleanup steps API1--API3 are complete. The owner-led new-user onboarding audit is in progress.
+Phases A through F4, documentation Patches D1--D4, plotting migrations G1--G5, public-result
+cleanup steps API1--API3, the six-patch new-user onboarding series, and the documentation alignment
+pass are complete. The owner-led human audit continues from the current clean snapshot.
 The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
@@ -30,8 +31,8 @@ from those results with Matplotlib; annotated biplots use optional `adjustText`.
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
 Steel table, SARCOS, and FRED-MD from this repository because the exact source materials do not
-carry sufficiently clear redistribution rights. Public navigation now describes the installable
-package, API, examples, datasets, validation, and releases.
+carry sufficiently clear redistribution rights. Public navigation now separates tutorials, examples, programming reference, project
+validation, and scientific background.
 The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
 The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
 Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
@@ -110,7 +111,11 @@ implementing or reviewing this surface.
 - `src/pipls/_core.py`: fixed-`(n_components, predictor_rank)` numerical core.
 - `src/pipls/_cv_engine.py`: path-owned fold-local candidate evaluation, scoring, timing, caching,
   warning filtering, and OOF support.
+- `src/pipls/_result_validation.py`: shared private scalar, array, shape, finiteness, and pickle
+  validation for immutable public result records.
 - `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation and tags.
+- `src/pipls/component_path.py`: immutable component-path, scalar component-result, and conditional
+  predictor-rank-profile records.
 - `src/pipls/decomposition.py`: immutable public Pi-PLS factorization result.
 - `src/pipls/datasets.py`: optional immutable dataset container and deterministic synthetic
   generators; it is not required for user-supplied real data.
@@ -137,7 +142,8 @@ implementing or reviewing this surface.
   fixtures require separate review.
 - `tests/examples/`: small-data helper, CSV, PDF, and workflow-structure contracts; complete real-data
   examples are user-run and are not executed by the default test suite.
-- `tests/test_repository_seed.py`: `.llm` navigation, snapshot layout, and workflow invariants.
+- `tests/test_repository_seed.py`: `.llm` navigation, runtime-ownership coverage, patch-handoff
+  structure, snapshot layout, and workflow invariants.
 
 ## Product-asset ownership
 
@@ -163,11 +169,13 @@ implementing or reviewing this surface.
   theory, generated-API source pages, release notes, local MathJax configuration, and maintainer
   records under `docs/decisions/`. Root `mkdocs.yml` defines the strict Material site and excludes
   the maintainer records from rendered pages and search.
-- packaging and release configuration: installable distributions, compatibility policy, versioning,
-  and release automation. `constraints/minimum.txt` records the maintainer-only lower-bound test
+- packaging and distribution configuration: installable distributions, compatibility policy, and
+  version metadata. `constraints/minimum.txt` records the maintainer-only lower-bound test
   environment; `.github/workflows/tests.yml` owns the three compatibility CI environments;
   `.github/workflows/build.yml` and `tools/check_distributions.py` own clean artifact-installation
-  validation; `docs/compatibility.md` owns the public support statement.
+  validation; `.github/workflows/documentation.yml` and `tools/configure_pages_docs.py` own strict
+  documentation CI and repository-derived GitHub Pages deployment; `docs/compatibility.md` owns the
+  public support statement. Package-release automation is not implemented or authorized.
 
 ## Contract and documentation ownership
 

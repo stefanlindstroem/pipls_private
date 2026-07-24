@@ -100,8 +100,7 @@ def test_optional_dependency_groups_match_maintained_workflows() -> None:
     assert not any(requirement.startswith("pytest-cov") for requirement in extras["dev"])
     assert not any(requirement.startswith("ruff") for requirement in extras["docs"])
     assert not any(
-        requirement.startswith(("pandas", "matplotlib", "adjustText"))
-        for requirement in runtime
+        requirement.startswith(("pandas", "matplotlib", "adjustText")) for requirement in runtime
     )
 
     docs = set(extras["docs"])
@@ -288,9 +287,12 @@ def test_documentation_ci_builds_checkout_and_source_distribution() -> None:
     assert 'python -m pip install -e ".[docs]"' in commands
     assert "make docs" in commands
     assert "make docs-dist" in commands
-    assert "docs" not in yaml.safe_load(
-        (root / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
-    )["jobs"]
+    assert (
+        "docs"
+        not in yaml.safe_load(
+            (root / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
+        )["jobs"]
+    )
 
 
 def test_documentation_ci_deploys_only_the_master_pages_site(tmp_path: Path) -> None:
@@ -316,9 +318,9 @@ def test_documentation_ci_deploys_only_the_master_pages_site(tmp_path: Path) -> 
     }
     conditional_steps = [step for step in build_steps if "if" in step]
     assert conditional_steps
-    assert {
-        step["if"] for step in conditional_steps
-    } == {"github.event_name == 'push' && github.ref == 'refs/heads/master'"}
+    assert {step["if"] for step in conditional_steps} == {
+        "github.event_name == 'push' && github.ref == 'refs/heads/master'"
+    }
 
     output = tmp_path / "mkdocs-pages.yml"
     subprocess.run(
@@ -352,13 +354,8 @@ def test_examples_extra_declares_data_and_rendering_dependencies() -> None:
         "adjustText>=1.4,<2",
     ]
     assert set(extras["examples"]) <= set(extras["dev"])
-    assert not any(
-        requirement.startswith(("matplotlib", "adjustText"))
-        for requirement in runtime
-    )
+    assert not any(requirement.startswith(("matplotlib", "adjustText")) for requirement in runtime)
     assert "plot" not in extras
-
-
 
 
 def test_make_examples_runs_every_numbered_example() -> None:
@@ -395,6 +392,34 @@ def test_make_examples_runs_every_numbered_example() -> None:
     assert actual == expected
     assert positions == sorted(positions)
     assert completed.stdout.count("MPLBACKEND=Agg") == 1
+
+
+def test_llm_project_maps_every_runtime_module() -> None:
+    root = _repository_root()
+    project = (root / ".llm" / "project.md").read_text(encoding="utf-8")
+    documented = set(re.findall(r"`(src/pipls/[A-Za-z0-9_]+\.py)`", project))
+    runtime_modules = {
+        path.relative_to(root).as_posix() for path in (root / "src" / "pipls").glob("*.py")
+    }
+
+    assert documented == runtime_modules
+
+
+def test_patch_request_template_has_downloadable_checksum_handoff() -> None:
+    template = (_repository_root() / ".llm" / "templates" / "PATCH_REQUEST.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "downloadable unified Git patch" in template
+    assert "SHA-256" in template
+    for command in (
+        "git apply",
+        "make check",
+        "git add -A",
+        "git commit",
+        "make snapshot",
+    ):
+        assert command in template
 
 
 def test_required_llm_contracts_exist_and_are_formatted() -> None:

@@ -52,7 +52,7 @@ This index is navigation, not a substitute for those records.
 | `0044-minimal-onboarding-and-example-support.md` | user onboarding and example organization | literal-matrix first example; complete-workflow helpers under `examples/_support/`; one examples target retained |
 | `0045-pls-family-analysis-boundary.md` | comparison versus fitted-model analysis ownership | retain ordinary PLS for CV-MSE comparison; keep $P$, $D$, and $Q$ Pi-PLS-specific; make shared analysis estimator-neutral and apply it only to Pi-PLS in numbered examples |
 | `0046-concise-numbered-examples.md` | pedagogical example minimality | keep scientific stages explicit; remove one-use scaffolding and redundant repository-data checks; track required result directories |
-| `0047-separate-pls-path-comparison-example.md` | comparison versus normal analysis examples | isolate all PLS path comparisons in example 09; keep examples 10–12 Pi-PLS-only and co-locate path and post-analysis artifacts |
+| `0047-separate-pls-path-comparison-example.md` | comparison versus normal analysis examples | isolate all PLS path comparisons in the dedicated comparison example; Decision 0101 later renumbers it to example 04 and the Pi-PLS-only real-data analyses to examples 05–07 |
 | `0048-self-contained-user-examples.md` | user-facing example semantics | remove context-free advanced CV; require explained data, labeled output, and publication-independent numbered examples |
 | `0049-public-documentation-source-boundary.md` | public documentation ownership | `docs/` is self-contained; user guides describe implemented behavior and do not depend on `.llm` or repository-external Markdown |
 | `0050-buildable-documentation-foundation.md` | strict MkDocs foundation | Material, MathJax, user navigation, and `make docs` define the buildable public site |
@@ -173,9 +173,9 @@ plan contains an earlier or more general proposal:
   and declared comparator benchmarks; $P$, $D$, and $Q$ inspection stays Pi-PLS-specific; shared
   score, loading, coefficient, biplot, observation, and prediction analysis uses estimator-neutral
   APIs and is applied only to the selected Pi-PLS model in numbered examples;
-- Decision 0047 isolates all real-data Pi-PLS-versus-PLS path comparisons in example 09;
-  Decisions 0067–0069 subsequently make Sugarcane, Pulp, and Tobacco direct Pi-PLS-only in-memory
-  workflows.
+- Decision 0047 isolates all real-data Pi-PLS-versus-PLS path comparisons in the dedicated
+  comparison example; Decision 0101 assigns it the current number 04, while examples 05–07 are the
+  direct Pi-PLS-only Pulp, Sugarcane, and Tobacco workflows.
 - repository tests validate executable behavior and durable file structure rather than pinning
   living roadmap prose or documentary metadata values;
 - `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only
@@ -189,13 +189,13 @@ plan contains an earlier or more general proposal:
   performance claim before calibration;
 - the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
-- example 09 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
-  Sugarcane, and Tobacco plot `component_path_` directly in memory; every complete real-data analysis
-  fits a separate fixed model after an explicit user component choice;
+- example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
+  Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; every complete
+  real-data analysis fits a separate fixed model after an explicit user component choice;
 - fold SD is descriptive, while component count remains a visible path-based user choice;
-- example 09 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
-  dataset; Pulp, Sugarcane, and Tobacco write final PDFs directly from in-memory Pi-PLS results, with Pulp
-  exposing the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,
+- example 04 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
+  dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with Pulp exposing
+  the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,
   source-order response pagination, and raw observation diagnostics; randomized SVD is covered by
   the solver-consistency benchmark;
 - Python 3.10–3.14 are supported; runtime metadata admits NumPy 1.26--2.x,
