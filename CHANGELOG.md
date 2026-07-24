@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Normalize the unreleased changelog structure and update maintained example references after
+  the continuous 01--07 renumbering.
+
 - Synchronize the `.llm` guide layer with the current repository: use the maintained 01--07 example
   numbers, record the stable path-scoring default, complete runtime and documentation-workflow
   ownership, and standardize downloadable patch handoffs with SHA-256 checksums and the concise
@@ -102,8 +107,6 @@
 - Complete the data-first rendering migration: define immutable inspection results as the
   compatibility surface, keep Matplotlib and `adjustText` optional, document caller-owned
   rendering, and enforce the absence of package plotters and hidden chart helpers.
-## Unreleased
-
 - Renumber the maintained examples continuously from 01 through 07 and label the first example's terminal output.
 - Render Pi-PLS $P$, $D$, $Q$, and $QD$ factors directly from immutable arrays, remove the complete `pipls.plotting` module and its generated API page, and retire the `plot` optional dependency extra.
 - Render standard PLS-family scores, loadings, coefficients, and observation diagnostics directly from immutable arrays, and remove their five public convenience plotters.
@@ -159,7 +162,7 @@
   that prevent generated analytical CSV intermediates or file-based plotting in numbered examples.
 
 - Make the Pi-PLS/ordinary-PLS path comparison direct: return immutable ordinary-PLS path arrays,
-  plot both methods in example 09 with ordinary Matplotlib, write only three final PDFs, and remove
+  plot both methods in example 04 with ordinary Matplotlib, write only three final PDFs, and remove
   the comparison CSV intermediates and plotting helper.
 
 - Make Tobacco a direct in-memory workflow: preserve full predictor SVD, adaptive rank scanning,
@@ -169,7 +172,7 @@
 
 - Make the Pulp example and tutorial direct: remove the one-step workflow wrapper and generated
   analysis CSV round trips, calculate path selection, fixed fitting, scikit-learn OOF predictions,
-  and immutable inspection results visibly in example 10, add a three-component predictor-rank
+  and immutable inspection results visibly in example 05, add a three-component predictor-rank
   profile, and write six final PDF figures from in-memory results.
 
 - Make Sugarcane the direct reference workflow: plot `component_path_` in memory, use
@@ -233,13 +236,13 @@
   conditional outputs.
 - Add a strict MkDocs documentation build with Material navigation, MathJax rendering, dedicated documentation dependencies, and ignored `site/` output.
 - Define `docs/` as the self-contained public documentation source, add public example and design-decision navigation, expand the implemented Pi-PLS theory guide, and remove unused selection alternatives from current documentation.
-- Align component-path documentation with the current example ownership: example 09 owns explicit
-  Pi-PLS-versus-PLS comparisons, examples 10–12 use Pi-PLS-only paths, fold SD remains descriptive,
+- Align component-path documentation with the current example ownership: example 04 owns explicit
+  Pi-PLS-versus-PLS comparisons, examples 05–07 use Pi-PLS-only paths, fold SD remains descriptive,
   and component count remains an explicit path-based choice.
 - Remove the context-free advanced-cross-validation example; keep grouped, leave-one-out, and temporal splitters in the dedicated cross-validation documentation.
 - Rewrite the synthetic-data example as an explained independent train/test use case with labeled matrix dimensions, latent structure, fitted parameters, prediction shape, and test $R^2$.
 - Require numbered examples to demonstrate self-contained user tasks, comparisons, or benchmarks without publication context.
-- Separate comparison from normal analysis examples: add one dedicated Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS path-comparison example, and make examples 10–12 write Pi-PLS-only `component_path.csv` and `component_path.pdf` beside each dataset post-analysis report.
+- Separate comparison from normal analysis examples: add one dedicated Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS path-comparison example, and make examples 05–07 write Pi-PLS-only `component_path.csv` and `component_path.pdf` beside each dataset post-analysis report.
 
 - Shorten the numbered examples without changing their analyses: inline one-use arguments, remove redundant checks of committed CSV headers and axis order, use one selected Pi-PLS object for fixed-fit and OOF calls, reduce console scaffolding, and track required result directories instead of creating them at runtime.
 
