@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Strengthen the documentation-home motivation by distinguishing the theoretical foundations of
+  Pi-PLS and ordinary PLS and directing readers to the maintained example-04 CV-MSE comparisons.
+
 - Normalize the unreleased changelog structure and update maintained example references after
   the continuous 01--07 renumbering.
 

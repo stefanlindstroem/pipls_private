@@ -5,12 +5,12 @@ paired predictor and response latent variables.
 
 ## When Pi-PLS may be useful
 
-Pi-PLS is designed for multivariate responses and predictor blocks whose structured variation need
-not all be predictive. It separates the predictor-subspace rank from the number of paired
-predictor-response components, so those dimensions can be selected and interpreted independently.
-That extra control is a modeling option rather than a general performance claim: ordinary PLS and
-other multivariate regression methods may be more suitable for a particular dataset or validation
-question.
+Although Pi-PLS and ordinary PLS have similar names and belong to the same broad family of
+latent-variable regression methods, their theoretical foundations differ. The maintained
+[PLS path comparisons](examples.md#pi-pls-and-ordinary-pls-comparison) show Pi-PLS attaining lower
+cross-validated prediction error than ordinary PLS at a given number of latent components. The
+figures and comparison procedure are provided in example 04. These displayed results motivate
+Pi-PLS but are not a general performance claim and do not imply universal superiority.
 
 ## Choose a tutorial
 
