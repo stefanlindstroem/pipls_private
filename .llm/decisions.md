@@ -104,6 +104,7 @@ This index is navigation, not a substitute for those records.
 | `0096-notation-path-ceilings-and-inspection-navigation.md` | notation, path ceilings, and inspection navigation | distinguish mathematical $Y$ from scikit-learn `y`, define both path ceilings first, and group inspection concepts with its API |
 | `0097-focused-leave-one-out-example.md` | focused leave-one-out example | show one small calibration workflow with singleton-safe scoring, ordered OOF predictions, and pooled OOF $R^2$ |
 | `0098-grouped-make-help.md` | grouped maintainer command index | highlight setup and routine validation, then group unchanged Make targets by task |
+| `0099-example-artifact-and-sdist-boundary.md` | example artifact and source-distribution boundary | commit and snapshot only result-directory placeholders; include them in sdists and run example 01 from an extracted sdist |
 
 ## Implemented estimator/search transition
 

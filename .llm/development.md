@@ -88,7 +88,9 @@
   performs a clean install and strict build from
   the unpacked sdist and therefore remains outside the ordinary fast test target. Use
   `make dist-check` for packaging, dependency, public-module, or included-data changes; it builds
-  once and checks separate clean wheel and sdist installations outside the checkout.
+  once and checks separate clean wheel and sdist installations outside the checkout. The sdist
+  check also installs the `examples` extra, runs example 01 from the extracted source tree, and
+  verifies that its repository-owned output directory is present and writable.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
 - Design each benchmark around one explicit user-facing question. Give it one readable script and
@@ -118,7 +120,8 @@
   datasets.
 - Create handoff snapshots only from a clean committed Git tree. `make snapshot` must refuse
   tracked, staged, or nonignored untracked changes and must archive `HEAD`, so ignored generated
-  files cannot enter the handoff.
+  files cannot enter the handoff. It must also refuse a clean `HEAD` that contains committed files
+  below `examples/results/` other than `.gitkeep` placeholders.
 
 ## Delivery and validation
 

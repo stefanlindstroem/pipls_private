@@ -114,3 +114,4 @@ reference describe the current public behavior directly.
 - [0091: clean committed-tree snapshots](0091-clean-git-snapshots.md)
 - [0094: inspection result safety](0094-inspection-result-safety.md)
 - [0098: grouped maintainer command index](0098-grouped-make-help.md)
+- [0099: example artifact and source-distribution boundary](0099-example-artifact-and-sdist-boundary.md)

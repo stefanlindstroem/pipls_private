@@ -122,7 +122,7 @@ thirteen responses in source order. Generated files under `examples/results/` ar
 ## Output directories
 
 `examples/results/`, the synthetic-tutorial and PLS-path-comparison directories, and the Pulp,
-Sugarcane, and Tobacco post-analysis subdirectories are tracked with placeholder files. The examples therefore write directly to known destinations and do not
-contain directory-creation code. Generated PDF files remain ignored,
-and `make clean`
-removes them while preserving the tracked directory structure.
+Sugarcane, and Tobacco post-analysis subdirectories are tracked with placeholder files and shipped
+in the source distribution. The examples therefore write directly to known destinations and do not
+contain directory-creation code. Generated PDF files remain ignored, and `make clean` removes them
+while preserving the tracked directory structure.

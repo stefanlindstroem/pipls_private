@@ -74,6 +74,7 @@ def test_source_distribution_manifest_includes_documentation_build_inputs() -> N
         "include tools/render_synthetic_tutorial.py",
         "include tools/render_pulp_tutorial.py",
         "recursive-include docs *.md *.js",
+        "recursive-include examples/results .gitkeep",
     } <= manifest_lines
 
 
@@ -198,9 +199,7 @@ def test_make_help_and_documentation_preview_are_discoverable() -> None:
     assert "Usage: make <target>" in default_output
     assert re.search(r"^First setup:\s+make install$", help_output, re.MULTILINE)
     assert re.search(r"^Routine validation:\s+make check$", help_output, re.MULTILINE)
-    assert public_targets == set(
-        re.findall(r"^([A-Za-z0-9_.-]+):.*## .+$", makefile, re.MULTILINE)
-    )
+    assert public_targets == set(re.findall(r"^([A-Za-z0-9_.-]+):.*## .+$", makefile, re.MULTILINE))
 
     section_positions = [help_output.index(f"{section}:") for section in target_groups]
     assert section_positions == sorted(section_positions)
@@ -379,8 +378,7 @@ def _create_snapshot_test_repository(path: Path) -> Path:
     shutil.copy2(_repository_root() / ".llm" / "snapshot.sh", root / ".llm" / "snapshot.sh")
     (root / "README.md").write_text("# Snapshot fixture\n", encoding="utf-8")
     (root / ".gitignore").write_text(
-        "benchmarks/results/\ndocs/assets/generated/\n.pytest_cache/\n"
-        "*-snapshot.tar.gz\n",
+        "benchmarks/results/\ndocs/assets/generated/\n.pytest_cache/\n*-snapshot.tar.gz\n",
         encoding="utf-8",
     )
 
@@ -458,6 +456,40 @@ def test_snapshot_has_committed_repository_contents_at_archive_root(tmp_path: Pa
     assert archived_results == expected_result_placeholders
 
 
+def test_example_result_tree_contains_placeholders_and_ignored_outputs() -> None:
+    repository_root = _repository_root()
+    result_root = repository_root / "examples" / "results"
+    expected_placeholders = {
+        ".gitkeep",
+        "pls_path_comparison/.gitkeep",
+        "pulp_post_analysis/.gitkeep",
+        "sugarcane_post_analysis/.gitkeep",
+        "synthetic_tutorial/.gitkeep",
+        "tobacco_post_analysis/.gitkeep",
+    }
+    result_files = {
+        path.relative_to(result_root).as_posix()
+        for path in result_root.rglob("*")
+        if path.is_file()
+    }
+
+    assert expected_placeholders <= result_files
+
+    generated_paths = sorted(
+        f"examples/results/{path}" for path in result_files - expected_placeholders
+    )
+    if generated_paths:
+        ignored = subprocess.run(
+            ["git", "check-ignore", "--no-index", "--stdin"],
+            cwd=repository_root,
+            input="\n".join(generated_paths),
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert set(ignored.stdout.splitlines()) == set(generated_paths)
+
+
 def test_snapshot_refuses_modified_staged_and_untracked_files(tmp_path: Path) -> None:
     for state in ("modified", "staged", "untracked"):
         root = _create_snapshot_test_repository(tmp_path / state)
@@ -480,6 +512,32 @@ def test_snapshot_refuses_modified_staged_and_untracked_files(tmp_path: Path) ->
         assert completed.returncode != 0
         assert "Refusing to create a snapshot from a dirty worktree" in completed.stderr
         assert not archive.exists()
+
+
+def test_snapshot_refuses_committed_generated_example_outputs(tmp_path: Path) -> None:
+    root = _create_snapshot_test_repository(tmp_path)
+    generated = root / "examples" / "results" / "generated.pdf"
+    generated.write_bytes(b"%PDF-generated fixture\n")
+    subprocess.run(["git", "add", "examples/results/generated.pdf"], cwd=root, check=True)
+    subprocess.run(
+        ["git", "commit", "--quiet", "-m", "Commit generated output"],
+        cwd=root,
+        check=True,
+    )
+    archive = tmp_path / "snapshot.tar.gz"
+
+    completed = subprocess.run(
+        [str(root / ".llm" / "snapshot.sh"), str(archive)],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode != 0
+    assert "committed generated example outputs" in completed.stderr
+    assert "examples/results/generated.pdf" in completed.stderr
+    assert not archive.exists()
 
 
 def test_snapshot_ignores_ignored_generated_files(tmp_path: Path) -> None:

@@ -15,13 +15,17 @@ Tests may verify:
   scikit-learn composition;
 - focused benchmark runners and small example helper contracts;
 - package and source-distribution contents, plus clean installed wheel and source-distribution
-  runtime behavior at the public import and representative fit/predict boundary;
+  runtime behavior at the public import and representative fit/predict boundary; extracted source
+  distributions must retain example output-directory placeholders and run example 01 after the
+  `examples` extra is installed;
 - presence, encoding, parsability, and structural format of shipped Markdown, YAML, CSV, TOML, and
   shell files;
 - generic consistency rules, such as every indexed decision record existing and every shipped
   decision record appearing in the index;
 - snapshot integrity in isolated Git repositories: clean committed-tree contents, refusal of
-  tracked/staged/nonignored-untracked changes, exclusion of ignored files, and truthful metadata;
+  tracked/staged/nonignored-untracked changes, exclusion of ignored files, truthful metadata, and
+  refusal of committed generated files below `examples/results/`;
+- the repository example-result tree containing only `.gitkeep` directory placeholders;
 - repository dataset tables being readable numeric comma-separated files with aligned rows;
 - explicitly frozen package-benchmark results after a separate decision defines their scientific
   meaning, tolerances, and update procedure.

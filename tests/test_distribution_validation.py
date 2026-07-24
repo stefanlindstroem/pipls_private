@@ -31,6 +31,7 @@ def test_distribution_check_is_a_public_make_target_and_sdist_input() -> None:
     assert "tools/check_distributions.py" in dry_run.stdout
     assert "dist-check" in help_output
     assert "include tools/check_distributions.py" in manifest
+    assert "recursive-include examples/results .gitkeep" in manifest
 
 
 def test_distribution_helper_builds_once_and_checks_both_artifacts() -> None:
@@ -39,10 +40,14 @@ def test_distribution_helper_builds_once_and_checks_both_artifacts() -> None:
     assert helper.count('"-m", "build"') == 1
     assert '_single_artifact(artifacts, "*.whl", "wheel")' in helper
     assert 'artifacts, "*.tar.gz", "source distribution"' in helper
-    assert '("wheel", wheel)' in helper
-    assert '("sdist", source_distribution)' in helper
+    assert '("wheel", wheel, False)' in helper
+    assert '("sdist", source_distribution, True)' in helper
     assert "cwd=run_directory" in helper
     assert 'environment.pop("PYTHONPATH", None)' in helper
+    assert "_check_source_distribution_example" in helper
+    assert 'f"pipls[examples] @ {artifact.resolve().as_uri()}"' in helper
+    assert 'source / "examples" / "01_minimal_fit_and_plot.py"' in helper
+    assert 'source / "examples" / "results" / "minimal_fit_and_plot.pdf"' in helper
 
 
 def test_distribution_smoke_test_covers_public_installed_behavior() -> None:

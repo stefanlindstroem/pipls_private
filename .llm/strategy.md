@@ -631,10 +631,28 @@ route, groups the remaining commands by task, and mirrors that hierarchy in `CON
 
 Current status: **maintainer command orientation complete**.
 
+### Owner-authorized new-user onboarding series
+
+A whole-package audit from a new user's perspective identified six focused increments:
+
+1. remove committed example outputs and make source-distribution examples runnable;
+2. establish the rendered documentation site as the primary user entry;
+3. make numbered examples continuous and improve the first example's terminal output;
+4. align path-search defaults and scorer representation with the documented workflow;
+5. simplify optional dependencies and separate user installation from contributor setup;
+6. refine the landing page and tutorial openings after the preceding contracts settle.
+
+Decision 0099 completes the first increment by committing and snapshotting only example-result
+placeholders, distributing those placeholders, and running example 01 from an extracted source
+distribution. Package release preparation and publication remain outside this series.
+
+Current status: **patch 1/6 complete**.
+
 ## Current next increment
 
-No further implementation increment is authorized. Continue the owner-led human audit and record
-a new focused increment only after an explicit owner decision.
+Implement the rendered-documentation entry only after the owner supplies the canonical public
+repository and documentation URLs. If those URLs remain unresolved, the owner may explicitly move
+to the continuous-example increment without changing package-release scope.
 
 ## Maintenance protocol
 

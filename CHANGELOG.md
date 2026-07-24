@@ -1,5 +1,8 @@
 # Changelog
 
+- Remove committed generated example PDFs, preserve only output-directory placeholders in Git and
+  snapshots, and include those placeholders in source distributions so the introductory example
+  runs from a clean extraction.
 - Group the self-documenting Make command index around setup, routine validation, development,
   documentation and examples, and distribution maintenance, while retaining every target and
   recipe.

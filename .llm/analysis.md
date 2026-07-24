@@ -161,9 +161,11 @@ features without a coherent problem belongs in documentation or focused tests, n
 example.
 
 Keep genuine user choices named, but inline one-use arguments whose function names already explain
-them. Trust committed CSV headers and the tracked `examples/results/` directory structure; do not add
-repeated dtype, ordering, missing-value, or directory-creation checks to the scripts. Reusable helper
-contracts remain tested separately. Brevity removes scaffolding, not explanatory context.
+them. Trust committed CSV headers and the tracked `examples/results/` directory structure; Git and
+source distributions contain only `.gitkeep` placeholders there, while generated PDFs remain local
+and excluded from snapshots. Do not add repeated dtype, ordering, missing-value, or
+directory-creation checks to the scripts. Reusable helper contracts remain tested separately.
+Brevity removes scaffolding, not explanatory context.
 
 Variable-name acquisition is also example-owned. When a table has meaningful headers, examples
 should derive names visibly from `X.columns` and `Y.columns` and use them in direct rendering. Users

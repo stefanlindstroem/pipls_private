@@ -23,6 +23,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
 
 - repository, packaging, clean committed-tree root-relative snapshots, and direct Git patch
   workflow;
+- example output directories represented by committed `.gitkeep` files in both Git and source
+  distributions, with generated PDFs excluded from snapshots and example 01 exercised from an
+  extracted source distribution;
 - fixed-parameter Pi-PLS numerical core;
 - scikit-learn-compatible fixed-model `PiPLSRegression` for one explicit
   `(n_components, predictor_rank)` pair;
@@ -127,6 +130,9 @@ adds one focused small-sample leave-one-out workflow without restoring a context
 catalogue.
 Decision 0098 retains every maintained Make target while grouping the command index around setup,
 routine validation, development, documentation and examples, and distribution maintenance.
+Decision 0099 restores the example artifact boundary: only output-directory placeholders are
+committed or snapshotted, source distributions include those placeholders, and distribution
+validation runs the introductory example from a clean extraction.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -343,15 +349,22 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-The owner-authorized grouped Make-command increment is complete under Decision 0098. No package
-release preparation or publication work is authorized. The project owner is continuing the human
-audit.
+Patch 1/6 of the owner-authorized new-user onboarding series is complete under Decision 0099. The
+next planned increment is the rendered-documentation entry point. It requires the owner-confirmed
+canonical documentation and repository URLs before implementation. No package release preparation
+or publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Human audit:** continue reviewing the complete package and documentation.
-2. **Owner decision:** define the next focused increment only after that review identifies and
-   authorizes it.
+1. **Rendered documentation entry:** publish the strict MkDocs site and route README readers to its
+   rendered tutorials and generated API, after the owner supplies the canonical URLs.
+2. **Continuous examples:** renumber the maintained numbered examples and improve example 01 output.
+3. **Path-search defaults:** resolve the owner-approved `refit` and default-scorer presentation.
+4. **Installation cleanup:** remove unused extras and distinguish source-user installation from
+   contributor setup.
+5. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
+   workflow.
+6. **Human audit:** continue owner review after each focused snapshot.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

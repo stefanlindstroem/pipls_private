@@ -162,4 +162,5 @@ make snapshot
 
 The snapshot target requires a clean committed worktree. It refuses tracked, staged, and
 nonignored untracked changes and archives only `HEAD`, so ignored generated files and caches are
-not included.
+not included. It also refuses committed files below `examples/results/` other than `.gitkeep`
+placeholders.

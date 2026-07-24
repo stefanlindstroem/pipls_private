@@ -20,6 +20,18 @@ if [[ -n "$status" ]]; then
     exit 1
 fi
 
+committed_example_outputs=()
+while IFS= read -r -d '' path; do
+    if [[ "$(basename "$path")" != ".gitkeep" ]]; then
+        committed_example_outputs+=("$path")
+    fi
+done < <(git -C "$root" ls-tree -r -z --name-only HEAD -- examples/results)
+if (( ${#committed_example_outputs[@]} > 0 )); then
+    printf 'Refusing to create a snapshot with committed generated example outputs:\n' >&2
+    printf '  %s\n' "${committed_example_outputs[@]}" >&2
+    exit 1
+fi
+
 commit="$(git -C "$root" rev-parse HEAD)"
 branch="$(git -C "$root" symbolic-ref --quiet --short HEAD || printf 'detached')"
 version="$(PYTHONPATH="$root/src" python3 -c 'import pipls; print(pipls.__version__)' 2>/dev/null || printf 'unknown')"

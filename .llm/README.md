@@ -155,7 +155,8 @@ commit clean state -> make snapshot -> upload -> receive patch -> git apply --ch
 
 - `snapshot.sh [OUTPUT]`: create an upload tarball from a clean committed Git tree. The helper
   refuses tracked, staged, or nonignored untracked changes; ignored generated files are excluded
-  because only `HEAD` is archived.
+  because only `HEAD` is archived. It also rejects committed files below `examples/results/` other
+  than the directory-preserving `.gitkeep` placeholders.
 - `create_patch.sh [OUTPUT]`: optionally export current unstaged changes as a root-relative patch.
 
 Patch application and committing deliberately use ordinary Git commands. This keeps behavior
