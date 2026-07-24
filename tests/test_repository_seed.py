@@ -179,29 +179,38 @@ def test_make_help_and_documentation_preview_are_discoverable() -> None:
         text=True,
     ).stdout
 
-    public_targets = {
-        "help",
-        "install",
-        "test",
-        "lint",
-        "format",
-        "typecheck",
-        "docs",
-        "docs-serve",
-        "docs-dist",
-        "build",
-        "dist-check",
-        "check",
-        "examples",
-        "snapshot",
-        "clean",
+    target_groups = {
+        "Start here": ("help", "install", "check"),
+        "Development": ("test", "lint", "format", "typecheck", "clean"),
+        "Documentation and examples": (
+            "examples",
+            "docs",
+            "docs-serve",
+            "docs-figures",
+            "docs-dist",
+        ),
+        "Distribution and maintenance": ("build", "dist-check", "snapshot"),
     }
+    public_targets = {target for targets in target_groups.values() for target in targets}
 
     assert ".DEFAULT_GOAL := help" in makefile
     assert "Usage: make <target>" in help_output
     assert "Usage: make <target>" in default_output
-    assert public_targets <= set(re.findall(r"^([A-Za-z0-9_.-]+):.*## .+$", makefile, re.MULTILINE))
-    assert all(target in help_output for target in public_targets)
+    assert re.search(r"^First setup:\s+make install$", help_output, re.MULTILINE)
+    assert re.search(r"^Routine validation:\s+make check$", help_output, re.MULTILINE)
+    assert public_targets == set(
+        re.findall(r"^([A-Za-z0-9_.-]+):.*## .+$", makefile, re.MULTILINE)
+    )
+
+    section_positions = [help_output.index(f"{section}:") for section in target_groups]
+    assert section_positions == sorted(section_positions)
+    for index, targets in enumerate(target_groups.values()):
+        start = section_positions[index]
+        end = section_positions[index + 1] if index + 1 < len(section_positions) else None
+        block = help_output[start:end]
+        for target in targets:
+            assert re.search(rf"^  {re.escape(target)}\s+\S", block, re.MULTILINE)
+
     assert "-m mkdocs serve --dev-addr=127.0.0.1:8000" in preview
     assert "http://127.0.0.1:8000/" in preview
 

@@ -113,3 +113,4 @@ reference describe the current public behavior directly.
 - [0090: programming-reference consolidation](0090-reference-consolidation.md)
 - [0091: clean committed-tree snapshots](0091-clean-git-snapshots.md)
 - [0094: inspection result safety](0094-inspection-result-safety.md)
+- [0098: grouped maintainer command index](0098-grouped-make-help.md)

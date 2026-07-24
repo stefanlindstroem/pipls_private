@@ -1,5 +1,8 @@
 # Changelog
 
+- Group the self-documenting Make command index around setup, routine validation, development,
+  documentation and examples, and distribution maintenance, while retaining every target and
+  recipe.
 - Add a focused small-sample leave-one-out example with singleton-safe path scoring, ordered OOF
   predictions, complete coverage reporting, and an explicit distinction between pooled OOF $R^2$
   and undefined mean foldwise $R^2$.

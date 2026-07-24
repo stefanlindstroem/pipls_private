@@ -92,6 +92,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   utility groups live with their owning estimators, path selection and cross-validation share one
   advanced page, and model inspection retains all stable interpretation anchors without repeating
   elementary plotting recipes.
+- a grouped self-documenting maintainer command index that presents `make install` and `make check`
+  first, then separates development, documentation/example, and distribution/maintenance targets
+  without renaming or changing any recipe.
 
 Decision 0086 reduces the public decomposition to quantities used for fitted-model interpretation;
 private construction matrices remain in `PiPLSCoreResult`. Decision 0087 removes scorer plumbing,
@@ -122,6 +125,8 @@ distinguishes mathematical $Y$ from scikit-learn `y`, defines both resolved path
 policy details, and groups inspection concepts with the generated inspection API. Decision 0097
 adds one focused small-sample leave-one-out workflow without restoring a context-free splitter
 catalogue.
+Decision 0098 retains every maintained Make target while grouping the command index around setup,
+routine validation, development, documentation and examples, and distribution maintenance.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -338,9 +343,9 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-The owner-authorized three-patch human-audit continuation is complete. No package release
-preparation, publication work, or further implementation increment is authorized. The project
-owner is continuing the human audit.
+The owner-authorized grouped Make-command increment is complete under Decision 0098. No package
+release preparation or publication work is authorized. The project owner is continuing the human
+audit.
 
 ## Subsequent roadmap
 

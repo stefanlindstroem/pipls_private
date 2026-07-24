@@ -15,7 +15,7 @@ Create and activate a development environment from the repository root:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -e ".[dev]"
+make install
 make check
 ```
 
@@ -28,38 +28,49 @@ git status
 make check
 ```
 
-Refresh the editable installation after dependency changes:
+Refresh the editable installation after dependency changes with `make install`.
 
-```bash
-python -m pip install -e ".[dev]"
-```
-
-Run `make help` for the maintained command index.
+Run `make help` for the maintained command index. It presents first setup and routine validation
+before the task-specific groups.
 
 ## Validation commands
 
-The standard source checks are:
+After activating the development environment, the primary route is:
 
 ```bash
+make install
 make check
 ```
 
-This runs tests, Ruff, and strict mypy checks. Use the more specific targets while developing:
+`make check` runs tests, Ruff, and strict mypy checks. Use the grouped targets when working on a
+specific part of the repository:
 
 ```text
-make test          run the test suite
-make lint          run Ruff checks
-make format        format Python files with Ruff
-make typecheck     run strict mypy checks
-make examples      run every numbered example
-make docs-figures  regenerate both tutorial figure sets
-make docs          build the strict MkDocs site
-make docs-serve    preview the site locally
-make docs-dist     rebuild the site from a clean source distribution
-make build         build the wheel and source distribution
-make dist-check    verify clean wheel and source-distribution installations
-make clean         remove generated files and caches
-make snapshot      create an uploadable repository snapshot
+Development
+  make test          run the test suite
+  make lint          run Ruff checks
+  make format        format Python files with Ruff
+  make typecheck     run strict mypy checks
+  make clean         remove generated files and caches
+
+Documentation and examples
+  make examples      run every numbered example
+  make docs          build the strict MkDocs site and its tutorial figures
+  make docs-serve    generate figures and preview the site locally
+  make docs-figures  regenerate both tutorial figure sets only
+  make docs-dist     rebuild the site from a clean source distribution
+
+Distribution and maintenance
+  make build         build the wheel and source distribution
+  make dist-check    verify clean wheel and source-distribution installations
+  make snapshot      create an uploadable repository snapshot
+```
+
+Documentation targets use the dedicated documentation extra. Before documentation work, install
+it alongside the development dependencies:
+
+```bash
+python -m pip install -e ".[dev,docs]"
 ```
 
 Run `make examples` when changing executable example behavior, example artifacts, or an

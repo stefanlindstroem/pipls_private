@@ -623,6 +623,14 @@ preparation and publication remain outside this continuation.
 
 Current status: **all three human-audit continuation patches complete**.
 
+### Owner-authorized maintainer command orientation
+
+The owner identified the flat Make target list as a contributor-entry problem. Decision 0098
+retains all target names and recipes, identifies `make install` and `make check` as the primary
+route, groups the remaining commands by task, and mirrors that hierarchy in `CONTRIBUTING.md`.
+
+Current status: **maintainer command orientation complete**.
+
 ## Current next increment
 
 No further implementation increment is authorized. Continue the owner-led human audit and record

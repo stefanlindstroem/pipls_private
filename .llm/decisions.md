@@ -103,6 +103,7 @@ This index is navigation, not a substitute for those records.
 | `0095-required-fixed-rank-pair.md` | required fixed Pi-PLS rank pair | require keyword-only `n_components` and `predictor_rank`; path templates use a replaceable valid seed pair |
 | `0096-notation-path-ceilings-and-inspection-navigation.md` | notation, path ceilings, and inspection navigation | distinguish mathematical $Y$ from scikit-learn `y`, define both path ceilings first, and group inspection concepts with its API |
 | `0097-focused-leave-one-out-example.md` | focused leave-one-out example | show one small calibration workflow with singleton-safe scoring, ordered OOF predictions, and pooled OOF $R^2$ |
+| `0098-grouped-make-help.md` | grouped maintainer command index | highlight setup and routine validation, then group unchanged Make targets by task |
 
 ## Implemented estimator/search transition
 

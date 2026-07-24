@@ -72,8 +72,9 @@
   selected-model workflows, tutorial routes, and public reference links. Development environments,
   Make targets, distribution checks, repository layout, and snapshot instructions belong in
   `CONTRIBUTING.md`.
-- Keep repository commands discoverable through the self-documenting Makefile. `make` and
-  `make help` list the maintained targets; each public target carries one `##` description.
+- Keep repository commands discoverable through the grouped self-documenting Makefile. `make`
+  and `make help` show first setup and routine validation before the maintained task groups; each
+  public target carries one `##` description and each group one `##@` heading.
 - Build public documentation with the dedicated `docs` dependency extra and `make docs`. Use
   `make docs-serve` for a live local preview at `http://127.0.0.1:8000/`. The build
   is strict: navigation, internal links, anchors, mathematics support, and generated API targets must
