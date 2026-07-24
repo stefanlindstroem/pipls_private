@@ -21,8 +21,9 @@ the declared public names from `pipls.inspection`, `pipls.datasets`, and `pipls.
 Private modules and `pipls.model_selection` are not reference surfaces.
 
 `PiPLSRegression` fits one explicit fixed pair `(n_components, predictor_rank)` and performs no
-cross-validation or parameter selection. `PiPLSPathCV` is the standard package workflow for the
-bounded triangular scan and conditional predictor-rank selection. Public scoring callables remain
+cross-validation or parameter selection. Both rank parameters are required keyword-only
+constructor arguments; neither has a default or accepts a missing-value sentinel. `PiPLSPathCV` is
+the standard package workflow for the bounded triangular scan and conditional predictor-rank selection. Public scoring callables remain
 available from `pipls.metrics`.
 
 ## Public names
@@ -39,10 +40,11 @@ Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 
 ## Fixed-estimator validation and warning contract
 
-`PiPLSRegression` constructor parameters are `n_components`, `scale`, `copy`, `predictor_rank`,
-`svd_solver`, and `random_state`.
+`PiPLSRegression` constructor parameters are required keyword-only `n_components` and
+`predictor_rank`, followed by optional `scale`, `copy`, `svd_solver`, and `random_state`.
 
-- `n_components` and `predictor_rank` are positive Python or NumPy integers; booleans and
+- `n_components` and `predictor_rank` have no defaults and accept no `None` or automatic sentinel.
+- They are positive Python or NumPy integers; booleans and
   integral-valued floats are invalid.
 - `n_components <= predictor_rank`.
 - `predictor_rank <= min(n_features, n_samples - 1)` after centering and must not exceed the

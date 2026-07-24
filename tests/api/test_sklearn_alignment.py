@@ -40,12 +40,12 @@ def _fixed_estimator() -> PiPLSRegression:
     )
 
 
-def test_fixed_regression_and_path_defaults_have_distinct_ownership() -> None:
-    regression = PiPLSRegression()
+def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> None:
+    regression = _fixed_estimator()
     path = PiPLSPathCV()
 
     assert regression.n_components == 2
-    assert regression.predictor_rank == 2
+    assert regression.predictor_rank == 3
     assert not hasattr(regression, "cv")
     assert not hasattr(regression, "samples_per_predictor_rank")
     assert path.samples_per_predictor_rank == 5.0
@@ -55,7 +55,13 @@ def test_fixed_regression_and_path_defaults_have_distinct_ownership() -> None:
 
 
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
-    assert set(PiPLSRegression().get_params()) == {
+    signature = inspect.signature(PiPLSRegression)
+    for name in ("n_components", "predictor_rank"):
+        parameter = signature.parameters[name]
+        assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
+        assert parameter.default is inspect.Parameter.empty
+
+    assert set(_fixed_estimator().get_params()) == {
         "copy",
         "n_components",
         "predictor_rank",
@@ -85,7 +91,7 @@ def test_path_output_configuration_belongs_to_estimator_template() -> None:
     path = PiPLSPathCV()
 
     assert not hasattr(path, "set_output")
-    assert hasattr(PiPLSRegression(), "set_output")
+    assert hasattr(_fixed_estimator(), "set_output")
 
 
 def test_fixed_estimator_interoperates_with_grid_search_for_explicit_pairs() -> None:

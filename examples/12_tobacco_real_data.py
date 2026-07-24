@@ -33,7 +33,11 @@ response_pages = tuple(
 
 # Evaluate and plot the Pi-PLS component path with a full predictor SVD.
 path_search = PiPLSPathCV(
-    estimator=PiPLSRegression(svd_solver="full"),
+    estimator=PiPLSRegression(
+        n_components=1,
+        predictor_rank=1,
+        svd_solver="full",
+    ),
     search_method="auto",
     refit=False,
     n_jobs=1,

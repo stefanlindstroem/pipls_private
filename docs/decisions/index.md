@@ -32,6 +32,7 @@ reference describe the current public behavior directly.
 - [0088: public result-record cleanup](0088-public-result-record-cleanup.md)
 - [0092: fold numerical-rank feasibility](0092-fold-numerical-rank-feasibility.md)
 - [0093: public result invariants](0093-public-result-invariants.md)
+- [0095: required fixed Pi-PLS rank pair](0095-required-fixed-rank-pair.md)
 
 ## Validation, data, and benchmarks
 

@@ -94,7 +94,8 @@ and 3141. The scenarios are:
 - `two_shared_with_predictor_nuisance`, retaining the two shared directions and adding four
   predictor-only directions of strengths `(3.0, 2.5, 2.0, 1.5)`.
 
-The search uses `PiPLSRegression(scale=True, svd_solver="full")` inside five-fold
+The search uses `PiPLSRegression(n_components=1, predictor_rank=1, scale=True, svd_solver="full")` inside
+five-fold
 `PiPLSPathCV(search_method="auto")`, with a benchmark-specific rule-based predictor-rank bound
 and `samples_per_predictor_rank=10.0`. Every candidate learns centering and scaling from its training
 fold only. The selected estimator is then refitted on the complete generated training block.

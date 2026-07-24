@@ -1,5 +1,9 @@
 # Changelog
 
+- Require `PiPLSRegression` callers to provide the fixed `n_components` and `predictor_rank` pair
+  as keyword-only arguments, and document why path-search templates use a replaceable `(1, 1)`
+  construction seed.
+
 - Close the immutable dataset-metadata boundary: reject object-dtype NumPy arrays whose elements
   could remain mutable, retain copied read-only non-object arrays, and route dataset-API readers to
   the shipped Pulp, Sugarcane, and Tobacco reference datasets and examples.

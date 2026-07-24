@@ -18,7 +18,11 @@ for dataset, path_search in (
     (
         "tobacco",
         PiPLSPathCV(
-            estimator=PiPLSRegression(svd_solver="full"),
+            estimator=PiPLSRegression(
+                n_components=1,
+                predictor_rank=1,
+                svd_solver="full",
+            ),
             refit=False,
             n_jobs=1,
         ),

@@ -91,6 +91,12 @@ pipeline = Pipeline(
 search = PiPLSPathCV(estimator=pipeline, refit=False).fit(X, Y)
 ```
 
+The terminal estimator needs the valid construction seed pair `(1, 1)` because
+`PiPLSRegression` always represents one explicit fixed pair. `PiPLSPathCV` replaces both values
+before fold-rank preflight, every candidate fit, optional OOF fitting, and the final refit, so the
+seed pair does not restrict or select the path. Other template settings, including `scale`,
+`svd_solver`, and `random_state`, do affect candidate fitting.
+
 Do not fit learned preprocessing on the complete dataset before path evaluation.
 
 ## Cross-validation protocols and metadata

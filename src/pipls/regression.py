@@ -42,17 +42,17 @@ class PiPLSRegression(
 
     Parameters
     ----------
-    n_components : int, default=2
-        Response-side latent dimension $h$. It must satisfy
+    n_components : int
+        Required response-side latent dimension $h$. It must satisfy
         ``1 <= n_components <= min(n_targets, predictor_rank)``.
+    predictor_rank : int
+        Required positive predictor truncation rank $r_\pi$. After centering, it
+        must not exceed ``min(n_features, n_samples - 1)``.
     scale : bool, default=True
         If true, center and divide predictor and response columns by their
         training-sample standard deviations. If false, center without scaling.
     copy : bool, default=True
         Whether fitting may copy the supplied arrays before preprocessing.
-    predictor_rank : int, default=2
-        Explicit positive predictor truncation rank $r_\pi$. After centering, it
-        must not exceed ``min(n_features, n_samples - 1)``.
     svd_solver : {"auto", "full", "randomized"}, default="auto"
         Predictor SVD policy. ``"full"`` uses the exact thin SVD,
         ``"randomized"`` always uses randomized truncated SVD, and ``"auto"``
@@ -108,18 +108,19 @@ class PiPLSRegression(
 
     Notes
     -----
-    This estimator performs no parameter selection or cross-validation. Use
+    This estimator performs no parameter selection or cross-validation. Both
+    rank parameters are therefore required explicitly. Use
     :class:`pipls.PiPLSPathCV` when component count and predictor rank must be
     selected by cross-validation.
     """
 
     def __init__(
         self,
-        n_components: int = 2,
         *,
+        n_components: int,
+        predictor_rank: int,
         scale: bool = True,
         copy: bool = True,
-        predictor_rank: int = 2,
         svd_solver: SVDSolver = "auto",
         random_state: int | np.random.RandomState | None = 0,
     ) -> None:

@@ -100,6 +100,7 @@ This index is navigation, not a substitute for those records.
 | `0092-fold-numerical-rank-feasibility.md` | fold numerical-rank feasibility | cap path candidates by the minimum rank verified after fold-local preprocessing before scoring |
 | `0093-public-result-invariants.md` | immutable core public-result invariants | validate direct construction, defensive copies, scalar normalization, OOF coverage, and pickle reconstruction |
 | `0094-inspection-result-safety.md` | immutable and finite inspection results | validate direct construction and pickle reconstruction; use range-safe calculations and reject unrepresentable derived values |
+| `0095-required-fixed-rank-pair.md` | required fixed Pi-PLS rank pair | require keyword-only `n_components` and `predictor_rank`; path templates use a replaceable valid seed pair |
 
 ## Implemented estimator/search transition
 

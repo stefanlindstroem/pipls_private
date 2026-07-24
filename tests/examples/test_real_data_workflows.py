@@ -94,7 +94,11 @@ def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
     assert "Y.columns.tolist()" in text
     assert "range(0, len(response_names), RESPONSES_PER_PAGE)" in text
     assert "min(start + RESPONSES_PER_PAGE, len(response_names))" in text
-    assert 'estimator=PiPLSRegression(svd_solver="full")' in text
+    assert """estimator=PiPLSRegression(
+        n_components=1,
+        predictor_rank=1,
+        svd_solver="full",
+    )""" in text
     assert 'search_method="auto"' in text
     assert "path_search.component_path_" in text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in text

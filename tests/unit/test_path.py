@@ -113,7 +113,12 @@ def test_path_caps_candidates_at_minimum_fold_numerical_rank(
 ) -> None:
     X, Y = _rank_two_data()
     search = PiPLSPathCV(
-        estimator=PiPLSRegression(svd_solver=svd_solver, random_state=0),
+        estimator=PiPLSRegression(
+            n_components=1,
+            predictor_rank=1,
+            svd_solver=svd_solver,
+            random_state=0,
+        ),
         search_method="optimal",
         cv=3,
         refit=False,
@@ -155,7 +160,12 @@ def test_path_uses_the_minimum_numerical_rank_across_training_folds() -> None:
     )
 
     search = PiPLSPathCV(
-        estimator=PiPLSRegression(scale=False, svd_solver="full"),
+        estimator=PiPLSRegression(
+            n_components=1,
+            predictor_rank=1,
+            scale=False,
+            svd_solver="full",
+        ),
         max_predictor_rank=3,
         search_method="optimal",
         cv=splits,
@@ -172,7 +182,15 @@ def test_pipeline_rank_preflight_uses_fold_local_transformed_predictors() -> Non
     pipeline = Pipeline(
         [
             ("rank_two", _RankTwoTransformer()),
-            ("regression", PiPLSRegression(scale=False, svd_solver="full")),
+            (
+                "regression",
+                PiPLSRegression(
+                    n_components=1,
+                    predictor_rank=1,
+                    scale=False,
+                    svd_solver="full",
+                ),
+            ),
         ]
     )
 

@@ -96,11 +96,17 @@ def test_constant_columns_have_unit_scale() -> None:
     assert model.y_scale_[0] == 1.0
 
 
-def test_default_estimator_is_one_fixed_pair() -> None:
-    model = PiPLSRegression()
+def test_fixed_rank_pair_is_required_and_keyword_only() -> None:
+    with pytest.raises(TypeError):
+        PiPLSRegression()  # type: ignore[call-arg]
+    with pytest.raises(TypeError):
+        PiPLSRegression(n_components=1)  # type: ignore[call-arg]
+    with pytest.raises(TypeError):
+        PiPLSRegression(predictor_rank=1)  # type: ignore[call-arg]
+    with pytest.raises(TypeError):
+        PiPLSRegression(1, predictor_rank=1)  # type: ignore[call-arg]
 
-    assert model.n_components == 2
-    assert model.predictor_rank == 2
+    model = PiPLSRegression(n_components=1, predictor_rank=1)
     assert set(model.get_params()) == {
         "copy",
         "n_components",
@@ -191,29 +197,40 @@ def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
 def test_rejects_invalid_svd_solver(value: object) -> None:
     X, Y = _data()
     with pytest.raises(ValueError, match="svd_solver"):
-        PiPLSRegression(svd_solver=value).fit(X, Y)  # type: ignore[arg-type]
+        PiPLSRegression(
+            n_components=1,
+            predictor_rank=1,
+            svd_solver=value,  # type: ignore[arg-type]
+        ).fit(X, Y)
 
 
 @pytest.mark.parametrize("value", [-1, True, 1.5, "seed"])
 def test_rejects_invalid_random_state(value: object) -> None:
     X, Y = _data()
     with pytest.raises(ValueError, match="random_state"):
-        PiPLSRegression(random_state=value).fit(X, Y)  # type: ignore[arg-type]
+        PiPLSRegression(
+            n_components=1,
+            predictor_rank=1,
+            random_state=value,  # type: ignore[arg-type]
+        ).fit(X, Y)
 
 
 def test_randomized_svd_accepts_none_and_random_state_instances() -> None:
     X, Y = _data()
     none_model = PiPLSRegression(
+        n_components=2,
         predictor_rank=3,
         svd_solver="randomized",
         random_state=None,
     ).fit(X, Y)
     first = PiPLSRegression(
+        n_components=2,
         predictor_rank=3,
         svd_solver="randomized",
         random_state=np.random.RandomState(23),
     ).fit(X, Y)
     second = PiPLSRegression(
+        n_components=2,
         predictor_rank=3,
         svd_solver="randomized",
         random_state=np.random.RandomState(23),

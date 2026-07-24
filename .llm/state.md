@@ -331,13 +331,18 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-The six-patch pre-release hardening series is complete. Stop for the owner's human audit; no package
-release preparation or publication work is authorized in the current sequence.
+The owner-authorized three-patch human-audit continuation is in progress. Patch 1/3 requires the
+fixed `PiPLSRegression` rank pair explicitly and is complete. Patch 2/3 should clarify mathematical
+$Y$ versus scikit-learn `y`, define and order $r_{\pi,\max}$ and $h_{\max}$ in the path reference,
+use a response-neutral residual axis label, and improve the reciprocal inspection-page navigation.
+No package release preparation or publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Human audit:** review the complete package and documentation before authorizing another
-   implementation increment.
+1. **Patch 2/3:** notation, path ceilings, residual labeling, and inspection navigation.
+2. **Patch 3/3:** a focused small-sample synthetic leave-one-out example linked from the reference.
+3. **Human audit:** continue reviewing the complete package and documentation before authorizing
+   another implementation increment.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

@@ -67,6 +67,12 @@ _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _CONTROLLED_FIT_WARNING_CATEGORIES = (StatisticalSupportWarning,)
 
 
+def _default_pipls_template() -> PiPLSRegression:
+    """Return the direct path template with a valid construction seed pair."""
+
+    return PiPLSRegression(n_components=1, predictor_rank=1)
+
+
 def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
     def check(search: Any) -> bool:
         if not bool(search.refit):
@@ -76,7 +82,7 @@ def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
         estimator = (
             search.best_estimator_
             if hasattr(search, "best_estimator_")
-            else (PiPLSRegression() if search.estimator is None else search.estimator)
+            else (_default_pipls_template() if search.estimator is None else search.estimator)
         )
         return hasattr(estimator, method_name)
 
@@ -103,8 +109,9 @@ class PiPLSPathCV(
     ----------
     estimator : PiPLSRegression, sklearn.pipeline.Pipeline or None, default=None
         Direct Pi-PLS estimator or pipeline whose final step is
-        :class:`pipls.PiPLSRegression`. ``None`` creates a default direct
-        estimator template.
+        :class:`pipls.PiPLSRegression`. ``None`` creates a direct template with
+        the valid construction seed pair ``(n_components=1, predictor_rank=1)``.
+        Path preflight and candidate evaluation replace both values before fitting.
     n_components_values : sequence of int or "all", default="all"
         Positive component counts to evaluate. ``"all"`` uses every value from
         one through ``min(n_targets_, max_predictor_rank_)``.
@@ -277,7 +284,7 @@ class PiPLSPathCV(
         self.n_targets_ = int(y_2d.shape[1])
         X_indexable, y_indexable = indexable(X, y)
 
-        template = PiPLSRegression() if self.estimator is None else self.estimator
+        template = _default_pipls_template() if self.estimator is None else self.estimator
         pipls_param_prefix = _resolve_pipls_param_prefix(template)
         n_components_key, predictor_rank_key = _pipls_parameter_keys(
             pipls_param_prefix
@@ -810,7 +817,7 @@ class PiPLSPathCV(
         _validate_n_jobs(self.n_jobs)
         _validate_cv(self.cv)
         scorer_template = (
-            PiPLSRegression() if self.estimator is None else self.estimator
+            _default_pipls_template() if self.estimator is None else self.estimator
         )
         _resolve_path_scorer(self.scoring, scorer_template)
 

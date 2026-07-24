@@ -1,7 +1,8 @@
 # Fixed Pi-PLS regression
 
-Use `PiPLSRegression` when `n_components` and `predictor_rank` are already fixed. The estimator does
-not perform cross-validation or parameter selection.
+Use `PiPLSRegression` when `n_components` and `predictor_rank` are already fixed. Both are
+required keyword-only constructor arguments because the estimator fits exactly one explicit pair
+and does not perform cross-validation or parameter selection.
 
 ```python
 from pipls import PiPLSRegression

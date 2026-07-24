@@ -603,11 +603,27 @@ retaining copied read-only non-object arrays and recursively frozen heterogeneou
 sequences. Release preparation and publication are explicitly outside this series and remain
 deferred until the owner completes a human audit.
 
-Current status: **all six pre-release hardening increments complete; owner human audit next**.
+Current status: **all six pre-release hardening increments complete**.
+
+### Owner-authorized human-audit continuation
+
+The owner identified three additional focused increments during the human audit:
+
+1. require the fixed `PiPLSRegression` rank pair explicitly and explain replaceable path-template
+   seed values;
+2. align notation and path-ceiling documentation and improve inspection navigation;
+3. add one focused small-sample synthetic leave-one-out example.
+
+Decision 0095 completes the first increment. Release preparation and publication remain outside
+this continuation.
+
+Current status: **Patch 1/3 complete; Patch 2/3 next**.
 
 ## Current next increment
 
-No implementation increment is authorized. Stop for the owner's human audit.
+Clarify mathematical $Y$ versus scikit-learn `y`, define $h_{\max}$ beside $r_{\pi,\max}$ before
+predictor-rank policies, use response-neutral residual labeling, and improve reciprocal navigation
+between inspection concepts and the generated inspection API.
 
 ## Maintenance protocol
 

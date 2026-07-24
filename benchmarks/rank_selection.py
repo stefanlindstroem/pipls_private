@@ -92,6 +92,8 @@ def fit_search(train: PiPLSDataset, seed: int) -> PiPLSPathCV:
 
     return PiPLSPathCV(
         estimator=PiPLSRegression(
+            n_components=1,
+            predictor_rank=1,
             scale=True,
             svd_solver="full",
             random_state=seed,

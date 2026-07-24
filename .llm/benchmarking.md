@@ -105,7 +105,8 @@ table.
 which ranks does `PiPLSPathCV(search_method="auto")` select for prediction?
 
 **Method:** adaptive Pi-PLS path selection only. Candidate models use
-`PiPLSRegression(scale=True, svd_solver="full")`, five-fold CV, a benchmark-specific
+`PiPLSRegression(n_components=1, predictor_rank=1, scale=True, svd_solver="full")`,
+five-fold CV, a benchmark-specific
 rule-based predictor-rank bound with `samples_per_predictor_rank=10.0`, and one execution job.
 Every candidate
 learns model centering and scaling inside its training fold, and the selected model refits on the
