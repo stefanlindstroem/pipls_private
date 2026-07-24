@@ -111,7 +111,9 @@ after fold-local preprocessing, so rank-deficient folds bound the candidate path
 aborting it. The third pre-release hardening increment aligns `rank_test_score` with selection by
 using one reference-anchored tolerant comparison and forbidding adjacent near-tie chaining.
 Decision 0093 makes the core public result records validate direct construction, defensive copies,
-scalar values, aligned arrays, OOF coverage, and pickle reconstruction uniformly.
+scalar values, aligned arrays, OOF coverage, and pickle reconstruction uniformly. Decision 0094
+applies the same defensive boundary to inspection records and requires inspection helpers to return
+finite float64 quantities or fail explicitly when a derived value is not representable.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -328,13 +330,12 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Pre-release audit hardening 5/6: make inspection result records uniformly defensive and prevent
-inspection helpers from returning nonfinite derived quantities.
+Pre-release audit hardening 6/6: reject mutable object arrays from recursively frozen dataset
+metadata.
 
 ## Subsequent roadmap
 
-1. **Dataset metadata closure:** reject mutable object arrays from recursively frozen metadata.
-2. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
+1. **Human audit:** stop after the six hardening patches for owner review. Release preparation and
    publication are outside the current sequence.
 
 Future datasets still require a distinct package-level use case and verified source-level

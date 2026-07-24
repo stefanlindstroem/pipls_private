@@ -33,6 +33,16 @@
 - Validation-report OOF rows use one explicit coverage representation: positive counts require
   finite predictions, while zero counts require NaN predictions across the complete response row.
   Counts are nonnegative integer arrays and align one-to-one with prediction rows.
+- Inspection result records defensively copy and freeze arrays, validate direct construction, and
+  reconstruct through the same validation path when unpickled. Shape relationships, provenance,
+  nonnegative diagnostics, positive display scales, factor weighting, and prediction-standardization
+  relationships are enforced.
+- Inspection helpers use range-safe scaled means, sample scales, norms, covariance products,
+  squared residual norms, and RMSE calculations. Finite inputs must either produce finite float64
+  inspection quantities or raise a clear `ValueError` naming the unrepresentable derived quantity.
+- Score-distance covariance scaling uses one common scalar for fitted and supplied centered scores,
+  preserving the Moore--Penrose quadratic form. Biplot balancing uses scaled column norms and a
+  quotient of square roots. These safeguards do not alter ordinary finite results.
 
 - Automatic-selection response scales are estimated from the matching training fold with `ddof=1`; zero scales and singleton-training-fold scales are replaced by 1.0.
 - Response-standardized MSE uniformly averages squared residuals over validation samples and response columns after division by the matching fold-local response scales.

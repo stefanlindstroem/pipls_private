@@ -1,5 +1,9 @@
 # Changelog
 
+- Make inspection results uniformly defensive and numerically finite: validate direct construction
+  and pickle reconstruction, use range-safe means, scales, norms, covariance products, squared
+  residuals, and RMSE calculations, and reject unrepresentable derived float64 quantities.
+
 - Make the core public result records uniformly defensive and validated: normalize scalar values,
   copy arrays as read-only, reject invalid dimensions and diagnostics, enforce explicit OOF coverage
   semantics, and preserve the same invariants through pickle reconstruction.

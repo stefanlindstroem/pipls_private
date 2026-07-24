@@ -246,3 +246,43 @@ def test_prediction_diagnostics_reject_unknown_prediction_kind() -> None:
             np.array([1.0, 2.0]),
             prediction_kind="cross-validated predictions",  # type: ignore[arg-type]
         )
+
+
+def test_prediction_diagnostics_handles_representable_extreme_values() -> None:
+    observed = np.array([-1.0e307, 1.0e307])
+    predicted = np.zeros(2)
+
+    with np.errstate(all="raise"):
+        diagnostics = prediction_diagnostics(
+            observed,
+            predicted,
+            prediction_kind="external test predictions",
+        )
+
+    assert np.all(np.isfinite(diagnostics.response_centers))
+    assert np.all(np.isfinite(diagnostics.response_scales))
+    assert np.all(np.isfinite(diagnostics.standardized_rmse))
+    np.testing.assert_allclose(diagnostics.response_scales, [np.sqrt(2.0) * 1.0e307])
+
+
+def test_prediction_diagnostics_rejects_unrepresentable_residuals() -> None:
+    observed = np.array([np.finfo(np.float64).max, 0.0])
+    predicted = np.array([-np.finfo(np.float64).max, 0.0])
+
+    with pytest.raises(ValueError, match="residual cannot be represented"):
+        prediction_diagnostics(
+            observed,
+            predicted,
+            prediction_kind="external test predictions",
+        )
+
+
+def test_pipls_display_factors_rejects_unrepresentable_weighting() -> None:
+    decomposition = _decomposition(
+        np.eye(2),
+        np.array([[np.finfo(np.float64).max, 0.0], [0.0, 1.0]]),
+        np.array([2.0, 1.0]),
+    )
+
+    with pytest.raises(ValueError, match="weighted_response_directions cannot be represented"):
+        pipls_display_factors(decomposition)

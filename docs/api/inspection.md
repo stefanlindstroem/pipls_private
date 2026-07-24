@@ -3,6 +3,9 @@
 `pipls.inspection` contains pure numerical analysis helpers. It has no pandas or Matplotlib
 requirement, returns immutable defensive copies, and performs no file writing. Result records are
 obtained from these helpers; the reference emphasizes their fields rather than manual construction.
+Direct construction and pickle reconstruction nevertheless validate the same finite-value, shape,
+relationship, and read-only invariants. Finite inputs either produce finite float64 inspection
+quantities or raise a clear `ValueError` when a requested derived value is not representable.
 
 The Pi-PLS factorization helper is method-specific. The latent-structure, biplot, observation, and
 prediction helpers use PLS-family quantities and can therefore be applied to a compatible fitted

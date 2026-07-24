@@ -10,10 +10,15 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from sklearn.utils.validation import check_is_fitted
 
+from ._result_validation import (
+    _literal_string,
+    _read_only_float_array,
+    _read_only_int_array,
+)
 from .decomposition import PiPLSDecomposition
 
 FloatArray = NDArray[np.float64]
-IntArray = NDArray[np.int64]
+IntArray = NDArray[np.intp]
 PredictionKind: TypeAlias = Literal[
     "fitted values",
     "fixed-parameter OOF predictions",
@@ -51,6 +56,7 @@ _PREDICTION_KINDS: tuple[PredictionKind, ...] = (
     "selection-conditioned OOF predictions",
     "external test predictions",
 )
+_PREDICTION_KIND_SET = frozenset(_PREDICTION_KINDS)
 
 __all__ = [
     "BiplotCoordinates",
@@ -73,7 +79,8 @@ class BiplotCoordinates:
 
     ``sample_coordinates`` and ``predictor_coordinates`` preserve the selected
     score-loading reconstruction while giving both coordinate sets equal
-    Euclidean norm within each component. Construct instances with
+    Euclidean norm within each component. Direct construction validates shapes,
+    finite values, and immutability; instances are normally obtained from
     :func:`biplot_coordinates`.
 
     Attributes
@@ -93,6 +100,56 @@ class BiplotCoordinates:
     component_indices: IntArray
     scaling_factors: FloatArray
 
+    def __post_init__(self) -> None:
+        sample_coordinates = _read_only_float_array(
+            self.sample_coordinates,
+            name="sample_coordinates",
+            ndim=2,
+        )
+        predictor_coordinates = _read_only_float_array(
+            self.predictor_coordinates,
+            name="predictor_coordinates",
+            ndim=2,
+        )
+        component_indices = _read_only_int_array(
+            self.component_indices,
+            name="component_indices",
+        )
+        scaling_factors = _read_only_float_array(
+            self.scaling_factors,
+            name="scaling_factors",
+        )
+        if sample_coordinates.shape[0] == 0 or predictor_coordinates.shape[0] == 0:
+            raise ValueError("Biplot coordinate arrays must contain at least one row.")
+        if sample_coordinates.shape[1] != 2 or predictor_coordinates.shape[1] != 2:
+            raise ValueError("Biplot coordinate arrays must contain exactly two columns.")
+        if component_indices.shape != (2,):
+            raise ValueError("component_indices must contain exactly two values.")
+        if component_indices[0] == component_indices[1] or np.any(component_indices < 0):
+            raise ValueError("component_indices must contain two distinct nonnegative values.")
+        if scaling_factors.shape != (2,):
+            raise ValueError("scaling_factors must contain exactly two values.")
+        if np.any(scaling_factors <= 0.0):
+            raise ValueError("scaling_factors must contain positive values.")
+
+        object.__setattr__(self, "sample_coordinates", sample_coordinates)
+        object.__setattr__(self, "predictor_coordinates", predictor_coordinates)
+        object.__setattr__(self, "component_indices", component_indices)
+        object.__setattr__(self, "scaling_factors", scaling_factors)
+
+    def __reduce__(self) -> tuple[type[BiplotCoordinates], tuple[object, ...]]:
+        """Reconstruct through validation so unpickled arrays remain read-only."""
+
+        return (
+            type(self),
+            (
+                self.sample_coordinates,
+                self.predictor_coordinates,
+                self.component_indices,
+                self.scaling_factors,
+            ),
+        )
+
     @property
     def n_samples(self) -> int:
         """Number of represented observations."""
@@ -111,7 +168,8 @@ class LatentStructure:
     r"""Immutable copies of public fitted PLS-family quantities.
 
     The coefficient orientation follows ``PLSRegression`` and
-    ``PiPLSRegression``. Construct instances with :func:`latent_structure`.
+    ``PiPLSRegression``. Direct construction validates aligned finite arrays and
+    immutability; instances are normally obtained from :func:`latent_structure`.
 
     Attributes
     ----------
@@ -129,6 +187,42 @@ class LatentStructure:
     x_loadings: FloatArray
     y_loadings: FloatArray
     coefficients: FloatArray
+
+    def __post_init__(self) -> None:
+        x_scores = _read_only_float_array(self.x_scores, name="x_scores", ndim=2)
+        x_loadings = _read_only_float_array(self.x_loadings, name="x_loadings", ndim=2)
+        y_loadings = _read_only_float_array(self.y_loadings, name="y_loadings", ndim=2)
+        coefficients = _read_only_float_array(
+            self.coefficients,
+            name="coefficients",
+            ndim=2,
+        )
+        n_components = x_scores.shape[1]
+        if x_scores.shape[0] == 0 or n_components == 0:
+            raise ValueError("x_scores must contain at least one row and one component.")
+        if x_loadings.shape[0] == 0 or y_loadings.shape[0] == 0:
+            raise ValueError("Loading arrays must contain at least one row.")
+        if x_loadings.shape[1] != n_components or y_loadings.shape[1] != n_components:
+            raise ValueError("Scores and loadings must contain the same number of components.")
+        expected_coefficients = (y_loadings.shape[0], x_loadings.shape[0])
+        if coefficients.shape != expected_coefficients:
+            raise ValueError(
+                "coefficients must have shape (n_targets, n_features): "
+                f"expected {expected_coefficients}, got {coefficients.shape}."
+            )
+
+        object.__setattr__(self, "x_scores", x_scores)
+        object.__setattr__(self, "x_loadings", x_loadings)
+        object.__setattr__(self, "y_loadings", y_loadings)
+        object.__setattr__(self, "coefficients", coefficients)
+
+    def __reduce__(self) -> tuple[type[LatentStructure], tuple[object, ...]]:
+        """Reconstruct through validation so unpickled arrays remain read-only."""
+
+        return (
+            type(self),
+            (self.x_scores, self.x_loadings, self.y_loadings, self.coefficients),
+        )
 
     @property
     def n_samples(self) -> int:
@@ -163,7 +257,8 @@ class ObservationDiagnostics:
     training-score center, using the Moore--Penrose inverse of the fitted
     training-score covariance. ``x_reconstruction_residual`` is the row-wise
     squared Euclidean residual after the public transform/inverse-transform round
-    trip. No theoretical warning limits are attached.
+    trip. No theoretical warning limits are attached. Direct construction validates
+    aligned nonnegative finite arrays and immutability.
 
     Attributes
     ----------
@@ -175,6 +270,34 @@ class ObservationDiagnostics:
 
     score_distance: FloatArray
     x_reconstruction_residual: FloatArray
+
+    def __post_init__(self) -> None:
+        score_distance = _read_only_float_array(
+            self.score_distance,
+            name="score_distance",
+        )
+        x_reconstruction_residual = _read_only_float_array(
+            self.x_reconstruction_residual,
+            name="x_reconstruction_residual",
+        )
+        if score_distance.shape[0] == 0:
+            raise ValueError("Observation diagnostics must contain at least one row.")
+        if x_reconstruction_residual.shape != score_distance.shape:
+            raise ValueError(
+                "score_distance and x_reconstruction_residual must have identical shapes."
+            )
+        if np.any(score_distance < 0.0):
+            raise ValueError("score_distance must contain nonnegative values.")
+        if np.any(x_reconstruction_residual < 0.0):
+            raise ValueError("x_reconstruction_residual must contain nonnegative values.")
+
+        object.__setattr__(self, "score_distance", score_distance)
+        object.__setattr__(self, "x_reconstruction_residual", x_reconstruction_residual)
+
+    def __reduce__(self) -> tuple[type[ObservationDiagnostics], tuple[object, ...]]:
+        """Reconstruct through validation so unpickled arrays remain read-only."""
+
+        return type(self), (self.score_distance, self.x_reconstruction_residual)
 
     @property
     def n_samples(self) -> int:
@@ -189,7 +312,8 @@ class PiPLSDisplayFactors:
 
     The predictor and response direction columns use one deterministic display
     sign per component. Applying the same sign to both sides preserves the
-    centered/scaled regression map $PDQ^{\mathsf T}$.
+    centered/scaled regression map $PDQ^{\mathsf T}$. Direct construction validates
+    the factor relationship and stores defensive read-only copies.
 
     Attributes
     ----------
@@ -207,6 +331,79 @@ class PiPLSDisplayFactors:
     dilation: FloatArray
     response_directions: FloatArray
     weighted_response_directions: FloatArray
+
+    def __post_init__(self) -> None:
+        predictor_directions = _read_only_float_array(
+            self.predictor_directions,
+            name="predictor_directions",
+            ndim=2,
+        )
+        dilation = _read_only_float_array(self.dilation, name="dilation")
+        response_directions = _read_only_float_array(
+            self.response_directions,
+            name="response_directions",
+            ndim=2,
+        )
+        weighted_response_directions = _read_only_float_array(
+            self.weighted_response_directions,
+            name="weighted_response_directions",
+            ndim=2,
+        )
+        n_components = dilation.shape[0]
+        if n_components == 0:
+            raise ValueError("Pi-PLS display factors must contain at least one component.")
+        if predictor_directions.shape[0] == 0 or response_directions.shape[0] == 0:
+            raise ValueError("Direction arrays must contain at least one row.")
+        if predictor_directions.shape[1] != n_components:
+            raise ValueError(
+                "predictor_directions and dilation must contain the same number of components."
+            )
+        if response_directions.shape[1] != n_components:
+            raise ValueError(
+                "response_directions and dilation must contain the same number of components."
+            )
+        if weighted_response_directions.shape != response_directions.shape:
+            raise ValueError(
+                "weighted_response_directions must have the same shape as response_directions."
+            )
+        if np.any(dilation < 0.0):
+            raise ValueError("dilation must contain nonnegative values.")
+        expected_weighted = _finite_product(
+            response_directions,
+            dilation[None, :],
+            name="response_directions * dilation",
+        )
+        if not np.allclose(
+            weighted_response_directions,
+            expected_weighted,
+            rtol=1e-7,
+            atol=1e-12,
+        ):
+            raise ValueError(
+                "weighted_response_directions must equal response_directions * dilation."
+            )
+
+        object.__setattr__(self, "predictor_directions", predictor_directions)
+        object.__setattr__(self, "dilation", dilation)
+        object.__setattr__(self, "response_directions", response_directions)
+        object.__setattr__(
+            self,
+            "weighted_response_directions",
+            weighted_response_directions,
+        )
+
+    def __reduce__(self) -> tuple[type[PiPLSDisplayFactors], tuple[object, ...]]:
+        """Reconstruct through validation so unpickled arrays remain read-only."""
+
+        return (
+            type(self),
+            (
+                self.predictor_directions,
+                self.dilation,
+                self.response_directions,
+                self.weighted_response_directions,
+            ),
+        )
 
     @property
     def n_features(self) -> int:
@@ -233,7 +430,8 @@ class PredictionDiagnostics:
 
     All response matrices are two-dimensional, including single-response input.
     Centers and sample standard deviations are estimated from ``observed`` and
-    applied unchanged to ``predicted``.
+    applied unchanged to ``predicted``. Direct construction validates all aligned
+    fields, derived relationships, provenance, and immutability.
 
     Attributes
     ----------
@@ -265,6 +463,158 @@ class PredictionDiagnostics:
     response_scales: FloatArray
     standardized_rmse: FloatArray
     prediction_kind: PredictionKind
+
+    def __post_init__(self) -> None:
+        observed = _read_only_float_array(self.observed, name="observed", ndim=2)
+        predicted = _read_only_float_array(self.predicted, name="predicted", ndim=2)
+        residual = _read_only_float_array(self.residual, name="residual", ndim=2)
+        observed_standardized = _read_only_float_array(
+            self.observed_standardized,
+            name="observed_standardized",
+            ndim=2,
+        )
+        predicted_standardized = _read_only_float_array(
+            self.predicted_standardized,
+            name="predicted_standardized",
+            ndim=2,
+        )
+        residual_standardized = _read_only_float_array(
+            self.residual_standardized,
+            name="residual_standardized",
+            ndim=2,
+        )
+        response_centers = _read_only_float_array(
+            self.response_centers,
+            name="response_centers",
+        )
+        response_scales = _read_only_float_array(
+            self.response_scales,
+            name="response_scales",
+        )
+        standardized_rmse = _read_only_float_array(
+            self.standardized_rmse,
+            name="standardized_rmse",
+        )
+        prediction_kind = cast(
+            PredictionKind,
+            _literal_string(
+                self.prediction_kind,
+                name="prediction_kind",
+                allowed=_PREDICTION_KIND_SET,
+            ),
+        )
+
+        if observed.shape[0] < 2 or observed.shape[1] == 0:
+            raise ValueError(
+                "Prediction diagnostics require at least two observations and one response."
+            )
+        for name, values in (
+            ("predicted", predicted),
+            ("residual", residual),
+            ("observed_standardized", observed_standardized),
+            ("predicted_standardized", predicted_standardized),
+            ("residual_standardized", residual_standardized),
+        ):
+            if values.shape != observed.shape:
+                raise ValueError(f"{name} must have the same shape as observed.")
+        vector_shape = (observed.shape[1],)
+        for name, values in (
+            ("response_centers", response_centers),
+            ("response_scales", response_scales),
+            ("standardized_rmse", standardized_rmse),
+        ):
+            if values.shape != vector_shape:
+                raise ValueError(f"{name} must contain one value per response.")
+        if np.any(response_scales <= 0.0):
+            raise ValueError("response_scales must contain positive values.")
+        if np.any(standardized_rmse < 0.0):
+            raise ValueError("standardized_rmse must contain nonnegative values.")
+
+        expected_residual = _finite_difference(observed, predicted, name="observed - predicted")
+        _require_close(residual, expected_residual, name="residual")
+        expected_observed_standardized = _finite_divide(
+            _finite_difference(
+                observed,
+                response_centers[None, :],
+                name="observed - response_centers",
+            ),
+            response_scales[None, :],
+            name="observed_standardized",
+        )
+        expected_predicted_standardized = _finite_divide(
+            _finite_difference(
+                predicted,
+                response_centers[None, :],
+                name="predicted - response_centers",
+            ),
+            response_scales[None, :],
+            name="predicted_standardized",
+        )
+        expected_residual_standardized = _finite_divide(
+            residual,
+            response_scales[None, :],
+            name="residual_standardized",
+        )
+        _require_close(
+            observed_standardized,
+            expected_observed_standardized,
+            name="observed_standardized",
+        )
+        _require_close(
+            predicted_standardized,
+            expected_predicted_standardized,
+            name="predicted_standardized",
+        )
+        _require_close(
+            residual_standardized,
+            expected_residual_standardized,
+            name="residual_standardized",
+        )
+        _require_close(
+            response_centers,
+            _safe_column_mean(observed, name="response_centers"),
+            name="response_centers",
+        )
+        _require_close(
+            response_scales,
+            _safe_sample_scales(observed, response_centers, name="response_scales"),
+            name="response_scales",
+        )
+        _require_close(
+            standardized_rmse,
+            _safe_column_rmse(residual_standardized, name="standardized_rmse"),
+            name="standardized_rmse",
+        )
+
+        object.__setattr__(self, "observed", observed)
+        object.__setattr__(self, "predicted", predicted)
+        object.__setattr__(self, "residual", residual)
+        object.__setattr__(self, "observed_standardized", observed_standardized)
+        object.__setattr__(self, "predicted_standardized", predicted_standardized)
+        object.__setattr__(self, "residual_standardized", residual_standardized)
+        object.__setattr__(self, "response_centers", response_centers)
+        object.__setattr__(self, "response_scales", response_scales)
+        object.__setattr__(self, "standardized_rmse", standardized_rmse)
+        object.__setattr__(self, "prediction_kind", prediction_kind)
+
+    def __reduce__(self) -> tuple[type[PredictionDiagnostics], tuple[object, ...]]:
+        """Reconstruct through validation so unpickled arrays remain read-only."""
+
+        return (
+            type(self),
+            (
+                self.observed,
+                self.predicted,
+                self.residual,
+                self.observed_standardized,
+                self.predicted_standardized,
+                self.residual_standardized,
+                self.response_centers,
+                self.response_scales,
+                self.standardized_rmse,
+                self.prediction_kind,
+            ),
+        )
 
     @property
     def n_samples(self) -> int:
@@ -315,22 +665,26 @@ def biplot_coordinates(
     indices = _two_component_indices(components, size=structure.n_components)
     selected_scores = structure.x_scores[:, indices]
     selected_loadings = structure.x_loadings[:, indices]
-    score_norms = np.linalg.norm(selected_scores, axis=0)
-    loading_norms = np.linalg.norm(selected_loadings, axis=0)
-    if np.any(score_norms == 0.0):
-        raise ValueError("Selected PLS score columns must have nonzero norm.")
-    if np.any(loading_norms == 0.0):
-        raise ValueError("Selected PLS X-loading columns must have nonzero norm.")
-
-    scaling_factors = np.sqrt(loading_norms / score_norms)
-    sample_coordinates = selected_scores * scaling_factors[None, :]
-    predictor_coordinates = selected_loadings / scaling_factors[None, :]
+    scaling_factors = _safe_biplot_scaling_factors(
+        selected_scores,
+        selected_loadings,
+    )
+    sample_coordinates = _finite_product(
+        selected_scores,
+        scaling_factors[None, :],
+        name="balanced sample coordinates",
+    )
+    predictor_coordinates = _finite_divide(
+        selected_loadings,
+        scaling_factors[None, :],
+        name="balanced predictor coordinates",
+    )
 
     return BiplotCoordinates(
-        sample_coordinates=_read_only(np.array(sample_coordinates, copy=True)),
-        predictor_coordinates=_read_only(np.array(predictor_coordinates, copy=True)),
-        component_indices=_read_only_ints(np.array(indices, dtype=np.int64)),
-        scaling_factors=_read_only(np.array(scaling_factors, copy=True)),
+        sample_coordinates=sample_coordinates,
+        predictor_coordinates=predictor_coordinates,
+        component_indices=np.array(indices, dtype=np.int64),
+        scaling_factors=scaling_factors,
     )
 
 
@@ -387,10 +741,10 @@ def latent_structure(model: object) -> LatentStructure:
         )
 
     return LatentStructure(
-        x_scores=_read_only(x_scores),
-        x_loadings=_read_only(x_loadings),
-        y_loadings=_read_only(y_loadings),
-        coefficients=_read_only(coefficients),
+        x_scores=x_scores,
+        x_loadings=x_loadings,
+        y_loadings=y_loadings,
+        coefficients=coefficients,
     )
 
 
@@ -439,32 +793,66 @@ def observation_diagnostics(
             f"expected {x_loadings.shape[0]}, got {X_values.shape[1]}."
         )
 
-    score_center = np.mean(training_scores, axis=0)
-    centered_training_scores = training_scores - score_center
-    score_covariance = (centered_training_scores.T @ centered_training_scores) / (
-        training_scores.shape[0] - 1
+    score_center = _safe_column_mean(training_scores, name="training-score center")
+    centered_training_scores = _finite_difference(
+        training_scores,
+        score_center[None, :],
+        name="centered training scores",
     )
-    inverse_covariance = np.linalg.pinv(score_covariance)
+    covariance_scale = float(np.max(np.abs(centered_training_scores)))
+    if covariance_scale == 0.0:
+        scaled_training_scores = centered_training_scores
+    else:
+        scaled_training_scores = centered_training_scores / covariance_scale
+    score_covariance = (
+        scaled_training_scores.T @ scaled_training_scores
+    ) / (training_scores.shape[0] - 1)
+    inverse_covariance = _finite_derived_array(
+        np.linalg.pinv(score_covariance),
+        name="training-score covariance pseudoinverse",
+    )
 
     transformed = _finite_matrix(fitted.transform(X), name="model.transform(X)")
-    centered_scores = transformed - score_center
-    score_distance = np.einsum(
-        "ij,jk,ik->i",
-        centered_scores,
-        inverse_covariance,
-        centered_scores,
+    if transformed.shape != (X_values.shape[0], training_scores.shape[1]):
+        raise ValueError(
+            "model.transform(X) must have shape (n_samples, n_components): "
+            f"expected {(X_values.shape[0], training_scores.shape[1])}, "
+            f"got {transformed.shape}."
+        )
+    centered_scores = _finite_difference(
+        transformed,
+        score_center[None, :],
+        name="centered transformed scores",
     )
+    scaled_scores = (
+        centered_scores if covariance_scale == 0.0 else centered_scores / covariance_scale
+    )
+    with np.errstate(over="ignore", invalid="ignore"):
+        score_distance = np.einsum(
+            "ij,jk,ik->i",
+            scaled_scores,
+            inverse_covariance,
+            scaled_scores,
+        )
+    score_distance = _finite_derived_array(score_distance, name="score_distance")
+    score_distance = np.maximum(score_distance, 0.0)
     reconstructed = _finite_matrix(
         fitted.inverse_transform(transformed),
         name="model.inverse_transform(model.transform(X))",
     )
-    x_reconstruction_residual = np.sum((X_values - reconstructed) ** 2, axis=1)
+    reconstruction_error = _finite_difference(
+        X_values,
+        reconstructed,
+        name="X reconstruction error",
+    )
+    x_reconstruction_residual = _safe_squared_row_norms(
+        reconstruction_error,
+        name="x_reconstruction_residual",
+    )
 
     return ObservationDiagnostics(
-        score_distance=_read_only(np.asarray(score_distance, dtype=np.float64)),
-        x_reconstruction_residual=_read_only(
-            np.asarray(x_reconstruction_residual, dtype=np.float64)
-        ),
+        score_distance=score_distance,
+        x_reconstruction_residual=x_reconstruction_residual,
     )
 
 
@@ -524,13 +912,17 @@ def pipls_display_factors(decomposition: PiPLSDecomposition) -> PiPLSDisplayFact
 
     predictor_directions *= component_signs[None, :]
     response_directions *= component_signs[None, :]
-    weighted_response_directions = response_directions * dilation[None, :]
+    weighted_response_directions = _finite_product(
+        response_directions,
+        dilation[None, :],
+        name="weighted_response_directions",
+    )
 
     return PiPLSDisplayFactors(
-        predictor_directions=_read_only(predictor_directions),
-        dilation=_read_only(dilation),
-        response_directions=_read_only(response_directions),
-        weighted_response_directions=_read_only(weighted_response_directions),
+        predictor_directions=predictor_directions,
+        dilation=dilation,
+        response_directions=response_directions,
+        weighted_response_directions=weighted_response_directions,
     )
 
 
@@ -574,29 +966,56 @@ def prediction_diagnostics(
     if observed.shape[0] < 2:
         raise ValueError("Prediction diagnostics require at least two observations.")
 
-    response_centers = np.mean(observed, axis=0)
-    response_scales = np.std(observed, axis=0, ddof=1)
+    response_centers = _safe_column_mean(observed, name="response_centers")
+    response_scales = _safe_sample_scales(
+        observed,
+        response_centers,
+        name="response_scales",
+    )
     constant = np.flatnonzero(response_scales == 0.0)
     if constant.size:
         columns = ", ".join(str(int(index)) for index in constant)
         raise ValueError(f"y_true contains constant response columns at indices: {columns}.")
 
-    residual = observed - predicted
-    observed_standardized = (observed - response_centers[None, :]) / response_scales[None, :]
-    predicted_standardized = (predicted - response_centers[None, :]) / response_scales[None, :]
-    residual_standardized = residual / response_scales[None, :]
-    standardized_rmse = np.sqrt(np.mean(np.square(residual_standardized), axis=0))
+    residual = _finite_difference(observed, predicted, name="residual")
+    observed_standardized = _finite_divide(
+        _finite_difference(
+            observed,
+            response_centers[None, :],
+            name="centered observed responses",
+        ),
+        response_scales[None, :],
+        name="observed_standardized",
+    )
+    predicted_standardized = _finite_divide(
+        _finite_difference(
+            predicted,
+            response_centers[None, :],
+            name="centered predicted responses",
+        ),
+        response_scales[None, :],
+        name="predicted_standardized",
+    )
+    residual_standardized = _finite_divide(
+        residual,
+        response_scales[None, :],
+        name="residual_standardized",
+    )
+    standardized_rmse = _safe_column_rmse(
+        residual_standardized,
+        name="standardized_rmse",
+    )
 
     return PredictionDiagnostics(
-        observed=_read_only(observed),
-        predicted=_read_only(predicted),
-        residual=_read_only(residual),
-        observed_standardized=_read_only(observed_standardized),
-        predicted_standardized=_read_only(predicted_standardized),
-        residual_standardized=_read_only(residual_standardized),
-        response_centers=_read_only(response_centers),
-        response_scales=_read_only(response_scales),
-        standardized_rmse=_read_only(standardized_rmse),
+        observed=observed,
+        predicted=predicted,
+        residual=residual,
+        observed_standardized=observed_standardized,
+        predicted_standardized=predicted_standardized,
+        residual_standardized=residual_standardized,
+        response_centers=response_centers,
+        response_scales=response_scales,
+        standardized_rmse=standardized_rmse,
         prediction_kind=prediction_kind,
     )
 
@@ -668,11 +1087,134 @@ def _two_component_indices(components: Sequence[int], *, size: int) -> tuple[int
     return first, second
 
 
-def _read_only(values: FloatArray) -> FloatArray:
-    values.setflags(write=False)
-    return values
+def _finite_derived_array(values: ArrayLike, *, name: str) -> FloatArray:
+    array = np.asarray(values, dtype=np.float64)
+    if not np.all(np.isfinite(array)):
+        raise ValueError(f"{name} cannot be represented as finite float64 values.")
+    return np.array(array, dtype=np.float64, copy=True)
 
 
-def _read_only_ints(values: IntArray) -> IntArray:
-    values.setflags(write=False)
-    return values
+def _finite_difference(left: ArrayLike, right: ArrayLike, *, name: str) -> FloatArray:
+    with np.errstate(over="ignore", invalid="ignore"):
+        difference = np.asarray(left, dtype=np.float64) - np.asarray(right, dtype=np.float64)
+    return _finite_derived_array(difference, name=name)
+
+
+def _finite_product(left: ArrayLike, right: ArrayLike, *, name: str) -> FloatArray:
+    with np.errstate(over="ignore", invalid="ignore", under="ignore"):
+        product = np.asarray(left, dtype=np.float64) * np.asarray(right, dtype=np.float64)
+    return _finite_derived_array(product, name=name)
+
+
+def _finite_divide(numerator: ArrayLike, denominator: ArrayLike, *, name: str) -> FloatArray:
+    with np.errstate(divide="ignore", over="ignore", invalid="ignore", under="ignore"):
+        quotient = np.asarray(numerator, dtype=np.float64) / np.asarray(
+            denominator,
+            dtype=np.float64,
+        )
+    return _finite_derived_array(quotient, name=name)
+
+
+def _safe_column_mean(values: FloatArray, *, name: str) -> FloatArray:
+    scales = np.max(np.abs(values), axis=0)
+    means = np.zeros(values.shape[1], dtype=np.float64)
+    nonzero = scales > 0.0
+    if np.any(nonzero):
+        normalized = values[:, nonzero] / scales[nonzero]
+        means[nonzero] = np.mean(normalized, axis=0) * scales[nonzero]
+    return _finite_derived_array(means, name=name)
+
+
+def _safe_sample_scales(
+    values: FloatArray,
+    centers: FloatArray,
+    *,
+    name: str,
+) -> FloatArray:
+    centered = _finite_difference(
+        values,
+        centers[None, :],
+        name=f"centered values for {name}",
+    )
+    maxima = np.max(np.abs(centered), axis=0)
+    scales = np.zeros(values.shape[1], dtype=np.float64)
+    nonzero = maxima > 0.0
+    if np.any(nonzero):
+        normalized = centered[:, nonzero] / maxima[nonzero]
+        mean_squares = np.sum(normalized * normalized, axis=0) / (values.shape[0] - 1)
+        scales[nonzero] = _finite_product(
+            maxima[nonzero],
+            np.sqrt(mean_squares),
+            name=name,
+        )
+    return _finite_derived_array(scales, name=name)
+
+
+def _safe_biplot_scaling_factors(
+    scores: FloatArray,
+    loadings: FloatArray,
+) -> FloatArray:
+    score_maxima = np.max(np.abs(scores), axis=0)
+    loading_maxima = np.max(np.abs(loadings), axis=0)
+    if np.any(score_maxima == 0.0):
+        raise ValueError("Selected PLS score columns must have nonzero norm.")
+    if np.any(loading_maxima == 0.0):
+        raise ValueError("Selected PLS X-loading columns must have nonzero norm.")
+
+    normalized_scores = scores / score_maxima[None, :]
+    normalized_loadings = loadings / loading_maxima[None, :]
+    score_norm_factors = np.sqrt(np.sum(normalized_scores * normalized_scores, axis=0))
+    loading_norm_factors = np.sqrt(
+        np.sum(normalized_loadings * normalized_loadings, axis=0)
+    )
+    log_factors = 0.5 * (
+        np.log(loading_maxima)
+        + np.log(loading_norm_factors)
+        - np.log(score_maxima)
+        - np.log(score_norm_factors)
+    )
+    with np.errstate(over="ignore", under="ignore", invalid="ignore"):
+        scaling_factors = np.exp(log_factors)
+    scaling_factors = _finite_derived_array(
+        scaling_factors,
+        name="biplot scaling_factors",
+    )
+    if np.any(scaling_factors == 0.0):
+        raise ValueError("biplot scaling_factors cannot be represented as positive float64 values.")
+    return scaling_factors
+
+
+def _safe_squared_row_norms(values: FloatArray, *, name: str) -> FloatArray:
+    maxima = np.max(np.abs(values), axis=1)
+    squared_norms = np.zeros(values.shape[0], dtype=np.float64)
+    nonzero = maxima > 0.0
+    if np.any(nonzero):
+        normalized = values[nonzero, :] / maxima[nonzero, None]
+        normalized_squares = np.sum(normalized * normalized, axis=1)
+        limits = np.sqrt(np.finfo(np.float64).max / normalized_squares)
+        if np.any(maxima[nonzero] > limits):
+            raise ValueError(f"{name} cannot be represented as finite float64 values.")
+        squared_norms[nonzero] = (
+            maxima[nonzero] * maxima[nonzero] * normalized_squares
+        )
+    return _finite_derived_array(squared_norms, name=name)
+
+
+def _safe_column_rmse(values: FloatArray, *, name: str) -> FloatArray:
+    maxima = np.max(np.abs(values), axis=0)
+    rmse = np.zeros(values.shape[1], dtype=np.float64)
+    nonzero = maxima > 0.0
+    if np.any(nonzero):
+        normalized = values[:, nonzero] / maxima[nonzero]
+        normalized_rmse = np.sqrt(np.mean(normalized * normalized, axis=0))
+        rmse[nonzero] = _finite_product(
+            maxima[nonzero],
+            normalized_rmse,
+            name=name,
+        )
+    return _finite_derived_array(rmse, name=name)
+
+
+def _require_close(actual: FloatArray, expected: FloatArray, *, name: str) -> None:
+    if not np.allclose(actual, expected, rtol=1e-7, atol=1e-12):
+        raise ValueError(f"{name} is inconsistent with the other diagnostic fields.")

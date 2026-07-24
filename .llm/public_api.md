@@ -250,6 +250,12 @@ probability limits.
 `biplot_coordinates()` accepts a `LatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
 $TP^\mathsf{T}$ reconstruction.
 
+All five inspection records validate direct construction, store defensive read-only copies, and
+revalidate through pickle reconstruction. Their helper functions guarantee finite public arrays:
+range-safe scaled calculations are used where ordinary means, norms, covariance products, squared
+residuals, or RMSE calculations could overflow, and an unrepresentable derived quantity raises a
+clear `ValueError` instead of returning `inf` or `nan`.
+
 The package exposes no `pipls.plotting` module and no public `plot_*` convenience functions.
 The immutable numerical results are the compatibility surface; Matplotlib artists, styles, and
 `adjustText` label positions are caller-owned and are not package results.

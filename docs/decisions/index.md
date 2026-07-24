@@ -108,3 +108,4 @@ reference describe the current public behavior directly.
 - [0089: balanced Pulp factorization views](0089-balanced-pulp-factorization-views.md)
 - [0090: programming-reference consolidation](0090-reference-consolidation.md)
 - [0091: clean committed-tree snapshots](0091-clean-git-snapshots.md)
+- [0094: inspection result safety](0094-inspection-result-safety.md)

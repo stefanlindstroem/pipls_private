@@ -244,7 +244,9 @@ e^{(z)}_{ij}=z_{ij}-\hat z_{ij}.
 
 The scale therefore uses `ddof=1`. The same observed-response center and scale apply to predictions.
 Reject nonfinite inputs, shape disagreement, fewer than two observations, and constant response
-columns.
+columns. Calculate centers, scales, residual standardization, and response-wise RMSE with
+range-safe scaled operations. If a required diagnostic cannot be represented as finite float64,
+raise a clear `ValueError` rather than returning a nonfinite record.
 
 The initial figure contract contains:
 
@@ -306,11 +308,17 @@ transform/inverse-transform round trip. These are descriptive raw quantities. Do
 theoretical probability limits, automatic outlier labels, or contribution plots without a separate
 decision.
 
+Form the training-score covariance after one common scaling of the centered score matrix, and apply
+the same scale to supplied centered scores. The scale cancels in the Moore--Penrose quadratic form
+while avoiding overflow in the covariance product. Calculate $q_i$ through a scaled row-wise squared
+norm and reject an unrepresentable squared residual.
+
 For selected $t_k$ and $p_k$, the biplot uses
 $a_k=\sqrt{\lVert p_k\rVert_2/\lVert t_k\rVert_2}$,
 $\tilde t_k=a_kt_k$, and $\tilde p_k=p_k/a_k$. Tests must preserve
 $\tilde T\tilde P^\mathsf{T}=T_{\mathcal K}P_{\mathcal K}^\mathsf{T}$ and equal component-wise
-score/loading norms. The biplot is enabled only for Pulp.
+score/loading norms. Compute norms by max scaling and form $a_k$ as a quotient of square roots so
+finite extreme columns do not overflow before balancing. The biplot is enabled only for Pulp.
 
 VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation tests,
 contribution plots, and theoretical outlier thresholds require separate decisions.
@@ -340,8 +348,9 @@ fold-local scaling used by the component-path loss.
 
 ## Testing boundary
 
-Pure inspection tests should verify equations, shapes, finite-value validation, defensive copying,
-read-only results, sign preservation, and no estimator mutation.
+Pure inspection tests should verify equations, shapes, direct-construction invariants, finite-value
+validation, defensive copying, read-only and pickle reconstruction, sign preservation, no estimator
+mutation, representable extreme inputs, and explicit failure for unrepresentable derived values.
 
 Rendering tests should use a headless Matplotlib backend and protect only durable example contracts:
 direct access to named immutable arrays, explicit figure and axis construction, physical coordinate

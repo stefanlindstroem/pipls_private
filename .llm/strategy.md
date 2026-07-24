@@ -595,16 +595,18 @@ completes the second increment by capping the path with the minimum rank verifie
 preprocessing. The third increment uses one reference-anchored tolerant comparison for selection
 and score ranking, so rank groups cannot expand through adjacent near-ties. Decision 0093 completes
 the fourth increment by applying one direct-construction, defensive-copy, scalar, OOF-coverage, and
-pickle-validation policy to the core estimator and path result records. Release preparation and
-publication are explicitly outside this series and remain deferred until the owner completes a
-human audit.
+pickle-validation policy to the core estimator and path result records. Decision 0094 completes the
+fifth increment by applying the same boundary to inspection records and using range-safe
+calculations that reject unrepresentable derived values rather than returning nonfinite arrays.
+Release preparation and publication are explicitly outside this series and remain deferred until
+the owner completes a human audit.
 
-Current status: **increment 4/6 complete; inspection-result hardening next**.
+Current status: **increment 5/6 complete; dataset metadata closure next**.
 
 ## Current next increment
 
-Pre-release audit hardening 5/6: make inspection result records uniformly defensive and prevent
-inspection helpers from returning nonfinite derived quantities.
+Pre-release audit hardening 6/6: reject mutable object arrays from recursively frozen dataset
+metadata.
 
 ## Maintenance protocol
 

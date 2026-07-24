@@ -88,6 +88,13 @@ Correct the data or parameters and call `fit()` again. The
 [fixed-regression reference](api/regression.md) documents preprocessing, fit safety, solver choices,
 and the statistical-support warning.
 
+## Inspection rejects an extreme derived quantity
+
+Inspection helpers accept finite inputs but reject a derived norm, squared residual, standardized
+value, or factor product that cannot be represented as finite `float64`. Rescale the physical units
+or inspect the preceding fitted and prediction arrays. The package does not return nonfinite
+inspection records.
+
 ## `StatisticalSupportWarning` appears
 
 A direct fixed fit warns when the number of observations is small relative to the requested

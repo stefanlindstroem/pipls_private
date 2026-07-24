@@ -4,6 +4,9 @@
 Pi-PLS-specific inspection covers $P$, $D$, $Q$, and $QD$; scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics use estimator-neutral PLS-family objects.
 Maintained examples render these arrays directly, but rendering is not part of the numerical API.
+Inspection calculations use range-safe scaled operations where ordinary norms, covariance products,
+sample scales, or squared residuals could overflow. A derived quantity that cannot be represented
+as finite float64 raises `ValueError` rather than entering an immutable result.
 
 The [Pulp tutorial](tutorials/pulp.md#interpret-representative-fitted-model-plots) shows a
 representative subset. The generated [inspection API](api/inspection.md) documents exact fields and

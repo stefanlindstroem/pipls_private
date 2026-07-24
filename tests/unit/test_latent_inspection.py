@@ -4,6 +4,7 @@ from typing import Any, Literal
 
 import numpy as np
 import pytest
+from sklearn.base import BaseEstimator
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 
@@ -264,3 +265,63 @@ def test_biplot_coordinates_reject_zero_norm_loadings() -> None:
 def _structure_for_biplot() -> LatentStructure:
     model, _ = _fitted_model("pls")
     return latent_structure(model)
+
+
+class _ExtremeObservationModel(BaseEstimator):
+    def __init__(self, *, reconstruct_sign: float = 1.0) -> None:
+        self.x_scores_ = np.array(
+            [[-1.0e200, 0.0], [1.0e200, 0.0], [0.0, 1.0e200]],
+            dtype=np.float64,
+        )
+        self.x_loadings_ = np.eye(2)
+        self.y_loadings_ = np.eye(2)
+        self.coef_ = np.eye(2)
+        self._reconstruct_sign = reconstruct_sign
+
+    def fit(self, X: object, y: object) -> _ExtremeObservationModel:
+        del X, y
+        return self
+
+    def transform(self, X: object) -> np.ndarray:
+        return np.asarray(X, dtype=np.float64)
+
+    def inverse_transform(self, X: object) -> np.ndarray:
+        return self._reconstruct_sign * np.asarray(X, dtype=np.float64)
+
+
+def test_biplot_coordinates_handle_extreme_representable_norms() -> None:
+    structure = LatentStructure(
+        x_scores=np.array([[1.0e200, 0.0], [0.0, 1.0e200]]),
+        x_loadings=np.array([[1.0e-200, 0.0], [0.0, 1.0e-200]]),
+        y_loadings=np.eye(2),
+        coefficients=np.eye(2),
+    )
+
+    with np.errstate(all="raise"):
+        coordinates = biplot_coordinates(structure)
+
+    assert np.all(np.isfinite(coordinates.sample_coordinates))
+    assert np.all(np.isfinite(coordinates.predictor_coordinates))
+    np.testing.assert_allclose(
+        coordinates.sample_coordinates @ coordinates.predictor_coordinates.T,
+        np.eye(2),
+    )
+
+
+def test_observation_diagnostics_handle_extreme_score_covariance() -> None:
+    model = _ExtremeObservationModel()
+    X = model.x_scores_.copy()
+
+    with np.errstate(all="raise"):
+        diagnostics = observation_diagnostics(model, X)
+
+    assert np.all(np.isfinite(diagnostics.score_distance))
+    np.testing.assert_array_equal(diagnostics.x_reconstruction_residual, np.zeros(3))
+
+
+def test_observation_diagnostics_reject_unrepresentable_reconstruction_residuals() -> None:
+    model = _ExtremeObservationModel(reconstruct_sign=-1.0)
+    X = np.array([[np.finfo(np.float64).max, 0.0]])
+
+    with pytest.raises(ValueError, match="X reconstruction error cannot be represented"):
+        observation_diagnostics(model, X)

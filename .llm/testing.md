@@ -61,9 +61,10 @@ OOF behavior is tested through `validation_report_`. Predictor-rank-profile test
 ascending ranks, aligned defensive read-only arrays, scorer-general selection, invalid lookup,
 pickling, and consistency with both `cv_results_` and `component_path_`.
 
-Post-analysis inspection tests should verify mathematical identities, shapes, finite-value
-validation, defensive copying, read-only results, deterministic sign handling, prediction
-provenance, and absence of estimator mutation. Rendering tests belong at the example or tutorial
+Post-analysis inspection tests should verify mathematical identities, shapes, direct-construction
+and pickle invariants, finite-value validation, defensive copying, read-only results, deterministic
+sign handling, prediction provenance, representable extreme inputs, explicit failure for
+unrepresentable derived values, and absence of estimator mutation. Rendering tests belong at the example or tutorial
 boundary and should use a headless Matplotlib backend. Protect named result-field access, direct
 figure and axis construction, physical coordinate order, final files, and successful SVG or PDF
 creation without pinning pixels, exact styling, automatically adjusted label positions, or
