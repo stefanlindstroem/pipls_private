@@ -121,6 +121,11 @@ direct rendering from immutable inspection arrays and the immutable ordinary-PLS
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 benchmarks.
 
+Documentation workflow tests should protect strict checkout and source-distribution validation,
+master-only Pages deployment, least-privilege deployment permissions, canonical repository-derived
+configuration, and generated-artifact upload. They should not pin action implementation details
+beyond the maintained official Pages action majors.
+
 Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
 assertions require an explicit decision record describing why the value is stable, what software
 behavior it protects, and what tolerance or update procedure applies. Publication-result fixtures

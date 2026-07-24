@@ -17,7 +17,7 @@ implemented boundary and next increment; this file records where responsibilitie
 ## Current state
 
 Phases A through F4, documentation Patches D1--D4, plotting migrations G1--G5, and public-result
-cleanup steps API1--API3 are complete. First-release preparation is next.
+cleanup steps API1--API3 are complete. The owner-led new-user onboarding audit is in progress.
 The current public surface includes
 `PiPLSRegression`,
 `PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,

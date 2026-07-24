@@ -91,6 +91,11 @@
   once and checks separate clean wheel and sdist installations outside the checkout. The sdist
   check also installs the `examples` extra, runs example 01 from the extracted source tree, and
   verifies that its repository-owned output directory is present and writable.
+- The dedicated documentation workflow runs the strict checkout and source-distribution builds on
+  pushes and pull requests. Pushes to `master` additionally derive the default GitHub Pages and
+  repository URLs from the Actions context, rebuild the site with those canonical values, and
+  deploy `site/`. Keep Pages write and identity-token permissions confined to the deployment job;
+  never commit the temporary `.mkdocs-pages.yml` file or generated site.
 - Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
   package-benchmark decision; do not freeze them accidentally in repository-layout tests.
 - Design each benchmark around one explicit user-facing question. Give it one readable script and

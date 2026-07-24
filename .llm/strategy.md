@@ -644,15 +644,16 @@ A whole-package audit from a new user's perspective identified six focused incre
 
 Decision 0099 completes the first increment by committing and snapshotting only example-result
 placeholders, distributing those placeholders, and running example 01 from an extracted source
-distribution. Package release preparation and publication remain outside this series.
+distribution. Decision 0100 completes the second increment with strict documentation validation on
+pushes and pull requests and repository-derived GitHub Pages deployment from `master`. Package
+release preparation and Python-package publication remain outside this series.
 
-Current status: **patch 1/6 complete**.
+Current status: **patches 1/6 and 2/6 complete**.
 
 ## Current next increment
 
-Implement the rendered-documentation entry only after the owner supplies the canonical public
-repository and documentation URLs. If those URLs remain unresolved, the owner may explicitly move
-to the continuous-example increment without changing package-release scope.
+Renumber the maintained examples continuously and improve example 01 terminal output without
+changing model calculations, datasets, result directories, or PDF filenames.
 
 ## Maintenance protocol
 

@@ -34,3 +34,5 @@ examples/results/*
 !examples/results/tobacco_post_analysis/
 !examples/results/tobacco_post_analysis/.gitkeep
 benchmarks/.cache/
+
+.mkdocs-pages.yml

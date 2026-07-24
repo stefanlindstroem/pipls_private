@@ -1,5 +1,8 @@
 # Changelog
 
+- Deploy the strict rendered documentation through GitHub Pages from `master`, validate it on
+  pushes and pull requests, and make the repository deployment the primary README route while
+  retaining source-checkout links.
 - Remove committed generated example PDFs, preserve only output-directory placeholders in Git and
   snapshots, and include those placeholders in source distributions so the introductory example
   runs from a clean extraction.

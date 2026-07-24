@@ -115,3 +115,4 @@ reference describe the current public behavior directly.
 - [0094: inspection result safety](0094-inspection-result-safety.md)
 - [0098: grouped maintainer command index](0098-grouped-make-help.md)
 - [0099: example artifact and source-distribution boundary](0099-example-artifact-and-sdist-boundary.md)
+- [0100: rendered documentation deployment](0100-rendered-documentation-deployment.md)

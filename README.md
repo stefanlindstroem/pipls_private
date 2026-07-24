@@ -9,6 +9,10 @@ For routine model selection, `PiPLSPathCV` evaluates component counts by cross-v
 selects a predictor rank conditionally for each count. The user then chooses a parsimonious point
 from the component path and fits one fixed `PiPLSRegression` model.
 
+The rendered documentation is the primary user guide. On GitHub, open the latest
+[`github-pages` deployment](../../deployments/github-pages). The source links below remain useful
+in a local checkout.
+
 Start with:
 
 1. [First Pi-PLS model with synthetic data](docs/tutorials/synthetic.md) for the compact selection
@@ -116,13 +120,15 @@ Install the `examples` extra before running them.
 
 ## Documentation
 
-- [Tutorial 1: synthetic selection and prediction](docs/tutorials/synthetic.md)
-- [Tutorial 2: complete Pulp analysis](docs/tutorials/pulp.md)
-- [API overview](docs/api/index.md)
-- [Path-selection details](docs/path_analysis.md)
-- [Troubleshooting](docs/troubleshooting.md)
-- [Model inspection](docs/model_inspection.md)
-- [Reference datasets](docs/datasets.md)
-- [Theory](docs/theory.md)
+- [Rendered documentation](../../deployments/github-pages)
+- Source documentation:
+  - [Tutorial 1: synthetic selection and prediction](docs/tutorials/synthetic.md)
+  - [Tutorial 2: complete Pulp analysis](docs/tutorials/pulp.md)
+  - [API overview](docs/api/index.md)
+  - [Path-selection details](docs/path_analysis.md)
+  - [Troubleshooting](docs/troubleshooting.md)
+  - [Model inspection](docs/model_inspection.md)
+  - [Reference datasets](docs/datasets.md)
+  - [Theory](docs/theory.md)
 
 The package is distributed under the [BSD 3-Clause License](LICENSE).

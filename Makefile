@@ -35,7 +35,7 @@ typecheck: ## Run strict mypy checks.
 	$(PYTHON) -m mypy src
 
 clean: ## Remove generated files and caches.
-	rm -rf build dist site docs/assets/generated benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
+	rm -rf build dist site .mkdocs-pages.yml docs/assets/generated benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
 	find examples/results -type f ! -name .gitkeep -delete
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	find . -type d -name '*.egg-info' -prune -exec rm -rf {} +

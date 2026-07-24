@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 from pathlib import Path
 
@@ -233,15 +234,66 @@ def test_documentation_distribution_target_uses_the_validation_helper() -> None:
 
 
 def test_documentation_ci_builds_checkout_and_source_distribution() -> None:
-    workflow = yaml.safe_load(
-        (_repository_root() / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
-    )
-    docs_steps = workflow["jobs"]["docs"]["steps"]
+    root = _repository_root()
+    workflow_path = root / ".github" / "workflows" / "documentation.yml"
+    workflow = yaml.safe_load(workflow_path.read_text(encoding="utf-8"))
+    docs_steps = workflow["jobs"]["build"]["steps"]
     commands = [step["run"] for step in docs_steps if "run" in step]
 
     assert 'python -m pip install -e ".[docs]"' in commands
     assert "make docs" in commands
     assert "make docs-dist" in commands
+    assert "docs" not in yaml.safe_load(
+        (root / ".github" / "workflows" / "build.yml").read_text(encoding="utf-8")
+    )["jobs"]
+
+
+def test_documentation_ci_deploys_only_the_master_pages_site(tmp_path: Path) -> None:
+    root = _repository_root()
+    workflow_path = root / ".github" / "workflows" / "documentation.yml"
+    workflow_text = workflow_path.read_text(encoding="utf-8")
+    workflow = yaml.safe_load(workflow_text)
+    build_steps = workflow["jobs"]["build"]["steps"]
+    deploy = workflow["jobs"]["deploy"]
+
+    assert "actions/configure-pages@v6" in workflow_text
+    assert "actions/upload-pages-artifact@v5" in workflow_text
+    assert "actions/deploy-pages@v5" in workflow_text
+    assert deploy["if"] == "github.event_name == 'push' && github.ref == 'refs/heads/master'"
+    assert deploy["environment"] == {
+        "name": "github-pages",
+        "url": "${{ steps.deployment.outputs.page_url }}",
+    }
+    assert deploy["permissions"] == {"pages": "write", "id-token": "write"}
+    assert deploy["concurrency"] == {
+        "group": "github-pages",
+        "cancel-in-progress": False,
+    }
+    conditional_steps = [step for step in build_steps if "if" in step]
+    assert conditional_steps
+    assert {
+        step["if"] for step in conditional_steps
+    } == {"github.event_name == 'push' && github.ref == 'refs/heads/master'"}
+
+    output = tmp_path / "mkdocs-pages.yml"
+    subprocess.run(
+        [
+            sys.executable,
+            str(root / "tools" / "configure_pages_docs.py"),
+            "--repository",
+            "example/pipls",
+            "--server-url",
+            "https://github.com",
+            "--output",
+            str(output),
+        ],
+        cwd=root,
+        check=True,
+    )
+    config = yaml.safe_load(output.read_text(encoding="utf-8"))
+    assert config["site_url"] == "https://example.github.io/pipls/"
+    assert config["repo_url"] == "https://github.com/example/pipls"
+    assert config["edit_uri"] == "edit/master/docs/"
 
 
 def test_examples_extra_declares_data_and_rendering_dependencies() -> None:
@@ -303,6 +355,7 @@ def test_readme_and_contributing_have_distinct_audiences() -> None:
         "PiPLSRegression",
         "PiPLSPathCV",
         "for_n_components",
+        "../../deployments/github-pages",
         "docs/tutorials/synthetic.md",
         "docs/tutorials/pulp.md",
     ):
