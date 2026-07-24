@@ -211,6 +211,12 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     for filename in FIGURE_FILENAMES:
         assert f"../assets/generated/pulp/{filename}" in tutorial
 
+    coverage_start = tutorial.index("## What this tutorial covers")
+    setup_start = tutorial.index("## Setup")
+    coverage = tutorial[coverage_start:setup_start]
+    assert coverage_start < setup_start
+    assert len(re.findall(r"^\d+\. ", coverage, flags=re.MULTILINE)) >= 6
+
     assert tutorial.index("pulp-tutorial-setup") < tutorial.index("load-pulp-data")
     assert tutorial.index("select-pulp-parameters") < tutorial.index(
         "plot-pulp-component-path"

@@ -442,7 +442,7 @@ def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
         y_validation: object,
     ) -> float:
         del X_validation, y_validation
-        predictor_rank = int(getattr(estimator, "predictor_rank"))
+        predictor_rank = int(estimator.predictor_rank)
         return score_by_rank[predictor_rank]
 
     search = PiPLSPathCV(

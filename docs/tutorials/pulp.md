@@ -15,6 +15,18 @@ example dependencies before running either route:
 python -m pip install -e ".[examples]"
 ```
 
+## What this tutorial covers
+
+You will:
+
+1. load the Pulp predictors and responses;
+2. evaluate the component path and conditional predictor-rank profile;
+3. qualify a predictor-rank choice at the upper evaluated boundary;
+4. fit one fixed `PiPLSRegression` model;
+5. generate selection-conditioned OOF predictions;
+6. compute immutable latent-structure, factorization, and prediction-diagnostic results;
+7. interpret representative standard PLS-family and Pi-PLS-specific plots.
+
 ## Setup
 
 The example imports the estimators, numerical inspection functions, Matplotlib, and `adjustText`,

@@ -1,5 +1,8 @@
 # Changelog
 
+- Add a concise coverage list to Tutorial 2 so readers can see the complete Pulp workflow before
+  entering the setup and analysis sections.
+
 - Align `rank_test_score` with Pi-PLS candidate selection by using one reference-anchored
   tolerant score comparison, preventing adjacent near-ties from chaining into a wider rank group.
 
