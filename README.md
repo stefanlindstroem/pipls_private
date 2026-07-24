@@ -27,13 +27,13 @@ From a source checkout, install the runtime package with:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -e .
+python -m pip install .
 ```
 
 Install the complete example and tutorial plotting dependencies when needed:
 
 ```bash
-python -m pip install -e ".[examples]"
+python -m pip install ".[examples]"
 ```
 
 Development setup and repository validation commands are documented in
@@ -112,8 +112,9 @@ attributes, result shapes, and method contracts are collected in the
 
 The repository includes maintained examples for synthetic data and for the Pulp, Sugarcane, and
 Tobacco datasets. Real-data examples read `X.csv` and `Y.csv` explicitly and keep analytical
-results in memory. The original sources, licenses, adaptations, and DOI links are documented in the
-[dataset guide](docs/datasets.md).
+results in memory. The CSV assets are ordinary repository files; there is no dataset-access extra,
+registry, or package-owned loader. The original sources, licenses, adaptations, and DOI links are
+documented in the [dataset guide](docs/datasets.md).
 
 See the [example catalogue](docs/examples.md) for the purpose and outputs of every numbered script.
 Install the `examples` extra before running them.

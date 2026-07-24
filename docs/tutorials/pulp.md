@@ -12,7 +12,7 @@ SVG figures displayed here. Install the
 example dependencies before running either route:
 
 ```bash
-python -m pip install -e ".[examples]"
+python -m pip install ".[examples]"
 ```
 
 ## What this tutorial covers

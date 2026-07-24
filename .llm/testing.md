@@ -18,6 +18,8 @@ Tests may verify:
   runtime behavior at the public import and representative fit/predict boundary; extracted source
   distributions must retain example output-directory placeholders and run example 01 after the
   `examples` extra is installed;
+- optional dependency metadata matching maintained `dev`, `examples`, and `docs` workflows, with
+  public source-install commands remaining noneditable and contributor setup remaining editable;
 - presence, encoding, parsability, and structural format of shipped Markdown, YAML, CSV, TOML, and
   shell files;
 - generic consistency rules, such as every indexed decision record existing and every shipped
@@ -25,7 +27,8 @@ Tests may verify:
 - snapshot integrity in isolated Git repositories: clean committed-tree contents, refusal of
   tracked/staged/nonignored-untracked changes, exclusion of ignored files, truthful metadata, and
   refusal of committed generated files below `examples/results/`;
-- the repository example-result tree containing only `.gitkeep` directory placeholders;
+- the Git-tracked example-result tree containing only `.gitkeep` directory placeholders, while
+  ignored local outputs remain permitted;
 - repository dataset tables being readable numeric comma-separated files with aligned rows;
 - explicitly frozen package-benchmark results after a separate decision defines their scientific
   meaning, tolerances, and update procedure.

@@ -117,7 +117,7 @@ Numerical estimators and inspection results do not require plotting dependencies
 example extra before running the maintained plotting workflows:
 
 ```bash
-python -m pip install -e ".[examples]"
+python -m pip install ".[examples]"
 ```
 
 The examples render immutable inspection arrays with ordinary Matplotlib. Annotated biplots also

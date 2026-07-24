@@ -27,6 +27,8 @@ access.
 
 `PiPLSDataset` remains an optional structured container and the return type of the package-owned
 synthetic generators. It is not required for real data, and examples must not imply otherwise.
+Shipped CSV datasets are repository assets rather than installable registry entries, so package
+metadata exposes no `data` extra.
 
 ## Example transparency
 

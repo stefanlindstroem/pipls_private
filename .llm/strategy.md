@@ -650,15 +650,17 @@ pushes and pull requests and repository-derived GitHub Pages deployment from `ma
 from 01 to 07, migrating every active consumer, and labeling example 01 terminal output. Decision
 0102 completes the fourth increment by making path evaluation selection-only by default and
 replacing the function-object scoring default with a stable package name that resolves to the same
-public callable. Package release preparation and Python-package publication remain outside this
-series.
+public callable. Decision 0103 completes the fifth increment by limiting optional dependencies to
+maintained workflows, removing unused packages, and separating noneditable user installation from
+editable contributor setup. Package release preparation and Python-package publication remain
+outside this series.
 
-Current status: **patches 1/6 through 4/6 complete**.
+Current status: **patches 1/6 through 5/6 complete**.
 
 ## Current next increment
 
-Simplify optional dependencies and separate ordinary source-user installation from editable
-contributor setup without preparing or publishing a package release.
+Refine the landing page and tutorial openings after the preceding user-entry contracts have settled,
+without preparing or publishing a package release.
 
 ## Maintenance protocol
 

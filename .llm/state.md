@@ -355,18 +355,17 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Patches 1/6 through 4/6 of the owner-authorized new-user onboarding series are complete under
-Decisions 0099--0102. `PiPLSPathCV` now defaults to selection-only `refit=False`, and its default
-scoring parameter is the stable package name that resolves to the public response-standardized
-scorer. No package release preparation or Python-package publication work is authorized.
+Patches 1/6 through 5/6 of the owner-authorized new-user onboarding series are complete under
+Decisions 0099--0103. `PiPLSPathCV` defaults to selection-only `refit=False`; its default scoring
+parameter is stable; ordinary source users receive noneditable installation instructions; and the
+optional dependency groups are limited to the maintained `dev`, `examples`, and `docs` workflows.
+No package release preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Installation cleanup:** remove unused extras and distinguish source-user installation from
-   contributor setup.
-2. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
+1. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
    workflow.
-3. **Human audit:** continue owner review after each focused snapshot.
+2. **Human audit:** continue owner review after each focused snapshot.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

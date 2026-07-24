@@ -6,6 +6,12 @@ import subprocess
 import sys
 import tarfile
 from pathlib import Path
+from typing import Any
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - Python 3.10
+    import tomli as tomllib
 
 import yaml
 
@@ -36,6 +42,11 @@ _DECISION_ROW = re.compile(r"^\| `(?P<filename>\d{4}-[a-z0-9-]+\.md)` \|", re.MU
 
 def _repository_root() -> Path:
     return Path(__file__).resolve().parents[1]
+
+
+def _project_metadata() -> dict[str, Any]:
+    with (_repository_root() / "pyproject.toml").open("rb") as stream:
+        return tomllib.load(stream)["project"]
 
 
 def _assert_markdown_format(path: Path) -> None:
@@ -79,14 +90,48 @@ def test_source_distribution_manifest_includes_documentation_build_inputs() -> N
     } <= manifest_lines
 
 
-def test_docs_extra_declares_the_build_toolchain() -> None:
-    pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
-    assert "docs = [" in pyproject
-    assert '"build>=1.2,<2"' in pyproject
-    assert '"mkdocs>=1.6,<2"' in pyproject
-    assert '"mkdocs-material>=9.5,<9.7"' in pyproject
-    assert '"mkdocstrings-python>=2,<3"' in pyproject
-    assert '"ruff>=0.6"' in pyproject.split("docs = [", 1)[1].split("]", 1)[0]
+def test_optional_dependency_groups_match_maintained_workflows() -> None:
+    project = _project_metadata()
+    runtime = set(project["dependencies"])
+    extras = project["optional-dependencies"]
+
+    assert set(extras) == {"dev", "examples", "docs"}
+    assert set(extras["examples"]) <= set(extras["dev"])
+    assert not any(requirement.startswith("pytest-cov") for requirement in extras["dev"])
+    assert not any(requirement.startswith("ruff") for requirement in extras["docs"])
+    assert not any(
+        requirement.startswith(("pandas", "matplotlib", "adjustText"))
+        for requirement in runtime
+    )
+
+    docs = set(extras["docs"])
+    assert {
+        "build>=1.2,<2",
+        "pandas>=2.0",
+        "matplotlib>=3.8",
+        "adjustText>=1.4,<2",
+        "mkdocs>=1.6,<2",
+        "mkdocs-material>=9.5,<9.7",
+        "mkdocstrings-python>=2,<3",
+    } <= docs
+
+
+def test_public_installation_is_noneditable_and_contributor_setup_is_editable() -> None:
+    root = _repository_root()
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    contributing = (root / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    served_docs = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in sorted((root / "docs").rglob("*.md"))
+        if "decisions" not in path.parts
+    )
+
+    assert "python -m pip install ." in readme
+    assert 'python -m pip install ".[examples]"' in readme
+    assert "pip install -e" not in readme
+    assert "pip install -e" not in served_docs
+    assert 'python -m pip install -e ".[dev,docs]"' in contributing
+    assert "make install" in contributing
 
 
 def test_mkdocs_configuration_has_valid_user_navigation() -> None:
@@ -297,17 +342,23 @@ def test_documentation_ci_deploys_only_the_master_pages_site(tmp_path: Path) -> 
 
 
 def test_examples_extra_declares_data_and_rendering_dependencies() -> None:
-    pyproject = (_repository_root() / "pyproject.toml").read_text(encoding="utf-8")
+    project = _project_metadata()
+    runtime = project["dependencies"]
+    extras = project["optional-dependencies"]
 
-    assert 'examples = ["pandas>=2.0", "matplotlib>=3.8", "adjustText>=1.4,<2"]' in pyproject
-    assert '"pandas>=2.0"' in pyproject.split("dev = [", 1)[1].split("]", 1)[0]
-    dev_dependencies = pyproject.split("dev = [", 1)[1].split("]", 1)[0]
-    assert '"matplotlib>=3.8"' in dev_dependencies
-    assert '"adjustText>=1.4,<2"' in dev_dependencies
-    runtime_dependencies = pyproject.split("dependencies = [", 1)[1].split("]", 1)[0]
-    assert "adjustText" not in runtime_dependencies
-    assert "matplotlib" not in runtime_dependencies
-    assert "plot =" not in pyproject
+    assert extras["examples"] == [
+        "pandas>=2.0",
+        "matplotlib>=3.8",
+        "adjustText>=1.4,<2",
+    ]
+    assert set(extras["examples"]) <= set(extras["dev"])
+    assert not any(
+        requirement.startswith(("matplotlib", "adjustText"))
+        for requirement in runtime
+    )
+    assert "plot" not in extras
+
+
 
 
 def test_make_examples_runs_every_numbered_example() -> None:

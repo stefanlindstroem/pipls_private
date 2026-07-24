@@ -1,5 +1,9 @@
 # Changelog
 
+- Simplified installation and optional dependencies: public source users now receive noneditable
+  install commands; only the maintained `dev`, `examples`, and `docs` extras remain; and unused
+  `data`, coverage, and documentation-lint dependencies were removed.
+
 - Make `PiPLSPathCV` selection-only by default with `refit=False`, and represent the default
   response-standardized scorer by a stable package string that resolves to the existing public
   callable.

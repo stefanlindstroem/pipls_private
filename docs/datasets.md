@@ -120,10 +120,11 @@ block is unchanged when only `n_test` changes.
 ## Real-data boundary
 
 Real-data reading remains user-owned. Examples and reproduction scripts must show how `X` and `Y`
-are read and formed directly using ordinary NumPy, pandas, or domain-specific code. The project
-tracks public provenance, licenses, and analysis-facing transformations for its own datasets, but
-no public registry, generic loader, preparation-only script, or required metadata sidecar is part
-of the runtime API.
+are read and formed directly using ordinary NumPy, pandas, or domain-specific code. The shipped CSV
+assets require no `data` installation extra: they are ordinary repository files, not entries in a
+runtime registry. The project tracks public provenance, licenses, and analysis-facing
+transformations for its own datasets, but no public registry, generic loader, preparation-only
+script, or required metadata sidecar is part of the runtime API.
 
 
 ## Pulp real-data integration

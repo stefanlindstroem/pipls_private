@@ -23,7 +23,14 @@
   candidate training fold and refit them on the complete training set after selection.
 - Fit every additional learned preprocessing operation inside its matching training fold.
 - Add dependencies only when a short, stable NumPy/scikit-learn implementation is insufficient.
-- Keep executable example dependencies under the `examples` extra; the `dev` extra must include them so repository validation does not skip example artifacts.
+- Keep executable example dependencies under the `examples` extra; the `dev` extra must include
+them so repository validation does not skip example artifacts.
+- Keep optional dependency groups tied to maintained workflows: `examples` for numbered examples,
+  `docs` for strict documentation construction, and `dev` for repository validation. Do not expose
+  a dataset-access extra when datasets are ordinary repository files, and do not retain tools that
+  no maintained target invokes.
+- Public source-checkout instructions use ordinary noneditable installation. Editable installation
+  belongs to `CONTRIBUTING.md` and maintainer workflows.
 - Keep rendering data-first: the package computes immutable numerical results, while maintained
   examples and tutorial renderers use ordinary Matplotlib directly. Retain
   `biplot_coordinates()` as numerical preparation and use optional `adjustText` only after final

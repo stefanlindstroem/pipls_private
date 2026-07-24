@@ -153,8 +153,10 @@ implementing or reviewing this surface.
   PLS (NIPALS) paths and direct comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS
   paths, scikit-learn OOF
   predictions, immutable inspection results, and explicit final figures; Pulp additionally owns its
-  conditional predictor-rank profile and tutorial snippets. Their pandas and Matplotlib
-  requirements are grouped in the `examples` optional dependency extra.
+  conditional predictor-rank profile and tutorial snippets. Their pandas, Matplotlib, and optional
+  `adjustText` requirements are grouped in the `examples` extra and repeated in `dev` for complete
+  repository validation. The `docs` extra owns the strict site and tutorial-rendering toolchain.
+  There is no dataset-access extra because shipped datasets are ordinary repository CSV assets.
 - `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
 - `docs/`: the self-contained documentation source, including served user guides, implemented

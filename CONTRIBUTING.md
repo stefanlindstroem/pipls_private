@@ -66,8 +66,9 @@ Distribution and maintenance
   make snapshot      create an uploadable repository snapshot
 ```
 
-Documentation targets use the dedicated documentation extra. Before documentation work, install
-it alongside the development dependencies:
+The `dev` extra owns repository validation, including the maintained example dependencies.
+Documentation targets add the dedicated `docs` toolchain. Before documentation work, install
+both extras in the editable checkout:
 
 ```bash
 python -m pip install -e ".[dev,docs]"

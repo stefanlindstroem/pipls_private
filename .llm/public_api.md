@@ -278,9 +278,10 @@ create Matplotlib figures and axes directly, including component and response se
 coordinates, grouped-bar widths, labels, legends, titles, saving, and closing.
 
 Annotated biplots are rendered from `BiplotCoordinates` with optional `adjustText` label placement.
-Matplotlib and `adjustText` remain optional under the examples, docs, and development extras and are
-not imported by the runtime package. No estimator method, fitted attribute, path-search parameter,
-or top-level export is added by the rendering layer.
+Matplotlib and `adjustText` remain optional under the `examples`, `docs`, and `dev` extras and are
+not imported by the runtime package. No `data` extra is exposed; real-data reading is user-owned.
+No estimator method, fitted attribute, path-search parameter, or top-level export is added by the
+rendering layer.
 
 ## Example workflow boundary
 

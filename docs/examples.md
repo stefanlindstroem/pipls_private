@@ -67,7 +67,7 @@ example 04. It is not required for ordinary estimator use.
 ## Run the examples
 
 ```bash
-python -m pip install -e ".[examples]"
+python -m pip install ".[examples]"
 make examples
 ```
 

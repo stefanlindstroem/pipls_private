@@ -9,7 +9,7 @@ examples, and lightweight validation benchmarks should be reviewable from the re
 A clean source checkout should support:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install ".[dev]"
 make check
 make examples
 make build
@@ -26,12 +26,13 @@ The executable real-data examples require pandas and Matplotlib; the annotated P
 uses `adjustText`. Install their dedicated extra with:
 
 ```bash
-python -m pip install -e ".[examples]"
+python -m pip install ".[examples]"
 make examples
 ```
 
-The development extra already includes these packages. Re-run `python -m pip install -e ".[dev]"`
-after pulling dependency changes into an existing virtual environment.
+The development extra already includes these packages. Re-run `python -m pip install ".[dev]"`
+after pulling dependency changes into an existing validation environment. Contributors who
+need an editable checkout use the setup documented in the contributor guide.
 
 ## Installed-distribution reproducibility
 
@@ -58,7 +59,7 @@ installation behavior; `make check` remains the ordinary source-checkout test su
 Install the dedicated documentation dependencies and build or preview the site from a checkout:
 
 ```bash
-python -m pip install -e ".[docs]"
+python -m pip install ".[docs]"
 make docs-figures
 make docs
 make docs-serve

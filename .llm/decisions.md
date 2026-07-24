@@ -108,6 +108,7 @@ This index is navigation, not a substitute for those records.
 | `0100-rendered-documentation-deployment.md` | rendered documentation deployment | validate strict docs on pushes and pull requests; deploy the canonical repository-derived GitHub Pages site from `master` |
 | `0101-continuous-numbered-examples.md` | continuous numbered examples | renumber maintained examples 01--07, migrate active consumers, and label example 01 terminal output |
 | `0102-path-search-defaults.md` | path-search defaults and scorer presentation | default to selection-only `refit=False`; use a stable package scorer name resolving to the public callable |
+| `0103-installation-and-optional-dependency-boundary.md` | installation and optional dependencies | retain only maintained `dev`, `examples`, and `docs` extras; use noneditable public installation and editable contributor setup |
 
 ## Implemented estimator/search transition
 

@@ -120,3 +120,4 @@ reference describe the current public behavior directly.
 - [0100: rendered documentation deployment](0100-rendered-documentation-deployment.md)
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
+- [0103: installation and optional-dependency boundary](0103-installation-and-optional-dependency-boundary.md)
