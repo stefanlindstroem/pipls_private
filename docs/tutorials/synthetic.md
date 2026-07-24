@@ -4,9 +4,6 @@ This tutorial shows the shortest complete path from data generation to a selecte
 uses deterministic synthetic training and test data so that the latent structure is known and the
 prediction assessment is independent of model selection.
 
-The maintained source is `examples/02_synthetic_path_selection.py`. Run `make docs-figures` to
-regenerate the three figures on this page.
-
 ## What this tutorial covers
 
 You will:
@@ -149,3 +146,11 @@ For exact signatures and advanced behavior, see:
 - [`PiPLSPathCV`](../api/path.md#pipls.PiPLSPathCV);
 - [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression);
 - [Path-selection details](../path_analysis.md).
+
+## Reproduce this tutorial
+
+The executable calculation is maintained in `examples/02_synthetic_path_selection.py`, and the
+code blocks above are checked snippets from that file. From a source checkout, `make docs-figures`
+regenerates the three SVG figures and `make docs` regenerates them before building the strict site.
+See [Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the
+required dependencies and distribution-level checks.

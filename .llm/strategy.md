@@ -646,21 +646,23 @@ A whole-package audit from a new user's perspective identified six focused incre
 Decision 0099 completes the first increment by committing and snapshotting only example-result
 placeholders, distributing those placeholders, and running example 01 from an extracted source
 distribution. Decision 0100 completes the second increment with strict documentation validation on
-pushes and pull requests and repository-derived GitHub Pages deployment from `master`. Decision 0101 completes the third increment by renumbering all maintained examples continuously
-from 01 to 07, migrating every active consumer, and labeling example 01 terminal output. Decision
-0102 completes the fourth increment by making path evaluation selection-only by default and
-replacing the function-object scoring default with a stable package name that resolves to the same
-public callable. Decision 0103 completes the fifth increment by limiting optional dependencies to
-maintained workflows, removing unused packages, and separating noneditable user installation from
-editable contributor setup. Package release preparation and Python-package publication remain
-outside this series.
+pushes and pull requests and repository-derived GitHub Pages deployment from `master`. Decision
+0101 completes the third increment by renumbering all maintained examples continuously from 01 to
+07, migrating every active consumer, and labeling example 01 terminal output. Decision 0102
+completes the fourth increment by making path evaluation selection-only by default and replacing the
+function-object scoring default with a stable package name that resolves to the same public callable.
+Decision 0103 completes the fifth increment by limiting optional dependencies to maintained
+workflows, removing unused packages, and separating noneditable user installation from editable
+contributor setup. Decision 0104 completes the sixth by adding restrained application-oriented
+motivation and moving tutorial source and renderer provenance to terminal reproduction sections.
+Package release preparation and Python-package publication remain outside this series.
 
-Current status: **patches 1/6 through 5/6 complete**.
+Current status: **all six new-user onboarding patches complete**.
 
 ## Current next increment
 
-Refine the landing page and tutorial openings after the preceding user-entry contracts have settled,
-without preparing or publishing a package release.
+Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a
+package release.
 
 ## Maintenance protocol
 

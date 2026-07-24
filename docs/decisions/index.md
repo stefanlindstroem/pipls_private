@@ -121,3 +121,4 @@ reference describe the current public behavior directly.
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
 - [0103: installation and optional-dependency boundary](0103-installation-and-optional-dependency-boundary.md)
+- [0104: new-user documentation route](0104-new-user-documentation-route.md)

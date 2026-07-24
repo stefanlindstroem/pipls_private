@@ -130,9 +130,12 @@ minimum normal workflow. The Pulp tutorial owns the real-data selection qualific
 selection-conditioned OOF boundary, immutable inspection-result handoff, and a representative set
 of generated interpretation figures. The complete plot catalogue belongs to
 `model_inspection.md`, while common variations belong to the generated API and advanced guides. The
-home page owns the minimal fixed-fit entry and audience routes. The root README owns package
-orientation, installation, two compact workflows, and tutorial links; contributor commands and
-repository maintenance belong only in `CONTRIBUTING.md`. Generated fixed-regression and path
+home page owns a restrained application-oriented motivation, the minimal fixed-fit entry, and
+audience routes. The root README owns package orientation, motivation without comparative
+performance claims, installation, two compact workflows, and tutorial links; contributor commands
+and repository maintenance belong only in `CONTRIBUTING.md`. Tutorial openings present purpose,
+coverage, and workflow before source or renderer provenance, which belongs in terminal reproduction
+sections. Generated fixed-regression and path
 pages own exact
 estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md` owns advanced search, splitter, OOF, and validation behavior in one place.
 `model_inspection.md` owns the bridge from immutable numerical fields to caller-owned rendering

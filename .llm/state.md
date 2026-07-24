@@ -86,9 +86,13 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - a compact documentation navigation without separate quickstart, estimator, parameter-selection,
   or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
   exact estimator contracts, and retained path and validation pages cover advanced behavior;
-- an audience-oriented documentation entry: the root README owns package orientation, installation,
-  two compact workflows, and tutorial routes; `CONTRIBUTING.md` owns development and repository
-  maintenance; served navigation separates programming reference from project validation;
+- an audience-oriented documentation entry: the root README owns restrained application-oriented
+  motivation, installation, two compact workflows, and tutorial routes; `CONTRIBUTING.md` owns
+  development and repository maintenance; served navigation separates programming reference from
+  project validation;
+- tutorial openings that present purpose, coverage, setup or data, and modeling workflow before
+  source provenance, renderer ownership, and figure-generation commands in terminal reproduction
+  sections;
 - a completed documentation reference layer with a public result-object map, task-oriented
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
@@ -355,17 +359,15 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Patches 1/6 through 5/6 of the owner-authorized new-user onboarding series are complete under
-Decisions 0099--0103. `PiPLSPathCV` defaults to selection-only `refit=False`; its default scoring
-parameter is stable; ordinary source users receive noneditable installation instructions; and the
-optional dependency groups are limited to the maintained `dev`, `examples`, and `docs` workflows.
-No package release preparation or Python-package publication work is authorized.
+All six owner-authorized new-user onboarding patches are complete under Decisions 0099--0104. The
+README and served home page now explain the intended use of the separate Pi-PLS rank controls without
+claiming general superiority, and both tutorials defer source and figure-generation provenance until
+a terminal reproduction section. No package release preparation or Python-package publication work
+is authorized.
 
 ## Subsequent roadmap
 
-1. **Landing-page polish:** refine motivation and move tutorial-maintenance details after the user
-   workflow.
-2. **Human audit:** continue owner review after each focused snapshot.
+1. **Human audit:** continue owner review from the next clean focused snapshot.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

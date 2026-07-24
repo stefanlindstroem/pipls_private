@@ -3,6 +3,15 @@
 Pi-PLS is a multivariate linear-regression method that represents the predictive relation through
 paired predictor and response latent variables.
 
+## When Pi-PLS may be useful
+
+Pi-PLS is designed for multivariate responses and predictor blocks whose structured variation need
+not all be predictive. It separates the predictor-subspace rank from the number of paired
+predictor-response components, so those dimensions can be selected and interpreted independently.
+That extra control is a modeling option rather than a general performance claim: ordinary PLS and
+other multivariate regression methods may be more suitable for a particular dataset or validation
+question.
+
 ## Choose a tutorial
 
 [First Pi-PLS model with synthetic data](tutorials/synthetic.md) is the recommended introduction. It

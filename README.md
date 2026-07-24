@@ -5,6 +5,12 @@ Pi-PLS represents the predictive relation through paired predictor and response 
 The number of components controls how many pairs are retained; predictor rank controls how much
 predictor variation is available to form them.
 
+Pi-PLS is intended for problems with several responses where the predictor block may contain
+structured variation that is not equally useful for prediction. Its two rank controls let users
+examine the predictor subspace and the paired predictive relation separately. This does not make
+Pi-PLS preferable for every regression problem; ordinary PLS and other multivariate methods remain
+appropriate alternatives whose suitability depends on the data and validation design.
+
 For routine model selection, `PiPLSPathCV` evaluates component counts by cross-validation and
 selects a predictor rank conditionally for each count. The user then chooses a parsimonious point
 from the component path and fits one fixed `PiPLSRegression` model.

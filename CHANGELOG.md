@@ -1,5 +1,9 @@
 # Changelog
 
+- Refine the new-user documentation route: explain when separate Pi-PLS rank controls may be useful
+  without claiming general superiority, and move tutorial source and figure-generation details to
+  terminal reproduction sections.
+
 - Simplified installation and optional dependencies: public source users now receive noneditable
   install commands; only the maintained `dev`, `examples`, and `docs` extras remain; and unused
   `data`, coverage, and documentation-lint dependencies were removed.

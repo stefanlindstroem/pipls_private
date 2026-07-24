@@ -109,6 +109,7 @@ This index is navigation, not a substitute for those records.
 | `0101-continuous-numbered-examples.md` | continuous numbered examples | renumber maintained examples 01--07, migrate active consumers, and label example 01 terminal output |
 | `0102-path-search-defaults.md` | path-search defaults and scorer presentation | default to selection-only `refit=False`; use a stable package scorer name resolving to the public callable |
 | `0103-installation-and-optional-dependency-boundary.md` | installation and optional dependencies | retain only maintained `dev`, `examples`, and `docs` extras; use noneditable public installation and editable contributor setup |
+| `0104-new-user-documentation-route.md` | new-user documentation route | motivate the separate ranks without performance claims and defer tutorial maintenance details to reproduction sections |
 
 ## Implemented estimator/search transition
 

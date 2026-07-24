@@ -6,15 +6,6 @@ multivariate dataset. It assumes that `PiPLSPathCV`, `component_path_`,
 with real data: an upper-boundary predictor-rank result, selection-conditioned out-of-fold (OOF)
 predictions, and interpretation of a selected model.
 
-Analysis and selection snippets come from `examples/05_pulp_real_data.py`. Standalone
-interpretation-figure recipes come from `tools/render_pulp_tutorial.py`, which generates the eight
-SVG figures displayed here. Install the
-example dependencies before running either route:
-
-```bash
-python -m pip install ".[examples]"
-```
-
 ## What this tutorial covers
 
 You will:
@@ -28,6 +19,12 @@ You will:
 7. interpret representative standard PLS-family and Pi-PLS-specific plots.
 
 ## Setup
+
+Install the example dependencies before running the analysis from a source checkout:
+
+```bash
+python -m pip install ".[examples]"
+```
 
 The example imports the estimators, numerical inspection functions, Matplotlib, and `adjustText`,
 then states the component and display choices used below:
@@ -299,17 +296,22 @@ identical to the fold-local standardized losses used during path selection.
 
 See [Standardized RMSE](../model_inspection.md#standardized-rmse).
 
-## Run the complete example
+## Reproduce this tutorial
 
-The maintained source is `examples/05_pulp_real_data.py`. Run it from the repository root:
+The analysis and selection snippets are maintained in `examples/05_pulp_real_data.py`. Run the
+complete example from the repository root:
 
 ```bash
 python examples/05_pulp_real_data.py
 ```
 
-The tutorial renderer writes eight representative single-chart SVGs. The numbered example writes
-six caller-owned PDFs, including additional score, loading, factorization, and coefficient views.
-Both routes calculate directly from in-memory results and write no analytical CSV intermediates.
+Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.
+`make docs-figures` regenerates the eight representative single-chart SVGs displayed here, while
+the numbered example writes six caller-owned PDFs with additional score, loading, factorization,
+and coefficient views. Both routes calculate directly from in-memory results and write no
+analytical CSV intermediates. See
+[Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the
+strict documentation-build and source-distribution checks.
 
 ## Next steps
 

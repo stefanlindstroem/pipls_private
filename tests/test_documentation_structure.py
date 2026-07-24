@@ -217,3 +217,42 @@ def test_path_reference_defines_resolved_ceilings_before_rank_policies() -> None
     assert bounds < ceilings < component_requests < rank_policies
     assert r"r_{\pi,\max}" in page[ceilings:component_requests]
     assert r"h_{\max}" in page[ceilings:component_requests]
+
+
+def test_new_user_entry_explains_scope_before_routing_to_workflows() -> None:
+    root = _repository_root()
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    home = (root / "docs" / "index.md").read_text(encoding="utf-8")
+
+    for page in (readme, home):
+        assert "multivariate" in page
+        assert "predictor" in page
+        assert "ordinary PLS" in page
+        assert "every regression problem" in page or "general performance claim" in page
+
+    assert home.index("## When Pi-PLS may be useful") < home.index("## Choose a tutorial")
+    assert readme.index("ordinary PLS") < readme.index("Start with:")
+
+
+def test_tutorials_defer_maintenance_details_until_after_the_workflow() -> None:
+    tutorial_root = _repository_root() / "docs" / "tutorials"
+    synthetic = (tutorial_root / "synthetic.md").read_text(encoding="utf-8")
+    pulp = (tutorial_root / "pulp.md").read_text(encoding="utf-8")
+
+    synthetic_coverage = synthetic.index("## What this tutorial covers")
+    synthetic_workflow = synthetic.index("## Generate training and test data")
+    synthetic_reproduce = synthetic.index("## Reproduce this tutorial")
+    assert synthetic_coverage < synthetic_workflow < synthetic_reproduce
+    assert "The executable calculation is maintained" not in synthetic[:synthetic_reproduce]
+    assert synthetic.index("The executable calculation is maintained") > synthetic_reproduce
+    assert synthetic.index("make docs-figures") > synthetic_reproduce
+
+    pulp_coverage = pulp.index("## What this tutorial covers")
+    pulp_setup = pulp.index("## Setup")
+    pulp_workflow = pulp.index("## The data and modeling question")
+    pulp_reproduce = pulp.index("## Reproduce this tutorial")
+    assert pulp_coverage < pulp_setup < pulp_workflow < pulp_reproduce
+    assert "Standalone interpretation-figure recipes are maintained" not in pulp[:pulp_reproduce]
+    assert pulp.index("Standalone interpretation-figure recipes are maintained") > pulp_reproduce
+    assert pulp.index("make docs-figures") > pulp_reproduce
+    assert pulp.index('python -m pip install ".[examples]"') < pulp_workflow

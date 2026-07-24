@@ -75,10 +75,13 @@ them so repository validation does not skip example artifacts.
   construction is part of the supported workflow.
 - Do not expose internal phase or patch labels in served user guides. Maintainer chronology belongs
   in `.llm` and excluded decision records.
-- Keep the root README focused on package users: orientation, installation, compact fixed and
-  selected-model workflows, tutorial routes, and public reference links. Development environments,
-  Make targets, distribution checks, repository layout, and snapshot instructions belong in
-  `CONTRIBUTING.md`.
+- Keep the root README focused on package users: restrained application-oriented motivation,
+  installation, compact fixed and selected-model workflows, tutorial routes, and public reference
+  links. Do not make general performance claims. Development environments, Make targets,
+  distribution checks, repository layout, and snapshot instructions belong in `CONTRIBUTING.md`.
+- Keep tutorial openings focused on purpose, coverage, setup or data, and the modeling workflow.
+  Put maintained source paths, renderer ownership, and figure-generation commands in a terminal
+  reproduction section.
 - Keep repository commands discoverable through the grouped self-documenting Makefile. `make`
   and `make help` show first setup and routine validation before the maintained task groups; each
   public target carries one `##` description and each group one `##@` heading.
