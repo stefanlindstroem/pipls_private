@@ -72,9 +72,13 @@ and survives pickle reconstruction without becoming stored constructor state. Re
 tests should verify exact stored minimum lookup, smallest-component handling of exact ties, use of
 the minimum row's standard error, first eligible ascending component selection, aligned predictor
 rank and policy, one-split behavior, nonfinite-threshold failure, and absence of new stored state or
-search mutation. Rendering-policy tests should verify that every maintained CV-MSE `errorbar()` call uses
-`cv_mse_standard_error`, that dependent vertical-limit calculations use the same quantity, and that
-no example automates the 1-SE component choice. Fitted-surface tests should verify that exact
+search mutation. Reference-documentation tests may require the two stable recommendation method
+names in the path-analysis and generated API references and may protect their absence from the
+README, documentation home, tutorials, tutorial renderers, and numbered examples while that
+non-promoted scope remains an accepted contract. Rendering-policy tests should verify that every
+maintained CV-MSE `errorbar()` call uses `cv_mse_standard_error`, that dependent vertical-limit
+calculations use the same quantity, and that no example automates the 1-SE component choice.
+Fitted-surface tests should verify that exact
 rotation aliases,
 scorer plumbing, path execution history, candidate counters, and flat OOF duplicates remain absent;
 OOF behavior is tested through `validation_report_`. Predictor-rank-profile tests should verify evaluated-only

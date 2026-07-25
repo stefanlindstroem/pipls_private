@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Document the component-path minimum-CV-MSE and one-standard-error recommendation methods in the
+  restrained path-analysis and API references while keeping them out of examples, tutorials, and
+  documentation entry pages.
+
 - Add exact stored-value `PiPLSComponentPath` recommendation methods for the minimum-CV-MSE row and
   the conventional one-standard-error row, returning complete immutable component results without
   fitting, refitting, mutation, numerical tolerances, or redundant stored state.

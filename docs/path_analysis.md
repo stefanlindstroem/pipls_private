@@ -199,11 +199,33 @@ The rule chooses the smallest evaluated component count whose mean CV-MSE does n
 It is a heuristic for identifying a simpler model within one estimated standard error of the
 minimum; it does not establish equivalence between the candidates.
 
-The maintained examples do not automate this rule. Their `CHOSEN_N_COMPONENTS` values and plotted
-diamonds remain explicit user choices informed by prediction error, parsimony, and interpretation.
-Conditional predictor-rank profiles use the same standard-error bars for scale, but the stored
-predictor rank for each component count continues to minimize the configured mean CV score rather
-than applying the 1-SE rule.
+### Result-object recommendations
+
+`PiPLSComponentPath` provides two non-mutating reference methods for these stored path choices:
+
+```python
+minimum = search.component_path_.minimum_cv_mse_result()
+one_se = search.component_path_.one_standard_error_result()
+```
+
+Both methods return a complete immutable `PiPLSComponentResult`. `minimum_cv_mse_result()` returns
+the first stored row attaining the exact minimum mean CV-MSE. Because component counts are stored in
+strictly ascending order, an exact tie returns the smallest tied count.
+`one_standard_error_result()` returns the first stored row satisfying the 1-SE threshold above.
+It requires at least two validation splits so that the reference-row standard error is defined.
+
+The associated predictor rank is the rank already selected conditionally for that component count
+under the configured scorer. The methods do not revisit the predictor-rank profile, fit or refit an
+estimator, mutate the search object, or alter `best_*`. With a nondefault scorer, the stored
+predictor rank need not minimize CV-MSE within its component-count profile. These methods provide
+references for user judgment rather than an automatic final-model decision.
+
+The maintained examples do not automate this rule or invoke either recommendation method. Their
+`CHOSEN_N_COMPONENTS`
+values and plotted diamonds remain explicit user choices informed by prediction error, parsimony,
+and interpretation. Conditional predictor-rank profiles use the same standard-error bars for scale,
+but the stored predictor rank for each component count continues to minimize the configured mean CV
+score rather than applying the 1-SE rule.
 
 ## Refit and detailed diagnostics
 

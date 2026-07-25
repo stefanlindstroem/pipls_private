@@ -112,3 +112,13 @@ def test_fixed_regression_reference_covers_output_configuration_and_rank_diagnos
         "predictor_svd_solver",
     ):
         assert f"`{field}`" in regression
+
+
+def test_component_path_reference_lists_recommendation_methods() -> None:
+    path_page = (
+        _repository_root() / "docs" / "api" / "path.md"
+    ).read_text(encoding="utf-8")
+    options = _directive_options(path_page, "pipls.PiPLSComponentPath")
+
+    assert "- minimum_cv_mse_result" in options
+    assert "- one_standard_error_result" in options

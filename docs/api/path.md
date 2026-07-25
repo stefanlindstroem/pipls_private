@@ -40,7 +40,11 @@ response is a matrix denoted by $Y$ in equations; see the
 
 `component_path_` contains one conditionally selected predictor-rank result for each evaluated
 component count. Its aligned read-only arrays support complete path plots and comparisons without
-requiring manual masking of `cv_results_`.
+requiring manual masking of `cv_results_`. It also provides non-mutating methods that return the
+stored minimum-CV-MSE row or the conventional 1-SE row as complete `PiPLSComponentResult` objects.
+These methods inspect evaluated results only; they do not fit, refit, or change `best_*`. See
+[Component-path recommendation methods](../path_analysis.md#result-object-recommendations) for the
+rule definitions and scope.
 
 ::: pipls.PiPLSComponentPath
     options:

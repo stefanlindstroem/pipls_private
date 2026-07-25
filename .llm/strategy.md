@@ -698,6 +698,18 @@ Current status: **complete**. Maintained CV-MSE plots use the derived fold-based
 the documentation explains the conventional 1-SE component heuristic, and component-count choice
 remains explicit rather than automated.
 
+### Component-path recommendation references
+
+Decision 0107 adds exact stored-value minimum-CV-MSE and one-standard-error methods to
+`PiPLSComponentPath`. The implementation returns complete immutable path rows without fitting,
+refitting, mutation, comparison tolerances, or redundant state. A restrained follow-through
+documents the methods in `docs/path_analysis.md` and the generated API route while keeping the
+README, documentation home, tutorials, renderers, and numbered examples on explicit component
+choices.
+
+Current status: **implementation and reference documentation complete; not promoted in tutorials or
+examples**.
+
 ## Current next increment
 
 Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a

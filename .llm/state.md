@@ -368,12 +368,13 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Decision 0107 adds non-mutating `PiPLSComponentPath` methods for the exact stored CV-MSE minimum
-and the conventional one-standard-error recommendation. They return complete aligned
-`PiPLSComponentResult` rows, preserve the conditionally selected predictor rank, introduce no
-comparison tolerance or redundant state, and do not fit or refit. The following focused increment
-may add restrained path-analysis and API-overview prose; numbered examples and tutorials remain
-unchanged. No package release preparation or Python-package publication work is authorized.
+Decision 0107 and its reference-documentation follow-through are complete. The exact stored
+minimum-CV-MSE and one-standard-error methods return complete aligned `PiPLSComponentResult` rows,
+preserve the conditionally selected predictor rank, introduce no comparison tolerance or redundant
+state, and do not fit or refit. They are documented in the path-analysis and API references but
+remain absent from numbered examples, tutorial renderers, tutorial prose, the README, and the
+documentation home. Continue the owner-led human audit from the next clean focused snapshot. No
+package release preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 

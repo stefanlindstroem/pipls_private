@@ -305,3 +305,33 @@ def test_cv_mse_error_bar_documentation_defines_manual_one_se_heuristic() -> Non
         assert "one fold-based standard error" in tutorial
         assert "one-standard-error rule" in tutorial
         assert "does not automate that rule" in tutorial
+
+
+def test_component_path_recommendations_are_reference_only() -> None:
+    root = _repository_root()
+    method_names = (
+        "minimum_cv_mse_result",
+        "one_standard_error_result",
+    )
+    reference_pages = (
+        root / "docs" / "path_analysis.md",
+        root / "docs" / "api" / "index.md",
+        root / "docs" / "api" / "path.md",
+    )
+
+    for page in reference_pages:
+        page_text = page.read_text(encoding="utf-8")
+        for method_name in method_names:
+            assert method_name in page_text
+
+    promoted_paths = [
+        root / "README.md",
+        root / "docs" / "index.md",
+        *sorted((root / "docs" / "tutorials").glob("*.md")),
+        *sorted((root / "examples").glob("[0-9][0-9]_*.py")),
+        *sorted((root / "tools").glob("render_*_tutorial.py")),
+    ]
+    for promoted_path in promoted_paths:
+        promoted_text = promoted_path.read_text(encoding="utf-8")
+        for method_name in method_names:
+            assert method_name not in promoted_text, promoted_path
