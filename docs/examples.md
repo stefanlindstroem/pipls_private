@@ -50,8 +50,9 @@ component path and fit one selected fixed model:
 - `examples/06_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
   component path, scikit-learn OOF prediction, wavelength-aware inspection, and five final PDF
   figures;
-- `examples/07_tobacco_real_data.py`: decreasing-wavenumber plots, response pagination, and raw
-  observation diagnostics.
+- `examples/07_tobacco_real_data.py`: explicit application of the one-standard-error rule to the
+  component path, followed by decreasing-wavenumber plots, response pagination, and raw observation
+  diagnostics for the recommended fixed model.
 
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
 Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered

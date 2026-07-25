@@ -252,7 +252,8 @@ Additional fixed decisions:
   `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
 - Real-data examples use the default selection-only `PiPLSPathCV()` for the path and fit a
   separate fixed model
-  after an explicit component choice. Pulp, Sugarcane, and Tobacco use `component_path_`,
+  after a visible component-path choice. Pulp and Sugarcane use explicit counts, while Tobacco
+  uses `one_standard_error_result()`. All three use `component_path_`,
   scikit-learn OOF prediction, and inspection results directly in memory. All three use direct fixed
   estimators. `best_params_` remains a convenience, not the required user decision.
 - Path coefficients are accessed through `best_pipls_` or `best_estimator_`; they are not flattened
@@ -333,8 +334,9 @@ in memory and generates the overlaid comparison PDFs directly. Examples 05–07 
 `component_path_` without table conversion, fit selected fixed estimators, use
 scikit-learn `cross_val_predict`, calculate inspection results in memory, and write only final PDF
 figures. Pulp additionally plots the evaluated predictor-rank profile at three components. Tobacco
-writes three-page prediction-diagnostic and coefficient PDFs while preserving source-order response
-pagination. Required result directories are tracked and preserved by `make clean`. Default tests
+uses the stored 1-SE component recommendation, then writes three-page prediction-diagnostic and
+coefficient PDFs while preserving source-order response pagination. Required result directories are
+tracked and preserved by `make clean`. Default tests
 retain dataset-layout, component-path API, immutable PLS-helper, and workflow-structure contracts
 without executing the artifact-producing real-data scripts.
 
@@ -368,13 +370,13 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Decision 0107 and its reference-documentation follow-through are complete. The exact stored
-minimum-CV-MSE and one-standard-error methods return complete aligned `PiPLSComponentResult` rows,
-preserve the conditionally selected predictor rank, introduce no comparison tolerance or redundant
-state, and do not fit or refit. They are documented in the path-analysis and API references but
-remain absent from numbered examples, tutorial renderers, tutorial prose, the README, and the
-documentation home. Continue the owner-led human audit from the next clean focused snapshot. No
-package release preparation or Python-package publication work is authorized.
+Decisions 0107 and 0108 are complete. The exact stored minimum-CV-MSE and one-standard-error
+methods return complete aligned `PiPLSComponentResult` rows, preserve the conditionally selected
+predictor rank, introduce no comparison tolerance or redundant state, and do not fit or refit.
+Example 07 is the single maintained application of `one_standard_error_result()`; tutorials,
+renderers, the README, and the documentation home retain the ordinary explicit-choice route.
+Continue the owner-led human audit from the next clean focused snapshot. No package release
+preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 

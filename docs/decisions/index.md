@@ -82,6 +82,7 @@ reference describe the current public behavior directly.
 - [0097: focused leave-one-out example](0097-focused-leave-one-out-example.md)
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
+- [0108: Tobacco one-standard-error workflow](0108-tobacco-one-standard-error-workflow.md)
 
 ## Repository and documentation policy
 
@@ -122,6 +123,7 @@ reference describe the current public behavior directly.
 - [0100: rendered documentation deployment](0100-rendered-documentation-deployment.md)
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
+- [0108: Tobacco one-standard-error workflow](0108-tobacco-one-standard-error-workflow.md)
 - [0103: installation and optional-dependency boundary](0103-installation-and-optional-dependency-boundary.md)
 - [0104: new-user documentation route](0104-new-user-documentation-route.md)
 - [0105: documentation and implementation alignment](0105-documentation-implementation-alignment.md)

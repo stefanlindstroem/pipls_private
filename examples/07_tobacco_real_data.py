@@ -18,8 +18,7 @@ from pipls.inspection import (
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "tobacco"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analysis"
-CHOSEN_N_COMPONENTS = 8
-DISPLAY_COMPONENTS = (0, 1, 2, 3)
+DISPLAY_COMPONENT_COUNT = 4
 RESPONSES_PER_PAGE = 5
 
 X = pd.read_csv(DATA_DIR / "X.csv")
@@ -42,7 +41,10 @@ path_search = PiPLSPathCV(
     n_jobs=1,
 ).fit(X, Y)
 path = path_search.component_path_
-selected = path.for_n_components(CHOSEN_N_COMPONENTS)
+selected = path.one_standard_error_result()
+display_components = tuple(
+    range(min(DISPLAY_COMPONENT_COUNT, selected.n_components))
+)
 
 figure, axis = plt.subplots(
     figsize=(7.0, 4.5),
@@ -61,7 +63,7 @@ axis.scatter(
     marker="D",
     s=70,
     label=(
-        f"Chosen: {selected.n_components} components, "
+        f"1-SE recommendation: {selected.n_components} components, "
         f"predictor rank {selected.predictor_rank}"
     ),
     zorder=3,
@@ -247,14 +249,29 @@ figure, axes = plt.subplots(
     figsize=(12.0, 9.0),
     layout="constrained",
 )
-axes[0, 0].scatter(structure.x_scores[:, 0], structure.x_scores[:, 1], alpha=0.75)
+if selected.n_components >= 2:
+    axes[0, 0].scatter(
+        structure.x_scores[:, 0],
+        structure.x_scores[:, 1],
+        alpha=0.75,
+    )
+    axes[0, 0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+    axes[0, 0].set_xlabel("X score component 1")
+    axes[0, 0].set_ylabel("X score component 2")
+    axes[0, 0].set_title("X scores")
+else:
+    observation_positions = np.arange(structure.x_scores.shape[0])
+    axes[0, 0].scatter(
+        observation_positions,
+        structure.x_scores[:, 0],
+        alpha=0.75,
+    )
+    axes[0, 0].set_xlabel("Observation")
+    axes[0, 0].set_ylabel("X score component 1")
+    axes[0, 0].set_title("X score")
 axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-axes[0, 0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-axes[0, 0].set_xlabel("X score component 1")
-axes[0, 0].set_ylabel("X score component 2")
-axes[0, 0].set_title("X scores")
 
-for component in DISPLAY_COMPONENTS:
+for component in display_components:
     axes[0, 1].plot(
         wavenumbers,
         structure.x_loadings[:, component],
@@ -267,9 +284,9 @@ axes[0, 1].set_title("X loadings")
 axes[0, 1].legend()
 
 response_positions = np.arange(len(response_names))
-component_width = 0.8 / len(DISPLAY_COMPONENTS)
-for series, component in enumerate(DISPLAY_COMPONENTS):
-    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2) * component_width
+component_width = 0.8 / len(display_components)
+for series, component in enumerate(display_components):
+    offset = (series - (len(display_components) - 1) / 2) * component_width
     axes[1, 0].bar(
         response_positions + offset,
         structure.y_loadings[:, component],
@@ -322,7 +339,7 @@ with PdfPages(ANALYSIS_DIR / "coefficients.pdf") as report:
 
 print(f"X shape: {X.shape}; Y shape: {Y.shape}")
 print(
-    "Selected Pi-PLS: "
+    "1-SE-recommended Pi-PLS: "
     f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
 )
 print(f"Wrote PDF figures to {ANALYSIS_DIR}")

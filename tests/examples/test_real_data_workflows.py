@@ -89,8 +89,8 @@ def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
     root = _repository_root()
     text = (root / "examples" / "07_tobacco_real_data.py").read_text(encoding="utf-8")
 
-    assert "CHOSEN_N_COMPONENTS = 8" in text
-    assert "DISPLAY_COMPONENTS = (0, 1, 2, 3)" in text
+    assert "CHOSEN_N_COMPONENTS" not in text
+    assert "DISPLAY_COMPONENT_COUNT = 4" in text
     assert "RESPONSES_PER_PAGE = 5" in text
     assert "from sklearn.cross_decomposition import PLSRegression" not in text
     assert "X.columns.to_numpy(dtype=float)" in text
@@ -104,14 +104,16 @@ def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
     )""" in text
     assert 'search_method="auto"' in text
     assert "path_search.component_path_" in text
-    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in text
+    assert "path.one_standard_error_result()" in text
     assert "cross_val_predict(" in text
     assert "cv=KFold(n_splits=5, shuffle=False)" in text
     assert "pipls_display_factors(model.decomposition_)" in text
     assert "latent_structure(model)" in text
     assert "observation_diagnostics(model, X)" in text
     assert 'prediction_kind="selection-conditioned OOF predictions"' in text
-    assert "for component in DISPLAY_COMPONENTS:" in text
+    assert "range(min(DISPLAY_COMPONENT_COUNT, selected.n_components))" in text
+    assert "for component in display_components:" in text
+    assert "if selected.n_components >= 2:" in text
     assert 'set_xlabel("Wavenumber (cm$^{-1}$)")' in text
     assert "structure.x_loadings[:, component]" in text
     assert "structure.y_loadings[:, component]" in text

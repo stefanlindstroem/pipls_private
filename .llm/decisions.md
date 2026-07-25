@@ -113,6 +113,7 @@ This index is navigation, not a substitute for those records.
 | `0105-documentation-implementation-alignment.md` | documentation and implementation alignment | demonstrate current path defaults and document complete decomposition, output, and adaptive-search surfaces |
 | `0106-fold-based-cv-standard-error.md` | fold-based CV standard error | derive read-only standard errors from stored population fold SD and split counts without changing selection or plots |
 | `0107-component-path-recommendation-methods.md` | component-path recommendation methods | return exact stored minimum-CV-MSE and one-standard-error rows without fitting, mutation, tolerances, or redundant state |
+| `0108-tobacco-one-standard-error-workflow.md` | Tobacco one-standard-error workflow | use the stored 1-SE recommendation for example 07 while keeping introductory workflows explicit |
 
 ## Implemented estimator/search transition
 

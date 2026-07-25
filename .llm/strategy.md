@@ -389,8 +389,9 @@ consistency are implemented as independent scripts with minimal question-specifi
 ### Phase E4c: representative real-data examples — complete
 
 Pulp, Sugarcane, and Tobacco provide transparent component-path analyses with direct `X.csv` and
-`Y.csv` reading. Example 04 owns the Pi-PLS and standard PLS comparison figures; examples 05–07
-perform separate Pi-PLS-only fixed fits after explicit component choices. Phase F4 subsequently makes
+`Y.csv` reading. Example 04 owns the Pi-PLS and standard PLS comparison figures; examples 05–06
+perform separate Pi-PLS-only fixed fits after explicit component choices, while example 07 uses the
+stored one-standard-error recommendation for its final fixed fit. Phase F4 subsequently makes
 all four real-data workflows direct in-memory analyses.
 
 The initial real-data smoke benchmark scripts and tests were removed after review because they
@@ -504,8 +505,9 @@ does not require manual `cv_results_` masking while preserving that dictionary a
 truth. Decision 0106 adds a derived fold-based CV-MSE standard error to the concise path and profile
 records without changing their stored arrays, selection semantics, or pickle payloads. Decision
 0107 adds exact stored-value minimum-CV-MSE and one-standard-error recommendation methods to
-`PiPLSComponentPath`; they return immutable scalar rows and do not fit, refit, mutate search state,
-or enter the promoted example workflow.
+`PiPLSComponentPath`; they return immutable scalar rows and do not fit, refit, or mutate search
+state. Decision 0108 makes example 07 the single maintained application of the one-standard-error
+method.
 
 ### Product documentation and release hardening
 
@@ -704,11 +706,12 @@ Decision 0107 adds exact stored-value minimum-CV-MSE and one-standard-error meth
 `PiPLSComponentPath`. The implementation returns complete immutable path rows without fitting,
 refitting, mutation, comparison tolerances, or redundant state. A restrained follow-through
 documents the methods in `docs/path_analysis.md` and the generated API route while keeping the
-README, documentation home, tutorials, renderers, and numbered examples on explicit component
-choices.
+README, documentation home, tutorials, and renderers on explicit component choices. Decision 0108
+then uses `one_standard_error_result()` in the advanced Tobacco workflow while retaining explicit
+choices in the introductory and other numbered examples.
 
-Current status: **implementation and reference documentation complete; not promoted in tutorials or
-examples**.
+Current status: **implementation, reference documentation, and one focused Tobacco application
+complete; not promoted in tutorials or entry pages**.
 
 ## Current next increment
 

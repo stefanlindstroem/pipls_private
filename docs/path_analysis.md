@@ -220,10 +220,11 @@ estimator, mutate the search object, or alter `best_*`. With a nondefault scorer
 predictor rank need not minimize CV-MSE within its component-count profile. These methods provide
 references for user judgment rather than an automatic final-model decision.
 
-The maintained examples do not automate this rule or invoke either recommendation method. Their
-`CHOSEN_N_COMPONENTS`
-values and plotted diamonds remain explicit user choices informed by prediction error, parsimony,
-and interpretation. Conditional predictor-rank profiles use the same standard-error bars for scale,
+The [Tobacco workflow](examples.md#complete-real-data-analyses) demonstrates the explicit
+application of `one_standard_error_result()`: it uses the returned component count and the predictor
+rank already stored in that component-path row to fit the final fixed model. `PiPLSPathCV` does not
+apply the rule automatically, and the other maintained examples and tutorials retain explicit
+component choices. Conditional predictor-rank profiles use the same standard-error bars for scale,
 but the stored predictor rank for each component count continues to minimize the configured mean CV
 score rather than applying the 1-SE rule.
 

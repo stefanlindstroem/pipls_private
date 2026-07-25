@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Use the component-path one-standard-error recommendation to choose the final Tobacco model,
+  adapt its inspection panels to the recommended component count, and identify example 07 as the
+  maintained application in the path-analysis and example documentation.
+
 - Document the component-path minimum-CV-MSE and one-standard-error recommendation methods in the
   restrained path-analysis and API references while keeping them out of examples, tutorials, and
   documentation entry pages.

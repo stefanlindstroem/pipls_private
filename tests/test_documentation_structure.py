@@ -286,7 +286,7 @@ def test_path_details_expose_adaptive_search_completion_status() -> None:
     assert 'search_method="optimal"' in page
 
 
-def test_cv_mse_error_bar_documentation_defines_manual_one_se_heuristic() -> None:
+def test_cv_mse_error_bar_documentation_defines_explicit_one_se_heuristic() -> None:
     root = _repository_root()
     path_analysis = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
 
@@ -294,7 +294,9 @@ def test_cv_mse_error_bar_documentation_defines_manual_one_se_heuristic() -> Non
     assert "1-SE rule" in path_analysis
     assert "cv_mse_standard_error" in path_analysis
     assert "smallest evaluated component count" in path_analysis
-    assert "do not automate this rule" in path_analysis
+    assert "PiPLSPathCV" in path_analysis
+    assert "automatically" in path_analysis
+    assert "Tobacco workflow" in path_analysis
     assert "confidence intervals" in path_analysis
 
     for relative_path in (
@@ -307,7 +309,7 @@ def test_cv_mse_error_bar_documentation_defines_manual_one_se_heuristic() -> Non
         assert "does not automate that rule" in tutorial
 
 
-def test_component_path_recommendations_are_reference_only() -> None:
+def test_component_path_recommendations_have_one_maintained_application() -> None:
     root = _repository_root()
     method_names = (
         "minimum_cv_mse_result",
@@ -324,14 +326,25 @@ def test_component_path_recommendations_are_reference_only() -> None:
         for method_name in method_names:
             assert method_name in page_text
 
+    tobacco = root / "examples" / "07_tobacco_real_data.py"
+    tobacco_text = tobacco.read_text(encoding="utf-8")
+    assert "one_standard_error_result" in tobacco_text
+    assert "minimum_cv_mse_result" not in tobacco_text
+
+    other_numbered_examples = sorted((root / "examples").glob("[0-9][0-9]_*.py"))
     promoted_paths = [
         root / "README.md",
         root / "docs" / "index.md",
         *sorted((root / "docs" / "tutorials").glob("*.md")),
-        *sorted((root / "examples").glob("[0-9][0-9]_*.py")),
+        *(path for path in other_numbered_examples if path != tobacco),
         *sorted((root / "tools").glob("render_*_tutorial.py")),
     ]
     for promoted_path in promoted_paths:
         promoted_text = promoted_path.read_text(encoding="utf-8")
         for method_name in method_names:
             assert method_name not in promoted_text, promoted_path
+
+    path_analysis = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
+    examples = (root / "docs" / "examples.md").read_text(encoding="utf-8")
+    assert "examples.md#complete-real-data-analyses" in path_analysis
+    assert "one-standard-error rule" in examples
