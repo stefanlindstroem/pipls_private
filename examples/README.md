@@ -2,9 +2,12 @@
 
 Pi-PLS predicts through paired predictor and response latent variables. Applied workflows normally
 scan the number of latent components by cross-validation and inspect CV-MSE against component count.
-The resulting table or curve is called the component path; a common choice is an elbow or plateau
-where further components add little improvement. For the mathematical construction, see
-`docs/theory.md`.
+The resulting table or curve is called the component path. A clear elbow or plateau can motivate a
+component count; when no clear elbow is present, the conventional one-standard-error rule provides a
+reproducible parsimony heuristic. Example 07 demonstrates that rule. See the
+[component-path discussion](../docs/path_analysis.md#one-standard-error-component-heuristic) and the
+[served example catalogue](../docs/examples.md#tobacco-one-standard-error-selection). For the
+mathematical construction, see `docs/theory.md`.
 
 The examples are arranged by user task rather than by implementation complexity. Each numbered
 script is self-contained: it explains its data, purpose, and printed or written results without
@@ -54,13 +57,20 @@ use case rather than combining unrelated split protocols in one context-free scr
   inspection results in memory, calculates OOF predictions with scikit-learn, and writes five
   wavelength-aware final PDF figures without generated analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
-  SVD, one selected Pi-PLS interpretation model, selection-conditioned Pi-PLS OOF predictions,
-  decreasing-wavenumber spectral plots, deterministic response pagination, and raw observation
-  diagnostics through direct in-memory results and caller-owned multipage PDFs.
+  SVD and an explicit application of `one_standard_error_result()`. Its component-path figure shows
+  the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row; the returned
+  component count and associated predictor rank define the final interpretation model. The workflow
+  then calculates selection-conditioned OOF predictions, decreasing-wavenumber spectral plots,
+  deterministic response pagination, and raw observation diagnostics through direct in-memory
+  results and caller-owned multipage PDFs. See the
+  [1-SE rule](../docs/path_analysis.md#one-standard-error-component-heuristic) and the
+  [focused Tobacco explanation](../docs/examples.md#tobacco-one-standard-error-selection).
 
 These are application analyses rather than introductory snippets. Pulp and Sugarcane expose their
 complete scientific sequences directly in the numbered scripts: path evaluation and plotting,
-fixed fitting, OOF prediction, immutable inspection results, and explicit Matplotlib composition.
+explicit component-count choice, fixed fitting, OOF prediction, immutable inspection results, and
+explicit Matplotlib composition. Tobacco replaces the manual component-count choice with the
+explicit 1-SE recommendation described above while retaining the same separate fixed-fit boundary.
 Pulp writes `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
 `latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Sugarcane writes five
 corresponding figures without a predictor-rank-profile page. Tobacco also writes five final PDFs;
@@ -110,8 +120,11 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 Pulp is the canonical tutorial workflow. Example 05 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
 `predictor_rank_profile()`, fits one explicit `PiPLSRegression`, calculates OOF predictions with
-`cross_val_predict()`, and renders immutable inspection arrays directly. Tobacco follows the same direct pattern
-and owns its full-SVD configuration, response pagination, and multipage PDF output visibly.
+`cross_val_predict()`, and renders immutable inspection arrays directly. Tobacco follows the same
+direct result-to-Matplotlib pattern, but obtains its final pair from
+`one_standard_error_result()`. It uses `minimum_cv_mse_result()` only to construct the explanatory
+component-path figure and owns its full-SVD configuration, response pagination, and multipage PDF
+output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
 figures retain explicit provenance. Numbered examples never serialize analytical results for later

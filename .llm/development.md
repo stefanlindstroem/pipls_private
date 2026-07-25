@@ -124,7 +124,8 @@
   figure shows the minimum row, horizontal 1-SE threshold, and recommended row. Introductory
   examples and tutorials retain explicit component choices. Document the methods in the
   path-analysis and generated API reference without promoting them on the README or documentation
-  home.
+  home. When a numbered example is the maintained application of a reference method, keep
+  `examples/README.md`, `docs/examples.md`, and the method reference directly cross-linked.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

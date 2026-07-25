@@ -50,22 +50,23 @@ component path and fit one selected fixed model:
 - `examples/06_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
   component path, scikit-learn OOF prediction, wavelength-aware inspection, and five final PDF
   figures;
-- `examples/07_tobacco_real_data.py`: explicit application of the
-  [one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) to the
-  component path, followed by decreasing-wavenumber plots, response pagination, and raw observation
-  diagnostics for the recommended fixed model. See the focused explanation below.
+- `examples/07_tobacco_real_data.py`: a complete spectral workflow that uses the
+  [one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) to recommend
+  the final component count before fixed-model inspection. See the focused explanation below.
 
 ### Tobacco: one-standard-error selection
 
-The Tobacco component path has no clear elbow that would by itself motivate one particular
-component count. Example 07 therefore uses
-`PiPLSComponentPath.one_standard_error_result()` as a reproducible parsimony heuristic. The
-component-path figure marks the minimum-mean-CV-MSE row and the horizontal 1-SE threshold. It then
-marks the smallest component count whose mean CV-MSE lies at or below that threshold.
-The returned row also supplies the conditionally selected predictor rank used by the final fixed
-model. See the
-[component-path recommendation discussion](path_analysis.md#result-object-recommendations) and the
-[component-path API reference](api/path.md). `PiPLSPathCV` does not apply this rule automatically.
+The Tobacco component path has no clear elbow that would by itself motivate one component count.
+Example 07 therefore demonstrates the conventional
+[one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) as a reproducible
+parsimony heuristic. Its component-path figure marks the minimum-mean-CV-MSE row, draws the
+horizontal 1-SE threshold, and marks the smallest evaluated component count whose mean CV-MSE does
+not exceed that threshold. The returned row also supplies the conditionally selected predictor rank
+used by the final fixed model.
+
+The [result-object recommendation methods](path_analysis.md#result-object-recommendations) describe
+how the stored row is obtained, and the [component-path API reference](api/path.md) gives the exact
+method surface. `PiPLSPathCV` does not apply the rule automatically; the example calls it explicitly.
 
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
 Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered

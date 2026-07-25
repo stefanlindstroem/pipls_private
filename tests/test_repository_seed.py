@@ -498,11 +498,13 @@ def test_public_documentation_is_self_contained() -> None:
 def test_maintainer_decision_index_links_every_record() -> None:
     root = _repository_root()
     index = (root / "docs" / "decisions" / "index.md").read_text(encoding="utf-8")
-    linked_files = set(re.findall(r"\((\d{4}-[a-z0-9-]+\.md)\)", index))
+    linked_entries = re.findall(r"\((\d{4}-[a-z0-9-]+\.md)\)", index)
+    linked_files = set(linked_entries)
     decision_files = {
         path.name for path in (root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md")
     }
 
+    assert len(linked_entries) == len(linked_files), "decision records must be indexed exactly once"
     assert linked_files == decision_files
 
 

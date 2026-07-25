@@ -194,10 +194,13 @@ plan contains an earlier or more general proposal:
 - the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
   benchmarks now use one readable script and one minimal CSV output per user-facing question;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
-  Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; every complete
-  real-data analysis fits a separate fixed model after an explicit user component choice;
+  Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
+  Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls
+  the stored 1-SE recommendation explicitly and fits the returned component-count/predictor-rank
+  pair;
 - fold SD remains stored descriptive dispersion; maintained CV-MSE figures use the derived
-  fold-based standard error, while component count remains a visible path-based user choice;
+  fold-based standard error, and component count remains a visible path-based choice rather than an
+  automatic `PiPLSPathCV` action;
 - example 04 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
   dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with Pulp exposing
   the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,

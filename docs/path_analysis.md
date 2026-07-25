@@ -198,7 +198,9 @@ CV-MSE and define
 The rule chooses the smallest evaluated component count whose mean CV-MSE does not exceed $\tau$.
 It is a heuristic for identifying a simpler model within one estimated standard error of the
 minimum; it does not establish equivalence between the candidates. It is particularly convenient
-when the CV-MSE curve has no clear elbow that would otherwise motivate a component count.
+when the CV-MSE curve has no clear elbow that would otherwise motivate a component count. The
+[Tobacco one-standard-error workflow](examples.md#tobacco-one-standard-error-selection) demonstrates this case and
+shows the minimum row, horizontal threshold, and recommended row in the component-path figure.
 
 ### Result-object recommendations
 
@@ -221,15 +223,12 @@ estimator, mutate the search object, or alter `best_*`. With a nondefault scorer
 predictor rank need not minimize CV-MSE within its component-count profile. These methods provide
 references for user judgment rather than an automatic final-model decision.
 
-The [Tobacco one-standard-error workflow](examples.md#tobacco-one-standard-error-selection)
-demonstrates the explicit application of `one_standard_error_result()`: it uses the returned
-component count and the predictor rank already stored in that component-path row to fit the final
-fixed model. Its component-path figure marks the minimum-mean-CV-MSE row, draws the horizontal 1-SE
-threshold, and marks the recommended row. `PiPLSPathCV` does not apply the rule automatically, and
-the other maintained examples and tutorials retain explicit component choices. Conditional
-predictor-rank profiles use the same standard-error bars for scale, but the stored predictor rank
-for each component count continues to minimize the configured mean CV score rather than applying
-the 1-SE rule.
+The Tobacco workflow calls `one_standard_error_result()` explicitly and uses the returned component
+count and the predictor rank already stored in that component-path row to fit the final fixed model.
+`PiPLSPathCV` does not apply the rule automatically, and the other maintained examples and tutorials
+retain explicit component choices. Conditional predictor-rank profiles use the same standard-error
+bars for scale, but the stored predictor rank for each component count continues to minimize the
+configured mean CV score rather than applying the 1-SE rule.
 
 ## Refit and detailed diagnostics
 

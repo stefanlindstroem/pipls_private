@@ -713,7 +713,8 @@ with the minimum row, horizontal 1-SE threshold, recommended row, and direct doc
 cross-links.
 
 Current status: **implementation, reference documentation, and one focused Tobacco application
-complete; not promoted in tutorials or entry pages**.
+complete; the example catalogue and repository example overview are synchronized, and the workflow
+is not promoted in tutorials or entry pages**.
 
 ## Current next increment
 

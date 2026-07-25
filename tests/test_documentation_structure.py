@@ -348,9 +348,14 @@ def test_component_path_recommendations_have_one_maintained_application() -> Non
 
     path_analysis = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
     examples = (root / "docs" / "examples.md").read_text(encoding="utf-8")
+    examples_readme = (root / "examples" / "README.md").read_text(encoding="utf-8")
     assert "examples.md#tobacco-one-standard-error-selection" in path_analysis
     assert "path_analysis.md#one-standard-error-component-heuristic" in examples
     assert "path_analysis.md#result-object-recommendations" in examples
     assert "api/path.md" in examples
     assert "no clear elbow" in examples
     assert "horizontal 1-SE threshold" in examples
+    assert "one_standard_error_result()" in examples_readme
+    assert "../docs/path_analysis.md#one-standard-error-component-heuristic" in examples_readme
+    assert "../docs/examples.md#tobacco-one-standard-error-selection" in examples_readme
+    assert "horizontal 1-SE threshold" in examples_readme

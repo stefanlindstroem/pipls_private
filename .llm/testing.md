@@ -74,9 +74,11 @@ the minimum row's standard error, first eligible ascending component selection, 
 rank and policy, one-split behavior, nonfinite-threshold failure, and absence of new stored state or
 search mutation. Reference-documentation tests may require the two stable recommendation method
 names in the path-analysis and generated API references, require both recommendation methods in
-example 07, require its horizontal 1-SE threshold and direct documentation cross-links, and protect
-both methods from the README, documentation home, tutorials, tutorial renderers, and all other
-numbered examples. Rendering-policy tests should verify that every maintained CV-MSE `errorbar()`
+example 07, require its horizontal 1-SE threshold and direct documentation cross-links from both
+example catalogues, and protect both methods from the README, documentation home, tutorials,
+tutorial renderers, and all other numbered examples. Decision-index tests should require every
+shipped decision record to appear exactly once in the served maintainer index. Rendering-policy
+tests should verify that every maintained CV-MSE `errorbar()`
 call uses
 `cv_mse_standard_error` and that dependent vertical-limit calculations use the same quantity.
 Fitted-surface tests should verify that exact

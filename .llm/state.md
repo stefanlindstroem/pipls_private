@@ -374,10 +374,11 @@ Decisions 0107--0109 are complete. The exact stored minimum-CV-MSE and one-stand
 methods return complete aligned `PiPLSComponentResult` rows, preserve the conditionally selected
 predictor rank, introduce no comparison tolerance or redundant state, and do not fit or refit.
 Example 07 is the single maintained application of `one_standard_error_result()` and graphically
-shows the minimum row, horizontal 1-SE threshold, and recommended row; tutorials, renderers, the
-README, and the documentation home retain the ordinary explicit-choice route. Continue the
-owner-led human audit from the next clean focused snapshot. No package release preparation or
-Python-package publication work is authorized.
+shows the minimum row, horizontal 1-SE threshold, and recommended row; the repository example
+README, served example catalogue, and path-analysis reference are cross-linked and consistent.
+Tutorials, renderers, the README, and the documentation home retain the ordinary explicit-choice
+route. Continue the owner-led human audit from the next clean focused snapshot. No package release
+preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 

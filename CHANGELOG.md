@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Consolidate the Tobacco 1-SE documentation across the repository and served example catalogues,
+  reduce repeated rule descriptions, synchronize the active guide layer, remove duplicate decision
+  links, and require every decision record to be indexed exactly once.
+
 - Complete the Tobacco one-standard-error demonstration by marking the minimum-CV-MSE row, drawing
   the horizontal 1-SE threshold, marking the recommended row, and cross-linking the example
   catalogue with the path-analysis and API references.
