@@ -143,8 +143,14 @@ not public fitted state; advanced users can inspect aligned `cv_results_` column
 `n_splits` arrays. It derives the aligned read-only `cv_mse_standard_error` array from the stored
 population fold SD and split counts. `for_n_components()` returns a frozen
 `PiPLSComponentResult` with the aligned scalar values and the same derived standard-error property.
-The numeric predictor rank is present for every component count. The standard-error property
-requires at least two validation splits and raises explicitly for a valid one-split path.
+`minimum_cv_mse_result()` returns the first exact stored CV-MSE minimum, which is the smallest tied
+component count because path rows are strictly ascending. `one_standard_error_result()` returns the
+smallest stored component count not exceeding the minimum row's mean plus its standard error. Both
+methods return the complete aligned scalar row, including its already conditionally selected
+predictor rank; they do not fit, refit, mutate, apply numerical tolerances, or add stored state.
+The numeric predictor rank is present for every component count. The standard-error property and
+the one-standard-error method require at least two validation splits at the relevant row and raise
+explicitly when that quantity is undefined.
 
 `PiPLSPathCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only

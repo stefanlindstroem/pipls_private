@@ -59,6 +59,11 @@
   property raises explicitly when fewer than two split values make the estimate undefined.
   Maintained CV-MSE figures use this derived quantity for symmetric $\pm 1$ standard-error bars;
   they do not use the stored fold SD as `yerr`.
+- Component-path recommendation methods use the immutable stored path values exactly. The minimum
+  rule returns the first `np.argmin(cv_mse_mean)` row. The one-standard-error rule uses that row's
+  mean plus that row's derived standard error as its threshold and returns the first ascending path
+  row satisfying `cv_mse_mean <= threshold`. No comparison tolerance or redundant recommendation
+  state is part of this contract; a nonfinite threshold raises explicitly.
 - CV splits are materialized once, validated, copied, and reused for rank preflight and every
   candidate. The samples-per-rank term uses total `n`; the smallest centered training fold supplies
   the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical

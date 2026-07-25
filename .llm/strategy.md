@@ -502,7 +502,10 @@ sole detailed candidate surface, and enforces the direct in-memory example polic
 Decision 0072 adds a derived immutable one-component predictor-rank profile so ordinary inspection
 does not require manual `cv_results_` masking while preserving that dictionary as the source of
 truth. Decision 0106 adds a derived fold-based CV-MSE standard error to the concise path and profile
-records without changing their stored arrays, selection semantics, or pickle payloads.
+records without changing their stored arrays, selection semantics, or pickle payloads. Decision
+0107 adds exact stored-value minimum-CV-MSE and one-standard-error recommendation methods to
+`PiPLSComponentPath`; they return immutable scalar rows and do not fit, refit, mutate search state,
+or enter the promoted example workflow.
 
 ### Product documentation and release hardening
 

@@ -361,6 +361,53 @@ class PiPLSComponentPath:
             ),
         )
 
+    def minimum_cv_mse_result(self) -> PiPLSComponentResult:
+        """Return the stored path row with minimum mean CV-MSE.
+
+        Returns
+        -------
+        PiPLSComponentResult
+            Complete immutable row for the minimum mean CV-MSE. Exact ties
+            return the first stored row, which is the smallest tied component
+            count because the path is strictly ascending.
+
+        Notes
+        -----
+        The returned predictor rank is the rank already selected conditionally
+        for that component count under the configured scorer.
+        """
+
+        index = int(np.argmin(self.cv_mse_mean))
+        return self._result_at_index(index)
+
+    def one_standard_error_result(self) -> PiPLSComponentResult:
+        """Return the smallest component count within one SE of the minimum.
+
+        The threshold is the minimum stored mean CV-MSE plus the fold-based
+        standard error from that same path row. Comparisons use the stored
+        floating-point values directly, without an additional tolerance.
+
+        Returns
+        -------
+        PiPLSComponentResult
+            Complete immutable row for the smallest evaluated component count
+            whose mean CV-MSE does not exceed the threshold. Its predictor rank
+            is the rank already selected conditionally for that path row.
+
+        Raises
+        ------
+        ValueError
+            If the minimum-CV-MSE row has fewer than two validation splits or
+            the derived threshold is not finite.
+        """
+
+        reference = self.minimum_cv_mse_result()
+        threshold = reference.cv_mse_mean + reference.cv_mse_standard_error
+        if not np.isfinite(threshold):
+            raise ValueError("The one-standard-error threshold must be finite.")
+        eligible = np.flatnonzero(self.cv_mse_mean <= threshold)
+        return self._result_at_index(int(eligible[0]))
+
     def for_n_components(self, n_components: int) -> PiPLSComponentResult:
         """Return the selected result for one evaluated component count.
 
@@ -395,6 +442,11 @@ class PiPLSComponentPath:
                 f"n_components={requested} was not evaluated. Available values are "
                 f"[{available}]."
             )
+        return self._result_at_index(index)
+
+    def _result_at_index(self, index: int) -> PiPLSComponentResult:
+        """Return one scalar result from an internally validated row index."""
+
         return PiPLSComponentResult(
             n_components=int(self.n_components[index]),
             predictor_rank=int(self.predictor_rank[index]),

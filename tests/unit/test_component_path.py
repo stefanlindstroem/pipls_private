@@ -134,6 +134,115 @@ def test_component_path_scalar_lookup_returns_frozen_python_values() -> None:
         selected.predictor_rank = 5  # type: ignore[misc]
 
 
+def test_component_path_minimum_cv_mse_result_uses_exact_stored_rows() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 4],
+        predictor_rank=[2, 4, 6],
+        predictor_rank_policy=["optimized", "fixed", "maximum"],
+        mean_test_score=[-0.5, -0.4, -0.4],
+        cv_mse_mean=[0.5, 0.4, 0.4],
+        cv_mse_fold_sd=[0.1, 0.08, 0.07],
+        n_splits=[5, 5, 5],
+    )
+
+    result = path.minimum_cv_mse_result()
+
+    assert result == path.for_n_components(2)
+    assert result.predictor_rank == 4
+    assert result.predictor_rank_policy == "fixed"
+
+
+def test_component_path_one_standard_error_result_uses_reference_row_se() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3, 4],
+        predictor_rank=[2, 3, 5, 6],
+        predictor_rank_policy=["optimized"] * 4,
+        mean_test_score=[-0.48, -0.45, -0.40, -0.42],
+        cv_mse_mean=[0.48, 0.45, 0.40, 0.42],
+        cv_mse_fold_sd=[1.0, 0.4, 0.08, 0.2],
+        n_splits=[5, 5, 5, 5],
+    )
+
+    result = path.one_standard_error_result()
+
+    assert result == path.for_n_components(3)
+    assert result.predictor_rank == 5
+
+
+def test_component_path_one_standard_error_result_returns_smallest_eligible_count() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 4],
+        predictor_rank=[2, 3, 5],
+        predictor_rank_policy=["optimized"] * 3,
+        mean_test_score=[-0.50, -0.44, -0.40],
+        cv_mse_mean=[0.50, 0.44, 0.40],
+        cv_mse_fold_sd=[0.1, 0.1, 0.10],
+        n_splits=[5, 5, 5],
+    )
+
+    result = path.one_standard_error_result()
+
+    assert result == path.for_n_components(2)
+
+
+def test_component_path_one_standard_error_result_uses_no_tolerance() -> None:
+    minimum = 0.4
+    reference_standard_error = 0.04
+    threshold = minimum + reference_standard_error
+    just_above_threshold = np.nextafter(threshold, np.inf)
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3],
+        predictor_rank=[2, 3, 4],
+        predictor_rank_policy=["optimized"] * 3,
+        mean_test_score=[-0.5, -just_above_threshold, -minimum],
+        cv_mse_mean=[0.5, just_above_threshold, minimum],
+        cv_mse_fold_sd=[0.1, 0.1, 2.0 * reference_standard_error],
+        n_splits=[5, 5, 5],
+    )
+
+    result = path.one_standard_error_result()
+
+    assert result.n_components == 3
+
+
+def test_component_path_recommendations_handle_split_and_range_edges() -> None:
+    nonminimum_one_split = PiPLSComponentPath(
+        n_components=[1, 2],
+        predictor_rank=[2, 3],
+        predictor_rank_policy=["optimized", "optimized"],
+        mean_test_score=[-0.5, -0.4],
+        cv_mse_mean=[0.5, 0.4],
+        cv_mse_fold_sd=[0.0, 0.1],
+        n_splits=[1, 5],
+    )
+    assert nonminimum_one_split.one_standard_error_result().n_components == 2
+
+    minimum_one_split = PiPLSComponentPath(
+        n_components=[1, 2],
+        predictor_rank=[2, 3],
+        predictor_rank_policy=["optimized", "optimized"],
+        mean_test_score=[-0.4, -0.5],
+        cv_mse_mean=[0.4, 0.5],
+        cv_mse_fold_sd=[0.0, 0.1],
+        n_splits=[1, 5],
+    )
+    assert minimum_one_split.minimum_cv_mse_result().n_components == 1
+    with pytest.raises(ValueError, match="requires at least two"):
+        minimum_one_split.one_standard_error_result()
+
+    overflowing = PiPLSComponentPath(
+        n_components=[1],
+        predictor_rank=[1],
+        predictor_rank_policy=["fixed"],
+        mean_test_score=[-1.0e308],
+        cv_mse_mean=[1.0e308],
+        cv_mse_fold_sd=[1.0e308],
+        n_splits=[2],
+    )
+    with pytest.raises(ValueError, match="threshold must be finite"):
+        overflowing.one_standard_error_result()
+
+
 def test_component_path_lookup_rejects_unevaluated_or_noninteger_counts() -> None:
     path = _component_path()
 
@@ -150,6 +259,8 @@ def test_component_path_is_pickleable_with_read_only_arrays() -> None:
     np.testing.assert_array_equal(restored.n_components, np.array([1, 2, 4]))
     assert not restored.n_components.flags.writeable
     assert restored.for_n_components(4).predictor_rank == 5
+    assert restored.minimum_cv_mse_result() == restored.for_n_components(4)
+    assert restored.one_standard_error_result() == restored.for_n_components(4)
     np.testing.assert_allclose(
         restored.cv_mse_standard_error,
         _component_path().cv_mse_fold_sd / np.sqrt(4.0),

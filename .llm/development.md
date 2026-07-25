@@ -118,8 +118,9 @@
   in memory. They must not write generated CSV files as analytical or plotting intermediates.
 - Preserve `cv_mse_fold_sd` as descriptive population fold dispersion. Maintained CV-MSE figures
   use the derived `cv_mse_standard_error` for symmetric $\pm 1$ standard-error bars that can support
-  the conventional one-standard-error (1-SE) heuristic. Do not describe those bars as confidence
-  intervals or automate 1-SE component selection unless the owner explicitly authorizes it.
+  the conventional one-standard-error (1-SE) heuristic. Result-object recommendation methods may
+  return the relevant stored path row, but they must not fit, refit, mutate search state, or replace
+  explicit component choices in maintained examples and tutorials.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

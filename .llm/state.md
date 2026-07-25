@@ -368,12 +368,12 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-The owner-authorized one-standard-error visualization series is complete. Decision 0106 established
-the derived fold-based `cv_mse_standard_error`; the maintained examples and tutorial renderers now
-use it for symmetric $\pm 1$ standard-error bars, and the documentation explains the conventional
-one-standard-error (1-SE) component heuristic. Stored fold SD, candidate selection, and explicit
-component-count ownership remain unchanged. No package release preparation or Python-package
-publication work is authorized.
+Decision 0107 adds non-mutating `PiPLSComponentPath` methods for the exact stored CV-MSE minimum
+and the conventional one-standard-error recommendation. They return complete aligned
+`PiPLSComponentResult` rows, preserve the conditionally selected predictor rank, introduce no
+comparison tolerance or redundant state, and do not fit or refit. The following focused increment
+may add restrained path-analysis and API-overview prose; numbered examples and tutorials remain
+unchanged. No package release preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 

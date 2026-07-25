@@ -36,6 +36,7 @@ reference describe the current public behavior directly.
 - [0096: notation, path ceilings, and inspection navigation]
   (0096-notation-path-ceilings-and-inspection-navigation.md)
 - [0106: fold-based CV standard error](0106-fold-based-cv-standard-error.md)
+- [0107: component-path recommendation methods](0107-component-path-recommendation-methods.md)
 
 ## Validation, data, and benchmarks
 

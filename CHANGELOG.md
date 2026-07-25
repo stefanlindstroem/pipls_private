@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add exact stored-value `PiPLSComponentPath` recommendation methods for the minimum-CV-MSE row and
+  the conventional one-standard-error row, returning complete immutable component results without
+  fitting, refitting, mutation, numerical tolerances, or redundant stored state.
+
 - Migrate every maintained CV-MSE error-bar plot to the derived fold-based standard error, label
   the figures as mean $\pm 1$ SE, and document the conventional one-standard-error component
   heuristic while keeping component choice explicit and unautomated.

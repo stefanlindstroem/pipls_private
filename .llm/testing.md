@@ -68,8 +68,11 @@ predictor rank and explicit policy for every count, scalar lookup, pickling, and
 conditional rows in `cv_results_`. They should also verify that `cv_mse_standard_error` is derived
 from the stored population fold SD when at least two split values are available, raises explicitly
 for a one-split path, is read-only for array results,
-and survives pickle reconstruction without becoming stored constructor state. Rendering-policy
-tests should verify that every maintained CV-MSE `errorbar()` call uses
+and survives pickle reconstruction without becoming stored constructor state. Recommendation-method
+tests should verify exact stored minimum lookup, smallest-component handling of exact ties, use of
+the minimum row's standard error, first eligible ascending component selection, aligned predictor
+rank and policy, one-split behavior, nonfinite-threshold failure, and absence of new stored state or
+search mutation. Rendering-policy tests should verify that every maintained CV-MSE `errorbar()` call uses
 `cv_mse_standard_error`, that dependent vertical-limit calculations use the same quantity, and that
 no example automates the 1-SE component choice. Fitted-surface tests should verify that exact
 rotation aliases,

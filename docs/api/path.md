@@ -47,6 +47,8 @@ requiring manual masking of `cv_results_`.
       show_signature: false
       members:
         - cv_mse_standard_error
+        - minimum_cv_mse_result
+        - one_standard_error_result
         - for_n_components
 
 ## One component result
