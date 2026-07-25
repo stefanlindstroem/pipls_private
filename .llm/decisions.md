@@ -114,6 +114,7 @@ This index is navigation, not a substitute for those records.
 | `0106-fold-based-cv-standard-error.md` | fold-based CV standard error | derive read-only standard errors from stored population fold SD and split counts without changing selection or plots |
 | `0107-component-path-recommendation-methods.md` | component-path recommendation methods | return exact stored minimum-CV-MSE and one-standard-error rows without fitting, mutation, tolerances, or redundant state |
 | `0108-tobacco-one-standard-error-workflow.md` | Tobacco one-standard-error workflow | use the stored 1-SE recommendation for example 07 while keeping introductory workflows explicit |
+| `0109-tobacco-one-standard-error-threshold-figure.md` | Tobacco one-standard-error threshold figure | show the minimum row, horizontal 1-SE threshold, and recommended row with direct documentation cross-links |
 
 ## Implemented estimator/search transition
 

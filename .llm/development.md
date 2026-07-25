@@ -120,9 +120,11 @@
   use the derived `cv_mse_standard_error` for symmetric $\pm 1$ standard-error bars that can support
   the conventional one-standard-error (1-SE) heuristic. Result-object recommendation methods may
   return the relevant stored path row, but they must not fit, refit, or mutate search state. Example
-  07 is the single maintained application of `one_standard_error_result()`; introductory examples
-  and tutorials retain explicit component choices. Document the methods in the path-analysis and
-  generated API reference without promoting them on the README or documentation home.
+  07 is the single maintained application of `one_standard_error_result()`; its component-path
+  figure shows the minimum row, horizontal 1-SE threshold, and recommended row. Introductory
+  examples and tutorials retain explicit component choices. Document the methods in the
+  path-analysis and generated API reference without promoting them on the README or documentation
+  home.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

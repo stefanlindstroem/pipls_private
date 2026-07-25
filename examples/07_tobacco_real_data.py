@@ -41,7 +41,9 @@ path_search = PiPLSPathCV(
     n_jobs=1,
 ).fit(X, Y)
 path = path_search.component_path_
+minimum = path.minimum_cv_mse_result()
 selected = path.one_standard_error_result()
+one_se_threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error
 display_components = tuple(
     range(min(DISPLAY_COMPONENT_COUNT, selected.n_components))
 )
@@ -56,6 +58,21 @@ axis.errorbar(
     yerr=path.cv_mse_standard_error,
     fmt="o-",
     capsize=4,
+)
+axis.scatter(
+    [minimum.n_components],
+    [minimum.cv_mse_mean],
+    marker="X",
+    s=70,
+    label=f"Minimum mean CV-MSE: {minimum.n_components} components",
+    zorder=3,
+)
+axis.axhline(
+    one_se_threshold,
+    linewidth=1.2,
+    linestyle="--",
+    color="0.35",
+    label="1-SE threshold",
 )
 axis.scatter(
     [selected.n_components],

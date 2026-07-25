@@ -104,7 +104,10 @@ def test_tobacco_example_is_a_direct_paginated_spectral_workflow() -> None:
     )""" in text
     assert 'search_method="auto"' in text
     assert "path_search.component_path_" in text
+    assert "path.minimum_cv_mse_result()" in text
     assert "path.one_standard_error_result()" in text
+    assert "one_se_threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error" in text
+    assert 'label="1-SE threshold"' in text
     assert "cross_val_predict(" in text
     assert "cv=KFold(n_splits=5, shuffle=False)" in text
     assert "pipls_display_factors(model.decomposition_)" in text

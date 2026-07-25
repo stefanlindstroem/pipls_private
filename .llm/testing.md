@@ -73,10 +73,11 @@ tests should verify exact stored minimum lookup, smallest-component handling of 
 the minimum row's standard error, first eligible ascending component selection, aligned predictor
 rank and policy, one-split behavior, nonfinite-threshold failure, and absence of new stored state or
 search mutation. Reference-documentation tests may require the two stable recommendation method
-names in the path-analysis and generated API references, require
-`one_standard_error_result()` in example 07, and protect both methods from the README,
-documentation home, tutorials, tutorial renderers, and all other numbered examples. Rendering-policy
-tests should verify that every maintained CV-MSE `errorbar()` call uses
+names in the path-analysis and generated API references, require both recommendation methods in
+example 07, require its horizontal 1-SE threshold and direct documentation cross-links, and protect
+both methods from the README, documentation home, tutorials, tutorial renderers, and all other
+numbered examples. Rendering-policy tests should verify that every maintained CV-MSE `errorbar()`
+call uses
 `cv_mse_standard_error` and that dependent vertical-limit calculations use the same quantity.
 Fitted-surface tests should verify that exact
 rotation aliases,

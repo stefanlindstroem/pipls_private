@@ -708,7 +708,9 @@ refitting, mutation, comparison tolerances, or redundant state. A restrained fol
 documents the methods in `docs/path_analysis.md` and the generated API route while keeping the
 README, documentation home, tutorials, and renderers on explicit component choices. Decision 0108
 then uses `one_standard_error_result()` in the advanced Tobacco workflow while retaining explicit
-choices in the introductory and other numbered examples.
+choices in the introductory and other numbered examples. Decision 0109 completes that demonstration
+with the minimum row, horizontal 1-SE threshold, recommended row, and direct documentation
+cross-links.
 
 Current status: **implementation, reference documentation, and one focused Tobacco application
 complete; not promoted in tutorials or entry pages**.

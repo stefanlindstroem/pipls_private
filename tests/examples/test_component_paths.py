@@ -206,7 +206,10 @@ def test_real_data_examples_use_pipls_only_component_paths() -> None:
     tobacco_text = (examples_dir / "07_tobacco_real_data.py").read_text(encoding="utf-8")
     assert "component_path_" in tobacco_text
     assert "refit=False" not in tobacco_text
+    assert "path.minimum_cv_mse_result()" in tobacco_text
     assert "path.one_standard_error_result()" in tobacco_text
+    assert "one_se_threshold" in tobacco_text
+    assert "axis.axhline(" in tobacco_text
     assert "axis.errorbar(" in tobacco_text
     assert "component_path.csv" not in tobacco_text
     assert "post_analysis.pdf" not in tobacco_text

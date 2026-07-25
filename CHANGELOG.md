@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Complete the Tobacco one-standard-error demonstration by marking the minimum-CV-MSE row, drawing
+  the horizontal 1-SE threshold, marking the recommended row, and cross-linking the example
+  catalogue with the path-analysis and API references.
+
 - Use the component-path one-standard-error recommendation to choose the final Tobacco model,
   adapt its inspection panels to the recommended component count, and identify example 07 as the
   maintained application in the path-analysis and example documentation.

@@ -296,7 +296,7 @@ def test_cv_mse_error_bar_documentation_defines_explicit_one_se_heuristic() -> N
     assert "smallest evaluated component count" in path_analysis
     assert "PiPLSPathCV" in path_analysis
     assert "automatically" in path_analysis
-    assert "Tobacco workflow" in path_analysis
+    assert "Tobacco one-standard-error workflow" in path_analysis
     assert "confidence intervals" in path_analysis
 
     for relative_path in (
@@ -328,8 +328,10 @@ def test_component_path_recommendations_have_one_maintained_application() -> Non
 
     tobacco = root / "examples" / "07_tobacco_real_data.py"
     tobacco_text = tobacco.read_text(encoding="utf-8")
+    assert "minimum_cv_mse_result" in tobacco_text
     assert "one_standard_error_result" in tobacco_text
-    assert "minimum_cv_mse_result" not in tobacco_text
+    assert "one_se_threshold" in tobacco_text
+    assert 'label="1-SE threshold"' in tobacco_text
 
     other_numbered_examples = sorted((root / "examples").glob("[0-9][0-9]_*.py"))
     promoted_paths = [
@@ -346,5 +348,9 @@ def test_component_path_recommendations_have_one_maintained_application() -> Non
 
     path_analysis = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
     examples = (root / "docs" / "examples.md").read_text(encoding="utf-8")
-    assert "examples.md#complete-real-data-analyses" in path_analysis
-    assert "one-standard-error rule" in examples
+    assert "examples.md#tobacco-one-standard-error-selection" in path_analysis
+    assert "path_analysis.md#one-standard-error-component-heuristic" in examples
+    assert "path_analysis.md#result-object-recommendations" in examples
+    assert "api/path.md" in examples
+    assert "no clear elbow" in examples
+    assert "horizontal 1-SE threshold" in examples

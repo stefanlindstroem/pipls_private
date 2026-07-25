@@ -83,6 +83,7 @@ reference describe the current public behavior directly.
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
 - [0108: Tobacco one-standard-error workflow](0108-tobacco-one-standard-error-workflow.md)
+- [0109: Tobacco one-standard-error threshold figure](0109-tobacco-one-standard-error-threshold-figure.md)
 
 ## Repository and documentation policy
 
@@ -124,6 +125,7 @@ reference describe the current public behavior directly.
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
 - [0108: Tobacco one-standard-error workflow](0108-tobacco-one-standard-error-workflow.md)
+- [0109: Tobacco one-standard-error threshold figure](0109-tobacco-one-standard-error-threshold-figure.md)
 - [0103: installation and optional-dependency boundary](0103-installation-and-optional-dependency-boundary.md)
 - [0104: new-user documentation route](0104-new-user-documentation-route.md)
 - [0105: documentation and implementation alignment](0105-documentation-implementation-alignment.md)

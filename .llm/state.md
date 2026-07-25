@@ -370,13 +370,14 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Decisions 0107 and 0108 are complete. The exact stored minimum-CV-MSE and one-standard-error
+Decisions 0107--0109 are complete. The exact stored minimum-CV-MSE and one-standard-error
 methods return complete aligned `PiPLSComponentResult` rows, preserve the conditionally selected
 predictor rank, introduce no comparison tolerance or redundant state, and do not fit or refit.
-Example 07 is the single maintained application of `one_standard_error_result()`; tutorials,
-renderers, the README, and the documentation home retain the ordinary explicit-choice route.
-Continue the owner-led human audit from the next clean focused snapshot. No package release
-preparation or Python-package publication work is authorized.
+Example 07 is the single maintained application of `one_standard_error_result()` and graphically
+shows the minimum row, horizontal 1-SE threshold, and recommended row; tutorials, renderers, the
+README, and the documentation home retain the ordinary explicit-choice route. Continue the
+owner-led human audit from the next clean focused snapshot. No package release preparation or
+Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
