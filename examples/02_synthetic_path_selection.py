@@ -38,7 +38,7 @@ figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
 axis.errorbar(
     path.n_components,
     path.cv_mse_mean,
-    yerr=path.cv_mse_fold_sd,
+    yerr=path.cv_mse_standard_error,
     fmt="o-",
     capsize=4,
 )
@@ -51,7 +51,7 @@ axis.scatter(
     zorder=3,
 )
 axis.set_xlabel("Number of components")
-axis.set_ylabel("Response-standardized CV-MSE")
+axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
 axis.set_title("Synthetic Pi-PLS component path")
 axis.set_xticks(path.n_components)
 axis.grid(axis="y", alpha=0.25)
@@ -67,7 +67,7 @@ figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
 axis.errorbar(
     rank_profile.predictor_rank,
     rank_profile.cv_mse_mean,
-    yerr=rank_profile.cv_mse_fold_sd,
+    yerr=rank_profile.cv_mse_standard_error,
     fmt="o-",
     capsize=4,
 )
@@ -80,7 +80,7 @@ axis.scatter(
     zorder=3,
 )
 axis.set_xlabel("Predictor rank")
-axis.set_ylabel("Response-standardized CV-MSE")
+axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
 axis.set_title(f"Predictor-rank profile at {selected.n_components} components")
 axis.set_xticks(rank_profile.predictor_rank)
 axis.grid(axis="y", alpha=0.25)

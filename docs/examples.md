@@ -33,8 +33,9 @@ scoring and selection qualifications.
 ## Pi-PLS and ordinary PLS comparison
 
 `examples/04_pls_path_comparison.py` evaluates matched component-count paths for Pulp, Sugarcane,
-and Tobacco. It keeps both immutable paths in memory and writes one overlaid CV-MSE figure per dataset.
-This comparison is optional and is not part of routine Pi-PLS fitting.
+and Tobacco. It keeps both immutable paths in memory and writes one overlaid mean CV-MSE figure per
+dataset with $\pm 1$ fold-based standard-error bars. This comparison is optional and is not part
+of routine Pi-PLS fitting.
 
 ## Complete real-data analyses
 

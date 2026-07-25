@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Migrate every maintained CV-MSE error-bar plot to the derived fold-based standard error, label
+  the figures as mean $\pm 1$ SE, and document the conventional one-standard-error component
+  heuristic while keeping component choice explicit and unautomated.
+
 - Add derived fold-based CV-MSE standard errors to the immutable Pi-PLS path results and the
   example-local ordinary-PLS path, establishing the numerical contract for a later migration to
   one-standard-error error bars without changing selection or plots.

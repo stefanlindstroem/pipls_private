@@ -68,9 +68,11 @@ The component path is plotted before fitting:
 
 ![Synthetic component path](../assets/generated/synthetic/component_path.svg)
 
-The mean CV-MSE falls markedly from one to two components and changes little at three. The diamond
-marks the explicit choice of two components. Fold standard deviation is descriptive variability,
-not a confidence interval.
+The mean CV-MSE falls markedly from one to two components and changes little at three. The bars
+show one fold-based standard error on either side of each mean; they are not confidence intervals.
+Such bars can inform the conventional [one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic)
+for choosing a parsimonious component count, but this tutorial does not automate that rule. The
+diamond marks the explicit choice of two components.
 
 ## Inspect the conditional predictor-rank profile
 

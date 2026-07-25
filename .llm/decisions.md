@@ -193,7 +193,8 @@ plan contains an earlier or more general proposal:
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; every complete
   real-data analysis fits a separate fixed model after an explicit user component choice;
-- fold SD is descriptive, while component count remains a visible path-based user choice;
+- fold SD remains stored descriptive dispersion; maintained CV-MSE figures use the derived
+  fold-based standard error, while component count remains a visible path-based user choice;
 - example 04 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
   dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with Pulp exposing
   the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,

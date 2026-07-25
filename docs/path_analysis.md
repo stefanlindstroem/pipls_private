@@ -175,10 +175,35 @@ standard error of the mean CV-MSE:
 \]
 
 where $K$ is the number of validation splits. This is equivalent to dividing the sample standard
-deviation of the fold MSE values by $\sqrt{K}$. At least two splits are required. Because CV
-training sets overlap, this is a conventional resampling heuristic rather than a confidence
-interval or formal uncertainty guarantee. Maintained figures continue to use fold-SD bars until the
-separate plotting migration is completed.
+deviation of the fold MSE values by $\sqrt{K}$. At least two splits are required. Maintained
+component-path and predictor-rank-profile figures plot the mean response-standardized CV-MSE with
+symmetric $\pm 1$ standard-error bars from this property. Because CV training sets overlap, these
+bars are a conventional resampling heuristic rather than confidence intervals or a formal
+uncertainty guarantee.
+
+### One-standard-error component heuristic
+
+The conventional one-standard-error rule, usually abbreviated the 1-SE rule, can use the component
+path to favor a more parsimonious component count. Let $h_{\min}$ minimize the displayed mean
+CV-MSE and define
+
+\[
+\tau
+=
+\widehat{\operatorname{CV\text{-}MSE}}(h_{\min})
++
+\widehat{\operatorname{SE}}_{\mathrm{CV}}(h_{\min}).
+\]
+
+The rule chooses the smallest evaluated component count whose mean CV-MSE does not exceed $\tau$.
+It is a heuristic for identifying a simpler model within one estimated standard error of the
+minimum; it does not establish equivalence between the candidates.
+
+The maintained examples do not automate this rule. Their `CHOSEN_N_COMPONENTS` values and plotted
+diamonds remain explicit user choices informed by prediction error, parsimony, and interpretation.
+Conditional predictor-rank profiles use the same standard-error bars for scale, but the stored
+predictor rank for each component count continues to minimize the configured mean CV score rather
+than applying the 1-SE rule.
 
 ## Refit and detailed diagnostics
 

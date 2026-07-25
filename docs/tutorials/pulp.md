@@ -98,8 +98,11 @@ The matching immutable row is retrieved before plotting so that the chosen point
 ![Pulp component path](../assets/generated/pulp/component_path.svg)
 
 The mean CV-MSE falls substantially through three components and is nearly flat thereafter. The
-diamond marks the stated elbow-based choice; it is not an automatic rule. Fold standard deviation
-is descriptive variability rather than a confidence interval.
+bars show one fold-based standard error on either side of each mean; they are not confidence
+intervals. Such bars can inform the conventional
+[one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic), but the
+present demonstration does not automate that rule. The diamond marks the stated elbow-based
+choice.
 
 The selected row contains `predictor_rank=10`, the rank with the lowest evaluated mean CV-MSE at
 three components. `for_n_components()` retrieves that evaluated row; it does not repeat the
@@ -123,8 +126,8 @@ The complete evaluated rank profile at three components is available without fil
 Rank 10 has the lowest evaluated mean CV-MSE, but it is also the upper default boundary. For these
 46 rows, 14 predictors, and five-fold CV, the support rule gives
 $r_{\pi,\max}=\min[14,35,\lceil46/5\rceil]=10$. Ranks 9 and 10 have mean CV-MSE values of
-approximately 0.347 and 0.331, with fold standard deviations of approximately 0.167 and 0.151.
-Their mean difference is small relative to the fold variation.
+approximately 0.347 and 0.331, with fold-based standard errors of approximately 0.083 and 0.076.
+Their mean difference is small relative to the displayed uncertainty scale.
 
 The profile supports rank 10 for this fitted model, but it does not establish that ranks above 10
 would be worse or that rank 10 has a distinct scientific advantage over rank 9. The fixed model

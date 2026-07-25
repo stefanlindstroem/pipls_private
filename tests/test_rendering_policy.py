@@ -47,6 +47,18 @@ def _call_name(node: ast.Call) -> str | None:
     return None
 
 
+def _attribute_path(node: ast.expr) -> str | None:
+    parts: list[str] = []
+    current: ast.expr = node
+    while isinstance(current, ast.Attribute):
+        parts.append(current.attr)
+        current = current.value
+    if not isinstance(current, ast.Name):
+        return None
+    parts.append(current.id)
+    return ".".join(reversed(parts))
+
+
 def _import_roots(tree: ast.AST) -> set[str]:
     roots: set[str] = set()
     for node in ast.walk(tree):
@@ -204,3 +216,53 @@ def test_real_data_prediction_plots_use_response_neutral_residual_labels() -> No
         text = path.read_text(encoding="utf-8")
         assert 'set_ylabel("Standardized residual")' in text
         assert r"Residual $y-\hat y$ (standardized)" not in text
+
+
+def test_maintained_cv_mse_error_bars_use_fold_based_standard_error() -> None:
+    root = _repository_root()
+    relative_paths = (
+        "examples/02_synthetic_path_selection.py",
+        "examples/04_pls_path_comparison.py",
+        "examples/05_pulp_real_data.py",
+        "examples/06_sugarcane_real_data.py",
+        "examples/07_tobacco_real_data.py",
+        "tools/render_synthetic_tutorial.py",
+        "tools/render_pulp_tutorial.py",
+    )
+
+    for relative_path in relative_paths:
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        tree = ast.parse(text, filename=str(path))
+        errorbar_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and _call_name(node) == "errorbar"
+        ]
+
+        assert errorbar_calls, path
+        assert "cv_mse_fold_sd" not in text, path
+        assert 'set_ylabel("Mean response-standardized CV-MSE (±1 SE)")' in text
+        for call in errorbar_calls:
+            yerr = next(
+                (keyword.value for keyword in call.keywords if keyword.arg == "yerr"),
+                None,
+            )
+            assert yerr is not None, path
+            attribute = _attribute_path(yerr)
+            assert attribute is not None, path
+            assert attribute.endswith(".cv_mse_standard_error"), (path, attribute)
+
+    comparison = (root / "examples" / "04_pls_path_comparison.py").read_text(
+        encoding="utf-8"
+    )
+    assert "pipls_path.cv_mse_mean + pipls_path.cv_mse_standard_error" in comparison
+    assert "pls_path.cv_mse_mean + pls_path.cv_mse_standard_error" in comparison
+
+    pulp_renderer = (root / "tools" / "render_pulp_tutorial.py").read_text(
+        encoding="utf-8"
+    )
+    assert (
+        "component_path.cv_mse_mean + component_path.cv_mse_standard_error"
+        in pulp_renderer
+    )

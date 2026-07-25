@@ -368,18 +368,16 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Decision 0106 completes the first increment of the owner-authorized one-standard-error visualization
-series. The concise Pi-PLS path records and the example-local ordinary-PLS path now expose a derived
-fold-based `cv_mse_standard_error`, while stored fold SD, selection, and plotting remain unchanged.
-The next focused patch must migrate every maintained CV-MSE figure and its explanatory
-documentation to this property without automating the component-count choice. No package release
-preparation or Python-package publication work is authorized.
+The owner-authorized one-standard-error visualization series is complete. Decision 0106 established
+the derived fold-based `cv_mse_standard_error`; the maintained examples and tutorial renderers now
+use it for symmetric $\pm 1$ standard-error bars, and the documentation explains the conventional
+one-standard-error (1-SE) component heuristic. Stored fold SD, candidate selection, and explicit
+component-count ownership remain unchanged. No package release preparation or Python-package
+publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **SE2 plotting and documentation:** replace descriptive fold-SD bars with the derived fold-based
-   standard error and explain the conventional one-standard-error (1-SE) heuristic.
-2. **Human audit:** continue owner review from the next clean focused snapshot.
+1. **Human audit:** continue owner review from the next clean focused snapshot.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

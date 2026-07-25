@@ -691,13 +691,14 @@ Decision 0106 completes the first increment. It uses the conventional name one-s
 (1-SE rule), preserves the stored population fold SD, and derives the sample-standard-error-
 equivalent quantity from the fold SD and split count. Automatic 1-SE selection remains out of scope.
 
-Current status: **SE1 complete; SE2 plotting and documentation migration is next**.
+Current status: **complete**. Maintained CV-MSE plots use the derived fold-based standard error,
+the documentation explains the conventional 1-SE component heuristic, and component-count choice
+remains explicit rather than automated.
 
 ## Current next increment
 
-Migrate every maintained CV-MSE plot and its explanatory documentation from descriptive fold-SD
-bars to the derived fold-based standard error, without automating the 1-SE component choice. Do not
-prepare or publish a package release.
+Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a
+package release.
 
 ## Maintenance protocol
 

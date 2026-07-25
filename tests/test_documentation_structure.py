@@ -284,3 +284,24 @@ def test_path_details_expose_adaptive_search_completion_status() -> None:
     assert "path_search_exhaustive_" in page
     assert 'search_method="auto"' in page
     assert 'search_method="optimal"' in page
+
+
+def test_cv_mse_error_bar_documentation_defines_manual_one_se_heuristic() -> None:
+    root = _repository_root()
+    path_analysis = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
+
+    assert "One-standard-error component heuristic" in path_analysis
+    assert "1-SE rule" in path_analysis
+    assert "cv_mse_standard_error" in path_analysis
+    assert "smallest evaluated component count" in path_analysis
+    assert "do not automate this rule" in path_analysis
+    assert "confidence intervals" in path_analysis
+
+    for relative_path in (
+        "docs/tutorials/synthetic.md",
+        "docs/tutorials/pulp.md",
+    ):
+        tutorial = (root / relative_path).read_text(encoding="utf-8")
+        assert "one fold-based standard error" in tutorial
+        assert "one-standard-error rule" in tutorial
+        assert "does not automate that rule" in tutorial

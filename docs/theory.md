@@ -150,8 +150,10 @@ the preprocessed predictor matrix.
 Centering and scaling are learned separately inside every training fold used by `PiPLSPathCV`.
 Before constructing the candidate path, the selector also caps predictor rank by the minimum rank
 verified from those fold-local preprocessed predictors. Response-standardized CV-MSE gives each
-response equal weight after scaling by its training-fold standard deviation. The component-path
-fold SD describes variation across the realized folds; it is not a confidence interval.
+response equal weight after scaling by its training-fold standard deviation. The stored
+component-path fold SD describes variation across the realized folds. Maintained path figures
+convert it to a fold-based standard error and show the mean CV-MSE with $\pm 1$ standard-error
+bars; those bars are not confidence intervals.
 
 A path is a model-selection diagnostic. After inspecting it, fit a fixed `PiPLSRegression` with the
 chosen component count and the predictor rank reported for that row. Prediction diagnostics must

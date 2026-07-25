@@ -57,6 +57,8 @@
   the sample fold standard deviation divided by `sqrt(n_splits)`. Derived arrays are finite
   read-only `float64` and are a conventional CV heuristic rather than confidence intervals. The
   property raises explicitly when fewer than two split values make the estimate undefined.
+  Maintained CV-MSE figures use this derived quantity for symmetric $\pm 1$ standard-error bars;
+  they do not use the stored fold SD as `yerr`.
 - CV splits are materialized once, validated, copied, and reused for rank preflight and every
   candidate. The samples-per-rank term uses total `n`; the smallest centered training fold supplies
   the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical
