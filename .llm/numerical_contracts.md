@@ -51,6 +51,12 @@
   choose the lexicographically smallest tied complexity. `rank_test_score` uses minimum ranks and
   anchors each tolerant group to its leading score; adjacent near-ties must not chain candidates
   that are not tied with the same group reference.
+- Component-path and predictor-rank-profile records may represent a valid one-split protocol. Their
+  stored `cv_mse_fold_sd` is the population standard deviation across realized fold MSE values,
+  while the derived `cv_mse_standard_error` is `cv_mse_fold_sd / sqrt(n_splits - 1)`, equivalently
+  the sample fold standard deviation divided by `sqrt(n_splits)`. Derived arrays are finite
+  read-only `float64` and are a conventional CV heuristic rather than confidence intervals. The
+  property raises explicitly when fewer than two split values make the estimate undefined.
 - CV splits are materialized once, validated, copied, and reused for rank preflight and every
   candidate. The samples-per-rank term uses total `n`; the smallest centered training fold supplies
   the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical

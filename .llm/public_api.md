@@ -140,16 +140,20 @@ history, candidate counters, direct-rank parameter aliases, and matrix-shaped sc
 not public fitted state; advanced users can inspect aligned `cv_results_` columns when needed.
 `PiPLSComponentPath` stores aligned read-only `n_components`,
 `predictor_rank`, `predictor_rank_policy`, `mean_test_score`, `cv_mse_mean`, `cv_mse_fold_sd`, and
-`n_splits` arrays. `for_n_components()` returns a frozen `PiPLSComponentResult` with the aligned
-scalar values. The numeric predictor rank is present for every component count.
+`n_splits` arrays. It derives the aligned read-only `cv_mse_standard_error` array from the stored
+population fold SD and split counts. `for_n_components()` returns a frozen
+`PiPLSComponentResult` with the aligned scalar values and the same derived standard-error property.
+The numeric predictor rank is present for every component count. The standard-error property
+requires at least two validation splits and raises explicitly for a valid one-split path.
 
 `PiPLSPathCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
 predictor ranks actually evaluated at `h`, sorted in ascending order, and its `selected` field is
 the same scalar result returned by `component_path_.for_n_components(h)`. The profile does not add
-another fitted attribute or stored search representation. Selection maximizes the configured mean
-test score; only the default scorer makes this equivalent to minimizing mean response-standardized
-CV-MSE.
+another fitted attribute or stored search representation. It exposes an aligned read-only
+`cv_mse_standard_error` property derived by the same contract as the component path. Selection
+maximizes the configured mean test score; only the default scorer makes this equivalent to
+minimizing mean response-standardized CV-MSE.
 All five top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSValidationReport`) validate direct
 construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and

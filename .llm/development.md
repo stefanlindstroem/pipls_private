@@ -115,9 +115,12 @@
 - Design files and command outputs for both humans and machines. When results are naturally tabular,
   prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
 - Numbered examples migrated under Phase F4 operate directly on immutable path and inspection results
-  in memory. They must not write generated CSV files as analytical or plotting intermediates. Every path
-  figure must label fold SD as
-  descriptive variability rather than a confidence interval.
+  in memory. They must not write generated CSV files as analytical or plotting intermediates.
+- Preserve `cv_mse_fold_sd` as descriptive population fold dispersion. The authorized plotting
+  migration must use the derived `cv_mse_standard_error` for maintained CV-MSE error bars intended
+  to support the conventional one-standard-error (1-SE) heuristic. Do not describe those bars as
+  confidence intervals or automate 1-SE component selection unless the owner explicitly authorizes
+  it.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

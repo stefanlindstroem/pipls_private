@@ -65,7 +65,11 @@ the question-specific script, deterministic generation, finite metrics, metric d
 minimal CSV header, and repeatability of scientific values. Component-path API tests may verify one
 ordered result per requested component count, aligned read-only arrays with stable dtypes, a numeric
 predictor rank and explicit policy for every count, scalar lookup, pickling, and agreement with
-conditional rows in `cv_results_`. Fitted-surface tests should verify that exact rotation aliases,
+conditional rows in `cv_results_`. They should also verify that `cv_mse_standard_error` is derived
+from the stored population fold SD when at least two split values are available, raises explicitly
+for a one-split path, is read-only for array results,
+and survives pickle reconstruction without becoming stored constructor state. Fitted-surface tests
+should verify that exact rotation aliases,
 scorer plumbing, path execution history, candidate counters, and flat OOF duplicates remain absent;
 OOF behavior is tested through `validation_report_`. Predictor-rank-profile tests should verify evaluated-only
 ascending ranks, aligned defensive read-only arrays, scorer-general selection, invalid lookup,

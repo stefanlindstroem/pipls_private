@@ -48,11 +48,17 @@ def test_standard_pls_path_is_deterministic_and_immutable() -> None:
     assert first.n_components.dtype == np.dtype(np.intp)
     assert first.cv_mse_mean.dtype == np.dtype(np.float64)
     assert first.cv_mse_fold_sd.dtype == np.dtype(np.float64)
+    assert first.cv_mse_standard_error.dtype == np.dtype(np.float64)
     assert np.isfinite(first.cv_mse_mean).all()
     assert (first.cv_mse_fold_sd >= 0.0).all()
     assert not first.n_components.flags.writeable
     assert not first.cv_mse_mean.flags.writeable
     assert not first.cv_mse_fold_sd.flags.writeable
+    assert not first.cv_mse_standard_error.flags.writeable
+    np.testing.assert_allclose(
+        first.cv_mse_standard_error,
+        first.cv_mse_fold_sd / np.sqrt(first.n_splits - 1),
+    )
 
 
 def test_standard_pls_path_defensively_copies_and_pickles() -> None:
@@ -73,6 +79,10 @@ def test_standard_pls_path_defensively_copies_and_pickles() -> None:
     assert path.n_components.tolist() == [1, 2, 3]
     assert path.cv_mse_mean.tolist() == [0.9, 0.6, 0.55]
     assert path.cv_mse_fold_sd.tolist() == [0.12, 0.09, 0.08]
+    np.testing.assert_allclose(
+        path.cv_mse_standard_error,
+        np.array([0.12, 0.09, 0.08]) / np.sqrt(path.n_splits - 1),
+    )
 
     restored = pickle.loads(pickle.dumps(path))
     np.testing.assert_array_equal(restored.n_components, path.n_components)
@@ -81,6 +91,7 @@ def test_standard_pls_path_defensively_copies_and_pickles() -> None:
     assert not restored.n_components.flags.writeable
     assert not restored.cv_mse_mean.flags.writeable
     assert not restored.cv_mse_fold_sd.flags.writeable
+    assert not restored.cv_mse_standard_error.flags.writeable
 
 
 def test_standard_pls_path_rejects_invalid_arrays() -> None:
@@ -108,6 +119,15 @@ def test_standard_pls_path_rejects_invalid_arrays() -> None:
             algorithm="NIPALS",
             n_splits=5,
         )
+    one_split_path = PLS_PATH.PLSComponentPath(
+        n_components=[1, 2],
+        cv_mse_mean=[0.9, 0.8],
+        cv_mse_fold_sd=[0.0, 0.0],
+        algorithm="NIPALS",
+        n_splits=1,
+    )
+    with pytest.raises(ValueError, match="requires at least two"):
+        _ = one_split_path.cv_mse_standard_error
 
 
 def test_nested_pls_path_matches_separate_pls_fits() -> None:
@@ -130,6 +150,9 @@ def test_nested_pls_path_matches_separate_pls_fits() -> None:
         index = n_components - 1
         assert path.cv_mse_mean[index] == pytest.approx(np.mean(split_mse))
         assert path.cv_mse_fold_sd[index] == pytest.approx(np.std(split_mse))
+        assert path.cv_mse_standard_error[index] == pytest.approx(
+            np.std(split_mse, ddof=1) / np.sqrt(path.n_splits)
+        )
 
 
 def test_dedicated_example_compares_paths_directly_in_memory() -> None:

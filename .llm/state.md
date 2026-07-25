@@ -36,7 +36,7 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - transactional fixed and path fits, range-safe boundary preprocessing, safe read-only or
   overlapping `copy=False` inputs, and finite public fitted/output values;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
-- immutable `PiPLSComponentPath` arrays and frozen scalar lookup through `component_path_`;
+- immutable `PiPLSComponentPath` arrays, derived fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
   `predictor_rank_profile(n_components)`, derived from `cv_results_`;
 - a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
@@ -209,7 +209,7 @@ case, or public behavior.
 | Conditional predictor-rank selection | `PiPLSPathCV(search_method="auto")` |
 | Component counts | `n_components_values="all"` by default; explicit integer sequences request a subset |
 | Path search | `PiPLSPathCV(search_method="auto")` by default |
-| Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, predictor-rank, policy, and split-count arrays plus scalar lookup |
+| Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, derived fold-based standard-error, predictor-rank, policy, and split-count arrays plus scalar lookup |
 | Conditional rank profile | `predictor_rank_profile(h)` returns evaluated ranks and aligned score/CV-MSE arrays on demand, plus the selected scalar row |
 | Exhaustive search | explicit `PiPLSPathCV(search_method="optimal")` |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
@@ -368,18 +368,18 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-All six owner-authorized new-user onboarding patches are complete under Decisions 0099--0104.
-Decision 0105 aligns the complete documentation and maintained examples with the resulting
-implementation. The README and served home page now explain the intended use of the separate Pi-PLS
-rank controls without claiming general superiority, and both tutorials defer source and
-figure-generation provenance until a terminal reproduction section. The active guide layer is
-synchronized with the maintained example numbers, public defaults, runtime ownership, documentation
-workflow, and owner-requested patch handoff. No package release preparation or Python-package
-publication work is authorized.
+Decision 0106 completes the first increment of the owner-authorized one-standard-error visualization
+series. The concise Pi-PLS path records and the example-local ordinary-PLS path now expose a derived
+fold-based `cv_mse_standard_error`, while stored fold SD, selection, and plotting remain unchanged.
+The next focused patch must migrate every maintained CV-MSE figure and its explanatory
+documentation to this property without automating the component-count choice. No package release
+preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Human audit:** continue owner review from the next clean focused snapshot.
+1. **SE2 plotting and documentation:** replace descriptive fold-SD bars with the derived fold-based
+   standard error and explain the conventional one-standard-error (1-SE) heuristic.
+2. **Human audit:** continue owner review from the next clean focused snapshot.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

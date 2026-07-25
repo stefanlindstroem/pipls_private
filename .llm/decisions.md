@@ -111,6 +111,7 @@ This index is navigation, not a substitute for those records.
 | `0103-installation-and-optional-dependency-boundary.md` | installation and optional dependencies | retain only maintained `dev`, `examples`, and `docs` extras; use noneditable public installation and editable contributor setup |
 | `0104-new-user-documentation-route.md` | new-user documentation route | motivate the separate ranks without performance claims and defer tutorial maintenance details to reproduction sections |
 | `0105-documentation-implementation-alignment.md` | documentation and implementation alignment | demonstrate current path defaults and document complete decomposition, output, and adaptive-search surfaces |
+| `0106-fold-based-cv-standard-error.md` | fold-based CV standard error | derive read-only standard errors from stored population fold SD and split counts without changing selection or plots |
 
 ## Implemented estimator/search transition
 

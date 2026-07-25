@@ -663,7 +663,7 @@ def test_invalid_public_controls_are_rejected(
         PiPLSPathCV(**kwargs).fit(X, Y)
 
 
-def test_component_path_exposes_conditional_score_rank_mean_and_fold_sd() -> None:
+def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> None:
     X, Y = _data()
     search = PiPLSPathCV(
         n_components_values=[1, 2],
@@ -697,6 +697,10 @@ def test_component_path_exposes_conditional_score_rank_mean_and_fold_sd() -> Non
         assert path.cv_mse_fold_sd[row_index] == pytest.approx(
             search.cv_results_["std_response_standardized_mse"][index]
         )
+        assert path.cv_mse_standard_error[row_index] == pytest.approx(
+            search.cv_results_["std_response_standardized_mse"][index]
+            / np.sqrt(path.n_splits[row_index] - 1)
+        )
 
     selected = path.for_n_components(search.best_n_components_)
     assert selected.predictor_rank == search.best_predictor_rank_
@@ -723,6 +727,11 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
     assert isinstance(profile, PiPLSPredictorRankProfile)
     assert profile.n_components == 2
     assert profile.n_splits == 3
+    np.testing.assert_allclose(
+        profile.cv_mse_standard_error,
+        profile.cv_mse_fold_sd / np.sqrt(profile.n_splits - 1),
+    )
+    assert not profile.cv_mse_standard_error.flags.writeable
     np.testing.assert_array_equal(profile.predictor_rank, np.array([2, 3, 4]))
     assert all(
         not array.flags.writeable

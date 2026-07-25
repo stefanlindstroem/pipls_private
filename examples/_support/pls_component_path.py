@@ -63,6 +63,21 @@ class PLSComponentPath:
         object.__setattr__(self, "algorithm", algorithm)
         object.__setattr__(self, "n_splits", n_splits)
 
+    @property
+    def cv_mse_standard_error(self) -> FloatArray:
+        """Return read-only fold-based standard errors of mean CV-MSE."""
+
+        if self.n_splits < 2:
+            raise ValueError(
+                "cv_mse_standard_error requires at least two validation splits."
+            )
+        standard_error = np.asarray(
+            self.cv_mse_fold_sd / np.sqrt(self.n_splits - 1),
+            dtype=np.float64,
+        )
+        standard_error.setflags(write=False)
+        return standard_error
+
     def __reduce__(self) -> tuple[type[PLSComponentPath], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""
 

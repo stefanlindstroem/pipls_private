@@ -43,6 +43,8 @@ class PiPLSComponentResult:
         Mean response-standardized validation MSE.
     cv_mse_fold_sd : float
         Population standard deviation of response-standardized MSE across folds.
+    cv_mse_standard_error : float
+        Fold-based standard error of the mean response-standardized CV-MSE.
     n_splits : int
         Number of cross-validation splits.
     """
@@ -84,6 +86,21 @@ class PiPLSComponentResult:
         object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
         object.__setattr__(self, "n_splits", n_splits)
 
+    @property
+    def cv_mse_standard_error(self) -> float:
+        """Return the fold-based standard error of mean CV-MSE.
+
+        ``cv_mse_fold_sd`` stores a population standard deviation. Dividing it
+        by ``sqrt(n_splits - 1)`` is equivalent to converting it to the sample
+        standard deviation and then dividing by ``sqrt(n_splits)``.
+        """
+
+        if self.n_splits < 2:
+            raise ValueError(
+                "cv_mse_standard_error requires at least two validation splits."
+            )
+        return float(self.cv_mse_fold_sd / np.sqrt(self.n_splits - 1))
+
     def __reduce__(self) -> tuple[type[PiPLSComponentResult], tuple[object, ...]]:
         """Reconstruct through validation during unpickling."""
 
@@ -122,6 +139,8 @@ class PiPLSPredictorRankProfile:
         Mean response-standardized validation MSE for each evaluated rank.
     cv_mse_fold_sd : ndarray of shape (n_evaluated_ranks,)
         Population standard deviation of response-standardized MSE across folds.
+    cv_mse_standard_error : ndarray of shape (n_evaluated_ranks,)
+        Fold-based standard error of mean response-standardized CV-MSE.
     n_splits : int
         Number of cross-validation splits.
     selected : PiPLSComponentResult
@@ -197,6 +216,15 @@ class PiPLSPredictorRankProfile:
         object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
         object.__setattr__(self, "n_splits", n_splits)
 
+    @property
+    def cv_mse_standard_error(self) -> FloatArray:
+        """Return read-only fold-based standard errors of mean CV-MSE."""
+
+        return _read_only_cv_mse_standard_error(
+            self.cv_mse_fold_sd,
+            self.n_splits,
+        )
+
     def __reduce__(self) -> tuple[type[PiPLSPredictorRankProfile], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""
 
@@ -236,6 +264,8 @@ class PiPLSComponentPath:
         Mean response-standardized validation MSE for each selected candidate.
     cv_mse_fold_sd : ndarray of shape (n_component_values,)
         Population standard deviation of response-standardized MSE across folds.
+    cv_mse_standard_error : ndarray of shape (n_component_values,)
+        Fold-based standard error of mean response-standardized CV-MSE.
     n_splits : ndarray of shape (n_component_values,)
         Number of cross-validation splits represented by each row.
     """
@@ -306,6 +336,15 @@ class PiPLSComponentPath:
         object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
         object.__setattr__(self, "n_splits", n_splits)
 
+    @property
+    def cv_mse_standard_error(self) -> FloatArray:
+        """Return read-only fold-based standard errors of mean CV-MSE."""
+
+        return _read_only_cv_mse_standard_error(
+            self.cv_mse_fold_sd,
+            self.n_splits,
+        )
+
     def __reduce__(self) -> tuple[type[PiPLSComponentPath], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""
 
@@ -368,3 +407,22 @@ class PiPLSComponentPath:
             cv_mse_fold_sd=float(self.cv_mse_fold_sd[index]),
             n_splits=int(self.n_splits[index]),
         )
+
+
+def _read_only_cv_mse_standard_error(
+    cv_mse_fold_sd: FloatArray,
+    n_splits: IntArray | int,
+) -> FloatArray:
+    """Derive sample-standard-error values from stored population fold SDs."""
+
+    split_counts = np.asarray(n_splits, dtype=np.float64)
+    if np.any(split_counts < 2.0):
+        raise ValueError(
+            "cv_mse_standard_error requires at least two validation splits."
+        )
+    standard_error = np.asarray(
+        cv_mse_fold_sd / np.sqrt(split_counts - 1.0),
+        dtype=np.float64,
+    )
+    standard_error.setflags(write=False)
+    return standard_error

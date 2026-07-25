@@ -475,7 +475,6 @@ def test_public_documentation_is_self_contained() -> None:
     docs_root = (root / "docs").resolve()
     markdown_target = re.compile(r"\]\((?P<target>[^)]+)\)")
     abandoned_selection_terms = (
-        "one-standard-error",
         "one-standard-deviation",
         "1sd",
     )

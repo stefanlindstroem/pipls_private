@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add derived fold-based CV-MSE standard errors to the immutable Pi-PLS path results and the
+  example-local ordinary-PLS path, establishing the numerical contract for a later migration to
+  one-standard-error error bars without changing selection or plots.
+
 - Derive the Pulp display-component indices from the chosen component count in both the
   maintained example and tutorial renderer, avoiding a redundant display literal.
 

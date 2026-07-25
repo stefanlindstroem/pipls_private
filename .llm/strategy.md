@@ -501,7 +501,8 @@ CSV plotting helper. Decision 0071 removes duplicate matrix-path aliases, makes 
 sole detailed candidate surface, and enforces the direct in-memory example policy structurally.
 Decision 0072 adds a derived immutable one-component predictor-rank profile so ordinary inspection
 does not require manual `cv_results_` masking while preserving that dictionary as the source of
-truth.
+truth. Decision 0106 adds a derived fold-based CV-MSE standard error to the concise path and profile
+records without changing their stored arrays, selection semantics, or pickle payloads.
 
 ### Product documentation and release hardening
 
@@ -679,10 +680,24 @@ is a maintenance synchronization and introduces no new public or architectural d
 
 Current status: **guide layer synchronized with the current repository**.
 
+### One-standard-error visualization series
+
+The owner-authorized series has two focused increments:
+
+1. establish one public derived fold-based CV-MSE standard-error contract without changing plots;
+2. migrate maintained CV-MSE figures and explanations while keeping the component choice manual.
+
+Decision 0106 completes the first increment. It uses the conventional name one-standard-error rule
+(1-SE rule), preserves the stored population fold SD, and derives the sample-standard-error-
+equivalent quantity from the fold SD and split count. Automatic 1-SE selection remains out of scope.
+
+Current status: **SE1 complete; SE2 plotting and documentation migration is next**.
+
 ## Current next increment
 
-Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a
-package release.
+Migrate every maintained CV-MSE plot and its explanatory documentation from descriptive fold-SD
+bars to the derived fold-based standard error, without automating the 1-SE component choice. Do not
+prepare or publish a package release.
 
 ## Maintenance protocol
 

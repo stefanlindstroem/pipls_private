@@ -35,6 +35,7 @@ reference describe the current public behavior directly.
 - [0095: required fixed Pi-PLS rank pair](0095-required-fixed-rank-pair.md)
 - [0096: notation, path ceilings, and inspection navigation]
   (0096-notation-path-ceilings-and-inspection-navigation.md)
+- [0106: fold-based CV standard error](0106-fold-based-cv-standard-error.md)
 
 ## Validation, data, and benchmarks
 

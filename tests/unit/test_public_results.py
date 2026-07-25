@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pickle
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, fields
 
 import numpy as np
 import pytest
@@ -54,6 +54,15 @@ def _validation_report() -> PiPLSValidationReport:
     )
 
 
+def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
+    for result_type in (
+        PiPLSComponentResult,
+        PiPLSPredictorRankProfile,
+        PiPLSComponentPath,
+    ):
+        assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
+
+
 def test_component_result_validates_and_normalizes_python_scalars() -> None:
     result = _component_result()
 
@@ -62,6 +71,8 @@ def test_component_result_validates_and_normalizes_python_scalars() -> None:
     assert type(result.mean_test_score) is float
     assert type(result.cv_mse_mean) is float
     assert type(result.cv_mse_fold_sd) is float
+    assert type(result.cv_mse_standard_error) is float
+    assert result.cv_mse_standard_error == pytest.approx(0.05)
     assert type(result.n_splits) is int
     with pytest.raises(FrozenInstanceError):
         result.n_components = 1  # type: ignore[misc]
@@ -118,6 +129,9 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
         PiPLSComponentPath(**{**path_kwargs, "cv_mse_mean": [0.5, -0.1]})
     with pytest.raises(ValueError, match="contain integers"):
         PiPLSComponentPath(**{**path_kwargs, "n_components": [1.0, 2.0]})
+    one_split_path = PiPLSComponentPath(**{**path_kwargs, "n_splits": [3, 1]})
+    with pytest.raises(ValueError, match="requires at least two"):
+        _ = one_split_path.cv_mse_standard_error
 
     selected = _component_result()
     profile_kwargs = {

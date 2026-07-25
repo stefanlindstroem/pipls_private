@@ -161,11 +161,24 @@ observations, a compact explicit candidate grid, the singleton-safe default scor
 predictions. Its validation report is selection-conditioned because the same LOO path selects the
 rank pair and supplies the pooled diagnostic.
 
-## Fold variation
+## Fold variation and standard error
 
 `component_path_.cv_mse_fold_sd` is the population standard deviation of the realized fold-specific
-MSE values. It describes fold variation, not a confidence interval. Formal uncertainty statements
-require a separately designed repeated or nested resampling procedure.
+MSE values. It describes fold variation. The derived read-only
+`component_path_.cv_mse_standard_error` converts that stored quantity to the usual fold-based
+standard error of the mean CV-MSE:
+
+\[
+\widehat{\mathrm{SE}}_{\mathrm{CV}}
+=
+\frac{\widehat{\sigma}_{\mathrm{fold,pop}}}{\sqrt{K-1}},
+\]
+
+where $K$ is the number of validation splits. This is equivalent to dividing the sample standard
+deviation of the fold MSE values by $\sqrt{K}$. At least two splits are required. Because CV
+training sets overlap, this is a conventional resampling heuristic rather than a confidence
+interval or formal uncertainty guarantee. Maintained figures continue to use fold-SD bars until the
+separate plotting migration is completed.
 
 ## Refit and detailed diagnostics
 
