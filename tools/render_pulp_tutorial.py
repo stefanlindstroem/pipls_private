@@ -165,7 +165,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     Y = pd.read_csv(PULP_DATA_DIR / "Y.csv")
     predictor_names = tuple(str(name) for name in X.columns)
     response_names = tuple(str(name) for name in Y.columns)
-    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 
     path_search = PiPLSPathCV().fit(X, Y)
     component_path = path_search.component_path_
@@ -307,6 +306,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
 
     # --8<-- [start:render-pulp-observed-vs-predicted]
     figure, axis = plt.subplots(figsize=(6.4, 5.0), layout="constrained")
+    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
     detailed_array = np.array(detailed_response_indices, dtype=np.int64)
     for response in detailed_response_indices:
         axis.scatter(

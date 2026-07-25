@@ -29,8 +29,6 @@ X = pd.read_csv(DATA_DIR / "X.csv")
 Y = pd.read_csv(DATA_DIR / "Y.csv")
 predictor_names = X.columns.tolist()
 response_names = Y.columns.tolist()
-# Show the first three responses only to keep pointwise diagnostic plots legible.
-detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:evaluate-pulp-component-path]
@@ -327,33 +325,6 @@ figure.suptitle("Pulp Pi-PLS latent structure")
 figure.savefig(ANALYSIS_DIR / "latent_structure.pdf")
 plt.close(figure)
 
-# Plot response-specific regression coefficients.
-figure, axis = plt.subplots(
-    figsize=(10.0, 5.4),
-    layout="constrained",
-)
-response_width = 0.8 / len(detailed_response_indices)
-for series, response in enumerate(detailed_response_indices):
-    offset = (series - (len(detailed_response_indices) - 1) / 2) * response_width
-    axis.bar(
-        predictor_positions + offset,
-        structure.coefficients[response],
-        width=response_width,
-        label=response_names[response],
-    )
-axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-axis.set_xticks(predictor_positions)
-axis.set_xticklabels(predictor_names)
-axis.set_xlabel("Predictor")
-axis.set_ylabel("Regression coefficient")
-axis.set_title("Pulp Pi-PLS regression coefficients")
-axis.legend(title="Response")
-axis.tick_params(axis="x", labelrotation=45)
-for label in axis.get_xticklabels():
-    label.set_horizontalalignment("right")
-figure.savefig(ANALYSIS_DIR / "coefficients.pdf")
-plt.close(figure)
-
 # --8<-- [start:plot-pulp-prediction-diagnostics]
 # Plot selection-conditioned prediction diagnostics.
 figure, axes = plt.subplots(
@@ -362,6 +333,7 @@ figure, axes = plt.subplots(
     figsize=(14.0, 4.6),
     layout="constrained",
 )
+detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 detailed_array = np.array(detailed_response_indices, dtype=np.int64)
 for response in detailed_response_indices:
     axes[0].scatter(
@@ -439,6 +411,33 @@ figure.suptitle(f"Pulp Pi-PLS prediction diagnostics\n{diagnostics.prediction_ki
 figure.savefig(ANALYSIS_DIR / "prediction_diagnostics.pdf")
 plt.close(figure)
 # --8<-- [end:plot-pulp-prediction-diagnostics]
+
+# Plot response-specific regression coefficients.
+figure, axis = plt.subplots(
+    figsize=(10.0, 5.4),
+    layout="constrained",
+)
+response_width = 0.8 / len(detailed_response_indices)
+for series, response in enumerate(detailed_response_indices):
+    offset = (series - (len(detailed_response_indices) - 1) / 2) * response_width
+    axis.bar(
+        predictor_positions + offset,
+        structure.coefficients[response],
+        width=response_width,
+        label=response_names[response],
+    )
+axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
+axis.set_xticks(predictor_positions)
+axis.set_xticklabels(predictor_names)
+axis.set_xlabel("Predictor")
+axis.set_ylabel("Regression coefficient")
+axis.set_title("Pulp Pi-PLS regression coefficients")
+axis.legend(title="Response")
+axis.tick_params(axis="x", labelrotation=45)
+for label in axis.get_xticklabels():
+    label.set_horizontalalignment("right")
+figure.savefig(ANALYSIS_DIR / "coefficients.pdf")
+plt.close(figure)
 
 print(f"X shape: {X.shape}; Y shape: {Y.shape}")
 print(
