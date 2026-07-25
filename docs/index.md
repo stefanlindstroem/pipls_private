@@ -6,11 +6,14 @@ paired predictor and response latent variables.
 ## When Pi-PLS may be useful
 
 Although Pi-PLS and ordinary PLS have similar names and belong to the same broad family of
-latent-variable regression methods, their theoretical foundations differ. The maintained
-[PLS path comparisons](examples.md#pi-pls-and-ordinary-pls-comparison) show Pi-PLS attaining lower
-cross-validated prediction error than ordinary PLS at a given number of latent components. The
-figures and comparison procedure are provided in example 04. These displayed results motivate
-Pi-PLS but are not a general performance claim and do not imply universal superiority.
+latent-variable regression methods, their theoretical foundations differ. Pi-PLS diagonalizes its
+latent regression map into paired predictor and response directions, giving each retained component
+a direct one-to-one predictor-response interpretation. It can also provide a more parsimonious
+predictive model by attaining a given cross-validated mean squared error (CV-MSE) with fewer
+latent components.
+
+Across a wide range of synthetic settings and real-world datasets examined during
+development, Pi-PLS typically yields lower CV-MSE than ordinary PLS at a given number of latent components (*cf*. example 04). This is not a general performance claim: no method is universally better.
 
 ## Choose a tutorial
 

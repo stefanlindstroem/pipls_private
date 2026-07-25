@@ -45,7 +45,6 @@ from pipls.inspection import (  # noqa: E402
 PULP_DATA_DIR = REPOSITORY_ROOT / "datasets" / "pulp"
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 CHOSEN_N_COMPONENTS = 3
-DISPLAY_COMPONENTS = (0, 1, 2)
 DETAILED_RESPONSE_COUNT = 3
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
@@ -171,6 +170,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     path_search = PiPLSPathCV().fit(X, Y)
     component_path = path_search.component_path_
     selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
+    display_components = tuple(range(CHOSEN_N_COMPONENTS))
 
     _render_component_path(
         component_path,
@@ -258,9 +258,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     # --8<-- [start:render-pulp-predictor-directions]
     figure, axis = plt.subplots(figsize=(10.0, 5.4), layout="constrained")
     predictor_positions = np.arange(len(predictor_names))
-    predictor_width = 0.8 / len(DISPLAY_COMPONENTS)
-    for series, component in enumerate(DISPLAY_COMPONENTS):
-        offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2.0) * predictor_width
+    predictor_width = 0.8 / CHOSEN_N_COMPONENTS
+    for series, component in enumerate(display_components):
+        offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2.0) * predictor_width
         axis.bar(
             predictor_positions + offset,
             factors.predictor_directions[:, component],
@@ -283,9 +283,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     # --8<-- [start:render-pulp-weighted-response-directions]
     figure, axis = plt.subplots(figsize=(8.2, 5.4), layout="constrained")
     response_positions = np.arange(len(response_names))
-    response_width = 0.8 / len(DISPLAY_COMPONENTS)
-    for series, component in enumerate(DISPLAY_COMPONENTS):
-        offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2.0) * response_width
+    response_width = 0.8 / CHOSEN_N_COMPONENTS
+    for series, component in enumerate(display_components):
+        offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2.0) * response_width
         axis.bar(
             response_positions + offset,
             factors.weighted_response_directions[:, component],
@@ -407,7 +407,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
             "predictor_rank_at_upper_boundary": bool(
                 selected.predictor_rank == int(rank_profile.predictor_rank[-1])
             ),
-            "displayed_components": [component + 1 for component in DISPLAY_COMPONENTS],
+            "displayed_components": [component + 1 for component in display_components],
             "detailed_responses": [
                 response_names[index] for index in detailed_response_indices
             ],

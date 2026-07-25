@@ -27,16 +27,17 @@ python -m pip install ".[examples]"
 ```
 
 The example imports the estimators, numerical inspection functions, Matplotlib, and `adjustText`,
-then states the component and display choices used below:
+then states the component choice and diagnostic-response limit used below:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-tutorial-setup"
 ```
 
-`CHOSEN_N_COMPONENTS=3` is the user choice made from the component path.
-`DISPLAY_COMPONENTS=(0, 1, 2)` uses Python's zero-based indices for the three fitted components.
-The first three response columns are shown in pointwise diagnostic figures only to keep the
-demonstration legible; the RMSE summary still includes all eight responses.
+`CHOSEN_N_COMPONENTS=3` is the user choice made from the component path. Because every fitted
+component is shown, the plotting code derives its zero-based component indices from that value
+instead of maintaining a second display setting. The first three response columns are shown only
+in pointwise diagnostic figures to keep the demonstration legible; the RMSE summary still includes
+all eight responses.
 
 ## The data and modeling question
 

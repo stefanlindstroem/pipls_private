@@ -236,6 +236,10 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     )
     assert "DETAILED_RESPONSE_COUNT = 3" in example
     assert "tuple(range(DETAILED_RESPONSE_COUNT))" in example
+    for source in (example, renderer):
+        assert "display_components = tuple(range(CHOSEN_N_COMPONENTS))" in source
+        assert "DISPLAY_COMPONENTS" not in source
+        assert "len(display_components)" not in source
     assert "DETAILED_RESPONSES" not in example
     assert "DETAILED_RESPONSES" not in renderer
 

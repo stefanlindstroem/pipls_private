@@ -21,7 +21,6 @@ from pipls.inspection import (
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "pulp"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
 CHOSEN_N_COMPONENTS = 3
-DISPLAY_COMPONENTS = (0, 1, 2)
 DETAILED_RESPONSE_COUNT = 3
 # --8<-- [end:pulp-tutorial-setup]
 
@@ -137,6 +136,8 @@ diagnostics = prediction_diagnostics(
 )
 # --8<-- [end:pulp-inspection-results]
 
+# Every fitted component is displayed, so derive the zero-based indices locally.
+display_components = tuple(range(CHOSEN_N_COMPONENTS))
 
 # Plot the Pi-PLS factors directly from their immutable arrays.
 figure, axes = plt.subplots(
@@ -145,12 +146,12 @@ figure, axes = plt.subplots(
     figsize=(13.0, 9.0),
     layout="constrained",
 )
-component_indices = np.array(DISPLAY_COMPONENTS, dtype=np.int64)
-component_labels = [f"Component {component + 1}" for component in DISPLAY_COMPONENTS]
+component_indices = np.array(display_components, dtype=np.int64)
+component_labels = [f"Component {component + 1}" for component in display_components]
 predictor_positions = np.arange(len(predictor_names))
-predictor_width = 0.8 / len(DISPLAY_COMPONENTS)
-for series, component in enumerate(DISPLAY_COMPONENTS):
-    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2.0) * predictor_width
+predictor_width = 0.8 / CHOSEN_N_COMPONENTS
+for series, component in enumerate(display_components):
+    offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2.0) * predictor_width
     axes[0, 0].bar(
         predictor_positions + offset,
         factors.predictor_directions[:, component],
@@ -165,7 +166,7 @@ axes[0, 0].set_ylabel(r"Predictor direction $P_{:k}$")
 axes[0, 0].set_title(r"Predictor directions $P$")
 axes[0, 0].legend()
 
-dilation_positions = np.arange(len(DISPLAY_COMPONENTS))
+dilation_positions = np.arange(CHOSEN_N_COMPONENTS)
 axes[0, 1].bar(dilation_positions, factors.dilation[component_indices])
 axes[0, 1].set_xticks(dilation_positions)
 axes[0, 1].set_xticklabels(component_labels)
@@ -174,9 +175,9 @@ axes[0, 1].set_ylabel(r"Dilation $d_k$")
 axes[0, 1].set_title(r"Dilation $D$")
 
 response_positions = np.arange(len(response_names))
-response_width = 0.8 / len(DISPLAY_COMPONENTS)
-for series, component in enumerate(DISPLAY_COMPONENTS):
-    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2.0) * response_width
+response_width = 0.8 / CHOSEN_N_COMPONENTS
+for series, component in enumerate(display_components):
+    offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2.0) * response_width
     axes[1, 0].bar(
         response_positions + offset,
         factors.response_directions[:, component],
@@ -285,9 +286,9 @@ adjust_text(
 )
 # --8<-- [end:plot-pulp-biplot]
 predictor_positions = np.arange(len(predictor_names))
-component_width = 0.8 / len(DISPLAY_COMPONENTS)
-for series, component in enumerate(DISPLAY_COMPONENTS):
-    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2) * component_width
+component_width = 0.8 / CHOSEN_N_COMPONENTS
+for series, component in enumerate(display_components):
+    offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2) * component_width
     axes[1, 0].bar(
         predictor_positions + offset,
         structure.x_loadings[:, component],
@@ -303,8 +304,8 @@ axes[1, 0].set_title("X loadings")
 axes[1, 0].legend()
 
 response_positions = np.arange(len(response_names))
-for series, component in enumerate(DISPLAY_COMPONENTS):
-    offset = (series - (len(DISPLAY_COMPONENTS) - 1) / 2) * component_width
+for series, component in enumerate(display_components):
+    offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2) * component_width
     axes[1, 1].bar(
         response_positions + offset,
         structure.y_loadings[:, component],

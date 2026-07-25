@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Derive the Pulp display-component indices from the chosen component count in both the
+  maintained example and tutorial renderer, avoiding a redundant display literal.
+
 - Strengthen the documentation-home motivation by distinguishing the theoretical foundations of
   Pi-PLS and ordinary PLS and directing readers to the maintained example-04 CV-MSE comparisons.
 

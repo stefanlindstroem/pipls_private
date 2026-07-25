@@ -19,6 +19,9 @@ def test_pulp_example_uses_direct_in_memory_results() -> None:
     assert "pipls_display_factors(model.decomposition_)" in text
     assert "latent_structure(model)" in text
     assert "prediction_diagnostics(" in text
+    assert "display_components = tuple(range(CHOSEN_N_COMPONENTS))" in text
+    assert "DISPLAY_COMPONENTS" not in text
+    assert "len(display_components)" not in text
     assert 'prediction_kind="selection-conditioned OOF predictions"' in text
     assert 'ANALYSIS_DIR / "predictor_rank_profile.pdf"' in text
     assert 'ANALYSIS_DIR / "pipls_factors.pdf"' in text
