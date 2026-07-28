@@ -150,7 +150,8 @@ before dilation. Use explicit response labels when comparing them.
 
 ### Weighted response directions $QD$ { #weighted-response-directions }
 
-`factors.weighted_response_directions` combines response-side orientation and mode strength through
+`factors.weighted_response_directions` is a derived read-only array that combines response-side
+orientation and mode strength through
 $d_kq_{:k}$. Compare it with $Q$ when distinguishing direction from scaled contribution to the
 centered/scaled regression map.
 

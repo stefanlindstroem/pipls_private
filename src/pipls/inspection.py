@@ -313,7 +313,8 @@ class PiPLSDisplayFactors:
     The predictor and response direction columns use one chosen deterministic
     display sign per component. Applying the same sign to both sides preserves the
     centered/scaled regression map $PDQ^{\mathsf T}$. Direct construction validates
-    the factor relationship and stores defensive read-only copies.
+    the independent factor arrays and stores defensive read-only copies. Weighted
+    response directions are derived from the validated response directions and dilation.
 
     Attributes
     ----------
@@ -324,13 +325,13 @@ class PiPLSDisplayFactors:
     response_directions : ndarray of shape (n_targets, n_components)
         Display-signed copy of $Q$.
     weighted_response_directions : ndarray of shape (n_targets, n_components)
-        Columns $d_k q_{:k}$, equal to ``response_directions * dilation``.
+        Derived read-only columns $d_k q_{:k}$, equal to
+        ``response_directions * dilation``.
     """
 
     predictor_directions: FloatArray
     dilation: FloatArray
     response_directions: FloatArray
-    weighted_response_directions: FloatArray
 
     def __post_init__(self) -> None:
         predictor_directions = _read_only_float_array(
@@ -342,11 +343,6 @@ class PiPLSDisplayFactors:
         response_directions = _read_only_float_array(
             self.response_directions,
             name="response_directions",
-            ndim=2,
-        )
-        weighted_response_directions = _read_only_float_array(
-            self.weighted_response_directions,
-            name="weighted_response_directions",
             ndim=2,
         )
         n_components = dilation.shape[0]
@@ -362,35 +358,17 @@ class PiPLSDisplayFactors:
             raise ValueError(
                 "response_directions and dilation must contain the same number of components."
             )
-        if weighted_response_directions.shape != response_directions.shape:
-            raise ValueError(
-                "weighted_response_directions must have the same shape as response_directions."
-            )
         if np.any(dilation < 0.0):
             raise ValueError("dilation must contain nonnegative values.")
-        expected_weighted = _finite_product(
+        _finite_product(
             response_directions,
             dilation[None, :],
-            name="response_directions * dilation",
+            name="weighted_response_directions",
         )
-        if not np.allclose(
-            weighted_response_directions,
-            expected_weighted,
-            rtol=1e-7,
-            atol=1e-12,
-        ):
-            raise ValueError(
-                "weighted_response_directions must equal response_directions * dilation."
-            )
 
         object.__setattr__(self, "predictor_directions", predictor_directions)
         object.__setattr__(self, "dilation", dilation)
         object.__setattr__(self, "response_directions", response_directions)
-        object.__setattr__(
-            self,
-            "weighted_response_directions",
-            weighted_response_directions,
-        )
 
     def __reduce__(self) -> tuple[type[PiPLSDisplayFactors], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""
@@ -401,9 +379,20 @@ class PiPLSDisplayFactors:
                 self.predictor_directions,
                 self.dilation,
                 self.response_directions,
-                self.weighted_response_directions,
             ),
         )
+
+    @property
+    def weighted_response_directions(self) -> FloatArray:
+        """Derived read-only columns $d_k q_{:k}$ of $QD$."""
+
+        weighted = _finite_product(
+            self.response_directions,
+            self.dilation[None, :],
+            name="weighted_response_directions",
+        )
+        weighted.setflags(write=False)
+        return weighted
 
     @property
     def n_features(self) -> int:
@@ -937,17 +926,10 @@ def pipls_display_factors(
 
     predictor_directions *= component_signs[None, :]
     response_directions *= component_signs[None, :]
-    weighted_response_directions = _finite_product(
-        response_directions,
-        dilation[None, :],
-        name="weighted_response_directions",
-    )
-
     return PiPLSDisplayFactors(
         predictor_directions=predictor_directions,
         dilation=dilation,
         response_directions=response_directions,
-        weighted_response_directions=weighted_response_directions,
     )
 
 

@@ -298,7 +298,10 @@ The package exposes no `pipls.plotting` module and no public `plot_*` convenienc
 The immutable numerical results are the compatibility surface; Matplotlib artists, styles, and
 `adjustText` label positions are caller-owned and are not package results.
 `PiPLSDisplayFactors`, `LatentStructure`, `ObservationDiagnostics`, `PredictionDiagnostics`, and
-`BiplotCoordinates` expose the numerical quantities required for rendering. Maintained examples
+`BiplotCoordinates` expose the numerical quantities required for rendering.
+`PiPLSDisplayFactors.weighted_response_directions` is derived as a checked read-only $QD$ array
+from the stored response directions and dilation rather than accepted as independent constructor
+state. Maintained examples
 create Matplotlib figures and axes directly, including component and response selection, physical
 coordinates, grouped-bar widths, labels, legends, titles, saving, and closing.
 

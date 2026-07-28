@@ -169,6 +169,7 @@ def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
         factors.weighted_response_directions,
     ):
         assert not values.flags.writeable
+    assert "weighted_response_directions" not in vars(factors)
     assert not np.shares_memory(factors.predictor_directions, decomposition.predictor_rotations)
     assert not np.shares_memory(factors.response_directions, decomposition.response_rotations)
     assert not np.shares_memory(factors.dilation, decomposition.dilation)

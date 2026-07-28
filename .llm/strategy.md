@@ -767,12 +767,21 @@ the newly computed weighted response directions.
 
 Current status: **behavior-preserving decomposition inspection simplification complete**.
 
+### Derived display-factor state simplification
+
+Decision 0113 removes `weighted_response_directions` as independent constructor and serialized
+state. `PiPLSDisplayFactors` stores validated $P$, $d$, and $Q$ arrays and retains checked read-only
+$QD$ through a derived property. Direct construction still rejects an unrepresentable product.
+
+Current status: **derived weighted-response-direction simplification complete**.
+
 ## Current next increment
 
-Before changing public result-record construction, document the contract decision for whether
-`PiPLSDisplayFactors.weighted_response_directions` should be derived from the stored response
-directions and dilation rather than supplied as independent constructor state. Do not prepare or
-publish a package release.
+Before changing `PredictionDiagnostics`, document the contract decision for whether its residual,
+standardized matrices, response statistics, and standardized RMSE should be derived from observed
+values, predicted values, and prediction provenance rather than supplied as independent constructor
+state. Do not combine that change with path-record or validation-report simplification. Do not
+prepare or publish a package release.
 
 ## Maintenance protocol
 

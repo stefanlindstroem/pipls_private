@@ -188,7 +188,7 @@ The primary decomposition report displays:
 
 - predictor rotations $P$;
 - dilation values $d_k=D_{kk}$;
-- dilation-weighted response rotations $d_kq_{jk}$, stored or plotted as $QD$.
+- dilation-weighted response rotations $d_kq_{jk}$, exposed or plotted as $QD$.
 
 Use the terms **predictor rotation** or **predictor direction** for $P$. Do not call $P$ an X
 loading: `PiPLSRegression.x_loadings_` is a separate score-reconstruction quantity.

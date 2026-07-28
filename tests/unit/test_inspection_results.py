@@ -57,7 +57,6 @@ def test_inspection_records_copy_arrays_and_revalidate_pickle() -> None:
         predictor_directions=np.eye(2, dtype=np.float32),
         dilation=np.array([2.0, 1.0], dtype=np.float32),
         response_directions=np.eye(2, dtype=np.float32),
-        weighted_response_directions=np.diag([2.0, 1.0]).astype(np.float32),
     )
     predictions = _prediction_diagnostics()
 
@@ -95,15 +94,6 @@ def test_inspection_records_copy_arrays_and_revalidate_pickle() -> None:
             lambda: ObservationDiagnostics(np.array([1.0, -1.0]), np.ones(2)),
             "nonnegative",
         ),
-        (
-            lambda: PiPLSDisplayFactors(
-                np.eye(2),
-                np.ones(2),
-                np.eye(2),
-                np.ones((2, 2)),
-            ),
-            "must equal",
-        ),
     ],
 )
 def test_inspection_records_reject_invalid_direct_construction(
@@ -112,6 +102,30 @@ def test_inspection_records_reject_invalid_direct_construction(
 ) -> None:
     with pytest.raises(ValueError, match=message):
         constructor()
+
+
+def test_display_factors_derive_weighted_response_directions() -> None:
+    factors = PiPLSDisplayFactors(
+        predictor_directions=np.eye(2, dtype=np.float32),
+        dilation=np.array([2.0, 1.0], dtype=np.float32),
+        response_directions=np.eye(2, dtype=np.float32),
+    )
+
+    weighted = factors.weighted_response_directions
+    np.testing.assert_array_equal(weighted, np.diag([2.0, 1.0]))
+    assert not weighted.flags.writeable
+    assert "weighted_response_directions" not in vars(factors)
+
+
+def test_display_factors_reject_unrepresentable_derived_weighting() -> None:
+    with pytest.raises(ValueError, match="weighted_response_directions cannot be represented"):
+        PiPLSDisplayFactors(
+            predictor_directions=np.eye(2),
+            dilation=np.array([2.0, 1.0]),
+            response_directions=np.array(
+                [[np.finfo(np.float64).max, 0.0], [0.0, 1.0]]
+            ),
+        )
 
 
 def test_prediction_diagnostics_reject_inconsistent_direct_construction() -> None:

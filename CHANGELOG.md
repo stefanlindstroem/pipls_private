@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Derive `PiPLSDisplayFactors.weighted_response_directions` as a checked read-only
+  property of the stored response directions and dilation, removing redundant constructor and
+  serialized state without changing its public attribute or numerical values.
+
 - Simplify `pipls_display_factors()` by trusting the finite, aligned, nonempty, and
   nonnegative factor arrays already guaranteed by `PiPLSDecomposition`, while retaining
   validation of response-orientation controls and newly computed weighted directions.
