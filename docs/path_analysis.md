@@ -243,7 +243,12 @@ search = PiPLSPathCV(
 ).fit(X, Y)
 
 model = search.selected_pipls_
+Y_pred = model.predict(X_new)
 ```
+
+Once the selected Pi-PLS model has been extracted, application code should call its methods
+directly. Delegated methods such as `search.predict(X_new)` remain available as scikit-learn-style
+conveniences, but the explicit model call keeps selection and model application visually separate.
 
 The accepted rules are:
 

@@ -56,7 +56,14 @@ model = PiPLSRegression(
 
 or construct the search with `refit=True`. The default `selection_rule="best_score"` refits the
 global configured-score optimum; `selection_rule="one_standard_error"` refits the stored 1-SE
-component-path recommendation. The fitted model is available as `selected_pipls_`. See the
+component-path recommendation. Extract the fitted model and use it directly for application:
+
+```python
+model = search.selected_pipls_
+Y_pred = model.predict(X_new)
+```
+
+Delegated calls through the search object remain available as compatibility conveniences. See the
 [path API](api/path.md).
 
 ## The CV-MSE minimum, best candidate, and selected model disagree

@@ -279,7 +279,15 @@ def test_current_user_workflows_rely_on_the_selection_only_path_default() -> Non
 
     readme = (root / "README.md").read_text(encoding="utf-8")
     assert 'selection_rule="one_standard_error"' in readme
-    assert "selected_pipls_" in readme
+    assert "model = search.selected_pipls_" in readme
+    assert "Y_pred = model.predict(X_test)" in readme
+    assert "Y_pred = search.predict(X_test)" not in readme
+
+    path_analysis = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
+    troubleshooting = (root / "docs" / "troubleshooting.md").read_text(encoding="utf-8")
+    for page in (path_analysis, troubleshooting):
+        assert "model = search.selected_pipls_" in page
+        assert "Y_pred = model.predict(X_new)" in page
 
 
 def test_path_details_expose_adaptive_search_completion_status() -> None:

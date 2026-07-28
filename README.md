@@ -109,7 +109,7 @@ search = PiPLSPathCV(
 ).fit(X_train, Y_train)
 
 model = search.selected_pipls_
-Y_pred = search.predict(X_test)
+Y_pred = model.predict(X_test)
 ```
 
 `best_*` still identifies the global configured-score optimum. `selected_result_`,

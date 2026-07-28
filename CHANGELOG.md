@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Present automated model application through the extracted `selected_pipls_` model in public
+  workflows, while retaining delegated search methods as compatibility conveniences.
+
 - Add explicit `PiPLSPathCV` final-selection rules: preserve `best_*` as the global configured-score
   optimum, expose the declared `selected_result_`, and optionally refit either that optimum or the
   stored one-standard-error component-path recommendation as one auditable model-building call.
