@@ -249,9 +249,11 @@ from pipls.inspection import (
 ```
 
 These names are not top-level `pipls` exports. `pipls_display_factors()` accepts a
-`PiPLSDecomposition`, copies $P$, $D$, and $Q$, chooses deterministic display signs from the first
-largest-magnitude predictor entry, and preserves $PDQ^\mathsf{T}$. It returns $P$, the dilation
-vector, $Q$, and $QD$ as read-only arrays; the sign bookkeeping remains internal.
+`PiPLSDecomposition`, copies $P$, $D$, and $Q$, and preserves $PDQ^\mathsf{T}$. Its default display
+signs come from the first largest-magnitude predictor entry. A caller may instead supply a zero-based
+`response_index` and request a positive or negative response orientation; exact zero anchor entries
+fall back to the predictor convention. It returns $P$, the dilation vector, $Q$, and $QD$ as
+read-only arrays; labels and sign bookkeeping remain outside the result record.
 
 `prediction_diagnostics()` accepts one- or two-dimensional observed and predicted responses,
 normalizes outputs to two dimensions, uses residuals $y-\hat y$, and applies observed-response

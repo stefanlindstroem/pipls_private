@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Extend `pipls_display_factors()` with optional response-anchored sign orientation while retaining
+  the predictor-canonical default; demonstrate a positive tensile-index orientation in the Pulp
+  analysis and tutorial without changing the fitted regression map or public result fields.
+
 - Consolidate the Tobacco 1-SE documentation across the repository and served example catalogues,
   reduce repeated rule descriptions, synchronize the active guide layer, remove duplicate decision
   links, and require every decision record to be indexed exactly once.

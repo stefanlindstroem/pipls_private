@@ -81,6 +81,10 @@ def test_pulp_tutorial_renderer_writes_declared_parseable_svgs(
     assert manifest["analysis"]["evaluated_predictor_ranks"] == list(range(3, 11))
     assert manifest["analysis"]["predictor_rank_at_upper_boundary"] is True
     assert manifest["analysis"]["displayed_components"] == [1, 2, 3]
+    assert manifest["analysis"]["factor_sign_anchor"] == {
+        "response": "TI",
+        "sign": "positive",
+    }
     assert manifest["analysis"]["detailed_responses"] == ["CSF", "Density", "TI"]
 
     figures = manifest["figures"]

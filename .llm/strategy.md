@@ -716,6 +716,16 @@ Current status: **implementation, reference documentation, and one focused Tobac
 complete; the example catalogue and repository example overview are synchronized, and the workflow
 is not promoted in tutorials or entry pages**.
 
+### Response-anchored factor display
+
+Decision 0110 extends `pipls_display_factors()` without changing its default. Callers may orient all
+components by a selected zero-based response row and a requested positive or negative sign; exact
+zero anchor entries retain the predictor-canonical fallback. The Pulp example and tutorial use the
+`TI` response as a positive display anchor. The transformation remains inspection-only, preserves
+$PDQ^\mathsf{T}$, and adds no fitted state or result-record bookkeeping.
+
+Current status: **response-anchored factor display implemented and documented**.
+
 ## Current next increment
 
 Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a

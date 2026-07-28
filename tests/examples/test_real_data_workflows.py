@@ -16,7 +16,8 @@ def test_pulp_example_uses_direct_in_memory_results() -> None:
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in text
     assert "PiPLSRegression(" in text
     assert "cross_val_predict(" in text
-    assert "pipls_display_factors(model.decomposition_)" in text
+    assert 'response_index=response_names.index("TI")' in text
+    assert 'response_sign="positive"' in text
     assert "latent_structure(model)" in text
     assert "prediction_diagnostics(" in text
     assert "display_components = tuple(range(CHOSEN_N_COMPONENTS))" in text

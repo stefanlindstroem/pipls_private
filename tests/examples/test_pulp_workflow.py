@@ -47,7 +47,11 @@ def pulp_result() -> SimpleNamespace:
         Y,
         cv=KFold(n_splits=5, shuffle=False),
     )
-    factors = pipls_display_factors(model.decomposition_)
+    factors = pipls_display_factors(
+        model.decomposition_,
+        response_index=Y.columns.get_loc("TI"),
+        response_sign="positive",
+    )
     structure = latent_structure(model)
     diagnostics = prediction_diagnostics(
         Y,
@@ -108,6 +112,9 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
     assert result.oof_predictions.shape == result.Y.shape
     assert np.all(np.isfinite(result.oof_predictions))
     assert result.diagnostics.prediction_kind == "selection-conditioned OOF predictions"
+    ti_response_index = result.Y.columns.get_loc("TI")
+    assert np.all(result.factors.response_directions[ti_response_index] > 0.0)
+    assert np.all(result.factors.weighted_response_directions[ti_response_index] > 0.0)
     assert result.diagnostics.observed.shape == result.Y.shape
     assert result.factors.n_components == result.selected.n_components
     assert result.structure.n_samples == len(result.X)

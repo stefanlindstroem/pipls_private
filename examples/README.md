@@ -51,8 +51,9 @@ use case rather than combining unrelated split protocols in one context-free scr
 
 - `05_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the path, inspects
   the conditional predictor-rank profile at three components, fits the selected fixed model,
-  calculates selection-conditioned OOF predictions, and writes six final PDF figures directly from
-  in-memory results.
+  orients the displayed factors so the tensile-index response is positive, calculates
+  selection-conditioned OOF predictions, and writes six final PDF figures directly from in-memory
+  results.
 - `06_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
   inspection results in memory, calculates OOF predictions with scikit-learn, and writes five
   wavelength-aware final PDF figures without generated analytical CSV files.
@@ -113,7 +114,8 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 3. `cross_val_predict()` with five non-shuffled folds produces
    `selection-conditioned OOF predictions`.
 4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return
-   immutable in-memory results.
+   immutable in-memory results; the Pulp factor call anchors component signs to positive `TI`
+   entries.
 5. The script plots latent structure, prediction diagnostics, and $P$, $D$, $Q$, and $QD$ factors
    directly with Matplotlib and saves the five final figures itself.
 

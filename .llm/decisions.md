@@ -115,6 +115,7 @@ This index is navigation, not a substitute for those records.
 | `0107-component-path-recommendation-methods.md` | component-path recommendation methods | return exact stored minimum-CV-MSE and one-standard-error rows without fitting, mutation, tolerances, or redundant state |
 | `0108-tobacco-one-standard-error-workflow.md` | Tobacco one-standard-error workflow | use the stored 1-SE recommendation for example 07 while keeping introductory workflows explicit |
 | `0109-tobacco-one-standard-error-threshold-figure.md` | Tobacco one-standard-error threshold figure | show the minimum row, horizontal 1-SE threshold, and recommended row with direct documentation cross-links |
+| `0110-response-anchored-display-factors.md` | response-anchored Pi-PLS display factors | retain predictor-canonical defaults; optionally orient every component by a selected response row and requested sign |
 
 ## Implemented estimator/search transition
 

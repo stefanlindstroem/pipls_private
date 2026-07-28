@@ -24,13 +24,31 @@ B_{\mathrm{cs}}=PDQ^{\mathsf T}.
 
 `pipls_display_factors()` returns defensive read-only copies and applies one deterministic display
 sign per component. The same sign is applied to the paired columns of $P$ and $Q$, so the regression
-map is unchanged.
+map is unchanged. By default, the first largest-magnitude predictor entry is made nonnegative.
 
 ```python
 from pipls.inspection import pipls_display_factors
 
 factors = pipls_display_factors(model.decomposition_)
 ```
+
+A response can instead define the display orientation. The caller resolves a scientific response
+name to its zero-based row because the decomposition intentionally contains no labels:
+
+```python
+ti_index = response_names.index("TI")
+factors = pipls_display_factors(
+    model.decomposition_,
+    response_index=ti_index,
+    response_sign="positive",
+)
+```
+
+This makes the selected response entry nonnegative in every component. `response_sign="negative"`
+requests nonpositive entries. If the selected response entry is exactly zero, that component falls
+back to the default predictor-based convention. These choices orient an equivalent factorization;
+they do not change predictions or establish that the selected response has a positive or negative
+physical effect.
 
 $P$ contains predictor rotations, not X loadings. X loadings belong to score reconstruction and are
 stored in `LatentStructure`.

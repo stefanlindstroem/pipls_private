@@ -189,7 +189,11 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         Y,
         cv=KFold(n_splits=5, shuffle=False),
     )
-    factors = pipls_display_factors(model.decomposition_)
+    factors = pipls_display_factors(
+        model.decomposition_,
+        response_index=response_names.index("TI"),
+        response_sign="positive",
+    )
     structure = latent_structure(model)
     diagnostics = prediction_diagnostics(
         Y,
@@ -268,7 +272,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_xticklabels(predictor_names)
     axis.set_xlabel("Predictor")
     axis.set_ylabel(r"Predictor direction $P_{:k}$")
-    axis.set_title(r"Pulp predictor directions $P$")
+    axis.set_title(r"Pulp predictor directions $P$ (TI-positive orientation)")
     axis.legend()
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
@@ -293,7 +297,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
     axis.set_ylabel(r"Weighted response direction $d_kq_{:k}$")
-    axis.set_title(r"Pulp weighted response directions $QD$")
+    axis.set_title(r"Pulp weighted response directions $QD$ (TI-positive orientation)")
     axis.legend()
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
@@ -405,6 +409,10 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
                 selected.predictor_rank == int(rank_profile.predictor_rank[-1])
             ),
             "displayed_components": [component + 1 for component in display_components],
+            "factor_sign_anchor": {
+                "response": "TI",
+                "sign": "positive",
+            },
             "detailed_responses": [
                 response_names[index] for index in detailed_response_indices
             ],

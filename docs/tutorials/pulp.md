@@ -181,13 +181,23 @@ The fitted estimator and OOF predictions are converted to numerical result objec
 | `PiPLSDisplayFactors` | What are the Pi-PLS-specific $P$, $D$, $Q$, and $QD$ factors? |
 | `PredictionDiagnostics` | How do the selection-conditioned OOF predictions and residuals behave? |
 
+The Pulp workflow uses `response_names.index("TI")` as the response sign anchor and requests a
+positive orientation. The resulting TI entry is nonnegative for every displayed component, and the
+same component sign is applied to the paired columns of $P$ and $Q$. This convention is useful here
+because tensile index is the principal controlled target. It only chooses how an equivalent
+factorization is displayed; it does not change predictions or assert that every physical effect on
+TI is positive. If an anchored entry were exactly zero, the helper would use its default
+predictor-based sign for that component.
+
 At this point the programming workflow is complete. The remaining figures are optional
 interpretation views; the full catalogue is in [Model inspection](../model_inspection.md).
 
 ## Interpret representative fitted-model plots
 
-Singular-vector signs are arbitrary, so paired quantities may change sign together without changing
-predictions. Interpret relative patterns and paired quantities, not isolated signs.
+Factor signs are arbitrary, so paired quantities may change sign together without changing
+predictions. This tutorial fixes that ambiguity with the TI-positive convention above. Interpret
+relative patterns and paired quantities rather than treating the chosen sign as a fitted scientific
+conclusion.
 
 ### Standard PLS-family latent structure
 
@@ -225,7 +235,7 @@ The grouped bars are constructed directly from `factors.predictor_directions`:
 The dominant entries differ by component: the first direction emphasizes `Shives` and selected
 fibrillation or length descriptors, the second emphasizes length descriptors, and the third is
 strongly associated with `Fines B`. Only relative within-component patterns should be interpreted;
-signs may reverse together.
+the displayed orientation is fixed by the TI entries in the paired response directions.
 
 The columns of $P$ are predictor rotations paired with response directions in $PDQ^{\mathsf T}$.
 They are distinct from ordinary X loadings. The figure shows all three selected paired components;

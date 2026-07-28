@@ -84,6 +84,7 @@ reference describe the current public behavior directly.
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
 - [0108: Tobacco one-standard-error workflow](0108-tobacco-one-standard-error-workflow.md)
 - [0109: Tobacco one-standard-error threshold figure](0109-tobacco-one-standard-error-threshold-figure.md)
+- [0110: response-anchored Pi-PLS display factors](0110-response-anchored-display-factors.md)
 
 ## Repository and documentation policy
 

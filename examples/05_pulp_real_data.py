@@ -125,7 +125,11 @@ oof_predictions = cross_val_predict(
 # --8<-- [end:pulp-oof-predictions]
 
 # --8<-- [start:pulp-inspection-results]
-factors = pipls_display_factors(model.decomposition_)
+factors = pipls_display_factors(
+    model.decomposition_,
+    response_index=response_names.index("TI"),
+    response_sign="positive",
+)
 structure = latent_structure(model)
 diagnostics = prediction_diagnostics(
     Y,
@@ -204,7 +208,7 @@ for axis, ylabel, title in (
     axis.set_title(title)
     axis.legend()
 figure.suptitle(
-    "Pulp Pi-PLS factors "
+    "Pulp Pi-PLS factors with TI-positive orientation "
     f"({selected.n_components} components, predictor rank {selected.predictor_rank})"
 )
 figure.savefig(ANALYSIS_DIR / "pipls_factors.pdf")

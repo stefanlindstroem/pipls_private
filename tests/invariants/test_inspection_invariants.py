@@ -15,17 +15,31 @@ def test_display_sign_canonicalization_preserves_fitted_regression_map() -> None
     predictor_before = decomposition.predictor_rotations.copy()
     response_before = decomposition.response_rotations.copy()
 
-    factors = pipls_display_factors(decomposition)
-    display_map = (
-        factors.predictor_directions @ np.diag(factors.dilation) @ factors.response_directions.T
+    factor_views = (
+        pipls_display_factors(decomposition),
+        pipls_display_factors(
+            decomposition,
+            response_index=1,
+            response_sign="negative",
+        ),
     )
+    for factors in factor_views:
+        display_map = (
+            factors.predictor_directions
+            @ np.diag(factors.dilation)
+            @ factors.response_directions.T
+        )
 
-    np.testing.assert_allclose(display_map, decomposition.standardized_regression_map, atol=1e-14)
-    np.testing.assert_allclose(
-        factors.predictor_directions @ factors.weighted_response_directions.T,
-        decomposition.standardized_regression_map,
-        atol=1e-14,
-    )
+        np.testing.assert_allclose(
+            display_map,
+            decomposition.standardized_regression_map,
+            atol=1e-14,
+        )
+        np.testing.assert_allclose(
+            factors.predictor_directions @ factors.weighted_response_directions.T,
+            decomposition.standardized_regression_map,
+            atol=1e-14,
+        )
     np.testing.assert_array_equal(decomposition.predictor_rotations, predictor_before)
     np.testing.assert_array_equal(decomposition.response_rotations, response_before)
     assert model.x_rotations_ is decomposition.predictor_rotations

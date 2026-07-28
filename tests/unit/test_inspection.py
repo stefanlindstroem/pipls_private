@@ -84,6 +84,76 @@ def test_pipls_display_factors_use_first_largest_predictor_entry_for_sign() -> N
     assert not hasattr(factors, "component_signs")
 
 
+def test_pipls_display_factors_can_anchor_signs_to_a_response() -> None:
+    predictor_directions = np.array(
+        [
+            [-4.0, 1.0, -3.0],
+            [2.0, -2.0, 1.0],
+        ]
+    )
+    response_directions = np.array(
+        [
+            [-2.0, 3.0, 0.0],
+            [1.0, -1.0, 4.0],
+        ]
+    )
+    dilation = np.array([3.0, 2.0, 1.0])
+    decomposition = _decomposition(predictor_directions, response_directions, dilation)
+
+    positive = pipls_display_factors(
+        decomposition,
+        response_index=0,
+        response_sign="positive",
+    )
+    negative = pipls_display_factors(
+        decomposition,
+        response_index=np.int64(0),
+        response_sign="negative",
+    )
+
+    positive_signs = np.array([-1.0, 1.0, -1.0])
+    negative_signs = np.array([1.0, -1.0, -1.0])
+    np.testing.assert_array_equal(
+        positive.predictor_directions,
+        predictor_directions * positive_signs,
+    )
+    np.testing.assert_array_equal(
+        positive.response_directions,
+        response_directions * positive_signs,
+    )
+    np.testing.assert_array_equal(
+        negative.predictor_directions,
+        predictor_directions * negative_signs,
+    )
+    np.testing.assert_array_equal(
+        negative.response_directions,
+        response_directions * negative_signs,
+    )
+    assert np.all(positive.response_directions[0] >= 0.0)
+    assert np.all(negative.response_directions[0] <= 0.0)
+
+
+def test_pipls_display_factors_validate_response_orientation() -> None:
+    decomposition = _decomposition(np.eye(2), np.eye(2), np.ones(2))
+
+    with pytest.raises(ValueError, match="response_sign must be"):
+        pipls_display_factors(
+            decomposition,
+            response_index=0,
+            response_sign="up",  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match="requires response_index"):
+        pipls_display_factors(decomposition, response_sign="negative")
+    with pytest.raises(TypeError, match="response_index must be an integer or None"):
+        pipls_display_factors(decomposition, response_index=True)
+    with pytest.raises(TypeError, match="response_index must be an integer or None"):
+        pipls_display_factors(decomposition, response_index=0.5)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match=r"between 0 and 1; got -1"):
+        pipls_display_factors(decomposition, response_index=-1)
+    with pytest.raises(ValueError, match=r"between 0 and 1; got 2"):
+        pipls_display_factors(decomposition, response_index=2)
+
+
 def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
     predictor_directions = np.eye(2)
     response_directions = np.eye(2)

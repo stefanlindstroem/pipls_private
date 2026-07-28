@@ -310,8 +310,8 @@ class ObservationDiagnostics:
 class PiPLSDisplayFactors:
     r"""Immutable display-oriented copy of a Pi-PLS factorization.
 
-    The predictor and response direction columns use one deterministic display
-    sign per component. Applying the same sign to both sides preserves the
+    The predictor and response direction columns use one chosen deterministic
+    display sign per component. Applying the same sign to both sides preserves the
     centered/scaled regression map $PDQ^{\mathsf T}$. Direct construction validates
     the factor relationship and stores defensive read-only copies.
 
@@ -856,26 +856,62 @@ def observation_diagnostics(
     )
 
 
-def pipls_display_factors(decomposition: PiPLSDecomposition) -> PiPLSDisplayFactors:
+def _predictor_display_signs(predictor_directions: FloatArray) -> NDArray[np.int8]:
+    """Return predictor-anchored component signs without modifying the input."""
+
+    n_components = predictor_directions.shape[1]
+    component_signs = np.ones(n_components, dtype=np.int8)
+    pivots = np.argmax(np.abs(predictor_directions), axis=0)
+    components = np.arange(n_components)
+    component_signs[predictor_directions[pivots, components] < 0.0] = -1
+    return component_signs
+
+
+def pipls_display_factors(
+    decomposition: PiPLSDecomposition,
+    *,
+    response_index: int | None = None,
+    response_sign: Literal["positive", "negative"] = "positive",
+) -> PiPLSDisplayFactors:
     r"""Return copied Pi-PLS factors with deterministic display signs.
 
-    For each component, the first largest-magnitude entry of the predictor
-    direction is made nonnegative. The same sign is applied to the corresponding
-    response direction, preserving $PDQ^{\mathsf T}$.
+    By default, the first largest-magnitude entry of each predictor direction is
+    made nonnegative. When ``response_index`` is supplied, each component is
+    instead oriented so that the selected response-direction entry has the
+    requested nonnegative or nonpositive sign. An exactly zero selected entry
+    uses the default predictor-based sign for that component. The same sign is
+    applied to the paired predictor and response directions, preserving
+    $PDQ^{\mathsf T}$.
 
     Parameters
     ----------
     decomposition : pipls.PiPLSDecomposition
         Public fitted Pi-PLS decomposition.
+    response_index : int or None, default=None
+        Zero-based response row used to orient every component. ``None`` uses the
+        default predictor-based convention.
+    response_sign : {"positive", "negative"}, default="positive"
+        Requested sign for the selected response row. ``"positive"`` means
+        nonnegative and ``"negative"`` means nonpositive. A negative response
+        sign requires ``response_index``.
 
     Returns
     -------
     PiPLSDisplayFactors
-        Read-only display factors and the applied component signs.
+        Read-only display factors.
     """
 
     if not isinstance(decomposition, PiPLSDecomposition):
         raise TypeError("decomposition must be a PiPLSDecomposition.")
+    if response_sign not in ("positive", "negative"):
+        raise ValueError("response_sign must be 'positive' or 'negative'.")
+    if response_index is None and response_sign == "negative":
+        raise ValueError("response_sign='negative' requires response_index.")
+    if response_index is not None and (
+        isinstance(response_index, (bool, np.bool_))
+        or not isinstance(response_index, (int, np.integer))
+    ):
+        raise TypeError("response_index must be an integer or None.")
 
     predictor_directions = _finite_matrix(
         decomposition.predictor_rotations,
@@ -903,12 +939,23 @@ def pipls_display_factors(decomposition: PiPLSDecomposition) -> PiPLSDisplayFact
     if np.any(dilation < 0.0):
         raise ValueError("decomposition.dilation must contain nonnegative values.")
 
-    component_signs = np.ones(n_components, dtype=np.int8)
-    for component in range(n_components):
-        column = predictor_directions[:, component]
-        pivot = int(np.argmax(np.abs(column)))
-        if column[pivot] < 0.0:
-            component_signs[component] = -1
+    component_signs = _predictor_display_signs(predictor_directions)
+    if response_index is not None:
+        resolved_response_index = int(response_index)
+        n_targets = response_directions.shape[0]
+        if not 0 <= resolved_response_index < n_targets:
+            raise ValueError(
+                "response_index must be between 0 and "
+                f"{n_targets - 1}; got {resolved_response_index}."
+            )
+        response_anchor = response_directions[resolved_response_index]
+        nonzero = response_anchor != 0.0
+        desired_sign = 1.0 if response_sign == "positive" else -1.0
+        component_signs[nonzero] = np.where(
+            response_anchor[nonzero] * desired_sign < 0.0,
+            -1,
+            1,
+        )
 
     predictor_directions *= component_signs[None, :]
     response_directions *= component_signs[None, :]
