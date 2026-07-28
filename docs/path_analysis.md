@@ -135,14 +135,16 @@ routing when routing is enabled and requested. Split metadata belongs to the sea
 Set `return_oof_predictions=True` to fit `selected_result_` once per training fold after selection.
 The immutable `validation_report_` then owns row-ordered OOF results:
 
+- `selected_result` is the same immutable component-path row exposed as `search.selected_result_`;
 - `oof_predictions` preserves input row order;
 - repeated validation predictions are averaged and their counts are recorded;
 - rows without validation coverage have count 0 and a NaN prediction;
-- `n_components` and `predictor_rank` identify the fitted pair;
+- `n_components` and `predictor_rank` remain convenient views of the selected result;
 - `pooled_oof_r2` uses only rows with OOF coverage.
 
-The report also records the split count, mean score, CV-MSE, OOF coverage, and whether the splitter
-is structurally leave-one-out. These results are selection-conditioned because the same path search
+The report derives its split count, mean score, and CV-MSE convenience attributes from
+`selected_result` and separately records OOF coverage and whether the splitter is structurally
+leave-one-out. These results are selection-conditioned because the same path search
 selected the parameters. Use nested cross-validation or an external test set when an unbiased
 post-selection estimate is required.
 

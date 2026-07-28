@@ -501,11 +501,7 @@ class PiPLSSearchCV(
             pooled_r2 = _pooled_oof_r2(y_indexable, predictions, counts)
 
         self.validation_report_ = PiPLSValidationReport(
-            n_components=self.selected_result_.n_components,
-            predictor_rank=self.selected_result_.predictor_rank,
-            n_splits=self.n_splits_,
-            mean_test_score=self.selected_result_.mean_test_score,
-            mean_response_standardized_mse=self.selected_result_.cv_mse_mean,
+            selected_result=self.selected_result_,
             estimate_kind="selection-conditioned",
             is_leave_one_out=_is_leave_one_out_splits(
                 materialized.splits,

@@ -138,9 +138,12 @@ Public path attributes include standard candidate-level search results in `cv_re
 `best_*` selection attributes, `selected_result_`, `selected_params_`,
 `path_search_exhaustive_`, optional selected refitted estimators, immutable `validation_report_`,
 and the canonical immutable `component_path_` result. OOF arrays and their coverage counts live
-only in `validation_report_` and represent the selected row. Validated input grids, adaptive-search batch
-history, candidate counters, direct-rank parameter aliases, and matrix-shaped score/MSE aliases are
-not public fitted state; advanced users can inspect aligned `cv_results_` columns when needed.
+only in `validation_report_` and represent the selected row. The report composes the same immutable
+`PiPLSComponentResult` exposed as `selected_result_`; its component-count, predictor-rank,
+split-count, score, and CV-MSE convenience names are properties of that result rather than duplicated
+stored state. Validated input grids, adaptive-search batch history, candidate counters, direct-rank
+parameter aliases, and matrix-shaped score/MSE aliases are not public fitted state; advanced users
+can inspect aligned `cv_results_` columns when needed.
 `PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
 `mean_test_score`, `cv_mse_mean`, and `cv_mse_fold_sd` arrays. The predictor-rank policy and number
 of validation splits are path-wide Python scalars. It derives the aligned read-only

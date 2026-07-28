@@ -54,6 +54,7 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
         expected[validation] = clone(_fixed()).fit(X[train], Y[train]).predict(X[validation])
 
     report = search.validation_report_
+    assert report.selected_result is search.selected_result_
     assert report.oof_predictions is not None
     assert report.oof_prediction_counts is not None
     np.testing.assert_allclose(report.oof_predictions, expected)

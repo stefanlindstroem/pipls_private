@@ -39,13 +39,21 @@ def _decomposition() -> PiPLSDecomposition:
     )
 
 
-def _validation_report() -> PiPLSValidationReport:
-    return PiPLSValidationReport(
+def _validation_result() -> PiPLSComponentResult:
+    return PiPLSComponentResult(
         n_components=np.int64(1),
         predictor_rank=np.int64(2),
-        n_splits=np.int64(3),
+        predictor_rank_policy="optimized",
         mean_test_score=np.float32(-0.5),
-        mean_response_standardized_mse=np.float32(0.5),
+        cv_mse_mean=np.float32(0.5),
+        cv_mse_fold_sd=np.float32(0.1),
+        n_splits=np.int64(3),
+    )
+
+
+def _validation_report() -> PiPLSValidationReport:
+    return PiPLSValidationReport(
+        selected_result=_validation_result(),
         estimate_kind="selection-conditioned",
         is_leave_one_out=np.bool_(False),
         oof_predictions=np.array([[1.0, 2.0], [np.nan, np.nan], [3.0, 4.0]]),
@@ -65,6 +73,13 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     assert "selected" not in {
         field.name for field in fields(PiPLSPredictorRankProfile)
     }
+    assert {
+        "n_components",
+        "predictor_rank",
+        "n_splits",
+        "mean_test_score",
+        "mean_response_standardized_mse",
+    }.isdisjoint(field.name for field in fields(PiPLSValidationReport))
 
 
 def test_component_result_validates_and_normalizes_python_scalars() -> None:
@@ -251,6 +266,7 @@ def test_decomposition_requires_solver_and_rank_exactness_to_agree() -> None:
 def test_validation_report_normalizes_and_freezes_oof_arrays() -> None:
     report = _validation_report()
 
+    assert report.selected_result == _validation_result()
     assert type(report.n_components) is int
     assert type(report.predictor_rank) is int
     assert type(report.n_splits) is int
@@ -265,6 +281,7 @@ def test_validation_report_normalizes_and_freezes_oof_arrays() -> None:
 
     restored = pickle.loads(pickle.dumps(report))
     assert isinstance(restored, PiPLSValidationReport)
+    assert restored.selected_result == report.selected_result
     assert restored.oof_predictions is not None
     assert not restored.oof_predictions.flags.writeable
     np.testing.assert_array_equal(
@@ -273,14 +290,18 @@ def test_validation_report_normalizes_and_freezes_oof_arrays() -> None:
     )
 
 
+def test_validation_report_requires_component_result() -> None:
+    with pytest.raises(TypeError, match="selected_result must be a PiPLSComponentResult"):
+        PiPLSValidationReport(
+            selected_result=object(),  # type: ignore[arg-type]
+            estimate_kind="selection-conditioned",
+            is_leave_one_out=False,
+        )
+
+
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [
-        ("n_components", 0, "positive integer"),
-        ("predictor_rank", 0, "positive integer"),
-        ("n_splits", 0, "positive integer"),
-        ("mean_test_score", np.nan, "finite real"),
-        ("mean_response_standardized_mse", -0.1, "nonnegative"),
         ("estimate_kind", "unknown", "must be one of"),
         ("is_leave_one_out", 1, "must be boolean"),
         ("pooled_oof_r2", np.inf, "finite real"),
@@ -292,11 +313,7 @@ def test_validation_report_rejects_invalid_scalar_fields(
     message: str,
 ) -> None:
     kwargs = {
-        "n_components": 1,
-        "predictor_rank": 2,
-        "n_splits": 3,
-        "mean_test_score": -0.5,
-        "mean_response_standardized_mse": 0.5,
+        "selected_result": _validation_result(),
         "estimate_kind": "selection-conditioned",
         "is_leave_one_out": False,
         "oof_predictions": [1.0, 2.0],
@@ -310,11 +327,7 @@ def test_validation_report_rejects_invalid_scalar_fields(
 
 def test_validation_report_enforces_oof_coverage_representation() -> None:
     kwargs = {
-        "n_components": 1,
-        "predictor_rank": 2,
-        "n_splits": 3,
-        "mean_test_score": -0.5,
-        "mean_response_standardized_mse": 0.5,
+        "selected_result": _validation_result(),
         "estimate_kind": "selection-conditioned",
         "is_leave_one_out": False,
     }

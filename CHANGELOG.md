@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Compose `PiPLSValidationReport` from one immutable `PiPLSComponentResult` and derive its
+  existing selected-row convenience attributes, removing five duplicated constructor and
+  serialized scalar fields without changing report values or OOF behavior.
+
 - Normalize immutable path results by storing one predictor-rank policy and split count per search
   and deriving `PiPLSPredictorRankProfile.selected` from its candidate arrays with the fitted
   tolerant lower-rank tie rule, removing repeated and potentially inconsistent state.

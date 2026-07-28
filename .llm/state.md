@@ -53,8 +53,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   solver provenance, and the derived centered/scaled regression map;
 - grouped, repeated, predefined, temporal, and leave-one-out split workflows, with a focused
   small-sample LOO example reporting ordered OOF predictions and pooled OOF $R^2$;
-- optional ordered OOF predictions and immutable `PiPLSValidationReport` with explicit
-  fixed-parameter versus selection-conditioned labeling;
+- optional ordered OOF predictions and immutable `PiPLSValidationReport` composed from the
+  selected `PiPLSComponentResult`, with explicit fixed-parameter versus selection-conditioned
+  labeling;
 - immutable validated `PiPLSDataset` with recursively frozen metadata, explicit rejection of
   object-dtype metadata arrays, and deterministic synthetic generators with shared,
   predictor-specific, and response-specific latent structure;
@@ -380,33 +381,23 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Decisions 0107--0112 are complete. The path result methods remain non-mutating stored-row
-inspection. Decision 0112 renames the unreleased selection meta-estimator to
-`PiPLSSearchCV` without a compatibility alias or numerical change. Decision 0111 adds
-explicit final-row orchestration to `PiPLSSearchCV`: `best_*` retains
-the global configured-score optimum, `selected_result_` records either that row or the stored 1-SE
-recommendation, and optional OOF generation and full-data refitting follow the selected row. No
-second automated-model wrapper is added, and `PiPLSRegression` remains fixed-pair only.
+Decisions 0107--0116 are complete. The path result methods remain non-mutating stored-row
+inspection. `PiPLSSearchCV` retains separate global `best_*` and declared `selected_result_`
+contracts, and `PiPLSRegression` remains fixed-pair only.
 
-The first five simplifications from the owner-led audit are complete.
-`PiPLSSearchCV.fit()` resolves its estimator template, Pi-PLS parameter prefix, and scorer once per
-fit, while retaining distinct upper-independent sequence checks and later data-dependent rank
-bounds. `pipls_display_factors()` trusts the finite, aligned, nonempty, and nonnegative arrays
-already guaranteed by `PiPLSDecomposition`; it still validates response-orientation controls.
-`PiPLSDisplayFactors` stores only $P$, $d$, and $Q$ and derives the checked read-only $QD$ property.
-`PredictionDiagnostics` accepts only observed values, predicted values, and prediction provenance;
-it derives its residual, standardization statistics, standardized arrays, and response-wise RMSE
-once, so inconsistent redundant diagnostic state cannot be constructed. Decision 0115 stores the
-component-path predictor-rank policy and split count once as scalars and derives
-`PiPLSPredictorRankProfile.selected` from immutable candidate arrays with the fitted tolerant
-lower-rank tie rule. No package release
+The six owner-authorized simplifications are complete. Search inputs are resolved once;
+decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction
+diagnostics are derived from independent state; path-wide metadata and profile selection are not
+duplicated; and `PiPLSValidationReport` composes the same immutable `PiPLSComponentResult` exposed
+as `selected_result_` while preserving its existing convenience attributes. No package release
 preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Human audit contract decision:** decide whether `PiPLSValidationReport` should compose the
-   selected `PiPLSComponentResult` rather than independently storing the selected component count,
-   predictor rank, split count, mean score, and mean response-standardized MSE.
+No further implementation patch is preauthorized. Continue the human audit and identify one
+concrete unnecessary structure or repeated contract before changing code. Add a decision record
+first when the next finding changes a public constructor, stored result state, or documented
+behavior.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

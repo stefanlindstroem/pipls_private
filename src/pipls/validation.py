@@ -12,11 +12,10 @@ from ._result_validation import (
     _boolean,
     _finite_float,
     _literal_string,
-    _nonnegative_finite_float,
-    _positive_int,
     _read_only_float_array,
     _read_only_int_array,
 )
+from .component_path import PiPLSComponentResult
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -28,21 +27,14 @@ _ALLOWED_ESTIMATE_KINDS = frozenset({"selection-conditioned", "fixed-parameter"}
 class PiPLSValidationReport:
     """Immutable summary of a Pi-PLS cross-validation result.
 
-    Direct construction validates the same scalar, array, coverage, and
-    immutability invariants as reports returned by :class:`pipls.PiPLSSearchCV`.
+    Direct construction validates the same selected-result, array, coverage,
+    and immutability invariants as reports returned by
+    :class:`pipls.PiPLSSearchCV`.
 
     Parameters
     ----------
-    n_components : int
-        Component count represented by the report.
-    predictor_rank : int
-        Predictor rank represented by the report.
-    n_splits : int
-        Number of cross-validation splits.
-    mean_test_score : float
-        Mean configured test score.
-    mean_response_standardized_mse : float
-        Nonnegative mean response-standardized validation MSE.
+    selected_result : PiPLSComponentResult
+        Immutable component-path result represented by the report.
     estimate_kind : {"selection-conditioned", "fixed-parameter"}
         Whether the same validation result selected model parameters or evaluated
         a parameterization fixed independently of those predictions.
@@ -58,6 +50,19 @@ class PiPLSValidationReport:
     pooled_oof_r2 : float or None, default=None
         Finite pooled $R^2$ over rows with OOF coverage.
 
+    Attributes
+    ----------
+    n_components : int
+        Component count from ``selected_result``.
+    predictor_rank : int
+        Predictor rank from ``selected_result``.
+    n_splits : int
+        Number of cross-validation splits from ``selected_result``.
+    mean_test_score : float
+        Mean configured test score from ``selected_result``.
+    mean_response_standardized_mse : float
+        Mean response-standardized validation MSE from ``selected_result``.
+
     Notes
     -----
     ``estimate_kind="selection-conditioned"`` means the reported validation
@@ -66,11 +71,7 @@ class PiPLSValidationReport:
     stored by the report are defensive, read-only copies.
     """
 
-    n_components: int
-    predictor_rank: int
-    n_splits: int
-    mean_test_score: float
-    mean_response_standardized_mse: float
+    selected_result: PiPLSComponentResult
     estimate_kind: EstimateKind
     is_leave_one_out: bool
     oof_predictions: FloatArray | None = None
@@ -78,16 +79,9 @@ class PiPLSValidationReport:
     pooled_oof_r2: float | None = None
 
     def __post_init__(self) -> None:
-        n_components = _positive_int(self.n_components, name="n_components")
-        predictor_rank = _positive_int(self.predictor_rank, name="predictor_rank")
-        if n_components > predictor_rank:
-            raise ValueError("n_components must not exceed predictor_rank.")
-        n_splits = _positive_int(self.n_splits, name="n_splits")
-        mean_test_score = _finite_float(self.mean_test_score, name="mean_test_score")
-        mean_response_standardized_mse = _nonnegative_finite_float(
-            self.mean_response_standardized_mse,
-            name="mean_response_standardized_mse",
-        )
+        if not isinstance(self.selected_result, PiPLSComponentResult):
+            raise TypeError("selected_result must be a PiPLSComponentResult.")
+        selected_result = self.selected_result
         estimate_kind = cast(
             EstimateKind,
             _literal_string(
@@ -148,15 +142,7 @@ class PiPLSValidationReport:
                 if np.any(~np.isnan(predictions[uncovered, :])):
                     raise ValueError("Uncovered OOF predictions must be NaN.")
 
-        object.__setattr__(self, "n_components", n_components)
-        object.__setattr__(self, "predictor_rank", predictor_rank)
-        object.__setattr__(self, "n_splits", n_splits)
-        object.__setattr__(self, "mean_test_score", mean_test_score)
-        object.__setattr__(
-            self,
-            "mean_response_standardized_mse",
-            mean_response_standardized_mse,
-        )
+        object.__setattr__(self, "selected_result", selected_result)
         object.__setattr__(self, "estimate_kind", estimate_kind)
         object.__setattr__(self, "is_leave_one_out", is_leave_one_out)
         object.__setattr__(self, "oof_predictions", predictions)
@@ -169,11 +155,7 @@ class PiPLSValidationReport:
         return (
             type(self),
             (
-                self.n_components,
-                self.predictor_rank,
-                self.n_splits,
-                self.mean_test_score,
-                self.mean_response_standardized_mse,
+                self.selected_result,
                 self.estimate_kind,
                 self.is_leave_one_out,
                 self.oof_predictions,
@@ -181,6 +163,36 @@ class PiPLSValidationReport:
                 self.pooled_oof_r2,
             ),
         )
+
+    @property
+    def n_components(self) -> int:
+        """Component count represented by the report."""
+
+        return self.selected_result.n_components
+
+    @property
+    def predictor_rank(self) -> int:
+        """Predictor rank represented by the report."""
+
+        return self.selected_result.predictor_rank
+
+    @property
+    def n_splits(self) -> int:
+        """Number of cross-validation splits."""
+
+        return self.selected_result.n_splits
+
+    @property
+    def mean_test_score(self) -> float:
+        """Mean configured test score."""
+
+        return self.selected_result.mean_test_score
+
+    @property
+    def mean_response_standardized_mse(self) -> float:
+        """Mean response-standardized validation MSE."""
+
+        return self.selected_result.cv_mse_mean
 
     @property
     def selection_conditioned(self) -> bool:

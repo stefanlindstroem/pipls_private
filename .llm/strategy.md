@@ -793,12 +793,21 @@ tolerant lower-rank tie rule instead of accepting a duplicated selected row.
 
 Current status: **normalized path-result simplification complete**.
 
+### Composed validation-report state simplification
+
+Decision 0116 makes one immutable `PiPLSComponentResult` authoritative for the selected row in
+`PiPLSValidationReport`. The report preserves its component-count, predictor-rank, split-count,
+score, and CV-MSE names as properties and retains report-owned OOF coverage and provenance state.
+
+Current status: **composed validation-report simplification complete**.
+
 ## Current next increment
 
-Before changing validation reports, document the contract decision for whether
-`PiPLSValidationReport` should compose the selected `PiPLSComponentResult` rather than independently
-storing the same selected-row scalars. Do not combine that change with another result-record
-simplification. Do not prepare or publish a package release.
+The owner-authorized S1--S6 simplification series is complete. No further implementation patch is
+preauthorized. Continue the human audit and identify one concrete unnecessary structure or repeated
+contract before changing code. Add a decision record first when the next finding changes a public
+constructor, stored result state, or documented behavior. Do not prepare or publish a package
+release.
 
 ## Maintenance protocol
 

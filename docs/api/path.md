@@ -81,8 +81,10 @@ its `selected` property derives the same conditionally selected scalar values re
 
 ## Validation report
 
-`PiPLSSearchCV.validation_report_` summarizes the selected cross-validation result and, when
-requested, its ordered out-of-fold predictions.
+`PiPLSSearchCV.validation_report_` composes the immutable `selected_result_` with validation
+provenance and, when requested, ordered out-of-fold predictions. Its existing component-count,
+predictor-rank, split-count, score, and CV-MSE attributes are read-only views of
+`validation_report_.selected_result`.
 
 ::: pipls.PiPLSValidationReport
     options:

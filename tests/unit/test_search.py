@@ -365,6 +365,7 @@ def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
         search.predict(X),
         search.selected_estimator_.predict(X),
     )
+    assert search.validation_report_.selected_result is search.selected_result_
     assert search.validation_report_.n_components == expected.n_components
     assert search.validation_report_.predictor_rank == expected.predictor_rank
     assert search.validation_report_.mean_test_score == pytest.approx(
