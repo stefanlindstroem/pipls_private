@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove an unused private finite-vector inspection helper and a redundant reassignment of
+  `PiPLSValidationReport.selected_result`; this is a behavior-preserving internal cleanup.
+
 - Compose `PiPLSValidationReport` from one immutable `PiPLSComponentResult` and derive its
   existing selected-row convenience attributes, removing five duplicated constructor and
   serialized scalar fields without changing report values or OOF behavior.

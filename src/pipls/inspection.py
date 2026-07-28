@@ -952,17 +952,6 @@ def _finite_matrix(values: ArrayLike, *, name: str) -> FloatArray:
     return array
 
 
-def _finite_vector(values: ArrayLike, *, name: str) -> FloatArray:
-    array = np.array(values, dtype=np.float64, copy=True)
-    if array.ndim != 1:
-        raise ValueError(f"{name} must be one-dimensional; got shape {array.shape}.")
-    if array.shape[0] == 0:
-        raise ValueError(f"{name} must contain at least one value.")
-    if not np.all(np.isfinite(array)):
-        raise ValueError(f"{name} must contain only finite values.")
-    return array
-
-
 def _two_component_indices(components: Sequence[int], *, size: int) -> tuple[int, int]:
     values = tuple(components)
     if len(values) != 2:

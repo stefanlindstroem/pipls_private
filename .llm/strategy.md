@@ -801,6 +801,13 @@ score, and CV-MSE names as properties and retains report-owned OOF coverage and 
 
 Current status: **composed validation-report simplification complete**.
 
+### Post-series audit cleanup
+
+A behavior-preserving follow-up removes one unused private finite-vector inspection helper and
+one redundant reassignment of the already validated selected component result.
+
+Current status: **post-series audit cleanup complete**.
+
 ## Current next increment
 
 The owner-authorized S1--S6 simplification series is complete. No further implementation patch is

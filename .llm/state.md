@@ -391,6 +391,8 @@ diagnostics are derived from independent state; path-wide metadata and profile s
 duplicated; and `PiPLSValidationReport` composes the same immutable `PiPLSComponentResult` exposed
 as `selected_result_` while preserving its existing convenience attributes. No package release
 preparation or Python-package publication work is authorized.
+A follow-up behavior-preserving audit cleanup removes the now-unused private finite-vector
+inspection helper and the no-op reassignment of the already validated selected result.
 
 ## Subsequent roadmap
 

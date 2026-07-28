@@ -81,7 +81,6 @@ class PiPLSValidationReport:
     def __post_init__(self) -> None:
         if not isinstance(self.selected_result, PiPLSComponentResult):
             raise TypeError("selected_result must be a PiPLSComponentResult.")
-        selected_result = self.selected_result
         estimate_kind = cast(
             EstimateKind,
             _literal_string(
@@ -142,7 +141,6 @@ class PiPLSValidationReport:
                 if np.any(~np.isnan(predictions[uncovered, :])):
                     raise ValueError("Uncovered OOF predictions must be NaN.")
 
-        object.__setattr__(self, "selected_result", selected_result)
         object.__setattr__(self, "estimate_kind", estimate_kind)
         object.__setattr__(self, "is_leave_one_out", is_leave_one_out)
         object.__setattr__(self, "oof_predictions", predictions)
