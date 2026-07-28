@@ -387,18 +387,20 @@ the global configured-score optimum, `selected_result_` records either that row 
 recommendation, and optional OOF generation and full-data refitting follow the selected row. No
 second automated-model wrapper is added, and `PiPLSRegression` remains fixed-pair only.
 
-The first behavior-preserving simplification from the owner-led audit is complete:
-`PiPLSSearchCV.fit()` now resolves its estimator template, Pi-PLS parameter prefix, and scorer once
-per fit. The upper-independent sequence checks and later data-dependent rank-bound checks remain
-separate because they assert different conditions. The next focused increment is the inspection
-cleanup that trusts validated `PiPLSDecomposition` inputs while retaining validation of newly
-computed display quantities. No package release preparation or Python-package publication work is
-authorized.
+The first two behavior-preserving simplifications from the owner-led audit are complete.
+`PiPLSSearchCV.fit()` resolves its estimator template, Pi-PLS parameter prefix, and scorer once per
+fit, while retaining distinct upper-independent sequence checks and later data-dependent rank
+bounds. `pipls_display_factors()` now trusts the finite, aligned, nonempty, and nonnegative arrays
+already guaranteed by `PiPLSDecomposition`; it still validates response-orientation controls and
+rejects unrepresentable newly computed weighted directions. No package release preparation or
+Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Human audit:** remove redundant decomposition-input checks in `pipls_display_factors()` while
-   retaining validation for response-orientation controls and newly computed products.
+1. **Human audit contract decision:** decide whether
+   `PiPLSDisplayFactors.weighted_response_directions` should become a derived read-only property
+   instead of independently stored constructor state before implementing that public result-record
+   simplification.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

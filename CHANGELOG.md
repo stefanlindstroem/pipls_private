@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Simplify `pipls_display_factors()` by trusting the finite, aligned, nonempty, and
+  nonnegative factor arrays already guaranteed by `PiPLSDecomposition`, while retaining
+  validation of response-orientation controls and newly computed weighted directions.
+
 - Simplify `PiPLSSearchCV.fit()` preflight by resolving the estimator template, Pi-PLS
   parameter prefix, and scorer once per fit without changing validation, candidate evaluation,
   selection, or refitting behavior.

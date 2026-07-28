@@ -913,31 +913,9 @@ def pipls_display_factors(
     ):
         raise TypeError("response_index must be an integer or None.")
 
-    predictor_directions = _finite_matrix(
-        decomposition.predictor_rotations,
-        name="decomposition.predictor_rotations",
-    )
-    response_directions = _finite_matrix(
-        decomposition.response_rotations,
-        name="decomposition.response_rotations",
-    )
-    dilation = _finite_vector(decomposition.dilation, name="decomposition.dilation")
-
-    n_components = predictor_directions.shape[1]
-    if n_components == 0:
-        raise ValueError("decomposition must contain at least one component.")
-    if response_directions.shape[1] != n_components:
-        raise ValueError(
-            "decomposition predictor and response rotations must contain "
-            "the same number of components."
-        )
-    if dilation.shape != (n_components,):
-        raise ValueError(
-            "decomposition.dilation must contain one value per component: "
-            f"expected {(n_components,)}, got {dilation.shape}."
-        )
-    if np.any(dilation < 0.0):
-        raise ValueError("decomposition.dilation must contain nonnegative values.")
+    predictor_directions = decomposition.predictor_rotations.copy()
+    response_directions = decomposition.response_rotations.copy()
+    dilation = decomposition.dilation.copy()
 
     component_signs = _predictor_display_signs(predictor_directions)
     if response_index is not None:

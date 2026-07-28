@@ -757,11 +757,22 @@ enforce different contracts.
 
 Current status: **behavior-preserving search preflight simplification complete**.
 
+### Validated decomposition inspection simplification
+
+The owner-led audit also identified input checks in `pipls_display_factors()` that repeated the
+finite-value, dimensional, alignment, nonempty-row, and nonnegative-dilation invariants already
+established by `PiPLSDecomposition`. The helper now copies those validated arrays directly. It
+retains its public type and response-orientation validation and still uses checked arithmetic for
+the newly computed weighted response directions.
+
+Current status: **behavior-preserving decomposition inspection simplification complete**.
+
 ## Current next increment
 
-Continue the owner-led human audit with the focused inspection cleanup that trusts validated
-`PiPLSDecomposition` inputs while retaining checks for newly computed display quantities. Do not
-prepare or publish a package release.
+Before changing public result-record construction, document the contract decision for whether
+`PiPLSDisplayFactors.weighted_response_directions` should be derived from the stored response
+directions and dilation rather than supplied as independent constructor state. Do not prepare or
+publish a package release.
 
 ## Maintenance protocol
 
