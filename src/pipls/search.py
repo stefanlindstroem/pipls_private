@@ -289,7 +289,11 @@ class PiPLSSearchCV(
         *,
         groups: ArrayLike | None,
     ) -> PiPLSSearchCV:
-        self._validate_constructor_parameters()
+        template = (
+            _default_pipls_template() if self.estimator is None else self.estimator
+        )
+        pipls_param_prefix = _resolve_pipls_param_prefix(template)
+        scorer = self._validate_constructor_parameters(template)
         validated = _validate_estimator_data(
             self,
             X,
@@ -309,8 +313,6 @@ class PiPLSSearchCV(
         self.n_targets_ = int(y_2d.shape[1])
         X_indexable, y_indexable = indexable(X, y)
 
-        template = _default_pipls_template() if self.estimator is None else self.estimator
-        pipls_param_prefix = _resolve_pipls_param_prefix(template)
         n_components_key, predictor_rank_key = _pipls_parameter_keys(
             pipls_param_prefix
         )
@@ -389,7 +391,6 @@ class PiPLSSearchCV(
                 "Every n_components value must have at least one admissible predictor "
                 f"rank; missing ranks for {missing}."
             )
-        scorer = _resolve_path_scorer(self.scoring, template)
         self.scorer_ = scorer
         cache: CandidateCache = {}
         if self.search_method == "optimal":
@@ -829,9 +830,7 @@ class PiPLSSearchCV(
             )
         return self.selected_estimator_
 
-    def _validate_constructor_parameters(self) -> None:
-        if self.estimator is not None:
-            _validate_supported_estimator(self.estimator)
+    def _validate_constructor_parameters(self, template: Any) -> Scorer:
         if self.search_method not in ("optimal", "auto"):
             raise ValueError('search_method must be "optimal" or "auto".')
         if self.selection_rule not in ("best_score", "one_standard_error"):
@@ -867,10 +866,7 @@ class PiPLSSearchCV(
         _validate_predictor_rank_values(self.predictor_rank_values)
         _validate_n_jobs(self.n_jobs)
         _validate_cv(self.cv)
-        scorer_template = (
-            _default_pipls_template() if self.estimator is None else self.estimator
-        )
-        _resolve_path_scorer(self.scoring, scorer_template)
+        return _resolve_path_scorer(self.scoring, template)
 
 
 def _validate_supported_estimator(estimator: Any) -> None:

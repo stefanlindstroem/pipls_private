@@ -747,10 +747,21 @@ estimator with no hidden selection.
 
 Current status: **explicit best-score and 1-SE final-row orchestration implemented and documented**.
 
+### Search configuration resolution simplification
+
+The owner-led audit identified repeated estimator-template, Pi-PLS parameter-prefix, and scorer
+resolution in `PiPLSSearchCV.fit()`. The search now resolves those inputs once during constructor
+preflight and reuses the validated values through candidate evaluation and optional refitting.
+Upper-independent sequence checks and later data-dependent rank bounds remain separate because they
+enforce different contracts.
+
+Current status: **behavior-preserving search preflight simplification complete**.
+
 ## Current next increment
 
-Continue the owner-led human audit from the next clean focused snapshot. Do not prepare or publish a
-package release.
+Continue the owner-led human audit with the focused inspection cleanup that trusts validated
+`PiPLSDecomposition` inputs while retaining checks for newly computed display quantities. Do not
+prepare or publish a package release.
 
 ## Maintenance protocol
 

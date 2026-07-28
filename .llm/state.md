@@ -385,13 +385,20 @@ inspection. Decision 0112 renames the unreleased selection meta-estimator to
 explicit final-row orchestration to `PiPLSSearchCV`: `best_*` retains
 the global configured-score optimum, `selected_result_` records either that row or the stored 1-SE
 recommendation, and optional OOF generation and full-data refitting follow the selected row. No
-second automated-model wrapper is added, and `PiPLSRegression` remains fixed-pair only. Continue the
-owner-led human audit from the next clean focused snapshot. No package release preparation or
-Python-package publication work is authorized.
+second automated-model wrapper is added, and `PiPLSRegression` remains fixed-pair only.
+
+The first behavior-preserving simplification from the owner-led audit is complete:
+`PiPLSSearchCV.fit()` now resolves its estimator template, Pi-PLS parameter prefix, and scorer once
+per fit. The upper-independent sequence checks and later data-dependent rank-bound checks remain
+separate because they assert different conditions. The next focused increment is the inspection
+cleanup that trusts validated `PiPLSDecomposition` inputs while retaining validation of newly
+computed display quantities. No package release preparation or Python-package publication work is
+authorized.
 
 ## Subsequent roadmap
 
-1. **Human audit:** continue owner review from the next clean focused snapshot.
+1. **Human audit:** remove redundant decomposition-input checks in `pipls_display_factors()` while
+   retaining validation for response-orientation controls and newly computed products.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

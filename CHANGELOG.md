@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Simplify `PiPLSSearchCV.fit()` preflight by resolving the estimator template, Pi-PLS
+  parameter prefix, and scorer once per fit without changing validation, candidate evaluation,
+  selection, or refitting behavior.
+
 - Rename the unreleased cross-validated selection meta-estimator from `PiPLSPathCV` to
   `PiPLSSearchCV`, move its implementation to `pipls.search`, and update all code, examples,
   benchmarks, tests, documentation, distribution checks, and guide-layer contracts without
