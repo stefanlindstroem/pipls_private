@@ -121,7 +121,9 @@ caps. Explicit component and predictor-rank sequences are validated against the 
 before scoring. The class accepts a direct fixed `PiPLSRegression` or a pipeline ending in one,
 materializes one CV split set, clones fixed candidates, and optionally refits the selected pair.
 The default `refit=False` keeps path evaluation separate from final fixed-model fitting;
-`refit=True` explicitly requests a full-data fit of the globally best evaluated pair.
+`selection_rule="best_score"` is the default final-row rule, while
+`selection_rule="one_standard_error"` uses the stored component-path 1-SE recommendation.
+`refit=True` explicitly requests a full-data fit of the row chosen by that rule.
 
 The default `scoring` value is the stable package string
 `"neg_response_standardized_mean_squared_error"`, which resolves to the public callable
@@ -133,9 +135,10 @@ search makes no claim about
 unevaluated admissible pairs.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
-`best_*` selection attributes, `path_search_exhaustive_`, optional refitted estimators, immutable
-`validation_report_`, and the canonical immutable `component_path_` result. OOF arrays and their
-coverage counts live only in `validation_report_`. Validated input grids, adaptive-search batch
+`best_*` selection attributes, `selected_result_`, `selected_params_`,
+`path_search_exhaustive_`, optional selected refitted estimators, immutable `validation_report_`,
+and the canonical immutable `component_path_` result. OOF arrays and their coverage counts live
+only in `validation_report_` and represent the selected row. Validated input grids, adaptive-search batch
 history, candidate counters, direct-rank parameter aliases, and matrix-shaped score/MSE aliases are
 not public fitted state; advanced users can inspect aligned `cv_results_` columns when needed.
 `PiPLSComponentPath` stores aligned read-only `n_components`,
@@ -151,6 +154,14 @@ predictor rank; they do not fit, refit, mutate, apply numerical tolerances, or a
 The numeric predictor rank is present for every component count. The standard-error property and
 the one-standard-error method require at least two validation splits at the relevant row and raise
 explicitly when that quantity is undefined.
+
+`best_index_`, `best_score_`, `best_params_`, `best_n_components_`, and
+`best_predictor_rank_` always describe the global configured-score optimum. The declared final rule
+is represented separately by `selected_result_` and `selected_params_`. With `refit=True`,
+`selected_estimator_` and `selected_pipls_` contain the one final full-data fit and all delegated
+methods use it. Under the default best-score rule, `best_estimator_` and `best_pipls_` remain
+compatibility aliases; they are absent for the 1-SE rule rather than naming a recommendation
+“best”.
 
 `PiPLSPathCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only

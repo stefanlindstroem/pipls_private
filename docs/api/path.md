@@ -9,8 +9,9 @@ Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in on
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
 selector caps the path by the minimum predictor rank verified across those transformed folds.
 The default constructor is selection-only: `PiPLSPathCV()` uses `refit=False` and leaves final
-fixed-model fitting as an explicit user step. Methods that delegate to a selected estimator are
-available only when `refit=True`.
+fixed-model fitting as an explicit user step. A caller may instead declare `selection_rule` and set
+`refit=True` to fit that stored path row on all supplied data. Methods that delegate to a selected
+estimator are available only after such a refit.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see
@@ -18,9 +19,10 @@ tie-breaking, pipelines, and detailed result surfaces, see
 problems, see [Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. `component_path_` and
-`predictor_rank_profile()` provide concise immutable views, `validation_report_` owns optional OOF
-arrays and coverage counts, and standard `best_*` attributes identify the global selected
-candidate. Python method signatures use `y` by scikit-learn convention even when the
+`predictor_rank_profile()` provide concise immutable views. Standard `best_*` attributes identify
+the global configured-score optimum, while `selected_result_` identifies the row chosen by the
+declared final rule. `validation_report_` and optional OOF arrays describe that selected row.
+Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $Y$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
 

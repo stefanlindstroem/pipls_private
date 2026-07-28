@@ -101,8 +101,8 @@ The mean CV-MSE falls substantially through three components and is nearly flat 
 bars show one fold-based standard error on either side of each mean; they are not confidence
 intervals. Such bars can inform the conventional
 [one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic), but the
-present demonstration does not automate that rule. The diamond marks the stated elbow-based
-choice.
+present demonstration keeps the elbow choice explicit rather than declaring an automatic final
+selection rule. The diamond marks the stated choice.
 
 The selected row contains `predictor_rank=10`, the rank with the lowest evaluated mean CV-MSE at
 three components. `for_n_components()` retrieves that evaluated row; it does not repeat the

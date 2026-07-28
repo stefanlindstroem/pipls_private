@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add explicit `PiPLSPathCV` final-selection rules: preserve `best_*` as the global configured-score
+  optimum, expose the declared `selected_result_`, and optionally refit either that optimum or the
+  stored one-standard-error component-path recommendation as one auditable model-building call.
+
 - Extend `pipls_display_factors()` with optional response-anchored sign orientation while retaining
   the predictor-canonical default; demonstrate a positive tensile-index orientation in the Pulp
   analysis and tutorial without changing the fitted regression map or public result fields.

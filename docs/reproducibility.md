@@ -95,8 +95,8 @@ integer-seed contract.
 
 Centering and optional scaling are integral to `PiPLSRegression.fit`. `PiPLSPathCV` clones fixed
 estimators inside every training fold, so each candidate learns statistics only from that fold.
-With `refit=True`, the chosen fixed pair learns them again from the complete supplied training set.
-Learned scaling must not be fitted globally before CV.
+With `refit=True`, the pair chosen by `selection_rule` learns them again from the complete supplied
+training set. Learned scaling must not be fitted globally before CV.
 
 ## Synthetic validation
 

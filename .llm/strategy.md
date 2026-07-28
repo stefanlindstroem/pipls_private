@@ -694,11 +694,12 @@ The owner-authorized series has two focused increments:
 
 Decision 0106 completes the first increment. It uses the conventional name one-standard-error rule
 (1-SE rule), preserves the stored population fold SD, and derives the sample-standard-error-
-equivalent quantity from the fold SD and split count. Automatic 1-SE selection remains out of scope.
+equivalent quantity from the fold SD and split count. Automatic 1-SE selection remained outside
+that visualization increment; Decision 0111 later adds it as an explicit path-level rule.
 
-Current status: **complete**. Maintained CV-MSE plots use the derived fold-based standard error,
-the documentation explains the conventional 1-SE component heuristic, and component-count choice
-remains explicit rather than automated.
+Current status: **complete**. Maintained CV-MSE plots use the derived fold-based standard error and
+the documentation explains the conventional 1-SE component heuristic. Maintained examples retain
+their explicit choices, while Decision 0111 permits a predeclared automated rule.
 
 ### Component-path recommendation references
 
@@ -713,8 +714,9 @@ with the minimum row, horizontal 1-SE threshold, recommended row, and direct doc
 cross-links.
 
 Current status: **implementation, reference documentation, and one focused Tobacco application
-complete; the example catalogue and repository example overview are synchronized, and the workflow
-is not promoted in tutorials or entry pages**.
+complete; the example catalogue and repository example overview are synchronized. The result
+methods remain absent from tutorials and entry pages, while Decision 0111 separately documents an
+explicit path-level selection rule**.
 
 ### Response-anchored factor display
 
@@ -725,6 +727,17 @@ zero anchor entries retain the predictor-canonical fallback. The Pulp example an
 $PDQ^\mathsf{T}$, and adds no fitted state or result-record bookkeeping.
 
 Current status: **response-anchored factor display implemented and documented**.
+
+### Explicit final path selection
+
+Decision 0111 extends `PiPLSPathCV` rather than adding a second automated-model wrapper. The default
+`selection_rule="best_score"` preserves current behavior, while
+`selection_rule="one_standard_error"` selects the stored 1-SE component-path row. Global `best_*`
+attributes remain unchanged; `selected_result_`, `selected_params_`, optional OOF diagnostics, and
+the one selected refit represent the declared final protocol. `PiPLSRegression` remains a fixed-pair
+estimator with no hidden selection.
+
+Current status: **explicit best-score and 1-SE final-row orchestration implemented and documented**.
 
 ## Current next increment
 

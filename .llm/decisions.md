@@ -116,6 +116,7 @@ This index is navigation, not a substitute for those records.
 | `0108-tobacco-one-standard-error-workflow.md` | Tobacco one-standard-error workflow | use the stored 1-SE recommendation for example 07 while keeping introductory workflows explicit |
 | `0109-tobacco-one-standard-error-threshold-figure.md` | Tobacco one-standard-error threshold figure | show the minimum row, horizontal 1-SE threshold, and recommended row with direct documentation cross-links |
 | `0110-response-anchored-display-factors.md` | response-anchored Pi-PLS display factors | retain predictor-canonical defaults; optionally orient every component by a selected response row and requested sign |
+| `0111-explicit-path-selection-rules.md` | explicit path selection rules | preserve global `best_*`; expose a separate selected path row and optionally refit the best-score or 1-SE choice |
 
 ## Implemented estimator/search transition
 
@@ -134,7 +135,8 @@ plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
 - `PiPLSPathCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
-- `PiPLSPathCV` defaults to selection-only `refit=False`; automatic global-best refitting is explicit;
+- `PiPLSPathCV` defaults to selection-only `refit=False`; explicit `selection_rule` chooses the
+  best-score or stored 1-SE row for optional final refitting;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mean_squared_error"`, which resolves to the public scorer callable;
 - `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
@@ -200,8 +202,8 @@ plan contains an earlier or more general proposal:
   the stored 1-SE recommendation explicitly and fits the returned component-count/predictor-rank
   pair;
 - fold SD remains stored descriptive dispersion; maintained CV-MSE figures use the derived
-  fold-based standard error, and component count remains a visible path-based choice rather than an
-  automatic `PiPLSPathCV` action;
+  fold-based standard error. Maintained examples keep component choice visible, while an explicit
+  `selection_rule` may automate a protocol declared before fitting;
 - example 04 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
   dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with Pulp exposing
   the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,

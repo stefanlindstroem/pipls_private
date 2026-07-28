@@ -51,6 +51,7 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert path.cv == 5
     assert path.n_components_values == "all"
     assert path.scoring == "neg_response_standardized_mean_squared_error"
+    assert path.selection_rule == "best_score"
     assert path.refit is False
 
 
@@ -61,10 +62,12 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
         "neg_response_standardized_mean_squared_error"
     )
     assert signature.parameters["refit"].default is False
+    assert signature.parameters["selection_rule"].default == "best_score"
     assert "0x" not in str(signature)
     path = PiPLSPathCV()
     assert repr(path) == "PiPLSPathCV()"
     assert clone(path).scoring == path.scoring
+    assert clone(path).selection_rule == "best_score"
     assert clone(path).refit is False
 
 
@@ -97,6 +100,7 @@ def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
         "return_oof_predictions",
         "samples_per_predictor_rank",
         "scoring",
+        "selection_rule",
         "search_method",
     }
 
@@ -283,6 +287,10 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
 
     assert path.best_n_components_ == 2
     assert path.best_predictor_rank_ == 3
+    assert path.selected_result_.n_components == 2
+    assert path.selected_result_.predictor_rank == 3
+    assert path.selected_estimator_ is path.best_estimator_
+    assert path.selected_pipls_ is path.best_pipls_
     assert path.best_pipls_ is path.best_estimator_
     np.testing.assert_allclose(path.predict(X), direct.predict(X))
     np.testing.assert_allclose(path.best_pipls_.coef_, direct.coef_)
@@ -315,8 +323,37 @@ def test_path_exposes_nested_pipls_for_pipeline_without_flattening_coefficients(
     ).fit(X, Y)
 
     assert isinstance(path.best_estimator_, Pipeline)
+    assert path.selected_estimator_ is path.best_estimator_
+    assert path.selected_pipls_ is path.best_pipls_
     assert path.best_pipls_ is path.best_estimator_.named_steps["regression"]
     assert not hasattr(path, "coef_")
+
+
+def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
+    X, Y = _data()
+    pipeline = Pipeline(
+        [
+            ("scale", StandardScaler()),
+            ("regression", _fixed_estimator()),
+        ]
+    )
+    path = PiPLSPathCV(
+        estimator=pipeline,
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        selection_rule="one_standard_error",
+        cv=3,
+        refit=True,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert isinstance(path.selected_estimator_, Pipeline)
+    assert path.selected_pipls_ is path.selected_estimator_.named_steps["regression"]
+    assert path.selected_pipls_.n_components == path.selected_result_.n_components
+    assert path.selected_pipls_.predictor_rank == path.selected_result_.predictor_rank
+    assert not hasattr(path, "best_estimator_")
+    assert path.predict(X).shape == Y.shape
 
 
 def test_path_score_accepts_sample_weight_like_regression() -> None:

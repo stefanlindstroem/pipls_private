@@ -277,6 +277,10 @@ def test_current_user_workflows_rely_on_the_selection_only_path_default() -> Non
     assert "refit=False," not in combined
     assert "PiPLSPathCV()" in combined
 
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    assert 'selection_rule="one_standard_error"' in readme
+    assert "selected_pipls_" in readme
+
 
 def test_path_details_expose_adaptive_search_completion_status() -> None:
     page = (_repository_root() / "docs" / "path_analysis.md").read_text(encoding="utf-8")
@@ -295,7 +299,10 @@ def test_cv_mse_error_bar_documentation_defines_explicit_one_se_heuristic() -> N
     assert "cv_mse_standard_error" in path_analysis
     assert "smallest evaluated component count" in path_analysis
     assert "PiPLSPathCV" in path_analysis
-    assert "automatically" in path_analysis
+    assert "Predeclared final-model selection" in path_analysis
+    assert 'selection_rule="one_standard_error"' in path_analysis
+    assert "selected_result_" in path_analysis
+    assert "best_score_" in path_analysis
     assert "Tobacco one-standard-error workflow" in path_analysis
     assert "confidence intervals" in path_analysis
 
@@ -306,7 +313,7 @@ def test_cv_mse_error_bar_documentation_defines_explicit_one_se_heuristic() -> N
         tutorial = (root / relative_path).read_text(encoding="utf-8")
         assert "one fold-based standard error" in tutorial
         assert "one-standard-error rule" in tutorial
-        assert "does not automate that rule" in tutorial
+        assert "explicit" in tutorial
 
 
 def test_component_path_recommendations_have_one_maintained_application() -> None:

@@ -60,6 +60,7 @@ IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
+SelectionRule = Literal["best_score", "one_standard_error"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING_NAME = "neg_response_standardized_mean_squared_error"
@@ -77,11 +78,13 @@ def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
     def check(search: Any) -> bool:
         if not bool(search.refit):
             return False
-        if hasattr(search, "best_params_") and not hasattr(search, "best_estimator_"):
+        if hasattr(search, "selected_params_") and not hasattr(
+            search, "selected_estimator_"
+        ):
             return False
         estimator = (
-            search.best_estimator_
-            if hasattr(search, "best_estimator_")
+            search.selected_estimator_
+            if hasattr(search, "selected_estimator_")
             else (_default_pipls_template() if search.estimator is None else search.estimator)
         )
         return hasattr(estimator, method_name)
@@ -100,8 +103,9 @@ class PiPLSPathCV(
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
     Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
-    independently inside each training fold. The selected pair is optionally
-    refitted on all supplied data. The default ``search_method="auto"`` applies
+    independently inside each training fold. A declared selection rule chooses
+    one stored path row, which is optionally refitted on all supplied data. The
+    default ``search_method="auto"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
     for each component count.
 
@@ -139,10 +143,15 @@ class PiPLSPathCV(
         Scikit-learn scorer name, scorer callable, or ``None`` to use estimator
         ``score``. The package-specific default name resolves to
         :func:`pipls.metrics.neg_response_standardized_mean_squared_error`.
+    selection_rule : {"best_score", "one_standard_error"}, default="best_score"
+        Rule used to choose the final component-path row. ``"best_score"`` uses
+        the globally best evaluated pair under ``scoring``. ``"one_standard_error"``
+        uses :meth:`PiPLSComponentPath.one_standard_error_result`, retaining the
+        predictor rank already selected conditionally for that component count.
     refit : bool, default=False
-        Whether to refit the globally best evaluated pair on all supplied data.
-        The default leaves path evaluation and final fixed-model fitting as
-        separate steps. Delegated prediction, transformation, scoring, and
+        Whether to refit the row chosen by ``selection_rule`` on all supplied
+        data. The default leaves path evaluation and final fixed-model fitting
+        as separate steps. Delegated prediction, transformation, scoring, and
         feature-name methods require ``refit=True``.
     n_jobs : int or None, default=None
         Joblib parallelism across candidate pairs within each evaluation batch.
@@ -190,14 +199,27 @@ class PiPLSPathCV(
         Selected predictor rank.
     best_params_ : dict of str to int
         Parameters required to configure the supplied estimator or pipeline.
+    selected_result_ : PiPLSComponentResult
+        Immutable component-path row chosen by ``selection_rule``.
+    selected_params_ : dict of str to int
+        Parameters required to configure the supplied estimator or pipeline for
+        ``selected_result_``.
     validation_report_ : PiPLSValidationReport
-        Immutable summary of the selected cross-validation result.
-    best_estimator_ : estimator
-        Estimator refitted on all data. Defined only when ``refit=True``.
-    best_pipls_ : PiPLSRegression
+        Immutable summary of ``selected_result_`` and optional ordered OOF
+        predictions for that fixed parameterization.
+    selected_estimator_ : estimator
+        Estimator refitted on all data with ``selected_params_``. Defined only
+        when ``refit=True``.
+    selected_pipls_ : PiPLSRegression
         Fitted terminal Pi-PLS estimator. Defined only when ``refit=True``.
+    best_estimator_ : estimator
+        Compatibility alias of ``selected_estimator_``. Defined only when
+        ``refit=True`` and ``selection_rule="best_score"``.
+    best_pipls_ : PiPLSRegression
+        Compatibility alias of ``selected_pipls_``. Defined only when
+        ``refit=True`` and ``selection_rule="best_score"``.
     refit_time_ : float
-        Full-data refit time in seconds. Defined only when ``refit=True``.
+        Selected full-data refit time in seconds. Defined only when ``refit=True``.
     """
 
     def __init__(
@@ -211,6 +233,7 @@ class PiPLSPathCV(
         samples_per_predictor_rank: float = 5.0,
         cv: object = 5,
         scoring: Scoring = _DEFAULT_SCORING_NAME,
+        selection_rule: SelectionRule = "best_score",
         refit: bool = False,
         n_jobs: int | None = None,
         return_oof_predictions: bool = False,
@@ -223,6 +246,7 @@ class PiPLSPathCV(
         self.samples_per_predictor_rank = samples_per_predictor_rank
         self.cv = cv
         self.scoring = scoring
+        self.selection_rule = selection_rule
         self.refit = refit
         self.n_jobs = n_jobs
         self.return_oof_predictions = return_oof_predictions
@@ -234,7 +258,7 @@ class PiPLSPathCV(
         *,
         groups: ArrayLike | None = None,
     ) -> PiPLSPathCV:
-        """Evaluate the path and optionally refit the best evaluated pair.
+        """Evaluate the path and optionally refit the selected path row.
 
         Parameters
         ----------
@@ -295,6 +319,11 @@ class PiPLSPathCV(
         _validate_singleton_fold_scoring(self.scoring, materialized.splits)
         self.n_splits_ = len(materialized.splits)
         self.cv_n_train_min_ = materialized.n_train_min
+        if self.selection_rule == "one_standard_error" and self.n_splits_ < 2:
+            raise ValueError(
+                'selection_rule="one_standard_error" requires at least two '
+                "validation splits."
+            )
 
         fold_feature_limit, fold_numerical_rank_limit = _fold_predictor_limits(
             template=template,
@@ -410,9 +439,6 @@ class PiPLSPathCV(
         )
         self.best_index_ = _select_best_index(self.cv_results_)
         self.best_score_ = float(self.cv_results_["mean_test_score"][self.best_index_])
-        best_response_standardized_mse = float(
-            self.cv_results_["mean_response_standardized_mse"][self.best_index_]
-        )
         self.best_n_components_ = int(
             self.cv_results_["n_components"][self.best_index_]
         )
@@ -438,6 +464,16 @@ class PiPLSPathCV(
             predictor_rank_policy=predictor_rank_policy,
             n_splits=self.n_splits_,
         )
+        if self.selection_rule == "best_score":
+            self.selected_result_ = self.component_path_.for_n_components(
+                self.best_n_components_
+            )
+        else:
+            self.selected_result_ = self.component_path_.one_standard_error_result()
+        self.selected_params_ = {
+            n_components_key: self.selected_result_.n_components,
+            predictor_rank_key: self.selected_result_.predictor_rank,
+        }
 
         predictions: FloatArray | None = None
         counts: IntArray | None = None
@@ -445,8 +481,8 @@ class PiPLSPathCV(
         if self.return_oof_predictions:
             oof = _ordered_oof_predictions(
                 candidate=_PiPLSCandidate(
-                    n_components=self.best_n_components_,
-                    predictor_rank=self.best_predictor_rank_,
+                    n_components=self.selected_result_.n_components,
+                    predictor_rank=self.selected_result_.predictor_rank,
                 ),
                 template=template,
                 n_components_key=n_components_key,
@@ -464,11 +500,11 @@ class PiPLSPathCV(
             pooled_r2 = _pooled_oof_r2(y_indexable, predictions, counts)
 
         self.validation_report_ = PiPLSValidationReport(
-            n_components=self.best_n_components_,
-            predictor_rank=self.best_predictor_rank_,
+            n_components=self.selected_result_.n_components,
+            predictor_rank=self.selected_result_.predictor_rank,
             n_splits=self.n_splits_,
-            mean_test_score=self.best_score_,
-            mean_response_standardized_mse=best_response_standardized_mse,
+            mean_test_score=self.selected_result_.mean_test_score,
+            mean_response_standardized_mse=self.selected_result_.cv_mse_mean,
             estimate_kind="selection-conditioned",
             is_leave_one_out=_is_leave_one_out_splits(
                 materialized.splits,
@@ -480,13 +516,20 @@ class PiPLSPathCV(
         )
         if self.refit:
             refit_started = perf_counter()
-            self.best_estimator_ = clone(template).set_params(**self.best_params_)
-            _fit_controlled_estimator(self.best_estimator_, X_indexable, y_indexable)
+            self.selected_estimator_ = clone(template).set_params(**self.selected_params_)
+            _fit_controlled_estimator(
+                self.selected_estimator_,
+                X_indexable,
+                y_indexable,
+            )
             self.refit_time_ = perf_counter() - refit_started
-            self.best_pipls_ = _extract_fitted_pipls(
-                self.best_estimator_,
+            self.selected_pipls_ = _extract_fitted_pipls(
+                self.selected_estimator_,
                 pipls_param_prefix,
             )
+            if self.selection_rule == "best_score":
+                self.best_estimator_ = self.selected_estimator_
+                self.best_pipls_ = self.selected_pipls_
         return self
 
     def predictor_rank_profile(
@@ -546,7 +589,7 @@ class PiPLSPathCV(
 
     @available_if(_estimator_supports("predict"))  # type: ignore[untyped-decorator]
     def predict(self, X: ArrayLike, copy: bool = True) -> FloatArray:
-        """Predict with the refitted best evaluated estimator.
+        """Predict with the refitted selected estimator.
 
         Parameters
         ----------
@@ -558,7 +601,7 @@ class PiPLSPathCV(
         Returns
         -------
         y_pred : ndarray
-            Predictions from ``best_estimator_``.
+            Predictions from ``selected_estimator_``.
 
         Notes
         -----
@@ -578,7 +621,7 @@ class PiPLSPathCV(
         y: ArrayLike | None = None,
         copy: bool = True,
     ) -> Any:
-        """Transform with the refitted best evaluated estimator.
+        """Transform with the refitted selected estimator.
 
         Parameters
         ----------
@@ -607,7 +650,7 @@ class PiPLSPathCV(
         if y is not None:
             raise ValueError(
                 "transform(X, y) is available when the refitted estimator is a direct "
-                "PiPLSRegression. For composite estimators, use best_pipls_ with data "
+                "PiPLSRegression. For composite estimators, use selected_pipls_ with data "
                 "transformed by the preceding pipeline steps."
             )
         return estimator.transform(X)
@@ -637,7 +680,7 @@ class PiPLSPathCV(
         Returns
         -------
         transformed : ndarray or tuple of ndarray
-            Transformation of the fitted data by ``best_estimator_``.
+            Transformation of the fitted data by ``selected_estimator_``.
 
         Notes
         -----
@@ -651,7 +694,7 @@ class PiPLSPathCV(
         if y is None:
             raise ValueError("y is required to fit PiPLSPathCV.")
         self.fit(X, y, groups=groups)
-        if isinstance(self.best_estimator_, PiPLSRegression):
+        if isinstance(self.selected_estimator_, PiPLSRegression):
             return cast(tuple[FloatArray, FloatArray], self.transform(X, y))
         return cast(Any, self.transform(X))
 
@@ -713,7 +756,7 @@ class PiPLSPathCV(
         Returns
         -------
         score : float
-            Score returned by ``best_estimator_``.
+            Score returned by ``selected_estimator_``.
 
         Notes
         -----
@@ -741,7 +784,7 @@ class PiPLSPathCV(
         Returns
         -------
         feature_names_out : ndarray of str
-            Names returned by ``best_estimator_`` or its fitted terminal
+            Names returned by ``selected_estimator_`` or its fitted terminal
             ``PiPLSRegression``.
 
         Notes
@@ -754,7 +797,10 @@ class PiPLSPathCV(
         method = getattr(estimator, "get_feature_names_out", None)
         if method is not None:
             return cast(NDArray[np.object_], method(input_features))
-        return cast(NDArray[np.object_], self.best_pipls_.get_feature_names_out(input_features))
+        return cast(
+            NDArray[np.object_],
+            self.selected_pipls_.get_feature_names_out(input_features),
+        )
 
     def _more_tags(self) -> dict[str, bool]:
         """Legacy scikit-learn tags for releases before the Tags dataclasses."""
@@ -775,19 +821,23 @@ class PiPLSPathCV(
         return tags
 
     def _refitted_estimator(self) -> Any:
-        check_is_fitted(self, attributes=["best_params_"])
-        if not hasattr(self, "best_estimator_"):
+        check_is_fitted(self, attributes=["selected_params_"])
+        if not hasattr(self, "selected_estimator_"):
             raise AttributeError(
                 "PiPLSPathCV was fitted with refit=False; predict, transform, and score "
                 "require refit=True."
             )
-        return self.best_estimator_
+        return self.selected_estimator_
 
     def _validate_constructor_parameters(self) -> None:
         if self.estimator is not None:
             _validate_supported_estimator(self.estimator)
         if self.search_method not in ("optimal", "auto"):
             raise ValueError('search_method must be "optimal" or "auto".')
+        if self.selection_rule not in ("best_score", "one_standard_error"):
+            raise ValueError(
+                'selection_rule must be "best_score" or "one_standard_error".'
+            )
         if not isinstance(self.refit, (bool, np.bool_)):
             raise ValueError(f"refit must be boolean; got {self.refit!r}.")
         if not isinstance(self.return_oof_predictions, (bool, np.bool_)):

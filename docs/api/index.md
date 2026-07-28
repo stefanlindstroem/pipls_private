@@ -22,7 +22,7 @@ and `y_loadings_` follow the same programming convention and do not imply a scal
 | Object | Obtained from | Main purpose |
 |---|---|---|
 | [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare component counts and inspect minimum-CV-MSE or 1-SE result rows |
-| [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | explicit path lookup or a path recommendation method | Retrieve one evaluated fixed rank pair and its diagnostics |
+| [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | explicit path lookup, a path recommendation method, or `search.selected_result_` | Retrieve one evaluated fixed rank pair and its diagnostics |
 | [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one component count |
 | [`PiPLSValidationReport`](path.md#pipls.PiPLSValidationReport) | `search.validation_report_` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
 | [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access interpretable predictor rotations, dilation, response rotations, and rank diagnostics |

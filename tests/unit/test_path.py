@@ -9,6 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.utils.validation import check_is_fitted
 
 from pipls import (
     PiPLSComponentPath,
@@ -71,6 +72,15 @@ def _rank_two_data(n_samples: int = 30) -> tuple[np.ndarray, np.ndarray]:
             latent.sum(axis=1) + 0.05 * rng.normal(size=n_samples),
         ]
     )
+    return X, Y
+
+
+def _one_standard_error_data() -> tuple[np.ndarray, np.ndarray]:
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(24, 6))
+    coefficients = np.zeros((6, 3))
+    coefficients[:2, :] = rng.normal(size=(2, 3))
+    Y = X @ coefficients + rng.normal(size=(24, 3))
     return X, Y
 
 
@@ -315,10 +325,87 @@ def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
     ).fit(X, Y)
 
     assert isinstance(search.best_estimator_, PiPLSRegression)
+    assert search.selected_estimator_ is search.best_estimator_
+    assert search.selected_pipls_ is search.best_pipls_
+    assert search.selected_params_ == search.best_params_
+    assert search.selected_result_.n_components == search.best_n_components_
+    assert search.selected_result_.predictor_rank == search.best_predictor_rank_
     assert search.best_estimator_.n_components == search.best_n_components_
     assert search.best_estimator_.predictor_rank == search.best_predictor_rank_
     np.testing.assert_allclose(search.predict(X), search.best_estimator_.predict(X))
     assert search.score(X, Y) == pytest.approx(search.best_estimator_.score(X, Y))
+
+
+def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSPathCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        selection_rule="one_standard_error",
+        cv=4,
+        refit=True,
+        return_oof_predictions=True,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    expected = search.component_path_.one_standard_error_result()
+    assert search.selected_result_ == expected
+    assert search.selected_result_.n_components < search.best_n_components_
+    assert search.selected_params_ == {
+        "n_components": expected.n_components,
+        "predictor_rank": expected.predictor_rank,
+    }
+    assert search.selected_estimator_.n_components == expected.n_components
+    assert search.selected_estimator_.predictor_rank == expected.predictor_rank
+    assert search.selected_pipls_ is search.selected_estimator_
+    assert not hasattr(search, "best_estimator_")
+    assert not hasattr(search, "best_pipls_")
+    np.testing.assert_allclose(
+        search.predict(X),
+        search.selected_estimator_.predict(X),
+    )
+    assert search.validation_report_.n_components == expected.n_components
+    assert search.validation_report_.predictor_rank == expected.predictor_rank
+    assert search.validation_report_.mean_test_score == pytest.approx(
+        expected.mean_test_score
+    )
+    assert search.validation_report_.oof_predictions is not None
+
+
+def test_one_standard_error_selection_can_remain_selection_only() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSPathCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        selection_rule="one_standard_error",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.selected_result_ == search.component_path_.one_standard_error_result()
+    assert not hasattr(search, "selected_estimator_")
+    assert not hasattr(search, "selected_pipls_")
+    assert not hasattr(search, "predict")
+
+
+def test_one_standard_error_selection_requires_two_validation_splits() -> None:
+    X, Y = _data()
+    split = [(np.arange(24), np.arange(24, 36))]
+    search = PiPLSPathCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        selection_rule="one_standard_error",
+        cv=split,
+    )
+
+    with pytest.raises(ValueError, match="at least two validation splits"):
+        search.fit(X, Y)
+
+    with pytest.raises(NotFittedError):
+        check_is_fitted(search)
+    assert not hasattr(search, "selected_result_")
 
 
 def test_default_selection_hides_refit_dependent_methods() -> None:
@@ -365,12 +452,16 @@ def test_refit_false_clears_state_from_an_earlier_refitted_fit() -> None:
 
     assert hasattr(search, "best_estimator_")
     assert hasattr(search, "best_pipls_")
+    assert hasattr(search, "selected_estimator_")
+    assert hasattr(search, "selected_pipls_")
     assert hasattr(search, "refit_time_")
 
     search.set_params(refit=False).fit(X, Y)
 
     assert not hasattr(search, "best_estimator_")
     assert not hasattr(search, "best_pipls_")
+    assert not hasattr(search, "selected_estimator_")
+    assert not hasattr(search, "selected_pipls_")
     assert not hasattr(search, "refit_time_")
     assert not hasattr(search, "predict")
 
@@ -649,6 +740,7 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         ("predictor_rank_values", [1.0], "positive integer"),
         ("predictor_rank_values", "maximum", "must be None"),
         ("n_jobs", 0, "must not be zero"),
+        ("selection_rule", "smallest", "selection_rule"),
         ("refit", 1, "refit must be boolean"),
     ],
 )

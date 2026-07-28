@@ -71,8 +71,8 @@ The component path is plotted before fitting:
 The mean CV-MSE falls markedly from one to two components and changes little at three. The bars
 show one fold-based standard error on either side of each mean; they are not confidence intervals.
 Such bars can inform the conventional [one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic)
-for choosing a parsimonious component count, but this tutorial does not automate that rule. The
-diamond marks the explicit choice of two components.
+for choosing a parsimonious component count. This tutorial keeps that judgment explicit rather than
+setting `selection_rule="one_standard_error"`. The diamond marks the choice of two components.
 
 ## Inspect the conditional predictor-rank profile
 

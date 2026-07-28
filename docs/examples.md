@@ -66,7 +66,8 @@ used by the final fixed model.
 
 The [result-object recommendation methods](path_analysis.md#result-object-recommendations) describe
 how the stored row is obtained, and the [component-path API reference](api/path.md) gives the exact
-method surface. `PiPLSPathCV` does not apply the rule automatically; the example calls it explicitly.
+method surface. The example calls the result method explicitly instead of using the path-level
+`selection_rule="one_standard_error"` orchestration.
 
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
 Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered

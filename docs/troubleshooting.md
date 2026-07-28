@@ -54,16 +54,19 @@ model = PiPLSRegression(
 ).fit(X, Y)
 ```
 
-or construct the search with `refit=True` when automatic refitting of the globally best evaluated
-candidate is the intended workflow. See the [path API](api/path.md).
+or construct the search with `refit=True`. The default `selection_rule="best_score"` refits the
+global configured-score optimum; `selection_rule="one_standard_error"` refits the stored 1-SE
+component-path recommendation. The fitted model is available as `selected_pipls_`. See the
+[path API](api/path.md).
 
-## The CV-MSE minimum and selected candidate disagree
+## The CV-MSE minimum, best candidate, and selected model disagree
 
 Candidate selection always maximizes `mean_test_score`. With the default scorer, this is equivalent
 to minimizing mean response-standardized CV-MSE. With a custom scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 
-Use `mean_test_score` and `best_score_` when interpreting a nondefault scoring rule. See
+Use `mean_test_score` and `best_score_` for the global configured-score optimum. Inspect
+`selected_result_` for the row chosen by `selection_rule`. See
 [Scoring and the best evaluated pair](path_analysis.md#scoring-and-the-best-evaluated-pair).
 
 ## A grouped splitter reports missing metadata

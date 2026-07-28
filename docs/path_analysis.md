@@ -132,8 +132,8 @@ routing when routing is enabled and requested. Split metadata belongs to the pat
 
 ## Ordered out-of-fold predictions
 
-Set `return_oof_predictions=True` to fit the selected fixed parameterization once per training fold
-after selection. The immutable `validation_report_` then owns row-ordered OOF results:
+Set `return_oof_predictions=True` to fit `selected_result_` once per training fold after selection.
+The immutable `validation_report_` then owns row-ordered OOF results:
 
 - `oof_predictions` preserves input row order;
 - repeated validation predictions are averaged and their counts are recorded;
@@ -220,22 +220,60 @@ It requires at least two validation splits so that the reference-row standard er
 The associated predictor rank is the rank already selected conditionally for that component count
 under the configured scorer. The methods do not revisit the predictor-rank profile, fit or refit an
 estimator, mutate the search object, or alter `best_*`. With a nondefault scorer, the stored
-predictor rank need not minimize CV-MSE within its component-count profile. These methods provide
-references for user judgment rather than an automatic final-model decision.
+predictor rank need not minimize CV-MSE within its component-count profile. The returned rows can be
+used directly for user judgment or by the explicit path-level selection rule described below.
 
 The Tobacco workflow calls `one_standard_error_result()` explicitly and uses the returned component
 count and the predictor rank already stored in that component-path row to fit the final fixed model.
-`PiPLSPathCV` does not apply the rule automatically, and the other maintained examples and tutorials
-retain explicit component choices. Conditional predictor-rank profiles use the same standard-error
-bars for scale, but the stored predictor rank for each component count continues to minimize the
-configured mean CV score rather than applying the 1-SE rule.
+The other maintained examples and tutorials retain explicit component choices. Conditional
+predictor-rank profiles use the same standard-error bars for scale, but the stored predictor rank
+for each component count continues to maximize the configured mean CV score rather than applying
+the 1-SE rule.
+
+## Predeclared final-model selection
+
+When the model-building protocol is known before fitting, `selection_rule` can choose the final
+stored component-path row without introducing selection into `PiPLSRegression`:
+
+```python
+search = PiPLSPathCV(
+    search_method="auto",
+    selection_rule="one_standard_error",
+    refit=True,
+).fit(X, Y)
+
+model = search.selected_pipls_
+```
+
+The accepted rules are:
+
+- `selection_rule="best_score"`, the default, which chooses the globally best evaluated pair under
+  the configured scorer;
+- `selection_rule="one_standard_error"`, which chooses the exact stored row returned by
+  `component_path_.one_standard_error_result()`.
+
+The second rule therefore selects $h$ from the stored CV-MSE path and retains the predictor rank
+already selected conditionally for that $h$. With a nondefault scorer, the rank remains conditioned
+on that scorer even though the component rule uses response-standardized CV-MSE. The rule requires
+at least two validation splits.
+
+The global optimum and the declared final choice remain separate results. `best_index_`,
+`best_score_`, `best_params_`, `best_n_components_`, and `best_predictor_rank_` always describe the
+global configured-score optimum. `selected_result_` and `selected_params_` describe the final path
+row. `validation_report_` and optional OOF predictions also represent that selected row.
+
+This one-call form is suitable only for a rule declared in advance. A component count chosen after
+examining the path is a post-hoc scientific decision and should remain an explicit second fit.
 
 ## Refit and detailed diagnostics
 
 The default `refit=False` leaves path evaluation and final fixed-model fitting as separate steps,
-which keeps the component-count choice visible. With `refit=True`, the globally best evaluated
-candidate under the configured scorer is fitted on all supplied data, and supported prediction or
-transformation methods delegate to it.
+which keeps the component-count choice visible. With `refit=True`, the row chosen by
+`selection_rule` is fitted on all supplied data as `selected_estimator_` and `selected_pipls_`, and
+supported prediction or transformation methods delegate to it. Under the default
+`selection_rule="best_score"`, `best_estimator_` and `best_pipls_` remain compatibility aliases. They
+are absent for the 1-SE rule because that refitted model is a declared recommendation rather than
+the global score optimum.
 
 Use `component_path_` for the concise component-count curve and `predictor_rank_profile(h)` for the
 evaluated ranks at one count. `cv_results_` contains candidate parameters, split test scores,

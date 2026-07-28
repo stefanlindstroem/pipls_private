@@ -37,6 +37,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
   overlapping `copy=False` inputs, and finite public fitted/output values;
 - pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
 - immutable `PiPLSComponentPath` arrays, derived fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
+- explicit best-score or one-standard-error final path-row selection, with global `best_*` results
+  kept separate from `selected_result_`, optional OOF diagnostics, and one selected full-data refit;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
   `predictor_rank_profile(n_components)`, derived from `cv_results_`;
 - a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
@@ -217,6 +219,8 @@ case, or public behavior.
 | Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
 | Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
 | Selection score | stable package string `"neg_response_standardized_mean_squared_error"` by default, resolving to the public callable; sklearn scorer names, callables, and `None` accepted |
+| Final path-row selection | `selection_rule="best_score"` by default; explicit `"one_standard_error"` selects the stored 1-SE component row |
+| Final refit | `refit=False` by default; `refit=True` fits `selected_result_` and exposes `selected_estimator_`/`selected_pipls_` |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | path-only opt-in through `return_oof_predictions=True` |
@@ -246,8 +250,9 @@ Additional fixed decisions:
   in the read-only `decomposition_` object; construction matrices remain private and standard
   PLS-style fitted attributes remain top-level.
 - `PiPLSPathCV` defaults to selection-only `refit=False`; refit-dependent path methods are absent
-  unless automatic global-best refitting is requested explicitly, and output-container
-  configuration remains carried by the estimator template.
+  unless a final refit is requested explicitly. `best_*` remains the global configured-score
+  optimum, while `selected_result_` records the declared best-score or 1-SE final row. Output-
+  container configuration remains carried by the estimator template.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
 - Real-data examples use the default selection-only `PiPLSPathCV()` for the path and fit a
@@ -256,8 +261,10 @@ Additional fixed decisions:
   uses `one_standard_error_result()`. All three use `component_path_`,
   scikit-learn OOF prediction, and inspection results directly in memory. All three use direct fixed
   estimators. `best_params_` remains a convenience, not the required user decision.
-- Path coefficients are accessed through `best_pipls_` or `best_estimator_`; they are not flattened
-  onto `PiPLSPathCV` when preprocessing may change the feature space.
+- Refit coefficients are accessed through `selected_pipls_` or `selected_estimator_`; under the
+  default best-score rule, the existing `best_pipls_` and `best_estimator_` compatibility aliases
+  remain available. Coefficients are not flattened onto `PiPLSPathCV` when preprocessing may change
+  the feature space.
 - OOF results produced after using the same splits for model selection are labeled
   `selection-conditioned`, not unbiased external-test estimates.
 - Arbitrary nested meta-estimators and general metadata routing are not supported merely because
@@ -370,15 +377,13 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Decisions 0107--0110 are complete. The exact stored minimum-CV-MSE and one-standard-error
-methods return complete aligned `PiPLSComponentResult` rows, preserve the conditionally selected
-predictor rank, introduce no comparison tolerance or redundant state, and do not fit or refit.
-Example 07 is the single maintained application of `one_standard_error_result()` and graphically
-shows the minimum row, horizontal 1-SE threshold, and recommended row. Decision 0110 retains the
-predictor-anchored `pipls_display_factors()` default and adds an optional response-row orientation;
-the Pulp example and tutorial use positive `TI` entries without changing the fitted map or storing
-sign bookkeeping. Continue the owner-led human audit from the next clean focused snapshot. No
-package release preparation or Python-package publication work is authorized.
+Decisions 0107--0111 are complete. The path result methods remain non-mutating stored-row
+inspection. Decision 0111 adds explicit final-row orchestration to `PiPLSPathCV`: `best_*` retains
+the global configured-score optimum, `selected_result_` records either that row or the stored 1-SE
+recommendation, and optional OOF generation and full-data refitting follow the selected row. No
+second automated-model wrapper is added, and `PiPLSRegression` remains fixed-pair only. Continue the
+owner-led human audit from the next clean focused snapshot. No package release preparation or
+Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
