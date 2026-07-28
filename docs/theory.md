@@ -87,7 +87,7 @@ large, weak or nuisance predictor directions may enter the reduced regression pr
 The component count $h$ controls the number of diagonal predictor-response pairs. Increasing $h$
 adds paired modes but cannot exceed either the retained predictor rank or the number of responses.
 
-The two ranks therefore describe different forms of complexity. `PiPLSPathCV` evaluates predictor
+The two ranks therefore describe different forms of complexity. `PiPLSSearchCV` evaluates predictor
 rank conditionally for each requested component count and reports one path row per component count.
 The user then fits a separate fixed model with both selected values stated explicitly.
 
@@ -147,8 +147,8 @@ the preprocessed predictor matrix.
 
 ## Model selection and validation
 
-Centering and scaling are learned separately inside every training fold used by `PiPLSPathCV`.
-Before constructing the candidate path, the selector also caps predictor rank by the minimum rank
+Centering and scaling are learned separately inside every training fold used by `PiPLSSearchCV`.
+Before constructing the candidate path, the search object also caps predictor rank by the minimum rank
 verified from those fold-local preprocessed predictors. Response-standardized CV-MSE gives each
 response equal weight after scaling by its training-fold standard deviation. The stored
 component-path fold SD describes variation across the realized folds. Maintained path figures

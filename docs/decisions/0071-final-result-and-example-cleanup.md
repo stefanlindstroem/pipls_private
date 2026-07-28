@@ -7,7 +7,7 @@ Accepted and implemented.
 ## Context
 
 Patches 20a–20e replaced the former application-layer table exchange with immutable numerical
-results and direct example-owned plotting. `PiPLSPathCV.component_path_` is now the concise
+results and direct example-owned plotting. `PiPLSSearchCV.component_path_` is now the concise
 component-count view, while `cv_results_` remains the complete candidate-level dictionary of
 aligned arrays.
 
@@ -62,7 +62,7 @@ current direct-workflow contract.
 
 ## Consequences
 
-- `PiPLSPathCV` has one concise result surface and one detailed result surface rather than three
+- `PiPLSSearchCV` has one concise result surface and one detailed result surface rather than three
   synchronized representations.
 - Adaptive-search omissions remain explicit candidate absence in `cv_results_` instead of dense
   NaN cells.

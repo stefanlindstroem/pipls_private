@@ -7,7 +7,7 @@ Accepted.
 ## Context
 
 `PiPLSRegression` correctly fits one explicit `(n_components, predictor_rank)` pair, while
-`PiPLSPathCV` owns cross-validated selection. Before this decision, `PiPLSPathCV(refit=True)` could
+`PiPLSSearchCV` owns cross-validated selection. Before this decision, `PiPLSSearchCV(refit=True)` could
 only refit the globally best evaluated pair under the configured scorer. The component path could
 also return a stored one-standard-error recommendation, but applying that declared rule required a
 separate estimator construction and fit.
@@ -17,13 +17,13 @@ at every component count followed by the 1-SE component rule. Such a protocol ca
 one call without making selection hidden, provided the rule is explicit and all evaluated and
 selected results remain inspectable.
 
-A second wrapper would duplicate the path selector's candidate evaluation, split handling,
+A second wrapper would duplicate the search meta-estimator's candidate evaluation, split handling,
 preprocessing, result records, OOF generation, and refit delegation. The missing responsibility is
-therefore final-row selection inside `PiPLSPathCV`, not another model-building class.
+therefore final-row selection inside `PiPLSSearchCV`, not another model-building class.
 
 ## Decision
 
-`PiPLSPathCV` adds the constructor parameter
+`PiPLSSearchCV` adds the constructor parameter
 
 ```python
 selection_rule="best_score"
@@ -67,7 +67,7 @@ A predeclared automated workflow is possible without adding hidden selection to
 `PiPLSRegression`:
 
 ```python
-search = PiPLSPathCV(
+search = PiPLSSearchCV(
     search_method="auto",
     selection_rule="one_standard_error",
     refit=True,

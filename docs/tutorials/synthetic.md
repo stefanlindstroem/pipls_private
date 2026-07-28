@@ -39,7 +39,7 @@ is not required to recover them exactly in a finite noisy sample.
 
 ## Evaluate the component path
 
-`PiPLSPathCV` evaluates admissible pairs of component count $h$ and predictor rank $r_\pi$. For each
+`PiPLSSearchCV` evaluates admissible pairs of component count $h$ and predictor rank $r_\pi$. For each
 component count, it selects the evaluated predictor rank with the smallest mean
 response-standardized CV-MSE under the default scorer:
 
@@ -123,7 +123,7 @@ coefficients of determination.
 For ordinary use, the essential sequence is:
 
 ```python
-search = PiPLSPathCV().fit(X_train, Y_train)
+search = PiPLSSearchCV().fit(X_train, Y_train)
 selected = search.component_path_.for_n_components(chosen_n_components)
 
 model = PiPLSRegression(
@@ -134,7 +134,7 @@ model = PiPLSRegression(
 Y_pred = model.predict(X_test)
 ```
 
-`PiPLSPathCV` owns model selection. `PiPLSRegression` represents one fixed selected model. Keeping
+`PiPLSSearchCV` owns model selection. `PiPLSRegression` represents one fixed selected model. Keeping
 those roles separate makes the workflow explicit and modifiable.
 
 ## Continue with real data
@@ -145,7 +145,7 @@ PLS-family plots, and Pi-PLS-specific factorization plots.
 
 For exact signatures and advanced behavior, see:
 
-- [`PiPLSPathCV`](../api/path.md#pipls.PiPLSPathCV);
+- [`PiPLSSearchCV`](../api/path.md#pipls.PiPLSSearchCV);
 - [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression);
 - [Path-selection details](../path_analysis.md).
 

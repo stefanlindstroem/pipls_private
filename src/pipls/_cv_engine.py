@@ -1,4 +1,4 @@
-"""Private fold engine used by :class:`pipls.PiPLSPathCV`."""
+"""Private fold engine used by :class:`pipls.PiPLSSearchCV`."""
 
 from __future__ import annotations
 

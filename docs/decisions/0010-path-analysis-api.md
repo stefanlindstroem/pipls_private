@@ -6,7 +6,7 @@ Accepted and implemented.
 
 ## Decision
 
-`PiPLSPathCV` is the public two-parameter search layer. Its default `"auto"` mode
+`PiPLSSearchCV` is the public two-parameter search layer. Its default `"auto"` mode
 applies the established adaptive predictor-rank search independently for each component count. Its `"optimal"` mode evaluates the complete
 admissible triangular surface.
 

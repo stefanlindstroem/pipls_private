@@ -110,7 +110,7 @@ class PiPLSRegression(
     -----
     This estimator performs no parameter selection or cross-validation. Both
     rank parameters are therefore required explicitly. Use
-    :class:`pipls.PiPLSPathCV` when component count and predictor rank must be
+    :class:`pipls.PiPLSSearchCV` when component count and predictor rank must be
     selected by cross-validation.
     """
 

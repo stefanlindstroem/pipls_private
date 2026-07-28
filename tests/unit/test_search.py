@@ -13,9 +13,9 @@ from sklearn.utils.validation import check_is_fitted
 
 from pipls import (
     PiPLSComponentPath,
-    PiPLSPathCV,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
+    PiPLSSearchCV,
     StatisticalSupportWarning,
 )
 from pipls.metrics import neg_response_standardized_mean_squared_error
@@ -86,7 +86,7 @@ def _one_standard_error_data() -> tuple[np.ndarray, np.ndarray]:
 
 def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         samples_per_predictor_rank=8,
         cv=3,
         n_jobs=1,
@@ -122,7 +122,7 @@ def test_path_caps_candidates_at_minimum_fold_numerical_rank(
     svd_solver: str,
 ) -> None:
     X, Y = _rank_two_data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,
             predictor_rank=1,
@@ -169,7 +169,7 @@ def test_path_uses_the_minimum_numerical_rank_across_training_folds() -> None:
         (np.arange(4, 8), np.arange(0, 4)),
     )
 
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,
             predictor_rank=1,
@@ -204,7 +204,7 @@ def test_pipeline_rank_preflight_uses_fold_local_transformed_predictors() -> Non
         ]
     )
 
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=pipeline,
         search_method="optimal",
         max_predictor_rank=4,
@@ -233,7 +233,7 @@ def test_explicit_rank_above_fold_numerical_limit_is_rejected_before_scoring() -
 
     message = r"predictor_rank_values values must lie in \[1, 2\]"
     with pytest.raises(ValueError, match=message):
-        PiPLSPathCV(
+        PiPLSSearchCV(
             predictor_rank_values=[3],
             max_predictor_rank=5,
             search_method="optimal",
@@ -248,7 +248,7 @@ def test_explicit_rank_above_fold_numerical_limit_is_rejected_before_scoring() -
 
 def test_no_positive_fold_numerical_rank_fails_transactionally() -> None:
     X, Y = _data(24)
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
         max_predictor_rank=1,
@@ -271,7 +271,7 @@ def test_no_positive_fold_numerical_rank_fails_transactionally() -> None:
 
 def test_all_component_sentinel_matches_explicit_complete_range() -> None:
     X, Y = _data()
-    all_search = PiPLSPathCV(
+    all_search = PiPLSSearchCV(
         n_components_values="all",
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
@@ -279,7 +279,7 @@ def test_all_component_sentinel_matches_explicit_complete_range() -> None:
         cv=3,
         refit=False,
     ).fit(X, Y)
-    explicit_search = PiPLSPathCV(
+    explicit_search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
@@ -300,7 +300,7 @@ def test_all_component_sentinel_matches_explicit_complete_range() -> None:
 
 def test_default_scorer_name_resolves_to_the_public_callable() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
         cv=3,
@@ -316,7 +316,7 @@ def test_default_scorer_name_resolves_to_the_public_callable() -> None:
 
 def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
         cv=3,
@@ -338,7 +338,7 @@ def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
 
 def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
     X, Y = _one_standard_error_data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
@@ -375,7 +375,7 @@ def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
 
 def test_one_standard_error_selection_can_remain_selection_only() -> None:
     X, Y = _one_standard_error_data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
@@ -393,7 +393,7 @@ def test_one_standard_error_selection_can_remain_selection_only() -> None:
 def test_one_standard_error_selection_requires_two_validation_splits() -> None:
     X, Y = _data()
     split = [(np.arange(24), np.arange(24, 36))]
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
         selection_rule="one_standard_error",
@@ -410,7 +410,7 @@ def test_one_standard_error_selection_requires_two_validation_splits() -> None:
 
 def test_default_selection_hides_refit_dependent_methods() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1, 2],
         cv=3,
@@ -443,7 +443,7 @@ def test_default_selection_hides_refit_dependent_methods() -> None:
 
 def test_refit_false_clears_state_from_an_earlier_refitted_fit() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1, 2],
         cv=3,
@@ -487,7 +487,7 @@ def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
             ),
         ]
     )
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=pipeline,
         n_components_values=[1],
         predictor_rank_values=[1],
@@ -514,7 +514,7 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
         del estimator, X_validation, y_validation
         return 1.0
 
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=list(range(1, 13)),
         max_predictor_rank=12,
@@ -556,7 +556,7 @@ def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
         predictor_rank = int(estimator.predictor_rank)
         return score_by_rank[predictor_rank]
 
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
@@ -586,7 +586,7 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
         del estimator, X_validation, y_validation
         return 1.0
 
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
         scoring=constant_scorer,
@@ -610,7 +610,7 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
 
 def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
@@ -628,7 +628,7 @@ def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
 def test_low_samples_per_predictor_rank_warns() -> None:
     X, Y = _data()
     with pytest.warns(StatisticalSupportWarning, match="statistical support"):
-        PiPLSPathCV(
+        PiPLSSearchCV(
             n_components_values=[1],
             predictor_rank_values=[1],
             samples_per_predictor_rank=4,
@@ -650,7 +650,7 @@ def test_oof_generation_does_not_rescore_the_selected_candidate() -> None:
         calls += 1
         return 0.0
 
-    PiPLSPathCV(
+    PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
         max_predictor_rank=1,
@@ -669,7 +669,7 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> N
 
     with warnings.catch_warnings():
         warnings.simplefilter("error", StatisticalSupportWarning)
-        search = PiPLSPathCV(
+        search = PiPLSSearchCV(
             n_components_values=[1],
             predictor_rank_values=[4],
             max_predictor_rank=4,
@@ -696,7 +696,7 @@ def test_path_does_not_suppress_unrelated_estimator_warnings() -> None:
     )
 
     with pytest.warns(RuntimeWarning, match="unrelated path warning"):
-        PiPLSPathCV(
+        PiPLSSearchCV(
             estimator=pipeline,
             n_components_values=[1],
             predictor_rank_values=[1],
@@ -711,7 +711,7 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
     X, Y = _data()
     template = PiPLSRegression(n_components=2, predictor_rank=2)
 
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=template,
         n_components_values=[1],
         predictor_rank_values=[3],
@@ -752,12 +752,12 @@ def test_invalid_public_controls_are_rejected(
     X, Y = _data()
     kwargs = {keyword: value}
     with pytest.raises(ValueError, match=message):
-        PiPLSPathCV(**kwargs).fit(X, Y)
+        PiPLSSearchCV(**kwargs).fit(X, Y)
 
 
 def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
@@ -805,7 +805,7 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
 
 def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
@@ -853,7 +853,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
 
 
 def test_predictor_rank_profile_requires_fitted_evaluated_component_count() -> None:
-    search = PiPLSPathCV(refit=False)
+    search = PiPLSSearchCV(refit=False)
 
     with pytest.raises(NotFittedError):
         search.predictor_rank_profile(1)
@@ -880,7 +880,7 @@ def test_component_path_records_predictor_rank_policy(
     expected_policy: str,
 ) -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=predictor_rank_values,
         cv=3,
@@ -915,7 +915,7 @@ def test_fixed_predictor_rank_must_support_every_component_count() -> None:
     X, Y = _data()
 
     with pytest.raises(ValueError, match="Every n_components value"):
-        PiPLSPathCV(
+        PiPLSSearchCV(
             n_components_values=[1, 2, 3],
             predictor_rank_values=[2],
             cv=3,

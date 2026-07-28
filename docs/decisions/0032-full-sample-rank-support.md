@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented for `PiPLSPathCV`. This decision refines the rank-bound parts of
+Accepted and implemented for `PiPLSSearchCV`. This decision refines the rank-bound parts of
 Decisions 0003, 0005, 0010, and 0031; fixed `PiPLSRegression` no longer derives a rank ceiling.
 
 ## Context
@@ -40,7 +40,7 @@ training matrix with $n_{\mathrm{train,min}}$ rows to at most
 $n_{\mathrm{train,min}}-1$.
 
 For `PiPLSRegression(predictor_rank="max")`, no rank-selection CV is used, so
-$n_{\mathrm{train,min}}=n$ and $p_{\min}=p$. For `"auto"`, `"optimal"`, and `PiPLSPathCV`, one
+$n_{\mathrm{train,min}}=n$ and $p_{\min}=p$. For `"auto"`, `"optimal"`, and `PiPLSSearchCV`, one
 split set is materialized and reused for every candidate. Centering, scaling, decomposition,
 fitting, and scoring remain training-fold local.
 

@@ -10,7 +10,7 @@ from adjustText import adjust_text
 from matplotlib.patches import FancyArrowPatch
 from sklearn.model_selection import KFold, cross_val_predict
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.inspection import (
     biplot_coordinates,
     latent_structure,
@@ -32,7 +32,7 @@ response_names = Y.columns.tolist()
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:evaluate-pulp-component-path]
-path_search = PiPLSPathCV().fit(X, Y)
+path_search = PiPLSSearchCV().fit(X, Y)
 path = path_search.component_path_
 # --8<-- [end:evaluate-pulp-component-path]
 

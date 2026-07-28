@@ -27,7 +27,7 @@ component count.
 
 This decision supersedes only Decision 0108's statement that the example does not call
 `minimum_cv_mse_result()` and its label-only figure description. The recommendation methods, exact
-stored-value comparisons, predictor-rank contract, and nonautomatic `PiPLSPathCV` behavior are
+stored-value comparisons, predictor-rank contract, and nonautomatic `PiPLSSearchCV` behavior are
 unchanged.
 
 ## Consequences

@@ -102,7 +102,7 @@ table.
 ### 2. Rank selection
 
 **Question:** When the generator declares the shared dimension and complete predictor-signal rank,
-which ranks does `PiPLSPathCV(search_method="auto")` select for prediction?
+which ranks does `PiPLSSearchCV(search_method="auto")` select for prediction?
 
 **Method:** adaptive Pi-PLS path selection only. Candidate models use
 `PiPLSRegression(n_components=1, predictor_rank=1, scale=True, svd_solver="full")`,
@@ -126,9 +126,9 @@ response-specific directions, noise `(0.2, 0.2)`, and seeds 1729, 2718, and 3141
 **Metrics:**
 
 - `true_n_components` is `truth.n_shared`;
-- `selected_n_components` is `PiPLSPathCV.best_n_components_`;
+- `selected_n_components` is `PiPLSSearchCV.best_n_components_`;
 - `true_predictor_rank` is `truth.n_shared + truth.n_predictor_specific`;
-- `selected_predictor_rank` is `PiPLSPathCV.best_predictor_rank_`;
+- `selected_predictor_rank` is `PiPLSSearchCV.best_predictor_rank_`;
 - `test_mse` is the mean squared residual over the independent test samples and responses in
   original response units after full-training refit.
 

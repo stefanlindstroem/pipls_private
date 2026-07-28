@@ -7,7 +7,7 @@ Accepted and implemented.
 ## Context
 
 `PiPLSComponentPath` provides one conditionally selected predictor rank for each evaluated component
-count. The complete candidate rows remain available through `PiPLSPathCV.cv_results_`.
+count. The complete candidate rows remain available through `PiPLSSearchCV.cv_results_`.
 
 The Pulp workflow also needs the complete one-dimensional predictor-rank profile at one chosen
 component count. Obtaining that profile from `cv_results_` required user code to construct a Boolean

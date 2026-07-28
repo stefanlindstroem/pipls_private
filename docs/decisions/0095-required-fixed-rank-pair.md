@@ -10,7 +10,7 @@ constructor nevertheless supplied defaults of two for both `n_components` and `p
 Those values had no general mathematical or statistical justification and allowed a caller to fit a
 model without making the defining rank choice explicit.
 
-`PiPLSPathCV` still needs a valid terminal `PiPLSRegression` object when it owns the search or when a
+`PiPLSSearchCV` still needs a valid terminal `PiPLSRegression` object when it owns the search or when a
 user places the estimator in a pipeline. The selector replaces both rank parameters before its
 fold-rank preflight, candidate fits, optional OOF fits, and final refit.
 
@@ -19,10 +19,10 @@ fold-rank preflight, candidate fits, optional OOF fits, and final refit.
 1. `PiPLSRegression` requires `n_components` and `predictor_rank` as keyword-only constructor
    arguments. Neither parameter has a default or accepts a missing-value or automatic sentinel.
 2. Optional preprocessing and solver controls retain their defaults.
-3. `PiPLSPathCV(estimator=None)` creates a private direct estimator template with the smallest valid
+3. `PiPLSSearchCV(estimator=None)` creates a private direct estimator template with the smallest valid
    construction seed pair `(n_components=1, predictor_rank=1)`.
 4. A user-supplied pipeline terminal estimator must likewise contain a valid explicit pair. The pair
-   is a construction seed only: `PiPLSPathCV` replaces both values for every path-owned fit, so it
+   is a construction seed only: `PiPLSSearchCV` replaces both values for every path-owned fit, so it
    does not constrain or select the evaluated path.
 5. All repository consumers migrate in the same patch. No compatibility wrapper or deprecated
    constructor form is retained because the package has not been released.

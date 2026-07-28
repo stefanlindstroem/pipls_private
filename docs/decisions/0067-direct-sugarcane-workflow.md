@@ -22,7 +22,7 @@ reference implementation for the Phase F4 simplification.
 `examples/11_sugarcane_real_data.py` owns one visible linear workflow:
 
 1. read `X.csv` and `Y.csv` directly with pandas;
-2. fit `PiPLSPathCV(refit=False)`;
+2. fit `PiPLSSearchCV(refit=False)`;
 3. plot `component_path_` directly with ordinary Matplotlib;
 4. retrieve the chosen scalar result with `for_n_components()`;
 5. fit one fixed `PiPLSRegression` model;

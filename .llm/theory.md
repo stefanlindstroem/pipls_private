@@ -475,7 +475,7 @@ and optional scaling. These are hard feasibility caps. Using the public sample c
 term does not fit any quantity from $X$ or $Y$ outside the training folds.
 
 The fixed estimator accepts one explicit integer $r_\pi$. Rule-derived ceilings and adaptive or
-exhaustive rank search belong to `PiPLSPathCV`, which evaluates fixed-estimator clones on the
+exhaustive rank search belong to `PiPLSSearchCV`, which evaluates fixed-estimator clones on the
 admissible triangular surface.
 
 Adaptive search reports every evaluated rank and does not guarantee the exhaustive optimum for

@@ -1,4 +1,4 @@
-"""Private split, scoring, and rank-search primitives for ``PiPLSPathCV``."""
+"""Private split, scoring, and rank-search primitives for ``PiPLSSearchCV``."""
 
 from __future__ import annotations
 

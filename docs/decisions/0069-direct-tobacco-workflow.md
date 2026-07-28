@@ -23,7 +23,7 @@ source-order pages, and raw observation diagnostics.
 
 1. read `X.csv` and `Y.csv` directly with pandas;
 2. form the physical wavenumber coordinate from the `X.csv` headers;
-3. fit `PiPLSPathCV(refit=False)` with a full-SVD estimator template;
+3. fit `PiPLSSearchCV(refit=False)` with a full-SVD estimator template;
 4. plot `component_path_` directly with Matplotlib;
 5. choose $h=8$ with `for_n_components()`;
 6. fit one fixed full-SVD `PiPLSRegression` model;

@@ -42,7 +42,7 @@ generator and the training scales learned by the fitted model.
 
 ## Rank selection
 
-`rank_selection.py` asks how adaptive `PiPLSPathCV(search_method="auto")` selects the shared
+`rank_selection.py` asks how adaptive `PiPLSSearchCV(search_method="auto")` selects the shared
 component count and complete predictor rank when both are declared by the synthetic generator. It
 uses three controlled structures: one shared direction, two shared directions, and two shared
 directions plus four predictor-only nuisance directions.

@@ -10,7 +10,7 @@ frozen results. The first executable layer needed to remain small enough for ord
 consume the manifest directly, preserve fold-local model standardization, and avoid turning observed
 benchmark values into scientific or performance claims.
 
-The adaptive `PiPLSPathCV` method evaluates independent candidate models. Uncontrolled nested native
+The adaptive `PiPLSSearchCV` method evaluates independent candidate models. Uncontrolled nested native
 linear-algebra threads made that workload unsuitable for a small CI budget, even though the declared
 problem sizes were modest.
 
@@ -20,7 +20,7 @@ problem sizes were modest.
 - Implement only the manifest's `ci` tier in this increment.
 - Resolve constant and logarithmic scale specifications deterministically and generate each problem
   with `make_pipls_train_test`.
-- Execute fixed Pi-PLS, adaptive `PiPLSPathCV`, and ordinary `PLSRegression` exactly as declared by
+- Execute fixed Pi-PLS, adaptive `PiPLSSearchCV`, and ordinary `PLSRegression` exactly as declared by
   the manifest.
 - Parallelize independent path candidates with the joblib threading backend while limiting native
   BLAS/LAPACK work to one thread per candidate.

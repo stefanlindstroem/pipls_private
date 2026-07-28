@@ -57,11 +57,13 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
         "import pipls.datasets",
         "import pipls.inspection",
         "import pipls.metrics",
-        "from pipls import PiPLSPathCV, PiPLSRegression",
+        "import pipls.search",
+        "from pipls import PiPLSRegression, PiPLSSearchCV",
     ):
         assert public_import in helper
 
     assert 'version("pipls") == pipls.__version__' in helper
+    assert 'assert not hasattr(pipls, "PiPLSPathCV")' in helper
     assert "package_file.relative_to(source_root)" in helper
     assert "package_file.relative_to(environment_root)" in helper
     assert "PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)" in helper

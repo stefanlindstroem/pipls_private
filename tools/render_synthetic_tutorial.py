@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 
-from pipls import PiPLSPathCV, PiPLSRegression  # noqa: E402
+from pipls import PiPLSRegression, PiPLSSearchCV  # noqa: E402
 from pipls.datasets import make_pipls_train_test  # noqa: E402
 from pipls.inspection import prediction_diagnostics  # noqa: E402
 
@@ -75,7 +75,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         noise=(0.2, 0.25),
         random_state=0,
     )
-    search = PiPLSPathCV().fit(train.X, train.Y)
+    search = PiPLSSearchCV().fit(train.X, train.Y)
     path = search.component_path_
     selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 

@@ -7,7 +7,7 @@ from pipls import (
     PiPLSComponentPath,
     PiPLSComponentResult,
     PiPLSDecomposition,
-    PiPLSPathCV,
+    PiPLSSearchCV,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSValidationReport,
@@ -28,7 +28,7 @@ and residuals without implying that a multivariate response is scalar.
 
 `PiPLSRegression` fits one explicit fixed pair `(n_components, predictor_rank)` and performs no
 cross-validation or parameter selection. Both rank parameters are required keyword-only
-constructor arguments; neither has a default or accepts a missing-value sentinel. `PiPLSPathCV` is
+constructor arguments; neither has a default or accepts a missing-value sentinel. `PiPLSSearchCV` is
 the standard package workflow for the bounded triangular scan and conditional predictor-rank selection. Public scoring callables remain
 available from `pipls.metrics`.
 
@@ -38,7 +38,7 @@ available from `pipls.metrics`.
 |---|---|
 | `n_components` | $h$ |
 | `predictor_rank` | $r_\pi$ |
-| `samples_per_predictor_rank` | $c$ in `PiPLSPathCV` |
+| `samples_per_predictor_rank` | $c$ in `PiPLSSearchCV` |
 | `predictor_rank_` | fitted explicit $r_\pi$ |
 | `max_predictor_rank_` | centered algebraic limit on the fixed estimator; search ceiling on the path |
 
@@ -60,7 +60,7 @@ Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 - `scale` and `copy` are Python or NumPy booleans.
 
 A direct fixed fit emits `StatisticalSupportWarning` when $n/r_\pi<3$. This warning is diagnostic;
-it does not choose or cap the rank. `PiPLSPathCV` suppresses only this expected warning inside its
+it does not choose or cap the rank. `PiPLSSearchCV` suppresses only this expected warning inside its
 controlled feature probes, candidate fits, optional OOF fits, and selected full-data refit. Other
 warning categories remain visible.
 
@@ -75,7 +75,7 @@ Every `PiPLSRegression.fit` estimates `x_mean_` and `y_mean_` from the observati
 that fit. `scale=True` estimates safe sample-standard-deviation vectors with `ddof=1` and
 standardizes both blocks; `scale=False` still centers and stores unit scales. During path
 selection, every candidate clone learns these statistics only from its training fold. The optional
-final refit learns them again from all observations supplied to `PiPLSPathCV.fit`.
+final refit learns them again from all observations supplied to `PiPLSSearchCV.fit`.
 
 ## Predictor SVD policy
 
@@ -104,7 +104,7 @@ data.
 
 ## Path-analysis API
 
-`PiPLSPathCV` owns all package model selection. It defaults to
+`PiPLSSearchCV` owns all package model selection. It defaults to
 `n_components_values="all"`, which resolves every admissible component count. Explicit integer
 sequences request a subset; `None` is not a component-path alias. It also defaults to adaptive
 `search_method="auto"`; explicit `"optimal"` exhaustively evaluates every admissible pair. The
@@ -164,7 +164,7 @@ model methods on that bound object; delegated search methods remain compatibilit
 Under the default best-score rule, `best_estimator_` and `best_pipls_` remain compatibility aliases;
 they are absent for the 1-SE rule rather than naming a recommendation “best”.
 
-`PiPLSPathCV.predictor_rank_profile(h)` derives an immutable
+`PiPLSSearchCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
 predictor ranks actually evaluated at `h`, sorted in ascending order, and its `selected` field is
 the same scalar result returned by `component_path_.for_n_components(h)`. The profile does not add
@@ -183,7 +183,7 @@ Refit-dependent delegated methods are absent under the default `refit=False`. Ou
 configuration is owned by the estimator template and preserved through cloning and explicit refit;
 the path object does not add a separate `set_output` layer.
 
-Group-aware splitters and keyword-only `groups` belong to `PiPLSPathCV.fit`, not to the fixed
+Group-aware splitters and keyword-only `groups` belong to `PiPLSSearchCV.fit`, not to the fixed
 estimator. `return_oof_predictions` and selection-conditioned reporting likewise belong only to the
 path interface.
 
@@ -312,7 +312,7 @@ rendering layer.
 
 Example 04 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
 component paths directly in memory. Pulp, Sugarcane, and Tobacco use the default selection-only
-`PiPLSPathCV()`, plot
+`PiPLSSearchCV()`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn
 `cross_val_predict()`. They render immutable Pi-PLS factors, latent structure, observation

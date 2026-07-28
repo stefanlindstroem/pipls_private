@@ -1,6 +1,6 @@
 # Decision: 0007-predictor-rank-search-policies
 
-Status: accepted and implemented in `PiPLSPathCV`; Decision 0039 removes these search modes from
+Status: accepted and implemented in `PiPLSSearchCV`; Decision 0039 removes these search modes from
 `PiPLSRegression`.
 
 ## Context
@@ -83,7 +83,7 @@ coverage from approximate linear algebra.
 
 ## Consequences for path analysis
 
-`PiPLSPathCV` must reuse the same search-policy vocabulary. Its exhaustive policy searches the
+`PiPLSSearchCV` must reuse the same search-policy vocabulary. Its exhaustive policy searches the
 complete admissible triangular $(h,r_\pi)$ grid; its adaptive policy may reduce that grid while
 reporting every evaluated pair and retaining identical fold-local preprocessing and scoring
 contracts.

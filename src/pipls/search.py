@@ -1,4 +1,4 @@
-"""Pipeline-aware cross-validated Pi-PLS path analysis."""
+"""Pipeline-aware cross-validated Pi-PLS model selection."""
 
 from __future__ import annotations
 
@@ -92,7 +92,7 @@ def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
     return check
 
 
-class PiPLSPathCV(
+class PiPLSSearchCV(
     TransformerMixin,  # type: ignore[misc]
     RegressorMixin,  # type: ignore[misc]
     MultiOutputMixin,  # type: ignore[misc]
@@ -257,7 +257,7 @@ class PiPLSPathCV(
         y: ArrayLike,
         *,
         groups: ArrayLike | None = None,
-    ) -> PiPLSPathCV:
+    ) -> PiPLSSearchCV:
         """Evaluate the path and optionally refit the selected path row.
 
         Parameters
@@ -271,8 +271,8 @@ class PiPLSPathCV(
 
         Returns
         -------
-        self : PiPLSPathCV
-            Fitted path-search object.
+        self : PiPLSSearchCV
+            Fitted search object.
         """
 
         _clear_fitted_state(self)
@@ -288,7 +288,7 @@ class PiPLSPathCV(
         y: ArrayLike,
         *,
         groups: ArrayLike | None,
-    ) -> PiPLSPathCV:
+    ) -> PiPLSSearchCV:
         self._validate_constructor_parameters()
         validated = _validate_estimator_data(
             self,
@@ -692,7 +692,7 @@ class PiPLSPathCV(
             names = ", ".join(sorted(fit_params))
             raise TypeError(f"Unexpected fit parameters: {names}.")
         if y is None:
-            raise ValueError("y is required to fit PiPLSPathCV.")
+            raise ValueError("y is required to fit PiPLSSearchCV.")
         self.fit(X, y, groups=groups)
         if isinstance(self.selected_estimator_, PiPLSRegression):
             return cast(tuple[FloatArray, FloatArray], self.transform(X, y))
@@ -824,7 +824,7 @@ class PiPLSPathCV(
         check_is_fitted(self, attributes=["selected_params_"])
         if not hasattr(self, "selected_estimator_"):
             raise AttributeError(
-                "PiPLSPathCV was fitted with refit=False; predict, transform, and score "
+                "PiPLSSearchCV was fitted with refit=False; predict, transform, and score "
                 "require refit=True."
             )
         return self.selected_estimator_

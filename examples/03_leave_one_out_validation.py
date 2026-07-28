@@ -2,7 +2,7 @@
 
 from sklearn.model_selection import LeaveOneOut
 
-from pipls import PiPLSPathCV
+from pipls import PiPLSSearchCV
 from pipls.datasets import make_pipls_regression
 
 # Imagine a calibration study with twelve costly specimens. Leave-one-out
@@ -20,7 +20,7 @@ data = make_pipls_regression(
     random_state=7,
 )
 
-search = PiPLSPathCV(
+search = PiPLSSearchCV(
     n_components_values=[1, 2],
     predictor_rank_values=[1, 2],
     search_method="optimal",

@@ -21,7 +21,7 @@ memory-overlapping arrays with `copy=False` introduced further public surprises.
 
 Harden the public estimator boundary while keeping the private numerical core focused:
 
-- `PiPLSRegression.fit()` and `PiPLSPathCV.fit()` are transactional. They remove existing fitted
+- `PiPLSRegression.fit()` and `PiPLSSearchCV.fit()` are transactional. They remove existing fitted
   state before fitting and remove partial state after any exception.
 - Ordinary means and sample standard deviations remain unchanged for normal data. Range-safe
   calculations are used only when the ordinary calculation overflows or when a nonconstant finite

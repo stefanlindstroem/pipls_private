@@ -16,7 +16,7 @@ ambiguous public contract.
 
 The public fitting contract is deliberately narrow:
 
-- `PiPLSRegression.fit` and `PiPLSPathCV.fit` may accept keyword-only `groups` for group-aware
+- `PiPLSRegression.fit` and `PiPLSSearchCV.fit` may accept keyword-only `groups` for group-aware
   splitters;
 - the groups request may participate in scikit-learn metadata routing for that specific purpose;
 - Pi-PLS does not implement weighted fitting, weighted predictor-rank/path selection, or

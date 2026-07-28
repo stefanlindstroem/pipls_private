@@ -15,7 +15,7 @@ The core public objects require one generated reference derived from their Pytho
 - Add mkdocstrings-python and Ruff to the dedicated documentation dependency group; Ruff formats
   separated generated signatures in a docs-only environment.
 - Resolve the package from `src/` and parse the existing NumPy-style docstrings.
-- Generate explicit pages for `PiPLSRegression`, `PiPLSPathCV`, `PiPLSDecomposition`,
+- Generate explicit pages for `PiPLSRegression`, `PiPLSSearchCV`, `PiPLSDecomposition`,
   `PiPLSValidationReport`, and `StatisticalSupportWarning`.
 - List class members explicitly so inherited implementation machinery and private modules are not
   exposed accidentally.

@@ -26,7 +26,7 @@ The component-path figure labels the selected diamond as the 1-SE recommendation
 inspection code derives up to four displayed component indices from the recommended component count
 and handles a possible one-component recommendation without invalid score indexing.
 
-The path search itself is unchanged. `PiPLSPathCV` does not automatically apply the rule, predictor
+The path search itself is unchanged. `PiPLSSearchCV` does not automatically apply the rule, predictor
 rank is not selected again, and no other numbered example, tutorial, renderer, README section, or
 documentation-home workflow invokes either recommendation method. The path-analysis guide and
 example catalogue identify example 07 as the maintained application.

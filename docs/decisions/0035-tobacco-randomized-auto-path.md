@@ -18,7 +18,7 @@ example, so the computational boundary must be explicit.
 ## Decision
 
 The Tobacco example and smoke benchmark evaluate component counts 1 through 8. For each component
-count, predictor rank is selected conditionally with `PiPLSPathCV(search_method="auto")`.
+count, predictor rank is selected conditionally with `PiPLSSearchCV(search_method="auto")`.
 Candidate fits use an explicit `PiPLSRegression(svd_solver="randomized", random_state=0)` template.
 The path uses `refit=False` and writes the same six-column component-path CSV contract as Pulp and
 Sugarcane:

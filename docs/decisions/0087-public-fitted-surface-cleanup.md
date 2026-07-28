@@ -6,10 +6,10 @@ Accepted and implemented.
 
 ## Context
 
-The fixed estimator and path selector retained several fitted attributes that duplicated more
+The fixed estimator and search meta-estimator retained several fitted attributes that duplicated more
 meaningful public results or exposed implementation bookkeeping. `PiPLSRegression` published an
 internal response scale used only by the default scorer and exact `x_weights_`/`y_weights_` aliases
-of its rotation arrays. `PiPLSPathCV` published validated input grids, adaptive-search batch
+of its rotation arrays. `PiPLSSearchCV` published validated input grids, adaptive-search batch
 history, candidate counters, direct-rank parameter aliases, and flat OOF attributes already stored
 in `component_path_`, `cv_results_`, `best_*`, or `validation_report_`.
 
@@ -23,7 +23,7 @@ statistics, rank information, and `decomposition_`. The response scale required 
 scorer is private fitted state. Exact `x_weights_` and `y_weights_` aliases are removed; users use
 `x_rotations_` and `y_rotations_`.
 
-`PiPLSPathCV` retains:
+`PiPLSSearchCV` retains:
 
 - standard `cv_results_`, `best_index_`, `best_score_`, `best_params_`, and refit attributes;
 - direct `best_n_components_` and `best_predictor_rank_` values;

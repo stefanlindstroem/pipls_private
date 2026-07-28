@@ -143,7 +143,7 @@ with stable interpretation anchors and without repeating elementary Matplotlib r
 but must not reproduce the tutorial analysis or embed its generated figures.
 
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its direct pandas
-loading, default selection-only `PiPLSPathCV()` evaluation, visible three-component choice,
+loading, default selection-only `PiPLSSearchCV()` evaluation, visible three-component choice,
 conditional predictor-rank profile, fixed `PiPLSRegression` fit, five-fold scikit-learn OOF
 predictions,
 inspection computations, and final PDF composition. The selected component row is retrieved before
@@ -403,7 +403,7 @@ benchmark rather than depend on a public intermediate matrix.
 
 Decision 0087 distinguishes independent fitted results from exact aliases and execution traces.
 `PiPLSRegression` exposes rotations rather than duplicate weight aliases, and its scorer-specific
-response scale is private. `PiPLSPathCV` keeps standard candidate results, concise immutable path
+response scale is private. `PiPLSSearchCV` keeps standard candidate results, concise immutable path
 and rank-profile objects, global selection attributes, exhaustive-search qualification, validation
 reporting, and optional refitted estimators. OOF arrays live only in `validation_report_`; validated
 input grids, adaptive batches, candidate counters, search-method echoes, and duplicate direct-rank

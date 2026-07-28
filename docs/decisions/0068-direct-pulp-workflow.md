@@ -26,7 +26,7 @@ confused with the number of paired Pi-PLS components.
 `examples/10_pulp_real_data.py` owns one visible linear workflow:
 
 1. read `X.csv` and `Y.csv` directly with pandas;
-2. fit `PiPLSPathCV(refit=False)`;
+2. fit `PiPLSSearchCV(refit=False)`;
 3. inspect and plot `component_path_` directly;
 4. choose $h=3$ with `for_n_components()`;
 5. inspect the predictor-rank profile conditional on $h=3$;

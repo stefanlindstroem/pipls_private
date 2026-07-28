@@ -10,9 +10,9 @@ from sklearn.model_selection import KFold, cross_val_predict
 
 from pipls import (
     PiPLSComponentPath,
-    PiPLSPathCV,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
+    PiPLSSearchCV,
 )
 from pipls.inspection import (
     latent_structure,
@@ -31,7 +31,7 @@ def pulp_result() -> SimpleNamespace:
     X = pd.read_csv(data_dir / "X.csv")
     Y = pd.read_csv(data_dir / "Y.csv")
 
-    path_search = PiPLSPathCV(refit=False).fit(X, Y)
+    path_search = PiPLSSearchCV(refit=False).fit(X, Y)
     component_path = path_search.component_path_
     selected = component_path.for_n_components(3)
 
@@ -76,7 +76,7 @@ def pulp_result() -> SimpleNamespace:
 def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespace) -> None:
     result = pulp_result
 
-    assert isinstance(result.path_search, PiPLSPathCV)
+    assert isinstance(result.path_search, PiPLSSearchCV)
     assert result.path_search.estimator is None
     assert result.path_search.refit is False
     assert isinstance(result.component_path, PiPLSComponentPath)

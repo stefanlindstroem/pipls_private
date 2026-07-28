@@ -9,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.datasets import PiPLSDataset, make_pipls_train_test
 
 ResultValue = str | int | float
@@ -87,10 +87,10 @@ def generate_problem(scenario: Scenario, seed: int) -> tuple[PiPLSDataset, PiPLS
     )
 
 
-def fit_search(train: PiPLSDataset, seed: int) -> PiPLSPathCV:
+def fit_search(train: PiPLSDataset, seed: int) -> PiPLSSearchCV:
     """Fit the adaptive Pi-PLS path with fold-local model standardization."""
 
-    return PiPLSPathCV(
+    return PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,
             predictor_rank=1,

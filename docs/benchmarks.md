@@ -77,7 +77,7 @@ measure runtime, record software or environment metadata, or create figures.
 The implemented rank-selection benchmark asks:
 
 > When the generator declares the shared dimension and complete predictor-signal rank, which ranks
-> does adaptive `PiPLSPathCV(search_method="auto")` select for prediction?
+> does adaptive `PiPLSSearchCV(search_method="auto")` select for prediction?
 
 Run it from the repository root after installing the package:
 
@@ -96,7 +96,7 @@ and 3141. The scenarios are:
 
 The search uses `PiPLSRegression(n_components=1, predictor_rank=1, scale=True, svd_solver="full")` inside
 five-fold
-`PiPLSPathCV(search_method="auto")`, with a benchmark-specific rule-based predictor-rank bound
+`PiPLSSearchCV(search_method="auto")`, with a benchmark-specific rule-based predictor-rank bound
 and `samples_per_predictor_rank=10.0`. Every candidate learns centering and scaling from its training
 fold only. The selected estimator is then refitted on the complete generated training block.
 

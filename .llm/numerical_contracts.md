@@ -4,7 +4,7 @@
 - Use `numpy.linalg.eigh` only for symmetric matrices, after explicit symmetrization.
 - Do not form explicit inverses. Use solves, least squares, SVDs, or documented pseudoinverses.
 - The fixed core uses $\tau_X=\max(n,p)\,\epsilon_{64}\,s_1$ for predictor numerical rank; requested predictor rank above that numerical rank raises `ValueError`.
-- The path selector verifies predictor rank separately in every transformed training fold before
+- The search meta-estimator verifies predictor rank separately in every transformed training fold before
   candidate evaluation. With `r_num_min` denoting the minimum verified fold rank, the shared
   rule-derived upper predictor rank is
   `min(p_min, n_train_min - 1, r_num_min, ceil(n / c))`, where `n` is the total number of

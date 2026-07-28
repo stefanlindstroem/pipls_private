@@ -1,14 +1,14 @@
 # Pi-PLS path selection
 
-Use `PiPLSPathCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
+Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
 The [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path) shows the ordinary
 sequence: inspect `component_path_`, choose a component count, retrieve its conditional predictor
 rank, and fit a separate fixed estimator.
 
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
-selector caps the path by the minimum predictor rank verified across those transformed folds.
-The default constructor is selection-only: `PiPLSPathCV()` uses `refit=False` and leaves final
+search object caps the path by the minimum predictor rank verified across those transformed folds.
+The default constructor is selection-only: `PiPLSSearchCV()` uses `refit=False` and leaves final
 fixed-model fitting as an explicit user step. A caller may instead declare `selection_rule` and set
 `refit=True` to fit that stored path row on all supplied data. Methods that delegate to a selected
 estimator are available only after such a refit.
@@ -26,7 +26,7 @@ Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $Y$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
 
-::: pipls.PiPLSPathCV
+::: pipls.PiPLSSearchCV
     options:
       members:
         - fit
@@ -79,7 +79,7 @@ its `selected` field is the same scalar result returned by `component_path_`.
 
 ## Validation report
 
-`PiPLSPathCV.validation_report_` summarizes the selected cross-validation result and, when
+`PiPLSSearchCV.validation_report_` summarizes the selected cross-validation result and, when
 requested, its ordered out-of-fold predictions.
 
 ::: pipls.PiPLSValidationReport
@@ -94,7 +94,7 @@ requested, its ordered out-of-fold predictions.
 The public scoring functions standardize each response residual by the corresponding sample
 standard deviation learned from the estimator's training responses. The positive function reports
 an error; the negative function follows the scikit-learn convention that larger scorer values are
-better. `PiPLSPathCV` uses the stable string
+better. `PiPLSSearchCV` uses the stable string
 `"neg_response_standardized_mean_squared_error"` by default and resolves it to the public negative
 scorer callable.
 

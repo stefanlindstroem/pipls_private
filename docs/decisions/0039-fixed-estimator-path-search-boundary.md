@@ -7,14 +7,14 @@ Accepted and fully implemented.
 ## Context
 
 Before implementation, `PiPLSRegression` supported both fixed-rank fitting and internally
-cross-validated predictor-rank selection. `PiPLSPathCV` separately performed the intended triangular search over
+cross-validated predictor-rank selection. `PiPLSSearchCV` separately performed the intended triangular search over
 response component count and predictor rank. This duplicates model-selection responsibility and
 makes an apparently ordinary estimator fit perform hidden cross-validation.
 
 The standard package workflow needs a bounded triangular scan. Users should not have to construct
 an explicit rectangular `GridSearchCV` grid for `(n_components, predictor_rank)`, and wrapping an
 internally cross-validating estimator in `GridSearchCV` would create nested folds. The package
-therefore needs a direct estimator for one model and a dedicated path meta-estimator for the
+therefore needs a direct estimator for one model and a dedicated search meta-estimator for the
 standard selection procedure.
 
 ## Decision
@@ -29,7 +29,7 @@ standard selection procedure.
 - A direct fixed fit will emit `StatisticalSupportWarning` when
   $n/r_\pi < 3$. Algebraically infeasible ranks remain errors.
 
-`PiPLSPathCV` will be the standard package interface for model selection.
+`PiPLSSearchCV` will be the standard package interface for model selection.
 
 - It will evaluate the admissible triangular surface
   $1 \leq h \leq r_\pi \leq r_{\pi,\max}$.
@@ -44,19 +44,19 @@ standard selection procedure.
 Fixed `PiPLSRegression` instances will remain compatible with ordinary scikit-learn
 meta-estimators when users supply explicit valid parameter pairs. The repository will not present
 `GridSearchCV` as the recommended Pi-PLS selection workflow; examples and guides will use
-`PiPLSPathCV`.
+`PiPLSSearchCV`.
 
 ## Transition
 
 This decision is implemented incrementally:
 
 1. simplify `PiPLSRegression` to fixed-model fitting;
-2. make `PiPLSPathCV` the sole triangular-selection interface;
+2. make `PiPLSSearchCV` the sole triangular-selection interface;
 3. remove obsolete shared machinery and duplicated private results;
 4. align examples and guides with the final two-stage workflow;
 5. perform a final API and minimality audit.
 
-All five steps are implemented. `PiPLSRegression` is fixed-rank only, and `PiPLSPathCV` owns the
+All five steps are implemented. `PiPLSRegression` is fixed-rank only, and `PiPLSSearchCV` owns the
 complete package selection lifecycle: feature probes, candidate folds, conditional path results,
 optional OOF fits, and selected full-data refit. The path supplies the warning-suppression policy to
 the private fold engine, which otherwise propagates warnings normally. Obsolete solver tracing,
@@ -68,7 +68,7 @@ The final audit removed the redundant public `pipls_param_prefix` constructor co
 supported pipeline form already requires a unique terminal `PiPLSRegression` step. The terminal
 parameter prefix is now inferred. A focused interoperability test confirms that fixed explicit
 rank pairs remain usable with ordinary `GridSearchCV`, while repository examples continue to
-recommend `PiPLSPathCV`.
+recommend `PiPLSSearchCV`.
 
 Decision 0040 completes a separate public-surface polish: explicit `n_components_values="all"`,
 conventional random-state forms, a public callable default scorer, conditional refit method

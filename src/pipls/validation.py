@@ -29,7 +29,7 @@ class PiPLSValidationReport:
     """Immutable summary of a Pi-PLS cross-validation result.
 
     Direct construction validates the same scalar, array, coverage, and
-    immutability invariants as reports returned by :class:`pipls.PiPLSPathCV`.
+    immutability invariants as reports returned by :class:`pipls.PiPLSSearchCV`.
 
     Parameters
     ----------

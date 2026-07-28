@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented for `PiPLSPathCV`. Decision 0039 removes the rank-bound parameters and
+Accepted and implemented for `PiPLSSearchCV`. Decision 0039 removes the rank-bound parameters and
 CV defaults from `PiPLSRegression`; the sample-count convention remains refined by Decision 0032.
 
 ## Context
@@ -17,7 +17,7 @@ The package selection interface uses five-fold regression cross-validation by de
 
 ## Decision
 
-`PiPLSPathCV` defaults to:
+`PiPLSSearchCV` defaults to:
 
 - `samples_per_predictor_rank=5`;
 - `cv=5`.

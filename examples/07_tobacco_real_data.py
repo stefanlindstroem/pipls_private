@@ -8,7 +8,7 @@ import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 from sklearn.model_selection import KFold, cross_val_predict
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.inspection import (
     latent_structure,
     observation_diagnostics,
@@ -31,7 +31,7 @@ response_pages = tuple(
 )
 
 # Evaluate and plot the Pi-PLS component path with a full predictor SVD.
-path_search = PiPLSPathCV(
+path_search = PiPLSSearchCV(
     estimator=PiPLSRegression(
         n_components=1,
         predictor_rank=1,

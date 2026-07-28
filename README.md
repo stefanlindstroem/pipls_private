@@ -11,9 +11,9 @@ examine the predictor subspace and the paired predictive relation separately. Th
 Pi-PLS preferable for every regression problem; ordinary PLS and other multivariate methods remain
 appropriate alternatives whose suitability depends on the data and validation design.
 
-For routine model selection, `PiPLSPathCV` evaluates component counts by cross-validation and
+For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
 selects a predictor rank conditionally for each count. Users may inspect the path and fit one fixed
-`PiPLSRegression`, or declare a final selection rule and let the path object refit that selected
+`PiPLSRegression`, or declare a final selection rule and let the search object refit that selected
 pair while retaining the complete selection record.
 
 The rendered documentation is the primary user guide. On GitHub, open the latest
@@ -73,9 +73,9 @@ the [fixed-regression reference](docs/api/regression.md) for the complete contra
 When the ranks are not known, evaluate the path first:
 
 ```python
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 
-search = PiPLSPathCV().fit(X_train, Y_train)
+search = PiPLSSearchCV().fit(X_train, Y_train)
 path = search.component_path_
 
 selected = path.for_n_components(2)
@@ -102,7 +102,7 @@ When the complete protocol is known in advance, selection and final fitting can 
 call. This example uses adaptive predictor-rank search and the 1-SE component rule:
 
 ```python
-search = PiPLSPathCV(
+search = PiPLSSearchCV(
     search_method="auto",
     selection_rule="one_standard_error",
     refit=True,
@@ -122,7 +122,7 @@ two-stage workflow.
 | Interface | Purpose |
 |---|---|
 | `PiPLSRegression` | Fit one fixed `(n_components, predictor_rank)` pair |
-| `PiPLSPathCV` | Evaluate the path and optionally refit an explicitly selected path row |
+| `PiPLSSearchCV` | Evaluate the path and optionally refit an explicitly selected path row |
 | `component_path_` | Inspect one selected predictor rank for each component count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one count |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |

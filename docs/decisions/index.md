@@ -38,6 +38,7 @@ reference describe the current public behavior directly.
 - [0106: fold-based CV standard error](0106-fold-based-cv-standard-error.md)
 - [0107: component-path recommendation methods](0107-component-path-recommendation-methods.md)
 - [0111: explicit path selection rules](0111-explicit-path-selection-rules.md)
+- [0112: search-CV public name](0112-search-cv-public-name.md)
 
 ## Validation, data, and benchmarks
 

@@ -12,7 +12,7 @@ def test_pulp_example_uses_direct_in_memory_results() -> None:
         encoding="utf-8"
     )
 
-    assert "PiPLSPathCV().fit(X, Y)" in text
+    assert "PiPLSSearchCV().fit(X, Y)" in text
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in text
     assert "PiPLSRegression(" in text
     assert "cross_val_predict(" in text

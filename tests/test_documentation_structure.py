@@ -273,9 +273,9 @@ def test_current_user_workflows_rely_on_the_selection_only_path_default() -> Non
     ]
 
     combined = "\n".join(path.read_text(encoding="utf-8") for path in current_sources)
-    assert "PiPLSPathCV(refit=False)" not in combined
+    assert "PiPLSSearchCV(refit=False)" not in combined
     assert "refit=False," not in combined
-    assert "PiPLSPathCV()" in combined
+    assert "PiPLSSearchCV()" in combined
 
     readme = (root / "README.md").read_text(encoding="utf-8")
     assert 'selection_rule="one_standard_error"' in readme
@@ -306,7 +306,7 @@ def test_cv_mse_error_bar_documentation_defines_explicit_one_se_heuristic() -> N
     assert "1-SE rule" in path_analysis
     assert "cv_mse_standard_error" in path_analysis
     assert "smallest evaluated component count" in path_analysis
-    assert "PiPLSPathCV" in path_analysis
+    assert "PiPLSSearchCV" in path_analysis
     assert "Predeclared final-model selection" in path_analysis
     assert 'selection_rule="one_standard_error"' in path_analysis
     assert "selected_result_" in path_analysis

@@ -142,7 +142,7 @@ handsheet properties as supplementary data. The repository selects the documente
 and response columns from that public supplementary table.
 
 `examples/05_pulp_real_data.py` reads `X.csv` and `Y.csv` directly with pandas and then relies on
-ordinary estimator validation when fitting `PiPLSPathCV` with its adaptive defaults. It does not
+ordinary estimator validation when fitting `PiPLSSearchCV` with its adaptive defaults. It does not
 repeat repository-table validation, set a predictor-rank ceiling, parse `metadata.yaml`, or call a
 package loader.
 
@@ -168,7 +168,7 @@ The accompanying data paper is:
 The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches the public
 LabSpec and response tables by `Sample`, removes three rows whose total-sugar response is missing,
 and applies no imputation or spectral preprocessing. `examples/06_sugarcane_real_data.py` reads
-`X.csv` and `Y.csv` directly, evaluates the default selection-only `PiPLSPathCV()`, plots
+`X.csv` and `Y.csv` directly, evaluates the default selection-only `PiPLSSearchCV()`, plots
 `component_path_` in memory, and fits a separate fixed model after a visible user component choice.
 It calculates selection-conditioned OOF predictions with scikit-learn and writes five final PDF figures directly
 from immutable inspection results. The compact spectral-axis description in `metadata.yaml` avoids

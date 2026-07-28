@@ -25,7 +25,7 @@ r_{\mathrm{num,min}},
 
 Here $n$ is the total number of observations supplied to `fit()`, $p_{\min}$ is the minimum
 predictor count after fold-local pipeline preprocessing, and $r_{\mathrm{num,min}}$ is the minimum
-verified predictor rank after terminal-estimator centering and optional scaling. The selector fits
+verified predictor rank after terminal-estimator centering and optional scaling. The search object fits
 pipeline preprocessing separately inside each fold before this rank preflight. An integer
 `max_predictor_rank` bypasses the statistical support rule but remains capped by fold dimensions and
 numerical rank.
@@ -48,7 +48,7 @@ The default `n_components_values="all"` evaluates every component count from 1 t
 $h_{\max}$. An explicit integer sequence requests a subset:
 
 ```python
-search = PiPLSPathCV(
+search = PiPLSSearchCV(
     n_components_values=[1, 2, 3, 5],
 ).fit(X, Y)
 ```
@@ -94,7 +94,7 @@ final step is `PiPLSRegression`. The complete estimator is cloned and fitted ins
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 
 pipeline = Pipeline(
     [
@@ -102,11 +102,11 @@ pipeline = Pipeline(
         ("pipls", PiPLSRegression(n_components=1, predictor_rank=1)),
     ]
 )
-search = PiPLSPathCV(estimator=pipeline).fit(X, Y)
+search = PiPLSSearchCV(estimator=pipeline).fit(X, Y)
 ```
 
 The terminal estimator needs the valid construction seed pair `(1, 1)` because
-`PiPLSRegression` always represents one explicit fixed pair. `PiPLSPathCV` replaces both values
+`PiPLSRegression` always represents one explicit fixed pair. `PiPLSSearchCV` replaces both values
 before fold-rank preflight, every candidate fit, optional OOF fitting, and the final refit, so the
 seed pair does not restrict or select the path. Other template settings, including `scale`,
 `svd_solver`, and `random_state`, do affect candidate fitting.
@@ -115,19 +115,19 @@ Do not fit learned preprocessing on the complete dataset before path evaluation.
 
 ## Cross-validation protocols and metadata
 
-`PiPLSPathCV` accepts scikit-learn splitters for grouped, repeated, predefined, temporal, or
+`PiPLSSearchCV` accepts scikit-learn splitters for grouped, repeated, predefined, temporal, or
 leave-one-out protocols when their scientific assumptions match the data. Suitable examples include
 `GroupKFold`, `RepeatedKFold`, `PredefinedSplit`, `TimeSeriesSplit`, and `LeaveOneOut`.
 
 ```python
 from sklearn.model_selection import GroupKFold
 
-search = PiPLSPathCV(cv=GroupKFold(n_splits=5))
+search = PiPLSSearchCV(cv=GroupKFold(n_splits=5))
 search.fit(X, Y, groups=sample_groups)
 ```
 
-`groups` is an explicit `PiPLSPathCV.fit()` parameter and participates in scikit-learn metadata
-routing when routing is enabled and requested. Split metadata belongs to the path selector;
+`groups` is an explicit `PiPLSSearchCV.fit()` parameter and participates in scikit-learn metadata
+routing when routing is enabled and requested. Split metadata belongs to the search object;
 `PiPLSRegression.fit(X, Y)` fits one explicit pair and accepts none.
 
 ## Ordered out-of-fold predictions
@@ -236,7 +236,7 @@ When the model-building protocol is known before fitting, `selection_rule` can c
 stored component-path row without introducing selection into `PiPLSRegression`:
 
 ```python
-search = PiPLSPathCV(
+search = PiPLSSearchCV(
     search_method="auto",
     selection_rule="one_standard_error",
     refit=True,

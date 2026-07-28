@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import inspect
 from dataclasses import FrozenInstanceError
 from typing import Any
@@ -14,11 +15,12 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
 
+import pipls
 from pipls import (
     PiPLSComponentPath,
     PiPLSDecomposition,
-    PiPLSPathCV,
     PiPLSRegression,
+    PiPLSSearchCV,
 )
 
 
@@ -39,9 +41,16 @@ def _fixed_estimator() -> PiPLSRegression:
     )
 
 
+def test_search_cv_is_the_only_public_selection_class_name() -> None:
+    assert pipls.PiPLSSearchCV is PiPLSSearchCV
+    assert importlib.util.find_spec("pipls.search") is not None
+    assert importlib.util.find_spec("pipls.path") is None
+    assert not hasattr(pipls, "PiPLSPathCV")
+
+
 def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> None:
     regression = _fixed_estimator()
-    path = PiPLSPathCV()
+    path = PiPLSSearchCV()
 
     assert regression.n_components == 2
     assert regression.predictor_rank == 3
@@ -56,7 +65,7 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
 
 
 def test_path_defaults_have_stable_signature_and_repr() -> None:
-    signature = inspect.signature(PiPLSPathCV)
+    signature = inspect.signature(PiPLSSearchCV)
 
     assert signature.parameters["scoring"].default == (
         "neg_response_standardized_mean_squared_error"
@@ -64,8 +73,8 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     assert signature.parameters["refit"].default is False
     assert signature.parameters["selection_rule"].default == "best_score"
     assert "0x" not in str(signature)
-    path = PiPLSPathCV()
-    assert repr(path) == "PiPLSPathCV()"
+    path = PiPLSSearchCV()
+    assert repr(path) == "PiPLSSearchCV()"
     assert clone(path).scoring == path.scoring
     assert clone(path).selection_rule == "best_score"
     assert clone(path).refit is False
@@ -89,7 +98,7 @@ def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
 
 
 def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
-    assert set(PiPLSPathCV().get_params(deep=False)) == {
+    assert set(PiPLSSearchCV().get_params(deep=False)) == {
         "cv",
         "estimator",
         "max_predictor_rank",
@@ -106,7 +115,7 @@ def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
 
 
 def test_path_output_configuration_belongs_to_estimator_template() -> None:
-    path = PiPLSPathCV()
+    path = PiPLSSearchCV()
 
     assert not hasattr(path, "set_output")
     assert hasattr(_fixed_estimator(), "set_output")
@@ -274,7 +283,7 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
     X, Y = _data()
     base = _fixed_estimator()
     direct = clone(base).fit(X, Y)
-    path = PiPLSPathCV(
+    path = PiPLSSearchCV(
         estimator=base,
         n_components_values=[2],
         predictor_rank_values=[3],
@@ -312,7 +321,7 @@ def test_path_exposes_nested_pipls_for_pipeline_without_flattening_coefficients(
             ("regression", _fixed_estimator()),
         ]
     )
-    path = PiPLSPathCV(
+    path = PiPLSSearchCV(
         estimator=pipeline,
         n_components_values=[2],
         predictor_rank_values=[3],
@@ -337,7 +346,7 @@ def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
             ("regression", _fixed_estimator()),
         ]
     )
-    path = PiPLSPathCV(
+    path = PiPLSSearchCV(
         estimator=pipeline,
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
@@ -358,7 +367,7 @@ def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
 
 def test_path_score_accepts_sample_weight_like_regression() -> None:
     X, Y = _data()
-    path = PiPLSPathCV(
+    path = PiPLSSearchCV(
         estimator=_fixed_estimator(),
         n_components_values=[2],
         predictor_rank_values=[3],
@@ -379,7 +388,7 @@ def test_path_preserves_refitted_estimator_output_configuration() -> None:
     columns = [f"feature_{index}" for index in range(X.shape[1])]
     X_frame = pd.DataFrame(X, columns=columns)
     template = _fixed_estimator().set_output(transform="pandas")
-    path = PiPLSPathCV(
+    path = PiPLSSearchCV(
         estimator=template,
         n_components_values=[2],
         predictor_rank_values=[3],
@@ -421,7 +430,7 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
             ),
         ]
     )
-    path = PiPLSPathCV(
+    path = PiPLSSearchCV(
         estimator=pipeline,
         n_components_values=[2],
         predictor_rank_values=[3],
@@ -446,7 +455,7 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
             svd_solver="full",
             random_state=None,
         ),
-        PiPLSPathCV(
+        PiPLSSearchCV(
             estimator=PiPLSRegression(
                 n_components=1,
                 predictor_rank=1,
@@ -511,16 +520,16 @@ def test_path_restricts_estimator_scope_to_direct_or_final_pipeline_pipls() -> N
     unsupported = TransformedTargetRegressor(regressor=_fixed_estimator())
 
     with pytest.raises(ValueError, match="PiPLSRegression or a sklearn Pipeline"):
-        PiPLSPathCV(estimator=unsupported).fit(X, Y)
+        PiPLSSearchCV(estimator=unsupported).fit(X, Y)
 
     invalid_pipeline = Pipeline([("pipls", _fixed_estimator()), ("scale", StandardScaler())])
     with pytest.raises(ValueError, match="pipelines must end"):
-        PiPLSPathCV(estimator=invalid_pipeline).fit(X, Y)
+        PiPLSSearchCV(estimator=invalid_pipeline).fit(X, Y)
 
 
 def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=_fixed_estimator(),
         n_components_values=[2],
         predictor_rank_values=[3],
@@ -566,7 +575,7 @@ def test_path_inverse_transform_is_conditionally_available_for_pipeline() -> Non
             ("regression", _fixed_estimator()),
         ]
     )
-    search = PiPLSPathCV(estimator=pipeline, refit=True)
+    search = PiPLSSearchCV(estimator=pipeline, refit=True)
 
     assert hasattr(search, "transform")
     assert not hasattr(search, "inverse_transform")
@@ -586,7 +595,7 @@ def test_removed_fixed_estimator_aliases_are_absent() -> None:
 
 def test_removed_path_aliases_and_search_bookkeeping_are_absent() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=_fixed_estimator(),
         n_components_values=[1, 2],
         predictor_rank_values=[2, 3],

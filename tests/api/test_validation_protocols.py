@@ -15,7 +15,7 @@ from sklearn.model_selection import (
     cross_validate,
 )
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 
 
 def _data(n_samples: int = 18) -> tuple[np.ndarray, np.ndarray]:
@@ -38,7 +38,7 @@ def _fixed() -> PiPLSRegression:
 def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() -> None:
     X, Y = _data(12)
     splitter = LeaveOneOut()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -75,7 +75,7 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
 
 def test_repeated_kfold_averages_predictions_and_records_counts() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -98,7 +98,7 @@ def test_repeated_kfold_averages_predictions_and_records_counts() -> None:
 
 def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
     X, Y = _data()
-    predefined = PiPLSPathCV(
+    predefined = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -106,7 +106,7 @@ def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
         cv=PredefinedSplit(np.array([-1] * 9 + [0] * 9)),
         return_oof_predictions=True,
     ).fit(X, Y)
-    temporal = PiPLSPathCV(
+    temporal = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -133,7 +133,7 @@ def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
 def test_grouped_splitters_are_supported_by_path_interface() -> None:
     X, Y = _data(24)
     groups = np.repeat(np.arange(8), 3)
-    path = PiPLSPathCV(
+    path = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -147,7 +147,7 @@ def test_grouped_splitters_are_supported_by_path_interface() -> None:
 def test_groups_participate_in_path_metadata_routing() -> None:
     X, Y = _data(30)
     groups = np.repeat(np.arange(10), 3)
-    estimator = PiPLSPathCV(
+    estimator = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -171,7 +171,7 @@ def test_groups_participate_in_path_metadata_routing() -> None:
 @pytest.mark.parametrize("scoring", [None, "r2"])
 def test_singleton_validation_rejects_foldwise_r2(scoring: object) -> None:
     X, Y = _data(10)
-    estimator = PiPLSPathCV(
+    estimator = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -187,7 +187,7 @@ def test_singleton_validation_rejects_foldwise_r2(scoring: object) -> None:
 def test_oof_arrays_are_read_only_and_one_dimensional_targets_stay_one_dimensional() -> None:
     X, Y = _data()
     y = Y[:, 0]
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
@@ -209,4 +209,4 @@ def test_oof_arrays_are_read_only_and_one_dimensional_targets_stay_one_dimension
 def test_return_oof_predictions_requires_boolean() -> None:
     X, Y = _data()
     with pytest.raises(ValueError, match="return_oof_predictions must be boolean"):
-        PiPLSPathCV(return_oof_predictions=1).fit(X, Y)  # type: ignore[arg-type]
+        PiPLSSearchCV(return_oof_predictions=1).fit(X, Y)  # type: ignore[arg-type]

@@ -5,12 +5,12 @@ without relying on private implementation details.
 
 ## I do not know the two ranks
 
-Use `PiPLSPathCV` rather than guessing both values. The path selector evaluates admissible
+Use `PiPLSSearchCV` rather than guessing both values. The search object evaluates admissible
 `(n_components, predictor_rank)` pairs, retains one conditionally selected predictor rank for each
 component count, and exposes the concise result through `component_path_`.
 
 ```python
-search = PiPLSPathCV().fit(X, Y)
+search = PiPLSSearchCV().fit(X, Y)
 selected = search.component_path_.for_n_components(2)
 ```
 
@@ -43,7 +43,7 @@ section explains splitter-dependent feasibility and metadata such as `groups`.
 
 ## `predict()` is unavailable after path selection
 
-By default, `PiPLSPathCV` uses `refit=False` and is a selection object rather than a fitted
+By default, `PiPLSSearchCV` uses `refit=False` and is a selection object rather than a fitted
 prediction model. Either fit the chosen pair explicitly:
 
 ```python
@@ -78,7 +78,7 @@ Use `mean_test_score` and `best_score_` for the global configured-score optimum.
 
 ## A grouped splitter reports missing metadata
 
-Pass groups to the path selector's `fit()` call:
+Pass groups to the search object's `fit()` call:
 
 ```python
 search.fit(X, Y, groups=sample_groups)
@@ -111,7 +111,7 @@ A direct fixed fit warns when the number of observations is small relative to th
 predictor rank. The warning does not change the requested model. It indicates weak statistical
 support, while algebraically or numerically infeasible ranks remain errors.
 
-Use a lower predictor rank, provide more observations, or use `PiPLSPathCV`, whose default support
+Use a lower predictor rank, provide more observations, or use `PiPLSSearchCV`, whose default support
 rule is more conservative. See
 [Solver and statistical support](api/regression.md#solver-and-statistical-support).
 

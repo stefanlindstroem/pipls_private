@@ -6,7 +6,7 @@ Accepted and implemented.
 
 ## Context
 
-`PiPLSPathCV` already exposes the complete scikit-learn-style candidate table through
+`PiPLSSearchCV` already exposes the complete scikit-learn-style candidate table through
 `cv_results_`. Its former concise component view duplicated selected values across a dictionary of
 aligned arrays and two additional component-keyed dictionaries. Accessing one component choice
 therefore required table construction, indexing syntax, or synchronization among several fitted
@@ -26,7 +26,7 @@ Add two top-level public frozen result types:
 - `PiPLSComponentResult`, containing the corresponding Python scalar values for one component
   count.
 
-A fitted `PiPLSPathCV` exposes the concise result as `component_path_`.
+A fitted `PiPLSSearchCV` exposes the concise result as `component_path_`.
 `component_path_.for_n_components(h)` returns the unique scalar result for an evaluated component
 count and raises a `ValueError` that lists the available counts when `h` was not evaluated.
 

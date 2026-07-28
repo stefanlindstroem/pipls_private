@@ -20,7 +20,8 @@ import pipls
 import pipls.datasets
 import pipls.inspection
 import pipls.metrics
-from pipls import PiPLSPathCV, PiPLSRegression
+import pipls.search
+from pipls import PiPLSRegression, PiPLSSearchCV
 
 repository = Path(sys.argv[1]).resolve()
 artifact_label = sys.argv[2]
@@ -43,7 +44,8 @@ except ValueError as error:
     ) from error
 
 assert version("pipls") == pipls.__version__
-assert PiPLSPathCV.__name__ == "PiPLSPathCV"
+assert PiPLSSearchCV.__name__ == "PiPLSSearchCV"
+assert not hasattr(pipls, "PiPLSPathCV")
 
 rng = np.random.default_rng(0)
 X = rng.normal(size=(12, 4))

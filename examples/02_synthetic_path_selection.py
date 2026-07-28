@@ -5,7 +5,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.datasets import make_pipls_train_test
 from pipls.inspection import prediction_diagnostics
 
@@ -28,7 +28,7 @@ train, test = make_pipls_train_test(
 # --8<-- [end:generate-synthetic-data]
 
 # --8<-- [start:evaluate-synthetic-path]
-search = PiPLSPathCV().fit(train.X, train.Y)
+search = PiPLSSearchCV().fit(train.X, train.Y)
 path = search.component_path_
 selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 # --8<-- [end:evaluate-synthetic-path]

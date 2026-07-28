@@ -93,7 +93,7 @@ default integer `0` is reproducible. `None` uses NumPy's global random state and
 only when repeatability is not required. The synthetic generators retain their separate explicit
 integer-seed contract.
 
-Centering and optional scaling are integral to `PiPLSRegression.fit`. `PiPLSPathCV` clones fixed
+Centering and optional scaling are integral to `PiPLSRegression.fit`. `PiPLSSearchCV` clones fixed
 estimators inside every training fold, so each candidate learns statistics only from that fold.
 With `refit=True`, the pair chosen by `selection_rule` learns them again from the complete supplied
 training set. Learned scaling must not be fitted globally before CV.

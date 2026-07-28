@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted and implemented in `PiPLSPathCV`. Decision 0039 removes OOF and splitter ownership from
+Accepted and implemented in `PiPLSSearchCV`. Decision 0039 removes OOF and splitter ownership from
 the fixed `PiPLSRegression` estimator.
 
 ## Decision

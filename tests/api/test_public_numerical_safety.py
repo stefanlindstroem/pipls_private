@@ -5,7 +5,7 @@ import pytest
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.metrics import response_standardized_mean_squared_error
 
 
@@ -58,7 +58,7 @@ def test_failed_fixed_refit_clears_previous_fitted_state() -> None:
 
 def test_failed_path_refit_clears_previous_search_state() -> None:
     X, Y = _data()
-    search = PiPLSPathCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
         cv=3,

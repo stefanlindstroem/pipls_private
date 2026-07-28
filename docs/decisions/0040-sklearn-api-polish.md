@@ -18,12 +18,12 @@ small inconsistencies with ordinary scikit-learn use:
 - Pi-PLS factorization matrices and numerical diagnostics were duplicated between
   `decomposition_` and many top-level fitted aliases.
 
-The path meta-estimator also needs refit-dependent methods to follow the availability of the
+The search meta-estimator also needs refit-dependent methods to follow the availability of the
 selected refitted estimator without adding an output-configuration layer of its own.
 
 ## Decision
 
-`PiPLSPathCV.n_components_values` accepts only:
+`PiPLSSearchCV.n_components_values` accepts only:
 
 - `"all"`, meaning every admissible component count from 1 through
   `min(n_targets, max_predictor_rank_)`;
@@ -38,7 +38,7 @@ a NumPy `RandomState` instance, or `None`. The default remains `0`, so the defau
 is reproducible. `None` uses NumPy's global random state and is therefore not promised to be
 repeatable.
 
-`PiPLSPathCV.scoring` defaults directly to the public callable
+`PiPLSSearchCV.scoring` defaults directly to the public callable
 `pipls.metrics.neg_response_standardized_mean_squared_error`. Ordinary scikit-learn scorer names,
 other scorer callables, and `None` remain supported. The package does not register a private scorer
 name that appears portable to unrelated scikit-learn search objects.
@@ -56,14 +56,14 @@ x_rank_, x_rank_is_exact_, rank_tolerance_, svd_solver_
 Their values remain available through `decomposition_`; prediction coefficients remain available
 through standard `coef_` and `intercept_`.
 
-Refit-dependent `PiPLSPathCV` methods are available only when `refit=True` and the estimator
+Refit-dependent `PiPLSSearchCV` methods are available only when `refit=True` and the estimator
 supports the delegated operation. Output-container configuration belongs to the supplied estimator
 template, not to the path object. A configured estimator is cloned through the search and its
 selected refit retains that configuration.
 
 ## Consequences
 
-- `PiPLSPathCV()` visibly means a complete admissible component path.
+- `PiPLSSearchCV()` visibly means a complete admissible component path.
 - Users can pass the same conventional random-state forms used by scikit-learn estimators.
 - The default scorer can be imported and reused as an ordinary callable.
 - The fitted estimator has a smaller, less ambiguous attribute surface while retaining both

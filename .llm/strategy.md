@@ -78,7 +78,7 @@ tagged `pipls` versions.
 - Every candidate fit learns those statistics from its own training fold, and the selected model
   refits them on the complete training set supplied to `fit()`.
 - Custom learned preprocessing is searched around the complete supported estimator boundary.
-- `PiPLSPathCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
+- `PiPLSSearchCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
   `PiPLSRegression`; arbitrary nested meta-estimators are not implied.
 - Publication-specific rank rules and reporting conventions are not package defaults; they
   belong in downstream reproduction repositories.
@@ -219,12 +219,12 @@ safely without overflow.
 
 ### Phase D1: complete path analysis
 
-Add `PiPLSPathCV` with the admissible triangular grid, shared materialized splits, standard
+Add `PiPLSSearchCV` with the admissible triangular grid, shared materialized splits, standard
 scikit-learn scorer orientation, and complete-pipeline cloning. Its search-policy interface must
 mirror the established `"optimal"` and `"auto"` distinction rather than inventing a second set of
 meanings.
 
-Current status: **complete**. `PiPLSPathCV` is public, evaluates exhaustive or adaptive
+Current status: **complete**. `PiPLSSearchCV` is public, evaluates exhaustive or adaptive
 triangular paths, clones complete pipelines inside every fold, infers or validates the nested
 Pi-PLS parameter prefix, exposes standard and Pi-PLS-specific diagnostics, and refits the globally
 selected complete estimator.
@@ -232,7 +232,7 @@ selected complete estimator.
 ### Phase D1a: shared private selection engine
 
 Extract fold-level candidate evaluation and one-dimensional rank-search orchestration so
-`PiPLSRegression` and `PiPLSPathCV` share the same private machinery without making either
+`PiPLSRegression` and `PiPLSSearchCV` share the same private machinery without making either
 public class wrap the other. Add equivalence tests showing that one fixed path row matches the
 corresponding estimator rank search.
 
@@ -405,12 +405,12 @@ artifacts or end-to-end example validation are needed.
 Decision 0039 establishes a staged API correction before release hardening. The target boundary is:
 
 - `PiPLSRegression` fits one explicit fixed pair and owns no cross-validation or search results;
-- `PiPLSPathCV` owns the bounded triangular scan and conditional predictor-rank selection;
+- `PiPLSSearchCV` owns the bounded triangular scan and conditional predictor-rank selection;
 - the path ceiling uses `samples_per_predictor_rank=5`;
 - direct fixed fits warn when $n/r_\pi<3$;
 - expected support warnings are suppressed only inside path-controlled feature probes, candidate
   fits, optional OOF fits, and the selected full-data refit;
-- examples continue to recommend `PiPLSPathCV`, not a hand-built `GridSearchCV` surface.
+- examples continue to recommend `PiPLSSearchCV`, not a hand-built `GridSearchCV` surface.
 
 Implementation order is fixed-model estimator, sole path selection, dead-code consolidation,
 example and guide alignment, then final API/minimality audit.
@@ -495,7 +495,7 @@ Implementation order:
 6. package-wide cleanup, documentation migration, and structural enforcement.
 
 Current status: **complete**. Decision 0066 adds `PiPLSComponentPath`,
-`PiPLSComponentResult`, and `PiPLSPathCV.component_path_`. Decisions 0067–0069 make Sugarcane,
+`PiPLSComponentResult`, and `PiPLSSearchCV.component_path_`. Decisions 0067–0069 make Sugarcane,
 Pulp, and Tobacco direct and remove their analytical CSV/report machinery. Decision 0070 makes the
 Pi-PLS/PLS comparison direct, replaces its DataFrame result with immutable arrays, and removes the
 CSV plotting helper. Decision 0071 removes duplicate matrix-path aliases, makes `cv_results_` the
@@ -668,7 +668,7 @@ Current status: **all six new-user onboarding patches complete**.
 ### Documentation and implementation alignment
 
 Decision 0105 completes a cross-layer alignment pass after the onboarding series. Maintained
-selection workflows now demonstrate the selection-only `PiPLSPathCV()` default, the generated fixed
+selection workflows now demonstrate the selection-only `PiPLSSearchCV()` default, the generated fixed
 reference includes `set_output()` and all public decomposition diagnostics, path details expose
 `path_search_exhaustive_`, and guide-layer Pulp descriptions use `predictor_rank_profile()` instead
 of direct candidate-column access.
@@ -728,9 +728,17 @@ $PDQ^\mathsf{T}$, and adds no fitted state or result-record bookkeeping.
 
 Current status: **response-anchored factor display implemented and documented**.
 
+### Search-CV public name
+
+Decision 0112 gives the unreleased selection meta-estimator the direct public name
+`PiPLSSearchCV`, moves its implementation to `src/pipls/search.py`, and retains path
+terminology only for stored component-path results. No compatibility alias is kept.
+
+Current status: **search-CV public rename implemented and documented**.
+
 ### Explicit final path selection
 
-Decision 0111 extends `PiPLSPathCV` rather than adding a second automated-model wrapper. The default
+Decision 0111 extends `PiPLSSearchCV` rather than adding a second automated-model wrapper. The default
 `selection_rule="best_score"` preserves current behavior, while
 `selection_rule="one_standard_error"` selects the stored 1-SE component-path row. Global `best_*`
 attributes remain unchanged; `selected_result_`, `selected_params_`, optional OOF diagnostics, and
@@ -765,7 +773,7 @@ For every patch, the LLM maintainer should:
 API1 is complete under Decision 0086. `PiPLSDecomposition` exposes descriptive final factors and
 rank/solver diagnostics while the private core retains construction matrices. API2 is complete
 under Decision 0087: scorer state is private, exact weight aliases are removed, and
-`PiPLSPathCV` retains `cv_results_`, concise immutable path/profile results, standard `best_*`
+`PiPLSSearchCV` retains `cv_results_`, concise immutable path/profile results, standard `best_*`
 attributes, `path_search_exhaustive_`, and `validation_report_` without execution-history or flat
 OOF duplicates. Decision 0088 completes API3 by removing display-sign bookkeeping and redundant
 synthetic zero blocks and by suppressing constructor signatures for returned immutable records.

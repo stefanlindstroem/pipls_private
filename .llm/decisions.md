@@ -15,7 +15,7 @@ This index is navigation, not a substitute for those records.
 | `0007-predictor-rank-search-policies.md` | exhaustive versus adaptive search | `"optimal"` is exhaustive; `"auto"` is deterministic approximate search |
 | `0008-predictor-svd-policy.md` | scalable predictor decomposition | independent `full`, `randomized`, and `auto` solver policy |
 | `0009-public-parameter-validation.md` | exposed controls | early validation and low-statistical-support warning |
-| `0010-path-analysis-api.md` | triangular path search | pipeline-aware `PiPLSPathCV` with aligned search vocabulary |
+| `0010-path-analysis-api.md` | triangular path search | pipeline-aware `PiPLSSearchCV` with aligned search vocabulary |
 | `0011-shared-selection-engine.md` | code ownership | path-owned private fold/search machinery supports fixed candidate evaluation |
 | `0012-sklearn-api-alignment.md` | estimator and PLS compatibility | standard fitted surface plus structured Pi-PLS decomposition output |
 | `0013-sklearn-cleanup-boundary.md` | final pre-D2 scope | direct estimator or terminal-pipeline support and conditional delegation |
@@ -44,7 +44,7 @@ This index is navigation, not a substitute for those records.
 | `0036-real-data-pls-path-comparison.md` | real-data example comparison | separate Pi-PLS and PLS CSV paths, overlaid PDF, and full-SVD Tobacco workflow |
 | `0037-user-run-real-data-analyses.md` | real-data execution boundary | examples remain user-run; duplicate smoke benchmarks and full example tests are removed |
 | `0038-single-examples-target.md` | explicit application validation | `make examples` runs every numbered example; `make check` remains fast internal validation |
-| `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSPathCV` |
+| `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSSearchCV` |
 | `0040-sklearn-api-polish.md` | final public API polish | explicit complete-path sentinel, conventional random state, callable scorer, and canonical decomposition output |
 | `0041-legacy-dataset-licensing-roadmap.md` | legacy dataset licensing and roadmap | retain the three licensed datasets; exclude Corn, legacy Steel, SARCOS, and FRED-MD |
 | `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; reusable inspection, plotting, and all three real-data integrations |
@@ -117,13 +117,15 @@ This index is navigation, not a substitute for those records.
 | `0109-tobacco-one-standard-error-threshold-figure.md` | Tobacco one-standard-error threshold figure | show the minimum row, horizontal 1-SE threshold, and recommended row with direct documentation cross-links |
 | `0110-response-anchored-display-factors.md` | response-anchored Pi-PLS display factors | retain predictor-canonical defaults; optionally orient every component by a selected response row and requested sign |
 | `0111-explicit-path-selection-rules.md` | explicit path selection rules | preserve global `best_*`; expose a separate selected path row and optionally refit the best-score or 1-SE choice |
+| `0112-search-cv-public-name.md` | public selection-class name | rename the unreleased meta-estimator to `PiPLSSearchCV` without an alias; retain component-path result terminology |
 
 ## Implemented estimator/search transition
 
 Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` is a fixed-pair estimator with
-the direct-fit support warning at $n/r_\pi<3$. `PiPLSPathCV` owns the complete triangular-selection
+the direct-fit support warning at $n/r_\pi<3$. `PiPLSSearchCV` owns the complete triangular-selection
 lifecycle and defaults to the explicit complete-component sentinel `n_components_values="all"`.
-Decision 0102 makes path evaluation selection-only by default and represents the default scorer by
+Decision 0112 renames the sole package selection meta-estimator to `PiPLSSearchCV` without a
+legacy alias; component-path result names and numerical behavior are unchanged. Decision 0102 makes path evaluation selection-only by default and represents the default scorer by
 a stable package string resolving to the existing public callable. Conventional scikit-learn
 random-state forms remain accepted, and Pi-PLS-specific fitted output is canonicalized in
 `decomposition_`.
@@ -134,19 +136,19 @@ These points are fixed by implemented decisions and owner review even where the 
 plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
-- `PiPLSPathCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
-- `PiPLSPathCV` defaults to selection-only `refit=False`; explicit `selection_rule` chooses the
+- `PiPLSSearchCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
+- `PiPLSSearchCV` defaults to selection-only `refit=False`; explicit `selection_rule` chooses the
   best-score or stored 1-SE row for optional final refitting;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mean_squared_error"`, which resolves to the public scorer callable;
-- `PiPLSPathCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
+- `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
   while transformed feature count, centered training-fold dimensions, and minimum verified
   fold numerical rank remain hard candidate-feasibility caps;
 - randomized SVD is controlled independently and follows the same policy inside regression and
   path candidate fits;
-- `PiPLSRegression` fits explicit ranks only; `PiPLSPathCV` owns package selection and fits fixed
+- `PiPLSRegression` fits explicit ranks only; `PiPLSSearchCV` owns package selection and fits fixed
   estimator clones;
-- `PiPLSPathCV` supports a direct estimator or a scikit-learn `Pipeline` ending in
+- `PiPLSSearchCV` supports a direct estimator or a scikit-learn `Pipeline` ending in
   `PiPLSRegression`, not arbitrary nested meta-estimators;
 - D2 supports explicit group metadata for splitters, but weighted fitting and general-purpose
   sample metadata routing are not project goals;

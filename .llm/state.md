@@ -35,7 +35,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
   fewer than three observations per retained predictor-rank direction;
 - transactional fixed and path fits, range-safe boundary preprocessing, safe read-only or
   overlapping `copy=False` inputs, and finite public fitted/output values;
-- pipeline-aware `PiPLSPathCV` for triangular `(n_components, predictor_rank)` search;
+- pipeline-aware `PiPLSSearchCV` for triangular `(n_components, predictor_rank)` search;
+- the direct pre-release `PiPLSSearchCV` public name and `src/pipls/search.py` implementation,
+  with no former-name alias and unchanged component-path result terminology;
 - immutable `PiPLSComponentPath` arrays, derived fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
 - explicit best-score or one-standard-error final path-row selection, with global `best_*` results
   kept separate from `selected_result_`, optional OOF diagnostics, and one selected full-data refit;
@@ -103,7 +105,7 @@ implementation was removed and replaced by focused question-specific benchmarks:
   advanced page, and model inspection retains all stable interpretation anchors without repeating
   elementary plotting recipes.
 - documentation and maintained example constructions aligned with the current public defaults:
-  `PiPLSPathCV()` demonstrates selection-only operation, decomposition documentation includes
+  `PiPLSSearchCV()` demonstrates selection-only operation, decomposition documentation includes
   rank/solver diagnostics, and Pulp rank profiles use the public lookup method;
 - a grouped self-documenting maintainer command index that presents `make install` and `make check`
   first, then separates development, documentation/example, and distribution/maintenance targets
@@ -167,7 +169,7 @@ from pipls import (
     PiPLSComponentPath,
     PiPLSComponentResult,
     PiPLSDecomposition,
-    PiPLSPathCV,
+    PiPLSSearchCV,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSValidationReport,
@@ -208,12 +210,12 @@ case, or public behavior.
 
 | Concern | Current contract |
 |---|---|
-| Conditional predictor-rank selection | `PiPLSPathCV(search_method="auto")` |
+| Conditional predictor-rank selection | `PiPLSSearchCV(search_method="auto")` |
 | Component counts | `n_components_values="all"` by default; explicit integer sequences request a subset |
-| Path search | `PiPLSPathCV(search_method="auto")` by default |
+| Path search | `PiPLSSearchCV(search_method="auto")` by default |
 | Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, derived fold-based standard-error, predictor-rank, policy, and split-count arrays plus scalar lookup |
 | Conditional rank profile | `predictor_rank_profile(h)` returns evaluated ranks and aligned score/CV-MSE arrays on demand, plus the selected scalar row |
-| Exhaustive search | explicit `PiPLSPathCV(search_method="optimal")` |
+| Exhaustive search | explicit `PiPLSSearchCV(search_method="optimal")` |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
 | Reproducibility | estimator `random_state` accepts integer, NumPy `RandomState`, or `None`; default `0` is reproducible |
 | Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
@@ -249,13 +251,13 @@ Additional fixed decisions:
 - interpretable Pi-PLS rotations, dilation, rank/solver diagnostics, and the standardized map live
   in the read-only `decomposition_` object; construction matrices remain private and standard
   PLS-style fitted attributes remain top-level.
-- `PiPLSPathCV` defaults to selection-only `refit=False`; refit-dependent path methods are absent
+- `PiPLSSearchCV` defaults to selection-only `refit=False`; refit-dependent path methods are absent
   unless a final refit is requested explicitly. `best_*` remains the global configured-score
   optimum, while `selected_result_` records the declared best-score or 1-SE final row. Output-
   container configuration remains carried by the estimator template.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
-  `PiPLSPathCV` is the path meta-estimator and sole package selection interface.
-- Real-data examples use the default selection-only `PiPLSPathCV()` for the path and fit a
+  `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
+- Real-data examples use the default selection-only `PiPLSSearchCV()` for the path and fit a
   separate fixed model
   after a visible component-path choice. Pulp and Sugarcane use explicit counts, while Tobacco
   uses `one_standard_error_result()`. All three use `component_path_`,
@@ -263,7 +265,7 @@ Additional fixed decisions:
   estimators. `best_params_` remains a convenience, not the required user decision.
 - Refit coefficients are accessed through `selected_pipls_` or `selected_estimator_`; under the
   default best-score rule, the existing `best_pipls_` and `best_estimator_` compatibility aliases
-  remain available. Coefficients are not flattened onto `PiPLSPathCV` when preprocessing may change
+  remain available. Coefficients are not flattened onto `PiPLSSearchCV` when preprocessing may change
   the feature space.
 - OOF results produced after using the same splits for model selection are labeled
   `selection-conditioned`, not unbiased external-test estimates.
@@ -279,7 +281,7 @@ Decisions 0039 and 0040 are fully implemented:
 - `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
 - it owns no CV, scoring, OOF, or search-result parameters and attributes;
 - direct fits warn when $n/r_\pi<3$;
-- `PiPLSPathCV` owns feature probes, candidate folds, conditional path selection, optional OOF
+- `PiPLSSearchCV` owns feature probes, candidate folds, conditional path selection, optional OOF
   fitting, and selected full-data refitting;
 - the path supplies the private fold engine with the one warning category it may suppress, while
   unrelated warnings remain visible;
@@ -377,8 +379,10 @@ publication grids, and figure generation remain outside the repository.
 
 ## Current next increment
 
-Decisions 0107--0111 are complete. The path result methods remain non-mutating stored-row
-inspection. Decision 0111 adds explicit final-row orchestration to `PiPLSPathCV`: `best_*` retains
+Decisions 0107--0112 are complete. The path result methods remain non-mutating stored-row
+inspection. Decision 0112 renames the unreleased selection meta-estimator to
+`PiPLSSearchCV` without a compatibility alias or numerical change. Decision 0111 adds
+explicit final-row orchestration to `PiPLSSearchCV`: `best_*` retains
 the global configured-score optimum, `selected_result_` records either that row or the stored 1-SE
 recommendation, and optional OOF generation and full-data refitting follow the selected row. No
 second automated-model wrapper is added, and `PiPLSRegression` remains fixed-pair only. Continue the

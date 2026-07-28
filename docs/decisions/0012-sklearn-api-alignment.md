@@ -3,11 +3,11 @@
 ## Status
 
 Accepted and implemented, with selection-result ownership refined by Decision 0039: search
-attributes belong to `PiPLSPathCV`, while `PiPLSRegression` is a direct estimator.
+attributes belong to `PiPLSSearchCV`, while `PiPLSRegression` is a direct estimator.
 
 ## Context
 
-Pi-PLS has a fixed-model estimator and a pipeline-aware path meta-estimator. Programming users
+Pi-PLS has a fixed-model estimator and a pipeline-aware search meta-estimator. Programming users
 should be able to apply ordinary scikit-learn expectations and transfer familiar
 `PLSRegression` workflows without learning a second set of method, feature-name, coefficient, or
 selection-result conventions. Pi-PLS also exposes factorization matrices that have no direct
@@ -31,14 +31,14 @@ Pi-PLS-specific factorization and numerical diagnostics are canonicalized in the
 and diagnostic top-level aliases so the structured result is the single method-specific source.
 
 `PiPLSRegression` is a direct estimator and exposes no search-result attributes.
-`PiPLSPathCV` owns `cv_results_`, `best_params_`, `best_index_`, `best_score_`, and the conditional
+`PiPLSSearchCV` owns `cv_results_`, `best_params_`, `best_index_`, `best_score_`, and the conditional
 component-path results. `rank_test_score` uses minimum ranks for tied scores, while the explicit
 Pi-PLS complexity rule selects the smaller admissible model among score ties. Every tolerant
 comparison is made against one reference score: rank 1 is the selector's direct tie set around the
 maximum, and each lower rank group is anchored to its leading score rather than chained through
 adjacent near-ties.
 
-`PiPLSPathCV` is a regressor, transformer, and meta-estimator. It preserves indexable input
+`PiPLSSearchCV` is a regressor, transformer, and meta-estimator. It preserves indexable input
 containers inside folds so pandas column names and column-selecting pipelines continue to work.
 It exposes the complete selected estimator as `best_estimator_` and the fitted nested
 `PiPLSRegression` as `best_pipls_`, with direct Pi-PLS parameter values in

@@ -7,17 +7,17 @@ import numpy as np
 import pandas as pd
 from _support.pls_component_path import evaluate_pls_component_path
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 
 DATASETS_DIR = Path(__file__).resolve().parents[1] / "datasets"
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
 
 for dataset, path_search in (
-    ("pulp", PiPLSPathCV()),
-    ("sugarcane", PiPLSPathCV()),
+    ("pulp", PiPLSSearchCV()),
+    ("sugarcane", PiPLSSearchCV()),
     (
         "tobacco",
-        PiPLSPathCV(
+        PiPLSSearchCV(
             estimator=PiPLSRegression(
                 n_components=1,
                 predictor_rank=1,

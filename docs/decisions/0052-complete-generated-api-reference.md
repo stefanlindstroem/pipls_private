@@ -6,7 +6,7 @@ Accepted and implemented.
 
 ## Context
 
-The core generated reference covered the fixed estimator, path selector, decomposition, validation
+The core generated reference covered the fixed estimator, search meta-estimator, decomposition, validation
 report, and warning. The supported inspection, plotting, dataset, and metric submodules still relied
 on handwritten guide prose and sparse source docstrings.
 

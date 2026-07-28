@@ -31,9 +31,9 @@ from sklearn.model_selection import KFold, cross_val_predict  # noqa: E402
 from pipls import (  # noqa: E402
     PiPLSComponentPath,
     PiPLSComponentResult,
-    PiPLSPathCV,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
+    PiPLSSearchCV,
 )
 from pipls.inspection import (  # noqa: E402
     biplot_coordinates,
@@ -163,7 +163,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     predictor_names = tuple(str(name) for name in X.columns)
     response_names = tuple(str(name) for name in Y.columns)
 
-    path_search = PiPLSPathCV().fit(X, Y)
+    path_search = PiPLSSearchCV().fit(X, Y)
     component_path = path_search.component_path_
     selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
     display_components = tuple(range(CHOSEN_N_COMPONENTS))

@@ -1,7 +1,7 @@
 # Pulp: a complete Pi-PLS workflow
 
 This tutorial applies [First Pi-PLS model with synthetic data](synthetic.md) to a real
-multivariate dataset. It assumes that `PiPLSPathCV`, `component_path_`,
+multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`,
 `predictor_rank_profile()`, and fixed-model fitting are already familiar. The focus is what changes
 with real data: an upper-boundary predictor-rank result, selection-conditioned out-of-fold (OOF)
 predictions, and interpretation of a selected model.
@@ -335,7 +335,7 @@ strict documentation-build and source-distribution checks.
   scorer behavior, grouped or temporal splitters, leave-one-out interpretation, OOF coverage,
   and automatic refitting.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
-- Use the [`PiPLSPathCV` reference](../api/path.md#pipls.PiPLSPathCV) and
+- Use the [`PiPLSSearchCV` reference](../api/path.md#pipls.PiPLSSearchCV) and
   [inspection API](../api/inspection.md) for exact signatures.
 
 ## Reference

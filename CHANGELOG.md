@@ -2,10 +2,15 @@
 
 ## Unreleased
 
+- Rename the unreleased cross-validated selection meta-estimator from `PiPLSPathCV` to
+  `PiPLSSearchCV`, move its implementation to `pipls.search`, and update all code, examples,
+  benchmarks, tests, documentation, distribution checks, and guide-layer contracts without
+  changing selection or refit behavior.
+
 - Present automated model application through the extracted `selected_pipls_` model in public
   workflows, while retaining delegated search methods as compatibility conveniences.
 
-- Add explicit `PiPLSPathCV` final-selection rules: preserve `best_*` as the global configured-score
+- Add explicit `PiPLSSearchCV` final-selection rules: preserve `best_*` as the global configured-score
   optimum, expose the declared `selected_result_`, and optionally refit either that optimum or the
   stored one-standard-error component-path recommendation as one auditable model-building call.
 
@@ -56,7 +61,7 @@
   five-command owner workflow.
 
 - Align the maintained documentation and examples with the current implementation: demonstrate the
-  selection-only `PiPLSPathCV()` default, document complete decomposition diagnostics and fixed-model
+  selection-only `PiPLSSearchCV()` default, document complete decomposition diagnostics and fixed-model
   output configuration, expose adaptive-search completion status, and correct guide-layer profile
   ownership.
 
@@ -68,7 +73,7 @@
   install commands; only the maintained `dev`, `examples`, and `docs` extras remain; and unused
   `data`, coverage, and documentation-lint dependencies were removed.
 
-- Make `PiPLSPathCV` selection-only by default with `refit=False`, and represent the default
+- Make `PiPLSSearchCV` selection-only by default with `refit=False`, and represent the default
   response-standardized scorer by a stable package string that resolves to the existing public
   callable.
 - Deploy the strict rendered documentation through GitHub Pages from `master`, validate it on
@@ -108,7 +113,7 @@
 - Align `rank_test_score` with Pi-PLS candidate selection by using one reference-anchored
   tolerant score comparison, preventing adjacent near-ties from chaining into a wider rank group.
 
-- Bound `PiPLSPathCV` by the minimum predictor rank verified across fold-local preprocessed
+- Bound `PiPLSSearchCV` by the minimum predictor rank verified across fold-local preprocessed
   training data, so rank-deficient folds reduce the admissible path instead of aborting candidate
   evaluation.
 
@@ -191,7 +196,7 @@
   omit the unreadable heterogeneous-unit regression-coefficient figure from the tutorial while
   retaining the plotting API and numbered-example output.
 
-- Add `PiPLSPathCV.predictor_rank_profile()` and the immutable `PiPLSPredictorRankProfile` result, replacing manual `cv_results_` masking and sorting in the Pulp example and tutorial renderer.
+- Add `PiPLSSearchCV.predictor_rank_profile()` and the immutable `PiPLSPredictorRankProfile` result, replacing manual `cv_results_` masking and sorting in the Pulp example and tutorial renderer.
 
 - Clarify that each component-path predictor rank is selected by minimizing mean CV-MSE conditional
   on the component count, label the Pulp rank-profile minimum explicitly, and remove redundant
@@ -358,8 +363,8 @@
 - Complete the fixed-estimator/path-search correction with a final API and minimality audit: remove the redundant `pipls_param_prefix` control, infer the terminal Pi-PLS pipeline step, and protect fixed-pair `GridSearchCV` interoperability without recommending it in examples.
 - Simplify the real-data examples around the final two-stage workflow: import the PLS-path and CSV-to-PDF helpers directly, remove subprocess wrappers and repeated table-validation boilerplate, and fit the fixed final model from the chosen canonical Pi-PLS CSV row.
 - Remove obsolete private selection machinery after the fixed-estimator split: delete unused rank-grid and solver-tracing hooks, eliminate duplicate candidate metadata, move response-standardized loss primitives to `metrics.py`, and generate OOF predictions without rescoring the selected candidate.
-- Make `PiPLSPathCV` the sole package selection owner, including explicit control of support-warning suppression across feature probes, candidate folds, optional OOF fits, and the selected full-data refit; unrelated warnings continue to propagate.
-- Make `PiPLSRegression` a direct fixed-pair estimator with no embedded CV or search results; add the direct-fit support warning at fewer than three observations per retained predictor direction while preserving `PiPLSPathCV` candidate behavior.
+- Make `PiPLSSearchCV` the sole package selection owner, including explicit control of support-warning suppression across feature probes, candidate folds, optional OOF fits, and the selected full-data refit; unrelated warnings continue to propagate.
+- Make `PiPLSRegression` a direct fixed-pair estimator with no embedded CV or search results; add the direct-fit support warning at fewer than three observations per retained predictor direction while preserving `PiPLSSearchCV` candidate behavior.
 
 - Record the staged fixed-estimator/path-search boundary, exclude generated example artifacts from snapshots, repair malformed documentation LaTeX, and correct stale core/preprocessing decision statuses.
 - Add a single `make examples` application-validation target that runs every numbered example in
@@ -374,7 +379,7 @@
   `component_path_` immutable result, explicit optimized/fixed/maximum predictor-rank policies,
   four-row Pulp and Sugarcane benchmark CSVs with fold SD, CSV-derived example PDFs, and separate
   fixed final-model fits chosen through visible component-count constants.
-- Add the Sugarcane high-dimensional component-path smoke check using direct pandas tables and the ordinary public `PiPLSPathCV` defaults.
+- Add the Sugarcane high-dimensional component-path smoke check using direct pandas tables and the ordinary public `PiPLSSearchCV` defaults.
 
 - Remove the Linnerud dataset integration, its executable example, and dataset-specific test
   because it does not provide a useful representative Pi-PLS workflow; retain pulp, sugarcane,
@@ -384,9 +389,9 @@
   public defaults at `samples_per_predictor_rank=5` and `cv=5` and remove the temporary Pulp
   `samples_per_predictor_rank=4` override.
 - Set the public rank-selection defaults to `samples_per_predictor_rank=5` and `cv=5` in both
-  `PiPLSRegression` and `PiPLSPathCV`, and simplify the Pulp example and smoke check to use the
+  `PiPLSRegression` and `PiPLSSearchCV`, and simplify the Pulp example and smoke check to use the
   ordinary rule-derived predictor-rank bound without an explicit maximum.
-- Add the transparent Pulp component-path smoke check using direct pandas `X.csv`/`Y.csv` reading and the ordinary public `PiPLSPathCV` workflow.
+- Add the transparent Pulp component-path smoke check using direct pandas `X.csv`/`Y.csv` reading and the ordinary public `PiPLSSearchCV` workflow.
 - Add the full-versus-randomized solver-consistency benchmark with paired fixed ranks, three high-dimensional matrix geometries, independent-test prediction and coefficient relative differences, a minimal four-column CSV, and focused contract tests.
 - Add the paired predictor-nuisance benchmark comparing fixed Pi-PLS and ordinary PLS on identical deterministic synthetic train/test problems, with controlled nuisance strengths, training-fitted model standardization, independent-test MSE, a minimal five-column CSV, and focused contract tests.
 - Add the adaptive rank-selection benchmark with deterministic public synthetic train/test data, generator-declared reference ranks, fold-local model standardization, full-training refit, independent-test MSE, a minimal seven-column CSV output, and focused repeatability tests.
@@ -420,7 +425,7 @@
 - Implement exhaustive `"optimal"` rank search and deterministic adaptive coarse-to-fine `"auto"` search, with cached evaluations and search diagnostics.
 - Add full, randomized, and conservative automatic predictor-SVD policies with reproducible seeds and fitted solver diagnostics.
 - Harden public parameter validation and warn when rule-based predictor-rank bounds use fewer than five samples per retained direction.
-- Add pipeline-aware `PiPLSPathCV` with exhaustive and adaptive triangular path search, fold-safe bounds, diagnostics, and full-data refitting.
+- Add pipeline-aware `PiPLSSearchCV` with exhaustive and adaptive triangular path search, fold-safe bounds, diagnostics, and full-data refitting.
 - Align the public estimators with scikit-learn and `PLSRegression` conventions, including estimator-aware validation, feature names, pandas output, weights/loadings, standard CV results, `PiPLSDecomposition`, `best_pipls_`, and container-preserving path folds.
 - Make pandas a required development dependency so pandas API-alignment tests run rather than skip.
 - Add D2 advanced split protocols, group metadata routing, ordered OOF predictions, pooled OOF diagnostics, singleton-safe LOO handling, and explicit selection-conditioned validation reports.

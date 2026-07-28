@@ -14,7 +14,7 @@ Before advanced CV work, the public API completes a compact compatibility cleanu
   removes the duplicate direct symbolic and diagnostic aliases.
 - Cross-validated interfaces accept `cv=None` for standard five-fold regression CV and
   `scoring=None` for estimator scoring, expose `scorer_`, and include standard timing diagnostics.
-- `PiPLSPathCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
+- `PiPLSSearchCV` supports a direct `PiPLSRegression` or a `Pipeline` whose final step is
   `PiPLSRegression`. Arbitrary nested meta-estimators are rejected until explicitly supported.
 - Delegated prediction and transformation methods are conditionally exposed when refitting is
   enabled and the selected estimator supports them.

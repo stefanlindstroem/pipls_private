@@ -27,7 +27,7 @@ def test_minimal_example_is_a_literal_fixed_model_workflow() -> None:
     assert 'response_names = ["Yield", "Purity"]' in text
     assert "pipls.plotting" not in text
     assert "plot_pipls_decomposition" not in text
-    assert "PiPLSPathCV" not in text
+    assert "PiPLSSearchCV" not in text
     assert "KFold" not in text
     assert "pandas" not in text
     assert "_support" not in text

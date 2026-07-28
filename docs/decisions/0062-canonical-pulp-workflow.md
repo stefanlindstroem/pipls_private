@@ -23,7 +23,7 @@ standardization or change the multivariate scaling model.
 1. read the committed `X.csv` and `Y.csv` tables explicitly with pandas;
 2. construct a cloneable scikit-learn `Pipeline` whose terminal `pipls` step is
    `PiPLSRegression`;
-3. evaluate that complete pipeline with `PiPLSPathCV(refit=False)`;
+3. evaluate that complete pipeline with `PiPLSSearchCV(refit=False)`;
 4. read the conditional predictor rank from the row for the stated component count;
 5. clone the pipeline, assign `pipls__n_components` and `pipls__predictor_rank`, and fit it on all
    observations;

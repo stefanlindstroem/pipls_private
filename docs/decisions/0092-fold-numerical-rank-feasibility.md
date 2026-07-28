@@ -6,13 +6,13 @@ Accepted.
 
 ## Context
 
-`PiPLSPathCV` previously bounded predictor rank by total-sample support, transformed feature count,
+`PiPLSSearchCV` previously bounded predictor rank by total-sample support, transformed feature count,
 and centered training-fold dimensions. The fixed Pi-PLS core separately rejects a requested rank
 above the numerical rank of its preprocessed predictor matrix. A rank-deficient training fold could
 therefore make one otherwise admissible candidate abort the complete path search, even when lower
 ranks were valid.
 
-Rank deficiency is an expected numerical condition. The path selector should construct only
+Rank deficiency is an expected numerical condition. The search meta-estimator should construct only
 candidates that every materialized training fold can fit, including when a supported pipeline
 changes the predictor representation inside each fold.
 

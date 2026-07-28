@@ -21,7 +21,7 @@ cleanup steps API1--API3, the six-patch new-user onboarding series, and the docu
 pass are complete. The owner-led human audit continues from the current clean snapshot.
 The current public surface includes
 `PiPLSRegression`,
-`PiPLSPathCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
+`PiPLSSearchCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
 `PiPLSValidationReport`, public selection metrics,
 `StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
@@ -85,7 +85,7 @@ factorization views.
 ## Implemented estimator and selection boundary
 
 Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` owns one explicit fixed rank
-pair and no cross-validation or selection results. `PiPLSPathCV` owns the complete triangular-
+pair and no cross-validation or selection results. `PiPLSSearchCV` owns the complete triangular-
 selection lifecycle and defaults to the explicit complete-component sentinel `"all"`. Obsolete
 private selection machinery and duplicate fitted aliases have been removed; interpretable
 Pi-PLS-specific output is canonical in `decomposition_`, while construction matrices remain private. Supported pipelines infer their unique terminal Pi-PLS step and
@@ -124,7 +124,7 @@ implementing or reviewing this surface.
 - `src/pipls/inspection.py`: pure immutable fitted-model inspection computations.
 - `src/pipls/model_selection.py`: path-owned rank limits, split materialization, and rank-search
   orchestration.
-- `src/pipls/path.py`: pipeline-aware `PiPLSPathCV` meta-estimator.
+- `src/pipls/search.py`: pipeline-aware `PiPLSSearchCV` meta-estimator.
 - `src/pipls/regression.py`: direct fixed-model `PiPLSRegression` estimator.
 - `src/pipls/validation.py`: immutable validation and OOF reporting.
 - `src/pipls/__init__.py`: deliberate top-level public exports.
@@ -219,7 +219,7 @@ implementing or reviewing this surface.
   publication workflows.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required
   registry or generic loader.
-- `PiPLSRegression` and `PiPLSPathCV` do not wrap each other; selection machinery is owned by the
+- `PiPLSRegression` and `PiPLSSearchCV` do not wrap each other; selection machinery is owned by the
   path interface.
 - `PiPLSRegression` owns current centering and optional scaling: every candidate fit learns its
   statistics from the corresponding training fold, and the selected model refits them on all

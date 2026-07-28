@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, cross_val_predict
 
-from pipls import PiPLSPathCV, PiPLSRegression
+from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.inspection import (
     latent_structure,
     pipls_display_factors,
@@ -24,7 +24,7 @@ wavelengths = X.columns.to_numpy(dtype=float)
 response_names = Y.columns.tolist()
 
 # Evaluate and plot the Pi-PLS component path.
-path_search = PiPLSPathCV().fit(X, Y)
+path_search = PiPLSSearchCV().fit(X, Y)
 path = path_search.component_path_
 
 figure, axis = plt.subplots(

@@ -18,7 +18,7 @@ Pi-PLS model is then fitted on all observations with both ranks stated explicitl
 
 ## Decision
 
-`PiPLSPathCV` exposes one conditionally selected result per requested `n_components` value.
+`PiPLSSearchCV` exposes one conditionally selected result per requested `n_components` value.
 Decision 0066 replaces the original dictionary representation with the immutable
 `component_path_` object. Its aligned fields are:
 

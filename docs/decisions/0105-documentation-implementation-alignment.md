@@ -19,7 +19,7 @@ profile directly from `cv_results_`.
 
 ## Decision
 
-Current user-facing selection workflows construct `PiPLSPathCV()` without spelling the default
+Current user-facing selection workflows construct `PiPLSSearchCV()` without spelling the default
 `refit=False`. Text continues to state that the default is selection-only, and `refit=True` remains
 explicit wherever automatic global-best refitting is intended. Historical decision records retain
 the syntax that was current when those decisions were accepted.

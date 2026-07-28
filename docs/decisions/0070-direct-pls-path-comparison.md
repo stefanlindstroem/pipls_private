@@ -44,7 +44,7 @@ validation path so array write protection is preserved.
 dataset:
 
 1. read `X.csv` and `Y.csv` directly with pandas;
-2. fit `PiPLSPathCV(refit=False)` and retain `component_path_`;
+2. fit `PiPLSSearchCV(refit=False)` and retain `component_path_`;
 3. evaluate the matched ordinary-PLS path in memory;
 4. verify that the two component-count arrays agree;
 5. create one Matplotlib figure and axis;
