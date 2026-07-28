@@ -8,6 +8,7 @@ import numpy as np
 from pipls import PiPLSRegression
 from pipls.inspection import pipls_display_factors
 
+predictor_names = ["Temperature", "Pressure", "Flow rate"]
 X = np.array(
     [
         [1.0, 2.0, 0.5],
@@ -20,6 +21,8 @@ X = np.array(
         [8.0, 7.0, 4.0],
     ]
 )
+
+response_names = ["Yield", "Purity"]
 Y = np.array(
     [
         [1.2, 2.0],
@@ -39,8 +42,6 @@ print("Predictions:")
 print(predictions)
 
 factors = pipls_display_factors(model.decomposition_)
-predictor_names = ["Temperature", "Pressure", "Flow rate"]
-response_names = ["Yield", "Purity"]
 
 figure, axes = plt.subplots(2, 2, figsize=(11.0, 8.0), layout="constrained")
 predictor_positions = np.arange(len(predictor_names))
