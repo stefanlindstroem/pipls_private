@@ -769,8 +769,8 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
     path = search.component_path_
     assert isinstance(path, PiPLSComponentPath)
     np.testing.assert_array_equal(path.n_components, np.array([1, 2]))
-    np.testing.assert_array_equal(path.n_splits, np.array([3, 3]))
-    assert path.predictor_rank_policy.tolist() == ["optimized", "optimized"]
+    assert path.n_splits == 3
+    assert path.predictor_rank_policy == "optimized"
 
     for row_index, h in enumerate((1, 2)):
         rank = int(path.predictor_rank[row_index])
@@ -791,7 +791,7 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
         )
         assert path.cv_mse_standard_error[row_index] == pytest.approx(
             search.cv_results_["std_response_standardized_mse"][index]
-            / np.sqrt(path.n_splits[row_index] - 1)
+            / np.sqrt(path.n_splits - 1)
         )
 
     selected = path.for_n_components(search.best_n_components_)
@@ -888,10 +888,7 @@ def test_component_path_records_predictor_rank_policy(
         n_jobs=1,
     ).fit(X, Y)
 
-    assert search.component_path_.predictor_rank_policy.tolist() == [
-        expected_policy,
-        expected_policy,
-    ]
+    assert search.component_path_.predictor_rank_policy == expected_policy
     if expected_policy == "fixed":
         np.testing.assert_array_equal(
             search.component_path_.predictor_rank,

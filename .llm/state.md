@@ -38,7 +38,8 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - pipeline-aware `PiPLSSearchCV` for triangular `(n_components, predictor_rank)` search;
 - the direct pre-release `PiPLSSearchCV` public name and `src/pipls/search.py` implementation,
   with no former-name alias and unchanged component-path result terminology;
-- immutable `PiPLSComponentPath` arrays, derived fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
+- immutable `PiPLSComponentPath` row arrays with path-wide policy and split-count scalars, derived
+  fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
 - explicit best-score or one-standard-error final path-row selection, with global `best_*` results
   kept separate from `selected_result_`, optional OOF diagnostics, and one selected full-data refit;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
@@ -387,7 +388,7 @@ the global configured-score optimum, `selected_result_` records either that row 
 recommendation, and optional OOF generation and full-data refitting follow the selected row. No
 second automated-model wrapper is added, and `PiPLSRegression` remains fixed-pair only.
 
-The first four simplifications from the owner-led audit are complete.
+The first five simplifications from the owner-led audit are complete.
 `PiPLSSearchCV.fit()` resolves its estimator template, Pi-PLS parameter prefix, and scorer once per
 fit, while retaining distinct upper-independent sequence checks and later data-dependent rank
 bounds. `pipls_display_factors()` trusts the finite, aligned, nonempty, and nonnegative arrays
@@ -395,14 +396,17 @@ already guaranteed by `PiPLSDecomposition`; it still validates response-orientat
 `PiPLSDisplayFactors` stores only $P$, $d$, and $Q$ and derives the checked read-only $QD$ property.
 `PredictionDiagnostics` accepts only observed values, predicted values, and prediction provenance;
 it derives its residual, standardization statistics, standardized arrays, and response-wise RMSE
-once, so inconsistent redundant diagnostic state cannot be constructed. No package release
+once, so inconsistent redundant diagnostic state cannot be constructed. Decision 0115 stores the
+component-path predictor-rank policy and split count once as scalars and derives
+`PiPLSPredictorRankProfile.selected` from immutable candidate arrays with the fitted tolerant
+lower-rank tie rule. No package release
 preparation or Python-package publication work is authorized.
 
 ## Subsequent roadmap
 
-1. **Human audit contract decision:** decide whether path-wide constants and duplicated selected-row
-   state in `PiPLSComponentPath` and `PiPLSPredictorRankProfile` should be normalized before
-   implementing that separate result-record simplification.
+1. **Human audit contract decision:** decide whether `PiPLSValidationReport` should compose the
+   selected `PiPLSComponentResult` rather than independently storing the selected component count,
+   predictor rank, split count, mean score, and mean response-standardized MSE.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

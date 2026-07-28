@@ -62,6 +62,10 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     ):
         assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
 
+    assert "selected" not in {
+        field.name for field in fields(PiPLSPredictorRankProfile)
+    }
+
 
 def test_component_result_validates_and_normalizes_python_scalars() -> None:
     result = _component_result()
@@ -117,11 +121,11 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
     path_kwargs = {
         "n_components": [1, 2],
         "predictor_rank": [2, 3],
-        "predictor_rank_policy": ["optimized", "optimized"],
+        "predictor_rank_policy": "optimized",
         "mean_test_score": [-0.5, -0.4],
         "cv_mse_mean": [0.5, 0.4],
         "cv_mse_fold_sd": [0.1, 0.1],
-        "n_splits": [3, 3],
+        "n_splits": 3,
     }
     with pytest.raises(ValueError, match="finite"):
         PiPLSComponentPath(**{**path_kwargs, "mean_test_score": [-0.5, np.nan]})
@@ -129,19 +133,18 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
         PiPLSComponentPath(**{**path_kwargs, "cv_mse_mean": [0.5, -0.1]})
     with pytest.raises(ValueError, match="contain integers"):
         PiPLSComponentPath(**{**path_kwargs, "n_components": [1.0, 2.0]})
-    one_split_path = PiPLSComponentPath(**{**path_kwargs, "n_splits": [3, 1]})
+    one_split_path = PiPLSComponentPath(**{**path_kwargs, "n_splits": 1})
     with pytest.raises(ValueError, match="requires at least two"):
         _ = one_split_path.cv_mse_standard_error
 
-    selected = _component_result()
     profile_kwargs = {
         "n_components": 2,
         "predictor_rank": [2, 3],
         "mean_test_score": [-0.5, -0.4],
         "cv_mse_mean": [0.5, 0.4],
         "cv_mse_fold_sd": [0.1, 0.1],
+        "predictor_rank_policy": "optimized",
         "n_splits": 5,
-        "selected": selected,
     }
     with pytest.raises(ValueError, match="finite"):
         PiPLSPredictorRankProfile(

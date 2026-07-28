@@ -120,6 +120,7 @@ This index is navigation, not a substitute for those records.
 | `0112-search-cv-public-name.md` | public selection-class name | rename the unreleased meta-estimator to `PiPLSSearchCV` without an alias; retain component-path result terminology |
 | `0113-derived-weighted-response-directions.md` | derived weighted response directions | store only independent display factors and expose checked read-only $QD$ as a derived property |
 | `0114-derived-prediction-diagnostics.md` | derived prediction diagnostics | accept observed values, predicted values, and provenance; derive all dependent diagnostic arrays once |
+| `0115-normalized-path-result-state.md` | normalized path result state | store path-wide policy and split count once; derive predictor-rank-profile selection from candidate arrays |
 
 ## Implemented estimator/search transition
 

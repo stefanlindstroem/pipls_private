@@ -549,7 +549,7 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
         "mean_score_time",
         "std_score_time",
     } <= search.cv_results_.keys()
-    assert search.component_path_.predictor_rank_policy.tolist() == ["fixed"]
+    assert search.component_path_.predictor_rank_policy == "fixed"
     assert isinstance(search.component_path_, PiPLSComponentPath)
     assert search.component_path_.for_n_components(2).predictor_rank == 3
     assert not hasattr(search, "component_path_results_")

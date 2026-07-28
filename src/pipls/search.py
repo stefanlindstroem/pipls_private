@@ -584,8 +584,8 @@ class PiPLSSearchCV(
                 FloatArray,
                 self.cv_results_["std_response_standardized_mse"],
             )[indices],
+            predictor_rank_policy=selected.predictor_rank_policy,
             n_splits=self.n_splits_,
-            selected=selected,
         )
 
     @available_if(_estimator_supports("predict"))  # type: ignore[untyped-decorator]
@@ -1147,11 +1147,10 @@ def _component_path(
 ) -> PiPLSComponentPath:
     """Return one conditionally selected predictor-rank result per component count."""
 
-    n_rows = int(conditional_indices.size)
     return PiPLSComponentPath(
         n_components=cast(IntArray, results["n_components"])[conditional_indices],
         predictor_rank=cast(IntArray, results["predictor_rank"])[conditional_indices],
-        predictor_rank_policy=np.full(n_rows, predictor_rank_policy, dtype=object),
+        predictor_rank_policy=predictor_rank_policy,
         mean_test_score=cast(FloatArray, results["mean_test_score"])[conditional_indices],
         cv_mse_mean=cast(
             FloatArray,
@@ -1161,7 +1160,7 @@ def _component_path(
             FloatArray,
             results["std_response_standardized_mse"],
         )[conditional_indices],
-        n_splits=np.full(n_rows, n_splits, dtype=np.intp),
+        n_splits=n_splits,
     )
 
 

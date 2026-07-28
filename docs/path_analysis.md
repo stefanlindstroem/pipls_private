@@ -174,8 +174,9 @@ standard error of the mean CV-MSE:
 \frac{\widehat{\sigma}_{\mathrm{fold,pop}}}{\sqrt{K-1}},
 \]
 
-where $K$ is the number of validation splits. This is equivalent to dividing the sample standard
-deviation of the fold MSE values by $\sqrt{K}$. At least two splits are required. Maintained
+where $K$ is the number of validation splits, stored once as the path-wide scalar
+`component_path_.n_splits`. This is equivalent to dividing the sample standard deviation of the
+fold MSE values by $\sqrt{K}$. At least two splits are required. Maintained
 component-path and predictor-rank-profile figures plot the mean response-standardized CV-MSE with
 symmetric $\pm 1$ standard-error bars from this property. Because CV training sets overlap, these
 bars are a conventional resampling heuristic rather than confidence intervals or a formal

@@ -15,12 +15,11 @@ from ._result_validation import (
     _positive_int,
     _read_only_float_array,
     _read_only_int_array,
-    _read_only_string_array,
 )
+from .model_selection import _tied_score_mask
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
-StringArray = NDArray[np.str_]
 PredictorRankPolicy = Literal["optimized", "fixed", "maximum"]
 _ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "maximum"})
 
@@ -141,10 +140,12 @@ class PiPLSPredictorRankProfile:
         Population standard deviation of response-standardized MSE across folds.
     cv_mse_standard_error : ndarray of shape (n_evaluated_ranks,)
         Fold-based standard error of mean response-standardized CV-MSE.
+    predictor_rank_policy : {"optimized", "fixed", "maximum"}
+        Predictor-rank policy shared by every evaluated candidate.
     n_splits : int
         Number of cross-validation splits.
     selected : PiPLSComponentResult
-        Conditionally selected scalar result for ``n_components``.
+        Derived conditionally selected scalar result for ``n_components``.
     """
 
     n_components: int
@@ -152,8 +153,8 @@ class PiPLSPredictorRankProfile:
     mean_test_score: FloatArray
     cv_mse_mean: FloatArray
     cv_mse_fold_sd: FloatArray
+    predictor_rank_policy: PredictorRankPolicy
     n_splits: int
-    selected: PiPLSComponentResult
 
     def __post_init__(self) -> None:
         n_components = _positive_int(self.n_components, name="n_components")
@@ -169,6 +170,14 @@ class PiPLSPredictorRankProfile:
         cv_mse_fold_sd = _read_only_float_array(
             self.cv_mse_fold_sd,
             name="cv_mse_fold_sd",
+        )
+        predictor_rank_policy = cast(
+            PredictorRankPolicy,
+            _literal_string(
+                self.predictor_rank_policy,
+                name="predictor_rank_policy",
+                allowed=_ALLOWED_PREDICTOR_RANK_POLICIES,
+            ),
         )
         n_splits = _positive_int(self.n_splits, name="n_splits")
 
@@ -187,33 +196,13 @@ class PiPLSPredictorRankProfile:
             raise ValueError("cv_mse_mean must contain nonnegative values.")
         if np.any(cv_mse_fold_sd < 0.0):
             raise ValueError("cv_mse_fold_sd must contain nonnegative values.")
-        if not isinstance(self.selected, PiPLSComponentResult):
-            raise ValueError("selected must be a PiPLSComponentResult.")
-        if self.selected.n_components != n_components:
-            raise ValueError("selected.n_components must match n_components.")
-        if self.selected.n_splits != n_splits:
-            raise ValueError("selected.n_splits must match n_splits.")
-
-        selected_rows = np.flatnonzero(predictor_rank == self.selected.predictor_rank)
-        if selected_rows.size != 1:
-            raise ValueError("selected.predictor_rank must occur exactly once in predictor_rank.")
-        selected_index = int(selected_rows[0])
-        selected_values = (
-            (self.selected.mean_test_score, mean_test_score[selected_index]),
-            (self.selected.cv_mse_mean, cv_mse_mean[selected_index]),
-            (self.selected.cv_mse_fold_sd, cv_mse_fold_sd[selected_index]),
-        )
-        if any(
-            not np.isclose(scalar, array_value, rtol=1e-7, atol=1e-12)
-            for scalar, array_value in selected_values
-        ):
-            raise ValueError("selected score values must match its predictor-rank row.")
 
         object.__setattr__(self, "n_components", n_components)
         object.__setattr__(self, "predictor_rank", predictor_rank)
         object.__setattr__(self, "mean_test_score", mean_test_score)
         object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
         object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
+        object.__setattr__(self, "predictor_rank_policy", predictor_rank_policy)
         object.__setattr__(self, "n_splits", n_splits)
 
     @property
@@ -223,6 +212,23 @@ class PiPLSPredictorRankProfile:
         return _read_only_cv_mse_standard_error(
             self.cv_mse_fold_sd,
             self.n_splits,
+        )
+
+    @property
+    def selected(self) -> PiPLSComponentResult:
+        """Return the conditionally selected predictor-rank result."""
+
+        maximum = float(np.max(self.mean_test_score))
+        tied = np.flatnonzero(_tied_score_mask(self.mean_test_score, maximum))
+        index = int(tied[0])
+        return PiPLSComponentResult(
+            n_components=self.n_components,
+            predictor_rank=int(self.predictor_rank[index]),
+            predictor_rank_policy=self.predictor_rank_policy,
+            mean_test_score=float(self.mean_test_score[index]),
+            cv_mse_mean=float(self.cv_mse_mean[index]),
+            cv_mse_fold_sd=float(self.cv_mse_fold_sd[index]),
+            n_splits=self.n_splits,
         )
 
     def __reduce__(self) -> tuple[type[PiPLSPredictorRankProfile], tuple[object, ...]]:
@@ -236,8 +242,8 @@ class PiPLSPredictorRankProfile:
                 self.mean_test_score,
                 self.cv_mse_mean,
                 self.cv_mse_fold_sd,
+                self.predictor_rank_policy,
                 self.n_splits,
-                self.selected,
             ),
         )
 
@@ -256,8 +262,8 @@ class PiPLSComponentPath:
         Evaluated component counts in strictly ascending order.
     predictor_rank : ndarray of shape (n_component_values,)
         Conditionally selected predictor rank for each component count.
-    predictor_rank_policy : ndarray of shape (n_component_values,)
-        Predictor-rank policy for each row.
+    predictor_rank_policy : {"optimized", "fixed", "maximum"}
+        Predictor-rank policy shared by every path row.
     mean_test_score : ndarray of shape (n_component_values,)
         Mean configured test score for each selected candidate.
     cv_mse_mean : ndarray of shape (n_component_values,)
@@ -266,17 +272,17 @@ class PiPLSComponentPath:
         Population standard deviation of response-standardized MSE across folds.
     cv_mse_standard_error : ndarray of shape (n_component_values,)
         Fold-based standard error of mean response-standardized CV-MSE.
-    n_splits : ndarray of shape (n_component_values,)
-        Number of cross-validation splits represented by each row.
+    n_splits : int
+        Number of cross-validation splits shared by every path row.
     """
 
     n_components: IntArray
     predictor_rank: IntArray
-    predictor_rank_policy: StringArray
+    predictor_rank_policy: PredictorRankPolicy
     mean_test_score: FloatArray
     cv_mse_mean: FloatArray
     cv_mse_fold_sd: FloatArray
-    n_splits: IntArray
+    n_splits: int
 
     def __post_init__(self) -> None:
         n_components = _read_only_int_array(self.n_components, name="n_components")
@@ -284,11 +290,13 @@ class PiPLSComponentPath:
             self.predictor_rank,
             name="predictor_rank",
         )
-        predictor_rank_policy = _read_only_string_array(
-            self.predictor_rank_policy,
-            name="predictor_rank_policy",
-            ndim=1,
-            allowed=_ALLOWED_PREDICTOR_RANK_POLICIES,
+        predictor_rank_policy = cast(
+            PredictorRankPolicy,
+            _literal_string(
+                self.predictor_rank_policy,
+                name="predictor_rank_policy",
+                allowed=_ALLOWED_PREDICTOR_RANK_POLICIES,
+            ),
         )
         mean_test_score = _read_only_float_array(
             self.mean_test_score,
@@ -299,15 +307,13 @@ class PiPLSComponentPath:
             self.cv_mse_fold_sd,
             name="cv_mse_fold_sd",
         )
-        n_splits = _read_only_int_array(self.n_splits, name="n_splits")
+        n_splits = _positive_int(self.n_splits, name="n_splits")
 
         arrays = (
             predictor_rank,
-            predictor_rank_policy,
             mean_test_score,
             cv_mse_mean,
             cv_mse_fold_sd,
-            n_splits,
         )
         if n_components.size == 0:
             raise ValueError("A component path must contain at least one result.")
@@ -321,8 +327,6 @@ class PiPLSComponentPath:
             raise ValueError(
                 "predictor_rank must not be smaller than the aligned n_components value."
             )
-        if np.any(n_splits <= 0):
-            raise ValueError("n_splits must contain positive integers.")
         if np.any(cv_mse_mean < 0.0):
             raise ValueError("cv_mse_mean must contain nonnegative values.")
         if np.any(cv_mse_fold_sd < 0.0):
@@ -450,14 +454,11 @@ class PiPLSComponentPath:
         return PiPLSComponentResult(
             n_components=int(self.n_components[index]),
             predictor_rank=int(self.predictor_rank[index]),
-            predictor_rank_policy=cast(
-                PredictorRankPolicy,
-                str(self.predictor_rank_policy[index]),
-            ),
+            predictor_rank_policy=self.predictor_rank_policy,
             mean_test_score=float(self.mean_test_score[index]),
             cv_mse_mean=float(self.cv_mse_mean[index]),
             cv_mse_fold_sd=float(self.cv_mse_fold_sd[index]),
-            n_splits=int(self.n_splits[index]),
+            n_splits=self.n_splits,
         )
 
 

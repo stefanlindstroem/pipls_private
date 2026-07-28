@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Normalize immutable path results by storing one predictor-rank policy and split count per search
+  and deriving `PiPLSPredictorRankProfile.selected` from its candidate arrays with the fitted
+  tolerant lower-rank tie rule, removing repeated and potentially inconsistent state.
+
 - Derive `PredictionDiagnostics` residuals, standardization statistics, standardized arrays, and
   response-wise RMSE from observed values, predicted values, and prediction provenance, removing
   seven redundant constructor fields without changing the returned attribute surface.

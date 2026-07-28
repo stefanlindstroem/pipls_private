@@ -42,7 +42,8 @@ response is a matrix denoted by $Y$ in equations; see the
 
 `component_path_` contains one conditionally selected predictor-rank result for each evaluated
 component count. Its aligned read-only arrays support complete path plots and comparisons without
-requiring manual masking of `cv_results_`. It also provides non-mutating methods that return the
+requiring manual masking of `cv_results_`. The predictor-rank policy and validation split count are
+stored once as path-wide scalars rather than repeated in every row. It also provides non-mutating methods that return the
 stored minimum-CV-MSE row or the conventional 1-SE row as complete `PiPLSComponentResult` objects.
 These methods inspect evaluated results only; they do not fit, refit, or change `best_*`. See
 [Component-path recommendation methods](../path_analysis.md#result-object-recommendations) for the
@@ -71,7 +72,8 @@ split count.
 
 `predictor_rank_profile(h)` contains every predictor rank actually evaluated for one component
 count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks;
-its `selected` field is the same scalar result returned by `component_path_`.
+its `selected` property derives the same conditionally selected scalar values returned by
+`component_path_` from the immutable candidate arrays and shared policy and split-count scalars.
 
 ::: pipls.PiPLSPredictorRankProfile
     options:

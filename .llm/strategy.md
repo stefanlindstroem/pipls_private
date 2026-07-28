@@ -784,12 +784,21 @@ and preserves their checked read-only public attributes.
 
 Current status: **derived prediction-diagnostic simplification complete**.
 
+### Normalized path-result state simplification
+
+Decision 0115 stores the predictor-rank policy and validation split count once on each component
+path rather than repeating them as row arrays. `PiPLSPredictorRankProfile` stores the same shared
+scalars and derives its public `selected` result from immutable candidate arrays with the fitted
+tolerant lower-rank tie rule instead of accepting a duplicated selected row.
+
+Current status: **normalized path-result simplification complete**.
+
 ## Current next increment
 
-Before changing path result records, document the contract decision for whether path-wide constants
-and duplicated selected-row state in `PiPLSComponentPath` and `PiPLSPredictorRankProfile` should be
-normalized. Do not combine that change with validation-report composition. Do not prepare or publish
-a package release.
+Before changing validation reports, document the contract decision for whether
+`PiPLSValidationReport` should compose the selected `PiPLSComponentResult` rather than independently
+storing the same selected-row scalars. Do not combine that change with another result-record
+simplification. Do not prepare or publish a package release.
 
 ## Maintenance protocol
 

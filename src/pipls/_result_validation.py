@@ -10,7 +10,6 @@ from numpy.typing import ArrayLike, NDArray
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
-StringArray = NDArray[np.str_]
 
 
 def _positive_int(value: object, *, name: str) -> int:
@@ -87,25 +86,5 @@ def _read_only_int_array(
     if raw.dtype.kind not in "iu" or raw.dtype.kind == "b":
         raise ValueError(f"{name} must contain integers.")
     array = np.array(raw, dtype=np.intp, copy=True)
-    array.setflags(write=False)
-    return array
-
-
-def _read_only_string_array(
-    value: ArrayLike,
-    *,
-    name: str,
-    ndim: int,
-    allowed: Collection[str],
-) -> StringArray:
-    raw = np.asarray(value, dtype=object)
-    if raw.ndim != ndim:
-        raise ValueError(f"{name} must be {ndim}-dimensional; got shape {raw.shape}.")
-    if any(not isinstance(item, str) for item in raw.flat):
-        raise ValueError(f"{name} must contain strings.")
-    invalid = sorted(set(raw.tolist()) - set(allowed))
-    if invalid:
-        raise ValueError(f"{name} contains unsupported values: {invalid}.")
-    array = np.array(raw, dtype=np.str_, copy=True)
     array.setflags(write=False)
     return array

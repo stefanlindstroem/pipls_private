@@ -39,6 +39,7 @@ reference describe the current public behavior directly.
 - [0107: component-path recommendation methods](0107-component-path-recommendation-methods.md)
 - [0111: explicit path selection rules](0111-explicit-path-selection-rules.md)
 - [0112: search-CV public name](0112-search-cv-public-name.md)
+- [0115: normalized path result state](0115-normalized-path-result-state.md)
 
 ## Validation, data, and benchmarks
 
