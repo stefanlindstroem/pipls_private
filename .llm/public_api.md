@@ -269,10 +269,10 @@ read-only arrays; labels and sign bookkeeping remain outside the result record.
 
 `prediction_diagnostics()` accepts one- or two-dimensional observed and predicted responses,
 normalizes outputs to two dimensions, uses residuals $y-\hat y$, and applies observed-response
-sample centers and standard deviations with `ddof=1`. It returns original and standardized arrays,
-response centers and scales, response-wise standardized RMSE, and one of the explicit prediction
-provenance labels defined by `PredictionKind`. Constant response columns and ambiguous labels are
-rejected.
+sample centers and standard deviations with `ddof=1`. `PredictionDiagnostics` accepts only the
+independent observed values, predicted values, and prediction provenance; it derives and stores the
+read-only residual, standardized arrays, response centers and scales, and response-wise standardized
+RMSE. Constant response columns and ambiguous labels are rejected.
 
 `latent_structure()` accepts a compatible fitted PLS-family model through the public
 `x_scores_`, `x_loadings_`, `y_loadings_`, and `coef_` attributes. Both `PiPLSRegression` and
@@ -288,8 +288,10 @@ probability limits.
 `biplot_coordinates()` accepts a `LatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
 $TP^\mathsf{T}$ reconstruction.
 
-All five inspection records validate direct construction, store defensive read-only copies, and
-revalidate through pickle reconstruction. Their helper functions guarantee finite public arrays:
+All five inspection records validate direct construction, store defensive read-only arrays, and
+revalidate through pickle reconstruction. Display-factor weighting and prediction-diagnostic
+quantities are derived from independent constructor state rather than accepted redundantly. Their
+helper functions guarantee finite public arrays:
 range-safe scaled calculations are used where ordinary means, norms, covariance products, squared
 residuals, or RMSE calculations could overflow, and an unrepresentable derived quantity raises a
 clear `ValueError` instead of returning `inf` or `nan`.

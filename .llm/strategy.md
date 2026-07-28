@@ -775,13 +775,21 @@ $QD$ through a derived property. Direct construction still rejects an unrepresen
 
 Current status: **derived weighted-response-direction simplification complete**.
 
+### Derived prediction-diagnostic state simplification
+
+Decision 0114 removes residuals, response statistics, standardized matrices, and standardized RMSE
+as independent `PredictionDiagnostics` constructor and serialized state. The result accepts
+observed values, predicted values, and prediction provenance, derives all dependent arrays once,
+and preserves their checked read-only public attributes.
+
+Current status: **derived prediction-diagnostic simplification complete**.
+
 ## Current next increment
 
-Before changing `PredictionDiagnostics`, document the contract decision for whether its residual,
-standardized matrices, response statistics, and standardized RMSE should be derived from observed
-values, predicted values, and prediction provenance rather than supplied as independent constructor
-state. Do not combine that change with path-record or validation-report simplification. Do not
-prepare or publish a package release.
+Before changing path result records, document the contract decision for whether path-wide constants
+and duplicated selected-row state in `PiPLSComponentPath` and `PiPLSPredictorRankProfile` should be
+normalized. Do not combine that change with validation-report composition. Do not prepare or publish
+a package release.
 
 ## Maintenance protocol
 

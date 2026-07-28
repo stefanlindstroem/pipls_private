@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Derive `PredictionDiagnostics` residuals, standardization statistics, standardized arrays, and
+  response-wise RMSE from observed values, predicted values, and prediction provenance, removing
+  seven redundant constructor fields without changing the returned attribute surface.
+
 - Derive `PiPLSDisplayFactors.weighted_response_directions` as a checked read-only
   property of the stored response directions and dilation, removing redundant constructor and
   serialized state without changing its public attribute or numerical values.

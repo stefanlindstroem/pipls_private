@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal, Protocol, TypeAlias, cast
 
 import numpy as np
@@ -419,8 +419,9 @@ class PredictionDiagnostics:
 
     All response matrices are two-dimensional, including single-response input.
     Centers and sample standard deviations are estimated from ``observed`` and
-    applied unchanged to ``predicted``. Direct construction validates all aligned
-    fields, derived relationships, provenance, and immutability.
+    applied unchanged to ``predicted``. Direct construction accepts only the
+    independent observed values, predicted values, and prediction provenance;
+    all diagnostic arrays are derived once, validated, and stored read-only.
 
     Attributes
     ----------
@@ -444,46 +445,18 @@ class PredictionDiagnostics:
 
     observed: FloatArray
     predicted: FloatArray
-    residual: FloatArray
-    observed_standardized: FloatArray
-    predicted_standardized: FloatArray
-    residual_standardized: FloatArray
-    response_centers: FloatArray
-    response_scales: FloatArray
-    standardized_rmse: FloatArray
     prediction_kind: PredictionKind
+    residual: FloatArray = field(init=False)
+    observed_standardized: FloatArray = field(init=False)
+    predicted_standardized: FloatArray = field(init=False)
+    residual_standardized: FloatArray = field(init=False)
+    response_centers: FloatArray = field(init=False)
+    response_scales: FloatArray = field(init=False)
+    standardized_rmse: FloatArray = field(init=False)
 
     def __post_init__(self) -> None:
         observed = _read_only_float_array(self.observed, name="observed", ndim=2)
         predicted = _read_only_float_array(self.predicted, name="predicted", ndim=2)
-        residual = _read_only_float_array(self.residual, name="residual", ndim=2)
-        observed_standardized = _read_only_float_array(
-            self.observed_standardized,
-            name="observed_standardized",
-            ndim=2,
-        )
-        predicted_standardized = _read_only_float_array(
-            self.predicted_standardized,
-            name="predicted_standardized",
-            ndim=2,
-        )
-        residual_standardized = _read_only_float_array(
-            self.residual_standardized,
-            name="residual_standardized",
-            ndim=2,
-        )
-        response_centers = _read_only_float_array(
-            self.response_centers,
-            name="response_centers",
-        )
-        response_scales = _read_only_float_array(
-            self.response_scales,
-            name="response_scales",
-        )
-        standardized_rmse = _read_only_float_array(
-            self.standardized_rmse,
-            name="standardized_rmse",
-        )
         prediction_kind = cast(
             PredictionKind,
             _literal_string(
@@ -497,86 +470,65 @@ class PredictionDiagnostics:
             raise ValueError(
                 "Prediction diagnostics require at least two observations and one response."
             )
-        for name, values in (
-            ("predicted", predicted),
-            ("residual", residual),
-            ("observed_standardized", observed_standardized),
-            ("predicted_standardized", predicted_standardized),
-            ("residual_standardized", residual_standardized),
-        ):
-            if values.shape != observed.shape:
-                raise ValueError(f"{name} must have the same shape as observed.")
-        vector_shape = (observed.shape[1],)
-        for name, values in (
-            ("response_centers", response_centers),
-            ("response_scales", response_scales),
-            ("standardized_rmse", standardized_rmse),
-        ):
-            if values.shape != vector_shape:
-                raise ValueError(f"{name} must contain one value per response.")
-        if np.any(response_scales <= 0.0):
-            raise ValueError("response_scales must contain positive values.")
-        if np.any(standardized_rmse < 0.0):
-            raise ValueError("standardized_rmse must contain nonnegative values.")
+        if predicted.shape != observed.shape:
+            raise ValueError("predicted must have the same shape as observed.")
 
-        expected_residual = _finite_difference(observed, predicted, name="observed - predicted")
-        _require_close(residual, expected_residual, name="residual")
-        expected_observed_standardized = _finite_divide(
+        response_centers = _safe_column_mean(observed, name="response_centers")
+        response_scales = _safe_sample_scales(
+            observed,
+            response_centers,
+            name="response_scales",
+        )
+        constant = np.flatnonzero(response_scales == 0.0)
+        if constant.size:
+            columns = ", ".join(str(int(index)) for index in constant)
+            raise ValueError(
+                f"observed contains constant response columns at indices: {columns}."
+            )
+
+        residual = _finite_difference(observed, predicted, name="residual")
+        observed_standardized = _finite_divide(
             _finite_difference(
                 observed,
                 response_centers[None, :],
-                name="observed - response_centers",
+                name="centered observed responses",
             ),
             response_scales[None, :],
             name="observed_standardized",
         )
-        expected_predicted_standardized = _finite_divide(
+        predicted_standardized = _finite_divide(
             _finite_difference(
                 predicted,
                 response_centers[None, :],
-                name="predicted - response_centers",
+                name="centered predicted responses",
             ),
             response_scales[None, :],
             name="predicted_standardized",
         )
-        expected_residual_standardized = _finite_divide(
+        residual_standardized = _finite_divide(
             residual,
             response_scales[None, :],
             name="residual_standardized",
         )
-        _require_close(
-            observed_standardized,
-            expected_observed_standardized,
-            name="observed_standardized",
-        )
-        _require_close(
-            predicted_standardized,
-            expected_predicted_standardized,
-            name="predicted_standardized",
-        )
-        _require_close(
+        standardized_rmse = _safe_column_rmse(
             residual_standardized,
-            expected_residual_standardized,
-            name="residual_standardized",
-        )
-        _require_close(
-            response_centers,
-            _safe_column_mean(observed, name="response_centers"),
-            name="response_centers",
-        )
-        _require_close(
-            response_scales,
-            _safe_sample_scales(observed, response_centers, name="response_scales"),
-            name="response_scales",
-        )
-        _require_close(
-            standardized_rmse,
-            _safe_column_rmse(residual_standardized, name="standardized_rmse"),
             name="standardized_rmse",
         )
 
+        for values in (
+            residual,
+            observed_standardized,
+            predicted_standardized,
+            residual_standardized,
+            response_centers,
+            response_scales,
+            standardized_rmse,
+        ):
+            values.setflags(write=False)
+
         object.__setattr__(self, "observed", observed)
         object.__setattr__(self, "predicted", predicted)
+        object.__setattr__(self, "prediction_kind", prediction_kind)
         object.__setattr__(self, "residual", residual)
         object.__setattr__(self, "observed_standardized", observed_standardized)
         object.__setattr__(self, "predicted_standardized", predicted_standardized)
@@ -584,26 +536,11 @@ class PredictionDiagnostics:
         object.__setattr__(self, "response_centers", response_centers)
         object.__setattr__(self, "response_scales", response_scales)
         object.__setattr__(self, "standardized_rmse", standardized_rmse)
-        object.__setattr__(self, "prediction_kind", prediction_kind)
 
     def __reduce__(self) -> tuple[type[PredictionDiagnostics], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""
 
-        return (
-            type(self),
-            (
-                self.observed,
-                self.predicted,
-                self.residual,
-                self.observed_standardized,
-                self.predicted_standardized,
-                self.residual_standardized,
-                self.response_centers,
-                self.response_scales,
-                self.standardized_rmse,
-                self.prediction_kind,
-            ),
-        )
+        return type(self), (self.observed, self.predicted, self.prediction_kind)
 
     @property
     def n_samples(self) -> int:
@@ -959,10 +896,6 @@ def prediction_diagnostics(
         standardized RMSE.
     """
 
-    if prediction_kind not in _PREDICTION_KINDS:
-        allowed = ", ".join(repr(value) for value in _PREDICTION_KINDS)
-        raise ValueError(f"prediction_kind must be one of {allowed}.")
-
     observed = _response_matrix(y_true, name="y_true")
     predicted = _response_matrix(y_pred, name="y_pred")
     if observed.shape != predicted.shape:
@@ -970,59 +903,9 @@ def prediction_diagnostics(
             "y_true and y_pred must have identical shapes after response normalization: "
             f"got {observed.shape} and {predicted.shape}."
         )
-    if observed.shape[0] < 2:
-        raise ValueError("Prediction diagnostics require at least two observations.")
-
-    response_centers = _safe_column_mean(observed, name="response_centers")
-    response_scales = _safe_sample_scales(
-        observed,
-        response_centers,
-        name="response_scales",
-    )
-    constant = np.flatnonzero(response_scales == 0.0)
-    if constant.size:
-        columns = ", ".join(str(int(index)) for index in constant)
-        raise ValueError(f"y_true contains constant response columns at indices: {columns}.")
-
-    residual = _finite_difference(observed, predicted, name="residual")
-    observed_standardized = _finite_divide(
-        _finite_difference(
-            observed,
-            response_centers[None, :],
-            name="centered observed responses",
-        ),
-        response_scales[None, :],
-        name="observed_standardized",
-    )
-    predicted_standardized = _finite_divide(
-        _finite_difference(
-            predicted,
-            response_centers[None, :],
-            name="centered predicted responses",
-        ),
-        response_scales[None, :],
-        name="predicted_standardized",
-    )
-    residual_standardized = _finite_divide(
-        residual,
-        response_scales[None, :],
-        name="residual_standardized",
-    )
-    standardized_rmse = _safe_column_rmse(
-        residual_standardized,
-        name="standardized_rmse",
-    )
-
     return PredictionDiagnostics(
         observed=observed,
         predicted=predicted,
-        residual=residual,
-        observed_standardized=observed_standardized,
-        predicted_standardized=predicted_standardized,
-        residual_standardized=residual_standardized,
-        response_centers=response_centers,
-        response_scales=response_scales,
-        standardized_rmse=standardized_rmse,
         prediction_kind=prediction_kind,
     )
 
@@ -1220,8 +1103,3 @@ def _safe_column_rmse(values: FloatArray, *, name: str) -> FloatArray:
             name=name,
         )
     return _finite_derived_array(rmse, name=name)
-
-
-def _require_close(actual: FloatArray, expected: FloatArray, *, name: str) -> None:
-    if not np.allclose(actual, expected, rtol=1e-7, atol=1e-12):
-        raise ValueError(f"{name} is inconsistent with the other diagnostic fields.")

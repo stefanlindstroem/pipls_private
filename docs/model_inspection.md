@@ -75,10 +75,11 @@ confidence regions, or variable importance.
 
 ### Prediction diagnostics
 
-`prediction_diagnostics()` receives observed and predicted responses explicitly. It stores original
-and response-standardized observations, predictions, residuals, response centers and scales,
-response-wise standardized RMSE, and a required provenance label. Display standardization uses the
-supplied observed responses and does not alter predictions in original units.
+`prediction_diagnostics()` receives observed and predicted responses explicitly.
+`PredictionDiagnostics` accepts those independent arrays and the required provenance label, then
+derives the residuals, response centers and scales, response-standardized arrays, and response-wise
+standardized RMSE once. Display standardization uses the supplied observed responses and does not
+alter predictions in original units.
 
 Selection-conditioned OOF predictions are descriptive post-selection diagnostics, not an
 independent estimate of future performance.

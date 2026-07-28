@@ -88,6 +88,7 @@ reference describe the current public behavior directly.
 - [0109: Tobacco one-standard-error threshold figure](0109-tobacco-one-standard-error-threshold-figure.md)
 - [0110: response-anchored Pi-PLS display factors](0110-response-anchored-display-factors.md)
 - [0113: derived weighted response directions](0113-derived-weighted-response-directions.md)
+- [0114: derived prediction diagnostics](0114-derived-prediction-diagnostics.md)
 
 ## Repository and documentation policy
 

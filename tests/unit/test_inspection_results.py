@@ -16,21 +16,9 @@ from pipls.inspection import (
 
 
 def _prediction_diagnostics() -> PredictionDiagnostics:
-    observed = np.array([[1.0], [3.0], [5.0]], dtype=np.float32)
-    predicted = np.array([[0.0], [4.0], [5.0]], dtype=np.float32)
-    centers = np.array([3.0], dtype=np.float32)
-    scales = np.array([2.0], dtype=np.float32)
-    residual = observed - predicted
     return PredictionDiagnostics(
-        observed=observed,
-        predicted=predicted,
-        residual=residual,
-        observed_standardized=(observed - centers) / scales,
-        predicted_standardized=(predicted - centers) / scales,
-        residual_standardized=residual / scales,
-        response_centers=centers,
-        response_scales=scales,
-        standardized_rmse=np.sqrt(np.mean(np.square(residual / scales), axis=0)),
+        observed=np.array([[1.0], [3.0], [5.0]], dtype=np.float32),
+        predicted=np.array([[0.0], [4.0], [5.0]], dtype=np.float32),
         prediction_kind="external test predictions",
     )
 
@@ -128,18 +116,45 @@ def test_display_factors_reject_unrepresentable_derived_weighting() -> None:
         )
 
 
-def test_prediction_diagnostics_reject_inconsistent_direct_construction() -> None:
+def test_prediction_diagnostics_derive_dependent_fields() -> None:
     diagnostics = _prediction_diagnostics()
-    with pytest.raises(ValueError, match="residual is inconsistent"):
+
+    np.testing.assert_array_equal(diagnostics.residual, [[1.0], [-1.0], [0.0]])
+    np.testing.assert_array_equal(diagnostics.response_centers, [3.0])
+    np.testing.assert_array_equal(diagnostics.response_scales, [2.0])
+    np.testing.assert_allclose(diagnostics.observed_standardized, [[-1.0], [0.0], [1.0]])
+    np.testing.assert_allclose(
+        diagnostics.predicted_standardized,
+        [[-1.5], [0.5], [1.0]],
+    )
+    np.testing.assert_allclose(
+        diagnostics.residual_standardized,
+        [[0.5], [-0.5], [0.0]],
+    )
+    np.testing.assert_allclose(diagnostics.standardized_rmse, [np.sqrt(1.0 / 6.0)])
+
+
+def test_prediction_diagnostics_reject_derived_constructor_arguments() -> None:
+    diagnostics = _prediction_diagnostics()
+    with pytest.raises(TypeError, match="unexpected keyword argument 'residual'"):
         PredictionDiagnostics(
             observed=diagnostics.observed,
             predicted=diagnostics.predicted,
-            residual=np.zeros_like(diagnostics.residual),
-            observed_standardized=diagnostics.observed_standardized,
-            predicted_standardized=diagnostics.predicted_standardized,
-            residual_standardized=diagnostics.residual_standardized,
-            response_centers=diagnostics.response_centers,
-            response_scales=diagnostics.response_scales,
-            standardized_rmse=diagnostics.standardized_rmse,
             prediction_kind=diagnostics.prediction_kind,
+            residual=np.zeros_like(diagnostics.residual),  # type: ignore[call-arg]
+        )
+
+
+def test_prediction_diagnostics_reject_invalid_independent_inputs() -> None:
+    with pytest.raises(ValueError, match="same shape"):
+        PredictionDiagnostics(
+            observed=np.ones((3, 2)),
+            predicted=np.ones((3, 1)),
+            prediction_kind="fitted values",
+        )
+    with pytest.raises(ValueError, match="constant response columns"):
+        PredictionDiagnostics(
+            observed=np.ones((3, 1)),
+            predicted=np.zeros((3, 1)),
+            prediction_kind="fitted values",
         )

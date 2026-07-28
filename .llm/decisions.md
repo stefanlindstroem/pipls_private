@@ -119,6 +119,7 @@ This index is navigation, not a substitute for those records.
 | `0111-explicit-path-selection-rules.md` | explicit path selection rules | preserve global `best_*`; expose a separate selected path row and optionally refit the best-score or 1-SE choice |
 | `0112-search-cv-public-name.md` | public selection-class name | rename the unreleased meta-estimator to `PiPLSSearchCV` without an alias; retain component-path result terminology |
 | `0113-derived-weighted-response-directions.md` | derived weighted response directions | store only independent display factors and expose checked read-only $QD$ as a derived property |
+| `0114-derived-prediction-diagnostics.md` | derived prediction diagnostics | accept observed values, predicted values, and provenance; derive all dependent diagnostic arrays once |
 
 ## Implemented estimator/search transition
 
