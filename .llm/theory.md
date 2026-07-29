@@ -85,8 +85,8 @@ and response modes.
 | $\mathbf{M}$ | $(r_\pi,h)$ | left singular vectors of $\mathbf{W}$ |
 | $\mathbf{D}$ | $(h,h)$ | nonnegative diagonal dilation matrix |
 | $\mathbf{N}$ | $(h,h)$ | right singular vectors of $\mathbf{W}$ |
-| $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ | $(p,h)$ | orthonormal predictor latent basis |
-| $\mathbf{Q}=\mathbf{C}\mathbf{N}$ | $(q,h)$ | orthonormal response latent basis |
+| $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ | $(p,h)$ | orthonormal predictor directions |
+| $\mathbf{Q}=\mathbf{C}\mathbf{N}$ | $(q,h)$ | orthonormal response directions |
 | $\mathbf{B}_{\mathrm{cs}}$ | $(p,q)$ | regression map in core coordinates |
 
 The dimensional admissibility conditions are
@@ -99,6 +99,37 @@ $$
 
 The implementation additionally requires $r_\pi$ not to exceed the numerical rank of the supplied
 predictor matrix.
+
+## Canonical terminology
+
+Use these terms in mathematical and explanatory prose:
+
+- $\mathbf{\Pi}$ is the **retained predictor basis**;
+- $\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}$ is the **retained-subspace projector**;
+- $\mathbf{P}$ and $\mathbf{Q}$ contain **orthonormal predictor directions** and
+  **orthonormal response directions**;
+- $d_k=D_{kk}$ is the **dilation** of paired latent mode $k$;
+- $\mathbf{X}\mathbf{P}$ and $\mathbf{Y}\mathbf{Q}$ are the **predictor scores** and
+  **response scores**;
+- $(P_{:k},d_k,Q_{:k})$ is **paired latent mode** $k$;
+- public `n_components` is the number of paired latent modes $h$;
+- public `predictor_rank` is the retained predictor-subspace dimension $r_\pi$.
+
+Do not call $P$ a projection matrix: $PP^{\mathsf T}$ is the projector onto the final predictor-
+direction span. Do not call $P$ or $Q$ reconstruction loadings: the estimator's `x_loadings_` and
+`y_loadings_` are separate least-squares reconstruction quantities. Existing public names
+`predictor_rotations`, `response_rotations`, `x_rotations_`, and `y_rotations_` remain unchanged,
+but **direction** is the canonical mathematical term.
+
+The package's response-by-mode weighted directions are $QD$, with column $k$ equal to $d_kQ_{:k}$.
+The mode-by-response form used in parts of the manuscript is exactly
+
+$$
+DQ^{\mathsf T}=(QD)^{\mathsf T}.
+$$
+
+Reserve “predictor signal rank” for synthetic truth where the noiseless rank is known. For observed
+data, use retained predictor basis, retained predictor subspace, and predictor rank.
 
 ## Step 1: retain a rank-controlled predictor subspace
 

@@ -409,6 +409,7 @@ def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
 
     sections = (
         "## Scientific source and package scope",
+        "## Canonical terminology",
         "## 1. Rank-controlled predictor projection",
         "## 2. Covariance-driven response projection",
         "## 3. Least squares in the reduced coordinates",
@@ -438,3 +439,30 @@ def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
         r"(r_\pi+q-h)h",
     ):
         assert required in mathematics
+
+
+def test_theory_page_defines_canonical_pipls_terminology() -> None:
+    root = _repository_root()
+    theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+    mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
+    public_api = (root / ".llm" / "public_api.md").read_text(encoding="utf-8")
+
+    for required in (
+        "retained predictor basis",
+        "retained-subspace projector",
+        "orthonormal predictor directions",
+        "orthonormal response directions",
+        "$d_k=D_{kk}$",
+        "paired latent mode",
+        "`predictor_rank`",
+        "`n_components`",
+        r"DQ^{\mathsf T}=(QD)^{\mathsf T}",
+        "`x_loadings_` and `y_loadings_`",
+    ):
+        assert required in theory
+
+    assert "number of paired latent modes $h$" in public_api
+    assert r"retained predictor-subspace dimension $r_\pi$" in public_api
+    assert "orthonormal predictor directions" in mathematics
+    assert "orthonormal response directions" in mathematics
+    assert r"(\mathbf{Q}\mathbf{D})^{\mathsf T}" in mathematics

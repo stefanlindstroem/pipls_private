@@ -193,12 +193,15 @@ B_{\mathrm{cs}} = P D Q^\mathsf{T}.
 
 The primary decomposition report displays:
 
-- predictor rotations $P$;
+- predictor directions $P$;
 - dilation values $d_k=D_{kk}$;
-- dilation-weighted response rotations $d_kQ_{jk}$, exposed or plotted as $QD$.
+- weighted response directions $d_kQ_{jk}$, exposed or plotted as $QD$.
 
-Use the terms **predictor rotation** or **predictor direction** for $P$. Do not call $P$ an X
-loading: `PiPLSRegression.x_loadings_` is a separate score-reconstruction quantity.
+Use **predictor direction** and **response direction** as the canonical mathematical terms. Existing
+public field names containing `rotations` remain unchanged. Do not call $P$ an X loading or $Q$ a Y
+loading: `PiPLSRegression.x_loadings_` and `y_loadings_` are separate score-reconstruction
+quantities. The response-by-mode display $QD$ is the transpose of the manuscript's mode-by-response
+form $DQ^{\mathsf T}$.
 
 ### Display signs
 

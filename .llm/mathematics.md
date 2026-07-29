@@ -22,8 +22,8 @@ mathematical object.
 | $\mathbf{M}$ | $(r_\pi,h)$ | left singular vectors of $\mathbf{W}$ |
 | $\mathbf{D}$ | $(h,h)$ | nonnegative diagonal dilation matrix |
 | $\mathbf{N}$ | $(h,h)$ | right singular vectors of $\mathbf{W}$ |
-| $\mathbf{P}$ | $(p,h)$ | orthonormal predictor rotations, $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ |
-| $\mathbf{Q}$ | $(q,h)$ | orthonormal response rotations, $\mathbf{Q}=\mathbf{C}\mathbf{N}$ |
+| $\mathbf{P}$ | $(p,h)$ | orthonormal predictor directions, $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ |
+| $\mathbf{Q}$ | $(q,h)$ | orthonormal response directions, $\mathbf{Q}=\mathbf{C}\mathbf{N}$ |
 
 Admissibility requires
 
@@ -32,6 +32,34 @@ Admissibility requires
 \qquad
 r_\pi\le\min(n,p).
 \end{equation}
+
+## Terminology and orientation
+
+$\mathbf{\Pi}$ is the retained predictor basis and
+$\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}$ is the retained-subspace projector. The columns of
+$\mathbf{P}$ and $\mathbf{Q}$ are orthonormal predictor and response directions. The projectors
+onto their final spans are $\mathbf{P}\mathbf{P}^{\mathsf T}$ and
+$\mathbf{Q}\mathbf{Q}^{\mathsf T}$; neither $\mathbf{P}$ nor $\mathbf{Q}$ is itself a
+projection matrix.
+
+For each $k$, $d_k=D_{kk}$ is the dilation of paired latent mode
+$(P_{:k},d_k,Q_{:k})$. The matrices $\mathbf{X}_{\mathrm{cs}}\mathbf{P}$ and
+$\mathbf{Y}_{\mathrm{cs}}\mathbf{Q}$ contain predictor and response scores. Public
+`n_components` counts the $h$ paired latent modes, while public `predictor_rank` denotes the retained
+predictor-subspace dimension $r_\pi$.
+
+The package's weighted response directions have response-by-mode orientation
+$\mathbf{Q}\mathbf{D}$, and
+
+\begin{equation}
+\mathbf{D}\mathbf{Q}^{\mathsf T}
+=
+(\mathbf{Q}\mathbf{D})^{\mathsf T}.
+\end{equation}
+
+The mathematical terms above do not rename the public fields `predictor_rotations`,
+`response_rotations`, `x_rotations_`, or `y_rotations_`. Predictor and response directions are not
+the estimator's separate least-squares reconstruction loadings.
 
 The private core additionally requires $r_\pi$ not to exceed the numerical rank of the supplied
 predictor matrix. For thin-SVD singular values $s_i$, numerical rank is determined by

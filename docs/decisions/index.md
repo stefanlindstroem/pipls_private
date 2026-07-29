@@ -42,6 +42,7 @@ reference describe the current public behavior directly.
 - [0115: normalized path result state](0115-normalized-path-result-state.md)
 - [0116: composed validation report result](0116-composed-validation-report-result.md)
 - [0120: companion-manuscript theory alignment](0120-companion-manuscript-theory-alignment.md)
+- [0121: canonical Pi-PLS terminology](0121-canonical-pipls-terminology.md)
 
 ## Validation, data, and benchmarks
 

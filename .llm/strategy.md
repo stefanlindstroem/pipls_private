@@ -848,14 +848,24 @@ behavior, default, example, benchmark, validation protocol, or real-data workflo
 
 Current status: **companion-manuscript theory alignment complete**.
 
+### Canonical Pi-PLS terminology
+
+Decision 0121 fixes the canonical names for the retained predictor basis and projector, predictor
+and response directions, dilations, scores, paired latent modes, and the two public rank
+parameters. It preserves public Python field names containing `rotations`, distinguishes $P$ and
+$Q$ from reconstruction loadings, relates package-facing $QD$ to manuscript-facing
+$DQ^{\mathsf T}$, and records recommended manuscript wording changes. No package behavior or
+public identifier changes.
+
+Current status: **canonical terminology decision complete**.
+
 ## Current next increment
 
-Record the canonical terminology decision before propagating vocabulary across the public surface.
-The review should cover $\Pi$, $P$, $Q$, $d_k$, scores, paired latent modes, `n_components`, and
-`predictor_rank`, and should identify manuscript wording that is less precise than the package's
-current distinctions. This increment is documentation-only and must not change estimator, search,
-validation, synthetic-generator, example, benchmark, or real-data behavior. Do not prepare or
-publish a package release.
+Propagate Decision 0121 vocabulary through the public documentation and source docstrings. This
+next increment may update README material, served guides, generated API prose, tutorials, examples,
+and public factorization docstrings, but it must not rename identifiers or change estimator, search,
+validation, synthetic-generator, benchmark, rendering, example, or real-data behavior. Do not
+prepare or publish a package release.
 
 ## Maintenance protocol
 

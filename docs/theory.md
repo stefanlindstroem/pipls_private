@@ -51,6 +51,42 @@ For a centered estimator fit, the effective sample-space bound becomes
 $r_\pi\leq\min(n-1,p)$. The implementation also requires $r_\pi$ not to exceed the verified numerical
 rank of the preprocessed predictor matrix.
 
+## Canonical terminology
+
+The package uses the following terms for the fixed Pi-PLS construction:
+
+| Object or public name | Canonical meaning |
+|---|---|
+| $\Pi$ | retained predictor basis |
+| $\Pi\Pi^{\mathsf T}$ | retained-subspace projector |
+| $P$ | orthonormal predictor directions |
+| $Q$ | orthonormal response directions |
+| $d_k=D_{kk}$ | dilation of paired latent mode $k$ |
+| $XP$ | predictor scores |
+| $YQ$ | response scores |
+| $(P_{:k},d_k,Q_{:k})$ | paired latent mode $k$ |
+| `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
+| `n_components` | number of paired latent modes $h$ |
+
+The word **direction** is the primary mathematical term for columns of $P$ and $Q$. Existing Python
+field names such as `predictor_rotations`, `response_rotations`, `x_rotations_`, and
+`y_rotations_` remain public interface names; they do not make $P$ or $Q$ projection matrices. The
+projectors onto the final direction spans are $PP^{\mathsf T}$ and $QQ^{\mathsf T}$.
+
+The Pi-PLS directions are also distinct from `x_loadings_` and `y_loadings_`, which are
+least-squares reconstruction loadings for the centered or centered-and-scaled training blocks.
+For response-side factor displays, the package stores response-by-mode weighted directions $QD$,
+where column $k$ is $d_kQ_{:k}$. The manuscript's mode-by-response orientation is the transpose:
+
+\begin{equation}
+DQ^{\mathsf T}=(QD)^{\mathsf T}.
+\end{equation}
+
+The API word “component” is retained because it is familiar in regression software. In Pi-PLS,
+`n_components` counts paired latent modes, not predictor-SVD directions and not synthetic latent
+components. Likewise, `predictor_rank` is a retained observed-subspace dimension; “predictor signal
+rank” is reserved for synthetic settings where the noiseless generating rank is known.
+
 ## 1. Rank-controlled predictor projection
 
 Take a singular value decomposition

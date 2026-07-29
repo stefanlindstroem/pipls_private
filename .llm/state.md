@@ -421,14 +421,21 @@ the panoramic interpretation, comparative limiting cases, and the nominal fitted
 $(r_\pi+q-h)h$ after $\Pi$ is fixed. It distinguishes retained observed predictor directions from
 known synthetic signal rank and leaves every package behavior and practical workflow unchanged.
 
+Decision 0121 establishes the canonical terminology for the fixed construction. $\Pi$ is the
+retained predictor basis, $\Pi\Pi^{\mathsf T}$ the retained-subspace projector, $P$ and $Q$
+orthonormal predictor and response directions, and $d_k$ the dilation of paired latent mode $k$.
+`n_components` counts paired latent modes and `predictor_rank` is the retained predictor-subspace
+dimension. Existing public field names containing `rotations` remain unchanged, while $P$ and $Q$
+remain distinct from reconstruction loadings. The package's $QD$ orientation is the transpose of
+manuscript-facing $DQ^{\mathsf T}$.
+
 ## Current next increment
 
-The next owner-authorized increment is documentation-only terminology review. Record explicit
-canonical terms for $\Pi$, $P$, $Q$, $d_k$, predictor/response scores, paired latent modes,
-`n_components`, and `predictor_rank`, including recommendations for terminology that should be
-changed in the manuscript rather than weakened in the package. Do not propagate vocabulary broadly
-until that decision is accepted. Do not change estimator, search, validation, synthetic, benchmark,
-example, or real-data behavior.
+Propagate Decision 0121 terminology through the public documentation and source docstrings. Update
+README material, served guides, generated API prose, tutorial and example prose, and public
+factorization descriptions without renaming public identifiers or changing equations, behavior,
+examples, benchmarks, model selection, validation, synthetic generation, or real-data workflows.
+Do not prepare or publish a package release.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

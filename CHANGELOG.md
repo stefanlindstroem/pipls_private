@@ -4,6 +4,12 @@
 
 ### Documentation
 
+- established canonical Pi-PLS terminology: $\Pi$ is the retained predictor basis,
+  $\Pi\Pi^{\mathsf T}$ the retained-subspace projector, $P$ and $Q$ orthonormal predictor and
+  response directions, $d_k$ a mode dilation, and `n_components` the number of paired latent modes;
+  retained existing public field names while distinguishing directions from reconstruction
+  loadings and relating $QD$ to $(DQ^{\mathsf T})^{\mathsf T}$.
+
 - aligned the canonical Pi-PLS theory page with the companion manuscript: added the retained
   predictor-projector decomposition, response-subspace optimization, latent least-squares and
   diagonal coupling relations, panoramic interpretation, comparative limiting cases, and the

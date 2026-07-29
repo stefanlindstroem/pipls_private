@@ -34,15 +34,20 @@ available from `pipls.metrics`.
 
 ## Public names
 
-| Public name | Mathematical notation |
+| Public name | Mathematical meaning |
 |---|---|
-| `n_components` | $h$ |
-| `predictor_rank` | $r_\pi$ |
+| `n_components` | number of paired latent modes $h$ |
+| `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
 | `samples_per_predictor_rank` | $c$ in `PiPLSSearchCV` |
 | `predictor_rank_` | fitted explicit $r_\pi$ |
 | `max_predictor_rank_` | centered algebraic limit on the fixed estimator; search ceiling on the path |
 
 Do not expose constructor aliases named `h`, `r_pi`, or `c`.
+
+The public factor fields retain the established names `predictor_rotations`, `response_rotations`,
+`x_rotations_`, and `y_rotations_`. Mathematical prose calls their $P$ and $Q$ columns predictor and
+response directions. These directions are distinct from the reconstruction loadings exposed as
+`x_loadings_` and `y_loadings_`.
 
 ## Fixed-estimator validation and warning contract
 
