@@ -4,6 +4,10 @@
 
 ### Documentation
 
+- correct the served example catalogue heading scope so the Tobacco-specific 1-SE discussion no
+  longer governs the generic output-artifact and rendering-ownership notes for all maintained
+  examples.
+
 - add a focused companion-manuscript synthetic-data guide that demonstrates the exact Gaussian
   latent generator and stored truth equations, records the oracle synthetic dimensions, and
   distinguishes distribution-level, seeded-realization, and complete-publication reproduction

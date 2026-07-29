@@ -878,6 +878,15 @@ examples, benchmarks, rendering, and real-data behavior remain unchanged.
 
 Current status: **companion-manuscript synthetic-data guide complete**.
 
+### Example-catalogue heading-scope cleanup
+
+A documentation audit separated the Tobacco-specific one-standard-error explanation from the
+generic output-artifact and rendering-ownership notes that follow it in the served example
+catalogue. This is a heading-structure correction only; no example, rendering, or package behavior
+changes.
+
+Current status: **example-catalogue heading-scope cleanup complete**.
+
 ## Current next increment
 
 The P1--P5 manuscript-alignment sequence is complete. No further implementation increment is

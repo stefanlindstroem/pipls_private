@@ -69,6 +69,8 @@ how the stored row is obtained, and the [component-path API reference](api/path.
 method surface. The example calls the result method explicitly instead of using the path-level
 `selection_rule="one_standard_error"` orchestration.
 
+## Output artifacts and rendering ownership
+
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
 Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered
 example writes a generated CSV file: committed `X.csv` and `Y.csv` tables are inputs, while every

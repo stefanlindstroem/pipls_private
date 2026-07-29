@@ -102,6 +102,9 @@ implementation was removed and replaced by focused question-specific benchmarks:
 - a completed documentation reference layer with a public result-object map, task-oriented
   troubleshooting, generic local-link and anchor validation, and tests that protect structure
   without freezing explanatory prose.
+- a served example catalogue whose dataset-specific selection notes and cross-example output or
+  rendering notes occupy separate heading scopes, so a narrow Tobacco subsection does not govern
+  generic documentation that follows it.
 - a consolidated programming reference with eight navigation entries: small generated result and
   utility groups live with their owning estimators, path selection and cross-validation share one
   advanced page, and model inspection retains all stable interpretation anchors without repeating
