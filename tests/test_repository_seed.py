@@ -71,6 +71,58 @@ def test_packaging_uses_pep639_license_metadata() -> None:
     assert 'license = {file = "LICENSE"}' not in pyproject
 
 
+def test_named_authors_and_complete_bsd_license() -> None:
+    root = _repository_root()
+    project = _project_metadata()
+    authors = [author["name"] for author in project["authors"]]
+    license_text = (root / "LICENSE").read_text(encoding="utf-8")
+
+    assert authors == [
+        "Vishal Agrawal",
+        "Fritjof Nilsson",
+        "Stefan B. Lindström",
+    ]
+    assert (
+        "Copyright (c) 2026 Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström"
+        in license_text
+    )
+    assert "Pi-PLS authors" not in license_text
+    assert "Redistribution and use in source and binary forms, with or without modification" in (
+        license_text
+    )
+    assert "IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE" in license_text
+    assert "LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION" in license_text
+
+
+def test_citation_metadata_names_software_and_companion_manuscript() -> None:
+    root = _repository_root()
+    citation = yaml.safe_load((root / "CITATION.cff").read_text(encoding="utf-8"))
+    project = _project_metadata()
+
+    expected_authors = [
+        {"family-names": "Agrawal", "given-names": "Vishal"},
+        {"family-names": "Nilsson", "given-names": "Fritjof"},
+        {"family-names": "Lindström", "given-names": "Stefan B."},
+    ]
+    assert citation["cff-version"] == "1.2.0"
+    assert citation["type"] == "software"
+    assert citation["license"] == "BSD-3-Clause"
+    assert citation["version"] == project["version"]
+    assert citation["authors"] == expected_authors
+
+    paper = citation["preferred-citation"]
+    assert paper["type"] == "article"
+    assert paper["title"] == (
+        "Panoramic Partial Least Squares (Pi-PLS): Transparent, parsimonious, and more "
+        "interpretable multivariate regression model"
+    )
+    assert paper["authors"] == expected_authors
+    assert paper["journal"] == "Computers & Chemical Engineering"
+    assert paper["status"] == "submitted"
+    assert paper["year"] == 2026
+    assert paper["notes"] == "Manuscript under revision, CACE-D-26-00847."
+
+
 def test_source_distribution_manifest_includes_documentation_build_inputs() -> None:
     manifest_lines = {
         line.strip()
@@ -79,6 +131,7 @@ def test_source_distribution_manifest_includes_documentation_build_inputs() -> N
     }
 
     assert {
+        "include CITATION.cff",
         "include Makefile",
         "include mkdocs.yml",
         "include tools/check_sdist_docs.py",

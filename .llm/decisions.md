@@ -122,6 +122,7 @@ This index is navigation, not a substitute for those records.
 | `0114-derived-prediction-diagnostics.md` | derived prediction diagnostics | accept observed values, predicted values, and provenance; derive all dependent diagnostic arrays once |
 | `0115-normalized-path-result-state.md` | normalized path result state | store path-wide policy and split count once; derive predictor-rank-profile selection from candidate arrays |
 | `0116-composed-validation-report-result.md` | composed validation-report result | store one selected component result and derive the existing selected-row convenience attributes |
+| `0117-commercial-license-authorship-and-citation.md` | commercial license, authorship, and citation | retain complete BSD-3-Clause terms, name the three copyright holders, and publish software plus companion-paper citation metadata |
 
 ## Implemented estimator/search transition
 

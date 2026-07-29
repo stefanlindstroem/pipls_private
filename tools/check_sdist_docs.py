@@ -137,8 +137,11 @@ def main() -> None:
             source = _safe_extract(archive, extracted)
 
         required = [
+            source / "CITATION.cff",
+            source / "LICENSE",
             source / "Makefile",
             source / "mkdocs.yml",
+            source / "docs" / "citation.md",
             source / "docs" / "index.md",
             source / "docs" / "tutorials" / "synthetic.md",
             source / "docs" / "tutorials" / "pulp.md",

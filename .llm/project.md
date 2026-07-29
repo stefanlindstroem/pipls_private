@@ -28,6 +28,12 @@ The current public surface includes
 `pipls.inspection`, and immutable inspection results. All maintained figures are rendered directly
 from those results with Matplotlib; annotated biplots use optional `adjustText`.
 
+The repository-authored code and documentation use the BSD 3-Clause License. Vishal Agrawal,
+Fritjof Nilsson, and Stefan B. Lindström are the package authors and current copyright holders.
+`CITATION.cff` and `docs/citation.md` record the software and the companion manuscript under
+revision at *Computers & Chemical Engineering* (CACE-D-26-00847). Dataset-specific licenses
+remain separate.
+
 The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
 Steel table, SARCOS, and FRED-MD from this repository because the exact source materials do not

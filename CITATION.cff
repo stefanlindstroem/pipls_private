@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the software and the companion manuscript."
+title: "pipls: Pi-PLS multivariate regression for Python"
+type: software
+version: "0.0.0"
+license: BSD-3-Clause
+authors:
+  - family-names: Agrawal
+    given-names: Vishal
+  - family-names: Nilsson
+    given-names: Fritjof
+  - family-names: Lindström
+    given-names: "Stefan B."
+preferred-citation:
+  type: article
+  title: "Panoramic Partial Least Squares (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model"
+  authors:
+    - family-names: Agrawal
+      given-names: Vishal
+    - family-names: Nilsson
+      given-names: Fritjof
+    - family-names: Lindström
+      given-names: "Stefan B."
+  journal: "Computers & Chemical Engineering"
+  status: submitted
+  year: 2026
+  notes: "Manuscript under revision, CACE-D-26-00847."

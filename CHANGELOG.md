@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Complete the BSD 3-Clause license text, name Vishal Agrawal, Fritjof Nilsson, and
+  Stefan B. Lindström as package authors and copyright holders of the code and documentation,
+  and add public plus machine-readable software and companion-paper citation metadata.
+
 - Remove an unused private finite-vector inspection helper and a redundant reassignment of
   `PiPLSValidationReport.selected_result`; this is a behavior-preserving internal cleanup.
 

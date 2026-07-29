@@ -374,3 +374,28 @@ def test_component_path_recommendations_have_one_maintained_application() -> Non
     assert "../docs/path_analysis.md#one-standard-error-component-heuristic" in examples_readme
     assert "../docs/examples.md#tobacco-one-standard-error-selection" in examples_readme
     assert "horizontal 1-SE threshold" in examples_readme
+
+
+def test_authors_license_and_citation_page_is_public_and_consistent() -> None:
+    root = _repository_root()
+    page = (root / "docs" / "citation.md").read_text(encoding="utf-8")
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    with (root / "mkdocs.yml").open(encoding="utf-8") as stream:
+        navigation = yaml.safe_load(stream)["nav"]
+
+    scientific_background = next(
+        item["Scientific background"]
+        for item in navigation
+        if "Scientific background" in item
+    )
+    assert {"Authors, license, and citation": "citation.md"} in scientific_background
+
+    for name in ("Vishal Agrawal", "Fritjof Nilsson", "Stefan B. Lindström"):
+        assert name in page
+        assert name in readme
+    assert "BSD 3-Clause License" in page
+    assert "commercial use" in page
+    assert "CACE-D-26-00847" in page
+    assert "Manuscript under revision" in page
+    assert "docs/citation.md" in readme
+    assert "CITATION.cff" in readme

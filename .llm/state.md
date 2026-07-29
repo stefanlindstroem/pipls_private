@@ -394,6 +394,13 @@ preparation or Python-package publication work is authorized.
 A follow-up behavior-preserving audit cleanup removes the now-unused private finite-vector
 inspection helper and the no-op reassignment of the already validated selected result.
 
+Decision 0117 completes the standard BSD 3-Clause license text, names Vishal Agrawal,
+Fritjof Nilsson, and Stefan B. Lindström as package authors and current copyright holders of the
+repository-authored code and documentation, and adds public plus machine-readable citation
+metadata. The companion manuscript is under revision at *Computers & Chemical Engineering* as
+CACE-D-26-00847. Dataset-specific licenses remain authoritative, and no release or publication
+claim is implied.
+
 ## Subsequent roadmap
 
 No further implementation patch is preauthorized. Continue the human audit and identify one

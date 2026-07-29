@@ -30,6 +30,7 @@ def test_distribution_check_is_a_public_make_target_and_sdist_input() -> None:
 
     assert "tools/check_distributions.py" in dry_run.stdout
     assert "dist-check" in help_output
+    assert "include CITATION.cff" in manifest
     assert "include tools/check_distributions.py" in manifest
     assert "recursive-include examples/results .gitkeep" in manifest
 

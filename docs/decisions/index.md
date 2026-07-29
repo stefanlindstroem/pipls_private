@@ -132,3 +132,4 @@ reference describe the current public behavior directly.
 - [0103: installation and optional-dependency boundary](0103-installation-and-optional-dependency-boundary.md)
 - [0104: new-user documentation route](0104-new-user-documentation-route.md)
 - [0105: documentation and implementation alignment](0105-documentation-implementation-alignment.md)
+- [0117: commercial license, authorship, and citation](0117-commercial-license-authorship-and-citation.md)

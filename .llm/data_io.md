@@ -85,6 +85,10 @@ The source license and required attribution must be preserved in the dataset dir
 in `metadata.yaml`. If rights are uncertain, the data remain external to `pipls`; an example may not
 work around this boundary by downloading and republishing the same material automatically.
 
+The repository-level BSD 3-Clause License covers repository-authored code and documentation; it
+does not relicense included datasets. Dataset-specific license and attribution files remain
+authoritative for those assets.
+
 ## Repository dataset policy
 
 Every committed real dataset follows `.llm/dataset_layout.md`:

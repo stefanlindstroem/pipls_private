@@ -808,6 +808,17 @@ one redundant reassignment of the already validated selected component result.
 
 Current status: **post-series audit cleanup complete**.
 
+### Commercial licensing, authorship, and citation metadata
+
+Decision 0117 retains the BSD 3-Clause License, restores its complete standard text, and names
+Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström consistently in the license, package
+metadata, public documentation, and citation metadata. `docs/citation.md` explains commercial-use
+and notice-retention terms without overriding dataset-specific licenses. `CITATION.cff` records
+the software and the companion manuscript under revision at *Computers & Chemical Engineering*
+(CACE-D-26-00847). Publication details must be updated when final publication metadata become available.
+
+Current status: **commercial license and citation metadata complete**.
+
 ## Current next increment
 
 The owner-authorized S1--S6 simplification series is complete. No further implementation patch is

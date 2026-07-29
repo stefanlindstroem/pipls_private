@@ -1,5 +1,6 @@
 site_name: Pi-PLS
 site_description: Pi-PLS multivariate regression for Python
+copyright: Copyright © 2026 Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström
 strict: true
 
 theme:
@@ -33,6 +34,7 @@ nav:
       - Compatibility: compatibility.md
   - Scientific background:
       - Theory: theory.md
+      - Authors, license, and citation: citation.md
 
 exclude_docs: |
   decisions/**

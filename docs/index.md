@@ -64,3 +64,8 @@ contracts.
 ## Scientific background
 
 - [Theory](theory.md): the implemented matrix construction and rank interpretation.
+
+## Project information
+
+- [Authors, license, and citation](citation.md): copyright holders, commercial-use terms,
+  dataset-license scope, and the companion paper.

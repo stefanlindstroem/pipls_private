@@ -10,7 +10,11 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
-authors = [{name = "Pi-PLS authors"}]
+authors = [
+  {name = "Vishal Agrawal"},
+  {name = "Fritjof Nilsson"},
+  {name = "Stefan B. Lindström"},
+]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",

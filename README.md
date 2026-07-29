@@ -158,4 +158,20 @@ Install the `examples` extra before running them.
   - [Reference datasets](docs/datasets.md)
   - [Theory](docs/theory.md)
 
-The package is distributed under the [BSD 3-Clause License](LICENSE).
+## Authors, license, and citation
+
+The code and repository-authored documentation are copyright (c) 2026 Vishal Agrawal,
+Fritjof Nilsson, and Stefan B. Lindström. They are distributed under the
+[BSD 3-Clause License](LICENSE), which permits commercial use, redistribution, and modification
+provided its conditions are followed, including retention of the copyright notice, conditions, and
+disclaimer. Included reference datasets retain their own license and attribution notices.
+
+The companion paper is under revision:
+
+> Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). Panoramic Partial Least Squares
+> (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model.
+> Manuscript under revision at *Computers & Chemical Engineering*, manuscript
+> CACE-D-26-00847.
+
+See [authors, license, and citation](docs/citation.md) for the full scope and
+[`CITATION.cff`](CITATION.cff) for machine-readable citation metadata.
