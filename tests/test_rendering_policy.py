@@ -266,3 +266,165 @@ def test_maintained_cv_mse_error_bars_use_fold_based_standard_error() -> None:
         "component_path.cv_mse_mean + component_path.cv_mse_standard_error"
         in pulp_renderer
     )
+
+
+def _call_source_segments(path: Path, names: set[str]) -> list[str]:
+    text = path.read_text(encoding="utf-8")
+    tree = ast.parse(text, filename=str(path))
+    return [
+        ast.get_source_segment(text, node) or ""
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and _call_name(node) in names
+    ]
+
+
+def _source_between(path: Path, start: str, end: str) -> str:
+    text = path.read_text(encoding="utf-8")
+    start_index = text.index(start)
+    end_index = text.index(end, start_index)
+    return text[start_index:end_index]
+
+
+def test_maintained_rendered_method_names_use_pi_symbol() -> None:
+    root = _repository_root()
+    relative_paths = (
+        "examples/01_minimal_fit_and_plot.py",
+        "examples/02_synthetic_path_selection.py",
+        "examples/04_pls_path_comparison.py",
+        "examples/05_pulp_real_data.py",
+        "examples/06_sugarcane_real_data.py",
+        "examples/07_tobacco_real_data.py",
+        "tools/render_synthetic_tutorial.py",
+        "tools/render_pulp_tutorial.py",
+    )
+
+    for relative_path in relative_paths:
+        path = root / relative_path
+        text = path.read_text(encoding="utf-8")
+        title_calls = _call_source_segments(path, {"set_title", "suptitle"})
+
+        assert title_calls, path
+        assert r"$\Pi$-PLS" in text, path
+        assert all("Pi-PLS" not in call for call in title_calls), path
+
+
+def test_maintained_paths_and_rank_profiles_share_zero_based_y_limits() -> None:
+    root = _repository_root()
+    expected_counts = {
+        "examples/02_synthetic_path_selection.py": 2,
+        "examples/04_pls_path_comparison.py": 1,
+        "examples/05_pulp_real_data.py": 2,
+        "examples/06_sugarcane_real_data.py": 1,
+        "examples/07_tobacco_real_data.py": 1,
+        "tools/render_synthetic_tutorial.py": 2,
+        "tools/render_pulp_tutorial.py": 2,
+    }
+    limit_call = "set_ylim(0.0, max(1.0, 1.05 * upper))"
+
+    for relative_path, expected_count in expected_counts.items():
+        text = (root / relative_path).read_text(encoding="utf-8")
+        assert text.count(limit_call) == expected_count, relative_path
+
+
+def test_pipls_factor_figures_use_matrix_element_notation_without_tile_titles() -> None:
+    root = _repository_root()
+    factor_sources = (
+        root / "examples" / "01_minimal_fit_and_plot.py",
+        root / "examples" / "05_pulp_real_data.py",
+        root / "examples" / "06_sugarcane_real_data.py",
+        root / "examples" / "07_tobacco_real_data.py",
+        root / "tools" / "render_pulp_tutorial.py",
+    )
+
+    for path in factor_sources:
+        text = path.read_text(encoding="utf-8")
+        assert "$q_{:" not in text, path
+        assert "$d_kq_{:" not in text, path
+        assert "$d_1q_{:" not in text, path
+
+    tile_ranges = {
+        "examples/01_minimal_fit_and_plot.py": (
+            "figure, axes = plt.subplots(2, 2",
+            "figure.suptitle(",
+        ),
+        "examples/05_pulp_real_data.py": (
+            "# Plot the Pi-PLS factors directly",
+            "figure.suptitle(",
+        ),
+        "examples/06_sugarcane_real_data.py": (
+            "# Plot the Pi-PLS factors directly",
+            "figure.suptitle(",
+        ),
+        "examples/07_tobacco_real_data.py": (
+            "# Plot the Pi-PLS factors directly",
+            "figure.suptitle(",
+        ),
+    }
+    for relative_path, (start, end) in tile_ranges.items():
+        block = _source_between(root / relative_path, start, end)
+        assert ".set_title(" not in block, relative_path
+
+
+def test_latent_and_prediction_tiles_have_no_subplot_titles() -> None:
+    root = _repository_root()
+    ranges = {
+        "examples/05_pulp_real_data.py": (
+            ("# Plot scores, a score-loading biplot, and loadings.", "figure.suptitle("),
+            ("# Plot selection-conditioned prediction diagnostics.", "figure.suptitle("),
+        ),
+        "examples/06_sugarcane_real_data.py": (
+            ("# Plot selection-conditioned prediction diagnostics.", "figure.suptitle("),
+            ("# Plot scores and loadings from the selected full-data model.", "figure.suptitle("),
+        ),
+        "examples/07_tobacco_real_data.py": (
+            (
+                "# Plot selection-conditioned diagnostics in deterministic source-order response pages.",
+                "figure.suptitle(",
+            ),
+            (
+                "# Plot scores, loadings, and raw observation diagnostics.",
+                "figure.suptitle(",
+            ),
+        ),
+    }
+
+    for relative_path, blocks in ranges.items():
+        path = root / relative_path
+        for start, end in blocks:
+            assert ".set_title(" not in _source_between(path, start, end), (
+                relative_path,
+                start,
+            )
+
+    for relative_path in ranges:
+        path = root / relative_path
+        for call in _call_source_segments(path, {"suptitle"}):
+            if "prediction diagnostics" in call:
+                assert r"\n" not in call, relative_path
+
+
+def test_tobacco_dense_categorical_axes_use_angled_labels() -> None:
+    tobacco = (
+        _repository_root() / "examples" / "07_tobacco_real_data.py"
+    ).read_text(encoding="utf-8")
+
+    assert 'set_xticklabels(component_labels, rotation=45, ha="right")' in tobacco
+    assert 'set_xticklabels(response_names, rotation=45, ha="right")' in tobacco
+    assert 'rotation=45,\n            ha="right",\n        )' in tobacco
+
+
+def test_standalone_pulp_tutorial_titles_do_not_repeat_axis_quantities() -> None:
+    renderer = (
+        _repository_root() / "tools" / "render_pulp_tutorial.py"
+    ).read_text(encoding="utf-8")
+
+    for removed_title in (
+        "Pulp predictor directions",
+        "Pulp weighted response directions",
+        "Pulp observed versus predicted",
+        "Pulp residual versus predicted",
+        "Pulp standardized RMSE",
+    ):
+        assert removed_title not in renderer
+
+    assert renderer.count('axis.set_title(\n        rf"Pulp $\\Pi$-PLS —') == 3

@@ -819,6 +819,15 @@ the software and the companion manuscript under revision at *Computers & Chemica
 
 Current status: **commercial license and citation metadata complete**.
 
+### Maintained figure notation and layout policy
+
+Decision 0118 applies one visible rendering contract to all numbered-example PDFs and generated
+tutorial SVGs. It standardizes `$\Pi$`-PLS titles, factor-element notation, tile-title removal,
+prediction-title line structure, zero-based path/profile scales, and Tobacco categorical-label
+rotation without changing numerical analysis.
+
+Current status: **maintained figure rendering policy complete**.
+
 ## Current next increment
 
 The owner-authorized S1--S6 simplification series is complete. No further implementation patch is

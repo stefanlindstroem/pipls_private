@@ -87,6 +87,13 @@ numerical operation. Annotated biplots use optional `adjustText` only after fina
 The runtime package imports neither Matplotlib nor `adjustText`. Maintained examples and
 renderers must not hide chart construction in support helpers.
 
+Maintained rendered figures use `$\Pi$`-PLS when the method name appears. Pi-PLS factor labels use
+upper-case `$P$` and `$Q$` for matrix elements and lower-case `$d$` for diagonal elements of `$D$`.
+Tiled factor, latent-structure, and prediction-diagnostic figures omit subplot titles; their axis
+labels and legends identify the plotted quantities. Prediction-diagnostic figure-level titles stay
+on one line. Component-path and predictor-rank-profile figures start at zero and use an upper limit
+of at least one.
+
 ### `examples/`
 
 `examples/01_minimal_fit_and_plot.py` is the primary onboarding path: literal NumPy matrices, one
@@ -188,7 +195,7 @@ The primary decomposition report displays:
 
 - predictor rotations $P$;
 - dilation values $d_k=D_{kk}$;
-- dilation-weighted response rotations $d_kq_{jk}$, exposed or plotted as $QD$.
+- dilation-weighted response rotations $d_kQ_{jk}$, exposed or plotted as $QD$.
 
 Use the terms **predictor rotation** or **predictor direction** for $P$. Do not call $P$ an X
 loading: `PiPLSRegression.x_loadings_` is a separate score-reconstruction quantity.

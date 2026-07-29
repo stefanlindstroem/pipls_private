@@ -105,7 +105,7 @@ def _render_component_path(
         label=f"Chosen: {selected.n_components} components",
         zorder=3,
     )
-    axis.set_title("Pulp component path")
+    axis.set_title(r"Pulp $\Pi$-PLS component path")
     axis.set_xlabel("Number of components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
     axis.set_xticks(component_path.n_components)
@@ -140,11 +140,14 @@ def _render_predictor_rank_profile(
         zorder=3,
     )
     axis.set_title(
-        f"Pulp predictor-rank profile at {profile.n_components} components"
+        rf"Pulp $\Pi$-PLS predictor-rank profile at "
+        f"{profile.n_components} components"
     )
     axis.set_xlabel("Predictor rank")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
     axis.set_xticks(profile.predictor_rank)
+    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_standard_error))
+    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
     _save_svg(figure, output_path)
@@ -236,7 +239,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
     axis.set_xlabel(f"Balanced component {first + 1}")
     axis.set_ylabel(f"Balanced component {second + 1}")
-    axis.set_title("Pulp score-loading biplot")
+    axis.set_title(r"Pulp $\Pi$-PLS score-loading biplot")
     axis.set_aspect("equal", adjustable="datalim")
     axis.margins(0.1)
     axis.legend()
@@ -272,7 +275,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_xticklabels(predictor_names)
     axis.set_xlabel("Predictor")
     axis.set_ylabel(r"Predictor direction $P_{:k}$")
-    axis.set_title(r"Pulp predictor directions $P$ (TI-positive orientation)")
     axis.legend()
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
@@ -296,8 +298,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_xticks(response_positions)
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
-    axis.set_ylabel(r"Weighted response direction $d_kq_{:k}$")
-    axis.set_title(r"Pulp weighted response directions $QD$ (TI-positive orientation)")
+    axis.set_ylabel(r"Weighted response direction $d_kQ_{:k}$")
     axis.legend()
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
@@ -331,7 +332,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_ylim(limits)
     axis.set_xlabel("Observed response (standardized)")
     axis.set_ylabel("Predicted response (standardized)")
-    axis.set_title(f"Pulp observed versus predicted\n{diagnostics.prediction_kind}")
+    axis.set_title(
+        rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}"
+    )
     axis.legend(title="Response")
     # --8<-- [end:render-pulp-observed-vs-predicted]
     _save_svg(figure, output_dir / "observed_vs_predicted.svg")
@@ -365,7 +368,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
     axis.set_xlabel("Predicted response (standardized)")
     axis.set_ylabel("Standardized residual")
-    axis.set_title(f"Pulp residual versus predicted\n{diagnostics.prediction_kind}")
+    axis.set_title(
+        rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}"
+    )
     axis.legend(title="Response")
     # --8<-- [end:render-pulp-residuals-vs-predicted]
     _save_svg(figure, output_dir / "residuals_vs_predicted.svg")
@@ -378,7 +383,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
     axis.set_ylabel("Standardized RMSE")
-    axis.set_title(f"Pulp standardized RMSE\n{diagnostics.prediction_kind}")
+    axis.set_title(
+        rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}"
+    )
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
         label.set_horizontalalignment("right")

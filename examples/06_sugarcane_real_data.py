@@ -40,7 +40,11 @@ axis.errorbar(
 )
 axis.set_xlabel("Number of components")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
-axis.set_title("Sugarcane Pi-PLS component path")
+axis.set_title(r"Sugarcane $\Pi$-PLS component path")
+axis.set_xticks(path.n_components)
+upper = float(np.max(path.cv_mse_mean + path.cv_mse_standard_error))
+axis.set_ylim(0.0, max(1.0, 1.05 * upper))
+axis.grid(axis="y", alpha=0.25)
 figure.savefig(ANALYSIS_DIR / "component_path.pdf")
 plt.close(figure)
 
@@ -87,7 +91,6 @@ axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[0, 0].set_xlim(float(wavelengths[0]), float(wavelengths[-1]))
 axes[0, 0].set_xlabel("Wavelength (nm)")
 axes[0, 0].set_ylabel(r"Predictor direction $P_{:k}$")
-axes[0, 0].set_title(r"Predictor directions $P$")
 axes[0, 0].legend()
 
 dilation_positions = np.arange(factors.n_components)
@@ -96,7 +99,6 @@ axes[0, 1].set_xticks(dilation_positions)
 axes[0, 1].set_xticklabels(component_labels)
 axes[0, 1].set_xlabel("Component")
 axes[0, 1].set_ylabel(r"Dilation $d_k$")
-axes[0, 1].set_title(r"Dilation $D$")
 
 response_positions = np.arange(len(response_names))
 response_width = 0.8 / factors.n_components
@@ -114,23 +116,18 @@ for component, label in zip(components, component_labels, strict=True):
         width=response_width,
         label=label,
     )
-for axis, ylabel, title in (
-    (axes[1, 0], r"Response direction $q_{:k}$", r"Response directions $Q$"),
-    (
-        axes[1, 1],
-        r"Weighted response direction $d_kq_{:k}$",
-        r"Weighted response directions $QD$",
-    ),
+for axis, ylabel in (
+    (axes[1, 0], r"Response direction $Q_{:k}$"),
+    (axes[1, 1], r"Weighted response direction $d_kQ_{:k}$"),
 ):
     axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
     axis.set_xticks(response_positions)
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
     axis.set_ylabel(ylabel)
-    axis.set_title(title)
     axis.legend()
 figure.suptitle(
-    "Sugarcane Pi-PLS factors "
+    r"Sugarcane $\Pi$-PLS factors "
     f"({selected.n_components} components, predictor rank {selected.predictor_rank})"
 )
 figure.savefig(ANALYSIS_DIR / "pipls_factors.pdf")
@@ -178,12 +175,10 @@ axes[0].set_xlim(identity_limits)
 axes[0].set_ylim(identity_limits)
 axes[0].set_xlabel("Observed response (standardized)")
 axes[0].set_ylabel("Predicted response (standardized)")
-axes[0].set_title("Observed versus predicted")
 
 axes[1].axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
 axes[1].set_xlabel("Predicted response (standardized)")
 axes[1].set_ylabel("Standardized residual")
-axes[1].set_title("Residual versus predicted")
 
 positions = np.arange(len(response_names))
 axes[2].bar(positions, diagnostics.standardized_rmse)
@@ -191,12 +186,10 @@ axes[2].set_xticks(positions)
 axes[2].set_xticklabels(response_names)
 axes[2].set_xlabel("Response")
 axes[2].set_ylabel("Standardized RMSE")
-axes[2].set_title("Response-wise standardized RMSE")
 axes[0].legend()
 axes[1].legend()
 figure.suptitle(
-    "Sugarcane Pi-PLS prediction diagnostics\n"
-    f"{diagnostics.prediction_kind}"
+    rf"Sugarcane $\Pi$-PLS prediction diagnostics — {diagnostics.prediction_kind}"
 )
 figure.savefig(ANALYSIS_DIR / "prediction_diagnostics.pdf")
 plt.close(figure)
@@ -214,7 +207,6 @@ axes[0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[0].set_xlabel("X score component 1")
 axes[0].set_ylabel("X score component 2")
-axes[0].set_title("X scores")
 
 for component in (0, 1):
     axes[1].plot(
@@ -225,7 +217,6 @@ for component in (0, 1):
 axes[1].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[1].set_xlabel("Wavelength (nm)")
 axes[1].set_ylabel("X loading")
-axes[1].set_title("X loadings")
 axes[1].legend()
 
 response_positions = np.arange(len(response_names))
@@ -243,9 +234,8 @@ axes[2].set_xticks(response_positions)
 axes[2].set_xticklabels(response_names)
 axes[2].set_xlabel("Response")
 axes[2].set_ylabel("Y loading")
-axes[2].set_title("Y loadings")
 axes[2].legend()
-figure.suptitle("Sugarcane Pi-PLS latent structure")
+figure.suptitle(r"Sugarcane $\Pi$-PLS latent structure")
 figure.savefig(ANALYSIS_DIR / "latent_structure.pdf")
 plt.close(figure)
 
@@ -259,7 +249,6 @@ for response, name in enumerate(response_names):
 axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axis.set_xlabel("Wavelength (nm)")
 axis.set_ylabel("Regression coefficient")
-axis.set_title("Sugarcane Pi-PLS coefficients")
 axis.legend(title="Response")
 figure.savefig(ANALYSIS_DIR / "coefficients.pdf")
 plt.close(figure)

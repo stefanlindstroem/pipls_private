@@ -123,6 +123,7 @@ This index is navigation, not a substitute for those records.
 | `0115-normalized-path-result-state.md` | normalized path result state | store path-wide policy and split count once; derive predictor-rank-profile selection from candidate arrays |
 | `0116-composed-validation-report-result.md` | composed validation-report result | store one selected component result and derive the existing selected-row convenience attributes |
 | `0117-commercial-license-authorship-and-citation.md` | commercial license, authorship, and citation | retain complete BSD-3-Clause terms, name the three copyright holders, and publish software plus companion-paper citation metadata |
+| `0118-maintained-figure-labeling-and-axis-policy.md` | maintained figure labeling and axis policy | consistent $\Pi$-PLS notation, factor symbols, tile titles, path/profile scales, and Tobacco categorical labels |
 
 ## Implemented estimator/search transition
 

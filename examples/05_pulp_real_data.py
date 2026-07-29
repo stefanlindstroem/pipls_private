@@ -63,8 +63,10 @@ axis.scatter(
 )
 axis.set_xlabel("Number of components")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
-axis.set_title("Pulp Pi-PLS component path")
+axis.set_title(r"Pulp $\Pi$-PLS component path")
 axis.set_xticks(path.n_components)
+upper = float(np.max(path.cv_mse_mean + path.cv_mse_standard_error))
+axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)
 axis.legend()
 figure.savefig(ANALYSIS_DIR / "component_path.pdf")
@@ -99,8 +101,15 @@ axis.scatter(
 )
 axis.set_xlabel("Predictor rank")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
-axis.set_title(f"Pulp predictor-rank profile at {selected.n_components} components")
+axis.set_title(
+    rf"Pulp $\Pi$-PLS predictor-rank profile at "
+    f"{selected.n_components} components"
+)
 axis.set_xticks(rank_profile.predictor_rank)
+upper = float(
+    np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_standard_error)
+)
+axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)
 axis.legend()
 figure.savefig(ANALYSIS_DIR / "predictor_rank_profile.pdf")
@@ -165,7 +174,6 @@ axes[0, 0].set_xticks(predictor_positions)
 axes[0, 0].set_xticklabels(predictor_names, rotation=45, ha="right")
 axes[0, 0].set_xlabel("Predictor")
 axes[0, 0].set_ylabel(r"Predictor direction $P_{:k}$")
-axes[0, 0].set_title(r"Predictor directions $P$")
 axes[0, 0].legend()
 
 dilation_positions = np.arange(CHOSEN_N_COMPONENTS)
@@ -174,7 +182,6 @@ axes[0, 1].set_xticks(dilation_positions)
 axes[0, 1].set_xticklabels(component_labels)
 axes[0, 1].set_xlabel("Component")
 axes[0, 1].set_ylabel(r"Dilation $d_k$")
-axes[0, 1].set_title(r"Dilation $D$")
 
 response_positions = np.arange(len(response_names))
 response_width = 0.8 / CHOSEN_N_COMPONENTS
@@ -192,23 +199,18 @@ for series, component in enumerate(display_components):
         width=response_width,
         label=component_labels[series],
     )
-for axis, ylabel, title in (
-    (axes[1, 0], r"Response direction $q_{:k}$", r"Response directions $Q$"),
-    (
-        axes[1, 1],
-        r"Weighted response direction $d_kq_{:k}$",
-        r"Weighted response directions $QD$",
-    ),
+for axis, ylabel in (
+    (axes[1, 0], r"Response direction $Q_{:k}$"),
+    (axes[1, 1], r"Weighted response direction $d_kQ_{:k}$"),
 ):
     axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
     axis.set_xticks(response_positions)
     axis.set_xticklabels(response_names, rotation=45, ha="right")
     axis.set_xlabel("Response")
     axis.set_ylabel(ylabel)
-    axis.set_title(title)
     axis.legend()
 figure.suptitle(
-    "Pulp Pi-PLS factors with TI-positive orientation "
+    r"Pulp $\Pi$-PLS factors with TI-positive orientation "
     f"({selected.n_components} components, predictor rank {selected.predictor_rank})"
 )
 figure.savefig(ANALYSIS_DIR / "pipls_factors.pdf")
@@ -231,7 +233,6 @@ axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[0, 0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[0, 0].set_xlabel(f"X score component {score_components[0] + 1}")
 axes[0, 0].set_ylabel(f"X score component {score_components[1] + 1}")
-axes[0, 0].set_title("X scores")
 # --8<-- [start:plot-pulp-biplot]
 biplot = biplot_coordinates(structure, components=(0, 1))
 sample_xy = biplot.sample_coordinates
@@ -269,7 +270,6 @@ biplot_axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 biplot_axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 biplot_axis.set_xlabel(f"Balanced component {first + 1}")
 biplot_axis.set_ylabel(f"Balanced component {second + 1}")
-biplot_axis.set_title("Score-loading biplot")
 biplot_axis.set_aspect("equal", adjustable="datalim")
 biplot_axis.margins(0.1)
 biplot_axis.legend()
@@ -302,7 +302,6 @@ axes[1, 0].set_xticks(predictor_positions)
 axes[1, 0].set_xticklabels(predictor_names)
 axes[1, 0].set_xlabel("Predictor")
 axes[1, 0].set_ylabel("X loading")
-axes[1, 0].set_title("X loadings")
 axes[1, 0].legend()
 
 response_positions = np.arange(len(response_names))
@@ -319,13 +318,12 @@ axes[1, 1].set_xticks(response_positions)
 axes[1, 1].set_xticklabels(response_names)
 axes[1, 1].set_xlabel("Response")
 axes[1, 1].set_ylabel("Y loading")
-axes[1, 1].set_title("Y loadings")
 axes[1, 1].legend()
 for axis in (axes[1, 0], axes[1, 1]):
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
         label.set_horizontalalignment("right")
-figure.suptitle("Pulp Pi-PLS latent structure")
+figure.suptitle(r"Pulp $\Pi$-PLS latent structure")
 figure.savefig(ANALYSIS_DIR / "latent_structure.pdf")
 plt.close(figure)
 
@@ -380,7 +378,6 @@ axes[0].set_xlim(identity_limits)
 axes[0].set_ylim(identity_limits)
 axes[0].set_xlabel("Observed response (standardized)")
 axes[0].set_ylabel("Predicted response (standardized)")
-axes[0].set_title("Observed versus predicted")
 
 predicted = diagnostics.predicted_standardized[:, detailed_array]
 residual = diagnostics.residual_standardized[:, detailed_array]
@@ -397,7 +394,6 @@ axes[1].set_ylim(
 axes[1].axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
 axes[1].set_xlabel("Predicted response (standardized)")
 axes[1].set_ylabel("Standardized residual")
-axes[1].set_title("Residual versus predicted")
 
 positions = np.arange(len(response_names))
 axes[2].bar(positions, diagnostics.standardized_rmse)
@@ -405,13 +401,14 @@ axes[2].set_xticks(positions)
 axes[2].set_xticklabels(response_names)
 axes[2].set_xlabel("Response")
 axes[2].set_ylabel("Standardized RMSE")
-axes[2].set_title("Response-wise standardized RMSE")
 axes[0].legend(title="Response")
 axes[1].legend(title="Response")
 axes[2].tick_params(axis="x", labelrotation=45)
 for label in axes[2].get_xticklabels():
     label.set_horizontalalignment("right")
-figure.suptitle(f"Pulp Pi-PLS prediction diagnostics\n{diagnostics.prediction_kind}")
+figure.suptitle(
+    rf"Pulp $\Pi$-PLS prediction diagnostics — {diagnostics.prediction_kind}"
+)
 figure.savefig(ANALYSIS_DIR / "prediction_diagnostics.pdf")
 plt.close(figure)
 # --8<-- [end:plot-pulp-prediction-diagnostics]
@@ -435,7 +432,6 @@ axis.set_xticks(predictor_positions)
 axis.set_xticklabels(predictor_names)
 axis.set_xlabel("Predictor")
 axis.set_ylabel("Regression coefficient")
-axis.set_title("Pulp Pi-PLS regression coefficients")
 axis.legend(title="Response")
 axis.tick_params(axis="x", labelrotation=45)
 for label in axis.get_xticklabels():

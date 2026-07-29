@@ -133,3 +133,4 @@ reference describe the current public behavior directly.
 - [0104: new-user documentation route](0104-new-user-documentation-route.md)
 - [0105: documentation and implementation alignment](0105-documentation-implementation-alignment.md)
 - [0117: commercial license, authorship, and citation](0117-commercial-license-authorship-and-citation.md)
+- [0118: maintained figure labeling and axis policy](0118-maintained-figure-labeling-and-axis-policy.md)

@@ -97,8 +97,10 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     )
     axis.set_xlabel("Number of components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
-    axis.set_title("Synthetic Pi-PLS component path")
+    axis.set_title(r"Synthetic $\Pi$-PLS component path")
     axis.set_xticks(path.n_components)
+    upper = float(np.max(path.cv_mse_mean + path.cv_mse_standard_error))
+    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
     _save_svg(figure, output_dir / "component_path.svg")
@@ -123,9 +125,14 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     axis.set_xlabel("Predictor rank")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
     axis.set_title(
-        f"Predictor-rank profile at {selected.n_components} components"
+        rf"Synthetic $\Pi$-PLS predictor-rank profile at "
+        f"{selected.n_components} components"
     )
     axis.set_xticks(rank_profile.predictor_rank)
+    upper = float(
+        np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_standard_error)
+    )
+    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
     _save_svg(figure, output_dir / "predictor_rank_profile.svg")
@@ -163,7 +170,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     axis.set_ylim(limits)
     axis.set_xlabel("Observed response (standardized)")
     axis.set_ylabel("Predicted response (standardized)")
-    axis.set_title(f"Synthetic external-test predictions\n{diagnostics.prediction_kind}")
+    axis.set_title(rf"Synthetic $\Pi$-PLS — {diagnostics.prediction_kind}")
     axis.legend(title="Response")
     _save_svg(figure, output_dir / "observed_vs_predicted.svg")
 

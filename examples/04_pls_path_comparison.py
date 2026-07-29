@@ -77,7 +77,9 @@ for dataset, path_search in (
         float(np.max(pipls_path.cv_mse_mean + pipls_path.cv_mse_standard_error)),
         float(np.max(pls_path.cv_mse_mean + pls_path.cv_mse_standard_error)),
     )
-    axis.set_title(f"{dataset.capitalize()} component-path comparison")
+    axis.set_title(
+        rf"{dataset.capitalize()} $\Pi$-PLS and PLS component-path comparison"
+    )
     axis.set_xlabel("Number of response components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
     axis.set_xticks(pipls_path.n_components)

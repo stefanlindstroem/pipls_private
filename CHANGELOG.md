@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Standardize maintained example and documentation figures: use `$\Pi$`-PLS in rendered titles, use upper-case `$P$` and `$Q$` with lower-case diagonal `$d$` in factor labels, remove redundant tile titles, keep prediction-diagnostic main titles on one line, normalize path/profile y-limits, and rotate dense Tobacco categorical labels.
+
 - Complete the BSD 3-Clause license text, name Vishal Agrawal, Fritjof Nilsson, and
   Stefan B. Lindström as package authors and copyright holders of the code and documentation,
   and add public plus machine-readable software and companion-paper citation metadata.

@@ -87,8 +87,13 @@ axis.scatter(
 )
 axis.set_xlabel("Number of components")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
-axis.set_title("Tobacco Pi-PLS component path")
+axis.set_title(r"Tobacco $\Pi$-PLS component path")
 axis.set_xticks(path.n_components)
+upper = max(
+    float(np.max(path.cv_mse_mean + path.cv_mse_standard_error)),
+    float(one_se_threshold),
+)
+axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)
 axis.legend()
 figure.savefig(ANALYSIS_DIR / "component_path.pdf")
@@ -136,16 +141,14 @@ axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[0, 0].set_xlim(float(wavenumbers[0]), float(wavenumbers[-1]))
 axes[0, 0].set_xlabel("Wavenumber (cm$^{-1}$)")
 axes[0, 0].set_ylabel(r"Predictor direction $P_{:k}$")
-axes[0, 0].set_title(r"Predictor directions $P$")
 axes[0, 0].legend()
 
 dilation_positions = np.arange(factors.n_components)
 axes[0, 1].bar(dilation_positions, factors.dilation)
 axes[0, 1].set_xticks(dilation_positions)
-axes[0, 1].set_xticklabels(component_labels)
+axes[0, 1].set_xticklabels(component_labels, rotation=45, ha="right")
 axes[0, 1].set_xlabel("Component")
 axes[0, 1].set_ylabel(r"Dilation $d_k$")
-axes[0, 1].set_title(r"Dilation $D$")
 
 response_positions = np.arange(len(response_names))
 response_width = 0.8 / factors.n_components
@@ -163,23 +166,18 @@ for component, label in zip(components, component_labels, strict=True):
         width=response_width,
         label=label,
     )
-for axis, ylabel, title in (
-    (axes[1, 0], r"Response direction $q_{:k}$", r"Response directions $Q$"),
-    (
-        axes[1, 1],
-        r"Weighted response direction $d_kq_{:k}$",
-        r"Weighted response directions $QD$",
-    ),
+for axis, ylabel in (
+    (axes[1, 0], r"Response direction $Q_{:k}$"),
+    (axes[1, 1], r"Weighted response direction $d_kQ_{:k}$"),
 ):
     axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
     axis.set_xticks(response_positions)
     axis.set_xticklabels(response_names, rotation=45, ha="right")
     axis.set_xlabel("Response")
     axis.set_ylabel(ylabel)
-    axis.set_title(title)
     axis.legend()
 figure.suptitle(
-    "Tobacco Pi-PLS factors "
+    r"Tobacco $\Pi$-PLS factors "
     f"({selected.n_components} components, predictor rank {selected.predictor_rank})"
 )
 figure.savefig(ANALYSIS_DIR / "pipls_factors.pdf")
@@ -236,24 +234,25 @@ with PdfPages(ANALYSIS_DIR / "prediction_diagnostics.pdf") as report:
         axes[0].set_ylim(identity_limits)
         axes[0].set_xlabel("Observed response (standardized)")
         axes[0].set_ylabel("Predicted response (standardized)")
-        axes[0].set_title("Observed versus predicted")
         axes[1].axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
         axes[1].set_xlabel("Predicted response (standardized)")
         axes[1].set_ylabel("Standardized residual")
-        axes[1].set_title("Residual versus predicted")
         positions = np.arange(len(responses))
         axes[2].bar(positions, diagnostics.standardized_rmse[response_array])
         axes[2].set_xticks(positions)
-        axes[2].set_xticklabels([response_names[index] for index in responses])
+        axes[2].set_xticklabels(
+            [response_names[index] for index in responses],
+            rotation=45,
+            ha="right",
+        )
         axes[2].set_xlabel("Response")
         axes[2].set_ylabel("Standardized RMSE")
-        axes[2].set_title("Response-wise standardized RMSE")
         if len(responses) > 1:
             axes[0].legend()
             axes[1].legend()
         figure.suptitle(
-            "Tobacco Pi-PLS prediction diagnostics "
-            f"— response page {page_number}/{len(response_pages)}\n"
+            rf"Tobacco $\Pi$-PLS prediction diagnostics — "
+            f"response page {page_number}/{len(response_pages)} — "
             f"{diagnostics.prediction_kind}"
         )
         report.savefig(figure)
@@ -275,7 +274,6 @@ if selected.n_components >= 2:
     axes[0, 0].axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
     axes[0, 0].set_xlabel("X score component 1")
     axes[0, 0].set_ylabel("X score component 2")
-    axes[0, 0].set_title("X scores")
 else:
     observation_positions = np.arange(structure.x_scores.shape[0])
     axes[0, 0].scatter(
@@ -285,7 +283,6 @@ else:
     )
     axes[0, 0].set_xlabel("Observation")
     axes[0, 0].set_ylabel("X score component 1")
-    axes[0, 0].set_title("X score")
 axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 
 for component in display_components:
@@ -297,7 +294,6 @@ for component in display_components:
 axes[0, 1].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[0, 1].set_xlabel("Wavenumber (cm$^{-1}$)")
 axes[0, 1].set_ylabel("X loading")
-axes[0, 1].set_title("X loadings")
 axes[0, 1].legend()
 
 response_positions = np.arange(len(response_names))
@@ -312,10 +308,9 @@ for series, component in enumerate(display_components):
     )
 axes[1, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[1, 0].set_xticks(response_positions)
-axes[1, 0].set_xticklabels(response_names)
+axes[1, 0].set_xticklabels(response_names, rotation=45, ha="right")
 axes[1, 0].set_xlabel("Response")
 axes[1, 0].set_ylabel("Y loading")
-axes[1, 0].set_title("Y loadings")
 axes[1, 0].legend()
 
 axes[1, 1].scatter(
@@ -325,8 +320,9 @@ axes[1, 1].scatter(
 )
 axes[1, 1].set_xlabel("Score distance")
 axes[1, 1].set_ylabel("Squared X-reconstruction residual")
-axes[1, 1].set_title("Observation diagnostics")
-figure.suptitle("Tobacco Pi-PLS latent structure and observation diagnostics")
+figure.suptitle(
+    r"Tobacco $\Pi$-PLS latent structure and observation diagnostics"
+)
 figure.savefig(ANALYSIS_DIR / "latent_structure.pdf")
 plt.close(figure)
 
@@ -347,8 +343,8 @@ with PdfPages(ANALYSIS_DIR / "coefficients.pdf") as report:
         axis.set_xlabel("Wavenumber (cm$^{-1}$)")
         axis.set_ylabel("Regression coefficient")
         axis.set_title(
-            "Tobacco Pi-PLS coefficients "
-            f"— response page {page_number}/{len(response_pages)}"
+            rf"Tobacco $\Pi$-PLS — "
+            f"response page {page_number}/{len(response_pages)}"
         )
         axis.legend(title="Response")
         report.savefig(figure)

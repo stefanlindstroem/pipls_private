@@ -401,6 +401,12 @@ metadata. The companion manuscript is under revision at *Computers & Chemical En
 CACE-D-26-00847. Dataset-specific licenses remain authoritative, and no release or publication
 claim is implied.
 
+Decision 0118 standardizes every maintained example and documentation figure: rendered method
+names use `$\Pi$`-PLS, factor labels use upper-case `$P$` and `$Q$` with lower-case diagonal `$d$`,
+tiled factor/latent/prediction figures omit redundant subplot titles, prediction main titles remain
+on one line, path/profile y-axes start at zero with an upper limit of at least one, and dense Tobacco
+categorical labels are rotated explicitly.
+
 ## Subsequent roadmap
 
 No further implementation patch is preauthorized. Continue the human audit and identify one
