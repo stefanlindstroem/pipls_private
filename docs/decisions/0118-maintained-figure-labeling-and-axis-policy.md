@@ -24,8 +24,9 @@ Apply one rendering policy to every maintained numbered-example PDF and generate
 - keep prediction-diagnostic figure-level titles on one rendered line;
 - give every maintained component path and predictor-rank profile a lower y-limit of zero and an
   upper y-limit of at least one;
-- rotate the Tobacco factor-component, prediction-response, and latent-response labels where
-  requested;
+- use numeric dilation tick labels (`1`, `2`, `3`, ...) beneath the `Component` x-axis label,
+  avoiding repeated labels such as `Component 1`;
+- rotate the Tobacco prediction-response and latent-response labels where requested;
 - omit single-plot titles that merely repeat the quantity already stated by the y-axis label.
 
 This policy belongs to the caller-owned example and documentation rendering layer. It does not add a

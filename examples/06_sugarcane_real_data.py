@@ -96,7 +96,7 @@ axes[0, 0].legend()
 dilation_positions = np.arange(factors.n_components)
 axes[0, 1].bar(dilation_positions, factors.dilation)
 axes[0, 1].set_xticks(dilation_positions)
-axes[0, 1].set_xticklabels(component_labels)
+axes[0, 1].set_xticklabels(np.arange(1, factors.n_components + 1))
 axes[0, 1].set_xlabel("Component")
 axes[0, 1].set_ylabel(r"Dilation $d_k$")
 

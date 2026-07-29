@@ -404,8 +404,9 @@ claim is implied.
 Decision 0118 standardizes every maintained example and documentation figure: rendered method
 names use `$\Pi$`-PLS, factor labels use upper-case `$P$` and `$Q$` with lower-case diagonal `$d$`,
 tiled factor/latent/prediction figures omit redundant subplot titles, prediction main titles remain
-on one line, path/profile y-axes start at zero with an upper limit of at least one, and dense Tobacco
-categorical labels are rotated explicitly.
+on one line, path/profile y-axes start at zero with an upper limit of at least one, dilation plots
+use numeric component ticks without repeating the x-axis label, and dense Tobacco response labels
+are rotated explicitly.
 
 ## Subsequent roadmap
 

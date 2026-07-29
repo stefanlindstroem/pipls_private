@@ -403,12 +403,39 @@ def test_latent_and_prediction_tiles_have_no_subplot_titles() -> None:
                 assert r"\n" not in call, relative_path
 
 
-def test_tobacco_dense_categorical_axes_use_angled_labels() -> None:
+def test_dilation_plots_use_numeric_component_tick_labels() -> None:
+    root = _repository_root()
+    expected = {
+        "examples/01_minimal_fit_and_plot.py": 'set_xticklabels(["1"])',
+        "examples/05_pulp_real_data.py": (
+            "set_xticklabels(np.arange(1, CHOSEN_N_COMPONENTS + 1))"
+        ),
+        "examples/06_sugarcane_real_data.py": (
+            "set_xticklabels(np.arange(1, factors.n_components + 1))"
+        ),
+        "examples/07_tobacco_real_data.py": (
+            "set_xticklabels(np.arange(1, factors.n_components + 1))"
+        ),
+    }
+
+    for relative_path, numeric_ticks in expected.items():
+        text = (root / relative_path).read_text(encoding="utf-8")
+        assert numeric_ticks in text, relative_path
+        assert 'set_xlabel("Component")' in text, relative_path
+
+    combined = "\n".join(
+        (root / relative_path).read_text(encoding="utf-8")
+        for relative_path in expected
+    )
+    assert 'set_xticklabels(["Component 1"])' not in combined
+    assert "set_xticklabels(component_labels" not in combined
+
+
+def test_tobacco_dense_response_axes_use_angled_labels() -> None:
     tobacco = (
         _repository_root() / "examples" / "07_tobacco_real_data.py"
     ).read_text(encoding="utf-8")
 
-    assert 'set_xticklabels(component_labels, rotation=45, ha="right")' in tobacco
     assert 'set_xticklabels(response_names, rotation=45, ha="right")' in tobacco
     assert 'rotation=45,\n            ha="right",\n        )' in tobacco
 

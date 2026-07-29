@@ -54,7 +54,7 @@ axes[0, 0].set_ylabel(r"Predictor direction $P_{:1}$")
 
 axes[0, 1].bar([0], [factors.dilation[0]])
 axes[0, 1].set_xticks([0])
-axes[0, 1].set_xticklabels(["Component 1"])
+axes[0, 1].set_xticklabels(["1"])
 axes[0, 1].set_xlabel("Component")
 axes[0, 1].set_ylabel(r"Dilation $d_k$")
 
