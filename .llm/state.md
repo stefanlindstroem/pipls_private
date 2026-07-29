@@ -414,13 +414,21 @@ and loading entries plus independent Gaussian predictor/response noise, with no 
 orthonormalization, strength, or observed-scale transformation. Existing configurable generators,
 benchmarks, examples, estimator/search behavior, and practical real-data workflows are unchanged.
 
+Decision 0120 makes the companion manuscript the scientific source for the canonical public theory
+page. The documentation now includes the retained-subspace projector decomposition, the
+cross-covariance response-subspace optimization, the latent least-squares and diagonal relations,
+the panoramic interpretation, comparative limiting cases, and the nominal fitted dimension
+$(r_\pi+q-h)h$ after $\Pi$ is fixed. It distinguishes retained observed predictor directions from
+known synthetic signal rank and leaves every package behavior and practical workflow unchanged.
+
 ## Current next increment
 
-The next owner-authorized increment is documentation-only: rebuild the canonical Pi-PLS theory
-page around the companion manuscript, replace the current theory reference-and-scope section,
-correct the nominal fitted-dimension expression, and distinguish retained predictor subspaces from
-synthetic signal rank. Do not change estimator defaults, search behavior, validation protocols,
-real-data workflows, or existing synthetic generators in that increment.
+The next owner-authorized increment is documentation-only terminology review. Record explicit
+canonical terms for $\Pi$, $P$, $Q$, $d_k$, predictor/response scores, paired latent modes,
+`n_components`, and `predictor_rank`, including recommendations for terminology that should be
+changed in the manuscript rather than weakened in the package. Do not propagate vocabulary broadly
+until that decision is accepted. Do not change estimator, search, validation, synthetic, benchmark,
+example, or real-data behavior.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

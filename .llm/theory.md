@@ -7,9 +7,11 @@ It summarizes the mathematical construction, interpretation, limiting cases, ran
 implementation consequences of the method so that the project owner does not need to attach the
 manuscript for routine implementation work.
 
-The scientific source for this summary is the project owner's Pi-PLS manuscript. This file is a
-repository-maintained explanation, not a replacement for the manuscript. The authority hierarchy
-for implementation work is:
+The scientific source for this summary is the project owner's companion manuscript, “Panoramic
+Partial Least Squares (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate
+regression model,” under revision at *Computers & Chemical Engineering* as CACE-D-26-00847. This
+file is a repository-maintained explanation, not a replacement for the manuscript. The authority
+hierarchy for implementation work is:
 
 1. explicit scientific decisions from the project owner;
 2. accepted decision records under `docs/decisions/`;
@@ -62,7 +64,7 @@ Pi-PLS combines ideas familiar from several multivariate methods:
   factorization.
 - Unlike iterative deflation-based PLS algorithms, the fixed-parameter Pi-PLS construction is a
   sequence of SVD and least-squares operations with an explicit closed form.
-- Unlike PLS-SVD, Pi-PLS first preserves a chosen predictor-side signal subspace and only then
+- Unlike PLS-SVD, Pi-PLS first preserves a chosen rank-controlled predictor subspace and only then
   identifies response directions from cross-covariance within that subspace.
 
 The defining interpretive feature is a diagonal one-to-one coupling between orthogonal predictor
@@ -98,7 +100,7 @@ $$
 The implementation additionally requires $r_\pi$ not to exceed the numerical rank of the supplied
 predictor matrix.
 
-## Step 1: retain a predictor signal subspace
+## Step 1: retain a rank-controlled predictor subspace
 
 Let the singular value decomposition of the core predictor matrix be
 
@@ -227,9 +229,9 @@ $$
 and
 
 $$
-\mathbf{D}=\operatorname{diag}(D_1,\ldots,D_h),
+\mathbf{D}=\operatorname{diag}(d_1,\ldots,d_h),
 \qquad
-D_1\ge D_2\ge\cdots\ge D_h\ge0.
+d_1\ge d_2\ge\cdots\ge d_h\ge0.
 $$
 
 Define
@@ -258,12 +260,19 @@ $$
 \mathbf{E}_{\pi},
 $$
 
-with $\mathbf{E}_{\pi}=\mathbf{E}''\mathbf{N}$. Orthogonal rotation preserves the residual Frobenius norm and rotates the residual covariance
-without changing its eigenvalues.
+with $\mathbf{E}_{\pi}=\mathbf{E}''\mathbf{N}$. Orthogonal rotation preserves the residual
+Frobenius norm and rotates the residual covariance without changing its eigenvalues.
 
 This is the panoramic one-to-one representation. Column $j$ of $\mathbf{X}\mathbf{P}$ is coupled
-only to column $j$ of $\mathbf{Y}\mathbf{Q}$, with coupling strength $D_j$. There are no
+only to column $j$ of $\mathbf{Y}\mathbf{Q}$, with dilation $d_j$. There are no
 cross-coupling terms between distinct latent modes in these coordinates.
+
+## Why the method is panoramic
+
+Unlike standard deflation-based PLS algorithms, Pi-PLS fixes one rank-controlled predictor
+representation $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ and derives all $h$ coupled modes from that
+undeflated retained space. The full retained predictor subspace remains available during the
+cross-covariance and latent least-squares stages; in this sense, the method is panoramic.
 
 ## Regression-map identities and prediction
 
@@ -330,7 +339,7 @@ When `scale=False`, the scale vectors are ones and the same expressions reduce t
 ### Predictor rank $r_\pi$
 
 $r_\pi$ controls how much predictor-side variation is retained before response information is
-used. It is a regularization and signal-preservation parameter.
+used. It is a regularization and subspace-retention parameter.
 
 - If $r_\pi$ is too small, predictive directions may be irreversibly removed.
 - Once all predictive directions are retained, additional predictor directions may have little
@@ -354,21 +363,19 @@ retained predictor dimension. Also $h\le q$ because the response latent basis ha
 
 ## Model size
 
-The factorization uses
-
-- $ph$ entries in $\mathbf{P}$;
-- $h$ diagonal entries in $\mathbf{D}$;
-- $qh$ entries in $\mathbf{Q}$.
-
-After accounting for the orthonormality constraints on $\mathbf{P}$ and $\mathbf{Q}$, the
-manuscript gives the effective model dimension
+After $\mathbf{\Pi}$ has been fixed, the fitted representation is described by
+$\mathbf{M}$, $\mathbf{D}$, and $\mathbf{Q}$. They contribute $r_\pi h$, $h$, and $qh$
+entries. The orthonormality constraints on $\mathbf{M}$ and $\mathbf{Q}$ each remove
+$h(h+1)/2$ degrees of freedom. The nominal fitted dimension is therefore
 
 $$
-(p+q-h)h.
+\boxed{(r_\pi+q-h)h}.
 $$
 
-This is substantially smaller than the $pq$ coefficients of unconstrained multivariate OLS when
-$h\ll\min(p,q)$.
+This is the internally consistent count derived in Section 3.3 of the companion manuscript. It
+does not treat the $ph$ entries of $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ as independently free
+parameters. The later manuscript discussion uses an incomplete shorthand; the explicit derivation
+is normative for this repository.
 
 ## Limiting and comparative cases
 
@@ -389,9 +396,17 @@ orthogonal latent-coordinate representation of the same fitted map rather than a
 ### Relation to reduced-rank regression
 
 Both methods produce low-rank coefficient structures. Pi-PLS differs by explicitly selecting a
-predictor signal subspace first, selecting response directions through
+rank-controlled predictor subspace first, selecting response directions through
 $\mathbf{Z}^{\mathsf T}\mathbf{Y}$, and then rotating the latent regression into a diagonal
 one-to-one coupling.
+
+### Relation to CCA
+
+CCA also constructs paired predictor and response variates with a diagonal association structure,
+but classical CCA maximizes normalized correlation after within-block whitening. Pi-PLS uses an
+unwhitened cross-covariance criterion within the retained predictor representation and then
+estimates a predictive least-squares map. The diagonal relation is structurally analogous to CCA,
+not identical to its objective.
 
 ### Relation to PLS and PLS-SVD
 
@@ -545,7 +560,7 @@ following:
 - $\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}$;
 - $\mathbf{P}^{\mathsf T}\mathbf{P}=\mathbf{I}$;
 - $\mathbf{Q}^{\mathsf T}\mathbf{Q}=\mathbf{I}$;
-- $D_1\ge\cdots\ge D_h\ge0$;
+- $d_1\ge\cdots\ge d_h\ge0$;
 - $\mathbf{B}_{\mathrm{cs}}=\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$;
 - $\mathbf{B}_{\mathrm{cs}}=\mathbf{\Pi}\mathbf{W}\mathbf{C}^{\mathsf T}$;
 - predictions from the two factorizations agree;

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Documentation
+
+- aligned the canonical Pi-PLS theory page with the companion manuscript: added the retained
+  predictor-projector decomposition, response-subspace optimization, latent least-squares and
+  diagonal coupling relations, panoramic interpretation, comparative limiting cases, and the
+  nominal fitted dimension $(r_\pi+q-h)h$ after $\Pi$ is fixed; replaced the Pulp application paper
+  as the theory reference while retaining it for dataset provenance and application context.
+
 - Add `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth` as an additive, manuscript-aligned synthetic capability: independent standard-normal latent scores and loadings, independent Gaussian predictor/response noise, manuscript-oriented loading matrices, and exact stored reconstruction identities. Existing configurable generators, benchmarks, examples, search policy, and real-data workflows remain unchanged.
 
 - Standardize maintained example and documentation figures: use `$\Pi$`-PLS in rendered titles, use upper-case `$P$` and `$Q$` with lower-case diagonal `$d$` in factor labels, remove redundant tile titles, keep prediction-diagnostic main titles on one line, normalize path/profile y-limits, use numeric component ticks in dilation plots, and rotate dense Tobacco response labels.

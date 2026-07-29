@@ -400,3 +400,41 @@ def test_authors_license_and_citation_page_is_public_and_consistent() -> None:
     assert "Manuscript under revision" in page
     assert "docs/citation.md" in readme
     assert "CITATION.cff" in readme
+
+
+def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
+    root = _repository_root()
+    theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+    mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
+
+    sections = (
+        "## Scientific source and package scope",
+        "## 1. Rank-controlled predictor projection",
+        "## 2. Covariance-driven response projection",
+        "## 3. Least squares in the reduced coordinates",
+        "## 4. Diagonal latent coupling",
+        "## Why the method is panoramic",
+        "## Nominal fitted dimension",
+        "## Relationships to established methods",
+        "## Package realization",
+        "## Selection, validation, and synthetic-data boundaries",
+    )
+    positions = [theory.index(section) for section in sections]
+    assert positions == sorted(positions)
+
+    for required in (
+        r"X=X\Pi\Pi^{\mathsf T}+X(I_p-\Pi\Pi^{\mathsf T})",
+        r"\max_{C^{\mathsf T}C=I_h}",
+        r"YQ=XPD+E_\pi",
+        r"=PDQ^{\mathsf T}",
+        r"(r_\pi+q-h)h",
+    ):
+        assert required in theory
+
+    for required in (
+        r"\mathbf{X}_{\mathrm{cs}}\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}",
+        r"\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}",
+        r"\mathbf{Y}_{\mathrm{cs}}\mathbf{Q}",
+        r"(r_\pi+q-h)h",
+    ):
+        assert required in mathematics

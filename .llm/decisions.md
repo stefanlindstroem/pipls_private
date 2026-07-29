@@ -125,6 +125,7 @@ This index is navigation, not a substitute for those records.
 | `0117-commercial-license-authorship-and-citation.md` | commercial license, authorship, and citation | retain complete BSD-3-Clause terms, name the three copyright holders, and publish software plus companion-paper citation metadata |
 | `0118-maintained-figure-labeling-and-axis-policy.md` | maintained figure labeling and axis policy | consistent $\Pi$-PLS notation, factor symbols, numeric dilation ticks, tile titles, path/profile scales, and Tobacco response labels |
 | `0119-manuscript-latent-geometry-generator.md` | manuscript latent-geometry generator | additive exact Gaussian manuscript generator with manuscript-oriented immutable truth; existing synthetic and real-data workflows unchanged |
+| `0120-companion-manuscript-theory-alignment.md` | companion-manuscript theory alignment | canonical projector/optimization/diagonal derivation, corrected fitted dimension, and explicit manuscript/package scope boundary |
 
 ## Implemented estimator/search transition
 

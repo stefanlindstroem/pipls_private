@@ -837,14 +837,25 @@ real-data, estimator, search, example, and benchmark behavior unchanged.
 
 Current status: **manuscript latent-geometry generator complete**.
 
+### Companion-manuscript theory alignment
+
+Decision 0120 rebuilds the canonical public theory page around the companion manuscript. It adds
+the retained-subspace projector decomposition, the cross-covariance response-subspace optimization,
+the latent least-squares and diagonal relations, the panoramic interpretation, comparative limiting
+cases, and the nominal fitted dimension $(r_\pi+q-h)h$ after $\Pi$ is fixed. The Pulp source paper
+remains an application and provenance reference rather than the source of Pi-PLS theory. No package
+behavior, default, example, benchmark, validation protocol, or real-data workflow changes.
+
+Current status: **companion-manuscript theory alignment complete**.
+
 ## Current next increment
 
-Align the canonical theory documentation with the companion manuscript. Replace the current
-reference-and-scope section, present the full three-stage derivation and limiting relationships,
-correct the nominal fitted dimension after the predictor basis is fixed, and retain explicit
-separation between manuscript theory and broader package capabilities. This next increment is
-documentation-only: do not change estimator defaults, predictor-rank search, validation, real-data
-workflows, or synthetic-generator behavior. Do not prepare or publish a package release.
+Record the canonical terminology decision before propagating vocabulary across the public surface.
+The review should cover $\Pi$, $P$, $Q$, $d_k$, scores, paired latent modes, `n_components`, and
+`predictor_rank`, and should identify manuscript wording that is less precise than the package's
+current distinctions. This increment is documentation-only and must not change estimator, search,
+validation, synthetic-generator, example, benchmark, or real-data behavior. Do not prepare or
+publish a package release.
 
 ## Maintenance protocol
 
