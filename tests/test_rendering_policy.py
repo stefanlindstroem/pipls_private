@@ -378,7 +378,8 @@ def test_latent_and_prediction_tiles_have_no_subplot_titles() -> None:
         ),
         "examples/07_tobacco_real_data.py": (
             (
-                "# Plot selection-conditioned diagnostics in deterministic source-order response pages.",
+                "# Plot selection-conditioned diagnostics in deterministic "
+                "source-order response pages.",
                 "figure.suptitle(",
             ),
             (

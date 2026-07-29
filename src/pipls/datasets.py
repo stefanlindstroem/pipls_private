@@ -17,7 +17,9 @@ NoiseSpec: TypeAlias = float | tuple[float, float]
 
 __all__ = [
     "PiPLSDataset",
+    "PiPLSLatentGeometryTruth",
     "PiPLSSyntheticTruth",
+    "make_pipls_latent_geometry",
     "make_pipls_regression",
     "make_pipls_train_test",
 ]
@@ -127,6 +129,92 @@ class PiPLSSyntheticTruth:
 
 
 @dataclass(frozen=True)
+class PiPLSLatentGeometryTruth:
+    r"""Immutable manuscript latent geometry for one synthetic dataset.
+
+    This record follows the orientation of the companion manuscript directly:
+
+    .. math::
+
+       X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
+       \qquad
+       Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
+
+    All score, loading, signal, and noise arrays are defensive read-only
+    ``float64`` copies. Loading matrices therefore have latent dimensions on
+    rows and observed variables on columns.
+
+    Attributes
+    ----------
+    predictor_specific_scores : ndarray of shape (n_samples, n_predictor_specific)
+        Predictor-specific latent matrix :math:`\Lambda_p`.
+    shared_scores : ndarray of shape (n_samples, n_shared)
+        Shared latent matrix :math:`\Lambda_s`.
+    response_specific_scores : ndarray of shape (n_samples, n_response_specific)
+        Response-specific latent matrix :math:`\Lambda_r`.
+    predictor_specific_loadings : ndarray of shape (n_predictor_specific, n_features)
+        Predictor-specific loading matrix :math:`L_p`.
+    shared_predictor_loadings : ndarray of shape (n_shared, n_features)
+        Shared predictor loading matrix :math:`L_{sp}`.
+    shared_response_loadings : ndarray of shape (n_shared, n_targets)
+        Shared response loading matrix :math:`L_{sr}`.
+    response_specific_loadings : ndarray of shape (n_response_specific, n_targets)
+        Response-specific loading matrix :math:`L_r`.
+    x_signal, x_noise : ndarray of shape (n_samples, n_features)
+        Noise-free predictor signal and additive noise.
+    y_signal, y_noise : ndarray of shape (n_samples, n_targets)
+        Noise-free response signal and additive noise.
+    """
+
+    predictor_specific_scores: FloatArray
+    shared_scores: FloatArray
+    response_specific_scores: FloatArray
+    predictor_specific_loadings: FloatArray
+    shared_predictor_loadings: FloatArray
+    shared_response_loadings: FloatArray
+    response_specific_loadings: FloatArray
+    x_signal: FloatArray
+    y_signal: FloatArray
+    x_noise: FloatArray
+    y_noise: FloatArray
+
+    def __post_init__(self) -> None:
+        for name in self.__dataclass_fields__:
+            value = _read_only_float_array(getattr(self, name), name=name)
+            if value.ndim != 2:
+                raise ValueError(f"{name} must be two-dimensional.")
+            object.__setattr__(self, name, value)
+        _validate_latent_geometry_truth(self)
+
+    @property
+    def n_shared(self) -> int:
+        """Number of shared latent directions :math:`d_s`."""
+
+        return int(self.shared_scores.shape[1])
+
+    @property
+    def n_predictor_specific(self) -> int:
+        """Number of predictor-specific latent directions :math:`d_p`."""
+
+        return int(self.predictor_specific_scores.shape[1])
+
+    @property
+    def n_response_specific(self) -> int:
+        """Number of response-specific latent directions :math:`d_r`."""
+
+        return int(self.response_specific_scores.shape[1])
+
+    def __reduce__(self) -> tuple[object, tuple[FloatArray, ...]]:
+        return (
+            type(self),
+            tuple(getattr(self, name) for name in self.__dataclass_fields__),
+        )
+
+
+_SyntheticTruth: TypeAlias = PiPLSSyntheticTruth | PiPLSLatentGeometryTruth
+
+
+@dataclass(frozen=True)
 class PiPLSDataset:
     r"""Immutable validated multivariate regression dataset.
 
@@ -151,7 +239,7 @@ class PiPLSDataset:
     metadata : mapping of str to object, default={}
         Recursively frozen dataset metadata. NumPy metadata arrays must not use
         object dtype, because object-array elements can remain mutable.
-    truth : PiPLSSyntheticTruth or None, default=None
+    truth : PiPLSSyntheticTruth, PiPLSLatentGeometryTruth, or None, default=None
         Optional synthetic latent structure consistent with ``X`` and ``Y``.
 
     Attributes
@@ -162,7 +250,7 @@ class PiPLSDataset:
         Validated axis labels.
     provenance, metadata : mapping
         Immutable mappings.
-    truth : PiPLSSyntheticTruth or None
+    truth : PiPLSSyntheticTruth, PiPLSLatentGeometryTruth, or None
         Optional synthetic truth object.
     """
 
@@ -173,7 +261,7 @@ class PiPLSDataset:
     sample_ids: Sequence[str]
     provenance: Mapping[str, str]
     metadata: Mapping[str, object] = field(default_factory=dict)
-    truth: PiPLSSyntheticTruth | None = None
+    truth: _SyntheticTruth | None = None
 
     def __post_init__(self) -> None:
         X = _validated_matrix(self.X, name="X", allow_vector=False)
@@ -283,6 +371,159 @@ class _SyntheticConfig:
     x_noise: float
     y_noise: float
     random_state: int
+
+
+def make_pipls_latent_geometry(
+    *,
+    n_samples: int,
+    n_features: int,
+    n_targets: int,
+    n_shared: int,
+    n_predictor_specific: int = 0,
+    n_response_specific: int = 0,
+    noise: NoiseSpec = 0.0,
+    random_state: int = 0,
+) -> PiPLSDataset:
+    r"""Generate the Gaussian latent geometry used in the companion manuscript.
+
+    The function implements the manuscript data model directly:
+
+    .. math::
+
+       X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
+       \qquad
+       Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
+
+    Every entry of the three latent-score matrices and four loading matrices is
+    drawn independently from :math:`\mathcal{N}(0, 1)`. Predictor and response
+    noise entries are independent Gaussian draws with the requested standard
+    deviations. No score centering, score standardization, loading
+    orthonormalization, latent-strength scaling, or observed-variable scaling is
+    applied.
+
+    This manuscript-aligned generator is separate from
+    :func:`make_pipls_regression`, which remains the configurable package
+    generator used by existing examples and benchmarks.
+
+    Parameters
+    ----------
+    n_samples : int
+        Number of observations; at least one.
+    n_features : int
+        Number of predictor variables :math:`p`.
+    n_targets : int
+        Number of response variables :math:`q`.
+    n_shared : int
+        Shared latent dimension :math:`d_s`.
+    n_predictor_specific : int, default=0
+        Predictor-specific latent dimension :math:`d_p`.
+    n_response_specific : int, default=0
+        Response-specific latent dimension :math:`d_r`.
+    noise : float or tuple of float, default=0.0
+        Common noise standard deviation, or separate
+        ``(sigma_x, sigma_y)`` values.
+    random_state : int, default=0
+        Local deterministic unsigned 32-bit random seed.
+
+    Returns
+    -------
+    PiPLSDataset
+        Generated matrices, manuscript-oriented latent truth, metadata, and
+        provenance.
+    """
+
+    n_samples = _positive_integer(n_samples, name="n_samples")
+    n_features = _positive_integer(n_features, name="n_features")
+    n_targets = _positive_integer(n_targets, name="n_targets")
+    n_shared = _nonnegative_integer(n_shared, name="n_shared")
+    n_predictor_specific = _nonnegative_integer(
+        n_predictor_specific,
+        name="n_predictor_specific",
+    )
+    n_response_specific = _nonnegative_integer(
+        n_response_specific,
+        name="n_response_specific",
+    )
+    if n_predictor_specific + n_shared > n_features:
+        raise ValueError("n_predictor_specific + n_shared must not exceed n_features.")
+    if n_shared + n_response_specific > n_targets:
+        raise ValueError("n_shared + n_response_specific must not exceed n_targets.")
+
+    sigma_x, sigma_y = _resolve_noise(noise)
+    seed = _validated_seed(random_state)
+    rng = np.random.default_rng(seed)
+
+    predictor_specific_scores = rng.standard_normal(
+        (n_samples, n_predictor_specific)
+    )
+    shared_scores = rng.standard_normal((n_samples, n_shared))
+    response_specific_scores = rng.standard_normal(
+        (n_samples, n_response_specific)
+    )
+    predictor_specific_loadings = rng.standard_normal(
+        (n_predictor_specific, n_features)
+    )
+    shared_predictor_loadings = rng.standard_normal((n_shared, n_features))
+    shared_response_loadings = rng.standard_normal((n_shared, n_targets))
+    response_specific_loadings = rng.standard_normal(
+        (n_response_specific, n_targets)
+    )
+    x_noise = sigma_x * rng.standard_normal((n_samples, n_features))
+    y_noise = sigma_y * rng.standard_normal((n_samples, n_targets))
+
+    x_signal = (
+        predictor_specific_scores @ predictor_specific_loadings
+        + shared_scores @ shared_predictor_loadings
+    )
+    y_signal = (
+        shared_scores @ shared_response_loadings
+        + response_specific_scores @ response_specific_loadings
+    )
+    truth = PiPLSLatentGeometryTruth(
+        predictor_specific_scores=predictor_specific_scores,
+        shared_scores=shared_scores,
+        response_specific_scores=response_specific_scores,
+        predictor_specific_loadings=predictor_specific_loadings,
+        shared_predictor_loadings=shared_predictor_loadings,
+        shared_response_loadings=shared_response_loadings,
+        response_specific_loadings=response_specific_loadings,
+        x_signal=x_signal,
+        y_signal=y_signal,
+        x_noise=x_noise,
+        y_noise=y_noise,
+    )
+    metadata: Mapping[str, object] = {
+        "schema_version": 1,
+        "generator": "make_pipls_latent_geometry",
+        "random_state": seed,
+        "latent_dimensions": {
+            "predictor_specific": n_predictor_specific,
+            "shared": n_shared,
+            "response_specific": n_response_specific,
+        },
+        "noise_standard_deviation": {"X": sigma_x, "Y": sigma_y},
+        "distribution": "independent standard normal scores and loadings",
+    }
+    provenance = {
+        "source": "generated:pipls.datasets.make_pipls_latent_geometry",
+        "license": "BSD-3-Clause",
+        "citation": (
+            "Agrawal, Vishal; Nilsson, Fritjof; Lindström, Stefan B. "
+            "Panoramic Partial Least Squares (Pi-PLS): Transparent, parsimonious, "
+            "and more interpretable multivariate regression model. Manuscript under revision."
+        ),
+        "version": "1",
+    }
+    return PiPLSDataset(
+        X=x_signal + x_noise,
+        Y=y_signal + y_noise,
+        feature_names=tuple(f"x_{index:03d}" for index in range(n_features)),
+        target_names=tuple(f"y_{index:03d}" for index in range(n_targets)),
+        sample_ids=tuple(f"sample_{index:04d}" for index in range(n_samples)),
+        provenance=provenance,
+        metadata=metadata,
+        truth=truth,
+    )
 
 
 def make_pipls_regression(
@@ -871,12 +1112,27 @@ def _freeze_metadata_value(value: object, *, path: str) -> object:
 
 
 def _validate_truth(
-    truth: PiPLSSyntheticTruth,
+    truth: _SyntheticTruth,
     *,
     n_samples: int,
     n_features: int,
     n_targets: int,
 ) -> None:
+    if isinstance(truth, PiPLSLatentGeometryTruth):
+        if truth.x_signal.shape != (n_samples, n_features):
+            raise ValueError(
+                f"truth.x_signal must have shape {(n_samples, n_features)}."
+            )
+        if truth.y_signal.shape != (n_samples, n_targets):
+            raise ValueError(
+                f"truth.y_signal must have shape {(n_samples, n_targets)}."
+            )
+        return
+    if not isinstance(truth, PiPLSSyntheticTruth):
+        raise TypeError(
+            "truth must be PiPLSSyntheticTruth or PiPLSLatentGeometryTruth."
+        )
+
     n_shared = truth.n_shared
     n_predictor_specific = truth.n_predictor_specific
     n_response_specific = truth.n_response_specific
@@ -910,6 +1166,49 @@ def _validate_truth(
     )
     if any(np.any(strengths <= 0.0) for strengths in strength_arrays):
         raise ValueError("truth latent strengths must be positive.")
+
+
+def _validate_latent_geometry_truth(truth: PiPLSLatentGeometryTruth) -> None:
+    n_samples = truth.shared_scores.shape[0]
+    if truth.predictor_specific_scores.shape[0] != n_samples:
+        raise ValueError("All latent score matrices must contain the same samples.")
+    if truth.response_specific_scores.shape[0] != n_samples:
+        raise ValueError("All latent score matrices must contain the same samples.")
+
+    n_features = truth.shared_predictor_loadings.shape[1]
+    n_targets = truth.shared_response_loadings.shape[1]
+    expected_shapes = {
+        "predictor_specific_loadings": (
+            truth.n_predictor_specific,
+            n_features,
+        ),
+        "shared_predictor_loadings": (truth.n_shared, n_features),
+        "shared_response_loadings": (truth.n_shared, n_targets),
+        "response_specific_loadings": (
+            truth.n_response_specific,
+            n_targets,
+        ),
+        "x_signal": (n_samples, n_features),
+        "x_noise": (n_samples, n_features),
+        "y_signal": (n_samples, n_targets),
+        "y_noise": (n_samples, n_targets),
+    }
+    for name, expected in expected_shapes.items():
+        if getattr(truth, name).shape != expected:
+            raise ValueError(f"{name} must have shape {expected}.")
+
+    expected_x_signal = (
+        truth.predictor_specific_scores @ truth.predictor_specific_loadings
+        + truth.shared_scores @ truth.shared_predictor_loadings
+    )
+    expected_y_signal = (
+        truth.shared_scores @ truth.shared_response_loadings
+        + truth.response_specific_scores @ truth.response_specific_loadings
+    )
+    if not np.allclose(truth.x_signal, expected_x_signal):
+        raise ValueError("x_signal must follow the manuscript latent-geometry equation.")
+    if not np.allclose(truth.y_signal, expected_y_signal):
+        raise ValueError("y_signal must follow the manuscript latent-geometry equation.")
 
 
 def _read_only_float_array(value: object, *, name: str) -> FloatArray:

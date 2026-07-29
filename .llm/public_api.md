@@ -200,7 +200,9 @@ that module's `__all__`:
 ```python
 from pipls.datasets import (
     PiPLSDataset,
+    PiPLSLatentGeometryTruth,
     PiPLSSyntheticTruth,
+    make_pipls_latent_geometry,
     make_pipls_regression,
     make_pipls_train_test,
 )
@@ -226,9 +228,17 @@ centered latent rank requested for `X` or `Y`.
 independent train/test score and noise draws. It performs no fitted preprocessing and the training
 block does not depend on the requested test size.
 
+`make_pipls_latent_geometry` is a separate manuscript-aligned generator. It draws independent
+standard-normal predictor-specific, shared, and response-specific score matrices; independent
+standard-normal loading matrices; and independent Gaussian predictor/response noise. It applies no
+score centering or standardization, loading orthonormalization, strength scaling, or observed-scale
+transformation. Its loading matrices use manuscript orientation with latent dimensions on rows.
+
 `PiPLSSyntheticTruth` exposes read-only latent scores, contributing loading blocks, signal/noise
-matrices, strengths, and scales. Structurally absent cross-side loading blocks are not stored as
-redundant zero arrays.
+matrices, strengths, and scales for the configurable package generators. Structurally absent
+cross-side loading blocks are not stored as redundant zero arrays. `PiPLSLatentGeometryTruth`
+exposes the manuscript matrices directly and validates the two signal equations. Both truth forms
+may be carried by `PiPLSDataset.truth`.
 
 No metadata file, registry lookup, or package-owned loader is required for real-data fitting.
 Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Repository examples

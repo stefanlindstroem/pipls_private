@@ -3,7 +3,12 @@ from __future__ import annotations
 import numpy as np
 from numpy.testing import assert_allclose
 
-from pipls.datasets import make_pipls_regression, make_pipls_train_test
+from pipls.datasets import (
+    PiPLSLatentGeometryTruth,
+    make_pipls_latent_geometry,
+    make_pipls_regression,
+    make_pipls_train_test,
+)
 
 
 def test_synthetic_shapes_and_reconstruction_identity() -> None:
@@ -97,6 +102,84 @@ def test_generator_does_not_mutate_numpy_global_rng() -> None:
         n_targets=3,
         n_shared=1,
         random_state=5,
+    )
+    observed = np.random.random(5)
+
+    assert_allclose(observed, expected)
+
+
+
+def test_manuscript_latent_geometry_matches_both_generating_equations() -> None:
+    dataset = make_pipls_latent_geometry(
+        n_samples=40,
+        n_features=8,
+        n_targets=5,
+        n_shared=2,
+        n_predictor_specific=3,
+        n_response_specific=2,
+        noise=(0.2, 0.3),
+        random_state=42,
+    )
+    truth = dataset.truth
+    assert isinstance(truth, PiPLSLatentGeometryTruth)
+
+    assert truth.predictor_specific_scores.shape == (40, 3)
+    assert truth.shared_scores.shape == (40, 2)
+    assert truth.response_specific_scores.shape == (40, 2)
+    assert truth.predictor_specific_loadings.shape == (3, 8)
+    assert truth.shared_predictor_loadings.shape == (2, 8)
+    assert truth.shared_response_loadings.shape == (2, 5)
+    assert truth.response_specific_loadings.shape == (2, 5)
+    assert_allclose(
+        truth.x_signal,
+        truth.predictor_specific_scores @ truth.predictor_specific_loadings
+        + truth.shared_scores @ truth.shared_predictor_loadings,
+    )
+    assert_allclose(
+        truth.y_signal,
+        truth.shared_scores @ truth.shared_response_loadings
+        + truth.response_specific_scores @ truth.response_specific_loadings,
+    )
+    assert_allclose(dataset.X, truth.x_signal + truth.x_noise)
+    assert_allclose(dataset.Y, truth.y_signal + truth.y_noise)
+
+
+def test_manuscript_latent_geometry_supports_structurally_absent_blocks() -> None:
+    dataset = make_pipls_latent_geometry(
+        n_samples=6,
+        n_features=4,
+        n_targets=3,
+        n_shared=0,
+        n_predictor_specific=0,
+        n_response_specific=0,
+        noise=(0.1, 0.2),
+        random_state=11,
+    )
+    truth = dataset.truth
+    assert isinstance(truth, PiPLSLatentGeometryTruth)
+
+    assert truth.predictor_specific_scores.shape == (6, 0)
+    assert truth.shared_scores.shape == (6, 0)
+    assert truth.response_specific_scores.shape == (6, 0)
+    assert truth.predictor_specific_loadings.shape == (0, 4)
+    assert truth.shared_predictor_loadings.shape == (0, 4)
+    assert truth.shared_response_loadings.shape == (0, 3)
+    assert truth.response_specific_loadings.shape == (0, 3)
+    assert_allclose(truth.x_signal, 0.0)
+    assert_allclose(truth.y_signal, 0.0)
+
+
+def test_manuscript_generator_does_not_mutate_numpy_global_rng() -> None:
+    np.random.seed(318)
+    expected = np.random.random(5)
+    np.random.seed(318)
+
+    make_pipls_latent_geometry(
+        n_samples=10,
+        n_features=4,
+        n_targets=3,
+        n_shared=1,
+        random_state=8,
     )
     observed = np.random.random(5)
 

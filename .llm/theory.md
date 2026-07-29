@@ -501,6 +501,24 @@ Response-standardized MSE is used so response columns with different physical sc
 comparably. The scale for each response must be estimated from the corresponding training fold,
 not from the validation fold or the complete dataset.
 
+## Synthetic-data capability
+
+Decision 0119 separates two public synthetic purposes. `make_pipls_regression()` and
+`make_pipls_train_test()` remain configurable package generators with standardized latent scores,
+orthonormal loading directions, strengths, distributions, and observed scales.
+`make_pipls_latent_geometry()` instead implements the companion manuscript model exactly:
+
+$$
+X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
+\qquad
+Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
+$$
+
+All score and loading entries are independent standard-normal draws, and the noise blocks are
+independent Gaussian draws with caller-specified standard deviations. No centering,
+standardization, orthonormalization, strength scaling, or observed scaling is applied by that
+generator. This capability does not change estimator, search, validation, or real-data policy.
+
 ## Core algorithm summary
 
 For centered or centered-and-scaled $\mathbf{X}$ and $\mathbf{Y}$:

@@ -95,6 +95,61 @@ loading blocks, signal matrices, noise matrices, strengths, and observed-variabl
 that are structurally absent from one observed block are described by the declared latent ranks;
 they are not stored as redundant zero loading arrays.
 
+## Companion-manuscript latent geometry
+
+Use `make_pipls_latent_geometry()` when the data-generating distribution must match the Gaussian
+latent geometry in the companion manuscript:
+
+```python
+from pipls.datasets import make_pipls_latent_geometry
+
+synthetic = make_pipls_latent_geometry(
+    n_samples=40,
+    n_features=80,
+    n_targets=30,
+    n_predictor_specific=4,
+    n_shared=4,
+    n_response_specific=1,
+    noise=(0.5, 0.5),
+    random_state=0,
+)
+```
+
+The generator implements
+
+\[
+X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
+\qquad
+Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
+\]
+
+Every latent-score entry and loading entry is an independent standard-normal draw. Noise entries
+are independent Gaussian draws with standard deviations `noise[0]` and `noise[1]`. The function
+applies no centering, score standardization, loading orthonormalization, latent-strength scaling, or
+observed-variable scaling. This is the synthetic model described in the [companion manuscript](citation.md); it
+is separate from the more configurable package generator above.
+
+`synthetic.truth` is a read-only `PiPLSLatentGeometryTruth`. Its loading matrices retain the
+manuscript orientation, with latent dimensions on rows and observed variables on columns. The
+stored arrays therefore verify the equations directly:
+
+```python
+truth = synthetic.truth
+
+x_signal = (
+    truth.predictor_specific_scores @ truth.predictor_specific_loadings
+    + truth.shared_scores @ truth.shared_predictor_loadings
+)
+y_signal = (
+    truth.shared_scores @ truth.shared_response_loadings
+    + truth.response_specific_scores @ truth.response_specific_loadings
+)
+```
+
+A fixed `random_state` reproduces the package draw sequence exactly. Reproducing a particular
+manuscript table or figure additionally requires the parameter grid, random seeds, resampling
+protocol, and analysis settings used for that result.
+
 ## Leakage-free train/test generation
 
 ```python

@@ -6,7 +6,13 @@ from collections.abc import Mapping
 import numpy as np
 import pytest
 
-from pipls.datasets import PiPLSDataset, PiPLSSyntheticTruth, make_pipls_regression
+from pipls.datasets import (
+    PiPLSDataset,
+    PiPLSLatentGeometryTruth,
+    PiPLSSyntheticTruth,
+    make_pipls_latent_geometry,
+    make_pipls_regression,
+)
 
 PROVENANCE = {
     "source": "unit-test",
@@ -151,3 +157,60 @@ def test_synthetic_truth_is_read_only() -> None:
     assert truth.n_response_specific == 1
     for name in truth.__dataclass_fields__:
         assert not getattr(truth, name).flags.writeable
+
+
+
+def test_manuscript_latent_geometry_truth_is_read_only_and_pickleable() -> None:
+    dataset = make_pipls_latent_geometry(
+        n_samples=9,
+        n_features=6,
+        n_targets=5,
+        n_shared=2,
+        n_predictor_specific=1,
+        n_response_specific=2,
+        noise=(0.2, 0.3),
+        random_state=17,
+    )
+    truth = dataset.truth
+
+    assert isinstance(truth, PiPLSLatentGeometryTruth)
+    assert truth.n_shared == 2
+    assert truth.n_predictor_specific == 1
+    assert truth.n_response_specific == 2
+    for name in truth.__dataclass_fields__:
+        assert not getattr(truth, name).flags.writeable
+
+    restored = pickle.loads(pickle.dumps(truth))
+    assert isinstance(restored, PiPLSLatentGeometryTruth)
+    for name in truth.__dataclass_fields__:
+        np.testing.assert_array_equal(getattr(restored, name), getattr(truth, name))
+        assert not getattr(restored, name).flags.writeable
+
+
+def test_manuscript_latent_geometry_truth_validates_equations() -> None:
+    dataset = make_pipls_latent_geometry(
+        n_samples=8,
+        n_features=5,
+        n_targets=4,
+        n_shared=2,
+        n_predictor_specific=1,
+        n_response_specific=1,
+        random_state=3,
+    )
+    truth = dataset.truth
+    assert isinstance(truth, PiPLSLatentGeometryTruth)
+
+    with pytest.raises(ValueError, match="x_signal"):
+        PiPLSLatentGeometryTruth(
+            predictor_specific_scores=truth.predictor_specific_scores,
+            shared_scores=truth.shared_scores,
+            response_specific_scores=truth.response_specific_scores,
+            predictor_specific_loadings=truth.predictor_specific_loadings,
+            shared_predictor_loadings=truth.shared_predictor_loadings,
+            shared_response_loadings=truth.shared_response_loadings,
+            response_specific_loadings=truth.response_specific_loadings,
+            x_signal=truth.x_signal + 1.0,
+            y_signal=truth.y_signal,
+            x_noise=truth.x_noise,
+            y_noise=truth.y_noise,
+        )

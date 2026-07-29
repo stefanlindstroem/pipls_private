@@ -88,6 +88,7 @@ def test_returned_result_records_hide_constructor_signatures() -> None:
         "pipls.inspection.ObservationDiagnostics",
         "pipls.inspection.PiPLSDisplayFactors",
         "pipls.inspection.PredictionDiagnostics",
+        "pipls.datasets.PiPLSLatentGeometryTruth",
         "pipls.datasets.PiPLSSyntheticTruth",
     }
 

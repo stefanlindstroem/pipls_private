@@ -828,13 +828,23 @@ rotation without changing numerical analysis.
 
 Current status: **maintained figure rendering policy complete**.
 
+### Manuscript latent-geometry capability
+
+Decision 0119 adds a separate exact Gaussian latent-geometry generator rather than changing the
+existing configurable synthetic API. The new function follows the manuscript score/loading
+orientation and draw distribution, returns immutable manuscript-oriented truth, and leaves all
+real-data, estimator, search, example, and benchmark behavior unchanged.
+
+Current status: **manuscript latent-geometry generator complete**.
+
 ## Current next increment
 
-The owner-authorized S1--S6 simplification series is complete. No further implementation patch is
-preauthorized. Continue the human audit and identify one concrete unnecessary structure or repeated
-contract before changing code. Add a decision record first when the next finding changes a public
-constructor, stored result state, or documented behavior. Do not prepare or publish a package
-release.
+Align the canonical theory documentation with the companion manuscript. Replace the current
+reference-and-scope section, present the full three-stage derivation and limiting relationships,
+correct the nominal fitted dimension after the predictor basis is fixed, and retain explicit
+separation between manuscript theory and broader package capabilities. This next increment is
+documentation-only: do not change estimator defaults, predictor-rank search, validation, real-data
+workflows, or synthetic-generator behavior. Do not prepare or publish a package release.
 
 ## Maintenance protocol
 

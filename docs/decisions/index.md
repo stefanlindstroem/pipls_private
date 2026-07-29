@@ -60,6 +60,7 @@ reference describe the current public behavior directly.
 - [0033: remove Linnerud integration](0033-remove-linnerud-integration.md)
 - [0035: former Tobacco randomized path](0035-tobacco-randomized-auto-path.md)
 - [0041: legacy dataset licensing](0041-legacy-dataset-licensing-roadmap.md)
+- [0119: manuscript latent-geometry generator](0119-manuscript-latent-geometry-generator.md)
 
 ## Examples and analysis workflows
 

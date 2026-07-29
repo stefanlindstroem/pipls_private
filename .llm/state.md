@@ -379,7 +379,7 @@ ignored and are excluded from snapshots. Software versions, execution controls, 
 unrelated metrics are omitted unless they answer that benchmark's explicit question. OLS, CCA,
 publication grids, and figure generation remain outside the repository.
 
-## Current next increment
+## Recent completed increments
 
 Decisions 0107--0116 are complete. The path result methods remain non-mutating stored-row
 inspection. `PiPLSSearchCV` retains separate global `best_*` and declared `selected_result_`
@@ -408,12 +408,19 @@ on one line, path/profile y-axes start at zero with an upper limit of at least o
 use numeric component ticks without repeating the x-axis label, and dense Tobacco response labels
 are rotated explicitly.
 
-## Subsequent roadmap
+Decision 0119 adds `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth` as an additive
+manuscript-aligned synthetic capability. It implements independent standard-normal latent scores
+and loading entries plus independent Gaussian predictor/response noise, with no normalization,
+orthonormalization, strength, or observed-scale transformation. Existing configurable generators,
+benchmarks, examples, estimator/search behavior, and practical real-data workflows are unchanged.
 
-No further implementation patch is preauthorized. Continue the human audit and identify one
-concrete unnecessary structure or repeated contract before changing code. Add a decision record
-first when the next finding changes a public constructor, stored result state, or documented
-behavior.
+## Current next increment
+
+The next owner-authorized increment is documentation-only: rebuild the canonical Pi-PLS theory
+page around the companion manuscript, replace the current theory reference-and-scope section,
+correct the nominal fitted-dimension expression, and distinguish retained predictor subspaces from
+synthetic signal rank. Do not change estimator defaults, search behavior, validation protocols,
+real-data workflows, or existing synthetic generators in that increment.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.
