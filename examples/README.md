@@ -1,7 +1,8 @@
 # Examples
 
-Pi-PLS predicts through paired predictor and response latent variables. Applied workflows normally
-scan the number of latent components by cross-validation and inspect CV-MSE against component count.
+Pi-PLS predicts through paired latent modes, each containing one predictor direction, one response
+direction, and one dilation. Applied workflows normally scan `n_components`, the number of paired
+latent modes, by cross-validation and inspect CV-MSE against that count.
 The resulting table or curve is called the component path. A clear elbow or plateau can motivate a
 component count; when no clear elbow is present, the conventional one-standard-error rule provides a
 reproducible parsimony heuristic. Example 07 demonstrates that rule. See the
@@ -60,7 +61,7 @@ use case rather than combining unrelated split protocols in one context-free scr
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD and an explicit application of `one_standard_error_result()`. Its component-path figure shows
   the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row; the returned
-  component count and associated predictor rank define the final interpretation model. The workflow
+  paired-mode count and associated predictor rank define the final interpretation model. The workflow
   then calculates selection-conditioned OOF predictions, decreasing-wavenumber spectral plots,
   deterministic response pagination, and raw observation diagnostics through direct in-memory
   results and caller-owned multipage PDFs. See the
@@ -109,7 +110,7 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 
 1. the default selection-only `PiPLSSearchCV()` returns `component_path_`, which is plotted directly
    with Matplotlib.
-2. `path.for_n_components(CHOSEN_N_COMPONENTS)` supplies the fixed component count and predictor
+2. `path.for_n_components(CHOSEN_N_COMPONENTS)` supplies the fixed paired-mode count and predictor
    rank.
 3. `cross_val_predict()` with five non-shuffled folds produces
    `selection-conditioned OOF predictions`.

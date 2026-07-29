@@ -1,8 +1,10 @@
 # Fixed Pi-PLS regression
 
-Use `PiPLSRegression` when `n_components` and `predictor_rank` are already fixed. Both are
-required keyword-only constructor arguments because the estimator fits exactly one explicit pair
-and does not perform cross-validation or parameter selection.
+Use `PiPLSRegression` when `n_components` and `predictor_rank` are already fixed. Here
+`n_components` is the number of paired latent modes $h$, while `predictor_rank` is the retained
+predictor-subspace dimension $r_\pi$. Both are required keyword-only constructor arguments because
+the estimator fits exactly one explicit pair and does not perform cross-validation or parameter
+selection.
 
 ```python
 from pipls import PiPLSRegression
@@ -74,13 +76,15 @@ documented below.
 
 `PiPLSRegression.decomposition_` is normally obtained from a fitted estimator. Directly
 constructed instances apply the same shape, finite-value, scalar, and read-only-array validation.
-Its public fields use descriptive Python names:
+Its public field names retain the established `rotations` identifiers for compatibility, while the
+mathematical values are the orthonormal predictor and response directions defined in the
+[canonical terminology](../theory.md#canonical-terminology):
 
 | Field | Method notation | Meaning |
 |---|---|---|
-| `predictor_rotations` | $P$ | orthogonal predictor directions |
-| `dilation` | $\operatorname{diag}(D)$ | nonnegative strength of each paired mode |
-| `response_rotations` | $Q$ | orthogonal response directions |
+| `predictor_rotations` | $P$ | orthonormal predictor directions |
+| `dilation` | $d_k=D_{kk}$ | nonnegative dilation of each paired latent mode |
+| `response_rotations` | $Q$ | orthonormal response directions |
 | `predictor_numerical_rank` | — | complete numerical rank under full SVD, or a verified lower bound under randomized SVD |
 | `predictor_numerical_rank_is_exact` | — | whether the reported numerical rank is complete |
 | `rank_tolerance` | — | tolerance used to classify retained predictor singular values |

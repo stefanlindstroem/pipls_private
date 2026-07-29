@@ -56,17 +56,17 @@ class PiPLSCoreResult:
     Attributes
     ----------
     Pi:
-        Predictor basis with shape ``(p, r_pi)``.
+        Retained predictor basis with shape ``(p, r_pi)``.
     C:
         Response basis with shape ``(q, h)``.
     W:
         Least-squares map with shape ``(r_pi, h)``.
     P:
-        Orthogonal predictor rotations with shape ``(p, h)``.
+        Orthonormal predictor directions with shape ``(p, h)``.
     D:
         Nonnegative diagonal dilation matrix with shape ``(h, h)``.
     Q:
-        Orthogonal response rotations with shape ``(q, h)``.
+        Orthonormal response directions with shape ``(q, h)``.
     x_rank:
         Numerical rank of the supplied predictor matrix for full SVD, or a
         verified lower bound equal to the number of retained nonzero singular
@@ -129,9 +129,9 @@ def fit_pipls_core(
     Y:
         Centered, optionally scaled response matrix with shape ``(n, q)``.
     predictor_rank:
-        Predictor truncation rank $r_\pi$.
+        Retained predictor-subspace dimension $r_\pi$.
     n_components:
-        Response-side latent dimension $h$.
+        Number of paired latent modes $h$.
     svd_solver:
         Predictor decomposition policy. ``"full"`` uses NumPy's exact thin SVD,
         ``"randomized"`` uses scikit-learn's randomized truncated SVD, and

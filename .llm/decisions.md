@@ -127,6 +127,7 @@ This index is navigation, not a substitute for those records.
 | `0119-manuscript-latent-geometry-generator.md` | manuscript latent-geometry generator | additive exact Gaussian manuscript generator with manuscript-oriented immutable truth; existing synthetic and real-data workflows unchanged |
 | `0120-companion-manuscript-theory-alignment.md` | companion-manuscript theory alignment | canonical projector/optimization/diagonal derivation, corrected fitted dimension, and explicit manuscript/package scope boundary |
 | `0121-canonical-pipls-terminology.md` | canonical Pi-PLS terminology | retained basis/projector, predictor and response directions, dilation, paired modes, score orientation, and public rank-name meanings |
+| `0122-public-terminology-propagation.md` | public terminology propagation | canonical paired-mode, rank, direction, dilation, and loading distinctions across living docs and generated docstrings |
 
 ## Implemented estimator/search transition
 

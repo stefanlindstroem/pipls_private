@@ -6,8 +6,9 @@ without relying on private implementation details.
 ## I do not know the two ranks
 
 Use `PiPLSSearchCV` rather than guessing both values. The search object evaluates admissible
-`(n_components, predictor_rank)` pairs, retains one conditionally selected predictor rank for each
-component count, and exposes the concise result through `component_path_`.
+`(n_components, predictor_rank)` pairs, where `n_components` counts paired latent modes and
+`predictor_rank` is the retained predictor-subspace dimension. It retains one conditionally selected
+predictor rank for each paired-mode count and exposes the concise result through `component_path_`.
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)

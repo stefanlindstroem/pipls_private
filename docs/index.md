@@ -1,25 +1,26 @@
 # Pi-PLS documentation
 
 Pi-PLS is a multivariate linear-regression method that represents the predictive relation through
-paired predictor and response latent variables.
+paired latent modes. Each mode contains one orthonormal predictor direction, one orthonormal response
+direction, and one nonnegative dilation.
 
 ## When Pi-PLS may be useful
 
 Although Pi-PLS and ordinary PLS have similar names and belong to the same broad family of
 latent-variable regression methods, their theoretical foundations differ. Pi-PLS diagonalizes its
-latent regression map into paired predictor and response directions, giving each retained component
-a direct one-to-one predictor-response interpretation. It can also provide a more parsimonious
-predictive model by attaining a given cross-validated mean squared error (CV-MSE) with fewer
-latent components.
+latent regression map into paired predictor and response directions, giving each retained paired
+mode a direct one-to-one predictor-response interpretation. It can also provide a more parsimonious
+predictive model by attaining a given cross-validated mean squared error (CV-MSE) with fewer paired
+latent modes.
 
 Across a wide range of synthetic settings and real-world datasets examined during
-development, Pi-PLS typically yields lower CV-MSE than ordinary PLS at a given number of latent components (*cf*. example 04). This is not a general performance claim: no method is universally better.
+development, Pi-PLS typically yields lower CV-MSE than ordinary PLS at a given number of paired latent modes (*cf*. example 04). This is not a general performance claim: no method is universally better.
 
 ## Choose a tutorial
 
 [First Pi-PLS model with synthetic data](tutorials/synthetic.md) is the recommended introduction. It
 shows the complete selection contract in a small deterministic problem: evaluate the component
-path, choose a component count, retrieve its conditionally selected predictor rank, fit one fixed
+path, choose a paired-mode count, retrieve its conditionally selected predictor rank, fit one fixed
 model, and predict an independent test set.
 
 Continue with [Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) for real-data loading,

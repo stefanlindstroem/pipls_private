@@ -58,7 +58,7 @@ arithmetic, length-weighted, and length-length-weighted means. The response labe
 energy absorption), `TSI` (tensile stiffness index), `Tear index`, and `s` (light-scattering
 coefficient).
 
-The analysis asks for a parsimonious number of paired Pi-PLS components, then uses the predictor
+The analysis asks for a parsimonious number of Pi-PLS paired latent modes, then uses the predictor
 rank selected conditionally at that component count. The distinction is summarized in
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
@@ -78,7 +78,7 @@ workflow object is required.
 
 ### Component path
 
-The search evaluates admissible component counts and selects one predictor rank conditionally at
+The search evaluates admissible paired-mode counts and selects one predictor rank conditionally at
 each count:
 
 ```python
@@ -131,8 +131,8 @@ Their mean difference is small relative to the displayed uncertainty scale.
 
 The profile supports rank 10 for this fitted model, but it does not establish that ranks above 10
 would be worse or that rank 10 has a distinct scientific advantage over rank 9. The fixed model
-still contains three paired components; predictor rank 10 is the dimension of the predictor basis
-used to estimate those pairs. See [Path-selection details](../path_analysis.md) for other
+still contains three paired latent modes; predictor rank 10 is the retained predictor-subspace
+dimension used to estimate those modes. See [Path-selection details](../path_analysis.md) for other
 bounds and policies.
 
 ## Fit the selected model
@@ -237,9 +237,9 @@ fibrillation or length descriptors, the second emphasizes length descriptors, an
 strongly associated with `Fines B`. Only relative within-component patterns should be interpreted;
 the displayed orientation is fixed by the TI entries in the paired response directions.
 
-The columns of $P$ are predictor rotations paired with response directions in $PDQ^{\mathsf T}$.
-They are distinct from ordinary X loadings. The figure shows all three selected paired components;
-predictor rank 10 does not create ten plotted components. See
+The columns of $P$ are orthonormal predictor directions paired with orthonormal response directions
+in $PDQ^{\mathsf T}$. They are distinct from ordinary X loadings. The figure shows all three
+selected paired latent modes; predictor rank 10 does not create ten plotted modes. See
 [Predictor directions](../model_inspection.md#predictor-directions) and
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
 
@@ -255,8 +255,8 @@ The grouped bars are constructed directly from `factors.weighted_response_direct
 
 The first component has its largest absolute entries for `TI`, `TEA`, `Tear index`, and `TSI`.
 The second component is most pronounced for `Tear index` and `s`, while the third contrasts `CSF`
-with `Elongation`. Because $QD$ combines each response direction with its dilation, it shows the
-response-side orientation and strength of the paired modes rather than $Q$ alone.
+with `Elongation`. Because column $k$ of $QD$ is $d_kQ_{:k}$, it combines each response direction
+with the dilation of its paired latent mode and shows orientation and strength rather than $Q$ alone.
 
 The complete example includes separate $D$ and $Q$ plots in the same four-panel Pi-PLS
 factorization figure. See [Dilation](../model_inspection.md#dilation),

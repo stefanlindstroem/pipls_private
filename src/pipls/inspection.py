@@ -311,8 +311,9 @@ class PiPLSDisplayFactors:
     r"""Immutable display-oriented copy of a Pi-PLS factorization.
 
     The predictor and response direction columns use one chosen deterministic
-    display sign per component. Applying the same sign to both sides preserves the
-    centered/scaled regression map $PDQ^{\mathsf T}$. Direct construction validates
+    display sign per paired latent mode. Applying the same sign to both sides
+    preserves the centered/scaled regression map $PDQ^{\mathsf T}$. Direct
+    construction validates
     the independent factor arrays and stores defensive read-only copies. Weighted
     response directions are derived from the validated response directions and dilation.
 
@@ -325,7 +326,7 @@ class PiPLSDisplayFactors:
     response_directions : ndarray of shape (n_targets, n_components)
         Display-signed copy of $Q$.
     weighted_response_directions : ndarray of shape (n_targets, n_components)
-        Derived read-only columns $d_k q_{:k}$, equal to
+        Derived read-only columns $d_k Q_{:k}$, equal to
         ``response_directions * dilation``.
     """
 
@@ -384,7 +385,7 @@ class PiPLSDisplayFactors:
 
     @property
     def weighted_response_directions(self) -> FloatArray:
-        """Derived read-only columns $d_k q_{:k}$ of $QD$."""
+        """Derived read-only columns $d_k Q_{:k}$ of $QD$."""
 
         weighted = _finite_product(
             self.response_directions,
@@ -408,7 +409,7 @@ class PiPLSDisplayFactors:
 
     @property
     def n_components(self) -> int:
-        """Number of retained Pi-PLS components."""
+        """Number of retained Pi-PLS paired latent modes."""
 
         return int(self.dilation.shape[0])
 

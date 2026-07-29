@@ -23,8 +23,9 @@ B_{\mathrm{cs}}=PDQ^{\mathsf T}.
 \end{equation}
 
 `pipls_display_factors()` returns defensive read-only copies and applies one deterministic display
-sign per component. The same sign is applied to the paired columns of $P$ and $Q$, so the regression
-map is unchanged. By default, the first largest-magnitude predictor entry is made nonnegative.
+sign per paired latent mode. The same sign is applied to the paired columns of $P$ and $Q$, so
+the regression map is unchanged. By default, the first largest-magnitude predictor entry is made
+nonnegative.
 
 ```python
 from pipls.inspection import pipls_display_factors
@@ -50,8 +51,8 @@ back to the default predictor-based convention. These choices orient an equivale
 they do not change predictions or establish that the selected response has a positive or negative
 physical effect.
 
-$P$ contains predictor rotations, not X loadings. X loadings belong to score reconstruction and are
-stored in `LatentStructure`.
+$P$ contains orthonormal predictor directions, not X loadings. X loadings belong to score
+reconstruction and are stored in `LatentStructure`.
 
 ### Latent structure
 
@@ -98,9 +99,9 @@ outlier labels, or contribution diagnostics.
 | Where are samples in the latent plane? | `structure.x_scores` | Scatter two components; proximity means similar displayed score coordinates |
 | How do predictors reconstruct scores? | `structure.x_loadings` | Plot or group selected loading columns; these are not regression coefficients |
 | How do responses enter the latent representation? | `structure.y_loadings` | Compare selected loading columns across named responses |
-| What are the Pi-PLS predictor modes? | `factors.predictor_directions` | Plot columns of $P$ against names or a physical predictor coordinate |
-| How strong is each paired mode? | `factors.dilation` | Compare the nonnegative diagonal values of $D$ |
-| What are the response-side modes? | `factors.response_directions` | Compare columns of $Q$ across responses |
+| What are the Pi-PLS predictor directions? | `factors.predictor_directions` | Plot columns of $P$ against names or a physical predictor coordinate |
+| How strong is each paired latent mode? | `factors.dilation` | Compare the nonnegative dilations $d_k=D_{kk}$ |
+| What are the Pi-PLS response directions? | `factors.response_directions` | Compare columns of $Q$ across responses |
 | What is each response mode after dilation? | `factors.weighted_response_directions` | Compare columns of $QD$ across responses |
 | What is the original-unit linear map? | `structure.coefficients` | Plot one coefficient row per response, respecting variable units |
 | Which observations are distant or poorly reconstructed? | `observations.score_distance`, `observations.x_reconstruction_residual` | Scatter the two raw diagnostics |
@@ -133,28 +134,27 @@ loadings describe the standardized fitted representation rather than original-un
 
 ### Predictor directions $P$ { #predictor-directions }
 
-Use columns of `factors.predictor_directions`. They define predictor rotations paired with response
-rotations in $PDQ^{\mathsf T}$ and are distinct from X loadings because they belong to the
-regression factorization rather than score reconstruction.
+Use columns of `factors.predictor_directions`. They are orthonormal predictor directions paired with
+orthonormal response directions in $PDQ^{\mathsf T}$. They are distinct from X loadings because
+they belong to the regression factorization rather than score reconstruction.
 
 Theory: [Diagonal latent coupling](theory.md#diagonal-latent-coupling).
 
 ### Dilation $D$ { #dilation }
 
-Each value $d_k=D_{kk}$ scales one paired predictor-response mode and should be interpreted together
-with the matching columns of $P$ and $Q$.
+Each value $d_k=D_{kk}$ is the dilation of paired latent mode $k$ and should be interpreted
+together with the matching columns of $P$ and $Q$.
 
 ### Response directions $Q$ { #response-directions }
 
-The columns of `factors.response_directions` describe the response rotation of each paired mode
-before dilation. Use explicit response labels when comparing them.
+The columns of `factors.response_directions` are the orthonormal response directions of the paired
+latent modes before dilation. Use explicit response labels when comparing them.
 
 ### Weighted response directions $QD$ { #weighted-response-directions }
 
 `factors.weighted_response_directions` is a derived read-only array that combines response-side
-orientation and mode strength through
-$d_kq_{:k}$. Compare it with $Q$ when distinguishing direction from scaled contribution to the
-centered/scaled regression map.
+orientation and mode strength. Column $k$ is $d_kQ_{:k}$. Compare it with $Q$ when
+distinguishing direction from scaled contribution to the centered/scaled regression map.
 
 ### Regression coefficients { #regression-coefficients }
 

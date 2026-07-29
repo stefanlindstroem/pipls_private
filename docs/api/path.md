@@ -1,9 +1,10 @@
 # Pi-PLS path selection
 
 Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
-The [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path) shows the ordinary
-sequence: inspect `component_path_`, choose a component count, retrieve its conditional predictor
-rank, and fit a separate fixed estimator.
+`n_components` counts paired latent modes $h$; `predictor_rank` is the retained predictor-subspace
+dimension $r_\pi$. The [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path)
+shows the ordinary sequence: inspect `component_path_`, choose a paired-mode count, retrieve its
+conditional predictor rank, and fit a separate fixed estimator.
 
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
@@ -41,7 +42,7 @@ response is a matrix denoted by $Y$ in equations; see the
 ## Concise component path
 
 `component_path_` contains one conditionally selected predictor-rank result for each evaluated
-component count. Its aligned read-only arrays support complete path plots and comparisons without
+paired-mode count. Its aligned read-only arrays support complete path plots and comparisons without
 requiring manual masking of `cv_results_`. The predictor-rank policy and validation split count are
 stored once as path-wide scalars rather than repeated in every row. It also provides non-mutating methods that return the
 stored minimum-CV-MSE row or the conventional 1-SE row as complete `PiPLSComponentResult` objects.
@@ -60,7 +61,7 @@ rule definitions and scope.
 
 ## One component result
 
-`component_path_.for_n_components(h)` returns the frozen scalar row for one evaluated component
+`component_path_.for_n_components(h)` returns the frozen scalar row for one evaluated paired-mode
 count, including its conditionally selected predictor rank, score, CV-MSE summary, policy, and
 split count.
 
@@ -70,7 +71,7 @@ split count.
 
 ## Predictor-rank profile
 
-`predictor_rank_profile(h)` contains every predictor rank actually evaluated for one component
+`predictor_rank_profile(h)` contains every predictor rank actually evaluated for one paired-mode
 count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks;
 its `selected` property derives the same conditionally selected scalar values returned by
 `component_path_` from the immutable candidate arrays and shared policy and split-count scalars.

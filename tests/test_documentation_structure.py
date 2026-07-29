@@ -1,10 +1,19 @@
 from __future__ import annotations
 
+import inspect
 import re
 import unicodedata
 from pathlib import Path
 
 import yaml
+
+from pipls import (
+    PiPLSComponentPath,
+    PiPLSDecomposition,
+    PiPLSRegression,
+    PiPLSSearchCV,
+)
+from pipls.inspection import PiPLSDisplayFactors
 
 _MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((?P<target>[^)]+)\)")
 _HEADING = re.compile(r"^(?P<marks>#{1,6})\s+(?P<title>.+?)\s*$", re.MULTILINE)
@@ -466,3 +475,57 @@ def test_theory_page_defines_canonical_pipls_terminology() -> None:
     assert "orthonormal predictor directions" in mathematics
     assert "orthonormal response directions" in mathematics
     assert r"(\mathbf{Q}\mathbf{D})^{\mathsf T}" in mathematics
+
+
+
+def test_canonical_terminology_is_propagated_to_public_entry_points() -> None:
+    root = _repository_root()
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    home = (root / "docs" / "index.md").read_text(encoding="utf-8")
+    api_overview = (root / "docs" / "api" / "index.md").read_text(
+        encoding="utf-8"
+    )
+    regression_page = (root / "docs" / "api" / "regression.md").read_text(
+        encoding="utf-8"
+    )
+    inspection_page = (root / "docs" / "model_inspection.md").read_text(
+        encoding="utf-8"
+    )
+    synthetic_tutorial = (root / "docs" / "tutorials" / "synthetic.md").read_text(
+        encoding="utf-8"
+    )
+    pulp_tutorial = (root / "docs" / "tutorials" / "pulp.md").read_text(
+        encoding="utf-8"
+    )
+    examples = (root / "examples" / "README.md").read_text(encoding="utf-8")
+
+    for page in (readme, home, api_overview, synthetic_tutorial, examples):
+        assert "paired latent modes" in page
+
+    for page in (readme, home, api_overview, regression_page, pulp_tutorial):
+        assert "predictor direction" in page
+        assert "response direction" in page
+
+    assert "retained predictor-subspace dimension" in api_overview
+    assert "$d_k=D_{kk}$" in regression_page
+    assert "$d_kQ_{:k}$" in inspection_page
+    assert "predictor rotations" not in inspection_page
+    assert "response rotations" not in inspection_page
+
+    # Public identifiers remain stable even though prose names their values as directions.
+    assert "`predictor_rotations`" in regression_page
+    assert "`response_rotations`" in regression_page
+
+    regression_doc = inspect.getdoc(PiPLSRegression) or ""
+    decomposition_doc = inspect.getdoc(PiPLSDecomposition) or ""
+    search_doc = inspect.getdoc(PiPLSSearchCV) or ""
+    path_doc = inspect.getdoc(PiPLSComponentPath) or ""
+    factors_doc = inspect.getdoc(PiPLSDisplayFactors) or ""
+
+    assert "number of paired latent modes" in regression_doc
+    assert "retained predictor-subspace dimension" in regression_doc
+    assert "Orthonormal predictor directions" in decomposition_doc
+    assert "Orthonormal response directions" in decomposition_doc
+    assert "paired-mode count" in search_doc
+    assert "paired-mode count" in path_doc
+    assert "$d_k Q_{:k}$" in factors_doc

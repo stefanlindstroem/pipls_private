@@ -404,8 +404,10 @@ The accepted order after Decision 0042 is:
 ## Public decomposition boundary
 
 `PiPLSDecomposition` is an interpretation result, not a copy of the private construction record. It
-exposes `predictor_rotations`, `dilation`, `response_rotations`, rank/solver diagnostics, and
-`standardized_regression_map`. The private `PiPLSCoreResult` retains $\Pi$, $C$, $W$, $P$, $D$,
+exposes the established fields `predictor_rotations`, `dilation`, and `response_rotations`, whose
+mathematical values are the predictor directions, mode dilations, and response directions, together
+with rank/solver diagnostics and `standardized_regression_map`. The private `PiPLSCoreResult` retains
+$\Pi$, $C$, $W$, $P$, $D$,
 and $Q$ because numerical invariants and algorithm implementation still require the complete
 construction. Benchmarks that need the truncated predictor basis must reconstruct it within the
 benchmark rather than depend on a public intermediate matrix.

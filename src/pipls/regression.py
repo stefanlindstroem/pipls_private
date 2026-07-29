@@ -43,10 +43,11 @@ class PiPLSRegression(
     Parameters
     ----------
     n_components : int
-        Required response-side latent dimension $h$. It must satisfy
+        Required number of paired latent modes $h$. It must satisfy
         ``1 <= n_components <= min(n_targets, predictor_rank)``.
     predictor_rank : int
-        Required positive predictor truncation rank $r_\pi$. After centering, it
+        Required retained predictor-subspace dimension $r_\pi$. After
+        centering, it
         must not exceed ``min(n_features, n_samples - 1)``.
     scale : bool, default=True
         If true, center and divide predictor and response columns by their
@@ -78,7 +79,8 @@ class PiPLSRegression(
         Algebraic upper bound ``min(n_features_in_, n_samples - 1)`` for the
         fitted data.
     decomposition_ : PiPLSDecomposition
-        Immutable canonical Pi-PLS factorization and numerical diagnostics.
+        Immutable Pi-PLS predictor directions, dilations, response directions,
+        and numerical diagnostics.
     coef_ : ndarray of shape (n_targets_, n_features_in_)
         Regression coefficients in original predictor and response units.
     intercept_ : ndarray of shape (n_targets_,)
@@ -110,7 +112,7 @@ class PiPLSRegression(
     -----
     This estimator performs no parameter selection or cross-validation. Both
     rank parameters are therefore required explicitly. Use
-    :class:`pipls.PiPLSSearchCV` when component count and predictor rank must be
+    :class:`pipls.PiPLSSearchCV` when paired-mode count and predictor rank must be
     selected by cross-validation.
     """
 

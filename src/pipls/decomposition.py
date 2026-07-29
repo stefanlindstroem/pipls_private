@@ -33,12 +33,13 @@ class PiPLSDecomposition:
     Attributes
     ----------
     predictor_rotations : ndarray of shape (n_features, n_components)
-        Orthogonal predictor rotations $P$ of the centered/scaled regression
-        map.
+        Orthonormal predictor directions $P$ of the centered/scaled regression
+        map. The field name is retained for API compatibility.
     dilation : ndarray of shape (n_components,)
-        Nonnegative diagonal values of $D$.
+        Nonnegative dilations $d_k=D_{kk}$ of the paired latent modes.
     response_rotations : ndarray of shape (n_targets, n_components)
-        Orthogonal response rotations $Q$.
+        Orthonormal response directions $Q$. The field name is retained for API
+        compatibility.
     predictor_numerical_rank : int
         Complete numerical predictor rank under full SVD, or a verified lower
         bound under truncated randomized SVD.

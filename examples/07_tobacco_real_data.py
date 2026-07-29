@@ -30,7 +30,7 @@ response_pages = tuple(
     for start in range(0, len(response_names), RESPONSES_PER_PAGE)
 )
 
-# Evaluate and plot the Pi-PLS component path with a full predictor SVD.
+# Evaluate the Pi-PLS component path over paired-mode counts with a full predictor SVD.
 path_search = PiPLSSearchCV(
     estimator=PiPLSRegression(
         n_components=1,

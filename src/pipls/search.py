@@ -107,7 +107,7 @@ class PiPLSSearchCV(
     one stored path row, which is optionally refitted on all supplied data. The
     default ``search_method="auto"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
-    for each component count.
+    for each paired-mode count.
 
     Parameters
     ----------
@@ -117,14 +117,15 @@ class PiPLSSearchCV(
         the valid construction seed pair ``(n_components=1, predictor_rank=1)``.
         Path preflight and candidate evaluation replace both values before fitting.
     n_components_values : sequence of int or "all", default="all"
-        Positive component counts to evaluate. ``"all"`` uses every value from
+        Positive paired latent-mode counts to evaluate. ``"all"`` uses every value
+        from
         one through ``min(n_targets_, max_predictor_rank_)``.
     predictor_rank_values : sequence of int, "max" or None, default=None
         Admissible predictor ranks. ``None`` makes every rank from one through
         ``max_predictor_rank_`` available; ``search_method`` determines which
         are evaluated. A one-element sequence fixes one rank, a longer sequence
         defines an explicit set, and ``"max"`` uses ``max_predictor_rank_`` for
-        every component count.
+        every paired-mode count.
     max_predictor_rank : int or "rule", default="rule"
         ``"rule"`` applies the total-sample support rule together with
         dimensional and verified numerical-rank caps from every training fold.
@@ -147,7 +148,7 @@ class PiPLSSearchCV(
         Rule used to choose the final component-path row. ``"best_score"`` uses
         the globally best evaluated pair under ``scoring``. ``"one_standard_error"``
         uses :meth:`PiPLSComponentPath.one_standard_error_result`, retaining the
-        predictor rank already selected conditionally for that component count.
+        predictor rank already selected conditionally for that paired-mode count.
     refit : bool, default=False
         Whether to refit the row chosen by ``selection_rule`` on all supplied
         data. The default leaves path evaluation and final fixed-model fitting
@@ -186,15 +187,15 @@ class PiPLSSearchCV(
         ranks formed with the same tolerant comparison used for selection.
     component_path_ : PiPLSComponentPath
         Immutable concise view with one conditionally selected predictor-rank
-        result per component count. Use :meth:`predictor_rank_profile` for the
-        evaluated rank candidates at one component count.
+        result per paired-mode count. Use :meth:`predictor_rank_profile` for the
+        evaluated rank candidates at one paired-mode count.
     best_index_ : int
         Row of ``cv_results_`` selected by maximum mean test score, with smaller
-        component count and predictor rank used as deterministic tie-breakers.
+        paired-mode count and predictor rank used as deterministic tie-breakers.
     best_score_ : float
         Mean cross-validation score at ``best_index_``.
     best_n_components_ : int
-        Selected component count.
+        Selected number of paired latent modes.
     best_predictor_rank_ : int
         Selected predictor rank.
     best_params_ : dict of str to int
@@ -533,7 +534,7 @@ class PiPLSSearchCV(
         self,
         n_components: int,
     ) -> PiPLSPredictorRankProfile:
-        """Return evaluated predictor-rank results for one component count.
+        """Return evaluated predictor-rank results for one paired-mode count.
 
         Rows are sorted by ascending predictor rank and include only candidates
         actually evaluated by the fitted search. The selected scalar result
@@ -544,7 +545,7 @@ class PiPLSSearchCV(
         Parameters
         ----------
         n_components : int
-            Evaluated component count whose predictor-rank profile is requested.
+            Evaluated paired-mode count whose predictor-rank profile is requested.
 
         Returns
         -------
@@ -1141,7 +1142,7 @@ def _component_path(
     predictor_rank_policy: PredictorRankPolicy,
     n_splits: int,
 ) -> PiPLSComponentPath:
-    """Return one conditionally selected predictor-rank result per component count."""
+    """Return one conditionally selected predictor-rank result per paired-mode count."""
 
     return PiPLSComponentPath(
         n_components=cast(IntArray, results["n_components"])[conditional_indices],

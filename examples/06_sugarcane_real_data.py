@@ -23,7 +23,7 @@ Y = pd.read_csv(DATA_DIR / "Y.csv")
 wavelengths = X.columns.to_numpy(dtype=float)
 response_names = Y.columns.tolist()
 
-# Evaluate and plot the Pi-PLS component path.
+# Evaluate and plot the Pi-PLS component path over paired-mode counts.
 path_search = PiPLSSearchCV().fit(X, Y)
 path = path_search.component_path_
 

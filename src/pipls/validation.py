@@ -164,7 +164,7 @@ class PiPLSValidationReport:
 
     @property
     def n_components(self) -> int:
-        """Component count represented by the report."""
+        """Number of paired latent modes represented by the report."""
 
         return self.selected_result.n_components
 

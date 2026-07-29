@@ -26,12 +26,12 @@ _ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "maximum"})
 
 @dataclass(frozen=True)
 class PiPLSComponentResult:
-    """Conditionally selected result for one component count.
+    """Conditionally selected result for one paired-mode count.
 
     Attributes
     ----------
     n_components : int
-        Evaluated component count.
+        Evaluated number of paired latent modes.
     predictor_rank : int
         Predictor rank selected conditionally for ``n_components``.
     predictor_rank_policy : {"optimized", "fixed", "maximum"}
@@ -119,17 +119,17 @@ class PiPLSComponentResult:
 
 @dataclass(frozen=True)
 class PiPLSPredictorRankProfile:
-    """Immutable evaluated predictor-rank results for one component count.
+    """Immutable evaluated predictor-rank results for one paired-mode count.
 
     Arrays contain the predictor-rank candidates actually evaluated for one
-    component count, sorted by ascending predictor rank. The selected scalar
+    paired-mode count, sorted by ascending predictor rank. The selected scalar
     result follows the fitted search score and tie-breaking rule. Under the
     default scorer, that selection minimizes mean response-standardized CV-MSE.
 
     Attributes
     ----------
     n_components : int
-        Component count shared by every evaluated candidate.
+        Number of paired latent modes shared by every evaluated candidate.
     predictor_rank : ndarray of shape (n_evaluated_ranks,)
         Evaluated predictor ranks in strictly ascending order.
     mean_test_score : ndarray of shape (n_evaluated_ranks,)
@@ -253,15 +253,15 @@ class PiPLSComponentPath:
     """Immutable concise component-path results.
 
     Each array contains one conditionally selected predictor-rank result per
-    evaluated component count. Arrays are defensive, read-only copies and are
+    evaluated paired-mode count. Arrays are defensive, read-only copies and are
     aligned by row.
 
     Attributes
     ----------
     n_components : ndarray of shape (n_component_values,)
-        Evaluated component counts in strictly ascending order.
+        Evaluated paired-mode counts in strictly ascending order.
     predictor_rank : ndarray of shape (n_component_values,)
-        Conditionally selected predictor rank for each component count.
+        Conditionally selected predictor rank for each paired-mode count.
     predictor_rank_policy : {"optimized", "fixed", "maximum"}
         Predictor-rank policy shared by every path row.
     mean_test_score : ndarray of shape (n_component_values,)
@@ -378,14 +378,14 @@ class PiPLSComponentPath:
         Notes
         -----
         The returned predictor rank is the rank already selected conditionally
-        for that component count under the configured scorer.
+        for that paired-mode count under the configured scorer.
         """
 
         index = int(np.argmin(self.cv_mse_mean))
         return self._result_at_index(index)
 
     def one_standard_error_result(self) -> PiPLSComponentResult:
-        """Return the smallest component count within one SE of the minimum.
+        """Return the smallest paired-mode count within one SE of the minimum.
 
         The threshold is the minimum stored mean CV-MSE plus the fold-based
         standard error from that same path row. Comparisons use the stored
@@ -394,7 +394,7 @@ class PiPLSComponentPath:
         Returns
         -------
         PiPLSComponentResult
-            Complete immutable row for the smallest evaluated component count
+            Complete immutable row for the smallest evaluated paired-mode count
             whose mean CV-MSE does not exceed the threshold. Its predictor rank
             is the rank already selected conditionally for that path row.
 
@@ -413,7 +413,7 @@ class PiPLSComponentPath:
         return self._result_at_index(int(eligible[0]))
 
     def for_n_components(self, n_components: int) -> PiPLSComponentResult:
-        """Return the selected result for one evaluated component count.
+        """Return the selected result for one evaluated paired-mode count.
 
         Parameters
         ----------
@@ -423,7 +423,7 @@ class PiPLSComponentPath:
         Returns
         -------
         PiPLSComponentResult
-            Frozen scalar result for the requested component count.
+            Frozen scalar result for the requested paired-mode count.
 
         Raises
         ------

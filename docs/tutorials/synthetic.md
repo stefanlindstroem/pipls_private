@@ -2,7 +2,8 @@
 
 This tutorial shows the shortest complete path from data generation to a selected Pi-PLS model. It
 uses deterministic synthetic training and test data so that the latent structure is known and the
-prediction assessment is independent of model selection.
+prediction assessment is independent of model selection. For Pi-PLS, `n_components` is the number
+of paired latent modes.
 
 ## What this tutorial covers
 
@@ -10,7 +11,7 @@ You will:
 
 1. generate independent training and test observations;
 2. evaluate a cross-validated component path;
-3. choose a component count;
+3. choose a paired-mode count;
 4. retrieve the predictor rank selected at that count;
 5. fit one fixed `PiPLSRegression` model;
 6. predict the independent test responses.
@@ -33,14 +34,16 @@ The generating structure contains:
 - two predictor-specific directions that affect only the predictors;
 - one response-specific direction that affects only the responses.
 
-The true predictive component count is therefore two, while the predictor block contains four
-structured directions in total. These known values help interpret the example, but cross-validation
+The shared dimension, and therefore the intended predictive paired-mode count, is two, while the
+predictor block contains four structured directions in total. These known values help interpret the
+example, but cross-validation
 is not required to recover them exactly in a finite noisy sample.
 
 ## Evaluate the component path
 
-`PiPLSSearchCV` evaluates admissible pairs of component count $h$ and predictor rank $r_\pi$. For each
-component count, it selects the evaluated predictor rank with the smallest mean
+`PiPLSSearchCV` evaluates admissible pairs of paired-mode count $h$ (`n_components`) and retained
+predictor-subspace dimension $r_\pi$ (`predictor_rank`). For each paired-mode count, it selects the
+evaluated predictor rank with the smallest mean
 response-standardized CV-MSE under the default scorer:
 
 \[
@@ -50,8 +53,8 @@ r_\pi^*(h)
 \operatorname{CV\text{-}MSE}(h,r_\pi).
 \]
 
-The concise `component_path_` object contains one row per evaluated component count. Each row already
-contains its conditionally selected predictor rank $r_\pi^*(h)$:
+The concise `component_path_` object contains one row per evaluated paired-mode count. Each row
+already contains its conditionally selected predictor rank $r_\pi^*(h)$:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:evaluate-synthetic-path"
@@ -71,12 +74,12 @@ The component path is plotted before fitting:
 The mean CV-MSE falls markedly from one to two components and changes little at three. The bars
 show one fold-based standard error on either side of each mean; they are not confidence intervals.
 Such bars can inform the conventional [one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic)
-for choosing a parsimonious component count. This tutorial keeps that judgment explicit rather than
+for choosing a parsimonious paired-mode count. This tutorial keeps that judgment explicit rather than
 setting `selection_rule="one_standard_error"`. The diamond marks the choice of two components.
 
 ## Inspect the conditional predictor-rank profile
 
-The selected component row stores one predictor rank, but the complete evaluated rank profile is
+The selected paired-mode row stores one predictor rank, but the complete evaluated rank profile is
 available through `predictor_rank_profile()`:
 
 ```python
@@ -94,9 +97,9 @@ The programming contract is now complete:
 ```text
 search candidate pairs
         ↓
-component_path_ stores one selected predictor rank for each component count
+component_path_ stores one selected predictor rank for each paired-mode count
         ↓
-choose a component count
+choose a paired-mode count
         ↓
 for_n_components(h) returns [h, r_pi*(h)]
         ↓

@@ -11,6 +11,10 @@ call signatures follow the scikit-learn convention `fit(X, y)`: `y` may be eithe
 response or a two-dimensional multivariate response matrix. Names such as `y_pred`, `y_scores_`,
 and `y_loadings_` follow the same programming convention and do not imply a scalar response.
 
+For Pi-PLS, public `n_components` counts paired latent modes $h$, and `predictor_rank` is the
+retained predictor-subspace dimension $r_\pi$. The factor arrays $P$ and $Q$ are orthonormal
+predictor and response directions; they are distinct from reconstruction loadings.
+
 ## Start with the estimators
 
 - [Fixed regression](regression.md)
@@ -21,11 +25,11 @@ and `y_loadings_` follow the same programming convention and do not imply a scal
 
 | Object | Obtained from | Main purpose |
 |---|---|---|
-| [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare component counts and inspect minimum-CV-MSE or 1-SE result rows |
+| [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts and inspect minimum-CV-MSE or 1-SE result rows |
 | [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | explicit path lookup, a path recommendation method, or `search.selected_result_` | Retrieve one evaluated fixed rank pair and its diagnostics |
-| [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one component count |
+| [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
 | [`PiPLSValidationReport`](path.md#pipls.PiPLSValidationReport) | `search.validation_report_` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
-| [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access interpretable predictor rotations, dilation, response rotations, and rank diagnostics |
+| [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
 | [`LatentStructure`](inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, rotations, and coefficients for PLS-family inspection |
 | [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $P$, $D$, $Q$, and $QD$ factors |
 | [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |

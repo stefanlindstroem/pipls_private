@@ -4,6 +4,12 @@
 
 ### Documentation
 
+- propagated the canonical Pi-PLS vocabulary through onboarding, generated API prose, path and
+  inspection guides, tutorials, example prose, and public source docstrings: `n_components` now
+  consistently counts paired latent modes, `predictor_rank` denotes retained predictor-subspace
+  dimension, $P$ and $Q$ are predictor and response directions, and $d_k$ is a mode dilation;
+  public identifiers containing `rotations` remain unchanged.
+
 - established canonical Pi-PLS terminology: $\Pi$ is the retained predictor basis,
   $\Pi\Pi^{\mathsf T}$ the retained-subspace projector, $P$ and $Q$ orthonormal predictor and
   response directions, $d_k$ a mode dilation, and `n_components` the number of paired latent modes;

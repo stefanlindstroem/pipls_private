@@ -429,13 +429,20 @@ dimension. Existing public field names containing `rotations` remain unchanged, 
 remain distinct from reconstruction loadings. The package's $QD$ orientation is the transpose of
 manuscript-facing $DQ^{\mathsf T}$.
 
+Decision 0122 propagates that vocabulary through the living README, served guides, generated API
+introductions, tutorials, example prose, and public source docstrings. It defines the two public
+rank names at their owning entry points, uses directions and dilations for the Pi-PLS factors, and
+retains established Python identifiers and generic component-path terminology without changing
+behavior.
+
 ## Current next increment
 
-Propagate Decision 0121 terminology through the public documentation and source docstrings. Update
-README material, served guides, generated API prose, tutorial and example prose, and public
-factorization descriptions without renaming public identifiers or changing equations, behavior,
-examples, benchmarks, model selection, validation, synthetic generation, or real-data workflows.
-Do not prepare or publish a package release.
+Add the focused manuscript-reproduction guide planned as P5. It should show how
+`make_pipls_latent_geometry()` reproduces the manuscript data-generating distribution and explain
+the distinction between reproducing that distribution, reproducing a particular seeded dataset, and
+reproducing complete manuscript tables or figures. It must not alter estimator, search, validation,
+synthetic-generator, benchmark, example, or practical real-data behavior. Do not prepare or publish
+a package release.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

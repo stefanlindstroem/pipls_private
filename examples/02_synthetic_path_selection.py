@@ -1,4 +1,4 @@
-"""Select and fit a Pi-PLS model on deterministic synthetic data."""
+"""Select a paired-mode count and fit Pi-PLS on deterministic synthetic data."""
 
 from pathlib import Path
 

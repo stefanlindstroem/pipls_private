@@ -7,7 +7,8 @@ when the defaults are not enough. Exact signatures and fitted attributes are in 
 
 ## Search bounds
 
-For component count $h$ and predictor rank $r_\pi$, the admissible pairs are
+For paired-mode count $h$ (`n_components`) and retained predictor-subspace dimension $r_\pi$
+(`predictor_rank`), the admissible pairs are
 
 \begin{equation}
 \mathcal{G}=\{(h,r_\pi):1\le h\le h_{\max},\ h\le r_\pi\le r_{\pi,\max}\}.
@@ -44,7 +45,7 @@ $h\le r_\pi$, the request is rejected rather than silently dropping that compone
 
 ### Component-count requests
 
-The default `n_components_values="all"` evaluates every component count from 1 through
+The default `n_components_values="all"` evaluates every paired-mode count from 1 through
 $h_{\max}$. An explicit integer sequence requests a subset:
 
 ```python

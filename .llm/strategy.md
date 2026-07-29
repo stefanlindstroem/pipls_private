@@ -859,13 +859,22 @@ public identifier changes.
 
 Current status: **canonical terminology decision complete**.
 
+### Public terminology propagation
+
+Decision 0122 applies the canonical names across living onboarding, API introductions, path and
+inspection guides, tutorials, example prose, and public docstrings. Established Python identifiers
+containing `rotations` and generic component-path terminology remain stable, while their Pi-PLS
+meaning is defined explicitly. Historical decisions are not rewritten.
+
+Current status: **public terminology propagation complete**.
+
 ## Current next increment
 
-Propagate Decision 0121 vocabulary through the public documentation and source docstrings. This
-next increment may update README material, served guides, generated API prose, tutorials, examples,
-and public factorization docstrings, but it must not rename identifiers or change estimator, search,
-validation, synthetic-generator, benchmark, rendering, example, or real-data behavior. Do not
-prepare or publish a package release.
+Add the focused manuscript-reproduction guide planned as P5. It must distinguish the exact
+manuscript data-generating distribution from a particular seeded realization and from complete
+table/figure reproduction. It may document the known synthetic dimensions used in the manuscript,
+but it must not change estimator, search, validation, generator, benchmark, example, or practical
+real-data behavior. Do not prepare or publish a package release.
 
 ## Maintenance protocol
 

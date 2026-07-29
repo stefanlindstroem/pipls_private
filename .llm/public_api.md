@@ -96,7 +96,7 @@ The estimator provides PLS-style `fit`, `predict(X, copy=True)`,
 scalar R2 `score`. It supports feature names and inherited scikit-learn `set_output()`
 configuration for transform containers, including pandas output. Standard PLS-style fitted
 attributes, coefficients, and scores remain available. The frozen `decomposition_` object exposes
-only interpretable predictor rotations, dilation values, response rotations, numerical-rank
+only interpretable predictor directions, dilation values, response directions, numerical-rank
 diagnostics, the resolved predictor solver, and the derived centered/scaled regression map. The
 construction matrices $\Pi$, $C$, and $W$, the redundant diagonal matrix $D$, and symbolic aliases
 remain private.

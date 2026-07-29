@@ -1,9 +1,10 @@
 # Pi-PLS
 
 `pipls` is a Python package for Pi-PLS, a PLS-family method for multivariate regression.
-Pi-PLS represents the predictive relation through paired predictor and response latent variables.
-The number of components controls how many pairs are retained; predictor rank controls how much
-predictor variation is available to form them.
+Pi-PLS represents the predictive relation through paired latent modes. Each mode combines one
+orthonormal predictor direction, one orthonormal response direction, and one nonnegative dilation.
+Public `n_components` counts those paired modes; `predictor_rank` controls the dimension of the
+retained predictor subspace from which they are estimated.
 
 Pi-PLS is intended for problems with several responses where the predictor block may contain
 structured variation that is not equally useful for prediction. Its two rank controls let users
@@ -121,10 +122,10 @@ two-stage workflow.
 
 | Interface | Purpose |
 |---|---|
-| `PiPLSRegression` | Fit one fixed `(n_components, predictor_rank)` pair |
+| `PiPLSRegression` | Fit one fixed paired-mode count and retained predictor-subspace dimension |
 | `PiPLSSearchCV` | Evaluate the path and optionally refit an explicitly selected path row |
-| `component_path_` | Inspect one selected predictor rank for each component count |
-| `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one count |
+| `component_path_` | Inspect one selected predictor rank for each paired-mode count |
+| `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one paired-mode count |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
 | Matplotlib | Optionally render those arrays with caller-controlled figures and styling |
 | `pipls.datasets` | Generate deterministic synthetic Pi-PLS data |
