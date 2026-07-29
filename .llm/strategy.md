@@ -868,13 +868,21 @@ meaning is defined explicitly. Historical decisions are not rewritten.
 
 Current status: **public terminology propagation complete**.
 
+### Companion-manuscript synthetic-data guide
+
+Decision 0123 adds one served guide for the exact manuscript Gaussian latent distribution. It
+separates distribution reproduction, deterministic seeded realization, and complete publication
+reproduction; demonstrates stored truth identities and oracle synthetic dimensions; and keeps
+publication grids, comparator orchestration, and reporting downstream. Search, validation,
+examples, benchmarks, rendering, and real-data behavior remain unchanged.
+
+Current status: **companion-manuscript synthetic-data guide complete**.
+
 ## Current next increment
 
-Add the focused manuscript-reproduction guide planned as P5. It must distinguish the exact
-manuscript data-generating distribution from a particular seeded realization and from complete
-table/figure reproduction. It may document the known synthetic dimensions used in the manuscript,
-but it must not change estimator, search, validation, generator, benchmark, example, or practical
-real-data behavior. Do not prepare or publish a package release.
+The P1--P5 manuscript-alignment sequence is complete. No further implementation increment is
+preauthorized. The next change should arise from a concrete owner request or another documented
+human-audit finding. Do not prepare or publish a package release.
 
 ## Maintenance protocol
 

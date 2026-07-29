@@ -65,6 +65,8 @@ contracts.
 ## Scientific background
 
 - [Theory](theory.md): the implemented matrix construction and rank interpretation.
+- [Companion-manuscript synthetic data](manuscript_reproduction.md): generate the exact Gaussian
+  latent distribution and distinguish distribution, seeded-dataset, and full-study reproduction.
 
 ## Project information
 

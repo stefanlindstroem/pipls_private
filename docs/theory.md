@@ -373,7 +373,9 @@ redefined by this theory page and need not duplicate the manuscript’s experime
 The package offers two synthetic-data purposes. `make_pipls_latent_geometry()` implements the
 companion manuscript’s Gaussian latent data-generating model directly. The older
 `make_pipls_regression()` and `make_pipls_train_test()` functions remain broader configurable
-package generators. See the [dataset and generator guide](datasets.md) for the exact distinction.
+package generators. See the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
+for the exact distribution and reproducibility boundary, and the
+[dataset and generator guide](datasets.md) for the broader package distinction.
 
 The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#select-the-fixed-rank-pair)
 and [path-selection details](path_analysis.md) define the package’s general selection and

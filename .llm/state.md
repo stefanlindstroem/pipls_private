@@ -435,14 +435,17 @@ rank names at their owning entry points, uses directions and dilations for the P
 retains established Python identifiers and generic component-path terminology without changing
 behavior.
 
+Decision 0123 adds the focused companion-manuscript synthetic-data guide. It demonstrates the exact
+Gaussian latent generator and truth equations, documents the known oracle synthetic dimensions,
+and distinguishes distribution-level, seeded-realization, and complete-publication reproduction.
+Complete manuscript grids, comparators, and reporting remain downstream, and package search plus
+real-data workflows remain unchanged.
+
 ## Current next increment
 
-Add the focused manuscript-reproduction guide planned as P5. It should show how
-`make_pipls_latent_geometry()` reproduces the manuscript data-generating distribution and explain
-the distinction between reproducing that distribution, reproducing a particular seeded dataset, and
-reproducing complete manuscript tables or figures. It must not alter estimator, search, validation,
-synthetic-generator, benchmark, example, or practical real-data behavior. Do not prepare or publish
-a package release.
+The P1--P5 manuscript-alignment sequence is complete. No further implementation increment is
+preauthorized. The next change should arise from a concrete owner request or another documented
+human-audit finding. Do not prepare or publish a package release.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

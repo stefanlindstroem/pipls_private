@@ -4,6 +4,11 @@
 
 ### Documentation
 
+- add a focused companion-manuscript synthetic-data guide that demonstrates the exact Gaussian
+  latent generator and stored truth equations, records the oracle synthetic dimensions, and
+  distinguishes distribution-level, seeded-realization, and complete-publication reproduction
+  without changing package search or real-data workflows.
+
 - propagated the canonical Pi-PLS vocabulary through onboarding, generated API prose, path and
   inspection guides, tutorials, example prose, and public source docstrings: `n_components` now
   consistently counts paired latent modes, `predictor_rank` denotes retained predictor-subspace

@@ -101,9 +101,15 @@ training set. Learned scaling must not be fitted globally before CV.
 ## Synthetic validation
 
 `pipls.datasets` provides deterministic latent-structure generators with known shared,
-predictor-specific, and response-specific components. The package benchmark plan is documented in
-[`benchmarks.md`](benchmarks.md). Each benchmark answers one question and writes one minimal CSV
-output; unrelated metrics, software metadata, and timings are not combined into a universal table.
+predictor-specific, and response-specific components. The separate
+[companion-manuscript synthetic-data guide](manuscript_reproduction.md) documents the exact
+Gaussian latent distribution and distinguishes reproducing that distribution from reproducing one
+seeded realization or a complete publication study.
+
+The package benchmark plan is documented in [`benchmarks.md`](benchmarks.md). Each benchmark answers
+one question and writes one minimal CSV output; unrelated metrics, software metadata, and timings
+are not combined into a universal table. Publication grids, paper-only comparators, and manuscript
+figure or table orchestration remain downstream assets that pin a released package version.
 
 ## Reference datasets
 

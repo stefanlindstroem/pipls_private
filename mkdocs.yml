@@ -34,6 +34,7 @@ nav:
       - Compatibility: compatibility.md
   - Scientific background:
       - Theory: theory.md
+      - Companion manuscript synthetic data: manuscript_reproduction.md
       - Authors, license, and citation: citation.md
 
 exclude_docs: |

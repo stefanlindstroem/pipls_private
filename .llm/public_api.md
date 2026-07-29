@@ -245,6 +245,13 @@ cross-side loading blocks are not stored as redundant zero arrays. `PiPLSLatentG
 exposes the manuscript matrices directly and validates the two signal equations. Both truth forms
 may be carried by `PiPLSDataset.truth`.
 
+The served companion-manuscript synthetic-data guide must distinguish reproducing the exact
+data-generating distribution, reproducing one seeded realization, and reproducing complete
+publication results. It may document the known oracle dimensions $r_\pi=d_p+d_s$ and $h=d_s$ for
+the synthetic experiments, but it must not redefine package search defaults or practical real-data
+selection. Complete grids, comparator pipelines, and paper figure/table orchestration remain
+downstream publication assets.
+
 No metadata file, registry lookup, or package-owned loader is required for real-data fitting.
 Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Repository examples
 must show these steps directly rather than hiding them behind convenience utilities.

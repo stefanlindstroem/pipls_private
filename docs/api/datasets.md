@@ -47,6 +47,10 @@ inspect these records through `dataset.truth` rather than construct them directl
 
 ## Generators
 
+The [companion-manuscript synthetic-data guide](../manuscript_reproduction.md) shows how to use the
+exact Gaussian latent generator, inspect its truth matrices, and distinguish distribution-level
+from realization-level and complete-study reproduction.
+
 ::: pipls.datasets.make_pipls_latent_geometry
     options:
       members: false

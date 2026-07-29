@@ -40,6 +40,10 @@ The companion paper is currently under revision:
 > Manuscript under revision at *Computers & Chemical Engineering*, manuscript
 > CACE-D-26-00847.
 
-The [theory overview](theory.md) summarizes the fixed mathematical construction from the companion manuscript and distinguishes it from package-level preprocessing, search, and validation capabilities.
+The [theory overview](theory.md) summarizes the fixed mathematical construction from the
+companion manuscript and distinguishes it from package-level preprocessing, search, and validation
+capabilities. The [companion-manuscript synthetic-data guide](manuscript_reproduction.md) documents
+the exact Gaussian data-generating distribution and the boundary between a seeded dataset and
+complete publication-result reproduction.
 
 The citation metadata should be updated when final publication details and a DOI become available.

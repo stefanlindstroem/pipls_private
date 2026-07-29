@@ -529,3 +529,60 @@ def test_canonical_terminology_is_propagated_to_public_entry_points() -> None:
     assert "paired-mode count" in search_doc
     assert "paired-mode count" in path_doc
     assert "$d_k Q_{:k}$" in factors_doc
+
+
+def test_companion_manuscript_synthetic_data_guide_is_public_and_scoped() -> None:
+    root = _repository_root()
+    guide = (root / "docs" / "manuscript_reproduction.md").read_text(
+        encoding="utf-8"
+    )
+    with (root / "mkdocs.yml").open(encoding="utf-8") as stream:
+        navigation = yaml.safe_load(stream)["nav"]
+
+    scientific_background = next(
+        item["Scientific background"]
+        for item in navigation
+        if "Scientific background" in item
+    )
+    assert {
+        "Companion manuscript synthetic data": "manuscript_reproduction.md"
+    } in scientific_background
+
+    sections = (
+        "## Three reproducibility levels",
+        "## Generate the manuscript distribution",
+        "## Verify the stored latent geometry",
+        "## Record one deterministic realization",
+        "## Known dimensions in the synthetic experiments",
+        "## What this guide does not reproduce",
+        "## Relationship to ordinary package workflows",
+    )
+    positions = [guide.index(section) for section in sections]
+    assert positions == sorted(positions)
+
+    for required in (
+        "make_pipls_latent_geometry",
+        r"X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X",
+        r"Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y",
+        r"r_\pi=d_p+d_s",
+        r"h=d_s",
+        "random_state=0",
+        "PiPLSSearchCV",
+        "downstream reproduction repository",
+    ):
+        assert required in guide
+
+    assert "real-data rank-selection rule" in guide
+    assert "**Complete manuscript results.**" in guide
+    assert "complete simulation grid" in guide
+
+    cross_link_sources = (
+        root / "README.md",
+        root / "docs" / "index.md",
+        root / "docs" / "theory.md",
+        root / "docs" / "reproducibility.md",
+        root / "docs" / "citation.md",
+        root / "docs" / "api" / "datasets.md",
+    )
+    for source in cross_link_sources:
+        assert "manuscript_reproduction.md" in source.read_text(encoding="utf-8")
