@@ -56,7 +56,7 @@ axes[0, 1].bar([0], [factors.dilation[0]])
 axes[0, 1].set_xticks([0])
 axes[0, 1].set_xticklabels(["1"])
 axes[0, 1].set_xlabel("Component")
-axes[0, 1].set_ylabel(r"Dilation $d_k$")
+axes[0, 1].set_ylabel(r"Dilation $d_1$")
 
 response_positions = np.arange(len(response_names))
 axes[1, 0].bar(response_positions, factors.response_directions[:, 0])
@@ -71,7 +71,7 @@ axes[1, 1].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
 axes[1, 1].set_xticks(response_positions)
 axes[1, 1].set_xticklabels(response_names)
 axes[1, 1].set_xlabel("Response")
-axes[1, 1].set_ylabel(r"Weighted direction $d_1Q_{:1}$")
+axes[1, 1].set_ylabel(r"Weighted response direction $d_1Q_{:1}$")
 
 figure.suptitle(r"Minimal $\Pi$-PLS fit")
 output_path = Path(__file__).resolve().parent / "results" / "minimal_fit_and_plot.pdf"

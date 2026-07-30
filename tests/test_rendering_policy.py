@@ -326,21 +326,51 @@ def test_maintained_paths_and_rank_profiles_share_zero_based_y_limits() -> None:
         assert text.count(limit_call) == expected_count, relative_path
 
 
-def test_pipls_factor_figures_use_matrix_element_notation_without_tile_titles() -> None:
+def test_pipls_factor_figures_use_canonical_labels_without_tile_titles() -> None:
     root = _repository_root()
-    factor_sources = (
-        root / "examples" / "01_minimal_fit_and_plot.py",
-        root / "examples" / "05_pulp_real_data.py",
-        root / "examples" / "06_sugarcane_real_data.py",
-        root / "examples" / "07_tobacco_real_data.py",
-        root / "tools" / "render_pulp_tutorial.py",
-    )
+    expected_labels = {
+        "examples/01_minimal_fit_and_plot.py": (
+            r"Predictor direction $P_{:1}$",
+            r"Dilation $d_1$",
+            r"Response direction $Q_{:1}$",
+            r"Weighted response direction $d_1Q_{:1}$",
+        ),
+        "examples/05_pulp_real_data.py": (
+            r"Predictor direction $P_{:k}$",
+            r"Dilation $d_k$",
+            r"Response direction $Q_{:k}$",
+            r"Weighted response direction $d_kQ_{:k}$",
+        ),
+        "examples/06_sugarcane_real_data.py": (
+            r"Predictor direction $P_{:k}$",
+            r"Dilation $d_k$",
+            r"Response direction $Q_{:k}$",
+            r"Weighted response direction $d_kQ_{:k}$",
+        ),
+        "examples/07_tobacco_real_data.py": (
+            r"Predictor direction $P_{:k}$",
+            r"Dilation $d_k$",
+            r"Response direction $Q_{:k}$",
+            r"Weighted response direction $d_kQ_{:k}$",
+        ),
+        "tools/render_pulp_tutorial.py": (
+            r"Predictor direction $P_{:k}$",
+            r"Weighted response direction $d_kQ_{:k}$",
+        ),
+    }
 
-    for path in factor_sources:
+    for relative_path, labels in expected_labels.items():
+        path = root / relative_path
         text = path.read_text(encoding="utf-8")
+        for label in labels:
+            assert label in text, (path, label)
+        assert "Weighted direction $" not in text, path
         assert "$q_{:" not in text, path
         assert "$d_kq_{:" not in text, path
         assert "$d_1q_{:" not in text, path
+        assert r"\mathbf{P}_{:" not in text, path
+        assert r"\mathbf{Q}_{:" not in text, path
+        assert r"\mathbf{D}_{" not in text, path
 
     tile_ranges = {
         "examples/01_minimal_fit_and_plot.py": (
@@ -363,6 +393,18 @@ def test_pipls_factor_figures_use_matrix_element_notation_without_tile_titles() 
     for relative_path, (start, end) in tile_ranges.items():
         block = _source_between(root / relative_path, start, end)
         assert ".set_title(" not in block, relative_path
+
+
+def test_latent_structure_figures_keep_reconstruction_loading_labels() -> None:
+    root = _repository_root()
+    for relative_path in (
+        "examples/05_pulp_real_data.py",
+        "examples/06_sugarcane_real_data.py",
+        "examples/07_tobacco_real_data.py",
+    ):
+        text = (root / relative_path).read_text(encoding="utf-8")
+        assert 'set_ylabel("X loading")' in text, relative_path
+        assert 'set_ylabel("Y loading")' in text, relative_path
 
 
 def test_latent_and_prediction_tiles_have_no_subplot_titles() -> None:
