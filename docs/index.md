@@ -27,25 +27,6 @@ Continue with [Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) for real-dat
 fixed-parameter OOF predictions, immutable inspection results, and representative interpretation of
 standard PLS-family and Pi-PLS-specific plots.
 
-## Fit one known model directly
-
-When `n_components` and `predictor_rank` are already known, use the fixed estimator directly:
-
-```python
-from pipls import PiPLSRegression
-
-model = PiPLSRegression(
-    n_components=2,
-    predictor_rank=4,
-).fit(X_train, Y_train)
-
-Y_pred = model.predict(X_test)
-```
-
-This fit performs no parameter selection. See the
-[fixed-regression reference](api/regression.md) for preprocessing, solver, fitted-state, and method
-contracts.
-
 ## Programming reference
 
 - [API overview](api/index.md): generated signatures and method contracts.
