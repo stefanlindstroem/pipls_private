@@ -388,6 +388,47 @@ def test_cv_mse_error_bar_documentation_defines_explicit_one_se_heuristic() -> N
         assert "explicit" in tutorial
 
 
+def test_example_catalogue_is_scannable_and_runnable() -> None:
+    root = _repository_root()
+    page_path = root / "docs" / "examples.md"
+    page = page_path.read_text(encoding="utf-8")
+
+    table_start = page.index("## Choose an example")
+    run_one_start = page.index("## Run one example")
+    table = page[table_start:run_one_start]
+    rows = [
+        line
+        for line in table.splitlines()
+        if line.startswith("| `") and line.endswith("|")
+    ]
+
+    expected_scripts = [
+        path.name
+        for path in sorted((root / "examples").glob("[0-9][0-9]_*.py"))
+    ]
+    documented_scripts: list[str] = []
+    for row in rows:
+        cells = [cell.strip() for cell in row.strip("|").split("|")]
+        assert len(cells) == 3
+        assert all(cells)
+        assert cells[0].startswith("`") and cells[0].endswith("`")
+        documented_scripts.append(cells[0].strip("`"))
+
+    assert documented_scripts == expected_scripts
+    assert 'python -m pip install ".[examples]"' in page
+    assert "python examples/02_synthetic_path_selection.py" in page
+    assert "`examples/results/`" in page
+    assert "make examples" in page
+
+    anchors = _document_anchors(page_path)
+    for anchor in (
+        "leave-one-out-validation",
+        "complete-real-data-analyses",
+        "tobacco-one-standard-error-selection",
+    ):
+        assert anchor in anchors
+
+
 def test_component_path_recommendations_have_one_maintained_application() -> None:
     root = _repository_root()
     method_names = (

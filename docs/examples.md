@@ -1,24 +1,45 @@
 # Examples
 
-The numbered examples are executable workflows organized by purpose. Start with the
+The numbered examples are executable workflows organized by programming task. Start with the
 [synthetic tutorial](tutorials/synthetic.md) for the short selection-and-prediction sequence, then
 continue with the [Pulp tutorial](tutorials/pulp.md) for a complete real-data analysis. This page is
 a catalogue of the maintained scripts.
 
-## Fixed fit
+## Choose an example
 
-`examples/01_minimal_fit_and_plot.py` uses literal NumPy arrays, fits one fixed
-`PiPLSRegression`, predicts responses, and creates a caller-owned $2\times2$ factor panel. It does
-not perform parameter selection. The [fixed-regression reference](api/regression.md) documents
-its estimator contract.
+| Script | Programming task | Main output |
+|---|---|---|
+| `01_minimal_fit_and_plot.py` | Fit and inspect one known Pi-PLS rank pair from literal NumPy arrays | Printed predictions and `minimal_fit_and_plot.pdf` |
+| `02_synthetic_path_selection.py` | Inspect a component path, select one fixed model, and evaluate independent test predictions | Three PDF figures and printed external-test $R^2$ |
+| `03_leave_one_out_validation.py` | Validate a small calibration study with leave-one-out splits and ordered OOF predictions | Printed selected rank pair and immutable validation summary |
+| `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
+| `05_pulp_real_data.py` | Run the complete Pulp selection, rank-profile, inspection, and OOF workflow | Six PDF figures |
+| `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Five PDF figures |
+| `07_tobacco_real_data.py` | Apply the one-standard-error rule in a complete Tobacco spectral workflow | Five PDFs, including multipage diagnostics and coefficients |
 
-## Synthetic path selection
+The [fixed-regression reference](api/regression.md) documents the estimator used by example 01.
+The [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02 workflow
+directly. The comparison in example 04 is optional and is not part of routine Pi-PLS fitting.
 
-`examples/02_synthetic_path_selection.py` generates independent training and test blocks with known
-shared, predictor-specific, and response-specific latent structure. It evaluates the component path,
-inspects the conditional predictor-rank profile, fits one selected fixed model, reports held-out
-$R^2$, and writes three final PDF figures. The [synthetic tutorial](tutorials/synthetic.md) extracts
-its maintained code directly.
+## Run one example
+
+Install the example dependencies and execute a script from the repository root:
+
+```bash
+python -m pip install ".[examples]"
+python examples/02_synthetic_path_selection.py
+```
+
+Generated files are written below `examples/results/`.
+
+## Run all examples
+
+```bash
+make examples
+```
+
+The complete real-data analyses are intentionally outside `make check` because they are application
+workflows and may take substantially longer than the package test suite.
 
 ## Leave-one-out validation
 
@@ -29,13 +50,6 @@ OOF $R^2$ is calculated across all held-out predictions; it is not mean foldwise
 undefined for singleton validation folds. See the
 [leave-one-out interpretation](path_analysis.md#leave-one-out-interpretation) for the associated
 scoring and selection qualifications.
-
-## Pi-PLS and ordinary PLS comparison
-
-`examples/04_pls_path_comparison.py` evaluates matched component-count paths for Pulp, Sugarcane,
-and Tobacco. It keeps both immutable paths in memory and writes one overlaid mean CV-MSE figure per
-dataset with $\pm 1$ fold-based standard-error bars. This comparison is optional and is not part
-of routine Pi-PLS fitting.
 
 ## Complete real-data analyses
 
@@ -84,13 +98,3 @@ array-to-Matplotlib boundary.
 The Pulp tutorial extracts its checked snippets directly from `examples/05_pulp_real_data.py`.
 The sole module under `examples/_support/` evaluates the nontrivial fold-local ordinary-PLS path for
 example 04. It is not required for ordinary estimator use.
-
-## Run the examples
-
-```bash
-python -m pip install ".[examples]"
-make examples
-```
-
-The complete real-data analyses are intentionally outside `make check` because they are application
-workflows and may take substantially longer than the package test suite.
