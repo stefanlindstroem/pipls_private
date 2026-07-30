@@ -411,6 +411,18 @@ def test_authors_license_and_citation_page_is_public_and_consistent() -> None:
     assert "CITATION.cff" in readme
 
 
+def test_mathjax_supports_bold_vector_notation() -> None:
+    root = _repository_root()
+    mathjax = (root / "docs" / "javascripts" / "mathjax.js").read_text(
+        encoding="utf-8"
+    )
+    theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+
+    assert 'bm: ["\\\\boldsymbol{#1}", 1]' in mathjax
+    assert r"\bm{p}_k" in theory
+    assert r"\bm{q}_k" in theory
+
+
 def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
     root = _repository_root()
     theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
@@ -433,10 +445,13 @@ def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
     assert positions == sorted(positions)
 
     for required in (
-        r"X=X\Pi\Pi^{\mathsf T}+X(I_p-\Pi\Pi^{\mathsf T})",
-        r"\max_{C^{\mathsf T}C=I_h}",
-        r"YQ=XPD+E_\pi",
-        r"=PDQ^{\mathsf T}",
+        (
+            r"\mathbf{X}=\mathbf{X}\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}"
+            r"+\mathbf{X}(\mathbf{I}_p-\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T})"
+        ),
+        r"\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}",
+        r"\mathbf{Y}\mathbf{Q}=\mathbf{X}\mathbf{P}\mathbf{D}+\mathbf{E}_\pi",
+        r"=\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}",
         r"(r_\pi+q-h)h",
     ):
         assert required in theory
@@ -461,11 +476,14 @@ def test_theory_page_defines_canonical_pipls_terminology() -> None:
         "retained-subspace projector",
         "orthonormal predictor directions",
         "orthonormal response directions",
-        "$d_k=D_{kk}$",
+        "$d_k=\\mathbf{D}_{kk}$",
         "paired latent mode",
         "`predictor_rank`",
         "`n_components`",
-        r"DQ^{\mathsf T}=(QD)^{\mathsf T}",
+        (
+            r"\mathbf{D}\mathbf{Q}^{\mathsf T}"
+            r"=(\mathbf{Q}\mathbf{D})^{\mathsf T}"
+        ),
         "`x_loadings_` and `y_loadings_`",
     ):
         assert required in theory
