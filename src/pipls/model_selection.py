@@ -42,10 +42,13 @@ def _max_predictor_rank(
 
     The bound is
 
-    .. math::
-
-        \min\left(p, n_{\mathrm{train,min}} - 1,
-        \left\lceil n / c \right\rceil\right),
+    \begin{equation}
+    \min\left(
+    p,
+    n_{\mathrm{train,min}}-1,
+    \left\lceil n/c \right\rceil
+    \right),
+    \end{equation}
 
     where ``p`` is ``n_features``, ``n`` is ``n_samples``, and ``c`` is
     ``samples_per_predictor_rank``. The smallest training-fold size remains a

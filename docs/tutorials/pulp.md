@@ -125,7 +125,7 @@ The complete evaluated rank profile at three components is available without fil
 
 Rank 10 has the lowest evaluated mean CV-MSE, but it is also the upper default boundary. For these
 46 rows, 14 predictors, and five-fold CV, the support rule gives
-$r_{\pi,\max}=\min[14,35,\lceil46/5\rceil]=10$. Ranks 9 and 10 have mean CV-MSE values of
+$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. Ranks 9 and 10 have mean CV-MSE values of
 approximately 0.347 and 0.331, with fold-based standard errors of approximately 0.083 and 0.076.
 Their mean difference is small relative to the displayed uncertainty scale.
 

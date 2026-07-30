@@ -31,17 +31,32 @@ software repository as the orchestration environment for one paper.
 
 ## Generate the manuscript distribution
 
-The manuscript separates predictor-specific, shared, and response-specific latent variation:
+The manuscript separates predictor-specific, shared, and response-specific latent variation.
+Upright subscripts identify fixed roles or blocks: $\mathrm{p}$ is predictor-specific,
+$\mathrm{s}$ is shared, $\mathrm{r}$ is response-specific, $\mathrm{sp}$ is shared-predictor,
+and $\mathrm{sr}$ is shared-response.
 
-\[
-X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
+\begin{equation}
+\mathbf{X}
+=
+\boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
++
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
++
+\boldsymbol{\varepsilon}_{\mathrm{X}},
 \qquad
-Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
-\]
+\mathbf{Y}
+=
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
++
+\boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
++
+\boldsymbol{\varepsilon}_{\mathrm{Y}}.
+\end{equation}
 
 Every entry of the three latent-score matrices and four loading matrices is sampled independently
-from \(\mathcal N(0,1)\). Predictor and response noise entries are independent Gaussian draws with
-standard deviations \(\sigma_X\) and \(\sigma_Y\).
+from $\mathcal{N}(0,1)$. Predictor and response noise entries are independent Gaussian draws with
+standard deviations $\sigma_{\mathrm{X}}$ and $\sigma_{\mathrm{Y}}$.
 
 The following call uses a representative geometry discussed in the manuscript: 40 observations,
 80 predictors, 30 responses, four predictor-specific directions, four shared directions, one
@@ -132,14 +147,14 @@ is insufficient for an exact realization-level claim.
 ## Known dimensions in the synthetic experiments
 
 For the manuscript synthetic geometry, the noiseless predictor signal has rank at most
-\(d_p+d_s\), and the predictable shared relation has dimension at most \(d_s\). The manuscript's
-synthetic evaluations use the known generating dimensions
+$d_{\mathrm{p}}+d_{\mathrm{s}}$, and the predictable shared relation has dimension at most
+$d_{\mathrm{s}}$. The manuscript's synthetic evaluations use the known generating dimensions
 
-\[
-r_\pi=d_p+d_s,
+\begin{equation}
+r_\pi=d_{\mathrm{p}}+d_{\mathrm{s}},
 \qquad
-h=d_s.
-\]
+h=d_{\mathrm{s}}.
+\end{equation}
 
 With the representative call above, these values are:
 

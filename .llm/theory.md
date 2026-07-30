@@ -136,13 +136,13 @@ data, use retained predictor basis, retained predictor subspace, and predictor r
 Let the singular value decomposition of the core predictor matrix be
 
 $$
-\mathbf{X}=\mathbf{U}_X\mathbf{S}_X\mathbf{V}_X^{\mathsf T}.
+\mathbf{X}=\mathbf{U}_{\mathrm{X}}\mathbf{S}_{\mathrm{X}}\mathbf{V}_{\mathrm{X}}^{\mathsf T}.
 $$
 
 Retain the leading $r_\pi$ right singular vectors:
 
 $$
-\mathbf{\Pi}=\mathbf{V}_{X(:,1:r_\pi)},
+\mathbf{\Pi}=\mathbf{V}_{\mathrm{X}}(:,1:r_\pi),
 \qquad
 \mathbf{\Pi}^{\mathsf T}\mathbf{\Pi}=\mathbf{I}_{r_\pi}.
 $$
@@ -175,7 +175,7 @@ by increasing $h$.
 Within the retained predictor space, form the predictor-response cross-product matrix
 
 $$
-\mathbf{\Sigma}_{ZY}=\mathbf{Z}^{\mathsf T}\mathbf{Y}
+\boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{Z}^{\mathsf T}\mathbf{Y}
 \in\mathbb{R}^{r_\pi\times q}.
 $$
 
@@ -184,13 +184,13 @@ $\mathbf{C}\in\mathbb{R}^{q\times h}$ that maximizes retained squared cross-cova
 
 $$
 \max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
-\left\|\mathbf{\Sigma}_{ZY}\mathbf{C}\right\|_F^2.
+\left\|\boldsymbol{\Sigma}_{\mathrm{ZY}}\mathbf{C}\right\|_{\mathrm{F}}^2.
 $$
 
 If
 
 $$
-\mathbf{\Sigma}_{ZY}=\mathbf{U}\mathbf{S}\mathbf{V}^{\mathsf T},
+\boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}\mathbf{S}\mathbf{V}^{\mathsf T},
 $$
 
 then one optimum is
@@ -335,13 +335,14 @@ $$
 \mathbf{X}_{\mathrm{new}}\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}.
 $$
 
-In the public estimator, let $\boldsymbol\mu_X$, $\boldsymbol\mu_Y$ be training means and let
-$\mathbf{s}_X$, $\mathbf{s}_Y$ be the safe training scales. Then
+In the public estimator, let $\boldsymbol\mu_{\mathrm{X}}$ and
+$\boldsymbol\mu_{\mathrm{Y}}$ be training means, and let
+$\mathbf{s}_{\mathrm{X}}$, $\mathbf{s}_{\mathrm{Y}}$ be the safe training scales. Then
 
 $$
 \mathbf{X}_{\mathrm{cs}}
 =
-(\mathbf{X}-\boldsymbol\mu_X)\operatorname{diag}(\mathbf{s}_X)^{-1},
+(\mathbf{X}-\boldsymbol\mu_{\mathrm{X}})\operatorname{diag}(\mathbf{s}_{\mathrm{X}})^{-1},
 $$
 
 and predictions are transformed back to response units. Equivalently, the original-unit
@@ -350,9 +351,9 @@ coefficient matrix is
 $$
 \mathbf{B}
 =
-\operatorname{diag}(\mathbf{s}_X)^{-1}
+\operatorname{diag}(\mathbf{s}_{\mathrm{X}})^{-1}
 \mathbf{B}_{\mathrm{cs}}
-\operatorname{diag}(\mathbf{s}_Y),
+\operatorname{diag}(\mathbf{s}_{\mathrm{Y}}),
 $$
 
 with intercept
@@ -360,7 +361,7 @@ with intercept
 $$
 \mathbf{b}_0
 =
-\boldsymbol\mu_Y-\boldsymbol\mu_X\mathbf{B}.
+\boldsymbol\mu_{\mathrm{Y}}-\boldsymbol\mu_{\mathrm{X}}\mathbf{B}.
 $$
 
 When `scale=False`, the scale vectors are ones and the same expressions reduce to centering only.
@@ -479,10 +480,11 @@ The mathematical bound $r_\pi\le\min(n,p)$ is insufficient for finite-precision 
 private core estimates predictor numerical rank from the thin-SVD singular values $s_i$ using
 
 $$
-\tau_X=\max(n,p)\,\epsilon_{64}\,s_1,
+\tau_{\mathrm{X}}=\max(n,p)\,\epsilon_{64}\,s_1,
 $$
 
-and counts singular values satisfying $s_i>\tau_X$. A requested $r_\pi$ above this numerical rank
+and counts singular values satisfying $s_i>\tau_{\mathrm{X}}$. A requested $r_\pi$ above this
+numerical rank
 is invalid and raises an error rather than being silently clamped.
 
 Constant columns, rank-deficient matrices, $p\gg n$, singleton CV training folds, and repeated
@@ -498,11 +500,11 @@ sample-size heuristics and exhaustive CV as practical selection approaches.
 
 The repository API uses the full-sample-supported, fold-feasible upper bound
 
-$$
-r_{\pi,\max}
+\begin{equation}
+r_{\pi,\mathrm{max}}
 =
 \min\left(
- p_{\min},
+ p_{\mathrm{min}},
  n_{\mathrm{train,min}}-1,
  r_{\mathrm{num,min}},
  \left\lceil
@@ -510,11 +512,12 @@ r_{\pi,\max}
  {\texttt{samples\_per\_predictor\_rank}}
  \right\rceil
 \right).
-$$
+\end{equation}
 
 This bound is an API and regularization policy, not a theorem of Pi-PLS. The total supplied sample
 count $n$ defines statistical support for the final model, which is refitted on all supplied rows.
-For internal CV, $p_{\min}$ is the minimum predictor count after fold-local pipeline preprocessing,
+For internal CV, $p_{\mathrm{min}}$ is the minimum predictor count after fold-local pipeline
+preprocessing,
 $n_{\mathrm{train,min}}$ is the smallest materialized training-fold size, and
 $r_{\mathrm{num,min}}$ is the minimum predictor rank verified after terminal-estimator centering
 and optional scaling. These are hard feasibility caps. Using the public sample count in the support
@@ -554,11 +557,23 @@ Decision 0119 separates two public synthetic purposes. `make_pipls_regression()`
 orthonormal loading directions, strengths, distributions, and observed scales.
 `make_pipls_latent_geometry()` instead implements the companion manuscript model exactly:
 
-$$
-X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
+\begin{equation}
+\mathbf{X}
+=
+\boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
++
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
++
+\boldsymbol{\varepsilon}_{\mathrm{X}},
 \qquad
-Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
-$$
+\mathbf{Y}
+=
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
++
+\boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
++
+\boldsymbol{\varepsilon}_{\mathrm{Y}}.
+\end{equation}
 
 All score and loading entries are independent standard-normal draws, and the noise blocks are
 independent Gaussian draws with caller-specified standard deviations. No centering,

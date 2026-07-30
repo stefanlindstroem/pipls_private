@@ -73,13 +73,15 @@ response-specific directions, shared strengths `(2.5, 1.5)`, noise `(0.2, 0.2)`,
 
 - `test_mse` is the mean squared residual over all test samples and responses in original response
   units;
-- `predictor_shared_capture` compares the true predictor-shared subspace with fitted $P$;
+- `predictor_shared_capture` compares the true predictor-shared subspace with fitted $\mathbf{P}$;
 - `predictor_signal_capture` compares the complete true predictor-signal subspace with fitted
-  $\Pi$;
-- `response_shared_capture` compares the true response-shared subspace with fitted $Q$.
+  $\boldsymbol{\Pi}$;
+- `response_shared_capture` compares the true response-shared subspace with fitted $\mathbf{Q}$.
 
-For true basis $A$ and estimated basis $B$, with orthonormal column bases $Q_A$ and $Q_B$, capture
-is $\lVert Q_A^{\mathsf{T}} Q_B \rVert_{\mathrm{F}}^2 / \dim[\mathrm{col}(A)]$. Generator
+For true basis $\mathbf{A}$ and estimated basis $\mathbf{B}$, with orthonormal column bases
+$\mathbf{Q}_A$ and $\mathbf{Q}_B$, capture is
+$\left\lVert\mathbf{Q}_A^{\mathsf T}\mathbf{Q}_B\right\rVert_{\mathrm{F}}^2/\dim[\operatorname{col}(\mathbf{A})]$.
+Generator
 loadings are mapped into the estimator coordinates using `truth.feature_scale / model.x_scale_` for
 predictors and `truth.target_scale / model.y_scale_` for responses. Learned scales therefore come
 only from the benchmark training block.

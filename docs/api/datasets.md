@@ -10,6 +10,11 @@ The repository also ships the Pulp, Sugarcane, and Tobacco [reference datasets](
 assets read explicitly by the examples; they are not registry entries and are not loaded through
 `PiPLSDataset`.
 
+Mathematical notation on this page follows the package convention: complete matrices are bold,
+descriptive role and block subscripts are upright, and variable indices remain italic. For example,
+$\boldsymbol{\Lambda}_{\mathrm{p}}$ and $\mathbf{L}_{\mathrm{sp}}$ are complete matrices,
+while $d_k$ retains the variable index $k$.
+
 ## Containers
 
 ::: pipls.datasets.PiPLSDataset

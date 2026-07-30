@@ -11,7 +11,7 @@ For paired-mode count $h$ (`n_components`) and retained predictor-subspace dimen
 (`predictor_rank`), the admissible pairs are
 
 \begin{equation}
-\mathcal{G}=\{(h,r_\pi):1\le h\le h_{\max},\ h\le r_\pi\le r_{\pi,\max}\}.
+\mathcal{G}=\{(h,r_\pi):1\le h\le h_{\mathrm{max}},\ h\le r_\pi\le r_{\pi,\mathrm{max}}\}.
 \end{equation}
 
 ### Resolved ceilings
@@ -19,12 +19,12 @@ For paired-mode count $h$ (`n_components`) and retained predictor-subspace dimen
 The default upper predictor rank is
 
 \begin{equation}
-r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
+r_{\pi,\mathrm{max}}=\min\left[p_{\mathrm{min}},n_{\mathrm{train,min}}-1,
 r_{\mathrm{num,min}},
 \left\lceil\frac{n}{c}\right\rceil\right].
 \end{equation}
 
-Here $n$ is the total number of observations supplied to `fit()`, $p_{\min}$ is the minimum
+Here $n$ is the total number of observations supplied to `fit()`, $p_{\mathrm{min}}$ is the minimum
 predictor count after fold-local pipeline preprocessing, $r_{\mathrm{num,min}}$ is the minimum
 verified predictor rank after terminal-estimator centering and optional scaling, and $c$ is `samples_per_predictor_rank`. The search object fits
 pipeline preprocessing separately inside each fold before this rank preflight. An integer
@@ -34,7 +34,7 @@ numerical rank.
 If the response matrix has $q$ columns, the resolved component ceiling is
 
 \begin{equation}
-h_{\max}=\min(q,r_{\pi,\max}).
+h_{\mathrm{max}}=\min(q,r_{\pi,\mathrm{max}}).
 \end{equation}
 
 This ceiling enforces $h\le q$ and guarantees that at least one predictor rank can satisfy
@@ -46,7 +46,7 @@ $h\le r_\pi$, the request is rejected rather than silently dropping that compone
 ### Component-count requests
 
 The default `n_components_values="all"` evaluates every paired-mode count from 1 through
-$h_{\max}$. An explicit integer sequence requests a subset:
+$h_{\mathrm{max}}$. An explicit integer sequence requests a subset:
 
 ```python
 search = PiPLSSearchCV(
@@ -60,7 +60,7 @@ Every requested value must have at least one admissible predictor rank.
 
 With `predictor_rank_values=None`, predictor rank is selected independently for every component
 count. A one-element sequence fixes one rank across the path, a longer sequence defines the
-admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\max}$ directly.
+admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\mathrm{max}}$ directly.
 
 `search_method="optimal"` evaluates every admissible pair. `search_method="auto"` performs a
 deterministic adaptive coarse-to-fine search independently for each component count and may leave
@@ -173,11 +173,11 @@ MSE values. It describes fold variation. The derived read-only
 `component_path_.cv_mse_standard_error` converts that stored quantity to the usual fold-based
 standard error of the mean CV-MSE:
 
-\[
+\begin{equation}
 \widehat{\mathrm{SE}}_{\mathrm{CV}}
 =
 \frac{\widehat{\sigma}_{\mathrm{fold,pop}}}{\sqrt{K-1}},
-\]
+\end{equation}
 
 where $K$ is the number of validation splits, stored once as the path-wide scalar
 `component_path_.n_splits`. This is equivalent to dividing the sample standard deviation of the
@@ -190,16 +190,16 @@ uncertainty guarantee.
 ### One-standard-error component heuristic
 
 The conventional one-standard-error rule, usually abbreviated the 1-SE rule, can use the component
-path to favor a more parsimonious component count. Let $h_{\min}$ minimize the displayed mean
+path to favor a more parsimonious component count. Let $h_{\mathrm{min}}$ minimize the displayed mean
 CV-MSE and define
 
-\[
+\begin{equation}
 \tau
 =
-\widehat{\operatorname{CV\text{-}MSE}}(h_{\min})
+\widehat{\operatorname{CV\text{-}MSE}}(h_{\mathrm{min}})
 +
-\widehat{\operatorname{SE}}_{\mathrm{CV}}(h_{\min}).
-\]
+\widehat{\operatorname{SE}}_{\mathrm{CV}}(h_{\mathrm{min}}).
+\end{equation}
 
 The rule chooses the smallest evaluated component count whose mean CV-MSE does not exceed $\tau$.
 It is a heuristic for identifying a simpler model within one estimated standard error of the

@@ -13,6 +13,7 @@ from pipls import (
     PiPLSRegression,
     PiPLSSearchCV,
 )
+from pipls.datasets import PiPLSLatentGeometryTruth, make_pipls_latent_geometry
 from pipls.inspection import PiPLSDisplayFactors
 
 _MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((?P<target>[^)]+)\)")
@@ -279,8 +280,8 @@ def test_path_reference_defines_resolved_ceilings_before_rank_policies() -> None
     component_requests = page.index("### Component-count requests")
     rank_policies = page.index("## Predictor-rank policies")
     assert bounds < ceilings < component_requests < rank_policies
-    assert r"r_{\pi,\max}" in page[ceilings:component_requests]
-    assert r"h_{\max}" in page[ceilings:component_requests]
+    assert r"r_{\pi,\mathrm{max}}" in page[ceilings:component_requests]
+    assert r"h_{\mathrm{max}}" in page[ceilings:component_requests]
 
 
 def test_new_user_entry_explains_scope_before_routing_to_workflows() -> None:
@@ -527,6 +528,7 @@ def test_theory_distinguishes_complete_matrices_from_indexed_columns() -> None:
 def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
     root = _repository_root()
     theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+    benchmark_page = (root / "docs" / "benchmarks.md").read_text(encoding="utf-8")
     mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
 
     sections = (
@@ -569,6 +571,7 @@ def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
 def test_theory_page_defines_canonical_pipls_terminology() -> None:
     root = _repository_root()
     theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+    benchmark_page = (root / "docs" / "benchmarks.md").read_text(encoding="utf-8")
     mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
     public_api = (root / ".llm" / "public_api.md").read_text(encoding="utf-8")
 
@@ -723,10 +726,12 @@ def test_companion_manuscript_synthetic_data_guide_is_public_and_scoped() -> Non
 
     for required in (
         "make_pipls_latent_geometry",
-        r"X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X",
-        r"Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y",
-        r"r_\pi=d_p+d_s",
-        r"h=d_s",
+        r"\boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}",
+        r"\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}",
+        r"\boldsymbol{\varepsilon}_{\mathrm{X}}",
+        r"\boldsymbol{\varepsilon}_{\mathrm{Y}}",
+        r"r_\pi=d_{\mathrm{p}}+d_{\mathrm{s}}",
+        r"h=d_{\mathrm{s}}",
         "random_state=0",
         "PiPLSSearchCV",
         "downstream reproduction repository",
@@ -747,3 +752,96 @@ def test_companion_manuscript_synthetic_data_guide_is_public_and_scoped() -> Non
     )
     for source in cross_link_sources:
         assert "manuscript_reproduction.md" in source.read_text(encoding="utf-8")
+
+
+def test_mathematical_typography_and_descriptive_subscripts_are_consistent() -> None:
+    root = _repository_root()
+    dataset_page = (root / "docs" / "datasets.md").read_text(encoding="utf-8")
+    manuscript_page = (root / "docs" / "manuscript_reproduction.md").read_text(
+        encoding="utf-8"
+    )
+    theory_page = (root / "docs" / "theory.md").read_text(encoding="utf-8")
+    path_page = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
+    benchmark_page = (root / "docs" / "benchmarks.md").read_text(encoding="utf-8")
+    mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
+
+    for page in (dataset_page, manuscript_page):
+        for required in (
+            r"\mathbf{X}",
+            r"\mathbf{Y}",
+            r"\boldsymbol{\Lambda}_{\mathrm{p}}",
+            r"\boldsymbol{\Lambda}_{\mathrm{s}}",
+            r"\boldsymbol{\Lambda}_{\mathrm{r}}",
+            r"\mathbf{L}_{\mathrm{sp}}",
+            r"\mathbf{L}_{\mathrm{sr}}",
+            r"\boldsymbol{\varepsilon}_{\mathrm{X}}",
+            r"\boldsymbol{\varepsilon}_{\mathrm{Y}}",
+        ):
+            assert required in page
+        for obsolete in (
+            r"\Lambda_p",
+            r"\Lambda_s",
+            r"\Lambda_r",
+            r"L_{sp}",
+            r"L_{sr}",
+            r"\varepsilon_X",
+            r"\varepsilon_Y",
+        ):
+            assert obsolete not in page
+
+    for required in (
+        r"\mathbf{U}_{\mathrm{X}}",
+        r"\mathbf{S}_{\mathrm{X}}",
+        r"\mathbf{V}_{\mathrm{X}}",
+        r"\boldsymbol{\Sigma}_{\mathrm{ZY}}",
+        r"\|_{\mathrm{F}}",
+    ):
+        assert required in theory_page
+
+    for required in (
+        r"h_{\mathrm{max}}",
+        r"r_{\pi,\mathrm{max}}",
+        r"p_{\mathrm{min}}",
+        r"h_{\mathrm{min}}",
+    ):
+        assert required in path_page
+
+    for required in (
+        r"\mathbf{A}",
+        r"\mathbf{B}",
+        r"\mathbf{Q}_A",
+        r"\mathbf{Q}_B",
+        r"\mathbf{P}",
+        r"\boldsymbol{\Pi}",
+        r"\mathbf{Q}",
+    ):
+        assert required in benchmark_page
+
+    for variable_index in ("d_k=D_{kk}", "P_{:k}", "Q_{:k}", "s_i"):
+        assert variable_index in mathematics
+    assert "Descriptive, role, block, method, and extremum subscripts" in mathematics
+
+
+def test_generated_dataset_equations_use_markdown_math_and_canonical_notation() -> None:
+    root = _repository_root()
+    source = (root / "src" / "pipls" / "datasets.py").read_text(encoding="utf-8")
+    truth_doc = inspect.getdoc(PiPLSLatentGeometryTruth) or ""
+    generator_doc = inspect.getdoc(make_pipls_latent_geometry) or ""
+
+    for path in (root / "src" / "pipls").glob("*.py"):
+        assert ".. math::" not in path.read_text(encoding="utf-8"), path
+
+    for path in (root / "docs").rglob("*.md"):
+        if "decisions" not in path.parts:
+            text = path.read_text(encoding="utf-8")
+            assert "\n\\[\n" not in text, path
+            assert "\n\\]\n" not in text, path
+
+    assert ".. math::" not in source
+    for docstring in (truth_doc, generator_doc):
+        assert r"\begin{equation}" in docstring
+        assert r"\end{equation}" in docstring
+        assert r"\boldsymbol{\Lambda}_{\mathrm{p}}" in docstring
+        assert r"\mathbf{L}_{\mathrm{sp}}" in docstring
+        assert r"\boldsymbol{\varepsilon}_{\mathrm{X}}" in docstring
+        assert ":math:" not in docstring

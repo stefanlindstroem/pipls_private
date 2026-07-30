@@ -11,6 +11,13 @@ estimator signatures retain scikit-learn's `X` and `y` convention, including whe
 two-dimensional multivariate response matrix. The programming name does not change the
 mathematical object.
 
+Complete matrices are bold. Use `\mathbf` for Latin matrix symbols and `\boldsymbol` for Greek
+matrix symbols that must render in bold. Descriptive, role, block, method, and extremum subscripts
+are upright with `\mathrm`, for example $d_{\mathrm{p}}$,
+$\boldsymbol{\Lambda}_{\mathrm{s}}$, $\mathbf{L}_{\mathrm{sp}}$,
+$\mathbf{U}_{\mathrm{X}}$, and $h_{\mathrm{max}}$. Mathematical indices and dimensions remain
+italic, for example $d_k$, $D_{kk}$, $P_{:k}$, $s_i$, $r_\pi$, and $\mathbf{I}_p$.
+
 | Quantity | Shape | Meaning |
 |---|---:|---|
 | $\mathbf{X}_{\mathrm{cs}}$ | $(n,p)$ | centered, optionally scaled predictors |
@@ -63,10 +70,10 @@ the estimator's separate least-squares reconstruction loadings.
 
 The private core additionally requires $r_\pi$ not to exceed the numerical rank of the supplied
 predictor matrix. For thin-SVD singular values $s_i$, numerical rank is determined by
-$s_i>\tau_X$, where
+$s_i>\tau_{\mathrm{X}}$, where
 
 \begin{equation}
-\tau_X=\max(n,p)\,\epsilon_{64}\,s_1.
+\tau_{\mathrm{X}}=\max(n,p)\,\epsilon_{64}\,s_1.
 \end{equation}
 
 ## Fixed-parameter construction
@@ -75,7 +82,7 @@ For the thin SVD
 
 \begin{equation}
 \mathbf{X}_{\mathrm{cs}}
-=\mathbf{U}_X\mathbf{S}_X\mathbf{V}_X^{\mathsf T},
+=\mathbf{U}_{\mathrm{X}}\mathbf{S}_{\mathrm{X}}\mathbf{V}_{\mathrm{X}}^{\mathsf T},
 \end{equation}
 
 retain the first $r_\pi$ right singular vectors in $\mathbf{\Pi}$. The retained-subspace projector
@@ -106,7 +113,7 @@ The response basis solves
 \max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
 \left\|
 \mathbf{Z}^{\mathsf T}\mathbf{Y}_{\mathrm{cs}}\mathbf{C}
-\right\|_F^2.
+\right\|_{\mathrm{F}}^2.
 \end{equation}
 
 One optimum is formed by the leading $h$ right singular vectors of
@@ -198,10 +205,10 @@ fold-local pipeline preprocessing and terminal-estimator centering/scaling. The 
 is
 
 \begin{equation}
-r_{\pi,\max}
+r_{\pi,\mathrm{max}}
 =
 \min\left[
- p_{\min},
+ p_{\mathrm{min}},
  n_{\mathrm{train,min}}-1,
  r_{\mathrm{num,min}},
  \left\lceil\frac{n}{c}\right\rceil

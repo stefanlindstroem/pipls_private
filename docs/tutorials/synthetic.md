@@ -46,12 +46,12 @@ predictor-subspace dimension $r_\pi$ (`predictor_rank`). For each paired-mode co
 evaluated predictor rank with the smallest mean
 response-standardized CV-MSE under the default scorer:
 
-\[
+\begin{equation}
 r_\pi^*(h)
 =
 \operatorname*{arg\,min}_{r_\pi}
 \operatorname{CV\text{-}MSE}(h,r_\pi).
-\]
+\end{equation}
 
 The concise `component_path_` object contains one row per evaluated paired-mode count. Each row
 already contains its conditionally selected predictor rank $r_\pi^*(h)$:

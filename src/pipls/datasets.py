@@ -134,11 +134,23 @@ class PiPLSLatentGeometryTruth:
 
     This record follows the orientation of the companion manuscript directly:
 
-    .. math::
-
-       X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
-       \qquad
-       Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
+    \begin{equation}
+    \mathbf{X}
+    =
+    \boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
+    +
+    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
+    +
+    \boldsymbol{\varepsilon}_{\mathrm{X}},
+    \qquad
+    \mathbf{Y}
+    =
+    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
+    +
+    \boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
+    +
+    \boldsymbol{\varepsilon}_{\mathrm{Y}}.
+    \end{equation}
 
     All score, loading, signal, and noise arrays are defensive read-only
     ``float64`` copies. Loading matrices therefore have latent dimensions on
@@ -147,19 +159,19 @@ class PiPLSLatentGeometryTruth:
     Attributes
     ----------
     predictor_specific_scores : ndarray of shape (n_samples, n_predictor_specific)
-        Predictor-specific latent matrix :math:`\Lambda_p`.
+        Predictor-specific latent matrix $\boldsymbol{\Lambda}_{\mathrm{p}}$.
     shared_scores : ndarray of shape (n_samples, n_shared)
-        Shared latent matrix :math:`\Lambda_s`.
+        Shared latent matrix $\boldsymbol{\Lambda}_{\mathrm{s}}$.
     response_specific_scores : ndarray of shape (n_samples, n_response_specific)
-        Response-specific latent matrix :math:`\Lambda_r`.
+        Response-specific latent matrix $\boldsymbol{\Lambda}_{\mathrm{r}}$.
     predictor_specific_loadings : ndarray of shape (n_predictor_specific, n_features)
-        Predictor-specific loading matrix :math:`L_p`.
+        Predictor-specific loading matrix $\mathbf{L}_{\mathrm{p}}$.
     shared_predictor_loadings : ndarray of shape (n_shared, n_features)
-        Shared predictor loading matrix :math:`L_{sp}`.
+        Shared predictor loading matrix $\mathbf{L}_{\mathrm{sp}}$.
     shared_response_loadings : ndarray of shape (n_shared, n_targets)
-        Shared response loading matrix :math:`L_{sr}`.
+        Shared response loading matrix $\mathbf{L}_{\mathrm{sr}}$.
     response_specific_loadings : ndarray of shape (n_response_specific, n_targets)
-        Response-specific loading matrix :math:`L_r`.
+        Response-specific loading matrix $\mathbf{L}_{\mathrm{r}}$.
     x_signal, x_noise : ndarray of shape (n_samples, n_features)
         Noise-free predictor signal and additive noise.
     y_signal, y_noise : ndarray of shape (n_samples, n_targets)
@@ -188,19 +200,19 @@ class PiPLSLatentGeometryTruth:
 
     @property
     def n_shared(self) -> int:
-        """Number of shared latent directions :math:`d_s`."""
+        r"""Number of shared latent directions $d_{\mathrm{s}}$."""
 
         return int(self.shared_scores.shape[1])
 
     @property
     def n_predictor_specific(self) -> int:
-        """Number of predictor-specific latent directions :math:`d_p`."""
+        r"""Number of predictor-specific latent directions $d_{\mathrm{p}}$."""
 
         return int(self.predictor_specific_scores.shape[1])
 
     @property
     def n_response_specific(self) -> int:
-        """Number of response-specific latent directions :math:`d_r`."""
+        r"""Number of response-specific latent directions $d_{\mathrm{r}}$."""
 
         return int(self.response_specific_scores.shape[1])
 
@@ -383,14 +395,26 @@ def make_pipls_latent_geometry(
 
     The function implements the manuscript data model directly:
 
-    .. math::
-
-       X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
-       \qquad
-       Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
+    \begin{equation}
+    \mathbf{X}
+    =
+    \boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
+    +
+    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
+    +
+    \boldsymbol{\varepsilon}_{\mathrm{X}},
+    \qquad
+    \mathbf{Y}
+    =
+    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
+    +
+    \boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
+    +
+    \boldsymbol{\varepsilon}_{\mathrm{Y}}.
+    \end{equation}
 
     Every entry of the three latent-score matrices and four loading matrices is
-    drawn independently from :math:`\mathcal{N}(0, 1)`. Predictor and response
+    drawn independently from $\mathcal{N}(0,1)$. Predictor and response
     noise entries are independent Gaussian draws with the requested standard
     deviations. No score centering, score standardization, loading
     orthonormalization, latent-strength scaling, or observed-variable scaling is
@@ -405,15 +429,15 @@ def make_pipls_latent_geometry(
     n_samples : int
         Number of observations; at least one.
     n_features : int
-        Number of predictor variables :math:`p`.
+        Number of predictor variables $p$.
     n_targets : int
-        Number of response variables :math:`q`.
+        Number of response variables $q$.
     n_shared : int
-        Shared latent dimension :math:`d_s`.
+        Shared latent dimension $d_{\mathrm{s}}$.
     n_predictor_specific : int, default=0
-        Predictor-specific latent dimension :math:`d_p`.
+        Predictor-specific latent dimension $d_{\mathrm{p}}$.
     n_response_specific : int, default=0
-        Response-specific latent dimension :math:`d_r`.
+        Response-specific latent dimension $d_{\mathrm{r}}$.
     noise : float or tuple of float, default=0.0
         Common noise standard deviation, or separate
         ``(sigma_x, sigma_y)`` values.

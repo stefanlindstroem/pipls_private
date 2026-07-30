@@ -188,20 +188,21 @@ neither read files nor generate scientific-looking fallback names.
 For a fitted standardized map,
 
 \begin{equation}
-B_{\mathrm{cs}} = P D Q^\mathsf{T}.
+\mathbf{B}_{\mathrm{cs}} = \mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}.
 \end{equation}
 
 The primary decomposition report displays:
 
-- predictor directions $P$;
+- predictor directions $\mathbf{P}$;
 - dilation values $d_k=D_{kk}$;
-- weighted response directions $d_kQ_{jk}$, exposed or plotted as $QD$.
+- weighted response directions $d_kQ_{jk}$, exposed or plotted as $\mathbf{Q}\mathbf{D}$.
 
 Use **predictor direction** and **response direction** as the canonical mathematical terms. Existing
-public field names containing `rotations` remain unchanged. Do not call $P$ an X loading or $Q$ a Y
-loading: `PiPLSRegression.x_loadings_` and `y_loadings_` are separate score-reconstruction
-quantities. The response-by-mode display $QD$ is the transpose of the manuscript's mode-by-response
-form $DQ^{\mathsf T}$.
+public field names containing `rotations` remain unchanged. Do not call $\mathbf{P}$ an X loading or
+$\mathbf{Q}$ a Y loading: `PiPLSRegression.x_loadings_` and `y_loadings_` are separate
+score-reconstruction quantities. The response-by-mode display $\mathbf{Q}\mathbf{D}$ is the
+transpose of the
+manuscript's mode-by-response form $\mathbf{D}\mathbf{Q}^{\mathsf T}$.
 
 ### Display signs
 
@@ -210,7 +211,10 @@ $P_{:k}$. Choose a sign that makes that entry nonnegative, and apply the same si
 This must preserve
 
 \begin{equation}
-P_{\mathrm{display}}D Q_{\mathrm{display}}^\mathsf{T}=PDQ^\mathsf{T}.
+\mathbf{P}_{\mathrm{display}}\mathbf{D}
+\mathbf{Q}_{\mathrm{display}}^{\mathsf T}
+=
+\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}.
 \end{equation}
 
 Ties must be resolved deterministically by the first array position. Zero columns remain unchanged.
@@ -306,11 +310,15 @@ predictor axis. Selected coefficient responses likewise share one axis. Do not c
 hidden heuristics. Do not draw thousands of biplot arrows for spectral data.
 
 For a supplied observation with X score $t_i$, let $\bar t_{\mathrm{train}}$ and
-$S_{T,\mathrm{train}}$ be the center and sample covariance of the fitted training scores. The raw
-score distance is
+$\mathbf{S}_{\mathrm{T},\mathrm{train}}$ be the center and sample covariance of the fitted
+training scores. The raw score distance is
 
 \begin{equation}
-h_i=(t_i-\bar t_{\mathrm{train}})^\mathsf{T}S_{T,\mathrm{train}}^{+}(t_i-\bar t_{\mathrm{train}}).
+h_i
+=
+(t_i-\bar t_{\mathrm{train}})^{\mathsf T}
+\mathbf{S}_{\mathrm{T},\mathrm{train}}^{+}
+(t_i-\bar t_{\mathrm{train}}).
 \end{equation}
 
 Here $+$ denotes the Moore--Penrose inverse. The X reconstruction residual is
@@ -332,8 +340,10 @@ norm and reject an unrepresentable squared residual.
 For selected $t_k$ and $p_k$, the biplot uses
 $a_k=\sqrt{\lVert p_k\rVert_2/\lVert t_k\rVert_2}$,
 $\tilde t_k=a_kt_k$, and $\tilde p_k=p_k/a_k$. Tests must preserve
-$\tilde T\tilde P^\mathsf{T}=T_{\mathcal K}P_{\mathcal K}^\mathsf{T}$ and equal component-wise
-score/loading norms. Compute norms by max scaling and form $a_k$ as a quotient of square roots so
+$\widetilde{\mathbf{T}}\widetilde{\mathbf{P}}^{\mathsf T}
+=\mathbf{T}_{\mathcal K}\mathbf{P}_{\mathcal K}^{\mathsf T}$ and equal component-wise
+score/loading norms. Compute norms by max scaling and form $a_k$ as a quotient of square roots
+so
 finite extreme columns do not overflow before balancing. The biplot is enabled only for Pulp.
 
 VIP, automatic variable selection, confidence ellipses, uncertainty intervals, permutation tests,

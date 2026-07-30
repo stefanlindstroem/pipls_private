@@ -96,13 +96,13 @@ rank” is reserved for synthetic settings where the noiseless generating rank i
 Take a singular value decomposition
 
 \begin{equation}
-\mathbf{X}=\mathbf{U}_X\mathbf{S}_X\mathbf{V}_X^{\mathsf T}
+\mathbf{X}=\mathbf{U}_{\mathrm{X}}\mathbf{S}_{\mathrm{X}}\mathbf{V}_{\mathrm{X}}^{\mathsf T}
 \end{equation}
 
 and retain the leading $r_\pi$ right singular vectors:
 
 \begin{equation}
-\mathbf{\Pi}=\mathbf{V}_{X(:,1:r_\pi)}\in\mathbb{R}^{p\times r_\pi},
+\mathbf{\Pi}=\mathbf{V}_{\mathrm{X}}(:,1:r_\pi)\in\mathbb{R}^{p\times r_\pi},
 \qquad
 \mathbf{\Pi}^{\mathsf T}\mathbf{\Pi}=\mathbf{I}_{r_\pi}.
 \end{equation}
@@ -138,7 +138,7 @@ be recovered later by increasing $h$.
 Within the retained predictor representation, form
 
 \begin{equation}
-\mathbf{\Sigma}_{ZY}=\mathbf{Z}^{\mathsf T}\mathbf{Y}\in\mathbb{R}^{r_\pi\times q}.
+\boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{Z}^{\mathsf T}\mathbf{Y}\in\mathbb{R}^{r_\pi\times q}.
 \end{equation}
 
 For a prescribed $h$, Pi-PLS selects an orthonormal response basis
@@ -146,21 +146,26 @@ $\mathbf{C}\in\mathbb{R}^{q\times h}$ by solving
 
 \begin{equation}
 \max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
-\left\|\mathbf{\Sigma}_{ZY}\mathbf{C}\right\|_F^2.
+\left\|\boldsymbol{\Sigma}_{\mathrm{ZY}}\mathbf{C}\right\|_{\mathrm{F}}^2.
 \end{equation}
 
 Because
 
 \begin{equation}
-\left\|\mathbf{\Sigma}_{ZY}\mathbf{C}\right\|_F^2
+\left\|\boldsymbol{\Sigma}_{\mathrm{ZY}}\mathbf{C}\right\|_{\mathrm{F}}^2
 =
-\operatorname{tr}\!\left(\mathbf{C}^{\mathsf T}\mathbf{\Sigma}_{ZY}^{\mathsf T}\mathbf{\Sigma}_{ZY}\mathbf{C}\right),
+\operatorname{tr}\!\left(
+\mathbf{C}^{\mathsf T}
+\boldsymbol{\Sigma}_{\mathrm{ZY}}^{\mathsf T}
+\boldsymbol{\Sigma}_{\mathrm{ZY}}
+\mathbf{C}
+\right),
 \end{equation}
 
 this is an orthonormal trace-maximization problem. If
 
 \begin{equation}
-\mathbf{\Sigma}_{ZY}=\mathbf{U}\mathbf{S}\mathbf{V}^{\mathsf T},
+\boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}\mathbf{S}\mathbf{V}^{\mathsf T},
 \end{equation}
 
 then the leading $h$ right singular vectors span an optimum:

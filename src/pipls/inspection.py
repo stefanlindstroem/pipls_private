@@ -567,14 +567,20 @@ def biplot_coordinates(
 
     For selected score and X-loading columns $t_k$ and $p_k$, define
 
-    .. math::
+    \begin{equation}
+    a_k
+    =
+    \sqrt{\frac{\lVert p_k \rVert_2}{\lVert t_k \rVert_2}},
+    \qquad
+    \widetilde t_k=a_kt_k,
+    \qquad
+    \widetilde p_k=\frac{p_k}{a_k}.
+    \end{equation}
 
-       a_k = \sqrt{\frac{\lVert p_k \rVert_2}{\lVert t_k \rVert_2}},
-       \qquad \tilde t_k = a_k t_k,
-       \qquad \tilde p_k = p_k / a_k.
-
-    The balanced coordinates preserve ``T_K @ P_K.T`` and have equal score and
-    loading norm within each selected component.
+    The balanced coordinates preserve
+    $\widetilde{\mathbf{T}}\widetilde{\mathbf{P}}^{\mathsf T}
+    =\mathbf{T}_{\mathcal K}\mathbf{P}_{\mathcal K}^{\mathsf T}$ and
+    have equal score and loading norm within each selected component.
 
     Parameters
     ----------

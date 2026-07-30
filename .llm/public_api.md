@@ -116,7 +116,7 @@ sequences request a subset; `None` is not a component-path alias. It also defaul
 surface satisfies
 
 \[
-1 \le h \le \min(q,r_{\pi,\max}), \qquad h \le r_\pi \le r_{\pi,\max}.
+1 \le h \le \min(q,r_{\pi,\mathrm{max}}), \qquad h \le r_\pi \le r_{\pi,\mathrm{max}}.
 \]
 
 The default ceiling uses total supplied $n$ for the support term with
@@ -247,7 +247,8 @@ may be carried by `PiPLSDataset.truth`.
 
 The served companion-manuscript synthetic-data guide must distinguish reproducing the exact
 data-generating distribution, reproducing one seeded realization, and reproducing complete
-publication results. It may document the known oracle dimensions $r_\pi=d_p+d_s$ and $h=d_s$ for
+publication results. It may document the known oracle dimensions
+$r_\pi=d_{\mathrm{p}}+d_{\mathrm{s}}$ and $h=d_{\mathrm{s}}$ for
 the synthetic experiments, but it must not redefine package search defaults or practical real-data
 selection. Complete grids, comparator pipelines, and paper figure/table orchestration remain
 downstream publication assets.

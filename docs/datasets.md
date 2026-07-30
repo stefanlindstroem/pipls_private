@@ -79,14 +79,27 @@ rejected rather than silently producing a lower-rank realization.
 
 The generative model is
 
-\[
-X = T_s A_s^\mathsf{T} + T_x A_x^\mathsf{T} + E_x,
+\begin{equation}
+\mathbf{X}
+=
+\mathbf{T}_{\mathrm{s}}\mathbf{A}_{\mathrm{s}}^{\mathsf T}
++
+\mathbf{T}_{\mathrm{x}}\mathbf{A}_{\mathrm{x}}^{\mathsf T}
++
+\mathbf{E}_{\mathrm{X}},
 \qquad
-Y = T_s B_s^\mathsf{T} + T_y B_y^\mathsf{T} + E_y,
-\]
+\mathbf{Y}
+=
+\mathbf{T}_{\mathrm{s}}\mathbf{B}_{\mathrm{s}}^{\mathsf T}
++
+\mathbf{T}_{\mathrm{y}}\mathbf{B}_{\mathrm{y}}^{\mathsf T}
++
+\mathbf{E}_{\mathrm{Y}}.
+\end{equation}
 
-where `T_s` is shared, `T_x` is predictor-specific, and `T_y` is response-specific. The loading
-columns are orthonormal within each observed block. Latent score columns are centered and scaled
+Here $\mathbf{T}_{\mathrm{s}}$ is shared, $\mathbf{T}_{\mathrm{x}}$ is predictor-specific, and
+$\mathbf{T}_{\mathrm{y}}$ is response-specific. The loading columns are orthonormal within
+each observed block. Latent score columns are centered and scaled
 to unit sample standard deviation after being drawn from the selected normal or uniform source
 distribution.
 
@@ -117,17 +130,30 @@ synthetic = make_pipls_latent_geometry(
 
 The generator implements
 
-\[
-X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
+\begin{equation}
+\mathbf{X}
+=
+\boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
++
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
++
+\boldsymbol{\varepsilon}_{\mathrm{X}},
 \qquad
-Y = \Lambda_s L_{sr} + \Lambda_r L_r + \varepsilon_Y.
-\]
+\mathbf{Y}
+=
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
++
+\boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
++
+\boldsymbol{\varepsilon}_{\mathrm{Y}}.
+\end{equation}
 
 Every latent-score entry and loading entry is an independent standard-normal draw. Noise entries
 are independent Gaussian draws with standard deviations `noise[0]` and `noise[1]`. The function
 applies no centering, score standardization, loading orthonormalization, latent-strength scaling, or
-observed-variable scaling. This is the synthetic model described in the [companion manuscript](citation.md); it
-is separate from the more configurable package generator above.
+observed-variable scaling. This is the synthetic model described in the
+[companion manuscript](citation.md); it is separate from the more configurable package
+generator above.
 
 `synthetic.truth` is a read-only `PiPLSLatentGeometryTruth`. Its loading matrices retain the
 manuscript orientation, with latent dimensions on rows and observed variables on columns. The

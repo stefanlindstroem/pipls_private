@@ -3,7 +3,8 @@
 - Use thin SVDs and avoid forming a $p\times p$ covariance matrix when $p\gg n$.
 - Use `numpy.linalg.eigh` only for symmetric matrices, after explicit symmetrization.
 - Do not form explicit inverses. Use solves, least squares, SVDs, or documented pseudoinverses.
-- The fixed core uses $\tau_X=\max(n,p)\,\epsilon_{64}\,s_1$ for predictor numerical rank; requested predictor rank above that numerical rank raises `ValueError`.
+- The fixed core uses $\tau_{\mathrm{X}}=\max(n,p)\,\epsilon_{64}\,s_1$ for predictor
+  numerical rank; requested predictor rank above that numerical rank raises `ValueError`.
 - The search meta-estimator verifies predictor rank separately in every transformed training fold before
   candidate evaluation. With `r_num_min` denoting the minimum verified fold rank, the shared
   rule-derived upper predictor rank is

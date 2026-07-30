@@ -49,19 +49,22 @@ response_shared_capture
 `test_mse` is the arithmetic mean of squared test residuals over all samples and responses in the
 original generated response units.
 
-For a true basis $A$ and estimated basis $B$, let $Q_A$ and $Q_B$ be orthonormal bases for their
-column spaces. Every capture metric is
+For a true basis $\mathbf{A}$ and estimated basis $\mathbf{B}$, let $\mathbf{Q}_A$ and
+$\mathbf{Q}_B$ be orthonormal bases for their column spaces. Every capture metric is
 
 \begin{equation}
-\mathrm{capture}(A, B) = \frac{\lVert Q_A^{\mathsf{T}} Q_B \rVert_{\mathrm{F}}^2}{\dim[\mathrm{col}(A)]}.
+\operatorname{capture}(\mathbf{A},\mathbf{B})
+=
+\frac{\left\lVert\mathbf{Q}_A^{\mathsf T}\mathbf{Q}_B\right\rVert_{\mathrm{F}}^2}
+{\dim\!\left[\operatorname{col}(\mathbf{A})\right]}.
 \end{equation}
 
 It is the mean squared canonical correlation and lies in $[0, 1]$. The three applications are:
 
-- `predictor_shared_capture`: true predictor-shared loadings against fitted $P$;
+- `predictor_shared_capture`: true predictor-shared loadings against fitted $\mathbf{P}$;
 - `predictor_signal_capture`: concatenated true shared and predictor-specific loadings against
-  fitted $\Pi$;
-- `response_shared_capture`: true response-shared loadings against fitted $Q$.
+  fitted $\boldsymbol{\Pi}$;
+- `response_shared_capture`: true response-shared loadings against fitted $\mathbf{Q}$.
 
 The generator loadings precede observed-variable scaling, whereas the fitted bases use model
 standardization. Before comparison, predictor truth loadings are multiplied row-wise by
