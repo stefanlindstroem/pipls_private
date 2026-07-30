@@ -98,6 +98,22 @@ def test_pulp_tutorial_renderer_writes_declared_parseable_svgs(
         ET.parse(figure_path)
         assert item["sha256"] == _sha256(figure_path)
 
+    expected_labels = {
+        "predictor_directions.svg": r"Predictor direction $P_{:k}$",
+        "weighted_response_directions.svg": (
+            r"Weighted response direction $d_kQ_{:k}$"
+        ),
+    }
+    for filename, label in expected_labels.items():
+        svg = (generated_pulp_assets / filename).read_text(encoding="utf-8")
+        assert label in svg, (filename, label)
+        assert "Weighted direction $" not in svg, filename
+        assert r"\mathbf{P}_{:" not in svg, filename
+        assert r"\mathbf{Q}_{:" not in svg, filename
+        assert r"\mathbf{D}_{" not in svg, filename
+        assert "$q_{:" not in svg, filename
+        assert "$d_kq_{:" not in svg, filename
+
 
 def test_pulp_tutorial_manifest_records_dataset_hashes(
     generated_pulp_assets: Path,
@@ -135,6 +151,34 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert 'source / "examples" / "05_pulp_real_data.py"' in sdist_checker
     assert 'source / "site" / "tutorials" / "pulp" / "index.html"' in sdist_checker
     assert "PULP_TUTORIAL_FIGURES" in sdist_checker
+
+
+def test_pulp_tutorial_factor_prose_uses_complete_matrix_notation() -> None:
+    tutorial = (
+        _repository_root() / "docs" / "tutorials" / "pulp.md"
+    ).read_text(encoding="utf-8")
+
+    for notation in (
+        r"$\mathbf{P}$",
+        r"$\mathbf{D}$",
+        r"$\mathbf{Q}$",
+        r"$\mathbf{Q}\mathbf{D}$",
+        r"$\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$",
+        r"$d_kQ_{:k}$",
+    ):
+        assert notation in tutorial
+
+    for old_notation in (
+        "$P$, $D$, $Q$, and $QD$",
+        "columns of $P$ and $Q$",
+        "#### Predictor directions $P$",
+        r"$PDQ^{\mathsf T}$",
+        "#### Weighted response directions $QD$",
+        "column $k$ of $QD$",
+        "rather than $Q$ alone",
+        "separate $D$ and $Q$ plots",
+    ):
+        assert old_notation not in tutorial
 
 
 def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:

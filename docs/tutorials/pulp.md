@@ -178,16 +178,16 @@ The fitted estimator and OOF predictions are converted to numerical result objec
 | Result | Question answered |
 |---|---|
 | `LatentStructure` | How are samples and variables represented by the fitted PLS-family model? |
-| `PiPLSDisplayFactors` | What are the Pi-PLS-specific $P$, $D$, $Q$, and $QD$ factors? |
+| `PiPLSDisplayFactors` | What are the Pi-PLS-specific $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors? |
 | `PredictionDiagnostics` | How do the selection-conditioned OOF predictions and residuals behave? |
 
 The Pulp workflow uses `response_names.index("TI")` as the response sign anchor and requests a
 positive orientation. The resulting TI entry is nonnegative for every displayed component, and the
-same component sign is applied to the paired columns of $P$ and $Q$. This convention is useful here
-because tensile index is the principal controlled target. It only chooses how an equivalent
-factorization is displayed; it does not change predictions or assert that every physical effect on
-TI is positive. If an anchored entry were exactly zero, the helper would use its default
-predictor-based sign for that component.
+same component sign is applied to the paired columns of $\mathbf{P}$ and $\mathbf{Q}$. This
+convention is useful here because tensile index is the principal controlled target. It only chooses
+how an equivalent factorization is displayed; it does not change predictions or assert that every
+physical effect on TI is positive. If an anchored entry were exactly zero, the helper would use
+its default predictor-based sign for that component.
 
 At this point the programming workflow is complete. The remaining figures are optional
 interpretation views; the full catalogue is in [Model inspection](../model_inspection.md).
@@ -222,7 +222,7 @@ See [Score-loading biplot](../model_inspection.md#score-loading-biplot) and
 
 ### Pi-PLS-specific factorization
 
-#### Predictor directions $P$
+#### Predictor directions $\mathbf{P}$
 
 The grouped bars are constructed directly from `factors.predictor_directions`:
 
@@ -237,13 +237,14 @@ fibrillation or length descriptors, the second emphasizes length descriptors, an
 strongly associated with `Fines B`. Only relative within-component patterns should be interpreted;
 the displayed orientation is fixed by the TI entries in the paired response directions.
 
-The columns of $P$ are orthonormal predictor directions paired with orthonormal response directions
-in $PDQ^{\mathsf T}$. They are distinct from ordinary X loadings. The figure shows all three
-selected paired latent modes; predictor rank 10 does not create ten plotted modes. See
+The columns of $\mathbf{P}$ are orthonormal predictor directions paired with orthonormal response
+directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. They are distinct from ordinary X
+loadings. The figure shows all three selected paired latent modes; predictor rank 10 does not create
+ten plotted modes. See
 [Predictor directions](../model_inspection.md#predictor-directions) and
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
 
-#### Weighted response directions $QD$
+#### Weighted response directions $\mathbf{Q}\mathbf{D}$
 
 The grouped bars are constructed directly from `factors.weighted_response_directions`:
 
@@ -255,11 +256,12 @@ The grouped bars are constructed directly from `factors.weighted_response_direct
 
 The first component has its largest absolute entries for `TI`, `TEA`, `Tear index`, and `TSI`.
 The second component is most pronounced for `Tear index` and `s`, while the third contrasts `CSF`
-with `Elongation`. Because column $k$ of $QD$ is $d_kQ_{:k}$, it combines each response direction
-with the dilation of its paired latent mode and shows orientation and strength rather than $Q$ alone.
+with `Elongation`. Because column $k$ of $\mathbf{Q}\mathbf{D}$ is $d_kQ_{:k}$, it combines each
+response direction with the dilation of its paired latent mode and shows orientation and strength
+rather than $\mathbf{Q}$ alone.
 
-The complete example includes separate $D$ and $Q$ plots in the same four-panel Pi-PLS
-factorization figure. See [Dilation](../model_inspection.md#dilation),
+The complete example includes separate $\mathbf{D}$ and $\mathbf{Q}$ plots in the same
+four-panel Pi-PLS factorization figure. See [Dilation](../model_inspection.md#dilation),
 [Response directions](../model_inspection.md#response-directions), and
 [Weighted response directions](../model_inspection.md#weighted-response-directions).
 
