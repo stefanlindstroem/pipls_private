@@ -341,16 +341,11 @@ class PiPLSDataset:
 
 
 @dataclass(frozen=True)
-class _SyntheticModel:
+class _SyntheticLoadings:
     x_shared_loadings: FloatArray
     x_predictor_specific_loadings: FloatArray
     y_shared_loadings: FloatArray
     y_response_specific_loadings: FloatArray
-    feature_scale: FloatArray
-    target_scale: FloatArray
-    shared_strengths: FloatArray
-    predictor_specific_strengths: FloatArray
-    response_specific_strengths: FloatArray
 
 
 @dataclass(frozen=True)
@@ -611,11 +606,11 @@ def make_pipls_regression(
     )
     _validate_sample_capacity(n_samples, config, name="n_samples")
     rng = np.random.default_rng(config.random_state)
-    model = _draw_synthetic_model(rng, config)
+    loadings = _draw_synthetic_loadings(rng, config)
     return _draw_dataset_block(
         rng,
         config,
-        model,
+        loadings,
         n_samples=n_samples,
         sample_prefix="sample",
         split_role="full",
@@ -712,11 +707,11 @@ def make_pipls_train_test(
     _validate_sample_capacity(n_train, config, name="n_train")
     _validate_sample_capacity(n_test, config, name="n_test")
     rng = np.random.default_rng(config.random_state)
-    model = _draw_synthetic_model(rng, config)
+    loadings = _draw_synthetic_loadings(rng, config)
     train = _draw_dataset_block(
         rng,
         config,
-        model,
+        loadings,
         n_samples=n_train,
         sample_prefix="train",
         split_role="train",
@@ -725,7 +720,7 @@ def make_pipls_train_test(
     test = _draw_dataset_block(
         rng,
         config,
-        model,
+        loadings,
         n_samples=n_test,
         sample_prefix="test",
         split_role="test",
@@ -834,10 +829,10 @@ def _validate_sample_capacity(
         )
 
 
-def _draw_synthetic_model(
+def _draw_synthetic_loadings(
     rng: np.random.Generator,
     config: _SyntheticConfig,
-) -> _SyntheticModel:
+) -> _SyntheticLoadings:
     x_basis = _orthonormal_columns(
         rng,
         n_rows=config.n_features,
@@ -848,23 +843,18 @@ def _draw_synthetic_model(
         n_rows=config.n_targets,
         n_columns=config.n_shared + config.n_response_specific,
     )
-    return _SyntheticModel(
+    return _SyntheticLoadings(
         x_shared_loadings=x_basis[:, : config.n_shared],
         x_predictor_specific_loadings=x_basis[:, config.n_shared :],
         y_shared_loadings=y_basis[:, : config.n_shared],
         y_response_specific_loadings=y_basis[:, config.n_shared :],
-        feature_scale=config.feature_scale,
-        target_scale=config.target_scale,
-        shared_strengths=config.shared_strengths,
-        predictor_specific_strengths=config.predictor_specific_strengths,
-        response_specific_strengths=config.response_specific_strengths,
     )
 
 
 def _draw_dataset_block(
     rng: np.random.Generator,
     config: _SyntheticConfig,
-    model: _SyntheticModel,
+    loadings: _SyntheticLoadings,
     *,
     n_samples: int,
     sample_prefix: str,
@@ -892,29 +882,29 @@ def _draw_dataset_block(
 
     x_signal_unscaled = _signal_block(
         shared_scores,
-        model.shared_strengths,
-        model.x_shared_loadings,
+        config.shared_strengths,
+        loadings.x_shared_loadings,
     ) + _signal_block(
         predictor_specific_scores,
-        model.predictor_specific_strengths,
-        model.x_predictor_specific_loadings,
+        config.predictor_specific_strengths,
+        loadings.x_predictor_specific_loadings,
     )
     y_signal_unscaled = _signal_block(
         shared_scores,
-        model.shared_strengths,
-        model.y_shared_loadings,
+        config.shared_strengths,
+        loadings.y_shared_loadings,
     ) + _signal_block(
         response_specific_scores,
-        model.response_specific_strengths,
-        model.y_response_specific_loadings,
+        config.response_specific_strengths,
+        loadings.y_response_specific_loadings,
     )
 
     x_noise = rng.normal(scale=config.x_noise, size=(n_samples, config.n_features))
     y_noise = rng.normal(scale=config.y_noise, size=(n_samples, config.n_targets))
-    x_signal = x_signal_unscaled * model.feature_scale
-    y_signal = y_signal_unscaled * model.target_scale
-    x_noise = x_noise * model.feature_scale
-    y_noise = y_noise * model.target_scale
+    x_signal = x_signal_unscaled * config.feature_scale
+    y_signal = y_signal_unscaled * config.target_scale
+    x_noise = x_noise * config.feature_scale
+    y_noise = y_noise * config.target_scale
     X = x_signal + x_noise
     Y = y_signal + y_noise
 
@@ -922,19 +912,19 @@ def _draw_dataset_block(
         shared_scores=shared_scores,
         predictor_specific_scores=predictor_specific_scores,
         response_specific_scores=response_specific_scores,
-        x_shared_loadings=model.x_shared_loadings,
-        x_predictor_specific_loadings=model.x_predictor_specific_loadings,
-        y_shared_loadings=model.y_shared_loadings,
-        y_response_specific_loadings=model.y_response_specific_loadings,
+        x_shared_loadings=loadings.x_shared_loadings,
+        x_predictor_specific_loadings=loadings.x_predictor_specific_loadings,
+        y_shared_loadings=loadings.y_shared_loadings,
+        y_response_specific_loadings=loadings.y_response_specific_loadings,
         x_signal=x_signal,
         y_signal=y_signal,
         x_noise=x_noise,
         y_noise=y_noise,
-        feature_scale=model.feature_scale,
-        target_scale=model.target_scale,
-        shared_strengths=model.shared_strengths,
-        predictor_specific_strengths=model.predictor_specific_strengths,
-        response_specific_strengths=model.response_specific_strengths,
+        feature_scale=config.feature_scale,
+        target_scale=config.target_scale,
+        shared_strengths=config.shared_strengths,
+        predictor_specific_strengths=config.predictor_specific_strengths,
+        response_specific_strengths=config.response_specific_strengths,
     )
     metadata: Mapping[str, object] = {
         "schema_version": 1,
@@ -976,8 +966,6 @@ def _signal_block(
     strengths: FloatArray,
     loadings: FloatArray,
 ) -> FloatArray:
-    if strengths.size == 0:
-        return np.zeros((scores.shape[0], loadings.shape[0]), dtype=np.float64)
     return np.asarray((scores * strengths) @ loadings.T, dtype=np.float64)
 
 
