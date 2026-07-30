@@ -21,12 +21,12 @@ The default upper predictor rank is
 \begin{equation}
 r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
 r_{\mathrm{num,min}},
-\left\lceil\frac{n}{\texttt{samples_per_predictor_rank}}\right\rceil\right].
+\left\lceil\frac{n}{c}\right\rceil\right].
 \end{equation}
 
 Here $n$ is the total number of observations supplied to `fit()`, $p_{\min}$ is the minimum
-predictor count after fold-local pipeline preprocessing, and $r_{\mathrm{num,min}}$ is the minimum
-verified predictor rank after terminal-estimator centering and optional scaling. The search object fits
+predictor count after fold-local pipeline preprocessing, $r_{\mathrm{num,min}}$ is the minimum
+verified predictor rank after terminal-estimator centering and optional scaling, and $c$ is `samples_per_predictor_rank`. The search object fits
 pipeline preprocessing separately inside each fold before this rank preflight. An integer
 `max_predictor_rank` bypasses the statistical support rule but remains capped by fold dimensions and
 numerical rank.
