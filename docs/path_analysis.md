@@ -90,6 +90,8 @@ complexity choice.
 
 The supported estimator is either a direct `PiPLSRegression` or a scikit-learn `Pipeline` whose
 final step is `PiPLSRegression`. The complete estimator is cloned and fitted inside every fold.
+For the direct-template pattern and inherited settings, see
+[Configure the candidate estimator](api/path.md#configure-the-candidate-estimator).
 
 ```python
 from sklearn.impute import SimpleImputer

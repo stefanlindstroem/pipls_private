@@ -18,6 +18,28 @@ selected = search.component_path_.for_n_components(2)
 Continue with the [synthetic tutorial](tutorials/synthetic.md) or the
 [path-selection reference](api/path.md).
 
+## I need to change scaling or the SVD solver during search
+
+`PiPLSSearchCV` has no separate `scale` or `svd_solver` parameter. Configure these settings on the
+`PiPLSRegression` template supplied to the search:
+
+```python
+from pipls import PiPLSRegression, PiPLSSearchCV
+
+template = PiPLSRegression(
+    n_components=1,
+    predictor_rank=1,
+    scale=True,
+    svd_solver="full",
+    random_state=0,
+)
+search = PiPLSSearchCV(estimator=template).fit(X, Y)
+```
+
+The search replaces only `n_components` and `predictor_rank`; it retains the other template
+settings while cloning candidates. With `estimator=None`, the ordinary `PiPLSRegression` defaults
+are used. See [Configure the candidate estimator](api/path.md#configure-the-candidate-estimator).
+
 ## A component count or predictor rank was not evaluated
 
 Inspect the values that were actually evaluated before requesting a result:

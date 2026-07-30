@@ -215,6 +215,60 @@ def test_reference_navigation_is_consolidated_around_owning_pages() -> None:
     assert "../model_inspection.md" in inspection_api
 
 
+def test_path_api_explains_workflows_and_candidate_configuration() -> None:
+    root = _repository_root()
+    page = (root / "docs" / "api" / "path.md").read_text(encoding="utf-8")
+    details = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
+    troubleshooting = (root / "docs" / "troubleshooting.md").read_text(
+        encoding="utf-8"
+    )
+    search_doc = inspect.getdoc(PiPLSSearchCV) or ""
+
+    workflow = page.split("## Choose the workflow", maxsplit=1)[1].split(
+        "## Inspect the path and fit one fixed model", maxsplit=1
+    )[0]
+    assert "PiPLSRegression" in workflow
+    assert "PiPLSSearchCV()" in workflow
+    assert "selection_rule" in workflow
+    assert "refit=True" in workflow
+
+    fixed_fit = page.split(
+        "## Inspect the path and fit one fixed model", maxsplit=1
+    )[1].split("## Configure the candidate estimator", maxsplit=1)[0]
+    for required in (
+        "search = PiPLSSearchCV().fit(X, Y)",
+        "path = search.component_path_",
+        "path.for_n_components(CHOSEN_N_COMPONENTS)",
+        "n_components=selected.n_components",
+        "predictor_rank=selected.predictor_rank",
+    ):
+        assert required in fixed_fit
+
+    configuration = page.split(
+        "## Configure the candidate estimator", maxsplit=1
+    )[1].split("::: pipls.PiPLSSearchCV", maxsplit=1)[0]
+    for required in (
+        "template = PiPLSRegression(",
+        'svd_solver="full"',
+        "random_state=0",
+        "clone(template).set_params(",
+        "estimator=None",
+        "search.selected_pipls_.decomposition_.predictor_svd_solver",
+        "refit=True",
+    ):
+        assert required in configuration
+
+    canonical_link = "api/path.md#configure-the-candidate-estimator"
+    assert canonical_link in details
+    assert "## I need to change scaling or the SVD solver during search" in troubleshooting
+    assert canonical_link in troubleshooting
+    assert "PiPLSSearchCV` has no separate `scale` or `svd_solver` parameter" in troubleshooting
+
+    for setting in ("scale", "copy", "svd_solver", "random_state"):
+        assert f"``{setting}``" in search_doc
+    assert "replace only ``n_components`` and ``predictor_rank``" in search_doc
+
+
 def test_path_reference_defines_resolved_ceilings_before_rank_policies() -> None:
     page = (_repository_root() / "docs" / "path_analysis.md").read_text(
         encoding="utf-8"

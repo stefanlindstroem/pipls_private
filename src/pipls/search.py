@@ -113,9 +113,12 @@ class PiPLSSearchCV(
     ----------
     estimator : PiPLSRegression, sklearn.pipeline.Pipeline or None, default=None
         Direct Pi-PLS estimator or pipeline whose final step is
-        :class:`pipls.PiPLSRegression`. ``None`` creates a direct template with
-        the valid construction seed pair ``(n_components=1, predictor_rank=1)``.
-        Path preflight and candidate evaluation replace both values before fitting.
+        :class:`pipls.PiPLSRegression`. Path preflight and candidate evaluation
+        replace only ``n_components`` and ``predictor_rank``; settings such as
+        ``scale``, ``copy``, ``svd_solver``, and ``random_state`` are retained
+        from the cloned template. ``None`` creates a direct template with the
+        valid construction seed pair ``(n_components=1, predictor_rank=1)`` and
+        the ordinary :class:`pipls.PiPLSRegression` defaults for other settings.
     n_components_values : sequence of int or "all", default="all"
         Positive paired latent-mode counts to evaluate. ``"all"`` uses every value
         from
