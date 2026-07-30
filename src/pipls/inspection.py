@@ -312,7 +312,8 @@ class PiPLSDisplayFactors:
 
     The predictor and response direction columns use one chosen deterministic
     display sign per paired latent mode. Applying the same sign to both sides
-    preserves the centered/scaled regression map $PDQ^{\mathsf T}$. Direct
+    preserves the centered/scaled regression map
+    $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. Direct
     construction validates
     the independent factor arrays and stores defensive read-only copies. Weighted
     response directions are derived from the validated response directions and dilation.
@@ -320,13 +321,14 @@ class PiPLSDisplayFactors:
     Attributes
     ----------
     predictor_directions : ndarray of shape (n_features, n_components)
-        Display-signed copy of $P$.
+        Display-signed copy of $\mathbf{P}$.
     dilation : ndarray of shape (n_components,)
-        Diagonal values of $D$.
+        Diagonal values of $\mathbf{D}$.
     response_directions : ndarray of shape (n_targets, n_components)
-        Display-signed copy of $Q$.
+        Display-signed copy of $\mathbf{Q}$.
     weighted_response_directions : ndarray of shape (n_targets, n_components)
-        Derived read-only columns $d_k Q_{:k}$, equal to
+        Derived read-only columns $d_k Q_{:k}$, equal to the corresponding
+        columns of $\mathbf{Q}\mathbf{D}$ and to
         ``response_directions * dilation``.
     """
 
@@ -385,7 +387,7 @@ class PiPLSDisplayFactors:
 
     @property
     def weighted_response_directions(self) -> FloatArray:
-        """Derived read-only columns $d_k Q_{:k}$ of $QD$."""
+        r"""Derived read-only columns $d_k Q_{:k}$ of $\mathbf{Q}\mathbf{D}$."""
 
         weighted = _finite_product(
             self.response_directions,
@@ -808,7 +810,7 @@ def pipls_display_factors(
     requested nonnegative or nonpositive sign. An exactly zero selected entry
     uses the default predictor-based sign for that component. The same sign is
     applied to the paired predictor and response directions, preserving
-    $PDQ^{\mathsf T}$.
+    $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$.
 
     Parameters
     ----------

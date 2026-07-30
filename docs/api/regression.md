@@ -17,8 +17,8 @@ model = PiPLSRegression(
 Y_pred = model.predict(X_test)
 ```
 
-Equations use $Y$ for the response matrix, while Python signatures use scikit-learn's conventional
-`y` name even for multivariate responses. The
+Equations use $\mathbf{Y}$ for the response matrix, while Python signatures use scikit-learn's
+conventional `y` name even for multivariate responses. The
 [API overview](index.md#mathematical-notation-and-python-names) records this notation boundary.
 
 For the normal path-selection workflow, begin with the
@@ -82,14 +82,14 @@ mathematical values are the orthonormal predictor and response directions define
 
 | Field | Method notation | Meaning |
 |---|---|---|
-| `predictor_rotations` | $P$ | orthonormal predictor directions |
+| `predictor_rotations` | $\mathbf{P}$ | orthonormal predictor directions |
 | `dilation` | $d_k=D_{kk}$ | nonnegative dilation of each paired latent mode |
-| `response_rotations` | $Q$ | orthonormal response directions |
+| `response_rotations` | $\mathbf{Q}$ | orthonormal response directions |
 | `predictor_numerical_rank` | — | complete numerical rank under full SVD, or a verified lower bound under randomized SVD |
 | `predictor_numerical_rank_is_exact` | — | whether the reported numerical rank is complete |
 | `rank_tolerance` | — | tolerance used to classify retained predictor singular values |
 | `predictor_svd_solver` | — | predictor SVD implementation actually used |
-| `standardized_regression_map` | $PDQ^{\mathsf T}$ | regression map in centered/scaled coordinates |
+| `standardized_regression_map` | $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$ | regression map in centered/scaled coordinates |
 
 The rank fields distinguish the algebraic fixed-fit ceiling `max_predictor_rank_` from the
 numerical rank verified by the fitted decomposition. With randomized predictor SVD, the reported

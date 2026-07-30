@@ -24,7 +24,7 @@ problems, see [Troubleshooting](../troubleshooting.md).
 the global configured-score optimum, while `selected_result_` identifies the row chosen by the
 declared final rule. `validation_report_` and optional OOF arrays describe that selected row.
 Python method signatures use `y` by scikit-learn convention even when the
-response is a matrix denoted by $Y$ in equations; see the
+response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
 
 ::: pipls.PiPLSSearchCV

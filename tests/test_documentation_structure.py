@@ -411,16 +411,22 @@ def test_authors_license_and_citation_page_is_public_and_consistent() -> None:
     assert "CITATION.cff" in readme
 
 
-def test_mathjax_supports_bold_vector_notation() -> None:
+def test_theory_distinguishes_complete_matrices_from_indexed_columns() -> None:
     root = _repository_root()
     mathjax = (root / "docs" / "javascripts" / "mathjax.js").read_text(
         encoding="utf-8"
     )
     theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
 
-    assert 'bm: ["\\\\boldsymbol{#1}", 1]' in mathjax
-    assert r"\bm{p}_k" in theory
-    assert r"\bm{q}_k" in theory
+    assert r"\bm" not in mathjax
+    assert r"\bm" not in theory
+    assert "$d_k=D_{kk}$" in theory
+    assert "$(P_{:k},d_k,Q_{:k})$" in theory
+    assert r"$\mathbf{X}P_{:k}$" in theory
+    assert r"$\mathbf{Y}Q_{:k}$" in theory
+    assert r"\mathbf{D}_{kk}" not in theory
+    assert r"\mathbf{P}_{:k}" not in theory
+    assert r"\mathbf{Q}_{:k}" not in theory
 
 
 def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
@@ -476,7 +482,7 @@ def test_theory_page_defines_canonical_pipls_terminology() -> None:
         "retained-subspace projector",
         "orthonormal predictor directions",
         "orthonormal response directions",
-        "$d_k=\\mathbf{D}_{kk}$",
+        "$d_k=D_{kk}$",
         "paired latent mode",
         "`predictor_rank`",
         "`n_components`",
@@ -525,8 +531,14 @@ def test_canonical_terminology_is_propagated_to_public_entry_points() -> None:
         assert "response direction" in page
 
     assert "retained predictor-subspace dimension" in api_overview
+    assert r"$\mathbf{X}$" in api_overview
+    assert r"$\mathbf{Y}$" in api_overview
+    assert r"$\mathbf{P}$" in api_overview
+    assert r"$\mathbf{Q}$" in api_overview
     assert "$d_k=D_{kk}$" in regression_page
+    assert r"$\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$" in regression_page
     assert "$d_kQ_{:k}$" in inspection_page
+    assert r"$\mathbf{Q}\mathbf{D}$" in inspection_page
     assert "predictor rotations" not in inspection_page
     assert "response rotations" not in inspection_page
 
@@ -536,17 +548,53 @@ def test_canonical_terminology_is_propagated_to_public_entry_points() -> None:
 
     regression_doc = inspect.getdoc(PiPLSRegression) or ""
     decomposition_doc = inspect.getdoc(PiPLSDecomposition) or ""
+    regression_map_doc = (
+        inspect.getdoc(PiPLSDecomposition.standardized_regression_map) or ""
+    )
     search_doc = inspect.getdoc(PiPLSSearchCV) or ""
     path_doc = inspect.getdoc(PiPLSComponentPath) or ""
     factors_doc = inspect.getdoc(PiPLSDisplayFactors) or ""
 
     assert "number of paired latent modes" in regression_doc
     assert "retained predictor-subspace dimension" in regression_doc
-    assert "Orthonormal predictor directions" in decomposition_doc
-    assert "Orthonormal response directions" in decomposition_doc
+    assert r"Orthonormal predictor directions $\mathbf{P}$" in decomposition_doc
+    assert r"Orthonormal response directions $\mathbf{Q}$" in decomposition_doc
+    assert r"$\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$" in regression_map_doc
     assert "paired-mode count" in search_doc
     assert "paired-mode count" in path_doc
     assert "$d_k Q_{:k}$" in factors_doc
+
+
+def test_reference_pages_use_bold_complete_matrices_and_plain_indexed_columns(
+) -> None:
+    root = _repository_root()
+    reference_pages = (
+        root / "docs" / "api" / "index.md",
+        root / "docs" / "api" / "regression.md",
+        root / "docs" / "api" / "path.md",
+        root / "docs" / "api" / "inspection.md",
+        root / "docs" / "model_inspection.md",
+    )
+    reference = "\n".join(
+        path.read_text(encoding="utf-8") for path in reference_pages
+    )
+
+    for old in ("$P$", "$Q$", "$D$", "$QD$", r"$PDQ^{\mathsf T}$", "$Y$"):
+        assert old not in reference
+    for required in (
+        r"$\mathbf{P}$",
+        r"$\mathbf{Q}$",
+        r"$\mathbf{D}$",
+        r"$\mathbf{Q}\mathbf{D}$",
+        r"$\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$",
+        "$d_k=D_{kk}$",
+        "$d_kQ_{:k}$",
+        "$(P_{:k},d_k,Q_{:k})$",
+    ):
+        assert required in reference
+
+    for invalid in (r"\mathbf{D}_{kk}", r"\mathbf{P}_{:k}", r"\mathbf{Q}_{:k}"):
+        assert invalid not in reference
 
 
 def test_companion_manuscript_synthetic_data_guide_is_public_and_scoped() -> None:

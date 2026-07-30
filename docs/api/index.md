@@ -6,13 +6,15 @@ focused submodules. Rendering is caller-owned.
 
 ## Mathematical notation and Python names
 
-Mathematical sections use $X$ for the predictor matrix and $Y$ for the response matrix. Python
+Mathematical sections use $\mathbf{X}$ for the predictor matrix and $\mathbf{Y}$ for the
+response matrix. Python
 call signatures follow the scikit-learn convention `fit(X, y)`: `y` may be either a one-dimensional
 response or a two-dimensional multivariate response matrix. Names such as `y_pred`, `y_scores_`,
 and `y_loadings_` follow the same programming convention and do not imply a scalar response.
 
 For Pi-PLS, public `n_components` counts paired latent modes $h$, and `predictor_rank` is the
-retained predictor-subspace dimension $r_\pi$. The factor arrays $P$ and $Q$ are orthonormal
+retained predictor-subspace dimension $r_\pi$. The factor arrays $\mathbf{P}$ and
+$\mathbf{Q}$ are orthonormal
 predictor and response directions; they are distinct from reconstruction loadings.
 
 ## Start with the estimators
@@ -31,7 +33,7 @@ predictor and response directions; they are distinct from reconstruction loading
 | [`PiPLSValidationReport`](path.md#pipls.PiPLSValidationReport) | `search.validation_report_` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
 | [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
 | [`LatentStructure`](inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, rotations, and coefficients for PLS-family inspection |
-| [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $P$, $D$, $Q$, and $QD$ factors |
+| [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors |
 | [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |
 | [`ObservationDiagnostics`](inspection.md#pipls.inspection.ObservationDiagnostics) | `observation_diagnostics(model)` | Inspect score distance and X-reconstruction residuals |
 | [`PredictionDiagnostics`](inspection.md#pipls.inspection.PredictionDiagnostics) | `prediction_diagnostics(Y, Y_pred, ...)` | Inspect predictions, residuals, and response-standardized errors |

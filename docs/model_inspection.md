@@ -1,7 +1,8 @@
 # Model inspection concepts
 
 `pipls.inspection` computes immutable numerical results from fitted models or explicit predictions.
-Pi-PLS-specific inspection covers $P$, $D$, $Q$, and $QD$; scores, loadings, coefficients, biplots,
+Pi-PLS-specific inspection covers $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and
+$\mathbf{Q}\mathbf{D}$; scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics use estimator-neutral PLS-family objects.
 Maintained examples render these arrays directly, but rendering is not part of the numerical API.
 Inspection calculations use range-safe scaled operations where ordinary norms, covariance products,
@@ -19,12 +20,13 @@ signatures.
 A fitted `PiPLSRegression` stores the centered and scaled regression map as
 
 \begin{equation}
-B_{\mathrm{cs}}=PDQ^{\mathsf T}.
+\mathbf{B}_{\mathrm{cs}}=\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}.
 \end{equation}
 
 `pipls_display_factors()` returns defensive read-only copies and applies one deterministic display
-sign per paired latent mode. The same sign is applied to the paired columns of $P$ and $Q$, so
-the regression map is unchanged. By default, the first largest-magnitude predictor entry is made
+sign per paired latent mode. The same sign is applied to the paired columns of $\mathbf{P}$
+and $\mathbf{Q}$, so the regression map is unchanged. By default, the first largest-magnitude
+predictor entry is made
 nonnegative.
 
 ```python
@@ -51,7 +53,7 @@ back to the default predictor-based convention. These choices orient an equivale
 they do not change predictions or establish that the selected response has a positive or negative
 physical effect.
 
-$P$ contains orthonormal predictor directions, not X loadings. X loadings belong to score
+$\mathbf{P}$ contains orthonormal predictor directions, not X loadings. X loadings belong to score
 reconstruction and are stored in `LatentStructure`.
 
 ### Latent structure
@@ -99,10 +101,10 @@ outlier labels, or contribution diagnostics.
 | Where are samples in the latent plane? | `structure.x_scores` | Scatter two components; proximity means similar displayed score coordinates |
 | How do predictors reconstruct scores? | `structure.x_loadings` | Plot or group selected loading columns; these are not regression coefficients |
 | How do responses enter the latent representation? | `structure.y_loadings` | Compare selected loading columns across named responses |
-| What are the Pi-PLS predictor directions? | `factors.predictor_directions` | Plot columns of $P$ against names or a physical predictor coordinate |
+| What are the Pi-PLS predictor directions? | `factors.predictor_directions` | Plot columns of $\mathbf{P}$ against names or a physical predictor coordinate |
 | How strong is each paired latent mode? | `factors.dilation` | Compare the nonnegative dilations $d_k=D_{kk}$ |
-| What are the Pi-PLS response directions? | `factors.response_directions` | Compare columns of $Q$ across responses |
-| What is each response mode after dilation? | `factors.weighted_response_directions` | Compare columns of $QD$ across responses |
+| What are the Pi-PLS response directions? | `factors.response_directions` | Compare columns of $\mathbf{Q}$ across responses |
+| What is each response mode after dilation? | `factors.weighted_response_directions` | Compare columns of $\mathbf{Q}\mathbf{D}$ across responses |
 | What is the original-unit linear map? | `structure.coefficients` | Plot one coefficient row per response, respecting variable units |
 | Which observations are distant or poorly reconstructed? | `observations.score_distance`, `observations.x_reconstruction_residual` | Scatter the two raw diagnostics |
 | How well do predictions agree with observations? | `PredictionDiagnostics` arrays | Use observed/predicted, residual, and response-wise RMSE views with provenance shown |
@@ -132,28 +134,29 @@ Use selected columns of `structure.y_loadings` with explicit response labels. Re
 patterns are represented similarly across the selected components. With response scaling, these
 loadings describe the standardized fitted representation rather than original-unit response values.
 
-### Predictor directions $P$ { #predictor-directions }
+### Predictor directions $\mathbf{P}$ { #predictor-directions }
 
 Use columns of `factors.predictor_directions`. They are orthonormal predictor directions paired with
-orthonormal response directions in $PDQ^{\mathsf T}$. They are distinct from X loadings because
-they belong to the regression factorization rather than score reconstruction.
+orthonormal response directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. They are
+distinct from X loadings because they belong to the regression factorization rather than score
+reconstruction.
 
 Theory: [Diagonal latent coupling](theory.md#diagonal-latent-coupling).
 
-### Dilation $D$ { #dilation }
+### Dilation $\mathbf{D}$ { #dilation }
 
 Each value $d_k=D_{kk}$ is the dilation of paired latent mode $k$ and should be interpreted
-together with the matching columns of $P$ and $Q$.
+together with the matching columns of $\mathbf{P}$ and $\mathbf{Q}$.
 
-### Response directions $Q$ { #response-directions }
+### Response directions $\mathbf{Q}$ { #response-directions }
 
 The columns of `factors.response_directions` are the orthonormal response directions of the paired
 latent modes before dilation. Use explicit response labels when comparing them.
 
-### Weighted response directions $QD$ { #weighted-response-directions }
+### Weighted response directions $\mathbf{Q}\mathbf{D}$ { #weighted-response-directions }
 
 `factors.weighted_response_directions` is a derived read-only array that combines response-side
-orientation and mode strength. Column $k$ is $d_kQ_{:k}$. Compare it with $Q$ when
+orientation and mode strength. Column $k$ is $d_kQ_{:k}$. Compare it with $\mathbf{Q}$ when
 distinguishing direction from scaled contribution to the centered/scaled regression map.
 
 ### Regression coefficients { #regression-coefficients }

@@ -5,9 +5,6 @@ window.MathJax = {
     processEscapes: true,
     processEnvironments: true,
     tags: "ams",
-    macros: {
-      bm: ["\\boldsymbol{#1}", 1],
-    },
   },
   options: {
     ignoreHtmlClass: ".*|",

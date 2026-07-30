@@ -33,12 +33,12 @@ class PiPLSDecomposition:
     Attributes
     ----------
     predictor_rotations : ndarray of shape (n_features, n_components)
-        Orthonormal predictor directions $P$ of the centered/scaled regression
+        Orthonormal predictor directions $\mathbf{P}$ of the centered/scaled regression
         map. The field name is retained for API compatibility.
     dilation : ndarray of shape (n_components,)
         Nonnegative dilations $d_k=D_{kk}$ of the paired latent modes.
     response_rotations : ndarray of shape (n_targets, n_components)
-        Orthonormal response directions $Q$. The field name is retained for API
+        Orthonormal response directions $\mathbf{Q}$. The field name is retained for API
         compatibility.
     predictor_numerical_rank : int
         Complete numerical predictor rank under full SVD, or a verified lower
@@ -167,7 +167,7 @@ class PiPLSDecomposition:
 
     @property
     def standardized_regression_map(self) -> FloatArray:
-        r"""Return the centered/scaled regression map $P D Q^{\mathsf T}$."""
+        r"""Return the centered/scaled map $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$."""
 
         return _read_only_float_array(
             np.asarray(

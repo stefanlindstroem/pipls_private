@@ -62,16 +62,15 @@ The package uses the following terms for the fixed Pi-PLS construction:
 | $\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}$ | retained-subspace projector |
 | $\mathbf{P}$ | orthonormal predictor directions |
 | $\mathbf{Q}$ | orthonormal response directions |
-| $d_k=\mathbf{D}_{kk}$ | dilation of paired latent mode $k$ |
+| $d_k=D_{kk}$ | dilation of paired latent mode $k$ |
 | $\mathbf{X}\mathbf{P}$ | predictor scores |
 | $\mathbf{Y}\mathbf{Q}$ | response scores |
-| $(\bm{p}_k,d_k,\bm{q}_k)$ | paired latent mode $k$ |
+| $(P_{:k},d_k,Q_{:k})$ | paired latent mode $k$ |
 | `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
 | `n_components` | number of paired latent modes $h$ |
 
-Write $\bm{p}_k=\mathbf{P}_{:k}$ and $\bm{q}_k=\mathbf{Q}_{:k}$ for the predictor and response
-direction vectors of paired latent mode $k$. The word **direction** is the primary mathematical term
-for columns of $\mathbf{P}$ and $\mathbf{Q}$. Existing Python field names such as
+The word **direction** is the primary mathematical term for columns of $\mathbf{P}$ and
+$\mathbf{Q}$. Existing Python field names such as
 `predictor_rotations`, `response_rotations`, `x_rotations_`, and `y_rotations_` remain public
 interface names; they do not make $\mathbf{P}$ or $\mathbf{Q}$ projection matrices. The projectors
 onto the final direction spans are $\mathbf{P}\mathbf{P}^{\mathsf T}$ and
@@ -80,7 +79,7 @@ $\mathbf{Q}\mathbf{Q}^{\mathsf T}$.
 The Pi-PLS directions are also distinct from `x_loadings_` and `y_loadings_`, which are
 least-squares reconstruction loadings for the centered or centered-and-scaled training blocks.
 For response-side factor displays, the package stores response-by-mode weighted directions
-$\mathbf{Q}\mathbf{D}$, where column $k$ is $d_k\bm{q}_k$. The manuscript's mode-by-response
+$\mathbf{Q}\mathbf{D}$, where column $k$ is $d_kQ_{:k}$. The manuscript's mode-by-response
 orientation is the transpose:
 
 \begin{equation}
@@ -244,8 +243,8 @@ and the reduced regression relation becomes
 \mathbf{E}_\pi=\mathbf{E}''\mathbf{N}.
 \end{equation}
 
-The predictor score vector $\mathbf{X}\bm{p}_k$ is coupled only to the response score
-vector $\mathbf{Y}\bm{q}_k$, with dilation $d_k$. This is the one-to-one, mode-wise interpretation
+The predictor score vector $\mathbf{X}P_{:k}$ is coupled only to the response score
+vector $\mathbf{Y}Q_{:k}$, with dilation $d_k$. This is the one-to-one, mode-wise interpretation
 central to Pi-PLS. Orthogonal rotation by $\mathbf{N}$ preserves the Frobenius norm of the
 residual and orthogonally transforms its covariance; it preserves covariance
 eigenvalues but does not generally leave the covariance matrix itself unchanged.
