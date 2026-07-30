@@ -528,7 +528,6 @@ def test_theory_distinguishes_complete_matrices_from_indexed_columns() -> None:
 def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
     root = _repository_root()
     theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
-    benchmark_page = (root / "docs" / "benchmarks.md").read_text(encoding="utf-8")
     mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
 
     sections = (
@@ -571,7 +570,6 @@ def test_theory_page_exposes_the_canonical_fixed_construction() -> None:
 def test_theory_page_defines_canonical_pipls_terminology() -> None:
     root = _repository_root()
     theory = (root / "docs" / "theory.md").read_text(encoding="utf-8")
-    benchmark_page = (root / "docs" / "benchmarks.md").read_text(encoding="utf-8")
     mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
     public_api = (root / ".llm" / "public_api.md").read_text(encoding="utf-8")
 
