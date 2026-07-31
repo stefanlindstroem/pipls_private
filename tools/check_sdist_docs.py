@@ -53,7 +53,7 @@ def _safe_extract(archive: tarfile.TarFile, destination: Path) -> Path:
     if len(roots) != 1:
         raise RuntimeError("The source distribution must contain one top-level directory.")
 
-    destination_resolved = destination.resolve()
+    resolved_destination = destination.resolve()
     for member in members:
         member_path = Path(member.name)
         if member_path.is_absolute() or ".." in member_path.parts:
@@ -61,7 +61,7 @@ def _safe_extract(archive: tarfile.TarFile, destination: Path) -> Path:
         if member.issym() or member.islnk():
             raise RuntimeError(f"Archive links are not supported: {member.name}")
         target = (destination / member_path).resolve()
-        if not target.is_relative_to(destination_resolved):
+        if not target.is_relative_to(resolved_destination):
             raise RuntimeError(f"Archive member escapes extraction directory: {member.name}")
 
     if sys.version_info >= (3, 12):

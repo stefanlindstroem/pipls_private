@@ -381,7 +381,7 @@ class PiPLSSearchCV(
         missing_components = [
             int(h)
             for h in component_values
-            if not any(hh == int(h) for hh, _ in admissible)
+            if not any(candidate_h == int(h) for candidate_h, _ in admissible)
         ]
         if missing_components:
             missing = ", ".join(map(str, missing_components))
@@ -409,7 +409,11 @@ class PiPLSSearchCV(
             for h_value in component_values:
                 h = int(h_value)
                 allowed = np.asarray(
-                    [r for hh, r in admissible if hh == h],
+                    [
+                        candidate_rank
+                        for candidate_h, candidate_rank in admissible
+                        if candidate_h == h
+                    ],
                     dtype=np.intp,
                 )
                 _adaptive_path_search(

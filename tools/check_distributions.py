@@ -103,7 +103,7 @@ def _single_artifact(artifacts: Path, pattern: str, label: str) -> Path:
 
 def _extract_source_distribution(artifact: Path, destination: Path) -> Path:
     destination.mkdir()
-    destination_resolved = destination.resolve()
+    resolved_destination = destination.resolve()
     with tarfile.open(artifact, mode="r:gz") as archive:
         members = archive.getmembers()
         roots = {Path(member.name).parts[0] for member in members if Path(member.name).parts}
@@ -116,7 +116,7 @@ def _extract_source_distribution(artifact: Path, destination: Path) -> Path:
             if member.issym() or member.islnk():
                 raise RuntimeError(f"Source-distribution links are unsupported: {member.name}")
             target = (destination / member_path).resolve()
-            if not target.is_relative_to(destination_resolved):
+            if not target.is_relative_to(resolved_destination):
                 raise RuntimeError(f"Source-distribution member escapes extraction: {member.name}")
         if sys.version_info >= (3, 12):
             archive.extractall(destination, filter="data")
