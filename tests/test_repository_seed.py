@@ -795,22 +795,3 @@ def test_repository_datasets_are_not_top_level_runtime_exports() -> None:
     datasets_root = _repository_root() / "datasets"
     dataset_names = {path.name for path in datasets_root.iterdir() if path.is_dir()}
     assert dataset_names.isdisjoint(pipls.__all__)
-
-
-def test_repository_has_no_paper_reproduction_scaffolding() -> None:
-    root = _repository_root()
-    retired_paths = [
-        root / "paper",
-        root / "scripts" / "reproduce_paper",
-    ]
-    assert not any(path.exists() for path in retired_paths)
-
-
-def test_retired_linnerud_integration_is_absent() -> None:
-    root = _repository_root()
-    retired_paths = [
-        root / "datasets" / "linnerud",
-        root / "examples" / "09_linnerud_real_data.py",
-        root / "tests" / "data" / "test_linnerud_dataset.py",
-    ]
-    assert not any(path.exists() for path in retired_paths)

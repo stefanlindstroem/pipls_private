@@ -70,11 +70,6 @@ def test_api_pages_reference_only_public_import_paths() -> None:
     assert "pipls.model_selection" not in api_text
 
 
-def test_removed_plotting_module_is_absent() -> None:
-    assert importlib.util.find_spec("pipls.plotting") is None
-    assert not (_repository_root() / "docs" / "api" / "plotting.md").exists()
-
-
 def test_returned_result_records_hide_constructor_signatures() -> None:
     api_text = _api_text()
     returned_records = {

@@ -15,21 +15,6 @@ _INSPECTION_CALLS = {
     "pipls_display_factors",
     "prediction_diagnostics",
 }
-_OLD_RESULT_NAMES = {
-    "component_path_results_",
-    "best_predictor_rank_by_n_components_",
-    "best_score_by_n_components_",
-    "response_standardized_mse_path_",
-    "score_path_",
-}
-_OLD_HELPER_NAMES = {
-    "build_post_analysis_tables",
-    "fixed_model_oof_predictions",
-    "plot_pipls_component_path",
-    "render_post_analysis_report",
-    "run_pulp_workflow",
-    "write_post_analysis_tables",
-}
 
 
 def _repository_root() -> Path:
@@ -123,10 +108,7 @@ def test_tutorial_renderer_uses_the_direct_in_memory_public_sequence() -> None:
     assert "component_path_" in source
     assert "predictor_rank_profile(" in source
     assert "cross_val_predict(" in source
-    for name in _OLD_HELPER_NAMES:
-        assert name not in source
     assert ".to_csv(" not in source
-
 
 
 def test_synthetic_tutorial_renderer_uses_the_direct_in_memory_public_sequence() -> None:
@@ -140,24 +122,3 @@ def test_synthetic_tutorial_renderer_uses_the_direct_in_memory_public_sequence()
     assert "PiPLSRegression(" in source
     assert "model.predict(test.X)" in source
     assert ".to_csv(" not in source
-
-def test_removed_result_attributes_and_helpers_are_absent() -> None:
-    root = _repository_root()
-    maintained_sources = [
-        *sorted((root / "src").rglob("*.py")),
-        *sorted((root / "examples").rglob("*.py")),
-        *sorted((root / "tools").rglob("*.py")),
-    ]
-    combined = "\n".join(path.read_text(encoding="utf-8") for path in maintained_sources)
-
-    for name in _OLD_RESULT_NAMES | _OLD_HELPER_NAMES:
-        assert name not in combined
-
-    support = root / "examples" / "_support"
-    for filename in (
-        "fixed_model_oof.py",
-        "plot_component_path.py",
-        "post_analysis_artifacts.py",
-        "pulp_workflow.py",
-    ):
-        assert not (support / filename).exists()

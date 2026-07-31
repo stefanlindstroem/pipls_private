@@ -49,6 +49,17 @@ file exists and parses as a non-empty YAML mapping rather than pinning its conte
 consistency test may collect DOI values from each metadata source block and require matching
 resolvable links in the served dataset guide; it must not hard-code the current DOI values.
 
+## Historical removal boundary
+
+Do not keep a test solely to prove that a former internal name, helper, dataset integration,
+documentation wrapper, or repository path remains absent. Accepted decision records preserve that
+history. Prefer positive tests of the supported surface and generic structural checks.
+
+A negative test remains appropriate when absence is itself a current public or architectural
+contract, such as the package exposing no plotting API, optional rendering libraries remaining
+outside runtime dependencies, or repository datasets remaining outside top-level exports. Do not
+turn every pre-release deletion into a permanent executable tombstone.
+
 ## Dataset boundary
 
 Repository dataset tests should check file layout and

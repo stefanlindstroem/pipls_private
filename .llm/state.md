@@ -115,6 +115,8 @@ and later retired by Decision 0125 after its development-validation purpose had 
 - a grouped self-documenting maintainer command index that presents `make install` and `make check`
   first, then separates development, documentation/example, and distribution/maintenance targets
   without renaming or changing any recipe.
+- a current-boundary testing policy that retires one-off migration tombstones while preserving
+  negative tests for explicit public and architectural exclusions.
 
 Decision 0086 reduces the public decomposition to quantities used for fitted-model interpretation;
 private construction matrices remain in `PiPLSCoreResult`. Decision 0087 removes scorer plumbing,
@@ -235,6 +237,7 @@ case, or public behavior.
 | Repository datasets | comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
+| Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
 | Publication assets | downstream repositories pin released `pipls` versions |
 | Retired benchmark layer | the former focused synthetic scripts, result contracts, tests, and documentation were removed by Decision 0125 |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
