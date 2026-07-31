@@ -128,7 +128,7 @@ value, or factor product that cannot be represented as finite `float64`. Rescale
 or inspect the preceding fitted and prediction arrays. The package does not return nonfinite
 inspection records.
 
-## `StatisticalSupportWarning` appears
+## `PredictorRankSupportWarning` appears
 
 A direct fixed fit warns when the number of observations is small relative to the requested
 predictor rank. The warning does not change the requested model. It indicates weak statistical

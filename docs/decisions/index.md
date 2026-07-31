@@ -49,6 +49,7 @@ reference describe the current public behavior directly.
 - [0131: concise response-standardized MSE names](0131-concise-response-standardized-mse-names.md)
 - [0132: predicate-style search exhaustiveness name](0132-predicate-search-exhaustiveness-name.md)
 - [0134: type-revealing public result properties](0134-type-revealing-result-properties.md)
+- [0135: specific predictor-rank support warning name](0135-specific-predictor-rank-support-warning.md)
 
 ## Validation, data, and benchmarks
 

@@ -37,7 +37,7 @@ from .component_path import (
     PiPLSPredictorRankProfile,
     PredictorRankPolicy,
 )
-from .exceptions import StatisticalSupportWarning
+from .exceptions import PredictorRankSupportWarning
 from .metrics import neg_response_standardized_mse
 from .model_selection import (
     CVSplit,
@@ -65,7 +65,7 @@ ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING_NAME = "neg_response_standardized_mse"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
-_CONTROLLED_FIT_WARNING_CATEGORIES = (StatisticalSupportWarning,)
+_CONTROLLED_FIT_WARNING_CATEGORIES = (PredictorRankSupportWarning,)
 
 
 def _default_pipls_template() -> PiPLSRegression:
@@ -139,7 +139,7 @@ class PiPLSSearchCV(
         deterministic adaptive search and may skip pairs.
     samples_per_predictor_rank : float, default=5
         Positive support parameter $c$ for ``max_predictor_rank="rule"``. Values
-        below five issue :class:`pipls.StatisticalSupportWarning`.
+        below five issue :class:`pipls.PredictorRankSupportWarning`.
     cv : int, splitter, iterable or None, default=5
         Cross-validation specification. ``None`` requests the standard five-fold
         regression split.
@@ -852,7 +852,7 @@ class PiPLSSearchCV(
                 "This permits fewer than five supplied samples per retained predictor-rank "
                 "direction, so the resulting rank bound may not have sufficient statistical "
                 "support to be trusted without external validation.",
-                StatisticalSupportWarning,
+                PredictorRankSupportWarning,
                 stacklevel=3,
             )
         if self.max_predictor_rank != "rule":

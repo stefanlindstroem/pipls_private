@@ -5,7 +5,7 @@ import warnings
 import numpy as np
 import pytest
 
-from pipls import PiPLSRegression, StatisticalSupportWarning
+from pipls import PiPLSRegression, PredictorRankSupportWarning
 
 _MAX_RANDOM_STATE = int(np.iinfo(np.uint32).max)
 
@@ -74,10 +74,10 @@ def test_support_warning_boundary_is_strictly_below_three() -> None:
     X_wide = np.column_stack([X, rng.normal(size=(X.shape[0], 3))])
 
     with warnings.catch_warnings():
-        warnings.simplefilter("error", StatisticalSupportWarning)
+        warnings.simplefilter("error", PredictorRankSupportWarning)
         PiPLSRegression(n_components=1, predictor_rank=8).fit(X_wide, Y)
 
-    with pytest.warns(StatisticalSupportWarning):
+    with pytest.warns(PredictorRankSupportWarning):
         PiPLSRegression(n_components=1, predictor_rank=9).fit(X_wide, Y)
 
 

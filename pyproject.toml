@@ -60,7 +60,7 @@ where = ["src"]
 testpaths = ["tests"]
 addopts = "-ra"
 filterwarnings = [
-  "error::pipls.exceptions.StatisticalSupportWarning",
+  "error::pipls.exceptions.PredictorRankSupportWarning",
 ]
 
 [tool.ruff]

@@ -4,6 +4,9 @@
 
 ### Repository
 
+- Rename the unreleased public warning class from `StatisticalSupportWarning` to
+  `PredictorRankSupportWarning`, so its name identifies the specific low-sample-support
+  condition without changing thresholds, warning messages, or suppression behavior.
 - Rename the unreleased result properties to make their return types and predicates explicit:
   `PiPLSPredictorRankProfile.selected_result`, `PiPLSValidationReport.cv_mse_mean`,
   `is_selection_conditioned`, and `has_complete_oof_coverage`, without compatibility aliases or

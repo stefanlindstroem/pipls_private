@@ -16,7 +16,7 @@ from pipls import (
     PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSSearchCV,
-    StatisticalSupportWarning,
+    PredictorRankSupportWarning,
 )
 from pipls.metrics import neg_response_standardized_mse
 
@@ -618,7 +618,7 @@ def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
 
 def test_low_samples_per_predictor_rank_warns() -> None:
     X, Y = _data()
-    with pytest.warns(StatisticalSupportWarning, match="statistical support"):
+    with pytest.warns(PredictorRankSupportWarning, match="statistical support"):
         PiPLSSearchCV(
             n_components_values=[1],
             predictor_rank_values=[1],
@@ -659,7 +659,7 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> N
     X, Y = _data(12)
 
     with warnings.catch_warnings():
-        warnings.simplefilter("error", StatisticalSupportWarning)
+        warnings.simplefilter("error", PredictorRankSupportWarning)
         search = PiPLSSearchCV(
             n_components_values=[1],
             predictor_rank_values=[4],

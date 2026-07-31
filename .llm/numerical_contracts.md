@@ -72,7 +72,7 @@
   the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical
   cap. Explicit requested ranks above the resolved ceiling fail before candidate scoring.
 - Fold-rank preflight preserves NumPy global random state, uses the configured terminal estimator
-  scaling and predictor-SVD policy, and suppresses only `StatisticalSupportWarning`.
+  scaling and predictor-SVD policy, and suppresses only `PredictorRankSupportWarning`.
 
 - Predictor SVD policy is independent of rank-search policy. `"full"` is the exact reference,
   `"randomized"` is explicit approximation, and `"auto"` randomizes only when

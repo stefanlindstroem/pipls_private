@@ -214,7 +214,7 @@ retained predictor-rank direction, and add exhaustive API-level tests.
 
 Current status: **complete**. Constructor validation now runs before dependency calls; integer,
 boolean, CV, job-count, seed, solver, scorer, and extreme rank-bound cases have API-level tests;
-`StatisticalSupportWarning` is public; and extremely small positive rule parameters saturate
+`PredictorRankSupportWarning` is public; and extremely small positive rule parameters saturate
 safely without overflow.
 
 ### Phase D1: complete path analysis

@@ -23,7 +23,7 @@ The current public surface includes
 `PiPLSSearchCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
 `PiPLSValidationReport`, public selection metrics,
-`StatisticalSupportWarning`, deterministic synthetic dataset generation, pure numerical
+`PredictorRankSupportWarning`, deterministic synthetic dataset generation, pure numerical
 `pipls.inspection`, and immutable inspection results. All maintained figures are rendered directly
 from those results with Matplotlib; annotated biplots use optional `adjustText`.
 

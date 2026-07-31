@@ -24,7 +24,7 @@ from ._core import (
 )
 from ._sklearn_compat import _validate_estimator_data
 from .decomposition import PiPLSDecomposition
-from .exceptions import StatisticalSupportWarning
+from .exceptions import PredictorRankSupportWarning
 from .metrics import _safe_column_mean, _safe_sample_scale, _training_response_scale
 
 FloatArray = NDArray[np.float64]
@@ -207,7 +207,7 @@ class PiPLSRegression(
                 f"The fitted model has {n_samples / predictor_rank:.3g} samples per "
                 "retained predictor-rank direction, below the recommended minimum of 3. "
                 "The model may have poor statistical support; use external validation.",
-                StatisticalSupportWarning,
+                PredictorRankSupportWarning,
                 stacklevel=2,
             )
         self._fit_fixed_rank(

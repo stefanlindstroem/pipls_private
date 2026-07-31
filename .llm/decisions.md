@@ -140,6 +140,7 @@ This index is navigation, not a substitute for those records.
 | `0132-predicate-search-exhaustiveness-name.md` | predicate-style search exhaustiveness name | expose `search_is_exhaustive_` as the completed-search coverage predicate without an alias or behavioral change |
 | `0133-regression-generator-truth-name.md` | regression-generator truth naming | distinguish the configurable regression truth record from the manuscript latent-geometry truth without aliases or data changes |
 | `0134-type-revealing-result-properties.md` | type-revealing public result properties | expose explicit result-object, CV-MSE, and boolean predicate names without aliases or numerical changes |
+| `0135-specific-predictor-rank-support-warning.md` | specific predictor-rank support warning name | expose `PredictorRankSupportWarning` without an alias or support-policy change |
 
 ## Implemented estimator/search transition
 
@@ -232,6 +233,8 @@ plan contains an earlier or more general proposal:
   and adopts regression-specific private generator terminology without aliases or data changes;
 - Decision 0134 gives public result properties type-revealing names without aliases or
   changes to selected values, validation metrics, or OOF coverage;
+- Decision 0135 renames the public low-sample predictor-rank support warning to
+  `PredictorRankSupportWarning` without aliases, threshold changes, or suppression changes;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
   Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls

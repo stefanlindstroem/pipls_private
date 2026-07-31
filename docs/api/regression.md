@@ -45,11 +45,11 @@ and overlapping predictor/response storage are copied where mutation would be un
 randomized. `random_state` follows the ordinary scikit-learn forms; the default `0` makes randomized
 SVD reproducible.
 
-A direct fixed fit emits `StatisticalSupportWarning` when $n/r_\pi<3$. The warning is diagnostic and
+A direct fixed fit emits `PredictorRankSupportWarning` when $n/r_\pi<3$. The warning is diagnostic and
 does not alter the requested rank. Algebraically or numerically infeasible ranks remain errors. The
 standard path search uses its more conservative default support ceiling.
 
-::: pipls.StatisticalSupportWarning
+::: pipls.PredictorRankSupportWarning
     options:
       members: false
 

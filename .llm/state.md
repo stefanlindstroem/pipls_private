@@ -31,7 +31,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
 - scikit-learn-compatible fixed-model `PiPLSRegression` for one explicit
   `(n_components, predictor_rank)` pair;
 - independent full, randomized, and automatic predictor-SVD policies;
-- hardened public validation and `StatisticalSupportWarning` for direct fixed fits with
+- hardened public validation and `PredictorRankSupportWarning` for direct fixed fits with
   fewer than three observations per retained predictor-rank direction;
 - transactional fixed and path fits, range-safe boundary preprocessing, safe read-only or
   overlapping `copy=False` inputs, and finite public fitted/output values;
@@ -181,7 +181,7 @@ from pipls import (
     PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSValidationReport,
-    StatisticalSupportWarning,
+    PredictorRankSupportWarning,
 )
 ```
 
