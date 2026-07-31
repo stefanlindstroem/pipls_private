@@ -60,6 +60,14 @@ contract, such as the package exposing no plotting API, optional rendering libra
 outside runtime dependencies, or repository datasets remaining outside top-level exports. Do not
 turn every pre-release deletion into a permanent executable tombstone.
 
+## Rendering validation boundary
+
+Protect rendering through executable artifact generation, parseable declared outputs, optional
+dependency boundaries, caller-owned chart construction, direct immutable-result use, and numerical
+semantics such as fold-based standard errors. Do not freeze exact title text, axis-label wording,
+Matplotlib call counts, source-code ranges, axis-limit expressions, tick-label expressions, or label
+rotation syntax. Review regenerated SVG and PDF artifacts when visible rendering behavior changes.
+
 ## Dataset boundary
 
 Repository dataset tests should check file layout and

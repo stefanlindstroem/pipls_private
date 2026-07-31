@@ -132,6 +132,7 @@ This index is navigation, not a substitute for those records.
 | `0124-mathematical-typography-and-subscripts.md` | mathematical typography and descriptive subscripts | bold complete matrices, upright descriptive subscripts, italic variable indices, and renderable generated equations |
 | `0125-retire-benchmark-layer.md` | benchmark-layer retirement | remove benchmark scripts, tests, outputs, navigation, and active contracts; preserve historical records |
 | `0126-historical-removal-test-policy.md` | historical-removal test policy | retain negative tests for current boundaries, not one tombstone per pre-release removal |
+| `0127-artifact-based-rendering-validation.md` | artifact-based rendering validation | protect rendering ownership, numerical meaning, and generated artifacts without exact Matplotlib source locks |
 
 ## Implemented estimator/search transition
 
