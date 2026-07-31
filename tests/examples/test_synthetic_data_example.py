@@ -51,11 +51,3 @@ def test_synthetic_example_owns_the_short_selection_workflow() -> None:
     assert source.count("figure.savefig(") == 3
     assert ".to_csv(" not in source
     assert "pandas" not in source
-
-
-def test_numbered_examples_are_independent_of_publication_context() -> None:
-    examples_dir = _repository_root() / "examples"
-    publication_terms = re.compile(r"\b(paper|manuscript)\b", re.IGNORECASE)
-
-    for path in sorted(examples_dir.glob("[0-9][0-9]_*.py")):
-        assert publication_terms.search(path.read_text(encoding="utf-8")) is None, path

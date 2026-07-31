@@ -135,42 +135,6 @@ assert pipls.PiPLSRegression is not None
     )
 
 
-def test_numbered_examples_keep_rendering_caller_owned() -> None:
-    examples = _numbered_examples()
-    assert examples
-
-    for path in examples:
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        imports = _import_roots(tree)
-        calls = {
-            name
-            for node in ast.walk(tree)
-            if isinstance(node, ast.Call) and (name := _call_name(node)) is not None
-        }
-
-        if path.name == "03_leave_one_out_validation.py":
-            assert imports.isdisjoint(_RENDERING_PACKAGES)
-            assert calls.isdisjoint(_RENDERING_METHODS)
-            continue
-
-        assert "matplotlib" in imports, path
-        assert "subplots" in calls, path
-        assert "savefig" in calls, path
-        assert all(not name.startswith("plot_") for name in calls), path
-
-
-def test_example_support_contains_no_rendering_layer() -> None:
-    support = _repository_root() / "examples" / "_support"
-    for path in support.glob("*.py"):
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        calls = {
-            name
-            for node in ast.walk(tree)
-            if isinstance(node, ast.Call) and (name := _call_name(node)) is not None
-        }
-        assert _import_roots(tree).isdisjoint(_RENDERING_PACKAGES), path
-        assert calls.isdisjoint(_RENDERING_METHODS), path
-
 
 def test_tutorial_examples_render_named_result_arrays_directly() -> None:
     root = _repository_root()

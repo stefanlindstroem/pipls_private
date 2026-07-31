@@ -91,10 +91,11 @@ support code does not hide chart construction.
 
 Structural tests for Pulp, Sugarcane, and Tobacco protect direct `component_path_` access,
 scikit-learn `cross_val_predict()`, immutable inspection results, explicit Matplotlib
-construction, absence of
-analytical CSV output, and the declared final PDF filenames without running the artifact-writing
-scripts. Tobacco tests also protect its full-SVD configuration, source-order response pagination,
-raw observation diagnostics, and caller-owned multipage PDF loops. Biplot tests protect
+construction, absence of analytical CSV output, physical coordinate order, and the declared final
+PDF filenames without running the artifact-writing scripts. Keep these source scans consolidated as
+AST-level ownership and data-flow checks rather than repeating per-example string inventories.
+Tobacco tests also protect its full-SVD configuration, source-order response pagination, raw
+observation diagnostics, and caller-owned multipage PDF loops. Biplot tests protect
 balanced-coordinate numerics in `pipls.inspection`; maintained example and
 renderer structure must expose direct Matplotlib arrows and labels, call `adjust_text()` after axis
 configuration, and avoid pinning adjusted label coordinates.
