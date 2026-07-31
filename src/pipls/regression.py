@@ -491,7 +491,7 @@ class PiPLSRegression(
 
         X_cs = X
         y_cs = y
-        _require_safe_core_products(X_cs, y_cs)
+        _check_core_product_range(X_cs, y_cs)
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
             result = fit_pipls_core(
                 X_cs,
@@ -512,7 +512,7 @@ class PiPLSRegression(
 
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
             coef_matrix = (
-                result.regression_map
+                result.standardized_regression_map
                 * self.y_scale_[None, :]
                 / self.x_scale_[:, None]
             )
@@ -559,7 +559,7 @@ def _clear_fitted_state(estimator: BaseEstimator) -> None:
             delattr(estimator, name)
 
 
-def _require_safe_core_products(X: FloatArray, y: FloatArray) -> None:
+def _check_core_product_range(X: FloatArray, y: FloatArray) -> None:
     x_max = float(np.max(np.abs(X)))
     y_max = float(np.max(np.abs(y)))
     if x_max == 0.0 or y_max == 0.0:

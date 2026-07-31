@@ -42,12 +42,12 @@ from .metrics import neg_response_standardized_mse
 from .model_selection import (
     CVSplit,
     _as_positive_float,
-    _is_leave_one_out_splits,
     _materialize_cv_splits,
     _max_predictor_rank,
     _pooled_oof_r2,
     _rank_test_scores,
     _search_predictor_ranks,
+    _splits_are_leave_one_out,
     _tied_score_mask,
     _validate_positive_int,
     _validate_singleton_fold_scoring,
@@ -434,7 +434,7 @@ class PiPLSSearchCV(
         evaluated_pairs = tuple(sorted(cache))
         self.search_is_exhaustive_ = len(evaluated_pairs) == len(admissible)
 
-        self.cv_results_ = _path_cv_results(
+        self.cv_results_ = _build_path_cv_results(
             cache=cache,
             evaluated_pairs=evaluated_pairs,
             n_components_key=n_components_key,
@@ -461,7 +461,7 @@ class PiPLSSearchCV(
                     _select_best_index(self.cv_results_, indices)
                 )
 
-        self.component_path_ = _component_path(
+        self.component_path_ = _build_component_path(
             results=self.cv_results_,
             conditional_indices=np.asarray(conditional_indices, dtype=np.intp),
             predictor_rank_policy=predictor_rank_policy,
@@ -505,7 +505,7 @@ class PiPLSSearchCV(
         self.validation_report_ = PiPLSValidationReport(
             selected_result=self.selected_result_,
             estimate_kind="selection-conditioned",
-            is_leave_one_out=_is_leave_one_out_splits(
+            is_leave_one_out=_splits_are_leave_one_out(
                 materialized.splits,
                 n_samples=int(y_array.shape[0]),
             ),
@@ -516,7 +516,7 @@ class PiPLSSearchCV(
         if self.refit:
             refit_started = perf_counter()
             self.selected_estimator_ = clone(template).set_params(**self.selected_params_)
-            _fit_controlled_estimator(
+            _fit_path_estimator(
                 self.selected_estimator_,
                 X_indexable,
                 y_indexable,
@@ -929,7 +929,7 @@ def _fold_predictor_limits(
         for split_index, (train, _) in enumerate(splits):
             X_train = _safe_indexing(X, train)
             y_train = _safe_indexing(y, train)
-            final_estimator, X_transformed = _fold_final_estimator_and_predictors(
+            final_estimator, X_transformed = _prepare_fold_pipls_inputs(
                 template=template,
                 X=X_train,
                 y=y_train,
@@ -953,7 +953,7 @@ def _fold_predictor_limits(
                 predictor_rank=algebraic_limit,
             )
             try:
-                _fit_controlled_estimator(probe, X_transformed, y_train)
+                _fit_path_estimator(probe, X_transformed, y_train)
             except _PredictorRankInfeasibleError as error:
                 verified_rank = error.verified_rank
             else:
@@ -969,7 +969,7 @@ def _fold_predictor_limits(
     return min(feature_counts), min(numerical_ranks)
 
 
-def _fold_final_estimator_and_predictors(
+def _prepare_fold_pipls_inputs(
     *,
     template: Any,
     X: ArrayLike,
@@ -1021,7 +1021,7 @@ def _evaluate_path_batch(
     )
 
 
-def _fit_controlled_estimator(estimator: Any, X: ArrayLike, y: ArrayLike) -> None:
+def _fit_path_estimator(estimator: Any, X: ArrayLike, y: ArrayLike) -> None:
     """Fit one path-owned estimator while suppressing only the support diagnostic."""
 
     _fit_with_ignored_warnings(
@@ -1090,7 +1090,7 @@ def _uses_default_path_scoring(scoring: Scoring) -> bool:
     return isinstance(scoring, str) and scoring == _DEFAULT_SCORING_NAME
 
 
-def _path_cv_results(
+def _build_path_cv_results(
     *,
     cache: CandidateCache,
     evaluated_pairs: tuple[tuple[int, int], ...],
@@ -1133,7 +1133,7 @@ def _path_cv_results(
     return results
 
 
-def _component_path(
+def _build_component_path(
     *,
     results: dict[str, Any],
     conditional_indices: IntArray,

@@ -130,7 +130,7 @@ def _materialize_cv_splits(
     )
 
 
-def _is_leave_one_out_splits(
+def _splits_are_leave_one_out(
     splits: tuple[CVSplit, ...],
     *,
     n_samples: int,

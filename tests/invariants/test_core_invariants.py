@@ -24,7 +24,7 @@ def test_core_orthogonality_dilation_and_factorization() -> None:
     assert np.all(np.diff(np.diag(result.D)) <= 0.0)
 
     direct_fitted = (X @ result.Pi) @ result.W @ result.C.T
-    factored_fitted = X @ result.regression_map
+    factored_fitted = X @ result.standardized_regression_map
     assert_allclose(factored_fitted, direct_fitted, atol=2e-12)
 
 
@@ -37,4 +37,4 @@ def test_core_supports_p_much_greater_than_n() -> None:
 
     assert result.x_rank == 6
     assert result.P.shape == (50, 3)
-    assert np.all(np.isfinite(result.regression_map))
+    assert np.all(np.isfinite(result.standardized_regression_map))

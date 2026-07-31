@@ -93,11 +93,11 @@ class PiPLSCoreResult:
     predictor_svd_solver: ResolvedSVDSolver
 
     @property
-    def regression_map(self) -> FloatArray:
+    def standardized_regression_map(self) -> FloatArray:
         """Return the centered/scaled regression map with shape ``(p, q)``."""
 
-        regression_map: FloatArray = self.P @ self.D @ self.Q.T
-        return regression_map
+        standardized_regression_map: FloatArray = self.P @ self.D @ self.Q.T
+        return standardized_regression_map
 
     def predict(self, X: ArrayLike) -> FloatArray:
         """Predict centered/scaled responses from a compatible predictor matrix."""
@@ -108,7 +108,7 @@ class PiPLSCoreResult:
                 "X has an incompatible number of features: "
                 f"expected {self.P.shape[0]}, got {X_array.shape[1]}."
             )
-        return X_array @ self.regression_map
+        return X_array @ self.standardized_regression_map
 
 
 def fit_pipls_core(

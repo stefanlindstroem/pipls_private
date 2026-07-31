@@ -24,8 +24,8 @@ def test_core_shapes_and_prediction_method() -> None:
     assert result.P.shape == (7, 3)
     assert result.D.shape == (3, 3)
     assert result.Q.shape == (4, 3)
-    assert result.regression_map.shape == (7, 4)
-    assert_allclose(result.predict(X), X @ result.regression_map)
+    assert result.standardized_regression_map.shape == (7, 4)
+    assert_allclose(result.predict(X), X @ result.standardized_regression_map)
 
 
 def test_core_rejects_inadmissible_inputs() -> None:
@@ -149,8 +149,16 @@ def test_randomized_predictor_svd_is_reproducible_and_close_to_full() -> None:
     assert first.predictor_svd_solver == "randomized"
     assert not first.x_rank_is_exact
     np.testing.assert_allclose(first.Pi, second.Pi)
-    np.testing.assert_allclose(first.regression_map, second.regression_map)
-    np.testing.assert_allclose(first.regression_map, full.regression_map, rtol=1e-6, atol=1e-8)
+    np.testing.assert_allclose(
+        first.standardized_regression_map,
+        second.standardized_regression_map,
+    )
+    np.testing.assert_allclose(
+        first.standardized_regression_map,
+        full.standardized_regression_map,
+        rtol=1e-6,
+        atol=1e-8,
+    )
 
 
 def test_randomized_predictor_svd_accepts_none_and_random_state() -> None:
@@ -184,4 +192,7 @@ def test_randomized_predictor_svd_accepts_none_and_random_state() -> None:
     )
 
     assert none_result.predictor_svd_solver == "randomized"
-    np.testing.assert_allclose(first.regression_map, second.regression_map)
+    np.testing.assert_allclose(
+        first.standardized_regression_map,
+        second.standardized_regression_map,
+    )

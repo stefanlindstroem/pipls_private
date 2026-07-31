@@ -27,4 +27,9 @@ def test_core_matches_frozen_trusted_reference() -> None:
     result = fit_pipls_core(X, Y, predictor_rank=3, n_components=2)
 
     assert_allclose(np.diag(result.D), _EXPECTED_DILATION, rtol=2e-13, atol=2e-13)
-    assert_allclose(result.regression_map, _EXPECTED_REGRESSION_MAP, rtol=2e-13, atol=2e-13)
+    assert_allclose(
+        result.standardized_regression_map,
+        _EXPECTED_REGRESSION_MAP,
+        rtol=2e-13,
+        atol=2e-13,
+    )
