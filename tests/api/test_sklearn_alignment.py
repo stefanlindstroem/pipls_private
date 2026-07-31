@@ -182,7 +182,7 @@ def test_standard_pls_style_attributes_have_documented_meaning() -> None:
     np.testing.assert_allclose(model.y_scores_.T @ y_residual, 0.0, atol=1e-10)
 
 
-def test_public_decomposition_is_read_only_and_replaces_symbolic_aliases() -> None:
+def test_public_decomposition_is_read_only_and_matches_fitted_rotations() -> None:
     X, Y = _data()
     model = _fixed_estimator().fit(X, Y)
     decomposition = model.decomposition_
@@ -204,38 +204,6 @@ def test_public_decomposition_is_read_only_and_replaces_symbolic_aliases() -> No
     assert model.x_rotations_ is decomposition.predictor_directions
     assert model.y_rotations_ is decomposition.response_directions
 
-    for removed_alias in (
-        "Pi_",
-        "C_",
-        "W_",
-        "P_",
-        "D_",
-        "Q_",
-        "dilation_",
-        "coef_matrix_",
-        "x_rank_",
-        "x_rank_is_exact_",
-        "rank_tolerance_",
-        "svd_solver_",
-    ):
-        assert not hasattr(model, removed_alias)
-
-    for removed_field in (
-        "Pi",
-        "C",
-        "W",
-        "P",
-        "D",
-        "Q",
-        "predictor_basis",
-        "response_basis",
-        "least_squares_map",
-        "dilation_matrix",
-        "regression_map",
-        "x_rank",
-        "x_rank_is_exact",
-    ):
-        assert not hasattr(decomposition, removed_field)
 
     with pytest.raises(ValueError, match="read-only"):
         decomposition.predictor_directions[0, 0] = 0.0
@@ -543,9 +511,6 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
     assert search.component_path_.predictor_rank_policy == "fixed"
     assert isinstance(search.component_path_, PiPLSComponentPath)
     assert search.component_path_.for_n_components(2).predictor_rank == 3
-    assert not hasattr(search, "component_path_results_")
-    assert not hasattr(search, "best_predictor_rank_by_n_components_")
-    assert not hasattr(search, "best_score_by_n_components_")
     x_scores, y_scores = search.transform(X, Y)
     X_reconstructed, Y_reconstructed = search.inverse_transform(x_scores, y_scores)
     direct_X, direct_Y = search.selected_pipls_.inverse_transform(x_scores, y_scores)

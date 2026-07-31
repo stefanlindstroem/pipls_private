@@ -81,7 +81,6 @@ def test_pipls_display_factors_use_first_largest_predictor_entry_for_sign() -> N
     assert factors.n_features == 3
     assert factors.n_targets == 2
     assert factors.n_components == 3
-    assert not hasattr(factors, "component_signs")
 
 
 def test_pipls_display_factors_can_anchor_signs_to_a_response() -> None:

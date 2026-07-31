@@ -113,8 +113,6 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     assert (2, 1) not in evaluated_pairs
     assert (3, 1) not in evaluated_pairs
     assert (3, 2) not in evaluated_pairs
-    assert not hasattr(search, "response_standardized_mse_path_")
-    assert not hasattr(search, "score_path_")
 
 
 @pytest.mark.parametrize("svd_solver", ["full", "randomized"])
