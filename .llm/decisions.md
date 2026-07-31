@@ -137,6 +137,7 @@ This index is navigation, not a substitute for those records.
 | `0129-remove-pre-release-search-aliases.md` | pre-release search alias removal | expose only `selected_estimator_` and `selected_pipls_` for the one refitted model; retain candidate-level `best_*` diagnostics |
 | `0130-mathematical-decomposition-field-names.md` | mathematical decomposition field names | expose `predictor_directions` and `response_directions` without pre-release aliases; retain standard PLS-style estimator rotation attributes |
 | `0131-concise-response-standardized-mse-names.md` | concise response-standardized MSE names | expose concise public scorer callables and stable default scorer string without aliases or numerical changes |
+| `0132-predicate-search-exhaustiveness-name.md` | predicate-style search exhaustiveness name | expose `search_is_exhaustive_` as the completed-search coverage predicate without an alias or behavioral change |
 
 ## Implemented estimator/search transition
 
@@ -223,6 +224,8 @@ plan contains an earlier or more general proposal:
   `y_rotations_`;
 - Decision 0131 shortens the public response-standardized scorer callables and stable default
   scorer string to the established `mse` terminology without aliases or numerical changes;
+- Decision 0132 renames the fitted completed-search coverage flag to
+  `search_is_exhaustive_` without an alias or search-behavior change;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
   Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls

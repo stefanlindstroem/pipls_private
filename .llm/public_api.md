@@ -142,7 +142,7 @@ unevaluated admissible pairs.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `selected_result_`, `selected_params_`,
-`path_search_exhaustive_`, optional selected refitted estimators, immutable `validation_report_`,
+`search_is_exhaustive_`, optional selected refitted estimators, immutable `validation_report_`,
 and the canonical immutable `component_path_` result. OOF arrays and their coverage counts live
 only in `validation_report_` and represent the selected row. The report composes the same immutable
 `PiPLSComponentResult` exposed as `selected_result_`; its component-count, predictor-rank,

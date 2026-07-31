@@ -93,7 +93,7 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     ).fit(X, Y)
 
     assert search.max_predictor_rank_ == 5
-    assert search.path_search_exhaustive_
+    assert search.search_is_exhaustive_
     assert search.cv_results_["n_components"].size == 12
     np.testing.assert_array_equal(
         search.component_path_.n_components,
@@ -519,7 +519,7 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
     assert search.best_n_components_ == 1
     assert search.best_predictor_rank_ == 1
     assert search.cv_results_["predictor_rank"].size < 12
-    assert not search.path_search_exhaustive_
+    assert not search.search_is_exhaustive_
 
     profile = search.predictor_rank_profile(1)
     np.testing.assert_array_equal(

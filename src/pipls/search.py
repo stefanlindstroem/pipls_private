@@ -180,7 +180,7 @@ class PiPLSSearchCV(
     max_predictor_rank_ : int
         Effective predictor-rank upper bound after support, dimensional, and
         verified fold-numerical-rank constraints.
-    path_search_exhaustive_ : bool
+    search_is_exhaustive_ : bool
         Whether every admissible pair was evaluated.
     scorer_ : callable
         Validated scikit-learn scorer used during fitting.
@@ -432,7 +432,7 @@ class PiPLSSearchCV(
                 )
 
         evaluated_pairs = tuple(sorted(cache))
-        self.path_search_exhaustive_ = len(evaluated_pairs) == len(admissible)
+        self.search_is_exhaustive_ = len(evaluated_pairs) == len(admissible)
 
         self.cv_results_ = _path_cv_results(
             cache=cache,

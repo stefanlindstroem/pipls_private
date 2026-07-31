@@ -4,6 +4,9 @@
 
 ### Repository
 
+- Rename the unreleased fitted boolean `PiPLSSearchCV.path_search_exhaustive_` to
+  `search_is_exhaustive_`, so the public name reads as a predicate while preserving the
+  exact completed-search coverage semantics.
 - Rename the unreleased response-standardized scoring callables to
   `response_standardized_mse` and `neg_response_standardized_mse`, and use
   `"neg_response_standardized_mse"` as the stable default search scorer string, without

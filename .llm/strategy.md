@@ -674,7 +674,7 @@ Current status: **all six new-user onboarding patches complete**.
 Decision 0105 completes a cross-layer alignment pass after the onboarding series. Maintained
 selection workflows now demonstrate the selection-only `PiPLSSearchCV()` default, the generated fixed
 reference includes `set_output()` and all public decomposition diagnostics, path details expose
-`path_search_exhaustive_`, and guide-layer Pulp descriptions use `predictor_rank_profile()` instead
+`search_is_exhaustive_`, and guide-layer Pulp descriptions use `predictor_rank_profile()` instead
 of direct candidate-column access.
 
 Current status: **documentation aligned with the current implementation**.
@@ -929,6 +929,6 @@ API1 is complete under Decision 0086. `PiPLSDecomposition` exposes descriptive f
 rank/solver diagnostics while the private core retains construction matrices. API2 is complete
 under Decision 0087: scorer state is private, exact weight aliases are removed, and
 `PiPLSSearchCV` retains `cv_results_`, concise immutable path/profile results, standard `best_*`
-attributes, `path_search_exhaustive_`, and `validation_report_` without execution-history or flat
+attributes, `search_is_exhaustive_`, and `validation_report_` without execution-history or flat
 OOF duplicates. Decision 0088 completes API3 by removing display-sign bookkeeping and redundant
 synthetic zero blocks and by suppressing constructor signatures for returned immutable records.

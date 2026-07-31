@@ -64,7 +64,7 @@ admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\mathrm{max}}$ di
 
 `search_method="optimal"` evaluates every admissible pair. `search_method="auto"` performs a
 deterministic adaptive coarse-to-fine search independently for each component count and may leave
-admissible ranks unevaluated. After fitting, `path_search_exhaustive_` states whether every
+admissible ranks unevaluated. After fitting, `search_is_exhaustive_` states whether every
 admissible pair was evaluated. Score ties within numerical tolerance favor the smaller predictor
 rank for a fixed component count. The global best then favors the smaller component count and the
 smaller predictor rank.

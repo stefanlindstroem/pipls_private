@@ -47,6 +47,7 @@ reference describe the current public behavior directly.
 - [0129: remove pre-release search compatibility aliases](0129-remove-pre-release-search-aliases.md)
 - [0130: mathematical decomposition field names](0130-mathematical-decomposition-field-names.md)
 - [0131: concise response-standardized MSE names](0131-concise-response-standardized-mse-names.md)
+- [0132: predicate-style search exhaustiveness name](0132-predicate-search-exhaustiveness-name.md)
 
 ## Validation, data, and benchmarks
 
