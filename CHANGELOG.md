@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Repository
+
+- Retire the complete benchmark layer: remove the four focused synthetic scripts, their dedicated
+  tests and generated-result paths, the public benchmark page, the normative benchmark contract,
+  and active navigation, packaging, lint, cleanup, and guide-layer references. Preserve historical
+  decision records and retain focused package tests for maintained numerical and API contracts.
+
 ### Documentation
 
 - correct the served example catalogue heading scope so the Tobacco-specific 1-SE discussion no

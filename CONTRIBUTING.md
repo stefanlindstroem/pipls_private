@@ -3,8 +3,8 @@
 Use a clean Git worktree and make one reviewable change at a time.
 
 The repository is the long-lived home of the installable `pipls` package. Contributions should
-serve package users through the public API, documentation, concise examples, transparent datasets,
-lightweight validation benchmarks, tests, packaging, or release maintenance. Paper-specific figure
+serve package users through the public API, documentation, concise examples, transparent datasets, tests, packaging, or release
+maintenance. Paper-specific figure
 pipelines, complete publication grids, manuscript tables, and paper-only comparator workflows
 belong in downstream reproduction repositories.
 
@@ -129,15 +129,13 @@ Do not add a replacement plotting submodule or hide chart construction in `examp
 The served reference pages own exact API behavior and advanced alternatives. Avoid repeating those
 contracts in tutorial prose.
 
-## Data, benchmarks, and generated files
+## Data and generated files
 
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
-Benchmark changes must follow `.llm/benchmarking.md`: one question, one readable script, and one
-minimal CSV output. Do not introduce a universal manifest or result schema.
 
 Do not commit generated result files without an explicit fixture decision. Generated example
-figures, benchmark results, tutorial assets, build artifacts, caches, and archive clutter are
-ignored. Do not add datasets without verified redistribution and adaptation terms.
+figures, tutorial assets, build artifacts, caches, and archive clutter are ignored. Do not add
+datasets without verified redistribution and adaptation terms.
 
 ## Repository map
 
@@ -145,7 +143,6 @@ ignored. Do not add datasets without verified redistribution and adaptation term
 - `docs/`: served documentation and excluded maintainer decision records;
 - `examples/`: numbered user workflows and their small support layer;
 - `datasets/`: transparent redistributable reference datasets;
-- `benchmarks/`: focused package-validation scripts;
 - `tests/`: numerical, API, integration, documentation, and repository tests;
 - `tools/`: documentation and distribution validation helpers;
 - `constraints/`: the maintainer-only minimum-dependency environment;

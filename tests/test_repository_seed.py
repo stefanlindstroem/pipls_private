@@ -30,7 +30,6 @@ _REQUIRED_LLM_CONTRACTS = {
     ".llm/public_api.md",
     ".llm/data_io.md",
     ".llm/dataset_layout.md",
-    ".llm/benchmarking.md",
     ".llm/analysis.md",
     ".llm/testing.md",
     ".llm/snapshot.sh",
@@ -505,7 +504,7 @@ def test_readme_and_contributing_have_distinct_audiences() -> None:
         assert maintainer_command not in readme
         assert maintainer_command in contributing
 
-    repository_paths = ("src/pipls/", "benchmarks/", "constraints/", ".llm/")
+    repository_paths = ("src/pipls/", "constraints/", ".llm/")
     assert not any(repository_path in readme for repository_path in repository_paths)
     assert all(repository_path in contributing for repository_path in repository_paths)
 
@@ -514,7 +513,7 @@ def test_public_markdown_has_no_ascii_control_characters() -> None:
     root = _repository_root()
     markdown_paths = sorted(
         path
-        for directory in (root / "docs", root / "examples", root / "benchmarks", root / "datasets")
+        for directory in (root / "docs", root / "examples", root / "datasets")
         for path in directory.rglob("*.md")
     )
     markdown_paths.extend([root / "README.md", root / "CONTRIBUTING.md", root / "CHANGELOG.md"])
@@ -572,7 +571,7 @@ def _create_snapshot_test_repository(path: Path) -> Path:
     shutil.copy2(_repository_root() / ".llm" / "snapshot.sh", root / ".llm" / "snapshot.sh")
     (root / "README.md").write_text("# Snapshot fixture\n", encoding="utf-8")
     (root / ".gitignore").write_text(
-        "benchmarks/results/\ndocs/assets/generated/\n.pytest_cache/\n*-snapshot.tar.gz\n",
+        "docs/assets/generated/\n.pytest_cache/\n*-snapshot.tar.gz\n",
         encoding="utf-8",
     )
 
@@ -742,9 +741,6 @@ def test_snapshot_ignores_ignored_generated_files(tmp_path: Path) -> None:
     cache = root / ".pytest_cache" / "state"
     cache.parent.mkdir()
     cache.write_text("cache\n", encoding="utf-8")
-    benchmark_result = root / "benchmarks" / "results" / "result.csv"
-    benchmark_result.parent.mkdir(parents=True)
-    benchmark_result.write_text("generated\n", encoding="utf-8")
     archive = tmp_path / "snapshot.tar.gz"
 
     subprocess.run(
@@ -759,7 +755,6 @@ def test_snapshot_ignores_ignored_generated_files(tmp_path: Path) -> None:
         names = {member.name.removeprefix("./") for member in handle.getmembers()}
     assert not any(name.startswith("docs/assets/generated/") for name in names)
     assert not any(name.startswith(".pytest_cache/") for name in names)
-    assert not any(name.startswith("benchmarks/results/") for name in names)
 
 
 def test_llm_workflow_scripts_are_executable() -> None:

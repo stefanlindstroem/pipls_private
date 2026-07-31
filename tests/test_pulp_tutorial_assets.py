@@ -472,7 +472,6 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     )
     assert project_validation == [
         {"Reference datasets": "datasets.md"},
-        {"Benchmarks": "benchmarks.md"},
         {"Reproducibility": "reproducibility.md"},
         {"Compatibility": "compatibility.md"},
     ]

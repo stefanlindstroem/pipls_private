@@ -29,7 +29,6 @@ nav:
       - Dataset API and generators: api/datasets.md
   - Project validation:
       - Reference datasets: datasets.md
-      - Benchmarks: benchmarks.md
       - Reproducibility: reproducibility.md
       - Compatibility: compatibility.md
   - Scientific background:

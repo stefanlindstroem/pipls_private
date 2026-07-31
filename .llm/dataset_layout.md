@@ -118,5 +118,5 @@ row-aligned, and that the metadata file parses as a non-empty YAML mapping.
 
 Tests do not duplicate the documentary contents of `metadata.yaml`: titles, descriptions,
 citations, dimensions, variable lists, preparation prose, and recorded hashes remain reviewable
-repository data rather than fixed test expectations. Exact scientific fixtures require an explicit
-package-benchmark decision with scientific meaning, tolerances, and update rules.
+repository data rather than fixed test expectations. Exact scientific fixtures require an explicit decision with scientific meaning, tolerances, and
+update rules.

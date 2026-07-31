@@ -141,3 +141,4 @@ reference describe the current public behavior directly.
 - [0117: commercial license, authorship, and citation](0117-commercial-license-authorship-and-citation.md)
 - [0118: maintained figure labeling and axis policy](0118-maintained-figure-labeling-and-axis-policy.md)
 - [0124: mathematical typography and descriptive subscripts](0124-mathematical-typography-and-subscripts.md)
+- [0125: retire the benchmark layer](0125-retire-benchmark-layer.md)

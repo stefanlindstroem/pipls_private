@@ -165,7 +165,7 @@ construction, SVG writing, closing, and the generated manifest. Generated tutori
 derived documentation assets and are not committed.
 
 Numbered examples are pedagogical scripts, not production applications. Each one must demonstrate a
-recognizable minimal use case, explicit comparison, or focused benchmark and must be understandable
+recognizable minimal use case or explicit comparison and must be understandable
 without knowledge of a paper, manuscript, or project history. State what the data represent and
 label printed values or generated artifacts so their meaning is clear. An isolated collection of API
 features without a coherent problem belongs in documentation or focused tests, not in a numbered
@@ -419,8 +419,8 @@ mathematical values are the predictor directions, mode dilations, and response d
 with rank/solver diagnostics and `standardized_regression_map`. The private `PiPLSCoreResult` retains
 $\Pi$, $C$, $W$, $P$, $D$,
 and $Q$ because numerical invariants and algorithm implementation still require the complete
-construction. Benchmarks that need the truncated predictor basis must reconstruct it within the
-benchmark rather than depend on a public intermediate matrix.
+construction. Downstream studies that need the truncated predictor basis must reconstruct it
+without depending on a public intermediate matrix.
 ## Public fitted-surface cleanup
 
 Decision 0087 distinguishes independent fitted results from exact aliases and execution traces.

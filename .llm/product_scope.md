@@ -19,7 +19,6 @@ The repository owns:
 - user documentation and API reference;
 - numbered user examples ranging from one minimal fit to complete reference workflows;
 - transparent redistributable reference datasets;
-- lightweight deterministic validation benchmarks;
 - package tests, compatibility policy, release notes, packaging, and versioned releases.
 
 These assets should answer practical software-user questions: how to install the package, construct
@@ -54,29 +53,10 @@ A paper-reproduction repository should depend on a tagged `pipls` release and ma
 assets independently. The `pipls` repository may link to such repositories after they become
 public, but it does not absorb their workflows.
 
-Ordinary PLS is a relevant lightweight package benchmark because it is the nearest practical
-baseline for Pi-PLS users. OLS or CCA belong here only when they protect a package-level
-mathematical identity, limiting case, or user-facing behavior; paper-only comparisons remain
-downstream.
-
-## Benchmark boundary
-
-Package benchmarks are lightweight validation assets, not publication claims. Synthetic benchmarks
-should be primary because ranks, latent structure, signal strengths, noise, and subspaces are known.
-Reference real datasets provide transparent user-run examples and usage orientation.
-
-Benchmarks should protect one question at a time, such as:
-
-- recovery of known synthetic structure by a fixed Pi-PLS model;
-- Pi-PLS rank-selection behavior;
-- paired prediction comparison with ordinary PLS under predictor-specific nuisance;
-- consistency between exact and randomized numerical paths;
-- whether an ordinary public path-selection workflow runs transparently on one reference dataset
-  and returns correctly labeled validation diagnostics.
-
-Each question receives its own small script and minimal CSV output. Runtime and memory are separate
-questions and are not added to scientific result tables by default. Large experiment grids, final
-paper numbers, and manuscript plotting stay outside this repository.
+Ordinary PLS remains relevant in the dedicated component-path comparison example. Broader
+comparative studies, including synthetic recovery, nuisance sensitivity, solver comparisons,
+runtime, and memory studies, belong in downstream research or reproduction repositories unless a
+future package contract requires a focused regression test.
 
 ## Current model standardization and deferred block-aware variants
 
@@ -119,12 +99,9 @@ and its own small reviewable increments.
 The package-product boundary and public navigation cleanup are complete. The repository no longer
 contains paper-reproduction placeholders or promises to implement manuscript workflows.
 
-The first universal synthetic manifest, result schema, and broad CI runner were removed after owner
-review because they combined unrelated questions and produced an unnecessarily wide table. The
-focused synthetic sequence now includes implemented fixed-structure recovery, rank-selection,
-paired predictor-nuisance, and solver-consistency benchmarks, each with one minimal per-question CSV
-output. Pulp, Sugarcane, and Tobacco are transparent user-run examples rather than benchmark or
-default-test jobs. Example 04 keeps the Pi-PLS and standard PLS (NIPALS) comparison paths in memory
+The former synthetic benchmark sequence was retired after serving its development-validation
+purpose. Pulp, Sugarcane, and Tobacco are transparent user-run examples rather than default-test
+jobs. Example 04 keeps the Pi-PLS and standard PLS (NIPALS) comparison paths in memory
 and writes only the overlaid final PDFs. Sugarcane keeps its Pi-PLS path, fixed-model OOF predictions,
 and inspection results in memory and writes only final PDF figures. Pulp follows the same direct
 boundary and adds a conditional predictor-rank-profile figure. Tobacco is also direct while

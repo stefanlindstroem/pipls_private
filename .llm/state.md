@@ -19,8 +19,8 @@ removed; example 02 supplies the short synthetic path-selection tutorial and ind
 prediction workflow, while example 03 gives leave-one-out validation one focused small-calibration
 use case.
 
-Phases A through F4 are complete and committed. The first broad E4 benchmark
-implementation was removed and replaced by focused question-specific benchmarks:
+Phases A through F4 are complete and committed. The former E4 benchmark sequence was completed
+and later retired by Decision 0125 after its development-validation purpose had been served:
 
 - repository, packaging, clean committed-tree root-relative snapshots, and direct Git patch
   workflow;
@@ -163,7 +163,7 @@ Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
 analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
-is retained only in the dedicated example-04 CV-MSE comparisons and declared benchmarks. Examples
+is retained only in the dedicated example-04 CV-MSE comparison. Examples
 05–07 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
 model.
 
@@ -200,14 +200,13 @@ Decision 0024 defines `pipls` as a long-lived software-product repository. It ow
 - the installable package and public API;
 - user documentation and numbered examples from a minimal fixed fit through complete analyses;
 - transparent reference datasets;
-- lightweight synthetic and real-data validation benchmarks;
 - tests, packaging, compatibility policy, and releases.
 
 It does not own manuscript figures, complete publication experiment grids, paper-only OLS/CCA
 comparisons, cached paper results, or publication-specific environments. Those belong in downstream
 reproduction repositories that pin tagged `pipls` releases.
 
-Ordinary PLS remains an appropriate package benchmark because it is the nearest practical baseline
+Ordinary PLS remains the comparator in the dedicated component-path example because it is the nearest practical baseline
 for Pi-PLS users. OLS or CCA are included only when they protect a package-level identity, limiting
 case, or public behavior.
 
@@ -237,7 +236,7 @@ case, or public behavior.
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Publication assets | downstream repositories pin released `pipls` versions |
-| Synthetic benchmark plan | one user question, one readable script, and one minimal CSV output per benchmark; ordinary PLS is the sole planned external comparator |
+| Retired benchmark layer | the former focused synthetic scripts, result contracts, tests, and documentation were removed by Decision 0125 |
 | Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
 | Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
 | Model inspection | immutable numerical inspection is implemented; examples render every chart directly with Matplotlib and own all panel and report composition |
@@ -330,29 +329,13 @@ Until the owner starts a dedicated phase:
 - require every future learned scaling rule to fit inside its corresponding training fold and the
   final full-training refit.
 
-## Focused benchmark status
+## Retired benchmark layer
 
-Decision 0030 supersedes the earlier universal manifest, universal result schema, and broad CI
-runner. Those implementation assets have been removed. The four focused synthetic questions are
-implemented independently:
-
-1. fixed-structure recovery by fixed Pi-PLS;
-2. adaptive Pi-PLS rank selection;
-3. paired Pi-PLS versus ordinary PLS prediction under predictor-specific nuisance;
-4. full-versus-randomized solver consistency.
-
-The earlier real-data smoke-check scripts and full example-execution tests were removed because they
-duplicated the numbered analyses. `make examples` runs every numbered example as an explicit
-application-validation action. Example 04 keeps immutable Pi-PLS and standard PLS (NIPALS) paths
-in memory and generates the overlaid comparison PDFs directly. Examples 05–07 plot
-`component_path_` without table conversion, fit selected fixed estimators, use
-scikit-learn `cross_val_predict`, calculate inspection results in memory, and write only final PDF
-figures. Pulp additionally plots the evaluated predictor-rank profile at three components. Tobacco
-uses the stored 1-SE component recommendation, then writes three-page prediction-diagnostic and
-coefficient PDFs while preserving source-order response pagination. Required result directories are
-tracked and preserved by `make clean`. Default tests
-retain dataset-layout, component-path API, immutable PLS-helper, and workflow-structure contracts
-without executing the artifact-producing real-data scripts.
+Decision 0125 removes the four focused synthetic benchmark scripts, their dedicated tests, the
+public benchmark page, and the normative benchmark contract. Their development-validation purpose
+was complete, and they did not define package acceptance thresholds. Numerical, estimator, search,
+synthetic-data, and randomized-SVD behavior remain protected by focused package tests. Historical
+decision records remain unchanged.
 
 ## Legacy dataset licensing review
 
@@ -376,11 +359,6 @@ redistribution and adaptation for the repository's general use.
 
 No additional legacy dataset is pending integration. A future real dataset must add a distinct
 package-level use case and pass the source-level licensing gate before implementation work begins.
-
-Every benchmark owns one readable script and one minimal CSV output. Generated CSV files remain
-ignored and are excluded from snapshots. Software versions, execution controls, timings, and
-unrelated metrics are omitted unless they answer that benchmark's explicit question. OLS, CCA,
-publication grids, and figure generation remain outside the repository.
 
 ## Recent completed increments
 
@@ -415,7 +393,7 @@ Decision 0119 adds `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth`
 manuscript-aligned synthetic capability. It implements independent standard-normal latent scores
 and loading entries plus independent Gaussian predictor/response noise, with no normalization,
 orthonormalization, strength, or observed-scale transformation. Existing configurable generators,
-benchmarks, examples, estimator/search behavior, and practical real-data workflows are unchanged.
+examples, estimator/search behavior, and practical real-data workflows are unchanged.
 
 Decision 0120 makes the companion manuscript the scientific source for the canonical public theory
 page. The documentation now includes the retained-subspace projector decomposition, the
@@ -453,7 +431,7 @@ human-audit finding. Do not prepare or publish a package release.
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.
 
-The focused synthetic benchmarks and representative Pulp, Sugarcane, and Tobacco examples are
+The representative Pulp, Sugarcane, and Tobacco examples are
 complete. Corn, the legacy Steel table, SARCOS, and FRED-MD are intentionally outside the repository
 under Decision 0041. The included assets remain validation and documentation material during
 release hardening.
@@ -469,7 +447,6 @@ Use this order when sources disagree:
 2. accepted decision records under `docs/decisions/`;
 3. normative `.llm/product_scope.md`, `.llm/mathematics.md`, `.llm/numerical_contracts.md`,
    `.llm/public_api.md`, `.llm/data_io.md`, `.llm/dataset_layout.md`, and
-   `.llm/benchmarking.md`;
 4. source and tests as evidence of implemented behavior;
 5. this current-state handoff and `.llm/strategy.md`.
 
@@ -487,7 +464,6 @@ From an uploaded snapshot, a maintainer should:
 4. read the applicable mathematical, numerical, API, and development contracts;
 5. inspect the affected source and tests rather than trusting document claims alone;
 6. read `.llm/data_io.md` and `.llm/dataset_layout.md` for dataset, real-data, or example work;
-7. read `.llm/benchmarking.md` for benchmark questions, scripts, metrics, outputs, or fixtures;
 8. read `.llm/analysis.md` for fitted-model interpretation, plotting, prediction diagnostics, or
    analysis artifacts;
 9. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;

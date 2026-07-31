@@ -26,16 +26,16 @@ test: ## Run the test suite.
 	PYTHONPATH=src $(PYTHON) -m pytest -q
 
 lint: ## Run Ruff lint checks.
-	$(PYTHON) -m ruff check src tests benchmarks examples tools
+	$(PYTHON) -m ruff check src tests examples tools
 
 format: ## Format Python files with Ruff.
-	$(PYTHON) -m ruff format src tests benchmarks examples tools
+	$(PYTHON) -m ruff format src tests examples tools
 
 typecheck: ## Run strict mypy checks.
 	$(PYTHON) -m mypy src
 
 clean: ## Remove generated files and caches.
-	rm -rf build dist site .mkdocs-pages.yml docs/assets/generated benchmarks/results .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
+	rm -rf build dist site .mkdocs-pages.yml docs/assets/generated .pytest_cache .mypy_cache .ruff_cache .coverage coverage.xml htmlcov
 	find examples/results -type f ! -name .gitkeep -delete
 	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 	find . -type d -name '*.egg-info' -prune -exec rm -rf {} +

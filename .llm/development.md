@@ -16,7 +16,7 @@
 - Follow scikit-learn estimator conventions for constructor parameters, cloning, validation,
   fitted attributes, feature names, conditional delegation, and scalar `score()`.
 - Keep constructor arguments unchanged; resolve data-dependent values in `fit()`.
-- Keep the fixed numerical core independent from preprocessing, CV, datasets, benchmark policy,
+- Keep the fixed numerical core independent from preprocessing, CV, datasets,
   and publication-specific workflows.
 - Reuse the shared private evaluation/search machinery rather than adding a second fold loop.
 - Preserve current estimator-internal centering/scaling: fit its statistics inside every
@@ -40,7 +40,7 @@
 - Weighted fitting and `sample_weight` propagation during fitting are out of scope unless the
   project owner explicitly reverses that decision.
 - Every numbered example must present a recognizable user task, explicit comparison, or focused
-  benchmark. It must explain its data and label its output without relying on publication context or
+  comparison. It must explain its data and label its output without relying on publication context or
   earlier project history. Do not ship context-free API demonstrations as numbered examples.
 - For real-data examples, read and form `X` and `Y` explicitly in the script. Do not introduce a
   public registry, generic loader, metadata-driven runtime path, or helper function that obscures
@@ -106,10 +106,8 @@
   repository URLs from the Actions context, rebuild the site with those canonical values, and
   deploy `site/`. Keep Pages write and identity-token permissions confined to the deployment job;
   never commit the temporary `.mkdocs-pages.yml` file or generated site.
-- Exact dataset values, shapes, columns, hashes, or benchmark metrics require an explicit
-  package-benchmark decision; do not freeze them accidentally in repository-layout tests.
-- Design each benchmark around one explicit user-facing question. Give it one readable script and
-  one minimal CSV header; do not recreate a universal manifest, universal schema, or broad runner.
+- Exact dataset values, shapes, columns, or hashes require an explicit fixture decision; do not
+  freeze them accidentally in repository-layout tests.
 - Preserve fold-local standardization and keep generated outputs out of Git unless a decision
   explicitly freezes a narrow fixture.
 - Design files and command outputs for both humans and machines. When results are naturally tabular,

@@ -13,7 +13,7 @@ Tests may verify:
 
 - public Python behavior, numerical invariants, validation, fitted attributes, and supported
   scikit-learn composition;
-- focused benchmark runners and small example helper contracts;
+- small example helper contracts;
 - package and source-distribution contents, plus clean installed wheel and source-distribution
   runtime behavior at the public import and representative fit/predict boundary; extracted source
   distributions must retain example output-directory placeholders and run example 01 after the
@@ -31,8 +31,6 @@ Tests may verify:
 - the Git-tracked example-result tree containing only `.gitkeep` directory placeholders, while
   ignored local outputs remain permitted;
 - repository dataset tables being readable numeric comma-separated files with aligned rows;
-- explicitly frozen package-benchmark results after a separate decision defines their scientific
-  meaning, tolerances, and update procedure.
 
 ## What tests should not freeze
 
@@ -53,40 +51,12 @@ resolvable links in the served dataset guide; it must not hard-code the current 
 
 ## Dataset boundary
 
-Before benchmark fixtures are introduced, repository dataset tests should check file layout and
+Repository dataset tests should check file layout and
 technical readability, not exact scientific values, row examples, column lists, dimensions, or
 metadata checksums. Public container tests should verify recursive freezing, defensive array copies,
 acceptance of non-object metadata arrays, and rejection of object-dtype arrays whose elements could
 remain mutable. Git history, review, public provenance, and the dataset documentation remain the
 source of record for documentary contents.
-
-Focused synthetic package benchmarks are executable contracts once implemented. Tests may validate
-the question-specific script, deterministic generation, finite metrics, metric domains, exact
-minimal CSV header, and repeatability of scientific values. Component-path API tests may verify one
-ordered result per requested component count, aligned read-only arrays with stable dtypes, a numeric
-predictor rank and explicit policy for every count, scalar lookup, pickling, and agreement with
-conditional rows in `cv_results_`. They should also verify that `cv_mse_standard_error` is derived
-from the stored population fold SD when at least two split values are available, raises explicitly
-for a one-split path, is read-only for array results,
-and survives pickle reconstruction without becoming stored constructor state. Recommendation-method
-tests should verify exact stored minimum lookup, smallest-component handling of exact ties, use of
-the minimum row's standard error, first eligible ascending component selection, aligned predictor
-rank and policy, one-split behavior, nonfinite-threshold failure, and absence of new stored state or
-search mutation. Reference-documentation tests may require the two stable recommendation method
-names in the path-analysis and generated API references, require both recommendation methods in
-example 07, require its horizontal 1-SE threshold and direct documentation cross-links from both
-example catalogues, and protect both methods from the README, documentation home, tutorials,
-tutorial renderers, and all other numbered examples. Decision-index tests should require every
-shipped decision record to appear exactly once in the served maintainer index. Rendering-policy
-tests should verify that every maintained CV-MSE `errorbar()`
-call uses
-`cv_mse_standard_error` and that dependent vertical-limit calculations use the same quantity.
-Fitted-surface tests should verify that exact
-rotation aliases,
-scorer plumbing, path execution history, candidate counters, and flat OOF duplicates remain absent;
-OOF behavior is tested through `validation_report_`. Predictor-rank-profile tests should verify evaluated-only
-ascending ranks, aligned defensive read-only arrays, scorer-general selection, invalid lookup,
-pickling, and consistency with both `cv_results_` and `component_path_`.
 
 Post-analysis inspection tests should verify mathematical identities, shapes, direct-construction
 and pickle invariants, finite-value validation, defensive copying, read-only results, deterministic
@@ -138,23 +108,19 @@ without writing application artifacts.
 The minimal numbered example may be protected structurally and through the package-level numerical
 and direct-rendering tests; do not duplicate its arrays as a frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
-analyses as real-data benchmark scripts. `make examples` is the explicit application-validation
+analyses as duplicate repository scripts. `make examples` is the explicit application-validation
 target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset
 readability, the direct Pulp numerical workflow, direct Pulp, Sugarcane, and Tobacco workflow
 structure, component-path API, inspection equations,
 direct rendering from immutable inspection arrays and the immutable ordinary-PLS comparison-helper contract.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
-benchmarks.
+comparative studies.
 
 Documentation workflow tests should protect strict checkout and source-distribution validation,
 master-only Pages deployment, least-privilege deployment permissions, canonical repository-derived
 configuration, and generated-artifact upload. They should not pin action implementation details
 beyond the maintained official Pages action majors.
 
-Package benchmark work may deliberately freeze selected shapes, values, metrics, or hashes. Such
-assertions require an explicit decision record describing why the value is stable, what software
-behavior it protects, and what tolerance or update procedure applies. Publication-result fixtures
-belong in downstream reproduction repositories.
 
 ## Review rule
 

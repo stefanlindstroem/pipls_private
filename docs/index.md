@@ -39,7 +39,6 @@ standard PLS-family and Pi-PLS-specific plots.
 ## Project validation
 
 - [Reference datasets](datasets.md): provenance, licensing, adaptation, and matrix dimensions.
-- [Benchmarks](benchmarks.md): focused package-level numerical and selection checks.
 - [Reproducibility](reproducibility.md): software, data, and generated-documentation controls.
 - [Compatibility](compatibility.md): supported Python and dependency versions.
 

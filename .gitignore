@@ -20,7 +20,6 @@ notebooks/.ipynb_checkpoints/
 *~
 *.patch
 *-snapshot.tar.gz
-benchmarks/results/
 examples/results/*
 !examples/results/.gitkeep
 !examples/results/pls_path_comparison/
@@ -33,7 +32,6 @@ examples/results/*
 !examples/results/sugarcane_post_analysis/.gitkeep
 !examples/results/tobacco_post_analysis/
 !examples/results/tobacco_post_analysis/.gitkeep
-benchmarks/.cache/
 
 .mkdocs-pages.yml
 

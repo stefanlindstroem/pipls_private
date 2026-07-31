@@ -5,8 +5,7 @@
 Pi-PLS is a PLS-family method for multivariate regression. The repository is the long-lived home of
 the installable `pipls` package: its numerical core, scikit-learn-compatible public interfaces,
 validation utilities, synthetic generators, user documentation, numbered examples, staged fitted-
-model analysis tools, transparent reference datasets, lightweight validation benchmarks, tests,
-packaging, and releases.
+model analysis tools, transparent reference datasets, tests, packaging, and releases.
 
 The repository is not the reproduction environment for any one paper. Read
 `.llm/product_scope.md` for the normative product/publication boundary.
@@ -39,9 +38,8 @@ the remaining companion-analysis candidates intentionally excluded Corn, the leg
 Steel table, SARCOS, and FRED-MD from this repository because the exact source materials do not
 carry sufficiently clear redistribution rights. Public navigation now separates tutorials, examples, programming reference, project
 validation, and scientific background.
-The over-general synthetic manifest, universal result schema, and broad CI runner have been removed.
-The benchmark layer implements all four focused synthetic questions as separate scripts. Pulp,
-Sugarcane, and Tobacco are component-path examples rather than benchmark or test-suite executions.
+The former benchmark layer has been retired after serving its development-validation purpose.
+Pulp, Sugarcane, and Tobacco remain component-path examples rather than test-suite executions.
 `make examples` runs every numbered example explicitly, beginning with the literal-matrix
 `01_minimal_fit_and_plot.py`, followed by the synthetic path-selection tutorial example 02, and
 including the complete real-data analyses. Example 04
@@ -102,7 +100,7 @@ carry their own output-container configuration through cloning and refit.
 Decisions 0042 and 0045 define the staged fitted-model analysis surface. Pi-PLS-specific $P$, $D$,
 and $Q$ inspection remains explicitly method-owned. Scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics are shared PLS-family analyses with an
-estimator-neutral API. Ordinary PLS remains the component-path and benchmark comparator. The numbered post-analysis examples apply shared tools only to the selected Pi-PLS model and fit no
+estimator-neutral API. Ordinary PLS remains the component-path comparator. The numbered post-analysis examples apply shared tools only to the selected Pi-PLS model and fit no
 final ordinary PLS model. Pulp, Sugarcane, and Tobacco own their OOF prediction, inspection,
 figure composition, and final PDF output directly. Tobacco additionally owns source-order response
 pagination and raw observation diagnostics.
@@ -144,7 +142,6 @@ implementing or reviewing this surface.
   protocols.
 - `tests/estimator_checks/`: applicable scikit-learn common estimator checks.
 - `tests/regression/`: frozen comparisons with trusted implementations.
-- `tests/benchmarks/`: focused synthetic benchmark behavior and output-contract tests; future frozen
   fixtures require separate review.
 - `tests/examples/`: small-data helper, CSV, PDF, and workflow-structure contracts; complete real-data
   examples are user-run and are not executed by the default test suite.
@@ -169,7 +166,6 @@ implementing or reviewing this surface.
   `adjustText` requirements are grouped in the `examples` extra and repeated in `dev` for complete
   repository validation. The `docs` extra owns the strict site and tutorial-rendering toolchain.
   There is no dataset-access extra because shipped datasets are ordinary repository CSV assets.
-- `benchmarks/`: four focused synthetic package-validation scripts, each with one minimal generated
   CSV. Real-data analyses are not duplicated here.
 - `docs/`: the self-contained documentation source, including served user guides, implemented
   theory, generated-API source pages, release notes, local MathJax configuration, and maintainer
@@ -195,7 +191,6 @@ implementing or reviewing this surface.
 - `.llm/public_api.md`: public constructors, methods, outputs, defaults, and exclusions.
 - `.llm/data_io.md`: transparent real-data reading and example policy.
 - `.llm/dataset_layout.md`: normative committed-dataset file and metadata convention.
-- `.llm/benchmarking.md`: normative benchmark questions, minimal outputs, interpretation boundaries,
   and implementation order.
 - `.llm/analysis.md`: normative fitted-model interpretation, prediction-diagnostic, plotting, and
   analysis-artifact contracts.
@@ -206,7 +201,7 @@ implementing or reviewing this surface.
 
 ## Architectural invariants
 
-- Runtime code does not import from `.llm`, tests, examples, docs, scripts, datasets, or benchmarks.
+- Runtime code does not import from `.llm`, tests, examples, docs, scripts, or datasets.
 - Served Markdown under `docs/` is self-contained and does not link outside the documentation
   source tree. It defines Pi-PLS, component count, predictor rank, and the CV-MSE selection curve
   before specialized path or factorization terminology. `.llm` contracts and `docs/decisions/` may
@@ -221,7 +216,7 @@ implementing or reviewing this surface.
   prints the resolved interpreter and runtime dependency versions. The build workflow separately
   installs the wheel and source distribution into clean environments and verifies public runtime
   behavior outside the checkout.
-- The fixed numerical core does not own preprocessing, CV, datasets, benchmark policy, or
+- The fixed numerical core does not own preprocessing, CV, datasets, or
   publication workflows.
 - Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required
   registry or generic loader.

@@ -760,7 +760,6 @@ def test_mathematical_typography_and_descriptive_subscripts_are_consistent() -> 
     )
     theory_page = (root / "docs" / "theory.md").read_text(encoding="utf-8")
     path_page = (root / "docs" / "path_analysis.md").read_text(encoding="utf-8")
-    benchmark_page = (root / "docs" / "benchmarks.md").read_text(encoding="utf-8")
     mathematics = (root / ".llm" / "mathematics.md").read_text(encoding="utf-8")
 
     for page in (dataset_page, manuscript_page):
@@ -804,16 +803,6 @@ def test_mathematical_typography_and_descriptive_subscripts_are_consistent() -> 
     ):
         assert required in path_page
 
-    for required in (
-        r"\mathbf{A}",
-        r"\mathbf{B}",
-        r"\mathbf{Q}_A",
-        r"\mathbf{Q}_B",
-        r"\mathbf{P}",
-        r"\boldsymbol{\Pi}",
-        r"\mathbf{Q}",
-    ):
-        assert required in benchmark_page
 
     for variable_index in ("d_k=D_{kk}", "P_{:k}", "Q_{:k}", "s_i"):
         assert variable_index in mathematics

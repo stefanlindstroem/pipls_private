@@ -422,7 +422,7 @@ def make_pipls_latent_geometry(
 
     This manuscript-aligned generator is separate from
     :func:`make_pipls_regression`, which remains the configurable package
-    generator used by existing examples and benchmarks.
+    generator used by existing examples and validation workflows.
 
     Parameters
     ----------

@@ -264,7 +264,7 @@ analysis. Final public names for $P$, $D$, and $Q$ inspection retain an explicit
 Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics use
 estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiPLSRegression`
 objects. Numbered examples apply these shared tools only to the selected Pi-PLS model. Ordinary PLS
-remains available in the dedicated component-path comparison example and declared comparator benchmarks. Examples 05–07 evaluate only Pi-PLS paths.
+remains available in the dedicated component-path comparison example. Examples 05–07 evaluate only Pi-PLS paths.
 
 Decision 0042 introduced a staged inspection and plotting design. Decisions 0079--0082 establish
 the final boundary: `pipls.inspection` owns pure NumPy computations and immutable result objects,

@@ -8,7 +8,7 @@ LLM-assisted development. Current decision records and normative `.llm` contract
 or historical planning materials as the maintained source of project intent.
 
 The repository-product boundary is normative in `.llm/product_scope.md`: `pipls` owns package
-functionality, user documentation, examples, datasets, lightweight validation benchmarks, tests,
+functionality, user documentation, examples, datasets, tests,
 packaging, and releases. Paper-specific reproduction belongs in downstream repositories that pin
 tagged `pipls` versions.
 
@@ -40,14 +40,14 @@ tagged `pipls` versions.
 9. Keep real-data input transparent: examples read `X` and `Y` explicitly and do not depend on
    a public registry, generic loader, or required metadata sidecar.
 10. Keep numbered examples self-contained and user-oriented: each demonstrates a recognizable use
-    case, comparison, or benchmark, explains its data, labels its output, and assumes no publication
+    case or comparison, explains its data, labels its output, and assumes no publication
     context.
 11. Update `.llm/state.md`, the relevant `.llm` contracts, and user-facing documentation when a
     phase, roadmap, architecture, or public contract changes.
 12. Return one root-relative Git patch per increment with an explicit validation report.
 13. Use direct `git apply`, `git add`, and `git commit` commands; do not maintain wrapper scripts
     for patch application or committing.
-14. Do not combine algorithm porting, API expansion, dataset migration, benchmark freezing, and
+14. Do not combine algorithm porting, API expansion, dataset migration, validation-contract changes, and
     repository-product cleanup in one patch unless the dependency cannot be separated.
 15. Keep repository tests durable: verify behavior and file structure, not current roadmap prose
     or documentary metadata values.
@@ -356,7 +356,11 @@ Current status: **complete**. The paper-reproduction placeholders have been remo
 navigation now describes the installable package, user documentation, examples, datasets,
 validation, and release responsibilities.
 
-### Phase E4a: focused synthetic benchmark design
+### Historical Phase E4a: focused synthetic benchmark design
+
+Decision 0125 later retired this complete layer after it had served its development-validation
+purpose. The following text records historical implementation intent rather than current scope.
+
 
 Define package benchmarks as separate user-facing questions rather than a universal experiment
 framework.
@@ -377,7 +381,7 @@ Acceptance conditions:
 Current status: **complete**. Decision 0030 removes the earlier universal manifest/schema/runner
 architecture and establishes one question, one script, and one minimal CSV output per benchmark.
 
-### Phase E4b: focused benchmark implementation
+### Historical Phase E4b: focused benchmark implementation
 
 Implement the accepted benchmarks one at a time so each patch remains scientifically and
 operationally reviewable.
@@ -482,7 +486,7 @@ latent-model panels; coefficient curves remain full-width pages.
 Reduce the remaining application-layer indirection before release. Public numerical results should
 be directly accessible as arrays or immutable objects, and numbered examples should operate on
 those results in memory rather than using generated CSV files as analytical or plotting
-intermediates. Committed dataset tables and final focused benchmark CSV products remain outside
+intermediates. Committed dataset tables remain outside
 this restriction.
 
 Implementation order:
@@ -833,7 +837,7 @@ Current status: **maintained figure rendering policy complete**.
 Decision 0119 adds a separate exact Gaussian latent-geometry generator rather than changing the
 existing configurable synthetic API. The new function follows the manuscript score/loading
 orientation and draw distribution, returns immutable manuscript-oriented truth, and leaves all
-real-data, estimator, search, example, and benchmark behavior unchanged.
+real-data, estimator, search, and example behavior unchanged.
 
 Current status: **manuscript latent-geometry generator complete**.
 
@@ -844,7 +848,7 @@ the retained-subspace projector decomposition, the cross-covariance response-sub
 the latent least-squares and diagonal relations, the panoramic interpretation, comparative limiting
 cases, and the nominal fitted dimension $(r_\pi+q-h)h$ after $\Pi$ is fixed. The Pulp source paper
 remains an application and provenance reference rather than the source of Pi-PLS theory. No package
-behavior, default, example, benchmark, validation protocol, or real-data workflow changes.
+behavior, default, example, validation protocol, or real-data workflow changes.
 
 Current status: **companion-manuscript theory alignment complete**.
 
@@ -874,7 +878,7 @@ Decision 0123 adds one served guide for the exact manuscript Gaussian latent dis
 separates distribution reproduction, deterministic seeded realization, and complete publication
 reproduction; demonstrates stored truth identities and oracle synthetic dimensions; and keeps
 publication grids, comparator orchestration, and reporting downstream. Search, validation,
-examples, benchmarks, rendering, and real-data behavior remain unchanged.
+examples, rendering, and real-data behavior remain unchanged.
 
 Current status: **companion-manuscript synthetic-data guide complete**.
 

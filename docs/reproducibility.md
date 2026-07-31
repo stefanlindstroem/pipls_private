@@ -1,8 +1,8 @@
 # Reproducibility
 
 The `pipls` repository treats reproducibility as a software-product responsibility: distributed code,
-numerical contracts, deterministic synthetic generation, transparent example data, executable
-examples, and lightweight validation benchmarks should be reviewable from the repository itself.
+numerical contracts, deterministic synthetic generation, transparent example data, executable examples, and transparent validation contracts should be reviewable from the
+repository itself.
 
 ## Software reproducibility
 
@@ -106,10 +106,9 @@ predictor-specific, and response-specific components. The separate
 Gaussian latent distribution and distinguishes reproducing that distribution from reproducing one
 seeded realization or a complete publication study.
 
-The package benchmark plan is documented in [`benchmarks.md`](benchmarks.md). Each benchmark answers
-one question and writes one minimal CSV output; unrelated metrics, software metadata, and timings
-are not combined into a universal table. Publication grids, paper-only comparators, and manuscript
-figure or table orchestration remain downstream assets that pin a released package version.
+Scientific comparison studies, large simulation grids, paper-only comparators, and manuscript
+figure or table orchestration remain downstream assets that pin a released package version. The
+package test suite protects maintained numerical and API contracts directly.
 
 ## Reference datasets
 
@@ -125,8 +124,7 @@ for every integration, together with related data papers where applicable.
 
 Examples read `X.csv` and `Y.csv` directly. Example 04 operates on immutable Pi-PLS and ordinary-PLS
 paths in memory. Pulp, Sugarcane, and Tobacco operate on `component_path_`, scikit-learn OOF
-predictions, and immutable inspection results in memory. Every numbered real-data workflow writes only
-final PDF figures; generated CSV products are reserved for the focused benchmark scripts.
+predictions, and immutable inspection results in memory. Every numbered real-data workflow writes only final PDF figures.
 Metadata supports repository review but is not required by the runtime API. Dataset-specific
 transformations that matter to users are described publicly; private preparation archives and
 inaccessible paths are not part of the repository.
@@ -134,5 +132,5 @@ inaccessible paths are not part of the repository.
 ## Scope of reproducibility
 
 The repository validates the installable package, its documented datasets, and its maintained
-examples and benchmarks. Application-specific studies may add their own simulations, comparators,
+examples. Application-specific studies may add their own simulations, comparators,
 tables, and figures without changing the package reproducibility contract.

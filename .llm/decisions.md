@@ -34,8 +34,8 @@ This index is navigation, not a substitute for those records.
 | `0026-package-navigation-cleanup.md` | public repository navigation | remove paper placeholders and organize entry points around the installable software product |
 | `0027-synthetic-benchmark-contract.md` | earlier broad synthetic benchmark contract | historical manifest/schema design superseded by Decision 0030 |
 | `0028-synthetic-ci-benchmark-runner.md` | earlier broad CI runner | historical implementation removed by Decision 0030 |
-| `0029-human-and-machine-readable-results.md` | benchmark result usability | CSV principle retained; universal wide schema superseded by Decision 0030 |
-| `0030-focused-benchmark-design.md` | focused benchmark questions | one question, one script, and one minimal CSV output per benchmark |
+| `0029-human-and-machine-readable-results.md` | historical benchmark result usability | superseded by Decisions 0030 and 0125 |
+| `0030-focused-benchmark-design.md` | historical focused benchmark design | benchmark layer retired by Decision 0125 |
 | `0031-default-selection-support.md` | ordinary rank-selection defaults | five samples per retained predictor direction and five-fold CV by default |
 | `0032-full-sample-rank-support.md` | rank-support sample-count convention | full supplied $n$ defines support; centered training folds impose feasibility caps |
 | `0033-remove-linnerud-integration.md` | reference dataset scope | remove the Linnerud dataset, example, test, and active navigation |
@@ -130,6 +130,7 @@ This index is navigation, not a substitute for those records.
 | `0122-public-terminology-propagation.md` | public terminology propagation | canonical paired-mode, rank, direction, dilation, and loading distinctions across living docs and generated docstrings |
 | `0123-companion-manuscript-synthetic-data-guide.md` | companion-manuscript synthetic-data guide | distinguish exact distribution, seeded realization, and complete-study reproduction without changing package workflows |
 | `0124-mathematical-typography-and-subscripts.md` | mathematical typography and descriptive subscripts | bold complete matrices, upright descriptive subscripts, italic variable indices, and renderable generated equations |
+| `0125-retire-benchmark-layer.md` | benchmark-layer retirement | remove benchmark scripts, tests, outputs, navigation, and active contracts; preserve historical records |
 
 ## Implemented estimator/search transition
 
@@ -191,7 +192,7 @@ plan contains an earlier or more general proposal:
   dataset-specific artifacts remain example-owned; Decisions 0079--0083 supersede the former
   package plotting layer with direct caller-owned rendering;
 - Decision 0045 further separates model roles: ordinary PLS remains in component-path comparisons
-  and declared comparator benchmarks; $P$, $D$, and $Q$ inspection stays Pi-PLS-specific; shared
+  and the dedicated comparison example; $P$, $D$, and $Q$ inspection stays Pi-PLS-specific; shared
   score, loading, coefficient, biplot, observation, and prediction analysis uses estimator-neutral
   APIs and is applied only to the selected Pi-PLS model in numbered examples;
 - Decision 0047 isolates all real-data Pi-PLS-versus-PLS path comparisons in the dedicated
@@ -205,11 +206,10 @@ plan contains an earlier or more general proposal:
   each training fold during selection, and are refitted on all supplied training data;
 - future block-aware scaling remains a valid direction, but only its API design and schedule are
   deferred until the owner starts a dedicated phase;
-- the version-1 synthetic package benchmark uses ordinary PLS as its sole external comparator,
   separates oracle model validation from Pi-PLS selection validation, and freezes no predictive or
   performance claim before calibration;
-- the universal benchmark manifest, wide result schema, and broad CI runner were removed; focused
-  benchmarks now use one readable script and one minimal CSV output per user-facing question;
+- the complete benchmark layer was retired by Decision 0125 after its development-validation
+  purpose was complete;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
   Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls
@@ -222,7 +222,7 @@ plan contains an earlier or more general proposal:
   dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with Pulp exposing
   the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,
   source-order response pagination, and raw observation diagnostics; randomized SVD is covered by
-  the solver-consistency benchmark;
+  focused randomized-SVD tests;
 - Python 3.10–3.14 are supported; runtime metadata admits NumPy 1.26--2.x,
   scikit-learn 1.4--1.x, and joblib 1.2--1.x; the complete minimum stack is tested only on
   Python 3.10 because its oldest binary releases do not cover every newer interpreter;

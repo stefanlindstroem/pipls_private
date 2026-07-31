@@ -10,4 +10,3 @@ recursive-include docs *.md *.js
 recursive-include datasets *.csv *.md *.txt *.yaml
 recursive-include examples *.py *.md
 recursive-include examples/results .gitkeep
-recursive-include benchmarks *.py *.md
