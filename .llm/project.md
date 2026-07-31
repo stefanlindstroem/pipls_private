@@ -76,7 +76,7 @@ Decision 0071 removes duplicate
 matrix-path aliases and completes structural enforcement of in-memory numbered examples.
 Decision 0072 adds an on-demand immutable predictor-rank profile derived from `cv_results_`.
 Decision 0073 hardens the public numerical boundary and fitted-state transaction.
-Decision 0086 limits `PiPLSDecomposition` to interpretable rotations, dilation, rank/solver
+Decision 0086 limits `PiPLSDecomposition` to interpretable directions, dilation, rank/solver
 diagnostics, and the derived standardized regression map.
 Decision 0087 limits fitted estimator and path surfaces to independent numerical results:
 rotation aliases, scorer plumbing, adaptive-search execution history, and flat OOF duplicates are

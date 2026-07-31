@@ -76,15 +76,15 @@ documented below.
 
 `PiPLSRegression.decomposition_` is normally obtained from a fitted estimator. Directly
 constructed instances apply the same shape, finite-value, scalar, and read-only-array validation.
-Its public field names retain the established `rotations` identifiers for compatibility, while the
-mathematical values are the orthonormal predictor and response directions defined in the
+Its field names state the mathematical objects directly: the orthonormal predictor and response
+directions defined in the
 [canonical terminology](../theory.md#canonical-terminology):
 
 | Field | Method notation | Meaning |
 |---|---|---|
-| `predictor_rotations` | $\mathbf{P}$ | orthonormal predictor directions |
+| `predictor_directions` | $\mathbf{P}$ | orthonormal predictor directions |
 | `dilation` | $d_k=D_{kk}$ | nonnegative dilation of each paired latent mode |
-| `response_rotations` | $\mathbf{Q}$ | orthonormal response directions |
+| `response_directions` | $\mathbf{Q}$ | orthonormal response directions |
 | `predictor_numerical_rank` | — | complete numerical rank under full SVD, or a verified lower bound under randomized SVD |
 | `predictor_numerical_rank_is_exact` | — | whether the reported numerical rank is complete |
 | `rank_tolerance` | — | tolerance used to classify retained predictor singular values |

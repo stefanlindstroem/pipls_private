@@ -189,20 +189,20 @@ def test_public_decomposition_is_read_only_and_replaces_symbolic_aliases() -> No
 
     assert isinstance(decomposition, PiPLSDecomposition)
     for matrix in (
-        decomposition.predictor_rotations,
+        decomposition.predictor_directions,
         decomposition.dilation,
-        decomposition.response_rotations,
+        decomposition.response_directions,
     ):
         assert not matrix.flags.writeable
     standardized_map = decomposition.standardized_regression_map
     assert not standardized_map.flags.writeable
     np.testing.assert_allclose(
         standardized_map,
-        (decomposition.predictor_rotations * decomposition.dilation[None, :])
-        @ decomposition.response_rotations.T,
+        (decomposition.predictor_directions * decomposition.dilation[None, :])
+        @ decomposition.response_directions.T,
     )
-    assert model.x_rotations_ is decomposition.predictor_rotations
-    assert model.y_rotations_ is decomposition.response_rotations
+    assert model.x_rotations_ is decomposition.predictor_directions
+    assert model.y_rotations_ is decomposition.response_directions
 
     for removed_alias in (
         "Pi_",
@@ -238,7 +238,7 @@ def test_public_decomposition_is_read_only_and_replaces_symbolic_aliases() -> No
         assert not hasattr(decomposition, removed_field)
 
     with pytest.raises(ValueError, match="read-only"):
-        decomposition.predictor_rotations[0, 0] = 0.0
+        decomposition.predictor_directions[0, 0] = 0.0
     with pytest.raises(FrozenInstanceError):
         decomposition.predictor_numerical_rank = 0  # type: ignore[misc]
 
@@ -501,8 +501,8 @@ def test_decomposition_is_single_source_of_truth_for_pipls_specific_arrays() -> 
     X, Y = _data()
     model = _fixed_estimator().fit(X, Y)
 
-    assert model.x_rotations_ is model.decomposition_.predictor_rotations
-    assert model.y_rotations_ is model.decomposition_.response_rotations
+    assert model.x_rotations_ is model.decomposition_.predictor_directions
+    assert model.y_rotations_ is model.decomposition_.response_directions
     assert not model.x_rotations_.flags.writeable
 
 

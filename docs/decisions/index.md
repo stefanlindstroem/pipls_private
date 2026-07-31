@@ -45,6 +45,7 @@ reference describe the current public behavior directly.
 - [0121: canonical Pi-PLS terminology](0121-canonical-pipls-terminology.md)
 - [0122: public terminology propagation](0122-public-terminology-propagation.md)
 - [0129: remove pre-release search compatibility aliases](0129-remove-pre-release-search-aliases.md)
+- [0130: mathematical decomposition field names](0130-mathematical-decomposition-field-names.md)
 
 ## Validation, data, and benchmarks
 

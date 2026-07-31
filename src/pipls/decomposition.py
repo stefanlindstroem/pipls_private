@@ -32,14 +32,13 @@ class PiPLSDecomposition:
 
     Attributes
     ----------
-    predictor_rotations : ndarray of shape (n_features, n_components)
+    predictor_directions : ndarray of shape (n_features, n_components)
         Orthonormal predictor directions $\mathbf{P}$ of the centered/scaled regression
-        map. The field name is retained for API compatibility.
+        map.
     dilation : ndarray of shape (n_components,)
         Nonnegative dilations $d_k=D_{kk}$ of the paired latent modes.
-    response_rotations : ndarray of shape (n_targets, n_components)
-        Orthonormal response directions $\mathbf{Q}$. The field name is retained for API
-        compatibility.
+    response_directions : ndarray of shape (n_targets, n_components)
+        Orthonormal response directions $\mathbf{Q}$.
     predictor_numerical_rank : int
         Complete numerical predictor rank under full SVD, or a verified lower
         bound under truncated randomized SVD.
@@ -51,41 +50,41 @@ class PiPLSDecomposition:
         Predictor SVD implementation actually used.
     """
 
-    predictor_rotations: FloatArray
+    predictor_directions: FloatArray
     dilation: FloatArray
-    response_rotations: FloatArray
+    response_directions: FloatArray
     predictor_numerical_rank: int
     predictor_numerical_rank_is_exact: bool
     rank_tolerance: float
     predictor_svd_solver: ResolvedSVDSolver
 
     def __post_init__(self) -> None:
-        predictor_rotations = _read_only_float_array(
-            self.predictor_rotations,
-            name="predictor_rotations",
+        predictor_directions = _read_only_float_array(
+            self.predictor_directions,
+            name="predictor_directions",
             ndim=2,
         )
         dilation = _read_only_float_array(self.dilation, name="dilation")
-        response_rotations = _read_only_float_array(
-            self.response_rotations,
-            name="response_rotations",
+        response_directions = _read_only_float_array(
+            self.response_directions,
+            name="response_directions",
             ndim=2,
         )
         n_components = int(dilation.size)
         if n_components == 0:
             raise ValueError("A decomposition must contain at least one component.")
-        if predictor_rotations.shape[1] != n_components:
+        if predictor_directions.shape[1] != n_components:
             raise ValueError(
-                "predictor_rotations and dilation must contain the same number "
+                "predictor_directions and dilation must contain the same number "
                 "of components."
             )
-        if response_rotations.shape[1] != n_components:
+        if response_directions.shape[1] != n_components:
             raise ValueError(
-                "response_rotations and dilation must contain the same number "
+                "response_directions and dilation must contain the same number "
                 "of components."
             )
-        if predictor_rotations.shape[0] == 0 or response_rotations.shape[0] == 0:
-            raise ValueError("Rotation arrays must contain at least one row.")
+        if predictor_directions.shape[0] == 0 or response_directions.shape[0] == 0:
+            raise ValueError("Direction arrays must contain at least one row.")
         if np.any(dilation < 0.0):
             raise ValueError("dilation must contain nonnegative values.")
 
@@ -125,9 +124,9 @@ class PiPLSDecomposition:
                 'predictor_svd_solver="randomized".'
             )
 
-        object.__setattr__(self, "predictor_rotations", predictor_rotations)
+        object.__setattr__(self, "predictor_directions", predictor_directions)
         object.__setattr__(self, "dilation", dilation)
-        object.__setattr__(self, "response_rotations", response_rotations)
+        object.__setattr__(self, "response_directions", response_directions)
         object.__setattr__(self, "predictor_numerical_rank", predictor_numerical_rank)
         object.__setattr__(
             self,
@@ -143,9 +142,9 @@ class PiPLSDecomposition:
         return (
             type(self),
             (
-                self.predictor_rotations,
+                self.predictor_directions,
                 self.dilation,
-                self.response_rotations,
+                self.response_directions,
                 self.predictor_numerical_rank,
                 self.predictor_numerical_rank_is_exact,
                 self.rank_tolerance,
@@ -156,9 +155,9 @@ class PiPLSDecomposition:
     @classmethod
     def _from_core_result(cls, result: PiPLSCoreResult) -> PiPLSDecomposition:
         return cls(
-            predictor_rotations=result.P,
+            predictor_directions=result.P,
             dilation=np.diag(result.D),
-            response_rotations=result.Q,
+            response_directions=result.Q,
             predictor_numerical_rank=result.x_rank,
             predictor_numerical_rank_is_exact=result.x_rank_is_exact,
             rank_tolerance=result.rank_tolerance,
@@ -171,8 +170,8 @@ class PiPLSDecomposition:
 
         return _read_only_float_array(
             np.asarray(
-                (self.predictor_rotations * self.dilation[None, :])
-                @ self.response_rotations.T,
+                (self.predictor_directions * self.dilation[None, :])
+                @ self.response_directions.T,
                 dtype=np.float64,
             ),
             name="standardized_regression_map",

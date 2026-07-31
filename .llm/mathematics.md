@@ -64,9 +64,9 @@ $\mathbf{Q}\mathbf{D}$, and
 (\mathbf{Q}\mathbf{D})^{\mathsf T}.
 \end{equation}
 
-The mathematical terms above do not rename the public fields `predictor_rotations`,
-`response_rotations`, `x_rotations_`, or `y_rotations_`. Predictor and response directions are not
-the estimator's separate least-squares reconstruction loadings.
+The public decomposition fields are `predictor_directions` and `response_directions`. The standard
+PLS-style fitted attributes remain `x_rotations_` and `y_rotations_`. Predictor and response
+directions are not the estimator's separate least-squares reconstruction loadings.
 
 The private core additionally requires $r_\pi$ not to exceed the numerical rank of the supplied
 predictor matrix. For thin-SVD singular values $s_i$, numerical rank is determined by

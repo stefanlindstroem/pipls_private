@@ -856,7 +856,8 @@ Current status: **companion-manuscript theory alignment complete**.
 
 Decision 0121 fixes the canonical names for the retained predictor basis and projector, predictor
 and response directions, dilations, scores, paired latent modes, and the two public rank
-parameters. It preserves public Python field names containing `rotations`, distinguishes $P$ and
+parameters. It establishes predictor and response directions as the canonical mathematical objects and
+distinguishes $P$ and
 $Q$ from reconstruction loadings, relates package-facing $QD$ to manuscript-facing
 $DQ^{\mathsf T}$, and records recommended manuscript wording changes. No package behavior or
 public identifier changes.
@@ -866,11 +867,20 @@ Current status: **canonical terminology decision complete**.
 ### Public terminology propagation
 
 Decision 0122 applies the canonical names across living onboarding, API introductions, path and
-inspection guides, tutorials, example prose, and public docstrings. Established Python identifiers
-containing `rotations` and generic component-path terminology remain stable, while their Pi-PLS
-meaning is defined explicitly. Historical decisions are not rewritten.
+inspection guides, tutorials, example prose, and public docstrings. The living documentation uses
+direction terminology and generic component-path terminology while defining each Pi-PLS object
+explicitly. Decision 0130 later renames the pre-release public
+decomposition fields to match this terminology. Historical decisions are not rewritten.
 
 Current status: **public terminology propagation complete**.
+
+### Mathematical decomposition field names
+
+Decision 0130 renames the unreleased `PiPLSDecomposition` fields to `predictor_directions` and
+`response_directions` without compatibility aliases. The standard PLS-style estimator attributes
+`x_rotations_` and `y_rotations_` remain and reference the same read-only arrays.
+
+Current status: **mathematical decomposition naming complete**.
 
 ### Companion-manuscript synthetic-data guide
 

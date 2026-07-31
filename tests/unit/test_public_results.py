@@ -29,9 +29,9 @@ def _component_result() -> PiPLSComponentResult:
 
 def _decomposition() -> PiPLSDecomposition:
     return PiPLSDecomposition(
-        predictor_rotations=np.eye(3, 2, dtype=np.float32),
+        predictor_directions=np.eye(3, 2, dtype=np.float32),
         dilation=np.array([2.0, 1.0], dtype=np.float32),
-        response_rotations=np.eye(2, dtype=np.float32),
+        response_directions=np.eye(2, dtype=np.float32),
         predictor_numerical_rank=np.int64(3),
         predictor_numerical_rank_is_exact=np.bool_(True),
         rank_tolerance=np.float32(1e-6),
@@ -169,50 +169,62 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
         PiPLSPredictorRankProfile(**{**profile_kwargs, "cv_mse_mean": [0.5, -0.1]})
 
 
+def test_decomposition_uses_mathematical_direction_field_names() -> None:
+    assert tuple(field.name for field in fields(PiPLSDecomposition)) == (
+        "predictor_directions",
+        "dilation",
+        "response_directions",
+        "predictor_numerical_rank",
+        "predictor_numerical_rank_is_exact",
+        "rank_tolerance",
+        "predictor_svd_solver",
+    )
+
+
 def test_decomposition_makes_defensive_read_only_copies_and_revalidates_pickle() -> None:
-    predictor_rotations = np.eye(3, 2, dtype=np.float32)
+    predictor_directions = np.eye(3, 2, dtype=np.float32)
     dilation = np.array([2.0, 1.0], dtype=np.float32)
-    response_rotations = np.eye(2, dtype=np.float32)
+    response_directions = np.eye(2, dtype=np.float32)
     decomposition = PiPLSDecomposition(
-        predictor_rotations=predictor_rotations,
+        predictor_directions=predictor_directions,
         dilation=dilation,
-        response_rotations=response_rotations,
+        response_directions=response_directions,
         predictor_numerical_rank=3,
         predictor_numerical_rank_is_exact=True,
         rank_tolerance=1e-12,
         predictor_svd_solver="full",
     )
-    predictor_rotations[0, 0] = 9.0
+    predictor_directions[0, 0] = 9.0
     dilation[0] = 9.0
-    response_rotations[0, 0] = 9.0
+    response_directions[0, 0] = 9.0
 
-    assert decomposition.predictor_rotations.dtype == np.dtype(np.float64)
+    assert decomposition.predictor_directions.dtype == np.dtype(np.float64)
     assert decomposition.dilation.dtype == np.dtype(np.float64)
-    assert decomposition.response_rotations.dtype == np.dtype(np.float64)
-    assert decomposition.predictor_rotations[0, 0] == 1.0
+    assert decomposition.response_directions.dtype == np.dtype(np.float64)
+    assert decomposition.predictor_directions[0, 0] == 1.0
     assert decomposition.dilation[0] == 2.0
-    assert decomposition.response_rotations[0, 0] == 1.0
+    assert decomposition.response_directions[0, 0] == 1.0
     assert all(
         not array.flags.writeable
         for array in (
-            decomposition.predictor_rotations,
+            decomposition.predictor_directions,
             decomposition.dilation,
-            decomposition.response_rotations,
+            decomposition.response_directions,
             decomposition.standardized_regression_map,
         )
     )
 
     restored = pickle.loads(pickle.dumps(decomposition))
     assert isinstance(restored, PiPLSDecomposition)
-    assert not restored.predictor_rotations.flags.writeable
+    assert not restored.predictor_directions.flags.writeable
     np.testing.assert_array_equal(restored.dilation, decomposition.dilation)
 
 
 @pytest.mark.parametrize(
     ("field", "value", "message"),
     [
-        ("predictor_rotations", np.ones((3, 3)), "same number of components"),
-        ("response_rotations", np.ones((2, 1)), "same number of components"),
+        ("predictor_directions", np.ones((3, 3)), "same number of components"),
+        ("response_directions", np.ones((2, 1)), "same number of components"),
         ("dilation", [2.0, -1.0], "nonnegative"),
         ("dilation", [2.0, np.inf], "finite"),
         ("predictor_numerical_rank", 1, "not be smaller"),
@@ -227,9 +239,9 @@ def test_decomposition_rejects_invalid_fields(
     message: str,
 ) -> None:
     kwargs = {
-        "predictor_rotations": np.eye(3, 2),
+        "predictor_directions": np.eye(3, 2),
         "dilation": np.array([2.0, 1.0]),
-        "response_rotations": np.eye(2),
+        "response_directions": np.eye(2),
         "predictor_numerical_rank": 3,
         "predictor_numerical_rank_is_exact": True,
         "rank_tolerance": 1e-12,
@@ -243,18 +255,18 @@ def test_decomposition_rejects_invalid_fields(
 def test_decomposition_requires_solver_and_rank_exactness_to_agree() -> None:
     with pytest.raises(ValueError, match="must be true"):
         PiPLSDecomposition(
-            predictor_rotations=np.eye(2),
+            predictor_directions=np.eye(2),
             dilation=np.ones(2),
-            response_rotations=np.eye(2),
+            response_directions=np.eye(2),
             predictor_numerical_rank=2,
             predictor_numerical_rank_is_exact=False,
             rank_tolerance=1e-12,
             predictor_svd_solver="full",
         )
     randomized = PiPLSDecomposition(
-        predictor_rotations=np.eye(2),
+        predictor_directions=np.eye(2),
         dilation=np.ones(2),
-        response_rotations=np.eye(2),
+        response_directions=np.eye(2),
         predictor_numerical_rank=2,
         predictor_numerical_rank_is_exact=False,
         rank_tolerance=1e-12,

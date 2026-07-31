@@ -44,8 +44,9 @@ available from `pipls.metrics`.
 
 Do not expose constructor aliases named `h`, `r_pi`, or `c`.
 
-The public factor fields retain the established names `predictor_rotations`, `response_rotations`,
-`x_rotations_`, and `y_rotations_`. Mathematical prose calls their $P$ and $Q$ columns predictor and
+The immutable decomposition fields are `predictor_directions` and `response_directions`. The
+estimator also exposes the standard PLS-style fitted attributes `x_rotations_` and `y_rotations_`,
+which reference the same arrays. Mathematical prose calls their $P$ and $Q$ columns predictor and
 response directions. These directions are distinct from the reconstruction loadings exposed as
 `x_loadings_` and `y_loadings_`.
 

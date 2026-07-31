@@ -18,9 +18,9 @@ def test_fit_exposes_expected_fixed_rank_attributes() -> None:
 
     assert model.predictor_rank_ == 4
     assert model.max_predictor_rank_ == min(X.shape[1], X.shape[0] - 1)
-    assert model.decomposition_.predictor_rotations.shape == (8, 2)
+    assert model.decomposition_.predictor_directions.shape == (8, 2)
     assert model.decomposition_.dilation.shape == (2,)
-    assert model.decomposition_.response_rotations.shape == (3, 2)
+    assert model.decomposition_.response_directions.shape == (3, 2)
     assert model.coef_.shape == (3, 8)
     assert model.intercept_.shape == (3,)
     assert model.x_scores_.shape == (40, 2)

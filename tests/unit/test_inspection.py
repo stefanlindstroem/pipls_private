@@ -18,9 +18,9 @@ def _decomposition(
 ) -> PiPLSDecomposition:
     _, n_components = predictor_directions.shape
     return PiPLSDecomposition(
-        predictor_rotations=predictor_directions,
+        predictor_directions=predictor_directions,
         dilation=dilation,
-        response_rotations=response_directions,
+        response_directions=response_directions,
         predictor_numerical_rank=n_components,
         predictor_numerical_rank_is_exact=True,
         rank_tolerance=1e-12,
@@ -170,8 +170,8 @@ def test_pipls_display_factors_are_defensive_read_only_copies() -> None:
     ):
         assert not values.flags.writeable
     assert "weighted_response_directions" not in vars(factors)
-    assert not np.shares_memory(factors.predictor_directions, decomposition.predictor_rotations)
-    assert not np.shares_memory(factors.response_directions, decomposition.response_rotations)
+    assert not np.shares_memory(factors.predictor_directions, decomposition.predictor_directions)
+    assert not np.shares_memory(factors.response_directions, decomposition.response_directions)
     assert not np.shares_memory(factors.dilation, decomposition.dilation)
 
     predictor_directions[0, 0] = 7.0

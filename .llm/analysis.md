@@ -199,9 +199,10 @@ The primary decomposition report displays:
 - dilation values $d_k=D_{kk}$;
 - weighted response directions $d_kQ_{jk}$, exposed or plotted as $\mathbf{Q}\mathbf{D}$.
 
-Use **predictor direction** and **response direction** as the canonical mathematical terms. Existing
-public field names containing `rotations` remain unchanged. Do not call $\mathbf{P}$ an X loading or
-$\mathbf{Q}$ a Y loading: `PiPLSRegression.x_loadings_` and `y_loadings_` are separate
+Use **predictor direction** and **response direction** as the canonical mathematical terms. The
+public decomposition fields use `predictor_directions` and `response_directions`; the estimator's
+standard PLS-style `x_rotations_` and `y_rotations_` names remain. Do not call $\mathbf{P}$ an X
+loading or $\mathbf{Q}$ a Y loading: `PiPLSRegression.x_loadings_` and `y_loadings_` are separate
 score-reconstruction quantities. The response-by-mode display $\mathbf{Q}\mathbf{D}$ is the
 transpose of the
 manuscript's mode-by-response form $\mathbf{D}\mathbf{Q}^{\mathsf T}$.
@@ -422,7 +423,7 @@ The accepted order after Decision 0042 is:
 ## Public decomposition boundary
 
 `PiPLSDecomposition` is an interpretation result, not a copy of the private construction record. It
-exposes the established fields `predictor_rotations`, `dilation`, and `response_rotations`, whose
+exposes the fields `predictor_directions`, `dilation`, and `response_directions`, whose
 mathematical values are the predictor directions, mode dilations, and response directions, together
 with rank/solver diagnostics and `standardized_regression_map`. The private `PiPLSCoreResult` retains
 $\Pi$, $C$, $W$, $P$, $D$,
@@ -432,9 +433,10 @@ without depending on a public intermediate matrix.
 ## Public fitted-surface cleanup
 
 Decision 0087 distinguishes independent fitted results from exact aliases and execution traces.
-`PiPLSRegression` exposes rotations rather than duplicate weight aliases, and its scorer-specific
-response scale is private. `PiPLSSearchCV` keeps standard candidate results, concise immutable path
-and rank-profile objects, global selection attributes, exhaustive-search qualification, validation
+`PiPLSRegression` exposes one direction array per side through the decomposition and the standard
+PLS-style `x_rotations_` and `y_rotations_` fitted attributes rather than duplicate weight aliases.
+Its scorer-specific response scale is private. `PiPLSSearchCV` keeps standard candidate results,
+concise immutable path and rank-profile objects, global selection attributes, exhaustive-search qualification, validation
 reporting, and optional refitted estimators. OOF arrays live only in `validation_report_`; validated
 input grids, adaptive batches, candidate counters, search-method echoes, and duplicate direct-rank
 parameter dictionaries are private implementation details.

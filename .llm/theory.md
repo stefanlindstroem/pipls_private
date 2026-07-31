@@ -117,9 +117,10 @@ Use these terms in mathematical and explanatory prose:
 
 Do not call $P$ a projection matrix: $PP^{\mathsf T}$ is the projector onto the final predictor-
 direction span. Do not call $P$ or $Q$ reconstruction loadings: the estimator's `x_loadings_` and
-`y_loadings_` are separate least-squares reconstruction quantities. Existing public names
-`predictor_rotations`, `response_rotations`, `x_rotations_`, and `y_rotations_` remain unchanged,
-but **direction** is the canonical mathematical term.
+`y_loadings_` are separate least-squares reconstruction quantities. `PiPLSDecomposition` exposes
+`predictor_directions` and `response_directions`. The
+estimator retains the standard PLS-style names `x_rotations_` and `y_rotations_`, but **direction**
+is the canonical mathematical term.
 
 The package's response-by-mode weighted directions are $QD$, with column $k$ equal to $d_kQ_{:k}$.
 The mode-by-response form used in parts of the manuscript is exactly

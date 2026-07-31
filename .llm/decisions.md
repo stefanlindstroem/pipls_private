@@ -135,6 +135,7 @@ This index is navigation, not a substitute for those records.
 | `0127-artifact-based-rendering-validation.md` | artifact-based rendering validation | protect rendering ownership, numerical meaning, and generated artifacts without exact Matplotlib source locks |
 | `0128-same-file-rendering-functions.md` | same-file rendering functions | keep complete-example analysis in `main()` while private functions in the numbered script own rendering and report writing |
 | `0129-remove-pre-release-search-aliases.md` | pre-release search alias removal | expose only `selected_estimator_` and `selected_pipls_` for the one refitted model; retain candidate-level `best_*` diagnostics |
+| `0130-mathematical-decomposition-field-names.md` | mathematical decomposition field names | expose `predictor_directions` and `response_directions` without pre-release aliases; retain standard PLS-style estimator rotation attributes |
 
 ## Implemented estimator/search transition
 
@@ -216,6 +217,9 @@ plan contains an earlier or more general proposal:
   purpose was complete;
 - Decision 0129 removes the unreleased duplicate fitted-estimator `best_*` aliases; selected-model
   attributes now apply uniformly to every final selection rule;
+- Decision 0130 renames the unreleased decomposition fields to `predictor_directions` and
+  `response_directions` without aliases, while retaining standard PLS-style `x_rotations_` and
+  `y_rotations_`;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
   Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls

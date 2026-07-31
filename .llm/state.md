@@ -49,7 +49,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
   and elbow-based CV-MSE interpretation before specialized terminology;
 - shared private fold-evaluation and adaptive-search machinery;
 - PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and a public
-  immutable `PiPLSDecomposition` limited to interpretable rotations, dilation, rank diagnostics,
+  immutable `PiPLSDecomposition` limited to interpretable directions, dilation, rank diagnostics,
   solver provenance, and the derived centered/scaled regression map;
 - grouped, repeated, predefined, temporal, and leave-one-out split workflows, with a focused
   small-sample LOO example reporting ordered OOF predictions and pooled OOF $R^2$;
@@ -256,7 +256,7 @@ Additional fixed decisions:
   final small integer interval. `"optimal"` is exhaustive over the complete admissible range.
 - Randomized SVD affects only the initial predictor-matrix decomposition. Response and coupling
   decompositions remain exact.
-- interpretable Pi-PLS rotations, dilation, rank/solver diagnostics, and the standardized map live
+- interpretable Pi-PLS directions, dilation, rank/solver diagnostics, and the standardized map live
   in the read-only `decomposition_` object; construction matrices remain private and standard
   PLS-style fitted attributes remain top-level.
 - `PiPLSSearchCV` defaults to selection-only `refit=False`; refit-dependent path methods are absent
@@ -410,21 +410,28 @@ Decision 0121 establishes the canonical terminology for the fixed construction. 
 retained predictor basis, $\Pi\Pi^{\mathsf T}$ the retained-subspace projector, $P$ and $Q$
 orthonormal predictor and response directions, and $d_k$ the dilation of paired latent mode $k$.
 `n_components` counts paired latent modes and `predictor_rank` is the retained predictor-subspace
-dimension. Existing public field names containing `rotations` remain unchanged, while $P$ and $Q$
-remain distinct from reconstruction loadings. The package's $QD$ orientation is the transpose of
-manuscript-facing $DQ^{\mathsf T}$.
+dimension. `PiPLSDecomposition` exposes `predictor_directions` and
+`response_directions`, while the standard estimator attributes `x_rotations_` and `y_rotations_`
+remain for PLS-family compatibility. $P$ and $Q$ remain distinct from reconstruction loadings. The
+package's $QD$ orientation is the transpose of manuscript-facing $DQ^{\mathsf T}$.
 
 Decision 0122 propagates that vocabulary through the living README, served guides, generated API
 introductions, tutorials, example prose, and public source docstrings. It defines the two public
 rank names at their owning entry points, uses directions and dilations for the Pi-PLS factors, and
-retains established Python identifiers and generic component-path terminology without changing
-behavior.
+uses mathematically direct decomposition-field names and retains generic component-path
+terminology. Decision 0130 later renames the pre-release decomposition fields without changing
+numerical behavior.
 
 Decision 0123 adds the focused companion-manuscript synthetic-data guide. It demonstrates the exact
 Gaussian latent generator and truth equations, documents the known oracle synthetic dimensions,
 and distinguishes distribution-level, seeded-realization, and complete-publication reproduction.
 Complete manuscript grids, comparators, and reporting remain downstream, and package search plus
 real-data workflows remain unchanged.
+
+Decision 0130 aligns the public immutable decomposition with the canonical mathematics by renaming
+its pre-release fields to `predictor_directions` and `response_directions` without compatibility
+aliases. Standard PLS-style `x_rotations_` and `y_rotations_` remain fitted estimator attributes and
+reference the same read-only arrays.
 
 ## Current next increment
 

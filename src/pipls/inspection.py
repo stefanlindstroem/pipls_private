@@ -848,8 +848,8 @@ def pipls_display_factors(
     ):
         raise TypeError("response_index must be an integer or None.")
 
-    predictor_directions = decomposition.predictor_rotations.copy()
-    response_directions = decomposition.response_rotations.copy()
+    predictor_directions = decomposition.predictor_directions.copy()
+    response_directions = decomposition.response_directions.copy()
     dilation = decomposition.dilation.copy()
 
     component_signs = _predictor_display_signs(predictor_directions)

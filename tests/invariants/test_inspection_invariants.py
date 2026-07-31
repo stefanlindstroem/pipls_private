@@ -12,8 +12,8 @@ def test_display_sign_canonicalization_preserves_fitted_regression_map() -> None
     Y = rng.normal(size=(24, 3))
     model = PiPLSRegression(n_components=2, predictor_rank=3).fit(X, Y)
     decomposition = model.decomposition_
-    predictor_before = decomposition.predictor_rotations.copy()
-    response_before = decomposition.response_rotations.copy()
+    predictor_before = decomposition.predictor_directions.copy()
+    response_before = decomposition.response_directions.copy()
 
     factor_views = (
         pipls_display_factors(decomposition),
@@ -40,10 +40,10 @@ def test_display_sign_canonicalization_preserves_fitted_regression_map() -> None
             decomposition.standardized_regression_map,
             atol=1e-14,
         )
-    np.testing.assert_array_equal(decomposition.predictor_rotations, predictor_before)
-    np.testing.assert_array_equal(decomposition.response_rotations, response_before)
-    assert model.x_rotations_ is decomposition.predictor_rotations
-    assert model.y_rotations_ is decomposition.response_rotations
+    np.testing.assert_array_equal(decomposition.predictor_directions, predictor_before)
+    np.testing.assert_array_equal(decomposition.response_directions, response_before)
+    assert model.x_rotations_ is decomposition.predictor_directions
+    assert model.y_rotations_ is decomposition.response_directions
 
 
 def test_balanced_biplot_preserves_selected_score_loading_reconstruction() -> None:

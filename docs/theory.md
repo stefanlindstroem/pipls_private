@@ -70,10 +70,10 @@ The package uses the following terms for the fixed Pi-PLS construction:
 | `n_components` | number of paired latent modes $h$ |
 
 The word **direction** is the primary mathematical term for columns of $\mathbf{P}$ and
-$\mathbf{Q}$. Existing Python field names such as
-`predictor_rotations`, `response_rotations`, `x_rotations_`, and `y_rotations_` remain public
-interface names; they do not make $\mathbf{P}$ or $\mathbf{Q}$ projection matrices. The projectors
-onto the final direction spans are $\mathbf{P}\mathbf{P}^{\mathsf T}$ and
+$\mathbf{Q}$. `PiPLSDecomposition` exposes these arrays as `predictor_directions` and
+`response_directions`. The estimator retains the standard PLS-style names `x_rotations_` and
+`y_rotations_`; none of these names makes $\mathbf{P}$ or $\mathbf{Q}$ a projection matrix. The
+projectors onto the final direction spans are $\mathbf{P}\mathbf{P}^{\mathsf T}$ and
 $\mathbf{Q}\mathbf{Q}^{\mathsf T}$.
 
 The Pi-PLS directions are also distinct from `x_loadings_` and `y_loadings_`, which are
@@ -364,9 +364,9 @@ units for `coef_`, `intercept_`, and `predict()`.
 
 A fitted estimator exposes the Pi-PLS-specific factorization in `decomposition_`:
 
-- `predictor_rotations`: $\mathbf{P}$;
+- `predictor_directions`: $\mathbf{P}$;
 - `dilation`: $(d_1,\ldots,d_h)$;
-- `response_rotations`: $\mathbf{Q}$;
+- `response_directions`: $\mathbf{Q}$;
 - `standardized_regression_map`: $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$;
 - numerical-rank and resolved predictor-SVD diagnostics.
 

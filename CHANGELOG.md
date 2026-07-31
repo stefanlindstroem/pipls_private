@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Rename the unreleased `PiPLSDecomposition.predictor_rotations` and
+  `response_rotations` fields to `predictor_directions` and `response_directions`, without
+  compatibility aliases. Retain `PiPLSRegression.x_rotations_` and `y_rotations_` as standard
+  PLS-style fitted attributes referencing the same arrays.
 - Remove the unreleased `PiPLSSearchCV.best_estimator_` and `best_pipls_` compatibility aliases;
   `selected_estimator_` and `selected_pipls_` now name the one refitted model under every selection
   rule, while scalar and parameter `best_*` results continue to describe the global score optimum.
@@ -29,13 +33,15 @@
   inspection guides, tutorials, example prose, and public source docstrings: `n_components` now
   consistently counts paired latent modes, `predictor_rank` denotes retained predictor-subspace
   dimension, $P$ and $Q$ are predictor and response directions, and $d_k$ is a mode dilation;
-  public identifiers containing `rotations` remain unchanged.
+  `PiPLSDecomposition` now uses the mathematically direct `predictor_directions` and
+  `response_directions` field names; standard estimator attributes `x_rotations_` and
+  `y_rotations_` remain for scikit-learn PLS compatibility.
 
 - established canonical Pi-PLS terminology: $\Pi$ is the retained predictor basis,
   $\Pi\Pi^{\mathsf T}$ the retained-subspace projector, $P$ and $Q$ orthonormal predictor and
   response directions, $d_k$ a mode dilation, and `n_components` the number of paired latent modes;
-  retained existing public field names while distinguishing directions from reconstruction
-  loadings and relating $QD$ to $(DQ^{\mathsf T})^{\mathsf T}$.
+  uses direction terminology for the decomposition fields, distinguishes directions from
+  reconstruction loadings, and relates $QD$ to $(DQ^{\mathsf T})^{\mathsf T}$.
 
 - aligned the canonical Pi-PLS theory page with the companion manuscript: added the retained
   predictor-projector decomposition, response-subspace optimization, latent least-squares and
@@ -215,12 +221,12 @@
   `PiPLSSyntheticTruth`, and present returned immutable records without constructor-first generated
   signatures.
 
-- Reduce the fitted estimator and path-search surfaces: keep rotations without duplicate weight
-  aliases, make scorer response scaling private, retain standard and immutable path results, and
+- Reduce the fitted estimator and path-search surfaces: keep direction arrays without duplicate
+  weight aliases, make scorer response scaling private, retain standard and immutable path results, and
   move optional OOF arrays and coverage exclusively into `validation_report_`.
 
-- Reduce `PiPLSDecomposition` to the interpretable fitted factorization: descriptive predictor and
-  response rotations, a dilation vector, numerical-rank and solver diagnostics, and the derived
+- Reduce `PiPLSDecomposition` to the interpretable fitted factorization: predictor and response
+  directions, a dilation vector, numerical-rank and solver diagnostics, and the derived
   centered/scaled regression map. Keep $\Pi$, $C$, $W$, and the redundant diagonal matrix $D$
   private, and reconstruct the benchmark-only predictor basis inside its benchmark.
 
