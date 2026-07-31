@@ -115,11 +115,11 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         capsize=4,
     )
     axis.scatter(
-        [rank_profile.selected.predictor_rank],
-        [rank_profile.selected.cv_mse_mean],
+        [rank_profile.selected_result.predictor_rank],
+        [rank_profile.selected_result.cv_mse_mean],
         marker="D",
         s=70,
-        label=f"CV-MSE minimum: rank {rank_profile.selected.predictor_rank}",
+        label=f"CV-MSE minimum: rank {rank_profile.selected_result.predictor_rank}",
         zorder=3,
     )
     axis.set_xlabel("Predictor rank")

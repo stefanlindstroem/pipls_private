@@ -527,7 +527,7 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
         np.sort(search.cv_results_["predictor_rank"]),
     )
     assert profile.predictor_rank.size == search.cv_results_["predictor_rank"].size
-    assert profile.selected.predictor_rank == 1
+    assert profile.selected_result.predictor_rank == 1
 
 
 def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
@@ -594,7 +594,7 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
     )
 
     profile = search.predictor_rank_profile(2)
-    assert profile.selected.predictor_rank == 2
+    assert profile.selected_result.predictor_rank == 2
     assert np.all(profile.mean_test_score == 1.0)
     assert not np.allclose(profile.cv_mse_mean, -profile.mean_test_score)
 
@@ -840,7 +840,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
         profile.cv_mse_fold_sd,
         search.cv_results_["std_response_standardized_mse"][indices],
     )
-    assert profile.selected == search.component_path_.for_n_components(2)
+    assert profile.selected_result == search.component_path_.for_n_components(2)
 
 
 def test_predictor_rank_profile_requires_fitted_evaluated_component_count() -> None:
@@ -892,7 +892,7 @@ def test_component_path_records_predictor_rank_policy(
         )
 
     profile = search.predictor_rank_profile(2)
-    assert profile.selected.predictor_rank == search.component_path_.for_n_components(
+    assert profile.selected_result.predictor_rank == search.component_path_.for_n_components(
         2
     ).predictor_rank
     if expected_policy in {"fixed", "maximum"}:

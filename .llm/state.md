@@ -397,6 +397,11 @@ Decision 0133 names the configurable-generator truth record `PiPLSRegressionTrut
 `PiPLSLatentGeometryTruth` for the separate manuscript-aligned generator. The former generic
 pre-release truth-class name is not retained as an alias.
 
+Decision 0134 gives public result properties type-revealing names: predictor-rank profiles expose
+`selected_result`, validation reports expose `cv_mse_mean`, and their boolean summaries use
+`is_selection_conditioned` and `has_complete_oof_coverage`. The former pre-release names are
+not retained as aliases.
+
 Decision 0119 adds `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth` as an additive
 manuscript-aligned synthetic capability. It implements independent standard-normal latent scores
 and loading entries plus independent Gaussian predictor/response noise, with no normalization,

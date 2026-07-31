@@ -302,7 +302,7 @@ def test_predictor_rank_profile_makes_read_only_defensive_copies() -> None:
     )
     assert profile.cv_mse_standard_error.dtype == np.dtype(np.float64)
     assert not profile.cv_mse_standard_error.flags.writeable
-    assert profile.selected.predictor_rank == 3
+    assert profile.selected_result.predictor_rank == 3
 
     with pytest.raises(ValueError, match="read-only"):
         profile.cv_mse_mean[0] = 0.0
@@ -354,7 +354,7 @@ def test_predictor_rank_profile_derives_selected_with_fitted_tie_rule() -> None:
         n_splits=5,
     )
 
-    selected = profile.selected
+    selected = profile.selected_result
 
     assert selected == PiPLSComponentResult(
         n_components=2,
@@ -374,7 +374,7 @@ def test_predictor_rank_profile_is_pickleable_with_read_only_arrays() -> None:
     np.testing.assert_array_equal(restored.predictor_rank, np.array([2, 3, 4]))
     assert not restored.predictor_rank.flags.writeable
     assert restored.predictor_rank_policy == "optimized"
-    assert restored.selected.predictor_rank == 4
+    assert restored.selected_result.predictor_rank == 4
     np.testing.assert_allclose(
         restored.cv_mse_standard_error,
         _predictor_rank_profile().cv_mse_fold_sd / np.sqrt(4.0),

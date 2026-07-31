@@ -150,7 +150,7 @@ split count.
 
 `predictor_rank_profile(h)` contains every predictor rank actually evaluated for one paired-mode
 count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks;
-its `selected` property derives the same conditionally selected scalar values returned by
+its `selected_result` property derives the same conditionally selected scalar values returned by
 `component_path_` from the immutable candidate arrays and shared policy and split-count scalars.
 
 ::: pipls.PiPLSPredictorRankProfile
@@ -160,16 +160,17 @@ its `selected` property derives the same conditionally selected scalar values re
 ## Validation report
 
 `PiPLSSearchCV.validation_report_` composes the immutable `selected_result_` with validation
-provenance and, when requested, ordered out-of-fold predictions. Its existing component-count,
-predictor-rank, split-count, score, and CV-MSE attributes are read-only views of
-`validation_report_.selected_result`.
+provenance and, when requested, ordered out-of-fold predictions. Its `n_components`,
+`predictor_rank`, `n_splits`, `mean_test_score`, and `cv_mse_mean` properties are read-only views of
+`validation_report_.selected_result`. Its `is_selection_conditioned` and
+`has_complete_oof_coverage` properties expose provenance and coverage as predicates.
 
 ::: pipls.PiPLSValidationReport
     options:
       show_signature: false
       members:
-        - selection_conditioned
-        - complete_oof_coverage
+        - is_selection_conditioned
+        - has_complete_oof_coverage
 
 ## Scoring functions
 

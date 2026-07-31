@@ -48,6 +48,7 @@ reference describe the current public behavior directly.
 - [0130: mathematical decomposition field names](0130-mathematical-decomposition-field-names.md)
 - [0131: concise response-standardized MSE names](0131-concise-response-standardized-mse-names.md)
 - [0132: predicate-style search exhaustiveness name](0132-predicate-search-exhaustiveness-name.md)
+- [0134: type-revealing public result properties](0134-type-revealing-result-properties.md)
 
 ## Validation, data, and benchmarks
 

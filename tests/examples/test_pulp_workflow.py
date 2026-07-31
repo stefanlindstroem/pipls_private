@@ -95,8 +95,8 @@ def test_pulp_rank_profile_exposes_the_upper_boundary_selection(
     profile = result.rank_profile
     assert isinstance(profile, PiPLSPredictorRankProfile)
     np.testing.assert_array_equal(profile.predictor_rank, np.arange(3, 11))
-    assert profile.selected == result.selected
-    assert profile.selected.predictor_rank == int(profile.predictor_rank[-1])
+    assert profile.selected_result == result.selected
+    assert profile.selected_result.predictor_rank == int(profile.predictor_rank[-1])
     assert profile.cv_mse_mean[-1] < profile.cv_mse_mean[-2]
     assert profile.cv_mse_mean[-2] - profile.cv_mse_mean[-1] < min(
         profile.cv_mse_fold_sd[-2],

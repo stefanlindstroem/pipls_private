@@ -145,9 +145,11 @@ Public path attributes include standard candidate-level search results in `cv_re
 `search_is_exhaustive_`, optional selected refitted estimators, immutable `validation_report_`,
 and the canonical immutable `component_path_` result. OOF arrays and their coverage counts live
 only in `validation_report_` and represent the selected row. The report composes the same immutable
-`PiPLSComponentResult` exposed as `selected_result_`; its component-count, predictor-rank,
-split-count, score, and CV-MSE convenience names are properties of that result rather than duplicated
-stored state. Validated input grids, adaptive-search batch history, candidate counters, direct-rank
+`PiPLSComponentResult` exposed as `selected_result_`; its `n_components`, `predictor_rank`,
+`n_splits`, `mean_test_score`, and `cv_mse_mean` properties forward to that result rather than
+duplicating stored state. `is_selection_conditioned` and `has_complete_oof_coverage` expose report
+provenance and coverage as predicates. Validated input grids, adaptive-search batch history,
+candidate counters, direct-rank
 parameter aliases, and matrix-shaped score/MSE aliases are not public fitted state; advanced users
 can inspect aligned `cv_results_` columns when needed.
 `PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
@@ -178,8 +180,9 @@ duplicate fitted-estimator `best_*` aliases are exposed.
 `PiPLSSearchCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
 predictor ranks actually evaluated at `h`, sorted in ascending order. Its path-wide policy and split
-count are scalars, and its `selected` property derives the same conditionally selected scalar values
-as `component_path_.for_n_components(h)` from immutable candidate state. The profile does not add
+count are scalars, and its `selected_result` property derives the same conditionally selected scalar
+values as `component_path_.for_n_components(h)` from immutable candidate state. The profile does not
+add
 another fitted attribute or stored selected-row representation. It exposes an aligned read-only
 `cv_mse_standard_error` property derived by the same contract as the component path. Selection
 maximizes the configured mean test score; only the default scorer makes this equivalent to

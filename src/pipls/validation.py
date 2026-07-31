@@ -60,7 +60,7 @@ class PiPLSValidationReport:
         Number of cross-validation splits from ``selected_result``.
     mean_test_score : float
         Mean configured test score from ``selected_result``.
-    mean_response_standardized_mse : float
+    cv_mse_mean : float
         Mean response-standardized validation MSE from ``selected_result``.
 
     Notes
@@ -187,19 +187,19 @@ class PiPLSValidationReport:
         return self.selected_result.mean_test_score
 
     @property
-    def mean_response_standardized_mse(self) -> float:
+    def cv_mse_mean(self) -> float:
         """Mean response-standardized validation MSE."""
 
         return self.selected_result.cv_mse_mean
 
     @property
-    def selection_conditioned(self) -> bool:
+    def is_selection_conditioned(self) -> bool:
         """Whether the same CV result was used for parameter selection."""
 
         return self.estimate_kind == "selection-conditioned"
 
     @property
-    def complete_oof_coverage(self) -> bool:
+    def has_complete_oof_coverage(self) -> bool:
         """Whether every input row received at least one validation prediction."""
 
         counts = self.oof_prediction_counts

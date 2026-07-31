@@ -132,11 +132,11 @@ def _render_predictor_rank_profile(
         capsize=4,
     )
     axis.scatter(
-        [profile.selected.predictor_rank],
-        [profile.selected.cv_mse_mean],
+        [profile.selected_result.predictor_rank],
+        [profile.selected_result.cv_mse_mean],
         marker="D",
         s=70,
-        label=f"CV-MSE minimum: rank {profile.selected.predictor_rank}",
+        label=f"CV-MSE minimum: rank {profile.selected_result.predictor_rank}",
         zorder=3,
     )
     axis.set_title(

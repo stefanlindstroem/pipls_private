@@ -70,7 +70,7 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     ):
         assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
 
-    assert "selected" not in {
+    assert "selected_result" not in {
         field.name for field in fields(PiPLSPredictorRankProfile)
     }
     assert {
@@ -78,7 +78,7 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
         "predictor_rank",
         "n_splits",
         "mean_test_score",
-        "mean_response_standardized_mse",
+        "cv_mse_mean",
     }.isdisjoint(field.name for field in fields(PiPLSValidationReport))
 
 
@@ -283,13 +283,16 @@ def test_validation_report_normalizes_and_freezes_oof_arrays() -> None:
     assert type(report.predictor_rank) is int
     assert type(report.n_splits) is int
     assert type(report.mean_test_score) is float
-    assert type(report.mean_response_standardized_mse) is float
+    assert type(report.cv_mse_mean) is float
+    assert type(report.is_selection_conditioned) is bool
+    assert type(report.has_complete_oof_coverage) is bool
     assert type(report.is_leave_one_out) is bool
     assert report.oof_predictions is not None
     assert report.oof_prediction_counts is not None
     assert not report.oof_predictions.flags.writeable
     assert not report.oof_prediction_counts.flags.writeable
-    assert not report.complete_oof_coverage
+    assert report.is_selection_conditioned
+    assert not report.has_complete_oof_coverage
 
     restored = pickle.loads(pickle.dumps(report))
     assert isinstance(restored, PiPLSValidationReport)

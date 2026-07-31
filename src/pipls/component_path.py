@@ -144,7 +144,7 @@ class PiPLSPredictorRankProfile:
         Predictor-rank policy shared by every evaluated candidate.
     n_splits : int
         Number of cross-validation splits.
-    selected : PiPLSComponentResult
+    selected_result : PiPLSComponentResult
         Derived conditionally selected scalar result for ``n_components``.
     """
 
@@ -215,7 +215,7 @@ class PiPLSPredictorRankProfile:
         )
 
     @property
-    def selected(self) -> PiPLSComponentResult:
+    def selected_result(self) -> PiPLSComponentResult:
         """Return the conditionally selected predictor-rank result."""
 
         maximum = float(np.max(self.mean_test_score))

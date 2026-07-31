@@ -39,11 +39,11 @@ print(
     "Selected pair: "
     f"n_components={report.n_components}, predictor_rank={report.predictor_rank}"
 )
-print(f"Complete OOF coverage: {report.complete_oof_coverage}")
+print(f"Complete OOF coverage: {report.has_complete_oof_coverage}")
 print(f"OOF prediction shape: {report.oof_predictions.shape}")
 print(
     "Mean response-standardized CV-MSE: "
-    f"{report.mean_response_standardized_mse:.4f}"
+    f"{report.cv_mse_mean:.4f}"
 )
 print(
     "Pooled OOF R2 (not mean foldwise R2): "

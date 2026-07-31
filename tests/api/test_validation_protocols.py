@@ -61,10 +61,10 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
     assert report.n_components == search.best_n_components_
     assert report.predictor_rank == search.best_predictor_rank_
-    assert report.selection_conditioned
+    assert report.is_selection_conditioned
     assert report.is_leave_one_out
-    assert report.complete_oof_coverage
-    assert report.mean_response_standardized_mse == pytest.approx(
+    assert report.has_complete_oof_coverage
+    assert report.cv_mse_mean == pytest.approx(
         search.cv_results_["mean_response_standardized_mse"][search.best_index_]
     )
     assert report.pooled_oof_r2 == pytest.approx(
@@ -93,7 +93,7 @@ def test_repeated_kfold_averages_predictions_and_records_counts() -> None:
         report.oof_prediction_counts,
         np.full(X.shape[0], 2, dtype=np.intp),
     )
-    assert report.complete_oof_coverage
+    assert report.has_complete_oof_coverage
     assert np.all(np.isfinite(report.oof_predictions))
 
 
@@ -124,11 +124,11 @@ def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
     assert temporal_report.oof_predictions is not None
     np.testing.assert_array_equal(predefined_report.oof_prediction_counts[:9], 0)
     assert np.isnan(predefined_report.oof_predictions[:9]).all()
-    assert not predefined_report.complete_oof_coverage
+    assert not predefined_report.has_complete_oof_coverage
     assert np.any(temporal_report.oof_prediction_counts == 0)
     uncovered = temporal_report.oof_prediction_counts == 0
     assert np.isnan(temporal_report.oof_predictions[uncovered]).all()
-    assert not temporal_report.complete_oof_coverage
+    assert not temporal_report.has_complete_oof_coverage
 
 
 def test_grouped_splitters_are_supported_by_path_interface() -> None:

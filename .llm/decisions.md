@@ -139,6 +139,7 @@ This index is navigation, not a substitute for those records.
 | `0131-concise-response-standardized-mse-names.md` | concise response-standardized MSE names | expose concise public scorer callables and stable default scorer string without aliases or numerical changes |
 | `0132-predicate-search-exhaustiveness-name.md` | predicate-style search exhaustiveness name | expose `search_is_exhaustive_` as the completed-search coverage predicate without an alias or behavioral change |
 | `0133-regression-generator-truth-name.md` | regression-generator truth naming | distinguish the configurable regression truth record from the manuscript latent-geometry truth without aliases or data changes |
+| `0134-type-revealing-result-properties.md` | type-revealing public result properties | expose explicit result-object, CV-MSE, and boolean predicate names without aliases or numerical changes |
 
 ## Implemented estimator/search transition
 
@@ -229,6 +230,8 @@ plan contains an earlier or more general proposal:
   `search_is_exhaustive_` without an alias or search-behavior change;
 - Decision 0133 renames the configurable-generator truth record to `PiPLSRegressionTruth`
   and adopts regression-specific private generator terminology without aliases or data changes;
+- Decision 0134 gives public result properties type-revealing names without aliases or
+  changes to selected values, validation metrics, or OOF coverage;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
   Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls

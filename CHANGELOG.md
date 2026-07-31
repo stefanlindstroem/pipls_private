@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Rename the unreleased result properties to make their return types and predicates explicit:
+  `PiPLSPredictorRankProfile.selected_result`, `PiPLSValidationReport.cv_mse_mean`,
+  `is_selection_conditioned`, and `has_complete_oof_coverage`, without compatibility aliases or
+  numerical changes.
 - Rename the unreleased configurable-generator truth record from `PiPLSSyntheticTruth` to
   `PiPLSRegressionTruth`, and use regression-specific private generator terminology, without
   compatibility aliases or changes to generated data.
@@ -75,7 +79,7 @@
   serialized scalar fields without changing report values or OOF behavior.
 
 - Normalize immutable path results by storing one predictor-rank policy and split count per search
-  and deriving `PiPLSPredictorRankProfile.selected` from its candidate arrays with the fitted
+  and deriving `PiPLSPredictorRankProfile.selected_result` from its candidate arrays with the fitted
   tolerant lower-rank tie rule, removing repeated and potentially inconsistent state.
 
 - Derive `PredictionDiagnostics` residuals, standardization statistics, standardized arrays, and
