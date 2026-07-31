@@ -30,11 +30,11 @@ Metadata NumPy arrays are copied and made read-only, but they must have a non-ob
 ordinary nested sequences and mappings for heterogeneous metadata so every nested value can be
 validated and frozen explicitly.
 
-`PiPLSSyntheticTruth` is returned by the configurable package generators, while
+`PiPLSRegressionTruth` is returned by the configurable package generators, while
 `PiPLSLatentGeometryTruth` is returned by the companion-manuscript generator. Users normally
 inspect these records through `dataset.truth` rather than construct them directly.
 
-::: pipls.datasets.PiPLSSyntheticTruth
+::: pipls.datasets.PiPLSRegressionTruth
     options:
       show_signature: false
       members:

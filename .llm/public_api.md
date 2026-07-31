@@ -208,7 +208,7 @@ that module's `__all__`:
 from pipls.datasets import (
     PiPLSDataset,
     PiPLSLatentGeometryTruth,
-    PiPLSSyntheticTruth,
+    PiPLSRegressionTruth,
     make_pipls_latent_geometry,
     make_pipls_regression,
     make_pipls_train_test,
@@ -241,7 +241,7 @@ standard-normal loading matrices; and independent Gaussian predictor/response no
 score centering or standardization, loading orthonormalization, strength scaling, or observed-scale
 transformation. Its loading matrices use manuscript orientation with latent dimensions on rows.
 
-`PiPLSSyntheticTruth` exposes read-only latent scores, contributing loading blocks, signal/noise
+`PiPLSRegressionTruth` exposes read-only latent scores, contributing loading blocks, signal/noise
 matrices, strengths, and scales for the configurable package generators. Structurally absent
 cross-side loading blocks are not stored as redundant zero arrays. `PiPLSLatentGeometryTruth`
 exposes the manuscript matrices directly and validates the two signal equations. Both truth forms

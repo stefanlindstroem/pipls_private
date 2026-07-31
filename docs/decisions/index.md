@@ -70,6 +70,7 @@ reference describe the current public behavior directly.
 - [0119: manuscript latent-geometry generator](0119-manuscript-latent-geometry-generator.md)
 - [0123: companion-manuscript synthetic-data guide]
   (0123-companion-manuscript-synthetic-data-guide.md)
+- [0133: regression-generator truth naming](0133-regression-generator-truth-name.md)
 
 ## Examples and analysis workflows
 

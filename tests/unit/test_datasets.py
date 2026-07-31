@@ -9,7 +9,7 @@ import pytest
 from pipls.datasets import (
     PiPLSDataset,
     PiPLSLatentGeometryTruth,
-    PiPLSSyntheticTruth,
+    PiPLSRegressionTruth,
     make_pipls_latent_geometry,
     make_pipls_regression,
 )
@@ -139,7 +139,7 @@ def test_dataset_rejects_object_dtype_metadata_arrays(
         _dataset(metadata={"nested": {"array": metadata_array}})
 
 
-def test_synthetic_truth_is_read_only() -> None:
+def test_regression_truth_is_read_only() -> None:
     dataset = make_pipls_regression(
         n_samples=12,
         n_features=6,
@@ -151,7 +151,7 @@ def test_synthetic_truth_is_read_only() -> None:
     )
     truth = dataset.truth
 
-    assert isinstance(truth, PiPLSSyntheticTruth)
+    assert isinstance(truth, PiPLSRegressionTruth)
     assert truth.n_shared == 2
     assert truth.n_predictor_specific == 1
     assert truth.n_response_specific == 1

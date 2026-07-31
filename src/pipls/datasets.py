@@ -18,7 +18,7 @@ NoiseSpec: TypeAlias = float | tuple[float, float]
 __all__ = [
     "PiPLSDataset",
     "PiPLSLatentGeometryTruth",
-    "PiPLSSyntheticTruth",
+    "PiPLSRegressionTruth",
     "make_pipls_latent_geometry",
     "make_pipls_regression",
     "make_pipls_train_test",
@@ -55,8 +55,8 @@ _UINT32_MAX = 2**32 - 1
 
 
 @dataclass(frozen=True)
-class PiPLSSyntheticTruth:
-    r"""Immutable latent structure used to generate a synthetic dataset.
+class PiPLSRegressionTruth:
+    r"""Immutable latent structure used by the configurable regression generator.
 
     All arrays are read-only copies. The result stores only loading blocks that
     contribute to the generated predictor or response signal.
@@ -223,7 +223,7 @@ class PiPLSLatentGeometryTruth:
         )
 
 
-_SyntheticTruth: TypeAlias = PiPLSSyntheticTruth | PiPLSLatentGeometryTruth
+_SyntheticTruth: TypeAlias = PiPLSRegressionTruth | PiPLSLatentGeometryTruth
 
 
 @dataclass(frozen=True)
@@ -251,7 +251,7 @@ class PiPLSDataset:
     metadata : mapping of str to object, default={}
         Recursively frozen dataset metadata. NumPy metadata arrays must not use
         object dtype, because object-array elements can remain mutable.
-    truth : PiPLSSyntheticTruth, PiPLSLatentGeometryTruth, or None, default=None
+    truth : PiPLSRegressionTruth, PiPLSLatentGeometryTruth, or None, default=None
         Optional synthetic latent structure consistent with ``X`` and ``Y``.
 
     Attributes
@@ -262,7 +262,7 @@ class PiPLSDataset:
         Validated axis labels.
     provenance, metadata : mapping
         Immutable mappings.
-    truth : PiPLSSyntheticTruth, PiPLSLatentGeometryTruth, or None
+    truth : PiPLSRegressionTruth, PiPLSLatentGeometryTruth, or None
         Optional synthetic truth object.
     """
 
@@ -302,7 +302,7 @@ class PiPLSDataset:
         metadata = _freeze_mapping(self.metadata, name="metadata")
 
         if self.truth is not None:
-            _validate_truth(
+            _validate_dataset_truth(
                 self.truth,
                 n_samples=X.shape[0],
                 n_features=X.shape[1],
@@ -353,7 +353,7 @@ class PiPLSDataset:
 
 
 @dataclass(frozen=True)
-class _SyntheticLoadings:
+class _RegressionLoadings:
     x_shared_loadings: FloatArray
     x_predictor_specific_loadings: FloatArray
     y_shared_loadings: FloatArray
@@ -361,7 +361,7 @@ class _SyntheticLoadings:
 
 
 @dataclass(frozen=True)
-class _SyntheticConfig:
+class _RegressionGeneratorConfig:
     n_features: int
     n_targets: int
     n_shared: int
@@ -611,7 +611,7 @@ def make_pipls_regression(
     """
 
     n_samples = _positive_integer(n_samples, name="n_samples", minimum=2)
-    config = _validated_synthetic_config(
+    config = _validated_regression_config(
         n_features=n_features,
         n_targets=n_targets,
         n_shared=n_shared,
@@ -630,8 +630,8 @@ def make_pipls_regression(
     )
     _validate_sample_capacity(n_samples, config, name="n_samples")
     rng = np.random.default_rng(config.random_state)
-    loadings = _draw_synthetic_loadings(rng, config)
-    return _draw_dataset_block(
+    loadings = _draw_regression_loadings(rng, config)
+    return _draw_regression_block(
         rng,
         config,
         loadings,
@@ -711,7 +711,7 @@ def make_pipls_train_test(
 
     n_train = _positive_integer(n_train, name="n_train", minimum=2)
     n_test = _positive_integer(n_test, name="n_test", minimum=2)
-    config = _validated_synthetic_config(
+    config = _validated_regression_config(
         n_features=n_features,
         n_targets=n_targets,
         n_shared=n_shared,
@@ -731,8 +731,8 @@ def make_pipls_train_test(
     _validate_sample_capacity(n_train, config, name="n_train")
     _validate_sample_capacity(n_test, config, name="n_test")
     rng = np.random.default_rng(config.random_state)
-    loadings = _draw_synthetic_loadings(rng, config)
-    train = _draw_dataset_block(
+    loadings = _draw_regression_loadings(rng, config)
+    train = _draw_regression_block(
         rng,
         config,
         loadings,
@@ -741,7 +741,7 @@ def make_pipls_train_test(
         split_role="train",
         generator_name="make_pipls_train_test",
     )
-    test = _draw_dataset_block(
+    test = _draw_regression_block(
         rng,
         config,
         loadings,
@@ -753,7 +753,7 @@ def make_pipls_train_test(
     return train, test
 
 
-def _validated_synthetic_config(
+def _validated_regression_config(
     *,
     n_features: int,
     n_targets: int,
@@ -770,7 +770,7 @@ def _validated_synthetic_config(
     target_scale: NumericSpec,
     noise: NoiseSpec,
     random_state: int,
-) -> _SyntheticConfig:
+) -> _RegressionGeneratorConfig:
     n_features = _positive_integer(n_features, name="n_features")
     n_targets = _positive_integer(n_targets, name="n_targets")
     n_shared = _nonnegative_integer(n_shared, name="n_shared")
@@ -797,7 +797,7 @@ def _validated_synthetic_config(
             raise ValueError(f"{name} must be 'normal' or 'uniform'.")
 
     x_noise, y_noise = _resolve_noise(noise)
-    return _SyntheticConfig(
+    return _RegressionGeneratorConfig(
         n_features=n_features,
         n_targets=n_targets,
         n_shared=n_shared,
@@ -839,7 +839,7 @@ def _validated_synthetic_config(
 
 def _validate_sample_capacity(
     n_samples: int,
-    config: _SyntheticConfig,
+    config: _RegressionGeneratorConfig,
     *,
     name: str,
 ) -> None:
@@ -853,10 +853,10 @@ def _validate_sample_capacity(
         )
 
 
-def _draw_synthetic_loadings(
+def _draw_regression_loadings(
     rng: np.random.Generator,
-    config: _SyntheticConfig,
-) -> _SyntheticLoadings:
+    config: _RegressionGeneratorConfig,
+) -> _RegressionLoadings:
     x_basis = _orthonormal_columns(
         rng,
         n_rows=config.n_features,
@@ -867,7 +867,7 @@ def _draw_synthetic_loadings(
         n_rows=config.n_targets,
         n_columns=config.n_shared + config.n_response_specific,
     )
-    return _SyntheticLoadings(
+    return _RegressionLoadings(
         x_shared_loadings=x_basis[:, : config.n_shared],
         x_predictor_specific_loadings=x_basis[:, config.n_shared :],
         y_shared_loadings=y_basis[:, : config.n_shared],
@@ -875,10 +875,10 @@ def _draw_synthetic_loadings(
     )
 
 
-def _draw_dataset_block(
+def _draw_regression_block(
     rng: np.random.Generator,
-    config: _SyntheticConfig,
-    loadings: _SyntheticLoadings,
+    config: _RegressionGeneratorConfig,
+    loadings: _RegressionLoadings,
     *,
     n_samples: int,
     sample_prefix: str,
@@ -904,20 +904,20 @@ def _draw_dataset_block(
         distribution=config.response_specific_distribution,
     )
 
-    x_signal_unscaled = _signal_block(
+    x_signal_unscaled = _latent_signal(
         shared_scores,
         config.shared_strengths,
         loadings.x_shared_loadings,
-    ) + _signal_block(
+    ) + _latent_signal(
         predictor_specific_scores,
         config.predictor_specific_strengths,
         loadings.x_predictor_specific_loadings,
     )
-    y_signal_unscaled = _signal_block(
+    y_signal_unscaled = _latent_signal(
         shared_scores,
         config.shared_strengths,
         loadings.y_shared_loadings,
-    ) + _signal_block(
+    ) + _latent_signal(
         response_specific_scores,
         config.response_specific_strengths,
         loadings.y_response_specific_loadings,
@@ -932,7 +932,7 @@ def _draw_dataset_block(
     X = x_signal + x_noise
     Y = y_signal + y_noise
 
-    truth = PiPLSSyntheticTruth(
+    truth = PiPLSRegressionTruth(
         shared_scores=shared_scores,
         predictor_specific_scores=predictor_specific_scores,
         response_specific_scores=response_specific_scores,
@@ -985,7 +985,7 @@ def _draw_dataset_block(
     )
 
 
-def _signal_block(
+def _latent_signal(
     scores: FloatArray,
     strengths: FloatArray,
     loadings: FloatArray,
@@ -1123,7 +1123,7 @@ def _freeze_metadata_value(value: object, *, path: str) -> object:
     )
 
 
-def _validate_truth(
+def _validate_dataset_truth(
     truth: _SyntheticTruth,
     *,
     n_samples: int,
@@ -1140,9 +1140,9 @@ def _validate_truth(
                 f"truth.y_signal must have shape {(n_samples, n_targets)}."
             )
         return
-    if not isinstance(truth, PiPLSSyntheticTruth):
+    if not isinstance(truth, PiPLSRegressionTruth):
         raise TypeError(
-            "truth must be PiPLSSyntheticTruth or PiPLSLatentGeometryTruth."
+            "truth must be PiPLSRegressionTruth or PiPLSLatentGeometryTruth."
         )
 
     n_shared = truth.n_shared

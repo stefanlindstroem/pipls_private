@@ -38,7 +38,7 @@ predictor and response directions; they are distinct from reconstruction loading
 | [`ObservationDiagnostics`](inspection.md#pipls.inspection.ObservationDiagnostics) | `observation_diagnostics(model)` | Inspect score distance and X-reconstruction residuals |
 | [`PredictionDiagnostics`](inspection.md#pipls.inspection.PredictionDiagnostics) | `prediction_diagnostics(Y, Y_pred, ...)` | Inspect predictions, residuals, and response-standardized errors |
 | [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | dataset construction or generator output | Carry validated arrays, labels, provenance, and metadata |
-| [`PiPLSSyntheticTruth`](datasets.md#pipls.datasets.PiPLSSyntheticTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
+| [`PiPLSRegressionTruth`](datasets.md#pipls.datasets.PiPLSRegressionTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
 | [`PiPLSLatentGeometryTruth`](datasets.md#pipls.datasets.PiPLSLatentGeometryTruth) | `make_pipls_latent_geometry(...).truth` | Inspect the manuscript-oriented Gaussian latent geometry |
 
 `PiPLSComponentPath.minimum_cv_mse_result()` and

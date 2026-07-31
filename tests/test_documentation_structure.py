@@ -116,7 +116,7 @@ def test_api_overview_maps_the_public_result_objects() -> None:
         "PredictionDiagnostics",
         "PiPLSDataset",
         "PiPLSLatentGeometryTruth",
-        "PiPLSSyntheticTruth",
+        "PiPLSRegressionTruth",
     }
 
     for object_name in result_objects:

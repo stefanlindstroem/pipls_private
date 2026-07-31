@@ -190,7 +190,7 @@ Dataset functionality is public from `pipls.datasets`:
 ```python
 from pipls.datasets import (
     PiPLSDataset,
-    PiPLSSyntheticTruth,
+    PiPLSRegressionTruth,
     make_pipls_regression,
     make_pipls_train_test,
 )
@@ -392,6 +392,10 @@ tiled factor/latent/prediction figures omit redundant subplot titles, prediction
 on one line, path/profile y-axes start at zero with an upper limit of at least one, dilation plots
 use numeric component ticks without repeating the x-axis label, and dense Tobacco response labels
 are rotated explicitly.
+
+Decision 0133 names the configurable-generator truth record `PiPLSRegressionTruth` and keeps
+`PiPLSLatentGeometryTruth` for the separate manuscript-aligned generator. The former generic
+pre-release truth-class name is not retained as an alias.
 
 Decision 0119 adds `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth` as an additive
 manuscript-aligned synthetic capability. It implements independent standard-normal latent scores

@@ -4,6 +4,9 @@
 
 ### Repository
 
+- Rename the unreleased configurable-generator truth record from `PiPLSSyntheticTruth` to
+  `PiPLSRegressionTruth`, and use regression-specific private generator terminology, without
+  compatibility aliases or changes to generated data.
 - Rename the unreleased fitted boolean `PiPLSSearchCV.path_search_exhaustive_` to
   `search_is_exhaustive_`, so the public name reads as a predicate while preserving the
   exact completed-search coverage semantics.
@@ -225,7 +228,7 @@
 
 - Complete public result-record cleanup: remove sign-canonicalization bookkeeping from
   `PiPLSDisplayFactors`, omit structurally impossible zero loading blocks from
-  `PiPLSSyntheticTruth`, and present returned immutable records without constructor-first generated
+  `PiPLSRegressionTruth`, and present returned immutable records without constructor-first generated
   signatures.
 
 - Reduce the fitted estimator and path-search surfaces: keep direction arrays without duplicate
