@@ -18,7 +18,7 @@ from pipls import (
     PiPLSSearchCV,
     StatisticalSupportWarning,
 )
-from pipls.metrics import neg_response_standardized_mean_squared_error
+from pipls.metrics import neg_response_standardized_mse
 
 
 class _WarningTransformer(TransformerMixin, BaseEstimator):  # type: ignore[misc]
@@ -305,7 +305,7 @@ def test_default_scorer_name_resolves_to_the_public_callable() -> None:
         refit=False,
     ).fit(X, Y)
 
-    assert search.scorer_ is neg_response_standardized_mean_squared_error
+    assert search.scorer_ is neg_response_standardized_mse
     np.testing.assert_allclose(
         search.cv_results_["mean_test_score"],
         -search.cv_results_["mean_response_standardized_mse"],

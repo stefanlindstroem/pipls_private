@@ -227,7 +227,7 @@ case, or public behavior.
 | Reproducibility | estimator `random_state` accepts integer, NumPy `RandomState`, or `None`; default `0` is reproducible |
 | Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
 | Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
-| Selection score | stable package string `"neg_response_standardized_mean_squared_error"` by default, resolving to the public callable; sklearn scorer names, callables, and `None` accepted |
+| Selection score | stable package string `"neg_response_standardized_mse"` by default, resolving to the public callable; sklearn scorer names, callables, and `None` accepted |
 | Final path-row selection | `selection_rule="best_score"` by default; explicit `"one_standard_error"` selects the stored 1-SE component row |
 | Final refit | `refit=False` by default; `refit=True` fits `selected_result_` and exposes `selected_estimator_`/`selected_pipls_` |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
@@ -297,7 +297,7 @@ Decisions 0039 and 0040 are fully implemented:
   have been removed from the private selection layer.
 - the complete component path is explicit through `n_components_values="all"`;
 - random-state forms and refit-dependent method availability follow scikit-learn conventions;
-- the stable package string `"neg_response_standardized_mean_squared_error"` is the default selection parameter and resolves to the public scorer callable;
+- the stable package string `"neg_response_standardized_mse"` is the default selection parameter and resolves to the public scorer callable;
 - duplicate Pi-PLS-specific fitted aliases are removed in favor of canonical `decomposition_` fields;
 - the public guides distinguish best evaluated score from a global surface optimum, explain that
   response-standardized MSE is diagnostic when a nondefault scorer drives selection, and are

@@ -38,7 +38,7 @@ from .component_path import (
     PredictorRankPolicy,
 )
 from .exceptions import StatisticalSupportWarning
-from .metrics import neg_response_standardized_mean_squared_error
+from .metrics import neg_response_standardized_mse
 from .model_selection import (
     CVSplit,
     _as_positive_float,
@@ -63,7 +63,7 @@ SearchMethod = Literal["optimal", "auto"]
 SelectionRule = Literal["best_score", "one_standard_error"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
-_DEFAULT_SCORING_NAME = "neg_response_standardized_mean_squared_error"
+_DEFAULT_SCORING_NAME = "neg_response_standardized_mse"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _CONTROLLED_FIT_WARNING_CATEGORIES = (StatisticalSupportWarning,)
 
@@ -143,10 +143,10 @@ class PiPLSSearchCV(
     cv : int, splitter, iterable or None, default=5
         Cross-validation specification. ``None`` requests the standard five-fold
         regression split.
-    scoring : str, callable or None, default="neg_response_standardized_mean_squared_error"
+    scoring : str, callable or None, default="neg_response_standardized_mse"
         Scikit-learn scorer name, scorer callable, or ``None`` to use estimator
         ``score``. The package-specific default name resolves to
-        :func:`pipls.metrics.neg_response_standardized_mean_squared_error`.
+        :func:`pipls.metrics.neg_response_standardized_mse`.
     selection_rule : {"best_score", "one_standard_error"}, default="best_score"
         Rule used to choose the final component-path row. ``"best_score"`` uses
         the globally best evaluated pair under ``scoring``. ``"one_standard_error"``
@@ -1253,7 +1253,7 @@ def _predictor_rank_policy(values: PredictorRankValues) -> PredictorRankPolicy:
 
 def _resolve_path_scorer(scoring: Scoring, estimator: Any) -> Scorer:
     if isinstance(scoring, str) and scoring == _DEFAULT_SCORING_NAME:
-        return neg_response_standardized_mean_squared_error
+        return neg_response_standardized_mse
     if isinstance(scoring, str):
         try:
             return cast(Scorer, get_scorer(scoring))

@@ -132,8 +132,8 @@ The default `refit=False` keeps path evaluation separate from final fixed-model 
 `refit=True` explicitly requests a full-data fit of the row chosen by that rule.
 
 The default `scoring` value is the stable package string
-`"neg_response_standardized_mean_squared_error"`, which resolves to the public callable
-`pipls.metrics.neg_response_standardized_mean_squared_error`. Ordinary scikit-learn scorer names,
+`"neg_response_standardized_mse"`, which resolves to the public callable
+`pipls.metrics.neg_response_standardized_mse`. Ordinary scikit-learn scorer names,
 other callables, and `None` remain accepted. Conditional and overall selections among evaluated
 candidates maximize the configured mean test score. Under the default scorer this is
 equivalent to minimizing mean response-standardized MSE among evaluated candidates; adaptive

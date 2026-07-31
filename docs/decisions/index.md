@@ -46,6 +46,7 @@ reference describe the current public behavior directly.
 - [0122: public terminology propagation](0122-public-terminology-propagation.md)
 - [0129: remove pre-release search compatibility aliases](0129-remove-pre-release-search-aliases.md)
 - [0130: mathematical decomposition field names](0130-mathematical-decomposition-field-names.md)
+- [0131: concise response-standardized MSE names](0131-concise-response-standardized-mse-names.md)
 
 ## Validation, data, and benchmarks
 

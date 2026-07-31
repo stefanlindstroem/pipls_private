@@ -72,8 +72,8 @@ smaller predictor rank.
 ## Scoring and the best evaluated pair
 
 Candidate selection maximizes the configured mean test score. The default scoring parameter is
-the stable package name `"neg_response_standardized_mean_squared_error"`, which resolves to
-`pipls.metrics.neg_response_standardized_mean_squared_error`. Maximizing that score is equivalent
+the stable package name `"neg_response_standardized_mse"`, which resolves to
+`pipls.metrics.neg_response_standardized_mse`. Maximizing that score is equivalent
 to minimizing mean response-standardized CV-MSE. With another scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 

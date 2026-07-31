@@ -5,8 +5,8 @@ import pytest
 
 from pipls import PiPLSRegression
 from pipls.metrics import (
-    neg_response_standardized_mean_squared_error,
-    response_standardized_mean_squared_error,
+    neg_response_standardized_mse,
+    response_standardized_mse,
 )
 
 
@@ -22,15 +22,15 @@ def test_response_standardized_metric_uses_training_response_scale_when_scale_is
     prediction = model.predict(X)
     expected = np.mean(((y - prediction) / np.std(y, ddof=1)) ** 2)
 
-    assert response_standardized_mean_squared_error(model, X, y) == expected
-    assert neg_response_standardized_mean_squared_error(model, X, y) == -expected
+    assert response_standardized_mse(model, X, y) == expected
+    assert neg_response_standardized_mse(model, X, y) == -expected
 
 
 def test_metric_callable_has_sklearn_scorer_signature() -> None:
     def consume_scorer(scorer: Any) -> None:
         assert callable(scorer)
 
-    consume_scorer(neg_response_standardized_mean_squared_error)
+    consume_scorer(neg_response_standardized_mse)
 
 
 def test_training_response_scale_uses_sample_standard_deviation() -> None:

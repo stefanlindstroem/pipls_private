@@ -157,7 +157,7 @@ def _validate_singleton_fold_scoring(
     if scoring is None or scoring == "r2" or score_func is r2_score:
         raise ValueError(
             "R2 scoring is undefined for singleton validation folds. Use "
-            "pipls.metrics.neg_response_standardized_mean_squared_error or another "
+            "pipls.metrics.neg_response_standardized_mse or another "
             "singleton-safe scorer, and compute pooled OOF R2 only as a "
             "secondary diagnostic."
         )

@@ -136,6 +136,7 @@ This index is navigation, not a substitute for those records.
 | `0128-same-file-rendering-functions.md` | same-file rendering functions | keep complete-example analysis in `main()` while private functions in the numbered script own rendering and report writing |
 | `0129-remove-pre-release-search-aliases.md` | pre-release search alias removal | expose only `selected_estimator_` and `selected_pipls_` for the one refitted model; retain candidate-level `best_*` diagnostics |
 | `0130-mathematical-decomposition-field-names.md` | mathematical decomposition field names | expose `predictor_directions` and `response_directions` without pre-release aliases; retain standard PLS-style estimator rotation attributes |
+| `0131-concise-response-standardized-mse-names.md` | concise response-standardized MSE names | expose concise public scorer callables and stable default scorer string without aliases or numerical changes |
 
 ## Implemented estimator/search transition
 
@@ -157,7 +158,7 @@ plan contains an earlier or more general proposal:
 - `PiPLSSearchCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
 - `PiPLSSearchCV` defaults to selection-only `refit=False`; explicit `selection_rule` chooses the
   best-score or stored 1-SE row for optional final refitting;
-- the default scoring parameter is the stable package name `"neg_response_standardized_mean_squared_error"`, which resolves to the public scorer callable;
+- the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
   while transformed feature count, centered training-fold dimensions, and minimum verified
@@ -220,6 +221,8 @@ plan contains an earlier or more general proposal:
 - Decision 0130 renames the unreleased decomposition fields to `predictor_directions` and
   `response_directions` without aliases, while retaining standard PLS-style `x_rotations_` and
   `y_rotations_`;
+- Decision 0131 shortens the public response-standardized scorer callables and stable default
+  scorer string to the established `mse` terminology without aliases or numerical changes;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
   Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls

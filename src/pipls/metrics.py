@@ -12,12 +12,12 @@ FloatArray = NDArray[np.float64]
 
 
 __all__ = [
-    "neg_response_standardized_mean_squared_error",
-    "response_standardized_mean_squared_error",
+    "neg_response_standardized_mse",
+    "response_standardized_mse",
 ]
 
 
-def response_standardized_mean_squared_error(
+def response_standardized_mse(
     estimator: Any,
     X: ArrayLike,
     y: ArrayLike,
@@ -53,7 +53,7 @@ def response_standardized_mean_squared_error(
     )
 
 
-def neg_response_standardized_mean_squared_error(
+def neg_response_standardized_mse(
     estimator: Any,
     X: ArrayLike,
     y: ArrayLike,
@@ -62,7 +62,7 @@ def neg_response_standardized_mean_squared_error(
 
     This sign-reversed form follows the scikit-learn scorer convention that larger
     scores are better. Maximizing it is equivalent to minimizing
-    :func:`response_standardized_mean_squared_error`.
+    :func:`response_standardized_mse`.
 
     Parameters
     ----------
@@ -79,7 +79,7 @@ def neg_response_standardized_mean_squared_error(
         Nonpositive negative response-standardized MSE.
     """
 
-    return -response_standardized_mean_squared_error(estimator, X, y)
+    return -response_standardized_mse(estimator, X, y)
 
 
 def _training_response_scale(y_train: ArrayLike) -> FloatArray:

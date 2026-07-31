@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Rename the unreleased response-standardized scoring callables to
+  `response_standardized_mse` and `neg_response_standardized_mse`, and use
+  `"neg_response_standardized_mse"` as the stable default search scorer string, without
+  compatibility aliases or numerical changes.
 - Rename the unreleased `PiPLSDecomposition.predictor_rotations` and
   `response_rotations` fields to `predictor_directions` and `response_directions`, without
   compatibility aliases. Retain `PiPLSRegression.x_rotations_` and `y_rotations_` as standard

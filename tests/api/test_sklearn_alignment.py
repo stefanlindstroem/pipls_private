@@ -55,7 +55,7 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert path.samples_per_predictor_rank == 5.0
     assert path.cv == 5
     assert path.n_components_values == "all"
-    assert path.scoring == "neg_response_standardized_mean_squared_error"
+    assert path.scoring == "neg_response_standardized_mse"
     assert path.selection_rule == "best_score"
     assert path.refit is False
 
@@ -64,7 +64,7 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     signature = inspect.signature(PiPLSSearchCV)
 
     assert signature.parameters["scoring"].default == (
-        "neg_response_standardized_mean_squared_error"
+        "neg_response_standardized_mse"
     )
     assert signature.parameters["refit"].default is False
     assert signature.parameters["selection_rule"].default == "best_score"

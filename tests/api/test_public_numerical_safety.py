@@ -6,7 +6,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.validation import check_is_fitted
 
 from pipls import PiPLSRegression, PiPLSSearchCV
-from pipls.metrics import response_standardized_mean_squared_error
+from pipls.metrics import response_standardized_mse
 
 
 def _data() -> tuple[np.ndarray, np.ndarray]:
@@ -140,7 +140,7 @@ def test_public_scorer_rejects_unrepresentable_mse() -> None:
     model = PiPLSRegression(n_components=1, predictor_rank=1).fit(X, Y)
 
     with pytest.raises(ValueError, match="not representable"):
-        response_standardized_mean_squared_error(
+        response_standardized_mse(
             model,
             np.zeros((2, 1)),
             np.full((2, 1), np.finfo(np.float64).max),
