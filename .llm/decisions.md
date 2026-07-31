@@ -133,6 +133,7 @@ This index is navigation, not a substitute for those records.
 | `0125-retire-benchmark-layer.md` | benchmark-layer retirement | remove benchmark scripts, tests, outputs, navigation, and active contracts; preserve historical records |
 | `0126-historical-removal-test-policy.md` | historical-removal test policy | retain negative tests for current boundaries, not one tombstone per pre-release removal |
 | `0127-artifact-based-rendering-validation.md` | artifact-based rendering validation | protect rendering ownership, numerical meaning, and generated artifacts without exact Matplotlib source locks |
+| `0128-same-file-rendering-functions.md` | same-file rendering functions | keep complete-example analysis in `main()` while private functions in the numbered script own rendering and report writing |
 
 ## Implemented estimator/search transition
 
@@ -232,7 +233,8 @@ plan contains an earlier or more general proposal:
   or executed by the default test suite; `make examples` runs all numbered examples explicitly;
 - the package exposes no public plotting module; maintained reports render immutable inspection
   arrays directly with Matplotlib, group related charts in dataset-appropriate panels, and retain
-  full-width coefficient pages;
+  full-width coefficient pages; Sugarcane and Tobacco keep analysis in `main()` and rendering in
+  private functions within the same numbered script, while Pulp remains sequential;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
 record and add it to this index in the same patch.

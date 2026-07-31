@@ -46,8 +46,9 @@ including the complete real-data analyses. Example 04
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
 Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, keep OOF and
 inspection results in memory, and write only final PDF figures. Pulp also exposes the conditional
-predictor-rank profile at three components. Tobacco owns its full-SVD spectral figures, source-order
-response pagination, and raw observation diagnostics directly.
+predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
+`main()` and group rendering in private functions within their numbered scripts. Tobacco retains
+full-SVD spectral figures, source-order response pagination, and raw observation diagnostics.
 No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
 support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
 environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
@@ -102,8 +103,9 @@ and $Q$ inspection remains explicitly method-owned. Scores, loadings, coefficien
 observation diagnostics, and prediction diagnostics are shared PLS-family analyses with an
 estimator-neutral API. Ordinary PLS remains the component-path comparator. The numbered post-analysis examples apply shared tools only to the selected Pi-PLS model and fit no
 final ordinary PLS model. Pulp, Sugarcane, and Tobacco own their OOF prediction, inspection,
-figure composition, and final PDF output directly. Tobacco additionally owns source-order response
-pagination and raw observation diagnostics.
+figure composition, and final PDF output directly. Sugarcane and Tobacco separate `main()`-owned
+scientific computation from private same-file rendering functions. Tobacco additionally owns
+source-order response pagination and raw observation diagnostics.
 
 The current component-path helpers remain example-local selection-diagnostic tools. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
@@ -158,8 +160,9 @@ implementing or reviewing this surface.
   Underscore-prefixed `examples/_support/` contains only the ordinary-PLS path evaluator needed by
   the comparison rather than primary entry points. Example 04 owns the immutable Pi-PLS and standard
   PLS (NIPALS) paths and direct comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS
-  paths, scikit-learn OOF
-  predictions, immutable inspection results, and explicit final figures; Pulp additionally owns its
+  paths, scikit-learn OOF predictions, immutable inspection results, and explicit final figures.
+  Sugarcane and Tobacco keep rendering functions in their numbered scripts; Pulp additionally
+  owns its
   conditional predictor-rank profile and tutorial snippets. Their pandas, Matplotlib, and optional
   `adjustText` requirements are grouped in the `examples` extra and repeated in `dev` for complete
   repository validation. The `docs` extra owns the strict site and tutorial-rendering toolchain.

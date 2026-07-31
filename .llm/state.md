@@ -78,11 +78,12 @@ and later retired by Decision 0125 after its development-validation purpose had 
   Matplotlib; the package exposes no plotting submodule or convenience renderer;
 - direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
   OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
+  Sugarcane and Tobacco separate `main()`-owned analysis from private same-file rendering;
 - a two-tier tutorial route: a short deterministic synthetic selection-and-prediction workflow
   from example 02, followed by a focused Pulp real-data workflow from example 05; both use
   checked snippets and deterministic single-chart SVG assets;
-- direct Tobacco response pagination through two caller-owned multipage PDFs, with full predictor
-  SVD, decreasing-wavenumber spectral axes, and raw observation diagnostics;
+- direct Tobacco response pagination through two same-file multipage report writers, with full
+  predictor SVD, decreasing-wavenumber spectral axes, and raw observation diagnostics;
 - a direct Pi-PLS/ordinary-PLS comparison whose two immutable component paths are plotted together
   in example 04 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
 - a tutorial-first served site whose synthetic entry tutorial owns the minimum selection contract

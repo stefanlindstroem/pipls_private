@@ -111,7 +111,9 @@ The complete real-data examples own scientific orchestration:
 - dataset-specific physical-axis labels, response subsets, and pagination.
 
 Pulp, Sugarcane, and Tobacco keep those stages directly in their numbered scripts and use pandas
-only for committed input files. Do not hide real-data reading behind a package loader.
+only for committed input files. Sugarcane and Tobacco place scientific computation and orchestration
+in `main()` and may group rendering in private functions defined in the same script. Do not hide
+real-data reading behind a package loader.
 Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
 preparation area.
 
@@ -360,10 +362,13 @@ each contain three deterministic source-order response pages. The first two page
 responses and the last page contains the remaining three.
 
 A figure page must identify the dataset, model, selected components or responses, and prediction kind
-where predictions are shown. The numbered example controls pagination, panel geometry, legends,
-figure-level titles, PDF writing, closing, and each direct Matplotlib selection. Tobacco retains a $2\times2$ factor figure, one
-$1\times3$ prediction figure per response page, one $2\times2$ latent/observation figure, and one
-full-width coefficient figure per response page.
+where predictions are shown. The numbered example controls pagination, panel geometry,
+legends,
+figure-level titles, PDF writing, closing, and each direct Matplotlib selection. These operations may
+be grouped in private same-file rendering functions that consume completed numerical results. Tobacco
+retains a $2\times2$ factor figure, one $1\times3$ prediction figure per response page,
+one
+$2\times2$ latent/observation figure, and one full-width coefficient figure per response page.
 
 Pulp, Sugarcane, and Tobacco use five non-shuffled folds through scikit-learn
 `cross_val_predict()`. Because component count and predictor rank are chosen after inspecting paths
@@ -386,9 +391,12 @@ Matplotlib implementation details.
 
 Structural Pulp, Sugarcane, and Tobacco tests should verify direct `component_path_` access,
 scikit-learn OOF prediction, in-memory inspection, direct Matplotlib composition, and final PDF
-filenames without executing the artifact-writing scripts. Tobacco tests additionally protect full
-predictor SVD, decreasing-wavenumber rendering, source-order response pagination, raw observation
-diagnostics, and the two caller-owned multipage PDF loops. A focused Pulp numerical test protects
+filenames without executing the artifact-writing scripts. Sugarcane and Tobacco tests should also
+verify that analysis remains in `main()` while private same-file rendering functions consume
+completed
+results. Tobacco tests additionally protect full predictor SVD, decreasing-wavenumber rendering,
+source-order response pagination, raw observation diagnostics, and the two multipage PDF loops. A
+focused Pulp numerical test protects
 the selected pair, rank-profile boundary interpretation, OOF dimensions, and inspection alignment.
 Complete Pulp, Sugarcane, and Tobacco runs remain under `make examples`.
 

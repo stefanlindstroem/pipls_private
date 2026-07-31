@@ -64,9 +64,13 @@ turn every pre-release deletion into a permanent executable tombstone.
 
 Protect rendering through executable artifact generation, parseable declared outputs, optional
 dependency boundaries, caller-owned chart construction, direct immutable-result use, and numerical
-semantics such as fold-based standard errors. Do not freeze exact title text, axis-label wording,
-Matplotlib call counts, source-code ranges, axis-limit expressions, tick-label expressions, or label
-rotation syntax. Review regenerated SVG and PDF artifacts when visible rendering behavior changes.
+semantics such as fold-based standard errors. Same-file private rendering functions remain
+caller-owned; structural tests may verify that scientific computation stays in `main()` and that
+those functions do not load data, fit models, run cross-validation, select models, or calculate
+inspection results. Do not freeze exact private function names or signatures, title text, axis-label
+wording, Matplotlib call counts, source-code ranges, axis-limit expressions, tick-label expressions,
+or label rotation syntax. Review regenerated SVG and PDF artifacts when visible rendering behavior
+changes.
 
 ## Dataset boundary
 
@@ -94,8 +98,10 @@ scikit-learn `cross_val_predict()`, immutable inspection results, explicit Matpl
 construction, absence of analytical CSV output, physical coordinate order, and the declared final
 PDF filenames without running the artifact-writing scripts. Keep these source scans consolidated as
 AST-level ownership and data-flow checks rather than repeating per-example string inventories.
-Tobacco tests also protect its full-SVD configuration, source-order response pagination, raw
-observation diagnostics, and caller-owned multipage PDF loops. Biplot tests protect
+Sugarcane and Tobacco tests also protect the boundary between `main()`-owned analysis and private
+same-file rendering. Tobacco tests retain its full-SVD configuration, source-order response
+pagination, raw observation diagnostics, and two same-file multipage report loops. Biplot tests
+protect
 balanced-coordinate numerics in `pipls.inspection`; maintained example and
 renderer structure must expose direct Matplotlib arrows and labels, call `adjust_text()` after axis
 configuration, and avoid pinning adjusted label coordinates.

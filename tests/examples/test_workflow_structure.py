@@ -276,8 +276,25 @@ def test_real_data_examples_use_direct_public_results(
 
 
 
-def test_sugarcane_separates_analysis_from_same_file_rendering() -> None:
-    path = _repository_root() / "examples" / "06_sugarcane_real_data.py"
+@pytest.mark.parametrize(
+    ("filename", "extra_analysis_calls"),
+    [
+        ("06_sugarcane_real_data.py", set()),
+        (
+            "07_tobacco_real_data.py",
+            {
+                "minimum_cv_mse_result",
+                "observation_diagnostics",
+                "one_standard_error_result",
+            },
+        ),
+    ],
+)
+def test_complete_examples_separate_analysis_from_same_file_rendering(
+    filename: str,
+    extra_analysis_calls: set[str],
+) -> None:
+    path = _repository_root() / "examples" / filename
     tree = _tree(path)
     functions = _top_level_functions(tree)
     main = functions["main"]
@@ -288,6 +305,7 @@ def test_sugarcane_separates_analysis_from_same_file_rendering() -> None:
         "cross_val_predict",
         "read_csv",
         *_INSPECTION_CALLS,
+        *extra_analysis_calls,
     }
     assert analysis_calls <= _call_names(main)
     assert _call_names(main).isdisjoint(_RENDERING_METHODS)
@@ -354,27 +372,34 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     assert "sorted" not in calls
     assert "observation_diagnostics" in calls
 
-    paginated_reports: set[str] = set()
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.With):
+    functions = _top_level_functions(tree)
+    report_function_names: set[str] = set()
+    for name, function in functions.items():
+        if name == "main":
             continue
-        pdf_calls = [
-            item.context_expr
-            for item in node.items
-            if isinstance(item.context_expr, ast.Call)
-            and _call_name(item.context_expr) == "PdfPages"
-        ]
-        if not pdf_calls:
-            continue
-        assert any(
-            isinstance(child, ast.For) and _uses_name(child.iter, "response_pages")
-            for child in node.body
-        )
-        for call in pdf_calls:
-            paginated_reports.update(
-                value for value in _string_literals(call) if value.endswith(".pdf")
+        for node in ast.walk(function):
+            if not isinstance(node, ast.With):
+                continue
+            if not any(
+                isinstance(item.context_expr, ast.Call)
+                and _call_name(item.context_expr) == "PdfPages"
+                for item in node.items
+            ):
+                continue
+            assert any(
+                isinstance(child, ast.For) and _uses_name(child.iter, "response_pages")
+                for child in node.body
             )
+            report_function_names.add(name)
 
+    assert len(report_function_names) == 2
+    paginated_reports = {
+        value
+        for node in ast.walk(functions["main"])
+        if isinstance(node, ast.Call) and _call_name(node) in report_function_names
+        for value in _string_literals(node)
+        if value.endswith(".pdf")
+    }
     assert paginated_reports == {"prediction_diagnostics.pdf", "coefficients.pdf"}
 
 
