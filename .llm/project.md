@@ -135,12 +135,10 @@ implementing or reviewing this surface.
 
 ## Test ownership
 
-- `tests/unit/`: local behavior and boundary conditions.
+- `tests/unit/`: local behavior, boundary conditions, search orchestration, and leakage boundaries.
 - `tests/invariants/`: mathematical identities, dimensions, orthogonality, and subspace properties.
-- `tests/integration/`: estimator composition and leakage boundaries.
-- `tests/api/`: exposed parameter validation, scikit-learn/PLS compatibility, and validation
-  protocols.
-- `tests/estimator_checks/`: applicable scikit-learn common estimator checks.
+- `tests/api/`: exposed parameter validation, scikit-learn estimator compatibility and composition,
+  PLS alignment, and validation protocols.
 - `tests/regression/`: frozen comparisons with trusted implementations.
   fixtures require separate review.
 - `tests/examples/`: small-data helper, CSV, PDF, and workflow-structure contracts; complete real-data

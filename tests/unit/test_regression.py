@@ -1,9 +1,7 @@
-import warnings
-
 import numpy as np
 import pytest
 
-from pipls import PiPLSRegression, StatisticalSupportWarning
+from pipls import PiPLSRegression
 
 
 def _data() -> tuple[np.ndarray, np.ndarray]:
@@ -72,12 +70,6 @@ def test_invalid_constructor_combination_is_rejected() -> None:
         PiPLSRegression(n_components=3, predictor_rank=2).fit(X, Y)
 
 
-def test_rank_above_centered_matrix_limit_is_rejected() -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="predictor_rank <= min"):
-        PiPLSRegression(n_components=1, predictor_rank=X.shape[1] + 1).fit(X, Y)
-
-
 def test_wrong_feature_count_is_rejected_at_prediction() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
@@ -133,18 +125,6 @@ def test_fit_creates_no_selection_attributes() -> None:
         assert not hasattr(model, name)
 
 
-def test_statistical_support_warning_uses_three_samples_per_rank_boundary() -> None:
-    X, Y = _data()
-    rng = np.random.default_rng(99)
-    X_wide = np.column_stack([X, rng.normal(size=(X.shape[0], 6))])
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("error", StatisticalSupportWarning)
-        PiPLSRegression(n_components=2, predictor_rank=13).fit(X_wide, Y)
-
-    with pytest.warns(StatisticalSupportWarning, match="recommended minimum of 3"):
-        PiPLSRegression(n_components=2, predictor_rank=14).fit(X_wide, Y)
-
 def test_small_auto_svd_uses_full_solver_and_reports_exact_rank() -> None:
     X, Y = _data()
     model = PiPLSRegression(
@@ -191,28 +171,6 @@ def test_randomized_svd_estimator_is_reproducible_and_close_to_full() -> None:
     np.testing.assert_allclose(first.coef_, second.coef_)
     np.testing.assert_allclose(first.predict(X), second.predict(X))
     np.testing.assert_allclose(first.predict(X), full.predict(X), rtol=1e-6, atol=1e-8)
-
-
-@pytest.mark.parametrize("value", ["invalid", 1, None])
-def test_rejects_invalid_svd_solver(value: object) -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="svd_solver"):
-        PiPLSRegression(
-            n_components=1,
-            predictor_rank=1,
-            svd_solver=value,  # type: ignore[arg-type]
-        ).fit(X, Y)
-
-
-@pytest.mark.parametrize("value", [-1, True, 1.5, "seed"])
-def test_rejects_invalid_random_state(value: object) -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="random_state"):
-        PiPLSRegression(
-            n_components=1,
-            predictor_rank=1,
-            random_state=value,  # type: ignore[arg-type]
-        ).fit(X, Y)
 
 
 def test_randomized_svd_accepts_none_and_random_state_instances() -> None:
