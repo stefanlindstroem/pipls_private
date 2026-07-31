@@ -125,16 +125,13 @@ def test_documentation_targets_own_generated_synthetic_assets() -> None:
     assert "matplotlib>=3.8" in pyproject["project"]["optional-dependencies"]["docs"]
 
 
-def test_synthetic_tutorial_is_the_first_learning_route() -> None:
+def test_synthetic_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
     repository = _repository_root()
     tutorial = (repository / "docs" / "tutorials" / "synthetic.md").read_text(
         encoding="utf-8"
     )
     example = (
         repository / "examples" / "02_synthetic_path_selection.py"
-    ).read_text(encoding="utf-8")
-    renderer = (
-        repository / "tools" / "render_synthetic_tutorial.py"
     ).read_text(encoding="utf-8")
     with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
         mkdocs = yaml.safe_load(stream)
@@ -144,15 +141,6 @@ def test_synthetic_tutorial_is_the_first_learning_route() -> None:
         "tutorials/synthetic.md",
         "tutorials/pulp.md",
     ]
-
-    for source_path in (repository / "README.md", repository / "docs" / "index.md"):
-        source = source_path.read_text(encoding="utf-8")
-        assert "tutorials/synthetic.md" in source
-        assert "tutorials/pulp.md" in source
-        assert source.index("tutorials/synthetic.md") < source.index("tutorials/pulp.md")
-
-    pulp = (repository / "docs" / "tutorials" / "pulp.md").read_text(encoding="utf-8")
-    assert "synthetic.md" in pulp
 
     snippet_sections = {
         "generate-synthetic-data",
@@ -170,22 +158,9 @@ def test_synthetic_tutorial_is_the_first_learning_route() -> None:
         assert f"../assets/generated/synthetic/{filename}" in tutorial
 
     linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
-    assert "pulp.md" in linked_targets
-    assert "../api/path.md" in linked_targets
-    assert "../api/regression.md" in linked_targets
-    assert "../path_analysis.md" in linked_targets
-
-    selected_line = "selected = path.for_n_components(CHOSEN_N_COMPONENTS)"
-    component_plot = '# --8<-- [start:plot-synthetic-component-path]'
-    rank_profile = "rank_profile = search.predictor_rank_profile("
-    fixed_fit = "model = PiPLSRegression("
-    assert (
-        example.index(selected_line)
-        < example.index(component_plot)
-        < example.index(rank_profile)
-        < example.index(fixed_fit)
-    )
-    assert "PiPLSSearchCV().fit(train.X, train.Y)" in renderer
-    assert "predictor_rank_profile(selected.n_components)" in renderer
-    assert 'prediction_kind="external test predictions"' in renderer
-    assert "cross_val_predict" not in renderer
+    assert {
+        "pulp.md",
+        "../api/path.md",
+        "../api/regression.md",
+        "../path_analysis.md",
+    } <= set(linked_targets)

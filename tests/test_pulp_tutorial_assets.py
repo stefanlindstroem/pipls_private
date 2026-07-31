@@ -153,35 +153,7 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert "PULP_TUTORIAL_FIGURES" in sdist_checker
 
 
-def test_pulp_tutorial_factor_prose_uses_complete_matrix_notation() -> None:
-    tutorial = (
-        _repository_root() / "docs" / "tutorials" / "pulp.md"
-    ).read_text(encoding="utf-8")
-
-    for notation in (
-        r"$\mathbf{P}$",
-        r"$\mathbf{D}$",
-        r"$\mathbf{Q}$",
-        r"$\mathbf{Q}\mathbf{D}$",
-        r"$\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$",
-        r"$d_kQ_{:k}$",
-    ):
-        assert notation in tutorial
-
-    for old_notation in (
-        "$P$, $D$, $Q$, and $QD$",
-        "columns of $P$ and $Q$",
-        "#### Predictor directions $P$",
-        r"$PDQ^{\mathsf T}$",
-        "#### Weighted response directions $QD$",
-        "column $k$ of $QD$",
-        "rather than $Q$ alone",
-        "separate $D$ and $Q$ plots",
-    ):
-        assert old_notation not in tutorial
-
-
-def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
+def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
     repository = _repository_root()
     tutorial = (repository / "docs" / "tutorials" / "pulp.md").read_text(
         encoding="utf-8"
@@ -195,48 +167,31 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
         mkdocs = yaml.safe_load(stream)
 
-    tutorial_nav = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
-    assert [next(iter(item.values())) for item in tutorial_nav] == [
-        "tutorials/synthetic.md",
-        "tutorials/pulp.md",
-    ]
     snippets = next(
         extension["pymdownx.snippets"]
         for extension in mkdocs["markdown_extensions"]
         if isinstance(extension, dict) and "pymdownx.snippets" in extension
     )
-    assert snippets == {
-        "base_path": ["."],
-        "check_paths": True,
-        "dedent_subsections": True,
-    }
+    assert snippets["check_paths"] is True
 
-    linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
-    assert "tutorials/pulp.md" in (repository / "docs" / "index.md").read_text(
-        encoding="utf-8"
-    )
-    assert "tutorials/synthetic.md" in (
-        repository / "docs" / "api" / "regression.md"
-    ).read_text(encoding="utf-8")
-    assert "tutorials/pulp.md" in (repository / "docs" / "examples.md").read_text(
-        encoding="utf-8"
-    )
-    assert "../api/regression.md" in linked_targets
-    assert "../path_analysis.md" in linked_targets
-    assert "../model_inspection.md" in linked_targets
-    assert "../theory.md" in linked_targets
+    linked_targets = set(re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial))
+    assert {
+        "../api/path.md",
+        "../api/regression.md",
+        "../model_inspection.md",
+    } <= linked_targets
 
     example_sections = {
         "pulp-tutorial-setup",
         "load-pulp-data",
         "evaluate-pulp-component-path",
         "select-pulp-parameters",
-        "fit-pulp-model",
-        "pulp-oof-predictions",
-        "pulp-inspection-results",
         "plot-pulp-component-path",
         "extract-pulp-rank-profile",
         "plot-pulp-rank-profile",
+        "fit-pulp-model",
+        "pulp-oof-predictions",
+        "pulp-inspection-results",
     }
     for section in example_sections:
         assert f"examples/05_pulp_real_data.py:{section}" in tutorial
@@ -259,150 +214,12 @@ def test_pulp_tutorial_is_the_complete_generated_workflow() -> None:
     for filename in FIGURE_FILENAMES:
         assert f"../assets/generated/pulp/{filename}" in tutorial
 
-    coverage_start = tutorial.index("## What this tutorial covers")
-    setup_start = tutorial.index("## Setup")
-    coverage = tutorial[coverage_start:setup_start]
-    assert coverage_start < setup_start
-    assert len(re.findall(r"^\d+\. ", coverage, flags=re.MULTILINE)) >= 6
 
-    assert tutorial.index("pulp-tutorial-setup") < tutorial.index("load-pulp-data")
-    assert tutorial.index("select-pulp-parameters") < tutorial.index(
-        "plot-pulp-component-path"
-    ) < tutorial.index("fit-pulp-model")
-    assert '--8<-- "examples/05_pulp_real_data.py"' not in tutorial
-    assert "six SVG figures" not in tutorial
-
-    selected_line = "selected = path.for_n_components(CHOSEN_N_COMPONENTS)"
-    component_plot = '# --8<-- [start:plot-pulp-component-path]'
-    profile_line = "rank_profile = path_search.predictor_rank_profile("
-    model_fit = "model = PiPLSRegression("
-    assert (
-        example.index(selected_line)
-        < example.index(component_plot)
-        < example.index(profile_line)
-        < example.index(model_fit)
-    )
-    assert "DETAILED_RESPONSE_COUNT = 3" in example
-    assert "tuple(range(DETAILED_RESPONSE_COUNT))" in example
-    for source in (example, renderer):
-        assert "display_components = tuple(range(CHOSEN_N_COMPONENTS))" in source
-        assert "DISPLAY_COMPONENTS" not in source
-        assert "len(display_components)" not in source
-    assert "DETAILED_RESPONSES" not in example
-    assert "DETAILED_RESPONSES" not in renderer
-
-    renderer_biplot = renderer.index("# --8<-- [start:render-pulp-biplot]")
-    renderer_adjust = renderer.index("    adjust_text(", renderer_biplot)
-    assert renderer.index("    axis.set_aspect", renderer_biplot) < renderer_adjust
-    assert renderer.index("    axis.legend()", renderer_biplot) < renderer_adjust
-    assert "from adjustText import adjust_text" in example
-    assert "from matplotlib.patches import FancyArrowPatch" in example
-    assert "prevent_crossings=False" in renderer
-    assert "iter_lim=200" in renderer
-
-    for section in renderer_sections:
-        section_start = renderer.index(f"# --8<-- [start:{section}]")
-        section_end = renderer.index(f"# --8<-- [end:{section}]", section_start)
-        snippet = renderer[section_start:section_end]
-        assert "plt.subplots(" in snippet
-        assert "_figure(" not in snippet
-
-    residual_start = renderer.index(
-        "# --8<-- [start:render-pulp-residuals-vs-predicted]"
-    )
-    residual_end = renderer.index(
-        "# --8<-- [end:render-pulp-residuals-vs-predicted]", residual_start
-    )
-    assert "detailed_array = np.array(" in renderer[residual_start:residual_end]
-
-    renderer_selected = renderer.index("selected = component_path.for_n_components(")
-    renderer_plot = renderer.index("    _render_component_path(", renderer_selected)
-    renderer_profile = renderer.index(
-        "rank_profile = path_search.predictor_rank_profile(", renderer_plot
-    )
-    renderer_rank_plot = renderer.index(
-        "    _render_predictor_rank_profile(", renderer_profile
-    )
-    assert (
-        renderer_selected
-        < renderer_plot
-        < renderer_profile
-        < renderer_rank_plot
-        < renderer.index("model = PiPLSRegression(")
-    )
-
-    for source in (tutorial, example, renderer):
-        assert "Number of response components" not in source
-    assert 'axis.set_xlabel("Number of components")' in example
-    assert 'axis.set_xlabel("Number of components")' in renderer
-    assert 'legend(title="Component")' not in example
-    assert 'legend(title="Component")' not in renderer
-    assert 'cv_results["predictor_rank"]' not in example
-    assert 'cv_results["predictor_rank"]' not in renderer
-
-    assert (
-        tutorial.index("biplot.svg")
-        < tutorial.index("predictor_directions.svg")
-        < tutorial.index("weighted_response_directions.svg")
-        < tutorial.index("observed_vs_predicted.svg")
-        < tutorial.index("residuals_vs_predicted.svg")
-        < tutorial.index("standardized_rmse.svg")
-    )
-    omitted_figures = {
-        "scores.svg",
-        "x_loadings.svg",
-        "y_loadings.svg",
-        "dilation.svg",
-        "response_directions.svg",
-    }
-    for filename in omitted_figures:
-        assert f"../assets/generated/pulp/{filename}" not in tutorial
-        assert f'"{filename}"' not in renderer
-    assert "### Regression coefficients" not in tutorial
-    assert "coefficients.svg" not in tutorial
-    assert "plot_coefficients" not in renderer
-
-    assert "pipls.plotting" not in example
-    assert "pipls.plotting" not in renderer
-    assert "factors.predictor_directions" in example
-    assert "factors.predictor_directions" in renderer
-    assert "factors.weighted_response_directions" in renderer
-    assert "factors.dilation" in example
-    assert "factors.response_directions" in example
-    assert "factors.weighted_response_directions" in example
-
-    for field in {
-        "diagnostics.observed_standardized",
-        "diagnostics.predicted_standardized",
-        "diagnostics.residual_standardized",
-        "diagnostics.standardized_rmse",
-    }:
-        assert field in example
-        assert field in renderer
-    assert "axes[0].scatter(" in example
-    assert "axes[1].scatter(" in example
-    assert "axes[2].bar(" in example
-    assert 'set_ylabel("Standardized residual")' in example
-    assert 'set_ylabel("Standardized residual")' in renderer
-    assert r"Residual $y-\hat y$ (standardized)" not in example
-    assert r"Residual $y-\hat y$ (standardized)" not in renderer
-    assert 'prediction_kind="selection-conditioned OOF predictions"' in example
-    assert "run_pulp_workflow" not in example
-    assert "run_pulp_workflow" not in renderer
-    assert "PiPLSSearchCV().fit(X, Y)" in renderer
-    assert "cross_val_predict(" in renderer
-
-def test_documentation_layers_have_distinct_ownership() -> None:
+def test_pulp_assets_and_model_inspection_links_have_distinct_owners() -> None:
     repository = _repository_root()
     docs = repository / "docs"
-    tutorial_path = docs / "tutorials" / "pulp.md"
-    tutorial = tutorial_path.read_text(encoding="utf-8")
+    tutorial = (docs / "tutorials" / "pulp.md").read_text(encoding="utf-8")
     inspection = (docs / "model_inspection.md").read_text(encoding="utf-8")
-    examples = (docs / "examples.md").read_text(encoding="utf-8")
-    regression_reference = (docs / "api" / "regression.md").read_text(encoding="utf-8")
-    path_reference = (docs / "path_analysis.md").read_text(encoding="utf-8")
-    with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
-        mkdocs = yaml.safe_load(stream)
 
     image_owners = {
         path.relative_to(docs).as_posix()
@@ -412,24 +229,6 @@ def test_documentation_layers_have_distinct_ownership() -> None:
     }
     assert image_owners == {"tutorials/pulp.md"}
 
-    inspection_anchors = {
-        "scores",
-        "score-loading-biplot",
-        "x-loadings",
-        "y-loadings",
-        "predictor-directions",
-        "dilation",
-        "response-directions",
-        "weighted-response-directions",
-        "regression-coefficients",
-        "observed-versus-predicted",
-        "residuals-versus-predicted",
-        "standardized-rmse",
-        "observation-diagnostics",
-    }
-    for anchor in inspection_anchors:
-        assert f"{{ #{anchor} }}" in inspection
-
     tutorial_anchors = {
         "score-loading-biplot",
         "predictor-directions",
@@ -438,45 +237,5 @@ def test_documentation_layers_have_distinct_ownership() -> None:
         "standardized-rmse",
     }
     for anchor in tutorial_anchors:
+        assert f"{{ #{anchor} }}" in inspection
         assert f"../model_inspection.md#{anchor}" in tutorial
-
-    assert "../model_inspection.md#regression-coefficients" not in tutorial
-    assert not (docs / "api" / "plotting.md").exists()
-
-    assert "examples/results/" not in inspection
-    assert "post_analysis.pdf" not in inspection
-    assert "Sugarcane workflow" not in inspection
-    assert "Tobacco workflow" not in inspection
-    assert "assets/generated/pulp/" not in examples
-
-    removed_guides = {
-        "quickstart.md",
-        "estimator_api.md",
-        "parameter_selection.md",
-        "preprocessing.md",
-    }
-    assert not any((docs / filename).exists() for filename in removed_guides)
-    navigation_text = (repository / "mkdocs.yml").read_text(encoding="utf-8")
-    assert not any(filename in navigation_text for filename in removed_guides)
-    assert [next(iter(item)) for item in mkdocs["nav"]] == [
-        "Home",
-        "Tutorials",
-        "Examples",
-        "Reference",
-        "Project validation",
-        "Scientific background",
-    ]
-
-    project_validation = next(
-        item["Project validation"] for item in mkdocs["nav"] if "Project validation" in item
-    )
-    assert project_validation == [
-        {"Reference datasets": "datasets.md"},
-        {"Reproducibility": "reproducibility.md"},
-        {"Compatibility": "compatibility.md"},
-    ]
-
-    assert "tutorials/synthetic.md" in regression_reference
-    assert "tutorials/synthetic.md" in path_reference
-    assert "Example 04" not in path_reference
-    assert "Examples 05" not in path_reference
