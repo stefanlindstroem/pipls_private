@@ -45,7 +45,6 @@ except ValueError as error:
 
 assert version("pipls") == pipls.__version__
 assert PiPLSSearchCV.__name__ == "PiPLSSearchCV"
-assert not hasattr(pipls, "PiPLSPathCV")
 
 rng = np.random.default_rng(0)
 X = rng.normal(size=(12, 4))

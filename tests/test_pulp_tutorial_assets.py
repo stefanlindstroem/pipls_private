@@ -1,15 +1,8 @@
 from __future__ import annotations
 
-import hashlib
-import json
-import os
 import re
-import subprocess
-import sys
-import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import pytest
 import yaml
 
 try:
@@ -31,100 +24,6 @@ FIGURE_FILENAMES = (
 
 def _repository_root() -> Path:
     return Path(__file__).resolve().parents[1]
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    digest.update(path.read_bytes())
-    return digest.hexdigest()
-
-
-@pytest.fixture(scope="module")
-def generated_pulp_assets(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    repository = _repository_root()
-    output_dir = tmp_path_factory.mktemp("pulp-tutorial-assets") / "pulp"
-    environment = os.environ.copy()
-    environment.update(
-        {
-            "PYTHONPATH": str(repository / "src"),
-            "MPLBACKEND": "Agg",
-            "OMP_NUM_THREADS": "1",
-            "OPENBLAS_NUM_THREADS": "1",
-            "MKL_NUM_THREADS": "1",
-            "NUMEXPR_NUM_THREADS": "1",
-        }
-    )
-    subprocess.run(
-        [
-            sys.executable,
-            str(repository / "tools" / "render_pulp_tutorial.py"),
-            "--output-dir",
-            str(output_dir),
-        ],
-        cwd=repository,
-        env=environment,
-        check=True,
-    )
-    return output_dir
-
-
-def test_pulp_tutorial_renderer_writes_declared_parseable_svgs(
-    generated_pulp_assets: Path,
-) -> None:
-    manifest_path = generated_pulp_assets / "manifest.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-
-    assert manifest["schema_version"] == 1
-    assert manifest["dataset"]["name"] == "Pulp"
-    assert manifest["analysis"]["chosen_n_components"] == 3
-    assert manifest["analysis"]["chosen_predictor_rank"] == 10
-    assert manifest["analysis"]["evaluated_predictor_ranks"] == list(range(3, 11))
-    assert manifest["analysis"]["predictor_rank_at_upper_boundary"] is True
-    assert manifest["analysis"]["displayed_components"] == [1, 2, 3]
-    assert manifest["analysis"]["factor_sign_anchor"] == {
-        "response": "TI",
-        "sign": "positive",
-    }
-    assert manifest["analysis"]["detailed_responses"] == ["CSF", "Density", "TI"]
-
-    figures = manifest["figures"]
-    assert tuple(item["filename"] for item in figures) == FIGURE_FILENAMES
-    assert set(path.name for path in generated_pulp_assets.iterdir()) == {
-        *FIGURE_FILENAMES,
-        "manifest.json",
-    }
-    for item in figures:
-        figure_path = generated_pulp_assets / item["filename"]
-        ET.parse(figure_path)
-        assert item["sha256"] == _sha256(figure_path)
-
-    expected_labels = {
-        "predictor_directions.svg": r"Predictor direction $P_{:k}$",
-        "weighted_response_directions.svg": (
-            r"Weighted response direction $d_kQ_{:k}$"
-        ),
-    }
-    for filename, label in expected_labels.items():
-        svg = (generated_pulp_assets / filename).read_text(encoding="utf-8")
-        assert label in svg, (filename, label)
-        assert "Weighted direction $" not in svg, filename
-        assert r"\mathbf{P}_{:" not in svg, filename
-        assert r"\mathbf{Q}_{:" not in svg, filename
-        assert r"\mathbf{D}_{" not in svg, filename
-        assert "$q_{:" not in svg, filename
-        assert "$d_kq_{:" not in svg, filename
-
-
-def test_pulp_tutorial_manifest_records_dataset_hashes(
-    generated_pulp_assets: Path,
-) -> None:
-    repository = _repository_root()
-    manifest = json.loads((generated_pulp_assets / "manifest.json").read_text(encoding="utf-8"))
-
-    assert manifest["dataset"]["files"] == {
-        "X.csv": _sha256(repository / "datasets" / "pulp" / "X.csv"),
-        "Y.csv": _sha256(repository / "datasets" / "pulp" / "Y.csv"),
-    }
 
 
 def test_documentation_targets_own_generated_pulp_assets() -> None:

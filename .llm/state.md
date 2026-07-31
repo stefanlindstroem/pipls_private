@@ -271,10 +271,10 @@ Additional fixed decisions:
   uses `one_standard_error_result()`. All three use `component_path_`,
   scikit-learn OOF prediction, and inspection results directly in memory. All three use direct fixed
   estimators. `best_params_` remains a convenience, not the required user decision.
-- Refit coefficients are accessed through `selected_pipls_` or `selected_estimator_`; under the
-  default best-score rule, the existing `best_pipls_` and `best_estimator_` compatibility aliases
-  remain available. Coefficients are not flattened onto `PiPLSSearchCV` when preprocessing may change
-  the feature space.
+- Refit coefficients are accessed through `selected_pipls_` or `selected_estimator_` for every
+  selection rule. The unreleased duplicate fitted-estimator `best_*` aliases have been removed;
+  coefficients are not flattened onto `PiPLSSearchCV` when preprocessing may change the feature
+  space.
 - OOF results produced after using the same splits for model selection are labeled
   `selection-conditioned`, not unbiased external-test estimates.
 - Arbitrary nested meta-estimators and general metadata routing are not supported merely because

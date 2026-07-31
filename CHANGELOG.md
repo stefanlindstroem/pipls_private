@@ -4,6 +4,11 @@
 
 ### Repository
 
+- Remove the unreleased `PiPLSSearchCV.best_estimator_` and `best_pipls_` compatibility aliases;
+  `selected_estimator_` and `selected_pipls_` now name the one refitted model under every selection
+  rule, while scalar and parameter `best_*` results continue to describe the global score optimum.
+- Stop ordinary pytest from executing the Pulp tutorial renderer that requires optional
+  `adjustText`; retain the renderer and validate it through the documentation targets.
 - Retire the complete benchmark layer: remove the four focused synthetic scripts, their dedicated
   tests and generated-result paths, the public benchmark page, the normative benchmark contract,
   and active navigation, packaging, lint, cleanup, and guide-layer references. Preserve historical

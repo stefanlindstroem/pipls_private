@@ -170,8 +170,9 @@ is represented separately by `selected_result_` and `selected_params_`. With `re
 `selected_estimator_` and `selected_pipls_` contain the one final full-data fit and all delegated
 methods use it. Public application examples that bind either selected model should call subsequent
 model methods on that bound object; delegated search methods remain compatibility conveniences.
-Under the default best-score rule, `best_estimator_` and `best_pipls_` remain compatibility aliases;
-they are absent for the 1-SE rule rather than naming a recommendation “best”.
+`selected_estimator_` and `selected_pipls_` are the only fitted-model attributes for every selection
+rule. The global score optimum remains represented by scalar and parameter `best_*` results; no
+duplicate fitted-estimator `best_*` aliases are exposed.
 
 `PiPLSSearchCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only

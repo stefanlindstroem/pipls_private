@@ -250,9 +250,9 @@ pipeline path folds and expose the selected nested estimator without flattening 
 
 Current status: **complete**. Both public classes pass all applicable common estimator checks;
 only the tuple-valued cross-decomposition transformer checks are declared as expected failures,
-matching the special behavior of PLS estimators. `PiPLSDecomposition`, `best_pipls_`, standard CV
-result aliases, fit-time copy semantics, feature names, pandas output, and container-preserving
-path folds are implemented and tested.
+matching the special behavior of PLS estimators. `PiPLSDecomposition`, canonical selected-model
+attributes, standard CV result names, fit-time copy semantics, feature names, pandas output, and
+container-preserving path folds are implemented and tested.
 
 ### Phase D1c: final scikit-learn cleanup boundary
 

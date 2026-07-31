@@ -71,7 +71,6 @@ def test_failed_path_refit_clears_previous_search_state() -> None:
     with pytest.raises(NotFittedError):
         check_is_fitted(search)
     assert not hasattr(search, "cv_results_")
-    assert not hasattr(search, "best_estimator_")
     assert not hasattr(search, "selected_estimator_")
 
 

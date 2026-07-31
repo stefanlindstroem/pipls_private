@@ -216,12 +216,6 @@ class PiPLSSearchCV(
         when ``refit=True``.
     selected_pipls_ : PiPLSRegression
         Fitted terminal Pi-PLS estimator. Defined only when ``refit=True``.
-    best_estimator_ : estimator
-        Compatibility alias of ``selected_estimator_``. Defined only when
-        ``refit=True`` and ``selection_rule="best_score"``.
-    best_pipls_ : PiPLSRegression
-        Compatibility alias of ``selected_pipls_``. Defined only when
-        ``refit=True`` and ``selection_rule="best_score"``.
     refit_time_ : float
         Selected full-data refit time in seconds. Defined only when ``refit=True``.
     """
@@ -528,9 +522,6 @@ class PiPLSSearchCV(
                 self.selected_estimator_,
                 pipls_param_prefix,
             )
-            if self.selection_rule == "best_score":
-                self.best_estimator_ = self.selected_estimator_
-                self.best_pipls_ = self.selected_pipls_
         return self
 
     def predictor_rank_profile(

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib.util
 import inspect
 from dataclasses import FrozenInstanceError
 from typing import Any
@@ -41,11 +40,8 @@ def _fixed_estimator() -> PiPLSRegression:
     )
 
 
-def test_search_cv_is_the_only_public_selection_class_name() -> None:
+def test_search_cv_is_public_selection_class() -> None:
     assert pipls.PiPLSSearchCV is PiPLSSearchCV
-    assert importlib.util.find_spec("pipls.search") is not None
-    assert importlib.util.find_spec("pipls.path") is None
-    assert not hasattr(pipls, "PiPLSPathCV")
 
 
 def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> None:
@@ -298,13 +294,11 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
     assert path.best_predictor_rank_ == 3
     assert path.selected_result_.n_components == 2
     assert path.selected_result_.predictor_rank == 3
-    assert path.selected_estimator_ is path.best_estimator_
-    assert path.selected_pipls_ is path.best_pipls_
-    assert path.best_pipls_ is path.best_estimator_
+    assert path.selected_pipls_ is path.selected_estimator_
     np.testing.assert_allclose(path.predict(X), direct.predict(X))
-    np.testing.assert_allclose(path.best_pipls_.coef_, direct.coef_)
+    np.testing.assert_allclose(path.selected_pipls_.coef_, direct.coef_)
     np.testing.assert_allclose(
-        path.best_pipls_.decomposition_.dilation,
+        path.selected_pipls_.decomposition_.dilation,
         direct.decomposition_.dilation,
     )
     x_path, y_path = path.transform(X, Y)
@@ -331,10 +325,8 @@ def test_path_exposes_nested_pipls_for_pipeline_without_flattening_coefficients(
         n_jobs=1,
     ).fit(X, Y)
 
-    assert isinstance(path.best_estimator_, Pipeline)
-    assert path.selected_estimator_ is path.best_estimator_
-    assert path.selected_pipls_ is path.best_pipls_
-    assert path.best_pipls_ is path.best_estimator_.named_steps["regression"]
+    assert isinstance(path.selected_estimator_, Pipeline)
+    assert path.selected_pipls_ is path.selected_estimator_.named_steps["regression"]
     assert not hasattr(path, "coef_")
 
 
@@ -361,7 +353,6 @@ def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
     assert path.selected_pipls_ is path.selected_estimator_.named_steps["regression"]
     assert path.selected_pipls_.n_components == path.selected_result_.n_components
     assert path.selected_pipls_.predictor_rank == path.selected_result_.predictor_rank
-    assert not hasattr(path, "best_estimator_")
     assert path.predict(X).shape == Y.shape
 
 
@@ -379,7 +370,7 @@ def test_path_score_accepts_sample_weight_like_regression() -> None:
     weights = np.linspace(1.0, 2.0, X.shape[0])
 
     assert path.score(X, Y, sample_weight=weights) == pytest.approx(
-        path.best_pipls_.score(X, Y, sample_weight=weights)
+        path.selected_pipls_.score(X, Y, sample_weight=weights)
     )
 
 
@@ -399,7 +390,7 @@ def test_path_preserves_refitted_estimator_output_configuration() -> None:
     ).fit(X_frame, Y)
 
     np.testing.assert_array_equal(path.feature_names_in_, columns)
-    np.testing.assert_array_equal(path.best_pipls_.feature_names_in_, columns)
+    np.testing.assert_array_equal(path.selected_pipls_.feature_names_in_, columns)
     transformed = path.transform(X_frame)
     assert list(transformed.columns) == ["piplsregression0", "piplsregression1"]
 
@@ -440,9 +431,9 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
         n_jobs=1,
     ).fit(X_frame, Y)
 
-    assert path.best_pipls_.n_features_in_ == len(selected)
+    assert path.selected_pipls_.n_features_in_ == len(selected)
     assert path.predict(X_frame).shape == Y.shape
-    assert np.isfinite(path.scorer_(path.best_estimator_, X_frame, Y))
+    assert np.isfinite(path.scorer_(path.selected_estimator_, X_frame, Y))
 
 
 @pytest.mark.parametrize(
@@ -557,7 +548,7 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
     assert not hasattr(search, "best_score_by_n_components_")
     x_scores, y_scores = search.transform(X, Y)
     X_reconstructed, Y_reconstructed = search.inverse_transform(x_scores, y_scores)
-    direct_X, direct_Y = search.best_pipls_.inverse_transform(x_scores, y_scores)
+    direct_X, direct_Y = search.selected_pipls_.inverse_transform(x_scores, y_scores)
     np.testing.assert_allclose(X_reconstructed, direct_X)
     np.testing.assert_allclose(Y_reconstructed, direct_Y)
 

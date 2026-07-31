@@ -281,10 +281,8 @@ examining the path is a post-hoc scientific decision and should remain an explic
 The default `refit=False` leaves path evaluation and final fixed-model fitting as separate steps,
 which keeps the component-count choice visible. With `refit=True`, the row chosen by
 `selection_rule` is fitted on all supplied data as `selected_estimator_` and `selected_pipls_`, and
-supported prediction or transformation methods delegate to it. Under the default
-`selection_rule="best_score"`, `best_estimator_` and `best_pipls_` remain compatibility aliases. They
-are absent for the 1-SE rule because that refitted model is a declared recommendation rather than
-the global score optimum.
+supported prediction or transformation methods delegate to it. These selected-model attributes use
+the same names for every selection rule; no duplicate fitted-estimator `best_*` aliases are exposed.
 
 Use `component_path_` for the concise component-count curve and `predictor_rank_profile(h)` for the
 evaluated ranks at one count. `cv_results_` contains candidate parameters, split test scores,

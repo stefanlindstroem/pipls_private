@@ -314,7 +314,7 @@ def test_default_scorer_name_resolves_to_the_public_callable() -> None:
     )
 
 
-def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
+def test_selected_estimator_is_refitted_and_delegates_prediction() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
         n_components_values=[1, 2],
@@ -324,16 +324,15 @@ def test_best_estimator_is_refitted_and_delegates_prediction() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    assert isinstance(search.best_estimator_, PiPLSRegression)
-    assert search.selected_estimator_ is search.best_estimator_
-    assert search.selected_pipls_ is search.best_pipls_
+    assert isinstance(search.selected_estimator_, PiPLSRegression)
+    assert search.selected_pipls_ is search.selected_estimator_
     assert search.selected_params_ == search.best_params_
     assert search.selected_result_.n_components == search.best_n_components_
     assert search.selected_result_.predictor_rank == search.best_predictor_rank_
-    assert search.best_estimator_.n_components == search.best_n_components_
-    assert search.best_estimator_.predictor_rank == search.best_predictor_rank_
-    np.testing.assert_allclose(search.predict(X), search.best_estimator_.predict(X))
-    assert search.score(X, Y) == pytest.approx(search.best_estimator_.score(X, Y))
+    assert search.selected_estimator_.n_components == search.best_n_components_
+    assert search.selected_estimator_.predictor_rank == search.best_predictor_rank_
+    np.testing.assert_allclose(search.predict(X), search.selected_estimator_.predict(X))
+    assert search.score(X, Y) == pytest.approx(search.selected_estimator_.score(X, Y))
 
 
 def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
@@ -359,8 +358,6 @@ def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
     assert search.selected_estimator_.n_components == expected.n_components
     assert search.selected_estimator_.predictor_rank == expected.predictor_rank
     assert search.selected_pipls_ is search.selected_estimator_
-    assert not hasattr(search, "best_estimator_")
-    assert not hasattr(search, "best_pipls_")
     np.testing.assert_allclose(
         search.predict(X),
         search.selected_estimator_.predict(X),
@@ -429,7 +426,6 @@ def test_default_selection_hides_refit_dependent_methods() -> None:
         assert not hasattr(search, method_name)
 
     search.fit(X, Y)
-    assert not hasattr(search, "best_estimator_")
     for method_name in (
         "predict",
         "transform",
@@ -451,16 +447,12 @@ def test_refit_false_clears_state_from_an_earlier_refitted_fit() -> None:
         refit=True,
     ).fit(X, Y)
 
-    assert hasattr(search, "best_estimator_")
-    assert hasattr(search, "best_pipls_")
     assert hasattr(search, "selected_estimator_")
     assert hasattr(search, "selected_pipls_")
     assert hasattr(search, "refit_time_")
 
     search.set_params(refit=False).fit(X, Y)
 
-    assert not hasattr(search, "best_estimator_")
-    assert not hasattr(search, "best_pipls_")
     assert not hasattr(search, "selected_estimator_")
     assert not hasattr(search, "selected_pipls_")
     assert not hasattr(search, "refit_time_")
@@ -503,7 +495,7 @@ def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
     expected = np.mean(((Y[12:18] - prediction) / response_scale[None, :]) ** 2)
 
     assert search.cv_results_["split0_response_standardized_mse"][0] == pytest.approx(expected)
-    assert isinstance(search.best_estimator_, Pipeline)
+    assert isinstance(search.selected_estimator_, Pipeline)
 
 
 def test_auto_path_skips_candidates_with_constant_scorer() -> None:
@@ -681,7 +673,7 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> N
         ).fit(X, Y)
 
     assert search.best_predictor_rank_ == 4
-    assert search.best_pipls_.predictor_rank_ == 4
+    assert search.selected_pipls_.predictor_rank_ == 4
     report = search.validation_report_
     assert report.oof_prediction_counts is not None
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
@@ -725,8 +717,8 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
     assert template.n_components == 2
     assert template.predictor_rank == 2
     assert not hasattr(template, "coef_")
-    assert search.best_pipls_.n_components == 1
-    assert search.best_pipls_.predictor_rank == 3
+    assert search.selected_pipls_.n_components == 1
+    assert search.selected_pipls_.predictor_rank == 3
 
 
 @pytest.mark.parametrize(
