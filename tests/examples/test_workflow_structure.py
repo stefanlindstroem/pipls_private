@@ -141,6 +141,14 @@ def _uses_name(node: ast.AST, name: str) -> bool:
     return any(isinstance(child, ast.Name) and child.id == name for child in ast.walk(node))
 
 
+def _top_level_functions(tree: ast.Module) -> dict[str, ast.FunctionDef]:
+    return {
+        node.name: node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+    }
+
+
 def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
     examples = _repository_root() / "examples"
     users = {
@@ -265,6 +273,51 @@ def test_real_data_examples_use_direct_public_results(
         for value in _string_literals(tree)
         if value.endswith(".pdf")
     } == expected_pdfs
+
+
+
+def test_sugarcane_separates_analysis_from_same_file_rendering() -> None:
+    path = _repository_root() / "examples" / "06_sugarcane_real_data.py"
+    tree = _tree(path)
+    functions = _top_level_functions(tree)
+    main = functions["main"]
+
+    analysis_calls = {
+        "PiPLSRegression",
+        "PiPLSSearchCV",
+        "cross_val_predict",
+        "read_csv",
+        *_INSPECTION_CALLS,
+    }
+    assert analysis_calls <= _call_names(main)
+    assert _call_names(main).isdisjoint(_RENDERING_METHODS)
+
+    rendering_functions = [
+        function
+        for name, function in functions.items()
+        if name != "main"
+        and {"savefig", "subplots"} <= _call_names(function)
+    ]
+    assert rendering_functions
+    assert {function.name for function in rendering_functions} <= _call_names(main)
+
+    for function in rendering_functions:
+        calls = _call_names(function)
+        assert function.name.startswith("_")
+        assert calls.isdisjoint(analysis_calls)
+        assert {"savefig", "subplots"} <= calls
+
+    module_scope = ast.Module(
+        body=[
+            node
+            for node in tree.body
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+        ],
+        type_ignores=[],
+    )
+    module_calls = _call_names(module_scope)
+    assert "main" in module_calls
+    assert module_calls.isdisjoint({*analysis_calls, *_RENDERING_METHODS})
 
 
 
