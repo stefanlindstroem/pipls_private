@@ -36,8 +36,13 @@ def test_standard_pls_path_is_deterministic_and_immutable() -> None:
     X = pd.DataFrame(rng.normal(size=(30, 6)))
     Y = pd.DataFrame(rng.normal(size=(30, 3)))
 
-    first = PLS_PATH.evaluate_pls_component_path(X, Y, max_n_components=3)
-    second = PLS_PATH.evaluate_pls_component_path(X, Y, max_n_components=3)
+    cv = KFold(n_splits=5, shuffle=True, random_state=0)
+    first = PLS_PATH.evaluate_pls_component_path(
+        X, Y, max_n_components=3, cv=cv
+    )
+    second = PLS_PATH.evaluate_pls_component_path(
+        X, Y, max_n_components=3, cv=cv
+    )
 
     np.testing.assert_array_equal(first.n_components, second.n_components)
     np.testing.assert_allclose(first.cv_mse_mean, second.cv_mse_mean)
@@ -134,9 +139,11 @@ def test_nested_pls_path_matches_separate_pls_fits() -> None:
     rng = np.random.default_rng(2718)
     X = pd.DataFrame(rng.normal(size=(30, 6)))
     Y = pd.DataFrame(rng.normal(size=(30, 3)))
-    path = PLS_PATH.evaluate_pls_component_path(X, Y, max_n_components=3)
+    splitter = KFold(n_splits=5, shuffle=True, random_state=0)
+    path = PLS_PATH.evaluate_pls_component_path(
+        X, Y, max_n_components=3, cv=splitter
+    )
 
-    splitter = KFold(n_splits=5, shuffle=False)
     for n_components in range(1, 4):
         split_mse: list[float] = []
         for train, validation in splitter.split(X):

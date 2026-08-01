@@ -98,7 +98,7 @@ def evaluate_pls_component_path(
     Y: pd.DataFrame,
     *,
     max_n_components: int,
-    n_splits: int = 5,
+    cv: KFold,
 ) -> PLSComponentPath:
     """Return fold-local response-standardized CV-MSE for standard PLS.
 
@@ -118,9 +118,9 @@ def evaluate_pls_component_path(
             f"{max_n_components} > {algebraic_max}."
         )
 
-    splitter = KFold(n_splits=n_splits, shuffle=False)
+    n_splits = cv.get_n_splits(X, Y)
     split_mse = np.empty((max_n_components, n_splits), dtype=np.float64)
-    for split_index, (train, validation) in enumerate(splitter.split(X)):
+    for split_index, (train, validation) in enumerate(cv.split(X, Y)):
         X_train = X.iloc[train].to_numpy(dtype=np.float64)
         Y_train = Y.iloc[train].to_numpy(dtype=np.float64)
         X_validation = X.iloc[validation].to_numpy(dtype=np.float64)

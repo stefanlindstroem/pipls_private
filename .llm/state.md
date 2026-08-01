@@ -402,6 +402,11 @@ Decision 0134 gives public result properties type-revealing names: predictor-ran
 `is_selection_conditioned` and `has_complete_oof_coverage`. The former pre-release names are
 not retained as aliases.
 
+Decision 0136 makes every maintained ordinary five-fold example and tutorial renderer use
+`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Path selection, matched PLS
+comparison, and selection-conditioned OOF prediction use the same seeded partition within a
+workflow. Example 03 retains exhaustive `LeaveOneOut`, for which shuffling is not defined.
+
 Decision 0119 adds `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth` as an additive
 manuscript-aligned synthetic capability. It implements independent standard-normal latent scores
 and loading entries plus independent Gaussian predictor/response noise, with no normalization,

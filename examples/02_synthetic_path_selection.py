@@ -4,6 +4,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.model_selection import KFold
 
 from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.datasets import make_pipls_train_test
@@ -11,6 +12,7 @@ from pipls.inspection import prediction_diagnostics
 
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "synthetic_tutorial"
 CHOSEN_N_COMPONENTS = 2
+CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 # --8<-- [start:generate-synthetic-data]
 train, test = make_pipls_train_test(
@@ -28,7 +30,7 @@ train, test = make_pipls_train_test(
 # --8<-- [end:generate-synthetic-data]
 
 # --8<-- [start:evaluate-synthetic-path]
-search = PiPLSSearchCV().fit(train.X, train.Y)
+search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
 path = search.component_path_
 selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 # --8<-- [end:evaluate-synthetic-path]

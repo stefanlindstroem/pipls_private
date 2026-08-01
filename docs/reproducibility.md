@@ -98,6 +98,12 @@ estimators inside every training fold, so each candidate learns statistics only 
 With `refit=True`, the pair chosen by `selection_rule` learns them again from the complete supplied
 training set. Learned scaling must not be fitted globally before CV.
 
+
+Maintained examples that use ordinary five-fold regression CV specify
+`KFold(n_splits=5, shuffle=True, random_state=0)` rather than relying on the package default. This
+makes the demonstration partitions reproducible without tying them to file row order. The
+leave-one-out example is exhaustive and has no shuffle setting.
+
 ## Synthetic validation
 
 `pipls.datasets` provides deterministic latent-structure generators with known shared,

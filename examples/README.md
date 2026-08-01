@@ -39,6 +39,12 @@ The script writes `examples/results/minimal_fit_and_plot.pdf`. Its predictor and
 ordinary Python lists, demonstrating that plotting labels may come from any explicit metadata
 source rather than from pandas or CSV headers.
 
+
+All maintained examples that use five-fold regression CV construct
+`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. The fixed seed makes the examples
+reproducible while preventing row order from defining the folds. Example 03 uses `LeaveOneOut`,
+which exhaustively holds out each observation and therefore has no shuffle option.
+
 ## Explicit comparison
 
 - `04_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
@@ -112,7 +118,7 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
    with Matplotlib.
 2. `path.for_n_components(CHOSEN_N_COMPONENTS)` supplies the fixed paired-mode count and predictor
    rank.
-3. `cross_val_predict()` with five non-shuffled folds produces
+3. `cross_val_predict()` with five seeded shuffled folds produces
    `selection-conditioned OOF predictions`.
 4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return
    immutable in-memory results; the Pulp factor call anchors component signs to positive `TI`

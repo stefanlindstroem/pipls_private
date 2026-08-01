@@ -141,6 +141,7 @@ This index is navigation, not a substitute for those records.
 | `0133-regression-generator-truth-name.md` | regression-generator truth naming | distinguish the configurable regression truth record from the manuscript latent-geometry truth without aliases or data changes |
 | `0134-type-revealing-result-properties.md` | type-revealing public result properties | expose explicit result-object, CV-MSE, and boolean predicate names without aliases or numerical changes |
 | `0135-specific-predictor-rank-support-warning.md` | specific predictor-rank support warning name | expose `PredictorRankSupportWarning` without an alias or support-policy change |
+| `0136-seeded-shuffled-example-folds.md` | seeded shuffled example folds | use reproducible shuffled five-fold partitions in maintained examples while leaving package defaults and leave-one-out unchanged |
 
 ## Implemented estimator/search transition
 
@@ -235,6 +236,9 @@ plan contains an earlier or more general proposal:
   changes to selected values, validation metrics, or OOF coverage;
 - Decision 0135 renames the public low-sample predictor-rank support warning to
   `PredictorRankSupportWarning` without aliases, threshold changes, or suppression changes;
+- Decision 0136 makes maintained ordinary five-fold examples use
+  `KFold(n_splits=5, shuffle=True, random_state=0)` consistently for path selection, matched
+  comparison, and selection-conditioned OOF prediction; leave-one-out remains exhaustive;
 - example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
   Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
   Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls

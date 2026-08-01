@@ -6,15 +6,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from _support.pls_component_path import evaluate_pls_component_path
+from sklearn.model_selection import KFold
 
 from pipls import PiPLSRegression, PiPLSSearchCV
 
 DATASETS_DIR = Path(__file__).resolve().parents[1] / "datasets"
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
+CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 for dataset, path_search in (
-    ("pulp", PiPLSSearchCV()),
-    ("sugarcane", PiPLSSearchCV()),
+    ("pulp", PiPLSSearchCV(cv=CV)),
+    ("sugarcane", PiPLSSearchCV(cv=CV)),
     (
         "tobacco",
         PiPLSSearchCV(
@@ -24,6 +26,7 @@ for dataset, path_search in (
                 svd_solver="full",
             ),
             n_jobs=1,
+            cv=CV,
         ),
     ),
 ):
@@ -36,6 +39,7 @@ for dataset, path_search in (
         X,
         Y,
         max_n_components=int(pipls_path.n_components[-1]),
+        cv=CV,
     )
     if not np.array_equal(pipls_path.n_components, pls_path.n_components):
         raise RuntimeError("Pi-PLS and PLS paths must contain the same component counts.")

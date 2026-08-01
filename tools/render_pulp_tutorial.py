@@ -46,6 +46,7 @@ PULP_DATA_DIR = REPOSITORY_ROOT / "datasets" / "pulp"
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
+CV = KFold(n_splits=5, shuffle=True, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
     "component_path.svg",
@@ -166,7 +167,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     predictor_names = tuple(str(name) for name in X.columns)
     response_names = tuple(str(name) for name in Y.columns)
 
-    path_search = PiPLSSearchCV().fit(X, Y)
+    path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
     component_path = path_search.component_path_
     selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
     display_components = tuple(range(CHOSEN_N_COMPONENTS))
@@ -190,7 +191,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         model,
         X,
         Y,
-        cv=KFold(n_splits=5, shuffle=False),
+        cv=CV,
     )
     factors = pipls_display_factors(
         model.decomposition_,

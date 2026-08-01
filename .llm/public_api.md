@@ -352,8 +352,9 @@ Example 04 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plo
 component paths directly in memory. Pulp, Sugarcane, and Tobacco use the default selection-only
 `PiPLSSearchCV()`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
-`PiPLSRegression`, and calculate five-fold non-shuffled predictions through scikit-learn
-`cross_val_predict()`. They render immutable Pi-PLS factors, latent structure, observation
+`PiPLSRegression`, and calculate five-fold seeded shuffled predictions through scikit-learn
+`cross_val_predict()`. The path search and OOF calculation share the explicit
+`KFold(n_splits=5, shuffle=True, random_state=0)` policy. They render immutable Pi-PLS factors, latent structure, observation
 diagnostics, and prediction diagnostics directly with Matplotlib and write only final PDF figures.
 Pulp also reads the conditional predictor-rank profile through `predictor_rank_profile()` for the
 chosen component count. Tobacco uses

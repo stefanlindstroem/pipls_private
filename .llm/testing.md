@@ -93,8 +93,11 @@ incidental artist counts. Structural tests should require the absence of a packa
 and public `plot_*` functions, keep Matplotlib and `adjustText` optional, and ensure that example
 support code does not hide chart construction.
 
-Structural tests for Pulp, Sugarcane, and Tobacco protect direct `component_path_` access,
-scikit-learn `cross_val_predict()`, immutable inspection results, explicit Matplotlib
+Structural tests require every maintained ordinary K-fold example and tutorial renderer to use
+`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly, while the leave-one-out example
+retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane, and Tobacco protect
+direct `component_path_` access, scikit-learn `cross_val_predict()`, immutable inspection
+results, explicit Matplotlib
 construction, absence of analytical CSV output, physical coordinate order, and the declared final
 PDF filenames without running the artifact-writing scripts. Keep these source scans consolidated as
 AST-level ownership and data-flow checks rather than repeating per-example string inventories.

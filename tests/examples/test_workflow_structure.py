@@ -137,6 +137,15 @@ def _keyword_string(call: ast.Call, keyword_name: str) -> str | None:
     return None
 
 
+def _keyword_constant(call: ast.Call, keyword_name: str) -> object | None:
+    for keyword in call.keywords:
+        if keyword.arg != keyword_name:
+            continue
+        if isinstance(keyword.value, ast.Constant):
+            return keyword.value.value
+    return None
+
+
 def _uses_name(node: ast.AST, name: str) -> bool:
     return any(isinstance(child, ast.Name) and child.id == name for child in ast.walk(node))
 
@@ -147,6 +156,34 @@ def _top_level_functions(tree: ast.Module) -> dict[str, ast.FunctionDef]:
         for node in tree.body
         if isinstance(node, ast.FunctionDef)
     }
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "examples/02_synthetic_path_selection.py",
+        "examples/04_pls_path_comparison.py",
+        "examples/05_pulp_real_data.py",
+        "examples/06_sugarcane_real_data.py",
+        "examples/07_tobacco_real_data.py",
+        "tools/render_synthetic_tutorial.py",
+        "tools/render_pulp_tutorial.py",
+    ],
+)
+def test_kfold_examples_use_seeded_shuffled_folds(relative_path: str) -> None:
+    tree = _tree(_repository_root() / relative_path)
+    kfold_calls = _calls_with_name(tree, "KFold")
+    assert kfold_calls
+    for call in kfold_calls:
+        assert _keyword_constant(call, "n_splits") == 5
+        assert _keyword_constant(call, "shuffle") is True
+        assert _keyword_constant(call, "random_state") == 0
+
+
+def test_leave_one_out_example_uses_its_exhaustive_splitter() -> None:
+    tree = _tree(_repository_root() / "examples" / "03_leave_one_out_validation.py")
+    assert "LeaveOneOut" in _call_names(tree)
+    assert "KFold" not in _call_names(tree)
 
 
 def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:

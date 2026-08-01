@@ -4,6 +4,9 @@
 
 ### Repository
 
+- Use explicit reproducible shuffled five-fold partitions in every maintained example and tutorial
+  renderer that uses ordinary K-fold CV; keep leave-one-out exhaustive, and use the same seeded
+  folds for path selection, ordinary-PLS comparison, and selection-conditioned OOF prediction.
 - Rename the unreleased public warning class from `StatisticalSupportWarning` to
   `PredictorRankSupportWarning`, so its name identifies the specific low-sample-support
   condition without changing thresholds, warning messages, or suppression behavior.

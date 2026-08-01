@@ -21,6 +21,7 @@ from pipls.inspection import (
 DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "sugarcane"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "sugarcane_post_analysis"
 CHOSEN_N_COMPONENTS = 2
+CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 
 def _plot_component_path(path: PiPLSComponentPath, output_path: Path) -> None:
@@ -266,7 +267,7 @@ def main() -> None:
     response_names = Y.columns.tolist()
 
     # Evaluate the Pi-PLS component path over paired-mode counts.
-    path_search = PiPLSSearchCV().fit(X, Y)
+    path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
     path = path_search.component_path_
     selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 
@@ -281,7 +282,7 @@ def main() -> None:
         model,
         X,
         Y,
-        cv=KFold(n_splits=5, shuffle=False),
+        cv=CV,
     )
 
     # Calculate fitted-model and prediction inspection results.

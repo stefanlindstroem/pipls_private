@@ -22,6 +22,7 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "pulp"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
 CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
+CV = KFold(n_splits=5, shuffle=True, random_state=0)
 # --8<-- [end:pulp-tutorial-setup]
 
 # --8<-- [start:load-pulp-data]
@@ -32,7 +33,7 @@ response_names = Y.columns.tolist()
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:evaluate-pulp-component-path]
-path_search = PiPLSSearchCV().fit(X, Y)
+path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
 path = path_search.component_path_
 # --8<-- [end:evaluate-pulp-component-path]
 
@@ -129,7 +130,7 @@ oof_predictions = cross_val_predict(
     model,
     X,
     Y,
-    cv=KFold(n_splits=5, shuffle=False),
+    cv=CV,
 )
 # --8<-- [end:pulp-oof-predictions]
 

@@ -3,7 +3,7 @@
 This tutorial applies [First Pi-PLS model with synthetic data](synthetic.md) to a real
 multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`,
 `predictor_rank_profile()`, and fixed-model fitting are already familiar. The focus is what changes
-with real data: an upper-boundary predictor-rank result, selection-conditioned out-of-fold (OOF)
+with real data: an interior predictor-rank result, selection-conditioned out-of-fold (OOF)
 predictions, and interpretation of a selected model.
 
 ## What this tutorial covers
@@ -12,7 +12,7 @@ You will:
 
 1. load the Pulp predictors and responses;
 2. evaluate the component path and conditional predictor-rank profile;
-3. qualify a predictor-rank choice at the upper evaluated boundary;
+3. qualify an interior predictor-rank choice against the neighboring evaluated ranks;
 4. fit one fixed `PiPLSRegression` model;
 5. generate selection-conditioned OOF predictions;
 6. compute immutable latent-structure, factorization, and prediction-diagnostic results;
@@ -104,9 +104,9 @@ intervals. Such bars can inform the conventional
 present demonstration keeps the elbow choice explicit rather than declaring an automatic final
 selection rule. The diamond marks the stated choice.
 
-The selected row contains `predictor_rank=10`, the rank with the lowest evaluated mean CV-MSE at
-three components. `for_n_components()` retrieves that evaluated row; it does not repeat the
-optimization or fit the final model.
+The selected row contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at
+three components under the seeded shuffled folds. `for_n_components()` retrieves that evaluated
+row; it does not repeat the optimization or fit the final model.
 
 ### Conditional predictor-rank profile
 
@@ -123,17 +123,16 @@ The complete evaluated rank profile at three components is available without fil
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
-Rank 10 has the lowest evaluated mean CV-MSE, but it is also the upper default boundary. For these
-46 rows, 14 predictors, and five-fold CV, the support rule gives
-$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. Ranks 9 and 10 have mean CV-MSE values of
-approximately 0.347 and 0.331, with fold-based standard errors of approximately 0.083 and 0.076.
-Their mean difference is small relative to the displayed uncertainty scale.
+For these 46 rows, 14 predictors, and five-fold CV, the support rule gives
+$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The seeded shuffled folds select the
+interior rank 9. Ranks 9 and 10 have mean CV-MSE values of approximately 0.288 and 0.302, with
+fold-based standard errors of approximately 0.039 and 0.030. Their mean difference is small
+relative to the displayed uncertainty scale.
 
-The profile supports rank 10 for this fitted model, but it does not establish that ranks above 10
-would be worse or that rank 10 has a distinct scientific advantage over rank 9. The fixed model
-still contains three paired latent modes; predictor rank 10 is the retained predictor-subspace
-dimension used to estimate those modes. See [Path-selection details](../path_analysis.md) for other
-bounds and policies.
+The profile supports rank 9 for this fitted model, but it does not establish a distinct scientific
+advantage over nearby retained dimensions. The fixed model still contains three paired latent
+modes; predictor rank 9 is the retained predictor-subspace dimension used to estimate those modes.
+See [Path-selection details](../path_analysis.md) for other bounds and policies.
 
 ## Fit the selected model
 
@@ -151,14 +150,15 @@ results. `PiPLSRegression` learns predictor and response centering and scaling i
 ## Generate selection-conditioned OOF predictions
 
 Fitted values are unsuitable for assessing predictive residuals. The example therefore clones the
-fixed estimator inside five non-shuffled folds and predicts each held-out observation once:
+fixed estimator inside five seeded shuffled folds and predicts each held-out observation once:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
 ```
 
-The non-shuffled splitter is used here for a deterministic demonstration. Replace it with a grouped,
-temporal, or otherwise appropriate splitter when row order carries experimental structure.
+The fixed random seed makes the shuffled partition reproducible while avoiding a fold assignment
+that is determined by row order. Replace it with a grouped, temporal, or otherwise appropriate
+splitter when the sampling design carries experimental structure.
 
 !!! important "Validation scope"
     These are **selection-conditioned OOF predictions**. The rank pair is fixed during this second
@@ -239,8 +239,8 @@ the displayed orientation is fixed by the TI entries in the paired response dire
 
 The columns of $\mathbf{P}$ are orthonormal predictor directions paired with orthonormal response
 directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. They are distinct from ordinary X
-loadings. The figure shows all three selected paired latent modes; predictor rank 10 does not create
-ten plotted modes. See
+loadings. The figure shows all three selected paired latent modes; predictor rank 9 does not create
+nine plotted modes. See
 [Predictor directions](../model_inspection.md#predictor-directions) and
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
 

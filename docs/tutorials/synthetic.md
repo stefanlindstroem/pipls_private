@@ -44,7 +44,7 @@ is not required to recover them exactly in a finite noisy sample.
 `PiPLSSearchCV` evaluates admissible pairs of paired-mode count $h$ (`n_components`) and retained
 predictor-subspace dimension $r_\pi$ (`predictor_rank`). For each paired-mode count, it selects the
 evaluated predictor rank with the smallest mean
-response-standardized CV-MSE under the default scorer:
+response-standardized CV-MSE under a seeded shuffled five-fold splitter and the default scorer:
 
 \begin{equation}
 r_\pi^*(h)
@@ -126,7 +126,10 @@ coefficients of determination.
 For ordinary use, the essential sequence is:
 
 ```python
-search = PiPLSSearchCV().fit(X_train, Y_train)
+from sklearn.model_selection import KFold
+
+cv = KFold(n_splits=5, shuffle=True, random_state=0)
+search = PiPLSSearchCV(cv=cv).fit(X_train, Y_train)
 selected = search.component_path_.for_n_components(chosen_n_components)
 
 model = PiPLSRegression(

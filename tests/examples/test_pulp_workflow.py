@@ -31,7 +31,8 @@ def pulp_result() -> SimpleNamespace:
     X = pd.read_csv(data_dir / "X.csv")
     Y = pd.read_csv(data_dir / "Y.csv")
 
-    path_search = PiPLSSearchCV(refit=False).fit(X, Y)
+    cv = KFold(n_splits=5, shuffle=True, random_state=0)
+    path_search = PiPLSSearchCV(refit=False, cv=cv).fit(X, Y)
     component_path = path_search.component_path_
     selected = component_path.for_n_components(3)
 
@@ -45,7 +46,7 @@ def pulp_result() -> SimpleNamespace:
         model,
         X,
         Y,
-        cv=KFold(n_splits=5, shuffle=False),
+        cv=cv,
     )
     factors = pipls_display_factors(
         model.decomposition_,
@@ -81,13 +82,13 @@ def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespac
     assert result.path_search.refit is False
     assert isinstance(result.component_path, PiPLSComponentPath)
     assert result.selected.n_components == 3
-    assert result.selected.predictor_rank == 10
+    assert result.selected.predictor_rank == 9
     assert isinstance(result.model, PiPLSRegression)
     assert result.model.n_components == 3
-    assert result.model.predictor_rank_ == 10
+    assert result.model.predictor_rank_ == 9
 
 
-def test_pulp_rank_profile_exposes_the_upper_boundary_selection(
+def test_pulp_rank_profile_exposes_the_interior_selection(
     pulp_result: SimpleNamespace,
 ) -> None:
     result = pulp_result
@@ -96,11 +97,16 @@ def test_pulp_rank_profile_exposes_the_upper_boundary_selection(
     assert isinstance(profile, PiPLSPredictorRankProfile)
     np.testing.assert_array_equal(profile.predictor_rank, np.arange(3, 11))
     assert profile.selected_result == result.selected
-    assert profile.selected_result.predictor_rank == int(profile.predictor_rank[-1])
-    assert profile.cv_mse_mean[-1] < profile.cv_mse_mean[-2]
-    assert profile.cv_mse_mean[-2] - profile.cv_mse_mean[-1] < min(
-        profile.cv_mse_fold_sd[-2],
-        profile.cv_mse_fold_sd[-1],
+    assert profile.selected_result.predictor_rank == 9
+    selected_index = int(np.flatnonzero(profile.predictor_rank == 9)[0])
+    upper_index = int(np.flatnonzero(profile.predictor_rank == 10)[0])
+    assert profile.cv_mse_mean[selected_index] < profile.cv_mse_mean[upper_index]
+    assert (
+        profile.cv_mse_mean[upper_index] - profile.cv_mse_mean[selected_index]
+        < min(
+            profile.cv_mse_fold_sd[selected_index],
+            profile.cv_mse_fold_sd[upper_index],
+        )
     )
 
 

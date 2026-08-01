@@ -30,6 +30,7 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "tobacco"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analysis"
 DISPLAY_COMPONENT_COUNT = 4
 RESPONSES_PER_PAGE = 5
+CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 
 def _plot_component_path(
@@ -371,6 +372,7 @@ def main() -> None:
         ),
         search_method="auto",
         n_jobs=1,
+        cv=CV,
     ).fit(X, Y)
     path = path_search.component_path_
     minimum = path.minimum_cv_mse_result()
@@ -390,7 +392,7 @@ def main() -> None:
         model,
         X,
         Y,
-        cv=KFold(n_splits=5, shuffle=False),
+        cv=CV,
     )
 
     # Calculate immutable fitted-model and prediction inspection results.

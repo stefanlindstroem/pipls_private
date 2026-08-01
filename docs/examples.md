@@ -41,6 +41,15 @@ make examples
 The complete real-data analyses are intentionally outside `make check` because they are application
 workflows and may take substantially longer than the package test suite.
 
+
+## Cross-validation partitions
+
+Examples 02 and 04–07 use explicit five-fold shuffled regression splits with
+`KFold(n_splits=5, shuffle=True, random_state=0)`. The same seeded partition is used when an example
+compares paths or calculates selection-conditioned OOF predictions. Example 03 uses
+`LeaveOneOut`; shuffling is not defined because every observation is held out once. Grouped,
+temporal, or otherwise structured data require an application-specific splitter instead.
+
 ## Leave-one-out validation
 
 `examples/03_leave_one_out_validation.py` represents a small calibration study with twelve costly

@@ -104,6 +104,7 @@ reference describe the current public behavior directly.
 - [0110: response-anchored Pi-PLS display factors](0110-response-anchored-display-factors.md)
 - [0113: derived weighted response directions](0113-derived-weighted-response-directions.md)
 - [0114: derived prediction diagnostics](0114-derived-prediction-diagnostics.md)
+- [0136: seeded shuffled folds in maintained examples](0136-seeded-shuffled-example-folds.md)
 
 ## Repository and documentation policy
 

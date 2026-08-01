@@ -371,8 +371,9 @@ retains a $2\times2$ factor figure, one $1\times3$ prediction figure per respons
 one
 $2\times2$ latent/observation figure, and one full-width coefficient figure per response page.
 
-Pulp, Sugarcane, and Tobacco use five non-shuffled folds through scikit-learn
-`cross_val_predict()`. Because component count and predictor rank are chosen after inspecting paths
+Pulp, Sugarcane, and Tobacco use five seeded shuffled folds through scikit-learn
+`cross_val_predict()`. Their path searches use the same explicit
+`KFold(n_splits=5, shuffle=True, random_state=0)` partition. Because component count and predictor rank are chosen after inspecting paths
 computed from the same observations, the resulting OOF predictions are selection-conditioned rather
 than independent validation. The standardized display values in `PredictionDiagnostics` use the
 full supplied observed-response means and sample standard deviations; they do not reproduce the
