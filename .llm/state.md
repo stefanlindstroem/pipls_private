@@ -481,7 +481,32 @@ The remaining constructor-time selection and OOF controls and selected report st
 The search surface now contains only candidate evidence, immutable path/profile inspection, exact
 stored splits for explicit follow-up reporting, and the two post-fit operations.
 
+## Three-stage user onboarding transition
+
+Decision 0139 authorizes a three-patch presentation transition:
+
+1. establish the three-stage onboarding decision and guide-layer target;
+2. rename the first example to `01_pulp_quick_start.py`, add a rendered Pulp quick-start tutorial
+   and generated asset contract, and place it first in served navigation;
+3. reframe the landing page, synthetic tutorial, path reference, example catalogues, and active OOF
+   terminology around automatic fit, inspect-decide-refit, and selection-conditioned validation.
+
+The target route starts with the shortest automatic Pulp fit and full-data fitted-value plot,
+continues with synthetic path inspection and manual component choice, and ends with the complete
+Pulp selection-conditioned validation and interpretation workflow. The quick start must never call
+its calibration-fit predictions validation. The transition retains no old example filename,
+duplicate tutorial, or compatibility navigation because the package remains at version `0.0.0`.
+
+Current status: **Patch 1 complete; implementation pending**. Decision 0139 and the active guide
+layer now record the target, while examples, renderers, served navigation, and living public pages
+still describe the current implemented route until Patches 2 and 3 are accepted.
+
 ## Current next increment
+
+Decision 0139 Patch 2 is the current next increment: add the rendered Pulp quick-start
+tutorial, rename its maintained example, integrate its generated SVG and manifest, and update
+served navigation and structural/distribution contracts without yet reframing the remaining
+documentation journey.
 
 Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
 available in clean wheel and source-distribution installations, every maintained Pulp consumer uses

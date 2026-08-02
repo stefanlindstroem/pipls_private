@@ -947,7 +947,31 @@ loading, every maintained Pulp consumer uses the package-owned dataset, and tuto
 identify its resource and canonical-array hashes. The former repository layout is archived under
 `.llm/archive/`, while active tests verify one package-resource matrix location.
 
+### Three-stage user onboarding transition
+
+Decision 0139 authorizes a three-patch documentation and example transition:
+
+1. establish the accepted onboarding order in the decision and guide layer;
+2. rename the first example, add a rendered Pulp quick-start tutorial with one generated SVG and
+   semantic manifest, move it to the first served tutorial position, and protect its source and
+   distribution contracts;
+3. reorder and reframe the landing page, synthetic tutorial, path reference, catalogues, and active
+   OOF terminology, then close the transition with stale-surface audits.
+
+The final route presents automatic full-data fitting first, retained search evidence and manual
+selection second, and selection-conditioned validation and interpretation third. The quick-start
+plot remains explicitly a calibration-fit diagnostic. Because the package is unreleased, the old
+example filename and obsolete tutorial claims are removed rather than deprecated.
+
+Current status: **Patch 1 complete; implementation pending**. The governing decision and guide
+contracts are established. Executable examples and living user documentation remain unchanged
+until the next patches implement the target.
+
 ## Current next increment
+
+Decision 0139 Patch 2 is the current next increment. It adds the rendered Pulp quick start,
+renames the first example, integrates the generated asset pipeline, and updates tutorial
+navigation and durable contracts while leaving the broader documentation reframing to Patch 3.
 
 Decision 0138 is fully implemented and no Pulp dataset-transition increment remains. No generic
 dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.

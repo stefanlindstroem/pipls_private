@@ -88,6 +88,29 @@ The final surface should be tested through positive constructor and method contr
 compact assertion that removed pre-release constructor controls are rejected. Do not accumulate one
 historical tombstone test per removed fitted attribute.
 
+## Three-stage onboarding transition
+
+Decision 0139 introduces staged presentation contracts rather than package behavior. Patch 1 adds
+no executable test because the new tutorial, filename, renderer, and navigation do not yet exist.
+Patches 2 and 3 must add or update durable tests that protect:
+
+- one maintained `examples/01_pulp_quick_start.py` source and no compatibility copy under the former
+  name;
+- checked tutorial snippets owned by that example;
+- one parseable generated quick-start SVG plus a semantic manifest identifying package-owned Pulp,
+  the selected rank pair, fitted-value provenance, standardized RMSE, and the SVG hash;
+- strict navigation order: quick start, synthetic inspection, complete Pulp analysis;
+- source-distribution inclusion and clean rendered-documentation execution;
+- a single standardized observed-versus-fitted plotting axis and explicit absence of OOF or
+  predictive-validation claims in the quick-start tutorial;
+- synthetic-tutorial wording and structure that retain the search for evidence and manual
+  component selection;
+- selection-conditioned terminology for the maintained Pulp OOF workflow.
+
+Prefer parsed navigation, executable snippets, manifest semantics, artifact existence, and focused
+source-structure checks over frozen prose or pixel output. The current two-page tutorial route and
+first-example filename remain the tested implementation until Patch 2 changes them.
+
 ## Rendering validation boundary
 
 Protect rendering through executable artifact generation, parseable declared outputs, optional

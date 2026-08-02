@@ -144,6 +144,7 @@ This index is navigation, not a substitute for those records.
 | `0136-seeded-shuffled-example-folds.md` | seeded shuffled example folds | use reproducible shuffled five-fold partitions in maintained examples while leaving package defaults and leave-one-out unchanged |
 | `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select and fit through explicit post-fit `refit()` and `validation_report()` operations |
 | `0138-package-owned-pulp-dataset-loader.md` | package-owned Pulp dataset loader | provide one installed immutable `load_pulp()` dataset and archive the former repository layout without a duplicate active copy |
+| `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
 
 ## Implemented estimator/search transition
 

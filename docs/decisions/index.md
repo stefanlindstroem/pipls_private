@@ -108,6 +108,7 @@ reference describe the current public behavior directly.
 - [0113: derived weighted response directions](0113-derived-weighted-response-directions.md)
 - [0114: derived prediction diagnostics](0114-derived-prediction-diagnostics.md)
 - [0136: seeded shuffled folds in maintained examples](0136-seeded-shuffled-example-folds.md)
+- [0139: three-stage user onboarding](0139-three-stage-user-onboarding.md)
 
 ## Repository and documentation policy
 

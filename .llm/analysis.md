@@ -120,11 +120,15 @@ Do not introduce a generic real-data loader.
 Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
 preparation area.
 
-The served tutorial route has two levels. The synthetic tutorial extracts executable snippets from
-example 02 and owns the minimum component-path, conditional-rank, fixed-fit, and external-test
-prediction sequence. The Pulp tutorial follows with the complete real-data analysis, including
-the direct conditional predictor-rank plot, fixed-parameter OOF diagnostics, and deterministic
-inspection figures. It shows
+Decision 0139 establishes a three-stage served tutorial target. The first stage is a short rendered
+Pulp quick start sourced from the renamed `examples/01_pulp_quick_start.py`; it owns the automatic
+one-standard-error fit, full-data fitted-value diagnostics, one standardized observed-versus-fitted
+axis, and the explicit boundary that calibration fit is not validation. The second stage is the
+synthetic tutorial, which retains the fitted search object and owns component-path inspection,
+conditional-rank inspection, manual component selection, fixed fitting, and external-test
+prediction. The complete Pulp tutorial is the third stage and owns the real-data analysis,
+including the direct conditional predictor-rank plot, selection-conditioned OOF diagnostics, and
+deterministic inspection figures. It shows
 one setup block before use, selects the first three response columns only for pointwise-plot
 legibility, and sources each displayed interpretation figure from a matching standalone renderer
 block. Clear section headings distinguish estimator-neutral PLS-family latent-structure and
@@ -137,10 +141,11 @@ sections link to the general inspection reference rather than duplicating numeri
 
 Documentation ownership is fixed by Decisions 0074--0078. The API overview owns the public
 result-object map, and the task-oriented troubleshooting page owns common public-API recovery
-paths without becoming another tutorial. The synthetic tutorial owns the
-minimum normal workflow. The Pulp tutorial owns the real-data selection qualification,
-selection-conditioned OOF boundary, immutable inspection-result handoff, and a representative set
-of generated interpretation figures. The complete plot catalogue belongs to
+paths without becoming another tutorial. The quick-start tutorial owns the minimum automatic
+fitted-model workflow and its calibration-fit boundary. The synthetic tutorial owns
+inspect-decide-refit mechanics on controlled data. The Pulp tutorial owns the real-data selection
+qualification, selection-conditioned OOF boundary, immutable inspection-result handoff, and a
+representative set of generated interpretation figures. The complete plot catalogue belongs to
 `model_inspection.md`, while common variations belong to the generated API and advanced guides. The
 home page owns a restrained application-oriented motivation, the minimal fixed-fit entry, and
 audience routes. The root README owns package orientation, motivation without comparative
@@ -169,6 +174,10 @@ repeats the small in-memory numerical sequence rather than importing or executin
 artifact-writing example. It owns tutorial-specific figure dimensions, titles, legends, selected display components and responses, direct Matplotlib
 construction, SVG writing, closing, and the generated manifest. Generated tutorial files remain
 derived documentation assets and are not committed.
+
+Decision 0139 Patch 1 records this target only. The existing example filename, renderer set, served
+navigation, and public tutorial pages remain current until Patches 2 and 3 implement and test
+the three-stage route.
 
 Numbered examples are pedagogical scripts, not production applications. Each one must demonstrate a
 recognizable minimal use case or explicit comparison and must be understandable
