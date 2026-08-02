@@ -183,7 +183,7 @@ split indices but not supplied training matrices or returned reports.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
-`component_path_` result. The search stores no selected row, validation report, or fitted final
+component-path result. The search stores no selected row, validation report, or fitted final
 model. `PiPLSValidationReport` composes one immutable `PiPLSComponentResult`; its `n_components`,
 `predictor_rank`, `n_splits`, `mean_test_score`, and `cv_mse_mean` properties forward to that result
 rather than duplicating state. `is_selection_conditioned` and `has_complete_oof_coverage` expose
@@ -198,9 +198,8 @@ are not public fitted state. Advanced users can inspect aligned `cv_results_` co
 validation splits are path-wide Python scalars. It derives the aligned read-only
 `cv_mse_standard_error` array from the stored population fold SD and shared split count. New code
 retrieves one complete stored row through `search.select(...)`. Maintained consumers and living
-documentation use no path-level scalar selection. The three former path-selection methods remain
-temporarily only in their implementation and focused component-path unit tests until Patch 4
-removes them.
+documentation use no path-level scalar selection. `PiPLSComponentPath` exposes aligned numerical
+properties and immutable serialization behavior, not public selected-row operations.
 
 `best_index_`, `best_score_`, `best_params_`, `best_n_components_`, and
 `best_predictor_rank_` always describe the global configured-score optimum. They are search evidence,
@@ -219,11 +218,10 @@ add another fitted attribute or stored selected-row representation. It exposes a
 maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
 mean response-standardized CV-MSE.
 
-Decision 0140 Patches 2 and 3 are implemented. `search.select(rule=... or n_components=...)` is
-the search-owned selected-row lookup, the shared private rule vocabulary is `SelectionRule`, and
-selection inspection, refitting, validation reporting, and predictor-rank profile composition use
-search-owned helpers. Maintained consumers have migrated; Patch 4 removes the residual path-level
-methods and relocates their durable numerical tests.
+Decision 0140 is fully implemented. `search.select(rule=... or n_components=...)` is the sole
+public selected-row lookup, the shared private rule vocabulary is `SelectionRule`, and selection
+inspection, refitting, validation reporting, and predictor-rank profile composition use
+search-owned helpers. Durable numerical selection tests are located at this search boundary.
 
 All five top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSValidationReport`) validate direct

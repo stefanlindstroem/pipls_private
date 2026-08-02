@@ -435,16 +435,9 @@ def test_maintained_path_annotations_use_search_owned_selection() -> None:
         repository / "tools" / "render_synthetic_tutorial.py",
         repository / "tools" / "render_pulp_tutorial.py",
     )
-    removed_calls = {
-        "for_n_components",
-        "minimum_cv_mse_result",
-        "one_standard_error_result",
-    }
-
     for path in paths:
         calls = _call_names(_tree(path))
         assert "select" in calls, path
-        assert calls.isdisjoint(removed_calls), path
 
 
 def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:

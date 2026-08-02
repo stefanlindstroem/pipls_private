@@ -13,6 +13,7 @@ from sklearn.preprocessing import StandardScaler
 
 from pipls import (
     PiPLSComponentPath,
+    PiPLSComponentResult,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSSearchCV,
@@ -82,6 +83,24 @@ def _one_standard_error_data() -> tuple[np.ndarray, np.ndarray]:
     coefficients[:2, :] = rng.normal(size=(2, 3))
     Y = X @ coefficients + rng.normal(size=(24, 3))
     return X, Y
+
+
+def _search_with_component_path(
+    path: PiPLSComponentPath,
+    *,
+    best_n_components: int | None = None,
+) -> PiPLSSearchCV:
+    """Return minimal fitted-state evidence for exact selection tests."""
+
+    search = PiPLSSearchCV()
+    search.cv_results_ = {}
+    search.component_path_ = path
+    search.best_n_components_ = (
+        int(path.n_components[-1])
+        if best_n_components is None
+        else best_n_components
+    )
+    return search
 
 
 def test_optimal_path_evaluates_complete_triangular_grid() -> None:
@@ -360,10 +379,154 @@ def test_post_fit_select_validates_selection_input_and_fitted_state() -> None:
         search.select(rule="best_score", n_components=1)
     with pytest.raises(ValueError, match="rule must be"):
         search.select(rule="smallest")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="was not evaluated"):
+    with pytest.raises(
+        ValueError,
+        match=r"n_components=3 was not evaluated.*\[1, 2\]",
+    ):
         search.select(n_components=3)
     with pytest.raises(ValueError, match="must be an integer"):
         search.select(n_components=2.0)  # type: ignore[arg-type]
+
+
+def test_select_component_count_returns_the_complete_exact_stored_row() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 4],
+        predictor_rank=[3, 4, 5],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-0.8, -0.5, -0.45],
+        cv_mse_mean=[0.8, 0.5, 0.45],
+        cv_mse_fold_sd=[0.1, 0.08, 0.07],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(n_components=np.int64(2))
+
+    assert selected == PiPLSComponentResult(
+        n_components=2,
+        predictor_rank=4,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.5,
+        cv_mse_mean=0.5,
+        cv_mse_fold_sd=0.08,
+        n_splits=5,
+    )
+    assert type(selected.n_components) is int
+    assert type(selected.predictor_rank) is int
+    assert type(selected.mean_test_score) is float
+
+
+def test_select_minimum_cv_mse_returns_first_exact_stored_tie() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 4],
+        predictor_rank=[2, 4, 6],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-0.5, -0.4, -0.4],
+        cv_mse_mean=[0.5, 0.4, 0.4],
+        cv_mse_fold_sd=[0.1, 0.08, 0.07],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(rule="minimum_cv_mse")
+
+    assert selected == PiPLSComponentResult(
+        n_components=2,
+        predictor_rank=4,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.4,
+        cv_mse_mean=0.4,
+        cv_mse_fold_sd=0.08,
+        n_splits=5,
+    )
+
+
+def test_select_one_standard_error_uses_the_minimum_rows_standard_error() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3, 4],
+        predictor_rank=[2, 3, 5, 6],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-0.48, -0.45, -0.40, -0.42],
+        cv_mse_mean=[0.48, 0.45, 0.40, 0.42],
+        cv_mse_fold_sd=[1.0, 0.4, 0.08, 0.2],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(rule="one_standard_error")
+
+    assert selected.n_components == 3
+    assert selected.predictor_rank == 5
+
+
+def test_select_one_standard_error_returns_smallest_eligible_count() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 4],
+        predictor_rank=[2, 3, 5],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-0.50, -0.44, -0.40],
+        cv_mse_mean=[0.50, 0.44, 0.40],
+        cv_mse_fold_sd=[0.1, 0.1, 0.10],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(rule="one_standard_error")
+
+    assert selected.n_components == 2
+    assert selected.predictor_rank == 3
+
+
+def test_select_one_standard_error_uses_no_extra_tolerance() -> None:
+    minimum = 0.4
+    reference_standard_error = 0.04
+    threshold = minimum + reference_standard_error
+    just_above_threshold = np.nextafter(threshold, np.inf)
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3],
+        predictor_rank=[2, 3, 4],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-0.5, -just_above_threshold, -minimum],
+        cv_mse_mean=[0.5, just_above_threshold, minimum],
+        cv_mse_fold_sd=[0.1, 0.1, 2.0 * reference_standard_error],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(rule="one_standard_error")
+
+    assert selected.n_components == 3
+
+
+def test_select_rules_handle_split_and_finite_threshold_edges() -> None:
+    one_split = _search_with_component_path(
+        PiPLSComponentPath(
+            n_components=[1, 2],
+            predictor_rank=[2, 3],
+            predictor_rank_policy="optimized",
+            mean_test_score=[-0.4, -0.5],
+            cv_mse_mean=[0.4, 0.5],
+            cv_mse_fold_sd=[0.0, 0.1],
+            n_splits=1,
+        )
+    )
+    assert one_split.select(rule="minimum_cv_mse").n_components == 1
+    with pytest.raises(ValueError, match="requires at least two"):
+        one_split.select(rule="one_standard_error")
+
+    overflowing = _search_with_component_path(
+        PiPLSComponentPath(
+            n_components=[1],
+            predictor_rank=[1],
+            predictor_rank_policy="fixed",
+            mean_test_score=[-1.0e308],
+            cv_mse_mean=[1.0e308],
+            cv_mse_fold_sd=[1.0e308],
+            n_splits=2,
+        )
+    )
+    with pytest.raises(ValueError, match="threshold must be finite"):
+        overflowing.select(rule="one_standard_error")
 
 
 def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:

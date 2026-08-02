@@ -224,7 +224,7 @@ when the CV-MSE curve has no clear elbow that would otherwise motivate a compone
 [Tobacco one-standard-error workflow](examples.md#tobacco-one-standard-error-selection) demonstrates this case and
 shows the minimum row, horizontal threshold, and recommended row in the component-path figure.
 
-### Result-object recommendations
+### Search-owned selection rules
 
 `PiPLSSearchCV.select()` returns complete immutable stored rows for these choices without fitting:
 

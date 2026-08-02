@@ -38,8 +38,9 @@ and later retired by Decision 0125 after its development-validation purpose had 
 - pipeline-aware `PiPLSSearchCV` for triangular `(n_components, predictor_rank)` search;
 - the direct pre-release `PiPLSSearchCV` public name and `src/pipls/search.py` implementation,
   with no former-name alias and unchanged component-path result terminology;
-- immutable `PiPLSComponentPath` row arrays with path-wide policy and split-count scalars, derived
-  fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
+- immutable `PiPLSComponentPath` row arrays with path-wide policy and split-count scalars plus
+  derived fold-based CV-MSE standard errors; selected rows are resolved through
+  `PiPLSSearchCV.select()`;
 - explicit post-fit full-data refitting and selection-conditioned OOF reporting from a named rule
   or manually chosen component-path row, with exact split reuse and global `best_*` evidence kept
   separate from each post-fit choice;
@@ -266,8 +267,8 @@ Additional fixed decisions:
   PLS-style fitted attributes remain top-level.
 - `PiPLSSearchCV` is a path evaluator rather than a delegated fitted model. Post-fit `refit()`
   requires exactly one named rule or one component count, returns a fitted clone, and leaves search
-  evidence unchanged. Decision 0140 authorizes a pending non-mutating `select()` operation using the
-  same vocabulary and resolver. `best_*` remains the global configured-score optimum.
+  evidence unchanged. Non-mutating `select()` uses the same vocabulary and resolver to return one
+  immutable stored row. `best_*` remains the global configured-score optimum.
   Output-container configuration remains carried by the estimator template and returned clone.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
@@ -510,27 +511,25 @@ those pages target the final vocabulary once.
 Decision 0140 authorizes a four-patch public-API transition:
 
 1. establish the decision and guide-layer target;
-2. add non-mutating `PiPLSSearchCV.select()`, consolidate the private resolver, and retain current
-   path-level methods temporarily;
+2. add non-mutating `PiPLSSearchCV.select()`, consolidate the private resolver, and protect parity
+   during consumer migration;
 3. migrate maintained examples, renderers, tests, and living documentation to `search.select(...)`;
-4. remove `for_n_components()`, `minimum_cv_mse_result()`, and
-   `one_standard_error_result()` from `PiPLSComponentPath`, then close the transition with
-   active-surface audits.
+4. remove the three public selected-row methods from `PiPLSComponentPath`, relocate their durable
+   contracts to the search boundary, and close the transition with active-surface audits.
 
-The final boundary makes `component_path_` aligned numerical evidence only. `select()`, `refit()`,
+The final boundary makes the component path aligned numerical evidence only. `select()`, `refit()`,
 and `validation_report()` share exactly one rule/component-count vocabulary and one resolver.
 Selection numerics, tie behavior, final fitting, and OOF semantics do not change.
 
-Current status: **Patches 1 through 3 complete; final removal pending**. `PiPLSSearchCV.select()`
-is implemented, uses the shared `SelectionRule` vocabulary, and is now used by every maintained
-example, tutorial renderer, test outside the focused component-path unit module, and living user
-document. The path-level methods remain only in their implementation and focused unit tests.
+Current status: **complete**. `PiPLSSearchCV.select()` uses the shared `SelectionRule` vocabulary
+and is used by every maintained example, tutorial renderer, and living user document. The path
+object exposes aligned immutable evidence only, while exact selection contracts are tested at the
+search boundary.
 
 ## Current next increment
 
-Decision 0140 Patch 4 is the current next increment: remove the three path-level selection methods,
-relocate their durable numerical contracts to the search-selection boundary, and run final
-active-surface audits.
+Resume Decision 0139 Patch 3: complete the landing-page and reference reframing around the final
+search-owned selection vocabulary.
 
 Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
 available in clean wheel and source-distribution installations, every maintained Pulp consumer uses

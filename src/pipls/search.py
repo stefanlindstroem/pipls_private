@@ -71,7 +71,7 @@ def _default_pipls_template() -> PiPLSRegression:
     return PiPLSRegression(n_components=1, predictor_rank=1)
 
 
-def _component_result_for_n_components(
+def _component_result_at_count(
     path: PiPLSComponentPath,
     n_components: int,
 ) -> PiPLSComponentResult:
@@ -95,16 +95,16 @@ def _component_result_for_n_components(
     return path._result_at_index(index)
 
 
-def _minimum_cv_mse_result(path: PiPLSComponentPath) -> PiPLSComponentResult:
+def _select_minimum_cv_mse(path: PiPLSComponentPath) -> PiPLSComponentResult:
     """Return the first stored path row with minimum mean CV-MSE."""
 
     return path._result_at_index(int(np.argmin(path.cv_mse_mean)))
 
 
-def _one_standard_error_result(path: PiPLSComponentPath) -> PiPLSComponentResult:
+def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSComponentResult:
     """Return the smallest stored component count within one standard error."""
 
-    reference = _minimum_cv_mse_result(path)
+    reference = _select_minimum_cv_mse(path)
     threshold = reference.cv_mse_mean + reference.cv_mse_standard_error
     if not np.isfinite(threshold):
         raise ValueError("The one-standard-error threshold must be finite.")
@@ -710,19 +710,19 @@ class PiPLSSearchCV(
                 "Exactly one of rule and n_components must be supplied."
             )
         if n_components is not None:
-            return _component_result_for_n_components(
+            return _component_result_at_count(
                 self.component_path_,
                 n_components,
             )
         if rule == "best_score":
-            return _component_result_for_n_components(
+            return _component_result_at_count(
                 self.component_path_,
                 self.best_n_components_,
             )
         if rule == "minimum_cv_mse":
-            return _minimum_cv_mse_result(self.component_path_)
+            return _select_minimum_cv_mse(self.component_path_)
         if rule == "one_standard_error":
-            return _one_standard_error_result(self.component_path_)
+            return _select_one_standard_error(self.component_path_)
         raise ValueError(
             'rule must be "best_score", "minimum_cv_mse", or '
             '"one_standard_error".'
@@ -760,7 +760,7 @@ class PiPLSSearchCV(
         """
 
         check_is_fitted(self, attributes=["cv_results_", "component_path_", "n_splits_"])
-        selected = _component_result_for_n_components(
+        selected = _component_result_at_count(
             self.component_path_,
             n_components,
         )

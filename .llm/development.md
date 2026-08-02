@@ -53,8 +53,8 @@
   earlier project history. Do not ship context-free API demonstrations as numbered examples.
 - After path inspection, maintained search examples fit the final full-data model through
   `search.refit(...)`; do not manually transfer the selected predictor rank into a new estimator.
-  Keep scalar path-row lookup only where plotting, reporting, or an explicit recommendation display
-  needs that evidence.
+  Resolve scalar selected rows through `search.select(...)` only where plotting, reporting, or an
+  explicit recommendation display needs that evidence.
 - For real-data examples, form `X` and `Y` visibly in the script. Pulp uses the named public
   `load_pulp()` exception from Decision 0138; Sugarcane, Tobacco, and ordinary user data retain
   explicit reading. Do not introduce a registry, generic loader, metadata-driven runtime path, or

@@ -46,19 +46,19 @@ def test_search_cv_is_public_selection_class() -> None:
 
 def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> None:
     regression = _fixed_estimator()
-    path = PiPLSSearchCV()
+    search = PiPLSSearchCV()
 
     assert regression.n_components == 2
     assert regression.predictor_rank == 3
     assert not hasattr(regression, "cv")
     assert not hasattr(regression, "samples_per_predictor_rank")
-    assert path.samples_per_predictor_rank == 5.0
-    assert path.cv == 5
-    assert path.n_components_values == "all"
-    assert path.scoring == "neg_response_standardized_mse"
-    assert callable(path.select)
-    assert callable(path.refit)
-    assert callable(path.validation_report)
+    assert search.samples_per_predictor_rank == 5.0
+    assert search.cv == 5
+    assert search.n_components_values == "all"
+    assert search.scoring == "neg_response_standardized_mse"
+    assert callable(search.select)
+    assert callable(search.refit)
+    assert callable(search.validation_report)
 
 
 def test_path_defaults_have_stable_signature_and_repr() -> None:

@@ -4,14 +4,17 @@
 
 ### Repository
 
+- Complete the search-owned path-selection transition: remove the three public scalar-selection
+  methods from `PiPLSComponentPath`, retain the path as immutable aligned numerical evidence, and
+  relocate exact minimum, tie, one-standard-error, and boundary contracts to
+  `PiPLSSearchCV.select()` tests.
 - Migrate every maintained scalar path selection to `PiPLSSearchCV.select(...)`: synthetic,
   Pulp, Sugarcane, and Tobacco examples and tutorial renderers now resolve annotation rows
   through the fitted search; public documentation presents `component_path_` as aligned
   numerical evidence and `select()` as the sole selected-row lookup.
 - Add non-mutating `PiPLSSearchCV.select(rule=... or n_components=...)` for inspecting one immutable
   stored path row. Selection inspection, full-data `refit()`, validation reporting, and
-  predictor-rank profile composition now share search-owned selection helpers; the existing
-  path-level lookup methods remain temporarily only for final removal.
+  predictor-rank profile composition now share search-owned selection helpers.
 - Complete the package-owned Pulp transition: move the former repository-facing dataset layout byte-for-byte into the excluded `.llm` development archive, remove Pulp from active repository-dataset and distribution contracts, replace temporary parity tests with package-resource ownership checks, and leave `src/pipls/_data/pulp/` as the sole active matrix location.
 - Migrate every maintained Pulp consumer to `pipls.datasets.load_pulp()`, including the complete
   analysis, Pi-PLS-versus-PLS comparison, tutorial renderer, numerical workflow tests, and served

@@ -165,7 +165,7 @@ not the training matrices.
 |---|---|
 | `PiPLSRegression` | Fit one fixed paired-mode count and retained predictor-subspace dimension |
 | `PiPLSSearchCV` | Evaluate the path, inspect evidence, refit one row, or validate one row explicitly |
-| `component_path_` | Inspect one selected predictor rank for each paired-mode count |
+| `component_path_` | Inspect one conditionally chosen predictor rank for each paired-mode count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one paired-mode count |
 | `validation_report(X, Y, ...)` | Produce ordered OOF diagnostics for one stored path row |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |

@@ -51,7 +51,7 @@ figures. Decision 0139 Patches 1 and 2 have added the renamed Pulp quick start, 
 and the three-page served navigation. Its final landing-page and reference reframing is paused while
 Decision 0140 now provides non-mutating `PiPLSSearchCV.select()` as the search-owned selected-row
 lookup. Every maintained example, tutorial renderer, and living user document uses that operation;
-Patch 4 removes the residual path-level methods from the result object.
+`PiPLSComponentPath` is now limited to aligned numerical evidence and immutable serialization.
 
 Pulp acquisition uses the sole active package resources through `load_pulp()`; Sugarcane
 and Tobacco retain direct repository CSV reading. Pulp also exposes the conditional

@@ -111,7 +111,7 @@ The programming contract is now complete:
 ```text
 search candidate pairs
         ↓
-component_path_ stores one selected predictor rank for each paired-mode count
+component_path_ stores one conditionally chosen predictor rank for each paired-mode count
         ↓
 choose a paired-mode count
         ↓

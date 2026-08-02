@@ -93,7 +93,7 @@ not exceed that threshold. Both annotated rows are obtained through `path_search
 the recommended row also supplies the conditionally selected predictor rank used by the final fixed
 model.
 
-The [result-object recommendation methods](path_analysis.md#result-object-recommendations) describe
+The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) describe
 how the stored row is obtained, and the [component-path API reference](api/path.md) gives the exact
 method surface. The example retrieves the recommendation explicitly for plotting, then applies the
 same named rule through `path_search.refit(...)` for full-data fitting.

@@ -90,8 +90,8 @@ historical tombstone test per removed fitted attribute.
 
 ## Search-owned path-selection transition
 
-Decision 0140 stages a public ownership change without changing selection numerics. Patch 2 now
-protects:
+Decision 0140 completes a public ownership change without changing selection numerics. The test
+surface protects:
 
 - fitted-state enforcement and exactly-one-of validation for `search.select(...)`;
 - parity among `select()`, `refit()`, and `validation_report()` for component counts and all three
@@ -102,12 +102,12 @@ protects:
 - immutable returned results and unchanged search state;
 - invalid, unavailable, nonintegral, and insufficient-split failures;
 - maintained examples and tutorial renderers use `search.select(...)` for every scalar annotation;
-- living documentation presents `component_path_` as numerical evidence and `select()` as the
+- living documentation presents the component path as numerical evidence and `select()` as the
   selected-row lookup;
-- unchanged behavior of the temporarily retained path-level methods in the focused component-path
-  unit module.
+- component-path array validation, immutability, derived standard errors, and pickle stability
+  independently of selection.
 
-Patch 4 removes the path-level methods and relocates their durable numerical tests to the
+The path object has no public selected-row methods. Durable numerical selection tests belong at the
 search-selection boundary. Do not retain one tombstone test per removed method; use positive
 API-surface checks plus a compact active-surface audit.
 

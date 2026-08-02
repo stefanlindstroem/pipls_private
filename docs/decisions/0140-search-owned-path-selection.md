@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation in progress.
+Accepted and implemented.
 
 ## Context
 
@@ -140,11 +140,12 @@ contracts remain in force.
 
 ## Implementation status
 
-Patches 2 and 3 are implemented. `PiPLSSearchCV.select()` is public, the shared rule type is
-`SelectionRule`, and `select()`, `refit()`, `validation_report()`, and predictor-rank profile
-composition use search-owned helpers. Maintained examples, tutorial renderers, tests, and living
-user documentation now use `search.select(...)`. The three path methods remain only in their
-implementation and focused component-path unit tests until Patch 4 removes them.
+All four patches are implemented. `PiPLSSearchCV.select()` is the sole public selected-row lookup,
+the shared rule type is `SelectionRule`, and `select()`, `refit()`, `validation_report()`, and
+predictor-rank profile composition use search-owned helpers. Maintained examples, tutorial
+renderers, tests, and living user documentation use `search.select(...)`. `PiPLSComponentPath`
+contains only aligned numerical evidence, path-wide metadata, derived standard errors, immutable
+serialization behavior, and the private indexed-row constructor used by search internals.
 
 ## Consequences
 
@@ -154,4 +155,4 @@ implementation and focused component-path unit tests until Patch 4 removes them.
 - Users can inspect an automatic named-rule decision without fitting a model.
 - Tutorials no longer teach path-level scalar lookup as a prerequisite for final fitting.
 - Selection numerics and tie behavior do not change.
-- No compatibility aliases or deprecated path methods remain after the final removal patch.
+- No compatibility aliases or deprecated path methods remain.

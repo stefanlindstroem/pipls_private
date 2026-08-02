@@ -974,13 +974,14 @@ Decision 0140 authorizes a four-patch API transition:
 
 1. establish search-owned selected-row lookup in the decision and guide layer;
 2. add non-mutating `PiPLSSearchCV.select()`, consolidate the private resolver, and protect parity
-   while retaining current path-level methods temporarily;
+   during consumer migration;
 3. migrate maintained examples, renderers, tests, and living documentation to `search.select(...)`;
-4. remove the public path-level selection methods and close the transition with stale-surface
+4. reduce `PiPLSComponentPath` to numerical evidence and close the transition with stale-surface
    audits.
 
-Current status: **Patches 1 through 3 complete**. Every maintained consumer uses search-owned
-selection; only the final path-method removal and contract relocation remain.
+Current status: **complete**. Every maintained consumer uses search-owned selection, the path object
+contains no public selection methods, and durable numerical contracts are tested at
+`PiPLSSearchCV.select()`.
 
 The target keeps `PiPLSComponentPath` as aligned numerical evidence and makes `select()`, `refit()`,
 and `validation_report()` share one rule/component-count vocabulary. It changes no selection
@@ -988,9 +989,8 @@ numerics, tie rules, fitting semantics, or OOF provenance.
 
 ## Current next increment
 
-Decision 0140 Patch 4 is the current next increment. It removes the residual path-level methods,
-relocates their durable numerical contracts to `PiPLSSearchCV.select()`, and closes the transition
-with active-surface audits.
+Resume Decision 0139 Patch 3. Reframe the landing page, tutorials, and path reference around the
+completed search-owned selection vocabulary without reopening the selection API.
 
 
 Decision 0138 is fully implemented and no Pulp dataset-transition increment remains. No generic

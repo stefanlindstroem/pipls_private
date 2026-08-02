@@ -44,7 +44,7 @@ predictor and response directions; they are distinct from reconstruction loading
 `PiPLSSearchCV.select()` returns complete stored component rows by component count or by the
 `best_score`, `minimum_cv_mse`, and `one_standard_error` rules without fitting or mutating the
 search. Rule scope and scorer qualification are described under
-[result-object recommendations](../path_analysis.md#result-object-recommendations).
+[search-owned selection rules](../path_analysis.md#search-owned-selection-rules).
 
 Pulp is available as the named package-owned [`load_pulp()`](datasets.md#pipls.datasets.load_pulp)
 dataset. Sugarcane and Tobacco remain repository CSV assets; no generic dataset registry is part of

@@ -121,13 +121,13 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
 
 ## Concise component path
 
-`component_path_` contains one conditionally selected predictor-rank result for each evaluated
+`component_path_` contains one conditionally chosen predictor-rank result for each evaluated
 paired-mode count. Its aligned read-only arrays support complete path plots and comparisons without
 requiring manual masking of `cv_results_`. The predictor-rank policy and validation split count are
 stored once as path-wide scalars rather than repeated in every row. Use `search.select(...)` when a
 complete scalar row is needed for annotation or reporting. See
-[Component-path recommendation methods](../path_analysis.md#result-object-recommendations) for the
-rule definitions and scope.
+[Search-owned selection rules](../path_analysis.md#search-owned-selection-rules) for the rule
+definitions and scope. The path object itself provides no public row-selection methods.
 
 ::: pipls.PiPLSComponentPath
     options:
