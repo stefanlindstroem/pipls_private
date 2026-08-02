@@ -124,10 +124,8 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
 `component_path_` contains one conditionally selected predictor-rank result for each evaluated
 paired-mode count. Its aligned read-only arrays support complete path plots and comparisons without
 requiring manual masking of `cv_results_`. The predictor-rank policy and validation split count are
-stored once as path-wide scalars rather than repeated in every row. During the staged transition,
-the path still provides non-mutating row lookup and recommendation methods; new code should use
-`search.select(...)`. The transitional methods inspect evaluated results only; they do not fit,
-refit, or change `best_*`. See
+stored once as path-wide scalars rather than repeated in every row. Use `search.select(...)` when a
+complete scalar row is needed for annotation or reporting. See
 [Component-path recommendation methods](../path_analysis.md#result-object-recommendations) for the
 rule definitions and scope.
 
@@ -136,15 +134,11 @@ rule definitions and scope.
       show_signature: false
       members:
         - cv_mse_standard_error
-        - minimum_cv_mse_result
-        - one_standard_error_result
-        - for_n_components
 
 ## One component result
 
 `search.select(n_components=h)` returns the frozen scalar row for one evaluated paired-mode count,
 including its conditionally selected predictor rank, score, CV-MSE summary, policy, and split count.
-The path-level lookup remains temporarily for migration parity and will be removed before release.
 
 ::: pipls.PiPLSComponentResult
     options:

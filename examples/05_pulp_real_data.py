@@ -38,7 +38,7 @@ path = path_search.component_path_
 
 # --8<-- [start:select-pulp-parameters]
 # The stored predictor rank minimizes mean CV-MSE for this paired-mode count.
-selected = path.for_n_components(CHOSEN_N_COMPONENTS)
+selected = path_search.select(n_components=CHOSEN_N_COMPONENTS)
 # --8<-- [end:select-pulp-parameters]
 
 # --8<-- [start:plot-pulp-component-path]

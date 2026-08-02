@@ -66,7 +66,7 @@ use case rather than combining unrelated split protocols in one context-free scr
   inspection results in memory, requests OOF predictions through the search validation report,
   and writes five wavelength-aware final PDF figures without generated analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
-  SVD and an explicit application of `one_standard_error_result()`. Its component-path figure shows
+  SVD and explicit `search.select(rule=...)` calls. Its component-path figure shows
   the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row;
   `path_search.refit(..., rule="one_standard_error")` fits that row without manual parameter
   transfer. The workflow
@@ -136,8 +136,8 @@ the tutorial: it uses `component_path_`, retrieves the immutable conditional ran
 predictions through `path_search.validation_report()`, and renders immutable inspection arrays
 directly. Tobacco
 follows the same direct result-to-Matplotlib pattern, but applies the named
-`"one_standard_error"` refit rule. It uses `one_standard_error_result()` and
-`minimum_cv_mse_result()` only to construct the explanatory
+`"one_standard_error"` refit rule. It uses `path_search.select()` with the
+`"minimum_cv_mse"` and `"one_standard_error"` rules to construct the explanatory
 component-path figure and owns its full-SVD configuration, response pagination, and multipage PDF
 output visibly.
 

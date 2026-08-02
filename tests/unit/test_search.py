@@ -316,18 +316,24 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     state_before = dict(search.__dict__)
 
     selected = search.select(n_components=np.int64(2))
-    assert selected == search.component_path_.for_n_components(2)
-    assert search.select(rule="best_score") == search.component_path_.for_n_components(
-        search.best_n_components_
+    assert selected == search.predictor_rank_profile(2).selected_result
+    assert search.select(rule="best_score") == search.select(
+        n_components=search.best_n_components_
     )
-    assert (
-        search.select(rule="minimum_cv_mse")
-        == search.component_path_.minimum_cv_mse_result()
-    )
-    assert (
-        search.select(rule="one_standard_error")
-        == search.component_path_.one_standard_error_result()
-    )
+
+    path = search.component_path_
+    minimum_index = int(np.argmin(path.cv_mse_mean))
+    minimum = search.select(rule="minimum_cv_mse")
+    assert minimum.n_components == int(path.n_components[minimum_index])
+    assert minimum.predictor_rank == int(path.predictor_rank[minimum_index])
+    assert minimum.cv_mse_mean == path.cv_mse_mean[minimum_index]
+
+    threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error
+    eligible_index = int(np.flatnonzero(path.cv_mse_mean <= threshold)[0])
+    one_se = search.select(rule="one_standard_error")
+    assert one_se.n_components == int(path.n_components[eligible_index])
+    assert one_se.predictor_rank == int(path.predictor_rank[eligible_index])
+
     with pytest.raises(FrozenInstanceError):
         selected.n_components = 99  # type: ignore[misc]
 
@@ -360,33 +366,6 @@ def test_post_fit_select_validates_selection_input_and_fitted_state() -> None:
         search.select(n_components=2.0)  # type: ignore[arg-type]
 
 
-def test_search_selection_does_not_call_transitional_path_methods(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    X, Y = _one_standard_error_data()
-    search = PiPLSSearchCV(
-        n_components_values=[1, 2, 3],
-        predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
-        cv=4,
-        n_jobs=1,
-    ).fit(X, Y)
-
-    def fail(*args: object, **kwargs: object) -> None:
-        del args, kwargs
-        raise AssertionError("search selection called a transitional path method")
-
-    monkeypatch.setattr(PiPLSComponentPath, "for_n_components", fail)
-    monkeypatch.setattr(PiPLSComponentPath, "minimum_cv_mse_result", fail)
-    monkeypatch.setattr(PiPLSComponentPath, "one_standard_error_result", fail)
-
-    assert search.select(n_components=2).n_components == 2
-    assert search.select(rule="best_score").n_components == search.best_n_components_
-    assert np.isfinite(search.select(rule="minimum_cv_mse").cv_mse_mean)
-    assert np.isfinite(search.select(rule="one_standard_error").cv_mse_mean)
-    assert search.predictor_rank_profile(2).n_components == 2
-
-
 def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
@@ -416,7 +395,7 @@ def test_post_fit_refit_supports_manual_component_selection() -> None:
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
-    expected = search.component_path_.for_n_components(2)
+    expected = search.select(n_components=2)
 
     model = search.refit(X, Y, n_components=2)
 
@@ -457,7 +436,7 @@ def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> No
         "n_jobs": 1,
     }
     baseline = PiPLSSearchCV(**search_kwargs).fit(X, Y)
-    minimum_components = baseline.component_path_.minimum_cv_mse_result().n_components
+    minimum_components = baseline.select(rule="minimum_cv_mse").n_components
     favored_components = 3 if minimum_components != 3 else 1
 
     def component_scorer(

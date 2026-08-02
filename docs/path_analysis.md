@@ -242,16 +242,15 @@ least two validation splits so that the reference-row standard error is defined.
 The associated predictor rank is the rank already selected conditionally for that component count
 under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an
 estimator, mutate the search object, or alter `best_*`. With a nondefault scorer, the stored
-predictor rank need not minimize CV-MSE within its component-count profile. The transitional
-path-level recommendation and row-lookup methods remain available until maintained consumers
-migrate, but new code should use `search.select(...)`.
+predictor rank need not minimize CV-MSE within its component-count profile. Maintained workflows
+use `search.select(...)` for scalar annotations and reporting, while `component_path_` remains the
+aligned numerical curve.
 
-The Tobacco workflow still uses the transitional path methods during this implementation stage,
-then applies the same named rule independently through both `refit()` and `validation_report()`.
-The next migration patch moves its annotations and the other maintained scalar lookups to
-`search.select(...)`. Conditional predictor-rank profiles use the same standard-error bars for
-scale, but the stored predictor rank for each component count continues to maximize the configured
-mean CV score rather than applying the 1-SE rule.
+The Tobacco workflow resolves both the minimum row and the one-standard-error recommendation
+through `search.select(...)`, then applies the same named 1-SE rule independently through both
+`refit()` and `validation_report()`. Conditional predictor-rank profiles use the same standard-error
+bars for scale, but the stored predictor rank for each component count continues to maximize the
+configured mean CV score rather than applying the 1-SE rule.
 
 ## Post-fit final-model selection
 

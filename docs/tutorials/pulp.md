@@ -103,8 +103,8 @@ present demonstration keeps the elbow choice explicit rather than declaring an a
 selection rule. The diamond marks the stated choice.
 
 The selected row contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at
-three components under the seeded shuffled folds. `for_n_components()` retrieves that evaluated
-row; it does not repeat the optimization or fit the final model.
+three components under the seeded shuffled folds. `path_search.select()` retrieves that evaluated
+row for inspection; it does not repeat the optimization or fit the final model.
 
 ### Conditional predictor-rank profile
 

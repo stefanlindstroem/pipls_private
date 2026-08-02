@@ -74,8 +74,8 @@ already contains its conditionally selected predictor rank $r_\pi^*(h)$:
 --8<-- "examples/02_synthetic_path_selection.py:evaluate-synthetic-path"
 ```
 
-This tutorial chooses `CHOSEN_N_COMPONENTS=2`. The call to `for_n_components()` only retrieves the
-stored row; it does not perform another search and it does not fit the final model.
+This tutorial chooses `CHOSEN_N_COMPONENTS=2`. The call to `search.select()` retrieves the
+stored row for inspection; it does not perform another search and it does not fit the final model.
 
 The component path is plotted before fitting:
 

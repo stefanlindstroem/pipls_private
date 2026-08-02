@@ -290,7 +290,7 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
         ),
         (
             "07_tobacco_real_data.py",
-            {"minimum_cv_mse_result", "observation_diagnostics", "one_standard_error_result"},
+            {"observation_diagnostics"},
             {
                 "path_search.component_path_",
                 "factors.predictor_directions",
@@ -327,6 +327,7 @@ def test_real_data_examples_use_direct_public_results(
     assert {
         "PiPLSSearchCV",
         "refit",
+        "select",
         "validation_report",
         "savefig",
         "subplots",
@@ -351,11 +352,7 @@ def test_real_data_examples_use_direct_public_results(
         ("06_sugarcane_real_data.py", set()),
         (
             "07_tobacco_real_data.py",
-            {
-                "minimum_cv_mse_result",
-                "observation_diagnostics",
-                "one_standard_error_result",
-            },
+            {"observation_diagnostics"},
         ),
     ],
 )
@@ -372,6 +369,7 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
         "PiPLSSearchCV",
         "read_csv",
         "refit",
+        "select",
         "validation_report",
         *_INSPECTION_CALLS,
         *extra_analysis_calls,
@@ -427,6 +425,28 @@ def test_numbered_examples_keep_dataset_io_and_analysis_in_memory() -> None:
 
 
 
+def test_maintained_path_annotations_use_search_owned_selection() -> None:
+    repository = _repository_root()
+    paths = (
+        repository / "examples" / "02_synthetic_path_selection.py",
+        repository / "examples" / "05_pulp_real_data.py",
+        repository / "examples" / "06_sugarcane_real_data.py",
+        repository / "examples" / "07_tobacco_real_data.py",
+        repository / "tools" / "render_synthetic_tutorial.py",
+        repository / "tools" / "render_pulp_tutorial.py",
+    )
+    removed_calls = {
+        "for_n_components",
+        "minimum_cv_mse_result",
+        "one_standard_error_result",
+    }
+
+    for path in paths:
+        calls = _call_names(_tree(path))
+        assert "select" in calls, path
+        assert calls.isdisjoint(removed_calls), path
+
+
 def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     tree = _tree(_repository_root() / "examples" / "07_tobacco_real_data.py")
     calls = _call_names(tree)
@@ -434,6 +454,13 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     regression_calls = _calls_with_name(tree, "PiPLSRegression")
     assert len(regression_calls) == 1
     assert _keyword_string(regression_calls[0], "svd_solver") == "full"
+
+    select_calls = _calls_with_name(tree, "select")
+    assert len(select_calls) == 2
+    assert {_keyword_string(call, "rule") for call in select_calls} == {
+        "minimum_cv_mse",
+        "one_standard_error",
+    }
 
     refit_calls = _calls_with_name(tree, "refit")
     assert len(refit_calls) == 1

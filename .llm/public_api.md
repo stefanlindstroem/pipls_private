@@ -197,10 +197,10 @@ are not public fitted state. Advanced users can inspect aligned `cv_results_` co
 `mean_test_score`, `cv_mse_mean`, and `cv_mse_fold_sd` arrays. The predictor-rank policy and number of
 validation splits are path-wide Python scalars. It derives the aligned read-only
 `cv_mse_standard_error` array from the stored population fold SD and shared split count. New code
-retrieves one complete stored row through `search.select(...)`. The path-level
-`for_n_components()`, `minimum_cv_mse_result()`, and `one_standard_error_result()` methods remain
-temporarily for migration parity and preserve their exact stored-value, tie, standard-error, and
-error contracts until Patch 4 removes them.
+retrieves one complete stored row through `search.select(...)`. Maintained consumers and living
+documentation use no path-level scalar selection. The three former path-selection methods remain
+temporarily only in their implementation and focused component-path unit tests until Patch 4
+removes them.
 
 `best_index_`, `best_score_`, `best_params_`, `best_n_components_`, and
 `best_predictor_rank_` always describe the global configured-score optimum. They are search evidence,
@@ -219,11 +219,11 @@ add another fitted attribute or stored selected-row representation. It exposes a
 maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
 mean response-standardized CV-MSE.
 
-Decision 0140 Patch 2 is implemented. `search.select(rule=... or n_components=...)` is the new
-search-owned selected-row lookup, the shared private rule vocabulary is `SelectionRule`, and
+Decision 0140 Patches 2 and 3 are implemented. `search.select(rule=... or n_components=...)` is
+the search-owned selected-row lookup, the shared private rule vocabulary is `SelectionRule`, and
 selection inspection, refitting, validation reporting, and predictor-rank profile composition use
-search-owned helpers. The path-level methods remain temporarily until maintained consumers migrate
-in Patch 3 and are removed in Patch 4.
+search-owned helpers. Maintained consumers have migrated; Patch 4 removes the residual path-level
+methods and relocates their durable numerical tests.
 
 All five top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSValidationReport`) validate direct

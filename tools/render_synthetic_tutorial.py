@@ -79,7 +79,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     )
     search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
     path = search.component_path_
-    selected = path.for_n_components(CHOSEN_N_COMPONENTS)
+    selected = search.select(n_components=CHOSEN_N_COMPONENTS)
 
     figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
     axis.errorbar(

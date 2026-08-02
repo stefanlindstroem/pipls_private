@@ -169,8 +169,8 @@ plan contains an earlier or more general proposal:
   exposes no constructor boolean, selected fitted-model state, or delegated model methods;
   explicit post-fit `validation_report()` now reuses exact stored split indices without rescoring
   candidates or mutating search; constructor-selected report controls and state are removed;
-- Decision 0140 implements search-owned `select()` and schedules migration followed by removal of
-  path-level scalar selection methods; the current path methods remain temporarily for parity;
+- Decision 0140 implements search-owned `select()`; maintained consumers have migrated, and the
+  residual path-level scalar selection methods remain temporarily only for final removal;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,

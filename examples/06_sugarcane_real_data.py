@@ -269,7 +269,7 @@ def main() -> None:
     # Evaluate the Pi-PLS component path over paired-mode counts.
     path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
     path = path_search.component_path_
-    selected = path.for_n_components(CHOSEN_N_COMPONENTS)
+    selected = path_search.select(n_components=CHOSEN_N_COMPONENTS)
 
     # Fit the chosen component-path row on the full data.
     model = path_search.refit(

@@ -40,7 +40,7 @@ def test_synthetic_example_owns_the_short_selection_workflow() -> None:
     assert "make_pipls_train_test(" in source
     assert "KFold(n_splits=5, shuffle=True, random_state=0)" in source
     assert "PiPLSSearchCV(cv=CV).fit(train.X, train.Y)" in source
-    assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in source
+    assert "search.select(n_components=CHOSEN_N_COMPONENTS)" in source
     assert "search.predictor_rank_profile(selected.n_components)" in source
     assert "model = search.refit(" in source
     assert "n_components=CHOSEN_N_COMPONENTS" in source

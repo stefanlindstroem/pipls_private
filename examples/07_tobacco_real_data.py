@@ -375,8 +375,8 @@ def main() -> None:
         cv=CV,
     ).fit(X, Y)
     path = path_search.component_path_
-    minimum = path.minimum_cv_mse_result()
-    selected = path.one_standard_error_result()
+    minimum = path_search.select(rule="minimum_cv_mse")
+    selected = path_search.select(rule="one_standard_error")
     one_se_threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error
     display_components = tuple(
         range(min(DISPLAY_COMPONENT_COUNT, selected.n_components))

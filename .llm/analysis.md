@@ -161,8 +161,8 @@ but must not reproduce the tutorial analysis or embed its generated figures.
 
 Decision 0140 has implemented search-owned selected-row lookup:
 `search.select(rule=... or n_components=...)` now shares the same private resolver as `refit()` and
-`validation_report()`, while `component_path_` remains aligned numerical evidence. Existing
-path-level methods remain temporarily for consumer migration.
+`validation_report()`, while `component_path_` remains aligned numerical evidence. Maintained
+consumers now use `search.select(...)`; residual path methods remain only for final removal.
 
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
 `load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible

@@ -273,10 +273,11 @@ Additional fixed decisions:
   `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
 - Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
   separate fixed model
-  after a visible component-path choice. Pulp and Sugarcane use explicit counts, while Tobacco
-  uses `one_standard_error_result()` for path annotation. All three use `component_path_`, explicit
-  search validation reports, and inspection results directly in memory. All three use direct fixed
-  estimators. `best_params_` remains a convenience, not the required user decision.
+  after a visible component-path choice. Pulp and Sugarcane use explicit component counts, while
+  Tobacco resolves its minimum and 1-SE annotation rows through `path_search.select(rule=...)`.
+  All three use `component_path_`, explicit search validation reports, and inspection results
+  directly in memory. All three use direct fixed estimators. `best_params_` remains a convenience,
+  not the required user decision.
 - Refit coefficients and fitted-model methods are accessed on the direct estimator or pipeline
   returned by `search.refit(...)`. No fitted model is attached to `PiPLSSearchCV`, and coefficients
   are not flattened onto search state when preprocessing may change the feature space.
@@ -520,16 +521,16 @@ The final boundary makes `component_path_` aligned numerical evidence only. `sel
 and `validation_report()` share exactly one rule/component-count vocabulary and one resolver.
 Selection numerics, tie behavior, final fitting, and OOF semantics do not change.
 
-Current status: **Patches 1 and 2 complete; consumer migration pending**. `PiPLSSearchCV.select()`
-is implemented, uses the shared `SelectionRule` vocabulary, and shares search-owned helpers with
-`refit()`, `validation_report()`, and predictor-rank profile composition. The path-level methods
-remain temporarily for migration parity.
+Current status: **Patches 1 through 3 complete; final removal pending**. `PiPLSSearchCV.select()`
+is implemented, uses the shared `SelectionRule` vocabulary, and is now used by every maintained
+example, tutorial renderer, test outside the focused component-path unit module, and living user
+document. The path-level methods remain only in their implementation and focused unit tests.
 
 ## Current next increment
 
-Decision 0140 Patch 3 is the current next increment: migrate maintained examples, tutorial
-renderers, tests, and living documentation from path-level selection calls to `search.select(...)`
-without yet removing the transitional methods.
+Decision 0140 Patch 4 is the current next increment: remove the three path-level selection methods,
+relocate their durable numerical contracts to the search-selection boundary, and run final
+active-surface audits.
 
 Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
 available in clean wheel and source-distribution installations, every maintained Pulp consumer uses

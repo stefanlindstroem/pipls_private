@@ -268,7 +268,7 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
 
     assert search.best_n_components_ == 2
     assert search.best_predictor_rank_ == 3
-    selected = search.component_path_.for_n_components(2)
+    selected = search.select(n_components=2)
     assert selected.predictor_rank == 3
     assert isinstance(model, PiPLSRegression)
     np.testing.assert_allclose(model.predict(X), direct.predict(X))
@@ -323,7 +323,7 @@ def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
-    expected = search.component_path_.one_standard_error_result()
+    expected = search.select(rule="one_standard_error")
     model = search.refit(X, Y, rule="one_standard_error")
 
     assert isinstance(model, Pipeline)
@@ -505,7 +505,7 @@ def test_path_search_diagnostics_and_refitted_model_are_sklearn_like() -> None:
     } <= search.cv_results_.keys()
     assert search.component_path_.predictor_rank_policy == "fixed"
     assert isinstance(search.component_path_, PiPLSComponentPath)
-    assert search.component_path_.for_n_components(2).predictor_rank == 3
+    assert search.select(n_components=2).predictor_rank == 3
     x_scores, y_scores = model.transform(X, Y)
     X_reconstructed, Y_reconstructed = model.inverse_transform(x_scores, y_scores)
     direct_X, direct_Y = _fixed_estimator().fit(X, Y).inverse_transform(

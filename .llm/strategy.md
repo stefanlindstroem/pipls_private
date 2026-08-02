@@ -712,15 +712,15 @@ Decision 0107 adds exact stored-value minimum-CV-MSE and one-standard-error meth
 refitting, mutation, comparison tolerances, or redundant state. A restrained follow-through
 documents the methods in `docs/path_analysis.md` and the generated API route while keeping the
 README, documentation home, tutorials, and renderers on explicit component choices. Decision 0108
-then uses `one_standard_error_result()` in the advanced Tobacco workflow while retaining explicit
-choices in the introductory and other numbered examples. Decision 0109 completes that demonstration
+then initially uses a path-level 1-SE lookup in the advanced Tobacco workflow while retaining
+explicit choices in the introductory and other numbered examples. Decision 0109 completes that
+demonstration
 with the minimum row, horizontal 1-SE threshold, recommended row, and direct documentation
 cross-links.
 
-Current status: **implementation, reference documentation, and one focused Tobacco application
-complete; the example catalogue and repository example overview are synchronized. The result
-methods remain absent from tutorials and entry pages, while Decision 0111 separately documents an
-explicit path-level selection rule**.
+Current status: **historical implementation complete and superseded at the public ownership
+boundary by Decision 0140**. The Tobacco demonstration now resolves its minimum and 1-SE rows
+through `search.select(...)`; the path object is retained as numerical evidence only.
 
 ### Response-anchored factor display
 
@@ -979,18 +979,19 @@ Decision 0140 authorizes a four-patch API transition:
 4. remove the public path-level selection methods and close the transition with stale-surface
    audits.
 
+Current status: **Patches 1 through 3 complete**. Every maintained consumer uses search-owned
+selection; only the final path-method removal and contract relocation remain.
+
 The target keeps `PiPLSComponentPath` as aligned numerical evidence and makes `select()`, `refit()`,
 and `validation_report()` share one rule/component-count vocabulary. It changes no selection
 numerics, tie rules, fitting semantics, or OOF provenance.
 
-Current status: **Patches 1 and 2 complete; migration pending**. `PiPLSSearchCV.select()` and the
-shared `SelectionRule` resolver are implemented. The path methods remain only as a temporary public
-parity surface.
-
 ## Current next increment
 
-Decision 0140 Patch 3 is the current next increment. It migrates maintained examples, renderers,
-tests, and living documentation to `search.select(...)` without yet removing the path methods.
+Decision 0140 Patch 4 is the current next increment. It removes the residual path-level methods,
+relocates their durable numerical contracts to `PiPLSSearchCV.select()`, and closes the transition
+with active-surface audits.
+
 
 Decision 0138 is fully implemented and no Pulp dataset-transition increment remains. No generic
 dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.

@@ -117,10 +117,10 @@ Y_pred = model.predict(X_test)
 ```
 
 For every evaluated component count, the default search selects the predictor rank that minimizes
-mean response-standardized CV-MSE. `refit(..., n_components=h)` transfers that stored pair into a
-fitted clone without requiring the user to copy `predictor_rank`. Use `path.for_n_components(h)`
-when the scalar row itself is needed for annotation or reporting, and use
-`search.predictor_rank_profile(h)` to inspect all ranks evaluated at one component count.
+mean response-standardized CV-MSE. `refit(..., n_components=h)` transfers that stored pair into a fitted clone without requiring
+the user to copy `predictor_rank`. Use `search.select(n_components=h)` when the scalar row
+itself is needed for annotation or reporting, and use `search.predictor_rank_profile(h)` to
+inspect all ranks evaluated at one component count.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
 predictor-rank plots. The [path-selection reference](docs/api/path.md) and

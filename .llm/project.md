@@ -50,8 +50,8 @@ explicit search validation reports, keep inspection results in memory, and write
 figures. Decision 0139 Patches 1 and 2 have added the renamed Pulp quick start, its rendered tutorial,
 and the three-page served navigation. Its final landing-page and reference reframing is paused while
 Decision 0140 now provides non-mutating `PiPLSSearchCV.select()` as the search-owned selected-row
-lookup. The current examples and tutorials still use path-level methods temporarily; Patch 3 must
-migrate them before Patch 4 removes that surface.
+lookup. Every maintained example, tutorial renderer, and living user document uses that operation;
+Patch 4 removes the residual path-level methods from the result object.
 
 Pulp acquisition uses the sole active package resources through `load_pulp()`; Sugarcane
 and Tobacco retain direct repository CSV reading. Pulp also exposes the conditional

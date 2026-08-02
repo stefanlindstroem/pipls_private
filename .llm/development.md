@@ -135,11 +135,11 @@
 - Preserve `cv_mse_fold_sd` as descriptive population fold dispersion. Maintained CV-MSE figures
   use the derived `cv_mse_standard_error` for symmetric $\pm 1$ standard-error bars that can support
   the conventional one-standard-error (1-SE) heuristic. Selection lookup must not fit, refit, or
-  mutate search state. Decision 0140 now assigns that ownership to `search.select(...)`; until
-  consumer migration completes, the current path-level methods remain as temporary parity methods.
-  Example 07 continues to show the minimum row, horizontal 1-SE threshold, and recommended row, but
-  its final form must resolve both annotations through the fitted search. Keep maintained examples,
-  tutorial snippets, generated API pages, and cross-links synchronized with the implemented stage.
+  mutate search state. Decision 0140 assigns that ownership to `search.select(...)`, and all
+  maintained examples, tutorial snippets, and living API pages now use that operation. Example 07
+  shows the minimum row, horizontal 1-SE threshold, and recommended row by resolving both
+  annotations through the fitted search. Keep generated pages and cross-links synchronized with
+  the implemented stage.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.

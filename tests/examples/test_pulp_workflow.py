@@ -28,7 +28,7 @@ def pulp_result() -> SimpleNamespace:
     cv = KFold(n_splits=5, shuffle=True, random_state=0)
     path_search = PiPLSSearchCV(cv=cv).fit(X, Y)
     component_path = path_search.component_path_
-    selected = component_path.for_n_components(3)
+    selected = path_search.select(n_components=3)
 
     rank_profile = path_search.predictor_rank_profile(selected.n_components)
 
@@ -129,8 +129,8 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
     assert result.structure.n_components == result.selected.n_components
 
 
-def test_pulp_scalar_lookup_requires_an_evaluated_component_count(
+def test_pulp_selection_requires_an_evaluated_component_count(
     pulp_result: SimpleNamespace,
 ) -> None:
     with pytest.raises(ValueError, match="was not evaluated"):
-        pulp_result.component_path.for_n_components(99)
+        pulp_result.path_search.select(n_components=99)

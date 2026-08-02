@@ -167,7 +167,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
 
     path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
     component_path = path_search.component_path_
-    selected = component_path.for_n_components(CHOSEN_N_COMPONENTS)
+    selected = path_search.select(n_components=CHOSEN_N_COMPONENTS)
     display_components = tuple(range(CHOSEN_N_COMPONENTS))
 
     _render_component_path(

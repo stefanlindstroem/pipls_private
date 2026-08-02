@@ -140,10 +140,11 @@ contracts remain in force.
 
 ## Implementation status
 
-Patch 2 is implemented. `PiPLSSearchCV.select()` is public, the shared rule type is
+Patches 2 and 3 are implemented. `PiPLSSearchCV.select()` is public, the shared rule type is
 `SelectionRule`, and `select()`, `refit()`, `validation_report()`, and predictor-rank profile
-composition use search-owned helpers rather than the path-level methods. The three path methods
-remain temporarily so maintained consumers can migrate in Patch 3 before removal in Patch 4.
+composition use search-owned helpers. Maintained examples, tutorial renderers, tests, and living
+user documentation now use `search.select(...)`. The three path methods remain only in their
+implementation and focused component-path unit tests until Patch 4 removes them.
 
 ## Consequences
 

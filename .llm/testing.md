@@ -101,12 +101,15 @@ protects:
 - custom-scorer separation between `"best_score"` and `"minimum_cv_mse"`;
 - immutable returned results and unchanged search state;
 - invalid, unavailable, nonintegral, and insufficient-split failures;
-- unchanged behavior of the temporarily retained path-level methods.
+- maintained examples and tutorial renderers use `search.select(...)` for every scalar annotation;
+- living documentation presents `component_path_` as numerical evidence and `select()` as the
+  selected-row lookup;
+- unchanged behavior of the temporarily retained path-level methods in the focused component-path
+  unit module.
 
-Patch 3 must move maintained consumer contracts to `search.select(...)`. Patch 4 removes the
-path-level methods and relocates their durable numerical tests to the search-selection boundary. Do not retain
-one tombstone test per removed method; use positive API-surface checks plus a compact active-surface
-audit.
+Patch 4 removes the path-level methods and relocates their durable numerical tests to the
+search-selection boundary. Do not retain one tombstone test per removed method; use positive
+API-surface checks plus a compact active-surface audit.
 
 ## Three-stage onboarding transition
 

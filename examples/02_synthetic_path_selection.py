@@ -37,7 +37,7 @@ train, test = make_pipls_train_test(
 # --8<-- [start:evaluate-synthetic-path]
 search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
 path = search.component_path_
-selected = path.for_n_components(CHOSEN_N_COMPONENTS)
+selected = search.select(n_components=CHOSEN_N_COMPONENTS)
 # --8<-- [end:evaluate-synthetic-path]
 
 # --8<-- [start:plot-synthetic-component-path]

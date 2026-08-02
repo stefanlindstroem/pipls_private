@@ -28,7 +28,7 @@ predictor and response directions; they are distinct from reconstruction loading
 | Object | Obtained from | Main purpose |
 |---|---|---|
 | [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
-| [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | `search.select(...)`, a transitional path lookup, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
+| [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | `search.select(...)` or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
 | [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
 | [`PiPLSValidationReport`](path.md#pipls.PiPLSValidationReport) | `search.validation_report(X, Y, ...)` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
 | [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
@@ -43,8 +43,7 @@ predictor and response directions; they are distinct from reconstruction loading
 
 `PiPLSSearchCV.select()` returns complete stored component rows by component count or by the
 `best_score`, `minimum_cv_mse`, and `one_standard_error` rules without fitting or mutating the
-search. The equivalent path-level methods remain temporarily during migration. Rule scope and
-scorer qualification are described under
+search. Rule scope and scorer qualification are described under
 [result-object recommendations](../path_analysis.md#result-object-recommendations).
 
 Pulp is available as the named package-owned [`load_pulp()`](datasets.md#pipls.datasets.load_pulp)

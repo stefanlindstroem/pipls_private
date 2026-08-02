@@ -494,7 +494,7 @@ def test_readme_and_contributing_have_distinct_audiences() -> None:
     for public_workflow in (
         "PiPLSRegression",
         "PiPLSSearchCV",
-        "for_n_components",
+        "search.select",
         "../../deployments/github-pages",
         "docs/tutorials/quick_start.md",
         "docs/tutorials/synthetic.md",
