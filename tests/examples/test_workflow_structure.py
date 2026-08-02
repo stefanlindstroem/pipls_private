@@ -120,6 +120,25 @@ def _assigned_call_path(tree: ast.AST, target_name: str) -> str | None:
     return None
 
 
+def _assigned_call_argument_path(
+    tree: ast.AST,
+    target_name: str,
+    argument_index: int,
+) -> str | None:
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name) or target.id != target_name:
+            continue
+        if not isinstance(node.value, ast.Call):
+            return None
+        if argument_index >= len(node.value.args):
+            return None
+        return _attribute_path(node.value.args[argument_index])
+    return None
+
+
 def _assigned_value_path(tree: ast.AST, target_name: str) -> str | None:
     for node in ast.walk(tree):
         if not isinstance(node, ast.Assign) or len(node.targets) != 1:
@@ -292,15 +311,17 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
         ),
         (
             "06_sugarcane_real_data.py",
-            set(),
+            {"predictor_rank_profile"},
             {
                 "search.component_path_",
+                "rank_profile.selected_result",
                 "factors.predictor_directions",
                 "structure.x_scores",
                 "diagnostics.observed_standardized",
             },
             {
                 "component_path.pdf",
+                "predictor_rank_profile.pdf",
                 "pipls_factors.pdf",
                 "prediction_diagnostics.pdf",
                 "latent_structure.pdf",
@@ -311,9 +332,10 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
         ),
         (
             "07_tobacco_real_data.py",
-            {"observation_diagnostics"},
+            {"observation_diagnostics", "predictor_rank_profile"},
             {
                 "search.component_path_",
+                "rank_profile.selected_result",
                 "factors.predictor_directions",
                 "structure.x_scores",
                 "diagnostics.observed_standardized",
@@ -322,6 +344,7 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
             },
             {
                 "component_path.pdf",
+                "predictor_rank_profile.pdf",
                 "pipls_factors.pdf",
                 "prediction_diagnostics.pdf",
                 "latent_structure.pdf",
@@ -370,10 +393,10 @@ def test_real_data_examples_use_direct_public_results(
 @pytest.mark.parametrize(
     ("filename", "extra_analysis_calls"),
     [
-        ("06_sugarcane_real_data.py", set()),
+        ("06_sugarcane_real_data.py", {"predictor_rank_profile"}),
         (
             "07_tobacco_real_data.py",
-            {"observation_diagnostics"},
+            {"observation_diagnostics", "predictor_rank_profile"},
         ),
     ],
 )
@@ -459,6 +482,25 @@ def test_maintained_path_annotations_use_search_owned_selection() -> None:
     for path in paths:
         calls = _call_names(_tree(path))
         assert "select" in calls, path
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "06_sugarcane_real_data.py",
+        "07_tobacco_real_data.py",
+    ],
+)
+def test_spectral_examples_extract_rank_profile_at_selected_component_count(
+    filename: str,
+) -> None:
+    tree = _tree(_repository_root() / "examples" / filename)
+
+    assert _assigned_call_path(tree, "rank_profile") == "search.predictor_rank_profile"
+    assert (
+        _assigned_call_argument_path(tree, "rank_profile", 0)
+        == "selected.n_components"
+    )
 
 
 def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:

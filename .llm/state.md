@@ -82,9 +82,10 @@ and later retired by Decision 0125 after its development-validation purpose had 
   observation diagnostics are plotted from immutable arrays with ordinary Matplotlib;
 - direct Pi-PLS factor rendering from immutable `PiPLSDisplayFactors` arrays with ordinary
   Matplotlib; the package exposes no plotting submodule or convenience renderer;
-- direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, fixed-model
-  OOF predictions, and immutable inspection results in memory and write explicit final PDF figures;
-  Sugarcane and Tobacco separate `main()`-owned analysis from private same-file rendering;
+- direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, conditional
+  predictor-rank profiles, fixed-model OOF predictions, and immutable inspection results in memory
+  and write six explicit final PDF figures; Sugarcane and Tobacco separate `main()`-owned analysis
+  from private same-file rendering;
 - a two-tier tutorial route: a short deterministic synthetic selection-and-prediction workflow
   from example 02, followed by a focused Pulp real-data workflow from example 05; both use
   checked snippets and deterministic single-chart SVG assets;
@@ -276,7 +277,9 @@ Additional fixed decisions:
   separate fixed model
   after a visible component-path choice. Pulp and Sugarcane use explicit component counts, while
   Tobacco resolves its minimum and 1-SE annotation rows through `search.select(rule=...)`.
-  All three use `component_path_`, explicit search validation reports, and inspection results
+  All three call `search.predictor_rank_profile(selected.n_components)`; for Tobacco the profiled
+  count is therefore the result of the 1-SE rule. All three use `component_path_`, explicit search
+  validation reports, and inspection results
   directly in memory. All three use direct fixed estimators. `best_params_` remains a convenience,
   not the required user decision.
 - Refit coefficients and fitted-model methods are accessed on the direct estimator or pipeline
@@ -526,6 +529,10 @@ Current status: **complete**. `PiPLSSearchCV.select()` uses the shared `Selectio
 and is used by every maintained example, tutorial renderer, and living user document. The path
 object exposes aligned immutable evidence only, while exact selection contracts are tested at the
 search boundary.
+
+Decision 0141 adds `predictor_rank_profile.pdf` to both spectral complete analyses. Sugarcane
+profiles its explicit selected count; Tobacco profiles `selected.n_components` from the
+one-standard-error rule. All three complete real-data workflows now write six PDFs.
 
 ## Current next increment
 

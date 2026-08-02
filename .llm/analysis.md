@@ -164,6 +164,11 @@ Decision 0140 has implemented search-owned selected-row lookup:
 `validation_report()`, while `component_path_` remains aligned numerical evidence. Maintained
 consumers use `search.select(...)`, and the path object exposes no public selected-row operations.
 
+Decision 0141 makes every complete real-data workflow inspect the conditional predictor-rank
+profile at its selected component count. Sugarcane and Tobacco call
+`search.predictor_rank_profile(selected.n_components)`; for Tobacco, `selected` is the row returned
+by the one-standard-error rule.
+
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
 `load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible
 three-component choice,
@@ -376,8 +381,8 @@ contribution plots, and theoretical outlier thresholds require separate decision
 Numbered complete-analysis examples keep immutable numerical results in memory and generate only
 final PDF figures. Physical predictor coordinates remain caller-owned and are never inferred by the package.
 
-Pulp writes six one-page PDFs because it includes a conditional predictor-rank profile. Sugarcane
-writes five one-page PDFs. Tobacco writes five PDFs; its prediction-diagnostic and coefficient files
+Pulp and Sugarcane each write six one-page PDFs, including a conditional predictor-rank profile.
+Tobacco writes six PDFs; its prediction-diagnostic and coefficient files
 each contain three deterministic source-order response pages. The first two pages contain five
 responses and the last page contains the remaining three.
 

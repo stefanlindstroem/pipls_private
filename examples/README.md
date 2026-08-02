@@ -63,13 +63,15 @@ use case rather than combining unrelated split protocols in one context-free scr
   the displayed factors so the tensile-index response is positive, and writes six final PDF
   figures directly from in-memory results.
 - `06_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
-  inspection results in memory, requests OOF predictions through the search validation report,
-  and writes five wavelength-aware final PDF figures without generated analytical CSV files.
+  conditional predictor-rank profile in memory, requests OOF predictions through the search
+  validation report, and writes six wavelength-aware final PDF figures without generated
+  analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD and explicit `search.select(rule=...)` calls. Its component-path figure shows
-  the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row;
-  `search.refit(..., rule="one_standard_error")` fits that row without manual parameter
-  transfer. The workflow
+  the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row. It then calls
+  `search.predictor_rank_profile(selected.n_components)` to inspect the predictor ranks evaluated
+  at the 1-SE-selected component count; `search.refit(..., rule="one_standard_error")` fits that
+  row without manual parameter transfer. The workflow
   then requests selection-conditioned OOF predictions through the same named rule, produces
   decreasing-wavenumber spectral plots,
   deterministic response pagination, and raw observation diagnostics through direct in-memory
@@ -82,9 +84,9 @@ complete scientific sequences directly in the numbered scripts: path evaluation 
 explicit component-count choice, fixed fitting, OOF prediction, immutable inspection results, and
 explicit Matplotlib composition. Tobacco replaces the manual component-count choice with the
 explicit 1-SE recommendation described above while retaining the same separate fixed-fit boundary.
-Pulp writes `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
-`latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Sugarcane writes five
-corresponding figures without a predictor-rank-profile page. Tobacco also writes five final PDFs;
+Pulp, Sugarcane, and Tobacco each write `component_path.pdf`,
+`predictor_rank_profile.pdf`, `pipls_factors.pdf`, `latent_structure.pdf`, `coefficients.pdf`, and
+`prediction_diagnostics.pdf`. For Tobacco,
 `prediction_diagnostics.pdf` and `coefficients.pdf` each contain three source-order response pages.
 `make examples` runs every numbered example in filename order, including the slower
 real-data workflows. It remains separate from `make check`.
@@ -120,15 +122,17 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 
 1. the default path-evaluating `PiPLSSearchCV()` returns `component_path_`, which is plotted directly
    with Matplotlib.
-2. `search.refit(..., n_components=CHOSEN_N_COMPONENTS)` resolves the stored predictor rank
-   and fits the chosen path row on all observations.
-3. `search.validation_report(..., n_components=CHOSEN_N_COMPONENTS)` reuses the exact
-   seeded shuffled folds stored by the search and returns `selection-conditioned OOF predictions`.
-4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return
-   immutable in-memory results; the Pulp factor call anchors component signs to positive `TI`
-   entries.
-5. The script plots latent structure, prediction diagnostics, and $P$, $D$, $Q$, and $QD$ factors
-   directly with Matplotlib and saves the five final figures itself.
+2. `search.select(n_components=CHOSEN_N_COMPONENTS)` retrieves the complete chosen path row.
+3. `search.predictor_rank_profile(selected.n_components)` returns the aligned predictor-rank
+   candidates at that chosen component count for direct plotting.
+4. `search.refit(..., n_components=CHOSEN_N_COMPONENTS)` fits the chosen row on all observations.
+5. `search.validation_report(..., n_components=CHOSEN_N_COMPONENTS)` reuses the exact seeded
+   shuffled folds stored by the search and returns `selection-conditioned OOF predictions`.
+6. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return immutable
+   in-memory results.
+7. The script plots the conditional predictor-rank profile, latent structure, prediction
+   diagnostics, and $P$, $D$, $Q$, and $QD$ factors directly with Matplotlib and saves the six
+   final figures itself.
 
 Pulp is the canonical tutorial workflow. Example 05 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
@@ -138,8 +142,9 @@ directly. Tobacco
 follows the same direct result-to-Matplotlib pattern, but applies the named
 `"one_standard_error"` refit rule. It uses `search.select()` with the
 `"minimum_cv_mse"` and `"one_standard_error"` rules to construct the explanatory
-component-path figure and owns its full-SVD configuration, response pagination, and multipage PDF
-output visibly.
+component-path figure, then passes the 1-SE-selected component count to
+`predictor_rank_profile()`. It owns its full-SVD configuration, response pagination, and
+multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
 figures retain explicit provenance. Numbered examples never serialize analytical results for later

@@ -110,6 +110,7 @@ reference describe the current public behavior directly.
 - [0114: derived prediction diagnostics](0114-derived-prediction-diagnostics.md)
 - [0136: seeded shuffled folds in maintained examples](0136-seeded-shuffled-example-folds.md)
 - [0139: three-stage user onboarding](0139-three-stage-user-onboarding.md)
+- [0141: spectral predictor-rank profile figures](0141-spectral-predictor-rank-profile-figures.md)
 
 ## Repository and documentation policy
 

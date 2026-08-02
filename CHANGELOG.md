@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Add conditional predictor-rank profile extraction and plotting to the complete Sugarcane and
+  Tobacco workflows. Tobacco now demonstrates that the component count returned by the
+  one-standard-error rule can be passed directly to `predictor_rank_profile()`, and both spectral
+  examples write `predictor_rank_profile.pdf` as their sixth final figure.
 - Synchronize the completed search-owned selection boundary across maintainer guidance and
   maintained workflows: retained `PiPLSSearchCV` objects are consistently named `search`, path
   artifacts are described only as numerical evidence, and structural tests reject the former

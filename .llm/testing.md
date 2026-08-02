@@ -234,11 +234,12 @@ numerical, direct-rendering, and source-distribution execution tests. Protect it
 search/refit call, fitted-value provenance, standardized single-axis plot, and absence of OOF claims;
 do not duplicate Pulp arrays as a second frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
-analyses as duplicate repository scripts. `make examples` is the explicit application-validation
-target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset readability, package-owned Pulp loading and
-numerical behavior, Pulp, Sugarcane, and Tobacco workflow structure, component-path API,
-inspection equations,
-direct rendering from immutable inspection arrays and the immutable ordinary-PLS comparison-helper contract.
+analyses as duplicate repository scripts. `make examples` is the explicit application-validation target and runs every numbered example,
+including the slower Tobacco analysis. Durable tests instead protect repository dataset
+readability, package-owned Pulp loading and numerical behavior, Pulp, Sugarcane, and Tobacco
+workflow structure, component-path API, conditional predictor-rank extraction at the selected
+component count, inspection equations, direct rendering from immutable inspection arrays, and
+the immutable ordinary-PLS comparison-helper contract.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 comparative studies.
 

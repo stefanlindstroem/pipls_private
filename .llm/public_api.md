@@ -397,10 +397,11 @@ component paths directly in memory. Pulp, Sugarcane, and Tobacco use the default
 `KFold(n_splits=5, shuffle=True, random_state=0)` partition materialized by the path search. They
 render immutable Pi-PLS factors, latent structure, observation
 diagnostics, and prediction diagnostics directly with Matplotlib and write only final PDF figures.
-Pulp also reads the conditional predictor-rank profile through `predictor_rank_profile()` for the
-chosen component count. Tobacco uses
+All three complete real-data workflows read the conditional predictor-rank profile through
+`predictor_rank_profile()` at the selected component count. Tobacco obtains that count from the
+one-standard-error rule and uses
 full predictor SVD, direct observation diagnostics, and caller-owned source-order response
 pagination through multipage PDFs.
 
-The package exposes no dataset I/O, tutorial workflow, predictor-rank-profile object, or
-component-path plotting helper. The comparison-only `PLSComponentPath` remains example-local.
+The package exposes no generic real-data I/O, tutorial workflow, predictor-rank-profile plotting
+helper, or component-path plotting helper. The comparison-only `PLSComponentPath` remains example-local.

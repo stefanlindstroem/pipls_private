@@ -16,8 +16,8 @@ the maintained scripts.
 | `03_leave_one_out_validation.py` | Validate a small calibration study with leave-one-out splits and explicit ordered OOF reporting | Printed selected rank pair and immutable validation summary |
 | `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
 | `05_pulp_real_data.py` | Run the complete Pulp selection, rank-profile, inspection, and OOF workflow | Six PDF figures |
-| `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Five PDF figures |
-| `07_tobacco_real_data.py` | Apply the one-standard-error rule in a complete Tobacco spectral workflow | Five PDFs, including multipage diagnostics and coefficients |
+| `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Six PDF figures |
+| `07_tobacco_real_data.py` | Apply the one-standard-error rule in a complete Tobacco spectral workflow | Six PDFs, including a conditional rank profile and multipage reports |
 
 The [path-selection reference](api/path.md) documents the search and post-fit refit operation used
 by example 01. The [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02
@@ -76,11 +76,12 @@ component path and fit one selected fixed model:
   `predictor_rank_profile()`, score-loading
   biplot, fixed-model inspection, and OOF diagnostics;
 - `examples/06_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
-  component path, explicit search validation reporting, wavelength-aware inspection, and five
-  final PDF figures;
+  component path, a conditional predictor-rank profile at the chosen component count, explicit
+  search validation reporting, wavelength-aware inspection, and six final PDF figures;
 - `examples/07_tobacco_real_data.py`: a complete spectral workflow that uses the
   [one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) to recommend
-  the final component count before fixed-model inspection. See the focused explanation below.
+  the final component count, then inspects the conditional predictor-rank profile at that returned
+  count before fixed-model inspection. See the focused explanation below.
 
 ### Tobacco: one-standard-error selection
 
@@ -91,7 +92,10 @@ parsimony heuristic. Its component-path figure marks the minimum-mean-CV-MSE row
 horizontal 1-SE threshold, and marks the smallest evaluated component count whose mean CV-MSE does
 not exceed that threshold. Both annotated rows are obtained through `search.select(rule=...)`;
 the recommended row also supplies the conditionally selected predictor rank used by the final fixed
-model.
+model. The example then calls
+`search.predictor_rank_profile(selected.n_components)` so the 1-SE-selected component count
+becomes the input to the conditional predictor-rank inspection. The profile figure shows every
+rank actually evaluated at that count and marks its conditional CV-MSE minimum.
 
 The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) describe
 how the stored row is obtained, and the [component-path API reference](api/path.md) gives the exact
@@ -100,11 +104,13 @@ same named rule through `search.refit(...)` for full-data fitting.
 
 ## Output artifacts and rendering ownership
 
-Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
-Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered
+Pulp, Sugarcane, and Tobacco each write six final PDF figures, including
+`predictor_rank_profile.pdf`. Tobacco retains three-page prediction-diagnostic and coefficient
+PDFs. No numbered
 example writes a generated CSV file: Pulp is supplied by `load_pulp()`, while Sugarcane and Tobacco
 retain committed `X.csv` and `Y.csv` inputs. Every figure is constructed directly from
-`component_path_`, explicit search validation reports, and immutable inspection results. The Pulp factor view anchors every component to a positive tensile-
+`component_path_`, conditional predictor-rank profiles, explicit search validation reports, and
+immutable inspection results. The Pulp factor view anchors every component to a positive tensile-
 index (`TI`) response entry; Sugarcane and Tobacco retain the default predictor-based orientation.
 The example layer owns Matplotlib chart construction, physical coordinates, subplot layouts,
 legends, figure-level titles, PDF output, and closing. Pi-PLS factor panels use the same direct

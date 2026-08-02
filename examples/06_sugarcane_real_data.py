@@ -8,7 +8,7 @@ import pandas as pd
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
-from pipls import PiPLSComponentPath, PiPLSSearchCV
+from pipls import PiPLSComponentPath, PiPLSPredictorRankProfile, PiPLSSearchCV
 from pipls.inspection import (
     LatentStructure,
     PiPLSDisplayFactors,
@@ -43,6 +43,44 @@ def _plot_component_path(path: PiPLSComponentPath, output_path: Path) -> None:
     upper = float(np.max(path.cv_mse_mean + path.cv_mse_standard_error))
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
+    figure.savefig(output_path)
+    plt.close(figure)
+
+
+def _plot_predictor_rank_profile(
+    profile: PiPLSPredictorRankProfile,
+    output_path: Path,
+) -> None:
+    figure, axis = plt.subplots(
+        figsize=(7.0, 4.5),
+        layout="constrained",
+    )
+    axis.errorbar(
+        profile.predictor_rank,
+        profile.cv_mse_mean,
+        yerr=profile.cv_mse_standard_error,
+        fmt="o-",
+        capsize=4,
+    )
+    axis.scatter(
+        [profile.selected_result.predictor_rank],
+        [profile.selected_result.cv_mse_mean],
+        marker="D",
+        s=70,
+        label=f"CV-MSE minimum: rank {profile.selected_result.predictor_rank}",
+        zorder=3,
+    )
+    axis.set_xlabel("Predictor rank")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+    axis.set_title(
+        rf"Sugarcane $\Pi$-PLS predictor-rank profile at "
+        f"{profile.n_components} components"
+    )
+    axis.set_xticks(profile.predictor_rank)
+    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_standard_error))
+    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
+    axis.grid(axis="y", alpha=0.25)
+    axis.legend()
     figure.savefig(output_path)
     plt.close(figure)
 
@@ -270,6 +308,7 @@ def main() -> None:
     search = PiPLSSearchCV(cv=CV).fit(X, Y)
     path = search.component_path_
     selected = search.select(n_components=CHOSEN_N_COMPONENTS)
+    rank_profile = search.predictor_rank_profile(selected.n_components)
 
     # Fit the chosen component-path row on the full data.
     model = search.refit(
@@ -299,6 +338,10 @@ def main() -> None:
 
     # Render the final reports from completed public result objects.
     _plot_component_path(path, ANALYSIS_DIR / "component_path.pdf")
+    _plot_predictor_rank_profile(
+        rank_profile,
+        ANALYSIS_DIR / "predictor_rank_profile.pdf",
+    )
     _plot_pipls_factors(
         factors,
         wavelengths,
@@ -329,6 +372,12 @@ def main() -> None:
     print(
         "Selected Pi-PLS: "
         f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
+    )
+    print(
+        "Predictor-rank profile: "
+        f"evaluated {rank_profile.predictor_rank[0]} to "
+        f"{rank_profile.predictor_rank[-1]}; "
+        f"selected rank {rank_profile.selected_result.predictor_rank}"
     )
     print(f"Wrote PDF figures to {ANALYSIS_DIR}")
 

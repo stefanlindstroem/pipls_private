@@ -172,9 +172,9 @@ implementing or reviewing this surface.
   PLS (NIPALS) paths and direct comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS
   paths, explicit search validation reports, immutable inspection results, and explicit final
   figures.
-  Sugarcane and Tobacco keep rendering functions in their numbered scripts; Pulp additionally
-  owns its
-  conditional predictor-rank profile and tutorial snippets. Their pandas, Matplotlib, and optional
+  Sugarcane and Tobacco keep rendering functions in their numbered scripts; all three complete
+  real-data workflows own conditional predictor-rank profile figures, while Pulp additionally
+  owns tutorial snippets. Their pandas, Matplotlib, and optional
   `adjustText` requirements are grouped in the `examples` extra and repeated in `dev` for complete
   repository validation. The `docs` extra owns the strict site and tutorial-rendering toolchain.
   There is no dataset-access extra: the named Pulp loader is runtime package data, while the

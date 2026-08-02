@@ -55,3 +55,9 @@ Decisions 0067, 0079--0083, 0118, and 0127 otherwise remain in force.
   source-order pagination, raw observation diagnostics, and the existing five-file PDF inventory.
 - Pulp remains the sequential tutorial reference.
 - No package API, numerical calculation, output filename, page grouping, or visual content changes.
+
+## Subsequent refinement
+
+Decision 0141 adds `predictor_rank_profile.pdf` to both spectral workflows. It supersedes only
+the five-file artifact inventory stated above; the same-file computation/rendering boundary
+remains unchanged.

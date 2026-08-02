@@ -146,6 +146,7 @@ This index is navigation, not a substitute for those records.
 | `0138-package-owned-pulp-dataset-loader.md` | package-owned Pulp dataset loader | provide one installed immutable `load_pulp()` dataset and archive the former repository layout without a duplicate active copy |
 | `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
 | `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
+| `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot the conditional rank profile at the selected component count, including the Tobacco 1-SE result |
 
 ## Implemented estimator/search transition
 
@@ -171,6 +172,8 @@ plan contains an earlier or more general proposal:
   candidates or mutating search; constructor-selected report controls and state are removed;
 - Decision 0140 implements search-owned `select()` as the sole public selected-row lookup;
   `PiPLSComponentPath` is aligned numerical evidence rather than a selection service;
+- Decision 0141 adds conditional predictor-rank profile figures to the Sugarcane and Tobacco
+  workflows, with Tobacco deriving the profiled component count from its 1-SE selection;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
@@ -260,8 +263,9 @@ plan contains an earlier or more general proposal:
   fold-based standard error. Maintained examples keep component choice visible, while a named
   post-fit rule may automate the final choice after path evaluation;
 - example 04 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
-  dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with Pulp exposing
-  the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,
+  dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with all three
+  exposing conditional predictor-rank profiles and Tobacco preserving full-SVD
+  spectral plots,
   source-order response pagination, and raw observation diagnostics; randomized SVD is covered by
   focused randomized-SVD tests;
 - Python 3.10–3.14 are supported; runtime metadata admits NumPy 1.26--2.x,
