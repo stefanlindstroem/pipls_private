@@ -901,11 +901,31 @@ changes.
 
 Current status: **example-catalogue heading-scope cleanup complete**.
 
+### Post-fit inspect-decide-refit transition
+
+Decision 0137 authorizes a five-patch pre-release transition:
+
+1. establish the target lifecycle in the guide layer;
+2. add post-fit `refit()` while retaining the current lifecycle temporarily;
+3. add explicit post-fit `validation_report()` using the exact materialized search splits;
+4. remove constructor-time selection/refit/OOF controls, selected-model search state, and delegated
+   fitted-model methods, then update the public API documentation;
+5. migrate maintained examples, tutorial renderers, and final presentation to the new lifecycle.
+
+The target search object owns candidate evaluation and immutable evidence only. Final model fitting
+returns a fitted clone of the direct estimator or terminal-Pi-PLS pipeline. OOF reporting is an
+explicit selected-row diagnostic. The search stores neither training matrices nor returned fitted
+models. Because the package is version `0.0.0`, the completed transition contains no aliases,
+deprecation paths, ignored constructor parameters, or serialized compatibility state.
+
+Current status: **guide-layer decision accepted; implementation pending**.
+
 ## Current next increment
 
-The P1--P5 manuscript-alignment sequence is complete. No further implementation increment is
-preauthorized. The next change should arise from a concrete owner request or another documented
-human-audit finding. Do not prepare or publish a package release.
+Decision 0137 authorizes the inspect-decide-refit transition. The next patch adds post-fit
+`refit()` with shared selection resolution while temporarily retaining the current constructor-time
+selection and refit path. Public user documentation remains on the implemented lifecycle until the
+old surface is removed. Do not prepare or publish a package release during the transition.
 
 ## Maintenance protocol
 

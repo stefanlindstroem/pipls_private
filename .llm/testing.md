@@ -60,6 +60,26 @@ contract, such as the package exposing no plotting API, optional rendering libra
 outside runtime dependencies, or repository datasets remaining outside top-level exports. Do not
 turn every pre-release deletion into a permanent executable tombstone.
 
+## Inspect-decide-refit transition
+
+Decision 0137 changes ownership rather than numerical selection. Tests for the staged transition
+should protect these durable behaviors:
+
+- a fitted search exposes candidate evidence and immutable path/profile views;
+- post-fit `refit()` accepts exactly one named rule or one component count, returns a fitted clone of
+  the configured estimator or pipeline, and leaves the search unchanged;
+- manual component selection uses the conditionally selected predictor rank stored for that path
+  row;
+- `"best_score"`, `"minimum_cv_mse"`, and `"one_standard_error"` resolve through their documented
+  evidence and can differ under a custom scorer;
+- explicit validation reporting reuses the exact materialized search splits, preserves ordered OOF
+  coverage semantics, and does not perform a full-data refit;
+- the search does not retain supplied training matrices or returned fitted estimators.
+
+During the transition, test each implemented stage without treating the temporary coexistence of
+old and new lifecycles as a permanent contract. At final cleanup, prefer positive constructor and
+method-surface tests over one historical tombstone assertion per removed name.
+
 ## Rendering validation boundary
 
 Protect rendering through executable artifact generation, parseable declared outputs, optional

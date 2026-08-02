@@ -50,6 +50,8 @@ reference describe the current public behavior directly.
 - [0132: predicate-style search exhaustiveness name](0132-predicate-search-exhaustiveness-name.md)
 - [0134: type-revealing public result properties](0134-type-revealing-result-properties.md)
 - [0135: specific predictor-rank support warning name](0135-specific-predictor-rank-support-warning.md)
+- [0137: post-fit inspect-decide-refit lifecycle]
+  (0137-post-fit-inspect-decide-refit-lifecycle.md)
 
 ## Validation, data, and benchmarks
 

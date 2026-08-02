@@ -447,11 +447,34 @@ its pre-release fields to `predictor_directions` and `response_directions` witho
 aliases. Standard PLS-style `x_rotations_` and `y_rotations_` remain fitted estimator attributes and
 reference the same read-only arrays.
 
+## Authorized inspect-decide-refit transition
+
+Decision 0137 is accepted but not yet implemented. It authorizes replacing constructor-time final
+selection, optional selected-model refitting, and constructor-owned OOF reporting with an explicit
+post-fit lifecycle:
+
+```python
+search = PiPLSSearchCV(cv=cv).fit(X, Y)
+path = search.component_path_
+profile = search.predictor_rank_profile(n_components=4)
+model = search.refit(X, Y, n_components=4)
+report = search.validation_report(X, Y, n_components=4)
+```
+
+The implemented boundary above remains authoritative until each staged patch lands. Public user
+documentation must continue to describe the implemented API during the transition. The completed
+series removes `selection_rule`, constructor `refit`, `return_oof_predictions`, selected-model
+search attributes, and delegated fitted-model methods without aliases or deprecation machinery.
+
 ## Current next increment
 
-The P1--P5 manuscript-alignment sequence is complete. No further implementation increment is
-preauthorized. The next change should arise from a concrete owner request or another documented
-human-audit finding. Do not prepare or publish a package release.
+The P1--P5 manuscript-alignment sequence is complete. Decision 0137 now authorizes the staged
+inspect-decide-refit transition. The next implementation increment adds post-fit `refit()` while
+temporarily retaining the current constructor-time lifecycle so the new selection resolver, direct
+estimator behavior, and pipeline behavior can be reviewed independently.
+
+Do not update public user documentation to the final lifecycle before the matching implementation
+exists. Do not prepare or publish a package release during the transition.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

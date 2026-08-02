@@ -142,6 +142,7 @@ This index is navigation, not a substitute for those records.
 | `0134-type-revealing-result-properties.md` | type-revealing public result properties | expose explicit result-object, CV-MSE, and boolean predicate names without aliases or numerical changes |
 | `0135-specific-predictor-rank-support-warning.md` | specific predictor-rank support warning name | expose `PredictorRankSupportWarning` without an alias or support-policy change |
 | `0136-seeded-shuffled-example-folds.md` | seeded shuffled example folds | use reproducible shuffled five-fold partitions in maintained examples while leaving package defaults and leave-one-out unchanged |
+| `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select and fit through explicit post-fit `refit()` and `validation_report()` operations |
 
 ## Implemented estimator/search transition
 
@@ -161,8 +162,10 @@ plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
 - `PiPLSSearchCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
-- `PiPLSSearchCV` defaults to selection-only `refit=False`; explicit `selection_rule` chooses the
-  best-score or stored 1-SE row for optional final refitting;
+- the currently implemented search defaults to selection-only `refit=False`, with explicit
+  `selection_rule` for optional constructor-time final refitting; Decision 0137 authorizes its
+  staged replacement by post-fit `refit()` and `validation_report()` operations, after which the
+  constructor controls and selected-model search state are removed without compatibility aliases;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,

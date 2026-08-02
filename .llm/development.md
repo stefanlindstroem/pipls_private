@@ -15,10 +15,16 @@
 
 - Follow scikit-learn estimator conventions for constructor parameters, cloning, validation,
   fitted attributes, feature names, conditional delegation, and scalar `score()`.
-- Keep constructor arguments unchanged; resolve data-dependent values in `fit()`.
+- Keep constructor arguments unchanged unless an accepted decision explicitly changes the public
+  lifecycle. Decision 0137 authorizes staged removal of constructor-time selection, refit, and OOF
+  controls; do not add aliases, ignored arguments, deprecation paths, or fallback state.
 - Keep the fixed numerical core independent from preprocessing, CV, datasets,
   and publication-specific workflows.
 - Reuse the shared private evaluation/search machinery rather than adding a second fold loop.
+- During the Decision 0137 transition, use one private selected-row resolver for post-fit refitting
+  and validation reporting. `refit()` returns a fitted estimator clone and does not mutate search
+  state or retain training data. `validation_report()` reuses the exact splits materialized by the
+  search and does not perform a full-data fit.
 - Preserve current estimator-internal centering/scaling: fit its statistics inside every
   candidate training fold and refit them on the complete training set after selection.
 - Fit every additional learned preprocessing operation inside its matching training fold.
@@ -70,6 +76,9 @@
   documentation pages instead.
 - User guides describe implemented theory and behavior. Do not preserve rejected or unused options
   merely because they appeared in design discussions.
+- During a staged public-API transition, living user documentation must describe the implemented
+  boundary, not a later authorized stage. Guide-layer planning may describe the target explicitly as
+  pending. Update public documentation in the patch that makes the new boundary true.
 - Keep one task-oriented troubleshooting page and one API result-object map. Validate local
   documentation links and anchors generically; do not duplicate explanatory sentences in tests.
 - Present estimator- and helper-returned immutable records as fields to inspect rather than
