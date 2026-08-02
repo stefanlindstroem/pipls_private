@@ -52,6 +52,7 @@ reference describe the current public behavior directly.
 - [0135: specific predictor-rank support warning name](0135-specific-predictor-rank-support-warning.md)
 - [0137: post-fit inspect-decide-refit lifecycle]
   (0137-post-fit-inspect-decide-refit-lifecycle.md)
+- [0140: search-owned path selection](0140-search-owned-path-selection.md)
 
 ## Validation, data, and benchmarks
 

@@ -963,15 +963,34 @@ selection second, and selection-conditioned validation and interpretation third.
 plot remains explicitly a calibration-fit diagnostic. Because the package is unreleased, the old
 example filename and obsolete tutorial claims are removed rather than deprecated.
 
-Current status: **Patch 1 complete; implementation pending**. The governing decision and guide
-contracts are established. Executable examples and living user documentation remain unchanged
-until the next patches implement the target.
+Current status: **Patches 1 and 2 complete; final reframing paused**. The renamed first example,
+rendered Pulp quick start, generated asset contract, and three-page navigation are implemented.
+Patch 3 resumes after Decision 0140 so the landing page, tutorials, and path reference adopt the
+final selection vocabulary once.
+
+### Search-owned path-selection transition
+
+Decision 0140 authorizes a four-patch API transition:
+
+1. establish search-owned selected-row lookup in the decision and guide layer;
+2. add non-mutating `PiPLSSearchCV.select()`, consolidate the private resolver, and protect parity
+   while retaining current path-level methods temporarily;
+3. migrate maintained examples, renderers, tests, and living documentation to `search.select(...)`;
+4. remove the public path-level selection methods and close the transition with stale-surface
+   audits.
+
+The target keeps `PiPLSComponentPath` as aligned numerical evidence and makes `select()`, `refit()`,
+and `validation_report()` share one rule/component-count vocabulary. It changes no selection
+numerics, tie rules, fitting semantics, or OOF provenance.
+
+Current status: **Patch 1 established; implementation pending**. The current path methods remain the
+implemented public API until Patch 2 lands.
 
 ## Current next increment
 
-Decision 0139 Patch 2 is the current next increment. It adds the rendered Pulp quick start,
-renames the first example, integrates the generated asset pipeline, and updates tutorial
-navigation and durable contracts while leaving the broader documentation reframing to Patch 3.
+Decision 0140 Patch 2 is the current next increment. It implements `PiPLSSearchCV.select()`, renames
+the shared rule alias to `SelectionRule`, and consolidates the resolver without yet removing the
+path-level methods.
 
 Decision 0138 is fully implemented and no Pulp dataset-transition increment remains. No generic
 dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.

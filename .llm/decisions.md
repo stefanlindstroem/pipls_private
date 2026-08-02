@@ -145,6 +145,7 @@ This index is navigation, not a substitute for those records.
 | `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select and fit through explicit post-fit `refit()` and `validation_report()` operations |
 | `0138-package-owned-pulp-dataset-loader.md` | package-owned Pulp dataset loader | provide one installed immutable `load_pulp()` dataset and archive the former repository layout without a duplicate active copy |
 | `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
+| `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
 
 ## Implemented estimator/search transition
 
@@ -168,6 +169,9 @@ plan contains an earlier or more general proposal:
   exposes no constructor boolean, selected fitted-model state, or delegated model methods;
   explicit post-fit `validation_report()` now reuses exact stored split indices without rescoring
   candidates or mutating search; constructor-selected report controls and state are removed;
+- Decision 0140 authorizes a pending search-owned `select()` operation and later removal of
+  path-level scalar selection methods; until implementation lands, the current path methods remain
+  the authoritative public lookup surface;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,

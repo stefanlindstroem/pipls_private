@@ -88,6 +88,26 @@ The final surface should be tested through positive constructor and method contr
 compact assertion that removed pre-release constructor controls are rejected. Do not accumulate one
 historical tombstone test per removed fitted attribute.
 
+## Search-owned path-selection transition
+
+Decision 0140 stages a public ownership change without changing selection numerics. Patch 2 must
+protect:
+
+- fitted-state enforcement and exactly-one-of validation for `search.select(...)`;
+- parity among `select()`, `refit()`, and `validation_report()` for component counts and all three
+  named rules;
+- exact stored minimum and tie behavior, minimum-row standard-error use, smallest eligible 1-SE
+  component count, and absence of an added floating-point tolerance;
+- custom-scorer separation between `"best_score"` and `"minimum_cv_mse"`;
+- immutable returned results and unchanged search state;
+- invalid, unavailable, nonintegral, and insufficient-split failures;
+- unchanged behavior of the temporarily retained path-level methods.
+
+Patch 3 moves maintained consumer contracts to `search.select(...)`. Patch 4 removes the path-level
+methods and relocates their durable numerical tests to the search-selection boundary. Do not retain
+one tombstone test per removed method; use positive API-surface checks plus a compact active-surface
+audit.
+
 ## Three-stage onboarding transition
 
 Decision 0139 introduces staged presentation contracts rather than package behavior. Patch 2 now

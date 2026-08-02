@@ -159,6 +159,11 @@ estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md`
 with stable interpretation anchors and without repeating elementary Matplotlib recipes. Example pages may describe script purpose and artifacts
 but must not reproduce the tutorial analysis or embed its generated figures.
 
+Decision 0140 authorizes a pending ownership refinement: `component_path_` remains aligned
+numerical evidence, while `search.select(rule=... or n_components=...)` becomes the sole public
+selected-row lookup shared conceptually with `refit()` and `validation_report()`. Until implementation
+lands, the existing path-level methods remain authoritative.
+
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
 `load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible
 three-component choice,
@@ -175,9 +180,10 @@ artifact-writing example. It owns tutorial-specific figure dimensions, titles, l
 construction, SVG writing, closing, and the generated manifest. Generated tutorial files remain
 derived documentation assets and are not committed.
 
-Decision 0139 Patch 1 records this target only. The existing example filename, renderer set, served
-navigation, and public tutorial pages remain current until Patches 2 and 3 implement and test
-the three-stage route.
+Decision 0139 Patches 1 and 2 implement the renamed quick-start example, rendered first tutorial,
+and three-page served navigation. Its final landing-page and reference reframing is paused while
+Decision 0140 introduces search-owned selected-row lookup. The resumed onboarding patch must use
+`search.select(...)` rather than teaching path-level scalar selection.
 
 Numbered examples are pedagogical scripts, not production applications. Each one must demonstrate a
 recognizable minimal use case or explicit comparison and must be understandable

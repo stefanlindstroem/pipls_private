@@ -266,8 +266,9 @@ Additional fixed decisions:
   PLS-style fitted attributes remain top-level.
 - `PiPLSSearchCV` is a path evaluator rather than a delegated fitted model. Post-fit `refit()`
   requires exactly one named rule or one component count, returns a fitted clone, and leaves search
-  evidence unchanged. `best_*` remains the global configured-score optimum. Output-container
-  configuration remains carried by the estimator template and returned clone.
+  evidence unchanged. Decision 0140 authorizes a pending non-mutating `select()` operation using the
+  same vocabulary and resolver. `best_*` remains the global configured-score optimum.
+  Output-container configuration remains carried by the estimator template and returned clone.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
 - Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
@@ -497,16 +498,36 @@ Pulp selection-conditioned validation and interpretation workflow. The quick sta
 its calibration-fit predictions validation. The transition retains no old example filename,
 duplicate tutorial, or compatibility navigation because the package remains at version `0.0.0`.
 
-Current status: **Patches 1 and 2 complete; final reframing pending**. The maintained first example
+Current status: **Patches 1 and 2 complete; final reframing paused**. The maintained first example
 is now `examples/01_pulp_quick_start.py`, the rendered quick-start tutorial owns one generated SVG
 and semantic manifest, and served navigation presents quick start, synthetic inspection, and
-complete Pulp analysis in that order.
+complete Pulp analysis in that order. Patch 3 resumes after the search-owned selection transition so
+those pages target the final vocabulary once.
+
+## Search-owned path-selection transition
+
+Decision 0140 authorizes a four-patch public-API transition:
+
+1. establish the decision and guide-layer target;
+2. add non-mutating `PiPLSSearchCV.select()`, consolidate the private resolver, and retain current
+   path-level methods temporarily;
+3. migrate maintained examples, renderers, tests, and living documentation to `search.select(...)`;
+4. remove `for_n_components()`, `minimum_cv_mse_result()`, and
+   `one_standard_error_result()` from `PiPLSComponentPath`, then close the transition with
+   active-surface audits.
+
+The final boundary makes `component_path_` aligned numerical evidence only. `select()`, `refit()`,
+and `validation_report()` share exactly one rule/component-count vocabulary and one resolver.
+Selection numerics, tie behavior, final fitting, and OOF semantics do not change.
+
+Current status: **Patch 1 established; implementation pending**. Current path-level methods and
+living public documentation remain authoritative until Patch 2 implements `select()`.
 
 ## Current next increment
 
-Decision 0139 Patch 3 is the current next increment: reframe the landing page, synthetic tutorial,
-path reference, example catalogues, and active OOF terminology around automatic fit,
-inspect-decide-refit, and selection-conditioned validation, then close the transition.
+Decision 0140 Patch 2 is the current next increment: implement `PiPLSSearchCV.select()`, rename the
+shared rule type to `SelectionRule`, consolidate search-owned selection helpers, and add parity and
+immutability tests while temporarily retaining the current path-level methods.
 
 Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
 available in clean wheel and source-distribution installations, every maintained Pulp consumer uses

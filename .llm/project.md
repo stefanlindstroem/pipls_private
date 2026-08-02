@@ -47,13 +47,11 @@ including the complete real-data analyses. Example 04
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
 Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, obtain OOF predictions through
 explicit search validation reports, keep inspection results in memory, and write only final PDF
-figures. Decision 0139 authorizes a pending three-stage onboarding transition. It will add a
-rendered Pulp quick-start tutorial, reposition the synthetic tutorial as inspect-decide-refit,
-retain the
-complete Pulp tutorial for selection-conditioned validation and interpretation, and rename the
-first example without a compatibility copy. Until those two implementation patches land, the
-current filenames, two-page served tutorial route, and living public documentation remain
-authoritative.
+figures. Decision 0139 Patches 1 and 2 have added the renamed Pulp quick start, its rendered tutorial,
+and the three-page served navigation. Its final landing-page and reference reframing is paused while
+Decision 0140 moves selected-row lookup from `PiPLSComponentPath` to a new non-mutating
+`PiPLSSearchCV.select()` operation. Living public documentation remains authoritative until that
+four-patch selection transition is implemented and migrated.
 
 Pulp acquisition uses the sole active package resources through `load_pulp()`; Sugarcane
 and Tobacco retain direct repository CSV reading. Pulp also exposes the conditional

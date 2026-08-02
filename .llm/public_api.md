@@ -212,6 +212,13 @@ add another fitted attribute or stored selected-row representation. It exposes a
 maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
 mean response-standardized CV-MSE.
 
+Decision 0140 authorizes a staged ownership change that is not yet implemented. The target adds
+`search.select(rule=... or n_components=...)` as the sole public selected-row lookup, renames the
+shared private rule vocabulary to `SelectionRule`, and removes `for_n_components()`,
+`minimum_cv_mse_result()`, and `one_standard_error_result()` from `PiPLSComponentPath` after
+maintained consumers migrate. Until the implementation patch lands, the path-level methods above
+remain the current public API and living user documentation must continue to describe them.
+
 All five top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSValidationReport`) validate direct
 construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and
