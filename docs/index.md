@@ -16,12 +16,31 @@ latent modes.
 Across a wide range of synthetic settings and real-world datasets examined during
 development, Pi-PLS typically yields lower CV-MSE than ordinary PLS at a given number of paired latent modes (*cf*. example 04). This is not a general performance claim: no method is universally better.
 
+## Quick start with Pulp
+
+The installed package contains the multivariate Pulp dataset:
+
+```python
+from pipls import PiPLSSearchCV
+from pipls.datasets import load_pulp
+
+X, Y = load_pulp(return_X_y=True)
+model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")
+Y_fitted = model.predict(X)
+```
+
+The first numbered example standardizes the eight response variables and combines all observed and
+fitted values in one plot. This is a compact calibration-fit demonstration: `Y_fitted` comes from
+the same observations used to fit the final model. Use a
+[`validation_report()`](api/path.md#validation-report) for
+selection-conditioned out-of-fold validation.
+
 ## Choose a tutorial
 
-[First Pi-PLS model with synthetic data](tutorials/synthetic.md) is the recommended introduction. It
-shows the complete selection contract in a small deterministic problem: evaluate the component
-path, choose a paired-mode count, retrieve its conditionally selected predictor rank, fit one fixed
-model, and predict an independent test set.
+After the quick start, [First Pi-PLS model with synthetic data](tutorials/synthetic.md) introduces
+the complete selection contract in a small deterministic problem: evaluate the component path,
+choose a paired-mode count, inspect its conditionally selected predictor rank, fit one fixed model,
+and predict an independent test set.
 
 Continue with [Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) for real-data loading,
 fixed-parameter OOF predictions, immutable inspection results, and representative interpretation of

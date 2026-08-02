@@ -40,8 +40,9 @@ carry sufficiently clear redistribution rights. Public navigation now separates 
 validation, and scientific background.
 The former benchmark layer has been retired after serving its development-validation purpose.
 Pulp, Sugarcane, and Tobacco remain component-path examples rather than test-suite executions.
-`make examples` runs every numbered example explicitly, beginning with the literal-matrix
-`01_minimal_fit_and_plot.py`, followed by the synthetic path-selection tutorial example 02, and
+`make examples` runs every numbered example explicitly, beginning with the package-owned Pulp
+quick start in `01_minimal_fit_and_plot.py`, followed by the synthetic path-selection tutorial
+example 02, and
 including the complete real-data analyses. Example 04
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
 Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, obtain OOF predictions through
@@ -154,8 +155,9 @@ implementing or reviewing this surface.
 - `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`, and
   `metadata.yaml` layout with public-only provenance and an explicit source-level redistribution
   grant for the exact included material. No generic runtime registry is required.
-- `examples/`: self-contained numbered user workflows with a literal-matrix quickstart first,
-  followed by an explained synthetic train/test use case, one explicit comparison example, and
+- `examples/`: self-contained numbered user workflows with a package-owned Pulp fitted-value
+  quick start first, followed by an explained synthetic train/test use case, one explicit
+  comparison example, and
   complete Pi-PLS real-data analyses. Advanced splitters are documented rather than combined into a
   context-free numbered script.
   Underscore-prefixed `examples/_support/` contains only the ordinary-PLS path evaluator needed by
@@ -168,8 +170,9 @@ implementing or reviewing this surface.
   conditional predictor-rank profile and tutorial snippets. Their pandas, Matplotlib, and optional
   `adjustText` requirements are grouped in the `examples` extra and repeated in `dev` for complete
   repository validation. The `docs` extra owns the strict site and tutorial-rendering toolchain.
-  There is no dataset-access extra because shipped datasets are ordinary repository CSV assets.
-  CSV. Real-data analyses are not duplicated here.
+  There is no dataset-access extra: the named Pulp loader is runtime package data, while the
+  complete real-data analyses retain their currently assigned repository inputs. Real-data
+  analyses are not duplicated here.
 - `docs/`: the self-contained documentation source, including served user guides, implemented
   theory, generated-API source pages, release notes, local MathJax configuration, and maintainer
   records under `docs/decisions/`. Root `mkdocs.yml` defines the strict Material site and excludes

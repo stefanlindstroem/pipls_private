@@ -45,7 +45,8 @@ and later retired by Decision 0125 after its development-validation purpose had 
   separate from each post-fit choice;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
   `predictor_rank_profile(n_components)`, derived from `cv_results_`;
-- a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
+- a package-owned Pulp first example showing one chained path search and one-standard-error refit,
+  standardized fitted-value diagnostics, and one caller-owned observed-versus-fitted plot;
 - a public documentation entry that defines paired latent variables, component-count scanning,
   and elbow-based CV-MSE interpretation before specialized terminology;
 - shared private fold-evaluation and adaptive-search machinery;
@@ -483,17 +484,17 @@ stored splits for explicit follow-up reporting, and the two post-fit operations.
 ## Current next increment
 
 Decision 0138 authorizes a five-patch transition from the repository-facing Pulp CSV layout to one
-named installed dataset loader. Patches 1 and 2 are complete: `load_pulp()` and the canonical
-package resources are implemented, immutable loader results and exact parity are tested, and clean
-wheel/source-distribution smoke checks exercise the installed resources. The active Pulp example
-and tutorial still read `datasets/pulp/X.csv` and `Y.csv` during this transitional stage.
+named installed dataset loader. Patches 1 through 3 are complete: `load_pulp()` and the canonical
+package resources are implemented, immutable loader results and exact parity are tested, clean
+wheel/source-distribution installations load the data, and the first example plus prominent
+onboarding pages use the compact Pulp fitted-value quick start. The complete Pulp example and
+tutorial still read `datasets/pulp/X.csv` and `Y.csv` during this transitional stage.
 
-The next admissible increment is Patch 3: replace the first example and prominent onboarding
-presentation with a compact Pulp fitted-value quick start that clearly distinguishes calibration
-fit from predictive validation. The repository Pulp files remain temporarily as an exact parity
-source until maintained consumers migrate.
+The next admissible increment is Patch 4: migrate the complete Pulp example, tutorial renderer,
+tests, manifests, and active documentation to `load_pulp()`. The repository Pulp files remain
+temporarily as an exact parity source until maintained consumers migrate.
 
-Patches 4--5 then migrate the complete Pulp workflow and archive
+Patch 5 then archives
 the former repository layout under `.llm/archive/` while removing it from active runtime,
 distribution, documentation, and test ownership. No generic loader, registry, download mechanism,
 `as_frame` option, or compatibility alias is authorized.

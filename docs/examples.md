@@ -1,15 +1,16 @@
 # Examples
 
 The numbered examples are executable workflows organized by programming task. Start with the
-[synthetic tutorial](tutorials/synthetic.md) for the short selection-and-prediction sequence, then
-continue with the [Pulp tutorial](tutorials/pulp.md) for a complete real-data analysis. This page is
-a catalogue of the maintained scripts.
+package-owned Pulp quick start, continue with the [synthetic tutorial](tutorials/synthetic.md) for
+component-path inspection and independent-test prediction, then use the
+[Pulp tutorial](tutorials/pulp.md) for a complete real-data analysis. This page is a catalogue of
+the maintained scripts.
 
 ## Choose an example
 
 | Script | Programming task | Main output |
 |---|---|---|
-| `01_minimal_fit_and_plot.py` | Fit and inspect one known Pi-PLS rank pair from literal NumPy arrays | Printed predictions and `minimal_fit_and_plot.pdf` |
+| `01_minimal_fit_and_plot.py` | Search, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Inspect a component path, select one fixed model, and evaluate independent test predictions | Three PDF figures and printed external-test $R^2$ |
 | `03_leave_one_out_validation.py` | Validate a small calibration study with leave-one-out splits and explicit ordered OOF reporting | Printed selected rank pair and immutable validation summary |
 | `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
@@ -17,9 +18,10 @@ a catalogue of the maintained scripts.
 | `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Five PDF figures |
 | `07_tobacco_real_data.py` | Apply the one-standard-error rule in a complete Tobacco spectral workflow | Five PDFs, including multipage diagnostics and coefficients |
 
-The [fixed-regression reference](api/regression.md) documents the estimator used by example 01.
-The [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02 workflow
-directly. The comparison in example 04 is optional and is not part of routine Pi-PLS fitting.
+The [path-selection reference](api/path.md) documents the search and post-fit refit operation used
+by example 01. The [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02
+workflow directly. The comparison in example 04 is optional and is not part of routine Pi-PLS
+fitting.
 
 ## Run one example
 
@@ -27,7 +29,7 @@ Install the example dependencies and execute a script from the repository root:
 
 ```bash
 python -m pip install ".[examples]"
-python examples/02_synthetic_path_selection.py
+python examples/01_minimal_fit_and_plot.py
 ```
 
 Generated files are written below `examples/results/`.
@@ -44,8 +46,9 @@ workflows and may take substantially longer than the package test suite.
 
 ## Cross-validation partitions
 
-Examples 02 and 04–07 use explicit five-fold shuffled regression splits with
-`KFold(n_splits=5, shuffle=True, random_state=0)`. When an example requests
+Example 01 intentionally uses the scikit-learn-compatible default `cv=5` to keep the opening
+workflow to one search/refit expression. Examples 02 and 04–07 use explicit five-fold shuffled
+regression splits with `KFold(n_splits=5, shuffle=True, random_state=0)`. When an example requests
 selection-conditioned OOF predictions, `validation_report()` reuses the exact partition
 materialized by its path search. Example 03 uses
 `LeaveOneOut`; shuffling is not defined because every observation is held out once. Grouped,

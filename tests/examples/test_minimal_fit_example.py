@@ -7,27 +7,32 @@ def _repository_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
-def test_minimal_example_is_a_literal_fixed_model_workflow() -> None:
+def test_minimal_example_is_the_pulp_search_refit_quick_start() -> None:
     path = _repository_root() / "examples" / "01_minimal_fit_and_plot.py"
     text = path.read_text(encoding="utf-8")
 
-    assert "X = np.array(" in text
-    assert "Y = np.array(" in text
-    assert "PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)" in text
-    assert "predictions = model.predict(X)" in text
-    assert 'print("Predictions:")' in text
+    assert "from pipls import PiPLSSearchCV" in text
+    assert "from pipls.datasets import load_pulp" in text
+    assert "data = load_pulp()" in text
+    assert "X, Y = data.data, data.target" in text
+    assert (
+        'model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")'
+        in text
+    )
+    assert "model.predict(X)" in text
+    assert 'prediction_kind="fitted values"' in text
+    assert "diagnostics.observed_standardized.ravel()" in text
+    assert "diagnostics.predicted_standardized.ravel()" in text
+    assert "diagnostics.standardized_rmse.mean()" in text
+    assert "plt.subplots(" in text
+    assert "axis.scatter(observed, fitted)" in text
+    assert 'axis.plot(limits, limits, "--"' in text
+    assert '"pulp_quick_start.pdf"' in text
     assert 'print(f"Wrote PDF figure to {output_path}")' in text
-    assert "pipls_display_factors(model.decomposition_)" in text
-    assert "plt.subplots(2, 2" in text
-    assert "factors.predictor_directions[:, 0]" in text
-    assert "factors.dilation[0]" in text
-    assert "factors.response_directions[:, 0]" in text
-    assert "factors.weighted_response_directions[:, 0]" in text
-    assert 'predictor_names = ["Temperature", "Pressure", "Flow rate"]' in text
-    assert 'response_names = ["Yield", "Purity"]' in text
-    assert "pipls.plotting" not in text
-    assert "plot_pipls_decomposition" not in text
-    assert "PiPLSSearchCV" not in text
+
+    assert "PiPLSRegression" not in text
+    assert "validation_report" not in text
     assert "KFold" not in text
+    assert "np.array" not in text
     assert "pandas" not in text
     assert "_support" not in text

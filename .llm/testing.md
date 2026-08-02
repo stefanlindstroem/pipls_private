@@ -135,9 +135,11 @@ incidental artist counts. Structural tests should require the absence of a packa
 and public `plot_*` functions, keep Matplotlib and `adjustText` optional, and ensure that example
 support code does not hide chart construction.
 
-Structural tests require every maintained ordinary K-fold example and tutorial renderer to use
-`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly, while the leave-one-out example
-retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane, and Tobacco protect
+Structural tests require maintained analytical ordinary K-fold examples and tutorial renderers to
+use `KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. The compact first example is the
+intentional exception: it uses default `cv=5` to demonstrate the shortest installed-data workflow.
+The leave-one-out example retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane,
+and Tobacco protect
 direct `component_path_` access, explicit `validation_report()`, immutable inspection results,
 explicit Matplotlib
 construction, absence of analytical CSV output, physical coordinate order, and the declared final
@@ -179,8 +181,10 @@ the selected fixed pair, upper-boundary rank profile, aligned validation-report 
 and inspection shapes
 without writing application artifacts.
 
-The minimal numbered example may be protected structurally and through the package-level numerical
-and direct-rendering tests; do not duplicate its arrays as a frozen scientific fixture. Do not execute the
+The minimal numbered example may be protected structurally and through package-level Pulp-loader,
+numerical, direct-rendering, and source-distribution execution tests. Protect its chained
+search/refit call, fitted-value provenance, standardized single-axis plot, and absence of OOF claims;
+do not duplicate Pulp arrays as a second frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
 analyses as duplicate repository scripts. `make examples` is the explicit application-validation
 target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset

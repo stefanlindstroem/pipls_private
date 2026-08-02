@@ -12,15 +12,16 @@ mathematical construction, see `docs/theory.md`.
 
 The examples are arranged by user task rather than by implementation complexity. Each numbered
 script is self-contained: it explains its data, purpose, and printed or written results without
-assuming familiarity with a publication. Start with the literal-matrix fit, then move to synthetic
-data, explicit comparison, or the complete real-data workflows. The complete workflows are
-intentionally more extensive than ordinary estimator use.
+assuming familiarity with a publication. Start with the package-owned Pulp quick start, then move
+to synthetic data, explicit comparison, or the complete real-data workflows. The complete
+workflows are intentionally more extensive than ordinary estimator use.
 
 ## Start here
 
-- `01_minimal_fit_and_plot.py`: literal NumPy matrices, one fixed `PiPLSRegression` fit, predictions,
-  and one caller-composed panel of the $P$, $D$, $Q$, and $QD$ factor plots. It performs no
-  cross-validation or parameter selection.
+- `01_minimal_fit_and_plot.py`: the shortest installed-data workflow. It loads Pulp through
+  `load_pulp()`, evaluates the default component path, applies the one-standard-error rule through
+  `refit()`, and combines all standardized observed and fitted responses in one plot. The plotted
+  values describe full-data calibration fit, not OOF validation.
 - `02_synthetic_path_selection.py`: the short tutorial workflow. It generates independent synthetic
   train/test data, evaluates the component path and conditional predictor-rank profile, fits one
   selected fixed model, and writes three final PDF figures.
@@ -36,13 +37,12 @@ python -m pip install -e ".[examples]"
 PYTHONPATH=src MPLBACKEND=Agg python examples/01_minimal_fit_and_plot.py
 ```
 
-The script writes `examples/results/minimal_fit_and_plot.pdf`. Its predictor and response names are
-ordinary Python lists, demonstrating that plotting labels may come from any explicit metadata
-source rather than from pandas or CSV headers.
+The script writes `examples/results/pulp_quick_start.pdf`. The package loader provides the
+matrices and documentary labels, while the plot uses only the standardized numerical diagnostics.
 
-
-All maintained examples that use five-fold regression CV construct
-`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. The fixed seed makes the examples
+Example 01 intentionally uses the default `cv=5` to keep the first complete search and refit in one
+expression. Maintained analytical examples that use ordinary five-fold regression CV construct
+`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. The fixed seed makes those analyses
 reproducible while preventing row order from defining the folds. Example 03 uses `LeaveOneOut`,
 which exhaustively holds out each observation and therefore has no shuffle option.
 
@@ -102,7 +102,8 @@ uses optional `adjustText` only to reposition its Matplotlib text labels.
 
 ## Real-data workflow contract
 
-The Pulp, Sugarcane, and Tobacco examples show label acquisition as a separate I/O step:
+The complete Pulp, Sugarcane, and Tobacco examples show label acquisition as a separate
+repository-I/O step:
 
 ```python
 X = pd.read_csv(DATA_DIR / "X.csv")
@@ -110,9 +111,12 @@ Y = pd.read_csv(DATA_DIR / "Y.csv")
 response_names = Y.columns.tolist()
 ```
 
-Users whose arrays do not carry column headers can supply equivalent lists from a schema, laboratory
-information system, or other domain metadata. The package inspection API does not read files or invent scientific variable names. The committed datasets already have tested headers and ordering,
-so the numbered examples use them directly instead of repeating repository-integrity checks.
+Example 01 is the explicit exception: `load_pulp()` supplies the installed Pulp matrices and
+labels directly. Users whose arrays do not carry column headers can supply equivalent lists from a
+schema, laboratory information system, or other domain metadata. The package inspection API does
+not read files or invent scientific variable names. The committed complete-workflow datasets have
+tested headers and ordering, so those examples use them directly instead of repeating repository-
+integrity checks.
 
 Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
 comparison figures directly. Sugarcane demonstrates the complete-analysis workflow:

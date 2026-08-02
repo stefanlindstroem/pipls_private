@@ -58,7 +58,7 @@ def test_distribution_helper_builds_once_and_checks_both_artifacts() -> None:
     assert "_check_source_distribution_example" in helper
     assert 'f"pipls[examples] @ {artifact.resolve().as_uri()}"' in helper
     assert 'source / "examples" / "01_minimal_fit_and_plot.py"' in helper
-    assert 'source / "examples" / "results" / "minimal_fit_and_plot.pdf"' in helper
+    assert 'source / "examples" / "results" / "pulp_quick_start.pdf"' in helper
 
 
 def test_distribution_smoke_test_covers_public_installed_behavior() -> None:

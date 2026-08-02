@@ -1,80 +1,51 @@
-"""Fit and inspect one Pi-PLS model from literal NumPy matrices."""
+"""Fit Pi-PLS on the package-owned Pulp data and plot fitted responses."""
 
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 
-from pipls import PiPLSRegression
-from pipls.inspection import pipls_display_factors
+from pipls import PiPLSSearchCV
+from pipls.datasets import load_pulp
+from pipls.inspection import prediction_diagnostics
 
-predictor_names = ["Temperature", "Pressure", "Flow rate"]
-X = np.array(
-    [
-        [1.0, 2.0, 0.5],
-        [2.0, 1.0, 1.0],
-        [3.0, 4.0, 1.5],
-        [4.0, 3.0, 2.0],
-        [5.0, 6.0, 2.5],
-        [6.0, 5.0, 3.0],
-        [7.0, 8.0, 3.5],
-        [8.0, 7.0, 4.0],
-    ]
+data = load_pulp()
+X, Y = data.data, data.target
+
+model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")
+
+diagnostics = prediction_diagnostics(
+    Y,
+    model.predict(X),
+    prediction_kind="fitted values",
 )
+observed = diagnostics.observed_standardized.ravel()
+fitted = diagnostics.predicted_standardized.ravel()
+limits = [
+    min(float(observed.min()), float(fitted.min())),
+    max(float(observed.max()), float(fitted.max())),
+]
+mean_standardized_rmse = float(diagnostics.standardized_rmse.mean())
 
-response_names = ["Yield", "Purity"]
-Y = np.array(
-    [
-        [1.2, 2.0],
-        [1.8, 1.7],
-        [3.1, 3.3],
-        [3.7, 3.0],
-        [5.2, 4.6],
-        [5.8, 4.3],
-        [7.1, 5.9],
-        [7.7, 5.6],
-    ]
+figure, axis = plt.subplots(figsize=(5.8, 5.4), layout="constrained")
+axis.scatter(observed, fitted)
+axis.plot(limits, limits, "--", color="0.4")
+axis.set_xlim(limits)
+axis.set_ylim(limits)
+axis.set_aspect("equal", adjustable="box")
+axis.set_xlabel("Observed response, standardized")
+axis.set_ylabel("Fitted response, standardized")
+axis.set_title(
+    rf"Pulp $\Pi$-PLS fit; mean standardized RMSE = {mean_standardized_rmse:.2f}"
 )
+axis.grid(alpha=0.2)
 
-model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
-predictions = model.predict(X)
-print("Predictions:")
-print(predictions)
-
-factors = pipls_display_factors(model.decomposition_)
-
-figure, axes = plt.subplots(2, 2, figsize=(11.0, 8.0), layout="constrained")
-predictor_positions = np.arange(len(predictor_names))
-axes[0, 0].bar(predictor_positions, factors.predictor_directions[:, 0])
-axes[0, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-axes[0, 0].set_xticks(predictor_positions)
-axes[0, 0].set_xticklabels(predictor_names)
-axes[0, 0].set_xlabel("Predictor")
-axes[0, 0].set_ylabel(r"Predictor direction $P_{:1}$")
-
-axes[0, 1].bar([0], [factors.dilation[0]])
-axes[0, 1].set_xticks([0])
-axes[0, 1].set_xticklabels(["1"])
-axes[0, 1].set_xlabel("Component")
-axes[0, 1].set_ylabel(r"Dilation $d_1$")
-
-response_positions = np.arange(len(response_names))
-axes[1, 0].bar(response_positions, factors.response_directions[:, 0])
-axes[1, 0].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-axes[1, 0].set_xticks(response_positions)
-axes[1, 0].set_xticklabels(response_names)
-axes[1, 0].set_xlabel("Response")
-axes[1, 0].set_ylabel(r"Response direction $Q_{:1}$")
-
-axes[1, 1].bar(response_positions, factors.weighted_response_directions[:, 0])
-axes[1, 1].axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-axes[1, 1].set_xticks(response_positions)
-axes[1, 1].set_xticklabels(response_names)
-axes[1, 1].set_xlabel("Response")
-axes[1, 1].set_ylabel(r"Weighted response direction $d_1Q_{:1}$")
-
-figure.suptitle(r"Minimal $\Pi$-PLS fit")
-output_path = Path(__file__).resolve().parent / "results" / "minimal_fit_and_plot.pdf"
+output_path = Path(__file__).resolve().parent / "results" / "pulp_quick_start.pdf"
 figure.savefig(output_path)
 plt.close(figure)
+
+print(
+    "Selected model: "
+    f"n_components={model.n_components}, predictor_rank={model.predictor_rank}"
+)
+print(f"Mean response-wise standardized RMSE: {mean_standardized_rmse:.3f}")
 print(f"Wrote PDF figure to {output_path}")

@@ -941,19 +941,20 @@ read-only arrays with `return_X_y=True`. It uses package resources and standard-
 performs no network access or preprocessing, adds no pandas or PyYAML runtime dependency, and is
 exported only from `pipls.datasets`. Sugarcane and Tobacco remain repository CSV datasets.
 
-Current status: **Patches 1 and 2 complete**. The package resources and `load_pulp()` are implemented,
-public API documentation covers the loader, exact parity with the temporary repository copy is
-tested, and clean wheel/source-distribution smoke checks exercise installed loading. The maintained
-Pulp examples still use direct repository reading until their assigned migration patches.
+Current status: **Patches 1 through 3 complete**. The package resources and `load_pulp()` are
+implemented, public API documentation covers the loader, exact parity with the temporary repository
+copy is tested, clean wheel/source-distribution smoke checks exercise installed loading, and the
+first example plus prominent onboarding pages use the compact fitted-value quick start. The complete
+Pulp workflow still uses direct repository reading until Patch 4.
 
 ## Current next increment
 
-Decision 0138 is the active owner-authorized transition. The next increment is Patch 3: make the
-package-owned Pulp dataset the first compact fitted-value quick start and update prominent onboarding
-presentation without presenting in-sample fit as predictive validation.
+Decision 0138 is the active owner-authorized transition. The next increment is Patch 4: migrate the
+complete Pulp example, tutorial renderer, manifests, tests, and active documentation to
+`load_pulp()`.
 
-The remaining Pulp migration patches must not be combined with Patch 3. No unrelated release work,
-generic dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.
+The remaining archival work must not be combined with Patch 4. No unrelated release work, generic
+dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.
 
 Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
 validation splits; final models and selection-conditioned OOF reports are produced only by explicit

@@ -24,10 +24,12 @@ in a local checkout.
 
 Start with:
 
-1. [First Pi-PLS model with synthetic data](docs/tutorials/synthetic.md) for the compact selection
-   and independent-test workflow.
-2. [Complete Pulp analysis](docs/tutorials/pulp.md) for real-data loading, fixed-parameter OOF
-   predictions, and representative model interpretation.
+1. [Quick start with Pulp](#quick-start-with-pulp) for one installed real-data fit and one
+   observed-versus-fitted plot.
+2. [First Pi-PLS model with synthetic data](docs/tutorials/synthetic.md) for component-path
+   inspection and independent-test prediction.
+3. [Complete Pulp analysis](docs/tutorials/pulp.md) for selection-conditioned OOF predictions and
+   representative model interpretation.
 
 ## Installation
 
@@ -50,6 +52,30 @@ Development setup and repository validation commands are documented in
 
 Pi-PLS supports Python 3.10 through 3.14 with NumPy `>=1.26,<3`, scikit-learn `>=1.4,<2`, and
 joblib `>=1.2,<2`. See the [compatibility policy](docs/compatibility.md).
+
+## Quick start with Pulp
+
+The package includes the multivariate Pulp dataset, so the shortest complete search and final fit
+requires no external files:
+
+```python
+from pipls import PiPLSSearchCV
+from pipls.datasets import load_pulp
+
+X, Y = load_pulp(return_X_y=True)
+
+model = PiPLSSearchCV().fit(X, Y).refit(
+    X,
+    Y,
+    rule="one_standard_error",
+)
+
+Y_fitted = model.predict(X)
+```
+
+`examples/01_minimal_fit_and_plot.py` standardizes each response and places all observed and fitted
+values in one figure. These are fitted values from the final full-data model, not out-of-fold
+predictions; use `search.validation_report(...)` when predictive validation is required.
 
 ## Fit one known model
 
@@ -144,7 +170,7 @@ not the training matrices.
 | `validation_report(X, Y, ...)` | Produce ordered OOF diagnostics for one stored path row |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
 | Matplotlib | Optionally render those arrays with caller-controlled figures and styling |
-| `pipls.datasets` | Generate deterministic synthetic Pi-PLS data |
+| `pipls.datasets` | Load the package-owned Pulp data or generate deterministic synthetic data |
 
 Pi-PLS intentionally provides no plotting submodule: numerical inspection objects are the stable
 interface, while rendering remains optional and caller-owned. Generated signatures, fitted
@@ -153,11 +179,11 @@ attributes, result shapes, and method contracts are collected in the
 
 ## Examples and reference data
 
-The repository includes maintained examples for synthetic data and for the Pulp, Sugarcane, and
-Tobacco datasets. Real-data examples read `X.csv` and `Y.csv` explicitly and keep analytical
-results in memory. The CSV assets are ordinary repository files; there is no dataset-access extra,
-registry, or package-owned loader. The original sources, licenses, adaptations, and DOI links are
-documented in the [dataset guide](docs/datasets.md).
+The package includes Pulp through the named `pipls.datasets.load_pulp()` loader. The repository
+also contains maintained complete analyses for Pulp, Sugarcane, and Tobacco. Those complete
+workflows read their repository CSV inputs explicitly so data alignment and labels remain visible.
+There is no dataset-access extra or generic registry. Original sources, licenses, adaptations, and
+DOI links are documented in the [dataset guide](docs/datasets.md).
 
 See the [example catalogue](docs/examples.md) for the purpose and outputs of every numbered script.
 Install the `examples` extra before running them.

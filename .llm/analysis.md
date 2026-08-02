@@ -96,9 +96,11 @@ of at least one.
 
 ### `examples/`
 
-`examples/01_minimal_fit_and_plot.py` is the primary onboarding path: literal NumPy matrices, one
-fixed fit, one prediction call, and one caller-composed panel of the four Pi-PLS factor plots. It
-must not depend on the complete workflow helpers, pandas, cross-validation, or parameter selection.
+`examples/01_minimal_fit_and_plot.py` is the primary onboarding path: package-owned Pulp data,
+one chained default path search and one-standard-error refit, one fitted-value prediction call,
+standardized response diagnostics, and one caller-composed observed-versus-fitted plot. It must not
+depend on complete-workflow helpers, pandas, an explicit splitter, or OOF reporting, and its prose
+must identify the predictions as full-data fitted values rather than predictive validation.
 
 The complete real-data examples own scientific orchestration:
 

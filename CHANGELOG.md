@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Replace the literal-matrix first example with a package-owned Pulp quick start that performs the
+  complete search and one-standard-error refit in one expression, plots all responses together on
+  standardized observed-versus-fitted axes, reports mean response-wise standardized RMSE, and
+  labels the result explicitly as full-data calibration fit rather than predictive validation.
 - Add the package-owned `pipls.datasets.load_pulp()` API with immutable labeled and direct-matrix
   return modes, standard-library package-resource loading, embedded provenance and integrity
   metadata, exact parity tests against the temporary repository copy, and clean wheel/source-

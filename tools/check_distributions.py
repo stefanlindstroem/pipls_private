@@ -187,9 +187,11 @@ def _check_source_distribution_example(
         cwd=source,
         env=example_environment,
     )
-    output = source / "examples" / "results" / "minimal_fit_and_plot.pdf"
+    output = source / "examples" / "results" / "pulp_quick_start.pdf"
     if not output.is_file():
-        raise RuntimeError("The source-distribution minimal example did not create its PDF output.")
+        raise RuntimeError(
+            "The source-distribution quick-start example did not create its PDF output."
+        )
 
 
 def _check_installation(
