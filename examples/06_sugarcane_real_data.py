@@ -8,7 +8,7 @@ import pandas as pd
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold, cross_val_predict
 
-from pipls import PiPLSComponentPath, PiPLSRegression, PiPLSSearchCV
+from pipls import PiPLSComponentPath, PiPLSSearchCV
 from pipls.inspection import (
     LatentStructure,
     PiPLSDisplayFactors,
@@ -271,11 +271,12 @@ def main() -> None:
     path = path_search.component_path_
     selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 
-    # Fit the selected full-data model.
-    model = PiPLSRegression(
-        n_components=selected.n_components,
-        predictor_rank=selected.predictor_rank,
-    ).fit(X, Y)
+    # Fit the chosen component-path row on the full data.
+    model = path_search.refit(
+        X,
+        Y,
+        n_components=CHOSEN_N_COMPONENTS,
+    )
 
     # Calculate selection-conditioned out-of-fold predictions.
     oof_predictions = cross_val_predict(

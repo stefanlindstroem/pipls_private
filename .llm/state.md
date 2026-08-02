@@ -479,11 +479,11 @@ stored splits for explicit follow-up reporting, and the two post-fit operations.
 
 ## Current next increment
 
-The next implementation increment migrates maintained examples, tutorial renderers, and final
-presentation to use `search.refit(...)` wherever they currently transfer a selected rank pair into a
-new fixed estimator manually. It also performs the final repository-wide stale-surface scan.
+The five-patch inspect-decide-refit transition is complete. Maintained examples, tutorial renderers,
+and final user presentation use `search.refit(...)` rather than manual selected-rank transfer, and
+the active repository surface contains no compatibility state from the former lifecycle.
 
-Do not prepare or publish a package release before that final presentation migration is complete.
+Any release-preparation work requires a separate owner-authorized increment.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

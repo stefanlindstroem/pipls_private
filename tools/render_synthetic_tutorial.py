@@ -24,7 +24,7 @@ import numpy as np  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 from sklearn.model_selection import KFold  # noqa: E402
 
-from pipls import PiPLSRegression, PiPLSSearchCV  # noqa: E402
+from pipls import PiPLSSearchCV  # noqa: E402
 from pipls.datasets import make_pipls_train_test  # noqa: E402
 from pipls.inspection import prediction_diagnostics  # noqa: E402
 
@@ -139,10 +139,11 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     axis.legend()
     _save_svg(figure, output_dir / "predictor_rank_profile.svg")
 
-    model = PiPLSRegression(
-        n_components=selected.n_components,
-        predictor_rank=selected.predictor_rank,
-    ).fit(train.X, train.Y)
+    model = search.refit(
+        train.X,
+        train.Y,
+        n_components=CHOSEN_N_COMPONENTS,
+    )
     predictions = model.predict(test.X)
     diagnostics = prediction_diagnostics(
         test.Y,

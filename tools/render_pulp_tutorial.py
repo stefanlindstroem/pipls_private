@@ -32,7 +32,6 @@ from pipls import (  # noqa: E402
     PiPLSComponentPath,
     PiPLSComponentResult,
     PiPLSPredictorRankProfile,
-    PiPLSRegression,
     PiPLSSearchCV,
 )
 from pipls.inspection import (  # noqa: E402
@@ -177,16 +176,17 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         selected=selected,
         output_path=output_dir / "component_path.svg",
     )
-    rank_profile = path_search.predictor_rank_profile(selected.n_components)
+    rank_profile = path_search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
     _render_predictor_rank_profile(
         rank_profile,
         output_path=output_dir / "predictor_rank_profile.svg",
     )
 
-    model = PiPLSRegression(
-        n_components=selected.n_components,
-        predictor_rank=selected.predictor_rank,
-    ).fit(X, Y)
+    model = path_search.refit(
+        X,
+        Y,
+        n_components=CHOSEN_N_COMPONENTS,
+    )
     oof_predictions = cross_val_predict(
         model,
         X,

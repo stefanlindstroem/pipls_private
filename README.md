@@ -80,21 +80,21 @@ from pipls import PiPLSSearchCV
 search = PiPLSSearchCV().fit(X_train, Y_train)
 path = search.component_path_
 
-selected = path.for_n_components(2)
-
+# Inspect path.cv_mse_mean and search.predictor_rank_profile(2).
 model = search.refit(
     X_train,
     Y_train,
-    n_components=selected.n_components,
+    n_components=2,
 )
 
 Y_pred = model.predict(X_test)
 ```
 
 For every evaluated component count, the default search selects the predictor rank that minimizes
-mean response-standardized CV-MSE. `for_n_components()` retrieves that evaluated pair; it does not
-repeat the optimization. Use `search.predictor_rank_profile(h)` to inspect all ranks evaluated at
-one component count.
+mean response-standardized CV-MSE. `refit(..., n_components=h)` transfers that stored pair into a
+fitted clone without requiring the user to copy `predictor_rank`. Use `path.for_n_components(h)`
+when the scalar row itself is needed for annotation or reporting, and use
+`search.predictor_rank_profile(h)` to inspect all ranks evaluated at one component count.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
 predictor-rank plots. The [path-selection reference](docs/api/path.md) and
@@ -126,7 +126,7 @@ validation splits materialized by `fit()`:
 report = search.validation_report(
     X_train,
     Y_train,
-    n_components=selected.n_components,
+    n_components=2,
 )
 ```
 

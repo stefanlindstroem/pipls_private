@@ -38,10 +38,11 @@ def pulp_result() -> SimpleNamespace:
 
     rank_profile = path_search.predictor_rank_profile(selected.n_components)
 
-    model = PiPLSRegression(
-        n_components=selected.n_components,
-        predictor_rank=selected.predictor_rank,
-    ).fit(X, Y)
+    model = path_search.refit(
+        X,
+        Y,
+        n_components=3,
+    )
     oof_predictions = cross_val_predict(
         model,
         X,

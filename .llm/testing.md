@@ -76,7 +76,9 @@ behaviors:
   evidence and can differ under a custom scorer;
 - explicit validation reporting reuses the exact materialized search splits, preserves ordered OOF
   coverage semantics, and does not perform a full-data refit;
-- the search does not retain supplied training matrices or returned fitted estimators.
+- the search does not retain supplied training matrices or returned fitted estimators;
+- maintained search examples and tutorial renderers use `search.refit(...)` rather than manually
+  reconstructing the selected fixed estimator.
 
 The explicit report stage must additionally test single-use splitters, defensive read-only split
 copies, unchanged scorer-call counts, one-dimensional response shape, repeated and partial coverage,

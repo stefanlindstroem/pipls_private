@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import KFold
 
-from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls import PiPLSSearchCV
 from pipls.datasets import make_pipls_train_test
 from pipls.inspection import prediction_diagnostics
 
@@ -101,10 +101,11 @@ plt.close(figure)
 # --8<-- [end:plot-synthetic-rank-profile]
 
 # --8<-- [start:fit-predict-synthetic-model]
-model = PiPLSRegression(
-    n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(train.X, train.Y)
+model = search.refit(
+    train.X,
+    train.Y,
+    n_components=CHOSEN_N_COMPONENTS,
+)
 
 test_predictions = model.predict(test.X)
 diagnostics = prediction_diagnostics(

@@ -12,8 +12,8 @@ You will:
 1. generate independent training and test observations;
 2. evaluate a cross-validated component path;
 3. choose a paired-mode count;
-4. retrieve the predictor rank selected at that count;
-5. fit one fixed `PiPLSRegression` model;
+4. inspect the predictor rank selected at that count;
+5. refit the chosen path row on all training observations;
 6. predict the independent test responses.
 
 The tutorial deliberately stops after one prediction plot. Scores, loadings, Pi-PLS factorization
@@ -101,9 +101,9 @@ component_path_ stores one selected predictor rank for each paired-mode count
         ↓
 choose a paired-mode count
         ↓
-for_n_components(h) returns [h, r_pi*(h)]
+search.refit(..., n_components=h) resolves [h, r_pi*(h)]
         ↓
-fit one fixed PiPLSRegression model
+fit and return one fixed PiPLSRegression model
 ```
 
 ## Fit the selected model and predict
@@ -128,20 +128,25 @@ For ordinary use, the essential sequence is:
 ```python
 from sklearn.model_selection import KFold
 
+from pipls import PiPLSSearchCV
+
 cv = KFold(n_splits=5, shuffle=True, random_state=0)
 search = PiPLSSearchCV(cv=cv).fit(X_train, Y_train)
-selected = search.component_path_.for_n_components(chosen_n_components)
 
-model = PiPLSRegression(
-    n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(X_train, Y_train)
+# Inspect search.component_path_ and, when useful, the conditional rank profile.
+model = search.refit(
+    X_train,
+    Y_train,
+    n_components=chosen_n_components,
+)
 
 Y_pred = model.predict(X_test)
 ```
 
-`PiPLSSearchCV` owns model selection. `PiPLSRegression` represents one fixed selected model. Keeping
-those roles separate makes the workflow explicit and modifiable.
+`PiPLSSearchCV` owns model selection and the evidence used to inspect it. `refit()` transfers one
+stored path row into a fitted `PiPLSRegression` without making the user copy the associated predictor
+rank manually. Keeping the search variable preserves the complete path; the returned estimator owns
+prediction and fitted-model inspection.
 
 ## Continue with real data
 

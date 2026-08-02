@@ -292,9 +292,9 @@ def test_real_data_examples_use_direct_public_results(
     attributes = _attribute_paths(tree)
 
     assert {
-        "PiPLSRegression",
         "PiPLSSearchCV",
         "cross_val_predict",
+        "refit",
         "savefig",
         "subplots",
         *_INSPECTION_CALLS,
@@ -337,10 +337,10 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
     main = functions["main"]
 
     analysis_calls = {
-        "PiPLSRegression",
         "PiPLSSearchCV",
         "cross_val_predict",
         "read_csv",
+        "refit",
         *_INSPECTION_CALLS,
         *extra_analysis_calls,
     }
@@ -400,8 +400,12 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     calls = _call_names(tree)
 
     regression_calls = _calls_with_name(tree, "PiPLSRegression")
-    assert regression_calls
-    assert all(_keyword_string(call, "svd_solver") == "full" for call in regression_calls)
+    assert len(regression_calls) == 1
+    assert _keyword_string(regression_calls[0], "svd_solver") == "full"
+
+    refit_calls = _calls_with_name(tree, "refit")
+    assert len(refit_calls) == 1
+    assert _keyword_string(refit_calls[0], "rule") == "one_standard_error"
 
     search_calls = _calls_with_name(tree, "PiPLSSearchCV")
     assert any(_keyword_string(call, "search_method") == "auto" for call in search_calls)

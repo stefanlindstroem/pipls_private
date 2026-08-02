@@ -89,8 +89,8 @@ used by the final fixed model.
 
 The [result-object recommendation methods](path_analysis.md#result-object-recommendations) describe
 how the stored row is obtained, and the [component-path API reference](api/path.md) gives the exact
-method surface. The example calls the result method explicitly so that the recommendation remains visible before
-fixed-model fitting.
+method surface. The example retrieves the recommendation explicitly for plotting, then applies the
+same named rule through `path_search.refit(...)` for full-data fitting.
 
 ## Output artifacts and rendering ownership
 

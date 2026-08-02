@@ -134,7 +134,7 @@ This index is navigation, not a substitute for those records.
 | `0126-historical-removal-test-policy.md` | historical-removal test policy | retain negative tests for current boundaries, not one tombstone per pre-release removal |
 | `0127-artifact-based-rendering-validation.md` | artifact-based rendering validation | protect rendering ownership, numerical meaning, and generated artifacts without exact Matplotlib source locks |
 | `0128-same-file-rendering-functions.md` | same-file rendering functions | keep complete-example analysis in `main()` while private functions in the numbered script own rendering and report writing |
-| `0129-remove-pre-release-search-aliases.md` | pre-release search alias removal | expose only `selected_estimator_` and `selected_pipls_` for the one refitted model; retain candidate-level `best_*` diagnostics |
+| `0129-remove-pre-release-search-aliases.md` | pre-release search alias removal | historical fitted-model alias cleanup, superseded by Decision 0137; retain candidate-level `best_*` diagnostics |
 | `0130-mathematical-decomposition-field-names.md` | mathematical decomposition field names | expose `predictor_directions` and `response_directions` without pre-release aliases; retain standard PLS-style estimator rotation attributes |
 | `0131-concise-response-standardized-mse-names.md` | concise response-standardized MSE names | expose concise public scorer callables and stable default scorer string without aliases or numerical changes |
 | `0132-predicate-search-exhaustiveness-name.md` | predicate-style search exhaustiveness name | expose `search_is_exhaustive_` as the completed-search coverage predicate without an alias or behavioral change |

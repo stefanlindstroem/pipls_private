@@ -12,11 +12,13 @@ predictor rank for each paired-mode count and exposes the concise result through
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
-selected = search.component_path_.for_n_components(2)
+path = search.component_path_
+model = search.refit(X, Y, n_components=2)
 ```
 
-Continue with the [synthetic tutorial](tutorials/synthetic.md) or the
-[path-selection reference](api/path.md).
+Inspect `path` before choosing the component count. The returned model already uses the
+conditionally selected predictor rank stored for that row. Continue with the
+[synthetic tutorial](tutorials/synthetic.md) or the [path-selection reference](api/path.md).
 
 ## I need to change scaling or the SVD solver during search
 

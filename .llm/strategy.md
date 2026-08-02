@@ -917,16 +917,16 @@ explicit selected-row diagnostic. The search stores neither training matrices no
 models. Because the package is version `0.0.0`, the completed transition contains no aliases,
 deprecation paths, ignored constructor parameters, or serialized compatibility state.
 
-Current status: **public inspect-decide-refit lifecycle implemented without compatibility state**.
+Current status: **complete**. The public lifecycle, maintained examples, tutorial renderers, and
+final presentation use post-fit `refit()` and explicit `validation_report()` without compatibility
+state or manual selected-rank transfer.
 
 ## Current next increment
 
-Decision 0137 now governs the implemented search surface. Post-fit `refit()` and explicit
-`validation_report()` reuse one selected-row resolver; reporting reuses defensive read-only copies
-of the exact materialized split indices. Search owns no selected row, report, fitted final model, or
-delegated model methods. The next patch migrates maintained examples, tutorial renderers, and final
-presentation to this lifecycle and performs the final stale-surface scan. Do not prepare or publish
-a package release before that migration is complete.
+Decision 0137 is fully implemented. Search owns candidate evidence and exact stored validation
+splits; final models and selection-conditioned OOF reports are produced only by explicit post-fit
+operations. The five-patch transition is closed. Any release-preparation work requires a separate
+owner-authorized increment.
 
 ## Maintenance protocol
 

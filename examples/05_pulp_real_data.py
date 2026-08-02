@@ -10,7 +10,7 @@ from adjustText import adjust_text
 from matplotlib.patches import FancyArrowPatch
 from sklearn.model_selection import KFold, cross_val_predict
 
-from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls import PiPLSSearchCV
 from pipls.inspection import (
     biplot_coordinates,
     latent_structure,
@@ -76,7 +76,7 @@ plt.close(figure)
 
 # --8<-- [start:extract-pulp-rank-profile]
 # Retrieve every predictor rank evaluated at the chosen component count.
-rank_profile = path_search.predictor_rank_profile(selected.n_components)
+rank_profile = path_search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
 # --8<-- [end:extract-pulp-rank-profile]
 
 # --8<-- [start:plot-pulp-rank-profile]
@@ -119,10 +119,11 @@ plt.close(figure)
 
 # Fit the selected fixed model only after inspecting the selection figures.
 # --8<-- [start:fit-pulp-model]
-model = PiPLSRegression(
-    n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(X, Y)
+model = path_search.refit(
+    X,
+    Y,
+    n_components=CHOSEN_N_COMPONENTS,
+)
 # --8<-- [end:fit-pulp-model]
 
 # --8<-- [start:pulp-oof-predictions]

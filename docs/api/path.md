@@ -52,16 +52,17 @@ search = PiPLSSearchCV().fit(X, Y)
 path = search.component_path_
 
 CHOSEN_N_COMPONENTS = 2  # application-specific choice after inspecting the path
-selected = path.for_n_components(CHOSEN_N_COMPONENTS)
+selected = path.for_n_components(CHOSEN_N_COMPONENTS)  # optional scalar evidence
 
 model = search.refit(
     X,
     Y,
-    n_components=selected.n_components,
+    n_components=CHOSEN_N_COMPONENTS,
 )
 ```
 
-This example shows the executable selection-to-fit contract. The
+This example shows the executable selection-to-fit contract. The scalar lookup is optional and
+useful for annotations or reports; `refit()` resolves the same stored row internally. The
 [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path) explains how to inspect
 and interpret the component path before making the application-specific choice.
 

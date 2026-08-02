@@ -51,6 +51,10 @@
 - Every numbered example must present a recognizable user task, explicit comparison, or focused
   comparison. It must explain its data and label its output without relying on publication context or
   earlier project history. Do not ship context-free API demonstrations as numbered examples.
+- After path inspection, maintained search examples fit the final full-data model through
+  `search.refit(...)`; do not manually transfer the selected predictor rank into a new estimator.
+  Keep scalar path-row lookup only where plotting, reporting, or an explicit recommendation display
+  needs that evidence.
 - For real-data examples, read and form `X` and `Y` explicitly in the script. Do not introduce a
   public registry, generic loader, metadata-driven runtime path, or helper function that obscures
   the data-reading steps.

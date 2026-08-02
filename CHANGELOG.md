@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Complete the inspect-decide-refit presentation migration: maintained examples and tutorial
+  renderers now fit chosen path rows through `search.refit(...)`, scalar row lookups remain only for
+  inspection and annotation, and the active repository surface contains no legacy constructor-time
+  selection or manual selected-rank transfer workflow.
 - Complete the no-legacy `PiPLSSearchCV` lifecycle cleanup: remove constructor-time final-selection
   and OOF controls together with selected-row/report fitted state. Search fitting now produces only
   candidate evidence and immutable path/profile views; `refit()` and `validation_report()` make all

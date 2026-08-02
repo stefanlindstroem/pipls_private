@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. The public search lifecycle is implemented; maintained-example migration remains.
+Accepted and implemented.
 
 ## Context
 
@@ -82,6 +82,10 @@ selected fitted-model state, and search-level fitted-model delegation. Explicit
 `validation_report()` then replaced constructor-owned OOF reporting and reuses defensive read-only
 copies of the exact materialized split indices. The final cleanup removed all remaining
 constructor-selected report state without aliases or deprecation machinery.
+
+Maintained examples and tutorial renderers use `search.refit(...)` for the final full-data model
+rather than manually constructing a second estimator from the selected rank pair. Scalar result
+lookups remain available when a workflow needs the stored row for plotting or reporting.
 
 Do not add aliases, deprecation warnings, ignored constructor arguments, fallback attributes, or
 serialization migrations for the removed pre-release surface.

@@ -42,7 +42,9 @@ def test_synthetic_example_owns_the_short_selection_workflow() -> None:
     assert "PiPLSSearchCV(cv=CV).fit(train.X, train.Y)" in source
     assert "path.for_n_components(CHOSEN_N_COMPONENTS)" in source
     assert "search.predictor_rank_profile(selected.n_components)" in source
-    assert "model = PiPLSRegression(" in source
+    assert "model = search.refit(" in source
+    assert "n_components=CHOSEN_N_COMPONENTS" in source
+    assert "model = PiPLSRegression(" not in source
     assert "model.predict(test.X)" in source
     assert 'prediction_kind="external test predictions"' in source
     assert "diagnostics.observed_standardized" in source

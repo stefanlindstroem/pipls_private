@@ -67,8 +67,9 @@ use case rather than combining unrelated split protocols in one context-free scr
   wavelength-aware final PDF figures without generated analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD and an explicit application of `one_standard_error_result()`. Its component-path figure shows
-  the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row; the returned
-  paired-mode count and associated predictor rank define the final interpretation model. The workflow
+  the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row;
+  `path_search.refit(..., rule="one_standard_error")` fits that row without manual parameter
+  transfer. The workflow
   then calculates selection-conditioned OOF predictions, decreasing-wavenumber spectral plots,
   deterministic response pagination, and raw observation diagnostics through direct in-memory
   results and caller-owned multipage PDFs. See the
@@ -117,8 +118,8 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 
 1. the default path-evaluating `PiPLSSearchCV()` returns `component_path_`, which is plotted directly
    with Matplotlib.
-2. `path.for_n_components(CHOSEN_N_COMPONENTS)` supplies the fixed paired-mode count and predictor
-   rank.
+2. `path_search.refit(..., n_components=CHOSEN_N_COMPONENTS)` resolves the stored predictor rank
+   and fits the chosen path row on all observations.
 3. `cross_val_predict()` with five seeded shuffled folds produces
    `selection-conditioned OOF predictions`.
 4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return
@@ -129,10 +130,11 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 
 Pulp is the canonical tutorial workflow. Example 05 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
-`predictor_rank_profile()`, fits one explicit `PiPLSRegression`, calculates OOF predictions with
-`cross_val_predict()`, and renders immutable inspection arrays directly. Tobacco follows the same
-direct result-to-Matplotlib pattern, but obtains its final pair from
-`one_standard_error_result()`. It uses `minimum_cv_mse_result()` only to construct the explanatory
+`predictor_rank_profile()`, fits the chosen row through `path_search.refit()`, calculates OOF
+predictions with `cross_val_predict()`, and renders immutable inspection arrays directly. Tobacco
+follows the same direct result-to-Matplotlib pattern, but applies the named
+`"one_standard_error"` refit rule. It uses `one_standard_error_result()` and
+`minimum_cv_mse_result()` only to construct the explanatory
 component-path figure and owns its full-SVD configuration, response pagination, and multipage PDF
 output visibly.
 

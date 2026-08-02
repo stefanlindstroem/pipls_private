@@ -382,12 +382,12 @@ def main() -> None:
         range(min(DISPLAY_COMPONENT_COUNT, selected.n_components))
     )
 
-    # Fit the selected full-data model and calculate selection-conditioned OOF predictions.
-    model = PiPLSRegression(
-        n_components=selected.n_components,
-        predictor_rank=selected.predictor_rank,
-        svd_solver="full",
-    ).fit(X, Y)
+    # Apply the 1-SE rule and fit the chosen row on the full data.
+    model = path_search.refit(
+        X,
+        Y,
+        rule="one_standard_error",
+    )
     oof_predictions = cross_val_predict(
         model,
         X,

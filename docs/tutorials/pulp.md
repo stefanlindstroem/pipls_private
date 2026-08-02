@@ -13,7 +13,7 @@ You will:
 1. load the Pulp predictors and responses;
 2. evaluate the component path and conditional predictor-rank profile;
 3. qualify an interior predictor-rank choice against the neighboring evaluated ranks;
-4. fit one fixed `PiPLSRegression` model;
+4. refit the chosen path row on all observations;
 5. generate selection-conditioned OOF predictions;
 6. compute immutable latent-structure, factorization, and prediction-diagnostic results;
 7. interpret representative standard PLS-family and Pi-PLS-specific plots.
@@ -143,9 +143,11 @@ samples:
 --8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
 ```
 
-The search object supports model selection; the fixed estimator supplies predictions and fitted
-results. `PiPLSRegression` learns predictor and response centering and scaling inside the fit. The
-[`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression) gives the exact contract.
+`path_search.refit(...)` resolves the conditionally selected predictor rank stored for the chosen
+component count, clones the search estimator, and fits that clone on all observations. The search
+retains the path evidence, while the returned `PiPLSRegression` supplies predictions and fitted
+results. The [`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression) gives the
+fixed-model contract.
 
 ## Generate selection-conditioned OOF predictions
 
