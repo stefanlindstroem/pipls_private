@@ -78,6 +78,10 @@ should protect these durable behaviors:
   coverage semantics, and does not perform a full-data refit;
 - the search does not retain supplied training matrices or returned fitted estimators.
 
+The explicit report stage must additionally test single-use splitters, defensive read-only split
+copies, unchanged scorer-call counts, one-dimensional response shape, repeated and partial coverage,
+shape mismatch rejection, warning boundaries, and search-state immutability.
+
 During the transition, test each implemented stage without treating the temporary coexistence of
 old and new lifecycles as a permanent contract. At final cleanup, prefer positive constructor and
 method-surface tests over one historical tombstone assertion per removed name.

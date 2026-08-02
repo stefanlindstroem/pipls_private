@@ -164,9 +164,9 @@ plan contains an earlier or more general proposal:
 - `PiPLSSearchCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
 - the implemented search now performs final full-data fitting only through post-fit `refit()` and
   exposes no constructor boolean, selected fitted-model state, or delegated model methods;
-  constructor `selection_rule` and `return_oof_predictions` remain temporarily for selected-row
-  reporting until Decision 0137's explicit `validation_report()` stage replaces them without
-  compatibility aliases;
+  explicit post-fit `validation_report()` now reuses exact stored split indices without rescoring
+  candidates or mutating search; constructor `selection_rule` and `return_oof_predictions` remain
+  temporarily until the next no-legacy cleanup;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,

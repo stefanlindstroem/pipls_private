@@ -11,7 +11,7 @@ a catalogue of the maintained scripts.
 |---|---|---|
 | `01_minimal_fit_and_plot.py` | Fit and inspect one known Pi-PLS rank pair from literal NumPy arrays | Printed predictions and `minimal_fit_and_plot.pdf` |
 | `02_synthetic_path_selection.py` | Inspect a component path, select one fixed model, and evaluate independent test predictions | Three PDF figures and printed external-test $R^2$ |
-| `03_leave_one_out_validation.py` | Validate a small calibration study with leave-one-out splits and ordered OOF predictions | Printed selected rank pair and immutable validation summary |
+| `03_leave_one_out_validation.py` | Validate a small calibration study with leave-one-out splits and explicit ordered OOF reporting | Printed selected rank pair and immutable validation summary |
 | `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
 | `05_pulp_real_data.py` | Run the complete Pulp selection, rank-profile, inspection, and OOF workflow | Six PDF figures |
 | `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Five PDF figures |

@@ -110,8 +110,8 @@ search = PiPLSSearchCV(estimator=pipeline).fit(X, Y)
 
 The terminal estimator needs the valid construction seed pair `(1, 1)` because
 `PiPLSRegression` always represents one explicit fixed pair. `PiPLSSearchCV` replaces both values
-before fold-rank preflight, every candidate fit, optional OOF fitting, and each explicit post-fit
-refit, so the seed pair does not restrict or select the path. Other template settings, including `scale`,
+before fold-rank preflight, every candidate fit, explicit OOF reporting, and each post-fit refit,
+so the seed pair does not restrict or select the path. Other template settings, including `scale`,
 `svd_solver`, and `random_state`, do affect candidate fitting.
 
 Do not fit learned preprocessing on the complete dataset before path evaluation.
@@ -135,21 +135,35 @@ routing when routing is enabled and requested. Split metadata belongs to the sea
 
 ## Ordered out-of-fold predictions
 
-Set `return_oof_predictions=True` to fit `selected_result_` once per training fold after selection.
-The immutable `validation_report_` then owns row-ordered OOF results:
+Request ordered OOF diagnostics explicitly after path evaluation:
 
-- `selected_result` is the same immutable component-path row exposed as `search.selected_result_`;
+```python
+search = PiPLSSearchCV(cv=cv).fit(X, Y)
+report = search.validation_report(X, Y, rule="one_standard_error")
+# or: report = search.validation_report(X, Y, n_components=4)
+```
+
+The method uses the same selected-row resolver as `refit()` but performs no full-data fit. It fits the
+selected fixed parameterization once per stored training fold and returns an immutable report:
+
+- `selected_result` is the complete stored component-path row selected by the requested rule or count;
 - `oof_predictions` preserves input row order;
 - repeated validation predictions are averaged and their counts are recorded;
 - rows without validation coverage have count 0 and a NaN prediction;
 - `n_components` and `predictor_rank` remain convenient views of the selected result;
 - `pooled_oof_r2` uses only rows with OOF coverage.
 
+`fit()` stores defensive read-only copies of the exact materialized validation indices. Therefore an
+iterable splitter is not consumed a second time and a stochastic splitter is not asked to generate a
+new partition. `validation_report()` requires the same sample count, feature count, and response-column
+count as the fitted search, but it does not retain or compare original values. The caller is responsible
+for passing the same observations in the same row order.
+
 The report derives its split count, mean score, and CV-MSE convenience attributes from
 `selected_result` and separately records OOF coverage and whether the splitter is structurally
-leave-one-out. These results are selection-conditioned because the same path search
-selected the parameters. Use nested cross-validation or an external test set when an unbiased
-post-selection estimate is required.
+leave-one-out. These results are selection-conditioned because the same path search selected the
+parameters. Use nested cross-validation or an external test set when an unbiased post-selection
+estimate is required.
 
 ## Leave-one-out interpretation
 
@@ -157,9 +171,8 @@ post-selection estimate is required.
 feasibility is capped by $n-2$. The default standardized MSE remains defined for singleton
 validation folds because response scales are estimated from each training fold.
 
-Mean foldwise $R^2$ is rejected when validation folds contain one sample. When OOF predictions are
-requested, `validation_report_.pooled_oof_r2` may report $R^2$ from pooled LOO predictions; it is
-not mean foldwise $R^2$.
+Mean foldwise $R^2$ is rejected when validation folds contain one sample. The explicit report's
+`pooled_oof_r2` may report $R^2$ from pooled LOO predictions; it is not mean foldwise $R^2$.
 
 The [focused small-sample example](examples.md#leave-one-out-validation) uses twelve deterministic
 observations, a compact explicit candidate grid, the singleton-safe default scorer, and ordered OOF
@@ -270,9 +283,11 @@ pair, fits the clone, and returns it. It does not mutate the search, store the s
 attach the model to search state. Prediction, transformation, scoring, inverse transformation, and
 feature-name behavior belong to the returned model.
 
-The current `selection_rule` constructor control separately determines `selected_result_`,
-`selected_params_`, and `validation_report_`, including optional OOF predictions. A post-fit
-`refit()` rule is explicit and does not alter those report attributes.
+Post-fit `refit()` and `validation_report()` use the same explicit rule-or-component selection
+contract and do not alter search state. During the staged pre-release transition, the current
+`selection_rule` and `return_oof_predictions` constructor controls still determine
+`selected_result_`, `selected_params_`, and `validation_report_`. The next cleanup increment removes that remaining
+constructor-selected report surface.
 
 ## Search and model diagnostics
 

@@ -25,7 +25,8 @@ intentionally more extensive than ordinary estimator use.
   train/test data, evaluates the component path and conditional predictor-rank profile, fits one
   selected fixed model, and writes three final PDF figures.
 - `03_leave_one_out_validation.py`: a focused small-sample calibration workflow. It evaluates a
-  compact explicit path with `LeaveOneOut`, requests ordered OOF predictions, and distinguishes
+  compact explicit path with `LeaveOneOut`, requests ordered OOF predictions through
+  `search.validation_report()`, and distinguishes
   pooled OOF $R^2$ from undefined mean foldwise $R^2$.
 
 Run it with:

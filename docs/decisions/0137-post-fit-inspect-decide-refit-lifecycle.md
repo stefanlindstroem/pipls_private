@@ -80,8 +80,11 @@ coexist temporarily. That is not a valid scikit-learn estimator surface: constru
 stored as same-named instance attributes, so the boolean would shadow the method. The patch that
 adds post-fit `refit()` therefore also removes the constructor boolean, selected fitted-model state,
 and search-level fitted-model delegation. Constructor-time `selection_rule` and
-`return_oof_predictions` remain temporarily because they still own selected-row reporting until the
-explicit `validation_report()` operation is implemented.
+`return_oof_predictions` remained temporarily because they still owned selected-row reporting until
+explicit `validation_report()` was implemented. That method now reuses defensive read-only copies of
+the exact materialized split indices, always returns ordered OOF predictions and counts, performs no
+candidate rescoring or full-data fit, and leaves the search unchanged. Constructor-selected report
+state remains only until the next cleanup patch removes the old lifecycle in one coherent increment.
 
 Do not add aliases, deprecation warnings, ignored constructor arguments, fallback attributes, or
 serialization migrations for the removed pre-release surface.

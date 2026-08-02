@@ -11,8 +11,10 @@ preprocessing is fitted independently inside each training fold. Before candidat
 search object caps the path by the minimum predictor rank verified across those transformed folds.
 `PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Final full-data fitting
 is an explicit post-fit operation: `search.refit(X, Y, ...)` selects one stored component-path row,
-clones the configured estimator or pipeline, fits that clone, and returns it. The search object does
-not delegate model methods or retain the returned estimator.
+clones the configured estimator or pipeline, fits that clone, and returns it. Explicit
+`search.validation_report(X, Y, ...)` selects a row through the same rules and produces ordered OOF
+diagnostics from the exact validation splits materialized by `fit()`. The search object does not
+delegate model methods or retain the returned estimator or supplied training matrices.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see
@@ -21,10 +23,11 @@ problems, see [Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. `component_path_` and
 `predictor_rank_profile()` provide concise immutable views. Standard `best_*` attributes identify
-the global configured-score optimum, while the temporary constructor `selection_rule` determines
-the row represented by `selected_result_` and `validation_report_`. Optional OOF arrays describe
-that report row. Post-fit `refit()` makes an independent explicit selection and does not alter those
-report attributes.
+the global configured-score optimum. Post-fit `refit()` and `validation_report()` make independent
+explicit selections and do not alter search state. During the staged pre-release transition, the
+temporary constructor `selection_rule` and `return_oof_predictions` controls still determine
+`selected_result_`, `selected_params_`, and `validation_report_`. The next cleanup increment removes that remaining
+constructor-selected report surface.
 Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
@@ -36,6 +39,7 @@ response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 | Both ranks are already known | Fit `PiPLSRegression` directly |
 | Choose a component count after inspecting the path | Fit `PiPLSSearchCV`, inspect the path, then call `search.refit(X, Y, n_components=h)` |
 | Apply an automatic final rule | Call `search.refit(X, Y, rule=...)` after path evaluation |
+| Inspect OOF diagnostics for one selected row | Call `search.validation_report(X, Y, rule=... or n_components=h)` |
 
 Both workflows use the same post-fit operation. Retaining `search` preserves the complete path and
 candidate evidence; the returned model owns prediction, transformation, scoring, and inspection of
@@ -110,6 +114,7 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
       members:
         - fit
         - refit
+        - validation_report
         - predictor_rank_profile
 
 ## Concise component path
@@ -155,11 +160,21 @@ its `selected_result` property derives the same conditionally selected scalar va
 
 ## Validation report
 
-`PiPLSSearchCV.validation_report_` composes the immutable `selected_result_` with validation
-provenance and, when requested, ordered out-of-fold predictions. Its `n_components`,
-`predictor_rank`, `n_splits`, `mean_test_score`, and `cv_mse_mean` properties are read-only views of
-`validation_report_.selected_result`. Its `is_selection_conditioned` and
-`has_complete_oof_coverage` properties expose provenance and coverage as predicates.
+`search.validation_report(X, Y, rule=... or n_components=...)` selects one stored component-path row
+and fits that fixed parameterization independently on every training fold from the exact split set
+materialized by `search.fit()`. It returns an immutable `PiPLSValidationReport` with ordered OOF
+predictions, repeated-prediction counts, partial-coverage NaNs, leave-one-out provenance, and pooled
+OOF $R^2$ when at least two rows have coverage. The operation does not rescore candidates, perform a
+full-data fit, mutate the search, or retain the supplied matrices.
+
+The caller must provide the same observations in the same row order and with the same sample and
+response-column counts as the fitted search. The report's `n_components`, `predictor_rank`,
+`n_splits`, `mean_test_score`, and `cv_mse_mean` properties are read-only views of its immutable
+`selected_result`; `is_selection_conditioned` and `has_complete_oof_coverage` expose provenance and
+coverage as predicates.
+
+During the staged Decision 0137 transition, constructor-selected `validation_report_` remains
+temporarily available. New code should use the explicit method.
 
 ::: pipls.PiPLSValidationReport
     options:

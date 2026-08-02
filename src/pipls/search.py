@@ -80,9 +80,11 @@ class PiPLSSearchCV(
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
     Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
-    independently inside each training fold. A declared selection rule chooses
-    one stored path row for the current validation report. Final full-data
-    fitting is an explicit post-fit :meth:`refit` operation. The default
+    independently inside each training fold. Final full-data fitting and
+    selection-conditioned out-of-fold reporting are explicit post-fit
+    :meth:`refit` and :meth:`validation_report` operations. During the staged
+    pre-release transition, a declared constructor selection rule also chooses
+    one stored path row for ``validation_report_``. The default
     ``search_method="auto"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
     for each paired-mode count.
@@ -282,8 +284,10 @@ class PiPLSSearchCV(
         )
         template = clone(template)
         materialized = _materialize_cv_splits(self.cv, X_array, y_array, groups=groups)
-        _validate_singleton_fold_scoring(self.scoring, materialized.splits)
-        self.n_splits_ = len(materialized.splits)
+        self._cv_splits_ = _read_only_cv_splits(materialized.splits)
+        self._n_samples_fit_ = int(X_array.shape[0])
+        _validate_singleton_fold_scoring(self.scoring, self._cv_splits_)
+        self.n_splits_ = len(self._cv_splits_)
         self.cv_n_train_min_ = materialized.n_train_min
         if self.selection_rule == "one_standard_error" and self.n_splits_ < 2:
             raise ValueError(
@@ -295,7 +299,7 @@ class PiPLSSearchCV(
             template=template,
             X=X_indexable,
             y=y_indexable,
-            splits=materialized.splits,
+            splits=self._cv_splits_,
         )
         algebraic_limit = min(fold_feature_limit, materialized.n_train_min - 1)
         if self.max_predictor_rank == "rule":
@@ -368,7 +372,7 @@ class PiPLSSearchCV(
                 scoring=self.scoring,
                 X=X_indexable,
                 y=y_indexable,
-                splits=materialized.splits,
+                splits=self._cv_splits_,
                 n_jobs=self.n_jobs,
             )
         else:
@@ -393,7 +397,7 @@ class PiPLSSearchCV(
                     scoring=self.scoring,
                     X=X_indexable,
                     y=y_indexable,
-                    splits=materialized.splits,
+                    splits=self._cv_splits_,
                     n_jobs=self.n_jobs,
                 )
 
@@ -458,7 +462,7 @@ class PiPLSSearchCV(
                 predictor_rank_key=predictor_rank_key,
                 X=X_indexable,
                 y=y_indexable,
-                splits=materialized.splits,
+                splits=self._cv_splits_,
                 n_jobs=self.n_jobs,
                 ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
             )
@@ -472,8 +476,8 @@ class PiPLSSearchCV(
             selected_result=self.selected_result_,
             estimate_kind="selection-conditioned",
             is_leave_one_out=_splits_are_leave_one_out(
-                materialized.splits,
-                n_samples=int(y_array.shape[0]),
+                self._cv_splits_,
+                n_samples=self._n_samples_fit_,
             ),
             oof_predictions=predictions,
             oof_prediction_counts=counts,
@@ -552,6 +556,130 @@ class PiPLSSearchCV(
         _fit_path_estimator(estimator, X, y)
         return estimator
 
+    def validation_report(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        *,
+        rule: RefitRule | None = None,
+        n_components: int | None = None,
+    ) -> PiPLSValidationReport:
+        """Return selection-conditioned OOF diagnostics for one stored path row.
+
+        Exactly one of ``rule`` and ``n_components`` must be supplied. The
+        selected fixed parameterization is fitted independently on every
+        training fold from the exact split set materialized by :meth:`fit`.
+        Repeated validation predictions are averaged, and rows never used for
+        validation are represented by NaN with a zero prediction count.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix in the same row order and with the same sample
+            count as the data supplied to :meth:`fit`.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Response vector or matrix aligned row-for-row with ``X`` and the
+            data supplied to :meth:`fit`.
+        rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
+            Stored-row selection rule. ``"best_score"`` uses the global
+            configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
+            stored mean response-standardized CV-MSE, and
+            ``"one_standard_error"`` uses the smallest stored component count
+            within one fold-based standard error of that minimum.
+        n_components : int, optional
+            Evaluated paired-mode count whose conditionally selected predictor
+            rank is validated.
+
+        Returns
+        -------
+        PiPLSValidationReport
+            Immutable selection-conditioned report with ordered OOF predictions,
+            prediction counts, coverage provenance, and pooled OOF $R^2$ when at
+            least two rows have validation coverage.
+
+        Raises
+        ------
+        sklearn.exceptions.NotFittedError
+            If the search has not been fitted.
+        ValueError
+            If exactly one selection input is not supplied, the selection is
+            invalid, or the supplied data do not match the fitted search shape.
+
+        Notes
+        -----
+        The report reuses the original validation indices but does not retain or
+        compare the original data values. The caller is responsible for passing
+        the same row-aligned observations. The search object is not mutated and
+        no full-data model is fitted or retained.
+        """
+
+        selected = self._resolve_selection_result(
+            rule=rule,
+            n_components=n_components,
+        )
+        check_is_fitted(self, attributes=["_cv_splits_", "_n_samples_fit_"])
+        validated = _validate_estimator_data(
+            self,
+            X,
+            y,
+            reset=False,
+            accept_sparse=False,
+            dtype=np.float64,
+            multi_output=True,
+            y_numeric=True,
+            ensure_min_samples=2,
+            copy=False,
+        )
+        X_checked, y_checked = cast(tuple[Any, Any], validated)
+        y_array = np.asarray(y_checked, dtype=np.float64)
+        if int(np.shape(X_checked)[0]) != self._n_samples_fit_:
+            raise ValueError(
+                "validation_report() requires the same number of samples used "
+                f"during search.fit(); expected {self._n_samples_fit_}, got "
+                f"{np.shape(X_checked)[0]}."
+            )
+        n_targets = 1 if y_array.ndim == 1 else int(y_array.shape[1])
+        if n_targets != self.n_targets_:
+            raise ValueError(
+                "validation_report() requires the same number of response columns "
+                f"used during search.fit(); expected {self.n_targets_}, got {n_targets}."
+            )
+
+        X_indexable, y_indexable = indexable(X, y)
+        template = (
+            _default_pipls_template() if self.estimator is None else self.estimator
+        )
+        pipls_param_prefix = _resolve_pipls_param_prefix(template)
+        n_components_key, predictor_rank_key = _pipls_parameter_keys(
+            pipls_param_prefix
+        )
+        oof_predictions, counts = _ordered_oof_predictions(
+            candidate=_PiPLSCandidate(
+                n_components=selected.n_components,
+                predictor_rank=selected.predictor_rank,
+            ),
+            template=template,
+            n_components_key=n_components_key,
+            predictor_rank_key=predictor_rank_key,
+            X=X_indexable,
+            y=y_indexable,
+            splits=self._cv_splits_,
+            n_jobs=self.n_jobs,
+            ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
+        )
+        predictions = oof_predictions[:, 0] if y_array.ndim == 1 else oof_predictions
+        return PiPLSValidationReport(
+            selected_result=selected,
+            estimate_kind="selection-conditioned",
+            is_leave_one_out=_splits_are_leave_one_out(
+                self._cv_splits_,
+                n_samples=self._n_samples_fit_,
+            ),
+            oof_predictions=predictions,
+            oof_prediction_counts=counts,
+            pooled_oof_r2=_pooled_oof_r2(y_indexable, predictions, counts),
+        )
+
     def _resolve_selection_result(
         self,
         *,
@@ -566,7 +694,7 @@ class PiPLSSearchCV(
         )
         if (rule is None) == (n_components is None):
             raise ValueError(
-                "Exactly one of rule and n_components must be supplied to refit()."
+                "Exactly one of rule and n_components must be supplied."
             )
         if n_components is not None:
             return self.component_path_.for_n_components(n_components)
@@ -687,6 +815,19 @@ class PiPLSSearchCV(
         _validate_n_jobs(self.n_jobs)
         _validate_cv(self.cv)
         return _resolve_path_scorer(self.scoring, template)
+
+
+def _read_only_cv_splits(splits: tuple[CVSplit, ...]) -> tuple[CVSplit, ...]:
+    """Return defensive read-only copies of materialized split indices."""
+
+    stored: list[CVSplit] = []
+    for train, validation in splits:
+        train_copy = np.array(train, dtype=np.intp, copy=True)
+        validation_copy = np.array(validation, dtype=np.intp, copy=True)
+        train_copy.flags.writeable = False
+        validation_copy.flags.writeable = False
+        stored.append((train_copy, validation_copy))
+    return tuple(stored)
 
 
 def _validate_supported_estimator(estimator: Any) -> None:

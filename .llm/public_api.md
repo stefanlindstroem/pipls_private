@@ -67,7 +67,7 @@ response directions. These directions are distinct from the reconstruction loadi
 
 A direct fixed fit emits `PredictorRankSupportWarning` when $n/r_\pi<3$. This warning is diagnostic;
 it does not choose or cap the rank. `PiPLSSearchCV` suppresses only this expected warning inside its
-controlled feature probes, candidate fits, optional OOF fits, and explicit post-fit full-data refit.
+controlled feature probes, candidate fits, explicit OOF reports, and post-fit full-data refits.
 Other warning categories remain visible.
 
 Both public `fit()` methods are transactional. A failed search fit or fixed-estimator fit removes
@@ -154,18 +154,30 @@ the configured mean test score. Under the default scorer this is equivalent to m
 response-standardized MSE among evaluated candidates; adaptive search makes no claim about
 unevaluated admissible pairs.
 
-Public path attributes include standard candidate-level search results in `cv_results_`, global
-`best_*` selection attributes, `selected_result_`, `selected_params_`, `search_is_exhaustive_`, the
-immutable `validation_report_`, and the canonical immutable `component_path_` result. During the
-Decision 0137 transition, constructor `selection_rule` still chooses the row represented by
-`selected_result_`, `selected_params_`, and `validation_report_`; it does not choose or store the
-model returned by a later `refit()` call. `return_oof_predictions=True` still requests OOF arrays for
-that constructor-selected row until explicit post-fit validation reporting replaces this temporary
-surface. OOF arrays and their coverage counts live only in `validation_report_`. The report composes
-the same immutable `PiPLSComponentResult` exposed as `selected_result_`; its `n_components`,
-`predictor_rank`, `n_splits`, `mean_test_score`, and `cv_mse_mean` properties forward to that result
-rather than duplicating stored state. `is_selection_conditioned` and
-`has_complete_oof_coverage` expose report provenance and coverage as predicates.
+Explicit selection-conditioned OOF reporting is a post-fit operation:
+
+```python
+report = search.validation_report(X, y, rule="one_standard_error")
+report = search.validation_report(X, y, n_components=4)
+```
+
+The method requires exactly one selection input, uses the same stored-row resolver as `refit()`, and
+reuses defensive read-only copies of the exact validation indices materialized by `fit()`. It always
+returns ordered OOF predictions and prediction counts, averages repeated predictions, marks uncovered
+rows with NaN and count zero, computes pooled OOF $R^2$ only over covered rows, and performs neither
+candidate rescoring nor a full-data fit. It validates the fitted sample, feature, and response-column
+shape but cannot compare values; callers must preserve original row alignment. The search stores the
+split indices but not supplied training matrices or returned reports.
+
+Public path attributes currently include standard candidate-level search results in `cv_results_`,
+global `best_*` selection attributes, `selected_result_`, `selected_params_`,
+`search_is_exhaustive_`, the immutable transitional `validation_report_`, and the canonical immutable
+`component_path_` result. During the Decision 0137 transition, constructor `selection_rule` and
+`return_oof_predictions` still choose and populate that stored report row. They do not affect later
+explicit `refit()` or `validation_report()` calls and are removed in Patch 4. The report composes one
+immutable `PiPLSComponentResult`; its `n_components`, `predictor_rank`, `n_splits`,
+`mean_test_score`, and `cv_mse_mean` properties forward to that result rather than duplicating state.
+`is_selection_conditioned` and `has_complete_oof_coverage` expose provenance and coverage predicates.
 
 Validated input grids, adaptive-search batch history, candidate counters, direct-rank parameter
 aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and supplied training matrices
@@ -210,9 +222,8 @@ negative MSE summaries, unsupported policy values, and inconsistent OOF coverage
 Generated documentation keeps these records returned-first by suppressing constructor signatures.
 
 Group-aware splitters and keyword-only `groups` belong to `PiPLSSearchCV.fit`, not to the fixed
-estimator. The temporary `return_oof_predictions` constructor control and selection-conditioned
-reporting likewise belong only to the path interface until Patch 3 replaces them with explicit
-post-fit reporting.
+estimator. Explicit selection-conditioned reporting belongs to `PiPLSSearchCV.validation_report()`.
+The temporary constructor report controls remain only until Patch 4 removes them.
 
 ## E1 dataset and synthetic-data API
 

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import pickle
+
 import numpy as np
 import pytest
 from sklearn import config_context
 from sklearn.base import clone
+from sklearn.exceptions import NotFittedError
 from sklearn.metrics import r2_score
 from sklearn.model_selection import (
     GroupKFold,
@@ -43,7 +46,6 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
         max_predictor_rank=2,
         search_method="optimal",
         cv=splitter,
-        return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -51,8 +53,8 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
     for train, validation in splitter.split(X, Y):
         expected[validation] = clone(_fixed()).fit(X[train], Y[train]).predict(X[validation])
 
-    report = search.validation_report_
-    assert report.selected_result is search.selected_result_
+    report = search.validation_report(X, Y, rule="best_score")
+    assert report.selected_result == search.selected_result_
     assert report.oof_predictions is not None
     assert report.oof_prediction_counts is not None
     np.testing.assert_allclose(report.oof_predictions, expected)
@@ -70,8 +72,6 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
     )
 
 
-
-
 def test_repeated_kfold_averages_predictions_and_records_counts() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
@@ -80,11 +80,10 @@ def test_repeated_kfold_averages_predictions_and_records_counts() -> None:
         predictor_rank_values=[2],
         max_predictor_rank=2,
         cv=RepeatedKFold(n_splits=3, n_repeats=2, random_state=7),
-        return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)
 
-    report = search.validation_report_
+    report = search.validation_report(X, Y, n_components=1)
     assert report.oof_prediction_counts is not None
     assert report.oof_predictions is not None
     np.testing.assert_array_equal(
@@ -103,7 +102,6 @@ def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
         predictor_rank_values=[2],
         max_predictor_rank=2,
         cv=PredefinedSplit(np.array([-1] * 9 + [0] * 9)),
-        return_oof_predictions=True,
     ).fit(X, Y)
     temporal = PiPLSSearchCV(
         estimator=_fixed(),
@@ -111,11 +109,10 @@ def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
         predictor_rank_values=[2],
         max_predictor_rank=2,
         cv=TimeSeriesSplit(n_splits=3),
-        return_oof_predictions=True,
     ).fit(X, Y)
 
-    predefined_report = predefined.validation_report_
-    temporal_report = temporal.validation_report_
+    predefined_report = predefined.validation_report(X, Y, n_components=1)
+    temporal_report = temporal.validation_report(X, Y, n_components=1)
     assert predefined_report.oof_prediction_counts is not None
     assert predefined_report.oof_predictions is not None
     assert temporal_report.oof_prediction_counts is not None
@@ -187,10 +184,9 @@ def test_oof_arrays_are_read_only_and_one_dimensional_targets_stay_one_dimension
         predictor_rank_values=[2],
         max_predictor_rank=2,
         cv=3,
-        return_oof_predictions=True,
     ).fit(X, y)
 
-    report = search.validation_report_
+    report = search.validation_report(X, y, n_components=1)
     assert report.oof_predictions is not None
     assert report.oof_prediction_counts is not None
     assert report.oof_predictions.shape == (X.shape[0],)
@@ -204,3 +200,119 @@ def test_return_oof_predictions_requires_boolean() -> None:
     X, Y = _data()
     with pytest.raises(ValueError, match="return_oof_predictions must be boolean"):
         PiPLSSearchCV(return_oof_predictions=1).fit(X, Y)  # type: ignore[arg-type]
+
+
+class _SingleUseSplitter:
+    def __init__(self, splits: list[tuple[np.ndarray, np.ndarray]]) -> None:
+        self.splits = splits
+        self.calls = 0
+
+    def split(
+        self,
+        X: object,
+        y: object | None = None,
+        groups: object | None = None,
+    ) -> object:
+        del X, y, groups
+        self.calls += 1
+        if self.calls > 1:
+            raise RuntimeError("split() was called more than once")
+        return iter(self.splits)
+
+    def get_n_splits(
+        self,
+        X: object = None,
+        y: object | None = None,
+        groups: object | None = None,
+    ) -> int:
+        del X, y, groups
+        return len(self.splits)
+
+
+def test_validation_report_reuses_defensive_read_only_search_splits() -> None:
+    X, Y = _data()
+    indices = np.arange(X.shape[0], dtype=np.intp)
+    source_splits = [
+        (indices[6:].copy(), indices[:6].copy()),
+        (np.concatenate((indices[:6], indices[12:])), indices[6:12].copy()),
+        (indices[:12].copy(), indices[12:].copy()),
+    ]
+    splitter = _SingleUseSplitter(source_splits)
+    search = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=splitter,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    source_splits[0][0][0] = X.shape[0] + 10
+    assert splitter.calls == 1
+    assert all(
+        not index.flags.writeable
+        for split in search._cv_splits_
+        for index in split
+    )
+    with pytest.raises(ValueError, match="read-only"):
+        search._cv_splits_[0][0][0] = 0
+
+    report = search.validation_report(X, Y, n_components=1)
+
+    assert splitter.calls == 1
+    assert report.oof_prediction_counts is not None
+    np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
+
+
+def test_validation_report_requires_a_fitted_row_aligned_search_shape() -> None:
+    X, Y = _data()
+    with pytest.raises(NotFittedError):
+        PiPLSSearchCV().validation_report(X, Y, rule="best_score")
+
+    search = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=3,
+    ).fit(X, Y)
+    with pytest.raises(ValueError, match="same number of samples"):
+        search.validation_report(X[:-1], Y[:-1], n_components=1)
+    with pytest.raises(ValueError, match="same number of response columns"):
+        search.validation_report(X, Y[:, :1], n_components=1)
+
+
+def test_validation_report_requires_exactly_one_selection_input() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=3,
+    ).fit(X, Y)
+
+    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+        search.validation_report(X, Y)
+    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+        search.validation_report(X, Y, rule="best_score", n_components=1)
+    with pytest.raises(ValueError, match="rule must be"):
+        search.validation_report(X, Y, rule="smallest")  # type: ignore[arg-type]
+
+
+def test_validation_report_does_not_mutate_search_state() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+    before = pickle.dumps(search)
+
+    report = search.validation_report(X, Y, rule="best_score")
+
+    assert report.oof_predictions is not None
+    assert pickle.dumps(search) == before

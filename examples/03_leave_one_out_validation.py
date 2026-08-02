@@ -25,11 +25,10 @@ search = PiPLSSearchCV(
     predictor_rank_values=[1, 2],
     search_method="optimal",
     cv=LeaveOneOut(),
-    return_oof_predictions=True,
     n_jobs=1,
 ).fit(data.X, data.Y)
 
-report = search.validation_report_
+report = search.validation_report(data.X, data.Y, rule="best_score")
 if report.oof_predictions is None or report.pooled_oof_r2 is None:
     raise RuntimeError("Leave-one-out validation did not produce complete OOF diagnostics.")
 

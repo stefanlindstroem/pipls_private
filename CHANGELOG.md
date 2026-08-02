@@ -4,6 +4,11 @@
 
 ### Repository
 
+- Add explicit post-fit `PiPLSSearchCV.validation_report(X, y, rule=... or n_components=...)`,
+  reusing defensive read-only copies of the exact validation splits materialized by `fit()` to
+  produce ordered selection-conditioned OOF predictions without rescoring candidates, fitting a
+  full-data model, or mutating the search. Migrate the focused leave-one-out example to this method;
+  retain constructor-selected report state only until the next staged cleanup.
 - Add explicit post-fit `PiPLSSearchCV.refit(X, y, rule=... or n_components=...)`, returning a
   fitted clone of the configured direct estimator or terminal-Pi-PLS pipeline without mutating the
   search. Remove the conflicting constructor boolean, selected fitted-model attributes, refit

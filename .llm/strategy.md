@@ -919,15 +919,17 @@ explicit selected-row diagnostic. The search stores neither training matrices no
 models. Because the package is version `0.0.0`, the completed transition contains no aliases,
 deprecation paths, ignored constructor parameters, or serialized compatibility state.
 
-Current status: **post-fit `refit()` implemented; explicit validation reporting pending**.
+Current status: **post-fit `refit()` and explicit `validation_report()` implemented; old
+constructor-selected report state pending removal**.
 
 ## Current next increment
 
 Decision 0137 authorizes the inspect-decide-refit transition. The current implementation exposes
-post-fit `refit()` and no longer exposes constructor `refit`, selected fitted-model attributes, or
-search-level prediction/transformation delegation. Constructor-selected report state remains
-temporarily. The next patch adds explicit `validation_report()` with shared selection resolution and
-exact split reuse. Do not prepare or publish a package release during the transition.
+post-fit `refit()` and explicit `validation_report()`, reusing defensive read-only copies of the
+exact materialized split indices. It no longer exposes constructor `refit`, selected fitted-model
+attributes, or search-level prediction/transformation delegation. Constructor-selected report state
+remains temporarily. The next patch removes that remaining old lifecycle without compatibility
+machinery. Do not prepare or publish a package release during the transition.
 
 ## Maintenance protocol
 

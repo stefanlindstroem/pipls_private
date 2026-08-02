@@ -401,7 +401,7 @@ def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> No
     assert best_model.n_components != minimum_model.n_components
 
 
-def test_constructor_selection_and_post_fit_refit_are_temporarily_independent() -> None:
+def test_constructor_selection_and_post_fit_operations_are_temporarily_independent() -> None:
     X, Y = _one_standard_error_data()
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
@@ -418,10 +418,14 @@ def test_constructor_selection_and_post_fit_refit_are_temporarily_independent() 
     assert search.validation_report_.selected_result is search.selected_result_
     assert search.validation_report_.oof_predictions is not None
 
+    report = search.validation_report(X, Y, rule="best_score")
     model = search.refit(X, Y, rule="best_score")
+    assert report.n_components == search.best_n_components_
+    assert report.predictor_rank == search.best_predictor_rank_
     assert model.n_components == search.best_n_components_
     assert model.predictor_rank == search.best_predictor_rank_
     assert search.selected_result_ == expected_report
+    assert search.validation_report_.selected_result == expected_report
 
 
 def test_post_fit_refit_requires_exactly_one_selection_input() -> None:
@@ -513,6 +517,7 @@ def test_search_exposes_evidence_and_refit_but_no_model_delegation() -> None:
 
     search.fit(X, Y)
     assert hasattr(search, "refit")
+    assert hasattr(search, "validation_report")
     for method_name in (
         "predict",
         "transform",
@@ -709,15 +714,15 @@ def test_oof_generation_does_not_rescore_the_selected_candidate() -> None:
         calls += 1
         return 0.0
 
-    PiPLSSearchCV(
+    search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
         max_predictor_rank=1,
         cv=3,
         scoring=counting_scorer,
-        return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)
+    search.validation_report(X, Y, n_components=1)
 
     assert calls == 3
 
@@ -732,15 +737,14 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_post_fit_ref
             predictor_rank_values=[4],
             max_predictor_rank=4,
             cv=3,
-            return_oof_predictions=True,
             n_jobs=1,
         ).fit(X, Y)
+        report = search.validation_report(X, Y, rule="best_score")
         model = search.refit(X, Y, rule="best_score")
 
     assert search.best_predictor_rank_ == 4
     assert isinstance(model, PiPLSRegression)
     assert model.predictor_rank_ == 4
-    report = search.validation_report_
     assert report.oof_prediction_counts is not None
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
 
@@ -763,6 +767,8 @@ def test_path_does_not_suppress_unrelated_estimator_warnings() -> None:
             cv=2,
             n_jobs=1,
         ).fit(X, Y)
+    with pytest.warns(RuntimeWarning, match="unrelated path warning"):
+        search.validation_report(X, Y, n_components=1)
     with pytest.warns(RuntimeWarning, match="unrelated path warning"):
         search.refit(X, Y, n_components=1)
 

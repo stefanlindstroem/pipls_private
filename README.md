@@ -15,7 +15,8 @@ appropriate alternatives whose suitability depends on the data and validation de
 For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
 selects a predictor rank conditionally for each count. Users may inspect the path and fit one fixed
 model manually, or apply a named post-fit rule through `search.refit(X, Y, rule=...)`. The search
-retains the complete selection evidence, while `refit()` returns the fitted final estimator.
+retains the complete selection evidence, while `refit()` returns the fitted final estimator and
+`validation_report()` returns ordered selection-conditioned OOF diagnostics for one selected row.
 
 The rendered documentation is the primary user guide. On GitHub, open the latest
 [`github-pages` deployment](../../deployments/github-pages). The source links below remain useful
@@ -118,16 +119,29 @@ Y_pred = model.predict(X_test)
 
 Retain the fitted search in a variable when component-path, predictor-rank-profile, or candidate
 inspection is needed. `refit()` returns a fitted estimator or pipeline and does not attach it to the
-search object.
+search object. Selection-conditioned OOF diagnostics are requested explicitly and reuse the exact
+validation splits materialized by `fit()`:
+
+```python
+report = search.validation_report(
+    X_train,
+    Y_train,
+    n_components=selected.n_components,
+)
+```
+
+The caller must pass the same observations in the same row order; the search retains split indices,
+not the training matrices.
 
 ## Main interfaces
 
 | Interface | Purpose |
 |---|---|
 | `PiPLSRegression` | Fit one fixed paired-mode count and retained predictor-subspace dimension |
-| `PiPLSSearchCV` | Evaluate the path, inspect search evidence, and explicitly refit one selected row |
+| `PiPLSSearchCV` | Evaluate the path, inspect evidence, refit one row, or validate one row explicitly |
 | `component_path_` | Inspect one selected predictor rank for each paired-mode count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one paired-mode count |
+| `validation_report(X, Y, ...)` | Produce ordered OOF diagnostics for one stored path row |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
 | Matplotlib | Optionally render those arrays with caller-controlled figures and styling |
 | `pipls.datasets` | Generate deterministic synthetic Pi-PLS data |

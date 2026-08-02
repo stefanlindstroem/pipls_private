@@ -439,6 +439,8 @@ PLS-style `x_rotations_` and `y_rotations_` fitted attributes rather than duplic
 Its scorer-specific response scale is private. `PiPLSSearchCV` keeps standard candidate results,
 concise immutable path and rank-profile objects, global selection attributes, exhaustive-search qualification, and validation
 reporting. A fitted model is returned directly by post-fit `refit()` rather than attached to search
-state. OOF arrays live only in `validation_report_`; validated
+state. Explicit `validation_report()` reuses the exact materialized splits and returns OOF arrays
+without attaching the report; transitional constructor OOF arrays still live only in
+`validation_report_`. Validated
 input grids, adaptive batches, candidate counters, search-method echoes, and duplicate direct-rank
 parameter dictionaries are private implementation details.
