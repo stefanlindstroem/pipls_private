@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from adjustText import adjust_text
 from matplotlib.patches import FancyArrowPatch
-from sklearn.model_selection import KFold, cross_val_predict
+from sklearn.model_selection import KFold
 
 from pipls import PiPLSSearchCV
 from pipls.inspection import (
@@ -127,12 +127,14 @@ model = path_search.refit(
 # --8<-- [end:fit-pulp-model]
 
 # --8<-- [start:pulp-oof-predictions]
-oof_predictions = cross_val_predict(
-    model,
+report = path_search.validation_report(
     X,
     Y,
-    cv=CV,
+    n_components=CHOSEN_N_COMPONENTS,
 )
+if report.oof_predictions is None:
+    raise RuntimeError("Validation reporting did not produce OOF predictions.")
+oof_predictions = report.oof_predictions
 # --8<-- [end:pulp-oof-predictions]
 
 # --8<-- [start:pulp-inspection-results]

@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Complete the validation-report presentation migration: maintained Pulp, Sugarcane, and
+  Tobacco workflows now obtain selection-conditioned OOF predictions through
+  `search.validation_report(...)`, reusing the exact splits materialized by path evaluation
+  instead of constructing a second scikit-learn `cross_val_predict()` pass.
 - Complete the inspect-decide-refit presentation migration: maintained examples and tutorial
   renderers now fit chosen path rows through `search.refit(...)`, scalar row lookups remain only for
   inspection and annotation, and the active repository surface contains no legacy constructor-time

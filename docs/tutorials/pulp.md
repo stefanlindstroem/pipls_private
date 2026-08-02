@@ -151,20 +151,22 @@ fixed-model contract.
 
 ## Generate selection-conditioned OOF predictions
 
-Fitted values are unsuitable for assessing predictive residuals. The example therefore clones the
-fixed estimator inside five seeded shuffled folds and predicts each held-out observation once:
+Fitted values are unsuitable for assessing predictive residuals. The example therefore asks the
+fitted search for a validation report at the chosen component count:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
 ```
 
-The fixed random seed makes the shuffled partition reproducible while avoiding a fold assignment
-that is determined by row order. Replace it with a grouped, temporal, or otherwise appropriate
-splitter when the sampling design carries experimental structure.
+`validation_report()` resolves the same stored path row as `refit()` and reuses the exact five
+seeded shuffled splits materialized during path evaluation. The fixed random seed makes that
+partition reproducible while avoiding a fold assignment determined by row order. Replace the
+search splitter with a grouped, temporal, or otherwise appropriate protocol when the sampling
+design carries experimental structure.
 
 !!! important "Validation scope"
-    These are **selection-conditioned OOF predictions**. The rank pair is fixed during this second
-    cross-validation calculation, but the same observations were already used to inspect the
+    These are **selection-conditioned OOF predictions**. The selected rank pair is fitted on each
+    stored training fold, but the same observations were already used to inspect the
     selection path. Nested cross-validation or an external test set is required for an independent
     estimate of post-selection performance. See
     [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).

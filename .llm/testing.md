@@ -124,8 +124,8 @@ support code does not hide chart construction.
 Structural tests require every maintained ordinary K-fold example and tutorial renderer to use
 `KFold(n_splits=5, shuffle=True, random_state=0)` explicitly, while the leave-one-out example
 retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane, and Tobacco protect
-direct `component_path_` access, scikit-learn `cross_val_predict()`, immutable inspection
-results, explicit Matplotlib
+direct `component_path_` access, explicit `validation_report()`, immutable inspection results,
+explicit Matplotlib
 construction, absence of analytical CSV output, physical coordinate order, and the declared final
 PDF filenames without running the artifact-writing scripts. Keep these source scans consolidated as
 AST-level ownership and data-flow checks rather than repeating per-example string inventories.
@@ -161,7 +161,8 @@ example-specific report implementation out of the general inspection reference. 
 matrices protect generic OOF and report contracts. The focused leave-one-out example may be executed
 directly because it is small and artifact-free; tests should check labeled output and semantic
 coverage without freezing exact selected scores. One module-scoped Pulp numerical run may verify
-the selected fixed pair, upper-boundary rank profile, aligned OOF predictions, and inspection shapes
+the selected fixed pair, upper-boundary rank profile, aligned validation-report OOF predictions,
+and inspection shapes
 without writing application artifacts.
 
 The minimal numbered example may be protected structurally and through the package-level numerical

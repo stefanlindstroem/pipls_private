@@ -153,8 +153,8 @@ but must not reproduce the tutorial analysis or embed its generated figures.
 
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its direct pandas
 loading, default path-evaluating `PiPLSSearchCV()` evaluation, visible three-component choice,
-conditional predictor-rank profile, fixed `PiPLSRegression` fit, five-fold scikit-learn OOF
-predictions,
+conditional predictor-rank profile, fixed `PiPLSRegression` fit, explicit five-fold validation
+reporting,
 inspection computations, and final PDF composition. The selected component row is retrieved before
 the selection figures, while the fixed estimator is fitted only after those figures have been
 constructed. It intentionally adds no external scaler because `PiPLSRegression` learns predictor
@@ -371,9 +371,10 @@ retains a $2\times2$ factor figure, one $1\times3$ prediction figure per respons
 one
 $2\times2$ latent/observation figure, and one full-width coefficient figure per response page.
 
-Pulp, Sugarcane, and Tobacco use five seeded shuffled folds through scikit-learn
-`cross_val_predict()`. Their path searches use the same explicit
-`KFold(n_splits=5, shuffle=True, random_state=0)` partition. Because component count and predictor rank are chosen after inspecting paths
+Pulp, Sugarcane, and Tobacco obtain OOF predictions through explicit
+`validation_report()` calls. Each report reuses the exact
+`KFold(n_splits=5, shuffle=True, random_state=0)` partition materialized by its path search.
+Because component count and predictor rank are chosen after inspecting paths
 computed from the same observations, the resulting OOF predictions are selection-conditioned rather
 than independent validation. The standardized display values in `PredictionDiagnostics` use the
 full supplied observed-response means and sample standard deviations; they do not reproduce the
@@ -392,7 +393,7 @@ automatically adjusted label coordinates, exact artist counts unrelated to the c
 Matplotlib implementation details.
 
 Structural Pulp, Sugarcane, and Tobacco tests should verify direct `component_path_` access,
-scikit-learn OOF prediction, in-memory inspection, direct Matplotlib composition, and final PDF
+explicit validation reporting, in-memory inspection, direct Matplotlib composition, and final PDF
 filenames without executing the artifact-writing scripts. Sugarcane and Tobacco tests should also
 verify that analysis remains in `main()` while private same-file rendering functions consume
 completed

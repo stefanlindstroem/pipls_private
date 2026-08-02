@@ -44,8 +44,9 @@ Pulp, Sugarcane, and Tobacco remain component-path examples rather than test-sui
 `01_minimal_fit_and_plot.py`, followed by the synthetic path-selection tutorial example 02, and
 including the complete real-data analyses. Example 04
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
-Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, keep OOF and
-inspection results in memory, and write only final PDF figures. Pulp also exposes the conditional
+Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, obtain OOF predictions through
+explicit search validation reports, keep inspection results in memory, and write only final PDF
+figures. Pulp also exposes the conditional
 predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
 `main()` and group rendering in private functions within their numbered scripts. Tobacco retains
 full-SVD spectral figures, source-order response pagination, and raw observation diagnostics.
@@ -160,7 +161,8 @@ implementing or reviewing this surface.
   Underscore-prefixed `examples/_support/` contains only the ordinary-PLS path evaluator needed by
   the comparison rather than primary entry points. Example 04 owns the immutable Pi-PLS and standard
   PLS (NIPALS) paths and direct comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS
-  paths, scikit-learn OOF predictions, immutable inspection results, and explicit final figures.
+  paths, explicit search validation reports, immutable inspection results, and explicit final
+  figures.
   Sugarcane and Tobacco keep rendering functions in their numbered scripts; Pulp additionally
   owns its
   conditional predictor-rank profile and tutorial snippets. Their pandas, Matplotlib, and optional

@@ -59,18 +59,19 @@ use case rather than combining unrelated split protocols in one context-free scr
 
 - `05_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the path, inspects
   the conditional predictor-rank profile at three components, fits the selected fixed model,
-  orients the displayed factors so the tensile-index response is positive, calculates
-  selection-conditioned OOF predictions, and writes six final PDF figures directly from in-memory
-  results.
+  requests selection-conditioned OOF predictions through `search.validation_report()`, orients
+  the displayed factors so the tensile-index response is positive, and writes six final PDF
+  figures directly from in-memory results.
 - `06_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
-  inspection results in memory, calculates OOF predictions with scikit-learn, and writes five
-  wavelength-aware final PDF figures without generated analytical CSV files.
+  inspection results in memory, requests OOF predictions through the search validation report,
+  and writes five wavelength-aware final PDF figures without generated analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD and an explicit application of `one_standard_error_result()`. Its component-path figure shows
   the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row;
   `path_search.refit(..., rule="one_standard_error")` fits that row without manual parameter
   transfer. The workflow
-  then calculates selection-conditioned OOF predictions, decreasing-wavenumber spectral plots,
+  then requests selection-conditioned OOF predictions through the same named rule, produces
+  decreasing-wavenumber spectral plots,
   deterministic response pagination, and raw observation diagnostics through direct in-memory
   results and caller-owned multipage PDFs. See the
   [1-SE rule](../docs/path_analysis.md#one-standard-error-component-heuristic) and the
@@ -120,8 +121,8 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
    with Matplotlib.
 2. `path_search.refit(..., n_components=CHOSEN_N_COMPONENTS)` resolves the stored predictor rank
    and fits the chosen path row on all observations.
-3. `cross_val_predict()` with five seeded shuffled folds produces
-   `selection-conditioned OOF predictions`.
+3. `path_search.validation_report(..., n_components=CHOSEN_N_COMPONENTS)` reuses the exact
+   seeded shuffled folds stored by the search and returns `selection-conditioned OOF predictions`.
 4. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return
    immutable in-memory results; the Pulp factor call anchors component signs to positive `TI`
    entries.
@@ -130,8 +131,9 @@ comparison figures directly. Sugarcane demonstrates the complete-analysis workfl
 
 Pulp is the canonical tutorial workflow. Example 05 performs the same direct analysis shown in
 the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
-`predictor_rank_profile()`, fits the chosen row through `path_search.refit()`, calculates OOF
-predictions with `cross_val_predict()`, and renders immutable inspection arrays directly. Tobacco
+`predictor_rank_profile()`, fits the chosen row through `path_search.refit()`, obtains OOF
+predictions through `path_search.validation_report()`, and renders immutable inspection arrays
+directly. Tobacco
 follows the same direct result-to-Matplotlib pattern, but applies the named
 `"one_standard_error"` refit rule. It uses `one_standard_error_result()` and
 `minimum_cv_mse_result()` only to construct the explanatory

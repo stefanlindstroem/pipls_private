@@ -84,8 +84,10 @@ copies of the exact materialized split indices. The final cleanup removed all re
 constructor-selected report state without aliases or deprecation machinery.
 
 Maintained examples and tutorial renderers use `search.refit(...)` for the final full-data model
-rather than manually constructing a second estimator from the selected rank pair. Scalar result
-lookups remain available when a workflow needs the stored row for plotting or reporting.
+rather than manually constructing a second estimator from the selected rank pair. They use
+`search.validation_report(...)` for selection-conditioned OOF diagnostics rather than creating a
+second `cross_val_predict()` workflow. Scalar result lookups remain available when a workflow
+needs the stored row for plotting or reporting.
 
 Do not add aliases, deprecation warnings, ignored constructor arguments, fallback attributes, or
 serialization migrations for the removed pre-release surface.

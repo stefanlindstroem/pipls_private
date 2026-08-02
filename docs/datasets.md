@@ -251,8 +251,9 @@ LabSpec and response tables by `Sample`, removes three rows whose total-sugar re
 and applies no imputation or spectral preprocessing. `examples/06_sugarcane_real_data.py` reads
 `X.csv` and `Y.csv` directly, evaluates the default path-evaluating `PiPLSSearchCV()`, plots
 `component_path_` in memory, and fits a separate fixed model after a visible user component choice.
-It calculates selection-conditioned OOF predictions with scikit-learn and writes five final PDF figures directly
-from immutable inspection results. The compact spectral-axis description in `metadata.yaml` avoids
+It obtains selection-conditioned OOF predictions through `search.validation_report()` and writes
+five final PDF figures directly from immutable inspection results. The compact spectral-axis
+description in `metadata.yaml` avoids
 repeating 1,721 equivalent per-wavelength descriptions while still defining every predictor column
 exactly.
 
@@ -281,6 +282,7 @@ No imputation, smoothing, derivatives, scatter correction, centering, scaling, o
 preprocessing is applied. `examples/07_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly,
 evaluates a Pi-PLS component path with adaptive predictor-rank scanning and full predictor SVD,
 plots that path in memory, and then fits a separately chosen fixed Pi-PLS model. It preserves the
-decreasing wavenumber coordinate, calculates selection-conditioned OOF predictions and raw
-observation diagnostics, and writes five final PDFs. Prediction diagnostics and coefficients are
+decreasing wavenumber coordinate, obtains selection-conditioned OOF predictions through the
+search validation report, calculates raw observation diagnostics, and writes five final PDFs.
+Prediction diagnostics and coefficients are
 paginated in source response order. The separate ordinary-PLS comparison remains in example 04.

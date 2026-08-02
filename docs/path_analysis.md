@@ -242,8 +242,8 @@ estimator, mutate the search object, or alter `best_*`. With a nondefault scorer
 predictor rank need not minimize CV-MSE within its component-count profile. The returned rows can be
 used directly for user judgment or by the explicit path-level selection rule described below.
 
-The Tobacco workflow calls `one_standard_error_result()` explicitly and uses the returned component
-count and the predictor rank already stored in that component-path row to fit the final fixed model.
+The Tobacco workflow calls `one_standard_error_result()` explicitly to annotate the path figure,
+then applies the same named rule independently through both `refit()` and `validation_report()`.
 The other maintained examples and tutorials retain explicit component choices. Conditional
 predictor-rank profiles use the same standard-error bars for scale, but the stored predictor rank
 for each component count continues to maximize the configured mean CV score rather than applying

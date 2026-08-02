@@ -26,7 +26,7 @@ from adjustText import adjust_text  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 from matplotlib.patches import FancyArrowPatch  # noqa: E402
-from sklearn.model_selection import KFold, cross_val_predict  # noqa: E402
+from sklearn.model_selection import KFold  # noqa: E402
 
 from pipls import (  # noqa: E402
     PiPLSComponentPath,
@@ -187,12 +187,14 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         Y,
         n_components=CHOSEN_N_COMPONENTS,
     )
-    oof_predictions = cross_val_predict(
-        model,
+    report = path_search.validation_report(
         X,
         Y,
-        cv=CV,
+        n_components=CHOSEN_N_COMPONENTS,
     )
+    if report.oof_predictions is None:
+        raise RuntimeError("Validation reporting did not produce OOF predictions.")
+    oof_predictions = report.oof_predictions
     factors = pipls_display_factors(
         model.decomposition_,
         response_index=response_names.index("TI"),

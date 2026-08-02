@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 from numpy.typing import NDArray
-from sklearn.model_selection import KFold, cross_val_predict
+from sklearn.model_selection import KFold
 
 from pipls import (
     PiPLSComponentPath,
@@ -388,12 +388,14 @@ def main() -> None:
         Y,
         rule="one_standard_error",
     )
-    oof_predictions = cross_val_predict(
-        model,
+    report = path_search.validation_report(
         X,
         Y,
-        cv=CV,
+        rule="one_standard_error",
     )
+    if report.oof_predictions is None:
+        raise RuntimeError("Validation reporting did not produce OOF predictions.")
+    oof_predictions = report.oof_predictions
 
     # Calculate immutable fitted-model and prediction inspection results.
     factors = pipls_display_factors(model.decomposition_)

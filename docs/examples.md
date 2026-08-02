@@ -45,8 +45,9 @@ workflows and may take substantially longer than the package test suite.
 ## Cross-validation partitions
 
 Examples 02 and 04–07 use explicit five-fold shuffled regression splits with
-`KFold(n_splits=5, shuffle=True, random_state=0)`. The same seeded partition is used when an example
-compares paths or calculates selection-conditioned OOF predictions. Example 03 uses
+`KFold(n_splits=5, shuffle=True, random_state=0)`. When an example requests
+selection-conditioned OOF predictions, `validation_report()` reuses the exact partition
+materialized by its path search. Example 03 uses
 `LeaveOneOut`; shuffling is not defined because every observation is held out once. Grouped,
 temporal, or otherwise structured data require an application-specific splitter instead.
 
@@ -71,8 +72,8 @@ component path and fit one selected fixed model:
   `predictor_rank_profile()`, score-loading
   biplot, fixed-model inspection, and OOF diagnostics;
 - `examples/06_sugarcane_real_data.py`: the direct reference workflow, with a visible in-memory
-  component path, scikit-learn OOF prediction, wavelength-aware inspection, and five final PDF
-  figures;
+  component path, explicit search validation reporting, wavelength-aware inspection, and five
+  final PDF figures;
 - `examples/07_tobacco_real_data.py`: a complete spectral workflow that uses the
   [one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) to recommend
   the final component count before fixed-model inspection. See the focused explanation below.
@@ -97,7 +98,7 @@ same named rule through `path_search.refit(...)` for full-data fitting.
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
 Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered
 example writes a generated CSV file: committed `X.csv` and `Y.csv` tables are inputs, while every
-figure is constructed directly from `component_path_`, scikit-learn OOF predictions, and
+figure is constructed directly from `component_path_`, explicit search validation reports, and
 immutable inspection results. The Pulp factor view anchors every component to a positive tensile-
 index (`TI`) response entry; Sugarcane and Tobacco retain the default predictor-based orientation.
 The example layer owns Matplotlib chart construction, physical coordinates, subplot layouts,

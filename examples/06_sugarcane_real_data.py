@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from numpy.typing import NDArray
-from sklearn.model_selection import KFold, cross_val_predict
+from sklearn.model_selection import KFold
 
 from pipls import PiPLSComponentPath, PiPLSSearchCV
 from pipls.inspection import (
@@ -278,13 +278,15 @@ def main() -> None:
         n_components=CHOSEN_N_COMPONENTS,
     )
 
-    # Calculate selection-conditioned out-of-fold predictions.
-    oof_predictions = cross_val_predict(
-        model,
+    # Calculate selection-conditioned out-of-fold predictions on the stored splits.
+    report = path_search.validation_report(
         X,
         Y,
-        cv=CV,
+        n_components=CHOSEN_N_COMPONENTS,
     )
+    if report.oof_predictions is None:
+        raise RuntimeError("Validation reporting did not produce OOF predictions.")
+    oof_predictions = report.oof_predictions
 
     # Calculate fitted-model and prediction inspection results.
     factors = pipls_display_factors(model.decomposition_)

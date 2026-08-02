@@ -293,8 +293,8 @@ def test_real_data_examples_use_direct_public_results(
 
     assert {
         "PiPLSSearchCV",
-        "cross_val_predict",
         "refit",
+        "validation_report",
         "savefig",
         "subplots",
         *_INSPECTION_CALLS,
@@ -338,9 +338,9 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
 
     analysis_calls = {
         "PiPLSSearchCV",
-        "cross_val_predict",
         "read_csv",
         "refit",
+        "validation_report",
         *_INSPECTION_CALLS,
         *extra_analysis_calls,
     }
@@ -406,6 +406,10 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     refit_calls = _calls_with_name(tree, "refit")
     assert len(refit_calls) == 1
     assert _keyword_string(refit_calls[0], "rule") == "one_standard_error"
+
+    report_calls = _calls_with_name(tree, "validation_report")
+    assert len(report_calls) == 1
+    assert _keyword_string(report_calls[0], "rule") == "one_standard_error"
 
     search_calls = _calls_with_name(tree, "PiPLSSearchCV")
     assert any(_keyword_string(call, "search_method") == "auto" for call in search_calls)

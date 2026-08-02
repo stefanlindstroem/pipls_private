@@ -919,14 +919,15 @@ deprecation paths, ignored constructor parameters, or serialized compatibility s
 
 Current status: **complete**. The public lifecycle, maintained examples, tutorial renderers, and
 final presentation use post-fit `refit()` and explicit `validation_report()` without compatibility
-state or manual selected-rank transfer.
+state, manual selected-rank transfer, or a separate selection-conditioned `cross_val_predict()`
+pass.
 
 ## Current next increment
 
 Decision 0137 is fully implemented. Search owns candidate evidence and exact stored validation
 splits; final models and selection-conditioned OOF reports are produced only by explicit post-fit
-operations. The five-patch transition is closed. Any release-preparation work requires a separate
-owner-authorized increment.
+operations. The five-patch transition and final workflow audit are closed. Any release-preparation
+work requires a separate owner-authorized increment.
 
 ## Maintenance protocol
 

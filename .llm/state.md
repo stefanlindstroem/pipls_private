@@ -269,8 +269,8 @@ Additional fixed decisions:
 - Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
   separate fixed model
   after a visible component-path choice. Pulp and Sugarcane use explicit counts, while Tobacco
-  uses `one_standard_error_result()`. All three use `component_path_`,
-  scikit-learn OOF prediction, and inspection results directly in memory. All three use direct fixed
+  uses `one_standard_error_result()` for path annotation. All three use `component_path_`, explicit
+  search validation reports, and inspection results directly in memory. All three use direct fixed
   estimators. `best_params_` remains a convenience, not the required user decision.
 - Refit coefficients and fitted-model methods are accessed on the direct estimator or pipeline
   returned by `search.refit(...)`. No fitted model is attached to `PiPLSSearchCV`, and coefficients
@@ -479,9 +479,11 @@ stored splits for explicit follow-up reporting, and the two post-fit operations.
 
 ## Current next increment
 
-The five-patch inspect-decide-refit transition is complete. Maintained examples, tutorial renderers,
-and final user presentation use `search.refit(...)` rather than manual selected-rank transfer, and
-the active repository surface contains no compatibility state from the former lifecycle.
+The inspect-decide-refit transition and its final presentation cleanup are complete. Maintained
+examples and tutorial renderers use `search.refit(...)` rather than manual selected-rank transfer
+and obtain selection-conditioned OOF predictions through `search.validation_report(...)` rather
+than a separate `cross_val_predict()` pass. The active repository surface contains no
+compatibility state from the former lifecycle.
 
 Any release-preparation work requires a separate owner-authorized increment.
 

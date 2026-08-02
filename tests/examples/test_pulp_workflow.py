@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import pytest
-from sklearn.model_selection import KFold, cross_val_predict
+from sklearn.model_selection import KFold
 
 from pipls import (
     PiPLSComponentPath,
@@ -43,12 +43,13 @@ def pulp_result() -> SimpleNamespace:
         Y,
         n_components=3,
     )
-    oof_predictions = cross_val_predict(
-        model,
+    report = path_search.validation_report(
         X,
         Y,
-        cv=cv,
+        n_components=3,
     )
+    assert report.oof_predictions is not None
+    oof_predictions = report.oof_predictions
     factors = pipls_display_factors(
         model.decomposition_,
         response_index=Y.columns.get_loc("TI"),
@@ -68,6 +69,7 @@ def pulp_result() -> SimpleNamespace:
         selected=selected,
         rank_profile=rank_profile,
         model=model,
+        report=report,
         oof_predictions=oof_predictions,
         factors=factors,
         structure=structure,
@@ -116,6 +118,8 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
 
     assert result.X.shape == (46, 14)
     assert result.Y.shape == (46, 8)
+    assert result.report.selected_result == result.selected
+    assert result.report.has_complete_oof_coverage
     assert result.oof_predictions.shape == result.Y.shape
     assert np.all(np.isfinite(result.oof_predictions))
     assert result.diagnostics.prediction_kind == "selection-conditioned OOF predictions"
