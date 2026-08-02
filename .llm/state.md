@@ -65,6 +65,9 @@ and later retired by Decision 0125 after its development-validation purpose had 
 - a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
   `metadata.yaml`;
 - a current reference suite containing pulp, sugarcane, and tobacco;
+- an owner-authorized, not-yet-implemented transition that will make Pulp one named
+  package-owned dataset available through `pipls.datasets.load_pulp()`, while Sugarcane and
+  Tobacco retain the repository CSV convention;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
@@ -234,9 +237,9 @@ case, or public behavior.
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
-| Dataset namespace | optional immutable container and seeded generators under `pipls.datasets` |
-| Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or loader required for fitting |
-| Repository datasets | comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
+| Dataset namespace | current immutable container and seeded generators under `pipls.datasets`; Decision 0138 authorizes a staged named `load_pulp()` addition |
+| Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
+| Repository datasets | currently Pulp, Sugarcane, and Tobacco use comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml`; the accepted transition will move only Pulp to installed package resources |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -479,24 +482,26 @@ stored splits for explicit follow-up reporting, and the two post-fit operations.
 
 ## Current next increment
 
-The inspect-decide-refit transition and its final presentation cleanup are complete. Maintained
-examples and tutorial renderers use `search.refit(...)` rather than manual selected-rank transfer
-and obtain selection-conditioned OOF predictions through `search.validation_report(...)` rather
-than a separate `cross_val_predict()` pass. The active repository surface contains no
-compatibility state from the former lifecycle.
+Decision 0138 authorizes a five-patch transition from the repository-facing Pulp CSV layout to one
+named installed dataset loader. Patch 1 is the guide-layer decision only; `load_pulp()` is not yet
+implemented, the active Pulp example and tutorial still read `datasets/pulp/X.csv` and `Y.csv`, and
+public user documentation must continue to describe that implemented state.
 
-Any release-preparation work requires a separate owner-authorized increment.
+The next admissible increment is Patch 2: add the canonical package resources, implement
+`pipls.datasets.load_pulp(return_X_y=False)`, validate immutable results and provenance, and verify
+loading from clean wheel and source-distribution installations. The repository Pulp files remain
+temporarily as an exact parity source until maintained consumers migrate.
 
-Future datasets still require a distinct package-level use case and verified source-level
-redistribution rights. Block-aware scaling still requires a separate owner decision.
+Patches 3--5 then establish the Pulp quick start, migrate the complete Pulp workflow, and archive
+the former repository layout under `.llm/archive/` while removing it from active runtime,
+distribution, documentation, and test ownership. No generic loader, registry, download mechanism,
+`as_frame` option, or compatibility alias is authorized.
 
-The representative Pulp, Sugarcane, and Tobacco examples are
-complete. Corn, the legacy Steel table, SARCOS, and FRED-MD are intentionally outside the repository
-under Decision 0041. The included assets remain validation and documentation material during
-release hardening.
-
-The repository-product cleanup is complete. Paper-reproduction repositories remain outside this
-roadmap and may independently depend on specific tagged `pipls` releases.
+Any unrelated release-preparation work requires a separate owner-authorized increment. Block-aware
+scaling still requires a separate owner decision. Corn, the legacy Steel table, SARCOS, and FRED-MD
+remain intentionally outside the repository under Decision 0041. The representative Pulp,
+Sugarcane, and Tobacco analyses remain complete at the current implemented stage, and
+paper-reproduction repositories remain outside this roadmap.
 
 ## Authority and drift handling
 

@@ -7,7 +7,9 @@ able to read predictors `X`, read responses `Y`, and fit the model without a reg
 parser, package-owned loader, or access to repository-development materials.
 
 The package must not require a registry, metadata file, checksum manifest, dataset container, or
-package-owned loader before a model can be fitted.
+package-owned loader before a model can be fitted. A named built-in example dataset may be offered
+as an optional convenience when an explicit decision assigns package ownership; it does not change
+the primary user-owned `X`/`Y` contract.
 
 ## Programming-user contract
 
@@ -27,8 +29,9 @@ access.
 
 `PiPLSDataset` remains an optional structured container and the return type of the package-owned
 synthetic generators. It is not required for real data, and examples must not imply otherwise.
-Shipped CSV datasets are repository assets rather than installable registry entries, so package
-metadata exposes no `data` extra.
+At the current implemented stage, shipped CSV datasets remain repository assets rather than
+installable registry entries, so package metadata exposes no `data` extra. Decision 0138 authorizes
+a later named Pulp loader without creating a general data-access extra or registry.
 
 ## Example transparency
 
@@ -45,8 +48,9 @@ layout. Do not repeat dtype, missing-value, header-order, or directory-existence
 repository already establishes those facts. External users remain responsible for validating their
 own data sources.
 
-Do not hide these steps behind a package utility such as `load_dataset`, an example helper module,
-a registry resolver, metadata parser, or an implicit converter.
+Do not hide user-owned data preparation behind a generic utility such as `load_dataset`, an example
+helper module, a registry resolver, metadata parser, or an implicit converter. A decision-authorized
+named built-in dataset loader may replace repository file reading for that dataset only.
 
 For repository datasets, the preferred visible pattern is:
 
@@ -59,6 +63,27 @@ model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
 ```
 
 The example must not need to parse `metadata.yaml`; that file documents the repository asset.
+
+## Authorized Pulp ownership transition
+
+Decision 0138 authorizes one specific exception to the repository-CSV example rule. The completed
+transition will expose:
+
+```python
+from pipls.datasets import load_pulp
+
+data = load_pulp()
+X, Y = load_pulp(return_X_y=True)
+```
+
+The loader will return the existing immutable `PiPLSDataset` or read-only arrays from installed
+package resources. It is optional, named, local, and dataset-specific: no registry, download,
+`as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows from it.
+General users and every other real dataset continue to supply `X` and `Y` directly.
+
+This transition is accepted but not implemented in the current Patch 1 state. Until the loader and
+consumer migrations land, the Pulp example and tutorial continue to read the active repository CSV
+files directly. Public user documentation must not present the future loader prematurely.
 
 ## Public provenance boundary
 
@@ -132,7 +157,7 @@ layer.
 Do not introduce merely for repository examples:
 
 - a public dataset registry;
-- a generic real-data loader;
+- a generic real-data loader; the accepted named `load_pulp()` exception does not authorize one;
 - automatic downloading;
 - runtime dependence on `metadata.yaml`;
 - hidden example helpers that conceal how `X` and `Y` were formed;
@@ -165,8 +190,9 @@ The synthetic tutorial uses `make_pipls_train_test()` directly in example 02 and
 manifest records the deterministic generator configuration, selected rank pair, external-test
 provenance, and SVG hashes. No generated table is an input to fitting or plotting.
 
-The direct Pulp example and tutorial renderer both read the committed `datasets/pulp/X.csv` and
-`Y.csv` tables directly. The renderer records their SHA-256 values, selected rank pair, evaluated
-predictor ranks, and boundary status in a generated manifest and derives SVG figures from in-memory
-results. All tutorial figures and manifests are ignored build products, not alternative dataset
-representations or package inputs.
+At the current implemented stage, the direct Pulp example and tutorial renderer both read the
+committed `datasets/pulp/X.csv` and `Y.csv` tables directly. The renderer records their SHA-256
+values, selected rank pair, evaluated predictor ranks, and boundary status in a generated manifest
+and derives SVG figures from in-memory results. All tutorial figures and manifests are ignored build
+products, not alternative dataset representations or package inputs. Later Decision 0138 patches
+will migrate these consumers and manifest fields to the package-owned loader.

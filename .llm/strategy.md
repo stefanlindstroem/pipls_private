@@ -922,12 +922,41 @@ final presentation use post-fit `refit()` and explicit `validation_report()` wit
 state, manual selected-rank transfer, or a separate selection-conditioned `cross_val_predict()`
 pass.
 
+### Package-owned Pulp dataset transition
+
+Decision 0138 authorizes a five-patch transition:
+
+1. establish the package-owned Pulp decision and guide-layer target;
+2. add installed package resources, `load_pulp()`, focused loader tests, and clean distribution
+   validation while retaining the repository copy as a temporary parity source;
+3. replace the first example and prominent onboarding presentation with a compact Pulp fitted-value
+   quick start that clearly distinguishes calibration fit from predictive validation;
+4. migrate the complete Pulp example, tutorial renderer, manifests, tests, and active documentation
+   to the loader;
+5. move the former repository Pulp files to `.llm/archive/pulp-repository-layout-v1/`, remove them
+   from active dataset and distribution contracts, and verify one active Pulp matrix location.
+
+The final loader mirrors the `load_linnerud()` call style but returns `PiPLSDataset` by default and
+read-only arrays with `return_X_y=True`. It uses package resources and standard-library parsing,
+performs no network access or preprocessing, adds no pandas or PyYAML runtime dependency, and is
+exported only from `pipls.datasets`. Sugarcane and Tobacco remain repository CSV datasets.
+
+Current status: **Patch 1 complete in the guide layer; implementation has not started**. Public user
+documentation continues to describe direct repository Pulp reading until the loader exists.
+
 ## Current next increment
 
-Decision 0137 is fully implemented. Search owns candidate evidence and exact stored validation
-splits; final models and selection-conditioned OOF reports are produced only by explicit post-fit
-operations. The five-patch transition and final workflow audit are closed. Any release-preparation
-work requires a separate owner-authorized increment.
+Decision 0138 is the active owner-authorized transition. Patch 1 records the target without changing
+implementation or public user documentation. The next increment is Patch 2: package the canonical
+Pulp resources, add `pipls.datasets.load_pulp()`, and validate the loader from clean wheel and source
+distribution installations while retaining the repository copy for exact parity checks.
+
+The remaining Pulp migration patches must not be combined with Patch 2. No unrelated release work,
+generic dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.
+
+Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
+validation splits; final models and selection-conditioned OOF reports are produced only by explicit
+post-fit operations. That search-lifecycle transition and its workflow audit remain closed.
 
 ## Maintenance protocol
 

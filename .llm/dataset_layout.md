@@ -2,9 +2,28 @@
 
 ## Purpose
 
-This contract standardizes committed analysis-facing real datasets without changing the public
-estimator API. External programming users still read and prepare their own `X` and `Y`; they do not
-need a metadata file or package loader.
+This contract standardizes committed analysis-facing repository datasets without changing the
+public estimator API. External programming users still read and prepare their own `X` and `Y`; they
+do not need a metadata file or package loader. Decision 0138 authorizes one staged package-owned
+Pulp exception; until that migration completes, Pulp remains governed by this current layout.
+
+## Accepted Pulp exception and migration state
+
+Decision 0138 will move the canonical active Pulp assets to
+`src/pipls/_data/pulp/` and expose them through `pipls.datasets.load_pulp()`. The package-owned
+representation uses `metadata.json` so runtime loading requires only the standard library. This does
+not alter the repository layout for Sugarcane or Tobacco and does not create a generic dataset
+registry.
+
+During Patches 2--4, `datasets/pulp/` remains temporarily as an exact parity source while package
+resources and maintained consumers are validated. Patch 5 moves that former layout without
+modification to `.llm/archive/pulp-repository-layout-v1/`. The archive is excluded from runtime,
+served documentation, wheels, source distributions, and active dataset tests. After that cleanup,
+this repository-layout contract applies to Sugarcane and Tobacco, while the package-resource
+contract in Decision 0138 applies to Pulp.
+
+The present Patch 1 state changes no files or consumers below `datasets/pulp/`; all current layout
+requirements remain executable until the later patches complete the transition.
 
 ## Required files
 

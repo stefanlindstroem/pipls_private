@@ -239,6 +239,18 @@ from pipls.datasets import (
 )
 ```
 
+Decision 0138 authorizes a staged future addition:
+
+```python
+from pipls.datasets import load_pulp
+```
+
+The target signature is `load_pulp(*, return_X_y=False)`. It will return `PiPLSDataset` by default
+and a pair of read-only `float64` arrays when `return_X_y=True`. It will be package-resource backed,
+network-free, preprocessing-free, and exported only from `pipls.datasets`; no `as_frame`, registry,
+or generic loader is authorized. This contract is **not implemented in the current Patch 1 state**
+and must not yet appear in living public user documentation or the module's `__all__`.
+
 `PiPLSDataset` is an optional immutable in-memory container, primarily useful for package-owned
 synthetic data and structured experiments. Plain arrays and data frames passed directly to
 `fit(X, Y)` remain the primary real-data interface. The container stores read-only `float64` `X` and

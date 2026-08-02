@@ -75,6 +75,7 @@ reference describe the current public behavior directly.
 - [0123: companion-manuscript synthetic-data guide]
   (0123-companion-manuscript-synthetic-data-guide.md)
 - [0133: regression-generator truth naming](0133-regression-generator-truth-name.md)
+- [0138: package-owned Pulp dataset loader](0138-package-owned-pulp-dataset-loader.md)
 
 ## Examples and analysis workflows
 
