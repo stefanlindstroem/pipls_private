@@ -14,6 +14,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+QUICK_START_FIGURES = ("observed_vs_fitted.svg",)
 SYNTHETIC_TUTORIAL_FIGURES = (
     "component_path.svg",
     "predictor_rank_profile.svg",
@@ -143,13 +144,16 @@ def main() -> None:
             source / "mkdocs.yml",
             source / "docs" / "citation.md",
             source / "docs" / "index.md",
+            source / "docs" / "tutorials" / "quick_start.md",
             source / "docs" / "tutorials" / "synthetic.md",
             source / "docs" / "tutorials" / "pulp.md",
             source / "docs" / "api" / "index.md",
             source / "docs" / "troubleshooting.md",
             source / "docs" / "javascripts" / "mathjax.js",
+            source / "tools" / "render_quick_start_tutorial.py",
             source / "tools" / "render_synthetic_tutorial.py",
             source / "tools" / "render_pulp_tutorial.py",
+            source / "examples" / "01_pulp_quick_start.py",
             source / "examples" / "02_synthetic_path_selection.py",
             source / "examples" / "05_pulp_real_data.py",
             source / "src" / "pipls" / "_data" / "pulp" / "X.csv",
@@ -180,6 +184,28 @@ def main() -> None:
             ]
         )
         _run([make, "docs", f"PYTHON={python}"], cwd=source)
+
+        quick_start_dir = source / "docs" / "assets" / "generated" / "quick_start"
+        quick_start_manifest = _validate_figure_manifest(
+            quick_start_dir,
+            QUICK_START_FIGURES,
+            tutorial_name="quick-start tutorial",
+        )
+        quick_start_analysis = quick_start_manifest.get("analysis", {})
+        if quick_start_manifest.get("dataset") != {"id": "pulp", "version": "1"}:
+            raise RuntimeError("Quick-start tutorial dataset identity changed unexpectedly.")
+        if quick_start_analysis.get("selected_n_components") != 3:
+            raise RuntimeError("Quick-start tutorial component selection changed unexpectedly.")
+        if quick_start_analysis.get("selected_predictor_rank") != 10:
+            raise RuntimeError(
+                "Quick-start tutorial predictor-rank selection changed unexpectedly."
+            )
+        if quick_start_analysis.get("prediction_kind") != "fitted values":
+            raise RuntimeError("Quick-start tutorial must report fitted-value provenance.")
+        if not math.isfinite(
+            float(quick_start_analysis.get("mean_standardized_rmse", math.nan))
+        ):
+            raise RuntimeError("Quick-start tutorial standardized RMSE must be finite.")
 
         synthetic_dir = source / "docs" / "assets" / "generated" / "synthetic"
         synthetic_manifest = _validate_figure_manifest(
@@ -223,11 +249,18 @@ def main() -> None:
 
         rendered = [
             source / "site" / "index.html",
+            source / "site" / "tutorials" / "quick_start" / "index.html",
             source / "site" / "tutorials" / "synthetic" / "index.html",
             source / "site" / "tutorials" / "pulp" / "index.html",
             source / "site" / "api" / "regression" / "index.html",
             source / "site" / "troubleshooting" / "index.html",
             source / "site" / "api" / "inspection" / "index.html",
+            source
+            / "site"
+            / "assets"
+            / "generated"
+            / "quick_start"
+            / "observed_vs_fitted.svg",
             source / "site" / "assets" / "generated" / "synthetic" / "component_path.svg",
             source
             / "site"

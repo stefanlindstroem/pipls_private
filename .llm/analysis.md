@@ -96,7 +96,7 @@ of at least one.
 
 ### `examples/`
 
-`examples/01_minimal_fit_and_plot.py` is the primary onboarding path: package-owned Pulp data,
+`examples/01_pulp_quick_start.py` is the primary onboarding path: package-owned Pulp data,
 one chained default path search and one-standard-error refit, one fitted-value prediction call,
 standardized response diagnostics, and one caller-composed observed-versus-fitted plot. It must not
 depend on complete-workflow helpers, pandas, an explicit splitter, or OOF reporting, and its prose

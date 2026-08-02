@@ -14,8 +14,9 @@ theme:
 nav:
   - Home: index.md
   - Tutorials:
-      - 1. First model with synthetic data: tutorials/synthetic.md
-      - 2. Complete Pulp analysis: tutorials/pulp.md
+      - 1. Quick start with Pulp: tutorials/quick_start.md
+      - 2. Inspect and select with synthetic data: tutorials/synthetic.md
+      - 3. Complete Pulp analysis: tutorials/pulp.md
   - Examples: examples.md
   - Reference:
       - API overview: api/index.md

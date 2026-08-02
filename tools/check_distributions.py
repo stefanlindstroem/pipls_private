@@ -199,7 +199,7 @@ def _check_source_distribution_example(
     example_environment = environment_variables.copy()
     example_environment["MPLBACKEND"] = "Agg"
     _run(
-        [str(python), str(source / "examples" / "01_minimal_fit_and_plot.py")],
+        [str(python), str(source / "examples" / "01_pulp_quick_start.py")],
         cwd=source,
         env=example_environment,
     )

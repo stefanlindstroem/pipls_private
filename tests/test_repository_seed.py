@@ -425,7 +425,7 @@ def test_make_examples_runs_every_numbered_example() -> None:
         f"examples/{number:02d}_{name}.py"
         for number, name in enumerate(
             (
-                "minimal_fit_and_plot",
+                "pulp_quick_start",
                 "synthetic_path_selection",
                 "leave_one_out_validation",
                 "pls_path_comparison",
@@ -496,6 +496,7 @@ def test_readme_and_contributing_have_distinct_audiences() -> None:
         "PiPLSSearchCV",
         "for_n_components",
         "../../deployments/github-pages",
+        "docs/tutorials/quick_start.md",
         "docs/tutorials/synthetic.md",
         "docs/tutorials/pulp.md",
     ):

@@ -41,7 +41,7 @@ validation, and scientific background.
 The former benchmark layer has been retired after serving its development-validation purpose.
 Pulp, Sugarcane, and Tobacco remain component-path examples rather than test-suite executions.
 `make examples` runs every numbered example explicitly, beginning with the package-owned Pulp
-quick start in `01_minimal_fit_and_plot.py`, followed by the synthetic path-selection tutorial
+quick start in `01_pulp_quick_start.py`, followed by the synthetic path-selection tutorial
 example 02, and
 including the complete real-data analyses. Example 04
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.

@@ -130,6 +130,7 @@ def test_required_public_guides_are_reachable_through_navigation() -> None:
 
     navigation_paths = _navigation_paths(navigation)
     required_paths = {
+        "tutorials/quick_start.md",
         "tutorials/synthetic.md",
         "tutorials/pulp.md",
         "examples.md",
@@ -205,3 +206,58 @@ def test_companion_manuscript_guide_routes_to_public_theory_and_generator_api() 
     guide = _repository_root() / "docs" / "manuscript_reproduction.md"
 
     assert {"theory.md", "api/datasets.md", "citation.md"} <= _linked_paths(guide)
+
+
+def _snippet_sections(source: str) -> dict[str, str]:
+    sections: dict[str, list[str]] = {}
+    active: str | None = None
+    for line in source.splitlines():
+        start = re.fullmatch(r"\s*# --8<-- \[start:([^]]+)]", line)
+        end = re.fullmatch(r"\s*# --8<-- \[end:([^]]+)]", line)
+        if start is not None:
+            active = start.group(1)
+            sections[active] = []
+        elif end is not None:
+            assert active == end.group(1)
+            active = None
+        elif active is not None:
+            sections[active].append(line)
+    return {name: "\n".join(lines) for name, lines in sections.items()}
+
+
+def test_rendered_tutorials_show_explicit_kfold_definitions() -> None:
+    repository = _repository_root()
+    snippet_pattern = re.compile(r'--8<-- "(examples/[^:"]+):([^"]+)"')
+
+    for tutorial_path in sorted((repository / "docs" / "tutorials").glob("*.md")):
+        tutorial = tutorial_path.read_text(encoding="utf-8")
+        references = snippet_pattern.findall(tutorial)
+        by_source: dict[str, set[str]] = {}
+        for source_name, section in references:
+            by_source.setdefault(source_name, set()).add(section)
+
+        for source_name, referenced_sections in by_source.items():
+            source = (repository / source_name).read_text(encoding="utf-8")
+            if re.search(r"^CV\s*=\s*KFold\(", source, flags=re.MULTILINE) is None:
+                continue
+
+            sections = _snippet_sections(source)
+            visible_source = "\n".join(
+                sections[section]
+                for section in referenced_sections
+                if section in sections
+            )
+            assert "from sklearn.model_selection import KFold" in visible_source
+            assert "CV = KFold(" in visible_source
+
+
+def test_public_python_blocks_do_not_use_an_undefined_cv_variable() -> None:
+    repository = _repository_root()
+    code_fence = re.compile(r"```python\n(.*?)\n```", flags=re.DOTALL)
+
+    for document in sorted((repository / "docs").rglob("*.md")):
+        if "decisions" in document.parts:
+            continue
+        for block in code_fence.findall(document.read_text(encoding="utf-8")):
+            if "cv=cv" in block:
+                assert re.search(r"^cv\s*=", block, flags=re.MULTILINE) is not None

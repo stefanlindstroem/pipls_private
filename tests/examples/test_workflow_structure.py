@@ -228,7 +228,7 @@ def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
 def test_maintained_pulp_consumers_use_the_package_loader() -> None:
     repository = _repository_root()
     for relative_path in (
-        "examples/01_minimal_fit_and_plot.py",
+        "examples/01_pulp_quick_start.py",
         "examples/04_pls_path_comparison.py",
         "examples/05_pulp_real_data.py",
         "tools/render_pulp_tutorial.py",

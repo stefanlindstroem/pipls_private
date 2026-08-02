@@ -1,8 +1,9 @@
 # Examples
 
 The numbered examples are executable workflows organized by programming task. Start with the
-package-owned Pulp quick start, continue with the [synthetic tutorial](tutorials/synthetic.md) for
-component-path inspection and independent-test prediction, then use the
+package-owned [Pulp quick start](tutorials/quick_start.md), continue with the
+[synthetic tutorial](tutorials/synthetic.md) for component-path inspection and independent-test
+prediction, then use the
 [Pulp tutorial](tutorials/pulp.md) for a complete real-data analysis. This page is a catalogue of
 the maintained scripts.
 
@@ -10,7 +11,7 @@ the maintained scripts.
 
 | Script | Programming task | Main output |
 |---|---|---|
-| `01_minimal_fit_and_plot.py` | Search, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
+| `01_pulp_quick_start.py` | Search, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Inspect a component path, select one fixed model, and evaluate independent test predictions | Three PDF figures and printed external-test $R^2$ |
 | `03_leave_one_out_validation.py` | Validate a small calibration study with leave-one-out splits and explicit ordered OOF reporting | Printed selected rank pair and immutable validation summary |
 | `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
@@ -29,7 +30,7 @@ Install the example dependencies and execute a script from the repository root:
 
 ```bash
 python -m pip install ".[examples]"
-python examples/01_minimal_fit_and_plot.py
+python examples/01_pulp_quick_start.py
 ```
 
 Generated files are written below `examples/results/`.

@@ -18,7 +18,7 @@ workflows are intentionally more extensive than ordinary estimator use.
 
 ## Start here
 
-- `01_minimal_fit_and_plot.py`: the shortest installed-data workflow. It loads Pulp through
+- `01_pulp_quick_start.py`: the shortest installed-data workflow. It loads Pulp through
   `load_pulp()`, evaluates the default component path, applies the one-standard-error rule through
   `refit()`, and combines all standardized observed and fitted responses in one plot. The plotted
   values describe full-data calibration fit, not OOF validation.
@@ -34,7 +34,7 @@ Run it with:
 
 ```bash
 python -m pip install -e ".[examples]"
-PYTHONPATH=src MPLBACKEND=Agg python examples/01_minimal_fit_and_plot.py
+PYTHONPATH=src MPLBACKEND=Agg python examples/01_pulp_quick_start.py
 ```
 
 The script writes `examples/results/pulp_quick_start.pdf`. The package loader provides the

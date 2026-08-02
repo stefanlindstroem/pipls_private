@@ -60,7 +60,7 @@ def test_distribution_helper_builds_once_and_checks_both_artifacts() -> None:
     assert "_assert_development_archive_excluded(source_distribution)" in helper
     assert "_check_source_distribution_example" in helper
     assert 'f"pipls[examples] @ {artifact.resolve().as_uri()}"' in helper
-    assert 'source / "examples" / "01_minimal_fit_and_plot.py"' in helper
+    assert 'source / "examples" / "01_pulp_quick_start.py"' in helper
     assert 'source / "examples" / "results" / "pulp_quick_start.pdf"' in helper
 
 

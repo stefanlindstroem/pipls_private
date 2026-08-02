@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+# --8<-- [start:load-pulp-data]
 import matplotlib.pyplot as plt
 
 from pipls import PiPLSSearchCV
@@ -10,7 +11,9 @@ from pipls.inspection import prediction_diagnostics
 
 data = load_pulp()
 X, Y = data.data, data.target
+# --8<-- [end:load-pulp-data]
 
+# --8<-- [start:fit-selected-pulp-model]
 model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")
 
 diagnostics = prediction_diagnostics(
@@ -20,11 +23,14 @@ diagnostics = prediction_diagnostics(
 )
 observed = diagnostics.observed_standardized.ravel()
 fitted = diagnostics.predicted_standardized.ravel()
+mean_standardized_rmse = float(diagnostics.standardized_rmse.mean())
+# --8<-- [end:fit-selected-pulp-model]
+
+# --8<-- [start:plot-standardized-fitted-values]
 limits = [
     min(float(observed.min()), float(fitted.min())),
     max(float(observed.max()), float(fitted.max())),
 ]
-mean_standardized_rmse = float(diagnostics.standardized_rmse.mean())
 
 figure, axis = plt.subplots(figsize=(5.8, 5.4), layout="constrained")
 axis.scatter(observed, fitted)
@@ -38,6 +44,7 @@ axis.set_title(
     rf"Pulp $\Pi$-PLS fit; mean standardized RMSE = {mean_standardized_rmse:.2f}"
 )
 axis.grid(alpha=0.2)
+# --8<-- [end:plot-standardized-fitted-values]
 
 output_path = Path(__file__).resolve().parent / "results" / "pulp_quick_start.pdf"
 figure.savefig(output_path)

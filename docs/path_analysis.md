@@ -138,6 +138,9 @@ routing when routing is enabled and requested. Split metadata belongs to the sea
 Request ordered OOF diagnostics explicitly after path evaluation:
 
 ```python
+from sklearn.model_selection import KFold
+
+cv = KFold(n_splits=5, shuffle=True, random_state=0)
 search = PiPLSSearchCV(cv=cv).fit(X, Y)
 report = search.validation_report(X, Y, rule="one_standard_error")
 # or: report = search.validation_report(X, Y, n_components=4)

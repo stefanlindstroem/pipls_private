@@ -24,9 +24,9 @@ in a local checkout.
 
 Start with:
 
-1. [Quick start with Pulp](#quick-start-with-pulp) for one installed real-data fit and one
+1. [Quick start with Pulp](docs/tutorials/quick_start.md) for one installed real-data fit and one
    observed-versus-fitted plot.
-2. [First Pi-PLS model with synthetic data](docs/tutorials/synthetic.md) for component-path
+2. [Inspect and select with synthetic data](docs/tutorials/synthetic.md) for component-path
    inspection and independent-test prediction.
 3. [Complete Pulp analysis](docs/tutorials/pulp.md) for selection-conditioned OOF predictions and
    representative model interpretation.
@@ -73,7 +73,7 @@ model = PiPLSSearchCV().fit(X, Y).refit(
 Y_fitted = model.predict(X)
 ```
 
-`examples/01_minimal_fit_and_plot.py` standardizes each response and places all observed and fitted
+`examples/01_pulp_quick_start.py` standardizes each response and places all observed and fitted
 values in one figure. These are fitted values from the final full-data model, not out-of-fold
 predictions; use `search.validation_report(...)` when predictive validation is required.
 
@@ -192,8 +192,9 @@ Install the `examples` extra before running them.
 
 - [Rendered documentation](../../deployments/github-pages)
 - Source documentation:
-  - [Tutorial 1: synthetic selection and prediction](docs/tutorials/synthetic.md)
-  - [Tutorial 2: complete Pulp analysis](docs/tutorials/pulp.md)
+  - [Tutorial 1: Pulp quick start](docs/tutorials/quick_start.md)
+  - [Tutorial 2: synthetic path inspection](docs/tutorials/synthetic.md)
+  - [Tutorial 3: complete Pulp analysis](docs/tutorials/pulp.md)
   - [API overview](docs/api/index.md)
   - [Path-selection details](docs/path_analysis.md)
   - [Troubleshooting](docs/troubleshooting.md)

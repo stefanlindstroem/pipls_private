@@ -90,9 +90,10 @@ historical tombstone test per removed fitted attribute.
 
 ## Three-stage onboarding transition
 
-Decision 0139 introduces staged presentation contracts rather than package behavior. Patch 1 adds
-no executable test because the new tutorial, filename, renderer, and navigation do not yet exist.
-Patches 2 and 3 must add or update durable tests that protect:
+Decision 0139 introduces staged presentation contracts rather than package behavior. Patch 2 now
+protects the renamed example, generated quick-start asset, semantic manifest, navigation order, and
+source-distribution documentation route. Patch 3 must complete the broader wording and reference
+reframing. Durable tests protect:
 
 - one maintained `examples/01_pulp_quick_start.py` source and no compatibility copy under the former
   name;
@@ -108,8 +109,8 @@ Patches 2 and 3 must add or update durable tests that protect:
 - selection-conditioned terminology for the maintained Pulp OOF workflow.
 
 Prefer parsed navigation, executable snippets, manifest semantics, artifact existence, and focused
-source-structure checks over frozen prose or pixel output. The current two-page tutorial route and
-first-example filename remain the tested implementation until Patch 2 changes them.
+source-structure checks over frozen prose or pixel output. The three-page route and renamed first
+example are now the tested implementation.
 
 ## Rendering validation boundary
 
@@ -157,8 +158,11 @@ and public `plot_*` functions, keep Matplotlib and `adjustText` optional, and en
 support code does not hide chart construction.
 
 Structural tests require maintained analytical ordinary K-fold examples and tutorial renderers to
-use `KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. The compact first example is the
-intentional exception: it uses default `cv=5` to demonstrate the shortest installed-data workflow.
+use `KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Every rendered example that uses
+an explicit splitter must also display the splitter import and definition before a shown snippet
+uses its `CV` or `cv` variable; tutorial snippets must not depend on hidden module-level validation
+configuration. The compact first example is the intentional exception: it uses default `cv=5` to
+demonstrate the shortest installed-data workflow.
 The leave-one-out example retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane,
 and Tobacco protect
 direct `component_path_` access, explicit `validation_report()`, immutable inspection results,
@@ -177,7 +181,7 @@ configuration, and avoid pinning adjusted label coordinates.
 Ordinary pytest must not execute the Pulp tutorial renderer because it requires the optional
 `adjustText` dependency. Static tests protect its Makefile, source-distribution, snippet, asset-name,
 and ownership contracts; `make docs-figures` and `make docs` execute and validate the renderer in the
-complete documentation environment. Tutorial structure tests may verify the two-step navigation,
+complete documentation environment. Tutorial structure tests may verify the three-step navigation,
 generated-asset references, checked
 snippet sections from examples 02 and 05, links to stable API objects, and links to stable
 model-inspection anchors without freezing narrative wording. Documentation-entry tests may verify
@@ -202,7 +206,7 @@ the selected fixed pair, upper-boundary rank profile, aligned validation-report 
 and inspection shapes
 without writing application artifacts.
 
-The minimal numbered example may be protected structurally and through package-level Pulp-loader,
+The Pulp quick-start example may be protected structurally and through package-level Pulp-loader,
 numerical, direct-rendering, and source-distribution execution tests. Protect its chained
 search/refit call, fitted-value provenance, standardized single-axis plot, and absence of OOF claims;
 do not duplicate Pulp arrays as a second frozen scientific fixture. Do not execute the

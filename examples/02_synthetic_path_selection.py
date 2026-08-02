@@ -4,15 +4,20 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+# --8<-- [start:import-synthetic-kfold]
 from sklearn.model_selection import KFold
 
+# --8<-- [end:import-synthetic-kfold]
 from pipls import PiPLSSearchCV
 from pipls.datasets import make_pipls_train_test
 from pipls.inspection import prediction_diagnostics
 
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "synthetic_tutorial"
 CHOSEN_N_COMPONENTS = 2
+# --8<-- [start:define-synthetic-cv]
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
+# --8<-- [end:define-synthetic-cv]
 
 # --8<-- [start:generate-synthetic-data]
 train, test = make_pipls_train_test(

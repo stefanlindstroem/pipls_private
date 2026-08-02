@@ -497,16 +497,16 @@ Pulp selection-conditioned validation and interpretation workflow. The quick sta
 its calibration-fit predictions validation. The transition retains no old example filename,
 duplicate tutorial, or compatibility navigation because the package remains at version `0.0.0`.
 
-Current status: **Patch 1 complete; implementation pending**. Decision 0139 and the active guide
-layer now record the target, while examples, renderers, served navigation, and living public pages
-still describe the current implemented route until Patches 2 and 3 are accepted.
+Current status: **Patches 1 and 2 complete; final reframing pending**. The maintained first example
+is now `examples/01_pulp_quick_start.py`, the rendered quick-start tutorial owns one generated SVG
+and semantic manifest, and served navigation presents quick start, synthetic inspection, and
+complete Pulp analysis in that order.
 
 ## Current next increment
 
-Decision 0139 Patch 2 is the current next increment: add the rendered Pulp quick-start
-tutorial, rename its maintained example, integrate its generated SVG and manifest, and update
-served navigation and structural/distribution contracts without yet reframing the remaining
-documentation journey.
+Decision 0139 Patch 3 is the current next increment: reframe the landing page, synthetic tutorial,
+path reference, example catalogues, and active OOF terminology around automatic fit,
+inspect-decide-refit, and selection-conditioned validation, then close the transition.
 
 Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
 available in clean wheel and source-distribution installations, every maintained Pulp consumer uses

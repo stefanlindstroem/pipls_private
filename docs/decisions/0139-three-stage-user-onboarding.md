@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation pending.
+Accepted; implementation in progress.
 
 ## Context
 
@@ -118,8 +118,10 @@ Implement the transition in three reviewable patches:
 3. reframe the landing page, synthetic tutorial, path reference, catalogues, and active terminology
    around the three-stage route, then close the transition with stale-surface audits.
 
-Patch 1 changes no executable example, renderer, navigation, or living user documentation. Until
-Patches 2 and 3 are accepted, those surfaces continue to describe the currently implemented route.
+Patch 1 changed no executable example, renderer, navigation, or living user documentation. Patch 2
+implements the renamed quick-start example, rendered tutorial, generated asset pipeline, and first
+navigation position. Patch 3 remains responsible for reframing the broader landing page, path
+reference, catalogues, and active terminology around the complete three-stage route.
 
 This decision refines Decisions 0044, 0064, 0075, 0076, and 0104 where they assign the first or
 shortest pedagogical route. Their broader self-contained-example, tutorial ownership, documentation

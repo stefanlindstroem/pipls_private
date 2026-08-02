@@ -75,6 +75,10 @@
 
 ### Documentation
 
+- Make validation configuration visible in every served example that uses an explicit splitter:
+  Tutorial 2 now shows its seeded shuffled `KFold` definition before path evaluation, and the
+  standalone OOF example defines its `cv` variable in place.
+
 - correct the served example catalogue heading scope so the Tobacco-specific 1-SE discussion no
   longer governs the generic output-artifact and rendering-ownership notes for all maintained
   examples.

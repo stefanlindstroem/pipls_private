@@ -138,11 +138,14 @@ def test_synthetic_tutorial_uses_checked_snippets_assets_and_public_links() -> N
 
     tutorials = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
     assert [next(iter(item.values())) for item in tutorials] == [
+        "tutorials/quick_start.md",
         "tutorials/synthetic.md",
         "tutorials/pulp.md",
     ]
 
     snippet_sections = {
+        "import-synthetic-kfold",
+        "define-synthetic-cv",
         "generate-synthetic-data",
         "evaluate-synthetic-path",
         "plot-synthetic-component-path",

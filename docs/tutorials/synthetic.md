@@ -1,8 +1,9 @@
-# First Pi-PLS model with synthetic data
+# Inspect and select a Pi-PLS model with synthetic data
 
-This tutorial shows the shortest complete path from data generation to a selected Pi-PLS model. It
-uses deterministic synthetic training and test data so that the latent structure is known and the
-prediction assessment is independent of model selection. For Pi-PLS, `n_components` is the number
+This tutorial expands the [Pulp quick start](quick_start.md) by retaining the fitted search object,
+inspecting its component path and conditional predictor-rank profile, and choosing a component count
+before refitting. Deterministic synthetic training and test data make the latent structure known and
+keep prediction assessment independent of model selection. For Pi-PLS, `n_components` is the number
 of paired latent modes.
 
 ## What this tutorial covers
@@ -19,6 +20,19 @@ You will:
 The tutorial deliberately stops after one prediction plot. Scores, loadings, Pi-PLS factorization
 plots, and selection-conditioned OOF diagnostics are introduced in the
 [complete Pulp tutorial](pulp.md).
+
+## Define the validation splitter
+
+The component path uses reproducible shuffled five-fold cross-validation. The splitter definition
+is shown explicitly because it determines every fold-level fit and every CV-MSE value below:
+
+```python
+--8<-- "examples/02_synthetic_path_selection.py:import-synthetic-kfold"
+--8<-- "examples/02_synthetic_path_selection.py:define-synthetic-cv"
+```
+
+For grouped, blocked, or ordered observations, replace `KFold` with a splitter that represents the
+sampling design rather than shuffling those structures.
 
 ## Generate training and test data
 
