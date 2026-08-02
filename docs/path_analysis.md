@@ -110,8 +110,8 @@ search = PiPLSSearchCV(estimator=pipeline).fit(X, Y)
 
 The terminal estimator needs the valid construction seed pair `(1, 1)` because
 `PiPLSRegression` always represents one explicit fixed pair. `PiPLSSearchCV` replaces both values
-before fold-rank preflight, every candidate fit, optional OOF fitting, and the final refit, so the
-seed pair does not restrict or select the path. Other template settings, including `scale`,
+before fold-rank preflight, every candidate fit, optional OOF fitting, and each explicit post-fit
+refit, so the seed pair does not restrict or select the path. Other template settings, including `scale`,
 `svd_solver`, and `random_state`, do affect candidate fitting.
 
 Do not fit learned preprocessing on the complete dataset before path evaluation.
@@ -236,55 +236,51 @@ predictor-rank profiles use the same standard-error bars for scale, but the stor
 for each component count continues to maximize the configured mean CV score rather than applying
 the 1-SE rule.
 
-## Predeclared final-model selection
+## Post-fit final-model selection
 
-When the model-building protocol is known before fitting, `selection_rule` can choose the final
-stored component-path row without introducing selection into `PiPLSRegression`:
+After path evaluation, `refit()` selects one stored component-path row and fits the corresponding
+fixed model on the supplied full data:
 
 ```python
-search = PiPLSSearchCV(
-    search_method="auto",
-    selection_rule="one_standard_error",
-    refit=True,
-).fit(X, Y)
-
-model = search.selected_pipls_
+search = PiPLSSearchCV(search_method="auto").fit(X, Y)
+model = search.refit(X, Y, rule="one_standard_error")
 Y_pred = model.predict(X_new)
 ```
 
-Once the selected Pi-PLS model has been extracted, application code should call its methods
-directly. Delegated methods such as `search.predict(X_new)` remain available as scikit-learn-style
-conveniences, but the explicit model call keeps selection and model application visually separate.
+Manual selection uses the same operation:
 
-The accepted rules are:
+```python
+model = search.refit(X, Y, n_components=4)
+```
 
-- `selection_rule="best_score"`, the default, which chooses the globally best evaluated pair under
-  the configured scorer;
-- `selection_rule="one_standard_error"`, which chooses the exact stored row returned by
-  `component_path_.one_standard_error_result()`.
+Exactly one of `rule` and `n_components` is required. The accepted post-fit rules are:
 
-The second rule therefore selects $h$ from the stored CV-MSE path and retains the predictor rank
-already selected conditionally for that $h$. With a nondefault scorer, the rank remains conditioned
-on that scorer even though the component rule uses response-standardized CV-MSE. The rule requires
-at least two validation splits.
+- `rule="best_score"`, the global optimum under the configured scorer;
+- `rule="minimum_cv_mse"`, the stored component-path row with minimum mean
+  response-standardized CV-MSE;
+- `rule="one_standard_error"`, the smallest stored component count within one fold-based standard
+  error of that minimum.
 
-The global optimum and the declared final choice remain separate results. `best_index_`,
-`best_score_`, `best_params_`, `best_n_components_`, and `best_predictor_rank_` always describe the
-global configured-score optimum. `selected_result_` and `selected_params_` describe the final path
-row. `validation_report_` and optional OOF predictions also represent that selected row.
+Each rule retains the predictor rank already selected conditionally for the chosen component count.
+With a nondefault scorer, that rank remains conditioned on the scorer even when the component rule
+uses response-standardized CV-MSE. The 1-SE rule requires at least two validation splits.
 
-This one-call form is suitable only for a rule declared in advance. A component count chosen after
-examining the path is a post-hoc scientific decision and should remain an explicit second fit.
+`refit()` clones the configured direct estimator or pipeline, replaces the terminal Pi-PLS rank
+pair, fits the clone, and returns it. It does not mutate the search, store the supplied matrices, or
+attach the model to search state. Prediction, transformation, scoring, inverse transformation, and
+feature-name behavior belong to the returned model.
 
-## Refit and detailed diagnostics
+The current `selection_rule` constructor control separately determines `selected_result_`,
+`selected_params_`, and `validation_report_`, including optional OOF predictions. A post-fit
+`refit()` rule is explicit and does not alter those report attributes.
 
-The default `refit=False` leaves path evaluation and final fixed-model fitting as separate steps,
-which keeps the component-count choice visible. With `refit=True`, the row chosen by
-`selection_rule` is fitted on all supplied data as `selected_estimator_` and `selected_pipls_`, and
-supported prediction or transformation methods delegate to it. These selected-model attributes use
-the same names for every selection rule; no duplicate fitted-estimator `best_*` aliases are exposed.
+## Search and model diagnostics
 
 Use `component_path_` for the concise component-count curve and `predictor_rank_profile(h)` for the
 evaluated ranks at one count. `cv_results_` contains candidate parameters, split test scores,
 response-standardized MSE diagnostics, score ranks, and fit/score timing summaries. It contains only
 evaluated candidates.
+
+Use the returned estimator for fixed-model diagnostics such as `decomposition_`, coefficients,
+latent scores, predictions, and inspection helpers. Retain the search variable when both search
+evidence and the final fitted model are needed.

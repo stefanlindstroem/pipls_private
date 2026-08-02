@@ -4,6 +4,11 @@
 
 ### Repository
 
+- Add explicit post-fit `PiPLSSearchCV.refit(X, y, rule=... or n_components=...)`, returning a
+  fitted clone of the configured direct estimator or terminal-Pi-PLS pipeline without mutating the
+  search. Remove the conflicting constructor boolean, selected fitted-model attributes, refit
+  timing, and delegated fitted-model methods; retain constructor-selected validation reporting only
+  until the next staged transition.
 - Use explicit reproducible shuffled five-fold partitions in every maintained example and tutorial
   renderer that uses ordinary K-fold CV; keep leave-one-out exhaustive, and use the same seeded
   folds for path selection, ordinary-PLS comparison, and selection-conditioned OOF prediction.
@@ -28,9 +33,9 @@
   `response_rotations` fields to `predictor_directions` and `response_directions`, without
   compatibility aliases. Retain `PiPLSRegression.x_rotations_` and `y_rotations_` as standard
   PLS-style fitted attributes referencing the same arrays.
-- Remove the unreleased `PiPLSSearchCV.best_estimator_` and `best_pipls_` compatibility aliases;
-  `selected_estimator_` and `selected_pipls_` now name the one refitted model under every selection
-  rule, while scalar and parameter `best_*` results continue to describe the global score optimum.
+- Remove the unreleased fitted-estimator aliases from `PiPLSSearchCV`; scalar and parameter
+  `best_*` results continue to describe the global score optimum, while fitted models are returned
+  directly by explicit post-fit `refit()` rather than attached to search state.
 - Stop ordinary pytest from executing the Pulp tutorial renderer that requires optional
   `adjustText`; retain the renderer and validate it through the documentation targets.
 - Retire the complete benchmark layer: remove the four focused synthetic scripts, their dedicated

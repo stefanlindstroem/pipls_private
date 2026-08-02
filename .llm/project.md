@@ -224,8 +224,8 @@ implementing or reviewing this surface.
 - `PiPLSRegression` and `PiPLSSearchCV` do not wrap each other; selection machinery is owned by the
   path interface.
 - `PiPLSRegression` owns current centering and optional scaling: every candidate fit learns its
-  statistics from the corresponding training fold, and the selected model refits them on all
-  supplied training data.
+  statistics from the corresponding training fold, and a model returned by post-fit `refit()`
+  learns them on all data supplied to that operation.
 - Future block-aware variants of that standardization are valid product scope but currently have no
   accepted API, names, schedule, or implementation plan. They must preserve the same fold-local and
   full-training-refit boundary.

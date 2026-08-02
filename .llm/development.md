@@ -14,7 +14,8 @@
 ## Implementation
 
 - Follow scikit-learn estimator conventions for constructor parameters, cloning, validation,
-  fitted attributes, feature names, conditional delegation, and scalar `score()`.
+  fitted attributes, feature names, and scalar `score()` on fitted model estimators. Search objects
+  own evidence and do not delegate fitted-model methods.
 - Keep constructor arguments unchanged unless an accepted decision explicitly changes the public
   lifecycle. Decision 0137 authorizes staged removal of constructor-time selection, refit, and OOF
   controls; do not add aliases, ignored arguments, deprecation paths, or fallback state.

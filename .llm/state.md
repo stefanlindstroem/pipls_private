@@ -40,8 +40,8 @@ and later retired by Decision 0125 after its development-validation purpose had 
   with no former-name alias and unchanged component-path result terminology;
 - immutable `PiPLSComponentPath` row arrays with path-wide policy and split-count scalars, derived
   fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
-- explicit best-score or one-standard-error final path-row selection, with global `best_*` results
-  kept separate from `selected_result_`, optional OOF diagnostics, and one selected full-data refit;
+- explicit post-fit full-data refitting from a named rule or manually chosen component-path row,
+  with global `best_*` evidence kept separate from temporary constructor-selected report state;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
   `predictor_rank_profile(n_components)`, derived from `cv_results_`;
 - a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
@@ -111,7 +111,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
   advanced page, and model inspection retains all stable interpretation anchors without repeating
   elementary plotting recipes.
 - documentation and maintained example constructions aligned with the current public defaults:
-  `PiPLSSearchCV()` demonstrates selection-only operation, decomposition documentation includes
+  `PiPLSSearchCV()` demonstrates path-evaluation operation, decomposition documentation includes
   rank/solver diagnostics, and Pulp rank profiles use the public lookup method;
 - a grouped self-documenting maintainer command index that presents `make install` and `make check`
   first, then separates development, documentation/example, and distribution/maintenance targets
@@ -157,11 +157,12 @@ Decision 0100 moves rendered documentation into a dedicated GitHub Pages workflo
 pull request validates the strict checkout and source-distribution builds, while `master` pushes
 receive repository-derived canonical URLs and deploy the built site. The README routes GitHub users
 through the current Pages deployment without hard-coding an unconfirmed owner name. Decision 0101
-renumbers maintained examples continuously from 01 to 07. Decision 0102 makes path evaluation
-selection-only by default and gives the default scorer a stable package string. Decision 0103
+renumbers maintained examples continuously from 01 to 07. Decision 0102 separated path evaluation
+from automatic constructor-time refitting and gave the default scorer a stable package string. Decision 0103
 retains only the maintained `dev`, `examples`, and `docs` extras. Decision 0104 refines the new-user
 documentation route, and Decision 0105 aligns maintained documentation and examples with the
-resulting implementation.
+resulting implementation. Decision 0137 now supersedes Decision 0102's former constructor-refit
+surface with explicit post-fit refitting.
 Plotting migration G1--G5 and public-result cleanup API1--API3 are
 complete. Decision 0042 defines the staged fitted-model architecture, and Decision
 0045 corrects the
@@ -228,8 +229,8 @@ case, or public behavior.
 | Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
 | Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
 | Selection score | stable package string `"neg_response_standardized_mse"` by default, resolving to the public callable; sklearn scorer names, callables, and `None` accepted |
-| Final path-row selection | `selection_rule="best_score"` by default; explicit `"one_standard_error"` selects the stored 1-SE component row |
-| Final refit | `refit=False` by default; `refit=True` fits `selected_result_` and exposes `selected_estimator_`/`selected_pipls_` |
+| Temporary report-row selection | constructor `selection_rule="best_score"` by default; explicit `"one_standard_error"` selects the row represented by `selected_result_` and `validation_report_` |
+| Final refit | post-fit `search.refit(X, y, rule=...)` or `search.refit(X, y, n_components=...)` returns a fitted clone without mutating search state |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | path-only opt-in through `return_oof_predictions=True` |
@@ -259,22 +260,22 @@ Additional fixed decisions:
 - interpretable Pi-PLS directions, dilation, rank/solver diagnostics, and the standardized map live
   in the read-only `decomposition_` object; construction matrices remain private and standard
   PLS-style fitted attributes remain top-level.
-- `PiPLSSearchCV` defaults to selection-only `refit=False`; refit-dependent path methods are absent
-  unless a final refit is requested explicitly. `best_*` remains the global configured-score
-  optimum, while `selected_result_` records the declared best-score or 1-SE final row. Output-
-  container configuration remains carried by the estimator template.
+- `PiPLSSearchCV` is a path evaluator rather than a delegated fitted model. Post-fit `refit()`
+  requires exactly one named rule or one component count, returns a fitted clone, and leaves search
+  evidence unchanged. `best_*` remains the global configured-score optimum, while the temporary
+  `selected_result_` records the constructor-selected best-score or 1-SE report row. Output-container
+  configuration remains carried by the estimator template and returned clone.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
-- Real-data examples use the default selection-only `PiPLSSearchCV()` for the path and fit a
+- Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
   separate fixed model
   after a visible component-path choice. Pulp and Sugarcane use explicit counts, while Tobacco
   uses `one_standard_error_result()`. All three use `component_path_`,
   scikit-learn OOF prediction, and inspection results directly in memory. All three use direct fixed
   estimators. `best_params_` remains a convenience, not the required user decision.
-- Refit coefficients are accessed through `selected_pipls_` or `selected_estimator_` for every
-  selection rule. The unreleased duplicate fitted-estimator `best_*` aliases have been removed;
-  coefficients are not flattened onto `PiPLSSearchCV` when preprocessing may change the feature
-  space.
+- Refit coefficients and fitted-model methods are accessed on the direct estimator or pipeline
+  returned by `search.refit(...)`. No fitted model is attached to `PiPLSSearchCV`, and coefficients
+  are not flattened onto search state when preprocessing may change the feature space.
 - OOF results produced after using the same splits for model selection are labeled
   `selection-conditioned`, not unbiased external-test estimates.
 - Arbitrary nested meta-estimators and general metadata routing are not supported merely because
@@ -290,13 +291,14 @@ Decisions 0039 and 0040 are fully implemented:
 - it owns no CV, scoring, OOF, or search-result parameters and attributes;
 - direct fits warn when $n/r_\pi<3$;
 - `PiPLSSearchCV` owns feature probes, candidate folds, conditional path selection, optional OOF
-  fitting, and selected full-data refitting;
+  fitting, and explicit post-fit full-data refitting through a fresh estimator clone;
 - the path supplies the private fold engine with the one warning category it may suppress, while
   unrelated warnings remain visible;
 - unused rank-grid construction, solver tracing, duplicate candidate metadata, and OOF rescoring
   have been removed from the private selection layer.
 - the complete component path is explicit through `n_components_values="all"`;
-- random-state forms and refit-dependent method availability follow scikit-learn conventions;
+- random-state forms, cloning, and estimator-template parameter propagation follow scikit-learn
+  conventions;
 - the stable package string `"neg_response_standardized_mse"` is the default selection parameter and resolves to the public scorer callable;
 - duplicate Pi-PLS-specific fitted aliases are removed in favor of canonical `decomposition_` fields;
 - the public guides distinguish best evaluated score from a global surface optimum, explain that
@@ -449,32 +451,35 @@ reference the same read-only arrays.
 
 ## Authorized inspect-decide-refit transition
 
-Decision 0137 is accepted but not yet implemented. It authorizes replacing constructor-time final
-selection, optional selected-model refitting, and constructor-owned OOF reporting with an explicit
-post-fit lifecycle:
+Decision 0137 is accepted and partially implemented. `PiPLSSearchCV` now exposes explicit post-fit
+full-data refitting:
 
 ```python
 search = PiPLSSearchCV(cv=cv).fit(X, Y)
 path = search.component_path_
 profile = search.predictor_rank_profile(n_components=4)
 model = search.refit(X, Y, n_components=4)
-report = search.validation_report(X, Y, n_components=4)
 ```
 
-The implemented boundary above remains authoritative until each staged patch lands. Public user
-documentation must continue to describe the implemented API during the transition. The completed
-series removes `selection_rule`, constructor `refit`, `return_oof_predictions`, selected-model
-search attributes, and delegated fitted-model methods without aliases or deprecation machinery.
+`refit()` accepts exactly one of `rule` and `n_components`, supports `"best_score"`,
+`"minimum_cv_mse"`, and `"one_standard_error"`, returns a fitted clone of the direct estimator or
+terminal-Pi-PLS pipeline, and leaves the search unchanged. The constructor boolean `refit`, selected
+fitted-model attributes, and search-level model delegation were removed in the same increment
+because a same-named constructor attribute would shadow the method.
+
+Constructor `selection_rule`, `return_oof_predictions`, `selected_result_`, `selected_params_`, and
+`validation_report_` remain temporarily for the current selection-conditioned reporting lifecycle.
+The completed series removes that remaining surface after explicit post-fit validation reporting is
+implemented, without aliases or deprecation machinery.
 
 ## Current next increment
 
-The P1--P5 manuscript-alignment sequence is complete. Decision 0137 now authorizes the staged
-inspect-decide-refit transition. The next implementation increment adds post-fit `refit()` while
-temporarily retaining the current constructor-time lifecycle so the new selection resolver, direct
-estimator behavior, and pipeline behavior can be reviewed independently.
+The next implementation increment adds `search.validation_report(X, Y, rule=... or
+n_components=...)`, backed by the same selected-row resolver and the exact materialized search
+splits. It then removes constructor-owned OOF behavior in the following cleanup increment.
 
-Do not update public user documentation to the final lifecycle before the matching implementation
-exists. Do not prepare or publish a package release during the transition.
+Public documentation must describe the implemented transitional surface precisely. Do not prepare
+or publish a package release during the transition.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

@@ -67,21 +67,24 @@ response directions. These directions are distinct from the reconstruction loadi
 
 A direct fixed fit emits `PredictorRankSupportWarning` when $n/r_\pi<3$. This warning is diagnostic;
 it does not choose or cap the rank. `PiPLSSearchCV` suppresses only this expected warning inside its
-controlled feature probes, candidate fits, optional OOF fits, and selected full-data refit. Other
-warning categories remain visible.
+controlled feature probes, candidate fits, optional OOF fits, and explicit post-fit full-data refit.
+Other warning categories remain visible.
 
-Both public `fit()` methods are transactional. A failed initial fit or refit removes all fitted
-attributes, including any state from an earlier successful fit. A successful fixed fit exposes only
-finite fitted arrays. `copy=False` may reuse independent writable arrays, but read-only arrays and
-overlapping predictor/response storage are copied as needed to preserve correctness.
+Both public `fit()` methods are transactional. A failed search fit or fixed-estimator fit removes
+fitted attributes from the object being fitted, including any state from an earlier successful fit.
+A failed `PiPLSSearchCV.refit()` leaves the fitted search unchanged because it operates on a fresh
+clone. A successful fixed fit exposes only finite fitted arrays. `copy=False` may reuse independent
+writable arrays, but read-only arrays and overlapping predictor/response storage are copied as needed
+to preserve correctness.
 
 ## Model-internal standardization contract
 
 Every `PiPLSRegression.fit` estimates `x_mean_` and `y_mean_` from the observations supplied to
 that fit. `scale=True` estimates safe sample-standard-deviation vectors with `ddof=1` and
 standardizes both blocks; `scale=False` still centers and stores unit scales. During path
-selection, every candidate clone learns these statistics only from its training fold. The optional
-final refit learns them again from all observations supplied to `PiPLSSearchCV.fit`.
+selection, every candidate clone learns these statistics only from its training fold. An explicit
+post-fit `PiPLSSearchCV.refit(X, y, ...)` learns them again from all observations supplied to that
+operation.
 
 ## Predictor SVD policy
 
@@ -125,68 +128,80 @@ The default ceiling uses total supplied $n$ for the support term with
 after fold-local pipeline preprocessing and terminal-estimator preprocessing are hard feasibility
 caps. Explicit component and predictor-rank sequences are validated against the resolved ceiling
 before scoring. The class accepts a direct fixed `PiPLSRegression` or a pipeline ending in one,
-materializes one CV split set, clones fixed candidates, and optionally refits the selected pair.
-The default `refit=False` keeps path evaluation separate from final fixed-model fitting;
-`selection_rule="best_score"` is the default final-row rule, while
-`selection_rule="one_standard_error"` uses the stored component-path 1-SE recommendation.
-`refit=True` explicitly requests a full-data fit of the row chosen by that rule.
+materializes one CV split set, and clones fixed candidates for path evaluation.
+
+Final full-data fitting is an explicit post-fit operation:
+
+```python
+search = PiPLSSearchCV(cv=cv).fit(X, y)
+model = search.refit(X, y, rule="one_standard_error")
+model = search.refit(X, y, n_components=4)
+```
+
+`refit()` requires exactly one of `rule` and `n_components`. The supported named rules are
+`"best_score"`, `"minimum_cv_mse"`, and `"one_standard_error"`. Manual component selection uses the
+predictor rank already selected conditionally for that component-path row. The method clones the
+configured direct estimator or terminal-Pi-PLS pipeline, fits that clone on the supplied full data,
+and returns it. It does not mutate the search, retain the supplied data, or attach the returned model
+to search state. Exact manual `(n_components, predictor_rank)` pairs are fitted directly with
+`PiPLSRegression`.
 
 The default `scoring` value is the stable package string
 `"neg_response_standardized_mse"`, which resolves to the public callable
-`pipls.metrics.neg_response_standardized_mse`. Ordinary scikit-learn scorer names,
-other callables, and `None` remain accepted. Conditional and overall selections among evaluated
-candidates maximize the configured mean test score. Under the default scorer this is
-equivalent to minimizing mean response-standardized MSE among evaluated candidates; adaptive
-search makes no claim about
+`pipls.metrics.neg_response_standardized_mse`. Ordinary scikit-learn scorer names, other callables,
+and `None` remain accepted. Conditional and overall selections among evaluated candidates maximize
+the configured mean test score. Under the default scorer this is equivalent to minimizing mean
+response-standardized MSE among evaluated candidates; adaptive search makes no claim about
 unevaluated admissible pairs.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
-`best_*` selection attributes, `selected_result_`, `selected_params_`,
-`search_is_exhaustive_`, optional selected refitted estimators, immutable `validation_report_`,
-and the canonical immutable `component_path_` result. OOF arrays and their coverage counts live
-only in `validation_report_` and represent the selected row. The report composes the same immutable
-`PiPLSComponentResult` exposed as `selected_result_`; its `n_components`, `predictor_rank`,
-`n_splits`, `mean_test_score`, and `cv_mse_mean` properties forward to that result rather than
-duplicating stored state. `is_selection_conditioned` and `has_complete_oof_coverage` expose report
-provenance and coverage as predicates. Validated input grids, adaptive-search batch history,
-candidate counters, direct-rank
-parameter aliases, and matrix-shaped score/MSE aliases are not public fitted state; advanced users
-can inspect aligned `cv_results_` columns when needed.
+`best_*` selection attributes, `selected_result_`, `selected_params_`, `search_is_exhaustive_`, the
+immutable `validation_report_`, and the canonical immutable `component_path_` result. During the
+Decision 0137 transition, constructor `selection_rule` still chooses the row represented by
+`selected_result_`, `selected_params_`, and `validation_report_`; it does not choose or store the
+model returned by a later `refit()` call. `return_oof_predictions=True` still requests OOF arrays for
+that constructor-selected row until explicit post-fit validation reporting replaces this temporary
+surface. OOF arrays and their coverage counts live only in `validation_report_`. The report composes
+the same immutable `PiPLSComponentResult` exposed as `selected_result_`; its `n_components`,
+`predictor_rank`, `n_splits`, `mean_test_score`, and `cv_mse_mean` properties forward to that result
+rather than duplicating stored state. `is_selection_conditioned` and
+`has_complete_oof_coverage` expose report provenance and coverage as predicates.
+
+Validated input grids, adaptive-search batch history, candidate counters, direct-rank parameter
+aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and supplied training matrices
+are not public fitted state. Advanced users can inspect aligned `cv_results_` columns when needed.
+
 `PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
-`mean_test_score`, `cv_mse_mean`, and `cv_mse_fold_sd` arrays. The predictor-rank policy and number
-of validation splits are path-wide Python scalars. It derives the aligned read-only
+`mean_test_score`, `cv_mse_mean`, and `cv_mse_fold_sd` arrays. The predictor-rank policy and number of
+validation splits are path-wide Python scalars. It derives the aligned read-only
 `cv_mse_standard_error` array from the stored population fold SD and shared split count.
-`for_n_components()` returns a frozen
-`PiPLSComponentResult` with the aligned scalar values and the same derived standard-error property.
-`minimum_cv_mse_result()` returns the first exact stored CV-MSE minimum, which is the smallest tied
-component count because path rows are strictly ascending. `one_standard_error_result()` returns the
-smallest stored component count not exceeding the minimum row's mean plus its standard error. Both
-methods return the complete aligned scalar row, including its already conditionally selected
-predictor rank; they do not fit, refit, mutate, apply numerical tolerances, or add stored state.
-The numeric predictor rank is present for every component count. The standard-error property and
-the one-standard-error method require at least two validation splits at the relevant row and raise
-explicitly when that quantity is undefined.
+`for_n_components()` returns a frozen `PiPLSComponentResult` with the aligned scalar values and the
+same derived standard-error property. `minimum_cv_mse_result()` returns the first exact stored
+CV-MSE minimum, which is the smallest tied component count because path rows are strictly ascending.
+`one_standard_error_result()` returns the smallest stored component count not exceeding the minimum
+row's mean plus its standard error. Both methods return the complete aligned scalar row, including
+its already conditionally selected predictor rank; they do not fit, refit, mutate, apply numerical
+tolerances, or add stored state. The numeric predictor rank is present for every component count.
+The standard-error property and the one-standard-error method require at least two validation splits
+at the relevant row and raise explicitly when that quantity is undefined.
 
 `best_index_`, `best_score_`, `best_params_`, `best_n_components_`, and
-`best_predictor_rank_` always describe the global configured-score optimum. The declared final rule
-is represented separately by `selected_result_` and `selected_params_`. With `refit=True`,
-`selected_estimator_` and `selected_pipls_` contain the one final full-data fit and all delegated
-methods use it. Public application examples that bind either selected model should call subsequent
-model methods on that bound object; delegated search methods remain compatibility conveniences.
-`selected_estimator_` and `selected_pipls_` are the only fitted-model attributes for every selection
-rule. The global score optimum remains represented by scalar and parameter `best_*` results; no
-duplicate fitted-estimator `best_*` aliases are exposed.
+`best_predictor_rank_` always describe the global configured-score optimum. They are search evidence,
+not a stored final estimator. The search exposes no `predict`, `transform`, `fit_transform`,
+`inverse_transform`, `score`, or `get_feature_names_out` delegation. Call those methods on the
+estimator or pipeline returned by `refit()`. Output-container configuration is owned by the estimator
+template and is preserved through cloning; the path object adds no separate `set_output` layer.
 
 `PiPLSSearchCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
 predictor ranks actually evaluated at `h`, sorted in ascending order. Its path-wide policy and split
 count are scalars, and its `selected_result` property derives the same conditionally selected scalar
 values as `component_path_.for_n_components(h)` from immutable candidate state. The profile does not
-add
-another fitted attribute or stored selected-row representation. It exposes an aligned read-only
+add another fitted attribute or stored selected-row representation. It exposes an aligned read-only
 `cv_mse_standard_error` property derived by the same contract as the component path. Selection
-maximizes the configured mean test score; only the default scorer makes this equivalent to
-minimizing mean response-standardized CV-MSE.
+maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
+mean response-standardized CV-MSE.
+
 All five top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSValidationReport`) validate direct
 construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and
@@ -194,13 +209,10 @@ reconstruct through the same validation path when unpickled. Invalid dimensions,
 negative MSE summaries, unsupported policy values, and inconsistent OOF coverage are rejected.
 Generated documentation keeps these records returned-first by suppressing constructor signatures.
 
-Refit-dependent delegated methods are absent under the default `refit=False`. Output-container
-configuration is owned by the estimator template and preserved through cloning and explicit refit;
-the path object does not add a separate `set_output` layer.
-
 Group-aware splitters and keyword-only `groups` belong to `PiPLSSearchCV.fit`, not to the fixed
-estimator. `return_oof_predictions` and selection-conditioned reporting likewise belong only to the
-path interface.
+estimator. The temporary `return_oof_predictions` constructor control and selection-conditioned
+reporting likewise belong only to the path interface until Patch 3 replaces them with explicit
+post-fit reporting.
 
 ## E1 dataset and synthetic-data API
 
@@ -349,7 +361,7 @@ rendering layer.
 ## Example workflow boundary
 
 Example 04 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
-component paths directly in memory. Pulp, Sugarcane, and Tobacco use the default selection-only
+component paths directly in memory. Pulp, Sugarcane, and Tobacco use the default path-evaluating
 `PiPLSSearchCV()`, plot
 `component_path_` directly, read the selected pair through `for_n_components()`, fit one fixed
 `PiPLSRegression`, and calculate five-fold seeded shuffled predictions through scikit-learn

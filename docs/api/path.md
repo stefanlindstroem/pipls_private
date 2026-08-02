@@ -9,10 +9,10 @@ conditional predictor rank, and fit a separate fixed estimator.
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
 search object caps the path by the minimum predictor rank verified across those transformed folds.
-The default constructor is selection-only: `PiPLSSearchCV()` uses `refit=False` and leaves final
-fixed-model fitting as an explicit user step. A caller may instead declare `selection_rule` and set
-`refit=True` to fit that stored path row on all supplied data. Methods that delegate to a selected
-estimator are available only after such a refit.
+`PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Final full-data fitting
+is an explicit post-fit operation: `search.refit(X, Y, ...)` selects one stored component-path row,
+clones the configured estimator or pipeline, fits that clone, and returns it. The search object does
+not delegate model methods or retain the returned estimator.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see
@@ -21,8 +21,10 @@ problems, see [Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. `component_path_` and
 `predictor_rank_profile()` provide concise immutable views. Standard `best_*` attributes identify
-the global configured-score optimum, while `selected_result_` identifies the row chosen by the
-declared final rule. `validation_report_` and optional OOF arrays describe that selected row.
+the global configured-score optimum, while the temporary constructor `selection_rule` determines
+the row represented by `selected_result_` and `validation_report_`. Optional OOF arrays describe
+that report row. Post-fit `refit()` makes an independent explicit selection and does not alter those
+report attributes.
 Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
@@ -32,17 +34,17 @@ response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 | Situation | Workflow |
 |---|---|
 | Both ranks are already known | Fit `PiPLSRegression` directly |
-| Choose a component count after inspecting the path | Run selection-only `PiPLSSearchCV()`, retrieve the corresponding row, then fit one fixed model |
-| Apply a final rule declared before fitting | Set `selection_rule` and `refit=True` |
+| Choose a component count after inspecting the path | Fit `PiPLSSearchCV`, inspect the path, then call `search.refit(X, Y, n_components=h)` |
+| Apply an automatic final rule | Call `search.refit(X, Y, rule=...)` after path evaluation |
 
-The second workflow keeps a scientific choice made after path inspection visible as a separate
-fixed fit. The third workflow is appropriate only when the final selection rule is part of the
-model-building protocol before the search is run.
+Both workflows use the same post-fit operation. Retaining `search` preserves the complete path and
+candidate evidence; the returned model owns prediction, transformation, scoring, and inspection of
+the final fixed fit.
 
 ## Inspect the path and fit one fixed model { #inspect-the-path-and-fit-one-fixed-model }
 
 ```python
-from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls import PiPLSSearchCV
 
 search = PiPLSSearchCV().fit(X, Y)
 path = search.component_path_
@@ -50,10 +52,11 @@ path = search.component_path_
 CHOSEN_N_COMPONENTS = 2  # application-specific choice after inspecting the path
 selected = path.for_n_components(CHOSEN_N_COMPONENTS)
 
-model = PiPLSRegression(
+model = search.refit(
+    X,
+    Y,
     n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(X, Y)
+)
 ```
 
 This example shows the executable selection-to-fit contract. The
@@ -66,8 +69,6 @@ Settings that control candidate fitting belong to the supplied estimator templat
 `PiPLSSearchCV` parameters:
 
 ```python
-from sklearn.base import clone
-
 from pipls import PiPLSRegression, PiPLSSearchCV
 
 template = PiPLSRegression(
@@ -79,12 +80,11 @@ template = PiPLSRegression(
 )
 
 search = PiPLSSearchCV(estimator=template).fit(X, Y)
-selected = search.component_path_.for_n_components(CHOSEN_N_COMPONENTS)
-
-model = clone(template).set_params(
-    n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(X, Y)
+model = search.refit(
+    X,
+    Y,
+    n_components=CHOSEN_N_COMPONENTS,
+)
 ```
 
 The pair `(1, 1)` is only a valid construction seed. The search replaces `n_components` and
@@ -95,26 +95,22 @@ in the same way through its terminal `PiPLSRegression` step; see
 [Pipelines and fold-local preprocessing](../path_analysis.md#pipelines-and-fold-local-preprocessing).
 
 `svd_solver` controls only the initial predictor-matrix SVD. The response cross-product and latent
-coupling SVDs remain exact. After a declared full-data refit, inspect the solver actually used with:
+coupling SVDs remain exact. Inspect the solver actually used on the returned model:
 
 ```python
-search = PiPLSSearchCV(estimator=template, refit=True).fit(X, Y)
-search.selected_pipls_.decomposition_.predictor_svd_solver
+search = PiPLSSearchCV(estimator=template).fit(X, Y)
+model = search.refit(X, Y, n_components=CHOSEN_N_COMPONENTS)
+model.decomposition_.predictor_svd_solver
 ```
 
-The `selected_pipls_` attribute exists only when `refit=True`.
+When the configured template is a pipeline, inspect its fitted terminal `PiPLSRegression` step.
 
 ::: pipls.PiPLSSearchCV
     options:
       members:
         - fit
+        - refit
         - predictor_rank_profile
-        - predict
-        - transform
-        - fit_transform
-        - inverse_transform
-        - score
-        - get_feature_names_out
 
 ## Concise component path
 

@@ -95,8 +95,9 @@ integer-seed contract.
 
 Centering and optional scaling are integral to `PiPLSRegression.fit`. `PiPLSSearchCV` clones fixed
 estimators inside every training fold, so each candidate learns statistics only from that fold.
-With `refit=True`, the pair chosen by `selection_rule` learns them again from the complete supplied
-training set. Learned scaling must not be fitted globally before CV.
+A subsequent `search.refit(X, Y, ...)` call fits one selected rank pair on the complete supplied
+training set, so centering and scaling are learned again from that full data. Learned scaling must
+not be fitted globally before CV.
 
 
 Maintained examples that use ordinary five-fold regression CV specify

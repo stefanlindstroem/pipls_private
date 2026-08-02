@@ -9,7 +9,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.utils.validation import check_is_fitted
 
 from pipls import (
     PiPLSComponentPath,
@@ -129,7 +128,6 @@ def test_path_caps_candidates_at_minimum_fold_numerical_rank(
         ),
         search_method="optimal",
         cv=3,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -177,7 +175,6 @@ def test_path_uses_the_minimum_numerical_rank_across_training_folds() -> None:
         max_predictor_rank=3,
         search_method="optimal",
         cv=splits,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -207,7 +204,6 @@ def test_pipeline_rank_preflight_uses_fold_local_transformed_predictors() -> Non
         search_method="optimal",
         max_predictor_rank=4,
         cv=3,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -237,7 +233,6 @@ def test_explicit_rank_above_fold_numerical_limit_is_rejected_before_scoring() -
             search_method="optimal",
             cv=3,
             scoring=counting_scorer,
-            refit=False,
             n_jobs=1,
         ).fit(X, Y)
 
@@ -251,7 +246,6 @@ def test_no_positive_fold_numerical_rank_fails_transactionally() -> None:
         predictor_rank_values=[1],
         max_predictor_rank=1,
         cv=3,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -275,7 +269,6 @@ def test_all_component_sentinel_matches_explicit_complete_range() -> None:
         max_predictor_rank=3,
         search_method="optimal",
         cv=3,
-        refit=False,
     ).fit(X, Y)
     explicit_search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
@@ -283,7 +276,6 @@ def test_all_component_sentinel_matches_explicit_complete_range() -> None:
         max_predictor_rank=3,
         search_method="optimal",
         cv=3,
-        refit=False,
     ).fit(X, Y)
 
     np.testing.assert_array_equal(
@@ -302,7 +294,6 @@ def test_default_scorer_name_resolves_to_the_public_callable() -> None:
         n_components_values=[1],
         predictor_rank_values=[1],
         cv=3,
-        refit=False,
     ).fit(X, Y)
 
     assert search.scorer_ is neg_response_standardized_mse
@@ -312,28 +303,105 @@ def test_default_scorer_name_resolves_to_the_public_callable() -> None:
     )
 
 
-def test_selected_estimator_is_refitted_and_delegates_prediction() -> None:
+def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
-    assert isinstance(search.selected_estimator_, PiPLSRegression)
-    assert search.selected_pipls_ is search.selected_estimator_
-    assert search.selected_params_ == search.best_params_
-    assert search.selected_result_.n_components == search.best_n_components_
-    assert search.selected_result_.predictor_rank == search.best_predictor_rank_
-    assert search.selected_estimator_.n_components == search.best_n_components_
-    assert search.selected_estimator_.predictor_rank == search.best_predictor_rank_
-    np.testing.assert_allclose(search.predict(X), search.selected_estimator_.predict(X))
-    assert search.score(X, Y) == pytest.approx(search.selected_estimator_.score(X, Y))
+    model = search.refit(X, Y, rule="best_score")
+
+    assert isinstance(model, PiPLSRegression)
+    assert model.n_components == search.best_n_components_
+    assert model.predictor_rank == search.best_predictor_rank_
+    assert hasattr(model, "coef_")
+    assert model.predict(X).shape == Y.shape
+    assert not hasattr(search, "selected_estimator_")
+    assert not hasattr(search, "selected_pipls_")
 
 
-def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
+def test_post_fit_refit_supports_manual_component_selection() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+    expected = search.component_path_.for_n_components(2)
+
+    model = search.refit(X, Y, n_components=2)
+
+    assert isinstance(model, PiPLSRegression)
+    assert model.n_components == expected.n_components
+    assert model.predictor_rank == expected.predictor_rank
+
+
+def test_post_fit_refit_supports_component_path_rules() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    expected_by_rule = {
+        "best_score": search.component_path_.for_n_components(
+            search.best_n_components_
+        ),
+        "minimum_cv_mse": search.component_path_.minimum_cv_mse_result(),
+        "one_standard_error": search.component_path_.one_standard_error_result(),
+    }
+    for rule, expected in expected_by_rule.items():
+        model = search.refit(X, Y, rule=rule)  # type: ignore[arg-type]
+        assert isinstance(model, PiPLSRegression)
+        assert model.n_components == expected.n_components
+        assert model.predictor_rank == expected.predictor_rank
+
+
+def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> None:
+    X, Y = _data()
+    search_kwargs = {
+        "n_components_values": [1, 2, 3],
+        "predictor_rank_values": [3],
+        "max_predictor_rank": 3,
+        "search_method": "optimal",
+        "cv": 3,
+        "n_jobs": 1,
+    }
+    baseline = PiPLSSearchCV(**search_kwargs).fit(X, Y)
+    minimum_components = baseline.component_path_.minimum_cv_mse_result().n_components
+    favored_components = 3 if minimum_components != 3 else 1
+
+    def component_scorer(
+        estimator: object,
+        X_validation: object,
+        y_validation: object,
+    ) -> float:
+        del X_validation, y_validation
+        return float(
+            estimator.n_components == favored_components
+        )
+
+    search = PiPLSSearchCV(
+        **search_kwargs,
+        scoring=component_scorer,
+    ).fit(X, Y)
+    best_model = search.refit(X, Y, rule="best_score")
+    minimum_model = search.refit(X, Y, rule="minimum_cv_mse")
+
+    assert best_model.n_components == favored_components
+    assert minimum_model.n_components == minimum_components
+    assert best_model.n_components != minimum_model.n_components
+
+
+def test_constructor_selection_and_post_fit_refit_are_temporarily_independent() -> None:
     X, Y = _one_standard_error_data()
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
@@ -341,70 +409,90 @@ def test_one_standard_error_selection_refits_the_declared_path_row() -> None:
         search_method="optimal",
         selection_rule="one_standard_error",
         cv=4,
-        refit=True,
         return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)
 
-    expected = search.component_path_.one_standard_error_result()
-    assert search.selected_result_ == expected
-    assert search.selected_result_.n_components < search.best_n_components_
-    assert search.selected_params_ == {
-        "n_components": expected.n_components,
-        "predictor_rank": expected.predictor_rank,
-    }
-    assert search.selected_estimator_.n_components == expected.n_components
-    assert search.selected_estimator_.predictor_rank == expected.predictor_rank
-    assert search.selected_pipls_ is search.selected_estimator_
-    np.testing.assert_allclose(
-        search.predict(X),
-        search.selected_estimator_.predict(X),
-    )
+    expected_report = search.component_path_.one_standard_error_result()
+    assert search.selected_result_ == expected_report
     assert search.validation_report_.selected_result is search.selected_result_
-    assert search.validation_report_.n_components == expected.n_components
-    assert search.validation_report_.predictor_rank == expected.predictor_rank
-    assert search.validation_report_.mean_test_score == pytest.approx(
-        expected.mean_test_score
-    )
     assert search.validation_report_.oof_predictions is not None
 
+    model = search.refit(X, Y, rule="best_score")
+    assert model.n_components == search.best_n_components_
+    assert model.predictor_rank == search.best_predictor_rank_
+    assert search.selected_result_ == expected_report
 
-def test_one_standard_error_selection_can_remain_selection_only() -> None:
-    X, Y = _one_standard_error_data()
+
+def test_post_fit_refit_requires_exactly_one_selection_input() -> None:
+    X, Y = _data()
     search = PiPLSSearchCV(
-        n_components_values=[1, 2, 3],
-        predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
-        selection_rule="one_standard_error",
-        cv=4,
-        n_jobs=1,
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2],
+        cv=3,
     ).fit(X, Y)
 
-    assert search.selected_result_ == search.component_path_.one_standard_error_result()
-    assert not hasattr(search, "selected_estimator_")
-    assert not hasattr(search, "selected_pipls_")
-    assert not hasattr(search, "predict")
+    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+        search.refit(X, Y)
+    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+        search.refit(X, Y, rule="best_score", n_components=1)
+    with pytest.raises(ValueError, match="rule must be"):
+        search.refit(X, Y, rule="smallest")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="was not evaluated"):
+        search.refit(X, Y, n_components=3)
 
 
-def test_one_standard_error_selection_requires_two_validation_splits() -> None:
+def test_post_fit_refit_requires_a_fitted_search() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV()
+
+    with pytest.raises(NotFittedError):
+        search.refit(X, Y, rule="best_score")
+
+
+def test_one_standard_error_refit_requires_two_validation_splits() -> None:
     X, Y = _data()
     split = [(np.arange(24), np.arange(24, 36))]
     search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
-        selection_rule="one_standard_error",
         cv=split,
-    )
+    ).fit(X, Y)
 
     with pytest.raises(ValueError, match="at least two validation splits"):
-        search.fit(X, Y)
-
-    with pytest.raises(NotFittedError):
-        check_is_fitted(search)
-    assert not hasattr(search, "selected_result_")
+        search.refit(X, Y, rule="one_standard_error")
 
 
-def test_default_selection_hides_refit_dependent_methods() -> None:
+def test_post_fit_refit_does_not_mutate_search_state() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3],
+        cv=3,
+    ).fit(X, Y)
+    before = pickle.dumps(search)
+
+    search.refit(X, Y, n_components=1)
+
+    assert pickle.dumps(search) == before
+
+
+def test_failed_post_fit_refit_leaves_search_state_unchanged() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        cv=3,
+    ).fit(X, Y)
+    before = pickle.dumps(search)
+
+    with pytest.raises(ValueError):
+        search.refit(X[:-1], Y, n_components=1)
+
+    assert pickle.dumps(search) == before
+
+
+def test_search_exposes_evidence_and_refit_but_no_model_delegation() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
         n_components_values=[1],
@@ -424,6 +512,7 @@ def test_default_selection_hides_refit_dependent_methods() -> None:
         assert not hasattr(search, method_name)
 
     search.fit(X, Y)
+    assert hasattr(search, "refit")
     for method_name in (
         "predict",
         "transform",
@@ -434,27 +523,6 @@ def test_default_selection_hides_refit_dependent_methods() -> None:
         "set_output",
     ):
         assert not hasattr(search, method_name)
-
-
-def test_refit_false_clears_state_from_an_earlier_refitted_fit() -> None:
-    X, Y = _data()
-    search = PiPLSSearchCV(
-        n_components_values=[1],
-        predictor_rank_values=[1, 2],
-        cv=3,
-        refit=True,
-    ).fit(X, Y)
-
-    assert hasattr(search, "selected_estimator_")
-    assert hasattr(search, "selected_pipls_")
-    assert hasattr(search, "refit_time_")
-
-    search.set_params(refit=False).fit(X, Y)
-
-    assert not hasattr(search, "selected_estimator_")
-    assert not hasattr(search, "selected_pipls_")
-    assert not hasattr(search, "refit_time_")
-    assert not hasattr(search, "predict")
 
 
 def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
@@ -483,7 +551,6 @@ def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
         n_components_values=[1],
         predictor_rank_values=[1],
         cv=splits,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -493,7 +560,9 @@ def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
     expected = np.mean(((Y[12:18] - prediction) / response_scale[None, :]) ** 2)
 
     assert search.cv_results_["split0_response_standardized_mse"][0] == pytest.approx(expected)
-    assert isinstance(search.selected_estimator_, Pipeline)
+    model = search.refit(X, Y, rule="best_score")
+    assert isinstance(model, Pipeline)
+    assert model is not pipeline
 
 
 def test_auto_path_skips_candidates_with_constant_scorer() -> None:
@@ -554,7 +623,6 @@ def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
         search_method="optimal",
         scoring=chained_scores,
         cv=3,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -647,7 +715,6 @@ def test_oof_generation_does_not_rescore_the_selected_candidate() -> None:
         max_predictor_rank=1,
         cv=3,
         scoring=counting_scorer,
-        refit=False,
         return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)
@@ -655,7 +722,7 @@ def test_oof_generation_does_not_rescore_the_selected_candidate() -> None:
     assert calls == 3
 
 
-def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> None:
+def test_path_suppresses_direct_fit_support_warning_through_oof_and_post_fit_refit() -> None:
     X, Y = _data(12)
 
     with warnings.catch_warnings():
@@ -665,13 +732,14 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_refit() -> N
             predictor_rank_values=[4],
             max_predictor_rank=4,
             cv=3,
-            refit=True,
             return_oof_predictions=True,
             n_jobs=1,
         ).fit(X, Y)
+        model = search.refit(X, Y, rule="best_score")
 
     assert search.best_predictor_rank_ == 4
-    assert search.selected_pipls_.predictor_rank_ == 4
+    assert isinstance(model, PiPLSRegression)
+    assert model.predictor_rank_ == 4
     report = search.validation_report_
     assert report.oof_prediction_counts is not None
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
@@ -687,15 +755,16 @@ def test_path_does_not_suppress_unrelated_estimator_warnings() -> None:
     )
 
     with pytest.warns(RuntimeWarning, match="unrelated path warning"):
-        PiPLSSearchCV(
+        search = PiPLSSearchCV(
             estimator=pipeline,
             n_components_values=[1],
             predictor_rank_values=[1],
             max_predictor_rank=1,
             cv=2,
-            refit=False,
             n_jobs=1,
         ).fit(X, Y)
+    with pytest.warns(RuntimeWarning, match="unrelated path warning"):
+        search.refit(X, Y, n_components=1)
 
 
 def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
@@ -708,15 +777,15 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
+    model = search.refit(X, Y, n_components=1)
 
     assert template.n_components == 2
     assert template.predictor_rank == 2
     assert not hasattr(template, "coef_")
-    assert search.selected_pipls_.n_components == 1
-    assert search.selected_pipls_.predictor_rank == 3
+    assert model.n_components == 1
+    assert model.predictor_rank == 3
 
 
 @pytest.mark.parametrize(
@@ -732,7 +801,6 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         ("predictor_rank_values", "maximum", "must be None"),
         ("n_jobs", 0, "must not be zero"),
         ("selection_rule", "smallest", "selection_rule"),
-        ("refit", 1, "refit must be boolean"),
     ],
 )
 def test_invalid_public_controls_are_rejected(
@@ -753,7 +821,6 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
         cv=3,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -801,7 +868,6 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
         cv=3,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 
@@ -844,7 +910,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
 
 
 def test_predictor_rank_profile_requires_fitted_evaluated_component_count() -> None:
-    search = PiPLSSearchCV(refit=False)
+    search = PiPLSSearchCV()
 
     with pytest.raises(NotFittedError):
         search.predictor_rank_profile(1)
@@ -875,7 +941,6 @@ def test_component_path_records_predictor_rank_policy(
         n_components_values=[1, 2],
         predictor_rank_values=predictor_rank_values,
         cv=3,
-        refit=False,
         n_jobs=1,
     ).fit(X, Y)
 

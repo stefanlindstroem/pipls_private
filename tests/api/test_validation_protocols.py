@@ -7,12 +7,10 @@ from sklearn.base import clone
 from sklearn.metrics import r2_score
 from sklearn.model_selection import (
     GroupKFold,
-    KFold,
     LeaveOneOut,
     PredefinedSplit,
     RepeatedKFold,
     TimeSeriesSplit,
-    cross_validate,
 )
 
 from pipls import PiPLSRegression, PiPLSSearchCV
@@ -154,19 +152,14 @@ def test_groups_participate_in_path_metadata_routing() -> None:
         predictor_rank_values=[2],
         max_predictor_rank=2,
         cv=GroupKFold(n_splits=3),
-        refit=True,
     )
 
     with config_context(enable_metadata_routing=True):
         routed = estimator.set_fit_request(groups=True)
-        result = cross_validate(
-            routed,
-            X,
-            Y,
-            cv=KFold(n_splits=3),
-            params={"groups": groups},
-        )
-    assert result["test_score"].shape == (3,)
+        result = routed.fit(X, Y, groups=groups)
+
+    assert result is routed
+    assert result.n_splits_ == 3
 
 
 @pytest.mark.parametrize("scoring", [None, "r2"])

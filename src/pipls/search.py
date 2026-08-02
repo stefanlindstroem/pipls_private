@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Iterable, Sequence
-from time import perf_counter
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -13,14 +12,11 @@ from sklearn.base import (
     BaseEstimator,
     MetaEstimatorMixin,
     MultiOutputMixin,
-    RegressorMixin,
-    TransformerMixin,
     clone,
 )
 from sklearn.metrics import check_scoring, get_scorer
 from sklearn.pipeline import Pipeline
 from sklearn.utils import _safe_indexing, indexable
-from sklearn.utils.metaestimators import available_if
 from sklearn.utils.validation import check_is_fitted
 
 from ._core import _PredictorRankInfeasibleError
@@ -34,6 +30,7 @@ from ._cv_engine import (
 from ._sklearn_compat import _validate_estimator_data
 from .component_path import (
     PiPLSComponentPath,
+    PiPLSComponentResult,
     PiPLSPredictorRankProfile,
     PredictorRankPolicy,
 )
@@ -61,6 +58,7 @@ Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
 SelectionRule = Literal["best_score", "one_standard_error"]
+RefitRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING_NAME = "neg_response_standardized_mse"
@@ -74,38 +72,18 @@ def _default_pipls_template() -> PiPLSRegression:
     return PiPLSRegression(n_components=1, predictor_rank=1)
 
 
-def _estimator_supports(method_name: str) -> Callable[[Any], bool]:
-    def check(search: Any) -> bool:
-        if not bool(search.refit):
-            return False
-        if hasattr(search, "selected_params_") and not hasattr(
-            search, "selected_estimator_"
-        ):
-            return False
-        estimator = (
-            search.selected_estimator_
-            if hasattr(search, "selected_estimator_")
-            else (_default_pipls_template() if search.estimator is None else search.estimator)
-        )
-        return hasattr(estimator, method_name)
-
-    return check
-
-
 class PiPLSSearchCV(
-    TransformerMixin,  # type: ignore[misc]
-    RegressorMixin,  # type: ignore[misc]
     MultiOutputMixin,  # type: ignore[misc]
     MetaEstimatorMixin,  # type: ignore[misc]
     BaseEstimator,  # type: ignore[misc]
-    auto_wrap_output_keys=None,  # type: ignore[call-arg]
 ):
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
     Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
     independently inside each training fold. A declared selection rule chooses
-    one stored path row, which is optionally refitted on all supplied data. The
-    default ``search_method="auto"`` applies
+    one stored path row for the current validation report. Final full-data
+    fitting is an explicit post-fit :meth:`refit` operation. The default
+    ``search_method="auto"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
     for each paired-mode count.
 
@@ -148,15 +126,12 @@ class PiPLSSearchCV(
         ``score``. The package-specific default name resolves to
         :func:`pipls.metrics.neg_response_standardized_mse`.
     selection_rule : {"best_score", "one_standard_error"}, default="best_score"
-        Rule used to choose the final component-path row. ``"best_score"`` uses
-        the globally best evaluated pair under ``scoring``. ``"one_standard_error"``
-        uses :meth:`PiPLSComponentPath.one_standard_error_result`, retaining the
+        Rule used to choose the component-path row represented by
+        ``selected_result_``, ``selected_params_``, and ``validation_report_``.
+        ``"best_score"`` uses the globally best evaluated pair under ``scoring``.
+        ``"one_standard_error"`` uses
+        :meth:`PiPLSComponentPath.one_standard_error_result`, retaining the
         predictor rank already selected conditionally for that paired-mode count.
-    refit : bool, default=False
-        Whether to refit the row chosen by ``selection_rule`` on all supplied
-        data. The default leaves path evaluation and final fixed-model fitting
-        as separate steps. Delegated prediction, transformation, scoring, and
-        feature-name methods require ``refit=True``.
     n_jobs : int or None, default=None
         Joblib parallelism across candidate pairs within each evaluation batch.
     return_oof_predictions : bool, default=False
@@ -211,13 +186,6 @@ class PiPLSSearchCV(
     validation_report_ : PiPLSValidationReport
         Immutable summary of ``selected_result_`` and optional ordered OOF
         predictions for that fixed parameterization.
-    selected_estimator_ : estimator
-        Estimator refitted on all data with ``selected_params_``. Defined only
-        when ``refit=True``.
-    selected_pipls_ : PiPLSRegression
-        Fitted terminal Pi-PLS estimator. Defined only when ``refit=True``.
-    refit_time_ : float
-        Selected full-data refit time in seconds. Defined only when ``refit=True``.
     """
 
     def __init__(
@@ -232,7 +200,6 @@ class PiPLSSearchCV(
         cv: object = 5,
         scoring: Scoring = _DEFAULT_SCORING_NAME,
         selection_rule: SelectionRule = "best_score",
-        refit: bool = False,
         n_jobs: int | None = None,
         return_oof_predictions: bool = False,
     ) -> None:
@@ -245,7 +212,6 @@ class PiPLSSearchCV(
         self.cv = cv
         self.scoring = scoring
         self.selection_rule = selection_rule
-        self.refit = refit
         self.n_jobs = n_jobs
         self.return_oof_predictions = return_oof_predictions
 
@@ -256,7 +222,7 @@ class PiPLSSearchCV(
         *,
         groups: ArrayLike | None = None,
     ) -> PiPLSSearchCV:
-        """Evaluate the path and optionally refit the selected path row.
+        """Evaluate the path and construct selected-row diagnostics.
 
         Parameters
         ----------
@@ -513,20 +479,107 @@ class PiPLSSearchCV(
             oof_prediction_counts=counts,
             pooled_oof_r2=pooled_r2,
         )
-        if self.refit:
-            refit_started = perf_counter()
-            self.selected_estimator_ = clone(template).set_params(**self.selected_params_)
-            _fit_path_estimator(
-                self.selected_estimator_,
-                X_indexable,
-                y_indexable,
-            )
-            self.refit_time_ = perf_counter() - refit_started
-            self.selected_pipls_ = _extract_fitted_pipls(
-                self.selected_estimator_,
-                pipls_param_prefix,
-            )
         return self
+
+    def refit(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        *,
+        rule: RefitRule | None = None,
+        n_components: int | None = None,
+    ) -> Any:
+        """Fit and return one selected path model on the supplied full data.
+
+        Exactly one of ``rule`` and ``n_components`` must be supplied. A named
+        rule selects one stored component-path row; a component count retrieves
+        that row directly. In every case, the predictor rank is the rank already
+        selected conditionally for the chosen component count.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Predictor matrix used for the final full-data fit.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Response vector or matrix used for the final full-data fit.
+        rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
+            Stored-row selection rule. ``"best_score"`` uses the global
+            configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
+            stored mean response-standardized CV-MSE, and
+            ``"one_standard_error"`` uses the smallest stored component count
+            within one fold-based standard error of that minimum.
+        n_components : int, optional
+            Evaluated paired-mode count to refit manually.
+
+        Returns
+        -------
+        estimator
+            Fitted clone of the configured direct estimator or pipeline.
+
+        Raises
+        ------
+        sklearn.exceptions.NotFittedError
+            If the search has not been fitted.
+        ValueError
+            If exactly one selection input is not supplied, a rule is invalid,
+            or the requested component count was not evaluated.
+
+        Notes
+        -----
+        The search object is not mutated and does not retain ``X``, ``y``, or
+        the returned estimator. For an exact manually specified
+        ``(n_components, predictor_rank)`` pair, fit
+        :class:`pipls.PiPLSRegression` directly.
+        """
+
+        selected = self._resolve_selection_result(
+            rule=rule,
+            n_components=n_components,
+        )
+        template = (
+            _default_pipls_template() if self.estimator is None else self.estimator
+        )
+        pipls_param_prefix = _resolve_pipls_param_prefix(template)
+        n_components_key, predictor_rank_key = _pipls_parameter_keys(
+            pipls_param_prefix
+        )
+        estimator = clone(template).set_params(
+            **{
+                n_components_key: selected.n_components,
+                predictor_rank_key: selected.predictor_rank,
+            }
+        )
+        _fit_path_estimator(estimator, X, y)
+        return estimator
+
+    def _resolve_selection_result(
+        self,
+        *,
+        rule: RefitRule | None,
+        n_components: int | None,
+    ) -> PiPLSComponentResult:
+        """Resolve one stored component-path row without mutating search state."""
+
+        check_is_fitted(
+            self,
+            attributes=["cv_results_", "component_path_", "best_n_components_"],
+        )
+        if (rule is None) == (n_components is None):
+            raise ValueError(
+                "Exactly one of rule and n_components must be supplied to refit()."
+            )
+        if n_components is not None:
+            return self.component_path_.for_n_components(n_components)
+        if rule == "best_score":
+            return self.component_path_.for_n_components(self.best_n_components_)
+        if rule == "minimum_cv_mse":
+            return self.component_path_.minimum_cv_mse_result()
+        if rule == "one_standard_error":
+            return self.component_path_.one_standard_error_result()
+        raise ValueError(
+            'rule must be "best_score", "minimum_cv_mse", or '
+            '"one_standard_error".'
+        )
 
     def predictor_rank_profile(
         self,
@@ -583,228 +636,13 @@ class PiPLSSearchCV(
             n_splits=self.n_splits_,
         )
 
-    @available_if(_estimator_supports("predict"))  # type: ignore[untyped-decorator]
-    def predict(self, X: ArrayLike, copy: bool = True) -> FloatArray:
-        """Predict with the refitted selected estimator.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Predictor matrix.
-        copy : bool, default=True
-            Whether validation may copy ``X`` for a direct Pi-PLS estimator.
-
-        Returns
-        -------
-        y_pred : ndarray
-            Predictions from ``selected_estimator_``.
-
-        Notes
-        -----
-        This method is available only when ``refit=True`` and the estimator
-        template supports prediction.
-        """
-
-        estimator = self._refitted_estimator()
-        if isinstance(estimator, PiPLSRegression):
-            return estimator.predict(X, copy=copy)
-        return cast(FloatArray, estimator.predict(X))
-
-    @available_if(_estimator_supports("transform"))  # type: ignore[untyped-decorator]
-    def transform(
-        self,
-        X: ArrayLike,
-        y: ArrayLike | None = None,
-        copy: bool = True,
-    ) -> Any:
-        """Transform with the refitted selected estimator.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Predictor matrix.
-        y : array-like, optional
-            Responses to transform with a direct ``PiPLSRegression``. Composite
-            estimators support predictor transformation only.
-        copy : bool, default=True
-            Whether validation may copy arrays for a direct Pi-PLS estimator.
-
-        Returns
-        -------
-        transformed : ndarray or tuple of ndarray
-            Output of the selected estimator's transformation.
-
-        Notes
-        -----
-        This method is available only when ``refit=True`` and the estimator
-        template supports transformation.
-        """
-
-        estimator = self._refitted_estimator()
-        if isinstance(estimator, PiPLSRegression):
-            return estimator.transform(X, y, copy=copy)
-        if y is not None:
-            raise ValueError(
-                "transform(X, y) is available when the refitted estimator is a direct "
-                "PiPLSRegression. For composite estimators, use selected_pipls_ with data "
-                "transformed by the preceding pipeline steps."
-            )
-        return estimator.transform(X)
-
-    @available_if(_estimator_supports("transform"))  # type: ignore[untyped-decorator]
-    def fit_transform(
-        self,
-        X: ArrayLike,
-        y: ArrayLike | None = None,
-        *,
-        groups: ArrayLike | None = None,
-        **fit_params: Any,
-    ) -> Any:
-        """Fit the path search and transform with the selected estimator.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Predictor matrix.
-        y : array-like of shape (n_samples,) or (n_samples, n_targets)
-            Response vector or matrix. ``y`` is required.
-        groups : array-like of shape (n_samples,), optional
-            Group labels passed to a group-aware splitter.
-        **fit_params : dict
-            Additional fit parameters are not supported and raise ``TypeError``.
-
-        Returns
-        -------
-        transformed : ndarray or tuple of ndarray
-            Transformation of the fitted data by ``selected_estimator_``.
-
-        Notes
-        -----
-        This method is available only when ``refit=True`` and the estimator
-        template supports transformation.
-        """
-
-        if fit_params:
-            names = ", ".join(sorted(fit_params))
-            raise TypeError(f"Unexpected fit parameters: {names}.")
-        if y is None:
-            raise ValueError("y is required to fit PiPLSSearchCV.")
-        self.fit(X, y, groups=groups)
-        if isinstance(self.selected_estimator_, PiPLSRegression):
-            return cast(tuple[FloatArray, FloatArray], self.transform(X, y))
-        return cast(Any, self.transform(X))
-
-    @available_if(_estimator_supports("inverse_transform"))  # type: ignore[untyped-decorator]
-    def inverse_transform(
-        self,
-        X: ArrayLike,
-        y: ArrayLike | None = None,
-    ) -> Any:
-        """Reconstruct data through the refitted selected estimator.
-
-        Parameters
-        ----------
-        X : array-like
-            Transformed predictor representation.
-        y : array-like, optional
-            Response scores for a direct ``PiPLSRegression``. Composite
-            estimators reconstruct predictors only.
-
-        Returns
-        -------
-        reconstructed : ndarray or tuple of ndarray
-            Output of the selected estimator's inverse transformation.
-
-        Notes
-        -----
-        This method is available only when ``refit=True`` and the estimator
-        template supports inverse transformation.
-        """
-
-        estimator = self._refitted_estimator()
-        if isinstance(estimator, PiPLSRegression):
-            return estimator.inverse_transform(X, y)
-        if y is not None:
-            raise ValueError(
-                "inverse_transform(X, y) is available when the refitted estimator "
-                "is a direct PiPLSRegression. Composite estimators reconstruct X only."
-            )
-        return estimator.inverse_transform(X)
-
-    @available_if(_estimator_supports("score"))  # type: ignore[untyped-decorator]
-    def score(
-        self,
-        X: ArrayLike,
-        y: ArrayLike,
-        sample_weight: ArrayLike | None = None,
-    ) -> float:
-        r"""Return the selected estimator's uniformly averaged $R^2$.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Predictor matrix.
-        y : array-like of shape (n_samples,) or (n_samples, n_targets)
-            Observed responses.
-        sample_weight : array-like of shape (n_samples,), optional
-            Sample weights forwarded to the selected estimator.
-
-        Returns
-        -------
-        score : float
-            Score returned by ``selected_estimator_``.
-
-        Notes
-        -----
-        This method is available only when ``refit=True`` and the estimator
-        template supports scoring.
-        """
-
-        estimator = self._refitted_estimator()
-        if sample_weight is None:
-            return float(estimator.score(X, y))
-        return float(estimator.score(X, y, sample_weight=sample_weight))
-
-    @available_if(_estimator_supports("get_feature_names_out"))  # type: ignore[untyped-decorator]
-    def get_feature_names_out(
-        self,
-        input_features: ArrayLike | None = None,
-    ) -> NDArray[np.object_]:
-        """Return names for the selected transformed predictor features.
-
-        Parameters
-        ----------
-        input_features : array-like of str, optional
-            Input feature names validated by the selected estimator.
-
-        Returns
-        -------
-        feature_names_out : ndarray of str
-            Names returned by ``selected_estimator_`` or its fitted terminal
-            ``PiPLSRegression``.
-
-        Notes
-        -----
-        This method is available only when ``refit=True`` and the estimator
-        template supports output feature names.
-        """
-
-        estimator = self._refitted_estimator()
-        method = getattr(estimator, "get_feature_names_out", None)
-        if method is not None:
-            return cast(NDArray[np.object_], method(input_features))
-        return cast(
-            NDArray[np.object_],
-            self.selected_pipls_.get_feature_names_out(input_features),
-        )
-
     def _more_tags(self) -> dict[str, bool]:
         """Legacy scikit-learn tags for releases before the Tags dataclasses."""
 
-        return {"multioutput": True, "poor_score": True}
+        return {"multioutput": True}
 
     def __sklearn_tags__(self) -> Any:
-        """Declare a multi-output regression meta-estimator and transformer."""
+        """Declare multi-output target support for the path evaluator."""
 
         parent = getattr(super(), "__sklearn_tags__", None)
         if parent is None:  # pragma: no cover - scikit-learn 1.4/1.5
@@ -812,18 +650,7 @@ class PiPLSSearchCV(
         tags = parent()
         tags.target_tags.multi_output = True
         tags.target_tags.single_output = True
-        if tags.regressor_tags is not None:
-            tags.regressor_tags.poor_score = True
         return tags
-
-    def _refitted_estimator(self) -> Any:
-        check_is_fitted(self, attributes=["selected_params_"])
-        if not hasattr(self, "selected_estimator_"):
-            raise AttributeError(
-                "PiPLSSearchCV was fitted with refit=False; predict, transform, and score "
-                "require refit=True."
-            )
-        return self.selected_estimator_
 
     def _validate_constructor_parameters(self, template: Any) -> Scorer:
         if self.search_method not in ("optimal", "auto"):
@@ -832,8 +659,6 @@ class PiPLSSearchCV(
             raise ValueError(
                 'selection_rule must be "best_score" or "one_standard_error".'
             )
-        if not isinstance(self.refit, (bool, np.bool_)):
-            raise ValueError(f"refit must be boolean; got {self.refit!r}.")
         if not isinstance(self.return_oof_predictions, (bool, np.bool_)):
             raise ValueError(
                 "return_oof_predictions must be boolean; "
@@ -895,21 +720,6 @@ def _pipls_parameter_keys(prefix: str) -> tuple[str, str]:
     return (
         f"{prefix}{separator}n_components",
         f"{prefix}{separator}predictor_rank",
-    )
-
-
-def _extract_fitted_pipls(estimator: Any, prefix: str) -> PiPLSRegression:
-    if isinstance(estimator, PiPLSRegression):
-        if prefix != "":
-            raise ValueError("A direct fitted PiPLSRegression requires an empty prefix.")
-        return estimator
-    if isinstance(estimator, Pipeline):
-        value = estimator.named_steps.get(prefix)
-        if isinstance(value, PiPLSRegression) and estimator.steps[-1][0] == prefix:
-            return value
-    raise ValueError(
-        f"Fitted parameter prefix {prefix!r} no longer locates the final "
-        "PiPLSRegression step."
     )
 
 

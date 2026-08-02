@@ -162,10 +162,11 @@ plan contains an earlier or more general proposal:
 
 - both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
 - `PiPLSSearchCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
-- the currently implemented search defaults to selection-only `refit=False`, with explicit
-  `selection_rule` for optional constructor-time final refitting; Decision 0137 authorizes its
-  staged replacement by post-fit `refit()` and `validation_report()` operations, after which the
-  constructor controls and selected-model search state are removed without compatibility aliases;
+- the implemented search now performs final full-data fitting only through post-fit `refit()` and
+  exposes no constructor boolean, selected fitted-model state, or delegated model methods;
+  constructor `selection_rule` and `return_oof_predictions` remain temporarily for selected-row
+  reporting until Decision 0137's explicit `validation_report()` stage replaces them without
+  compatibility aliases;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,

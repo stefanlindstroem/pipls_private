@@ -66,28 +66,23 @@ section explains splitter-dependent feasibility and metadata such as `groups`.
 
 ## `predict()` is unavailable after path selection
 
-By default, `PiPLSSearchCV` uses `refit=False` and is a selection object rather than a fitted
-prediction model. Either fit the chosen pair explicitly:
+`PiPLSSearchCV` is a path evaluator rather than a fitted prediction model. Fit and retain one
+selected model explicitly:
 
 ```python
-selected = search.component_path_.for_n_components(h)
-model = PiPLSRegression(
-    n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(X, Y)
-```
-
-or construct the search with `refit=True`. The default `selection_rule="best_score"` refits the
-global configured-score optimum; `selection_rule="one_standard_error"` refits the stored 1-SE
-component-path recommendation. Extract the fitted model and use it directly for application:
-
-```python
-model = search.selected_pipls_
+model = search.refit(X, Y, n_components=h)
 Y_pred = model.predict(X_new)
 ```
 
-Delegated calls through the search object remain available as compatibility conveniences. See the
-[path API](api/path.md).
+Automatic choices use the same post-fit operation:
+
+```python
+model = search.refit(X, Y, rule="one_standard_error")
+```
+
+The accepted rules are `"best_score"`, `"minimum_cv_mse"`, and `"one_standard_error"`. The search
+object retains the path evidence but does not delegate prediction or store the returned model. See
+the [path API](api/path.md).
 
 ## The CV-MSE minimum, best candidate, and selected model disagree
 

@@ -57,7 +57,7 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert path.n_components_values == "all"
     assert path.scoring == "neg_response_standardized_mse"
     assert path.selection_rule == "best_score"
-    assert path.refit is False
+    assert callable(path.refit)
 
 
 def test_path_defaults_have_stable_signature_and_repr() -> None:
@@ -66,14 +66,14 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     assert signature.parameters["scoring"].default == (
         "neg_response_standardized_mse"
     )
-    assert signature.parameters["refit"].default is False
+    assert "refit" not in signature.parameters
     assert signature.parameters["selection_rule"].default == "best_score"
     assert "0x" not in str(signature)
     path = PiPLSSearchCV()
     assert repr(path) == "PiPLSSearchCV()"
     assert clone(path).scoring == path.scoring
     assert clone(path).selection_rule == "best_score"
-    assert clone(path).refit is False
+    assert callable(clone(path).refit)
 
 
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
@@ -101,7 +101,6 @@ def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
         "n_components_values",
         "n_jobs",
         "predictor_rank_values",
-        "refit",
         "return_oof_predictions",
         "samples_per_predictor_rank",
         "scoring",
@@ -247,35 +246,35 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
     X, Y = _data()
     base = _fixed_estimator()
     direct = clone(base).fit(X, Y)
-    path = PiPLSSearchCV(
+    search = PiPLSSearchCV(
         estimator=base,
         n_components_values=[2],
         predictor_rank_values=[3],
         max_predictor_rank=3,
         search_method="optimal",
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
+    model = search.refit(X, Y, n_components=2)
 
-    assert path.best_n_components_ == 2
-    assert path.best_predictor_rank_ == 3
-    assert path.selected_result_.n_components == 2
-    assert path.selected_result_.predictor_rank == 3
-    assert path.selected_pipls_ is path.selected_estimator_
-    np.testing.assert_allclose(path.predict(X), direct.predict(X))
-    np.testing.assert_allclose(path.selected_pipls_.coef_, direct.coef_)
+    assert search.best_n_components_ == 2
+    assert search.best_predictor_rank_ == 3
+    assert search.selected_result_.n_components == 2
+    assert search.selected_result_.predictor_rank == 3
+    assert isinstance(model, PiPLSRegression)
+    np.testing.assert_allclose(model.predict(X), direct.predict(X))
+    np.testing.assert_allclose(model.coef_, direct.coef_)
     np.testing.assert_allclose(
-        path.selected_pipls_.decomposition_.dilation,
+        model.decomposition_.dilation,
         direct.decomposition_.dilation,
     )
-    x_path, y_path = path.transform(X, Y)
+    x_model, y_model = model.transform(X, Y)
     x_direct, y_direct = direct.transform(X, Y)
-    np.testing.assert_allclose(x_path, x_direct)
-    np.testing.assert_allclose(y_path, y_direct)
+    np.testing.assert_allclose(x_model, x_direct)
+    np.testing.assert_allclose(y_model, y_direct)
 
 
-def test_path_exposes_nested_pipls_for_pipeline_without_flattening_coefficients() -> None:
+def test_refit_returns_pipeline_without_flattening_coefficients() -> None:
     X, Y = _data()
     pipeline = Pipeline(
         [
@@ -283,19 +282,20 @@ def test_path_exposes_nested_pipls_for_pipeline_without_flattening_coefficients(
             ("regression", _fixed_estimator()),
         ]
     )
-    path = PiPLSSearchCV(
+    search = PiPLSSearchCV(
         estimator=pipeline,
         n_components_values=[2],
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
+    model = search.refit(X, Y, n_components=2)
 
-    assert isinstance(path.selected_estimator_, Pipeline)
-    assert path.selected_pipls_ is path.selected_estimator_.named_steps["regression"]
-    assert not hasattr(path, "coef_")
+    assert isinstance(model, Pipeline)
+    assert isinstance(model.named_steps["regression"], PiPLSRegression)
+    assert not hasattr(search, "coef_")
+    assert not hasattr(search, "selected_estimator_")
 
 
 def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
@@ -306,60 +306,60 @@ def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
             ("regression", _fixed_estimator()),
         ]
     )
-    path = PiPLSSearchCV(
+    search = PiPLSSearchCV(
         estimator=pipeline,
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
-        selection_rule="one_standard_error",
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
+    expected = search.component_path_.one_standard_error_result()
+    model = search.refit(X, Y, rule="one_standard_error")
 
-    assert isinstance(path.selected_estimator_, Pipeline)
-    assert path.selected_pipls_ is path.selected_estimator_.named_steps["regression"]
-    assert path.selected_pipls_.n_components == path.selected_result_.n_components
-    assert path.selected_pipls_.predictor_rank == path.selected_result_.predictor_rank
-    assert path.predict(X).shape == Y.shape
+    assert isinstance(model, Pipeline)
+    selected_pipls = model.named_steps["regression"]
+    assert selected_pipls.n_components == expected.n_components
+    assert selected_pipls.predictor_rank == expected.predictor_rank
+    assert model.predict(X).shape == Y.shape
 
 
-def test_path_score_accepts_sample_weight_like_regression() -> None:
+def test_refitted_model_score_accepts_sample_weight_like_regression() -> None:
     X, Y = _data()
-    path = PiPLSSearchCV(
+    search = PiPLSSearchCV(
         estimator=_fixed_estimator(),
         n_components_values=[2],
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
+    model = search.refit(X, Y, n_components=2)
     weights = np.linspace(1.0, 2.0, X.shape[0])
 
-    assert path.score(X, Y, sample_weight=weights) == pytest.approx(
-        path.selected_pipls_.score(X, Y, sample_weight=weights)
+    assert model.score(X, Y, sample_weight=weights) == pytest.approx(
+        _fixed_estimator().fit(X, Y).score(X, Y, sample_weight=weights)
     )
 
 
-def test_path_preserves_refitted_estimator_output_configuration() -> None:
+def test_refit_preserves_estimator_output_configuration() -> None:
     X, Y = _data()
     columns = [f"feature_{index}" for index in range(X.shape[1])]
     X_frame = pd.DataFrame(X, columns=columns)
     template = _fixed_estimator().set_output(transform="pandas")
-    path = PiPLSSearchCV(
+    search = PiPLSSearchCV(
         estimator=template,
         n_components_values=[2],
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X_frame, Y)
+    model = search.refit(X_frame, Y, n_components=2)
 
-    np.testing.assert_array_equal(path.feature_names_in_, columns)
-    np.testing.assert_array_equal(path.selected_pipls_.feature_names_in_, columns)
-    transformed = path.transform(X_frame)
+    np.testing.assert_array_equal(search.feature_names_in_, columns)
+    np.testing.assert_array_equal(model.feature_names_in_, columns)
+    transformed = model.transform(X_frame)
     assert list(transformed.columns) == ["piplsregression0", "piplsregression1"]
 
 
@@ -389,19 +389,21 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
             ),
         ]
     )
-    path = PiPLSSearchCV(
+    search = PiPLSSearchCV(
         estimator=pipeline,
         n_components_values=[2],
         predictor_rank_values=[3],
         max_predictor_rank=3,
         cv=3,
-        refit=True,
         n_jobs=1,
     ).fit(X_frame, Y)
+    model = search.refit(X_frame, Y, n_components=2)
 
-    assert path.selected_pipls_.n_features_in_ == len(selected)
-    assert path.predict(X_frame).shape == Y.shape
-    assert np.isfinite(path.scorer_(path.selected_estimator_, X_frame, Y))
+    assert isinstance(model, Pipeline)
+    selected_pipls = model.named_steps["regression"]
+    assert selected_pipls.n_features_in_ == len(selected)
+    assert model.predict(X_frame).shape == Y.shape
+    assert np.isfinite(search.scorer_(model, X_frame, Y))
 
 
 @pytest.mark.parametrize(
@@ -413,21 +415,6 @@ def test_path_preserves_dataframe_columns_inside_pipeline_folds() -> None:
             scale=False,
             svd_solver="full",
             random_state=None,
-        ),
-        PiPLSSearchCV(
-            estimator=PiPLSRegression(
-                n_components=1,
-                predictor_rank=1,
-                scale=False,
-                svd_solver="full",
-                random_state=None,
-            ),
-            n_components_values=[1],
-            predictor_rank_values=[1],
-            max_predictor_rank=1,
-            cv=2,
-            refit=True,
-            n_jobs=1,
         ),
     ],
 )
@@ -486,7 +473,7 @@ def test_path_restricts_estimator_scope_to_direct_or_final_pipeline_pipls() -> N
         PiPLSSearchCV(estimator=invalid_pipeline).fit(X, Y)
 
 
-def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> None:
+def test_path_search_diagnostics_and_refitted_model_are_sklearn_like() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
         estimator=_fixed_estimator(),
@@ -495,13 +482,12 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
         max_predictor_rank=3,
         cv=None,
         scoring=None,
-        refit=True,
         n_jobs=1,
     ).fit(X, Y)
+    model = search.refit(X, Y, n_components=2)
 
     assert search.n_splits_ == 5
     assert callable(search.scorer_)
-    assert search.refit_time_ >= 0.0
     assert {
         "mean_fit_time",
         "std_fit_time",
@@ -511,14 +497,18 @@ def test_path_search_diagnostics_and_inverse_transform_are_sklearn_like() -> Non
     assert search.component_path_.predictor_rank_policy == "fixed"
     assert isinstance(search.component_path_, PiPLSComponentPath)
     assert search.component_path_.for_n_components(2).predictor_rank == 3
-    x_scores, y_scores = search.transform(X, Y)
-    X_reconstructed, Y_reconstructed = search.inverse_transform(x_scores, y_scores)
-    direct_X, direct_Y = search.selected_pipls_.inverse_transform(x_scores, y_scores)
+    x_scores, y_scores = model.transform(X, Y)
+    X_reconstructed, Y_reconstructed = model.inverse_transform(x_scores, y_scores)
+    direct_X, direct_Y = _fixed_estimator().fit(X, Y).inverse_transform(
+        x_scores,
+        y_scores,
+    )
     np.testing.assert_allclose(X_reconstructed, direct_X)
     np.testing.assert_allclose(Y_reconstructed, direct_Y)
 
 
-def test_path_inverse_transform_is_conditionally_available_for_pipeline() -> None:
+def test_refitted_pipeline_exposes_only_pipeline_supported_transformations() -> None:
+    X, Y = _data()
     pipeline = Pipeline(
         [
             (
@@ -531,7 +521,16 @@ def test_path_inverse_transform_is_conditionally_available_for_pipeline() -> Non
             ("regression", _fixed_estimator()),
         ]
     )
-    search = PiPLSSearchCV(estimator=pipeline, refit=True)
+    search = PiPLSSearchCV(
+        estimator=pipeline,
+        n_components_values=[2],
+        predictor_rank_values=[3],
+        max_predictor_rank=3,
+        cv=3,
+    ).fit(X, Y)
+    model = search.refit(X, Y, n_components=2)
 
-    assert hasattr(search, "transform")
+    assert hasattr(model, "transform")
+    assert not hasattr(model, "inverse_transform")
+    assert not hasattr(search, "transform")
     assert not hasattr(search, "inverse_transform")

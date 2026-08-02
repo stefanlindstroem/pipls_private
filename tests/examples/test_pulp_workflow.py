@@ -32,7 +32,7 @@ def pulp_result() -> SimpleNamespace:
     Y = pd.read_csv(data_dir / "Y.csv")
 
     cv = KFold(n_splits=5, shuffle=True, random_state=0)
-    path_search = PiPLSSearchCV(refit=False, cv=cv).fit(X, Y)
+    path_search = PiPLSSearchCV(cv=cv).fit(X, Y)
     component_path = path_search.component_path_
     selected = component_path.for_n_components(3)
 
@@ -79,7 +79,7 @@ def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespac
 
     assert isinstance(result.path_search, PiPLSSearchCV)
     assert result.path_search.estimator is None
-    assert result.path_search.refit is False
+    assert callable(result.path_search.refit)
     assert isinstance(result.component_path, PiPLSComponentPath)
     assert result.selected.n_components == 3
     assert result.selected.predictor_rank == 9

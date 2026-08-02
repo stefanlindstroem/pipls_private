@@ -68,6 +68,8 @@ should protect these durable behaviors:
 - a fitted search exposes candidate evidence and immutable path/profile views;
 - post-fit `refit()` accepts exactly one named rule or one component count, returns a fitted clone of
   the configured estimator or pipeline, and leaves the search unchanged;
+- constructor parameters do not shadow the post-fit method, and search exposes no delegated
+  prediction, transformation, scoring, inverse-transformation, or feature-name surface;
 - manual component selection uses the conditionally selected predictor rank stored for that path
   row;
 - `"best_score"`, `"minimum_cv_mse"`, and `"one_standard_error"` resolve through their documented

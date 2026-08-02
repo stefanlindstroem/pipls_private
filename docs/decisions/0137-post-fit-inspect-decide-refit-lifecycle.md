@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Implementation is authorized but not yet complete.
+Accepted. Implementation is in progress.
 
 ## Context
 
@@ -72,9 +72,16 @@ Retain `cv_results_`, `component_path_`, `predictor_rank_profile()`, `best_index
 the configured scorer; they do not imply a final model choice.
 
 Implement the transition in reviewable stages: add `refit()`, add explicit validation reporting,
-remove the old lifecycle, then migrate examples and public documentation. Until the old lifecycle
-is removed, public user documentation continues to describe the implemented API rather than the
-future target.
+remove the remaining old lifecycle, then migrate examples and final presentation. Public user
+documentation describes the implemented stage rather than claiming unfinished behavior.
+
+The original staging expected the constructor boolean `refit` and the post-fit method `refit()` to
+coexist temporarily. That is not a valid scikit-learn estimator surface: constructor parameters are
+stored as same-named instance attributes, so the boolean would shadow the method. The patch that
+adds post-fit `refit()` therefore also removes the constructor boolean, selected fitted-model state,
+and search-level fitted-model delegation. Constructor-time `selection_rule` and
+`return_oof_predictions` remain temporarily because they still own selected-row reporting until the
+explicit `validation_report()` operation is implemented.
 
 Do not add aliases, deprecation warnings, ignored constructor arguments, fallback attributes, or
 serialization migrations for the removed pre-release surface.
@@ -104,5 +111,5 @@ otherwise remain in force.
 - The returned model remains an ordinary `PiPLSRegression` or user-supplied pipeline rather than a
   search object with delegated fitted-model methods.
 - Search objects do not retain potentially large or sensitive training matrices.
-- The staged implementation may temporarily contain both lifecycles, but the completed version
-  contains no legacy compatibility surface.
+- The staged implementation may temporarily retain constructor-selected report state alongside
+  post-fit model refitting, but the completed version contains no legacy compatibility surface.

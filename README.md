@@ -14,8 +14,8 @@ appropriate alternatives whose suitability depends on the data and validation de
 
 For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
 selects a predictor rank conditionally for each count. Users may inspect the path and fit one fixed
-`PiPLSRegression`, or declare a final selection rule and let the search object refit that selected
-pair while retaining the complete selection record.
+model manually, or apply a named post-fit rule through `search.refit(X, Y, rule=...)`. The search
+retains the complete selection evidence, while `refit()` returns the fitted final estimator.
 
 The rendered documentation is the primary user guide. On GitHub, open the latest
 [`github-pages` deployment](../../deployments/github-pages). The source links below remain useful
@@ -74,17 +74,18 @@ the [fixed-regression reference](docs/api/regression.md) for the complete contra
 When the ranks are not known, evaluate the path first:
 
 ```python
-from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls import PiPLSSearchCV
 
 search = PiPLSSearchCV().fit(X_train, Y_train)
 path = search.component_path_
 
 selected = path.for_n_components(2)
 
-model = PiPLSRegression(
+model = search.refit(
+    X_train,
+    Y_train,
     n_components=selected.n_components,
-    predictor_rank=selected.predictor_rank,
-).fit(X_train, Y_train)
+)
 
 Y_pred = model.predict(X_test)
 ```
@@ -99,31 +100,32 @@ predictor-rank plots. The [path-selection reference](docs/api/path.md) and
 [path-selection details](docs/path_analysis.md) cover alternative policies, splitters, and
 validation protocols.
 
-When the complete protocol is known in advance, selection and final fitting can be performed in one
-call. This example uses adaptive predictor-rank search and the 1-SE component rule:
+When the complete protocol is known in advance, search and final fitting can remain compact. This
+example uses adaptive predictor-rank search and the 1-SE component rule:
 
 ```python
-search = PiPLSSearchCV(
-    search_method="auto",
-    selection_rule="one_standard_error",
-    refit=True,
-).fit(X_train, Y_train)
+model = PiPLSSearchCV(search_method="auto").fit(
+    X_train,
+    Y_train,
+).refit(
+    X_train,
+    Y_train,
+    rule="one_standard_error",
+)
 
-model = search.selected_pipls_
 Y_pred = model.predict(X_test)
 ```
 
-`best_*` still identifies the global configured-score optimum. `selected_result_`,
-`selected_params_`, `validation_report_`, and `selected_pipls_` identify the model produced by the
-declared protocol. A component choice made after inspecting the path should remain an explicit
-two-stage workflow.
+Retain the fitted search in a variable when component-path, predictor-rank-profile, or candidate
+inspection is needed. `refit()` returns a fitted estimator or pipeline and does not attach it to the
+search object.
 
 ## Main interfaces
 
 | Interface | Purpose |
 |---|---|
 | `PiPLSRegression` | Fit one fixed paired-mode count and retained predictor-subspace dimension |
-| `PiPLSSearchCV` | Evaluate the path and optionally refit an explicitly selected path row |
+| `PiPLSSearchCV` | Evaluate the path, inspect search evidence, and explicitly refit one selected row |
 | `component_path_` | Inspect one selected predictor rank for each paired-mode count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one paired-mode count |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
