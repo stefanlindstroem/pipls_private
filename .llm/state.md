@@ -118,7 +118,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
   elementary plotting recipes.
 - documentation and maintained example constructions aligned with the current public defaults:
   `PiPLSSearchCV()` demonstrates path-evaluation operation, decomposition documentation includes
-  rank/solver diagnostics, and Pulp rank profiles use the public lookup method;
+  rank/solver diagnostics, and Pulp rank profiles use `predictor_rank_profile()`;
 - a grouped self-documenting maintainer command index that presents `make install` and `make check`
   first, then separates development, documentation/example, and distribution/maintenance targets
   without renaming or changing any recipe.
@@ -227,7 +227,7 @@ case, or public behavior.
 | Conditional predictor-rank selection | `PiPLSSearchCV(search_method="auto")` |
 | Component counts | `n_components_values="all"` by default; explicit integer sequences request a subset |
 | Path search | `PiPLSSearchCV(search_method="auto")` by default |
-| Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, derived fold-based standard-error, predictor-rank, policy, and split-count arrays plus scalar lookup |
+| Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, derived fold-based standard-error, predictor-rank, policy, and split-count arrays for plotting and inspection |
 | Conditional rank profile | `predictor_rank_profile(h)` returns evaluated ranks and aligned score/CV-MSE arrays on demand, plus the selected scalar row |
 | Exhaustive search | explicit `PiPLSSearchCV(search_method="optimal")` |
 | Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
@@ -275,7 +275,7 @@ Additional fixed decisions:
 - Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
   separate fixed model
   after a visible component-path choice. Pulp and Sugarcane use explicit component counts, while
-  Tobacco resolves its minimum and 1-SE annotation rows through `path_search.select(rule=...)`.
+  Tobacco resolves its minimum and 1-SE annotation rows through `search.select(rule=...)`.
   All three use `component_path_`, explicit search validation reports, and inspection results
   directly in memory. All three use direct fixed estimators. `best_params_` remains a convenience,
   not the required user decision.
@@ -374,9 +374,10 @@ package-level use case and pass the source-level licensing gate before implement
 
 ## Recent completed increments
 
-Decisions 0107--0116 are complete and partly superseded by Decision 0137. Path result methods remain
-non-mutating stored-row inspection, `PiPLSSearchCV` retains global `best_*` evidence without a
-declared final row, and `PiPLSRegression` remains fixed-pair only.
+Decisions 0107--0116 are complete and partly superseded by Decisions 0137 and 0140.
+`PiPLSSearchCV.select()` now owns non-mutating stored-row inspection, `PiPLSSearchCV` retains
+global `best_*` evidence without a declared final row, and `PiPLSRegression` remains fixed-pair
+only.
 
 The six owner-authorized simplifications are complete. Search inputs are resolved once;
 decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction

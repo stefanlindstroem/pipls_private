@@ -116,7 +116,7 @@ figure composition, and final PDF output directly. Sugarcane and Tobacco separat
 scientific computation from private same-file rendering functions. Tobacco additionally owns
 source-order response pagination and raw observation diagnostics.
 
-The current component-path helpers remain example-local selection-diagnostic tools. Full-data
+The current component-path plotting code remains example-local diagnostic presentation. Full-data
 decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
 receive predictions explicitly and record their provenance. Read `.llm/analysis.md` before
 implementing or reviewing this surface.

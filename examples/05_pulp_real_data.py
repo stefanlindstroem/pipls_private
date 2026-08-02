@@ -32,13 +32,13 @@ response_names = data.target_names
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:evaluate-pulp-component-path]
-path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
-path = path_search.component_path_
+search = PiPLSSearchCV(cv=CV).fit(X, Y)
+path = search.component_path_
 # --8<-- [end:evaluate-pulp-component-path]
 
 # --8<-- [start:select-pulp-parameters]
 # The stored predictor rank minimizes mean CV-MSE for this paired-mode count.
-selected = path_search.select(n_components=CHOSEN_N_COMPONENTS)
+selected = search.select(n_components=CHOSEN_N_COMPONENTS)
 # --8<-- [end:select-pulp-parameters]
 
 # --8<-- [start:plot-pulp-component-path]
@@ -75,7 +75,7 @@ plt.close(figure)
 
 # --8<-- [start:extract-pulp-rank-profile]
 # Retrieve every predictor rank evaluated at the chosen component count.
-rank_profile = path_search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
+rank_profile = search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
 # --8<-- [end:extract-pulp-rank-profile]
 
 # --8<-- [start:plot-pulp-rank-profile]
@@ -118,7 +118,7 @@ plt.close(figure)
 
 # Fit the selected fixed model only after inspecting the selection figures.
 # --8<-- [start:fit-pulp-model]
-model = path_search.refit(
+model = search.refit(
     X,
     Y,
     n_components=CHOSEN_N_COMPONENTS,
@@ -126,7 +126,7 @@ model = path_search.refit(
 # --8<-- [end:fit-pulp-model]
 
 # --8<-- [start:pulp-oof-predictions]
-report = path_search.validation_report(
+report = search.validation_report(
     X,
     Y,
     n_components=CHOSEN_N_COMPONENTS,

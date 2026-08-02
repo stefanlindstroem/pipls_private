@@ -364,7 +364,7 @@ def main() -> None:
     )
 
     # Evaluate the Pi-PLS component path over paired-mode counts with a full predictor SVD.
-    path_search = PiPLSSearchCV(
+    search = PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,
             predictor_rank=1,
@@ -374,21 +374,21 @@ def main() -> None:
         n_jobs=1,
         cv=CV,
     ).fit(X, Y)
-    path = path_search.component_path_
-    minimum = path_search.select(rule="minimum_cv_mse")
-    selected = path_search.select(rule="one_standard_error")
+    path = search.component_path_
+    minimum = search.select(rule="minimum_cv_mse")
+    selected = search.select(rule="one_standard_error")
     one_se_threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error
     display_components = tuple(
         range(min(DISPLAY_COMPONENT_COUNT, selected.n_components))
     )
 
     # Apply the 1-SE rule and fit the chosen row on the full data.
-    model = path_search.refit(
+    model = search.refit(
         X,
         Y,
         rule="one_standard_error",
     )
-    report = path_search.validation_report(
+    report = search.validation_report(
         X,
         Y,
         rule="one_standard_error",

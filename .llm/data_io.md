@@ -171,7 +171,7 @@ Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize 
 analysis results. Every numbered real-data workflow keeps its path and inspection results in memory,
 creates figures directly, and writes only final PDF outputs. Example 04 compares immutable Pi-PLS and
 ordinary-PLS paths; Pulp additionally exposes the conditional predictor-rank profile for its chosen
-component count; Tobacco applies the component-path 1-SE recommendation before deterministic
+component count; Tobacco applies search-owned one-standard-error selection before deterministic
 source-order response pagination through multipage PDFs.
 New numbered-example work should follow that pattern. Git and source distributions preserve the
 required output-directory structure through `.gitkeep` files; generated PDFs are never committed

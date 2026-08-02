@@ -103,7 +103,7 @@ present demonstration keeps the elbow choice explicit rather than declaring an a
 selection rule. The diamond marks the stated choice.
 
 The selected row contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at
-three components under the seeded shuffled folds. `path_search.select()` retrieves that evaluated
+three components under the seeded shuffled folds. `search.select()` retrieves that evaluated
 row for inspection; it does not repeat the optimization or fit the final model.
 
 ### Conditional predictor-rank profile
@@ -141,7 +141,7 @@ samples:
 --8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
 ```
 
-`path_search.refit(...)` resolves the conditionally selected predictor rank stored for the chosen
+`search.refit(...)` resolves the conditionally selected predictor rank stored for the chosen
 component count, clones the search estimator, and fits that clone on all observations. The search
 retains the path evidence, while the returned `PiPLSRegression` supplies predictions and fitted
 results. The [`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression) gives the

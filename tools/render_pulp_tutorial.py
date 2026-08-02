@@ -165,9 +165,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     predictor_names = data.feature_names
     response_names = data.target_names
 
-    path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
-    component_path = path_search.component_path_
-    selected = path_search.select(n_components=CHOSEN_N_COMPONENTS)
+    search = PiPLSSearchCV(cv=CV).fit(X, Y)
+    component_path = search.component_path_
+    selected = search.select(n_components=CHOSEN_N_COMPONENTS)
     display_components = tuple(range(CHOSEN_N_COMPONENTS))
 
     _render_component_path(
@@ -175,18 +175,18 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         selected=selected,
         output_path=output_dir / "component_path.svg",
     )
-    rank_profile = path_search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
+    rank_profile = search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
     _render_predictor_rank_profile(
         rank_profile,
         output_path=output_dir / "predictor_rank_profile.svg",
     )
 
-    model = path_search.refit(
+    model = search.refit(
         X,
         Y,
         n_components=CHOSEN_N_COMPONENTS,
     )
-    report = path_search.validation_report(
+    report = search.validation_report(
         X,
         Y,
         n_components=CHOSEN_N_COMPONENTS,

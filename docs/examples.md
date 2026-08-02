@@ -89,14 +89,14 @@ Example 07 therefore demonstrates the conventional
 [one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) as a reproducible
 parsimony heuristic. Its component-path figure marks the minimum-mean-CV-MSE row, draws the
 horizontal 1-SE threshold, and marks the smallest evaluated component count whose mean CV-MSE does
-not exceed that threshold. Both annotated rows are obtained through `path_search.select(rule=...)`;
+not exceed that threshold. Both annotated rows are obtained through `search.select(rule=...)`;
 the recommended row also supplies the conditionally selected predictor rank used by the final fixed
 model.
 
 The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) describe
 how the stored row is obtained, and the [component-path API reference](api/path.md) gives the exact
 method surface. The example retrieves the recommendation explicitly for plotting, then applies the
-same named rule through `path_search.refit(...)` for full-data fitting.
+same named rule through `search.refit(...)` for full-data fitting.
 
 ## Output artifacts and rendering ownership
 

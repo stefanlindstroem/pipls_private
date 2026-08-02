@@ -267,19 +267,19 @@ def main() -> None:
     response_names = Y.columns.tolist()
 
     # Evaluate the Pi-PLS component path over paired-mode counts.
-    path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
-    path = path_search.component_path_
-    selected = path_search.select(n_components=CHOSEN_N_COMPONENTS)
+    search = PiPLSSearchCV(cv=CV).fit(X, Y)
+    path = search.component_path_
+    selected = search.select(n_components=CHOSEN_N_COMPONENTS)
 
     # Fit the chosen component-path row on the full data.
-    model = path_search.refit(
+    model = search.refit(
         X,
         Y,
         n_components=CHOSEN_N_COMPONENTS,
     )
 
     # Calculate selection-conditioned out-of-fold predictions on the stored splits.
-    report = path_search.validation_report(
+    report = search.validation_report(
         X,
         Y,
         n_components=CHOSEN_N_COMPONENTS,

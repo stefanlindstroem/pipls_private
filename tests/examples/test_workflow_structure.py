@@ -173,6 +173,27 @@ def _top_level_functions(tree: ast.Module) -> dict[str, ast.FunctionDef]:
 
 
 @pytest.mark.parametrize(
+    ("relative_path", "required_attribute"),
+    [
+        ("examples/02_synthetic_path_selection.py", "search.component_path_"),
+        ("examples/03_leave_one_out_validation.py", "search.validation_report"),
+        ("examples/04_pls_path_comparison.py", "search.component_path_"),
+        ("examples/05_pulp_real_data.py", "search.component_path_"),
+        ("examples/06_sugarcane_real_data.py", "search.component_path_"),
+        ("examples/07_tobacco_real_data.py", "search.component_path_"),
+        ("tools/render_synthetic_tutorial.py", "search.component_path_"),
+        ("tools/render_pulp_tutorial.py", "search.component_path_"),
+    ],
+)
+def test_retained_search_objects_use_search_name(
+    relative_path: str,
+    required_attribute: str,
+) -> None:
+    tree = _tree(_repository_root() / relative_path)
+    assert required_attribute in _attribute_paths(tree)
+
+
+@pytest.mark.parametrize(
     "relative_path",
     [
         "examples/02_synthetic_path_selection.py",
@@ -214,7 +235,7 @@ def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
     comparison_calls = _call_names(comparison_tree)
     comparison_attributes = _attribute_paths(comparison_tree)
     assert "evaluate_pls_component_path" in comparison_calls
-    assert "path_search.component_path_" in comparison_attributes
+    assert "search.component_path_" in comparison_attributes
     assert {"pulp", "sugarcane", "tobacco"} <= _string_literals(comparison_tree)
 
     for filename in (
@@ -253,7 +274,7 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
             "05_pulp_real_data.py",
             {"predictor_rank_profile"},
             {
-                "path_search.component_path_",
+                "search.component_path_",
                 "factors.predictor_directions",
                 "structure.x_scores",
                 "diagnostics.observed_standardized",
@@ -273,7 +294,7 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
             "06_sugarcane_real_data.py",
             set(),
             {
-                "path_search.component_path_",
+                "search.component_path_",
                 "factors.predictor_directions",
                 "structure.x_scores",
                 "diagnostics.observed_standardized",
@@ -292,7 +313,7 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
             "07_tobacco_real_data.py",
             {"observation_diagnostics"},
             {
-                "path_search.component_path_",
+                "search.component_path_",
                 "factors.predictor_directions",
                 "structure.x_scores",
                 "diagnostics.observed_standardized",

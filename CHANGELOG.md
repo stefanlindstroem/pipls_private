@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Synchronize the completed search-owned selection boundary across maintainer guidance and
+  maintained workflows: retained `PiPLSSearchCV` objects are consistently named `search`, path
+  artifacts are described only as numerical evidence, and structural tests reject the former
+  `path_search` example name.
 - Complete the search-owned path-selection transition: remove the three public scalar-selection
   methods from `PiPLSComponentPath`, retain the path as immutable aligned numerical evidence, and
   relocate exact minimum, tie, one-standard-error, and boundary contracts to

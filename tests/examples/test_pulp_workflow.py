@@ -26,18 +26,18 @@ def pulp_result() -> SimpleNamespace:
     X, Y = data.data, data.target
 
     cv = KFold(n_splits=5, shuffle=True, random_state=0)
-    path_search = PiPLSSearchCV(cv=cv).fit(X, Y)
-    component_path = path_search.component_path_
-    selected = path_search.select(n_components=3)
+    search = PiPLSSearchCV(cv=cv).fit(X, Y)
+    component_path = search.component_path_
+    selected = search.select(n_components=3)
 
-    rank_profile = path_search.predictor_rank_profile(selected.n_components)
+    rank_profile = search.predictor_rank_profile(selected.n_components)
 
-    model = path_search.refit(
+    model = search.refit(
         X,
         Y,
         n_components=3,
     )
-    report = path_search.validation_report(
+    report = search.validation_report(
         X,
         Y,
         n_components=3,
@@ -59,7 +59,7 @@ def pulp_result() -> SimpleNamespace:
         data=data,
         X=X,
         Y=Y,
-        path_search=path_search,
+        search=search,
         component_path=component_path,
         selected=selected,
         rank_profile=rank_profile,
@@ -75,9 +75,9 @@ def pulp_result() -> SimpleNamespace:
 def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespace) -> None:
     result = pulp_result
 
-    assert isinstance(result.path_search, PiPLSSearchCV)
-    assert result.path_search.estimator is None
-    assert callable(result.path_search.refit)
+    assert isinstance(result.search, PiPLSSearchCV)
+    assert result.search.estimator is None
+    assert callable(result.search.refit)
     assert isinstance(result.component_path, PiPLSComponentPath)
     assert result.selected.n_components == 3
     assert result.selected.predictor_rank == 9
@@ -133,4 +133,4 @@ def test_pulp_selection_requires_an_evaluated_component_count(
     pulp_result: SimpleNamespace,
 ) -> None:
     with pytest.raises(ValueError, match="was not evaluated"):
-        pulp_result.path_search.select(n_components=99)
+        pulp_result.search.select(n_components=99)

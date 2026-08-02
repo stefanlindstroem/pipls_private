@@ -15,7 +15,7 @@ DATASETS_DIR = Path(__file__).resolve().parents[1] / "datasets"
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
-for dataset, path_search in (
+for dataset, search in (
     ("pulp", PiPLSSearchCV(cv=CV)),
     ("sugarcane", PiPLSSearchCV(cv=CV)),
     (
@@ -37,8 +37,8 @@ for dataset, path_search in (
         X = pd.read_csv(DATASETS_DIR / dataset / "X.csv")
         Y = pd.read_csv(DATASETS_DIR / dataset / "Y.csv")
 
-    path_search.fit(X, Y)
-    pipls_path = path_search.component_path_
+    search.fit(X, Y)
+    pipls_path = search.component_path_
     pls_path = evaluate_pls_component_path(
         X,
         Y,
