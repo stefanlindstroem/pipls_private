@@ -41,13 +41,11 @@ all eight responses.
 
 ## The data and modeling question
 
-The dataset contains 46 thermomechanical-pulp samples:
-
-- 14 fiber-description predictors in `datasets/pulp/X.csv`;
-- Canadian Standard Freeness and seven handsheet-property responses in `datasets/pulp/Y.csv`.
-
-The tables are adapted from supplementary material associated with Lindström et al. (2025). The
-repository preserves all rows and applies no imputation or learned preprocessing before fitting.
+The package-owned dataset contains 46 thermomechanical-pulp samples, 14 fiber-description
+predictors, and eight responses comprising Canadian Standard Freeness and seven handsheet
+properties. `load_pulp()` reads the installed resources without network access. The matrices are
+adapted from supplementary material associated with Lindström et al. (2025); all rows are preserved,
+and no imputation or learned preprocessing is applied before fitting.
 See the [dataset description](../datasets.md#pulp-real-data-integration) and the
 [reference](#reference) for provenance.
 
@@ -64,15 +62,15 @@ rank selected conditionally at that component count. The distinction is summariz
 
 ## Load the data
 
-The committed tables are read directly with pandas. Their headers supply the scientific labels, and
-the first three response indices are selected explicitly for the pointwise displays:
+The named loader returns immutable matrices together with scientific predictor and response labels.
+The first three response indices are selected explicitly for the pointwise displays:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:load-pulp-data"
 ```
 
-The resulting data frames have shapes `(46, 14)` and `(46, 8)`. No package-specific loader or
-workflow object is required.
+The resulting arrays have shapes `(46, 14)` and `(46, 8)`. The same loader works from a source
+checkout, wheel, or source distribution and applies no preprocessing.
 
 ## Select the fixed rank pair
 

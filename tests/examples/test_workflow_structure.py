@@ -120,6 +120,20 @@ def _assigned_call_path(tree: ast.AST, target_name: str) -> str | None:
     return None
 
 
+def _assigned_value_path(tree: ast.AST, target_name: str) -> str | None:
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name) or target.id != target_name:
+            continue
+        if isinstance(node.value, ast.Call):
+            return _attribute_path(node.value.func)
+        if isinstance(node.value, ast.Attribute):
+            return _attribute_path(node.value)
+    return None
+
+
 def _calls_with_name(tree: ast.AST, name: str) -> list[ast.Call]:
     return [
         node
@@ -211,12 +225,28 @@ def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
         assert "evaluate_pls_component_path" not in _call_names(_tree(examples / filename))
 
 
+def test_maintained_pulp_consumers_use_the_package_loader() -> None:
+    repository = _repository_root()
+    for relative_path in (
+        "examples/01_minimal_fit_and_plot.py",
+        "examples/04_pls_path_comparison.py",
+        "examples/05_pulp_real_data.py",
+        "tools/render_pulp_tutorial.py",
+    ):
+        path = repository / relative_path
+        tree = _tree(path)
+        assert "load_pulp" in _imported_names(tree), path
+        assert "load_pulp" in _call_names(tree), path
+        assert "datasets/pulp" not in path.read_text(encoding="utf-8"), path
+
+
 @pytest.mark.parametrize(
     (
         "filename",
         "extra_calls",
         "required_attributes",
         "expected_pdfs",
+        "response_assignment",
         "coordinate_assignment",
     ),
     [
@@ -237,6 +267,7 @@ def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
                 "latent_structure.pdf",
                 "coefficients.pdf",
             },
+            "data.target_names",
             None,
         ),
         (
@@ -255,6 +286,7 @@ def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
                 "latent_structure.pdf",
                 "coefficients.pdf",
             },
+            "Y.columns.tolist",
             ("wavelengths", "X.columns.to_numpy"),
         ),
         (
@@ -275,6 +307,7 @@ def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
                 "latent_structure.pdf",
                 "coefficients.pdf",
             },
+            "Y.columns.tolist",
             ("wavenumbers", "X.columns.to_numpy"),
         ),
     ],
@@ -284,6 +317,7 @@ def test_real_data_examples_use_direct_public_results(
     extra_calls: set[str],
     required_attributes: set[str],
     expected_pdfs: set[str],
+    response_assignment: str,
     coordinate_assignment: tuple[str, str] | None,
 ) -> None:
     path = _repository_root() / "examples" / filename
@@ -301,7 +335,7 @@ def test_real_data_examples_use_direct_public_results(
         *extra_calls,
     } <= calls
     assert required_attributes <= attributes
-    assert _assigned_call_path(tree, "response_names") == "Y.columns.tolist"
+    assert _assigned_value_path(tree, "response_names") == response_assignment
     if coordinate_assignment is not None:
         variable, call_path = coordinate_assignment
         assert _assigned_call_path(tree, variable) == call_path
@@ -310,7 +344,6 @@ def test_real_data_examples_use_direct_public_results(
         for value in _string_literals(tree)
         if value.endswith(".pdf")
     } == expected_pdfs
-
 
 
 @pytest.mark.parametrize(

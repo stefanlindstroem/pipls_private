@@ -109,13 +109,12 @@ acceptance of non-object metadata arrays, and rejection of object-dtype arrays w
 remain mutable. Git history, review, public provenance, and the dataset documentation remain the
 source of record for documentary contents.
 
-Decision 0138 adds a separate package-owned Pulp contract in stages. Current tests protect the named
-loader's return modes, immutable arrays and metadata, exact parity with the temporary repository
-copy, stable names and sample identifiers, public provenance, pickle reconstruction, resource and
-canonical-array hashes, and resource availability from clean wheel and source-distribution
-installations. Exact numeric parity and resource hashes are appropriate during the migration because
-they prove that ownership moved without changing the scientific dataset; ordinary documentary-
-metadata tests should still avoid freezing narrative wording.
+Decision 0138 adds a separate package-owned Pulp contract. Current tests protect the named loader's
+return modes, immutable arrays and metadata, exact parity with the temporary repository copy, stable
+names and sample identifiers, public provenance, pickle reconstruction, resource and canonical-array
+hashes, clean wheel/source-distribution loading, and loader ownership by every maintained Pulp
+consumer. Exact parity remains transitional evidence until Patch 5 archives the former layout;
+ordinary documentary-metadata tests should still avoid freezing narrative wording.
 
 Patch 5 replaces parity tests against `datasets/pulp/` with positive package-resource tests and a
 generic single-active-copy audit. Do not retain a permanent tombstone test for the former repository
@@ -187,9 +186,9 @@ search/refit call, fitted-value provenance, standardized single-axis plot, and a
 do not duplicate Pulp arrays as a second frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
 analyses as duplicate repository scripts. `make examples` is the explicit application-validation
-target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset
-readability, the direct Pulp numerical workflow, direct Pulp, Sugarcane, and Tobacco workflow
-structure, component-path API, inspection equations,
+target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead protect repository dataset readability, package-owned Pulp loading and
+numerical behavior, Pulp, Sugarcane, and Tobacco workflow structure, component-path API,
+inspection equations,
 direct rendering from immutable inspection arrays and the immutable ordinary-PLS comparison-helper contract.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated
 comparative studies.

@@ -5,12 +5,12 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from adjustText import adjust_text
 from matplotlib.patches import FancyArrowPatch
 from sklearn.model_selection import KFold
 
 from pipls import PiPLSSearchCV
+from pipls.datasets import load_pulp
 from pipls.inspection import (
     biplot_coordinates,
     latent_structure,
@@ -18,7 +18,6 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "pulp"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
 CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
@@ -26,10 +25,10 @@ CV = KFold(n_splits=5, shuffle=True, random_state=0)
 # --8<-- [end:pulp-tutorial-setup]
 
 # --8<-- [start:load-pulp-data]
-X = pd.read_csv(DATA_DIR / "X.csv")
-Y = pd.read_csv(DATA_DIR / "Y.csv")
-predictor_names = X.columns.tolist()
-response_names = Y.columns.tolist()
+data = load_pulp()
+X, Y = data.data, data.target
+predictor_names = data.feature_names
+response_names = data.target_names
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:evaluate-pulp-component-path]

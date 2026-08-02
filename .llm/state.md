@@ -484,20 +484,17 @@ stored splits for explicit follow-up reporting, and the two post-fit operations.
 ## Current next increment
 
 Decision 0138 authorizes a five-patch transition from the repository-facing Pulp CSV layout to one
-named installed dataset loader. Patches 1 through 3 are complete: `load_pulp()` and the canonical
+named installed dataset loader. Patches 1 through 4 are complete: `load_pulp()` and the canonical
 package resources are implemented, immutable loader results and exact parity are tested, clean
-wheel/source-distribution installations load the data, and the first example plus prominent
-onboarding pages use the compact Pulp fitted-value quick start. The complete Pulp example and
-tutorial still read `datasets/pulp/X.csv` and `Y.csv` during this transitional stage.
+wheel/source-distribution installations load the data, and every maintained Pulp consumer uses the
+public loader. The tutorial manifest now records package-owned dataset identity and integrity rather
+than repository paths.
 
-The next admissible increment is Patch 4: migrate the complete Pulp example, tutorial renderer,
-tests, manifests, and active documentation to `load_pulp()`. The repository Pulp files remain
-temporarily as an exact parity source until maintained consumers migrate.
-
-Patch 5 then archives
-the former repository layout under `.llm/archive/` while removing it from active runtime,
-distribution, documentation, and test ownership. No generic loader, registry, download mechanism,
-`as_frame` option, or compatibility alias is authorized.
+The next admissible increment is Patch 5: move the former repository layout unchanged to
+`.llm/archive/pulp-repository-layout-v1/`, remove it from active distribution and dataset contracts,
+replace migration parity tests with package-resource ownership checks, and verify one active Pulp
+matrix location. No generic loader, registry, download mechanism, `as_frame` option, or compatibility
+alias is authorized.
 
 Any unrelated release-preparation work requires a separate owner-authorized increment. Block-aware
 scaling still requires a separate owner decision. Corn, the legacy Steel table, SARCOS, and FRED-MD

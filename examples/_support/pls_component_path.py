@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-import pandas as pd
 from numpy.typing import ArrayLike, NDArray
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.model_selection import KFold
@@ -94,8 +93,8 @@ class PLSComponentPath:
 
 
 def evaluate_pls_component_path(
-    X: pd.DataFrame,
-    Y: pd.DataFrame,
+    X: ArrayLike,
+    Y: ArrayLike,
     *,
     max_n_components: int,
     cv: KFold,
@@ -107,24 +106,33 @@ def evaluate_pls_component_path(
     response loadings gives the same nested path without repeated earlier fits.
     """
 
-    if len(X) != len(Y):
-        raise ValueError(f"Predictor and response row counts differ: {len(X)} != {len(Y)}.")
+    X_array = np.asarray(X, dtype=np.float64)
+    Y_array = np.asarray(Y, dtype=np.float64)
+    if X_array.ndim != 2 or Y_array.ndim != 2:
+        raise ValueError("X and Y must be two-dimensional matrices.")
+    if X_array.shape[0] != Y_array.shape[0]:
+        raise ValueError(
+            "Predictor and response row counts differ: "
+            f"{X_array.shape[0]} != {Y_array.shape[0]}."
+        )
+    if not np.isfinite(X_array).all() or not np.isfinite(Y_array).all():
+        raise ValueError("X and Y must contain only finite values.")
     if max_n_components < 1:
         raise ValueError("max_n_components must be at least 1.")
-    algebraic_max = min(Y.shape[1], X.shape[1], X.shape[0] - 1)
+    algebraic_max = min(Y_array.shape[1], X_array.shape[1], X_array.shape[0] - 1)
     if max_n_components > algebraic_max:
         raise ValueError(
             "max_n_components exceeds the centered-data algebraic limit: "
             f"{max_n_components} > {algebraic_max}."
         )
 
-    n_splits = cv.get_n_splits(X, Y)
+    n_splits = cv.get_n_splits(X_array, Y_array)
     split_mse = np.empty((max_n_components, n_splits), dtype=np.float64)
-    for split_index, (train, validation) in enumerate(cv.split(X, Y)):
-        X_train = X.iloc[train].to_numpy(dtype=np.float64)
-        Y_train = Y.iloc[train].to_numpy(dtype=np.float64)
-        X_validation = X.iloc[validation].to_numpy(dtype=np.float64)
-        Y_validation = Y.iloc[validation].to_numpy(dtype=np.float64)
+    for split_index, (train, validation) in enumerate(cv.split(X_array, Y_array)):
+        X_train = X_array[train]
+        Y_train = Y_array[train]
+        X_validation = X_array[validation]
+        Y_validation = Y_array[validation]
 
         x_mean = np.mean(X_train, axis=0)
         y_mean = np.mean(Y_train, axis=0)

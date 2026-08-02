@@ -21,7 +21,6 @@ matplotlib.use("Agg")
 matplotlib.rcParams["svg.hashsalt"] = "pipls-pulp-tutorial"
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-import pandas as pd  # noqa: E402
 from adjustText import adjust_text  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
@@ -34,6 +33,7 @@ from pipls import (  # noqa: E402
     PiPLSPredictorRankProfile,
     PiPLSSearchCV,
 )
+from pipls.datasets import load_pulp  # noqa: E402
 from pipls.inspection import (  # noqa: E402
     biplot_coordinates,
     latent_structure,
@@ -41,7 +41,6 @@ from pipls.inspection import (  # noqa: E402
     prediction_diagnostics,
 )
 
-PULP_DATA_DIR = REPOSITORY_ROOT / "datasets" / "pulp"
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
@@ -161,10 +160,10 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True)
 
-    X = pd.read_csv(PULP_DATA_DIR / "X.csv")
-    Y = pd.read_csv(PULP_DATA_DIR / "Y.csv")
-    predictor_names = tuple(str(name) for name in X.columns)
-    response_names = tuple(str(name) for name in Y.columns)
+    data = load_pulp()
+    X, Y = data.data, data.target
+    predictor_names = data.feature_names
+    response_names = data.target_names
 
     path_search = PiPLSSearchCV(cv=CV).fit(X, Y)
     component_path = path_search.component_path_
@@ -405,11 +404,12 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     manifest = {
         "schema_version": 1,
         "dataset": {
-            "name": "Pulp",
-            "files": {
-                "X.csv": _sha256(PULP_DATA_DIR / "X.csv"),
-                "Y.csv": _sha256(PULP_DATA_DIR / "Y.csv"),
-            },
+            "id": data.metadata["dataset"]["id"],
+            "version": data.metadata["dataset"]["version"],
+            "source_doi": data.metadata["source"]["doi"],
+            "license": data.metadata["license"]["identifier"],
+            "resource_sha256": dict(data.metadata["integrity"]["resource_sha256"]),
+            "array_sha256": dict(data.metadata["integrity"]["array_sha256"]),
         },
         "analysis": {
             "chosen_n_components": selected.n_components,

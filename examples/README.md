@@ -102,21 +102,18 @@ uses optional `adjustText` only to reposition its Matplotlib text labels.
 
 ## Real-data workflow contract
 
-The complete Pulp, Sugarcane, and Tobacco examples show label acquisition as a separate
-repository-I/O step:
+Pulp is package-owned and all maintained Pulp consumers use its named loader:
 
 ```python
-X = pd.read_csv(DATA_DIR / "X.csv")
-Y = pd.read_csv(DATA_DIR / "Y.csv")
-response_names = Y.columns.tolist()
+data = load_pulp()
+X, Y = data.data, data.target
+response_names = data.target_names
 ```
 
-Example 01 is the explicit exception: `load_pulp()` supplies the installed Pulp matrices and
-labels directly. Users whose arrays do not carry column headers can supply equivalent lists from a
-schema, laboratory information system, or other domain metadata. The package inspection API does
-not read files or invent scientific variable names. The committed complete-workflow datasets have
-tested headers and ordering, so those examples use them directly instead of repeating repository-
-integrity checks.
+Sugarcane and Tobacco continue to show label acquisition through explicit repository CSV reading.
+Users whose arrays do not carry column headers can supply equivalent lists from a schema, laboratory
+information system, or other domain metadata. The package inspection API does not invent scientific
+variable names.
 
 Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
 comparison figures directly. Sugarcane demonstrates the complete-analysis workflow:

@@ -179,11 +179,11 @@ attributes, result shapes, and method contracts are collected in the
 
 ## Examples and reference data
 
-The package includes Pulp through the named `pipls.datasets.load_pulp()` loader. The repository
-also contains maintained complete analyses for Pulp, Sugarcane, and Tobacco. Those complete
-workflows read their repository CSV inputs explicitly so data alignment and labels remain visible.
-There is no dataset-access extra or generic registry. Original sources, licenses, adaptations, and
-DOI links are documented in the [dataset guide](docs/datasets.md).
+The package includes Pulp through the named `pipls.datasets.load_pulp()` loader. The maintained
+Pulp quick start, component-path comparison, and complete tutorial all use that installed dataset.
+Sugarcane and Tobacco remain explicit repository-CSV workflows so their alignment and physical axes
+remain visible. There is no dataset-access extra or generic registry. Original sources, licenses,
+adaptations, and DOI links are documented in the [dataset guide](docs/datasets.md).
 
 See the [example catalogue](docs/examples.md) for the purpose and outputs of every numbered script.
 Install the `examples` extra before running them.

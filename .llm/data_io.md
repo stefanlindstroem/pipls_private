@@ -190,9 +190,8 @@ The synthetic tutorial uses `make_pipls_train_test()` directly in example 02 and
 manifest records the deterministic generator configuration, selected rank pair, external-test
 provenance, and SVG hashes. No generated table is an input to fitting or plotting.
 
-At the current implemented stage, the direct Pulp example and tutorial renderer both read the
-committed `datasets/pulp/X.csv` and `Y.csv` tables directly. The renderer records their SHA-256
-values, selected rank pair, evaluated predictor ranks, and boundary status in a generated manifest
-and derives SVG figures from in-memory results. All tutorial figures and manifests are ignored build
-products, not alternative dataset representations or package inputs. Later Decision 0138 patches
-will migrate these consumers and manifest fields to the package-owned loader.
+The direct Pulp example and tutorial renderer both use the public `load_pulp()` API. The renderer
+records the packaged dataset identifier, version, source DOI, license, resource hashes, canonical
+array hashes, selected rank pair, evaluated predictor ranks, and boundary status in a generated
+manifest and derives SVG figures from in-memory results. All tutorial figures and manifests are
+ignored build products, not alternative dataset representations or package inputs.

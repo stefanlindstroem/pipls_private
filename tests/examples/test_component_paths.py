@@ -43,10 +43,16 @@ def test_standard_pls_path_is_deterministic_and_immutable() -> None:
     second = PLS_PATH.evaluate_pls_component_path(
         X, Y, max_n_components=3, cv=cv
     )
+    arrays = PLS_PATH.evaluate_pls_component_path(
+        X.to_numpy(), Y.to_numpy(), max_n_components=3, cv=cv
+    )
 
     np.testing.assert_array_equal(first.n_components, second.n_components)
+    np.testing.assert_array_equal(first.n_components, arrays.n_components)
     np.testing.assert_allclose(first.cv_mse_mean, second.cv_mse_mean)
     np.testing.assert_allclose(first.cv_mse_fold_sd, second.cv_mse_fold_sd)
+    np.testing.assert_allclose(first.cv_mse_mean, arrays.cv_mse_mean)
+    np.testing.assert_allclose(first.cv_mse_fold_sd, arrays.cv_mse_fold_sd)
     assert first.n_components.tolist() == [1, 2, 3]
     assert first.algorithm == "NIPALS"
     assert first.n_splits == 5

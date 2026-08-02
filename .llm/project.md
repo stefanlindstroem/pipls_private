@@ -33,7 +33,7 @@ Fritjof Nilsson, and Stefan B. Lindström are the package authors and current co
 revision at *Computers & Chemical Engineering* (CACE-D-26-00847). Dataset-specific licenses
 remain separate.
 
-The transparent real-dataset suite contains pulp, sugarcane, and tobacco. A licensing review of
+The real-dataset suite contains package-owned Pulp plus repository-owned Sugarcane and Tobacco. A licensing review of
 the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
 Steel table, SARCOS, and FRED-MD from this repository because the exact source materials do not
 carry sufficiently clear redistribution rights. Public navigation now separates tutorials, examples, programming reference, project
@@ -47,7 +47,8 @@ including the complete real-data analyses. Example 04
 plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
 Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, obtain OOF predictions through
 explicit search validation reports, keep inspection results in memory, and write only final PDF
-figures. Pulp also exposes the conditional
+figures. Pulp acquisition uses `load_pulp()`; Sugarcane and Tobacco retain direct repository CSV
+reading. Pulp also exposes the conditional
 predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
 `main()` and group rendering in private functions within their numbered scripts. Tobacco retains
 full-SVD spectral figures, source-order response pagination, and raw observation diagnostics.

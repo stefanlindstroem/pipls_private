@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Migrate every maintained Pulp consumer to `pipls.datasets.load_pulp()`, including the complete
+  analysis, Pi-PLS-versus-PLS comparison, tutorial renderer, numerical workflow tests, and served
+  documentation. Tutorial manifests now record package dataset identity, provenance, resource
+  hashes, and canonical-array hashes; the documentation extra no longer requires pandas.
 - Replace the literal-matrix first example with a package-owned Pulp quick start that performs the
   complete search and one-standard-error refit in one expression, plots all responses together on
   standardized observed-versus-fitted axes, reports mean response-wise standardized RMSE, and

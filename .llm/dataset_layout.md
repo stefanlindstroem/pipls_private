@@ -15,16 +15,16 @@ representation uses `metadata.json` so runtime loading requires only the standar
 not alter the repository layout for Sugarcane or Tobacco and does not create a generic dataset
 registry.
 
-During Patches 2--4, `datasets/pulp/` remains temporarily as an exact parity source while package
+Through Patch 4, `datasets/pulp/` remains temporarily as an exact parity source while package
 resources and maintained consumers are validated. Patch 5 moves that former layout without
 modification to `.llm/archive/pulp-repository-layout-v1/`. The archive is excluded from runtime,
 served documentation, wheels, source distributions, and active dataset tests. After that cleanup,
 this repository-layout contract applies to Sugarcane and Tobacco, while the package-resource
 contract in Decision 0138 applies to Pulp.
 
-The present Patch 2 state retains `datasets/pulp/` as an exact parity source while package resources
-and installed loading are validated. Existing Pulp consumers still use that repository copy until
-Patches 3 and 4 migrate them; all current layout requirements remain executable during this stage.
+The present Patch 4 state retains `datasets/pulp/` only as an exact parity source. The quick start,
+component-path comparison, complete Pulp workflow, tutorial renderer, and documentation use
+`load_pulp()`. Patch 5 archives the former layout and removes it from active dataset contracts.
 
 ## Required files
 
@@ -48,8 +48,9 @@ Do not add internal conversion scripts or references to private development inpu
 - preserve a documented common row order;
 - use the exact filenames `X.csv` and `Y.csv`.
 
-Examples must read these files directly with ordinary NumPy or pandas code. They must not call a
-package loader or parse `metadata.yaml` to construct the model matrices.
+Sugarcane and Tobacco examples read these files directly with ordinary NumPy or pandas code. They
+must not parse `metadata.yaml` to construct the model matrices. Pulp consumers use `load_pulp()`
+instead and do not read this repository layout.
 
 ## Metadata contract
 

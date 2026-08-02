@@ -104,7 +104,7 @@ must identify the predictions as full-data fitted values rather than predictive 
 
 The complete real-data examples own scientific orchestration:
 
-- direct dataset reading and alignment;
+- visible dataset acquisition and alignment;
 - visible fixed component and predictor-rank choices;
 - explicit cross-validation splitters;
 - fixed-parameter OOF prediction;
@@ -112,10 +112,11 @@ The complete real-data examples own scientific orchestration:
 - explicit figure, axis, legend, title, saving, and closing operations;
 - dataset-specific physical-axis labels, response subsets, and pagination.
 
-Pulp, Sugarcane, and Tobacco keep those stages directly in their numbered scripts and use pandas
-only for committed input files. Sugarcane and Tobacco place scientific computation and orchestration
-in `main()` and may group rendering in private functions defined in the same script. Do not hide
-real-data reading behind a package loader.
+Pulp, Sugarcane, and Tobacco keep those stages directly in their numbered scripts. Pulp obtains its
+installed matrices and labels through the named `load_pulp()` exception; Sugarcane and Tobacco use
+pandas only for committed input files. Sugarcane and Tobacco place scientific computation and
+orchestration in `main()` and may group rendering in private functions defined in the same script.
+Do not introduce a generic real-data loader.
 Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
 preparation area.
 
@@ -153,8 +154,9 @@ estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md`
 with stable interpretation anchors and without repeating elementary Matplotlib recipes. Example pages may describe script purpose and artifacts
 but must not reproduce the tutorial analysis or embed its generated figures.
 
-Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its direct pandas
-loading, default path-evaluating `PiPLSSearchCV()` evaluation, visible three-component choice,
+Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
+`load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible
+three-component choice,
 conditional predictor-rank profile, fixed `PiPLSRegression` fit, explicit five-fold validation
 reporting,
 inspection computations, and final PDF composition. The selected component row is retrieved before

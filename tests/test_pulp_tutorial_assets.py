@@ -42,7 +42,7 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert "docs/assets/generated/" in gitignore
     assert "include tools/render_pulp_tutorial.py" in manifest
     docs_dependencies = pyproject["project"]["optional-dependencies"]["docs"]
-    assert "pandas>=2.0" in docs_dependencies
+    assert "pandas>=2.0" not in docs_dependencies
     assert "matplotlib>=3.8" in docs_dependencies
     assert "adjustText>=1.4,<2" in docs_dependencies
     assert "render_pulp_tutorial.py" in sdist_checker

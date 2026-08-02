@@ -9,6 +9,7 @@ from _support.pls_component_path import evaluate_pls_component_path
 from sklearn.model_selection import KFold
 
 from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls.datasets import load_pulp
 
 DATASETS_DIR = Path(__file__).resolve().parents[1] / "datasets"
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
@@ -30,8 +31,11 @@ for dataset, path_search in (
         ),
     ),
 ):
-    X = pd.read_csv(DATASETS_DIR / dataset / "X.csv")
-    Y = pd.read_csv(DATASETS_DIR / dataset / "Y.csv")
+    if dataset == "pulp":
+        X, Y = load_pulp(return_X_y=True)
+    else:
+        X = pd.read_csv(DATASETS_DIR / dataset / "X.csv")
+        Y = pd.read_csv(DATASETS_DIR / dataset / "Y.csv")
 
     path_search.fit(X, Y)
     pipls_path = path_search.component_path_

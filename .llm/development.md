@@ -55,11 +55,13 @@
   `search.refit(...)`; do not manually transfer the selected predictor rank into a new estimator.
   Keep scalar path-row lookup only where plotting, reporting, or an explicit recommendation display
   needs that evidence.
-- For real-data examples, read and form `X` and `Y` explicitly in the script. Do not introduce a
-  public registry, generic loader, metadata-driven runtime path, or helper function that obscures
-  the data-reading steps.
-- Every committed real dataset follows `.llm/dataset_layout.md`: comma-delimited `X.csv`,
-  comma-delimited `Y.csv`, and documentary `metadata.yaml`.
+- For real-data examples, form `X` and `Y` visibly in the script. Pulp uses the named public
+  `load_pulp()` exception from Decision 0138; Sugarcane, Tobacco, and ordinary user data retain
+  explicit reading. Do not introduce a registry, generic loader, metadata-driven runtime path, or
+  helper that obscures data acquisition.
+- Repository-owned Sugarcane and Tobacco datasets follow `.llm/dataset_layout.md`:
+  comma-delimited `X.csv`, comma-delimited `Y.csv`, and documentary `metadata.yaml`. Pulp follows
+  the package-resource contract in Decision 0138.
 - Treat every committed dataset asset as public-facing. Cite only public or included sources;
   do not commit private archive paths, inaccessible source checksums, or preparation-only scripts.
 - Add public reconstruction or preprocessing code only when it operates on included or publicly

@@ -158,13 +158,13 @@ def test_optional_dependency_groups_match_maintained_workflows() -> None:
     docs = set(extras["docs"])
     assert {
         "build>=1.2,<2",
-        "pandas>=2.0",
         "matplotlib>=3.8",
         "adjustText>=1.4,<2",
         "mkdocs>=1.6,<2",
         "mkdocs-material>=9.5,<9.7",
         "mkdocstrings-python>=2,<3",
     } <= docs
+    assert not any(requirement.startswith("pandas") for requirement in docs)
 
 
 def test_public_installation_is_noneditable_and_contributor_setup_is_editable() -> None:

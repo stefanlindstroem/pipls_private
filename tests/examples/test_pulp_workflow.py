@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
-import pandas as pd
 import pytest
 from sklearn.model_selection import KFold
 
@@ -14,6 +12,7 @@ from pipls import (
     PiPLSRegression,
     PiPLSSearchCV,
 )
+from pipls.datasets import load_pulp
 from pipls.inspection import (
     latent_structure,
     pipls_display_factors,
@@ -21,15 +20,10 @@ from pipls.inspection import (
 )
 
 
-def _repository_root() -> Path:
-    return Path(__file__).resolve().parents[2]
-
-
 @pytest.fixture(scope="module")
 def pulp_result() -> SimpleNamespace:
-    data_dir = _repository_root() / "datasets" / "pulp"
-    X = pd.read_csv(data_dir / "X.csv")
-    Y = pd.read_csv(data_dir / "Y.csv")
+    data = load_pulp()
+    X, Y = data.data, data.target
 
     cv = KFold(n_splits=5, shuffle=True, random_state=0)
     path_search = PiPLSSearchCV(cv=cv).fit(X, Y)
@@ -52,7 +46,7 @@ def pulp_result() -> SimpleNamespace:
     oof_predictions = report.oof_predictions
     factors = pipls_display_factors(
         model.decomposition_,
-        response_index=Y.columns.get_loc("TI"),
+        response_index=data.target_names.index("TI"),
         response_sign="positive",
     )
     structure = latent_structure(model)
@@ -62,6 +56,7 @@ def pulp_result() -> SimpleNamespace:
         prediction_kind="selection-conditioned OOF predictions",
     )
     return SimpleNamespace(
+        data=data,
         X=X,
         Y=Y,
         path_search=path_search,
@@ -123,7 +118,7 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
     assert result.oof_predictions.shape == result.Y.shape
     assert np.all(np.isfinite(result.oof_predictions))
     assert result.diagnostics.prediction_kind == "selection-conditioned OOF predictions"
-    ti_response_index = result.Y.columns.get_loc("TI")
+    ti_response_index = result.data.target_names.index("TI")
     assert np.all(result.factors.response_directions[ti_response_index] > 0.0)
     assert np.all(result.factors.weighted_response_directions[ti_response_index] > 0.0)
     assert result.diagnostics.observed.shape == result.Y.shape

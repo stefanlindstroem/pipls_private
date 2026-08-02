@@ -152,8 +152,9 @@ def main() -> None:
             source / "tools" / "render_pulp_tutorial.py",
             source / "examples" / "02_synthetic_path_selection.py",
             source / "examples" / "05_pulp_real_data.py",
-            source / "datasets" / "pulp" / "X.csv",
-            source / "datasets" / "pulp" / "Y.csv",
+            source / "src" / "pipls" / "_data" / "pulp" / "X.csv",
+            source / "src" / "pipls" / "_data" / "pulp" / "Y.csv",
+            source / "src" / "pipls" / "_data" / "pulp" / "metadata.json",
             source / "src" / "pipls" / "__init__.py",
         ]
         missing = [path.relative_to(source).as_posix() for path in required if not path.is_file()]
@@ -200,11 +201,25 @@ def main() -> None:
             PULP_TUTORIAL_FIGURES,
             tutorial_name="Pulp tutorial",
         )
-        dataset_hashes = pulp_manifest.get("dataset", {}).get("files", {})
+        pulp_resources = source / "src" / "pipls" / "_data" / "pulp"
+        pulp_metadata = json.loads(
+            (pulp_resources / "metadata.json").read_text(encoding="utf-8")
+        )
+        manifest_dataset = pulp_manifest.get("dataset", {})
+        expected_dataset = {
+            "id": pulp_metadata["dataset"]["id"],
+            "version": pulp_metadata["dataset"]["version"],
+            "source_doi": pulp_metadata["source"]["doi"],
+            "license": pulp_metadata["license"]["identifier"],
+            "resource_sha256": pulp_metadata["integrity"]["resource_sha256"],
+            "array_sha256": pulp_metadata["integrity"]["array_sha256"],
+        }
+        if manifest_dataset != expected_dataset:
+            raise RuntimeError("Generated Pulp tutorial dataset identity disagrees.")
         for filename in ("X.csv", "Y.csv"):
-            dataset_path = source / "datasets" / "pulp" / filename
-            if dataset_hashes.get(filename) != _sha256(dataset_path):
-                raise RuntimeError(f"Generated Pulp tutorial dataset hash disagrees: {filename}")
+            expected_hash = expected_dataset["resource_sha256"][filename]
+            if expected_hash != _sha256(pulp_resources / filename):
+                raise RuntimeError(f"Packaged Pulp resource hash disagrees: {filename}")
 
         rendered = [
             source / "site" / "index.html",

@@ -220,8 +220,8 @@ preprocessing. Sugarcane, Tobacco, and user datasets continue to use explicit us
 
 ## Pulp real-data integration
 
-`datasets/pulp/` contains 46 rows, 14 fiber-property predictors, and eight responses adapted
-from the supplementary material for the following article:
+The installed Pulp resources contain 46 rows, 14 fiber-property predictors, and eight responses
+adapted from the supplementary material for the following article:
 
 > Lindström, S. B., Ferritsius, R., Carlson, J. E., Persson, J., and Nilsson, F. (2025).
 > Predicting handsheet properties and enhancing refiner control using fiber analyzer data and
@@ -233,10 +233,10 @@ handsheet properties as supplementary data. The repository selects the documente
 and response columns from that public supplementary table.
 
 `load_pulp()` reads the installed package resources and returns labels, stable sample identifiers,
-public provenance, and immutable metadata together with the two model matrices. During the staged
-migration, `datasets/pulp/` remains as an exact parity source and the complete Pulp example still
-reads those CSV files directly. Later patches migrate that maintained workflow and then archive the
-former repository layout.
+public provenance, and immutable metadata together with the two model matrices. The quick start,
+ordinary-PLS comparison, complete Pulp example, and tutorial renderer all use this public loader.
+During the final migration stage, `datasets/pulp/` remains only as an exact parity source before it
+is moved to the excluded `.llm` archive.
 
 ## Sugarcane spectral integration
 

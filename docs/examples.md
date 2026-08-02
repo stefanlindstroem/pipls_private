@@ -100,9 +100,9 @@ same named rule through `path_search.refit(...)` for full-data fitting.
 
 Pulp writes six final PDF figures, including `predictor_rank_profile.pdf`; Sugarcane writes five;
 Tobacco writes five, with three-page prediction-diagnostic and coefficient PDFs. No numbered
-example writes a generated CSV file: committed `X.csv` and `Y.csv` tables are inputs, while every
-figure is constructed directly from `component_path_`, explicit search validation reports, and
-immutable inspection results. The Pulp factor view anchors every component to a positive tensile-
+example writes a generated CSV file: Pulp is supplied by `load_pulp()`, while Sugarcane and Tobacco
+retain committed `X.csv` and `Y.csv` inputs. Every figure is constructed directly from
+`component_path_`, explicit search validation reports, and immutable inspection results. The Pulp factor view anchors every component to a positive tensile-
 index (`TI`) response entry; Sugarcane and Tobacco retain the default predictor-based orientation.
 The example layer owns Matplotlib chart construction, physical coordinates, subplot layouts,
 legends, figure-level titles, PDF output, and closing. Pi-PLS factor panels use the same direct
