@@ -1,25 +1,22 @@
 # Datasets
 
 Repository real datasets are added one at a time after source, citation, licensing, redistribution,
-row-order, missing-value, public-provenance, and preparation choices are reviewed. Every dataset
-directory uses
-comma-delimited `X.csv`, comma-delimited `Y.csv`, and a documentary `metadata.yaml`.
+row-order, missing-value, public-provenance, and preparation choices are reviewed. Every active
+repository dataset directory uses comma-delimited `X.csv`, comma-delimited `Y.csv`, and a
+documentary `metadata.yaml`.
 
-The installed package provides the named `pipls.datasets.load_pulp()` dataset, the optional Phase
-E1 in-memory dataset container, and deterministic synthetic generators; see `docs/datasets.md`.
-Synthetic data are generated at runtime and are not committed as dataset files.
+The installed package separately provides the named `pipls.datasets.load_pulp()` dataset, the
+optional in-memory dataset container, and deterministic synthetic generators; see
+`docs/datasets.md`. Synthetic data are generated at runtime and are not committed as dataset files.
+No generic loader or registry is provided.
 
-Real-data examples currently read repository `X.csv` and `Y.csv` files explicitly. Pulp also has one
-named package-owned loader during its staged migration; no generic loader or registry is provided.
-`metadata.yaml` standardizes public repository descriptions and provenance, but it is not read by
-the estimator and is not required for external users fitting their own data.
-Private development paths and preparation-only scripts are not part of dataset integrations.
+Repository real-data examples read `X.csv` and `Y.csv` explicitly. `metadata.yaml` standardizes
+public descriptions and provenance, but it is not read by the estimator and is not required for
+external users fitting their own data. Private development paths and preparation-only scripts are
+not part of dataset integrations.
 
-## Included datasets
+## Included repository datasets
 
-- `pulp/`: CC BY 4.0 thermomechanical-pulp fiber-property and handsheet dataset adapted from
-  supplementary material for
-  [Lindström et al. (2025)](https://doi.org/10.1016/j.compchemeng.2025.109143).
 - `sugarcane/`: CC BY 4.0 LabSpec absorbance spectra with four sugarcane quality responses from
   [Chaix, Bendoula, and Zgouz (2021)](https://doi.org/10.17632/mjttsjfj2s.1); see also the
   [related data paper](https://doi.org/10.1016/j.dib.2020.106013).
@@ -27,6 +24,6 @@ Private development paths and preparation-only scripts are not part of dataset i
   [Chen, Guo, Wang, and Zhao (2025)](https://doi.org/10.17632/9z7dgdtggk.1); see also the
   [related data paper](https://doi.org/10.1016/j.dib.2025.112418).
 
-Each example reads `X.csv` and `Y.csv` directly. `metadata.yaml` documents the repository asset but
-is not a runtime model input. Full source citations and preparation details are given in the
-individual dataset README and metadata files.
+Each repository example reads `X.csv` and `Y.csv` directly. `metadata.yaml` documents the asset but
+is not a runtime model input. Full source citations and preparation details are given in each
+dataset README and metadata file.

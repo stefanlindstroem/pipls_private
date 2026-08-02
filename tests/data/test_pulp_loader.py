@@ -51,15 +51,6 @@ def _repository_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
-def _repository_matrix(name: str) -> np.ndarray:
-    return np.loadtxt(
-        _repository_root() / "datasets" / "pulp" / name,
-        delimiter=",",
-        skiprows=1,
-        dtype=np.float64,
-    )
-
-
 def test_load_pulp_has_linnerud_style_return_contract() -> None:
     signature = inspect.signature(load_pulp)
 
@@ -125,21 +116,26 @@ def test_load_pulp_return_X_y_matches_default_result_and_is_fresh() -> None:
         Y[0, 0] = 0.0
 
 
-def test_packaged_pulp_resources_match_temporary_repository_copy() -> None:
-    dataset = load_pulp()
-
-    np.testing.assert_array_equal(dataset.data, _repository_matrix("X.csv"))
-    np.testing.assert_array_equal(dataset.target, _repository_matrix("Y.csv"))
-
-    resource_root = resources.files("pipls").joinpath("_data", "pulp")
+def test_packaged_pulp_resources_are_canonical_and_unique() -> None:
+    resource_root = resources.files("pipls").joinpath("_data").joinpath("pulp")
     for name, expected_hash in RESOURCE_HASHES.items():
         packaged = resource_root.joinpath(name).read_bytes()
-        repository = (_repository_root() / "datasets" / "pulp" / name).read_bytes()
-        assert packaged == repository
         assert hashlib.sha256(packaged).hexdigest() == expected_hash
 
     for name in ("metadata.json", "README.md"):
         assert resource_root.joinpath(name).is_file()
+
+    root = _repository_root()
+    active_matrices = sorted(
+        path.relative_to(root).as_posix()
+        for active_root in (root / "src", root / "datasets")
+        for path in active_root.rglob("*.csv")
+        if "pulp" in path.parts and path.name in {"X.csv", "Y.csv"}
+    )
+    assert active_matrices == [
+        "src/pipls/_data/pulp/X.csv",
+        "src/pipls/_data/pulp/Y.csv",
+    ]
 
 
 def test_load_pulp_result_is_pickleable() -> None:

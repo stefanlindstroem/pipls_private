@@ -244,8 +244,8 @@ from pipls.datasets import (
 pair of fresh read-only `float64` arrays when `return_X_y=True`. It is backed by installed package
 resources, verifies resource and canonical-array integrity, performs no network access or
 preprocessing, and is exported only from `pipls.datasets`; no `as_frame`, registry, or generic
-loader is authorized. All maintained Pulp consumers use this loader; the temporary repository copy
-remains only for final migration parity checks.
+loader is authorized. All maintained Pulp consumers use this loader, and the package resources are
+the sole active Pulp matrix representation.
 
 `PiPLSDataset` is an optional immutable in-memory container, primarily useful for package-owned
 synthetic data and structured experiments. Plain arrays and data frames passed directly to

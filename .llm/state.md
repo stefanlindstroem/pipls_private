@@ -65,10 +65,10 @@ and later retired by Decision 0125 after its development-validation purpose had 
   metadata, registry, or package-owned loader required for fitting;
 - a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
   `metadata.yaml`;
-- a current reference suite containing pulp, sugarcane, and tobacco;
-- an owner-authorized, not-yet-implemented transition that will make Pulp one named
-  package-owned dataset available through `pipls.datasets.load_pulp()`, while Sugarcane and
-  Tobacco retain the repository CSV convention;
+- a current reference suite containing package-owned Pulp plus repository-owned Sugarcane and
+  Tobacco;
+- the implemented `pipls.datasets.load_pulp()` dataset, backed by the sole active Pulp matrix
+  resources in the installed package;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
@@ -240,7 +240,7 @@ case, or public behavior.
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
 | Dataset namespace | immutable container, named package-owned `load_pulp()`, and seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Repository datasets | Sugarcane and Tobacco remain repository CSV datasets; Pulp package resources are implemented while the former repository copy remains temporarily for parity |
+| Repository datasets | Sugarcane and Tobacco remain repository CSV datasets; Pulp is package-owned and has one active resource location |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -483,21 +483,15 @@ stored splits for explicit follow-up reporting, and the two post-fit operations.
 
 ## Current next increment
 
-Decision 0138 authorizes a five-patch transition from the repository-facing Pulp CSV layout to one
-named installed dataset loader. Patches 1 through 4 are complete: `load_pulp()` and the canonical
-package resources are implemented, immutable loader results and exact parity are tested, clean
-wheel/source-distribution installations load the data, and every maintained Pulp consumer uses the
-public loader. The tutorial manifest now records package-owned dataset identity and integrity rather
-than repository paths.
+Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
+available in clean wheel and source-distribution installations, every maintained Pulp consumer uses
+the loader, the former repository layout is archived under `.llm/archive/`, and active tests verify
+package-resource integrity plus one active Pulp matrix location. The archive is excluded from
+runtime, distributions, served documentation, and active dataset tests.
 
-The next admissible increment is Patch 5: move the former repository layout unchanged to
-`.llm/archive/pulp-repository-layout-v1/`, remove it from active distribution and dataset contracts,
-replace migration parity tests with package-resource ownership checks, and verify one active Pulp
-matrix location. No generic loader, registry, download mechanism, `as_frame` option, or compatibility
-alias is authorized.
-
-Any unrelated release-preparation work requires a separate owner-authorized increment. Block-aware
-scaling still requires a separate owner decision. Corn, the legacy Steel table, SARCOS, and FRED-MD
+There is no remaining Pulp dataset-transition increment. Any unrelated release-preparation work
+requires a separate owner-authorized increment. Block-aware scaling still requires a separate
+owner decision. Corn, the legacy Steel table, SARCOS, and FRED-MD
 remain intentionally outside the repository under Decision 0041. The representative Pulp,
 Sugarcane, and Tobacco analyses remain complete at the current implemented stage, and
 paper-reproduction repositories remain outside this roadmap.

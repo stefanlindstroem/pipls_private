@@ -941,21 +941,16 @@ read-only arrays with `return_X_y=True`. It uses package resources and standard-
 performs no network access or preprocessing, adds no pandas or PyYAML runtime dependency, and is
 exported only from `pipls.datasets`. Sugarcane and Tobacco remain repository CSV datasets.
 
-Current status: **Patches 1 through 4 complete**. The package resources and `load_pulp()` are
-implemented, public API documentation covers the loader, exact parity with the temporary repository
-copy is tested, clean wheel/source-distribution smoke checks exercise installed loading, and every
-maintained Pulp consumer uses the package-owned dataset. Tutorial manifests identify the installed
-dataset and its resource and canonical-array hashes.
+Current status: **complete**. The package resources and `load_pulp()` are implemented, public API
+documentation covers the loader, clean wheel/source-distribution smoke checks exercise installed
+loading, every maintained Pulp consumer uses the package-owned dataset, and tutorial manifests
+identify its resource and canonical-array hashes. The former repository layout is archived under
+`.llm/archive/`, while active tests verify one package-resource matrix location.
 
 ## Current next increment
 
-Decision 0138 is the active owner-authorized transition. The next increment is Patch 5: archive the
-former repository Pulp layout, remove it from active distribution and repository-dataset contracts,
-replace transitional parity ownership with package-resource ownership tests, and run the final
-single-active-copy audit.
-
-No unrelated release work, generic dataset registry, downloader, `as_frame` surface, or
-compatibility layer is authorized.
+Decision 0138 is fully implemented and no Pulp dataset-transition increment remains. No generic
+dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.
 
 Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
 validation splits; final models and selection-conditioned OOF reports are produced only by explicit

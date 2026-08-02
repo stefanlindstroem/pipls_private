@@ -109,18 +109,17 @@ acceptance of non-object metadata arrays, and rejection of object-dtype arrays w
 remain mutable. Git history, review, public provenance, and the dataset documentation remain the
 source of record for documentary contents.
 
-Decision 0138 adds a separate package-owned Pulp contract. Current tests protect the named loader's
-return modes, immutable arrays and metadata, exact parity with the temporary repository copy, stable
-names and sample identifiers, public provenance, pickle reconstruction, resource and canonical-array
-hashes, clean wheel/source-distribution loading, and loader ownership by every maintained Pulp
-consumer. Exact parity remains transitional evidence until Patch 5 archives the former layout;
-ordinary documentary-metadata tests should still avoid freezing narrative wording.
+Decision 0138 adds a separate package-owned Pulp contract. Tests protect the named loader's return
+modes, immutable arrays and metadata, stable names and sample identifiers, public provenance,
+pickle reconstruction, resource and canonical-array hashes, clean wheel/source-distribution
+loading, loader ownership by every maintained Pulp consumer, and one active Pulp matrix location.
+Ordinary documentary-metadata tests should still avoid freezing narrative wording.
 
-Patch 5 replaces parity tests against `datasets/pulp/` with positive package-resource tests and a
-generic single-active-copy audit. Do not retain a permanent tombstone test for the former repository
-path. The `.llm/archive/pulp-repository-layout-v1/` copy is development history only and must be
-excluded from runtime, distribution, served-documentation, and active-dataset tests. Sugarcane and
-Tobacco continue under the repository-dataset readability contract.
+The `.llm/archive/pulp-repository-layout-v1/` copy is development history only and must be excluded
+from runtime, distributions, served documentation, and active-dataset tests. Do not retain a
+permanent tombstone assertion for the former repository path; use positive package-resource and
+generic active-location checks. Sugarcane and Tobacco continue under the repository-dataset
+readability contract.
 
 Post-analysis inspection tests should verify mathematical identities, shapes, direct-construction
 and pickle invariants, finite-value validation, defensive copying, read-only results, deterministic

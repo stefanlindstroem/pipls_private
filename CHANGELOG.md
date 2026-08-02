@@ -4,6 +4,7 @@
 
 ### Repository
 
+- Complete the package-owned Pulp transition: move the former repository-facing dataset layout byte-for-byte into the excluded `.llm` development archive, remove Pulp from active repository-dataset and distribution contracts, replace temporary parity tests with package-resource ownership checks, and leave `src/pipls/_data/pulp/` as the sole active matrix location.
 - Migrate every maintained Pulp consumer to `pipls.datasets.load_pulp()`, including the complete
   analysis, Pi-PLS-versus-PLS comparison, tutorial renderer, numerical workflow tests, and served
   documentation. Tutorial manifests now record package dataset identity, provenance, resource

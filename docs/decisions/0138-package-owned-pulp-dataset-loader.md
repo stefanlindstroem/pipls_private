@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; Patches 1 through 4 implemented.
+Accepted; transition implemented.
 
 ## Context
 
@@ -70,8 +70,7 @@ configuration includes these resources explicitly. The JSON metadata replaces YA
 package-owned runtime representation; Sugarcane and Tobacco continue to follow the repository
 `X.csv`/`Y.csv`/`metadata.yaml` convention.
 
-The former repository-facing Pulp files remain active only during the staged migration. Once every
-maintained Pulp consumer uses `load_pulp()`, move the former layout without modification to:
+The former repository-facing Pulp files have been moved without modification to:
 
 ```text
 .llm/archive/pulp-repository-layout-v1/
@@ -94,11 +93,10 @@ Implement the transition in five reviewable patches:
 5. move the former repository layout into `.llm/archive/`, remove it from active dataset and
    distribution contracts, and run a final single-active-copy audit.
 
-Public user documentation must describe only implemented stages. Patches 2 through 4 implement the
-package resources, `load_pulp()`, parity tests, clean-distribution smoke checks, the compact Pulp
-fitted-value quick start, and migration of every maintained Pulp consumer and tutorial manifest.
-The repository copy remains temporarily only for parity evidence; archival remains assigned to
-Patch 5.
+All five patches are implemented. The package resources, `load_pulp()`, clean-distribution smoke
+checks, compact Pulp fitted-value quick start, and every maintained Pulp consumer use the final
+package-owned representation. The former layout is retained only in the excluded development
+archive, and active tests verify package-resource integrity and one active matrix location.
 
 This decision supersedes Decisions 0019, 0062, and 0068 only where they require direct reading of
 `datasets/pulp/X.csv` and `datasets/pulp/Y.csv` or prohibit a Pulp-specific package loader. Their
@@ -115,7 +113,7 @@ package-owned exception rather than a generic replacement.
 - There is one named loader, not a registry or automatic downloader.
 - Pulp provenance and licensing travel with installed distributions.
 - Sugarcane and Tobacco retain transparent repository CSV ownership.
-- The completed repository contains one active Pulp matrix location plus a temporary hidden
-  historical archive excluded from runtime and distributions.
+- The completed repository contains one active Pulp matrix location plus a hidden historical
+  archive excluded from runtime, active tests, served documentation, and distributions.
 - No compatibility alias, duplicate active dataset, pandas return mode, or hidden preprocessing is
   introduced.

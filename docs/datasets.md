@@ -229,14 +229,13 @@ adapted from the supplementary material for the following article:
 > [doi:10.1016/j.compchemeng.2025.109143](https://doi.org/10.1016/j.compchemeng.2025.109143).
 
 The article identifies the refiner controls, internal state variables, pulp descriptions, and
-handsheet properties as supplementary data. The repository selects the documented fiber-property
-and response columns from that public supplementary table.
+handsheet properties as supplementary data. The package-owned dataset selects the documented
+fiber-property and response columns from that public supplementary table.
 
 `load_pulp()` reads the installed package resources and returns labels, stable sample identifiers,
 public provenance, and immutable metadata together with the two model matrices. The quick start,
 ordinary-PLS comparison, complete Pulp example, and tutorial renderer all use this public loader.
-During the final migration stage, `datasets/pulp/` remains only as an exact parity source before it
-is moved to the excluded `.llm` archive.
+The installed resources are the sole active Pulp matrix representation.
 
 ## Sugarcane spectral integration
 

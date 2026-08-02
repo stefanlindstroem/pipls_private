@@ -1,3 +1,4 @@
+prune .llm
 include CITATION.cff
 include Makefile
 include mkdocs.yml

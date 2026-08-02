@@ -64,9 +64,9 @@ model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
 
 The example must not need to parse `metadata.yaml`; that file documents the repository asset.
 
-## Authorized Pulp ownership transition
+## Package-owned Pulp dataset
 
-Decision 0138 authorizes one specific exception to the repository-CSV example rule. The implemented
+Decision 0138 defines one specific exception to the repository-CSV example rule. The implemented
 loader exposes:
 
 ```python
@@ -81,9 +81,9 @@ package resources. It is optional, named, local, and dataset-specific: no regist
 `as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows from it.
 General users and every other real dataset continue to supply `X` and `Y` directly.
 
-The loader and package resources are implemented. Until the consumer migrations land, the Pulp
-example and tutorial continue to read the active repository CSV files directly; that duplicate is a
-temporary parity source rather than a second public loading convention.
+The loader and package resources are implemented, and every maintained Pulp consumer uses them.
+The package resources are the sole active Pulp matrices. The former repository layout is retained
+only in an excluded `.llm` development archive and is not a loading convention or test fixture.
 
 ## Public provenance boundary
 

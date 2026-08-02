@@ -4,27 +4,20 @@
 
 This contract standardizes committed analysis-facing repository datasets without changing the
 public estimator API. External programming users still read and prepare their own `X` and `Y`; they
-do not need a metadata file or package loader. Decision 0138 authorizes one staged package-owned
-Pulp exception; until that migration completes, Pulp remains governed by this current layout.
+do not need a metadata file or package loader. Decision 0138 defines one completed package-owned
+Pulp exception outside this repository-dataset layout.
 
-## Accepted Pulp exception and migration state
+## Package-owned Pulp exception
 
-Decision 0138 has added the canonical package-owned Pulp assets under
-`src/pipls/_data/pulp/` and exposes them through `pipls.datasets.load_pulp()`. The package-owned
-representation uses `metadata.json` so runtime loading requires only the standard library. This does
-not alter the repository layout for Sugarcane or Tobacco and does not create a generic dataset
-registry.
+Decision 0138 places the canonical Pulp assets under `src/pipls/_data/pulp/` and exposes them
+through `pipls.datasets.load_pulp()`. The package-owned representation uses `metadata.json` so
+runtime loading requires only the standard library. It is the sole active Pulp matrix
+representation and does not create a generic dataset registry.
 
-Through Patch 4, `datasets/pulp/` remains temporarily as an exact parity source while package
-resources and maintained consumers are validated. Patch 5 moves that former layout without
-modification to `.llm/archive/pulp-repository-layout-v1/`. The archive is excluded from runtime,
-served documentation, wheels, source distributions, and active dataset tests. After that cleanup,
-this repository-layout contract applies to Sugarcane and Tobacco, while the package-resource
-contract in Decision 0138 applies to Pulp.
-
-The present Patch 4 state retains `datasets/pulp/` only as an exact parity source. The quick start,
-component-path comparison, complete Pulp workflow, tutorial renderer, and documentation use
-`load_pulp()`. Patch 5 archives the former layout and removes it from active dataset contracts.
+The former repository layout is preserved byte-for-byte under
+`.llm/archive/pulp-repository-layout-v1/` as development history only. It is excluded from runtime,
+active tests, served documentation, wheels, and source distributions. This repository-layout
+contract therefore applies only to Sugarcane and Tobacco; Decision 0138 governs Pulp.
 
 ## Required files
 

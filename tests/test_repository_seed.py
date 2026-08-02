@@ -130,6 +130,7 @@ def test_source_distribution_manifest_includes_documentation_build_inputs() -> N
     }
 
     assert {
+        "prune .llm",
         "include CITATION.cff",
         "include Makefile",
         "include mkdocs.yml",

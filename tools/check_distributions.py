@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -111,6 +112,21 @@ def _single_artifact(artifacts: Path, pattern: str, label: str) -> Path:
     if len(matches) != 1:
         raise RuntimeError(f"Expected one {label}, found {len(matches)}.")
     return matches[0]
+
+
+def _assert_development_archive_excluded(artifact: Path) -> None:
+    if artifact.suffix == ".whl":
+        with zipfile.ZipFile(artifact) as archive:
+            members = archive.namelist()
+    else:
+        with tarfile.open(artifact, mode="r:gz") as archive:
+            members = archive.getnames()
+
+    forbidden = [name for name in members if "/.llm/archive/" in f"/{name}"]
+    if forbidden:
+        raise RuntimeError(
+            f"Development archive leaked into {artifact.name}: {sorted(forbidden)}"
+        )
 
 
 def _extract_source_distribution(artifact: Path, destination: Path) -> Path:
@@ -262,6 +278,8 @@ def main() -> None:
         )
         wheel = _single_artifact(artifacts, "*.whl", "wheel")
         source_distribution = _single_artifact(artifacts, "*.tar.gz", "source distribution")
+        _assert_development_archive_excluded(wheel)
+        _assert_development_archive_excluded(source_distribution)
 
         checks = (
             ("wheel", wheel, False),

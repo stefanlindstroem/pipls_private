@@ -143,7 +143,7 @@ This index is navigation, not a substitute for those records.
 | `0135-specific-predictor-rank-support-warning.md` | specific predictor-rank support warning name | expose `PredictorRankSupportWarning` without an alias or support-policy change |
 | `0136-seeded-shuffled-example-folds.md` | seeded shuffled example folds | use reproducible shuffled five-fold partitions in maintained examples while leaving package defaults and leave-one-out unchanged |
 | `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select and fit through explicit post-fit `refit()` and `validation_report()` operations |
-| `0138-package-owned-pulp-dataset-loader.md` | package-owned Pulp dataset loader | add one installed, immutable `load_pulp()` dataset; later archive the former repository layout without a duplicate active copy |
+| `0138-package-owned-pulp-dataset-loader.md` | package-owned Pulp dataset loader | provide one installed immutable `load_pulp()` dataset and archive the former repository layout without a duplicate active copy |
 
 ## Implemented estimator/search transition
 

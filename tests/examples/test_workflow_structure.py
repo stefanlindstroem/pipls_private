@@ -237,7 +237,6 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
         tree = _tree(path)
         assert "load_pulp" in _imported_names(tree), path
         assert "load_pulp" in _call_names(tree), path
-        assert "datasets/pulp" not in path.read_text(encoding="utf-8"), path
 
 
 @pytest.mark.parametrize(
