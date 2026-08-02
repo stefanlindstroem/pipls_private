@@ -941,17 +941,18 @@ read-only arrays with `return_X_y=True`. It uses package resources and standard-
 performs no network access or preprocessing, adds no pandas or PyYAML runtime dependency, and is
 exported only from `pipls.datasets`. Sugarcane and Tobacco remain repository CSV datasets.
 
-Current status: **Patch 1 complete in the guide layer; implementation has not started**. Public user
-documentation continues to describe direct repository Pulp reading until the loader exists.
+Current status: **Patches 1 and 2 complete**. The package resources and `load_pulp()` are implemented,
+public API documentation covers the loader, exact parity with the temporary repository copy is
+tested, and clean wheel/source-distribution smoke checks exercise installed loading. The maintained
+Pulp examples still use direct repository reading until their assigned migration patches.
 
 ## Current next increment
 
-Decision 0138 is the active owner-authorized transition. Patch 1 records the target without changing
-implementation or public user documentation. The next increment is Patch 2: package the canonical
-Pulp resources, add `pipls.datasets.load_pulp()`, and validate the loader from clean wheel and source
-distribution installations while retaining the repository copy for exact parity checks.
+Decision 0138 is the active owner-authorized transition. The next increment is Patch 3: make the
+package-owned Pulp dataset the first compact fitted-value quick start and update prominent onboarding
+presentation without presenting in-sample fit as predictive validation.
 
-The remaining Pulp migration patches must not be combined with Patch 2. No unrelated release work,
+The remaining Pulp migration patches must not be combined with Patch 3. No unrelated release work,
 generic dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.
 
 Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored

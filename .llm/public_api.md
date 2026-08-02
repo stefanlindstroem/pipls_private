@@ -233,23 +233,18 @@ from pipls.datasets import (
     PiPLSDataset,
     PiPLSLatentGeometryTruth,
     PiPLSRegressionTruth,
+    load_pulp,
     make_pipls_latent_geometry,
     make_pipls_regression,
     make_pipls_train_test,
 )
 ```
 
-Decision 0138 authorizes a staged future addition:
-
-```python
-from pipls.datasets import load_pulp
-```
-
-The target signature is `load_pulp(*, return_X_y=False)`. It will return `PiPLSDataset` by default
-and a pair of read-only `float64` arrays when `return_X_y=True`. It will be package-resource backed,
-network-free, preprocessing-free, and exported only from `pipls.datasets`; no `as_frame`, registry,
-or generic loader is authorized. This contract is **not implemented in the current Patch 1 state**
-and must not yet appear in living public user documentation or the module's `__all__`.
+`load_pulp(*, return_X_y=False)` is implemented. It returns `PiPLSDataset` by default and a
+pair of fresh read-only `float64` arrays when `return_X_y=True`. It is backed by installed package
+resources, verifies resource and canonical-array integrity, performs no network access or
+preprocessing, and is exported only from `pipls.datasets`; no `as_frame`, registry, or generic
+loader is authorized. The temporary repository Pulp copy remains only for migration parity checks.
 
 `PiPLSDataset` is an optional immutable in-memory container, primarily useful for package-owned
 synthetic data and structured experiments. Plain arrays and data frames passed directly to

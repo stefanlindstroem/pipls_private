@@ -237,9 +237,9 @@ case, or public behavior.
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
-| Dataset namespace | current immutable container and seeded generators under `pipls.datasets`; Decision 0138 authorizes a staged named `load_pulp()` addition |
+| Dataset namespace | immutable container, named package-owned `load_pulp()`, and seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Repository datasets | currently Pulp, Sugarcane, and Tobacco use comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml`; the accepted transition will move only Pulp to installed package resources |
+| Repository datasets | Sugarcane and Tobacco remain repository CSV datasets; Pulp package resources are implemented while the former repository copy remains temporarily for parity |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -483,16 +483,17 @@ stored splits for explicit follow-up reporting, and the two post-fit operations.
 ## Current next increment
 
 Decision 0138 authorizes a five-patch transition from the repository-facing Pulp CSV layout to one
-named installed dataset loader. Patch 1 is the guide-layer decision only; `load_pulp()` is not yet
-implemented, the active Pulp example and tutorial still read `datasets/pulp/X.csv` and `Y.csv`, and
-public user documentation must continue to describe that implemented state.
+named installed dataset loader. Patches 1 and 2 are complete: `load_pulp()` and the canonical
+package resources are implemented, immutable loader results and exact parity are tested, and clean
+wheel/source-distribution smoke checks exercise the installed resources. The active Pulp example
+and tutorial still read `datasets/pulp/X.csv` and `Y.csv` during this transitional stage.
 
-The next admissible increment is Patch 2: add the canonical package resources, implement
-`pipls.datasets.load_pulp(return_X_y=False)`, validate immutable results and provenance, and verify
-loading from clean wheel and source-distribution installations. The repository Pulp files remain
-temporarily as an exact parity source until maintained consumers migrate.
+The next admissible increment is Patch 3: replace the first example and prominent onboarding
+presentation with a compact Pulp fitted-value quick start that clearly distinguishes calibration
+fit from predictive validation. The repository Pulp files remain temporarily as an exact parity
+source until maintained consumers migrate.
 
-Patches 3--5 then establish the Pulp quick start, migrate the complete Pulp workflow, and archive
+Patches 4--5 then migrate the complete Pulp workflow and archive
 the former repository layout under `.llm/archive/` while removing it from active runtime,
 distribution, documentation, and test ownership. No generic loader, registry, download mechanism,
 `as_frame` option, or compatibility alias is authorized.

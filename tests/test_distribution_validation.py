@@ -27,12 +27,22 @@ def test_distribution_check_is_a_public_make_target_and_sdist_input() -> None:
         text=True,
     ).stdout
     manifest = (root / "MANIFEST.in").read_text(encoding="utf-8").splitlines()
+    pyproject = (root / "pyproject.toml").read_text(encoding="utf-8")
 
     assert "tools/check_distributions.py" in dry_run.stdout
     assert "dist-check" in help_output
     assert "include CITATION.cff" in manifest
     assert "include tools/check_distributions.py" in manifest
+    assert "recursive-include src/pipls/_data/pulp *.csv *.json *.md *.txt" in manifest
     assert "recursive-include examples/results .gitkeep" in manifest
+    assert "[tool.setuptools.package-data]" in pyproject
+    for pattern in (
+        '"_data/pulp/*.csv"',
+        '"_data/pulp/*.json"',
+        '"_data/pulp/*.md"',
+        '"_data/pulp/*.txt"',
+    ):
+        assert pattern in pyproject
 
 
 def test_distribution_helper_builds_once_and_checks_both_artifacts() -> None:
@@ -60,6 +70,7 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
         "import pipls.metrics",
         "import pipls.search",
         "from pipls import PiPLSRegression, PiPLSSearchCV",
+        "from pipls.datasets import load_pulp",
     ):
         assert public_import in helper
 
@@ -68,6 +79,10 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
     assert "package_file.relative_to(environment_root)" in helper
     assert "PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)" in helper
     assert "prediction.shape == (2, 2)" in helper
+    assert "pulp = load_pulp()" in helper
+    assert "pulp_X, pulp_Y = load_pulp(return_X_y=True)" in helper
+    assert "pulp.data.shape == (46, 14)" in helper
+    assert "pulp.target.shape == (46, 8)" in helper
 
 
 def test_build_workflow_validates_installed_distributions() -> None:

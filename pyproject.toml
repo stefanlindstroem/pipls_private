@@ -56,6 +56,14 @@ docs = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+pipls = [
+  "_data/pulp/*.csv",
+  "_data/pulp/*.json",
+  "_data/pulp/*.md",
+  "_data/pulp/*.txt",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"

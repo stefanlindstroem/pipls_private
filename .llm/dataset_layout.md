@@ -9,8 +9,8 @@ Pulp exception; until that migration completes, Pulp remains governed by this cu
 
 ## Accepted Pulp exception and migration state
 
-Decision 0138 will move the canonical active Pulp assets to
-`src/pipls/_data/pulp/` and expose them through `pipls.datasets.load_pulp()`. The package-owned
+Decision 0138 has added the canonical package-owned Pulp assets under
+`src/pipls/_data/pulp/` and exposes them through `pipls.datasets.load_pulp()`. The package-owned
 representation uses `metadata.json` so runtime loading requires only the standard library. This does
 not alter the repository layout for Sugarcane or Tobacco and does not create a generic dataset
 registry.
@@ -22,8 +22,9 @@ served documentation, wheels, source distributions, and active dataset tests. Af
 this repository-layout contract applies to Sugarcane and Tobacco, while the package-resource
 contract in Decision 0138 applies to Pulp.
 
-The present Patch 1 state changes no files or consumers below `datasets/pulp/`; all current layout
-requirements remain executable until the later patches complete the transition.
+The present Patch 2 state retains `datasets/pulp/` as an exact parity source while package resources
+and installed loading are validated. Existing Pulp consumers still use that repository copy until
+Patches 3 and 4 migrate them; all current layout requirements remain executable during this stage.
 
 ## Required files
 

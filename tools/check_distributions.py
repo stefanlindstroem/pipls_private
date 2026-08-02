@@ -22,6 +22,7 @@ import pipls.inspection
 import pipls.metrics
 import pipls.search
 from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls.datasets import load_pulp
 
 repository = Path(sys.argv[1]).resolve()
 artifact_label = sys.argv[2]
@@ -54,6 +55,17 @@ prediction = model.predict(X[:2])
 
 assert prediction.shape == (2, 2)
 assert np.isfinite(prediction).all()
+
+pulp = load_pulp()
+pulp_X, pulp_Y = load_pulp(return_X_y=True)
+assert pulp.data.shape == (46, 14)
+assert pulp.target.shape == (46, 8)
+assert pulp.feature_names[0] == "Shives"
+assert pulp.target_names[-1] == "s"
+assert not pulp.data.flags.writeable
+assert not pulp.target.flags.writeable
+assert np.array_equal(pulp_X, pulp.data)
+assert np.array_equal(pulp_Y, pulp.target)
 assert pipls.__version__
 
 print(

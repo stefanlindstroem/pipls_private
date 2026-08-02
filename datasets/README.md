@@ -5,13 +5,14 @@ row-order, missing-value, public-provenance, and preparation choices are reviewe
 directory uses
 comma-delimited `X.csv`, comma-delimited `Y.csv`, and a documentary `metadata.yaml`.
 
-The installed package provides the optional Phase E1 in-memory dataset container and deterministic
-synthetic generator under `pipls.datasets`; see `docs/datasets.md`. Synthetic data are generated
-at runtime and are not committed as dataset files.
+The installed package provides the named `pipls.datasets.load_pulp()` dataset, the optional Phase
+E1 in-memory dataset container, and deterministic synthetic generators; see `docs/datasets.md`.
+Synthetic data are generated at runtime and are not committed as dataset files.
 
-Real-data examples read `X.csv` and `Y.csv` explicitly and form `X` and `Y` without a generic
-package loader. `metadata.yaml` standardizes public repository descriptions and provenance, but it
-is not read by the estimator and is not required for external users fitting their own data.
+Real-data examples currently read repository `X.csv` and `Y.csv` files explicitly. Pulp also has one
+named package-owned loader during its staged migration; no generic loader or registry is provided.
+`metadata.yaml` standardizes public repository descriptions and provenance, but it is not read by
+the estimator and is not required for external users fitting their own data.
 Private development paths and preparation-only scripts are not part of dataset integrations.
 
 ## Included datasets

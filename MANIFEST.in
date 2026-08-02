@@ -8,5 +8,6 @@ include tools/render_pulp_tutorial.py
 include constraints/minimum.txt
 recursive-include docs *.md *.js
 recursive-include datasets *.csv *.md *.txt *.yaml
+recursive-include src/pipls/_data/pulp *.csv *.json *.md *.txt
 recursive-include examples *.py *.md
 recursive-include examples/results .gitkeep

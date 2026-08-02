@@ -29,9 +29,9 @@ access.
 
 `PiPLSDataset` remains an optional structured container and the return type of the package-owned
 synthetic generators. It is not required for real data, and examples must not imply otherwise.
-At the current implemented stage, shipped CSV datasets remain repository assets rather than
-installable registry entries, so package metadata exposes no `data` extra. Decision 0138 authorizes
-a later named Pulp loader without creating a general data-access extra or registry.
+Pulp is now one named installed package dataset, while Sugarcane and Tobacco remain repository CSV
+assets. Package metadata exposes no `data` extra because the Pulp resources are included in the base
+installation. This does not create a general data-access extra or registry.
 
 ## Example transparency
 
@@ -66,8 +66,8 @@ The example must not need to parse `metadata.yaml`; that file documents the repo
 
 ## Authorized Pulp ownership transition
 
-Decision 0138 authorizes one specific exception to the repository-CSV example rule. The completed
-transition will expose:
+Decision 0138 authorizes one specific exception to the repository-CSV example rule. The implemented
+loader exposes:
 
 ```python
 from pipls.datasets import load_pulp
@@ -76,14 +76,14 @@ data = load_pulp()
 X, Y = load_pulp(return_X_y=True)
 ```
 
-The loader will return the existing immutable `PiPLSDataset` or read-only arrays from installed
+The loader returns the existing immutable `PiPLSDataset` or fresh read-only arrays from installed
 package resources. It is optional, named, local, and dataset-specific: no registry, download,
 `as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows from it.
 General users and every other real dataset continue to supply `X` and `Y` directly.
 
-This transition is accepted but not implemented in the current Patch 1 state. Until the loader and
-consumer migrations land, the Pulp example and tutorial continue to read the active repository CSV
-files directly. Public user documentation must not present the future loader prematurely.
+The loader and package resources are implemented. Until the consumer migrations land, the Pulp
+example and tutorial continue to read the active repository CSV files directly; that duplicate is a
+temporary parity source rather than a second public loading convention.
 
 ## Public provenance boundary
 

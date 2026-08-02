@@ -1,10 +1,15 @@
-"""Validated dataset containers and deterministic synthetic Pi-PLS data."""
+"""Packaged data, validated containers, and deterministic Pi-PLS generators."""
 
 from __future__ import annotations
 
+import csv
+import hashlib
+import io
+import json
 from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Generic, Literal, TypeAlias, TypeVar
+from importlib import resources
+from typing import Generic, Literal, TypeAlias, TypeVar, cast, overload
 
 import numpy as np
 from numpy.typing import NDArray
@@ -19,6 +24,7 @@ __all__ = [
     "PiPLSDataset",
     "PiPLSLatentGeometryTruth",
     "PiPLSRegressionTruth",
+    "load_pulp",
     "make_pipls_latent_geometry",
     "make_pipls_regression",
     "make_pipls_train_test",
@@ -231,8 +237,8 @@ class PiPLSDataset:
     r"""Immutable validated multivariate regression dataset.
 
     Plain arrays and data frames passed directly to ``fit(X, Y)`` remain the
-    primary real-data interface. This container is an optional convenience for
-    synthetic data and structured experiments.
+    primary real-data interface. This container carries the packaged Pulp
+    dataset, synthetic data, and structured experiment data.
 
     Parameters
     ----------
@@ -350,6 +356,211 @@ class PiPLSDataset:
         """Number of response columns."""
 
         return int(self.Y.shape[1])
+
+    def __reduce__(self) -> tuple[object, tuple[object, ...]]:
+        """Reconstruct through validation when unpickling."""
+
+        return (
+            type(self),
+            (
+                self.X,
+                self.Y,
+                self.feature_names,
+                self.target_names,
+                self.sample_ids,
+                self.provenance,
+                self.metadata,
+                self.truth,
+            ),
+        )
+
+
+@overload
+def load_pulp(*, return_X_y: Literal[False] = False) -> PiPLSDataset:
+    ...
+
+
+@overload
+def load_pulp(*, return_X_y: Literal[True]) -> tuple[FloatArray, FloatArray]:
+    ...
+
+
+def load_pulp(
+    *,
+    return_X_y: bool = False,
+) -> PiPLSDataset | tuple[FloatArray, FloatArray]:
+    """Load the packaged Pulp fiber-property regression dataset.
+
+    The dataset contains 46 thermomechanical-pulp samples, 14 fiber-property
+    predictors, and eight pulp or handsheet responses. The analysis-facing
+    matrices preserve the numeric values, column order, and row order selected
+    from the publication supplementary material. No preprocessing is applied.
+
+    Parameters
+    ----------
+    return_X_y : bool, default=False
+        If ``True``, return the read-only predictor and response arrays directly.
+        Otherwise return an immutable :class:`PiPLSDataset` with labels,
+        provenance, sample identifiers, and metadata.
+
+    Returns
+    -------
+    PiPLSDataset or tuple of ndarray
+        Structured dataset by default, or ``(X, Y)`` when ``return_X_y=True``.
+
+    Notes
+    -----
+    The dataset is adapted from supplementary material for Lindström et al.
+    (2025), *Computers & Chemical Engineering*, 199, 109143,
+    doi:10.1016/j.compchemeng.2025.109143, under CC BY 4.0.
+    """
+
+    if not isinstance(return_X_y, bool):
+        raise TypeError("return_X_y must be a boolean.")
+
+    metadata = _load_pulp_metadata()
+    feature_names = _metadata_string_tuple(metadata, "feature_names")
+    target_names = _metadata_string_tuple(metadata, "target_names")
+    dimensions = _metadata_mapping(metadata, "dimensions")
+    integrity = _metadata_mapping(metadata, "integrity")
+    resource_hashes = _metadata_mapping(integrity, "resource_sha256")
+    array_hashes = _metadata_mapping(integrity, "array_sha256")
+
+    X = _load_pulp_csv(
+        "X.csv",
+        expected_names=feature_names,
+        expected_resource_hash=_metadata_string(resource_hashes, "X.csv"),
+    )
+    Y = _load_pulp_csv(
+        "Y.csv",
+        expected_names=target_names,
+        expected_resource_hash=_metadata_string(resource_hashes, "Y.csv"),
+    )
+
+    expected_shape = (
+        _metadata_integer(dimensions, "n_samples"),
+        _metadata_integer(dimensions, "n_features"),
+        _metadata_integer(dimensions, "n_targets"),
+    )
+    if X.shape != expected_shape[:2] or Y.shape != (
+        expected_shape[0],
+        expected_shape[2],
+    ):
+        raise RuntimeError("Packaged Pulp matrices do not match metadata dimensions.")
+
+    _verify_pulp_array_hash(
+        X,
+        expected=_metadata_string(array_hashes, "data_float64_c_order"),
+        name="data",
+    )
+    _verify_pulp_array_hash(
+        Y,
+        expected=_metadata_string(array_hashes, "target_float64_c_order"),
+        name="target",
+    )
+
+    provenance_raw = _metadata_mapping(metadata, "provenance")
+    provenance = {
+        key: _metadata_string(provenance_raw, key)
+        for key in _REQUIRED_PROVENANCE_KEYS
+    }
+    dataset = PiPLSDataset(
+        X=X,
+        Y=Y,
+        feature_names=feature_names,
+        target_names=target_names,
+        sample_ids=tuple(f"pulp-{index:02d}" for index in range(1, X.shape[0] + 1)),
+        provenance=provenance,
+        metadata=metadata,
+    )
+    if return_X_y:
+        return dataset.data, dataset.target
+    return dataset
+
+
+def _pulp_resource_bytes(name: str) -> bytes:
+    resource = (
+        resources.files("pipls")
+        .joinpath("_data")
+        .joinpath("pulp")
+        .joinpath(name)
+    )
+    try:
+        return resource.read_bytes()
+    except (FileNotFoundError, OSError) as error:
+        raise RuntimeError(f"Packaged Pulp resource {name!r} is unavailable.") from error
+
+
+def _load_pulp_metadata() -> Mapping[str, object]:
+    try:
+        loaded = json.loads(_pulp_resource_bytes("metadata.json").decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise RuntimeError("Packaged Pulp metadata is invalid.") from error
+    if not isinstance(loaded, dict):
+        raise RuntimeError("Packaged Pulp metadata must be a JSON object.")
+    return cast(Mapping[str, object], loaded)
+
+
+def _load_pulp_csv(
+    name: str,
+    *,
+    expected_names: tuple[str, ...],
+    expected_resource_hash: str,
+) -> FloatArray:
+    raw = _pulp_resource_bytes(name)
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != expected_resource_hash:
+        raise RuntimeError(f"Packaged Pulp resource {name!r} failed its integrity check.")
+
+    try:
+        rows = csv.reader(io.StringIO(raw.decode("utf-8"), newline=""))
+        header = tuple(next(rows))
+        values = [[float(value) for value in row] for row in rows]
+    except (StopIteration, UnicodeDecodeError, ValueError) as error:
+        message = f"Packaged Pulp resource {name!r} is not a valid numeric CSV."
+        raise RuntimeError(message) from error
+    if header != expected_names:
+        raise RuntimeError(f"Packaged Pulp resource {name!r} has unexpected column names.")
+    if any(len(row) != len(header) for row in values):
+        raise RuntimeError(f"Packaged Pulp resource {name!r} has an irregular row width.")
+    return _validated_matrix(values, name=name, allow_vector=False)
+
+
+def _verify_pulp_array_hash(array: FloatArray, *, expected: str, name: str) -> None:
+    canonical = np.asarray(array, dtype=np.dtype("<f8"), order="C")
+    digest = hashlib.sha256(canonical.tobytes(order="C")).hexdigest()
+    if digest != expected:
+        raise RuntimeError(f"Packaged Pulp {name} array failed its integrity check.")
+
+
+def _metadata_mapping(values: Mapping[str, object], key: str) -> Mapping[str, object]:
+    value = values.get(key)
+    if not isinstance(value, Mapping):
+        raise RuntimeError(f"Packaged Pulp metadata field {key!r} must be an object.")
+    return value
+
+
+def _metadata_string(values: Mapping[str, object], key: str) -> str:
+    value = values.get(key)
+    if not isinstance(value, str) or not value:
+        raise RuntimeError(f"Packaged Pulp metadata field {key!r} must be a string.")
+    return value
+
+
+def _metadata_integer(values: Mapping[str, object], key: str) -> int:
+    value = values.get(key)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise RuntimeError(f"Packaged Pulp metadata field {key!r} must be an integer.")
+    return value
+
+
+def _metadata_string_tuple(values: Mapping[str, object], key: str) -> tuple[str, ...]:
+    value = values.get(key)
+    if not isinstance(value, list) or any(
+        not isinstance(item, str) or not item for item in value
+    ):
+        raise RuntimeError(f"Packaged Pulp metadata field {key!r} must be a string array.")
+    return cast(tuple[str, ...], tuple(value))
 
 
 @dataclass(frozen=True)

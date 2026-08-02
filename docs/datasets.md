@@ -1,9 +1,9 @@
 # Dataset interface and synthetic generator
 
-The optional dataset interface provides a structured in-memory boundary for package-owned
-synthetic data and experiments. Real-data users may pass ordinary arrays or data frames directly
-to `fit(X, Y)`; no container or metadata file is required for model fitting. Repository-included
-real datasets nevertheless use a consistent documentary `metadata.yaml`.
+The optional dataset interface provides a structured in-memory boundary for one packaged Pulp
+dataset, package-owned synthetic data, and experiments. Real-data users may pass ordinary arrays or
+data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
+Sugarcane and Tobacco remain repository datasets with documentary `metadata.yaml` files.
 
 ## Validated dataset container
 
@@ -200,13 +200,23 @@ block is unchanged when only `n_test` changes.
 
 ## Real-data boundary
 
-Real-data reading remains user-owned. Examples and reproduction scripts must show how `X` and `Y`
-are read and formed directly using ordinary NumPy, pandas, or domain-specific code. The shipped CSV
-assets require no `data` installation extra: they are ordinary repository files, not entries in a
-runtime registry. The project tracks public provenance, licenses, and analysis-facing
-transformations for its own datasets, but no public registry, generic loader, preparation-only
-script, or required metadata sidecar is part of the runtime API.
+Real-data reading remains user-owned in general. Examples and reproduction scripts show how `X` and
+`Y` are formed using ordinary NumPy, pandas, or domain-specific code. Pi-PLS provides no public
+registry, generic loader, downloader, preparation-only script, or required metadata sidecar.
 
+Pulp is one explicit package-owned exception. It is bundled with the installed distribution and
+available without network access:
+
+```python
+from pipls.datasets import load_pulp
+
+data = load_pulp()
+X, Y = load_pulp(return_X_y=True)
+```
+
+The default result is an immutable `PiPLSDataset`; the direct return mode supplies the same read-only
+`float64` matrices. The loader applies no imputation, centering, scaling, row filtering, or learned
+preprocessing. Sugarcane, Tobacco, and user datasets continue to use explicit user-owned reading.
 
 ## Pulp real-data integration
 
@@ -222,10 +232,11 @@ The article identifies the refiner controls, internal state variables, pulp desc
 handsheet properties as supplementary data. The repository selects the documented fiber-property
 and response columns from that public supplementary table.
 
-`examples/05_pulp_real_data.py` reads `X.csv` and `Y.csv` directly with pandas and then relies on
-ordinary estimator validation when fitting `PiPLSSearchCV` with its adaptive defaults. It does not
-repeat repository-table validation, set a predictor-rank ceiling, parse `metadata.yaml`, or call a
-package loader.
+`load_pulp()` reads the installed package resources and returns labels, stable sample identifiers,
+public provenance, and immutable metadata together with the two model matrices. During the staged
+migration, `datasets/pulp/` remains as an exact parity source and the complete Pulp example still
+reads those CSV files directly. Later patches migrate that maintained workflow and then archive the
+former repository layout.
 
 ## Sugarcane spectral integration
 

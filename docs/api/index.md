@@ -37,7 +37,7 @@ predictor and response directions; they are distinct from reconstruction loading
 | [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |
 | [`ObservationDiagnostics`](inspection.md#pipls.inspection.ObservationDiagnostics) | `observation_diagnostics(model)` | Inspect score distance and X-reconstruction residuals |
 | [`PredictionDiagnostics`](inspection.md#pipls.inspection.PredictionDiagnostics) | `prediction_diagnostics(Y, Y_pred, ...)` | Inspect predictions, residuals, and response-standardized errors |
-| [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | dataset construction or generator output | Carry validated arrays, labels, provenance, and metadata |
+| [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | `load_pulp()`, dataset construction, or generator output | Carry validated arrays, labels, provenance, and metadata |
 | [`PiPLSRegressionTruth`](datasets.md#pipls.datasets.PiPLSRegressionTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
 | [`PiPLSLatentGeometryTruth`](datasets.md#pipls.datasets.PiPLSLatentGeometryTruth) | `make_pipls_latent_geometry(...).truth` | Inspect the manuscript-oriented Gaussian latent geometry |
 
@@ -46,8 +46,9 @@ predictor and response directions; they are distinct from reconstruction loading
 reference rules without fitting or mutating the path search. Their scope and scorer qualification
 are described under [result-object recommendations](../path_analysis.md#result-object-recommendations).
 
-The Pulp, Sugarcane, and Tobacco [reference datasets](../datasets.md) are repository CSV assets,
-not `PiPLSDataset` registry entries or package-owned loader results.
+Pulp is available as the named package-owned [`load_pulp()`](datasets.md#pipls.datasets.load_pulp)
+dataset. Sugarcane and Tobacco remain repository CSV assets; no generic dataset registry is part of
+the runtime API.
 
 ## Rendering boundary
 

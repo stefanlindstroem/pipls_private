@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for staged implementation.
+Accepted; Patch 2 implemented.
 
 ## Context
 
@@ -94,8 +94,10 @@ Implement the transition in five reviewable patches:
 5. move the former repository layout into `.llm/archive/`, remove it from active dataset and
    distribution contracts, and run a final single-active-copy audit.
 
-Public user documentation must describe only implemented stages. In particular, this first decision
-patch does not add `load_pulp()` to the living public API or claim that Pulp is already packaged.
+Public user documentation must describe only implemented stages. Patch 2 implements the package
+resources, `load_pulp()`, parity tests, and clean-distribution smoke checks while retaining the
+repository copy temporarily. The first-example and complete-workflow migrations remain assigned to
+Patches 3 and 4, and archival remains assigned to Patch 5.
 
 This decision supersedes Decisions 0019, 0062, and 0068 only where they require direct reading of
 `datasets/pulp/X.csv` and `datasets/pulp/Y.csv` or prohibit a Pulp-specific package loader. Their

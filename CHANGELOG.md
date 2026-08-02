@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Add the package-owned `pipls.datasets.load_pulp()` API with immutable labeled and direct-matrix
+  return modes, standard-library package-resource loading, embedded provenance and integrity
+  metadata, exact parity tests against the temporary repository copy, and clean wheel/source-
+  distribution smoke coverage.
 - Complete the validation-report presentation migration: maintained Pulp, Sugarcane, and
   Tobacco workflows now obtain selection-conditioned OOF predictions through
   `search.validation_report(...)`, reusing the exact splits materialized by path evaluation

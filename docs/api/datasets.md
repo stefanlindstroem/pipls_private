@@ -1,19 +1,30 @@
 # Dataset API and generators
 
-`pipls.datasets` contains optional immutable containers and deterministic synthetic-data
-generators. They are conveniences for examples, tests, and structured experiments; ordinary arrays
-and data frames passed directly to `fit(X, Y)` remain the normal real-data interface. Synthetic
-truth stores only loading blocks that contribute to the generated predictor or response signal.
+`pipls.datasets` contains one packaged real-data loader, optional immutable containers, and
+deterministic synthetic-data generators. They are conveniences for examples, tests, and structured
+experiments; ordinary arrays and data frames passed directly to `fit(X, Y)` remain the normal
+real-data interface. Synthetic truth stores only loading blocks that contribute to the generated
+predictor or response signal.
 
-The repository also ships the Pulp, Sugarcane, and Tobacco [reference datasets](../datasets.md) and
-[complete real-data examples](../examples.md#complete-real-data-analyses). Those datasets are CSV
-assets read explicitly by the examples; they are not registry entries and are not loaded through
-`PiPLSDataset`.
+Pulp is available through the named package-owned loader below. Sugarcane and Tobacco remain
+[repository reference datasets](../datasets.md) read explicitly by their
+[maintained examples](../examples.md#complete-real-data-analyses); no generic registry or download
+layer is provided.
 
 Mathematical notation on this page follows the package convention: complete matrices are bold,
 descriptive role and block subscripts are upright, and variable indices remain italic. For example,
 $\boldsymbol{\Lambda}_{\mathrm{p}}$ and $\mathbf{L}_{\mathrm{sp}}$ are complete matrices,
 while $d_k$ retains the variable index $k$.
+
+## Packaged dataset
+
+::: pipls.datasets.load_pulp
+    options:
+      members: false
+
+`load_pulp()` performs no network access or preprocessing. Its default `PiPLSDataset` result keeps
+labels, sample identifiers, provenance, and recursively frozen metadata; `return_X_y=True` returns
+the same read-only predictor and response arrays directly.
 
 ## Containers
 
