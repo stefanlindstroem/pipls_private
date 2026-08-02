@@ -742,14 +742,12 @@ Current status: **search-CV public rename implemented and documented**.
 
 ### Explicit final path selection
 
-Decision 0111 extends `PiPLSSearchCV` rather than adding a second automated-model wrapper. The default
-`selection_rule="best_score"` preserves current behavior, while
-`selection_rule="one_standard_error"` selects the stored 1-SE component-path row. Global `best_*`
-attributes remain unchanged; `selected_result_`, `selected_params_`, optional OOF diagnostics, and
-the one selected refit represent the declared final protocol. `PiPLSRegression` remains a fixed-pair
-estimator with no hidden selection.
+Decision 0111 originally placed final-row orchestration on `PiPLSSearchCV`. Decision 0137 supersedes
+that ownership: global `best_*` attributes remain search evidence, while named or manual final-row
+choices occur only through post-fit `refit()` or `validation_report()`. `PiPLSRegression` remains a
+fixed-pair estimator with no hidden selection.
 
-Current status: **explicit best-score and 1-SE final-row orchestration implemented and documented**.
+Current status: **superseded by the post-fit inspect-decide-refit lifecycle**.
 
 ### Search configuration resolution simplification
 
@@ -919,17 +917,16 @@ explicit selected-row diagnostic. The search stores neither training matrices no
 models. Because the package is version `0.0.0`, the completed transition contains no aliases,
 deprecation paths, ignored constructor parameters, or serialized compatibility state.
 
-Current status: **post-fit `refit()` and explicit `validation_report()` implemented; old
-constructor-selected report state pending removal**.
+Current status: **public inspect-decide-refit lifecycle implemented without compatibility state**.
 
 ## Current next increment
 
-Decision 0137 authorizes the inspect-decide-refit transition. The current implementation exposes
-post-fit `refit()` and explicit `validation_report()`, reusing defensive read-only copies of the
-exact materialized split indices. It no longer exposes constructor `refit`, selected fitted-model
-attributes, or search-level prediction/transformation delegation. Constructor-selected report state
-remains temporarily. The next patch removes that remaining old lifecycle without compatibility
-machinery. Do not prepare or publish a package release during the transition.
+Decision 0137 now governs the implemented search surface. Post-fit `refit()` and explicit
+`validation_report()` reuse one selected-row resolver; reporting reuses defensive read-only copies
+of the exact materialized split indices. Search owns no selected row, report, fitted final model, or
+delegated model methods. The next patch migrates maintained examples, tutorial renderers, and final
+presentation to this lifecycle and performs the final stale-surface scan. Do not prepare or publish
+a package release before that migration is complete.
 
 ## Maintenance protocol
 
@@ -953,6 +950,6 @@ API1 is complete under Decision 0086. `PiPLSDecomposition` exposes descriptive f
 rank/solver diagnostics while the private core retains construction matrices. API2 is complete
 under Decision 0087: scorer state is private, exact weight aliases are removed, and
 `PiPLSSearchCV` retains `cv_results_`, concise immutable path/profile results, standard `best_*`
-attributes, `search_is_exhaustive_`, and `validation_report_` without execution-history or flat
+attributes, and `search_is_exhaustive_` without execution-history, selected report state, or flat
 OOF duplicates. Decision 0088 completes API3 by removing display-sign bookkeeping and redundant
 synthetic zero blocks and by suppressing constructor signatures for returned immutable records.

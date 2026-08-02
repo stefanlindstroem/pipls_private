@@ -54,7 +54,9 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
         expected[validation] = clone(_fixed()).fit(X[train], Y[train]).predict(X[validation])
 
     report = search.validation_report(X, Y, rule="best_score")
-    assert report.selected_result == search.selected_result_
+    assert report.selected_result == search.component_path_.for_n_components(
+        search.best_n_components_
+    )
     assert report.oof_predictions is not None
     assert report.oof_prediction_counts is not None
     np.testing.assert_allclose(report.oof_predictions, expected)
@@ -194,12 +196,6 @@ def test_oof_arrays_are_read_only_and_one_dimensional_targets_stay_one_dimension
     assert not report.oof_prediction_counts.flags.writeable
     with pytest.raises(ValueError, match="read-only"):
         report.oof_predictions[0] = 0.0
-
-
-def test_return_oof_predictions_requires_boolean() -> None:
-    X, Y = _data()
-    with pytest.raises(ValueError, match="return_oof_predictions must be boolean"):
-        PiPLSSearchCV(return_oof_predictions=1).fit(X, Y)  # type: ignore[arg-type]
 
 
 class _SingleUseSplitter:

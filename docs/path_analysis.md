@@ -284,10 +284,8 @@ attach the model to search state. Prediction, transformation, scoring, inverse t
 feature-name behavior belong to the returned model.
 
 Post-fit `refit()` and `validation_report()` use the same explicit rule-or-component selection
-contract and do not alter search state. During the staged pre-release transition, the current
-`selection_rule` and `return_oof_predictions` constructor controls still determine
-`selected_result_`, `selected_params_`, and `validation_report_`. The next cleanup increment removes that remaining
-constructor-selected report surface.
+contract and do not alter search state. The search stores candidate evidence and reusable split
+indices, but no selected row, report, or fitted final model.
 
 ## Search and model diagnostics
 

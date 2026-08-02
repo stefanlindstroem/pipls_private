@@ -90,8 +90,10 @@ Candidate selection always maximizes `mean_test_score`. With the default scorer,
 to minimizing mean response-standardized CV-MSE. With a custom scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 
-Use `mean_test_score` and `best_score_` for the global configured-score optimum. Inspect
-`selected_result_` for the row chosen by `selection_rule`. See
+Use `mean_test_score` and `best_score_` for the global configured-score optimum. Use
+`component_path_.minimum_cv_mse_result()` or `component_path_.one_standard_error_result()` for the
+corresponding CV-MSE recommendations. A final model is returned directly by `refit()` and is not
+stored on the search. See
 [Scoring and the best evaluated pair](path_analysis.md#scoring-and-the-best-evaluated-pair).
 
 ## A grouped splitter reports missing metadata

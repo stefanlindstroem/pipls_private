@@ -401,31 +401,25 @@ def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> No
     assert best_model.n_components != minimum_model.n_components
 
 
-def test_constructor_selection_and_post_fit_operations_are_temporarily_independent() -> None:
+def test_post_fit_operations_create_no_selected_search_state() -> None:
     X, Y = _one_standard_error_data()
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
         search_method="optimal",
-        selection_rule="one_standard_error",
         cv=4,
-        return_oof_predictions=True,
         n_jobs=1,
     ).fit(X, Y)
 
-    expected_report = search.component_path_.one_standard_error_result()
-    assert search.selected_result_ == expected_report
-    assert search.validation_report_.selected_result is search.selected_result_
-    assert search.validation_report_.oof_predictions is not None
+    report = search.validation_report(X, Y, rule="one_standard_error")
+    model = search.refit(X, Y, rule="one_standard_error")
+    expected = search.component_path_.one_standard_error_result()
 
-    report = search.validation_report(X, Y, rule="best_score")
-    model = search.refit(X, Y, rule="best_score")
-    assert report.n_components == search.best_n_components_
-    assert report.predictor_rank == search.best_predictor_rank_
-    assert model.n_components == search.best_n_components_
-    assert model.predictor_rank == search.best_predictor_rank_
-    assert search.selected_result_ == expected_report
-    assert search.validation_report_.selected_result == expected_report
+    assert report.selected_result == expected
+    assert model.n_components == expected.n_components
+    assert model.predictor_rank == expected.predictor_rank
+    for name in ("selected_result_", "selected_params_", "validation_report_"):
+        assert not hasattr(search, name)
 
 
 def test_post_fit_refit_requires_exactly_one_selection_input() -> None:
@@ -806,7 +800,6 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         ("predictor_rank_values", [1.0], "positive integer"),
         ("predictor_rank_values", "maximum", "must be None"),
         ("n_jobs", 0, "must not be zero"),
-        ("selection_rule", "smallest", "selection_rule"),
     ],
 )
 def test_invalid_public_controls_are_rejected(

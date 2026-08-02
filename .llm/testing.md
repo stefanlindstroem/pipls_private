@@ -60,10 +60,10 @@ contract, such as the package exposing no plotting API, optional rendering libra
 outside runtime dependencies, or repository datasets remaining outside top-level exports. Do not
 turn every pre-release deletion into a permanent executable tombstone.
 
-## Inspect-decide-refit transition
+## Inspect-decide-refit lifecycle
 
-Decision 0137 changes ownership rather than numerical selection. Tests for the staged transition
-should protect these durable behaviors:
+Decision 0137 changes ownership rather than numerical selection. Tests protect these durable
+behaviors:
 
 - a fitted search exposes candidate evidence and immutable path/profile views;
 - post-fit `refit()` accepts exactly one named rule or one component count, returns a fitted clone of
@@ -82,9 +82,9 @@ The explicit report stage must additionally test single-use splitters, defensive
 copies, unchanged scorer-call counts, one-dimensional response shape, repeated and partial coverage,
 shape mismatch rejection, warning boundaries, and search-state immutability.
 
-During the transition, test each implemented stage without treating the temporary coexistence of
-old and new lifecycles as a permanent contract. At final cleanup, prefer positive constructor and
-method-surface tests over one historical tombstone assertion per removed name.
+The final surface should be tested through positive constructor and method contracts plus one
+compact assertion that removed pre-release constructor controls are rejected. Do not accumulate one
+historical tombstone test per removed fitted attribute.
 
 ## Rendering validation boundary
 

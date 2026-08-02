@@ -2,18 +2,18 @@
 
 ## Status
 
-Accepted. Implementation is in progress.
+Accepted. The public search lifecycle is implemented; maintained-example migration remains.
 
 ## Context
 
-`PiPLSSearchCV` currently requires the final selection rule and refit policy to be declared before
-`fit()`. That follows the general `GridSearchCV` pattern, but it works against a central Pi-PLS use
-case: users often need to inspect the component path and one or more conditional predictor-rank
-profiles before choosing the final model.
+Before this decision, `PiPLSSearchCV` required the final selection rule and refit policy to be
+declared before `fit()`. That followed the general `GridSearchCV` pattern, but worked against a
+central Pi-PLS use case: users often need to inspect the component path and one or more conditional
+predictor-rank profiles before choosing the final model.
 
-The current constructor-time lifecycle also couples path evaluation, selected-row bookkeeping,
-optional out-of-fold (OOF) reporting, full-data refitting, and model delegation on one object. The
-result is more state and more conditional behavior than a pre-release package needs.
+That constructor-time lifecycle also coupled path evaluation, selected-row bookkeeping, optional
+out-of-fold (OOF) reporting, full-data refitting, and model delegation on one object. The result was
+more state and more conditional behavior than a pre-release package needs.
 
 The package remains unreleased at version `0.0.0`. No compatibility layer is required for the
 current constructor controls or fitted selected-model attributes.
@@ -60,11 +60,10 @@ report = search.validation_report(X, Y, n_components=4)
 splits materialized by `fit()`, returns an immutable `PiPLSValidationReport`, and does not perform a
 full-data refit or mutate the search object.
 
-When this transition is complete, remove the constructor parameters `selection_rule`, `refit`, and
-`return_oof_predictions`; remove `selected_result_`, `selected_params_`, `validation_report_`,
-`selected_estimator_`, `selected_pipls_`, and `refit_time_`; and remove search-level prediction,
-transformation, scoring, inverse-transformation, and feature-name delegation. The fixed estimator
-or returned pipeline owns fitted-model behavior.
+Remove the former constructor-time selection, refit, and OOF controls; remove selected-row and
+selected-model fitted state from the search; and remove search-level prediction, transformation,
+scoring, inverse-transformation, and feature-name delegation. The fixed estimator or returned
+pipeline owns fitted-model behavior.
 
 Retain `cv_results_`, `component_path_`, `predictor_rank_profile()`, `best_index_`, `best_score_`,
 `best_params_`, `best_n_components_`, `best_predictor_rank_`, `search_is_exhaustive_`, and
@@ -75,16 +74,14 @@ Implement the transition in reviewable stages: add `refit()`, add explicit valid
 remove the remaining old lifecycle, then migrate examples and final presentation. Public user
 documentation describes the implemented stage rather than claiming unfinished behavior.
 
-The original staging expected the constructor boolean `refit` and the post-fit method `refit()` to
-coexist temporarily. That is not a valid scikit-learn estimator surface: constructor parameters are
-stored as same-named instance attributes, so the boolean would shadow the method. The patch that
-adds post-fit `refit()` therefore also removes the constructor boolean, selected fitted-model state,
-and search-level fitted-model delegation. Constructor-time `selection_rule` and
-`return_oof_predictions` remained temporarily because they still owned selected-row reporting until
-explicit `validation_report()` was implemented. That method now reuses defensive read-only copies of
-the exact materialized split indices, always returns ordered OOF predictions and counts, performs no
-candidate rescoring or full-data fit, and leaves the search unchanged. Constructor-selected report
-state remains only until the next cleanup patch removes the old lifecycle in one coherent increment.
+The original staging expected the constructor boolean for automatic refitting and the post-fit
+`refit()` method to coexist temporarily. That is not a valid scikit-learn estimator surface:
+constructor parameters are stored as same-named instance attributes, so the boolean would shadow
+the method. Post-fit `refit()` therefore arrived together with removal of constructor refitting,
+selected fitted-model state, and search-level fitted-model delegation. Explicit
+`validation_report()` then replaced constructor-owned OOF reporting and reuses defensive read-only
+copies of the exact materialized split indices. The final cleanup removed all remaining
+constructor-selected report state without aliases or deprecation machinery.
 
 Do not add aliases, deprecation warnings, ignored constructor arguments, fallback attributes, or
 serialization migrations for the removed pre-release surface.
@@ -114,5 +111,5 @@ otherwise remain in force.
 - The returned model remains an ordinary `PiPLSRegression` or user-supplied pipeline rather than a
   search object with delegated fitted-model methods.
 - Search objects do not retain potentially large or sensitive training matrices.
-- The staged implementation may temporarily retain constructor-selected report state alongside
-  post-fit model refitting, but the completed version contains no legacy compatibility surface.
+- The completed public search surface contains no compatibility aliases, ignored arguments, or
+  constructor-selected report state.

@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Complete the no-legacy `PiPLSSearchCV` lifecycle cleanup: remove constructor-time final-selection
+  and OOF controls together with selected-row/report fitted state. Search fitting now produces only
+  candidate evidence and immutable path/profile views; `refit()` and `validation_report()` make all
+  final choices explicitly after inspection.
 - Add explicit post-fit `PiPLSSearchCV.validation_report(X, y, rule=... or n_components=...)`,
   reusing defensive read-only copies of the exact validation splits materialized by `fit()` to
   produce ordered selection-conditioned OOF predictions without rescoring candidates, fitting a

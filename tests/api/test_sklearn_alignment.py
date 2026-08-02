@@ -56,8 +56,8 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert path.cv == 5
     assert path.n_components_values == "all"
     assert path.scoring == "neg_response_standardized_mse"
-    assert path.selection_rule == "best_score"
     assert callable(path.refit)
+    assert callable(path.validation_report)
 
 
 def test_path_defaults_have_stable_signature_and_repr() -> None:
@@ -67,13 +67,15 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
         "neg_response_standardized_mse"
     )
     assert "refit" not in signature.parameters
-    assert signature.parameters["selection_rule"].default == "best_score"
+    assert "selection_rule" not in signature.parameters
+    assert "return_oof_predictions" not in signature.parameters
     assert "0x" not in str(signature)
     path = PiPLSSearchCV()
+    cloned = clone(path)
     assert repr(path) == "PiPLSSearchCV()"
-    assert clone(path).scoring == path.scoring
-    assert clone(path).selection_rule == "best_score"
-    assert callable(clone(path).refit)
+    assert cloned.scoring == path.scoring
+    assert callable(cloned.refit)
+    assert callable(cloned.validation_report)
 
 
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
@@ -101,12 +103,17 @@ def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
         "n_components_values",
         "n_jobs",
         "predictor_rank_values",
-        "return_oof_predictions",
         "samples_per_predictor_rank",
         "scoring",
-        "selection_rule",
         "search_method",
     }
+
+
+def test_removed_constructor_selection_controls_are_not_accepted() -> None:
+    with pytest.raises(TypeError, match="selection_rule"):
+        PiPLSSearchCV(selection_rule="best_score")  # type: ignore[call-arg]
+    with pytest.raises(TypeError, match="return_oof_predictions"):
+        PiPLSSearchCV(return_oof_predictions=True)  # type: ignore[call-arg]
 
 
 def test_path_output_configuration_belongs_to_estimator_template() -> None:
@@ -259,8 +266,8 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
 
     assert search.best_n_components_ == 2
     assert search.best_predictor_rank_ == 3
-    assert search.selected_result_.n_components == 2
-    assert search.selected_result_.predictor_rank == 3
+    selected = search.component_path_.for_n_components(2)
+    assert selected.predictor_rank == 3
     assert isinstance(model, PiPLSRegression)
     np.testing.assert_allclose(model.predict(X), direct.predict(X))
     np.testing.assert_allclose(model.coef_, direct.coef_)

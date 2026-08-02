@@ -24,10 +24,8 @@ problems, see [Troubleshooting](../troubleshooting.md).
 `cv_results_` is the complete candidate-level record. `component_path_` and
 `predictor_rank_profile()` provide concise immutable views. Standard `best_*` attributes identify
 the global configured-score optimum. Post-fit `refit()` and `validation_report()` make independent
-explicit selections and do not alter search state. During the staged pre-release transition, the
-temporary constructor `selection_rule` and `return_oof_predictions` controls still determine
-`selected_result_`, `selected_params_`, and `validation_report_`. The next cleanup increment removes that remaining
-constructor-selected report surface.
+explicit selections and do not alter search state. No final selection or validation report is
+stored on the search object.
 Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
@@ -172,9 +170,6 @@ response-column counts as the fitted search. The report's `n_components`, `predi
 `n_splits`, `mean_test_score`, and `cv_mse_mean` properties are read-only views of its immutable
 `selected_result`; `is_selection_conditioned` and `has_complete_oof_coverage` expose provenance and
 coverage as predicates.
-
-During the staged Decision 0137 transition, constructor-selected `validation_report_` remains
-temporarily available. New code should use the explicit method.
 
 ::: pipls.PiPLSValidationReport
     options:

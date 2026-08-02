@@ -57,7 +57,6 @@ IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
-SelectionRule = Literal["best_score", "one_standard_error"]
 RefitRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
@@ -82,9 +81,7 @@ class PiPLSSearchCV(
     Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
     independently inside each training fold. Final full-data fitting and
     selection-conditioned out-of-fold reporting are explicit post-fit
-    :meth:`refit` and :meth:`validation_report` operations. During the staged
-    pre-release transition, a declared constructor selection rule also chooses
-    one stored path row for ``validation_report_``. The default
+    :meth:`refit` and :meth:`validation_report` operations. The default
     ``search_method="auto"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
     for each paired-mode count.
@@ -127,19 +124,8 @@ class PiPLSSearchCV(
         Scikit-learn scorer name, scorer callable, or ``None`` to use estimator
         ``score``. The package-specific default name resolves to
         :func:`pipls.metrics.neg_response_standardized_mse`.
-    selection_rule : {"best_score", "one_standard_error"}, default="best_score"
-        Rule used to choose the component-path row represented by
-        ``selected_result_``, ``selected_params_``, and ``validation_report_``.
-        ``"best_score"`` uses the globally best evaluated pair under ``scoring``.
-        ``"one_standard_error"`` uses
-        :meth:`PiPLSComponentPath.one_standard_error_result`, retaining the
-        predictor rank already selected conditionally for that paired-mode count.
     n_jobs : int or None, default=None
         Joblib parallelism across candidate pairs within each evaluation batch.
-    return_oof_predictions : bool, default=False
-        Whether to fit the selected fixed parameterization on every training fold
-        and retain row-ordered validation predictions. Repeated predictions are
-        averaged and rows never validated are marked with NaN.
 
     Attributes
     ----------
@@ -180,14 +166,6 @@ class PiPLSSearchCV(
         Selected predictor rank.
     best_params_ : dict of str to int
         Parameters required to configure the supplied estimator or pipeline.
-    selected_result_ : PiPLSComponentResult
-        Immutable component-path row chosen by ``selection_rule``.
-    selected_params_ : dict of str to int
-        Parameters required to configure the supplied estimator or pipeline for
-        ``selected_result_``.
-    validation_report_ : PiPLSValidationReport
-        Immutable summary of ``selected_result_`` and optional ordered OOF
-        predictions for that fixed parameterization.
     """
 
     def __init__(
@@ -201,9 +179,7 @@ class PiPLSSearchCV(
         samples_per_predictor_rank: float = 5.0,
         cv: object = 5,
         scoring: Scoring = _DEFAULT_SCORING_NAME,
-        selection_rule: SelectionRule = "best_score",
         n_jobs: int | None = None,
-        return_oof_predictions: bool = False,
     ) -> None:
         self.estimator = estimator
         self.n_components_values = n_components_values
@@ -213,9 +189,7 @@ class PiPLSSearchCV(
         self.samples_per_predictor_rank = samples_per_predictor_rank
         self.cv = cv
         self.scoring = scoring
-        self.selection_rule = selection_rule
         self.n_jobs = n_jobs
-        self.return_oof_predictions = return_oof_predictions
 
     def fit(
         self,
@@ -224,7 +198,7 @@ class PiPLSSearchCV(
         *,
         groups: ArrayLike | None = None,
     ) -> PiPLSSearchCV:
-        """Evaluate the path and construct selected-row diagnostics.
+        """Evaluate the admissible Pi-PLS rank path.
 
         Parameters
         ----------
@@ -289,12 +263,6 @@ class PiPLSSearchCV(
         _validate_singleton_fold_scoring(self.scoring, self._cv_splits_)
         self.n_splits_ = len(self._cv_splits_)
         self.cv_n_train_min_ = materialized.n_train_min
-        if self.selection_rule == "one_standard_error" and self.n_splits_ < 2:
-            raise ValueError(
-                'selection_rule="one_standard_error" requires at least two '
-                "validation splits."
-            )
-
         fold_feature_limit, fold_numerical_rank_limit = _fold_predictor_limits(
             template=template,
             X=X_indexable,
@@ -436,52 +404,6 @@ class PiPLSSearchCV(
             conditional_indices=np.asarray(conditional_indices, dtype=np.intp),
             predictor_rank_policy=predictor_rank_policy,
             n_splits=self.n_splits_,
-        )
-        if self.selection_rule == "best_score":
-            self.selected_result_ = self.component_path_.for_n_components(
-                self.best_n_components_
-            )
-        else:
-            self.selected_result_ = self.component_path_.one_standard_error_result()
-        self.selected_params_ = {
-            n_components_key: self.selected_result_.n_components,
-            predictor_rank_key: self.selected_result_.predictor_rank,
-        }
-
-        predictions: FloatArray | None = None
-        counts: IntArray | None = None
-        pooled_r2: float | None = None
-        if self.return_oof_predictions:
-            oof = _ordered_oof_predictions(
-                candidate=_PiPLSCandidate(
-                    n_components=self.selected_result_.n_components,
-                    predictor_rank=self.selected_result_.predictor_rank,
-                ),
-                template=template,
-                n_components_key=n_components_key,
-                predictor_rank_key=predictor_rank_key,
-                X=X_indexable,
-                y=y_indexable,
-                splits=self._cv_splits_,
-                n_jobs=self.n_jobs,
-                ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
-            )
-            oof_predictions, counts = oof
-            predictions = (
-                oof_predictions[:, 0] if y_array.ndim == 1 else oof_predictions
-            )
-            pooled_r2 = _pooled_oof_r2(y_indexable, predictions, counts)
-
-        self.validation_report_ = PiPLSValidationReport(
-            selected_result=self.selected_result_,
-            estimate_kind="selection-conditioned",
-            is_leave_one_out=_splits_are_leave_one_out(
-                self._cv_splits_,
-                n_samples=self._n_samples_fit_,
-            ),
-            oof_predictions=predictions,
-            oof_prediction_counts=counts,
-            pooled_oof_r2=pooled_r2,
         )
         return self
 
@@ -783,15 +705,6 @@ class PiPLSSearchCV(
     def _validate_constructor_parameters(self, template: Any) -> Scorer:
         if self.search_method not in ("optimal", "auto"):
             raise ValueError('search_method must be "optimal" or "auto".')
-        if self.selection_rule not in ("best_score", "one_standard_error"):
-            raise ValueError(
-                'selection_rule must be "best_score" or "one_standard_error".'
-            )
-        if not isinstance(self.return_oof_predictions, (bool, np.bool_)):
-            raise ValueError(
-                "return_oof_predictions must be boolean; "
-                f"got {self.return_oof_predictions!r}."
-            )
         samples_per_rank = _as_positive_float(
             self.samples_per_predictor_rank,
             name="samples_per_predictor_rank",

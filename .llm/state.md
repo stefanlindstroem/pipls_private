@@ -42,7 +42,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
   fold-based CV-MSE standard errors, and frozen scalar lookup through `component_path_`;
 - explicit post-fit full-data refitting and selection-conditioned OOF reporting from a named rule
   or manually chosen component-path row, with exact split reuse and global `best_*` evidence kept
-  separate from temporary constructor-selected report state;
+  separate from each post-fit choice;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
   `predictor_rank_profile(n_components)`, derived from `cv_results_`;
 - a literal-matrix first example showing one fixed fit, prediction, and decomposition plot without CV;
@@ -230,11 +230,10 @@ case, or public behavior.
 | Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
 | Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
 | Selection score | stable package string `"neg_response_standardized_mse"` by default, resolving to the public callable; sklearn scorer names, callables, and `None` accepted |
-| Temporary report-row selection | constructor `selection_rule="best_score"` by default; explicit `"one_standard_error"` selects the row represented by `selected_result_` and `validation_report_` |
 | Final refit | post-fit `search.refit(X, y, rule=...)` or `search.refit(X, y, n_components=...)` returns a fitted clone without mutating search state |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
-| OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; temporary constructor opt-in remains until Patch 4 |
+| OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
 | Dataset namespace | optional immutable container and seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or loader required for fitting |
 | Repository datasets | comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
@@ -263,8 +262,7 @@ Additional fixed decisions:
   PLS-style fitted attributes remain top-level.
 - `PiPLSSearchCV` is a path evaluator rather than a delegated fitted model. Post-fit `refit()`
   requires exactly one named rule or one component count, returns a fitted clone, and leaves search
-  evidence unchanged. `best_*` remains the global configured-score optimum, while the temporary
-  `selected_result_` records the constructor-selected best-score or 1-SE report row. Output-container
+  evidence unchanged. `best_*` remains the global configured-score optimum. Output-container
   configuration remains carried by the estimator template and returned clone.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
@@ -369,16 +367,16 @@ package-level use case and pass the source-level licensing gate before implement
 
 ## Recent completed increments
 
-Decisions 0107--0116 are complete. The path result methods remain non-mutating stored-row
-inspection. `PiPLSSearchCV` retains separate global `best_*` and declared `selected_result_`
-contracts, and `PiPLSRegression` remains fixed-pair only.
+Decisions 0107--0116 are complete and partly superseded by Decision 0137. Path result methods remain
+non-mutating stored-row inspection, `PiPLSSearchCV` retains global `best_*` evidence without a
+declared final row, and `PiPLSRegression` remains fixed-pair only.
 
 The six owner-authorized simplifications are complete. Search inputs are resolved once;
 decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction
 diagnostics are derived from independent state; path-wide metadata and profile selection are not
-duplicated; and `PiPLSValidationReport` composes the same immutable `PiPLSComponentResult` exposed
-as `selected_result_` while preserving its existing convenience attributes. No package release
-preparation or Python-package publication work is authorized.
+duplicated; and `PiPLSValidationReport` composes an immutable `PiPLSComponentResult` while
+preserving its convenience properties. No package release preparation or Python-package publication
+work is authorized.
 A follow-up behavior-preserving audit cleanup removes the now-unused private finite-vector
 inspection helper and the no-op reassignment of the already validated selected result.
 
@@ -450,10 +448,10 @@ its pre-release fields to `predictor_directions` and `response_directions` witho
 aliases. Standard PLS-style `x_rotations_` and `y_rotations_` remain fitted estimator attributes and
 reference the same read-only arrays.
 
-## Authorized inspect-decide-refit transition
+## Implemented inspect-decide-refit lifecycle
 
-Decision 0137 is accepted and partially implemented. `PiPLSSearchCV` now exposes explicit post-fit
-full-data refitting:
+Decision 0137 governs the implemented `PiPLSSearchCV` lifecycle. The search exposes explicit
+post-fit full-data refitting:
 
 ```python
 search = PiPLSSearchCV(cv=cv).fit(X, Y)
@@ -475,18 +473,17 @@ a full-data model, and leaves the search unchanged. The supplied data must have 
 feature, and response-column shape and remain in the original row order; the search retains indices,
 not values.
 
-Constructor `selection_rule`, `return_oof_predictions`, `selected_result_`, `selected_params_`, and
-`validation_report_` remain temporarily. The completed series removes that remaining surface without
-aliases or deprecation machinery.
+The remaining constructor-time selection and OOF controls and selected report state are removed.
+The search surface now contains only candidate evidence, immutable path/profile inspection, exact
+stored splits for explicit follow-up reporting, and the two post-fit operations.
 
 ## Current next increment
 
-The next implementation increment removes the remaining constructor-time selection and OOF controls,
-selected report state, and transitional documentation. It preserves explicit `refit()`, explicit
-`validation_report()`, search evidence, and immutable path/profile results.
+The next implementation increment migrates maintained examples, tutorial renderers, and final
+presentation to use `search.refit(...)` wherever they currently transfer a selected rank pair into a
+new fixed estimator manually. It also performs the final repository-wide stale-surface scan.
 
-Public documentation must describe the implemented transitional surface precisely. Do not prepare
-or publish a package release during the transition.
+Do not prepare or publish a package release before that final presentation migration is complete.
 
 Future datasets still require a distinct package-level use case and verified source-level
 redistribution rights. Block-aware scaling still requires a separate owner decision.

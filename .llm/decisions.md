@@ -165,8 +165,7 @@ plan contains an earlier or more general proposal:
 - the implemented search now performs final full-data fitting only through post-fit `refit()` and
   exposes no constructor boolean, selected fitted-model state, or delegated model methods;
   explicit post-fit `validation_report()` now reuses exact stored split indices without rescoring
-  candidates or mutating search; constructor `selection_rule` and `return_oof_predictions` remain
-  temporarily until the next no-legacy cleanup;
+  candidates or mutating search; constructor-selected report controls and state are removed;
 - the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
 - `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
 - the samples-per-rank support term uses the total number of observations supplied to `fit()`,
@@ -249,8 +248,8 @@ plan contains an earlier or more general proposal:
   the stored 1-SE recommendation explicitly and fits the returned component-count/predictor-rank
   pair;
 - fold SD remains stored descriptive dispersion; maintained CV-MSE figures use the derived
-  fold-based standard error. Maintained examples keep component choice visible, while an explicit
-  `selection_rule` may automate a protocol declared before fitting;
+  fold-based standard error. Maintained examples keep component choice visible, while a named
+  post-fit rule may automate the final choice after path evaluation;
 - example 04 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
   dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with Pulp exposing
   the conditional predictor-rank profile and Tobacco preserving full-SVD spectral plots,

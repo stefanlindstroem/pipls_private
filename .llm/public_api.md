@@ -169,15 +169,13 @@ candidate rescoring nor a full-data fit. It validates the fitted sample, feature
 shape but cannot compare values; callers must preserve original row alignment. The search stores the
 split indices but not supplied training matrices or returned reports.
 
-Public path attributes currently include standard candidate-level search results in `cv_results_`,
-global `best_*` selection attributes, `selected_result_`, `selected_params_`,
-`search_is_exhaustive_`, the immutable transitional `validation_report_`, and the canonical immutable
-`component_path_` result. During the Decision 0137 transition, constructor `selection_rule` and
-`return_oof_predictions` still choose and populate that stored report row. They do not affect later
-explicit `refit()` or `validation_report()` calls and are removed in Patch 4. The report composes one
-immutable `PiPLSComponentResult`; its `n_components`, `predictor_rank`, `n_splits`,
-`mean_test_score`, and `cv_mse_mean` properties forward to that result rather than duplicating state.
-`is_selection_conditioned` and `has_complete_oof_coverage` expose provenance and coverage predicates.
+Public path attributes include standard candidate-level search results in `cv_results_`, global
+`best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
+`component_path_` result. The search stores no selected row, validation report, or fitted final
+model. `PiPLSValidationReport` composes one immutable `PiPLSComponentResult`; its `n_components`,
+`predictor_rank`, `n_splits`, `mean_test_score`, and `cv_mse_mean` properties forward to that result
+rather than duplicating state. `is_selection_conditioned` and `has_complete_oof_coverage` expose
+provenance and coverage predicates.
 
 Validated input grids, adaptive-search batch history, candidate counters, direct-rank parameter
 aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and supplied training matrices
@@ -222,8 +220,8 @@ negative MSE summaries, unsupported policy values, and inconsistent OOF coverage
 Generated documentation keeps these records returned-first by suppressing constructor signatures.
 
 Group-aware splitters and keyword-only `groups` belong to `PiPLSSearchCV.fit`, not to the fixed
-estimator. Explicit selection-conditioned reporting belongs to `PiPLSSearchCV.validation_report()`.
-The temporary constructor report controls remain only until Patch 4 removes them.
+estimator. Explicit selection-conditioned reporting belongs to `PiPLSSearchCV.validation_report()`;
+no report is constructed or attached during search fitting.
 
 ## E1 dataset and synthetic-data API
 

@@ -17,13 +17,13 @@
   fitted attributes, feature names, and scalar `score()` on fitted model estimators. Search objects
   own evidence and do not delegate fitted-model methods.
 - Keep constructor arguments unchanged unless an accepted decision explicitly changes the public
-  lifecycle. Decision 0137 authorizes staged removal of constructor-time selection, refit, and OOF
-  controls; do not add aliases, ignored arguments, deprecation paths, or fallback state.
+  lifecycle. Decision 0137 removed constructor-time selection, refit, and OOF controls; do not add
+  aliases, ignored arguments, deprecation paths, or fallback state.
 - Keep the fixed numerical core independent from preprocessing, CV, datasets,
   and publication-specific workflows.
 - Reuse the shared private evaluation/search machinery rather than adding a second fold loop.
-- During the Decision 0137 transition, use one private selected-row resolver for post-fit refitting
-  and validation reporting. `refit()` returns a fitted estimator clone and does not mutate search
+- Use one private selected-row resolver for post-fit refitting and validation reporting. `refit()`
+  returns a fitted estimator clone and does not mutate search
   state or retain training data. `validation_report()` reuses the exact splits materialized by the
   search and does not perform a full-data fit.
 - Preserve current estimator-internal centering/scaling: fit its statistics inside every
