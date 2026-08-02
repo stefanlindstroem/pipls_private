@@ -159,10 +159,10 @@ estimator, preprocessing, fitted-state, and result contracts. `path_analysis.md`
 with stable interpretation anchors and without repeating elementary Matplotlib recipes. Example pages may describe script purpose and artifacts
 but must not reproduce the tutorial analysis or embed its generated figures.
 
-Decision 0140 authorizes a pending ownership refinement: `component_path_` remains aligned
-numerical evidence, while `search.select(rule=... or n_components=...)` becomes the sole public
-selected-row lookup shared conceptually with `refit()` and `validation_report()`. Until implementation
-lands, the existing path-level methods remain authoritative.
+Decision 0140 has implemented search-owned selected-row lookup:
+`search.select(rule=... or n_components=...)` now shares the same private resolver as `refit()` and
+`validation_report()`, while `component_path_` remains aligned numerical evidence. Existing
+path-level methods remain temporarily for consumer migration.
 
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
 `load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible

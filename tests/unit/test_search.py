@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pickle
 import warnings
+from dataclasses import FrozenInstanceError
 
 import numpy as np
 import pytest
@@ -303,6 +304,89 @@ def test_default_scorer_name_resolves_to_the_public_callable() -> None:
     )
 
 
+def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+    state_before = dict(search.__dict__)
+
+    selected = search.select(n_components=np.int64(2))
+    assert selected == search.component_path_.for_n_components(2)
+    assert search.select(rule="best_score") == search.component_path_.for_n_components(
+        search.best_n_components_
+    )
+    assert (
+        search.select(rule="minimum_cv_mse")
+        == search.component_path_.minimum_cv_mse_result()
+    )
+    assert (
+        search.select(rule="one_standard_error")
+        == search.component_path_.one_standard_error_result()
+    )
+    with pytest.raises(FrozenInstanceError):
+        selected.n_components = 99  # type: ignore[misc]
+
+    assert search.__dict__.keys() == state_before.keys()
+    for name, value in state_before.items():
+        assert search.__dict__[name] is value
+
+
+def test_post_fit_select_validates_selection_input_and_fitted_state() -> None:
+    X, Y = _data()
+    unfitted = PiPLSSearchCV()
+
+    with pytest.raises(NotFittedError):
+        unfitted.select(rule="best_score")
+
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2],
+        cv=3,
+    ).fit(X, Y)
+    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+        search.select()
+    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+        search.select(rule="best_score", n_components=1)
+    with pytest.raises(ValueError, match="rule must be"):
+        search.select(rule="smallest")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="was not evaluated"):
+        search.select(n_components=3)
+    with pytest.raises(ValueError, match="must be an integer"):
+        search.select(n_components=2.0)  # type: ignore[arg-type]
+
+
+def test_search_selection_does_not_call_transitional_path_methods(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    def fail(*args: object, **kwargs: object) -> None:
+        del args, kwargs
+        raise AssertionError("search selection called a transitional path method")
+
+    monkeypatch.setattr(PiPLSComponentPath, "for_n_components", fail)
+    monkeypatch.setattr(PiPLSComponentPath, "minimum_cv_mse_result", fail)
+    monkeypatch.setattr(PiPLSComponentPath, "one_standard_error_result", fail)
+
+    assert search.select(n_components=2).n_components == 2
+    assert search.select(rule="best_score").n_components == search.best_n_components_
+    assert np.isfinite(search.select(rule="minimum_cv_mse").cv_mse_mean)
+    assert np.isfinite(search.select(rule="one_standard_error").cv_mse_mean)
+    assert search.predictor_rank_profile(2).n_components == 2
+
+
 def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
@@ -352,11 +436,8 @@ def test_post_fit_refit_supports_component_path_rules() -> None:
     ).fit(X, Y)
 
     expected_by_rule = {
-        "best_score": search.component_path_.for_n_components(
-            search.best_n_components_
-        ),
-        "minimum_cv_mse": search.component_path_.minimum_cv_mse_result(),
-        "one_standard_error": search.component_path_.one_standard_error_result(),
+        rule: search.select(rule=rule)
+        for rule in ("best_score", "minimum_cv_mse", "one_standard_error")
     }
     for rule, expected in expected_by_rule.items():
         model = search.refit(X, Y, rule=rule)  # type: ignore[arg-type]
@@ -393,11 +474,15 @@ def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> No
         **search_kwargs,
         scoring=component_scorer,
     ).fit(X, Y)
+    best_selected = search.select(rule="best_score")
+    minimum_selected = search.select(rule="minimum_cv_mse")
     best_model = search.refit(X, Y, rule="best_score")
     minimum_model = search.refit(X, Y, rule="minimum_cv_mse")
 
-    assert best_model.n_components == favored_components
-    assert minimum_model.n_components == minimum_components
+    assert best_selected.n_components == favored_components
+    assert minimum_selected.n_components == minimum_components
+    assert best_model.n_components == best_selected.n_components
+    assert minimum_model.n_components == minimum_selected.n_components
     assert best_model.n_components != minimum_model.n_components
 
 
@@ -411,9 +496,9 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
+    expected = search.select(rule="one_standard_error")
     report = search.validation_report(X, Y, rule="one_standard_error")
     model = search.refit(X, Y, rule="one_standard_error")
-    expected = search.component_path_.one_standard_error_result()
 
     assert report.selected_result == expected
     assert model.n_components == expected.n_components
@@ -448,7 +533,7 @@ def test_post_fit_refit_requires_a_fitted_search() -> None:
         search.refit(X, Y, rule="best_score")
 
 
-def test_one_standard_error_refit_requires_two_validation_splits() -> None:
+def test_one_standard_error_operations_require_two_validation_splits() -> None:
     X, Y = _data()
     split = [(np.arange(24), np.arange(24, 36))]
     search = PiPLSSearchCV(
@@ -457,6 +542,8 @@ def test_one_standard_error_refit_requires_two_validation_splits() -> None:
         cv=split,
     ).fit(X, Y)
 
+    with pytest.raises(ValueError, match="at least two validation splits"):
+        search.select(rule="one_standard_error")
     with pytest.raises(ValueError, match="at least two validation splits"):
         search.refit(X, Y, rule="one_standard_error")
 
@@ -851,7 +938,7 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
             / np.sqrt(path.n_splits - 1)
         )
 
-    selected = path.for_n_components(search.best_n_components_)
+    selected = search.select(n_components=search.best_n_components_)
     assert selected.predictor_rank == search.best_predictor_rank_
     assert selected.mean_test_score == pytest.approx(search.best_score_)
 
@@ -905,7 +992,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
         profile.cv_mse_fold_sd,
         search.cv_results_["std_response_standardized_mse"][indices],
     )
-    assert profile.selected_result == search.component_path_.for_n_components(2)
+    assert profile.selected_result == search.select(n_components=2)
 
 
 def test_predictor_rank_profile_requires_fitted_evaluated_component_count() -> None:
@@ -956,8 +1043,8 @@ def test_component_path_records_predictor_rank_policy(
         )
 
     profile = search.predictor_rank_profile(2)
-    assert profile.selected_result.predictor_rank == search.component_path_.for_n_components(
-        2
+    assert profile.selected_result.predictor_rank == search.select(
+        n_components=2
     ).predictor_rank
     if expected_policy in {"fixed", "maximum"}:
         assert profile.predictor_rank.size == 1

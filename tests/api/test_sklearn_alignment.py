@@ -56,6 +56,7 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert path.cv == 5
     assert path.n_components_values == "all"
     assert path.scoring == "neg_response_standardized_mse"
+    assert callable(path.select)
     assert callable(path.refit)
     assert callable(path.validation_report)
 
@@ -74,6 +75,7 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     cloned = clone(path)
     assert repr(path) == "PiPLSSearchCV()"
     assert cloned.scoring == path.scoring
+    assert callable(cloned.select)
     assert callable(cloned.refit)
     assert callable(cloned.validation_report)
 

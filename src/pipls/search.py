@@ -57,7 +57,7 @@ IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
-RefitRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]
+SelectionRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING_NAME = "neg_response_standardized_mse"
@@ -71,6 +71,47 @@ def _default_pipls_template() -> PiPLSRegression:
     return PiPLSRegression(n_components=1, predictor_rank=1)
 
 
+def _component_result_for_n_components(
+    path: PiPLSComponentPath,
+    n_components: int,
+) -> PiPLSComponentResult:
+    """Return one stored component-path row by paired-mode count."""
+
+    if isinstance(n_components, bool) or not isinstance(
+        n_components,
+        (int, np.integer),
+    ):
+        raise ValueError(
+            "n_components must be an integer present in the fitted component path."
+        )
+    requested = int(n_components)
+    index = int(np.searchsorted(path.n_components, requested))
+    if index >= path.n_components.size or int(path.n_components[index]) != requested:
+        available = ", ".join(str(int(value)) for value in path.n_components)
+        raise ValueError(
+            f"n_components={requested} was not evaluated. Available values are "
+            f"[{available}]."
+        )
+    return path._result_at_index(index)
+
+
+def _minimum_cv_mse_result(path: PiPLSComponentPath) -> PiPLSComponentResult:
+    """Return the first stored path row with minimum mean CV-MSE."""
+
+    return path._result_at_index(int(np.argmin(path.cv_mse_mean)))
+
+
+def _one_standard_error_result(path: PiPLSComponentPath) -> PiPLSComponentResult:
+    """Return the smallest stored component count within one standard error."""
+
+    reference = _minimum_cv_mse_result(path)
+    threshold = reference.cv_mse_mean + reference.cv_mse_standard_error
+    if not np.isfinite(threshold):
+        raise ValueError("The one-standard-error threshold must be finite.")
+    eligible = np.flatnonzero(path.cv_mse_mean <= threshold)
+    return path._result_at_index(int(eligible[0]))
+
+
 class PiPLSSearchCV(
     MultiOutputMixin,  # type: ignore[misc]
     MetaEstimatorMixin,  # type: ignore[misc]
@@ -79,9 +120,10 @@ class PiPLSSearchCV(
     r"""Cross-validated search over the admissible Pi-PLS rank path.
 
     Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
-    independently inside each training fold. Final full-data fitting and
-    selection-conditioned out-of-fold reporting are explicit post-fit
-    :meth:`refit` and :meth:`validation_report` operations. The default
+    independently inside each training fold. Selection inspection, final
+    full-data fitting, and selection-conditioned out-of-fold reporting are
+    explicit post-fit :meth:`select`, :meth:`refit`,
+    and :meth:`validation_report` operations. The default
     ``search_method="auto"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
     for each paired-mode count.
@@ -407,12 +449,61 @@ class PiPLSSearchCV(
         )
         return self
 
+    def select(
+        self,
+        *,
+        rule: SelectionRule | None = None,
+        n_components: int | None = None,
+    ) -> PiPLSComponentResult:
+        """Return one immutable selected component-path result.
+
+        Exactly one of ``rule`` and ``n_components`` must be supplied. A named
+        rule selects one stored component-path row; a component count retrieves
+        that row directly. In every case, the returned predictor rank is the
+        rank already selected conditionally for the chosen component count.
+
+        Parameters
+        ----------
+        rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
+            Stored-row selection rule. ``"best_score"`` uses the global
+            configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
+            stored mean response-standardized CV-MSE, and
+            ``"one_standard_error"`` uses the smallest stored component count
+            within one fold-based standard error of that minimum.
+        n_components : int, optional
+            Evaluated paired-mode count to retrieve manually.
+
+        Returns
+        -------
+        PiPLSComponentResult
+            Immutable stored result for the selected paired-mode count and its
+            conditionally selected predictor rank.
+
+        Raises
+        ------
+        sklearn.exceptions.NotFittedError
+            If the search has not been fitted.
+        ValueError
+            If exactly one selection input is not supplied, a rule is invalid,
+            or the requested component count was not evaluated.
+
+        Notes
+        -----
+        The method performs no fitting or rescoring, does not mutate the search,
+        and does not attach selected state.
+        """
+
+        return self._resolve_selection_result(
+            rule=rule,
+            n_components=n_components,
+        )
+
     def refit(
         self,
         X: ArrayLike,
         y: ArrayLike,
         *,
-        rule: RefitRule | None = None,
+        rule: SelectionRule | None = None,
         n_components: int | None = None,
     ) -> Any:
         """Fit and return one selected path model on the supplied full data.
@@ -483,7 +574,7 @@ class PiPLSSearchCV(
         X: ArrayLike,
         y: ArrayLike,
         *,
-        rule: RefitRule | None = None,
+        rule: SelectionRule | None = None,
         n_components: int | None = None,
     ) -> PiPLSValidationReport:
         """Return selection-conditioned OOF diagnostics for one stored path row.
@@ -605,7 +696,7 @@ class PiPLSSearchCV(
     def _resolve_selection_result(
         self,
         *,
-        rule: RefitRule | None,
+        rule: SelectionRule | None,
         n_components: int | None,
     ) -> PiPLSComponentResult:
         """Resolve one stored component-path row without mutating search state."""
@@ -619,13 +710,19 @@ class PiPLSSearchCV(
                 "Exactly one of rule and n_components must be supplied."
             )
         if n_components is not None:
-            return self.component_path_.for_n_components(n_components)
+            return _component_result_for_n_components(
+                self.component_path_,
+                n_components,
+            )
         if rule == "best_score":
-            return self.component_path_.for_n_components(self.best_n_components_)
+            return _component_result_for_n_components(
+                self.component_path_,
+                self.best_n_components_,
+            )
         if rule == "minimum_cv_mse":
-            return self.component_path_.minimum_cv_mse_result()
+            return _minimum_cv_mse_result(self.component_path_)
         if rule == "one_standard_error":
-            return self.component_path_.one_standard_error_result()
+            return _one_standard_error_result(self.component_path_)
         raise ValueError(
             'rule must be "best_score", "minimum_cv_mse", or '
             '"one_standard_error".'
@@ -663,7 +760,10 @@ class PiPLSSearchCV(
         """
 
         check_is_fitted(self, attributes=["cv_results_", "component_path_", "n_splits_"])
-        selected = self.component_path_.for_n_components(n_components)
+        selected = _component_result_for_n_components(
+            self.component_path_,
+            n_components,
+        )
         rows = np.flatnonzero(
             cast(IntArray, self.cv_results_["n_components"]) == selected.n_components
         )

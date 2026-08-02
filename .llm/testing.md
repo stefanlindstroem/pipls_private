@@ -90,8 +90,8 @@ historical tombstone test per removed fitted attribute.
 
 ## Search-owned path-selection transition
 
-Decision 0140 stages a public ownership change without changing selection numerics. Patch 2 must
-protect:
+Decision 0140 stages a public ownership change without changing selection numerics. Patch 2 now
+protects:
 
 - fitted-state enforcement and exactly-one-of validation for `search.select(...)`;
 - parity among `select()`, `refit()`, and `validation_report()` for component counts and all three
@@ -103,8 +103,8 @@ protect:
 - invalid, unavailable, nonintegral, and insufficient-split failures;
 - unchanged behavior of the temporarily retained path-level methods.
 
-Patch 3 moves maintained consumer contracts to `search.select(...)`. Patch 4 removes the path-level
-methods and relocates their durable numerical tests to the search-selection boundary. Do not retain
+Patch 3 must move maintained consumer contracts to `search.select(...)`. Patch 4 removes the
+path-level methods and relocates their durable numerical tests to the search-selection boundary. Do not retain
 one tombstone test per removed method; use positive API-surface checks plus a compact active-surface
 audit.
 

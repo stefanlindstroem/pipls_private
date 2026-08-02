@@ -3,16 +3,17 @@
 Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
 `n_components` counts paired latent modes $h$; `predictor_rank` is the retained predictor-subspace
 dimension $r_\pi$. The [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path)
-shows the ordinary sequence: inspect `component_path_`, choose a paired-mode count, retrieve its
-conditional predictor rank, and fit a separate fixed estimator.
+shows the ordinary sequence: inspect `component_path_`, choose a paired-mode count, inspect the
+complete stored row with `search.select(...)`, and fit it with `search.refit(...)`.
 
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
 search object caps the path by the minimum predictor rank verified across those transformed folds.
-`PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Final full-data fitting
-is an explicit post-fit operation: `search.refit(X, Y, ...)` selects one stored component-path row,
-clones the configured estimator or pipeline, fits that clone, and returns it. Explicit
-`search.validation_report(X, Y, ...)` selects a row through the same rules and produces ordered OOF
+`PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Explicit post-fit
+`search.select(...)` returns one immutable stored component-path row without fitting.
+`search.refit(X, Y, ...)` resolves the same row, clones the configured estimator or pipeline, fits
+that clone, and returns it. `search.validation_report(X, Y, ...)` selects a row through the same
+rules and produces ordered OOF
 diagnostics from the exact validation splits materialized by `fit()`. The search object does not
 delegate model methods or retain the returned estimator or supplied training matrices.
 
@@ -23,9 +24,9 @@ problems, see [Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. `component_path_` and
 `predictor_rank_profile()` provide concise immutable views. Standard `best_*` attributes identify
-the global configured-score optimum. Post-fit `refit()` and `validation_report()` make independent
-explicit selections and do not alter search state. No final selection or validation report is
-stored on the search object.
+the global configured-score optimum. Post-fit `select()`, `refit()`, and `validation_report()` use
+the same selection vocabulary and do not alter search state. No final selection or validation
+report is stored on the search object.
 Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
@@ -35,13 +36,14 @@ response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 | Situation | Workflow |
 |---|---|
 | Both ranks are already known | Fit `PiPLSRegression` directly |
-| Choose a component count after inspecting the path | Fit `PiPLSSearchCV`, inspect the path, then call `search.refit(X, Y, n_components=h)` |
+| Inspect one selected row without fitting | Call `search.select(rule=... or n_components=h)` |
+| Choose a component count after inspecting the path | Call `search.refit(X, Y, n_components=h)` |
 | Apply an automatic final rule | Call `search.refit(X, Y, rule=...)` after path evaluation |
 | Inspect OOF diagnostics for one selected row | Call `search.validation_report(X, Y, rule=... or n_components=h)` |
 
-Both workflows use the same post-fit operation. Retaining `search` preserves the complete path and
-candidate evidence; the returned model owns prediction, transformation, scoring, and inspection of
-the final fixed fit.
+All three search-owned operations use the same stored-row vocabulary. Retaining `search` preserves
+the complete path and candidate evidence; the returned model owns prediction, transformation,
+scoring, and inspection of the final fixed fit.
 
 ## Inspect the path and fit one fixed model { #inspect-the-path-and-fit-one-fixed-model }
 
@@ -52,7 +54,7 @@ search = PiPLSSearchCV().fit(X, Y)
 path = search.component_path_
 
 CHOSEN_N_COMPONENTS = 2  # application-specific choice after inspecting the path
-selected = path.for_n_components(CHOSEN_N_COMPONENTS)  # optional scalar evidence
+selected = search.select(n_components=CHOSEN_N_COMPONENTS)  # optional scalar evidence
 
 model = search.refit(
     X,
@@ -61,8 +63,8 @@ model = search.refit(
 )
 ```
 
-This example shows the executable selection-to-fit contract. The scalar lookup is optional and
-useful for annotations or reports; `refit()` resolves the same stored row internally. The
+This example shows the executable selection-to-fit contract. `select()` is optional and useful for
+annotations or reports; `refit()` resolves the same stored row internally. The
 [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path) explains how to inspect
 and interpret the component path before making the application-specific choice.
 
@@ -112,6 +114,7 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
     options:
       members:
         - fit
+        - select
         - refit
         - validation_report
         - predictor_rank_profile
@@ -121,9 +124,10 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
 `component_path_` contains one conditionally selected predictor-rank result for each evaluated
 paired-mode count. Its aligned read-only arrays support complete path plots and comparisons without
 requiring manual masking of `cv_results_`. The predictor-rank policy and validation split count are
-stored once as path-wide scalars rather than repeated in every row. It also provides non-mutating methods that return the
-stored minimum-CV-MSE row or the conventional 1-SE row as complete `PiPLSComponentResult` objects.
-These methods inspect evaluated results only; they do not fit, refit, or change `best_*`. See
+stored once as path-wide scalars rather than repeated in every row. During the staged transition,
+the path still provides non-mutating row lookup and recommendation methods; new code should use
+`search.select(...)`. The transitional methods inspect evaluated results only; they do not fit,
+refit, or change `best_*`. See
 [Component-path recommendation methods](../path_analysis.md#result-object-recommendations) for the
 rule definitions and scope.
 
@@ -138,9 +142,9 @@ rule definitions and scope.
 
 ## One component result
 
-`component_path_.for_n_components(h)` returns the frozen scalar row for one evaluated paired-mode
-count, including its conditionally selected predictor rank, score, CV-MSE summary, policy, and
-split count.
+`search.select(n_components=h)` returns the frozen scalar row for one evaluated paired-mode count,
+including its conditionally selected predictor rank, score, CV-MSE summary, policy, and split count.
+The path-level lookup remains temporarily for migration parity and will be removed before release.
 
 ::: pipls.PiPLSComponentResult
     options:
@@ -151,7 +155,8 @@ split count.
 `predictor_rank_profile(h)` contains every predictor rank actually evaluated for one paired-mode
 count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks;
 its `selected_result` property derives the same conditionally selected scalar values returned by
-`component_path_` from the immutable candidate arrays and shared policy and split-count scalars.
+`search.select(n_components=h)` from the immutable candidate arrays and shared policy and
+split-count scalars.
 
 ::: pipls.PiPLSPredictorRankProfile
     options:

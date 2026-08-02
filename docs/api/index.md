@@ -27,8 +27,8 @@ predictor and response directions; they are distinct from reconstruction loading
 
 | Object | Obtained from | Main purpose |
 |---|---|---|
-| [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts and inspect minimum-CV-MSE or 1-SE result rows |
-| [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | explicit path lookup, a path recommendation method, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
+| [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
+| [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | `search.select(...)`, a transitional path lookup, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
 | [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
 | [`PiPLSValidationReport`](path.md#pipls.PiPLSValidationReport) | `search.validation_report(X, Y, ...)` | Inspect validation provenance, coverage, and selected-candidate diagnostics |
 | [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
@@ -41,10 +41,11 @@ predictor and response directions; they are distinct from reconstruction loading
 | [`PiPLSRegressionTruth`](datasets.md#pipls.datasets.PiPLSRegressionTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
 | [`PiPLSLatentGeometryTruth`](datasets.md#pipls.datasets.PiPLSLatentGeometryTruth) | `make_pipls_latent_geometry(...).truth` | Inspect the manuscript-oriented Gaussian latent geometry |
 
-`PiPLSComponentPath.minimum_cv_mse_result()` and
-`PiPLSComponentPath.one_standard_error_result()` return complete stored component rows for the two
-reference rules without fitting or mutating the path search. Their scope and scorer qualification
-are described under [result-object recommendations](../path_analysis.md#result-object-recommendations).
+`PiPLSSearchCV.select()` returns complete stored component rows by component count or by the
+`best_score`, `minimum_cv_mse`, and `one_standard_error` rules without fitting or mutating the
+search. The equivalent path-level methods remain temporarily during migration. Rule scope and
+scorer qualification are described under
+[result-object recommendations](../path_analysis.md#result-object-recommendations).
 
 Pulp is available as the named package-owned [`load_pulp()`](datasets.md#pipls.datasets.load_pulp)
 dataset. Sugarcane and Tobacco remain repository CSV assets; no generic dataset registry is part of

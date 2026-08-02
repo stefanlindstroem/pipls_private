@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation pending.
+Accepted; implementation in progress.
 
 ## Context
 
@@ -137,6 +137,13 @@ This decision refines Decisions 0066, 0107, 0111, and 0137 where they assign pub
 recommendation methods to `PiPLSComponentPath`. Their immutable path arrays, exact stored-value
 selection numerics, named rules, inspect-decide-refit lifecycle, and explicit validation-report
 contracts remain in force.
+
+## Implementation status
+
+Patch 2 is implemented. `PiPLSSearchCV.select()` is public, the shared rule type is
+`SelectionRule`, and `select()`, `refit()`, `validation_report()`, and predictor-rank profile
+composition use search-owned helpers rather than the path-level methods. The three path methods
+remain temporarily so maintained consumers can migrate in Patch 3 before removal in Patch 4.
 
 ## Consequences
 

@@ -226,31 +226,32 @@ shows the minimum row, horizontal threshold, and recommended row in the componen
 
 ### Result-object recommendations
 
-`PiPLSComponentPath` provides two non-mutating reference methods for these stored path choices:
+`PiPLSSearchCV.select()` returns complete immutable stored rows for these choices without fitting:
 
 ```python
-minimum = search.component_path_.minimum_cv_mse_result()
-one_se = search.component_path_.one_standard_error_result()
+minimum = search.select(rule="minimum_cv_mse")
+one_se = search.select(rule="one_standard_error")
+manual = search.select(n_components=3)
 ```
 
-Both methods return a complete immutable `PiPLSComponentResult`. `minimum_cv_mse_result()` returns
-the first stored row attaining the exact minimum mean CV-MSE. Because component counts are stored in
-strictly ascending order, an exact tie returns the smallest tied count.
-`one_standard_error_result()` returns the first stored row satisfying the 1-SE threshold above.
-It requires at least two validation splits so that the reference-row standard error is defined.
+The minimum rule returns the first stored row attaining the exact minimum mean CV-MSE. Because
+component counts are stored in strictly ascending order, an exact tie returns the smallest tied
+count. The 1-SE rule returns the first stored row satisfying the threshold above and requires at
+least two validation splits so that the reference-row standard error is defined.
 
 The associated predictor rank is the rank already selected conditionally for that component count
-under the configured scorer. The methods do not revisit the predictor-rank profile, fit or refit an
+under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an
 estimator, mutate the search object, or alter `best_*`. With a nondefault scorer, the stored
-predictor rank need not minimize CV-MSE within its component-count profile. The returned rows can be
-used directly for user judgment or by the explicit path-level selection rule described below.
+predictor rank need not minimize CV-MSE within its component-count profile. The transitional
+path-level recommendation and row-lookup methods remain available until maintained consumers
+migrate, but new code should use `search.select(...)`.
 
-The Tobacco workflow calls `one_standard_error_result()` explicitly to annotate the path figure,
+The Tobacco workflow still uses the transitional path methods during this implementation stage,
 then applies the same named rule independently through both `refit()` and `validation_report()`.
-The other maintained examples and tutorials retain explicit component choices. Conditional
-predictor-rank profiles use the same standard-error bars for scale, but the stored predictor rank
-for each component count continues to maximize the configured mean CV score rather than applying
-the 1-SE rule.
+The next migration patch moves its annotations and the other maintained scalar lookups to
+`search.select(...)`. Conditional predictor-rank profiles use the same standard-error bars for
+scale, but the stored predictor rank for each component count continues to maximize the configured
+mean CV score rather than applying the 1-SE rule.
 
 ## Post-fit final-model selection
 

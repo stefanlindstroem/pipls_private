@@ -983,14 +983,14 @@ The target keeps `PiPLSComponentPath` as aligned numerical evidence and makes `s
 and `validation_report()` share one rule/component-count vocabulary. It changes no selection
 numerics, tie rules, fitting semantics, or OOF provenance.
 
-Current status: **Patch 1 established; implementation pending**. The current path methods remain the
-implemented public API until Patch 2 lands.
+Current status: **Patches 1 and 2 complete; migration pending**. `PiPLSSearchCV.select()` and the
+shared `SelectionRule` resolver are implemented. The path methods remain only as a temporary public
+parity surface.
 
 ## Current next increment
 
-Decision 0140 Patch 2 is the current next increment. It implements `PiPLSSearchCV.select()`, renames
-the shared rule alias to `SelectionRule`, and consolidates the resolver without yet removing the
-path-level methods.
+Decision 0140 Patch 3 is the current next increment. It migrates maintained examples, renderers,
+tests, and living documentation to `search.select(...)` without yet removing the path methods.
 
 Decision 0138 is fully implemented and no Pulp dataset-transition increment remains. No generic
 dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.

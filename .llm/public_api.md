@@ -154,6 +154,18 @@ the configured mean test score. Under the default scorer this is equivalent to m
 response-standardized MSE among evaluated candidates; adaptive search makes no claim about
 unevaluated admissible pairs.
 
+Explicit selected-row inspection is a post-fit operation:
+
+```python
+selected = search.select(rule="one_standard_error")
+selected = search.select(n_components=4)
+```
+
+The method requires exactly one selection input and returns one immutable stored
+`PiPLSComponentResult`. It performs no fitting, rescoring, split materialization, or mutation. The
+private `SelectionRule` vocabulary and search-owned resolver are shared with `refit()` and
+`validation_report()`.
+
 Explicit selection-conditioned OOF reporting is a post-fit operation:
 
 ```python
@@ -184,16 +196,11 @@ are not public fitted state. Advanced users can inspect aligned `cv_results_` co
 `PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
 `mean_test_score`, `cv_mse_mean`, and `cv_mse_fold_sd` arrays. The predictor-rank policy and number of
 validation splits are path-wide Python scalars. It derives the aligned read-only
-`cv_mse_standard_error` array from the stored population fold SD and shared split count.
-`for_n_components()` returns a frozen `PiPLSComponentResult` with the aligned scalar values and the
-same derived standard-error property. `minimum_cv_mse_result()` returns the first exact stored
-CV-MSE minimum, which is the smallest tied component count because path rows are strictly ascending.
-`one_standard_error_result()` returns the smallest stored component count not exceeding the minimum
-row's mean plus its standard error. Both methods return the complete aligned scalar row, including
-its already conditionally selected predictor rank; they do not fit, refit, mutate, apply numerical
-tolerances, or add stored state. The numeric predictor rank is present for every component count.
-The standard-error property and the one-standard-error method require at least two validation splits
-at the relevant row and raise explicitly when that quantity is undefined.
+`cv_mse_standard_error` array from the stored population fold SD and shared split count. New code
+retrieves one complete stored row through `search.select(...)`. The path-level
+`for_n_components()`, `minimum_cv_mse_result()`, and `one_standard_error_result()` methods remain
+temporarily for migration parity and preserve their exact stored-value, tie, standard-error, and
+error contracts until Patch 4 removes them.
 
 `best_index_`, `best_score_`, `best_params_`, `best_n_components_`, and
 `best_predictor_rank_` always describe the global configured-score optimum. They are search evidence,
@@ -206,18 +213,17 @@ template and is preserved through cloning; the path object adds no separate `set
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
 predictor ranks actually evaluated at `h`, sorted in ascending order. Its path-wide policy and split
 count are scalars, and its `selected_result` property derives the same conditionally selected scalar
-values as `component_path_.for_n_components(h)` from immutable candidate state. The profile does not
+values as `search.select(n_components=h)` from immutable candidate state. The profile does not
 add another fitted attribute or stored selected-row representation. It exposes an aligned read-only
 `cv_mse_standard_error` property derived by the same contract as the component path. Selection
 maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
 mean response-standardized CV-MSE.
 
-Decision 0140 authorizes a staged ownership change that is not yet implemented. The target adds
-`search.select(rule=... or n_components=...)` as the sole public selected-row lookup, renames the
-shared private rule vocabulary to `SelectionRule`, and removes `for_n_components()`,
-`minimum_cv_mse_result()`, and `one_standard_error_result()` from `PiPLSComponentPath` after
-maintained consumers migrate. Until the implementation patch lands, the path-level methods above
-remain the current public API and living user documentation must continue to describe them.
+Decision 0140 Patch 2 is implemented. `search.select(rule=... or n_components=...)` is the new
+search-owned selected-row lookup, the shared private rule vocabulary is `SelectionRule`, and
+selection inspection, refitting, validation reporting, and predictor-rank profile composition use
+search-owned helpers. The path-level methods remain temporarily until maintained consumers migrate
+in Patch 3 and are removed in Patch 4.
 
 All five top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSValidationReport`) validate direct

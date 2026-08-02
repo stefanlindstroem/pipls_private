@@ -520,14 +520,16 @@ The final boundary makes `component_path_` aligned numerical evidence only. `sel
 and `validation_report()` share exactly one rule/component-count vocabulary and one resolver.
 Selection numerics, tie behavior, final fitting, and OOF semantics do not change.
 
-Current status: **Patch 1 established; implementation pending**. Current path-level methods and
-living public documentation remain authoritative until Patch 2 implements `select()`.
+Current status: **Patches 1 and 2 complete; consumer migration pending**. `PiPLSSearchCV.select()`
+is implemented, uses the shared `SelectionRule` vocabulary, and shares search-owned helpers with
+`refit()`, `validation_report()`, and predictor-rank profile composition. The path-level methods
+remain temporarily for migration parity.
 
 ## Current next increment
 
-Decision 0140 Patch 2 is the current next increment: implement `PiPLSSearchCV.select()`, rename the
-shared rule type to `SelectionRule`, consolidate search-owned selection helpers, and add parity and
-immutability tests while temporarily retaining the current path-level methods.
+Decision 0140 Patch 3 is the current next increment: migrate maintained examples, tutorial
+renderers, tests, and living documentation from path-level selection calls to `search.select(...)`
+without yet removing the transitional methods.
 
 Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
 available in clean wheel and source-distribution installations, every maintained Pulp consumer uses
