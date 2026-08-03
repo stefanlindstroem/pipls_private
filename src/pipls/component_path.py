@@ -20,7 +20,11 @@ from .model_selection import _tied_score_mask
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
+SelectionRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]
 PredictorRankPolicy = Literal["optimized", "fixed", "maximum"]
+_ALLOWED_SELECTION_RULES = frozenset(
+    {"best_score", "minimum_cv_mse", "one_standard_error"}
+)
 _ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "maximum"})
 
 
@@ -46,6 +50,15 @@ class PiPLSComponentResult:
         Fold-based standard error of the mean response-standardized CV-MSE.
     n_splits : int
         Number of cross-validation splits.
+    rule : {"best_score", "minimum_cv_mse", "one_standard_error"} or None
+        Search-owned rule that produced this result. ``None`` denotes direct
+        lookup by component count.
+    reference_minimum : PiPLSComponentResult or None
+        Minimum-CV-MSE result used to derive a one-standard-error selection.
+        Defined only when ``rule="one_standard_error"``.
+    one_standard_error_threshold : float or None
+        Derived minimum-CV-MSE plus its fold-based standard error. Defined only
+        when ``rule="one_standard_error"``.
     """
 
     n_components: int
@@ -55,6 +68,8 @@ class PiPLSComponentResult:
     cv_mse_mean: float
     cv_mse_fold_sd: float
     n_splits: int
+    rule: SelectionRule | None = None
+    reference_minimum: PiPLSComponentResult | None = None
 
     def __post_init__(self) -> None:
         n_components = _positive_int(self.n_components, name="n_components")
@@ -76,6 +91,64 @@ class PiPLSComponentResult:
             name="cv_mse_fold_sd",
         )
         n_splits = _positive_int(self.n_splits, name="n_splits")
+        rule = (
+            None
+            if self.rule is None
+            else cast(
+                SelectionRule,
+                _literal_string(
+                    self.rule,
+                    name="rule",
+                    allowed=_ALLOWED_SELECTION_RULES,
+                ),
+            )
+        )
+        reference_minimum = self.reference_minimum
+        if reference_minimum is not None and not isinstance(
+            reference_minimum,
+            PiPLSComponentResult,
+        ):
+            raise TypeError(
+                "reference_minimum must be a PiPLSComponentResult or None."
+            )
+
+        if rule == "one_standard_error":
+            if reference_minimum is None:
+                raise ValueError(
+                    "reference_minimum is required for one-standard-error selection."
+                )
+            if reference_minimum.rule != "minimum_cv_mse":
+                raise ValueError(
+                    'reference_minimum must use rule="minimum_cv_mse".'
+                )
+            if reference_minimum.reference_minimum is not None:
+                raise ValueError("reference_minimum must not contain nested provenance.")
+            if reference_minimum.predictor_rank_policy != predictor_rank_policy:
+                raise ValueError(
+                    "reference_minimum must use the same predictor-rank policy."
+                )
+            if reference_minimum.n_splits != n_splits:
+                raise ValueError(
+                    "reference_minimum must use the same validation split count."
+                )
+            if reference_minimum.cv_mse_mean > cv_mse_mean:
+                raise ValueError(
+                    "reference_minimum CV-MSE must not exceed the selected CV-MSE."
+                )
+            threshold = (
+                reference_minimum.cv_mse_mean
+                + reference_minimum.cv_mse_standard_error
+            )
+            if not np.isfinite(threshold):
+                raise ValueError("The one-standard-error threshold must be finite.")
+            if cv_mse_mean > threshold:
+                raise ValueError(
+                    "Selected CV-MSE must not exceed the one-standard-error threshold."
+                )
+        elif reference_minimum is not None:
+            raise ValueError(
+                "reference_minimum is defined only for one-standard-error selection."
+            )
 
         object.__setattr__(self, "n_components", n_components)
         object.__setattr__(self, "predictor_rank", predictor_rank)
@@ -84,6 +157,8 @@ class PiPLSComponentResult:
         object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
         object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
         object.__setattr__(self, "n_splits", n_splits)
+        object.__setattr__(self, "rule", rule)
+        object.__setattr__(self, "reference_minimum", reference_minimum)
 
     @property
     def cv_mse_standard_error(self) -> float:
@@ -100,6 +175,19 @@ class PiPLSComponentResult:
             )
         return float(self.cv_mse_fold_sd / np.sqrt(self.n_splits - 1))
 
+    @property
+    def one_standard_error_threshold(self) -> float | None:
+        """Return the exact threshold used by one-standard-error selection."""
+
+        if self.rule != "one_standard_error":
+            return None
+        reference = self.reference_minimum
+        if reference is None:  # pragma: no cover - guarded by construction
+            raise RuntimeError(
+                "A one-standard-error selection requires a reference minimum."
+            )
+        return float(reference.cv_mse_mean + reference.cv_mse_standard_error)
+
     def __reduce__(self) -> tuple[type[PiPLSComponentResult], tuple[object, ...]]:
         """Reconstruct through validation during unpickling."""
 
@@ -113,6 +201,8 @@ class PiPLSComponentResult:
                 self.cv_mse_mean,
                 self.cv_mse_fold_sd,
                 self.n_splits,
+                self.rule,
+                self.reference_minimum,
             ),
         )
 

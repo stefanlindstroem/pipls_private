@@ -70,6 +70,9 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     ):
         assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
 
+    assert "one_standard_error_threshold" not in {
+        field.name for field in fields(PiPLSComponentResult)
+    }
     assert "selected_result" not in {
         field.name for field in fields(PiPLSPredictorRankProfile)
     }
@@ -93,6 +96,9 @@ def test_component_result_validates_and_normalizes_python_scalars() -> None:
     assert type(result.cv_mse_standard_error) is float
     assert result.cv_mse_standard_error == pytest.approx(0.05)
     assert type(result.n_splits) is int
+    assert result.rule is None
+    assert result.reference_minimum is None
+    assert result.one_standard_error_threshold is None
     with pytest.raises(FrozenInstanceError):
         result.n_components = 1  # type: ignore[misc]
 
@@ -111,6 +117,7 @@ def test_component_result_validates_and_normalizes_python_scalars() -> None:
         ("cv_mse_mean", -0.1, "nonnegative"),
         ("cv_mse_fold_sd", np.nan, "finite real"),
         ("n_splits", 0, "positive integer"),
+        ("rule", "unknown", "must be one of"),
     ],
 )
 def test_component_result_rejects_invalid_fields(
@@ -130,6 +137,84 @@ def test_component_result_rejects_invalid_fields(
 
     with pytest.raises(ValueError, match=message):
         PiPLSComponentResult(**{**kwargs, field: value})  # type: ignore[arg-type]
+
+
+def test_component_result_records_one_standard_error_provenance() -> None:
+    minimum = PiPLSComponentResult(
+        n_components=3,
+        predictor_rank=5,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.40,
+        cv_mse_mean=0.40,
+        cv_mse_fold_sd=0.08,
+        n_splits=5,
+        rule="minimum_cv_mse",
+    )
+    selection = PiPLSComponentResult(
+        n_components=2,
+        predictor_rank=4,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.43,
+        cv_mse_mean=0.43,
+        cv_mse_fold_sd=0.10,
+        n_splits=5,
+        rule="one_standard_error",
+        reference_minimum=minimum,
+    )
+
+    assert selection.rule == "one_standard_error"
+    assert selection.reference_minimum is minimum
+    assert selection.one_standard_error_threshold == pytest.approx(0.44)
+
+    restored = pickle.loads(pickle.dumps(selection))
+    assert restored == selection
+    assert restored.reference_minimum == minimum
+    assert restored.one_standard_error_threshold == selection.one_standard_error_threshold
+
+
+def test_component_result_rejects_invalid_selection_provenance() -> None:
+    minimum = PiPLSComponentResult(
+        n_components=3,
+        predictor_rank=5,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.40,
+        cv_mse_mean=0.40,
+        cv_mse_fold_sd=0.08,
+        n_splits=5,
+        rule="minimum_cv_mse",
+    )
+    base = {
+        "n_components": 2,
+        "predictor_rank": 4,
+        "predictor_rank_policy": "optimized",
+        "mean_test_score": -0.43,
+        "cv_mse_mean": 0.43,
+        "cv_mse_fold_sd": 0.10,
+        "n_splits": 5,
+    }
+
+    with pytest.raises(ValueError, match="required"):
+        PiPLSComponentResult(**base, rule="one_standard_error")
+    with pytest.raises(ValueError, match="defined only"):
+        PiPLSComponentResult(**base, reference_minimum=minimum)
+    with pytest.raises(TypeError, match="PiPLSComponentResult or None"):
+        PiPLSComponentResult(
+            **base,
+            rule="one_standard_error",
+            reference_minimum=object(),  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match='rule="minimum_cv_mse"'):
+        PiPLSComponentResult(
+            **base,
+            rule="one_standard_error",
+            reference_minimum=_component_result(),
+        )
+    with pytest.raises(ValueError, match="must not exceed the one-standard-error"):
+        PiPLSComponentResult(
+            **{**base, "cv_mse_mean": 0.45},
+            rule="one_standard_error",
+            reference_minimum=minimum,
+        )
 
 
 def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> None:

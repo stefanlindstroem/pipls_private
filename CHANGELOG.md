@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Enrich `PiPLSComponentResult` with immutable selection-rule provenance. Named selections now
+  record `rule`; one-standard-error selections retain the exact minimum-CV-MSE result as
+  `reference_minimum` and derive `one_standard_error_threshold` without duplicating threshold
+  state. Preserve all selection numerics, tie rules, refit behavior, and validation-report behavior.
 - Complete the package-owned reference-dataset transition: remove the duplicate top-level
   Sugarcane and Tobacco matrices, leave `src/pipls/_data/<dataset>/` as the sole active resource
   location for Pulp, Sugarcane, and Tobacco, publish direct raw-file access for non-Python users,

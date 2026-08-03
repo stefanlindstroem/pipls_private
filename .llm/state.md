@@ -578,16 +578,16 @@ The final model-producing order is search, refit, then analysis: `model.selectio
 inspection, and rendering. OOF reporting is not part of modeling. `search.select()` remains an
 optional fitting-free operation for selection-only workflows.
 
-Current status: **Patch 1 complete**. This patch changes guide-layer contracts only. Source, tests,
-examples, renderers, and served public documentation still expose the implemented
-`validation_report()` and `PiPLSValidationReport` surface.
+Current status: **Patches 1 and 2 complete**. `PiPLSComponentResult` now records validated named-
+rule provenance; one-standard-error results retain the exact minimum result and derive their
+threshold. Refit, reporting, examples, and renderers remain unchanged for later patches.
 
 ## Current next increment
 
-Decision 0143 Patch 2 is next: enrich `PiPLSComponentResult` with selection-rule provenance, a
-reference minimum for 1-SE selection, and a derived threshold without changing refit or report
-behavior yet. Decision 0139 Patch 3 remains paused until the owner resumes that independent
-presentation increment.
+Decision 0143 Patch 3 is next: retain the exact resolved selection as `model.selection_` after a
+successful direct-estimator or pipeline refit, without changing reporting or maintained workflows
+yet. Decision 0139 Patch 3 remains paused until the owner resumes that independent presentation
+increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
 package resources are available in clean wheel and source-distribution installations, every

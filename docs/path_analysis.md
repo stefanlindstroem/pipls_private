@@ -236,8 +236,11 @@ manual = search.select(n_components=3)
 
 The minimum rule returns the first stored row attaining the exact minimum mean CV-MSE. Because
 component counts are stored in strictly ascending order, an exact tie returns the smallest tied
-count. The 1-SE rule returns the first stored row satisfying the threshold above and requires at
-least two validation splits so that the reference-row standard error is defined.
+count. Its result records `rule="minimum_cv_mse"`. The 1-SE rule returns the first stored row
+satisfying the threshold above and requires at least two validation splits so that the reference-row
+standard error is defined. Its result records `rule="one_standard_error"`, retains the exact minimum
+result as `reference_minimum`, and derives `one_standard_error_threshold` without storing a second
+threshold value. Direct lookup by component count records no rule provenance.
 
 The associated predictor rank is the rank already selected conditionally for that component count
 under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an

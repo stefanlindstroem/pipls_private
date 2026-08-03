@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Iterable, Sequence
+from dataclasses import replace
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -33,6 +34,7 @@ from .component_path import (
     PiPLSComponentResult,
     PiPLSPredictorRankProfile,
     PredictorRankPolicy,
+    SelectionRule,
 )
 from .exceptions import PredictorRankSupportWarning
 from .metrics import neg_response_standardized_mse
@@ -57,7 +59,6 @@ IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["optimal", "auto"]
-SelectionRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING_NAME = "neg_response_standardized_mse"
@@ -98,7 +99,10 @@ def _component_result_at_count(
 def _select_minimum_cv_mse(path: PiPLSComponentPath) -> PiPLSComponentResult:
     """Return the first stored path row with minimum mean CV-MSE."""
 
-    return path._result_at_index(int(np.argmin(path.cv_mse_mean)))
+    return replace(
+        path._result_at_index(int(np.argmin(path.cv_mse_mean))),
+        rule="minimum_cv_mse",
+    )
 
 
 def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSComponentResult:
@@ -109,7 +113,11 @@ def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSComponentResult
     if not np.isfinite(threshold):
         raise ValueError("The one-standard-error threshold must be finite.")
     eligible = np.flatnonzero(path.cv_mse_mean <= threshold)
-    return path._result_at_index(int(eligible[0]))
+    return replace(
+        path._result_at_index(int(eligible[0])),
+        rule="one_standard_error",
+        reference_minimum=reference,
+    )
 
 
 class PiPLSSearchCV(
@@ -715,9 +723,12 @@ class PiPLSSearchCV(
                 n_components,
             )
         if rule == "best_score":
-            return _component_result_at_count(
-                self.component_path_,
-                self.best_n_components_,
+            return replace(
+                _component_result_at_count(
+                    self.component_path_,
+                    self.best_n_components_,
+                ),
+                rule="best_score",
             )
         if rule == "minimum_cv_mse":
             return _select_minimum_cv_mse(self.component_path_)

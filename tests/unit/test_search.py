@@ -336,9 +336,18 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
 
     selected = search.select(n_components=np.int64(2))
     assert selected == search.predictor_rank_profile(2).selected_result
-    assert search.select(rule="best_score") == search.select(
-        n_components=search.best_n_components_
-    )
+    assert selected.rule is None
+    assert selected.reference_minimum is None
+    assert selected.one_standard_error_threshold is None
+
+    best = search.select(rule="best_score")
+    best_row = search.select(n_components=search.best_n_components_)
+    assert best.rule == "best_score"
+    assert best.reference_minimum is None
+    assert best.one_standard_error_threshold is None
+    assert best.n_components == best_row.n_components
+    assert best.predictor_rank == best_row.predictor_rank
+    assert best.cv_mse_mean == best_row.cv_mse_mean
 
     path = search.component_path_
     minimum_index = int(np.argmin(path.cv_mse_mean))
@@ -346,12 +355,18 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     assert minimum.n_components == int(path.n_components[minimum_index])
     assert minimum.predictor_rank == int(path.predictor_rank[minimum_index])
     assert minimum.cv_mse_mean == path.cv_mse_mean[minimum_index]
+    assert minimum.rule == "minimum_cv_mse"
+    assert minimum.reference_minimum is None
+    assert minimum.one_standard_error_threshold is None
 
     threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error
     eligible_index = int(np.flatnonzero(path.cv_mse_mean <= threshold)[0])
     one_se = search.select(rule="one_standard_error")
     assert one_se.n_components == int(path.n_components[eligible_index])
     assert one_se.predictor_rank == int(path.predictor_rank[eligible_index])
+    assert one_se.rule == "one_standard_error"
+    assert one_se.reference_minimum == minimum
+    assert one_se.one_standard_error_threshold == threshold
 
     with pytest.raises(FrozenInstanceError):
         selected.n_components = 99  # type: ignore[misc]
@@ -438,6 +453,7 @@ def test_select_minimum_cv_mse_returns_first_exact_stored_tie() -> None:
         cv_mse_mean=0.4,
         cv_mse_fold_sd=0.08,
         n_splits=5,
+        rule="minimum_cv_mse",
     )
 
 
@@ -457,6 +473,9 @@ def test_select_one_standard_error_uses_the_minimum_rows_standard_error() -> Non
 
     assert selected.n_components == 3
     assert selected.predictor_rank == 5
+    assert selected.rule == "one_standard_error"
+    assert selected.reference_minimum == search.select(rule="minimum_cv_mse")
+    assert selected.one_standard_error_threshold == pytest.approx(0.44)
 
 
 def test_select_one_standard_error_returns_smallest_eligible_count() -> None:
@@ -475,6 +494,7 @@ def test_select_one_standard_error_returns_smallest_eligible_count() -> None:
 
     assert selected.n_components == 2
     assert selected.predictor_rank == 3
+    assert selected.reference_minimum == search.select(rule="minimum_cv_mse")
 
 
 def test_select_one_standard_error_uses_no_extra_tolerance() -> None:
@@ -496,6 +516,7 @@ def test_select_one_standard_error_uses_no_extra_tolerance() -> None:
     selected = search.select(rule="one_standard_error")
 
     assert selected.n_components == 3
+    assert selected.one_standard_error_threshold == threshold
 
 
 def test_select_rules_handle_split_and_finite_threshold_edges() -> None:
@@ -643,6 +664,11 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
     model = search.refit(X, Y, rule="one_standard_error")
 
     assert report.selected_result == expected
+    assert report.selected_result.rule == "one_standard_error"
+    assert report.selected_result.reference_minimum == search.select(
+        rule="minimum_cv_mse"
+    )
+    assert report.selected_result.one_standard_error_threshold is not None
     assert model.n_components == expected.n_components
     assert model.predictor_rank == expected.predictor_rank
     for name in ("selected_result_", "selected_params_", "validation_report_"):

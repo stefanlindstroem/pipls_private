@@ -214,9 +214,11 @@ full-data refitting before retrieving selection, path, rank-profile, OOF, fitted
 evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
 `oof_report()`.
 
-Patch 1 records this target only. Until the assigned implementation patches, the current source and
-served API remain `validation_report(...)`, `PiPLSValidationReport`, and refitted models without
-`selection_`. No compatibility alias is authorized in the final state.
+Patches 1 and 2 are complete. `PiPLSComponentResult` now implements `rule`,
+`reference_minimum`, and the derived `one_standard_error_threshold`. The current source and served
+report API remain `validation_report(...)` and `PiPLSValidationReport`, and refitted models still
+lack `selection_` until the assigned patches. No compatibility alias is authorized in the final
+state.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable

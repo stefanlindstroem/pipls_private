@@ -1034,8 +1034,8 @@ profile before optionally calling `oof_report(...)`; fitted-model inspection and
 OOF reporting is explicitly analysis, not modeling. `search.select()` remains available for
 selection-only workflows but is not required merely to recover the row used by `refit()`.
 
-Current status: **Patch 1 complete**. No implementation or maintained-consumer change occurs in
-this guide-layer patch.
+Current status: **Patches 1 and 2 complete**. Selection results now carry validated rule and 1-SE
+reference provenance; refitted-model ownership and maintained-consumer changes remain pending.
 
 ## Current next increment
 

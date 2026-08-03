@@ -133,8 +133,11 @@ OOF numerics. Across its seven patches, tests must protect:
 - maintained manual and automatic model-producing workflows do not call `search.select()` merely to
   recover the refit row, while the validation-only example may use selection-only inspection.
 
-Patch 1 adds no executable behavior. Its focused validation is decision navigation, repository
-structure, documentation structure, and the complete unchanged test suite.
+Patch 2 adds executable selection provenance. Focused tests protect direct construction,
+normalization, immutability, nested-result pickle stability, exact minimum ties, minimum-row
+standard-error use, smallest eligible count, exact threshold boundaries, nonfinite thresholds,
+unchanged search state, and propagation into the current validation report. Refit and OOF-report
+ownership remain assigned to later patches.
 
 ## Three-stage onboarding transition
 

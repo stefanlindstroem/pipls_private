@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation planned in seven patches.
+Accepted; implementation in progress (Patches 1 and 2 complete).
 
 ## Context
 
@@ -232,9 +232,11 @@ Implement this transition in seven reviewable patches:
 
 ## Implementation status
 
-Patch 1 records the accepted target only. The source, tests, examples, renderers, and served public
-documentation still expose the current `validation_report()` and `PiPLSValidationReport` API until
-the assigned implementation patches. Patch 2 is the next increment.
+Patches 1 and 2 are complete. `PiPLSComponentResult` now carries validated rule provenance,
+one-standard-error selections retain the exact minimum-CV-MSE result, and the threshold is derived
+from that immutable reference. `refit()` still returns a model without `selection_`, and the source,
+examples, renderers, and served reporting documentation still expose `validation_report()` and
+`PiPLSValidationReport` until their assigned patches. Patch 3 is the next increment.
 
 This decision refines Decisions 0137 and 0140. Search continues to own candidate evidence, exact
 stored splits, and fitting-free selected-row resolution, but final-model provenance now belongs on

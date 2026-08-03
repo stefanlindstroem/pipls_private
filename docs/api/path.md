@@ -139,6 +139,10 @@ definitions and scope. The path object itself provides no public row-selection m
 
 `search.select(n_components=h)` returns the frozen scalar row for one evaluated paired-mode count,
 including its conditionally selected predictor rank, score, CV-MSE summary, policy, and split count.
+Direct component-count lookup has `rule is None`. Named rules record their rule on the result. A
+`"one_standard_error"` result also retains the exact `"minimum_cv_mse"` result as
+`reference_minimum` and derives `one_standard_error_threshold` from that row's mean CV-MSE and
+standard error. The threshold is not stored independently.
 
 ::: pipls.PiPLSComponentResult
     options:
