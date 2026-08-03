@@ -1,12 +1,11 @@
 # Dataset interface and synthetic generator
 
-The optional dataset interface provides a structured in-memory boundary for packaged Pulp and
-Sugarcane datasets, package-owned synthetic data, and experiments. Real-data users may pass
-ordinary arrays or
+The optional dataset interface provides a structured in-memory boundary for packaged Pulp,
+Sugarcane, and Tobacco datasets, package-owned synthetic data, and experiments. Real-data users may
+pass ordinary arrays or
 data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
-Sugarcane now also has an installed named loader and canonical package resources; its maintained
-examples retain the byte-identical repository copy temporarily. Tobacco remains a repository
-dataset with documentary `metadata.yaml` until its assigned loader patch.
+Sugarcane and Tobacco also have installed named loaders and canonical package resources; their
+maintained examples retain byte-identical repository copies temporarily until consumer migration.
 
 ## Validated dataset container
 
@@ -207,15 +206,16 @@ Real-data reading remains user-owned in general. Examples and reproduction scrip
 `Y` are formed using ordinary NumPy, pandas, or domain-specific code. Pi-PLS provides no public
 registry, generic loader, downloader, preparation-only script, or required metadata sidecar.
 
-Pulp and Sugarcane are explicit package-owned reference datasets. They are bundled with the
-installed distribution and available without network access:
+Pulp, Sugarcane, and Tobacco are explicit package-owned reference datasets. They are bundled with
+the installed distribution and available without network access:
 
 ```python
-from pipls.datasets import load_pulp, load_sugarcane
+from pipls.datasets import load_pulp, load_sugarcane, load_tobacco
 
 pulp = load_pulp()
 sugarcane = load_sugarcane()
-X, Y = load_sugarcane(return_X_y=True)
+tobacco = load_tobacco()
+X, Y = load_tobacco(return_X_y=True)
 ```
 
 The default result is an immutable `PiPLSDataset`; the direct return mode supplies the same read-only
@@ -278,9 +278,9 @@ exactly.
 
 ## Tobacco spectral integration
 
-`datasets/tobacco/` contains 347 samples, 1,557 raw FT-NIR absorbance predictors spanning
-approximately 10,001 through 4,000 `cm^-1`, and 13 chemical-component responses. The original
-public dataset is:
+The installed Tobacco resources contain 347 samples, 1,557 raw FT-NIR absorbance predictors
+spanning approximately 10,001 through 4,000 `cm^-1`, and 13 chemical-component responses. The
+original public dataset is:
 
 > Chen, H., Guo, J., Wang, H., and Zhao, L. (2025). A Near-Infrared Spectroscopy Dataset for
 > Chemical Composition Prediction and Origin Identification of Tobacco Leaves. *Mendeley Data*,
@@ -294,11 +294,13 @@ The related data paper is:
 > spectroscopy and chemometric analysis. *Data in Brief*, **64**, 112418.
 > [doi:10.1016/j.dib.2025.112418](https://doi.org/10.1016/j.dib.2025.112418).
 
-The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches the public spectra
+The Mendeley collection is licensed CC BY 4.0. The package adaptation matches the public spectra
 and chemistry tables one-to-one by sample ID, orders rows by that identifier, and excludes only
 source metadata columns from the model matrices. All samples and chemical responses are retained.
 No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
-preprocessing is applied. `examples/07_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly,
+preprocessing is applied. `load_tobacco()` returns the immutable labeled package dataset or its
+read-only matrices. During the staged transition, `examples/07_tobacco_real_data.py` still reads the
+byte-identical repository `X.csv` and `Y.csv` directly,
 evaluates a Pi-PLS component path with adaptive predictor-rank scanning and full predictor SVD,
 plots that path in memory, applies the one-standard-error rule, and derives the conditional
 predictor-rank profile at the returned component count before fitting the fixed Pi-PLS model. It

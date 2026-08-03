@@ -46,10 +46,11 @@ predictor and response directions; they are distinct from reconstruction loading
 search. Rule scope and scorer qualification are described under
 [search-owned selection rules](../path_analysis.md#search-owned-selection-rules).
 
-Pulp and Sugarcane are available as named package-owned datasets through
-[`load_pulp()`](datasets.md#pipls.datasets.load_pulp) and
-[`load_sugarcane()`](datasets.md#pipls.datasets.load_sugarcane). Tobacco remains a repository CSV
-asset until its assigned resource patch. No generic dataset registry is part of the runtime API.
+Pulp, Sugarcane, and Tobacco are available as named package-owned datasets through
+[`load_pulp()`](datasets.md#pipls.datasets.load_pulp),
+[`load_sugarcane()`](datasets.md#pipls.datasets.load_sugarcane), and
+[`load_tobacco()`](datasets.md#pipls.datasets.load_tobacco). No generic dataset registry is part of
+the runtime API.
 
 ## Rendering boundary
 

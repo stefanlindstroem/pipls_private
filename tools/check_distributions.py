@@ -23,7 +23,7 @@ import pipls.inspection
 import pipls.metrics
 import pipls.search
 from pipls import PiPLSRegression, PiPLSSearchCV
-from pipls.datasets import load_pulp, load_sugarcane
+from pipls.datasets import load_pulp, load_sugarcane, load_tobacco
 
 repository = Path(sys.argv[1]).resolve()
 artifact_label = sys.argv[2]
@@ -79,6 +79,19 @@ assert not sugarcane.data.flags.writeable
 assert not sugarcane.target.flags.writeable
 assert np.array_equal(sugarcane_X, sugarcane.data)
 assert np.array_equal(sugarcane_Y, sugarcane.target)
+
+tobacco = load_tobacco()
+tobacco_X, tobacco_Y = load_tobacco(return_X_y=True)
+assert tobacco.data.shape == (347, 1557)
+assert tobacco.target.shape == (347, 13)
+assert tobacco.feature_names[0] == "10001.0283203125"
+assert tobacco.feature_names[-1] == "3999.63989257813"
+assert tobacco.target_names[0] == "Total Alkaloids"
+assert tobacco.target_names[-1] == "Rutin"
+assert not tobacco.data.flags.writeable
+assert not tobacco.target.flags.writeable
+assert np.array_equal(tobacco_X, tobacco.data)
+assert np.array_equal(tobacco_Y, tobacco.target)
 assert pipls.__version__
 
 print(

@@ -134,14 +134,16 @@ Implement the transition in six reviewable patches:
 
 ## Implementation status
 
-Patches 1 through 3 are implemented. The decision and guide-layer target are established, and the
+Patches 1 through 4 are implemented. The decision and guide-layer target are established, and the
 shared private machinery handles resource access, metadata and CSV parsing, shape validation,
 resource and canonical-array integrity checks, provenance, and stable sample identifiers.
-`load_pulp()` preserves its original public contract. `load_sugarcane()` now exposes the immutable
-57 by 1,721 LabSpec matrix and four responses from canonical package resources, with exact parity
-against the temporary `datasets/sugarcane/` copy and clean wheel/source-distribution loading. No
-Tobacco package resource or public loader is introduced before Patch 4, and maintained Sugarcane
-consumers continue to use the repository copy until Patch 5.
+`load_pulp()` preserves its original public contract. `load_sugarcane()` exposes the immutable
+57 by 1,721 LabSpec matrix and four responses, and `load_tobacco()` exposes the immutable 347 by
+1,557 raw FT-NIR matrix and 13 responses. Both spectral package resources have exact matrix parity
+with their temporary repository copies and pass clean wheel/source-distribution loading. The
+Tobacco attribution file is corrected before packaging so the canonical and temporary copies both
+identify the Tobacco source. Maintained Sugarcane and Tobacco consumers continue to use the
+repository copies until Patch 5.
 
 This decision refines Decision 0138 from one package-owned Pulp exception to a closed set of three
 maintained reference datasets. It supersedes Decisions 0022, 0023, 0067, 0069, and 0070 only where

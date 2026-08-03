@@ -6,11 +6,11 @@ experiments; ordinary arrays and data frames passed directly to `fit(X, Y)` rema
 real-data interface. Synthetic truth stores only loading blocks that contribute to the generated
 predictor or response signal.
 
-Pulp and Sugarcane are available through the named package-owned loaders below. Tobacco remains a
-[repository reference dataset](../datasets.md) read explicitly by its
-[maintained example](../examples.md#complete-real-data-analyses). Sugarcane's maintained examples
-continue to use the temporary repository copy until the consumer-migration patch; no generic
-registry or download layer is provided.
+Pulp, Sugarcane, and Tobacco are available through the named package-owned loaders below. The
+[dataset guide](../datasets.md) records provenance and preparation, and the
+[maintained examples](../examples.md#complete-real-data-analyses) show their analysis workflows.
+Sugarcane and Tobacco examples continue to use temporary byte-identical repository copies until the
+consumer-migration patch; no generic registry or download layer is provided.
 
 Mathematical notation on this page follows the package convention: complete matrices are bold,
 descriptive role and block subscripts are upright, and variable indices remain italic. For example,
@@ -35,6 +35,16 @@ the same read-only predictor and response arrays directly.
 installed package resources. The feature names are the wavelength labels `"780"` through `"2500"`;
 loading performs no network access or spectral preprocessing. The temporary repository copy remains
 only for parity and later consumer migration.
+
+::: pipls.datasets.load_tobacco
+    options:
+      members: false
+
+`load_tobacco()` returns the 347 by 1,557 raw FT-NIR predictor matrix and 13 aligned chemical
+responses from installed package resources. Feature names preserve the decreasing source
+wavenumbers from approximately 10,001 through 4,000 `cm^-1`; loading performs no network access or
+spectral preprocessing. The temporary repository copy remains only for parity and later consumer
+migration.
 
 ## Containers
 

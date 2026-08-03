@@ -31,9 +31,9 @@ access.
 synthetic generators and named reference datasets. It is not required for real data, and examples
 must not imply otherwise. Decision 0142 assigns package ownership to Pulp, Sugarcane, and Tobacco
 through three named loaders, with their resources included in the base installation. This creates
-neither a general data-access extra nor a registry. During the accepted transition, Pulp and Sugarcane are
-implemented as package loaders; their maintained Sugarcane consumers and all Tobacco consumers
-continue to use repository CSV files until the consumer and Tobacco resource patches land.
+neither a general data-access extra nor a registry. Pulp, Sugarcane, and Tobacco are implemented
+as package loaders; maintained Sugarcane and Tobacco consumers continue to use byte-identical
+repository CSV files until the consumer-migration patch lands.
 
 ## Example transparency
 
@@ -84,12 +84,12 @@ installed package resources. Loaders are optional, local, and dataset-specific: 
 download, `as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows
 from them. General users and every other real dataset continue to supply `X` and `Y` directly.
 
-`load_pulp()` and `load_sugarcane()` are implemented through dataset-neutral private resource,
-metadata, CSV, integrity, provenance, and sample-identifier machinery. Every maintained Pulp
-consumer uses its loader. Sugarcane's package resources exactly match the temporary repository
-matrices, but maintained consumers remain on that repository copy until Patch 5. `load_tobacco()`
-is accepted but is not added until Patch 4. The repository Sugarcane and Tobacco matrices remain
-temporary parity sources until consumer migration and final duplicate removal.
+`load_pulp()`, `load_sugarcane()`, and `load_tobacco()` are implemented through dataset-neutral
+private resource, metadata, CSV, integrity, provenance, and sample-identifier machinery. Every
+maintained Pulp consumer uses its loader. Sugarcane and Tobacco package matrices exactly match their
+temporary repository copies, but maintained consumers remain on those copies until Patch 5. The
+repository spectral matrices remain temporary parity sources until consumer migration and final
+duplicate removal.
 
 The final resource directories under `src/pipls/_data/<dataset>/` are intentionally ordinary
 CSV, JSON, README, and license assets. Public documentation must identify their locations in a

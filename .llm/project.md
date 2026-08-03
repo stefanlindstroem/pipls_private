@@ -33,9 +33,9 @@ Fritjof Nilsson, and Stefan B. Lindström are the package authors and current co
 revision at *Computers & Chemical Engineering* (CACE-D-26-00847). Dataset-specific licenses
 remain separate.
 
-The real-dataset suite currently contains package-owned Pulp and Sugarcane plus repository-owned
-Tobacco. Sugarcane retains a temporary repository parity copy until the consumer migration and
-single-copy cleanup patches. Decision 0142 accepts a six-patch transition to three package-owned named reference
+The real-dataset suite contains package-owned Pulp, Sugarcane, and Tobacco. Sugarcane and Tobacco
+retain temporary repository parity copies until the consumer migration and single-copy cleanup
+patches. Decision 0142 accepts a six-patch transition to three package-owned named reference
 datasets with ordinary language-neutral resources and one active matrix copy each. A licensing
 review of the remaining companion-analysis candidates intentionally excluded Corn, the legacy
 Citrination Steel table, SARCOS, and FRED-MD from this repository because the exact source
@@ -56,11 +56,11 @@ Decision 0140 now provides non-mutating `PiPLSSearchCV.select()` as the search-o
 lookup. Every maintained example, tutorial renderer, and living user document uses that operation;
 `PiPLSComponentPath` is now limited to aligned numerical evidence and immutable serialization.
 
-Pulp acquisition uses package resources through `load_pulp()`. `load_sugarcane()` and its package
-resources are implemented with exact parity to the temporary repository copy, while maintained
-Sugarcane consumers retain direct repository CSV reading until Patch 5. Tobacco remains repository-
-only until Patches 4 and 5 add its loader and migrate consumers. The final loaders are `load_pulp()`, `load_sugarcane()`, and
-`load_tobacco()`, all backed by documented CSV resources usable outside Python. Pulp also exposes
+Pulp acquisition uses package resources through `load_pulp()`. `load_sugarcane()` and
+`load_tobacco()` and their package resources are implemented with exact matrix parity to temporary
+repository copies, while maintained spectral consumers retain direct repository CSV reading until
+Patch 5. The loaders are `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`, all backed by
+documented CSV resources usable outside Python. Pulp also exposes
 the conditional predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
 `main()` and group rendering in private functions within their numbered scripts. Tobacco retains
 full-SVD spectral figures, source-order response pagination, and raw observation diagnostics.

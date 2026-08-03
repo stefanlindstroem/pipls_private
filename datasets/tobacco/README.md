@@ -10,7 +10,7 @@ components from raw Fourier-transform near-infrared spectra of 347 tobacco leaf 
 - `Y.csv`: the same 347 rows and 13 chemical response columns.
 - `metadata.yaml`: public provenance, alignment, variable, preparation, license, and integrity
   documentation. It is not needed to fit Pi-PLS.
-- `LICENSE.txt`: Creative Commons Attribution 4.0 license text.
+- `LICENSE.txt`: Tobacco-specific attribution and Creative Commons Attribution 4.0 notice.
 
 ## Public source
 
@@ -39,7 +39,7 @@ No smoothing, derivatives, multiplicative scatter correction, standard-normal-va
 centering, scaling, imputation, or other spectral preprocessing was applied. The numeric values and
 source column order are retained.
 
-The executable example `examples/07_tobacco_real_data.py` reads `X.csv` and `Y.csv` directly with
-pandas, evaluates a full-SVD Pi-PLS path, fits one selected fixed model, calculates OOF and
-inspection results in memory, and writes final PDF figures with source-order response pagination.
-It does not use a package loader or parse `metadata.yaml`.
+`pipls.datasets.load_tobacco()` reads byte-identical package resources and exposes immutable labels,
+provenance, metadata, and matrices. During the staged migration, the executable example
+`examples/07_tobacco_real_data.py` still reads this temporary repository copy directly; Patch 5
+migrates it to the named loader, and Patch 6 removes the duplicate repository matrices.

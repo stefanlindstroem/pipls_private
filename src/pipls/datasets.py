@@ -26,6 +26,7 @@ __all__ = [
     "PiPLSRegressionTruth",
     "load_pulp",
     "load_sugarcane",
+    "load_tobacco",
     "make_pipls_latent_geometry",
     "make_pipls_regression",
     "make_pipls_train_test",
@@ -77,6 +78,11 @@ _SUGARCANE_DATASET = _PackagedDatasetConfig(
     dataset_id="sugarcane",
     display_name="Sugarcane",
     sample_id_width=2,
+)
+_TOBACCO_DATASET = _PackagedDatasetConfig(
+    dataset_id="tobacco",
+    display_name="Tobacco",
+    sample_id_width=3,
 )
 
 
@@ -484,6 +490,52 @@ def load_sugarcane(
 
     return _load_packaged_dataset(
         _SUGARCANE_DATASET,
+        return_X_y=return_X_y,
+    )
+
+
+@overload
+def load_tobacco(*, return_X_y: Literal[False] = False) -> PiPLSDataset:
+    ...
+
+
+@overload
+def load_tobacco(*, return_X_y: Literal[True]) -> tuple[FloatArray, FloatArray]:
+    ...
+
+
+def load_tobacco(
+    *,
+    return_X_y: bool = False,
+) -> PiPLSDataset | tuple[FloatArray, FloatArray]:
+    """Load the packaged Tobacco leaf FT-NIR regression dataset.
+
+    The dataset contains 347 tobacco leaf samples, 1,557 raw FT-NIR
+    absorbance predictors ordered from approximately 10,001 down to
+    4,000 cm^-1, and 13 chemical-component responses. The matrices
+    preserve the retained numeric values, column order, and row order
+    derived from the public source workbooks. No preprocessing is applied.
+
+    Parameters
+    ----------
+    return_X_y : bool, default=False
+        If ``True``, return the read-only predictor and response arrays directly.
+        Otherwise return an immutable :class:`PiPLSDataset` with labels,
+        provenance, sample identifiers, and metadata.
+
+    Returns
+    -------
+    PiPLSDataset or tuple of ndarray
+        Structured dataset by default, or ``(X, Y)`` when ``return_X_y=True``.
+
+    Notes
+    -----
+    The dataset is adapted from Chen, Guo, Wang, and Zhao (2025),
+    Mendeley Data, Version 1, doi:10.17632/9z7dgdtggk.1, under CC BY 4.0.
+    """
+
+    return _load_packaged_dataset(
+        _TOBACCO_DATASET,
         return_X_y=return_X_y,
     )
 

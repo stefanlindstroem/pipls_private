@@ -4,6 +4,12 @@
 
 ### Repository
 
+- Add the package-owned `pipls.datasets.load_tobacco()` API with immutable labeled and direct-
+  matrix return modes, canonical FT-NIR CSV/JSON/README/license resources, exact matrix parity with
+  the temporary repository copy, resource and canonical-array integrity checks, and clean
+  wheel/source-distribution smoke coverage. Correct the temporary Tobacco attribution file, which
+  previously contained Sugarcane attribution text. Maintained consumers remain unchanged until the
+  migration patch.
 - Add the package-owned `pipls.datasets.load_sugarcane()` API with immutable labeled and direct-
   matrix return modes, canonical LabSpec CSV/JSON/README/license resources, exact parity with the
   temporary repository copy, resource and canonical-array integrity checks, and clean wheel/source-

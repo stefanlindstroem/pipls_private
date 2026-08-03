@@ -16,11 +16,11 @@ to Sugarcane and Tobacco under `src/pipls/_data/sugarcane/` and
 standard-library runtime parsing, and ordinary language-neutral CSV resources. No generic dataset
 registry follows.
 
-At the current Patch 3 state, Pulp and Sugarcane are implemented package resources and public
-loaders. Sugarcane's package matrices exactly match its temporary repository parity copy. Tobacco
-still follows the repository layout below until Patch 4. Both repository spectral copies are
-removed in the final single-copy patch after consumer migration. The former Pulp layout remains
-excluded development history under `.llm/archive/pulp-repository-layout-v1/`.
+At the current Patch 4 state, Pulp, Sugarcane, and Tobacco are implemented package resources and
+public loaders. Sugarcane and Tobacco package matrices exactly match their temporary repository
+parity copies. Both repository spectral copies are removed in the final single-copy patch after
+consumer migration. The former Pulp layout remains excluded development history under
+`.llm/archive/pulp-repository-layout-v1/`.
 
 ## Language-neutral package-resource contract
 
