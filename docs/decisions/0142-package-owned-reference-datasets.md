@@ -134,12 +134,14 @@ Implement the transition in six reviewable patches:
 
 ## Implementation status
 
-Patches 1 and 2 are implemented. The decision and guide-layer target are established, and
-`load_pulp()` now delegates to dataset-neutral private machinery for resource access, metadata and
-CSV parsing, shape validation, resource and canonical-array integrity checks, provenance, and
-stable sample identifiers. The public Pulp signature, arrays, labels, metadata, sample identifiers,
-error classes, namespace placement, and distribution behavior are unchanged. No Sugarcane or
-Tobacco package resource or public loader is introduced before its assigned patch.
+Patches 1 through 3 are implemented. The decision and guide-layer target are established, and the
+shared private machinery handles resource access, metadata and CSV parsing, shape validation,
+resource and canonical-array integrity checks, provenance, and stable sample identifiers.
+`load_pulp()` preserves its original public contract. `load_sugarcane()` now exposes the immutable
+57 by 1,721 LabSpec matrix and four responses from canonical package resources, with exact parity
+against the temporary `datasets/sugarcane/` copy and clean wheel/source-distribution loading. No
+Tobacco package resource or public loader is introduced before Patch 4, and maintained Sugarcane
+consumers continue to use the repository copy until Patch 5.
 
 This decision refines Decision 0138 from one package-owned Pulp exception to a closed set of three
 maintained reference datasets. It supersedes Decisions 0022, 0023, 0067, 0069, and 0070 only where

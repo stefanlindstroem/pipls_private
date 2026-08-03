@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Add the package-owned `pipls.datasets.load_sugarcane()` API with immutable labeled and direct-
+  matrix return modes, canonical LabSpec CSV/JSON/README/license resources, exact parity with the
+  temporary repository copy, resource and canonical-array integrity checks, and clean wheel/source-
+  distribution smoke coverage. Maintained consumers remain unchanged until the migration patch.
 - Generalize the private packaged-reference-dataset loader across resource access, metadata and CSV
   parsing, dimensional validation, integrity checks, provenance, and stable sample identifiers,
   while preserving the complete public `load_pulp()` contract and adding no new public loader.

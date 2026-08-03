@@ -37,7 +37,7 @@ predictor and response directions; they are distinct from reconstruction loading
 | [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |
 | [`ObservationDiagnostics`](inspection.md#pipls.inspection.ObservationDiagnostics) | `observation_diagnostics(model)` | Inspect score distance and X-reconstruction residuals |
 | [`PredictionDiagnostics`](inspection.md#pipls.inspection.PredictionDiagnostics) | `prediction_diagnostics(Y, Y_pred, ...)` | Inspect predictions, residuals, and response-standardized errors |
-| [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | `load_pulp()`, dataset construction, or generator output | Carry validated arrays, labels, provenance, and metadata |
+| [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | a named loader, dataset construction, or generator output | Carry validated arrays, labels, provenance, and metadata |
 | [`PiPLSRegressionTruth`](datasets.md#pipls.datasets.PiPLSRegressionTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
 | [`PiPLSLatentGeometryTruth`](datasets.md#pipls.datasets.PiPLSLatentGeometryTruth) | `make_pipls_latent_geometry(...).truth` | Inspect the manuscript-oriented Gaussian latent geometry |
 
@@ -46,9 +46,10 @@ predictor and response directions; they are distinct from reconstruction loading
 search. Rule scope and scorer qualification are described under
 [search-owned selection rules](../path_analysis.md#search-owned-selection-rules).
 
-Pulp is available as the named package-owned [`load_pulp()`](datasets.md#pipls.datasets.load_pulp)
-dataset. Sugarcane and Tobacco remain repository CSV assets; no generic dataset registry is part of
-the runtime API.
+Pulp and Sugarcane are available as named package-owned datasets through
+[`load_pulp()`](datasets.md#pipls.datasets.load_pulp) and
+[`load_sugarcane()`](datasets.md#pipls.datasets.load_sugarcane). Tobacco remains a repository CSV
+asset until its assigned resource patch. No generic dataset registry is part of the runtime API.
 
 ## Rendering boundary
 

@@ -66,12 +66,12 @@ and later retired by Decision 0125 after its development-validation purpose had 
   metadata, registry, or package-owned loader required for fitting;
 - a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
   `metadata.yaml`;
-- a current reference suite containing package-owned Pulp plus repository-owned Sugarcane and
-  Tobacco, with Decision 0142 accepting their transition to three package-owned named reference
-  datasets;
-- the implemented `pipls.datasets.load_pulp()` dataset, backed by the sole active Pulp matrix
-  resources in the installed package, and accepted future `load_sugarcane()` and `load_tobacco()`
-  loaders using the same immutable contract;
+- a current reference suite containing package-owned Pulp and Sugarcane plus repository-owned
+  Tobacco, with a temporary Sugarcane repository parity copy retained until consumer migration and
+  final single-copy cleanup;
+- the implemented `pipls.datasets.load_pulp()` and `load_sugarcane()` datasets, backed by installed
+  package resources, and the accepted future `load_tobacco()` loader using the same immutable
+  contract;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
@@ -242,9 +242,9 @@ case, or public behavior.
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
-| Dataset namespace | immutable container, implemented `load_pulp()`, accepted `load_sugarcane()` and `load_tobacco()`, and seeded generators under `pipls.datasets` |
+| Dataset namespace | immutable container, implemented `load_pulp()` and `load_sugarcane()`, accepted `load_tobacco()`, and seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Reference datasets | final target is one package-resource location each for Pulp, Sugarcane, and Tobacco; only Pulp is public at Patch 2, using dataset-neutral private loading machinery |
+| Reference datasets | Pulp and Sugarcane are public package resources at Patch 3; Tobacco remains repository-only until Patch 4; the final target is one package-resource location per dataset |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -553,15 +553,16 @@ The final resources remain ordinary CSV, JSON, README, and license files under
 wheels, and installed packages. The transition introduces no registry, downloader, `as_frame`
 surface, hidden preprocessing, or top-level loader exports.
 
-Current status: **Patches 1 and 2 complete**. Pulp remains the sole implemented named package
-loader, now backed by dataset-neutral private loading machinery with unchanged public behavior.
-Sugarcane and Tobacco still use repository CSV inputs until their resource and migration patches.
+Current status: **Patches 1 through 3 complete**. Pulp and Sugarcane are implemented named package
+loaders backed by dataset-neutral private loading machinery. Sugarcane package resources exactly
+match the temporary repository copy; maintained Sugarcane consumers remain unchanged until Patch 5.
+Tobacco still uses repository CSV inputs until its resource and migration patches.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 3: add canonical Sugarcane package resources,
-`load_sugarcane()`, integrity and parity tests, package-data configuration, and clean-distribution
-validation while retaining `datasets/sugarcane/` as a temporary parity source. Decision 0139 Patch
+Implement Decision 0142 Patch 4: add canonical Tobacco package resources, `load_tobacco()`,
+integrity and parity tests, package-data configuration, and clean-distribution validation while
+retaining `datasets/tobacco/` as a temporary parity source. Decision 0139 Patch
 3 remains paused until the owner resumes that independent presentation increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical

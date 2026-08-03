@@ -170,7 +170,7 @@ not the training matrices.
 | `validation_report(X, Y, ...)` | Produce ordered OOF diagnostics for one stored path row |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
 | Matplotlib | Optionally render those arrays with caller-controlled figures and styling |
-| `pipls.datasets` | Load the package-owned Pulp data or generate deterministic synthetic data |
+| `pipls.datasets` | Load package-owned Pulp and Sugarcane data or generate deterministic synthetic data |
 
 Pi-PLS intentionally provides no plotting submodule: numerical inspection objects are the stable
 interface, while rendering remains optional and caller-owned. Generated signatures, fitted
@@ -179,11 +179,13 @@ attributes, result shapes, and method contracts are collected in the
 
 ## Examples and reference data
 
-The package includes Pulp through the named `pipls.datasets.load_pulp()` loader. The maintained
-Pulp quick start, component-path comparison, and complete tutorial all use that installed dataset.
-Sugarcane and Tobacco remain explicit repository-CSV workflows so their alignment and physical axes
-remain visible. There is no dataset-access extra or generic registry. Original sources, licenses,
-adaptations, and DOI links are documented in the [dataset guide](docs/datasets.md).
+The package includes Pulp and Sugarcane through the named `pipls.datasets.load_pulp()` and
+`pipls.datasets.load_sugarcane()` loaders. The maintained Pulp quick start, component-path
+comparison, and complete tutorial use the installed Pulp dataset. Sugarcane's maintained workflows
+remain on the byte-identical repository CSV copy until the consumer-migration patch; Tobacco
+remains an explicit repository-CSV workflow. There is no dataset-access extra or generic registry.
+Original sources, licenses, adaptations, and DOI links are documented in the
+[dataset guide](docs/datasets.md).
 
 See the [example catalogue](docs/examples.md) for the purpose and outputs of every numbered script.
 Install the `examples` extra before running them.

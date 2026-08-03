@@ -113,9 +113,10 @@ The complete real-data examples own scientific orchestration:
 - dataset-specific physical-axis labels, response subsets, and pagination.
 
 Pulp, Sugarcane, and Tobacco keep those stages directly in their numbered scripts. Pulp obtains its
-installed matrices and labels through the named `load_pulp()` exception; Sugarcane and Tobacco use
-pandas only for committed input files. Sugarcane and Tobacco place scientific computation and
-orchestration in `main()` and may group rendering in private functions defined in the same script.
+installed matrices and labels through `load_pulp()`. `load_sugarcane()` is implemented, but the
+Sugarcane script still uses pandas on the temporary parity copy until Decision 0142 Patch 5;
+Tobacco uses pandas on its committed input files. Sugarcane and Tobacco place scientific
+computation and orchestration in `main()` and may group rendering in private functions defined in the same script.
 Do not introduce a generic real-data loader.
 Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
 preparation area.

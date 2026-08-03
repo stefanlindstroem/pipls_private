@@ -55,13 +55,15 @@
   `search.refit(...)`; do not manually transfer the selected predictor rank into a new estimator.
   Resolve scalar selected rows through `search.select(...)` only where plotting, reporting, or an
   explicit recommendation display needs that evidence.
-- For real-data examples, form `X` and `Y` visibly in the script. Pulp uses the named public
-  `load_pulp()` exception from Decision 0138; Sugarcane, Tobacco, and ordinary user data retain
+- For real-data examples, form `X` and `Y` visibly in the script. Pulp uses `load_pulp()`.
+  `load_sugarcane()` is implemented, but maintained Sugarcane examples retain explicit reading from
+  the temporary parity copy until Decision 0142 Patch 5. Tobacco and ordinary user data retain
   explicit reading. Do not introduce a registry, generic loader, metadata-driven runtime path, or
   helper that obscures data acquisition.
-- Repository-owned Sugarcane and Tobacco datasets follow `.llm/dataset_layout.md`:
-  comma-delimited `X.csv`, comma-delimited `Y.csv`, and documentary `metadata.yaml`. Pulp follows
-  the package-resource contract in Decision 0138.
+- The transitional Sugarcane and Tobacco repository copies follow `.llm/dataset_layout.md`:
+  comma-delimited `X.csv`, comma-delimited `Y.csv`, and documentary `metadata.yaml`. Pulp and the
+  canonical Sugarcane representation follow the package-resource contract in Decisions 0138 and
+  0142.
 - Treat every committed dataset asset as public-facing. Cite only public or included sources;
   do not commit private archive paths, inaccessible source checksums, or preparation-only scripts.
 - Add public reconstruction or preprocessing code only when it operates on included or publicly

@@ -328,9 +328,9 @@ repository use; public download access alone is insufficient.
 Current status: **complete for scientific integration and licensing; package-resource migration
 accepted under Decision 0142**. Pulp provides a compact multivariate process dataset; Sugarcane adds
 a 1,721-column regular wavelength grid; and Tobacco adds 347 samples, 1,557 raw FT-NIR predictors,
-and 13 responses. Every integration uses public provenance and no hidden preparation utility. Pulp
-already uses a named package loader; Sugarcane and Tobacco retain direct repository CSV reading
-only until the six-patch package-owned reference-dataset transition is complete. Decision 0033
+and 13 responses. Every integration uses public provenance and no hidden preparation utility. Pulp already uses a named package loader. Sugarcane now has an implemented package loader and
+canonical resources but retains direct repository CSV reading in maintained consumers until Patch
+5. Tobacco remains repository-only until its resource and consumer patches. Decision 0033
 removed the former Linnerud integration because it no longer served a useful package-level example
 or validation role. Decision 0041 intentionally excludes Corn, the legacy Citrination Steel table,
 SARCOS, and FRED-MD because the exact source
@@ -941,7 +941,8 @@ Decision 0138 authorizes a five-patch transition:
 The final loader mirrors the `load_linnerud()` call style but returns `PiPLSDataset` by default and
 read-only arrays with `return_X_y=True`. It uses package resources and standard-library parsing,
 performs no network access or preprocessing, adds no pandas or PyYAML runtime dependency, and is
-exported only from `pipls.datasets`. Sugarcane and Tobacco remain repository CSV datasets.
+exported only from `pipls.datasets`. Sugarcane and Tobacco remained repository CSV datasets at
+that transition stage; Decision 0142 now governs their package-resource migration.
 
 Current status: **complete**. The package resources and `load_pulp()` are implemented, public API
 documentation covers the loader, clean wheel/source-distribution smoke checks exercise installed
@@ -967,10 +968,10 @@ documented for use from tagged source releases, source distributions, wheels, in
 environments, and non-Python languages. No registry, downloader, pandas return mode, hidden
 preprocessing, optional data extra, or duplicate active representation is authorized.
 
-Current status: **Patches 1 and 2 complete**. The target is established and `load_pulp()` now
-uses dataset-neutral private resource-loading machinery with unchanged public behavior. No
-Sugarcane or Tobacco package resources, loaders, consumer changes, or public documentation are
-introduced before their assigned patches.
+Current status: **Patches 1 through 3 complete**. The target is established; `load_pulp()` and
+`load_sugarcane()` use dataset-neutral private resource-loading machinery. Sugarcane resources,
+integrity/parity tests, API documentation, and clean-distribution checks are implemented without
+consumer migration. No Tobacco package resource or loader is introduced before Patch 4.
 
 ### Three-stage user onboarding transition
 
@@ -1014,10 +1015,9 @@ numerics, tie rules, fitting semantics, or OOF provenance.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 3: add canonical Sugarcane resources and
-`load_sugarcane()` through the shared private loader, verify exact parity with the temporary
-repository matrices, and extend package-data and clean-distribution checks without migrating
-maintained consumers yet.
+Implement Decision 0142 Patch 4: add canonical Tobacco resources and `load_tobacco()` through the
+shared private loader, verify exact parity with the temporary repository matrices, and extend
+package-data and clean-distribution checks without migrating maintained consumers yet.
 
 Decision 0139 Patch 3 remains an independent paused documentation increment. Decision 0138 remains
 the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface,

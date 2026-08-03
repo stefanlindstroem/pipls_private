@@ -23,7 +23,7 @@ import pipls.inspection
 import pipls.metrics
 import pipls.search
 from pipls import PiPLSRegression, PiPLSSearchCV
-from pipls.datasets import load_pulp
+from pipls.datasets import load_pulp, load_sugarcane
 
 repository = Path(sys.argv[1]).resolve()
 artifact_label = sys.argv[2]
@@ -67,6 +67,18 @@ assert not pulp.data.flags.writeable
 assert not pulp.target.flags.writeable
 assert np.array_equal(pulp_X, pulp.data)
 assert np.array_equal(pulp_Y, pulp.target)
+
+sugarcane = load_sugarcane()
+sugarcane_X, sugarcane_Y = load_sugarcane(return_X_y=True)
+assert sugarcane.data.shape == (57, 1721)
+assert sugarcane.target.shape == (57, 4)
+assert sugarcane.feature_names[0] == "780"
+assert sugarcane.feature_names[-1] == "2500"
+assert sugarcane.target_names == ("TS", "CP", "ADF", "IVOMD")
+assert not sugarcane.data.flags.writeable
+assert not sugarcane.target.flags.writeable
+assert np.array_equal(sugarcane_X, sugarcane.data)
+assert np.array_equal(sugarcane_Y, sugarcane.target)
 assert pipls.__version__
 
 print(

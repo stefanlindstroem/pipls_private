@@ -1,22 +1,23 @@
 # Dataset API and generators
 
-`pipls.datasets` contains one packaged real-data loader, optional immutable containers, and
+`pipls.datasets` contains named packaged real-data loaders, optional immutable containers, and
 deterministic synthetic-data generators. They are conveniences for examples, tests, and structured
 experiments; ordinary arrays and data frames passed directly to `fit(X, Y)` remain the normal
 real-data interface. Synthetic truth stores only loading blocks that contribute to the generated
 predictor or response signal.
 
-Pulp is available through the named package-owned loader below. Sugarcane and Tobacco remain
-[repository reference datasets](../datasets.md) read explicitly by their
-[maintained examples](../examples.md#complete-real-data-analyses); no generic registry or download
-layer is provided.
+Pulp and Sugarcane are available through the named package-owned loaders below. Tobacco remains a
+[repository reference dataset](../datasets.md) read explicitly by its
+[maintained example](../examples.md#complete-real-data-analyses). Sugarcane's maintained examples
+continue to use the temporary repository copy until the consumer-migration patch; no generic
+registry or download layer is provided.
 
 Mathematical notation on this page follows the package convention: complete matrices are bold,
 descriptive role and block subscripts are upright, and variable indices remain italic. For example,
 $\boldsymbol{\Lambda}_{\mathrm{p}}$ and $\mathbf{L}_{\mathrm{sp}}$ are complete matrices,
 while $d_k$ retains the variable index $k$.
 
-## Packaged dataset
+## Packaged datasets
 
 ::: pipls.datasets.load_pulp
     options:
@@ -25,6 +26,15 @@ while $d_k$ retains the variable index $k$.
 `load_pulp()` performs no network access or preprocessing. Its default `PiPLSDataset` result keeps
 labels, sample identifiers, provenance, and recursively frozen metadata; `return_X_y=True` returns
 the same read-only predictor and response arrays directly.
+
+::: pipls.datasets.load_sugarcane
+    options:
+      members: false
+
+`load_sugarcane()` returns the 57 by 1,721 LabSpec predictor matrix and four aligned responses from
+installed package resources. The feature names are the wavelength labels `"780"` through `"2500"`;
+loading performs no network access or spectral preprocessing. The temporary repository copy remains
+only for parity and later consumer migration.
 
 ## Containers
 

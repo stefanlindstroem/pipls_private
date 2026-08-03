@@ -25,6 +25,7 @@ __all__ = [
     "PiPLSLatentGeometryTruth",
     "PiPLSRegressionTruth",
     "load_pulp",
+    "load_sugarcane",
     "make_pipls_latent_geometry",
     "make_pipls_regression",
     "make_pipls_train_test",
@@ -70,6 +71,11 @@ class _PackagedDatasetConfig:
 _PULP_DATASET = _PackagedDatasetConfig(
     dataset_id="pulp",
     display_name="Pulp",
+    sample_id_width=2,
+)
+_SUGARCANE_DATASET = _PackagedDatasetConfig(
+    dataset_id="sugarcane",
+    display_name="Sugarcane",
     sample_id_width=2,
 )
 
@@ -251,8 +257,8 @@ class PiPLSDataset:
     r"""Immutable validated multivariate regression dataset.
 
     Plain arrays and data frames passed directly to ``fit(X, Y)`` remain the
-    primary real-data interface. This container carries the packaged Pulp
-    dataset, synthetic data, and structured experiment data.
+    primary real-data interface. This container carries packaged reference
+    datasets, synthetic data, and structured experiment data.
 
     Parameters
     ----------
@@ -431,6 +437,53 @@ def load_pulp(
 
     return _load_packaged_dataset(
         _PULP_DATASET,
+        return_X_y=return_X_y,
+    )
+
+
+@overload
+def load_sugarcane(*, return_X_y: Literal[False] = False) -> PiPLSDataset:
+    ...
+
+
+@overload
+def load_sugarcane(*, return_X_y: Literal[True]) -> tuple[FloatArray, FloatArray]:
+    ...
+
+
+def load_sugarcane(
+    *,
+    return_X_y: bool = False,
+) -> PiPLSDataset | tuple[FloatArray, FloatArray]:
+    """Load the packaged Sugarcane LabSpec regression dataset.
+
+    The dataset contains 57 sugarcane samples, 1,721 visible-near-infrared
+    absorbance predictors at integer wavelengths from 780 through 2500 nm,
+    and four chemical or feed-quality responses. The matrices preserve the
+    retained numeric values, column order, and row order derived from the
+    public source tables. No preprocessing is applied during loading.
+
+    Parameters
+    ----------
+    return_X_y : bool, default=False
+        If ``True``, return the read-only predictor and response arrays directly.
+        Otherwise return an immutable :class:`PiPLSDataset` with labels,
+        provenance, sample identifiers, and metadata.
+
+    Returns
+    -------
+    PiPLSDataset or tuple of ndarray
+        Structured dataset by default, or ``(X, Y)`` when ``return_X_y=True``.
+
+    Notes
+    -----
+    The dataset is adapted from Chaix, Bendoula, and Zgouz (2021), Mendeley
+    Data, Version 1, doi:10.17632/mjttsjfj2s.1, under CC BY 4.0. Source samples
+    103, 105, and 111 are excluded because total sugar is missing.
+    """
+
+    return _load_packaged_dataset(
+        _SUGARCANE_DATASET,
         return_X_y=return_X_y,
     )
 

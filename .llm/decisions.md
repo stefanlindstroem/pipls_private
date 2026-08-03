@@ -197,11 +197,11 @@ plan contains an earlier or more general proposal:
 - Decision 0138 implemented the first named package-owned `load_pulp()` dataset without network
   access, pandas, a generic registry, or any requirement that users load their own real data
   through the package;
-- Decision 0142 accepts a six-patch extension of that same narrow contract to
-  `load_sugarcane()` and `load_tobacco()`. The final canonical resources remain ordinary CSV,
-  JSON, README, and license files usable independently of Python, while the current repository
-  Sugarcane and Tobacco copies remain transitional until consumer migration and single-copy
-  cleanup are complete;
+- Decision 0142 accepts a six-patch extension of that same narrow contract to Sugarcane and
+  Tobacco. `load_sugarcane()` and its canonical package resources are implemented; `load_tobacco()`
+  follows in Patch 4. The resources remain ordinary CSV, JSON, README, and license files usable
+  independently of Python, while the repository spectral copies remain transitional until consumer
+  migration and single-copy cleanup are complete;
 - examples show their data-reading and matrix-construction code rather than relying on hidden
   utility functions;
 - the first numbered example uses literal NumPy matrices and one fixed fit; complete-workflow

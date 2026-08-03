@@ -31,9 +31,9 @@ access.
 synthetic generators and named reference datasets. It is not required for real data, and examples
 must not imply otherwise. Decision 0142 assigns package ownership to Pulp, Sugarcane, and Tobacco
 through three named loaders, with their resources included in the base installation. This creates
-neither a general data-access extra nor a registry. During the accepted transition, only Pulp is
-implemented as a package loader; Sugarcane and Tobacco continue to use repository CSV files until
-their resource and consumer patches land.
+neither a general data-access extra nor a registry. During the accepted transition, Pulp and Sugarcane are
+implemented as package loaders; their maintained Sugarcane consumers and all Tobacco consumers
+continue to use repository CSV files until the consumer and Tobacco resource patches land.
 
 ## Example transparency
 
@@ -69,13 +69,14 @@ The example must not need to parse `metadata.yaml`; that file documents the repo
 ## Package-owned reference datasets
 
 Decision 0138 implemented the first named package-owned dataset. Decision 0142 extends the final
-closed set to Pulp, Sugarcane, and Tobacco. The currently implemented loader exposes:
+closed set to Pulp, Sugarcane, and Tobacco. The currently implemented loaders expose:
 
 ```python
-from pipls.datasets import load_pulp
+from pipls.datasets import load_pulp, load_sugarcane
 
-data = load_pulp()
-X, Y = load_pulp(return_X_y=True)
+pulp = load_pulp()
+sugarcane = load_sugarcane()
+X, Y = load_sugarcane(return_X_y=True)
 ```
 
 Each named loader returns the existing immutable `PiPLSDataset` or fresh read-only arrays from
@@ -83,12 +84,12 @@ installed package resources. Loaders are optional, local, and dataset-specific: 
 download, `as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows
 from them. General users and every other real dataset continue to supply `X` and `Y` directly.
 
-`load_pulp()` and its sole active package resources are implemented, and every maintained Pulp
-consumer uses them. Its public wrapper now delegates to dataset-neutral private resource, metadata,
-CSV, integrity, provenance, and sample-identifier machinery. `load_sugarcane()` and
-`load_tobacco()` are accepted targets but are not added until Decision 0142 Patches 3 and 4. Their
-current repository matrices remain temporary parity sources until consumer migration and final
-duplicate removal.
+`load_pulp()` and `load_sugarcane()` are implemented through dataset-neutral private resource,
+metadata, CSV, integrity, provenance, and sample-identifier machinery. Every maintained Pulp
+consumer uses its loader. Sugarcane's package resources exactly match the temporary repository
+matrices, but maintained consumers remain on that repository copy until Patch 5. `load_tobacco()`
+is accepted but is not added until Patch 4. The repository Sugarcane and Tobacco matrices remain
+temporary parity sources until consumer migration and final duplicate removal.
 
 The final resource directories under `src/pipls/_data/<dataset>/` are intentionally ordinary
 CSV, JSON, README, and license assets. Public documentation must identify their locations in a

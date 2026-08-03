@@ -1,9 +1,12 @@
 # Dataset interface and synthetic generator
 
-The optional dataset interface provides a structured in-memory boundary for one packaged Pulp
-dataset, package-owned synthetic data, and experiments. Real-data users may pass ordinary arrays or
+The optional dataset interface provides a structured in-memory boundary for packaged Pulp and
+Sugarcane datasets, package-owned synthetic data, and experiments. Real-data users may pass
+ordinary arrays or
 data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
-Sugarcane and Tobacco remain repository datasets with documentary `metadata.yaml` files.
+Sugarcane now also has an installed named loader and canonical package resources; its maintained
+examples retain the byte-identical repository copy temporarily. Tobacco remains a repository
+dataset with documentary `metadata.yaml` until its assigned loader patch.
 
 ## Validated dataset container
 
@@ -204,19 +207,21 @@ Real-data reading remains user-owned in general. Examples and reproduction scrip
 `Y` are formed using ordinary NumPy, pandas, or domain-specific code. Pi-PLS provides no public
 registry, generic loader, downloader, preparation-only script, or required metadata sidecar.
 
-Pulp is one explicit package-owned exception. It is bundled with the installed distribution and
-available without network access:
+Pulp and Sugarcane are explicit package-owned reference datasets. They are bundled with the
+installed distribution and available without network access:
 
 ```python
-from pipls.datasets import load_pulp
+from pipls.datasets import load_pulp, load_sugarcane
 
-data = load_pulp()
-X, Y = load_pulp(return_X_y=True)
+pulp = load_pulp()
+sugarcane = load_sugarcane()
+X, Y = load_sugarcane(return_X_y=True)
 ```
 
 The default result is an immutable `PiPLSDataset`; the direct return mode supplies the same read-only
-`float64` matrices. The loader applies no imputation, centering, scaling, row filtering, or learned
-preprocessing. Sugarcane, Tobacco, and user datasets continue to use explicit user-owned reading.
+`float64` matrices. The loaders apply no imputation, centering, scaling, row filtering, or learned
+preprocessing. Tobacco and user datasets continue to use explicit user-owned reading during this
+transition, and Sugarcane's maintained examples are migrated in a later patch.
 
 ## Pulp real-data integration
 
@@ -239,8 +244,9 @@ The installed resources are the sole active Pulp matrix representation.
 
 ## Sugarcane spectral integration
 
-`datasets/sugarcane/` contains 57 samples, 1,721 LabSpec absorbance predictors spanning 780
-through 2500 nm, and four responses: total sugar, crude protein, acid detergent fiber, and in vitro
+The installed Sugarcane resources contain 57 samples, 1,721 LabSpec absorbance predictors spanning
+780 through 2500 nm, and four responses: total sugar, crude protein, acid detergent fiber, and in
+vitro
 organic matter digestibility. The original public dataset is:
 
 > Chaix, G., Bendoula, R., and Zgouz, A. (2021). Data set of Visible-Near Infrared handled and
@@ -256,10 +262,12 @@ The accompanying data paper is:
 > properties. *Data in Brief*, **31**, 106013.
 > [doi:10.1016/j.dib.2020.106013](https://doi.org/10.1016/j.dib.2020.106013).
 
-The Mendeley collection is licensed CC BY 4.0. The repository adaptation matches the public
-LabSpec and response tables by `Sample`, removes three rows whose total-sugar response is missing,
-and applies no imputation or spectral preprocessing. `examples/06_sugarcane_real_data.py` reads
-`X.csv` and `Y.csv` directly, evaluates the default path-evaluating `PiPLSSearchCV()`, plots
+The Mendeley collection is licensed CC BY 4.0. The package adaptation matches the public LabSpec
+and response tables by `Sample`, removes three rows whose total-sugar response is missing, and
+applies no imputation or spectral preprocessing. `load_sugarcane()` returns the immutable labeled
+package dataset or its read-only matrices. During the staged transition,
+`examples/06_sugarcane_real_data.py` still reads the byte-identical repository `X.csv` and `Y.csv`
+directly, evaluates the default path-evaluating `PiPLSSearchCV()`, plots
 `component_path_` in memory, and fits a separate fixed model after a visible user component choice.
 It obtains the conditional predictor-rank profile at the selected component count, obtains
 selection-conditioned OOF predictions through `search.validation_report()`, and writes six final

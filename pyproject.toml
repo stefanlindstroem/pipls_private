@@ -61,6 +61,10 @@ pipls = [
   "_data/pulp/*.json",
   "_data/pulp/*.md",
   "_data/pulp/*.txt",
+  "_data/sugarcane/*.csv",
+  "_data/sugarcane/*.json",
+  "_data/sugarcane/*.md",
+  "_data/sugarcane/*.txt",
 ]
 
 [tool.pytest.ini_options]

@@ -157,10 +157,12 @@ remain mutable. Git history, review, public provenance, and the dataset document
 source of record for documentary contents.
 
 Decision 0138 adds the implemented package-owned Pulp contract. Decision 0142 extends the final
-test boundary to Sugarcane and Tobacco through staged patches. For each named loader, tests protect
-return modes, immutable arrays and metadata, stable package sample identifiers, ordered labels,
-public provenance, pickle reconstruction, resource and canonical-array hashes, clean wheel/source-
-distribution loading, maintained-consumer ownership, and one active matrix location. Ordinary
+test boundary to Sugarcane and Tobacco through staged patches. Pulp and Sugarcane loader tests now
+protect return modes, immutable arrays and metadata, stable package sample identifiers, ordered
+labels, public provenance, pickle reconstruction, resource and canonical-array hashes, and clean
+wheel/source-distribution loading. Sugarcane additionally retains exact byte and array parity with
+the temporary repository copy until final duplicate removal. Tobacco receives the same boundary in
+Patch 4; maintained-consumer ownership and one active matrix location follow in Patches 5 and 6. Ordinary
 documentary-metadata tests should still avoid freezing narrative wording.
 
 Patch 2 generalizes private resource loading without changing public behavior. Tests protect the

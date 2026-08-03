@@ -35,6 +35,10 @@ def test_distribution_check_is_a_public_make_target_and_sdist_input() -> None:
     assert "include CITATION.cff" in manifest
     assert "include tools/check_distributions.py" in manifest
     assert "recursive-include src/pipls/_data/pulp *.csv *.json *.md *.txt" in manifest
+    assert (
+        "recursive-include src/pipls/_data/sugarcane *.csv *.json *.md *.txt"
+        in manifest
+    )
     assert "recursive-include examples/results .gitkeep" in manifest
     assert "[tool.setuptools.package-data]" in pyproject
     for pattern in (
@@ -42,6 +46,10 @@ def test_distribution_check_is_a_public_make_target_and_sdist_input() -> None:
         '"_data/pulp/*.json"',
         '"_data/pulp/*.md"',
         '"_data/pulp/*.txt"',
+        '"_data/sugarcane/*.csv"',
+        '"_data/sugarcane/*.json"',
+        '"_data/sugarcane/*.md"',
+        '"_data/sugarcane/*.txt"',
     ):
         assert pattern in pyproject
 
@@ -73,7 +81,7 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
         "import pipls.metrics",
         "import pipls.search",
         "from pipls import PiPLSRegression, PiPLSSearchCV",
-        "from pipls.datasets import load_pulp",
+        "from pipls.datasets import load_pulp, load_sugarcane",
     ):
         assert public_import in helper
 
@@ -86,6 +94,10 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
     assert "pulp_X, pulp_Y = load_pulp(return_X_y=True)" in helper
     assert "pulp.data.shape == (46, 14)" in helper
     assert "pulp.target.shape == (46, 8)" in helper
+    assert "sugarcane = load_sugarcane()" in helper
+    assert "sugarcane_X, sugarcane_Y = load_sugarcane(return_X_y=True)" in helper
+    assert "sugarcane.data.shape == (57, 1721)" in helper
+    assert "sugarcane.target.shape == (57, 4)" in helper
 
 
 def test_build_workflow_validates_installed_distributions() -> None:
