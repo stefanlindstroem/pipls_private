@@ -112,11 +112,10 @@ The complete real-data examples own scientific orchestration:
 - explicit figure, axis, legend, title, saving, and closing operations;
 - dataset-specific physical-axis labels, response subsets, and pagination.
 
-Pulp, Sugarcane, and Tobacco keep those stages directly in their numbered scripts. Pulp obtains its
-installed matrices and labels through `load_pulp()`. `load_sugarcane()` and `load_tobacco()` are
-implemented, but both spectral scripts still use pandas on temporary parity copies until Decision
-0142 Patch 5. Sugarcane and Tobacco place scientific
-computation and orchestration in `main()` and may group rendering in private functions defined in the same script.
+Pulp, Sugarcane, and Tobacco keep those stages directly in their numbered scripts and obtain their
+installed matrices and labels through `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`. The
+spectral scripts derive physical coordinates and response names from `PiPLSDataset` while keeping
+scientific computation and orchestration in `main()` and rendering in private same-file functions.
 Do not introduce a generic real-data loader.
 Do not place user analysis helpers under `scripts/`, which remains the repository-maintenance and
 preparation area.

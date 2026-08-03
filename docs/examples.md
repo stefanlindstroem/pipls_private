@@ -107,8 +107,8 @@ same named rule through `search.refit(...)` for full-data fitting.
 Pulp, Sugarcane, and Tobacco each write six final PDF figures, including
 `predictor_rank_profile.pdf`. Tobacco retains three-page prediction-diagnostic and coefficient
 PDFs. No numbered
-example writes a generated CSV file: Pulp is supplied by `load_pulp()`, while Sugarcane and Tobacco
-retain committed `X.csv` and `Y.csv` inputs. Every figure is constructed directly from
+example writes a generated CSV file: Pulp, Sugarcane, and Tobacco are supplied by their named
+`pipls.datasets` loaders. Every figure is constructed directly from
 `component_path_`, conditional predictor-rank profiles, explicit search validation reports, and
 immutable inspection results. The Pulp factor view anchors every component to a positive tensile-
 index (`TI`) response entry; Sugarcane and Tobacco retain the default predictor-based orientation.

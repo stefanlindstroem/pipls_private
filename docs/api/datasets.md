@@ -9,8 +9,9 @@ predictor or response signal.
 Pulp, Sugarcane, and Tobacco are available through the named package-owned loaders below. The
 [dataset guide](../datasets.md) records provenance and preparation, and the
 [maintained examples](../examples.md#complete-real-data-analyses) show their analysis workflows.
-Sugarcane and Tobacco examples continue to use temporary byte-identical repository copies until the
-consumer-migration patch; no generic registry or download layer is provided.
+Every maintained reference-data workflow uses the corresponding loader. Temporary byte-identical
+Sugarcane and Tobacco repository copies remain only for final parity and single-copy cleanup; no
+generic registry or download layer is provided.
 
 Mathematical notation on this page follows the package convention: complete matrices are bold,
 descriptive role and block subscripts are upright, and variable indices remain italic. For example,
@@ -33,8 +34,8 @@ the same read-only predictor and response arrays directly.
 
 `load_sugarcane()` returns the 57 by 1,721 LabSpec predictor matrix and four aligned responses from
 installed package resources. The feature names are the wavelength labels `"780"` through `"2500"`;
-loading performs no network access or spectral preprocessing. The temporary repository copy remains
-only for parity and later consumer migration.
+loading performs no network access or spectral preprocessing. Maintained workflows use this loader;
+the temporary repository copy remains only for final parity and single-copy cleanup.
 
 ::: pipls.datasets.load_tobacco
     options:
@@ -43,8 +44,8 @@ only for parity and later consumer migration.
 `load_tobacco()` returns the 347 by 1,557 raw FT-NIR predictor matrix and 13 aligned chemical
 responses from installed package resources. Feature names preserve the decreasing source
 wavenumbers from approximately 10,001 through 4,000 `cm^-1`; loading performs no network access or
-spectral preprocessing. The temporary repository copy remains only for parity and later consumer
-migration.
+spectral preprocessing. Maintained workflows use this loader; the temporary repository copy remains
+only for final parity and single-copy cleanup.
 
 ## Containers
 

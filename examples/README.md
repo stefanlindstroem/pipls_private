@@ -104,18 +104,20 @@ uses optional `adjustText` only to reposition its Matplotlib text labels.
 
 ## Real-data workflow contract
 
-Pulp is package-owned and all maintained Pulp consumers use its named loader:
+Pulp, Sugarcane, and Tobacco are package-owned, and every maintained consumer uses the
+corresponding named loader:
 
 ```python
-data = load_pulp()
+data = load_sugarcane()
 X, Y = data.data, data.target
-response_names = data.target_names
+wavelengths = np.asarray(data.feature_names, dtype=np.float64)
+response_names = list(data.target_names)
 ```
 
-Sugarcane and Tobacco continue to show label acquisition through explicit repository CSV reading.
-Users whose arrays do not carry column headers can supply equivalent lists from a schema, laboratory
-information system, or other domain metadata. The package inspection API does not invent scientific
-variable names.
+The Tobacco workflow uses the same pattern for its decreasing wavenumber axis. Users whose arrays do
+not carry labels can supply equivalent coordinates and names from a schema, laboratory information
+system, or other domain metadata. The package inspection API does not invent scientific variable
+names.
 
 Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
 comparison figures directly. Sugarcane demonstrates the complete-analysis workflow:
@@ -148,10 +150,10 @@ multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
 figures retain explicit provenance. Numbered examples never serialize analytical results for later
-plotting; CSV use is limited to the committed `X.csv` and `Y.csv` inputs. Sugarcane reads its
-strictly increasing wavelength coordinate
-from the `X.csv` headers. Tobacco preserves its decreasing wavenumber coordinate and partitions all
-thirteen responses in source order. Generated files under `examples/results/` are ignored by Git.
+plotting and do not read repository CSV files. Sugarcane derives its strictly increasing wavelength
+coordinate from `data.feature_names`. Tobacco derives its decreasing wavenumber coordinate and all
+thirteen source-order response names from the same immutable dataset result. Generated files under
+`examples/results/` are ignored by Git.
 
 ## Output directories
 

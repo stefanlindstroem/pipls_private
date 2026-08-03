@@ -25,6 +25,7 @@ from 780 through 2500 nm. The resulting matrices contain 57 aligned rows, 1,721 
 responses.
 
 No response values are imputed. No smoothing, derivative, scatter correction, centering, scaling,
-or other spectral preprocessing is applied. `examples/06_sugarcane_real_data.py` reads `X.csv` and
-`Y.csv` directly and runs ordinary Pi-PLS path selection; it does not parse the metadata or call a
-package data loader.
+or other spectral preprocessing is applied. `examples/06_sugarcane_real_data.py` uses
+`pipls.datasets.load_sugarcane()` and derives wavelengths and response names from the immutable
+package result. This directory remains only as a temporary parity fixture until Patch 6 removes the
+duplicate repository matrices.

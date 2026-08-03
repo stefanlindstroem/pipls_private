@@ -134,7 +134,7 @@ Implement the transition in six reviewable patches:
 
 ## Implementation status
 
-Patches 1 through 4 are implemented. The decision and guide-layer target are established, and the
+Patches 1 through 5 are implemented. The decision and guide-layer target are established, and the
 shared private machinery handles resource access, metadata and CSV parsing, shape validation,
 resource and canonical-array integrity checks, provenance, and stable sample identifiers.
 `load_pulp()` preserves its original public contract. `load_sugarcane()` exposes the immutable
@@ -142,11 +142,14 @@ resource and canonical-array integrity checks, provenance, and stable sample ide
 1,557 raw FT-NIR matrix and 13 responses. Both spectral package resources have exact matrix parity
 with their temporary repository copies and pass clean wheel/source-distribution loading. The
 Tobacco attribution file is corrected before packaging so the canonical and temporary copies both
-identify the Tobacco source. Maintained Sugarcane and Tobacco consumers continue to use the
-repository copies until Patch 5.
+identify the Tobacco source. Every maintained Pulp, Sugarcane, and Tobacco consumer now uses its
+named loader. The repository spectral copies remain only as parity sources for Patch 6 single-copy
+cleanup and language-neutral raw-file publication.
 
 This decision refines Decision 0138 from one package-owned Pulp exception to a closed set of three
-maintained reference datasets. It supersedes Decisions 0022, 0023, 0067, 0069, and 0070 only where
+maintained reference datasets. It also refines Decision 0103 by removing pandas from the `examples`
+extra once every numbered reference-data workflow uses the named loaders. It supersedes Decisions
+0022, 0023, 0067, 0069, and 0070 only where
 they require direct reading from `datasets/sugarcane/` or `datasets/tobacco/`. Their scientific
 matrix definitions, provenance, selection, validation, interpretation, and rendering contracts
 otherwise remain in force. Decisions 0016 and 0018 continue to govern user-owned real data and any

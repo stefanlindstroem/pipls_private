@@ -200,8 +200,8 @@ plan contains an earlier or more general proposal:
 - Decision 0142 accepts a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable
-  independently of Python, while the repository spectral copies remain transitional until consumer
-  migration and single-copy cleanup are complete;
+  independently of Python. Every maintained consumer uses the named loaders, while repository
+  spectral copies remain transitional only until single-copy cleanup is complete;
 - examples show their data-reading and matrix-construction code rather than relying on hidden
   utility functions;
 - the first numbered example uses literal NumPy matrices and one fixed fit; complete-workflow

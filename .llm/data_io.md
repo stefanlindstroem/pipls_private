@@ -32,18 +32,18 @@ synthetic generators and named reference datasets. It is not required for real d
 must not imply otherwise. Decision 0142 assigns package ownership to Pulp, Sugarcane, and Tobacco
 through three named loaders, with their resources included in the base installation. This creates
 neither a general data-access extra nor a registry. Pulp, Sugarcane, and Tobacco are implemented
-as package loaders; maintained Sugarcane and Tobacco consumers continue to use byte-identical
-repository CSV files until the consumer-migration patch lands.
+as package loaders, and every maintained reference-data consumer uses those installed resources.
+The repository spectral matrices remain temporary parity fixtures until single-copy cleanup.
 
 ## Example transparency
 
 Examples must behave as an ordinary programming user is expected to behave:
 
-1. read the predictor file or columns explicitly;
-2. read the response file or columns explicitly;
-3. show any scientifically meaningful row alignment or column selection in the script;
-4. form `X` and `Y` visibly;
-5. call `fit(X, Y)`.
+1. obtain predictors and responses through a visible user-owned read or an explicitly named
+   package-owned loader;
+2. show any scientifically meaningful row alignment or column selection in the script;
+3. form `X` and `Y` visibly;
+4. call `fit(X, Y)`.
 
 For committed repository datasets, examples may trust the documented CSV schema and tested file
 layout. Do not repeat dtype, missing-value, header-order, or directory-existence checks when the
@@ -86,10 +86,9 @@ from them. General users and every other real dataset continue to supply `X` and
 
 `load_pulp()`, `load_sugarcane()`, and `load_tobacco()` are implemented through dataset-neutral
 private resource, metadata, CSV, integrity, provenance, and sample-identifier machinery. Every
-maintained Pulp consumer uses its loader. Sugarcane and Tobacco package matrices exactly match their
-temporary repository copies, but maintained consumers remain on those copies until Patch 5. The
-repository spectral matrices remain temporary parity sources until consumer migration and final
-duplicate removal.
+maintained reference-data consumer uses the corresponding loader. Sugarcane and Tobacco package
+matrices exactly match their temporary repository copies, which remain parity sources only until
+final duplicate removal.
 
 The final resource directories under `src/pipls/_data/<dataset>/` are intentionally ordinary
 CSV, JSON, README, and license assets. Public documentation must identify their locations in a

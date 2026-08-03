@@ -42,7 +42,7 @@ dev = [
   "pytest>=8",
   "ruff>=0.6",
 ]
-examples = ["pandas>=2.0", "matplotlib>=3.8", "adjustText>=1.4,<2"]
+examples = ["matplotlib>=3.8", "adjustText>=1.4,<2"]
 docs = [
   "build>=1.2,<2",
   "matplotlib>=3.8",

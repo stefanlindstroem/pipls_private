@@ -55,11 +55,10 @@
   `search.refit(...)`; do not manually transfer the selected predictor rank into a new estimator.
   Resolve scalar selected rows through `search.select(...)` only where plotting, reporting, or an
   explicit recommendation display needs that evidence.
-- For real-data examples, form `X` and `Y` visibly in the script. Pulp uses `load_pulp()`.
-  `load_sugarcane()` and `load_tobacco()` are implemented, but maintained spectral examples retain
-  explicit reading from their temporary parity copies until Decision 0142 Patch 5. Ordinary user
-  data retain explicit reading. Do not introduce a registry, generic loader, metadata-driven runtime
-  path, or helper that obscures data acquisition.
+- For real-data examples, form `X` and `Y` visibly in the script. Package-owned Pulp, Sugarcane,
+  and Tobacco use their named loaders; ordinary user data retain explicit user-owned reading. Do not
+  introduce a registry, generic loader, metadata-driven runtime path, or helper that obscures data
+  acquisition.
 - The transitional Sugarcane and Tobacco repository copies follow `.llm/dataset_layout.md`:
   comma-delimited `X.csv`, comma-delimited `Y.csv`, and documentary `metadata.yaml`. The canonical
   Pulp, Sugarcane, and Tobacco representations follow the package-resource contract in Decisions

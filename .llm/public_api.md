@@ -258,9 +258,9 @@ from pipls.datasets import (
 and a pair of fresh read-only `float64` arrays when `return_X_y=True`. The loaders are backed by
 installed package resources, verify resource and canonical-array integrity, perform no network
 access or preprocessing, and are exported only from `pipls.datasets`; no `as_frame`, registry, or
-generic loader is authorized. At Patch 4, all three use dataset-neutral private loading machinery.
-Sugarcane and Tobacco have canonical package representations plus temporary byte-identical matrix
-parity copies; their maintained consumers remain unchanged until Patch 5.
+generic loader is authorized. At Patch 5, all three use dataset-neutral private loading machinery,
+and every maintained reference-data consumer uses the corresponding loader. Sugarcane and Tobacco
+retain temporary byte-identical repository parity copies only until final single-copy cleanup.
 
 The final `src/pipls/_data/<dataset>/` directories contain ordinary `X.csv`, `Y.csv`,
 `metadata.json`, `README.md`, and `LICENSE.txt` resources. The exact same files are documented for

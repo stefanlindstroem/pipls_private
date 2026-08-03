@@ -67,8 +67,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
 - a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
   `metadata.yaml`;
 - a current reference suite containing package-owned Pulp, Sugarcane, and Tobacco, with temporary
-  Sugarcane and Tobacco repository parity copies retained until consumer migration and final
-  single-copy cleanup;
+  Sugarcane and Tobacco repository parity copies retained only until final single-copy cleanup;
 - the implemented `pipls.datasets.load_pulp()`, `load_sugarcane()`, and `load_tobacco()` datasets,
   backed by installed package resources and the same immutable contract;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
@@ -243,7 +242,7 @@ case, or public behavior.
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
 | Dataset namespace | immutable container, implemented `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`, plus seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Reference datasets | Pulp, Sugarcane, and Tobacco are public package resources at Patch 4; temporary spectral parity copies remain until Patches 5 and 6 complete migration and single-copy cleanup |
+| Reference datasets | Pulp, Sugarcane, and Tobacco are public package resources used by every maintained consumer at Patch 5; temporary spectral parity copies remain only until Patch 6 single-copy cleanup |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -552,18 +551,18 @@ The final resources remain ordinary CSV, JSON, README, and license files under
 wheels, and installed packages. The transition introduces no registry, downloader, `as_frame`
 surface, hidden preprocessing, or top-level loader exports.
 
-Current status: **Patches 1 through 4 complete**. Pulp, Sugarcane, and Tobacco are implemented
-named package loaders backed by dataset-neutral private loading machinery. Sugarcane and Tobacco
-package matrices exactly match temporary repository copies; maintained spectral consumers remain
-unchanged until Patch 5. The Tobacco attribution file now identifies the correct dataset in both
-locations.
+Current status: **Patches 1 through 5 complete**. Pulp, Sugarcane, and Tobacco are implemented
+named package loaders backed by dataset-neutral private loading machinery, and every maintained
+reference-data consumer uses the corresponding loader. Sugarcane and Tobacco package matrices
+exactly match temporary repository copies retained only for final parity and single-copy cleanup.
+The Tobacco attribution file identifies the correct dataset in both locations.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 5: migrate maintained Sugarcane and Tobacco consumers and active
-workflow documentation to `load_sugarcane()` and `load_tobacco()` while retaining the temporary
-repository copies for final parity and single-copy cleanup. Decision 0139 Patch 3 remains paused
-until the owner resumes that independent presentation increment.
+Implement Decision 0142 Patch 6: remove the temporary Sugarcane and Tobacco repository matrices,
+publish the language-neutral raw-file locations, enforce one active resource pair per named dataset,
+and mark Decision 0142 implemented. Decision 0139 Patch 3 remains paused until the owner resumes
+that independent presentation increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
 package resources are available in clean wheel and source-distribution installations, every

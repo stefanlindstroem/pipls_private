@@ -4,22 +4,21 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from _support.pls_component_path import evaluate_pls_component_path
 from sklearn.model_selection import KFold
 
 from pipls import PiPLSRegression, PiPLSSearchCV
-from pipls.datasets import load_pulp
+from pipls.datasets import load_pulp, load_sugarcane, load_tobacco
 
-DATASETS_DIR = Path(__file__).resolve().parents[1] / "datasets"
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
-for dataset, search in (
-    ("pulp", PiPLSSearchCV(cv=CV)),
-    ("sugarcane", PiPLSSearchCV(cv=CV)),
+for dataset, (X, Y), search in (
+    ("pulp", load_pulp(return_X_y=True), PiPLSSearchCV(cv=CV)),
+    ("sugarcane", load_sugarcane(return_X_y=True), PiPLSSearchCV(cv=CV)),
     (
         "tobacco",
+        load_tobacco(return_X_y=True),
         PiPLSSearchCV(
             estimator=PiPLSRegression(
                 n_components=1,
@@ -31,12 +30,6 @@ for dataset, search in (
         ),
     ),
 ):
-    if dataset == "pulp":
-        X, Y = load_pulp(return_X_y=True)
-    else:
-        X = pd.read_csv(DATASETS_DIR / dataset / "X.csv")
-        Y = pd.read_csv(DATASETS_DIR / dataset / "Y.csv")
-
     search.fit(X, Y)
     pipls_path = search.component_path_
     pls_path = evaluate_pls_component_path(

@@ -33,9 +33,10 @@ Fritjof Nilsson, and Stefan B. Lindström are the package authors and current co
 revision at *Computers & Chemical Engineering* (CACE-D-26-00847). Dataset-specific licenses
 remain separate.
 
-The real-dataset suite contains package-owned Pulp, Sugarcane, and Tobacco. Sugarcane and Tobacco
-retain temporary repository parity copies until the consumer migration and single-copy cleanup
-patches. Decision 0142 accepts a six-patch transition to three package-owned named reference
+The real-dataset suite contains package-owned Pulp, Sugarcane, and Tobacco. Every maintained
+consumer uses the named loaders; Sugarcane and Tobacco retain temporary repository parity copies only
+until the single-copy cleanup patch. Decision 0142 accepts a six-patch transition to three package-
+owned named reference
 datasets with ordinary language-neutral resources and one active matrix copy each. A licensing
 review of the remaining companion-analysis candidates intentionally excluded Corn, the legacy
 Citrination Steel table, SARCOS, and FRED-MD from this repository because the exact source
@@ -56,10 +57,9 @@ Decision 0140 now provides non-mutating `PiPLSSearchCV.select()` as the search-o
 lookup. Every maintained example, tutorial renderer, and living user document uses that operation;
 `PiPLSComponentPath` is now limited to aligned numerical evidence and immutable serialization.
 
-Pulp acquisition uses package resources through `load_pulp()`. `load_sugarcane()` and
-`load_tobacco()` and their package resources are implemented with exact matrix parity to temporary
-repository copies, while maintained spectral consumers retain direct repository CSV reading until
-Patch 5. The loaders are `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`, all backed by
+Pulp, Sugarcane, and Tobacco acquisition uses `load_pulp()`, `load_sugarcane()`, and
+`load_tobacco()`, respectively. The spectral package resources retain exact matrix parity to
+repository copies that now serve only as temporary cleanup fixtures. All loaders are backed by
 documented CSV resources usable outside Python. Pulp also exposes
 the conditional predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
 `main()` and group rendering in private functions within their numbered scripts. Tobacco retains
@@ -165,10 +165,10 @@ implementing or reviewing this surface.
 
 ## Product-asset ownership
 
-- `datasets/`: transitional Sugarcane and Tobacco repository resources using the standard
-  `X.csv`, `Y.csv`, and `metadata.yaml` layout. Decision 0142 moves their canonical active copies
-  into `src/pipls/_data/` and removes this duplicate layout after parity and consumer migration.
-  No generic runtime registry is required.
+- `datasets/`: transitional Sugarcane and Tobacco parity resources using the standard `X.csv`,
+  `Y.csv`, and `metadata.yaml` layout. Their canonical active copies are under `src/pipls/_data/`,
+  every maintained consumer uses the named loaders, and Decision 0142 Patch 6 removes this duplicate
+  layout after final parity verification. No generic runtime registry is required.
 - `examples/`: self-contained numbered user workflows with a package-owned Pulp fitted-value
   quick start first, followed by an explained synthetic train/test use case, one explicit
   comparison example, and
@@ -181,9 +181,10 @@ implementing or reviewing this surface.
   figures.
   Sugarcane and Tobacco keep rendering functions in their numbered scripts; all three complete
   real-data workflows own conditional predictor-rank profile figures, while Pulp additionally
-  owns tutorial snippets. Their pandas, Matplotlib, and optional
-  `adjustText` requirements are grouped in the `examples` extra and repeated in `dev` for complete
-  repository validation. The `docs` extra owns the strict site and tutorial-rendering toolchain.
+  owns tutorial snippets. Their Matplotlib and optional `adjustText` requirements are grouped in
+  the `examples` extra and repeated in `dev` for complete repository validation. Pandas remains a
+  development dependency for interoperability tests but is no longer required by numbered examples.
+  The `docs` extra owns the strict site and tutorial-rendering toolchain.
   There is no dataset-access extra: the named reference loaders use runtime package data, while the
   complete real-data analyses retain their currently assigned repository inputs. Real-data
   analyses are not duplicated here.

@@ -4,11 +4,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
 from pipls import PiPLSComponentPath, PiPLSPredictorRankProfile, PiPLSSearchCV
+from pipls.datasets import load_sugarcane
 from pipls.inspection import (
     LatentStructure,
     PiPLSDisplayFactors,
@@ -18,7 +18,6 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "sugarcane"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "sugarcane_post_analysis"
 CHOSEN_N_COMPONENTS = 2
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
@@ -299,10 +298,11 @@ def _plot_coefficients(
 
 
 def main() -> None:
-    X = pd.read_csv(DATA_DIR / "X.csv")
-    Y = pd.read_csv(DATA_DIR / "Y.csv")
-    wavelengths = X.columns.to_numpy(dtype=float)
-    response_names = Y.columns.tolist()
+    data = load_sugarcane()
+    X = data.data
+    Y = data.target
+    wavelengths = np.asarray(data.feature_names, dtype=np.float64)
+    response_names = list(data.target_names)
 
     # Evaluate the Pi-PLS component path over paired-mode counts.
     search = PiPLSSearchCV(cv=CV).fit(X, Y)

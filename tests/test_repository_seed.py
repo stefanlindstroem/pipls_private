@@ -396,13 +396,12 @@ def test_documentation_ci_deploys_only_the_master_pages_site(tmp_path: Path) -> 
     assert config["edit_uri"] == "edit/master/docs/"
 
 
-def test_examples_extra_declares_data_and_rendering_dependencies() -> None:
+def test_examples_extra_declares_rendering_dependencies() -> None:
     project = _project_metadata()
     runtime = project["dependencies"]
     extras = project["optional-dependencies"]
 
     assert extras["examples"] == [
-        "pandas>=2.0",
         "matplotlib>=3.8",
         "adjustText>=1.4,<2",
     ]

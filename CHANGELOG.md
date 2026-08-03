@@ -4,6 +4,12 @@
 
 ### Repository
 
+- Migrate every maintained Sugarcane and Tobacco consumer to the installed `load_sugarcane()` and
+  `load_tobacco()` resources. Examples 04, 06, and 07 no longer import pandas or use repository-
+  relative dataset paths; spectral coordinates and response names come from immutable
+  `PiPLSDataset` labels. Remove pandas from the `examples` extra while retaining it in `dev` for
+  interoperability tests. Retain the byte-identical repository matrices only for final parity and
+  single-copy cleanup.
 - Add the package-owned `pipls.datasets.load_tobacco()` API with immutable labeled and direct-
   matrix return modes, canonical FT-NIR CSV/JSON/README/license resources, exact matrix parity with
   the temporary repository copy, resource and canonical-array integrity checks, and clean

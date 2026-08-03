@@ -4,7 +4,6 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold
@@ -16,6 +15,7 @@ from pipls import (
     PiPLSRegression,
     PiPLSSearchCV,
 )
+from pipls.datasets import load_tobacco
 from pipls.inspection import (
     LatentStructure,
     ObservationDiagnostics,
@@ -27,7 +27,6 @@ from pipls.inspection import (
     prediction_diagnostics,
 )
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "datasets" / "tobacco"
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analysis"
 DISPLAY_COMPONENT_COUNT = 4
 RESPONSES_PER_PAGE = 5
@@ -396,10 +395,11 @@ def _write_coefficients_report(
 
 
 def main() -> None:
-    X = pd.read_csv(DATA_DIR / "X.csv")
-    Y = pd.read_csv(DATA_DIR / "Y.csv")
-    wavenumbers = X.columns.to_numpy(dtype=float)
-    response_names = Y.columns.tolist()
+    data = load_tobacco()
+    X = data.data
+    Y = data.target
+    wavenumbers = np.asarray(data.feature_names, dtype=np.float64)
+    response_names = list(data.target_names)
     response_pages = tuple(
         tuple(range(start, min(start + RESPONSES_PER_PAGE, len(response_names))))
         for start in range(0, len(response_names), RESPONSES_PER_PAGE)

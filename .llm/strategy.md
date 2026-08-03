@@ -37,8 +37,9 @@ tagged `pipls` versions.
 7. Fit every learned preprocessing operation inside the corresponding training fold.
 8. Keep paper-specific orchestration outside the package repository; downstream reproduction
    repositories pin released package versions.
-9. Keep real-data input transparent: examples read `X` and `Y` explicitly and do not depend on
-   a public registry, generic loader, or required metadata sidecar.
+9. Keep real-data input transparent: user-owned examples read `X` and `Y` explicitly; the closed
+   package-owned reference set uses named loaders. No public registry, generic loader, or required
+   metadata sidecar follows.
 10. Keep numbered examples self-contained and user-oriented: each demonstrates a recognizable use
     case or comparison, explains its data, labels its output, and assumes no publication
     context.
@@ -304,8 +305,8 @@ Acceptance conditions:
 - plain arrays or data frames supplied as `X` and `Y` remain the primary real-data interface;
 - `PiPLSDataset` is optional and no metadata sidecar is required for fitting;
 - no public registry or generic real-data loader is planned;
-- examples show ordinary reading, alignment, column selection, and matrix construction directly
-  rather than hiding them behind utilities;
+- examples show ordinary user-owned reading or an explicit named package loader, plus any alignment,
+  column selection, and matrix construction, rather than hiding them behind generic utilities;
 - repository-specific provenance and preparation information may be tracked for reproducibility
   without becoming runtime requirements for external users;
 - the revised contract is navigable from a fresh snapshot.
@@ -319,8 +320,9 @@ Migrate and validate one dataset per coherent increment. Every committed dataset
 comma-delimited `X.csv`, comma-delimited `Y.csv`, and a consistent documentary `metadata.yaml` as
 defined in `.llm/dataset_layout.md`. Record only public or included sources, citation, license,
 redistribution decision, preparation choices, shapes, columns, row ordering, missing-value policy,
-and integrity hashes. Make the analysis example read `X` and `Y` directly with ordinary NumPy or
-pandas code. Do not introduce a generic registry or loader, private-source references, or
+and integrity hashes. For ordinary repository datasets, make the analysis example read `X` and `Y`
+directly with NumPy or pandas. A decision-authorized package-owned reference dataset instead uses its
+named loader. Do not introduce a generic registry or loader, private-source references, or
 preparation-only scripts. Before implementation, verify that the exact source material has an
 explicit source-level license or permission granting redistribution and adaptation for general
 repository use; public download access alone is insufficient.
@@ -329,8 +331,9 @@ Current status: **complete for scientific integration and licensing; package-res
 accepted under Decision 0142**. Pulp provides a compact multivariate process dataset; Sugarcane adds
 a 1,721-column regular wavelength grid; and Tobacco adds 347 samples, 1,557 raw FT-NIR predictors,
 and 13 responses. Every integration uses public provenance and no hidden preparation utility.
-Pulp, Sugarcane, and Tobacco have named package loaders and canonical resources. Maintained
-Sugarcane and Tobacco consumers retain direct repository CSV reading until Patch 5. Decision 0033
+Pulp, Sugarcane, and Tobacco have named package loaders and canonical resources, and every
+maintained consumer uses them. Temporary spectral repository copies remain only for Patch 6 cleanup.
+Decision 0033
 removed the former Linnerud integration because it no longer served a useful package-level example
 or validation role. Decision 0041 intentionally excludes Corn, the legacy Citrination Steel table,
 SARCOS, and FRED-MD because the exact source
@@ -968,11 +971,11 @@ documented for use from tagged source releases, source distributions, wheels, in
 environments, and non-Python languages. No registry, downloader, pandas return mode, hidden
 preprocessing, optional data extra, or duplicate active representation is authorized.
 
-Current status: **Patches 1 through 4 complete**. The target is established; `load_pulp()`,
-`load_sugarcane()`, and `load_tobacco()` use dataset-neutral private resource-loading machinery.
-Sugarcane and Tobacco resources, integrity/parity tests, API documentation, and clean-distribution
-checks are implemented without consumer migration. The Tobacco attribution notice is corrected in
-both the package resource and temporary repository copy.
+Current status: **Patches 1 through 5 complete**. The target is established; `load_pulp()`,
+`load_sugarcane()`, and `load_tobacco()` use dataset-neutral private resource-loading machinery, and
+every maintained reference-data consumer uses the corresponding loader. Sugarcane and Tobacco
+repository copies remain parity fixtures only. The Tobacco attribution notice is correct in both
+locations.
 
 ### Three-stage user onboarding transition
 
@@ -1016,9 +1019,9 @@ numerics, tie rules, fitting semantics, or OOF provenance.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 5: migrate every maintained Sugarcane and Tobacco consumer to the
-named loaders, derive physical coordinates and response names from `PiPLSDataset`, and update active
-workflow documentation without removing the temporary parity copies yet.
+Implement Decision 0142 Patch 6: remove the duplicate Sugarcane and Tobacco repository matrices,
+document language-neutral raw-file access, enforce one active package-resource matrix pair per named
+dataset, and close Decision 0142.
 
 Decision 0139 Patch 3 remains an independent paused documentation increment. Decision 0138 remains
 the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface,

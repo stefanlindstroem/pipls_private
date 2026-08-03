@@ -5,13 +5,6 @@ from pathlib import Path
 
 import pytest
 
-_DATASET_FILENAMES = {"X.csv", "Y.csv"}
-_REAL_DATA_EXAMPLES = {
-    "04_pls_path_comparison.py",
-    "05_pulp_real_data.py",
-    "06_sugarcane_real_data.py",
-    "07_tobacco_real_data.py",
-}
 _RENDERING_PACKAGES = {"matplotlib", "adjustText"}
 _RENDERING_METHODS = {
     "add_patch",
@@ -265,18 +258,44 @@ def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
         assert "evaluate_pls_component_path" not in _call_names(_tree(examples / filename))
 
 
-def test_maintained_pulp_consumers_use_the_package_loader() -> None:
+@pytest.mark.parametrize(
+    ("loader_name", "relative_paths"),
+    [
+        (
+            "load_pulp",
+            (
+                "examples/01_pulp_quick_start.py",
+                "examples/04_pls_path_comparison.py",
+                "examples/05_pulp_real_data.py",
+                "tools/render_pulp_tutorial.py",
+            ),
+        ),
+        (
+            "load_sugarcane",
+            (
+                "examples/04_pls_path_comparison.py",
+                "examples/06_sugarcane_real_data.py",
+            ),
+        ),
+        (
+            "load_tobacco",
+            (
+                "examples/04_pls_path_comparison.py",
+                "examples/07_tobacco_real_data.py",
+            ),
+        ),
+    ],
+)
+def test_maintained_reference_consumers_use_package_loaders(
+    loader_name: str,
+    relative_paths: tuple[str, ...],
+) -> None:
     repository = _repository_root()
-    for relative_path in (
-        "examples/01_pulp_quick_start.py",
-        "examples/04_pls_path_comparison.py",
-        "examples/05_pulp_real_data.py",
-        "tools/render_pulp_tutorial.py",
-    ):
+    for relative_path in relative_paths:
         path = repository / relative_path
         tree = _tree(path)
-        assert "load_pulp" in _imported_names(tree), path
-        assert "load_pulp" in _call_names(tree), path
+        assert loader_name in _imported_names(tree), path
+        assert loader_name in _call_names(tree), path
 
 
 @pytest.mark.parametrize(
@@ -285,7 +304,9 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
         "extra_calls",
         "required_attributes",
         "expected_pdfs",
+        "loader_name",
         "response_assignment",
+        "response_source",
         "coordinate_assignment",
     ),
     [
@@ -306,7 +327,9 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
                 "latent_structure.pdf",
                 "coefficients.pdf",
             },
+            "load_pulp",
             "data.target_names",
+            None,
             None,
         ),
         (
@@ -327,8 +350,10 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
                 "latent_structure.pdf",
                 "coefficients.pdf",
             },
-            "Y.columns.tolist",
-            ("wavelengths", "X.columns.to_numpy"),
+            "load_sugarcane",
+            "list",
+            "data.target_names",
+            ("wavelengths", "np.asarray", "data.feature_names"),
         ),
         (
             "07_tobacco_real_data.py",
@@ -350,8 +375,10 @@ def test_maintained_pulp_consumers_use_the_package_loader() -> None:
                 "latent_structure.pdf",
                 "coefficients.pdf",
             },
-            "Y.columns.tolist",
-            ("wavenumbers", "X.columns.to_numpy"),
+            "load_tobacco",
+            "list",
+            "data.target_names",
+            ("wavenumbers", "np.asarray", "data.feature_names"),
         ),
     ],
 )
@@ -360,8 +387,10 @@ def test_real_data_examples_use_direct_public_results(
     extra_calls: set[str],
     required_attributes: set[str],
     expected_pdfs: set[str],
+    loader_name: str,
     response_assignment: str,
-    coordinate_assignment: tuple[str, str] | None,
+    response_source: str | None,
+    coordinate_assignment: tuple[str, str, str] | None,
 ) -> None:
     path = _repository_root() / "examples" / filename
     tree = _tree(path)
@@ -379,10 +408,14 @@ def test_real_data_examples_use_direct_public_results(
         *extra_calls,
     } <= calls
     assert required_attributes <= attributes
+    assert loader_name in calls
     assert _assigned_value_path(tree, "response_names") == response_assignment
+    if response_source is not None:
+        assert _assigned_call_argument_path(tree, "response_names", 0) == response_source
     if coordinate_assignment is not None:
-        variable, call_path = coordinate_assignment
+        variable, call_path, source_path = coordinate_assignment
         assert _assigned_call_path(tree, variable) == call_path
+        assert _assigned_call_argument_path(tree, variable, 0) == source_path
     assert {
         value
         for value in _string_literals(tree)
@@ -391,17 +424,23 @@ def test_real_data_examples_use_direct_public_results(
 
 
 @pytest.mark.parametrize(
-    ("filename", "extra_analysis_calls"),
+    ("filename", "loader_name", "extra_analysis_calls"),
     [
-        ("06_sugarcane_real_data.py", {"predictor_rank_profile"}),
+        (
+            "06_sugarcane_real_data.py",
+            "load_sugarcane",
+            {"predictor_rank_profile"},
+        ),
         (
             "07_tobacco_real_data.py",
+            "load_tobacco",
             {"observation_diagnostics", "predictor_rank_profile"},
         ),
     ],
 )
 def test_complete_examples_separate_analysis_from_same_file_rendering(
     filename: str,
+    loader_name: str,
     extra_analysis_calls: set[str],
 ) -> None:
     path = _repository_root() / "examples" / filename
@@ -411,7 +450,7 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
 
     analysis_calls = {
         "PiPLSSearchCV",
-        "read_csv",
+        loader_name,
         "refit",
         "select",
         "validation_report",
@@ -454,18 +493,12 @@ def test_numbered_examples_keep_dataset_io_and_analysis_in_memory() -> None:
     for path in _numbered_examples():
         tree = _tree(path)
         calls = _call_names(tree)
+        imports = _import_roots(tree)
         assert "mkdir" not in calls, path
+        assert "read_csv" not in calls, path
         assert "to_csv" not in calls, path
-        assert "subprocess" not in _import_roots(tree), path
-
-        for call in _calls_with_name(tree, "read_csv"):
-            assert path.name in _REAL_DATA_EXAMPLES, path
-            assert len(call.args) == 1, path
-            csv_literals = {
-                value for value in _string_literals(call.args[0]) if value.endswith(".csv")
-            }
-            assert csv_literals
-            assert csv_literals <= _DATASET_FILENAMES, path
+        assert "pandas" not in imports, path
+        assert "subprocess" not in imports, path
 
 
 
@@ -528,7 +561,11 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
 
     search_calls = _calls_with_name(tree, "PiPLSSearchCV")
     assert any(_keyword_string(call, "search_method") == "auto" for call in search_calls)
-    assert _assigned_call_path(tree, "response_names") == "Y.columns.tolist"
+    assert _assigned_call_path(tree, "response_names") == "list"
+    assert (
+        _assigned_call_argument_path(tree, "response_names", 0)
+        == "data.target_names"
+    )
     assert "sorted" not in calls
     assert "observation_diagnostics" in calls
 

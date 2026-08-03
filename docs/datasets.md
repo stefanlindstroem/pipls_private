@@ -4,8 +4,9 @@ The optional dataset interface provides a structured in-memory boundary for pack
 Sugarcane, and Tobacco datasets, package-owned synthetic data, and experiments. Real-data users may
 pass ordinary arrays or
 data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
-Sugarcane and Tobacco also have installed named loaders and canonical package resources; their
-maintained examples retain byte-identical repository copies temporarily until consumer migration.
+Sugarcane and Tobacco also have installed named loaders and canonical package resources. Every
+maintained reference-data example uses those loaders; byte-identical repository copies remain only
+as temporary parity sources until single-copy cleanup.
 
 ## Validated dataset container
 
@@ -265,9 +266,9 @@ The accompanying data paper is:
 The Mendeley collection is licensed CC BY 4.0. The package adaptation matches the public LabSpec
 and response tables by `Sample`, removes three rows whose total-sugar response is missing, and
 applies no imputation or spectral preprocessing. `load_sugarcane()` returns the immutable labeled
-package dataset or its read-only matrices. During the staged transition,
-`examples/06_sugarcane_real_data.py` still reads the byte-identical repository `X.csv` and `Y.csv`
-directly, evaluates the default path-evaluating `PiPLSSearchCV()`, plots
+package dataset or its read-only matrices. `examples/06_sugarcane_real_data.py` obtains the matrices,
+wavelength labels, and response names from that result, evaluates the default path-evaluating
+`PiPLSSearchCV()`, plots
 `component_path_` in memory, and fits a separate fixed model after a visible user component choice.
 It obtains the conditional predictor-rank profile at the selected component count, obtains
 selection-conditioned OOF predictions through `search.validation_report()`, and writes six final
@@ -299,9 +300,9 @@ and chemistry tables one-to-one by sample ID, orders rows by that identifier, an
 source metadata columns from the model matrices. All samples and chemical responses are retained.
 No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
 preprocessing is applied. `load_tobacco()` returns the immutable labeled package dataset or its
-read-only matrices. During the staged transition, `examples/07_tobacco_real_data.py` still reads the
-byte-identical repository `X.csv` and `Y.csv` directly,
-evaluates a Pi-PLS component path with adaptive predictor-rank scanning and full predictor SVD,
+read-only matrices. `examples/07_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
+labels, and source-order response names from that result, evaluates a Pi-PLS component path with
+adaptive predictor-rank scanning and full predictor SVD,
 plots that path in memory, applies the one-standard-error rule, and derives the conditional
 predictor-rank profile at the returned component count before fitting the fixed Pi-PLS model. It
 preserves the decreasing wavenumber coordinate, obtains selection-conditioned OOF predictions

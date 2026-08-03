@@ -101,8 +101,9 @@ contains paper-reproduction placeholders or promises to implement manuscript wor
 
 The former synthetic benchmark sequence was retired after serving its development-validation
 purpose. Package-owned Pulp, Sugarcane, and Tobacco are user-run examples rather than default-test
-jobs. Sugarcane and Tobacco retain temporary repository parity copies until consumer migration.
-Example 04 keeps the Pi-PLS and standard PLS (NIPALS) comparison paths in memory
+jobs. Sugarcane and Tobacco retain temporary repository parity copies only until single-copy
+cleanup; every maintained consumer uses the installed loaders. Example 04 keeps the Pi-PLS and
+standard PLS (NIPALS) comparison paths in memory
 and writes only the overlaid final PDFs. Sugarcane keeps its Pi-PLS path, fixed-model OOF predictions,
 and inspection results in memory and writes only final PDF figures. Pulp follows the same in-memory
 boundary through `load_pulp()` and adds a conditional predictor-rank-profile figure. Tobacco is

@@ -40,6 +40,6 @@ centering, scaling, imputation, or other spectral preprocessing was applied. The
 source column order are retained.
 
 `pipls.datasets.load_tobacco()` reads byte-identical package resources and exposes immutable labels,
-provenance, metadata, and matrices. During the staged migration, the executable example
-`examples/07_tobacco_real_data.py` still reads this temporary repository copy directly; Patch 5
-migrates it to the named loader, and Patch 6 removes the duplicate repository matrices.
+provenance, metadata, and matrices. `examples/07_tobacco_real_data.py` uses that loader and derives
+wavenumbers and source-order response names from the immutable package result. This directory remains
+only as a temporary parity fixture until Patch 6 removes the duplicate repository matrices.

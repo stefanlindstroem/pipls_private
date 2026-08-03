@@ -16,10 +16,10 @@ to Sugarcane and Tobacco under `src/pipls/_data/sugarcane/` and
 standard-library runtime parsing, and ordinary language-neutral CSV resources. No generic dataset
 registry follows.
 
-At the current Patch 4 state, Pulp, Sugarcane, and Tobacco are implemented package resources and
-public loaders. Sugarcane and Tobacco package matrices exactly match their temporary repository
-parity copies. Both repository spectral copies are removed in the final single-copy patch after
-consumer migration. The former Pulp layout remains excluded development history under
+At the current Patch 5 state, Pulp, Sugarcane, and Tobacco are implemented package resources and
+public loaders, and every maintained consumer uses them. Sugarcane and Tobacco package matrices
+exactly match their temporary repository parity copies. Both repository spectral copies are removed
+in the final single-copy patch. The former Pulp layout remains excluded development history under
 `.llm/archive/pulp-repository-layout-v1/`.
 
 ## Language-neutral package-resource contract
@@ -57,10 +57,9 @@ Do not add internal conversion scripts or references to private development inpu
 - preserve a documented common row order;
 - use the exact filenames `X.csv` and `Y.csv`.
 
-Until Decision 0142 consumer migration, Sugarcane and Tobacco examples read these files directly
-with ordinary NumPy or pandas code and must not parse `metadata.yaml` to construct model matrices.
-After migration, all three named reference-dataset consumers use their public loaders and no
-maintained example reads this repository layout.
+All three named reference-dataset consumers use their public loaders, and no maintained example
+reads this repository layout. Until final duplicate removal, Sugarcane and Tobacco `metadata.yaml`
+files document temporary parity assets only and are not runtime model inputs.
 
 ## Metadata contract
 
