@@ -967,9 +967,10 @@ documented for use from tagged source releases, source distributions, wheels, in
 environments, and non-Python languages. No registry, downloader, pandas return mode, hidden
 preprocessing, optional data extra, or duplicate active representation is authorized.
 
-Current status: **Patch 1 complete**. Only the decision and guide-layer target change. Source,
-resources, examples, tests, packaging, and public documentation retain the current Pulp-only
-implementation until their assigned later patches.
+Current status: **Patches 1 and 2 complete**. The target is established and `load_pulp()` now
+uses dataset-neutral private resource-loading machinery with unchanged public behavior. No
+Sugarcane or Tobacco package resources, loaders, consumer changes, or public documentation are
+introduced before their assigned patches.
 
 ### Three-stage user onboarding transition
 
@@ -1013,9 +1014,10 @@ numerics, tie rules, fitting semantics, or OOF provenance.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 2: refactor the Pulp-specific private resource reader into a
-dataset-neutral internal mechanism while preserving the complete public `load_pulp()` contract and
-adding no Sugarcane or Tobacco public loader yet.
+Implement Decision 0142 Patch 3: add canonical Sugarcane resources and
+`load_sugarcane()` through the shared private loader, verify exact parity with the temporary
+repository matrices, and extend package-data and clean-distribution checks without migrating
+maintained consumers yet.
 
 Decision 0139 Patch 3 remains an independent paused documentation increment. Decision 0138 remains
 the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface,

@@ -257,8 +257,10 @@ contract for later patches. Each returns `PiPLSDataset` by default and a pair of
 `float64` arrays when `return_X_y=True`. The loaders are backed by installed package resources,
 verify resource and canonical-array integrity, perform no network access or preprocessing, and are
 exported only from `pipls.datasets`; no `as_frame`, registry, or generic loader is authorized.
-At Patch 1, only Pulp is implemented and has a sole active package representation. Sugarcane and
-Tobacco retain their repository CSV inputs until the resource and consumer-migration patches.
+At Patch 2, only Pulp is implemented and has a sole active package representation. Its wrapper
+uses dataset-neutral private loading machinery, but this creates no additional public name or
+protocol. Sugarcane and Tobacco retain their repository CSV inputs until the resource and
+consumer-migration patches.
 
 The final `src/pipls/_data/<dataset>/` directories contain ordinary `X.csv`, `Y.csv`,
 `metadata.json`, `README.md`, and `LICENSE.txt` resources. The exact same files are documented for

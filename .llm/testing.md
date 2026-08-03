@@ -163,9 +163,11 @@ public provenance, pickle reconstruction, resource and canonical-array hashes, c
 distribution loading, maintained-consumer ownership, and one active matrix location. Ordinary
 documentary-metadata tests should still avoid freezing narrative wording.
 
-During Patches 3–5, the repository Sugarcane and Tobacco matrices are temporary parity sources and
-tests may require exact equality with the package resources. Patch 6 replaces those temporary
-checks with positive package-resource and generic single-location contracts. The
+Patch 2 generalizes private resource loading without changing public behavior. Tests protect the
+complete `load_pulp()` result and distribution contract rather than freezing private helper names
+or call structure. During Patches 3–5, the repository Sugarcane and Tobacco matrices are temporary
+parity sources and tests may require exact equality with the package resources. Patch 6 replaces
+those temporary checks with positive package-resource and generic single-location contracts. The
 `.llm/archive/pulp-repository-layout-v1/` copy remains excluded development history and must never
 enter runtime, distributions, served documentation, or active-dataset tests.
 

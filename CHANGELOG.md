@@ -4,6 +4,9 @@
 
 ### Repository
 
+- Generalize the private packaged-reference-dataset loader across resource access, metadata and CSV
+  parsing, dimensional validation, integrity checks, provenance, and stable sample identifiers,
+  while preserving the complete public `load_pulp()` contract and adding no new public loader.
 - Add conditional predictor-rank profile extraction and plotting to the complete Sugarcane and
   Tobacco workflows. Tobacco now demonstrates that the component count returned by the
   one-standard-error rule can be passed directly to `predictor_rank_profile()`, and both spectral

@@ -84,9 +84,11 @@ download, `as_frame` mode, pandas/PyYAML runtime dependency, or required loader 
 from them. General users and every other real dataset continue to supply `X` and `Y` directly.
 
 `load_pulp()` and its sole active package resources are implemented, and every maintained Pulp
-consumer uses them. `load_sugarcane()` and `load_tobacco()` are accepted targets but are not added
-until Decisions 0142 Patches 3 and 4. Their current repository matrices remain temporary parity
-sources until consumer migration and final duplicate removal.
+consumer uses them. Its public wrapper now delegates to dataset-neutral private resource, metadata,
+CSV, integrity, provenance, and sample-identifier machinery. `load_sugarcane()` and
+`load_tobacco()` are accepted targets but are not added until Decision 0142 Patches 3 and 4. Their
+current repository matrices remain temporary parity sources until consumer migration and final
+duplicate removal.
 
 The final resource directories under `src/pipls/_data/<dataset>/` are intentionally ordinary
 CSV, JSON, README, and license assets. Public documentation must identify their locations in a

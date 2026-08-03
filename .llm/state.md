@@ -244,7 +244,7 @@ case, or public behavior.
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
 | Dataset namespace | immutable container, implemented `load_pulp()`, accepted `load_sugarcane()` and `load_tobacco()`, and seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Reference datasets | final target is one package-resource location each for Pulp, Sugarcane, and Tobacco; only Pulp is migrated at Patch 1 |
+| Reference datasets | final target is one package-resource location each for Pulp, Sugarcane, and Tobacco; only Pulp is public at Patch 2, using dataset-neutral private loading machinery |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -553,15 +553,16 @@ The final resources remain ordinary CSV, JSON, README, and license files under
 wheels, and installed packages. The transition introduces no registry, downloader, `as_frame`
 surface, hidden preprocessing, or top-level loader exports.
 
-Current status: **Patch 1 complete; implementation pending**. Pulp remains the sole implemented
-named package loader. Sugarcane and Tobacco still use repository CSV inputs until their resource
-and migration patches.
+Current status: **Patches 1 and 2 complete**. Pulp remains the sole implemented named package
+loader, now backed by dataset-neutral private loading machinery with unchanged public behavior.
+Sugarcane and Tobacco still use repository CSV inputs until their resource and migration patches.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 2: generalize the private packaged-resource loading machinery while
-preserving every observable `load_pulp()` result and adding no new public loader. Decision 0139
-Patch 3 remains paused until the owner resumes that independent presentation increment.
+Implement Decision 0142 Patch 3: add canonical Sugarcane package resources,
+`load_sugarcane()`, integrity and parity tests, package-data configuration, and clean-distribution
+validation while retaining `datasets/sugarcane/` as a temporary parity source. Decision 0139 Patch
+3 remains paused until the owner resumes that independent presentation increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
 package resources are available in clean wheel and source-distribution installations, every

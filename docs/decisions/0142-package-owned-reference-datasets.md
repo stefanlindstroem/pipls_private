@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation planned in six patches.
+Accepted; implementation in progress.
 
 ## Context
 
@@ -131,6 +131,15 @@ Implement the transition in six reviewable patches:
    API, dataset, example, and maintainer documentation;
 6. remove the duplicate repository matrices, publish the language-neutral raw-file locations,
    enforce one active resource pair per dataset, and mark this decision implemented.
+
+## Implementation status
+
+Patches 1 and 2 are implemented. The decision and guide-layer target are established, and
+`load_pulp()` now delegates to dataset-neutral private machinery for resource access, metadata and
+CSV parsing, shape validation, resource and canonical-array integrity checks, provenance, and
+stable sample identifiers. The public Pulp signature, arrays, labels, metadata, sample identifiers,
+error classes, namespace placement, and distribution behavior are unchanged. No Sugarcane or
+Tobacco package resource or public loader is introduced before its assigned patch.
 
 This decision refines Decision 0138 from one package-owned Pulp exception to a closed set of three
 maintained reference datasets. It supersedes Decisions 0022, 0023, 0067, 0069, and 0070 only where
