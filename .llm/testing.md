@@ -93,8 +93,7 @@ Decision 0140 completes a public ownership change without changing selection num
 surface protects:
 
 - fitted-state enforcement and exactly-one-of validation for `search.select(...)`;
-- parity among `select()`, `refit()`, and `validation_report()` for component counts and all three
-  named rules;
+- parity between `select()` and `refit()` for component counts and all three named rules;
 - exact stored minimum and tie behavior, minimum-row standard-error use, smallest eligible 1-SE
   component count, and absence of an added floating-point tolerance;
 - custom-scorer separation between `"best_score"` and `"minimum_cv_mse"`;
@@ -125,8 +124,8 @@ OOF numerics. Across its seven patches, tests must protect:
   parity with the former OOF implementation during migration;
 - repeated, partial-coverage, leave-one-out, one-dimensional-response, pickle, and unchanged-search
   behavior;
-- final removal of `validation_report()`, `PiPLSValidationReport`, `estimate_kind`,
-  `is_selection_conditioned`, and any transitional aliases;
+- absence of the former report method, report type, estimate-kind state, selection-conditioned
+  predicate, and transitional aliases;
 - structural example order: search and refit complete modeling; analysis then retrieves
   `model.selection_`, path evidence, rank-profile evidence, optional OOF reporting, fitted-model
   inspection, and finally rendering;

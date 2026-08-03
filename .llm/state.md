@@ -56,9 +56,8 @@ and later retired by Decision 0125 after its development-validation purpose had 
   solver provenance, and the derived centered/scaled regression map;
 - grouped, repeated, predefined, temporal, and leave-one-out split workflows, with a focused
   small-sample LOO example reporting ordered OOF predictions and pooled OOF $R^2$;
-- optional ordered OOF predictions and immutable `PiPLSValidationReport` composed from the
-  selected `PiPLSComponentResult`, with explicit fixed-parameter versus selection-conditioned
-  labeling;
+- optional ordered OOF predictions and immutable `PiPLSOOFReport` composed from an existing
+  `PiPLSComponentResult`, with explicit selection-conditioned interpretation;
 - immutable validated `PiPLSDataset` with recursively frozen metadata, explicit rejection of
   object-dtype metadata arrays, and deterministic synthetic generators with shared,
   predictor-specific, and response-specific latent structure;
@@ -188,7 +187,7 @@ from pipls import (
     PiPLSSearchCV,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
-    PiPLSValidationReport,
+    PiPLSOOFReport,
     PredictorRankSupportWarning,
 )
 ```
@@ -239,7 +238,7 @@ case, or public behavior.
 | Final refit | post-fit `search.refit(X, y, rule=...)` or `search.refit(X, y, n_components=...)` returns a fitted clone without mutating search state |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
-| OOF output | explicit post-fit `search.oof_report(X, y, selection=...)`; reports are returned directly and not attached to search state; `validation_report()` is transitional |
+| OOF output | explicit post-fit `search.oof_report(X, y, selection=...)`; reports are returned directly and not attached to search state |
 | Dataset namespace | immutable container, implemented `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`, plus seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
 | Reference datasets | Pulp, Sugarcane, and Tobacco are public package resources used by every maintained consumer; each has one active matrix pair and documented raw-file access |
@@ -386,8 +385,8 @@ only.
 The six owner-authorized simplifications are complete. Search inputs are resolved once;
 decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction
 diagnostics are derived from independent state; path-wide metadata and profile selection are not
-duplicated; and `PiPLSValidationReport` composes an immutable `PiPLSComponentResult` while
-preserving its convenience properties. No package release preparation or Python-package publication
+duplicated; and `PiPLSOOFReport` composes an immutable `PiPLSComponentResult` while preserving
+its convenience properties. No package release preparation or Python-package publication
 work is authorized.
 A follow-up behavior-preserving audit cleanup removes the now-unused private finite-vector
 inspection helper and the no-op reassignment of the already validated selected result.
@@ -411,9 +410,8 @@ Decision 0133 names the configurable-generator truth record `PiPLSRegressionTrut
 pre-release truth-class name is not retained as an alias.
 
 Decision 0134 gives public result properties type-revealing names: predictor-rank profiles expose
-`selected_result`, validation reports expose `cv_mse_mean`, and their boolean summaries use
-`is_selection_conditioned` and `has_complete_oof_coverage`. The former pre-release names are
-not retained as aliases.
+`selected_result`, OOF reports expose `cv_mse_mean`, and their coverage summary uses
+`has_complete_oof_coverage`. Former pre-release names are not retained as aliases.
 
 Decision 0136 makes every maintained ordinary five-fold example and tutorial renderer use
 `KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Path selection, matched PLS
@@ -478,16 +476,15 @@ terminal-Pi-PLS pipeline, and leaves the search unchanged. The constructor boole
 fitted-model attributes, and search-level model delegation were removed in the same increment
 because a same-named constructor attribute would shadow the method.
 
-`PiPLSSearchCV.validation_report(X, Y, rule=... or n_components=...)` is now implemented. It uses the
-same selected-row resolver as `refit()`, reuses defensive read-only copies of the exact materialized
-search splits, always returns ordered OOF predictions and counts, does not rescore candidates or fit
-a full-data model, and leaves the search unchanged. The supplied data must have the fitted sample,
-feature, and response-column shape and remain in the original row order; the search retains indices,
-not values.
+`PiPLSSearchCV.oof_report(X, Y, selection=...)` reuses defensive read-only copies of the exact
+materialized search splits, always returns ordered OOF predictions and counts, does not rescore
+candidates or fit a full-data model, and leaves the search unchanged. The supplied data must have
+the fitted sample, feature, and response-column shape and remain in the original row order; the
+search retains indices, not values.
 
-The remaining constructor-time selection and OOF controls and selected report state are removed.
-The search surface now contains only candidate evidence, immutable path/profile inspection, exact
-stored splits for explicit follow-up reporting, and the two post-fit operations.
+The search surface contains candidate evidence, immutable path/profile inspection, exact stored
+splits for explicit follow-up reporting, and the post-fit `select()`, `refit()`, and `oof_report()`
+operations.
 
 ## Three-stage user onboarding transition
 
@@ -571,27 +568,27 @@ Decision 0143 authorizes seven patches:
    only as a temporary migration bridge;
 5. migrate manual-selection examples, tutorial renderers, tutorials, and structural tests;
 6. migrate automatic and validation-only workflows;
-7. remove `validation_report()` and `PiPLSValidationReport`, normalize every maintained workflow,
-   complete active-surface audits, and close the transition.
+7. remove the former report surface, normalize every maintained workflow, complete active-surface
+   audits, and close the transition.
 
 The final model-producing order is search, refit, then analysis: `model.selection_`,
 `component_path_`, `predictor_rank_profile(...)`, optional `oof_report(...)`, fitted-model
 inspection, and rendering. OOF reporting is not part of modeling. `search.select()` remains an
 optional fitting-free operation for selection-only workflows.
 
-Current status: **Patches 1 through 6 complete**. Selection results record validated named-rule and
+Current status: **complete**. Selection results record validated named-rule and
 1-SE reference provenance; successful direct-estimator and pipeline refits retain the exact resolved
 row as `model.selection_`; and `oof_report(selection=...)` returns immutable `PiPLSOOFReport` after
 exact search-compatibility validation. All model-producing workflows use `model.selection_`,
 selection-driven OOF reporting where applicable, modeling-before-analysis order, and rendering-last
 structure. The leave-one-out workflow remains selection-only and passes its `best_score` selection
-to `oof_report()`. The former report surface remains only for Patch 7 removal.
+to `oof_report()`. The former report surface has been removed without aliases, and all maintained
+workflows use the final selection-driven interface.
 
 ## Current next increment
 
-Decision 0143 Patch 6 is next: migrate the automatic Tobacco workflow, quick-start retained-search
-route, and leave-one-out validation workflow to the implemented selection and OOF-reporting surface.
-Decision 0139 Patch 3 remains paused until the owner resumes that independent presentation increment.
+Decision 0139 Patch 3 remains paused until the owner resumes that independent presentation
+increment. No further Decision 0143 implementation work remains.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
 package resources are available in clean wheel and source-distribution installations, every

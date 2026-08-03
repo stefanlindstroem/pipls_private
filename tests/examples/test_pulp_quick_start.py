@@ -40,7 +40,6 @@ def test_pulp_quick_start_is_the_automatic_search_refit_workflow() -> None:
         assert f"# --8<-- [end:{section}]" in text
 
     assert "PiPLSRegression" not in text
-    assert "validation_report" not in text
     assert "KFold" not in text
     assert "np.array" not in text
     assert "pandas" not in text

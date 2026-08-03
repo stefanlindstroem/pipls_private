@@ -53,15 +53,15 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
     for train, validation in splitter.split(X, Y):
         expected[validation] = clone(_fixed()).fit(X[train], Y[train]).predict(X[validation])
 
-    report = search.validation_report(X, Y, rule="best_score")
-    assert report.selected_result == search.select(rule="best_score")
+    selection = search.select(rule="best_score")
+    report = search.oof_report(X, Y, selection=selection)
+    assert report.selection is selection
     assert report.oof_predictions is not None
     assert report.oof_prediction_counts is not None
     np.testing.assert_allclose(report.oof_predictions, expected)
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
     assert report.n_components == search.best_n_components_
     assert report.predictor_rank == search.best_predictor_rank_
-    assert report.is_selection_conditioned
     assert report.is_leave_one_out
     assert report.has_complete_oof_coverage
     assert report.cv_mse_mean == pytest.approx(
@@ -83,7 +83,8 @@ def test_repeated_kfold_averages_predictions_and_records_counts() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    report = search.validation_report(X, Y, n_components=1)
+    selection = search.select(n_components=1)
+    report = search.oof_report(X, Y, selection=selection)
     assert report.oof_prediction_counts is not None
     assert report.oof_predictions is not None
     np.testing.assert_array_equal(
@@ -111,8 +112,12 @@ def test_predefined_and_temporal_splits_mark_uncovered_rows() -> None:
         cv=TimeSeriesSplit(n_splits=3),
     ).fit(X, Y)
 
-    predefined_report = predefined.validation_report(X, Y, n_components=1)
-    temporal_report = temporal.validation_report(X, Y, n_components=1)
+    predefined_selection = predefined.select(n_components=1)
+    temporal_selection = temporal.select(n_components=1)
+    predefined_report = predefined.oof_report(
+        X, Y, selection=predefined_selection
+    )
+    temporal_report = temporal.oof_report(X, Y, selection=temporal_selection)
     assert predefined_report.oof_prediction_counts is not None
     assert predefined_report.oof_predictions is not None
     assert temporal_report.oof_prediction_counts is not None
@@ -186,7 +191,8 @@ def test_oof_arrays_are_read_only_and_one_dimensional_targets_stay_one_dimension
         cv=3,
     ).fit(X, y)
 
-    report = search.validation_report(X, y, n_components=1)
+    selection = search.select(n_components=1)
+    report = search.oof_report(X, y, selection=selection)
     assert report.oof_predictions is not None
     assert report.oof_prediction_counts is not None
     assert report.oof_predictions.shape == (X.shape[0],)
@@ -223,7 +229,7 @@ class _SingleUseSplitter:
         return len(self.splits)
 
 
-def test_validation_report_reuses_defensive_read_only_search_splits() -> None:
+def test_oof_report_reuses_defensive_read_only_search_splits() -> None:
     X, Y = _data()
     indices = np.arange(X.shape[0], dtype=np.intp)
     source_splits = [
@@ -251,50 +257,35 @@ def test_validation_report_reuses_defensive_read_only_search_splits() -> None:
     with pytest.raises(ValueError, match="read-only"):
         search._cv_splits_[0][0][0] = 0
 
-    report = search.validation_report(X, Y, n_components=1)
+    selection = search.select(n_components=1)
+    report = search.oof_report(X, Y, selection=selection)
 
     assert splitter.calls == 1
     assert report.oof_prediction_counts is not None
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
 
 
-def test_validation_report_requires_a_fitted_row_aligned_search_shape() -> None:
+def test_oof_report_requires_a_fitted_row_aligned_search_shape() -> None:
     X, Y = _data()
+    fitted = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=3,
+    ).fit(X, Y)
+    selection = fitted.select(n_components=1)
+
     with pytest.raises(NotFittedError):
-        PiPLSSearchCV().validation_report(X, Y, rule="best_score")
+        PiPLSSearchCV().oof_report(X, Y, selection=selection)
 
-    search = PiPLSSearchCV(
-        estimator=_fixed(),
-        n_components_values=[1],
-        predictor_rank_values=[2],
-        max_predictor_rank=2,
-        cv=3,
-    ).fit(X, Y)
     with pytest.raises(ValueError, match="same number of samples"):
-        search.validation_report(X[:-1], Y[:-1], n_components=1)
+        fitted.oof_report(X[:-1], Y[:-1], selection=selection)
     with pytest.raises(ValueError, match="same number of response columns"):
-        search.validation_report(X, Y[:, :1], n_components=1)
+        fitted.oof_report(X, Y[:, :1], selection=selection)
 
 
-def test_validation_report_requires_exactly_one_selection_input() -> None:
-    X, Y = _data()
-    search = PiPLSSearchCV(
-        estimator=_fixed(),
-        n_components_values=[1],
-        predictor_rank_values=[2],
-        max_predictor_rank=2,
-        cv=3,
-    ).fit(X, Y)
-
-    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
-        search.validation_report(X, Y)
-    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
-        search.validation_report(X, Y, rule="best_score", n_components=1)
-    with pytest.raises(ValueError, match="rule must be"):
-        search.validation_report(X, Y, rule="smallest")  # type: ignore[arg-type]
-
-
-def test_validation_report_does_not_mutate_search_state() -> None:
+def test_oof_report_does_not_mutate_search_state() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
         estimator=_fixed(),
@@ -306,75 +297,8 @@ def test_validation_report_does_not_mutate_search_state() -> None:
     ).fit(X, Y)
     before = pickle.dumps(search)
 
-    report = search.validation_report(X, Y, rule="best_score")
+    selection = search.select(rule="best_score")
+    report = search.oof_report(X, Y, selection=selection)
 
     assert report.oof_predictions is not None
     assert pickle.dumps(search) == before
-
-
-def test_oof_report_preserves_repeated_cv_averaging_and_counts() -> None:
-    X, Y = _data()
-    search = PiPLSSearchCV(
-        estimator=_fixed(),
-        n_components_values=[1],
-        predictor_rank_values=[2],
-        max_predictor_rank=2,
-        cv=RepeatedKFold(n_splits=3, n_repeats=2, random_state=7),
-        n_jobs=1,
-    ).fit(X, Y)
-    selection = search.select(n_components=1)
-
-    report = search.oof_report(X, Y, selection=selection)
-
-    assert report.oof_prediction_counts is not None
-    assert report.oof_predictions is not None
-    np.testing.assert_array_equal(
-        report.oof_prediction_counts,
-        np.full(X.shape[0], 2, dtype=np.intp),
-    )
-    assert report.has_complete_oof_coverage
-    assert np.all(np.isfinite(report.oof_predictions))
-
-
-def test_oof_report_preserves_leave_one_out_provenance() -> None:
-    X, Y = _data(12)
-    search = PiPLSSearchCV(
-        estimator=_fixed(),
-        n_components_values=[1],
-        predictor_rank_values=[2],
-        max_predictor_rank=2,
-        search_method="optimal",
-        cv=LeaveOneOut(),
-        n_jobs=1,
-    ).fit(X, Y)
-    selection = search.select(rule="best_score")
-
-    report = search.oof_report(X, Y, selection=selection)
-
-    assert report.selection is selection
-    assert report.is_leave_one_out
-    assert report.has_complete_oof_coverage
-
-
-def test_oof_report_preserves_partial_coverage_and_one_dimensional_shape() -> None:
-    X, Y = _data()
-    y = Y[:, 0]
-    search = PiPLSSearchCV(
-        estimator=_fixed(),
-        n_components_values=[1],
-        predictor_rank_values=[2],
-        max_predictor_rank=2,
-        cv=TimeSeriesSplit(n_splits=3),
-        n_jobs=1,
-    ).fit(X, y)
-    selection = search.select(n_components=1)
-
-    report = search.oof_report(X, y, selection=selection)
-
-    assert report.oof_predictions is not None
-    assert report.oof_prediction_counts is not None
-    assert report.oof_predictions.shape == (X.shape[0],)
-    uncovered = report.oof_prediction_counts == 0
-    assert np.any(uncovered)
-    assert np.all(np.isnan(report.oof_predictions[uncovered]))
-    assert not report.has_complete_oof_coverage

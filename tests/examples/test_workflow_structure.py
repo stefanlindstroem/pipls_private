@@ -257,8 +257,6 @@ def test_leave_one_out_example_uses_its_exhaustive_splitter() -> None:
     assert "LeaveOneOut" in calls
     assert "KFold" not in calls
     assert "refit" not in calls
-    assert "validation_report" not in calls
-
     select_calls = _calls_with_name(tree, "select")
     assert len(select_calls) == 1
     assert _keyword_string(select_calls[0], "rule") == "best_score"
@@ -450,7 +448,7 @@ def test_real_data_examples_use_direct_public_results(
         *extra_calls,
     }
     required_calls.add("oof_report")
-    assert {"select", "validation_report"}.isdisjoint(calls)
+    assert "select" not in calls
     assert required_calls <= calls
     assert required_attributes <= attributes
     assert loader_name in calls
@@ -501,7 +499,7 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
         *extra_analysis_calls,
     }
     analysis_calls.add("oof_report")
-    assert {"select", "validation_report"}.isdisjoint(_call_names(main))
+    assert "select" not in _call_names(main)
     assert analysis_calls <= _call_names(main)
     assert _call_names(main).isdisjoint(_RENDERING_METHODS)
 
@@ -668,8 +666,6 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     assert _keyword_string(regression_calls[0], "svd_solver") == "full"
 
     assert "select" not in calls
-    assert "validation_report" not in calls
-
     refit_calls = _calls_with_name(tree, "refit")
     assert len(refit_calls) == 1
     assert _keyword_string(refit_calls[0], "rule") == "one_standard_error"

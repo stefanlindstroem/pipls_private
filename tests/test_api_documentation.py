@@ -76,7 +76,7 @@ def test_returned_result_records_hide_constructor_signatures() -> None:
         "pipls.PiPLSComponentPath",
         "pipls.PiPLSComponentResult",
         "pipls.PiPLSPredictorRankProfile",
-        "pipls.PiPLSValidationReport",
+        "pipls.PiPLSOOFReport",
         "pipls.PiPLSDecomposition",
         "pipls.inspection.BiplotCoordinates",
         "pipls.inspection.LatentStructure",

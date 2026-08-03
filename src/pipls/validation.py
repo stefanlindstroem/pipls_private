@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal, cast
+from typing import cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -11,7 +11,6 @@ from numpy.typing import ArrayLike, NDArray
 from ._result_validation import (
     _boolean,
     _finite_float,
-    _literal_string,
     _read_only_float_array,
     _read_only_int_array,
 )
@@ -19,8 +18,6 @@ from .component_path import PiPLSComponentResult
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
-EstimateKind = Literal["selection-conditioned", "fixed-parameter"]
-_ALLOWED_ESTIMATE_KINDS = frozenset({"selection-conditioned", "fixed-parameter"})
 
 
 def _validated_oof_fields(
@@ -177,104 +174,6 @@ class PiPLSOOFReport:
         """Mean response-standardized validation MSE."""
 
         return self.selection.cv_mse_mean
-
-    @property
-    def has_complete_oof_coverage(self) -> bool:
-        """Whether every input row received at least one validation prediction."""
-
-        counts = self.oof_prediction_counts
-        return counts is not None and bool(np.all(counts > 0))
-
-
-@dataclass(frozen=True)
-class PiPLSValidationReport:
-    """Transitional immutable summary returned by ``validation_report()``.
-
-    This public type remains temporarily so maintained consumers can migrate to
-    :class:`PiPLSOOFReport`. New code should use
-    :meth:`pipls.PiPLSSearchCV.oof_report` and its ``selection`` field.
-    """
-
-    selected_result: PiPLSComponentResult
-    estimate_kind: EstimateKind
-    is_leave_one_out: bool
-    oof_predictions: FloatArray | None = None
-    oof_prediction_counts: IntArray | None = None
-    pooled_oof_r2: float | None = None
-
-    def __post_init__(self) -> None:
-        if not isinstance(self.selected_result, PiPLSComponentResult):
-            raise TypeError("selected_result must be a PiPLSComponentResult.")
-        estimate_kind = cast(
-            EstimateKind,
-            _literal_string(
-                self.estimate_kind,
-                name="estimate_kind",
-                allowed=_ALLOWED_ESTIMATE_KINDS,
-            ),
-        )
-        leave_one_out, predictions, counts, pooled = _validated_oof_fields(
-            is_leave_one_out=self.is_leave_one_out,
-            oof_predictions=self.oof_predictions,
-            oof_prediction_counts=self.oof_prediction_counts,
-            pooled_oof_r2=self.pooled_oof_r2,
-        )
-        object.__setattr__(self, "estimate_kind", estimate_kind)
-        object.__setattr__(self, "is_leave_one_out", leave_one_out)
-        object.__setattr__(self, "oof_predictions", predictions)
-        object.__setattr__(self, "oof_prediction_counts", counts)
-        object.__setattr__(self, "pooled_oof_r2", pooled)
-
-    def __reduce__(self) -> tuple[type[PiPLSValidationReport], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
-
-        return (
-            type(self),
-            (
-                self.selected_result,
-                self.estimate_kind,
-                self.is_leave_one_out,
-                self.oof_predictions,
-                self.oof_prediction_counts,
-                self.pooled_oof_r2,
-            ),
-        )
-
-    @property
-    def n_components(self) -> int:
-        """Number of paired latent modes represented by the report."""
-
-        return self.selected_result.n_components
-
-    @property
-    def predictor_rank(self) -> int:
-        """Predictor rank represented by the report."""
-
-        return self.selected_result.predictor_rank
-
-    @property
-    def n_splits(self) -> int:
-        """Number of cross-validation splits."""
-
-        return self.selected_result.n_splits
-
-    @property
-    def mean_test_score(self) -> float:
-        """Mean configured test score."""
-
-        return self.selected_result.mean_test_score
-
-    @property
-    def cv_mse_mean(self) -> float:
-        """Mean response-standardized validation MSE."""
-
-        return self.selected_result.cv_mse_mean
-
-    @property
-    def is_selection_conditioned(self) -> bool:
-        """Whether the same CV result was used for parameter selection."""
-
-        return self.estimate_kind == "selection-conditioned"
 
     @property
     def has_complete_oof_coverage(self) -> bool:

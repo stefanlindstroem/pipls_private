@@ -665,20 +665,20 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
     ).fit(X, Y)
 
     expected = search.select(rule="one_standard_error")
-    report = search.validation_report(X, Y, rule="one_standard_error")
     model = search.refit(X, Y, rule="one_standard_error")
+    report = search.oof_report(X, Y, selection=model.selection_)
 
-    assert report.selected_result == expected
-    assert report.selected_result.rule == "one_standard_error"
-    assert report.selected_result.reference_minimum == search.select(
+    assert report.selection == expected
+    assert report.selection.rule == "one_standard_error"
+    assert report.selection.reference_minimum == search.select(
         rule="minimum_cv_mse"
     )
-    assert report.selected_result.one_standard_error_threshold is not None
+    assert report.selection.one_standard_error_threshold is not None
     assert model.n_components == expected.n_components
     assert model.predictor_rank == expected.predictor_rank
     assert model.selection_ == expected
-    assert model.selection_ == report.selected_result
-    for name in ("selected_result_", "selected_params_", "validation_report_"):
+    assert model.selection_ == report.selection
+    for name in ("selected_params_", "oof_report_"):
         assert not hasattr(search, name)
 
 
@@ -815,7 +815,7 @@ def test_search_exposes_evidence_and_refit_but_no_model_delegation() -> None:
 
     search.fit(X, Y)
     assert hasattr(search, "refit")
-    assert hasattr(search, "validation_report")
+    assert hasattr(search, "oof_report")
     for method_name in (
         "predict",
         "transform",
@@ -1020,7 +1020,8 @@ def test_oof_generation_does_not_rescore_the_selected_candidate() -> None:
         scoring=counting_scorer,
         n_jobs=1,
     ).fit(X, Y)
-    search.validation_report(X, Y, n_components=1)
+    selection = search.select(n_components=1)
+    search.oof_report(X, Y, selection=selection)
 
     assert calls == 3
 
@@ -1037,8 +1038,8 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_post_fit_ref
             cv=3,
             n_jobs=1,
         ).fit(X, Y)
-        report = search.validation_report(X, Y, rule="best_score")
         model = search.refit(X, Y, rule="best_score")
+        report = search.oof_report(X, Y, selection=model.selection_)
 
     assert search.best_predictor_rank_ == 4
     assert isinstance(model, PiPLSRegression)
@@ -1065,8 +1066,9 @@ def test_path_does_not_suppress_unrelated_estimator_warnings() -> None:
             cv=2,
             n_jobs=1,
         ).fit(X, Y)
+    selection = search.select(n_components=1)
     with pytest.warns(RuntimeWarning, match="unrelated path warning"):
-        search.validation_report(X, Y, n_components=1)
+        search.oof_report(X, Y, selection=selection)
     with pytest.warns(RuntimeWarning, match="unrelated path warning"):
         search.refit(X, Y, n_components=1)
 
@@ -1302,40 +1304,6 @@ def test_oof_report_uses_existing_model_selection() -> None:
     assert report.oof_prediction_counts is not None
     assert pickle.dumps(search) == before
 
-
-@pytest.mark.parametrize(
-    "selection_kwargs",
-    [
-        {"n_components": 2},
-        {"rule": "best_score"},
-        {"rule": "minimum_cv_mse"},
-        {"rule": "one_standard_error"},
-    ],
-)
-def test_oof_report_matches_transitional_validation_report(
-    selection_kwargs: dict[str, object],
-) -> None:
-    X, Y = _data()
-    search = PiPLSSearchCV(
-        n_components_values=[1, 2],
-        predictor_rank_values=[1, 2, 3],
-        search_method="optimal",
-        cv=3,
-        n_jobs=1,
-    ).fit(X, Y)
-    selection = search.select(**selection_kwargs)  # type: ignore[arg-type]
-
-    report = search.oof_report(X, Y, selection=selection)
-    legacy = search.validation_report(X, Y, **selection_kwargs)  # type: ignore[arg-type]
-
-    assert report.selection == legacy.selected_result
-    assert report.is_leave_one_out == legacy.is_leave_one_out
-    assert report.pooled_oof_r2 == legacy.pooled_oof_r2
-    np.testing.assert_allclose(report.oof_predictions, legacy.oof_predictions)
-    np.testing.assert_array_equal(
-        report.oof_prediction_counts,
-        legacy.oof_prediction_counts,
-    )
 
 
 def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:

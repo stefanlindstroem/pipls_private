@@ -160,8 +160,8 @@ with stable interpretation anchors and without repeating elementary Matplotlib r
 but must not reproduce the tutorial analysis or embed its generated figures.
 
 Decision 0140 has implemented search-owned selected-row lookup:
-`search.select(rule=... or n_components=...)` now shares the same private resolver as `refit()` and
-`validation_report()`, while `component_path_` remains aligned numerical evidence.
+`search.select(rule=... or n_components=...)` shares the same private resolver as `refit()`, while
+`component_path_` remains aligned numerical evidence.
 `search.select(...)` remains the fitting-free selection-only operation; model-producing consumers
 obtain the fitted row from `model.selection_`.
 
@@ -484,6 +484,6 @@ Its scorer-specific response scale is private. `PiPLSSearchCV` keeps standard ca
 concise immutable path and rank-profile objects, global selection attributes, exhaustive-search qualification, and validation
 reporting. A fitted model is returned directly by post-fit `refit()` rather than attached to search
 state. Explicit `oof_report(selection=...)` reuses the exact materialized splits and returns OOF
-arrays without attaching the report; `validation_report()` remains transitional. Validated
+arrays without attaching the report. Validated
 input grids, adaptive batches, candidate counters, search-method echoes, and duplicate direct-rank
 parameter dictionaries are private implementation details.

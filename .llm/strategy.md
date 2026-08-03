@@ -747,7 +747,7 @@ Current status: **search-CV public rename implemented and documented**.
 
 Decision 0111 originally placed final-row orchestration on `PiPLSSearchCV`. Decision 0137 supersedes
 that ownership: global `best_*` attributes remain search evidence, while named or manual final-row
-choices occur only through post-fit `refit()` or `validation_report()`. `PiPLSRegression` remains a
+choices occur only through post-fit selection and refitting operations. `PiPLSRegression` remains a
 fixed-pair estimator with no hidden selection.
 
 Current status: **superseded by the post-fit inspect-decide-refit lifecycle**.
@@ -800,9 +800,9 @@ Current status: **normalized path-result simplification complete**.
 
 ### Composed validation-report state simplification
 
-Decision 0116 makes one immutable `PiPLSComponentResult` authoritative for the selected row in
-`PiPLSValidationReport`. The report preserves its component-count, predictor-rank, split-count,
-score, and CV-MSE names as properties and retains report-owned OOF coverage and provenance state.
+Decision 0116 made one immutable `PiPLSComponentResult` authoritative for report selection. The
+current `PiPLSOOFReport` preserves component-count, predictor-rank, split-count, score, and CV-MSE
+names as properties and retains report-owned OOF coverage and provenance state.
 
 Current status: **composed validation-report simplification complete**.
 
@@ -909,7 +909,7 @@ Decision 0137 authorizes a five-patch pre-release transition:
 1. establish the target lifecycle in the guide layer;
 2. add post-fit `refit()` and remove the constructor boolean, selected fitted-model state, and
    delegated model methods that cannot coexist with that same-named method;
-3. add explicit post-fit `validation_report()` using the exact materialized search splits;
+3. add explicit post-fit OOF reporting using the exact materialized search splits;
 4. remove the remaining constructor-time selection/OOF controls and selected report state, then
    complete public API cleanup;
 5. migrate maintained examples, tutorial renderers, and final presentation to the new lifecycle.
@@ -921,9 +921,8 @@ models. Because the package is version `0.0.0`, the completed transition contain
 deprecation paths, ignored constructor parameters, or serialized compatibility state.
 
 Current status: **complete**. The public lifecycle, maintained examples, tutorial renderers, and
-final presentation use post-fit `refit()` and explicit `validation_report()` without compatibility
-state, manual selected-rank transfer, or a separate selection-conditioned `cross_val_predict()`
-pass.
+final presentation use post-fit `refit()` and explicit OOF reporting without compatibility state,
+manual selected-rank transfer, or a separate selection-conditioned `cross_val_predict()` pass.
 
 ### Package-owned Pulp dataset transition
 
@@ -1012,7 +1011,8 @@ contains no public selection methods, and durable numerical contracts are tested
 `PiPLSSearchCV.select()`.
 
 The target keeps `PiPLSComponentPath` as aligned numerical evidence and makes `select()`, `refit()`,
-and `validation_report()` share one rule/component-count vocabulary. It changes no selection
+and the then-current report operation shared one rule/component-count vocabulary. It changed no
+selection
 numerics, tie rules, fitting semantics, or OOF provenance.
 
 ### Model-selection provenance and OOF-reporting transition
@@ -1034,7 +1034,7 @@ profile before optionally calling `oof_report(...)`; fitted-model inspection and
 OOF reporting is explicitly analysis, not modeling. `search.select()` remains available for
 selection-only workflows but is not required merely to recover the row used by `refit()`.
 
-Current status: **Patches 1 through 6 complete**. Selection results carry validated rule and 1-SE
+Current status: **complete**. Selection results carry validated rule and 1-SE
 reference provenance, successful refits attach the exact immutable result as `model.selection_`, and
 `oof_report(selection=...)` returns immutable `PiPLSOOFReport` with exact compatibility validation.
 All model-producing workflows and the synthetic and Pulp renderers now
@@ -1043,10 +1043,9 @@ optional OOF diagnostics, fitted-model inspection results, and rendering.
 
 ## Current next increment
 
-Decision 0143 Patch 6 is next. It migrates the automatic Tobacco workflow, quick-start retained-search
-route, and validation-only workflow to the implemented selection and OOF-reporting surface. Decision 0139
-Patch 3 remains an independent paused documentation increment. Decision 0138 remains the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface, or compatibility layer is
-authorized.
+Decision 0139 Patch 3 remains an independent paused documentation increment. Decision 0138 remains
+the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface,
+or compatibility layer is authorized. Decision 0143 requires no further implementation work.
 
 Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
 validation splits; final models and selection-conditioned OOF reports are produced only by explicit

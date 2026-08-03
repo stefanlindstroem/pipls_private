@@ -10,7 +10,7 @@ from pipls import (
     PiPLSSearchCV,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
-    PiPLSValidationReport,
+    PiPLSOOFReport,
     PredictorRankSupportWarning,
 )
 ```
@@ -179,8 +179,7 @@ returns immutable `PiPLSOOFReport` with the supplied `selection`, ordered OOF pr
 repeated-prediction averaging, uncovered-row NaNs and zero counts, pooled OOF $R^2$ over covered rows,
 and leave-one-out provenance. It performs neither candidate rescoring nor a full-data fit. Callers
 must preserve the original row alignment because the search stores split indices but not supplied
-training matrices. All maintained consumers use this surface; `validation_report(...)` and
-`PiPLSValidationReport` remain only for final removal in Decision 0143 Patch 7.
+training matrices. All maintained consumers use this surface.
 
 ## Accepted selection-provenance and OOF-reporting transition
 
@@ -215,22 +214,21 @@ full-data refitting before retrieving selection, path, rank-profile, OOF, fitted
 evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
 `oof_report()`.
 
-Patches 1 through 6 are complete. `PiPLSComponentResult` implements `rule`,
+All seven patches are complete. `PiPLSComponentResult` implements `rule`,
 `reference_minimum`, and the derived `one_standard_error_threshold`; every successful refit result
 exposes the exact resolved selection as `model.selection_`; and `oof_report(selection=...)` returns
 immutable `PiPLSOOFReport` after exact compatibility validation. Directly fitted
 `PiPLSRegression` instances remain provenance-free. All model-producing workflows use
 `model.selection_` and `oof_report(selection=...)` where OOF analysis is required. The leave-one-out
 workflow remains selection-only and passes its `best_score` result directly to `oof_report()`.
-`validation_report(...)` and `PiPLSValidationReport` remain only for Patch 7 removal. No
-compatibility alias is authorized in the final state.
+The former report API has been removed without compatibility aliases.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
-component-path result. The search stores no selected row, OOF report, or fitted final model. `PiPLSOOFReport` composes one
-immutable selection; its `n_components`, `predictor_rank`, `n_splits`, `mean_test_score`, and
+component-path result. The search stores no selected row, OOF report, or fitted final model.
+`PiPLSOOFReport` composes one immutable selection; its `n_components`, `predictor_rank`, `n_splits`, `mean_test_score`, and
 `cv_mse_mean` properties forward to that selection rather than duplicating state.
-`has_complete_oof_coverage` exposes row coverage. The former validation report remains transitional.
+`has_complete_oof_coverage` exposes row coverage. The former report surface has been removed without aliases.
 
 Validated input grids, adaptive-search batch history, candidate counters, direct-rank parameter
 aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and supplied training matrices
@@ -263,12 +261,11 @@ mean response-standardized CV-MSE.
 
 Decision 0140 is fully implemented. `search.select(rule=... or n_components=...)` is the sole
 public selected-row lookup, the shared private rule vocabulary is `SelectionRule`, and selection
-inspection, refitting, validation reporting, and predictor-rank profile composition use
+inspection, refitting, OOF reporting, and predictor-rank profile composition use
 search-owned helpers. Durable numerical selection tests are located at this search boundary.
 
-All six current top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
-`PiPLSPredictorRankProfile`, `PiPLSComponentPath`, `PiPLSOOFReport`, and the transitional
-`PiPLSValidationReport`) validate direct
+All five current top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
+`PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSOOFReport`) validate direct
 construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and
 reconstruct through the same validation path when unpickled. Invalid dimensions, nonfinite scores,
 negative MSE summaries, unsupported policy values, and inconsistent OOF coverage are rejected.
@@ -276,8 +273,8 @@ Generated documentation keeps these records returned-first by suppressing constr
 
 Group-aware splitters and keyword-only `groups` belong to `PiPLSSearchCV.fit`, not to the fixed
 estimator. Explicit selection-conditioned reporting belongs to
-`PiPLSSearchCV.oof_report(selection=...)`; the former `validation_report()` remains transitional. No
-report is constructed or attached during search fitting.
+`PiPLSSearchCV.oof_report(selection=...)`. No report is constructed or attached during search
+fitting.
 
 ## E1 dataset and synthetic-data API
 

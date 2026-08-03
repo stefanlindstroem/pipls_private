@@ -52,7 +52,7 @@ from .model_selection import (
     _validate_singleton_fold_scoring,
 )
 from .regression import PiPLSRegression, _clear_fitted_state
-from .validation import PiPLSOOFReport, PiPLSValidationReport
+from .validation import PiPLSOOFReport
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -644,39 +644,6 @@ class PiPLSSearchCV(
         )
         return PiPLSOOFReport(
             selection=compatible,
-            is_leave_one_out=values[0],
-            oof_predictions=values[1],
-            oof_prediction_counts=values[2],
-            pooled_oof_r2=values[3],
-        )
-
-    def validation_report(
-        self,
-        X: ArrayLike,
-        y: ArrayLike,
-        *,
-        rule: SelectionRule | None = None,
-        n_components: int | None = None,
-    ) -> PiPLSValidationReport:
-        """Return the transitional report for one resolved path selection.
-
-        New code should call :meth:`oof_report` with an existing selection. This
-        method remains temporarily while maintained consumers migrate.
-        """
-
-        selected = self._resolve_selection_result(
-            rule=rule,
-            n_components=n_components,
-        )
-        values = self._compute_oof_report_values(
-            X,
-            y,
-            selection=selected,
-            operation_name="validation_report",
-        )
-        return PiPLSValidationReport(
-            selected_result=selected,
-            estimate_kind="selection-conditioned",
             is_leave_one_out=values[0],
             oof_predictions=values[1],
             oof_prediction_counts=values[2],

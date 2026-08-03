@@ -58,7 +58,7 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert search.scoring == "neg_response_standardized_mse"
     assert callable(search.select)
     assert callable(search.refit)
-    assert callable(search.validation_report)
+    assert callable(search.oof_report)
 
 
 def test_path_defaults_have_stable_signature_and_repr() -> None:
@@ -77,7 +77,7 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     assert cloned.scoring == path.scoring
     assert callable(cloned.select)
     assert callable(cloned.refit)
-    assert callable(cloned.validation_report)
+    assert callable(cloned.oof_report)
 
 
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:

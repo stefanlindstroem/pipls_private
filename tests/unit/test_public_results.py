@@ -12,7 +12,6 @@ from pipls import (
     PiPLSDecomposition,
     PiPLSOOFReport,
     PiPLSPredictorRankProfile,
-    PiPLSValidationReport,
 )
 
 
@@ -52,16 +51,6 @@ def _validation_result() -> PiPLSComponentResult:
     )
 
 
-def _validation_report() -> PiPLSValidationReport:
-    return PiPLSValidationReport(
-        selected_result=_validation_result(),
-        estimate_kind="selection-conditioned",
-        is_leave_one_out=np.bool_(False),
-        oof_predictions=np.array([[1.0, 2.0], [np.nan, np.nan], [3.0, 4.0]]),
-        oof_prediction_counts=np.array([1, 0, 2], dtype=np.int64),
-        pooled_oof_r2=np.float32(0.25),
-    )
-
 
 def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     for result_type in (
@@ -87,9 +76,6 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     }
     assert derived_report_fields.isdisjoint(
         field.name for field in fields(PiPLSOOFReport)
-    )
-    assert derived_report_fields.isdisjoint(
-        field.name for field in fields(PiPLSValidationReport)
     )
 
 
@@ -367,117 +353,6 @@ def test_decomposition_requires_solver_and_rank_exactness_to_agree() -> None:
     )
     assert randomized.predictor_svd_solver == "randomized"
 
-
-def test_validation_report_normalizes_and_freezes_oof_arrays() -> None:
-    report = _validation_report()
-
-    assert report.selected_result == _validation_result()
-    assert type(report.n_components) is int
-    assert type(report.predictor_rank) is int
-    assert type(report.n_splits) is int
-    assert type(report.mean_test_score) is float
-    assert type(report.cv_mse_mean) is float
-    assert type(report.is_selection_conditioned) is bool
-    assert type(report.has_complete_oof_coverage) is bool
-    assert type(report.is_leave_one_out) is bool
-    assert report.oof_predictions is not None
-    assert report.oof_prediction_counts is not None
-    assert not report.oof_predictions.flags.writeable
-    assert not report.oof_prediction_counts.flags.writeable
-    assert report.is_selection_conditioned
-    assert not report.has_complete_oof_coverage
-
-    restored = pickle.loads(pickle.dumps(report))
-    assert isinstance(restored, PiPLSValidationReport)
-    assert restored.selected_result == report.selected_result
-    assert restored.oof_predictions is not None
-    assert not restored.oof_predictions.flags.writeable
-    np.testing.assert_array_equal(
-        restored.oof_prediction_counts,
-        report.oof_prediction_counts,
-    )
-
-
-def test_validation_report_requires_component_result() -> None:
-    with pytest.raises(TypeError, match="selected_result must be a PiPLSComponentResult"):
-        PiPLSValidationReport(
-            selected_result=object(),  # type: ignore[arg-type]
-            estimate_kind="selection-conditioned",
-            is_leave_one_out=False,
-        )
-
-
-@pytest.mark.parametrize(
-    ("field", "value", "message"),
-    [
-        ("estimate_kind", "unknown", "must be one of"),
-        ("is_leave_one_out", 1, "must be boolean"),
-        ("pooled_oof_r2", np.inf, "finite real"),
-    ],
-)
-def test_validation_report_rejects_invalid_scalar_fields(
-    field: str,
-    value: object,
-    message: str,
-) -> None:
-    kwargs = {
-        "selected_result": _validation_result(),
-        "estimate_kind": "selection-conditioned",
-        "is_leave_one_out": False,
-        "oof_predictions": [1.0, 2.0],
-        "oof_prediction_counts": [1, 1],
-        "pooled_oof_r2": 0.2,
-    }
-
-    with pytest.raises(ValueError, match=message):
-        PiPLSValidationReport(**{**kwargs, field: value})  # type: ignore[arg-type]
-
-
-def test_validation_report_enforces_oof_coverage_representation() -> None:
-    kwargs = {
-        "selected_result": _validation_result(),
-        "estimate_kind": "selection-conditioned",
-        "is_leave_one_out": False,
-    }
-    with pytest.raises(ValueError, match="required"):
-        PiPLSValidationReport(**kwargs, oof_predictions=[1.0, 2.0])
-    with pytest.raises(ValueError, match="nonnegative"):
-        PiPLSValidationReport(
-            **kwargs,
-            oof_predictions=[1.0, 2.0],
-            oof_prediction_counts=[1, -1],
-        )
-    with pytest.raises(ValueError, match="Covered OOF predictions must be finite"):
-        PiPLSValidationReport(
-            **kwargs,
-            oof_predictions=[np.nan, 2.0],
-            oof_prediction_counts=[1, 1],
-        )
-    with pytest.raises(ValueError, match="Uncovered OOF predictions must be NaN"):
-        PiPLSValidationReport(
-            **kwargs,
-            oof_predictions=[1.0, 2.0],
-            oof_prediction_counts=[0, 1],
-        )
-    with pytest.raises(ValueError, match="contain integers"):
-        PiPLSValidationReport(
-            **kwargs,
-            oof_predictions=[1.0, 2.0],
-            oof_prediction_counts=[1.0, 1.0],
-        )
-    with pytest.raises(ValueError, match="at least one row"):
-        PiPLSValidationReport(
-            **kwargs,
-            oof_predictions=[],
-            oof_prediction_counts=[],
-        )
-    with pytest.raises(ValueError, match="at least two rows"):
-        PiPLSValidationReport(
-            **kwargs,
-            oof_predictions=[1.0, np.nan],
-            oof_prediction_counts=[1, 0],
-            pooled_oof_r2=0.0,
-        )
 
 
 def test_oof_report_normalizes_and_freezes_arrays() -> None:

@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Complete the model-selection provenance and OOF-reporting transition: remove the pre-release
+  report method and result type without aliases, retain all ordered-OOF numerical contracts under
+  `oof_report(selection=...)` and `PiPLSOOFReport`, and normalize the final API, tests, and
+  maintainer guidance around `model.selection_` and analysis-after-modeling workflows.
 - Migrate the automatic Tobacco workflow, retained-search quick-start guidance, and leave-one-out
   validation-only example to the final selection-driven analysis pattern. Tobacco now completes
   refitting before deriving its selected row, reference minimum, 1-SE threshold, rank profile, and

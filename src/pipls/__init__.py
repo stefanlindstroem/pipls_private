@@ -9,7 +9,7 @@ from .decomposition import PiPLSDecomposition
 from .exceptions import PredictorRankSupportWarning
 from .regression import PiPLSRegression
 from .search import PiPLSSearchCV
-from .validation import PiPLSOOFReport, PiPLSValidationReport
+from .validation import PiPLSOOFReport
 
 __all__ = [
     "PiPLSComponentPath",
@@ -19,7 +19,6 @@ __all__ = [
     "PiPLSRegression",
     "PiPLSSearchCV",
     "PiPLSOOFReport",
-    "PiPLSValidationReport",
     "PredictorRankSupportWarning",
     "__version__",
 ]

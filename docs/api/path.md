@@ -3,8 +3,8 @@
 Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
 `n_components` counts paired latent modes $h$; `predictor_rank` is the retained predictor-subspace
 dimension $r_\pi$. The [synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence)
-shows the ordinary sequence: inspect `component_path_`, choose a paired-mode count, inspect the
-complete stored row with `search.select(...)`, and fit it with `search.refit(...)`.
+shows the ordinary manual workflow: declare a component count, complete search and refitting, then
+inspect `model.selection_`, `component_path_`, and the conditional predictor-rank profile.
 
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
@@ -13,10 +13,9 @@ search object caps the path by the minimum predictor rank verified across those 
 `search.select(...)` returns one immutable stored component-path row without fitting.
 `search.refit(X, Y, ...)` resolves the same row, clones the configured estimator or pipeline, fits
 that clone, attaches the exact immutable row as `model.selection_`, and returns the model.
-`search.validation_report(X, Y, ...)` selects a row through the same
-rules and produces ordered OOF
+`search.oof_report(X, Y, selection=...)` consumes an existing selection and produces ordered OOF
 diagnostics from the exact validation splits materialized by `fit()`. The search object does not
-delegate model methods or retain the returned estimator or supplied training matrices.
+delegate model methods or retain the returned estimator, report, or supplied training matrices.
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see
@@ -25,9 +24,8 @@ problems, see [Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. `component_path_` and
 `predictor_rank_profile()` provide concise immutable views. Standard `best_*` attributes identify
-the global configured-score optimum. Post-fit `select()`, `refit()`, and `validation_report()` use
-the same selection vocabulary and do not alter search state. No final selection or validation
-report is stored on the search object.
+the global configured-score optimum. Post-fit `select()`, `refit()`, and `oof_report()` do not alter
+search state. No final selection, model, or OOF report is stored on the search object.
 Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).
@@ -41,35 +39,37 @@ response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 | Choose a component count after inspecting the path | Call `search.refit(X, Y, n_components=h)` |
 | Inspect the exact row used by a refitted model | Read `model.selection_` |
 | Apply an automatic final rule | Call `search.refit(X, Y, rule=...)` after path evaluation |
-| Inspect OOF diagnostics for one selected row | Call `search.validation_report(X, Y, rule=... or n_components=h)` |
+| Inspect OOF diagnostics for one selected row | Call `search.oof_report(X, Y, selection=selection)` |
 
-All three search-owned operations use the same stored-row vocabulary. Retaining `search` preserves
+These search-owned operations use the same stored-row vocabulary. Retaining `search` preserves
 the complete path and candidate evidence; the returned model owns prediction, transformation,
 scoring, and inspection of the final fixed fit.
 
-## Inspect the path and fit one fixed model { #inspect-the-path-and-fit-one-fixed-model }
+## Fit one fixed model and inspect the path { #inspect-the-path-and-fit-one-fixed-model }
 
 ```python
 from pipls import PiPLSSearchCV
 
+CHOSEN_N_COMPONENTS = 2  # application-specific declared choice
+
 search = PiPLSSearchCV().fit(X, Y)
-path = search.component_path_
-
-CHOSEN_N_COMPONENTS = 2  # application-specific choice after inspecting the path
-selected = search.select(n_components=CHOSEN_N_COMPONENTS)  # optional scalar evidence
-
 model = search.refit(
     X,
     Y,
     n_components=CHOSEN_N_COMPONENTS,
 )
-selected = model.selection_
+
+# Analysis follows completed modeling.
+selection = model.selection_
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
 ```
 
-This example shows the executable selection-to-fit contract. `select()` remains optional for
-selection-only inspection; a refitted model exposes the exact row it used through `selection_`. The
-[synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence) explains how to inspect
-and interpret the component path before making the application-specific choice.
+This example keeps model construction together and performs numerical analysis afterward. A
+refitted model exposes the exact row it used through `selection_`. `select()` remains optional for
+selection-only workflows that do not construct a final model. The
+[synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence) explains how retained
+path evidence can be used to justify an application-specific declared choice.
 
 ## Configure the candidate estimator { #configure-the-candidate-estimator }
 
@@ -120,7 +120,6 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
         - select
         - refit
         - oof_report
-        - validation_report
         - predictor_rank_profile
 
 ## Concise component path
@@ -193,17 +192,6 @@ estimate.
     options:
       show_signature: false
       members:
-        - has_complete_oof_coverage
-
-`validation_report(...)` and `PiPLSValidationReport` remain temporarily for maintained-consumer
-migration. New code should use `oof_report(selection=...)`; the former surface is removed in Patch 7
-of Decision 0143.
-
-::: pipls.PiPLSValidationReport
-    options:
-      show_signature: false
-      members:
-        - is_selection_conditioned
         - has_complete_oof_coverage
 
 ## Scoring functions

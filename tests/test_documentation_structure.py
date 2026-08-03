@@ -107,7 +107,7 @@ def test_api_overview_maps_the_public_result_objects() -> None:
         "PiPLSComponentPath",
         "PiPLSComponentResult",
         "PiPLSPredictorRankProfile",
-        "PiPLSValidationReport",
+        "PiPLSOOFReport",
         "PiPLSDecomposition",
         "LatentStructure",
         "PiPLSDisplayFactors",

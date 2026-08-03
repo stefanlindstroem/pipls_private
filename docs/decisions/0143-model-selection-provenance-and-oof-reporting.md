@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation in progress (Patches 1 through 6 complete).
+Accepted and implemented.
 
 ## Context
 
@@ -232,16 +232,15 @@ Implement this transition in seven reviewable patches:
 
 ## Implementation status
 
-Patches 1 through 6 are complete. `PiPLSComponentResult` carries validated rule provenance,
+All seven patches are complete. `PiPLSComponentResult` carries validated rule provenance,
 one-standard-error selections retain the exact minimum-CV-MSE result, and the threshold is derived
 from that immutable reference. Every successful `refit()` result exposes the exact resolved row as
 `model.selection_`. `oof_report(selection=...)` and `PiPLSOOFReport` provide the final OOF
 calculation contract, including exact compatibility validation against the fitted search. All
-model-producing examples now complete modeling before retrieving selection evidence, OOF
-diagnostics, fitted-model inspection results, and rendering. The leave-one-out example retains its
+model-producing examples complete modeling before retrieving selection evidence, OOF diagnostics,
+fitted-model inspection results, and rendering. The leave-one-out example retains its
 selection-only role through `search.select(...)` and passes that selection to `oof_report()`. The
-former `validation_report()` and `PiPLSValidationReport` remain only for final source, test, and API-
-documentation removal in Patch 7. Patch 7 is the next increment.
+former report method and result type have been removed without compatibility aliases.
 
 This decision refines Decisions 0137 and 0140. Search continues to own candidate evidence, exact
 stored splits, and fitting-free selected-row resolution, but final-model provenance now belongs on

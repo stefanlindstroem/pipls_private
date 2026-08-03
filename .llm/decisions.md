@@ -142,7 +142,7 @@ This index is navigation, not a substitute for those records.
 | `0134-type-revealing-result-properties.md` | type-revealing public result properties | expose explicit result-object, CV-MSE, and boolean predicate names without aliases or numerical changes |
 | `0135-specific-predictor-rank-support-warning.md` | specific predictor-rank support warning name | expose `PredictorRankSupportWarning` without an alias or support-policy change |
 | `0136-seeded-shuffled-example-folds.md` | seeded shuffled example folds | use reproducible shuffled five-fold partitions in maintained examples while leaving package defaults and leave-one-out unchanged |
-| `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select and fit through explicit post-fit `refit()` and `validation_report()` operations |
+| `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select, refit, and compute OOF diagnostics through explicit post-fit operations |
 | `0138-package-owned-pulp-dataset-loader.md` | package-owned Pulp dataset loader | provide one installed immutable `load_pulp()` dataset and archive the former repository layout without a duplicate active copy |
 | `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
 | `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
@@ -170,8 +170,8 @@ plan contains an earlier or more general proposal:
 - `PiPLSSearchCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
 - the implemented search now performs final full-data fitting only through post-fit `refit()` and
   exposes no constructor boolean, selected fitted-model state, or delegated model methods;
-  explicit post-fit `validation_report()` now reuses exact stored split indices without rescoring
-  candidates or mutating search; constructor-selected report controls and state are removed;
+  explicit post-fit OOF reporting reuses exact stored split indices without rescoring candidates or
+  mutating search; constructor-selected report controls and state are removed;
 - Decision 0140 implements search-owned `select()` as the sole public selected-row lookup;
   `PiPLSComponentPath` is aligned numerical evidence rather than a selection service;
 - Decision 0141 adds conditional predictor-rank profile figures to the Sugarcane and Tobacco
@@ -201,7 +201,7 @@ plan contains an earlier or more general proposal:
 - Decision 0143 authorizes a seven-patch model-selection provenance and OOF-reporting
   transition. The target retains the exact refit selection as `model.selection_`, enriches a
   1-SE selection with its reference minimum and derived threshold, and replaces repeated-rule
-  `validation_report()` calls with `oof_report(selection=...)`; Patch 1 records the target only;
+  repeated-rule report calls with `oof_report(selection=...)`; Patch 1 records the target only;
 - Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable

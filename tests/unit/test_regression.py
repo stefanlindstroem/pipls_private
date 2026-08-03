@@ -117,7 +117,7 @@ def test_fit_creates_no_selection_attributes() -> None:
         "best_params_",
         "best_score_",
         "cv_results_",
-        "validation_report_",
+        "oof_report_",
         "oof_predictions_",
         "selection_",
         "predictor_rank_values_",
