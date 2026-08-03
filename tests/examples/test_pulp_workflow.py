@@ -27,20 +27,18 @@ def pulp_result() -> SimpleNamespace:
 
     cv = KFold(n_splits=5, shuffle=True, random_state=0)
     search = PiPLSSearchCV(cv=cv).fit(X, Y)
-    component_path = search.component_path_
-    selected = search.select(n_components=3)
-
-    rank_profile = search.predictor_rank_profile(selected.n_components)
-
     model = search.refit(
         X,
         Y,
         n_components=3,
     )
-    report = search.validation_report(
+    selected = model.selection_
+    component_path = search.component_path_
+    rank_profile = search.predictor_rank_profile(selected.n_components)
+    report = search.oof_report(
         X,
         Y,
-        n_components=3,
+        selection=selected,
     )
     assert report.oof_predictions is not None
     oof_predictions = report.oof_predictions
@@ -113,7 +111,7 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
 
     assert result.X.shape == (46, 14)
     assert result.Y.shape == (46, 8)
-    assert result.report.selected_result == result.selected
+    assert result.report.selection == result.selected
     assert result.report.has_complete_oof_coverage
     assert result.oof_predictions.shape == result.Y.shape
     assert np.all(np.isfinite(result.oof_predictions))

@@ -183,20 +183,18 @@ report = search.oof_report(X, Y, selection=selection)
 `oof_report()` is optional numerical analysis, not a modeling statement. Fitted-model inspection and
 all rendering follow these retained search and OOF results. Workflows with an external test set may
 omit the OOF report. Validation-only and path-comparison-only examples retain their
-specialized roles and need not construct unused final models. Patches 1 through 4 are complete:
+specialized roles and need not construct unused final models. Patches 1 through 5 are complete:
 selection results carry rule and 1-SE reference evidence, refitted models retain `selection_`, and
-`oof_report(selection=...)` now owns OOF analysis. Consumer ordering remains assigned to Patches 5
-and 6.
+`oof_report(selection=...)` now owns OOF analysis. The manual synthetic, Pulp, and Sugarcane workflows and both tutorial renderers now implement this
+ordering. Automatic and validation-only consumers remain assigned to Patch 6.
 
-Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
-`load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible
-three-component choice,
-conditional predictor-rank profile, fixed `PiPLSRegression` fit, explicit five-fold validation
-reporting,
-inspection computations, and final PDF composition. The selected component row is retrieved before
-the selection figures, while the fixed estimator is fitted only after those figures have been
-constructed. It intentionally adds no external scaler because `PiPLSRegression` learns predictor
-and response standardization inside each fit.
+Pulp is the canonical manual-selection tutorial analysis. `examples/05_pulp_real_data.py` owns its
+public `load_pulp()` acquisition, visible three-component choice, path-evaluating search, full-data
+refit, retained `model.selection_`, conditional predictor-rank profile, selection-driven five-fold
+OOF report, inspection computations, and final PDF composition. Search and refitting complete
+modeling before any selection evidence or diagnostics are retrieved, and every figure is rendered
+only after the numerical analysis is complete. It intentionally adds no external scaler because
+`PiPLSRegression` learns predictor and response standardization inside each fit.
 
 The tutorial extracts checked snippets directly from example 05. `tools/render_pulp_tutorial.py`
 repeats the small in-memory numerical sequence rather than importing or executing the
@@ -414,8 +412,9 @@ retains a $2\times2$ factor figure, one $1\times3$ prediction figure per respons
 one
 $2\times2$ latent/observation figure, and one full-width coefficient figure per response page.
 
-Pulp, Sugarcane, and Tobacco obtain OOF predictions through explicit
-`validation_report()` calls. Each report reuses the exact
+Pulp and Sugarcane obtain OOF predictions through explicit
+`oof_report(selection=model.selection_)` calls. Tobacco retains its transitional named-rule report
+until Patch 6. Every report reuses the exact
 `KFold(n_splits=5, shuffle=True, random_state=0)` partition materialized by its path search.
 Because component count and predictor rank are chosen after inspecting paths
 computed from the same observations, the resulting OOF predictions are selection-conditioned rather
@@ -483,7 +482,7 @@ PLS-style `x_rotations_` and `y_rotations_` fitted attributes rather than duplic
 Its scorer-specific response scale is private. `PiPLSSearchCV` keeps standard candidate results,
 concise immutable path and rank-profile objects, global selection attributes, exhaustive-search qualification, and validation
 reporting. A fitted model is returned directly by post-fit `refit()` rather than attached to search
-state. Explicit `validation_report()` reuses the exact materialized splits and returns OOF arrays
-without attaching the report. Validated
+state. Explicit `oof_report(selection=...)` reuses the exact materialized splits and returns OOF
+arrays without attaching the report; `validation_report()` remains transitional. Validated
 input grids, adaptive batches, candidate counters, search-method echoes, and duplicate direct-rank
 parameter dictionaries are private implementation details.

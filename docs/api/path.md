@@ -2,7 +2,7 @@
 
 Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
 `n_components` counts paired latent modes $h$; `predictor_rank` is the retained predictor-subspace
-dimension $r_\pi$. The [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path)
+dimension $r_\pi$. The [synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence)
 shows the ordinary sequence: inspect `component_path_`, choose a paired-mode count, inspect the
 complete stored row with `search.select(...)`, and fit it with `search.refit(...)`.
 
@@ -68,7 +68,7 @@ selected = model.selection_
 
 This example shows the executable selection-to-fit contract. `select()` remains optional for
 selection-only inspection; a refitted model exposes the exact row it used through `selection_`. The
-[synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path) explains how to inspect
+[synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence) explains how to inspect
 and interpret the component path before making the application-specific choice.
 
 ## Configure the candidate estimator { #configure-the-candidate-estimator }

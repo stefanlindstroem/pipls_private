@@ -1,7 +1,7 @@
 # Pulp: a complete Pi-PLS workflow
 
-This tutorial applies [First Pi-PLS model with synthetic data](synthetic.md) to a real
-multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`,
+This tutorial applies [Inspect a manually selected Pi-PLS model with synthetic data](synthetic.md)
+to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`,
 `predictor_rank_profile()`, and fixed-model fitting are already familiar. The focus is what changes
 with real data: an interior predictor-rank result, selection-conditioned out-of-fold (OOF)
 predictions, and interpretation of a selected model.
@@ -11,12 +11,11 @@ predictions, and interpretation of a selected model.
 You will:
 
 1. load the Pulp predictors and responses;
-2. evaluate the component path and conditional predictor-rank profile;
-3. qualify an interior predictor-rank choice against the neighboring evaluated ranks;
-4. refit the chosen path row on all observations;
-5. generate selection-conditioned OOF predictions;
-6. compute immutable latent-structure, factorization, and prediction-diagnostic results;
-7. interpret representative standard PLS-family and Pi-PLS-specific plots.
+2. declare a component count and fit the corresponding model;
+3. retrieve the model's selection, component path, and conditional predictor-rank profile;
+4. generate OOF predictions for that exact selection;
+5. compute immutable latent-structure, factorization, and prediction-diagnostic results;
+6. render and interpret representative standard PLS-family and Pi-PLS-specific plots.
 
 ## Setup
 
@@ -33,11 +32,10 @@ then states the component choice and diagnostic-response limit used below:
 --8<-- "examples/05_pulp_real_data.py:pulp-tutorial-setup"
 ```
 
-`CHOSEN_N_COMPONENTS=3` is the user choice made from the component path. Because every fitted
-component is shown, the plotting code derives its zero-based component indices from that value
-instead of maintaining a second display setting. The first three response columns are shown only
-in pointwise diagnostic figures to keep the demonstration legible; the RMSE summary still includes
-all eight responses.
+`CHOSEN_N_COMPONENTS=3` is the explicit modeling choice. Because every fitted component is shown,
+the plotting code derives its zero-based component indices from that value instead of maintaining a
+second display setting. The first three response columns are shown only in pointwise diagnostic
+figures to keep the demonstration legible; the RMSE summary still includes all eight responses.
 
 ## The data and modeling question
 
@@ -45,9 +43,9 @@ The package-owned dataset contains 46 thermomechanical-pulp samples, 14 fiber-de
 predictors, and eight responses comprising Canadian Standard Freeness and seven handsheet
 properties. `load_pulp()` reads the installed resources without network access. The matrices are
 adapted from supplementary material associated with Lindström et al. (2025); all rows are preserved,
-and no imputation or learned preprocessing is applied before fitting.
-See the [dataset description](../datasets.md#pulp-real-data-integration) and the
-[reference](#reference) for provenance.
+and no imputation or learned preprocessing is applied before fitting. See the
+[dataset description](../datasets.md#pulp-real-data-integration) and the [reference](#reference) for
+provenance.
 
 Predictor labels retain the source notation: `L` is contour length, `W` is width, `C` is the source
 FiberLab C descriptor, and `F` is fibrillation. The suffixes `arith`, `lw`, and `llw` denote
@@ -56,14 +54,13 @@ arithmetic, length-weighted, and length-length-weighted means. The response labe
 energy absorption), `TSI` (tensile stiffness index), `Tear index`, and `s` (light-scattering
 coefficient).
 
-The analysis asks for a parsimonious number of Pi-PLS paired latent modes, then uses the predictor
-rank selected conditionally at that component count. The distinction is summarized in
+The analysis uses three paired latent modes and the predictor rank selected conditionally at that
+component count. The distinction is summarized in
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 ## Load the data
 
-The named loader returns immutable matrices together with scientific predictor and response labels.
-The first three response indices are selected explicitly for the pointwise displays:
+The named loader returns immutable matrices together with scientific predictor and response labels:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:load-pulp-data"
@@ -72,22 +69,34 @@ The first three response indices are selected explicitly for the pointwise displ
 The resulting arrays have shapes `(46, 14)` and `(46, 8)`. The same loader works from a source
 checkout, wheel, or source distribution and applies no preprocessing.
 
-## Select the fixed rank pair
+## Fit the manually selected model
+
+Search and full-data refitting are kept together:
+
+```python
+--8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
+```
+
+The search evaluates admissible paired-mode counts and conditionally selects one predictor rank at
+each count. `refit()` resolves the stored row for `CHOSEN_N_COMPONENTS` and fits that fixed pair on
+all 46 observations. The returned [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression)
+supplies predictions and fitted-model inspection; the search retains the cross-validation evidence.
+
+At this point modeling is complete.
+
+## Retrieve selection evidence
+
+The exact row used by `refit()` is available from `model.selection_`. The component path and the
+complete predictor-rank profile at that selected component count are then retrieved for analysis:
+
+```python
+--8<-- "examples/05_pulp_real_data.py:inspect-pulp-selection"
+```
+
+`search.select()` is not required. The fitted model already carries the selection that configured
+it.
 
 ### Component path
-
-The search evaluates admissible paired-mode counts and selects one predictor rank conditionally at
-each count:
-
-```python
---8<-- "examples/05_pulp_real_data.py:evaluate-pulp-component-path"
-```
-
-The matching immutable row is retrieved before plotting so that the chosen point can be marked:
-
-```python
---8<-- "examples/05_pulp_real_data.py:select-pulp-parameters"
-```
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:plot-pulp-component-path"
@@ -98,22 +107,14 @@ The matching immutable row is retrieved before plotting so that the chosen point
 The mean CV-MSE falls substantially through three components and is nearly flat thereafter. The
 bars show one fold-based standard error on either side of each mean; they are not confidence
 intervals. Such bars can inform the conventional
-[one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic), but the
-present demonstration keeps the elbow choice explicit rather than declaring an automatic final
-selection rule. The diamond marks the stated choice.
+[one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic), but this
+manual workflow keeps the three-component choice explicit. The diamond marks the row used by the
+fitted model.
 
-The selected row contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at
-three components under the seeded shuffled folds. `search.select()` retrieves that evaluated
-row for inspection; it does not repeat the optimization or fit the final model.
+The selection contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at three
+components under the seeded shuffled folds.
 
 ### Conditional predictor-rank profile
-
-The complete evaluated rank profile at three components is available without filtering
-`cv_results_`:
-
-```python
---8<-- "examples/05_pulp_real_data.py:extract-pulp-rank-profile"
-```
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:plot-pulp-rank-profile"
@@ -132,46 +133,32 @@ advantage over nearby retained dimensions. The fixed model still contains three 
 modes; predictor rank 9 is the retained predictor-subspace dimension used to estimate those modes.
 See [Path-selection details](../path_analysis.md) for other bounds and policies.
 
-## Fit the selected model
-
-Only after the two selection plots have been inspected is a fixed estimator fitted to all 46
-samples:
-
-```python
---8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
-```
-
-`search.refit(...)` resolves the conditionally selected predictor rank stored for the chosen
-component count, clones the search estimator, and fits that clone on all observations. The search
-retains the path evidence, while the returned `PiPLSRegression` supplies predictions and fitted
-results. The [`PiPLSRegression` reference](../api/regression.md#pipls.PiPLSRegression) gives the
-fixed-model contract.
-
 ## Generate selection-conditioned OOF predictions
 
-Fitted values are unsuitable for assessing predictive residuals. The example therefore asks the
-fitted search for a validation report at the chosen component count:
+OOF reporting is optional post-model analysis. The report consumes the exact selection retained by
+the model rather than resolving the component count again:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
 ```
 
-`validation_report()` resolves the same stored path row as `refit()` and reuses the exact five
-seeded shuffled splits materialized during path evaluation. The fixed random seed makes that
-partition reproducible while avoiding a fold assignment determined by row order. Replace the
-search splitter with a grouped, temporal, or otherwise appropriate protocol when the sampling
-design carries experimental structure.
+`oof_report()` reuses the exact five seeded shuffled splits materialized during path evaluation and
+recomputes row-ordered predictions for `selection`. The fixed random seed makes that partition
+reproducible while avoiding a fold assignment determined by row order. Replace the search splitter
+with a grouped, temporal, or otherwise appropriate protocol when the sampling design carries
+experimental structure.
 
 !!! important "Validation scope"
     These are **selection-conditioned OOF predictions**. The selected rank pair is fitted on each
-    stored training fold, but the same observations were already used to inspect the
-    selection path. Nested cross-validation or an external test set is required for an independent
-    estimate of post-selection performance. See
+    stored training fold, but the same observations were already used to inspect the selection path.
+    Nested cross-validation or an external test set is required for an independent estimate of
+    post-selection performance. See
     [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
 
 ## Compute immutable inspection results
 
-The fitted estimator and OOF predictions are converted to numerical result objects before plotting:
+The fitted estimator and OOF predictions are converted to numerical result objects before any
+figure is rendered:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-inspection-results"
@@ -188,11 +175,11 @@ positive orientation. The resulting TI entry is nonnegative for every displayed 
 same component sign is applied to the paired columns of $\mathbf{P}$ and $\mathbf{Q}$. This
 convention is useful here because tensile index is the principal controlled target. It only chooses
 how an equivalent factorization is displayed; it does not change predictions or assert that every
-physical effect on TI is positive. If an anchored entry were exactly zero, the helper would use
-its default predictor-based sign for that component.
+physical effect on TI is positive. If an anchored entry were exactly zero, the helper would use its
+default predictor-based sign for that component.
 
-At this point the programming workflow is complete. The remaining figures are optional
-interpretation views; the full catalogue is in [Model inspection](../model_inspection.md).
+At this point all numerical analysis is complete. The remaining code only renders completed public
+result objects. The full catalogue is in [Model inspection](../model_inspection.md).
 
 ## Interpret representative fitted-model plots
 

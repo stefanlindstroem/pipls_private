@@ -239,7 +239,7 @@ case, or public behavior.
 | Final refit | post-fit `search.refit(X, y, rule=...)` or `search.refit(X, y, n_components=...)` returns a fitted clone without mutating search state |
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
-| OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
+| OOF output | explicit post-fit `search.oof_report(X, y, selection=...)`; reports are returned directly and not attached to search state; `validation_report()` is transitional |
 | Dataset namespace | immutable container, implemented `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`, plus seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
 | Reference datasets | Pulp, Sugarcane, and Tobacco are public package resources used by every maintained consumer; each has one active matrix pair and documented raw-file access |
@@ -578,17 +578,19 @@ The final model-producing order is search, refit, then analysis: `model.selectio
 inspection, and rendering. OOF reporting is not part of modeling. `search.select()` remains an
 optional fitting-free operation for selection-only workflows.
 
-Current status: **Patches 1 through 4 complete**. Selection results record validated named-rule and
+Current status: **Patches 1 through 5 complete**. Selection results record validated named-rule and
 1-SE reference provenance; successful direct-estimator and pipeline refits retain the exact resolved
 row as `model.selection_`; and `oof_report(selection=...)` returns immutable `PiPLSOOFReport` after
-exact search-compatibility validation. The former report surface remains temporarily while examples
-and renderers migrate.
+exact search-compatibility validation. The manual synthetic, Pulp, and Sugarcane workflows and both tutorial renderers now use
+`model.selection_`, selection-driven OOF reporting where applicable, modeling-before-analysis order,
+and rendering-last structure. The former report surface remains only for the automatic and
+validation-only workflows.
 
 ## Current next increment
 
-Decision 0143 Patch 5 is next: migrate the manual-selection examples, tutorial renderers, tutorials,
-and structural tests to `model.selection_` and `oof_report(selection=...)`. Decision 0139 Patch 3 remains
-paused until the owner resumes that independent presentation increment.
+Decision 0143 Patch 6 is next: migrate the automatic Tobacco workflow, quick-start retained-search
+route, and leave-one-out validation workflow to the implemented selection and OOF-reporting surface.
+Decision 0139 Patch 3 remains paused until the owner resumes that independent presentation increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
 package resources are available in clean wheel and source-distribution installations, every

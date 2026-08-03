@@ -4,6 +4,11 @@
 
 ### Repository
 
+- Migrate the manual synthetic, Pulp, and Sugarcane workflows and the synthetic and Pulp tutorial
+  renderers to `model.selection_` and selection-driven `oof_report()`. Search and refitting now
+  complete modeling before path, rank-profile, OOF, fitted-model inspection, or rendering work;
+  redundant `search.select()` and manual `validation_report()` calls are removed from these
+  consumers without changing their numerical outputs or artifact inventories.
 - Add `PiPLSSearchCV.oof_report(X, y, selection=...)` and immutable `PiPLSOOFReport`. The new
   operation validates an existing selection against the fitted search, recomputes ordered OOF
   predictions on the exact stored splits, preserves repeated-CV averaging and partial coverage,

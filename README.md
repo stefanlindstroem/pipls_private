@@ -15,8 +15,9 @@ appropriate alternatives whose suitability depends on the data and validation de
 For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
 selects a predictor rank conditionally for each count. Users may inspect the path and fit one fixed
 model manually, or apply a named post-fit rule through `search.refit(X, Y, rule=...)`. The search
-retains the complete selection evidence, while `refit()` returns the fitted final estimator and
-`validation_report()` returns ordered selection-conditioned OOF diagnostics for one selected row.
+retains the complete selection evidence, while `refit()` returns the fitted final estimator with
+its exact `selection_`, and `oof_report()` returns ordered selection-conditioned OOF diagnostics for
+that selection.
 
 The rendered documentation is the primary user guide. On GitHub, open the latest
 [`github-pages` deployment](../../deployments/github-pages). The source links below remain useful
@@ -75,7 +76,7 @@ Y_fitted = model.predict(X)
 
 `examples/01_pulp_quick_start.py` standardizes each response and places all observed and fitted
 values in one figure. These are fitted values from the final full-data model, not out-of-fold
-predictions; use `search.validation_report(...)` when predictive validation is required.
+predictions; retain the search and use `search.oof_report(..., selection=model.selection_)` when OOF diagnostics are required.
 
 ## Fit one known model
 
@@ -104,23 +105,25 @@ When the ranks are not known, evaluate the path first:
 from pipls import PiPLSSearchCV
 
 search = PiPLSSearchCV().fit(X_train, Y_train)
-path = search.component_path_
-
-# Inspect path.cv_mse_mean and search.predictor_rank_profile(2).
 model = search.refit(
     X_train,
     Y_train,
     n_components=2,
 )
 
+selection = model.selection_
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
+
 Y_pred = model.predict(X_test)
 ```
 
 For every evaluated component count, the default search selects the predictor rank that minimizes
 mean response-standardized CV-MSE. `refit(..., n_components=h)` transfers that stored pair into a fitted clone without requiring
-the user to copy `predictor_rank`. Use `search.select(n_components=h)` when the scalar row
-itself is needed for annotation or reporting, and use `search.predictor_rank_profile(h)` to
-inspect all ranks evaluated at one component count.
+the user to copy `predictor_rank`. The returned model exposes that complete row as
+`model.selection_`; use `search.predictor_rank_profile(model.selection_.n_components)` to inspect all
+ranks evaluated at the fitted component count. `search.select(...)` remains available for
+selection-only work that does not fit a final model.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
 predictor-rank plots. The [path-selection reference](docs/api/path.md) and
@@ -149,10 +152,11 @@ search object. Selection-conditioned OOF diagnostics are requested explicitly an
 validation splits materialized by `fit()`:
 
 ```python
-report = search.validation_report(
+selection = model.selection_
+report = search.oof_report(
     X_train,
     Y_train,
-    n_components=2,
+    selection=selection,
 )
 ```
 
@@ -167,7 +171,7 @@ not the training matrices.
 | `PiPLSSearchCV` | Evaluate the path, inspect evidence, refit one row, or validate one row explicitly |
 | `component_path_` | Inspect one conditionally chosen predictor rank for each paired-mode count |
 | `predictor_rank_profile(h)` | Inspect all evaluated predictor ranks at one paired-mode count |
-| `validation_report(X, Y, ...)` | Produce ordered OOF diagnostics for one stored path row |
+| `oof_report(X, Y, selection=...)` | Produce ordered OOF diagnostics for one existing selection |
 | `pipls.inspection` | Compute immutable fitted-model and prediction diagnostics |
 | Matplotlib | Optionally render those arrays with caller-controlled figures and styling |
 | `pipls.datasets` | Load package-owned Pulp, Sugarcane, and Tobacco data or generate deterministic synthetic data |

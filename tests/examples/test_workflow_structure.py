@@ -184,6 +184,30 @@ def _top_level_functions(tree: ast.Module) -> dict[str, ast.FunctionDef]:
     }
 
 
+def _assigned_name_lineno(scope: ast.AST, target_name: str) -> int:
+    lines = [
+        node.lineno
+        for node in ast.walk(scope)
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Name) and target.id == target_name
+            for target in node.targets
+        )
+    ]
+    assert lines, target_name
+    return min(lines)
+
+
+def _first_call_lineno(scope: ast.AST, name: str) -> int:
+    lines = [
+        node.lineno
+        for node in ast.walk(scope)
+        if isinstance(node, ast.Call) and _call_name(node) == name
+    ]
+    assert lines, name
+    return min(lines)
+
+
 @pytest.mark.parametrize(
     ("relative_path", "required_attribute"),
     [
@@ -314,6 +338,7 @@ def test_maintained_reference_consumers_use_package_loaders(
             "05_pulp_real_data.py",
             {"predictor_rank_profile"},
             {
+                "model.selection_",
                 "search.component_path_",
                 "factors.predictor_directions",
                 "structure.x_scores",
@@ -336,6 +361,7 @@ def test_maintained_reference_consumers_use_package_loaders(
             "06_sugarcane_real_data.py",
             {"predictor_rank_profile"},
             {
+                "model.selection_",
                 "search.component_path_",
                 "rank_profile.selected_result",
                 "factors.predictor_directions",
@@ -397,16 +423,20 @@ def test_real_data_examples_use_direct_public_results(
     calls = _call_names(tree)
     attributes = _attribute_paths(tree)
 
-    assert {
+    required_calls = {
         "PiPLSSearchCV",
         "refit",
-        "select",
-        "validation_report",
         "savefig",
         "subplots",
         *_INSPECTION_CALLS,
         *extra_calls,
-    } <= calls
+    }
+    if filename in {"05_pulp_real_data.py", "06_sugarcane_real_data.py"}:
+        required_calls.add("oof_report")
+        assert {"select", "validation_report"}.isdisjoint(calls)
+    else:
+        required_calls.update({"select", "validation_report"})
+    assert required_calls <= calls
     assert required_attributes <= attributes
     assert loader_name in calls
     assert _assigned_value_path(tree, "response_names") == response_assignment
@@ -452,11 +482,14 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
         "PiPLSSearchCV",
         loader_name,
         "refit",
-        "select",
-        "validation_report",
         *_INSPECTION_CALLS,
         *extra_analysis_calls,
     }
+    if filename == "06_sugarcane_real_data.py":
+        analysis_calls.add("oof_report")
+        assert {"select", "validation_report"}.isdisjoint(_call_names(main))
+    else:
+        analysis_calls.update({"select", "validation_report"})
     assert analysis_calls <= _call_names(main)
     assert _call_names(main).isdisjoint(_RENDERING_METHODS)
 
@@ -489,6 +522,83 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
 
 
 
+@pytest.mark.parametrize(
+    (
+        "relative_path",
+        "scope_name",
+        "path_name",
+        "report_expected",
+        "render_call",
+    ),
+    [
+        (
+            "examples/02_synthetic_path_selection.py",
+            None,
+            "path",
+            False,
+            "subplots",
+        ),
+        (
+            "examples/05_pulp_real_data.py",
+            None,
+            "path",
+            True,
+            "subplots",
+        ),
+        (
+            "examples/06_sugarcane_real_data.py",
+            "main",
+            "path",
+            True,
+            "_plot_component_path",
+        ),
+        (
+            "tools/render_synthetic_tutorial.py",
+            "render_synthetic_tutorial_assets",
+            "path",
+            False,
+            "subplots",
+        ),
+        (
+            "tools/render_pulp_tutorial.py",
+            "render_pulp_tutorial_assets",
+            "component_path",
+            True,
+            "_render_component_path",
+        ),
+    ],
+)
+def test_manual_workflows_complete_modeling_before_analysis_and_rendering(
+    relative_path: str,
+    scope_name: str | None,
+    path_name: str,
+    report_expected: bool,
+    render_call: str,
+) -> None:
+    tree = _tree(_repository_root() / relative_path)
+    scope: ast.AST = (
+        tree if scope_name is None else _top_level_functions(tree)[scope_name]
+    )
+
+    search_line = _assigned_name_lineno(scope, "search")
+    model_line = _assigned_name_lineno(scope, "model")
+    selection_line = _assigned_name_lineno(scope, "selection")
+    path_line = _assigned_name_lineno(scope, path_name)
+    rank_profile_line = _assigned_name_lineno(scope, "rank_profile")
+    diagnostics_line = _assigned_name_lineno(scope, "diagnostics")
+    render_line = _first_call_lineno(scope, render_call)
+
+    assert search_line < model_line < selection_line
+    assert selection_line < path_line < rank_profile_line
+    if report_expected:
+        report_line = _assigned_name_lineno(scope, "report")
+        assert rank_profile_line < report_line < diagnostics_line
+    else:
+        assert "oof_report" not in _call_names(scope)
+        assert rank_profile_line < diagnostics_line
+    assert diagnostics_line < render_line
+
+
 def test_numbered_examples_keep_dataset_io_and_analysis_in_memory() -> None:
     for path in _numbered_examples():
         tree = _tree(path)
@@ -502,37 +612,38 @@ def test_numbered_examples_keep_dataset_io_and_analysis_in_memory() -> None:
 
 
 
-def test_maintained_path_annotations_use_search_owned_selection() -> None:
+def test_manual_workflows_use_refitted_model_selection() -> None:
     repository = _repository_root()
     paths = (
         repository / "examples" / "02_synthetic_path_selection.py",
         repository / "examples" / "05_pulp_real_data.py",
         repository / "examples" / "06_sugarcane_real_data.py",
-        repository / "examples" / "07_tobacco_real_data.py",
         repository / "tools" / "render_synthetic_tutorial.py",
         repository / "tools" / "render_pulp_tutorial.py",
     )
     for path in paths:
-        calls = _call_names(_tree(path))
-        assert "select" in calls, path
+        tree = _tree(path)
+        assert "model.selection_" in _attribute_paths(tree), path
+        assert "select" not in _call_names(tree), path
 
 
 @pytest.mark.parametrize(
-    "filename",
+    ("filename", "selection_name"),
     [
-        "06_sugarcane_real_data.py",
-        "07_tobacco_real_data.py",
+        ("06_sugarcane_real_data.py", "selection"),
+        ("07_tobacco_real_data.py", "selected"),
     ],
 )
 def test_spectral_examples_extract_rank_profile_at_selected_component_count(
     filename: str,
+    selection_name: str,
 ) -> None:
     tree = _tree(_repository_root() / "examples" / filename)
 
     assert _assigned_call_path(tree, "rank_profile") == "search.predictor_rank_profile"
     assert (
         _assigned_call_argument_path(tree, "rank_profile", 0)
-        == "selected.n_components"
+        == f"{selection_name}.n_components"
     )
 
 

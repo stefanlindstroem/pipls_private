@@ -78,8 +78,21 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         random_state=0,
     )
     search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
+    model = search.refit(
+        train.X,
+        train.Y,
+        n_components=CHOSEN_N_COMPONENTS,
+    )
+
+    selection = model.selection_
     path = search.component_path_
-    selected = search.select(n_components=CHOSEN_N_COMPONENTS)
+    rank_profile = search.predictor_rank_profile(selection.n_components)
+    predictions = model.predict(test.X)
+    diagnostics = prediction_diagnostics(
+        test.Y,
+        predictions,
+        prediction_kind="external test predictions",
+    )
 
     figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
     axis.errorbar(
@@ -90,11 +103,11 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         capsize=4,
     )
     axis.scatter(
-        [selected.n_components],
-        [selected.cv_mse_mean],
+        [selection.n_components],
+        [selection.cv_mse_mean],
         marker="D",
         s=70,
-        label=f"Chosen: {selected.n_components} components",
+        label=f"Chosen: {selection.n_components} components",
         zorder=3,
     )
     axis.set_xlabel("Number of components")
@@ -107,7 +120,6 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     axis.legend()
     _save_svg(figure, output_dir / "component_path.svg")
 
-    rank_profile = search.predictor_rank_profile(selected.n_components)
     figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
     axis.errorbar(
         rank_profile.predictor_rank,
@@ -128,7 +140,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
     axis.set_title(
         rf"Synthetic $\Pi$-PLS predictor-rank profile at "
-        f"{selected.n_components} components"
+        f"{selection.n_components} components"
     )
     axis.set_xticks(rank_profile.predictor_rank)
     upper = float(
@@ -139,17 +151,6 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     axis.legend()
     _save_svg(figure, output_dir / "predictor_rank_profile.svg")
 
-    model = search.refit(
-        train.X,
-        train.Y,
-        n_components=CHOSEN_N_COMPONENTS,
-    )
-    predictions = model.predict(test.X)
-    diagnostics = prediction_diagnostics(
-        test.Y,
-        predictions,
-        prediction_kind="external test predictions",
-    )
     figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
     for response, name in enumerate(test.target_names):
         axis.scatter(
@@ -191,8 +192,8 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
             "n_response_specific": train.truth.n_response_specific,
         },
         "analysis": {
-            "chosen_n_components": selected.n_components,
-            "chosen_predictor_rank": selected.predictor_rank,
+            "chosen_n_components": selection.n_components,
+            "chosen_predictor_rank": selection.predictor_rank,
             "evaluated_component_counts": path.n_components.tolist(),
             "evaluated_predictor_ranks": rank_profile.predictor_rank.tolist(),
             "prediction_kind": diagnostics.prediction_kind,

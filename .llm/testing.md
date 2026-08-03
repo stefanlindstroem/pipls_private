@@ -142,7 +142,11 @@ equality with search and report selections, post-fit attachment, model pickle st
 cleanup, direct-fit absence, output configuration, and unchanged search state. Patch 4 protects
 `PiPLSOOFReport` construction and pickling, exact selection compatibility, numerical parity with the
 transitional report, repeated-CV averaging, partial coverage, leave-one-out provenance, shape
-validation, and unchanged search state.
+validation, and unchanged search state. Patch 5 adds structural and numerical coverage for the
+manual synthetic, Pulp, and Sugarcane workflows and both tutorial renderers: no redundant
+`search.select()` calls, exact use of `model.selection_`, selection-driven `oof_report()` where OOF
+diagnostics are required, modeling-before-analysis order, and rendering after all numerical results
+are complete.
 
 ## Three-stage onboarding transition
 
@@ -220,12 +224,13 @@ uses its `CV` or `cv` variable; tutorial snippets must not depend on hidden modu
 configuration. The compact first example is the intentional exception: it uses default `cv=5` to
 demonstrate the shortest installed-data workflow.
 The leave-one-out example retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane,
-and Tobacco protect
-direct `component_path_` access, explicit `validation_report()`, immutable inspection results,
-explicit Matplotlib
+and Tobacco protect direct `component_path_` access, immutable inspection results, explicit
+Matplotlib
 construction, absence of analytical CSV output, physical coordinate order, and the declared final
-PDF filenames without running the artifact-writing scripts. Keep these source scans consolidated as
-AST-level ownership and data-flow checks rather than repeating per-example string inventories.
+PDF filenames without running the artifact-writing scripts. Pulp and Sugarcane additionally require
+`model.selection_` and `oof_report(selection=...)`; Tobacco retains its transitional report calls
+until Patch 6. Keep these source scans consolidated as AST-level ownership and data-flow checks
+rather than repeating per-example string inventories.
 Sugarcane and Tobacco tests also protect the boundary between `main()`-owned analysis and private
 same-file rendering. Tobacco tests retain its full-SVD configuration, source-order response
 pagination, raw observation diagnostics, and two same-file multipage report loops. Biplot tests

@@ -166,33 +166,22 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     response_names = data.target_names
 
     search = PiPLSSearchCV(cv=CV).fit(X, Y)
-    component_path = search.component_path_
-    selected = search.select(n_components=CHOSEN_N_COMPONENTS)
-    display_components = tuple(range(CHOSEN_N_COMPONENTS))
-
-    _render_component_path(
-        component_path,
-        selected=selected,
-        output_path=output_dir / "component_path.svg",
-    )
-    rank_profile = search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
-    _render_predictor_rank_profile(
-        rank_profile,
-        output_path=output_dir / "predictor_rank_profile.svg",
-    )
-
     model = search.refit(
         X,
         Y,
         n_components=CHOSEN_N_COMPONENTS,
     )
-    report = search.validation_report(
+
+    selection = model.selection_
+    component_path = search.component_path_
+    rank_profile = search.predictor_rank_profile(selection.n_components)
+    report = search.oof_report(
         X,
         Y,
-        n_components=CHOSEN_N_COMPONENTS,
+        selection=selection,
     )
     if report.oof_predictions is None:
-        raise RuntimeError("Validation reporting did not produce OOF predictions.")
+        raise RuntimeError("OOF reporting did not produce predictions.")
     oof_predictions = report.oof_predictions
     factors = pipls_display_factors(
         model.decomposition_,
@@ -204,6 +193,17 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         Y,
         oof_predictions,
         prediction_kind=PREDICTION_KIND,
+    )
+    display_components = tuple(range(selection.n_components))
+
+    _render_component_path(
+        component_path,
+        selected=selection,
+        output_path=output_dir / "component_path.svg",
+    )
+    _render_predictor_rank_profile(
+        rank_profile,
+        output_path=output_dir / "predictor_rank_profile.svg",
     )
 
     # --8<-- [start:render-pulp-biplot]
@@ -412,11 +412,11 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
             "array_sha256": dict(data.metadata["integrity"]["array_sha256"]),
         },
         "analysis": {
-            "chosen_n_components": selected.n_components,
-            "chosen_predictor_rank": selected.predictor_rank,
+            "chosen_n_components": selection.n_components,
+            "chosen_predictor_rank": selection.predictor_rank,
             "evaluated_predictor_ranks": rank_profile.predictor_rank.tolist(),
             "predictor_rank_at_upper_boundary": bool(
-                selected.predictor_rank == int(rank_profile.predictor_rank[-1])
+                selection.predictor_rank == int(rank_profile.predictor_rank[-1])
             ),
             "displayed_components": [component + 1 for component in display_components],
             "factor_sign_anchor": {

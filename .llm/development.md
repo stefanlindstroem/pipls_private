@@ -22,10 +22,11 @@
 - Keep the fixed numerical core independent from preprocessing, CV, datasets,
   and publication-specific workflows.
 - Reuse the shared private evaluation/search machinery rather than adding a second fold loop.
-- Use one private selected-row resolver for post-fit refitting and validation reporting. `refit()`
-  returns a fitted estimator clone and does not mutate search
-  state or retain training data. `validation_report()` reuses the exact splits materialized by the
-  search and does not perform a full-data fit.
+- Use one private selected-row resolver for selection and refitting, and one private OOF engine for
+  report calculation. `refit()` returns a fitted estimator clone and does not mutate search state or
+  retain training data. `oof_report(selection=...)` reuses the exact splits materialized by the
+  search and does not perform a full-data fit; `validation_report()` is only a temporary delegating
+  surface.
 - Preserve current estimator-internal centering/scaling: fit its statistics inside every
   candidate training fold and refit them on the complete training set after selection.
 - Fit every additional learned preprocessing operation inside its matching training fold.

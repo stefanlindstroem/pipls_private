@@ -83,12 +83,10 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
     example_sections = {
         "pulp-tutorial-setup",
         "load-pulp-data",
-        "evaluate-pulp-component-path",
-        "select-pulp-parameters",
-        "plot-pulp-component-path",
-        "extract-pulp-rank-profile",
-        "plot-pulp-rank-profile",
         "fit-pulp-model",
+        "inspect-pulp-selection",
+        "plot-pulp-component-path",
+        "plot-pulp-rank-profile",
         "pulp-oof-predictions",
         "pulp-inspection-results",
     }

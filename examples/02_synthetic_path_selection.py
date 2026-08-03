@@ -34,11 +34,29 @@ train, test = make_pipls_train_test(
 )
 # --8<-- [end:generate-synthetic-data]
 
-# --8<-- [start:evaluate-synthetic-path]
+# --8<-- [start:fit-synthetic-model]
 search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
+model = search.refit(
+    train.X,
+    train.Y,
+    n_components=CHOSEN_N_COMPONENTS,
+)
+# --8<-- [end:fit-synthetic-model]
+
+# --8<-- [start:inspect-synthetic-selection]
+selection = model.selection_
 path = search.component_path_
-selected = search.select(n_components=CHOSEN_N_COMPONENTS)
-# --8<-- [end:evaluate-synthetic-path]
+rank_profile = search.predictor_rank_profile(selection.n_components)
+# --8<-- [end:inspect-synthetic-selection]
+
+# --8<-- [start:evaluate-synthetic-predictions]
+test_predictions = model.predict(test.X)
+diagnostics = prediction_diagnostics(
+    test.Y,
+    test_predictions,
+    prediction_kind="external test predictions",
+)
+# --8<-- [end:evaluate-synthetic-predictions]
 
 # --8<-- [start:plot-synthetic-component-path]
 figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
@@ -50,11 +68,11 @@ axis.errorbar(
     capsize=4,
 )
 axis.scatter(
-    [selected.n_components],
-    [selected.cv_mse_mean],
+    [selection.n_components],
+    [selection.cv_mse_mean],
     marker="D",
     s=70,
-    label=f"Chosen: {selected.n_components} components",
+    label=f"Chosen: {selection.n_components} components",
     zorder=3,
 )
 axis.set_xlabel("Number of components")
@@ -70,8 +88,6 @@ plt.close(figure)
 # --8<-- [end:plot-synthetic-component-path]
 
 # --8<-- [start:plot-synthetic-rank-profile]
-rank_profile = search.predictor_rank_profile(selected.n_components)
-
 figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
 axis.errorbar(
     rank_profile.predictor_rank,
@@ -92,7 +108,7 @@ axis.set_xlabel("Predictor rank")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
 axis.set_title(
     rf"Synthetic $\Pi$-PLS predictor-rank profile at "
-    f"{selected.n_components} components"
+    f"{selection.n_components} components"
 )
 axis.set_xticks(rank_profile.predictor_rank)
 upper = float(
@@ -105,20 +121,7 @@ figure.savefig(ANALYSIS_DIR / "predictor_rank_profile.pdf")
 plt.close(figure)
 # --8<-- [end:plot-synthetic-rank-profile]
 
-# --8<-- [start:fit-predict-synthetic-model]
-model = search.refit(
-    train.X,
-    train.Y,
-    n_components=CHOSEN_N_COMPONENTS,
-)
-
-test_predictions = model.predict(test.X)
-diagnostics = prediction_diagnostics(
-    test.Y,
-    test_predictions,
-    prediction_kind="external test predictions",
-)
-
+# --8<-- [start:plot-synthetic-predictions]
 figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
 for response, name in enumerate(test.target_names):
     axis.scatter(
@@ -146,7 +149,7 @@ axis.set_title(rf"Synthetic $\Pi$-PLS — {diagnostics.prediction_kind}")
 axis.legend(title="Response")
 figure.savefig(ANALYSIS_DIR / "observed_vs_predicted.pdf")
 plt.close(figure)
-# --8<-- [end:fit-predict-synthetic-model]
+# --8<-- [end:plot-synthetic-predictions]
 
 print("Synthetic Pi-PLS path-selection example")
 print(f"Training data: X{train.X.shape}, Y{train.Y.shape}")
@@ -158,8 +161,8 @@ print(
 )
 print(
     "Selected fixed model: "
-    f"n_components={selected.n_components}, "
-    f"predictor_rank={selected.predictor_rank}"
+    f"n_components={selection.n_components}, "
+    f"predictor_rank={selection.predictor_rank}"
 )
 print(f"External-test R^2: {model.score(test.X, test.Y):.3f}")
 print(f"Wrote PDF figures to {ANALYSIS_DIR}")

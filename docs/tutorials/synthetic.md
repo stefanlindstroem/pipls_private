@@ -1,21 +1,21 @@
-# Inspect and select a Pi-PLS model with synthetic data
+# Inspect a manually selected Pi-PLS model with synthetic data
 
 This tutorial expands the [Pulp quick start](quick_start.md) by retaining the fitted search object,
-inspecting its component path and conditional predictor-rank profile, and choosing a component count
-before refitting. Deterministic synthetic training and test data make the latent structure known and
-keep prediction assessment independent of model selection. For Pi-PLS, `n_components` is the number
-of paired latent modes.
+declaring a component count, fitting the corresponding model, and then inspecting the retained
+component path and conditional predictor-rank profile. Deterministic synthetic training and test
+data make the latent structure known and keep prediction assessment independent of model
+selection. For Pi-PLS, `n_components` is the number of paired latent modes.
 
 ## What this tutorial covers
 
 You will:
 
 1. generate independent training and test observations;
-2. evaluate a cross-validated component path;
-3. choose a paired-mode count;
-4. inspect the predictor rank selected at that count;
-5. refit the chosen path row on all training observations;
-6. predict the independent test responses.
+2. declare a paired-mode count;
+3. evaluate the search and fit the corresponding full-data model;
+4. inspect the fitted model's selection, component path, and predictor-rank profile;
+5. predict the independent test responses;
+6. render the numerical results.
 
 The tutorial deliberately stops after one prediction plot. Scores, loadings, Pi-PLS factorization
 plots, and selection-conditioned OOF diagnostics are introduced in the
@@ -50,15 +50,14 @@ The generating structure contains:
 
 The shared dimension, and therefore the intended predictive paired-mode count, is two, while the
 predictor block contains four structured directions in total. These known values help interpret the
-example, but cross-validation
-is not required to recover them exactly in a finite noisy sample.
+example, but cross-validation is not required to recover them exactly in a finite noisy sample.
 
-## Evaluate the component path
+## Fit the manually selected model
 
-`PiPLSSearchCV` evaluates admissible pairs of paired-mode count $h$ (`n_components`) and retained
-predictor-subspace dimension $r_\pi$ (`predictor_rank`). For each paired-mode count, it selects the
-evaluated predictor rank with the smallest mean
-response-standardized CV-MSE under a seeded shuffled five-fold splitter and the default scorer:
+The example declares `CHOSEN_N_COMPONENTS=2` before modeling. The search evaluates admissible pairs
+of paired-mode count $h$ (`n_components`) and retained predictor-subspace dimension $r_\pi$
+(`predictor_rank`). For each paired-mode count, it selects the evaluated predictor rank with the
+smallest mean response-standardized CV-MSE:
 
 \begin{equation}
 r_\pi^*(h)
@@ -67,17 +66,29 @@ r_\pi^*(h)
 \operatorname{CV\text{-}MSE}(h,r_\pi).
 \end{equation}
 
-The concise `component_path_` object contains one row per evaluated paired-mode count. Each row
-already contains its conditionally selected predictor rank $r_\pi^*(h)$:
+`refit()` resolves the stored row $[h,r_\pi^*(h)]$ for the declared component count and fits that
+fixed pair on all training observations:
 
 ```python
---8<-- "examples/02_synthetic_path_selection.py:evaluate-synthetic-path"
+--8<-- "examples/02_synthetic_path_selection.py:fit-synthetic-model"
 ```
 
-This tutorial chooses `CHOSEN_N_COMPONENTS=2`. The call to `search.select()` retrieves the
-stored row for inspection; it does not perform another search and it does not fit the final model.
+At this point modeling is complete. The returned estimator owns prediction and fitted-model
+inspection. The retained search owns the numerical evidence produced during path evaluation.
 
-The component path is plotted before fitting:
+## Retrieve selection evidence
+
+The exact row used by `refit()` is available as `model.selection_`. The component path and
+conditional predictor-rank profile are then retrieved for analysis:
+
+```python
+--8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-selection"
+```
+
+No additional selection is performed. `selection`, `path`, and `rank_profile` are immutable
+numerical results derived from the completed modeling workflow.
+
+### Component path
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-component-path"
@@ -87,14 +98,11 @@ The component path is plotted before fitting:
 
 The mean CV-MSE falls markedly from one to two components and changes little at three. The bars
 show one fold-based standard error on either side of each mean; they are not confidence intervals.
-Such bars can inform the conventional [one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic)
-for choosing a parsimonious paired-mode count. This tutorial keeps that judgment explicit rather
-than applying the automatic post-fit 1-SE rule. The diamond marks the choice of two components.
+Such bars can inform the conventional
+[one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic). This tutorial
+keeps the component choice explicit. The diamond marks the row that produced the fitted model.
 
-## Inspect the conditional predictor-rank profile
-
-The selected paired-mode row stores one predictor rank, but the complete evaluated rank profile is
-available through `predictor_rank_profile()`:
+### Conditional predictor-rank profile
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-rank-profile"
@@ -106,38 +114,42 @@ At two components, the lowest evaluated mean CV-MSE occurs at predictor rank fou
 controlled example, that matches the two shared and two predictor-specific directions in the
 predictor block. This agreement is informative but not a general selection guarantee.
 
-The programming contract is now complete:
+The programming contract is:
 
 ```text
 search candidate pairs
         ↓
-component_path_ stores one conditionally chosen predictor rank for each paired-mode count
+refit the declared component count using its stored conditional predictor rank
         ↓
-choose a paired-mode count
+model.selection_ records the exact fitted row
         ↓
-search.refit(..., n_components=h) resolves [h, r_pi*(h)]
-        ↓
-fit and return one fixed PiPLSRegression model
+component_path_ and predictor_rank_profile() expose retained selection evidence
 ```
 
-## Fit the selected model and predict
+## Evaluate independent predictions
 
-Only after inspecting the two selection figures is the fixed model fitted. Predictions are then
-made for the independent test observations:
+Predictions are calculated for the independent test observations after the full-data model has been
+constructed:
 
 ```python
---8<-- "examples/02_synthetic_path_selection.py:fit-predict-synthetic-model"
+--8<-- "examples/02_synthetic_path_selection.py:evaluate-synthetic-predictions"
+```
+
+The completed diagnostic result is then rendered:
+
+```python
+--8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-predictions"
 ```
 
 ![Synthetic observed versus predicted responses](../assets/generated/synthetic/observed_vs_predicted.svg)
 
 The prediction plot uses the held-out test block, so it is not a fitted-data or
-selection-conditioned OOF display. `model.score(test.X, test.Y)` supplies the corresponding uniform average of the response-wise
-coefficients of determination.
+selection-conditioned OOF display. `model.score(test.X, test.Y)` supplies the corresponding uniform
+average of the response-wise coefficients of determination.
 
 ## Minimal reusable workflow
 
-For ordinary use, the essential sequence is:
+For ordinary manual selection, the essential sequence is:
 
 ```python
 from sklearn.model_selection import KFold
@@ -147,25 +159,26 @@ from pipls import PiPLSSearchCV
 cv = KFold(n_splits=5, shuffle=True, random_state=0)
 search = PiPLSSearchCV(cv=cv).fit(X_train, Y_train)
 
-# Inspect search.component_path_ and, when useful, the conditional rank profile.
 model = search.refit(
     X_train,
     Y_train,
     n_components=chosen_n_components,
 )
 
+selection = model.selection_
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
+
 Y_pred = model.predict(X_test)
 ```
 
-`PiPLSSearchCV` owns model selection and the evidence used to inspect it. `refit()` transfers one
-stored path row into a fitted `PiPLSRegression` without making the user copy the associated predictor
-rank manually. Keeping the search variable preserves the complete path; the returned estimator owns
-prediction and fitted-model inspection.
+`search.select()` is not required in this model-producing workflow. It remains available when a
+user wants to inspect a selection without fitting a final model.
 
 ## Continue with real data
 
-The [complete Pulp tutorial](pulp.md) applies the same selection sequence to a real multivariate
-dataset. It then adds fixed-parameter OOF predictions, immutable inspection objects, standard
+The [complete Pulp tutorial](pulp.md) applies the same ordering to a real multivariate dataset. It
+then adds OOF predictions for the fitted selection, immutable inspection objects, standard
 PLS-family plots, and Pi-PLS-specific factorization plots.
 
 For exact signatures and advanced behavior, see:

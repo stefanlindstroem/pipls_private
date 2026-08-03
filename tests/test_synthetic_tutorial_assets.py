@@ -147,10 +147,12 @@ def test_synthetic_tutorial_uses_checked_snippets_assets_and_public_links() -> N
         "import-synthetic-kfold",
         "define-synthetic-cv",
         "generate-synthetic-data",
-        "evaluate-synthetic-path",
+        "fit-synthetic-model",
+        "inspect-synthetic-selection",
+        "evaluate-synthetic-predictions",
         "plot-synthetic-component-path",
         "plot-synthetic-rank-profile",
-        "fit-predict-synthetic-model",
+        "plot-synthetic-predictions",
     }
     for section in snippet_sections:
         assert f"examples/02_synthetic_path_selection.py:{section}" in tutorial

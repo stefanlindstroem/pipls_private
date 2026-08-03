@@ -1034,15 +1034,17 @@ profile before optionally calling `oof_report(...)`; fitted-model inspection and
 OOF reporting is explicitly analysis, not modeling. `search.select()` remains available for
 selection-only workflows but is not required merely to recover the row used by `refit()`.
 
-Current status: **Patches 1 through 4 complete**. Selection results carry validated rule and 1-SE
+Current status: **Patches 1 through 5 complete**. Selection results carry validated rule and 1-SE
 reference provenance, successful refits attach the exact immutable result as `model.selection_`, and
 `oof_report(selection=...)` returns immutable `PiPLSOOFReport` with exact compatibility validation.
-Maintained-consumer changes remain pending.
+The manual synthetic, Pulp, and Sugarcane workflows and the synthetic and Pulp renderers now
+complete search and refitting before retrieving `model.selection_`, path and rank-profile evidence,
+optional OOF diagnostics, fitted-model inspection results, and rendering.
 
 ## Current next increment
 
-Decision 0143 Patch 5 is next. It migrates the manual-selection examples, tutorial renderers,
-tutorials, and structural tests to the implemented selection and OOF-reporting surface. Decision 0139
+Decision 0143 Patch 6 is next. It migrates the automatic Tobacco workflow, quick-start retained-search
+route, and validation-only workflow to the implemented selection and OOF-reporting surface. Decision 0139
 Patch 3 remains an independent paused documentation increment. Decision 0138 remains the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface, or compatibility layer is
 authorized.
 

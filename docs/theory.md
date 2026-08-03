@@ -393,6 +393,6 @@ package generators. See the [companion-manuscript synthetic-data guide](manuscri
 for the exact distribution and reproducibility boundary, and the
 [dataset and generator guide](datasets.md) for the broader package distinction.
 
-The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#select-the-fixed-rank-pair)
+The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#retrieve-selection-evidence)
 and [path-selection details](path_analysis.md) define the package’s general selection and
 validation contracts.

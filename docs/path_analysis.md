@@ -1,6 +1,6 @@
 # Path-selection details
 
-The [synthetic tutorial](tutorials/synthetic.md#evaluate-the-component-path) owns the routine
+The [synthetic tutorial](tutorials/synthetic.md#retrieve-selection-evidence) owns the routine
 selection workflow. This page records configuration, cross-validation, and edge behavior needed
 when the defaults are not enough. Exact signatures and fitted attributes are in the
 [generated path API](api/path.md).

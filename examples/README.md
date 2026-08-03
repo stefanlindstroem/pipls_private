@@ -22,9 +22,10 @@ workflows are intentionally more extensive than ordinary estimator use.
   `load_pulp()`, evaluates the default component path, applies the one-standard-error rule through
   `refit()`, and combines all standardized observed and fitted responses in one plot. The plotted
   values describe full-data calibration fit, not OOF validation.
-- `02_synthetic_path_selection.py`: the short tutorial workflow. It generates independent synthetic
-  train/test data, evaluates the component path and conditional predictor-rank profile, fits one
-  selected fixed model, and writes three final PDF figures.
+- `02_synthetic_path_selection.py`: the short manual-selection workflow. It generates independent
+  synthetic train/test data, completes search and refitting for the declared component count, then
+  inspects `model.selection_`, the component path, and the conditional predictor-rank profile before
+  writing three final PDF figures.
 - `03_leave_one_out_validation.py`: a focused small-sample calibration workflow. It evaluates a
   compact explicit path with `LeaveOneOut`, requests ordered OOF predictions through
   `search.validation_report()`, and distinguishes
@@ -57,14 +58,14 @@ use case rather than combining unrelated split protocols in one context-free scr
 
 ## Complete Pi-PLS reference workflows
 
-- `05_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the path, inspects
-  the conditional predictor-rank profile at three components, fits the selected fixed model,
-  requests selection-conditioned OOF predictions through `search.validation_report()`, orients
-  the displayed factors so the tensile-index response is positive, and writes six final PDF
-  figures directly from in-memory results.
-- `06_sugarcane_real_data.py`: the direct reference workflow. It reads the component path and
-  conditional predictor-rank profile in memory, requests OOF predictions through the search
-  validation report, and writes six wavelength-aware final PDF figures without generated
+- `05_pulp_real_data.py`: the direct canonical tutorial analysis. It completes search and manual
+  refitting at three components, retrieves the fitted model's `selection_`, component path, and
+  conditional predictor-rank profile, requests selection-conditioned OOF predictions through
+  `search.oof_report(..., selection=selection)`, orients the displayed factors so the tensile-index
+  response is positive, and writes six final PDF figures directly from in-memory results.
+- `06_sugarcane_real_data.py`: the direct reference workflow. It completes modeling before
+  retrieving `model.selection_`, the component path, the conditional predictor-rank profile, and an
+  OOF report for that selection. It writes six wavelength-aware final PDF figures without generated
   analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD and explicit `search.select(rule=...)` calls. Its component-path figure shows
@@ -120,27 +121,25 @@ system, or other domain metadata. The package inspection API does not invent sci
 names.
 
 Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
-comparison figures directly. Sugarcane demonstrates the complete-analysis workflow:
+comparison figures directly. Sugarcane demonstrates the complete manual-analysis workflow:
 
-1. the default path-evaluating `PiPLSSearchCV()` returns `component_path_`, which is plotted directly
-   with Matplotlib.
-2. `search.select(n_components=CHOSEN_N_COMPONENTS)` retrieves the complete chosen path row.
-3. `search.predictor_rank_profile(selected.n_components)` returns the aligned predictor-rank
-   candidates at that chosen component count for direct plotting.
-4. `search.refit(..., n_components=CHOSEN_N_COMPONENTS)` fits the chosen row on all observations.
-5. `search.validation_report(..., n_components=CHOSEN_N_COMPONENTS)` reuses the exact seeded
-   shuffled folds stored by the search and returns `selection-conditioned OOF predictions`.
+1. `PiPLSSearchCV(cv=CV).fit(X, Y)` evaluates the path.
+2. `search.refit(..., n_components=CHOSEN_N_COMPONENTS)` fits the declared component count and its
+   conditionally selected predictor rank on all observations.
+3. `selection = model.selection_` retrieves the exact row used by the fitted model.
+4. `component_path_` and `predictor_rank_profile(selection.n_components)` provide the retained
+   selection evidence.
+5. `search.oof_report(X, Y, selection=selection)` reuses the exact seeded shuffled folds and returns
+   selection-conditioned OOF predictions for that fitted specification.
 6. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return immutable
    in-memory results.
-7. The script plots the conditional predictor-rank profile, latent structure, prediction
-   diagnostics, and $P$, $D$, $Q$, and $QD$ factors directly with Matplotlib and saves the six
-   final figures itself.
+7. The script renders the completed path, rank-profile, latent-structure, prediction-diagnostic, and
+   factor results with Matplotlib and saves the six final figures itself.
 
-Pulp is the canonical tutorial workflow. Example 05 performs the same direct analysis shown in
-the tutorial: it uses `component_path_`, retrieves the immutable conditional rank profile with
-`predictor_rank_profile()`, fits the chosen row through `search.refit()`, obtains OOF
-predictions through `search.validation_report()`, and renders immutable inspection arrays
-directly. Tobacco
+Pulp is the canonical tutorial workflow. Example 05 follows the same ordering: search and refitting
+complete modeling, `model.selection_` identifies the fitted row, the search supplies path and rank
+profile evidence, `oof_report()` evaluates that selection on the stored folds, and rendering occurs
+only after the numerical analysis is complete. Tobacco
 follows the same direct result-to-Matplotlib pattern, but applies the named
 `"one_standard_error"` refit rule. It uses `search.select()` with the
 `"minimum_cv_mse"` and `"one_standard_error"` rules to construct the explanatory

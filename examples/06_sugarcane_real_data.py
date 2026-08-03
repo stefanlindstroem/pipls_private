@@ -304,27 +304,25 @@ def main() -> None:
     wavelengths = np.asarray(data.feature_names, dtype=np.float64)
     response_names = list(data.target_names)
 
-    # Evaluate the Pi-PLS component path over paired-mode counts.
+    # Complete search and full-data modeling before numerical analysis.
     search = PiPLSSearchCV(cv=CV).fit(X, Y)
-    path = search.component_path_
-    selected = search.select(n_components=CHOSEN_N_COMPONENTS)
-    rank_profile = search.predictor_rank_profile(selected.n_components)
-
-    # Fit the chosen component-path row on the full data.
     model = search.refit(
         X,
         Y,
         n_components=CHOSEN_N_COMPONENTS,
     )
 
-    # Calculate selection-conditioned out-of-fold predictions on the stored splits.
-    report = search.validation_report(
+    # Retrieve selection, path, rank-profile, and OOF evidence after modeling.
+    selection = model.selection_
+    path = search.component_path_
+    rank_profile = search.predictor_rank_profile(selection.n_components)
+    report = search.oof_report(
         X,
         Y,
-        n_components=CHOSEN_N_COMPONENTS,
+        selection=selection,
     )
     if report.oof_predictions is None:
-        raise RuntimeError("Validation reporting did not produce OOF predictions.")
+        raise RuntimeError("OOF reporting did not produce predictions.")
     oof_predictions = report.oof_predictions
 
     # Calculate fitted-model and prediction inspection results.
@@ -346,8 +344,8 @@ def main() -> None:
         factors,
         wavelengths,
         response_names,
-        selected_n_components=selected.n_components,
-        selected_predictor_rank=selected.predictor_rank,
+        selected_n_components=selection.n_components,
+        selected_predictor_rank=selection.predictor_rank,
         output_path=ANALYSIS_DIR / "pipls_factors.pdf",
     )
     _plot_prediction_diagnostics(

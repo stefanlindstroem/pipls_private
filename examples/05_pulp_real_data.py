@@ -31,15 +31,45 @@ predictor_names = data.feature_names
 response_names = data.target_names
 # --8<-- [end:load-pulp-data]
 
-# --8<-- [start:evaluate-pulp-component-path]
+# --8<-- [start:fit-pulp-model]
 search = PiPLSSearchCV(cv=CV).fit(X, Y)
-path = search.component_path_
-# --8<-- [end:evaluate-pulp-component-path]
+model = search.refit(
+    X,
+    Y,
+    n_components=CHOSEN_N_COMPONENTS,
+)
+# --8<-- [end:fit-pulp-model]
 
-# --8<-- [start:select-pulp-parameters]
-# The stored predictor rank minimizes mean CV-MSE for this paired-mode count.
-selected = search.select(n_components=CHOSEN_N_COMPONENTS)
-# --8<-- [end:select-pulp-parameters]
+# --8<-- [start:inspect-pulp-selection]
+selection = model.selection_
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
+# --8<-- [end:inspect-pulp-selection]
+
+# --8<-- [start:pulp-oof-predictions]
+report = search.oof_report(
+    X,
+    Y,
+    selection=selection,
+)
+if report.oof_predictions is None:
+    raise RuntimeError("OOF reporting did not produce predictions.")
+oof_predictions = report.oof_predictions
+# --8<-- [end:pulp-oof-predictions]
+
+# --8<-- [start:pulp-inspection-results]
+factors = pipls_display_factors(
+    model.decomposition_,
+    response_index=response_names.index("TI"),
+    response_sign="positive",
+)
+structure = latent_structure(model)
+diagnostics = prediction_diagnostics(
+    Y,
+    oof_predictions,
+    prediction_kind="selection-conditioned OOF predictions",
+)
+# --8<-- [end:pulp-inspection-results]
 
 # --8<-- [start:plot-pulp-component-path]
 figure, axis = plt.subplots(
@@ -54,11 +84,11 @@ axis.errorbar(
     capsize=4,
 )
 axis.scatter(
-    [selected.n_components],
-    [selected.cv_mse_mean],
+    [selection.n_components],
+    [selection.cv_mse_mean],
     marker="D",
     s=70,
-    label=f"Chosen: {selected.n_components} components",
+    label=f"Chosen: {selection.n_components} components",
     zorder=3,
 )
 axis.set_xlabel("Number of components")
@@ -72,11 +102,6 @@ axis.legend()
 figure.savefig(ANALYSIS_DIR / "component_path.pdf")
 plt.close(figure)
 # --8<-- [end:plot-pulp-component-path]
-
-# --8<-- [start:extract-pulp-rank-profile]
-# Retrieve every predictor rank evaluated at the chosen component count.
-rank_profile = search.predictor_rank_profile(CHOSEN_N_COMPONENTS)
-# --8<-- [end:extract-pulp-rank-profile]
 
 # --8<-- [start:plot-pulp-rank-profile]
 # Plot the conditional predictor-rank profile at the chosen component count.
@@ -103,7 +128,7 @@ axis.set_xlabel("Predictor rank")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
 axis.set_title(
     rf"Pulp $\Pi$-PLS predictor-rank profile at "
-    f"{selected.n_components} components"
+    f"{selection.n_components} components"
 )
 axis.set_xticks(rank_profile.predictor_rank)
 upper = float(
@@ -115,40 +140,6 @@ axis.legend()
 figure.savefig(ANALYSIS_DIR / "predictor_rank_profile.pdf")
 plt.close(figure)
 # --8<-- [end:plot-pulp-rank-profile]
-
-# Fit the selected fixed model only after inspecting the selection figures.
-# --8<-- [start:fit-pulp-model]
-model = search.refit(
-    X,
-    Y,
-    n_components=CHOSEN_N_COMPONENTS,
-)
-# --8<-- [end:fit-pulp-model]
-
-# --8<-- [start:pulp-oof-predictions]
-report = search.validation_report(
-    X,
-    Y,
-    n_components=CHOSEN_N_COMPONENTS,
-)
-if report.oof_predictions is None:
-    raise RuntimeError("Validation reporting did not produce OOF predictions.")
-oof_predictions = report.oof_predictions
-# --8<-- [end:pulp-oof-predictions]
-
-# --8<-- [start:pulp-inspection-results]
-factors = pipls_display_factors(
-    model.decomposition_,
-    response_index=response_names.index("TI"),
-    response_sign="positive",
-)
-structure = latent_structure(model)
-diagnostics = prediction_diagnostics(
-    Y,
-    oof_predictions,
-    prediction_kind="selection-conditioned OOF predictions",
-)
-# --8<-- [end:pulp-inspection-results]
 
 # Every fitted component is displayed, so derive the zero-based indices locally.
 display_components = tuple(range(CHOSEN_N_COMPONENTS))
@@ -214,7 +205,7 @@ for axis, ylabel in (
     axis.legend()
 figure.suptitle(
     r"Pulp $\Pi$-PLS factors with TI-positive orientation "
-    f"({selected.n_components} components, predictor rank {selected.predictor_rank})"
+    f"({selection.n_components} components, predictor rank {selection.predictor_rank})"
 )
 figure.savefig(ANALYSIS_DIR / "pipls_factors.pdf")
 plt.close(figure)
@@ -451,6 +442,6 @@ print(
     "Predictor-rank profile: "
     f"evaluated {rank_profile.predictor_rank[0]} to "
     f"{rank_profile.predictor_rank[-1]}; "
-    f"selected rank {selected.predictor_rank}"
+    f"selected rank {selection.predictor_rank}"
 )
 print(f"Wrote PDF figures to {ANALYSIS_DIR}")
