@@ -13,7 +13,7 @@ the maintained scripts.
 |---|---|---|
 | `01_pulp_quick_start.py` | Search, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Fit a declared component count, inspect the retained selection evidence, and evaluate independent test predictions | Three PDF figures and printed external-test $R^2$ |
-| `03_leave_one_out_validation.py` | Validate a small calibration study with leave-one-out splits and explicit ordered OOF reporting | Printed selected rank pair and immutable validation summary |
+| `03_leave_one_out_validation.py` | Select one path row without fitting a final model, then evaluate it with leave-one-out OOF reporting | Printed selected rank pair and immutable OOF summary |
 | `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
 | `05_pulp_real_data.py` | Fit a manual Pulp model, then inspect its selection, rank profile, OOF behavior, and latent structure | Six PDF figures |
 | `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Six PDF figures |
@@ -49,11 +49,11 @@ workflows and may take substantially longer than the package test suite.
 
 Example 01 intentionally uses the scikit-learn-compatible default `cv=5` to keep the opening
 workflow to one search/refit expression. Examples 02 and 04–07 use explicit five-fold shuffled
-regression splits with `KFold(n_splits=5, shuffle=True, random_state=0)`. In the manual Pulp and
-Sugarcane workflows, `oof_report(..., selection=model.selection_)` reuses the exact partition
-materialized by the path search. Example 03 still uses its transitional validation-report call until
-the validation-only workflow is migrated in the next increment. Example 03 uses
-`LeaveOneOut`; shuffling is not defined because every observation is held out once. Grouped,
+regression splits with `KFold(n_splits=5, shuffle=True, random_state=0)`. The complete Pulp,
+Sugarcane, and Tobacco workflows use `oof_report(..., selection=model.selection_)` to reuse the
+exact partition materialized by the path search. Example 03 deliberately fits no final model: it
+uses `search.select(rule="best_score")` and passes that selection to `oof_report()`. Its
+`LeaveOneOut` splitter is exhaustive, so shuffling is not defined. Grouped,
 temporal, or otherwise structured data require an application-specific splitter instead.
 
 ## Leave-one-out validation
@@ -88,19 +88,15 @@ component path and fit one selected fixed model:
 The Tobacco component path has no clear elbow that would by itself motivate one component count.
 Example 07 therefore demonstrates the conventional
 [one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) as a reproducible
-parsimony heuristic. Its component-path figure marks the minimum-mean-CV-MSE row, draws the
-horizontal 1-SE threshold, and marks the smallest evaluated component count whose mean CV-MSE does
-not exceed that threshold. Both annotated rows are obtained through `search.select(rule=...)`;
-the recommended row also supplies the conditionally selected predictor rank used by the final fixed
-model. The example then calls
-`search.predictor_rank_profile(selected.n_components)` so the 1-SE-selected component count
-becomes the input to the conditional predictor-rank inspection. The profile figure shows every
-rank actually evaluated at that count and marks its conditional CV-MSE minimum.
+parsimony heuristic. The search first refits the 1-SE-selected full-data model. Analysis then reads
+`model.selection_`, whose `reference_minimum` and `one_standard_error_threshold` provide the
+minimum-row and threshold annotations without repeated selection calls. The example obtains the
+conditional rank profile through
+`search.predictor_rank_profile(selection.n_components)` and evaluates the same selection through
+`search.oof_report(X, Y, selection=selection)` before rendering fitted-model diagnostics.
 
-The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) describe
-how the stored row is obtained, and the [component-path API reference](api/path.md) gives the exact
-method surface. The example retrieves the recommendation explicitly for plotting, then applies the
-same named rule through `search.refit(...)` for full-data fitting.
+The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) define the
+selection object, and the [component-path API reference](api/path.md) gives the exact method surface.
 
 ## Output artifacts and rendering ownership
 

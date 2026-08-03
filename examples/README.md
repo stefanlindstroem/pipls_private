@@ -27,8 +27,8 @@ workflows are intentionally more extensive than ordinary estimator use.
   inspects `model.selection_`, the component path, and the conditional predictor-rank profile before
   writing three final PDF figures.
 - `03_leave_one_out_validation.py`: a focused small-sample calibration workflow. It evaluates a
-  compact explicit path with `LeaveOneOut`, requests ordered OOF predictions through
-  `search.validation_report()`, and distinguishes
+  compact explicit path with `LeaveOneOut`, obtains one fitting-free selection through
+  `search.select(rule="best_score")`, evaluates it through `search.oof_report()`, and distinguishes
   pooled OOF $R^2$ from undefined mean foldwise $R^2$.
 
 Run it with:
@@ -68,23 +68,19 @@ use case rather than combining unrelated split protocols in one context-free scr
   OOF report for that selection. It writes six wavelength-aware final PDF figures without generated
   analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
-  SVD and explicit `search.select(rule=...)` calls. Its component-path figure shows
-  the minimum-CV-MSE row, the horizontal 1-SE threshold, and the recommended row. It then calls
-  `search.predictor_rank_profile(selected.n_components)` to inspect the predictor ranks evaluated
-  at the 1-SE-selected component count; `search.refit(..., rule="one_standard_error")` fits that
-  row without manual parameter transfer. The workflow
-  then requests selection-conditioned OOF predictions through the same named rule, produces
-  decreasing-wavenumber spectral plots,
-  deterministic response pagination, and raw observation diagnostics through direct in-memory
-  results and caller-owned multipage PDFs. See the
-  [1-SE rule](../docs/path_analysis.md#one-standard-error-component-heuristic) and the
+  SVD. `search.refit(..., rule="one_standard_error")` completes modeling, after which
+  `model.selection_` provides the selected row, its reference minimum, and the derived 1-SE
+  threshold. The workflow then obtains the conditional rank profile and selection-driven OOF
+  report before rendering the component-path annotations, decreasing-wavenumber spectral displays,
+  deterministic response pagination, and raw observation diagnostics through caller-owned PDFs.
+  See the [1-SE rule](../docs/path_analysis.md#one-standard-error-component-heuristic) and the
   [focused Tobacco explanation](../docs/examples.md#tobacco-one-standard-error-selection).
 
-These are application analyses rather than introductory snippets. Pulp and Sugarcane expose their
-complete scientific sequences directly in the numbered scripts: path evaluation and plotting,
-explicit component-count choice, fixed fitting, OOF prediction, immutable inspection results, and
-explicit Matplotlib composition. Tobacco replaces the manual component-count choice with the
-explicit 1-SE recommendation described above while retaining the same separate fixed-fit boundary.
+These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
+complete search and full-data refitting before retrieving the fitted selection, retained path
+evidence, conditional rank profile, optional OOF diagnostics, immutable fitted-model inspection
+results, and caller-owned Matplotlib composition. Tobacco replaces the manual component-count
+choice with the explicit 1-SE recommendation described above.
 Pulp, Sugarcane, and Tobacco each write `component_path.pdf`,
 `predictor_rank_profile.pdf`, `pipls_factors.pdf`, `latent_structure.pdf`, `coefficients.pdf`, and
 `prediction_diagnostics.pdf`. For Tobacco,
@@ -139,13 +135,11 @@ comparison figures directly. Sugarcane demonstrates the complete manual-analysis
 Pulp is the canonical tutorial workflow. Example 05 follows the same ordering: search and refitting
 complete modeling, `model.selection_` identifies the fitted row, the search supplies path and rank
 profile evidence, `oof_report()` evaluates that selection on the stored folds, and rendering occurs
-only after the numerical analysis is complete. Tobacco
-follows the same direct result-to-Matplotlib pattern, but applies the named
-`"one_standard_error"` refit rule. It uses `search.select()` with the
-`"minimum_cv_mse"` and `"one_standard_error"` rules to construct the explanatory
-component-path figure, then passes the 1-SE-selected component count to
-`predictor_rank_profile()`. It owns its full-SVD configuration, response pagination, and
-multipage PDF output visibly.
+only after the numerical analysis is complete. Tobacco follows the same direct
+result-to-Matplotlib pattern but applies the named `"one_standard_error"` refit rule. Its
+`model.selection_` supplies the selected row, reference minimum, and threshold used by the
+component-path figure; the selected count then supplies `predictor_rank_profile()`. It owns its
+full-SVD configuration, response pagination, and multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
 figures retain explicit provenance. Numbered examples never serialize analytical results for later

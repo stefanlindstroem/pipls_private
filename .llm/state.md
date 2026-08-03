@@ -276,8 +276,9 @@ Additional fixed decisions:
 - Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
   separate fixed model
   after a visible component-path choice. Pulp and Sugarcane use explicit component counts, while
-  Tobacco resolves its minimum and 1-SE annotation rows through `search.select(rule=...)`.
-  All three call `search.predictor_rank_profile(selected.n_components)`; for Tobacco the profiled
+  Tobacco obtains its selected row, minimum reference, and 1-SE threshold from
+  `model.selection_`. All three call `search.predictor_rank_profile(selection.n_components)`; for
+  Tobacco the profiled
   count is therefore the result of the 1-SE rule. All three use `component_path_`, explicit search
   validation reports, and inspection results
   directly in memory. All three use direct fixed estimators. `best_params_` remains a convenience,
@@ -521,18 +522,18 @@ Decision 0140 authorizes a four-patch public-API transition:
 4. remove the three public selected-row methods from `PiPLSComponentPath`, relocate their durable
    contracts to the search boundary, and close the transition with active-surface audits.
 
-The final boundary makes the component path aligned numerical evidence only. `select()`, `refit()`,
-and `validation_report()` share exactly one rule/component-count vocabulary and one resolver.
-Selection numerics, tie behavior, final fitting, and OOF semantics do not change.
+The final boundary makes the component path aligned numerical evidence only. `select()` and
+`refit()` share exactly one rule/component-count vocabulary and one resolver. Selection numerics,
+tie behavior, and final fitting do not change.
 
-Current status: **complete**. `PiPLSSearchCV.select()` uses the shared `SelectionRule` vocabulary
-and is used by every maintained example, tutorial renderer, and living user document. The path
-object exposes aligned immutable evidence only, while exact selection contracts are tested at the
-search boundary.
+Current status: **complete**. `PiPLSSearchCV.select()` uses the shared `SelectionRule` vocabulary as
+the fitting-free selection-only operation. Model-producing consumers recover the fitted row from
+`model.selection_`. The path object exposes aligned immutable evidence only, while exact selection
+contracts are tested at the search boundary.
 
 Decision 0141 adds `predictor_rank_profile.pdf` to both spectral complete analyses. Sugarcane
-profiles its explicit selected count; Tobacco profiles `selected.n_components` from the
-one-standard-error rule. All three complete real-data workflows now write six PDFs.
+profiles its explicit selected count; Tobacco profiles `selection.n_components` from the exact row
+retained by the one-standard-error refit. All three complete real-data workflows write six PDFs.
 
 ## Package-owned reference-dataset transition
 
@@ -578,13 +579,13 @@ The final model-producing order is search, refit, then analysis: `model.selectio
 inspection, and rendering. OOF reporting is not part of modeling. `search.select()` remains an
 optional fitting-free operation for selection-only workflows.
 
-Current status: **Patches 1 through 5 complete**. Selection results record validated named-rule and
+Current status: **Patches 1 through 6 complete**. Selection results record validated named-rule and
 1-SE reference provenance; successful direct-estimator and pipeline refits retain the exact resolved
 row as `model.selection_`; and `oof_report(selection=...)` returns immutable `PiPLSOOFReport` after
-exact search-compatibility validation. The manual synthetic, Pulp, and Sugarcane workflows and both tutorial renderers now use
-`model.selection_`, selection-driven OOF reporting where applicable, modeling-before-analysis order,
-and rendering-last structure. The former report surface remains only for the automatic and
-validation-only workflows.
+exact search-compatibility validation. All model-producing workflows use `model.selection_`,
+selection-driven OOF reporting where applicable, modeling-before-analysis order, and rendering-last
+structure. The leave-one-out workflow remains selection-only and passes its `best_score` selection
+to `oof_report()`. The former report surface remains only for Patch 7 removal.
 
 ## Current next increment
 

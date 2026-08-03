@@ -179,8 +179,8 @@ returns immutable `PiPLSOOFReport` with the supplied `selection`, ordered OOF pr
 repeated-prediction averaging, uncovered-row NaNs and zero counts, pooled OOF $R^2$ over covered rows,
 and leave-one-out provenance. It performs neither candidate rescoring nor a full-data fit. Callers
 must preserve the original row alignment because the search stores split indices but not supplied
-training matrices. `validation_report(...)` and `PiPLSValidationReport` remain only as a temporary
-consumer-migration surface.
+training matrices. All maintained consumers use this surface; `validation_report(...)` and
+`PiPLSValidationReport` remain only for final removal in Decision 0143 Patch 7.
 
 ## Accepted selection-provenance and OOF-reporting transition
 
@@ -215,14 +215,15 @@ full-data refitting before retrieving selection, path, rank-profile, OOF, fitted
 evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
 `oof_report()`.
 
-Patches 1 through 5 are complete. `PiPLSComponentResult` implements `rule`,
+Patches 1 through 6 are complete. `PiPLSComponentResult` implements `rule`,
 `reference_minimum`, and the derived `one_standard_error_threshold`; every successful refit result
 exposes the exact resolved selection as `model.selection_`; and `oof_report(selection=...)` returns
 immutable `PiPLSOOFReport` after exact compatibility validation. Directly fitted
-`PiPLSRegression` instances remain provenance-free. Manual model-producing workflows now use
-`model.selection_` and `oof_report(selection=...)` directly. `validation_report(...)` and
-`PiPLSValidationReport` remain temporarily only for the automatic and validation-only migration in
-Patch 6. No compatibility alias is authorized in the final state.
+`PiPLSRegression` instances remain provenance-free. All model-producing workflows use
+`model.selection_` and `oof_report(selection=...)` where OOF analysis is required. The leave-one-out
+workflow remains selection-only and passes its `best_score` result directly to `oof_report()`.
+`validation_report(...)` and `PiPLSValidationReport` remain only for Patch 7 removal. No
+compatibility alias is authorized in the final state.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
@@ -443,17 +444,14 @@ rendering layer.
 ## Example workflow boundary
 
 Example 04 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
-component paths directly in memory. Pulp, Sugarcane, and Tobacco use the default path-evaluating
-`PiPLSSearchCV()`, plot
-`component_path_` directly, optionally read a scalar row for annotations, fit the chosen row through
-`search.refit(...)`, and obtain five-fold seeded shuffled predictions through
-`search.validation_report(...)`. The report reuses the exact explicit
+component paths directly in memory. Pulp, Sugarcane, and Tobacco use path-evaluating
+`PiPLSSearchCV()`, fit the chosen row through `search.refit(...)`, and then retrieve
+`model.selection_`, `component_path_`, `predictor_rank_profile(...)`, and selection-driven
+`oof_report(...)` results before rendering. The OOF report reuses the exact explicit
 `KFold(n_splits=5, shuffle=True, random_state=0)` partition materialized by the path search. They
-render immutable Pi-PLS factors, latent structure, observation
-diagnostics, and prediction diagnostics directly with Matplotlib and write only final PDF figures.
-All three complete real-data workflows read the conditional predictor-rank profile through
-`predictor_rank_profile()` at the selected component count. Tobacco obtains that count from the
-one-standard-error rule and uses
+render immutable Pi-PLS factors, latent structure, observation diagnostics, and prediction
+diagnostics directly with Matplotlib and write only final PDF figures. Tobacco obtains its count,
+minimum reference, and threshold from the one-standard-error `model.selection_` and uses
 full predictor SVD, direct observation diagnostics, and caller-owned source-order response
 pagination through multipage PDFs.
 

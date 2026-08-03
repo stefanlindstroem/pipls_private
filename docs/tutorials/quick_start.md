@@ -57,12 +57,20 @@ count manually, or request selection-conditioned OOF diagnostics:
 ```python
 search = PiPLSSearchCV().fit(X, Y)
 model = search.refit(X, Y, rule="one_standard_error")
-report = search.validation_report(X, Y, rule="one_standard_error")
+
+selection = model.selection_
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
+report = search.oof_report(X, Y, selection=selection)
 ```
 
-Continue with [Inspect and select with synthetic data](synthetic.md) to examine the component path
-and predictor-rank profile before refitting. The [complete Pulp analysis](pulp.md) adds
-selection-conditioned OOF diagnostics and fitted-model interpretation.
+Modeling is complete when `refit()` returns. The later statements retrieve the fitted selection,
+component path, conditional predictor-rank profile, and optional selection-conditioned OOF
+diagnostics.
+
+Continue with [Inspect and select with synthetic data](synthetic.md) for a manual component choice
+and independent-test prediction. The [complete Pulp analysis](pulp.md) adds selection-conditioned
+OOF diagnostics and fitted-model interpretation.
 
 ## Reproduce this tutorial
 

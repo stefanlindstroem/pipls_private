@@ -161,13 +161,14 @@ but must not reproduce the tutorial analysis or embed its generated figures.
 
 Decision 0140 has implemented search-owned selected-row lookup:
 `search.select(rule=... or n_components=...)` now shares the same private resolver as `refit()` and
-`validation_report()`, while `component_path_` remains aligned numerical evidence. Maintained
-consumers use `search.select(...)`, and the path object exposes no public selected-row operations.
+`validation_report()`, while `component_path_` remains aligned numerical evidence.
+`search.select(...)` remains the fitting-free selection-only operation; model-producing consumers
+obtain the fitted row from `model.selection_`.
 
 Decision 0141 makes every complete real-data workflow inspect the conditional predictor-rank
 profile at its selected component count. Sugarcane and Tobacco call
-`search.predictor_rank_profile(selected.n_components)`; for Tobacco, `selected` is the row returned
-by the one-standard-error rule.
+`search.predictor_rank_profile(selection.n_components)`; for Tobacco, `selection` is the exact row
+retained by the one-standard-error refit.
 
 Decision 0143 accepts a seven-patch workflow normalization. In the final model-producing examples,
 modeling ends when `search.refit(...)` returns the full-data model. Analysis then begins in this
@@ -183,10 +184,11 @@ report = search.oof_report(X, Y, selection=selection)
 `oof_report()` is optional numerical analysis, not a modeling statement. Fitted-model inspection and
 all rendering follow these retained search and OOF results. Workflows with an external test set may
 omit the OOF report. Validation-only and path-comparison-only examples retain their
-specialized roles and need not construct unused final models. Patches 1 through 5 are complete:
+specialized roles and need not construct unused final models. Patches 1 through 6 are complete:
 selection results carry rule and 1-SE reference evidence, refitted models retain `selection_`, and
-`oof_report(selection=...)` now owns OOF analysis. The manual synthetic, Pulp, and Sugarcane workflows and both tutorial renderers now implement this
-ordering. Automatic and validation-only consumers remain assigned to Patch 6.
+`oof_report(selection=...)` owns OOF analysis. All model-producing workflows now implement this
+ordering. The leave-one-out workflow remains model-free, resolves one `best_score` selection, and
+passes it to `oof_report()`. Only former-API removal remains for Patch 7.
 
 Pulp is the canonical manual-selection tutorial analysis. `examples/05_pulp_real_data.py` owns its
 public `load_pulp()` acquisition, visible three-component choice, path-evaluating search, full-data
@@ -412,9 +414,8 @@ retains a $2\times2$ factor figure, one $1\times3$ prediction figure per respons
 one
 $2\times2$ latent/observation figure, and one full-width coefficient figure per response page.
 
-Pulp and Sugarcane obtain OOF predictions through explicit
-`oof_report(selection=model.selection_)` calls. Tobacco retains its transitional named-rule report
-until Patch 6. Every report reuses the exact
+Pulp, Sugarcane, and Tobacco obtain OOF predictions through explicit
+`oof_report(selection=model.selection_)` calls. Every report reuses the exact
 `KFold(n_splits=5, shuffle=True, random_state=0)` partition materialized by its path search.
 Because component count and predictor rank are chosen after inspecting paths
 computed from the same observations, the resulting OOF predictions are selection-conditioned rather

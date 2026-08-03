@@ -148,16 +148,17 @@ Y_pred = model.predict(X_test)
 
 Retain the fitted search in a variable when component-path, predictor-rank-profile, or candidate
 inspection is needed. `refit()` returns a fitted estimator or pipeline and does not attach it to the
-search object. Selection-conditioned OOF diagnostics are requested explicitly and reuse the exact
-validation splits materialized by `fit()`:
+search object. Modeling completes before the retained evidence and optional OOF diagnostics are
+calculated:
 
 ```python
+search = PiPLSSearchCV(search_method="auto").fit(X_train, Y_train)
+model = search.refit(X_train, Y_train, rule="one_standard_error")
+
 selection = model.selection_
-report = search.oof_report(
-    X_train,
-    Y_train,
-    selection=selection,
-)
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
+report = search.oof_report(X_train, Y_train, selection=selection)
 ```
 
 The caller must pass the same observations in the same row order; the search retains split indices,

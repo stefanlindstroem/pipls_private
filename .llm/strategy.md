@@ -1034,10 +1034,10 @@ profile before optionally calling `oof_report(...)`; fitted-model inspection and
 OOF reporting is explicitly analysis, not modeling. `search.select()` remains available for
 selection-only workflows but is not required merely to recover the row used by `refit()`.
 
-Current status: **Patches 1 through 5 complete**. Selection results carry validated rule and 1-SE
+Current status: **Patches 1 through 6 complete**. Selection results carry validated rule and 1-SE
 reference provenance, successful refits attach the exact immutable result as `model.selection_`, and
 `oof_report(selection=...)` returns immutable `PiPLSOOFReport` with exact compatibility validation.
-The manual synthetic, Pulp, and Sugarcane workflows and the synthetic and Pulp renderers now
+All model-producing workflows and the synthetic and Pulp renderers now
 complete search and refitting before retrieving `model.selection_`, path and rank-profile evidence,
 optional OOF diagnostics, fitted-model inspection results, and rendering.
 

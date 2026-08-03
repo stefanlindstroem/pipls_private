@@ -115,6 +115,9 @@ def test_quick_start_tutorial_owns_snippets_asset_and_navigation() -> None:
     assert "calibration fit" in tutorial
     assert "not an out-of-fold" in tutorial
     assert "selection-conditioned OOF diagnostics" in tutorial
+    assert "model.selection_" in tutorial
+    assert "search.oof_report" in tutorial
+    assert "validation_report" not in tutorial
 
 
 def test_documentation_targets_own_generated_quick_start_assets() -> None:

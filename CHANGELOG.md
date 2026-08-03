@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Migrate the automatic Tobacco workflow, retained-search quick-start guidance, and leave-one-out
+  validation-only example to the final selection-driven analysis pattern. Tobacco now completes
+  refitting before deriving its selected row, reference minimum, 1-SE threshold, rank profile, and
+  OOF report; leave-one-out passes a fitting-free `best_score` selection to `oof_report()`.
 - Migrate the manual synthetic, Pulp, and Sugarcane workflows and the synthetic and Pulp tutorial
   renderers to `model.selection_` and selection-driven `oof_report()`. Search and refitting now
   complete modeling before path, rank-profile, OOF, fitted-model inspection, or rendering work;

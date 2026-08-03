@@ -212,7 +212,7 @@ def _first_call_lineno(scope: ast.AST, name: str) -> int:
     ("relative_path", "required_attribute"),
     [
         ("examples/02_synthetic_path_selection.py", "search.component_path_"),
-        ("examples/03_leave_one_out_validation.py", "search.validation_report"),
+        ("examples/03_leave_one_out_validation.py", "search.oof_report"),
         ("examples/04_pls_path_comparison.py", "search.component_path_"),
         ("examples/05_pulp_real_data.py", "search.component_path_"),
         ("examples/06_sugarcane_real_data.py", "search.component_path_"),
@@ -253,8 +253,23 @@ def test_kfold_examples_use_seeded_shuffled_folds(relative_path: str) -> None:
 
 def test_leave_one_out_example_uses_its_exhaustive_splitter() -> None:
     tree = _tree(_repository_root() / "examples" / "03_leave_one_out_validation.py")
-    assert "LeaveOneOut" in _call_names(tree)
-    assert "KFold" not in _call_names(tree)
+    calls = _call_names(tree)
+    assert "LeaveOneOut" in calls
+    assert "KFold" not in calls
+    assert "refit" not in calls
+    assert "validation_report" not in calls
+
+    select_calls = _calls_with_name(tree, "select")
+    assert len(select_calls) == 1
+    assert _keyword_string(select_calls[0], "rule") == "best_score"
+
+    report_calls = _calls_with_name(tree, "oof_report")
+    assert len(report_calls) == 1
+    assert any(
+        keyword.arg == "selection"
+        and _attribute_path(keyword.value) == "selection"
+        for keyword in report_calls[0].keywords
+    )
 
 
 def test_ordinary_pls_is_confined_to_the_comparison_helper() -> None:
@@ -385,6 +400,9 @@ def test_maintained_reference_consumers_use_package_loaders(
             "07_tobacco_real_data.py",
             {"observation_diagnostics", "predictor_rank_profile"},
             {
+                "model.selection_",
+                "selection.reference_minimum",
+                "selection.one_standard_error_threshold",
                 "search.component_path_",
                 "rank_profile.selected_result",
                 "factors.predictor_directions",
@@ -431,11 +449,8 @@ def test_real_data_examples_use_direct_public_results(
         *_INSPECTION_CALLS,
         *extra_calls,
     }
-    if filename in {"05_pulp_real_data.py", "06_sugarcane_real_data.py"}:
-        required_calls.add("oof_report")
-        assert {"select", "validation_report"}.isdisjoint(calls)
-    else:
-        required_calls.update({"select", "validation_report"})
+    required_calls.add("oof_report")
+    assert {"select", "validation_report"}.isdisjoint(calls)
     assert required_calls <= calls
     assert required_attributes <= attributes
     assert loader_name in calls
@@ -485,11 +500,8 @@ def test_complete_examples_separate_analysis_from_same_file_rendering(
         *_INSPECTION_CALLS,
         *extra_analysis_calls,
     }
-    if filename == "06_sugarcane_real_data.py":
-        analysis_calls.add("oof_report")
-        assert {"select", "validation_report"}.isdisjoint(_call_names(main))
-    else:
-        analysis_calls.update({"select", "validation_report"})
+    analysis_calls.add("oof_report")
+    assert {"select", "validation_report"}.isdisjoint(_call_names(main))
     assert analysis_calls <= _call_names(main)
     assert _call_names(main).isdisjoint(_RENDERING_METHODS)
 
@@ -631,7 +643,7 @@ def test_manual_workflows_use_refitted_model_selection() -> None:
     ("filename", "selection_name"),
     [
         ("06_sugarcane_real_data.py", "selection"),
-        ("07_tobacco_real_data.py", "selected"),
+        ("07_tobacco_real_data.py", "selection"),
     ],
 )
 def test_spectral_examples_extract_rank_profile_at_selected_component_count(
@@ -655,20 +667,27 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     assert len(regression_calls) == 1
     assert _keyword_string(regression_calls[0], "svd_solver") == "full"
 
-    select_calls = _calls_with_name(tree, "select")
-    assert len(select_calls) == 2
-    assert {_keyword_string(call, "rule") for call in select_calls} == {
-        "minimum_cv_mse",
-        "one_standard_error",
-    }
+    assert "select" not in calls
+    assert "validation_report" not in calls
 
     refit_calls = _calls_with_name(tree, "refit")
     assert len(refit_calls) == 1
     assert _keyword_string(refit_calls[0], "rule") == "one_standard_error"
 
-    report_calls = _calls_with_name(tree, "validation_report")
+    report_calls = _calls_with_name(tree, "oof_report")
     assert len(report_calls) == 1
-    assert _keyword_string(report_calls[0], "rule") == "one_standard_error"
+    assert any(
+        keyword.arg == "selection"
+        and _attribute_path(keyword.value) == "selection"
+        for keyword in report_calls[0].keywords
+    )
+
+    assert _assigned_value_path(tree, "selection") == "model.selection_"
+    assert _assigned_value_path(tree, "minimum") == "selection.reference_minimum"
+    assert (
+        _assigned_value_path(tree, "one_se_threshold")
+        == "selection.one_standard_error_threshold"
+    )
 
     search_calls = _calls_with_name(tree, "PiPLSSearchCV")
     assert any(_keyword_string(call, "search_method") == "auto" for call in search_calls)
@@ -709,6 +728,24 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
         if value.endswith(".pdf")
     }
     assert paginated_reports == {"prediction_diagnostics.pdf", "coefficients.pdf"}
+
+
+def test_automatic_tobacco_workflow_completes_modeling_before_analysis() -> None:
+    tree = _tree(_repository_root() / "examples" / "07_tobacco_real_data.py")
+    main = _top_level_functions(tree)["main"]
+
+    search_line = _assigned_name_lineno(main, "search")
+    model_line = _assigned_name_lineno(main, "model")
+    selection_line = _assigned_name_lineno(main, "selection")
+    path_line = _assigned_name_lineno(main, "path")
+    rank_profile_line = _assigned_name_lineno(main, "rank_profile")
+    report_line = _assigned_name_lineno(main, "report")
+    factors_line = _assigned_name_lineno(main, "factors")
+    render_line = _first_call_lineno(main, "_plot_component_path")
+
+    assert search_line < model_line < selection_line
+    assert selection_line < path_line < rank_profile_line < report_line
+    assert report_line < factors_line < render_line
 
 
 

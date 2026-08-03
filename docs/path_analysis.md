@@ -135,37 +135,45 @@ routing when routing is enabled and requested. Split metadata belongs to the sea
 
 ## Ordered out-of-fold predictions
 
-Request ordered OOF diagnostics explicitly after path evaluation:
+Request ordered OOF diagnostics for an existing selection after modeling or selection-only analysis:
 
 ```python
 from sklearn.model_selection import KFold
 
 cv = KFold(n_splits=5, shuffle=True, random_state=0)
 search = PiPLSSearchCV(cv=cv).fit(X, Y)
-report = search.validation_report(X, Y, rule="one_standard_error")
-# or: report = search.validation_report(X, Y, n_components=4)
+model = search.refit(X, Y, rule="one_standard_error")
+
+selection = model.selection_
+report = search.oof_report(X, Y, selection=selection)
 ```
 
-The method uses the same selected-row resolver as `refit()` but performs no full-data fit. It fits the
-selected fixed parameterization once per stored training fold and returns an immutable report:
+A workflow that deliberately fits no final model may obtain the selection directly:
 
-- `selected_result` is the complete stored component-path row selected by the requested rule or count;
+```python
+selection = search.select(n_components=4)
+report = search.oof_report(X, Y, selection=selection)
+```
+
+The method validates that the supplied selection belongs to the fitted search, fits that fixed
+parameterization once per stored training fold, and returns an immutable report:
+
+- `selection` is the exact supplied component-count and predictor-rank selection;
 - `oof_predictions` preserves input row order;
 - repeated validation predictions are averaged and their counts are recorded;
 - rows without validation coverage have count 0 and a NaN prediction;
-- `n_components` and `predictor_rank` remain convenient views of the selected result;
+- `n_components` and `predictor_rank` remain convenient views of the selection;
 - `pooled_oof_r2` uses only rows with OOF coverage.
 
 `fit()` stores defensive read-only copies of the exact materialized validation indices. Therefore an
 iterable splitter is not consumed a second time and a stochastic splitter is not asked to generate a
-new partition. `validation_report()` requires the same sample count, feature count, and response-column
-count as the fitted search, but it does not retain or compare original values. The caller is responsible
-for passing the same observations in the same row order.
+new partition. `oof_report()` requires the same sample count, feature count, and response-column
+count as the fitted search, but it does not retain or compare original values. The caller is
+responsible for passing the same observations in the same row order.
 
-The report derives its split count, mean score, and CV-MSE convenience attributes from
-`selected_result` and separately records OOF coverage and whether the splitter is structurally
-leave-one-out. These results are selection-conditioned because the same path search selected the
-parameters. Use nested cross-validation or an external test set when an unbiased post-selection
+The report separately records OOF coverage and whether the splitter is structurally leave-one-out.
+These results are selection-conditioned because the same path search produced the supplied
+selection. Use nested cross-validation or an external test set when an unbiased post-selection
 estimate is required.
 
 ## Leave-one-out interpretation
@@ -179,8 +187,8 @@ Mean foldwise $R^2$ is rejected when validation folds contain one sample. The ex
 
 The [focused small-sample example](examples.md#leave-one-out-validation) uses twelve deterministic
 observations, a compact explicit candidate grid, the singleton-safe default scorer, and ordered OOF
-predictions. Its validation report is selection-conditioned because the same LOO path selects the
-rank pair and supplies the pooled diagnostic.
+predictions. Its OOF report is selection-conditioned because the same LOO path selects the rank
+pair and supplies the pooled diagnostic.
 
 ## Fold variation and standard error
 
@@ -245,15 +253,16 @@ threshold value. Direct lookup by component count records no rule provenance.
 The associated predictor rank is the rank already selected conditionally for that component count
 under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an
 estimator, mutate the search object, or alter `best_*`. With a nondefault scorer, the stored
-predictor rank need not minimize CV-MSE within its component-count profile. Maintained workflows
-use `search.select(...)` for scalar annotations and reporting, while `component_path_` remains the
-aligned numerical curve.
+predictor rank need not minimize CV-MSE within its component-count profile. Model-producing
+workflows obtain the fitted row from `model.selection_`; `search.select(...)` remains useful for
+selection-only analysis. `component_path_` remains the aligned numerical curve.
 
-The Tobacco workflow resolves both the minimum row and the one-standard-error recommendation
-through `search.select(...)`, then applies the same named 1-SE rule independently through both
-`refit()` and `validation_report()`. Conditional predictor-rank profiles use the same standard-error
-bars for scale, but the stored predictor rank for each component count continues to maximize the
-configured mean CV score rather than applying the 1-SE rule.
+The Tobacco workflow applies the named 1-SE rule once through `refit()`. The returned
+`model.selection_` carries the selected row, exact `reference_minimum`, and derived
+`one_standard_error_threshold`. The same selection supplies the conditional predictor-rank profile
+and `oof_report()`. Predictor-rank profile error bars use the same standard-error scale, but the
+stored predictor rank for each component count continues to maximize the configured mean CV score
+rather than applying the 1-SE rule.
 
 ## Post-fit final-model selection
 
@@ -285,13 +294,13 @@ With a nondefault scorer, that rank remains conditioned on the scorer even when 
 uses response-standardized CV-MSE. The 1-SE rule requires at least two validation splits.
 
 `refit()` clones the configured direct estimator or pipeline, replaces the terminal Pi-PLS rank
-pair, fits the clone, and returns it. It does not mutate the search, store the supplied matrices, or
-attach the model to search state. Prediction, transformation, scoring, inverse transformation, and
-feature-name behavior belong to the returned model.
+pair, fits the clone, attaches the exact immutable row as `model.selection_`, and returns the model.
+It does not mutate the search, store the supplied matrices, or attach the model to search state.
+Prediction, transformation, scoring, inverse transformation, and feature-name behavior belong to
+the returned model.
 
-Post-fit `refit()` and `validation_report()` use the same explicit rule-or-component selection
-contract and do not alter search state. The search stores candidate evidence and reusable split
-indices, but no selected row, report, or fitted final model.
+`oof_report()` consumes an existing selection and does not alter search state. The search stores
+candidate evidence and reusable split indices, but no report or fitted final model.
 
 ## Search and model diagnostics
 

@@ -405,7 +405,7 @@ def main() -> None:
         for start in range(0, len(response_names), RESPONSES_PER_PAGE)
     )
 
-    # Evaluate the Pi-PLS component path over paired-mode counts with a full predictor SVD.
+    # Evaluate the Pi-PLS component path and fit the 1-SE-selected model.
     search = PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,
@@ -416,28 +416,26 @@ def main() -> None:
         n_jobs=1,
         cv=CV,
     ).fit(X, Y)
-    path = search.component_path_
-    minimum = search.select(rule="minimum_cv_mse")
-    selected = search.select(rule="one_standard_error")
-    rank_profile = search.predictor_rank_profile(selected.n_components)
-    one_se_threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error
-    display_components = tuple(
-        range(min(DISPLAY_COMPONENT_COUNT, selected.n_components))
-    )
-
-    # Apply the 1-SE rule and fit the chosen row on the full data.
     model = search.refit(
         X,
         Y,
         rule="one_standard_error",
     )
-    report = search.validation_report(
-        X,
-        Y,
-        rule="one_standard_error",
+
+    # Analyze the fitted selection, retained search evidence, and OOF behavior.
+    selection = model.selection_
+    path = search.component_path_
+    rank_profile = search.predictor_rank_profile(selection.n_components)
+    report = search.oof_report(X, Y, selection=selection)
+    minimum = selection.reference_minimum
+    one_se_threshold = selection.one_standard_error_threshold
+    if minimum is None or one_se_threshold is None:
+        raise RuntimeError("The 1-SE selection lacks its reference evidence.")
+    display_components = tuple(
+        range(min(DISPLAY_COMPONENT_COUNT, selection.n_components))
     )
     if report.oof_predictions is None:
-        raise RuntimeError("Validation reporting did not produce OOF predictions.")
+        raise RuntimeError("OOF reporting did not produce predictions.")
     oof_predictions = report.oof_predictions
 
     # Calculate immutable fitted-model and prediction inspection results.
@@ -454,7 +452,7 @@ def main() -> None:
     _plot_component_path(
         path,
         minimum,
-        selected,
+        selection,
         one_se_threshold=one_se_threshold,
         output_path=ANALYSIS_DIR / "component_path.pdf",
     )
@@ -466,8 +464,8 @@ def main() -> None:
         factors,
         wavenumbers,
         response_names,
-        selected_n_components=selected.n_components,
-        selected_predictor_rank=selected.predictor_rank,
+        selected_n_components=selection.n_components,
+        selected_predictor_rank=selection.predictor_rank,
         output_path=ANALYSIS_DIR / "pipls_factors.pdf",
     )
     _write_prediction_diagnostics_report(
@@ -482,7 +480,7 @@ def main() -> None:
         wavenumbers,
         response_names,
         display_components,
-        selected_n_components=selected.n_components,
+        selected_n_components=selection.n_components,
         output_path=ANALYSIS_DIR / "latent_structure.pdf",
     )
     _write_coefficients_report(

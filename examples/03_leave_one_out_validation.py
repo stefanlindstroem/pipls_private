@@ -28,7 +28,8 @@ search = PiPLSSearchCV(
     n_jobs=1,
 ).fit(data.X, data.Y)
 
-report = search.validation_report(data.X, data.Y, rule="best_score")
+selection = search.select(rule="best_score")
+report = search.oof_report(data.X, data.Y, selection=selection)
 if report.oof_predictions is None or report.pooled_oof_r2 is None:
     raise RuntimeError("Leave-one-out validation did not produce complete OOF diagnostics.")
 
@@ -48,4 +49,4 @@ print(
     "Pooled OOF R2 (not mean foldwise R2): "
     f"{report.pooled_oof_r2:.4f}"
 )
-print(f"Estimate kind: {report.estimate_kind}")
+print("OOF interpretation: selection-conditioned")

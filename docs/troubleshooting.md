@@ -93,9 +93,9 @@ to minimizing mean response-standardized CV-MSE. With a custom scorer, the CV-MS
 diagnostics and need not identify the selected candidate.
 
 Use `mean_test_score` and `best_score_` for the global configured-score optimum. Use
-`search.select(rule="minimum_cv_mse")` or `search.select(rule="one_standard_error")` for the
-corresponding CV-MSE recommendations. A final model is returned directly by `refit()` and is not
-stored on the search. See
+`search.select(rule="minimum_cv_mse")` or `search.select(rule="one_standard_error")` for
+fitting-free recommendation inspection. A final model is returned directly by `refit()` and records
+the exact fitted row as `model.selection_`; it is not stored on the search. See
 [Scoring and the best evaluated pair](path_analysis.md#scoring-and-the-best-evaluated-pair).
 
 ## A grouped splitter reports missing metadata

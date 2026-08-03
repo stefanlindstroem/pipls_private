@@ -227,9 +227,10 @@ The leave-one-out example retains exhaustive `LeaveOneOut`. Structural tests for
 and Tobacco protect direct `component_path_` access, immutable inspection results, explicit
 Matplotlib
 construction, absence of analytical CSV output, physical coordinate order, and the declared final
-PDF filenames without running the artifact-writing scripts. Pulp and Sugarcane additionally require
-`model.selection_` and `oof_report(selection=...)`; Tobacco retains its transitional report calls
-until Patch 6. Keep these source scans consolidated as AST-level ownership and data-flow checks
+PDF filenames without running the artifact-writing scripts. Pulp, Sugarcane, and Tobacco require
+`model.selection_` and `oof_report(selection=...)`; Tobacco additionally requires its minimum and
+threshold evidence to come from the retained selection. Keep these source scans consolidated as
+AST-level ownership and data-flow checks
 rather than repeating per-example string inventories.
 Sugarcane and Tobacco tests also protect the boundary between `main()`-owned analysis and private
 same-file rendering. Tobacco tests retain its full-SVD configuration, source-order response

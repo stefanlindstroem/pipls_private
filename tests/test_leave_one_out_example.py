@@ -31,7 +31,7 @@ def test_leave_one_out_example_runs_and_reports_interpretable_results() -> None:
     assert "Leave-one-out splits: 12" in output
     assert "Complete OOF coverage: True" in output
     assert "OOF prediction shape: (12, 2)" in output
-    assert "Estimate kind: selection-conditioned" in output
+    assert "OOF interpretation: selection-conditioned" in output
     selected = re.search(
         r"Selected pair: n_components=([12]), predictor_rank=([12])", output
     )
@@ -54,4 +54,5 @@ def test_leave_one_out_example_is_linked_from_the_reference() -> None:
     assert "examples.md#leave-one-out-validation" in path_reference
     assert "examples/03_leave_one_out_validation.py" in example_catalogue
     assert "03_leave_one_out_validation.py" in example_readme
+    assert "search.oof_report()" in example_readme
     assert "not mean foldwise $R^2$" in path_reference
