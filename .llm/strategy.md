@@ -1015,11 +1015,35 @@ The target keeps `PiPLSComponentPath` as aligned numerical evidence and makes `s
 and `validation_report()` share one rule/component-count vocabulary. It changes no selection
 numerics, tie rules, fitting semantics, or OOF provenance.
 
+### Model-selection provenance and OOF-reporting transition
+
+Decision 0143 authorizes a seven-patch API and workflow transition:
+
+1. establish the decision and guide-layer target;
+2. enrich `PiPLSComponentResult` with rule and 1-SE reference evidence;
+3. attach the exact resolved selection as `model.selection_` after successful refitting;
+4. introduce `oof_report(selection=...)` and `PiPLSOOFReport` on the stored search splits;
+5. migrate manual-selection examples, tutorials, renderers, and structural tests;
+6. migrate automatic and validation-only workflows;
+7. remove the former report API, normalize modeling-before-analysis order, and close the
+   transition with active-surface audits.
+
+The final user pattern completes `search.refit(...)` before analysis. Maintained model-producing
+workflows then retrieve `model.selection_`, `component_path_`, and the conditional predictor-rank
+profile before optionally calling `oof_report(...)`; fitted-model inspection and rendering follow.
+OOF reporting is explicitly analysis, not modeling. `search.select()` remains available for
+selection-only workflows but is not required merely to recover the row used by `refit()`.
+
+Current status: **Patch 1 complete**. No implementation or maintained-consumer change occurs in
+this guide-layer patch.
+
 ## Current next increment
 
-Decision 0142 is closed. Decision 0139 Patch 3 remains an independent paused documentation
-increment. Decision 0138 remains the fully implemented Pulp baseline. No generic dataset registry,
-downloader, `as_frame` surface, or compatibility layer is authorized.
+Decision 0143 Patch 2 is next. It enriches `PiPLSComponentResult` while preserving the current
+`refit()` and `validation_report()` behavior for later migration. Decision 0139 Patch 3 remains an
+independent paused documentation increment. Decision 0138 remains the fully implemented Pulp
+baseline. No generic dataset registry, downloader, `as_frame` surface, or compatibility layer is
+authorized.
 
 Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
 validation splits; final models and selection-conditioned OOF reports are produced only by explicit

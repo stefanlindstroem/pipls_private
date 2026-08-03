@@ -110,6 +110,32 @@ The path object has no public selected-row methods. Durable numerical selection 
 search-selection boundary. Do not retain one tombstone test per removed method; use positive
 API-surface checks plus a compact active-surface audit.
 
+## Model-selection provenance and OOF-reporting transition
+
+Decision 0143 changes provenance ownership and workflow composition without changing selection or
+OOF numerics. Across its seven patches, tests must protect:
+
+- immutable rule provenance on `PiPLSComponentResult`, including exact 1-SE reference-minimum and
+  derived-threshold contracts;
+- `model.selection_` on every successful direct-estimator or pipeline result from `refit()`, with no
+  attribute on directly fitted fixed estimators and no partial exposure after failed fits;
+- equality among the selection used by `refit()`, optional `search.select(...)`, and the selection
+  retained by OOF reporting;
+- `oof_report(selection=...)` compatibility validation against the fitted search and numerical
+  parity with the former OOF implementation during migration;
+- repeated, partial-coverage, leave-one-out, one-dimensional-response, pickle, and unchanged-search
+  behavior;
+- final removal of `validation_report()`, `PiPLSValidationReport`, `estimate_kind`,
+  `is_selection_conditioned`, and any transitional aliases;
+- structural example order: search and refit complete modeling; analysis then retrieves
+  `model.selection_`, path evidence, rank-profile evidence, optional OOF reporting, fitted-model
+  inspection, and finally rendering;
+- maintained manual and automatic model-producing workflows do not call `search.select()` merely to
+  recover the refit row, while the validation-only example may use selection-only inspection.
+
+Patch 1 adds no executable behavior. Its focused validation is decision navigation, repository
+structure, documentation structure, and the complete unchanged test suite.
+
 ## Three-stage onboarding transition
 
 Decision 0139 introduces staged presentation contracts rather than package behavior. Patch 2 now

@@ -53,6 +53,8 @@ reference describe the current public behavior directly.
 - [0137: post-fit inspect-decide-refit lifecycle]
   (0137-post-fit-inspect-decide-refit-lifecycle.md)
 - [0140: search-owned path selection](0140-search-owned-path-selection.md)
+- [0143: model-selection provenance and OOF reporting]
+  (0143-model-selection-provenance-and-oof-reporting.md)
 
 ## Validation, data, and benchmarks
 

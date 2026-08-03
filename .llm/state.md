@@ -558,10 +558,36 @@ consumer uses the corresponding loader. The duplicate top-level spectral resourc
 `src/pipls/_data/<dataset>/` is the sole active location, and public documentation identifies the
 raw files for non-Python use.
 
+## Model-selection provenance and OOF-reporting transition
+
+Decision 0143 authorizes seven patches:
+
+1. establish the accepted decision and guide-layer target;
+2. enrich `PiPLSComponentResult` with rule, reference-minimum, and derived 1-SE-threshold
+   provenance;
+3. retain the resolved selection as `model.selection_` on successful `refit()` results;
+4. add `oof_report(selection=...)` and `PiPLSOOFReport` while retaining the former report surface
+   only as a temporary migration bridge;
+5. migrate manual-selection examples, tutorial renderers, tutorials, and structural tests;
+6. migrate automatic and validation-only workflows;
+7. remove `validation_report()` and `PiPLSValidationReport`, normalize every maintained workflow,
+   complete active-surface audits, and close the transition.
+
+The final model-producing order is search, refit, then analysis: `model.selection_`,
+`component_path_`, `predictor_rank_profile(...)`, optional `oof_report(...)`, fitted-model
+inspection, and rendering. OOF reporting is not part of modeling. `search.select()` remains an
+optional fitting-free operation for selection-only workflows.
+
+Current status: **Patch 1 complete**. This patch changes guide-layer contracts only. Source, tests,
+examples, renderers, and served public documentation still expose the implemented
+`validation_report()` and `PiPLSValidationReport` surface.
+
 ## Current next increment
 
-Decision 0142 is closed. Decision 0139 Patch 3 remains paused until the owner resumes that
-independent presentation increment.
+Decision 0143 Patch 2 is next: enrich `PiPLSComponentResult` with selection-rule provenance, a
+reference minimum for 1-SE selection, and a derived threshold without changing refit or report
+behavior yet. Decision 0139 Patch 3 remains paused until the owner resumes that independent
+presentation increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
 package resources are available in clean wheel and source-distribution installations, every

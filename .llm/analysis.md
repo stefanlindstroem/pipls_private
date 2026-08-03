@@ -169,6 +169,23 @@ profile at its selected component count. Sugarcane and Tobacco call
 `search.predictor_rank_profile(selected.n_components)`; for Tobacco, `selected` is the row returned
 by the one-standard-error rule.
 
+Decision 0143 accepts a seven-patch workflow normalization. In the final model-producing examples,
+modeling ends when `search.refit(...)` returns the full-data model. Analysis then begins in this
+default order:
+
+```python
+selection = model.selection_
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
+report = search.oof_report(X, Y, selection=selection)
+```
+
+`oof_report()` is optional numerical analysis, not a modeling statement. Fitted-model inspection and
+all rendering follow these retained search and OOF results. Workflows with an external test set may
+omit the OOF report. Validation-only and path-comparison-only examples retain their
+specialized roles and need not construct unused final models. Patch 1 records this target; current
+sources remain unchanged until the consumer-migration patches.
+
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
 `load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible
 three-component choice,

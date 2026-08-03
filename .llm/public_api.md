@@ -181,6 +181,43 @@ candidate rescoring nor a full-data fit. It validates the fitted sample, feature
 shape but cannot compare values; callers must preserve original row alignment. The search stores the
 split indices but not supplied training matrices or returned reports.
 
+## Accepted selection-provenance and OOF-reporting transition
+
+Decision 0143 authorizes a seven-patch pre-release transition. Its final model-producing workflow
+is:
+
+```python
+search = PiPLSSearchCV(cv=cv).fit(X, y)
+
+model = search.refit(
+    X,
+    y,
+    rule="one_standard_error",
+)
+
+# Analysis follows modeling.
+selection = model.selection_
+path = search.component_path_
+rank_profile = search.predictor_rank_profile(selection.n_components)
+report = search.oof_report(X, y, selection=selection)
+```
+
+The final `refit()` result carries the exact immutable selection as `model.selection_`. A 1-SE
+selection carries `rule="one_standard_error"`, its `reference_minimum`, and a derived
+`one_standard_error_threshold`. `search.oof_report(...)` accepts an existing selection rather than
+resolving `rule` or `n_components` again and returns `PiPLSOOFReport` with
+`report.selection`, ordered OOF predictions and counts, pooled OOF $R^2$, leave-one-out provenance,
+and complete-coverage status.
+
+OOF reporting is optional analysis, not model construction. Maintained workflows complete search and
+full-data refitting before retrieving selection, path, rank-profile, OOF, fitted-model, or rendering
+evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
+`oof_report()`.
+
+Patch 1 records this target only. Until the assigned implementation patches, the current source and
+served API remain `validation_report(...)`, `PiPLSValidationReport`, and refitted models without
+`selection_`. No compatibility alias is authorized in the final state.
+
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
 component-path result. The search stores no selected row, validation report, or fitted final

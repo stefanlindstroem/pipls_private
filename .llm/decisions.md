@@ -148,6 +148,7 @@ This index is navigation, not a substitute for those records.
 | `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
 | `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot the conditional rank profile at the selected component count, including the Tobacco 1-SE result |
 | `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named immutable loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
+| `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain the exact refit selection as `model.selection_`, enrich 1-SE provenance, and replace repeated-rule validation reporting with `oof_report(selection=...)` |
 
 ## Implemented estimator/search transition
 
@@ -197,6 +198,10 @@ plan contains an earlier or more general proposal:
 - Decision 0138 implemented the first named package-owned `load_pulp()` dataset without network
   access, pandas, a generic registry, or any requirement that users load their own real data
   through the package;
+- Decision 0143 authorizes a seven-patch model-selection provenance and OOF-reporting
+  transition. The target retains the exact refit selection as `model.selection_`, enriches a
+  1-SE selection with its reference minimum and derived threshold, and replaces repeated-rule
+  `validation_report()` calls with `oof_report(selection=...)`; Patch 1 records the target only;
 - Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable
