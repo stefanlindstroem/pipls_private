@@ -183,9 +183,10 @@ report = search.oof_report(X, Y, selection=selection)
 `oof_report()` is optional numerical analysis, not a modeling statement. Fitted-model inspection and
 all rendering follow these retained search and OOF results. Workflows with an external test set may
 omit the OOF report. Validation-only and path-comparison-only examples retain their
-specialized roles and need not construct unused final models. Patches 1 and 2 are complete:
-selection results now carry rule and 1-SE reference evidence, while model provenance, OOF naming,
-and consumer ordering remain assigned to later patches.
+specialized roles and need not construct unused final models. Patches 1 through 4 are complete:
+selection results carry rule and 1-SE reference evidence, refitted models retain `selection_`, and
+`oof_report(selection=...)` now owns OOF analysis. Consumer ordering remains assigned to Patches 5
+and 6.
 
 Pulp is the canonical tutorial analysis. `examples/05_pulp_real_data.py` owns its public
 `load_pulp()` acquisition, default path-evaluating `PiPLSSearchCV()` evaluation, visible

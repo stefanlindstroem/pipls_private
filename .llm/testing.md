@@ -139,8 +139,10 @@ standard-error use, smallest eligible count, exact threshold boundaries, nonfini
 unchanged search state, and propagation into the current validation report. Patch 3 additionally
 protects `model.selection_` for manual and named-rule direct refits, outer-pipeline ownership,
 equality with search and report selections, post-fit attachment, model pickle stability, clone
-cleanup, direct-fit absence, output configuration, and unchanged search state. OOF-report ownership
-remains assigned to Patch 4.
+cleanup, direct-fit absence, output configuration, and unchanged search state. Patch 4 protects
+`PiPLSOOFReport` construction and pickling, exact selection compatibility, numerical parity with the
+transitional report, repeated-CV averaging, partial coverage, leave-one-out provenance, shape
+validation, and unchanged search state.
 
 ## Three-stage onboarding transition
 

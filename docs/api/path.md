@@ -119,6 +119,7 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
         - fit
         - select
         - refit
+        - oof_report
         - validation_report
         - predictor_rank_profile
 
@@ -163,20 +164,40 @@ split-count scalars.
     options:
       show_signature: false
 
-## Validation report
+## Out-of-fold report
 
-`search.validation_report(X, Y, rule=... or n_components=...)` selects one stored component-path row
-and fits that fixed parameterization independently on every training fold from the exact split set
-materialized by `search.fit()`. It returns an immutable `PiPLSValidationReport` with ordered OOF
-predictions, repeated-prediction counts, partial-coverage NaNs, leave-one-out provenance, and pooled
-OOF $R^2$ when at least two rows have coverage. The operation does not rescore candidates, perform a
-full-data fit, mutate the search, or retain the supplied matrices.
+`search.oof_report(X, Y, selection=...)` fits one existing selection independently on every training
+fold from the exact split set materialized by `search.fit()`. A model returned by `search.refit(...)`
+exposes the intended value as `model.selection_`:
+
+```python
+selection = model.selection_
+report = search.oof_report(X, Y, selection=selection)
+```
+
+The immutable `PiPLSOOFReport` contains the exact supplied `selection`, ordered OOF predictions,
+repeated-prediction counts, partial-coverage NaNs, leave-one-out provenance, and pooled OOF $R^2$
+when at least two rows have coverage. The supplied selection is validated exactly against the fitted
+search, preventing a report for an unrelated component-count or predictor-rank decision. The
+operation does not rescore candidates, perform a full-data fit, mutate the search, or retain the
+supplied matrices.
 
 The caller must provide the same observations in the same row order and with the same sample and
 response-column counts as the fitted search. The report's `n_components`, `predictor_rank`,
-`n_splits`, `mean_test_score`, and `cv_mse_mean` properties are read-only views of its immutable
-`selected_result`; `is_selection_conditioned` and `has_complete_oof_coverage` expose provenance and
-coverage as predicates.
+`n_splits`, `mean_test_score`, and `cv_mse_mean` properties are read-only views of `selection`.
+`has_complete_oof_coverage` summarizes row coverage. Because the search splits also produced the
+selection, the report is a selection-conditioned diagnostic rather than an independent performance
+estimate.
+
+::: pipls.PiPLSOOFReport
+    options:
+      show_signature: false
+      members:
+        - has_complete_oof_coverage
+
+`validation_report(...)` and `PiPLSValidationReport` remain temporarily for maintained-consumer
+migration. New code should use `oof_report(selection=...)`; the former surface is removed in Patch 7
+of Decision 0143.
 
 ::: pipls.PiPLSValidationReport
     options:

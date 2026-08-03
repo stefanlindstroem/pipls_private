@@ -578,15 +578,16 @@ The final model-producing order is search, refit, then analysis: `model.selectio
 inspection, and rendering. OOF reporting is not part of modeling. `search.select()` remains an
 optional fitting-free operation for selection-only workflows.
 
-Current status: **Patches 1 through 3 complete**. `PiPLSComponentResult` records validated named-
-rule provenance; one-standard-error results retain the exact minimum result and derive their
-threshold. Successful direct-estimator and pipeline refits now retain the exact resolved row as
-`model.selection_`. Reporting, examples, and renderers remain unchanged for later patches.
+Current status: **Patches 1 through 4 complete**. Selection results record validated named-rule and
+1-SE reference provenance; successful direct-estimator and pipeline refits retain the exact resolved
+row as `model.selection_`; and `oof_report(selection=...)` returns immutable `PiPLSOOFReport` after
+exact search-compatibility validation. The former report surface remains temporarily while examples
+and renderers migrate.
 
 ## Current next increment
 
-Decision 0143 Patch 4 is next: add `oof_report(selection=...)` and `PiPLSOOFReport` while retaining
-the former report surface only as a temporary migration bridge. Decision 0139 Patch 3 remains
+Decision 0143 Patch 5 is next: migrate the manual-selection examples, tutorial renderers, tutorials,
+and structural tests to `model.selection_` and `oof_report(selection=...)`. Decision 0139 Patch 3 remains
 paused until the owner resumes that independent presentation increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical

@@ -1034,14 +1034,15 @@ profile before optionally calling `oof_report(...)`; fitted-model inspection and
 OOF reporting is explicitly analysis, not modeling. `search.select()` remains available for
 selection-only workflows but is not required merely to recover the row used by `refit()`.
 
-Current status: **Patches 1 through 3 complete**. Selection results carry validated rule and 1-SE
-reference provenance, and successful refits attach the exact immutable result as `model.selection_`
-on the returned outer estimator. Reporting and maintained-consumer changes remain pending.
+Current status: **Patches 1 through 4 complete**. Selection results carry validated rule and 1-SE
+reference provenance, successful refits attach the exact immutable result as `model.selection_`, and
+`oof_report(selection=...)` returns immutable `PiPLSOOFReport` with exact compatibility validation.
+Maintained-consumer changes remain pending.
 
 ## Current next increment
 
-Decision 0143 Patch 4 is next. It introduces `oof_report(selection=...)` and `PiPLSOOFReport`
-while retaining the former reporting surface only as a temporary migration bridge. Decision 0139
+Decision 0143 Patch 5 is next. It migrates the manual-selection examples, tutorial renderers,
+tutorials, and structural tests to the implemented selection and OOF-reporting surface. Decision 0139
 Patch 3 remains an independent paused documentation increment. Decision 0138 remains the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface, or compatibility layer is
 authorized.
 

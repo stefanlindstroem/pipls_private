@@ -310,3 +310,71 @@ def test_validation_report_does_not_mutate_search_state() -> None:
 
     assert report.oof_predictions is not None
     assert pickle.dumps(search) == before
+
+
+def test_oof_report_preserves_repeated_cv_averaging_and_counts() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=RepeatedKFold(n_splits=3, n_repeats=2, random_state=7),
+        n_jobs=1,
+    ).fit(X, Y)
+    selection = search.select(n_components=1)
+
+    report = search.oof_report(X, Y, selection=selection)
+
+    assert report.oof_prediction_counts is not None
+    assert report.oof_predictions is not None
+    np.testing.assert_array_equal(
+        report.oof_prediction_counts,
+        np.full(X.shape[0], 2, dtype=np.intp),
+    )
+    assert report.has_complete_oof_coverage
+    assert np.all(np.isfinite(report.oof_predictions))
+
+
+def test_oof_report_preserves_leave_one_out_provenance() -> None:
+    X, Y = _data(12)
+    search = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        search_method="optimal",
+        cv=LeaveOneOut(),
+        n_jobs=1,
+    ).fit(X, Y)
+    selection = search.select(rule="best_score")
+
+    report = search.oof_report(X, Y, selection=selection)
+
+    assert report.selection is selection
+    assert report.is_leave_one_out
+    assert report.has_complete_oof_coverage
+
+
+def test_oof_report_preserves_partial_coverage_and_one_dimensional_shape() -> None:
+    X, Y = _data()
+    y = Y[:, 0]
+    search = PiPLSSearchCV(
+        estimator=_fixed(),
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=TimeSeriesSplit(n_splits=3),
+        n_jobs=1,
+    ).fit(X, y)
+    selection = search.select(n_components=1)
+
+    report = search.oof_report(X, y, selection=selection)
+
+    assert report.oof_predictions is not None
+    assert report.oof_prediction_counts is not None
+    assert report.oof_predictions.shape == (X.shape[0],)
+    uncovered = report.oof_prediction_counts == 0
+    assert np.any(uncovered)
+    assert np.all(np.isnan(report.oof_predictions[uncovered]))
+    assert not report.has_complete_oof_coverage

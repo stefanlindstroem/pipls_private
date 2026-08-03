@@ -4,6 +4,11 @@
 
 ### Repository
 
+- Add `PiPLSSearchCV.oof_report(X, y, selection=...)` and immutable `PiPLSOOFReport`. The new
+  operation validates an existing selection against the fitted search, recomputes ordered OOF
+  predictions on the exact stored splits, preserves repeated-CV averaging and partial coverage,
+  and avoids repeating a rule or component count. Retain `validation_report()` and
+  `PiPLSValidationReport` only as a temporary migration surface.
 - Retain the exact immutable selected component-path row as `model.selection_` on every successful
   `PiPLSSearchCV.refit()` result. Attach provenance only after the full-data fit succeeds, keep it on
   the returned outer pipeline when pipelines are used, preserve search non-mutation, and leave

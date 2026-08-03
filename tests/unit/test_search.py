@@ -1276,3 +1276,120 @@ def test_fixed_predictor_rank_must_support_every_component_count() -> None:
             predictor_rank_values=[2],
             cv=3,
         ).fit(X, Y)
+
+
+def test_oof_report_uses_existing_model_selection() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+    model = search.refit(X, Y, rule="one_standard_error")
+
+    before = pickle.dumps(search)
+    report = search.oof_report(X, Y, selection=model.selection_)
+
+    assert report.selection is model.selection_
+    assert report.selection.rule == "one_standard_error"
+    assert report.selection.reference_minimum == search.select(
+        rule="minimum_cv_mse"
+    )
+    assert report.selection.one_standard_error_threshold is not None
+    assert report.oof_predictions is not None
+    assert report.oof_prediction_counts is not None
+    assert pickle.dumps(search) == before
+
+
+@pytest.mark.parametrize(
+    "selection_kwargs",
+    [
+        {"n_components": 2},
+        {"rule": "best_score"},
+        {"rule": "minimum_cv_mse"},
+        {"rule": "one_standard_error"},
+    ],
+)
+def test_oof_report_matches_transitional_validation_report(
+    selection_kwargs: dict[str, object],
+) -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3],
+        search_method="optimal",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+    selection = search.select(**selection_kwargs)  # type: ignore[arg-type]
+
+    report = search.oof_report(X, Y, selection=selection)
+    legacy = search.validation_report(X, Y, **selection_kwargs)  # type: ignore[arg-type]
+
+    assert report.selection == legacy.selected_result
+    assert report.is_leave_one_out == legacy.is_leave_one_out
+    assert report.pooled_oof_r2 == legacy.pooled_oof_r2
+    np.testing.assert_allclose(report.oof_predictions, legacy.oof_predictions)
+    np.testing.assert_array_equal(
+        report.oof_prediction_counts,
+        legacy.oof_prediction_counts,
+    )
+
+
+def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3],
+        search_method="optimal",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    with pytest.raises(TypeError, match="selection must be a PiPLSComponentResult"):
+        search.oof_report(X, Y, selection=object())  # type: ignore[arg-type]
+
+    other = PiPLSSearchCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        search_method="optimal",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+    with pytest.raises(ValueError, match="not compatible with this fitted search"):
+        search.oof_report(
+            X,
+            Y,
+            selection=other.select(n_components=1),
+        )
+
+
+def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
+    X, Y = _data()
+    unfitted = PiPLSSearchCV()
+    selection = PiPLSComponentResult(
+        n_components=1,
+        predictor_rank=1,
+        predictor_rank_policy="optimized",
+        mean_test_score=-1.0,
+        cv_mse_mean=1.0,
+        cv_mse_fold_sd=0.1,
+        n_splits=3,
+    )
+    with pytest.raises(NotFittedError):
+        unfitted.oof_report(X, Y, selection=selection)
+
+    search = PiPLSSearchCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        search_method="optimal",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+    compatible = search.select(n_components=1)
+    with pytest.raises(ValueError, match=r"oof_report\(\) requires the same number"):
+        search.oof_report(X[:-1], Y[:-1], selection=compatible)
+    with pytest.raises(ValueError, match="same number of response columns"):
+        search.oof_report(X, Y[:, :1], selection=compatible)

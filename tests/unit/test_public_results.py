@@ -10,6 +10,7 @@ from pipls import (
     PiPLSComponentPath,
     PiPLSComponentResult,
     PiPLSDecomposition,
+    PiPLSOOFReport,
     PiPLSPredictorRankProfile,
     PiPLSValidationReport,
 )
@@ -76,13 +77,20 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     assert "selected_result" not in {
         field.name for field in fields(PiPLSPredictorRankProfile)
     }
-    assert {
+    derived_report_fields = {
         "n_components",
         "predictor_rank",
         "n_splits",
         "mean_test_score",
         "cv_mse_mean",
-    }.isdisjoint(field.name for field in fields(PiPLSValidationReport))
+        "has_complete_oof_coverage",
+    }
+    assert derived_report_fields.isdisjoint(
+        field.name for field in fields(PiPLSOOFReport)
+    )
+    assert derived_report_fields.isdisjoint(
+        field.name for field in fields(PiPLSValidationReport)
+    )
 
 
 def test_component_result_validates_and_normalizes_python_scalars() -> None:
@@ -470,3 +478,97 @@ def test_validation_report_enforces_oof_coverage_representation() -> None:
             oof_prediction_counts=[1, 0],
             pooled_oof_r2=0.0,
         )
+
+
+def test_oof_report_normalizes_and_freezes_arrays() -> None:
+    selection = _validation_result()
+    report = PiPLSOOFReport(
+        selection=selection,
+        is_leave_one_out=np.bool_(False),
+        oof_predictions=np.array([[1.0, 2.0], [np.nan, np.nan], [3.0, 4.0]]),
+        oof_prediction_counts=np.array([1, 0, 2], dtype=np.int64),
+        pooled_oof_r2=np.float32(0.25),
+    )
+
+    assert report.selection == selection
+    assert type(report.n_components) is int
+    assert type(report.predictor_rank) is int
+    assert type(report.n_splits) is int
+    assert type(report.mean_test_score) is float
+    assert type(report.cv_mse_mean) is float
+    assert type(report.has_complete_oof_coverage) is bool
+    assert type(report.is_leave_one_out) is bool
+    assert report.oof_predictions is not None
+    assert report.oof_prediction_counts is not None
+    assert not report.oof_predictions.flags.writeable
+    assert not report.oof_prediction_counts.flags.writeable
+    assert not report.has_complete_oof_coverage
+
+    restored = pickle.loads(pickle.dumps(report))
+    assert isinstance(restored, PiPLSOOFReport)
+    assert restored.selection == report.selection
+    assert restored.oof_predictions is not None
+    assert not restored.oof_predictions.flags.writeable
+    np.testing.assert_array_equal(
+        restored.oof_prediction_counts,
+        report.oof_prediction_counts,
+    )
+
+
+def test_oof_report_requires_component_result() -> None:
+    with pytest.raises(TypeError, match="selection must be a PiPLSComponentResult"):
+        PiPLSOOFReport(
+            selection=object(),  # type: ignore[arg-type]
+            is_leave_one_out=False,
+        )
+
+
+def test_oof_report_enforces_oof_coverage_representation() -> None:
+    kwargs = {
+        "selection": _validation_result(),
+        "is_leave_one_out": False,
+    }
+    with pytest.raises(ValueError, match="required"):
+        PiPLSOOFReport(**kwargs, oof_predictions=[1.0, 2.0])
+    with pytest.raises(ValueError, match="nonnegative"):
+        PiPLSOOFReport(
+            **kwargs,
+            oof_predictions=[1.0, 2.0],
+            oof_prediction_counts=[1, -1],
+        )
+    with pytest.raises(ValueError, match="Covered OOF predictions must be finite"):
+        PiPLSOOFReport(
+            **kwargs,
+            oof_predictions=[np.nan, 2.0],
+            oof_prediction_counts=[1, 1],
+        )
+    with pytest.raises(ValueError, match="Uncovered OOF predictions must be NaN"):
+        PiPLSOOFReport(
+            **kwargs,
+            oof_predictions=[1.0, 2.0],
+            oof_prediction_counts=[0, 1],
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("is_leave_one_out", 1, "must be boolean"),
+        ("pooled_oof_r2", np.inf, "finite real"),
+    ],
+)
+def test_oof_report_rejects_invalid_scalar_fields(
+    field: str,
+    value: object,
+    message: str,
+) -> None:
+    kwargs = {
+        "selection": _validation_result(),
+        "is_leave_one_out": False,
+        "oof_predictions": [1.0, 2.0],
+        "oof_prediction_counts": [1, 1],
+        "pooled_oof_r2": 0.2,
+    }
+
+    with pytest.raises(ValueError, match=message):
+        PiPLSOOFReport(**{**kwargs, field: value})  # type: ignore[arg-type]

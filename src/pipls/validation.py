@@ -1,4 +1,4 @@
-"""Structured cross-validation reporting for public Pi-PLS estimators."""
+"""Structured out-of-fold reporting for public Pi-PLS estimators."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Literal, cast
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
 from ._result_validation import (
     _boolean,
@@ -23,21 +23,77 @@ EstimateKind = Literal["selection-conditioned", "fixed-parameter"]
 _ALLOWED_ESTIMATE_KINDS = frozenset({"selection-conditioned", "fixed-parameter"})
 
 
-@dataclass(frozen=True)
-class PiPLSValidationReport:
-    """Immutable summary of a Pi-PLS cross-validation result.
+def _validated_oof_fields(
+    *,
+    is_leave_one_out: object,
+    oof_predictions: object,
+    oof_prediction_counts: object,
+    pooled_oof_r2: object,
+) -> tuple[bool, FloatArray | None, IntArray | None, float | None]:
+    """Normalize common immutable OOF report fields."""
 
-    Direct construction validates the same selected-result, array, coverage,
-    and immutability invariants as reports returned by
-    :class:`pipls.PiPLSSearchCV`.
+    leave_one_out = _boolean(is_leave_one_out, name="is_leave_one_out")
+    pooled = (
+        None
+        if pooled_oof_r2 is None
+        else _finite_float(pooled_oof_r2, name="pooled_oof_r2")
+    )
+
+    predictions: FloatArray | None = None
+    counts: IntArray | None = None
+    if oof_predictions is None:
+        if oof_prediction_counts is not None or pooled is not None:
+            raise ValueError("OOF counts and pooled OOF R2 require oof_predictions.")
+        return leave_one_out, predictions, counts, pooled
+
+    if oof_prediction_counts is None:
+        raise ValueError("oof_prediction_counts are required with oof_predictions.")
+    predictions = _read_only_float_array(
+        cast(ArrayLike, oof_predictions),
+        name="oof_predictions",
+        ndim=np.asarray(oof_predictions).ndim,
+        require_finite=False,
+    )
+    if predictions.ndim not in (1, 2):
+        raise ValueError("oof_predictions must be one- or two-dimensional.")
+    if predictions.shape[0] == 0:
+        raise ValueError("oof_predictions must contain at least one row.")
+    counts = _read_only_int_array(
+        cast(ArrayLike, oof_prediction_counts),
+        name="oof_prediction_counts",
+    )
+    if counts.shape[0] != predictions.shape[0]:
+        raise ValueError(
+            "oof_prediction_counts must contain one value per prediction row."
+        )
+    if np.any(counts < 0):
+        raise ValueError("oof_prediction_counts must contain nonnegative values.")
+    covered = counts > 0
+    uncovered = ~covered
+    if pooled is not None and int(np.count_nonzero(covered)) < 2:
+        raise ValueError("pooled_oof_r2 requires at least two rows with OOF coverage.")
+    if predictions.ndim == 1:
+        if np.any(~np.isfinite(predictions[covered])):
+            raise ValueError("Covered OOF predictions must be finite.")
+        if np.any(~np.isnan(predictions[uncovered])):
+            raise ValueError("Uncovered OOF predictions must be NaN.")
+    else:
+        if np.any(~np.isfinite(predictions[covered, :])):
+            raise ValueError("Covered OOF predictions must be finite.")
+        if np.any(~np.isnan(predictions[uncovered, :])):
+            raise ValueError("Uncovered OOF predictions must be NaN.")
+
+    return leave_one_out, predictions, counts, pooled
+
+
+@dataclass(frozen=True)
+class PiPLSOOFReport:
+    """Immutable OOF diagnostics for one existing Pi-PLS selection.
 
     Parameters
     ----------
-    selected_result : PiPLSComponentResult
-        Immutable component-path result represented by the report.
-    estimate_kind : {"selection-conditioned", "fixed-parameter"}
-        Whether the same validation result selected model parameters or evaluated
-        a parameterization fixed independently of those predictions.
+    selection : PiPLSComponentResult
+        Exact immutable selection evaluated by the report.
     is_leave_one_out : bool
         Whether the materialized splitter is leave-one-out.
     oof_predictions : ndarray or None, default=None
@@ -50,25 +106,93 @@ class PiPLSValidationReport:
     pooled_oof_r2 : float or None, default=None
         Finite pooled $R^2$ over rows with OOF coverage.
 
-    Attributes
-    ----------
-    n_components : int
-        Component count from ``selected_result``.
-    predictor_rank : int
-        Predictor rank from ``selected_result``.
-    n_splits : int
-        Number of cross-validation splits from ``selected_result``.
-    mean_test_score : float
-        Mean configured test score from ``selected_result``.
-    cv_mse_mean : float
-        Mean response-standardized validation MSE from ``selected_result``.
-
     Notes
     -----
-    ``estimate_kind="selection-conditioned"`` means the reported validation
-    result was also used to choose ``n_components`` and/or ``predictor_rank``.
-    It is therefore not an unbiased post-selection performance estimate. Arrays
-    stored by the report are defensive, read-only copies.
+    A report returned by :meth:`pipls.PiPLSSearchCV.oof_report` reuses the search
+    splits that produced the supplied selection. It is therefore a
+    selection-conditioned diagnostic rather than an unbiased post-selection
+    performance estimate. Arrays are defensive, read-only copies.
+    """
+
+    selection: PiPLSComponentResult
+    is_leave_one_out: bool
+    oof_predictions: FloatArray | None = None
+    oof_prediction_counts: IntArray | None = None
+    pooled_oof_r2: float | None = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.selection, PiPLSComponentResult):
+            raise TypeError("selection must be a PiPLSComponentResult.")
+        leave_one_out, predictions, counts, pooled = _validated_oof_fields(
+            is_leave_one_out=self.is_leave_one_out,
+            oof_predictions=self.oof_predictions,
+            oof_prediction_counts=self.oof_prediction_counts,
+            pooled_oof_r2=self.pooled_oof_r2,
+        )
+        object.__setattr__(self, "is_leave_one_out", leave_one_out)
+        object.__setattr__(self, "oof_predictions", predictions)
+        object.__setattr__(self, "oof_prediction_counts", counts)
+        object.__setattr__(self, "pooled_oof_r2", pooled)
+
+    def __reduce__(self) -> tuple[type[PiPLSOOFReport], tuple[object, ...]]:
+        """Reconstruct through validation so unpickled arrays remain read-only."""
+
+        return (
+            type(self),
+            (
+                self.selection,
+                self.is_leave_one_out,
+                self.oof_predictions,
+                self.oof_prediction_counts,
+                self.pooled_oof_r2,
+            ),
+        )
+
+    @property
+    def n_components(self) -> int:
+        """Number of paired latent modes represented by the report."""
+
+        return self.selection.n_components
+
+    @property
+    def predictor_rank(self) -> int:
+        """Predictor rank represented by the report."""
+
+        return self.selection.predictor_rank
+
+    @property
+    def n_splits(self) -> int:
+        """Number of cross-validation splits."""
+
+        return self.selection.n_splits
+
+    @property
+    def mean_test_score(self) -> float:
+        """Mean configured test score."""
+
+        return self.selection.mean_test_score
+
+    @property
+    def cv_mse_mean(self) -> float:
+        """Mean response-standardized validation MSE."""
+
+        return self.selection.cv_mse_mean
+
+    @property
+    def has_complete_oof_coverage(self) -> bool:
+        """Whether every input row received at least one validation prediction."""
+
+        counts = self.oof_prediction_counts
+        return counts is not None and bool(np.all(counts > 0))
+
+
+@dataclass(frozen=True)
+class PiPLSValidationReport:
+    """Transitional immutable summary returned by ``validation_report()``.
+
+    This public type remains temporarily so maintained consumers can migrate to
+    :class:`PiPLSOOFReport`. New code should use
+    :meth:`pipls.PiPLSSearchCV.oof_report` and its ``selection`` field.
     """
 
     selected_result: PiPLSComponentResult
@@ -89,63 +213,17 @@ class PiPLSValidationReport:
                 allowed=_ALLOWED_ESTIMATE_KINDS,
             ),
         )
-        is_leave_one_out = _boolean(self.is_leave_one_out, name="is_leave_one_out")
-        pooled_oof_r2 = (
-            None
-            if self.pooled_oof_r2 is None
-            else _finite_float(self.pooled_oof_r2, name="pooled_oof_r2")
+        leave_one_out, predictions, counts, pooled = _validated_oof_fields(
+            is_leave_one_out=self.is_leave_one_out,
+            oof_predictions=self.oof_predictions,
+            oof_prediction_counts=self.oof_prediction_counts,
+            pooled_oof_r2=self.pooled_oof_r2,
         )
-
-        predictions: FloatArray | None = None
-        counts: IntArray | None = None
-        if self.oof_predictions is None:
-            if self.oof_prediction_counts is not None or pooled_oof_r2 is not None:
-                raise ValueError("OOF counts and pooled OOF R2 require oof_predictions.")
-        else:
-            if self.oof_prediction_counts is None:
-                raise ValueError("oof_prediction_counts are required with oof_predictions.")
-            predictions = _read_only_float_array(
-                self.oof_predictions,
-                name="oof_predictions",
-                ndim=np.asarray(self.oof_predictions).ndim,
-                require_finite=False,
-            )
-            if predictions.ndim not in (1, 2):
-                raise ValueError("oof_predictions must be one- or two-dimensional.")
-            if predictions.shape[0] == 0:
-                raise ValueError("oof_predictions must contain at least one row.")
-            counts = _read_only_int_array(
-                self.oof_prediction_counts,
-                name="oof_prediction_counts",
-            )
-            if counts.shape[0] != predictions.shape[0]:
-                raise ValueError(
-                    "oof_prediction_counts must contain one value per prediction row."
-                )
-            if np.any(counts < 0):
-                raise ValueError("oof_prediction_counts must contain nonnegative values.")
-            covered = counts > 0
-            uncovered = ~covered
-            if pooled_oof_r2 is not None and int(np.count_nonzero(covered)) < 2:
-                raise ValueError(
-                    "pooled_oof_r2 requires at least two rows with OOF coverage."
-                )
-            if predictions.ndim == 1:
-                if np.any(~np.isfinite(predictions[covered])):
-                    raise ValueError("Covered OOF predictions must be finite.")
-                if np.any(~np.isnan(predictions[uncovered])):
-                    raise ValueError("Uncovered OOF predictions must be NaN.")
-            else:
-                if np.any(~np.isfinite(predictions[covered, :])):
-                    raise ValueError("Covered OOF predictions must be finite.")
-                if np.any(~np.isnan(predictions[uncovered, :])):
-                    raise ValueError("Uncovered OOF predictions must be NaN.")
-
         object.__setattr__(self, "estimate_kind", estimate_kind)
-        object.__setattr__(self, "is_leave_one_out", is_leave_one_out)
+        object.__setattr__(self, "is_leave_one_out", leave_one_out)
         object.__setattr__(self, "oof_predictions", predictions)
         object.__setattr__(self, "oof_prediction_counts", counts)
-        object.__setattr__(self, "pooled_oof_r2", pooled_oof_r2)
+        object.__setattr__(self, "pooled_oof_r2", pooled)
 
     def __reduce__(self) -> tuple[type[PiPLSValidationReport], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""

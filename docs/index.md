@@ -32,8 +32,8 @@ Y_fitted = model.predict(X)
 The first numbered example standardizes the eight response variables and combines all observed and
 fitted values in one plot. This is a compact calibration-fit demonstration: `Y_fitted` comes from
 the same observations used to fit the final model. Use a
-[`validation_report()`](api/path.md#validation-report) for
-selection-conditioned out-of-fold validation.
+[`oof_report()`](api/path.md#out-of-fold-report) for
+selection-conditioned out-of-fold validation when the fitted search is retained.
 
 ## Choose a tutorial
 

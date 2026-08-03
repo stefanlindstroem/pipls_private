@@ -52,7 +52,7 @@ from .model_selection import (
     _validate_singleton_fold_scoring,
 )
 from .regression import PiPLSRegression, _clear_fitted_state
-from .validation import PiPLSValidationReport
+from .validation import PiPLSOOFReport, PiPLSValidationReport
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -131,7 +131,7 @@ class PiPLSSearchCV(
     independently inside each training fold. Selection inspection, final
     full-data fitting, and selection-conditioned out-of-fold reporting are
     explicit post-fit :meth:`select`, :meth:`refit`,
-    and :meth:`validation_report` operations. The default
+    and :meth:`oof_report` operations. The default
     ``search_method="auto"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
     for each paired-mode count.
@@ -582,19 +582,18 @@ class PiPLSSearchCV(
         estimator.selection_ = selected
         return estimator
 
-    def validation_report(
+    def oof_report(
         self,
         X: ArrayLike,
         y: ArrayLike,
         *,
-        rule: SelectionRule | None = None,
-        n_components: int | None = None,
-    ) -> PiPLSValidationReport:
-        """Return selection-conditioned OOF diagnostics for one stored path row.
+        selection: PiPLSComponentResult,
+    ) -> PiPLSOOFReport:
+        """Return ordered OOF diagnostics for one existing selection.
 
-        Exactly one of ``rule`` and ``n_components`` must be supplied. The
-        selected fixed parameterization is fitted independently on every
-        training fold from the exact split set materialized by :meth:`fit`.
+        The supplied selection is validated against this fitted search, then its
+        fixed component-count and predictor-rank pair is fitted independently on
+        every training fold from the exact split set materialized by :meth:`fit`.
         Repeated validation predictions are averaged, and rows never used for
         validation are represented by NaN with a zero prediction count.
 
@@ -606,30 +605,27 @@ class PiPLSSearchCV(
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
             Response vector or matrix aligned row-for-row with ``X`` and the
             data supplied to :meth:`fit`.
-        rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
-            Stored-row selection rule. ``"best_score"`` uses the global
-            configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
-            stored mean response-standardized CV-MSE, and
-            ``"one_standard_error"`` uses the smallest stored component count
-            within one fold-based standard error of that minimum.
-        n_components : int, optional
-            Evaluated paired-mode count whose conditionally selected predictor
-            rank is validated.
+        selection : PiPLSComponentResult
+            Existing immutable selection compatible with this fitted search.
+            A model returned by :meth:`refit` exposes the exact value as
+            ``model.selection_``.
 
         Returns
         -------
-        PiPLSValidationReport
-            Immutable selection-conditioned report with ordered OOF predictions,
-            prediction counts, coverage provenance, and pooled OOF $R^2$ when at
-            least two rows have validation coverage.
+        PiPLSOOFReport
+            Immutable report with the supplied selection, ordered OOF
+            predictions, prediction counts, coverage provenance, and pooled OOF
+            $R^2$ when at least two rows have validation coverage.
 
         Raises
         ------
         sklearn.exceptions.NotFittedError
             If the search has not been fitted.
+        TypeError
+            If ``selection`` is not a :class:`PiPLSComponentResult`.
         ValueError
-            If exactly one selection input is not supplied, the selection is
-            invalid, or the supplied data do not match the fitted search shape.
+            If the selection is incompatible with this search or the supplied
+            data do not match the fitted search shape.
 
         Notes
         -----
@@ -639,10 +635,89 @@ class PiPLSSearchCV(
         no full-data model is fitted or retained.
         """
 
+        compatible = self._validate_oof_selection(selection)
+        values = self._compute_oof_report_values(
+            X,
+            y,
+            selection=compatible,
+            operation_name="oof_report",
+        )
+        return PiPLSOOFReport(
+            selection=compatible,
+            is_leave_one_out=values[0],
+            oof_predictions=values[1],
+            oof_prediction_counts=values[2],
+            pooled_oof_r2=values[3],
+        )
+
+    def validation_report(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        *,
+        rule: SelectionRule | None = None,
+        n_components: int | None = None,
+    ) -> PiPLSValidationReport:
+        """Return the transitional report for one resolved path selection.
+
+        New code should call :meth:`oof_report` with an existing selection. This
+        method remains temporarily while maintained consumers migrate.
+        """
+
         selected = self._resolve_selection_result(
             rule=rule,
             n_components=n_components,
         )
+        values = self._compute_oof_report_values(
+            X,
+            y,
+            selection=selected,
+            operation_name="validation_report",
+        )
+        return PiPLSValidationReport(
+            selected_result=selected,
+            estimate_kind="selection-conditioned",
+            is_leave_one_out=values[0],
+            oof_predictions=values[1],
+            oof_prediction_counts=values[2],
+            pooled_oof_r2=values[3],
+        )
+
+    def _validate_oof_selection(
+        self,
+        selection: PiPLSComponentResult,
+    ) -> PiPLSComponentResult:
+        """Return a selection after exact compatibility validation."""
+
+        if not isinstance(selection, PiPLSComponentResult):
+            raise TypeError("selection must be a PiPLSComponentResult.")
+        if selection.rule is None:
+            expected = self._resolve_selection_result(
+                rule=None,
+                n_components=selection.n_components,
+            )
+        else:
+            expected = self._resolve_selection_result(
+                rule=selection.rule,
+                n_components=None,
+            )
+        if selection != expected:
+            raise ValueError(
+                "selection is not compatible with this fitted search. Use "
+                "model.selection_ or search.select(...) from the same search."
+            )
+        return selection
+
+    def _compute_oof_report_values(
+        self,
+        X: ArrayLike,
+        y: ArrayLike,
+        *,
+        selection: PiPLSComponentResult,
+        operation_name: str,
+    ) -> tuple[bool, FloatArray, IntArray, float | None]:
+        """Compute common ordered OOF report values without mutation."""
+
         check_is_fitted(self, attributes=["_cv_splits_", "_n_samples_fit_"])
         validated = _validate_estimator_data(
             self,
@@ -660,14 +735,14 @@ class PiPLSSearchCV(
         y_array = np.asarray(y_checked, dtype=np.float64)
         if int(np.shape(X_checked)[0]) != self._n_samples_fit_:
             raise ValueError(
-                "validation_report() requires the same number of samples used "
+                f"{operation_name}() requires the same number of samples used "
                 f"during search.fit(); expected {self._n_samples_fit_}, got "
                 f"{np.shape(X_checked)[0]}."
             )
         n_targets = 1 if y_array.ndim == 1 else int(y_array.shape[1])
         if n_targets != self.n_targets_:
             raise ValueError(
-                "validation_report() requires the same number of response columns "
+                f"{operation_name}() requires the same number of response columns "
                 f"used during search.fit(); expected {self.n_targets_}, got {n_targets}."
             )
 
@@ -681,8 +756,8 @@ class PiPLSSearchCV(
         )
         oof_predictions, counts = _ordered_oof_predictions(
             candidate=_PiPLSCandidate(
-                n_components=selected.n_components,
-                predictor_rank=selected.predictor_rank,
+                n_components=selection.n_components,
+                predictor_rank=selection.predictor_rank,
             ),
             template=template,
             n_components_key=n_components_key,
@@ -694,16 +769,14 @@ class PiPLSSearchCV(
             ignored_warning_categories=_CONTROLLED_FIT_WARNING_CATEGORIES,
         )
         predictions = oof_predictions[:, 0] if y_array.ndim == 1 else oof_predictions
-        return PiPLSValidationReport(
-            selected_result=selected,
-            estimate_kind="selection-conditioned",
-            is_leave_one_out=_splits_are_leave_one_out(
+        return (
+            _splits_are_leave_one_out(
                 self._cv_splits_,
                 n_samples=self._n_samples_fit_,
             ),
-            oof_predictions=predictions,
-            oof_prediction_counts=counts,
-            pooled_oof_r2=_pooled_oof_r2(y_indexable, predictions, counts),
+            predictions,
+            counts,
+            _pooled_oof_r2(y_indexable, predictions, counts),
         )
 
     def _resolve_selection_result(

@@ -164,23 +164,23 @@ selected = search.select(n_components=4)
 
 The method requires exactly one selection input and returns one immutable stored
 `PiPLSComponentResult`. It performs no fitting, rescoring, split materialization, or mutation. The
-private `SelectionRule` vocabulary and search-owned resolver are shared with `refit()` and
-`validation_report()`.
+private `SelectionRule` vocabulary and search-owned resolver are shared with `refit()`.
 
-Explicit selection-conditioned OOF reporting is a post-fit operation:
+Explicit OOF reporting is a post-fit analysis operation:
 
 ```python
-report = search.validation_report(X, y, rule="one_standard_error")
-report = search.validation_report(X, y, n_components=4)
+selection = model.selection_
+report = search.oof_report(X, y, selection=selection)
 ```
 
-The method requires exactly one selection input, uses the same stored-row resolver as `refit()`, and
-reuses defensive read-only copies of the exact validation indices materialized by `fit()`. It always
-returns ordered OOF predictions and prediction counts, averages repeated predictions, marks uncovered
-rows with NaN and count zero, computes pooled OOF $R^2$ only over covered rows, and performs neither
-candidate rescoring nor a full-data fit. It validates the fitted sample, feature, and response-column
-shape but cannot compare values; callers must preserve original row alignment. The search stores the
-split indices but not supplied training matrices or returned reports.
+The method accepts one existing `PiPLSComponentResult`, validates it exactly against the fitted
+search, and reuses defensive read-only copies of the validation indices materialized by `fit()`. It
+returns immutable `PiPLSOOFReport` with the supplied `selection`, ordered OOF predictions and counts,
+repeated-prediction averaging, uncovered-row NaNs and zero counts, pooled OOF $R^2$ over covered rows,
+and leave-one-out provenance. It performs neither candidate rescoring nor a full-data fit. Callers
+must preserve the original row alignment because the search stores split indices but not supplied
+training matrices. `validation_report(...)` and `PiPLSValidationReport` remain only as a temporary
+consumer-migration surface.
 
 ## Accepted selection-provenance and OOF-reporting transition
 
@@ -215,20 +215,20 @@ full-data refitting before retrieving selection, path, rank-profile, OOF, fitted
 evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
 `oof_report()`.
 
-Patches 1 through 3 are complete. `PiPLSComponentResult` implements `rule`,
-`reference_minimum`, and the derived `one_standard_error_threshold`, and every successful refit
-result exposes the exact resolved selection as `model.selection_`. Directly fitted
-`PiPLSRegression` instances remain provenance-free. The current source and served report API remain
-`validation_report(...)` and `PiPLSValidationReport` until their assigned patches. No compatibility
-alias is authorized in the final state.
+Patches 1 through 4 are complete. `PiPLSComponentResult` implements `rule`,
+`reference_minimum`, and the derived `one_standard_error_threshold`; every successful refit result
+exposes the exact resolved selection as `model.selection_`; and `oof_report(selection=...)` returns
+immutable `PiPLSOOFReport` after exact compatibility validation. Directly fitted
+`PiPLSRegression` instances remain provenance-free. `validation_report(...)` and
+`PiPLSValidationReport` remain temporarily for Patches 5 and 6. No compatibility alias is
+authorized in the final state.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
-component-path result. The search stores no selected row, validation report, or fitted final
-model. `PiPLSValidationReport` composes one immutable `PiPLSComponentResult`; its `n_components`,
-`predictor_rank`, `n_splits`, `mean_test_score`, and `cv_mse_mean` properties forward to that result
-rather than duplicating state. `is_selection_conditioned` and `has_complete_oof_coverage` expose
-provenance and coverage predicates.
+component-path result. The search stores no selected row, OOF report, or fitted final model. `PiPLSOOFReport` composes one
+immutable selection; its `n_components`, `predictor_rank`, `n_splits`, `mean_test_score`, and
+`cv_mse_mean` properties forward to that selection rather than duplicating state.
+`has_complete_oof_coverage` exposes row coverage. The former validation report remains transitional.
 
 Validated input grids, adaptive-search batch history, candidate counters, direct-rank parameter
 aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and supplied training matrices
