@@ -5,7 +5,6 @@ import inspect
 import pickle
 from collections.abc import Mapping
 from importlib import resources
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -26,9 +25,6 @@ ARRAY_HASHES = {
     "target": "eee177285c6dbdd2b8df8c97a2e3712d1b82b1946f4f9d93229204ebb90d6f8f",
 }
 
-
-def _repository_root() -> Path:
-    return Path(__file__).resolve().parents[2]
 
 
 def _canonical_array_hash(array: np.ndarray) -> str:
@@ -112,24 +108,17 @@ def test_load_sugarcane_return_X_y_matches_default_result_and_is_fresh() -> None
         Y[0, 0] = 0.0
 
 
-def test_packaged_sugarcane_resources_match_temporary_repository_copy() -> None:
+def test_packaged_sugarcane_resources_are_canonical() -> None:
     resource_root = resources.files("pipls").joinpath("_data").joinpath("sugarcane")
-    repository_root = _repository_root() / "datasets" / "sugarcane"
 
     for name, expected_hash in RESOURCE_HASHES.items():
         packaged = resource_root.joinpath(name).read_bytes()
-        repository = (repository_root / name).read_bytes()
-        assert packaged == repository
         assert hashlib.sha256(packaged).hexdigest() == expected_hash
 
     for name in ("metadata.json", "README.md"):
         assert resource_root.joinpath(name).is_file()
 
     dataset = load_sugarcane()
-    repository_X = np.loadtxt(repository_root / "X.csv", delimiter=",", skiprows=1)
-    repository_Y = np.loadtxt(repository_root / "Y.csv", delimiter=",", skiprows=1)
-    np.testing.assert_array_equal(dataset.data, repository_X)
-    np.testing.assert_array_equal(dataset.target, repository_Y)
     assert _canonical_array_hash(dataset.data) == ARRAY_HASHES["data"]
     assert _canonical_array_hash(dataset.target) == ARRAY_HASHES["target"]
 

@@ -23,7 +23,7 @@ This index is navigation, not a substitute for those records.
 | `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional immutable datasets plus local seeded latent-structure generation |
 | `0016-transparent-data-ingestion.md` | real-data and example boundary | users and examples read `X` and `Y` explicitly; no required registry or generic loader |
 | `0017-first-real-dataset.md` | former first transparent real-data integration | superseded by Decision 0033; the Linnerud integration is removed |
-| `0018-repository-dataset-layout.md` | committed real-dataset file convention | every dataset uses comma-delimited `X.csv`, `Y.csv`, and documentary `metadata.yaml` |
+| `0018-repository-dataset-layout.md` | historical repository-only dataset convention | retained for future repository-only assets; current named reference datasets follow Decision 0142 package resources |
 | `0019-pulp-dataset-integration.md` | pulp dataset integration | pulp uses public supplementary provenance, CC BY 4.0 attribution, named column selection, and direct X/Y reading |
 | `0020-public-dataset-provenance-boundary.md` | public versus internal dataset materials | public-only provenance and no private paths or preparation-only scripts; Corn-specific plan superseded by 0041 |
 | `0021-durable-repository-tests.md` | repository test stability | test behavior and structural format without pinning living prose or documentary field values |
@@ -197,19 +197,19 @@ plan contains an earlier or more general proposal:
 - Decision 0138 implemented the first named package-owned `load_pulp()` dataset without network
   access, pandas, a generic registry, or any requirement that users load their own real data
   through the package;
-- Decision 0142 accepts a six-patch extension of that same narrow contract to Sugarcane and
+- Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable
-  independently of Python. Every maintained consumer uses the named loaders, while repository
-  spectral copies remain transitional only until single-copy cleanup is complete;
+  independently of Python, and every maintained consumer uses the named loaders;
 - examples show their data-reading and matrix-construction code rather than relying on hidden
   utility functions;
 - the first numbered example uses literal NumPy matrices and one fixed fit; complete-workflow
   helpers are separated under `examples/_support/`;
 - numbered examples trust committed dataset and result-directory structure, avoid one-use configuration constants and repeated validation scaffolding, and leave reusable contract validation to focused tests;
 - numbered examples are self-contained user tasks with explained data and labeled output; they do not rely on paper or manuscript context, and the context-free advanced-CV script is removed;
-- committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
-  external users remain free to use any data source or file organization;
+- package-owned reference datasets use one canonical comma-delimited `X.csv`/`Y.csv` pair with
+  `metadata.json`, README, and license resources, while external users remain free to use any data
+  source or file organization;
 - the current real-data integration suite is Pulp, Sugarcane, and Tobacco; Decision 0142 assigns
   all three named package ownership as the accepted final state while preserving direct
   language-neutral raw-file access and making no publication-result claim;

@@ -139,10 +139,9 @@ datasets without verified redistribution and adaptation terms.
 
 ## Repository map
 
-- `src/pipls/`: installable package and public API;
+- `src/pipls/`: installable package, public API, and canonical reference-data resources;
 - `docs/`: served documentation and excluded maintainer decision records;
 - `examples/`: numbered user workflows and their small support layer;
-- `datasets/`: transparent redistributable reference datasets;
 - `tests/`: numerical, API, integration, documentation, and repository tests;
 - `tools/`: documentation and distribution validation helpers;
 - `constraints/`: the maintainer-only minimum-dependency environment;

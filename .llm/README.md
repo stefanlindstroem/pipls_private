@@ -27,8 +27,8 @@ The principal navigation documents are:
 9. `public_api.md` — constructor parameters, fitted attributes, shapes, supported composition,
    dataset interfaces, and explicit exclusions.
 10. `data_io.md` — transparent real-data input and example contract.
-11. `dataset_layout.md` — normative `X.csv`/`Y.csv`/`metadata.yaml` convention for committed real
-    datasets.
+11. `dataset_layout.md` — normative package-resource, integrity, raw-access, and single-copy
+    contract for named reference datasets.
 13. `analysis.md` — fitted-model interpretation, prediction-provenance, plotting, and analysis-
     artifact contracts.
 14. `testing.md` — durable test boundaries for behavior, shipped-file structure, and living

@@ -6,10 +6,8 @@ Pi-PLS is a regression package, not a general data-access framework. A programmi
 able to read predictors `X`, read responses `Y`, and fit the model without a registry, metadata
 parser, package-owned loader, or access to repository-development materials.
 
-The package must not require a registry, metadata file, checksum manifest, dataset container, or
-package-owned loader before a model can be fitted. A named built-in example dataset may be offered
-as an optional convenience when an explicit decision assigns package ownership; it does not change
-the primary user-owned `X`/`Y` contract.
+Named reference-dataset loaders are optional conveniences for three decision-owned examples. They
+do not change the primary user-owned `X`/`Y` contract.
 
 ## Programming-user contract
 
@@ -25,15 +23,7 @@ model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
 `X` and `Y` may come from NumPy, pandas, a database client, a domain-specific file reader, or any
 other user-controlled source compatible with the public estimator validation rules. Pi-PLS owns
 the regression behavior after `X` and `Y` are supplied; it does not own general-purpose data
-access.
-
-`PiPLSDataset` remains an optional structured container and the return type of the package-owned
-synthetic generators and named reference datasets. It is not required for real data, and examples
-must not imply otherwise. Decision 0142 assigns package ownership to Pulp, Sugarcane, and Tobacco
-through three named loaders, with their resources included in the base installation. This creates
-neither a general data-access extra nor a registry. Pulp, Sugarcane, and Tobacco are implemented
-as package loaders, and every maintained reference-data consumer uses those installed resources.
-The repository spectral matrices remain temporary parity fixtures until single-copy cleanup.
+access. `PiPLSDataset` is optional and must never be presented as a prerequisite for fitting.
 
 ## Example transparency
 
@@ -41,137 +31,100 @@ Examples must behave as an ordinary programming user is expected to behave:
 
 1. obtain predictors and responses through a visible user-owned read or an explicitly named
    package-owned loader;
-2. show any scientifically meaningful row alignment or column selection in the script;
+2. show scientifically meaningful row alignment or column selection when it is part of the user
+   workflow rather than already fixed in a package-owned resource;
 3. form `X` and `Y` visibly;
 4. call `fit(X, Y)`.
 
-For committed repository datasets, examples may trust the documented CSV schema and tested file
-layout. Do not repeat dtype, missing-value, header-order, or directory-existence checks when the
-repository already establishes those facts. External users remain responsible for validating their
-own data sources.
-
-Do not hide user-owned data preparation behind a generic utility such as `load_dataset`, an example
-helper module, a registry resolver, metadata parser, or an implicit converter. A decision-authorized
-named built-in dataset loader may replace repository file reading for that dataset only.
-
-For repository datasets, the preferred visible pattern is:
-
-```python
-import pandas as pd
-
-X = pd.read_csv("datasets/example/X.csv")
-Y = pd.read_csv("datasets/example/Y.csv")
-model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
-```
-
-The example must not need to parse `metadata.yaml`; that file documents the repository asset.
+Do not hide user-owned data preparation behind a generic utility such as `load_dataset`, a registry
+resolver, metadata parser, or implicit converter. A decision-authorized named loader may replace
+file reading for its dataset only.
 
 ## Package-owned reference datasets
 
-Decision 0138 implemented the first named package-owned dataset. Decision 0142 extends the final
-closed set to Pulp, Sugarcane, and Tobacco. The currently implemented loaders expose:
+Decisions 0138 and 0142 establish the final closed set of named reference datasets:
 
 ```python
-from pipls.datasets import load_pulp, load_sugarcane
+from pipls.datasets import load_pulp, load_sugarcane, load_tobacco
 
 pulp = load_pulp()
 sugarcane = load_sugarcane()
-X, Y = load_sugarcane(return_X_y=True)
+tobacco = load_tobacco()
+X, Y = load_tobacco(return_X_y=True)
 ```
 
-Each named loader returns the existing immutable `PiPLSDataset` or fresh read-only arrays from
-installed package resources. Loaders are optional, local, and dataset-specific: no registry,
-download, `as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows
-from them. General users and every other real dataset continue to supply `X` and `Y` directly.
+Each loader returns the immutable `PiPLSDataset` or fresh read-only `float64` arrays from installed
+package resources. Loading performs no download, imputation, centering, scaling, row filtering,
+spectral preprocessing, or model fitting. There is no registry, `as_frame` mode, optional data
+extra, pandas/PyYAML runtime dependency, or generic loader protocol.
 
-`load_pulp()`, `load_sugarcane()`, and `load_tobacco()` are implemented through dataset-neutral
-private resource, metadata, CSV, integrity, provenance, and sample-identifier machinery. Every
-maintained reference-data consumer uses the corresponding loader. Sugarcane and Tobacco package
-matrices exactly match their temporary repository copies, which remain parity sources only until
-final duplicate removal.
+The sole active resources are under `src/pipls/_data/<dataset>/` and contain `X.csv`, `Y.csv`,
+`metadata.json`, `README.md`, and `LICENSE.txt`. The CSV pairs are exactly the matrices returned by
+their loaders. Public documentation identifies the corresponding locations in tagged source
+releases, source distributions, wheels, and installed packages so R, C++, MATLAB, Julia, and other
+users can consume the same files without Python.
 
-The final resource directories under `src/pipls/_data/<dataset>/` are intentionally ordinary
-CSV, JSON, README, and license assets. Public documentation must identify their locations in a
-tagged source release, source distribution, wheel, and installed package so programming users in
-R, C++, MATLAB, Julia, or another environment can use the exact loader matrices without Python.
+## Public provenance and licensing boundary
 
-## Public provenance boundary
-
-Everything committed with a repository dataset is potentially visible to programming users.
-Dataset metadata, README files, examples, licenses, and decision records therefore use only:
+Everything committed with a reference dataset is public-facing. Metadata, README files, examples,
+licenses, and decision records therefore use only:
 
 - publicly accessible publications, repositories, archives, or included raw files;
 - public citations, DOI values, resolvable DOI URLs, and license statements;
 - analysis-facing transformations that a user can understand from the committed materials.
 
-Do not publish personal delivery details, private archive names, inaccessible local paths,
-checksums of unshared source files, or preparation scripts that only reconstruct committed files
-from private development inputs. Such development-only lineage remains outside the public
-repository.
+A dataset is eligible for package inclusion only when the exact source material used to create the
+resources has an explicit license or written permission permitting redistribution and adaptation.
+Public accessibility or an academic citation alone is insufficient. Each package resource
+directory preserves its dataset-specific attribution and license; the repository BSD 3-Clause
+license does not relicense included data.
 
-## Licensing gate
+Do not publish private delivery details, inaccessible local paths, checksums of unshared source
+files, or preparation scripts that only reconstruct committed resources from private inputs.
 
-A dataset is eligible for repository inclusion only when the exact source material used to create
-the committed tables has an explicit license or written permission that permits redistribution and
-adaptation for general use. Public accessibility, an academic citation, or a license attached only
-to a different derivative does not satisfy this requirement.
+## Resource and metadata policy
 
-The source license and required attribution must be preserved in the dataset directory and recorded
-in `metadata.yaml`. If rights are uncertain, the data remain external to `pipls`; an example may not
-work around this boundary by downloading and republishing the same material automatically.
+Every package-owned reference dataset follows `.llm/dataset_layout.md`:
 
-The repository-level BSD 3-Clause License covers repository-authored code and documentation; it
-does not relicense included datasets. Dataset-specific license and attribution files remain
-authoritative for those assets.
+- UTF-8 comma-delimited `X.csv` and `Y.csv` with headers;
+- `metadata.json` with ordered labels, dimensions, public provenance, preparation, licensing,
+  raw-resource hashes, and canonical-array hashes;
+- a human-readable `README.md` describing direct raw-file access;
+- a local `LICENSE.txt` containing the required attribution and redistribution terms;
+- exactly one active matrix pair in the repository.
 
-## Repository dataset policy
-
-Every committed real dataset follows `.llm/dataset_layout.md`:
-
-- predictors are stored in UTF-8, comma-delimited `X.csv` with a header;
-- responses are stored in UTF-8, comma-delimited `Y.csv` with a header;
-- `metadata.yaml` records a consistent public description, source, license, dimensions, variables,
-  alignment, preparation, missing-value policy, and integrity hashes;
-- the metadata file is mandatory for repository inclusion but optional and irrelevant for model
-  fitting by external users;
-- human-readable descriptions and license files may accompany the standard files.
-
-Repository metadata standardizes scientific assets; it does not create a public registry or loader.
-The served dataset guide reproduces each original-source citation and DOI link so provenance is
-available without opening the documentary YAML file.
+Metadata standardizes and validates the packaged resource. It does not create a public registry and
+is not required when users supply their own `X` and `Y`.
 
 ## Public reconstruction exception
 
 A reconstruction or preprocessing script is appropriate only when all of the following hold:
 
-- the raw source is itself included or publicly obtainable;
+- the raw source is included or publicly obtainable;
 - the transformation is scientifically relevant to how users should form `X` and `Y`;
 - the code is intended to be read and run by programming users;
 - the example exposes, rather than hides, the analytical choices.
 
-No current dataset uses this exception. A future reconstruction must first pass the repository
-licensing gate and must remain dataset-specific rather than becoming a generic internal preparation
-layer.
+No current reference dataset uses this exception. A future reconstruction requires a separate
+licensing and ownership decision and remains dataset-specific.
 
 ## Separation of responsibilities
 
-- **Programming user:** reads and prepares `X` and `Y` from their own source.
+- **Programming user:** reads and prepares arbitrary `X` and `Y` from their own source.
 - **Estimator API:** validates supplied model matrices and fits Pi-PLS.
 - **Package-owned reference integration:** provides one canonical language-neutral resource set,
-  named Python loading, public documentary metadata, provenance, and licenses.
-- **Examples:** use the named loader for a package-owned reference dataset and show all later
-  analytical choices; examples for user-owned data continue to form `X` and `Y` visibly.
+  named Python loading, public metadata, provenance, integrity checks, and licenses.
+- **Examples:** use the named loader for package-owned reference data and show all later analytical
+  choices; examples for user-owned data continue to form `X` and `Y` visibly.
 
 ## Prohibited directions
 
-Do not introduce merely for repository examples:
+Do not introduce merely for examples:
 
-- a public dataset registry;
-- a generic real-data loader; the accepted named `load_pulp()`, `load_sugarcane()`, and
-  `load_tobacco()` set does not authorize one;
+- a public dataset registry or generic real-data loader;
 - automatic downloading;
-- runtime dependence on `metadata.yaml`;
-- hidden example helpers that conceal how `X` and `Y` were formed;
+- runtime dependence on metadata sidecars for arbitrary user data;
+- hidden helpers that conceal how user-owned `X` and `Y` were formed;
 - private archive or local-path references in committed dataset materials;
 - preparation-only scripts whose required source is unavailable to users;
 - preprocessing learned across train/test or cross-validation boundaries.
@@ -179,31 +132,25 @@ Do not introduce merely for repository examples:
 ## Analysis artifact transparency
 
 Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize intermediate
-analysis results. Every numbered real-data workflow keeps its path and inspection results in memory,
-creates figures directly, and writes only final PDF outputs. Example 04 compares immutable Pi-PLS and
-ordinary-PLS paths; Pulp, Sugarcane, and Tobacco expose the conditional predictor-rank profile at
-their selected component count. Tobacco applies search-owned one-standard-error selection, uses
-the returned count for the rank profile, and retains deterministic source-order response
-pagination through multipage PDFs.
-New numbered-example work should follow that pattern. Git and source distributions preserve the
-required output-directory structure through `.gitkeep` files; generated PDFs are never committed
-or included in snapshots. The synthetic leave-one-out example writes no artifact: it reports one
-compact validation result directly and leaves application-specific reporting to the user.
+analysis results. Every numbered real-data workflow keeps paths, selected rows, predictor-rank
+profiles, validation reports, and inspection results in memory, creates figures directly, and
+writes only final PDF outputs. Example 04 compares immutable Pi-PLS and ordinary-PLS paths; Pulp,
+Sugarcane, and Tobacco expose the conditional predictor-rank profile at their selected component
+count. Tobacco uses search-owned one-standard-error selection and passes the returned count into
+`predictor_rank_profile()`.
+
+Generated PDFs are never committed or included in snapshots. Output-directory structure is
+preserved through `.gitkeep` files.
 
 ## Publication boundary
 
 Paper-specific data orchestration belongs in downstream reproduction repositories that depend on a
-tagged `pipls` release. This repository's examples remain concise package-use examples and should
-not grow into manuscript pipelines, figure generation, or complete comparison grids.
+tagged `pipls` release. This repository's examples remain concise package-use examples and do not
+grow into manuscript pipelines or complete comparison grids.
 
 ## Tutorial assets
 
-The synthetic tutorial uses `make_pipls_train_test()` directly in example 02 and its renderer. Its
-manifest records the deterministic generator configuration, selected rank pair, external-test
-provenance, and SVG hashes. No generated table is an input to fitting or plotting.
-
-The direct Pulp example and tutorial renderer both use the public `load_pulp()` API. The renderer
-records the packaged dataset identifier, version, source DOI, license, resource hashes, canonical
-array hashes, selected rank pair, evaluated predictor ranks, and boundary status in a generated
-manifest and derives SVG figures from in-memory results. All tutorial figures and manifests are
-ignored build products, not alternative dataset representations or package inputs.
+The synthetic tutorial uses `make_pipls_train_test()` directly. Pulp tutorial renderers use
+`load_pulp()` and record the packaged dataset identifier, provenance, resource hashes,
+canonical-array hashes, selected pair, evaluated predictor ranks, and generated-figure hashes in
+ignored manifests. Generated tutorial assets are not alternative dataset representations.

@@ -64,10 +64,10 @@ and later retired by Decision 0125 after its development-validation purpose had 
   predictor-specific, and response-specific latent structure;
 - a transparent real-data input contract: users and examples read `X` and `Y` explicitly, with no
   metadata, registry, or package-owned loader required for fitting;
-- a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
-  `metadata.yaml`;
-- a current reference suite containing package-owned Pulp, Sugarcane, and Tobacco, with temporary
-  Sugarcane and Tobacco repository parity copies retained only until final single-copy cleanup;
+- a package-owned reference-resource convention using one canonical `X.csv`/`Y.csv` pair plus
+  `metadata.json`, `README.md`, and `LICENSE.txt` under `src/pipls/_data/<dataset>/`;
+- a current reference suite containing package-owned Pulp, Sugarcane, and Tobacco with one active
+  matrix pair each, named loaders, direct non-Python raw-file access, and distribution checks;
 - the implemented `pipls.datasets.load_pulp()`, `load_sugarcane()`, and `load_tobacco()` datasets,
   backed by installed package resources and the same immutable contract;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
@@ -242,7 +242,7 @@ case, or public behavior.
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
 | Dataset namespace | immutable container, implemented `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`, plus seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Reference datasets | Pulp, Sugarcane, and Tobacco are public package resources used by every maintained consumer at Patch 5; temporary spectral parity copies remain only until Patch 6 single-copy cleanup |
+| Reference datasets | Pulp, Sugarcane, and Tobacco are public package resources used by every maintained consumer; each has one active matrix pair and documented raw-file access |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -551,18 +551,17 @@ The final resources remain ordinary CSV, JSON, README, and license files under
 wheels, and installed packages. The transition introduces no registry, downloader, `as_frame`
 surface, hidden preprocessing, or top-level loader exports.
 
-Current status: **Patches 1 through 5 complete**. Pulp, Sugarcane, and Tobacco are implemented
-named package loaders backed by dataset-neutral private loading machinery, and every maintained
-reference-data consumer uses the corresponding loader. Sugarcane and Tobacco package matrices
-exactly match temporary repository copies retained only for final parity and single-copy cleanup.
-The Tobacco attribution file identifies the correct dataset in both locations.
+Current status: **complete**. Pulp, Sugarcane, and Tobacco are implemented through one dataset-
+neutral private resource loader, return immutable labeled datasets or fresh read-only matrices, and
+work from clean wheel and source-distribution installations. Every maintained reference-data
+consumer uses the corresponding loader. The duplicate top-level spectral resources are removed;
+`src/pipls/_data/<dataset>/` is the sole active location, and public documentation identifies the
+raw files for non-Python use.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 6: remove the temporary Sugarcane and Tobacco repository matrices,
-publish the language-neutral raw-file locations, enforce one active resource pair per named dataset,
-and mark Decision 0142 implemented. Decision 0139 Patch 3 remains paused until the owner resumes
-that independent presentation increment.
+Decision 0142 is closed. Decision 0139 Patch 3 remains paused until the owner resumes that
+independent presentation increment.
 
 Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
 package resources are available in clean wheel and source-distribution installations, every

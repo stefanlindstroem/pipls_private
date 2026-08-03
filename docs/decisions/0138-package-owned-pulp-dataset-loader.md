@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; transition implemented.
+Accepted; transition implemented; refined by Decision 0142.
 
 ## Context
 
@@ -66,9 +66,8 @@ src/pipls/_data/pulp/
 
 Runtime loading uses `importlib.resources` and standard-library CSV/JSON handling so it works from a
 wheel, an unpacked source distribution, and a source checkout. Package and distribution
-configuration includes these resources explicitly. The JSON metadata replaces YAML only for the
-package-owned runtime representation; Sugarcane and Tobacco continue to follow the repository
-`X.csv`/`Y.csv`/`metadata.yaml` convention.
+configuration includes these resources explicitly. The JSON metadata replaces YAML for the package-owned runtime representation. Decision 0142 later
+extends this same resource contract to Sugarcane and Tobacco.
 
 The former repository-facing Pulp files have been moved without modification to:
 
@@ -102,17 +101,18 @@ This decision supersedes Decisions 0019, 0062, and 0068 only where they require 
 `datasets/pulp/X.csv` and `datasets/pulp/Y.csv` or prohibit a Pulp-specific package loader. Their
 scientific column selection, provenance, workflow visibility, path inspection, validation,
 interpretation, and rendering contracts otherwise remain in force. Decisions 0016 and 0018 remain
-the general contract for user-owned real data and repository datasets; Pulp becomes one explicit
-package-owned exception rather than a generic replacement.
+the general contract for user-owned real data and any future repository-only dataset. Decision 0142
+refines this decision from one Pulp exception to a closed set of three package-owned reference
+datasets.
 
 ## Consequences
 
 - The shortest installed-package example can use real Pi-PLS data without a repository checkout.
 - `PiPLSDataset.data` and `.target` gain a natural real-data use while plain arrays remain the
   primary estimator input.
-- There is one named loader, not a registry or automatic downloader.
+- Pulp belongs to a closed set of three named loaders, not a registry or automatic downloader.
 - Pulp provenance and licensing travel with installed distributions.
-- Sugarcane and Tobacco retain transparent repository CSV ownership.
+- Decision 0142 gives Sugarcane and Tobacco the same package-resource ownership contract.
 - The completed repository contains one active Pulp matrix location plus a hidden historical
   archive excluded from runtime, active tests, served documentation, and distributions.
 - No compatibility alias, duplicate active dataset, pandas return mode, or hidden preprocessing is

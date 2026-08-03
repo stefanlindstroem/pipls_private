@@ -59,10 +59,9 @@
   and Tobacco use their named loaders; ordinary user data retain explicit user-owned reading. Do not
   introduce a registry, generic loader, metadata-driven runtime path, or helper that obscures data
   acquisition.
-- The transitional Sugarcane and Tobacco repository copies follow `.llm/dataset_layout.md`:
-  comma-delimited `X.csv`, comma-delimited `Y.csv`, and documentary `metadata.yaml`. The canonical
-  Pulp, Sugarcane, and Tobacco representations follow the package-resource contract in Decisions
-  0138 and 0142.
+- Package-owned Pulp, Sugarcane, and Tobacco follow `.llm/dataset_layout.md`: one canonical
+  comma-delimited `X.csv`/`Y.csv` pair plus `metadata.json`, `README.md`, and `LICENSE.txt` under
+  `src/pipls/_data/<dataset>/`, with no duplicate top-level dataset copy.
 - Treat every committed dataset asset as public-facing. Cite only public or included sources;
   do not commit private archive paths, inaccessible source checksums, or preparation-only scripts.
 - Add public reconstruction or preprocessing code only when it operates on included or publicly

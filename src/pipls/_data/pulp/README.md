@@ -7,6 +7,14 @@ These package resources support `pipls.datasets.load_pulp()`.
 - `metadata.json` records labels, public provenance, preparation, dimensions, and integrity hashes.
 - `LICENSE.txt` contains the attribution and CC BY 4.0 notice for this adapted dataset.
 
+## Raw-file access
+
+These files are intentionally usable independently of Python. In a source checkout or unpacked
+source distribution, this directory is `src/pipls/_data/pulp/`. In a wheel, which is a ZIP
+archive, it is `pipls/_data/pulp/`. In an installed environment it normally appears below
+`<site-packages>/pipls/_data/pulp/`. Prefer a tagged source release, source distribution,
+or wheel when a reproducible external-data input is required.
+
 The public provenance reference is:
 
 > Lindström, S. B., Ferritsius, R., Carlson, J. E., Persson, J., and Nilsson, F. (2025).

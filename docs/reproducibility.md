@@ -121,23 +121,21 @@ package test suite protects maintained numerical and API contracts directly.
 
 ## Reference datasets
 
-Each committed real dataset uses `X.csv`, `Y.csv`, and documentary `metadata.yaml`, together with
-public provenance and redistribution terms. Current integrations are:
+Pulp, Sugarcane, and Tobacco are canonical package resources under
+`src/pipls/_data/<dataset>/`. Each directory contains `X.csv`, `Y.csv`, `metadata.json`,
+`README.md`, and `LICENSE.txt`; the same resources are included in wheels and source distributions.
+The named loaders return these exact matrices without learned preprocessing.
 
-- pulp;
-- sugarcane LabSpec spectroscopy;
-- tobacco FT-NIR spectroscopy.
+The [dataset documentation](datasets.md) gives the original-source citation, DOI links, preparation,
+license, dimensions, and direct raw-file locations for every integration. Every numbered
+reference-data workflow uses the corresponding named loader, keeps component paths, selected rows,
+predictor-rank profiles, validation reports, and inspection results in memory, and writes only its
+final PDF figures.
 
-The [dataset documentation](datasets.md) gives the original-source citation and resolvable DOI link
-for every integration, together with related data papers where applicable.
-
-Examples read `X.csv` and `Y.csv` directly. Example 04 operates on immutable Pi-PLS and ordinary-PLS
-paths in memory. Pulp, Sugarcane, and Tobacco operate on `component_path_`, explicit
-selection-conditioned validation reports, and immutable inspection results in memory. Every
-numbered real-data workflow writes only final PDF figures.
-Metadata supports repository review but is not required by the runtime API. Dataset-specific
-transformations that matter to users are described publicly; private preparation archives and
-inaccessible paths are not part of the repository.
+Distribution validation checks both clean installed loading and the presence of all five files for
+all three datasets. Package-resource tests verify declared raw-resource hashes, canonical `float64`
+array hashes, and one active matrix pair per named dataset. Metadata supports provenance and review;
+it is not required when users supply their own `X` and `Y`.
 
 ## Scope of reproducibility
 

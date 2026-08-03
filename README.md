@@ -181,12 +181,10 @@ attributes, result shapes, and method contracts are collected in the
 
 The package includes Pulp, Sugarcane, and Tobacco through the named
 `pipls.datasets.load_pulp()`, `pipls.datasets.load_sugarcane()`, and
-`pipls.datasets.load_tobacco()` loaders. Every maintained reference-data workflow uses the
-installed package resources. The byte-identical Sugarcane and Tobacco repository copies remain
-only as temporary parity sources until single-copy cleanup. There is no dataset-access extra or
-generic registry.
-Original sources, licenses, adaptations, and DOI links are documented in the
-[dataset guide](docs/datasets.md).
+`pipls.datasets.load_tobacco()` loaders. Every maintained reference-data workflow uses the same
+canonical package resources. There is no dataset-access extra or generic registry. The ordinary
+CSV, JSON, README, and license files are also documented for direct use from R, C++, MATLAB, Julia,
+or another environment in the [dataset guide](docs/datasets.md).
 
 See the [example catalogue](docs/examples.md) for the purpose and outputs of every numbered script.
 Install the `examples` extra before running them.

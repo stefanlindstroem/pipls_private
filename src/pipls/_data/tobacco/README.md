@@ -17,6 +17,14 @@ preprocessing.
 In a wheel, the files are stored under `pipls/_data/tobacco/`. In a source checkout or unpacked
 source distribution, they are under `src/pipls/_data/tobacco/`.
 
+## Raw-file access
+
+These files are intentionally usable independently of Python. In a source checkout or unpacked
+source distribution, this directory is `src/pipls/_data/tobacco/`. In a wheel, which is a ZIP
+archive, it is `pipls/_data/tobacco/`. In an installed environment it normally appears below
+`<site-packages>/pipls/_data/tobacco/`. Prefer a tagged source release, source distribution,
+or wheel when a reproducible external-data input is required.
+
 ## Public source
 
 The original source is Chen, Guo, Wang, and Zhao (2025), *A Near-Infrared Spectroscopy Dataset for

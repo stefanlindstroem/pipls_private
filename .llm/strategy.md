@@ -316,13 +316,11 @@ and the roadmap now proceeds directly to one explicit real-dataset integration p
 
 ### Phase E3: real dataset integrations
 
-Migrate and validate one dataset per coherent increment. Every committed dataset uses
-comma-delimited `X.csv`, comma-delimited `Y.csv`, and a consistent documentary `metadata.yaml` as
-defined in `.llm/dataset_layout.md`. Record only public or included sources, citation, license,
-redistribution decision, preparation choices, shapes, columns, row ordering, missing-value policy,
-and integrity hashes. For ordinary repository datasets, make the analysis example read `X` and `Y`
-directly with NumPy or pandas. A decision-authorized package-owned reference dataset instead uses its
-named loader. Do not introduce a generic registry or loader, private-source references, or
+Migrate and validate one dataset per coherent increment. Record only public or included sources,
+citation, license, redistribution decision, preparation choices, shapes, columns, row ordering,
+missing-value policy, and integrity hashes. User-owned examples read and form `X` and `Y` directly;
+a decision-authorized package-owned reference dataset uses the canonical resource layout in
+`.llm/dataset_layout.md` and its named loader. Do not introduce a generic registry or loader, private-source references, or
 preparation-only scripts. Before implementation, verify that the exact source material has an
 explicit source-level license or permission granting redistribution and adaptation for general
 repository use; public download access alone is insufficient.
@@ -331,8 +329,8 @@ Current status: **complete for scientific integration and licensing; package-res
 accepted under Decision 0142**. Pulp provides a compact multivariate process dataset; Sugarcane adds
 a 1,721-column regular wavelength grid; and Tobacco adds 347 samples, 1,557 raw FT-NIR predictors,
 and 13 responses. Every integration uses public provenance and no hidden preparation utility.
-Pulp, Sugarcane, and Tobacco have named package loaders and canonical resources, and every
-maintained consumer uses them. Temporary spectral repository copies remain only for Patch 6 cleanup.
+Pulp, Sugarcane, and Tobacco have named package loaders and canonical resources, every maintained
+consumer uses them, and the package-resource directories are the sole active matrix locations.
 Decision 0033
 removed the former Linnerud integration because it no longer served a useful package-level example
 or validation role. Decision 0041 intentionally excludes Corn, the legacy Citrination Steel table,
@@ -971,11 +969,11 @@ documented for use from tagged source releases, source distributions, wheels, in
 environments, and non-Python languages. No registry, downloader, pandas return mode, hidden
 preprocessing, optional data extra, or duplicate active representation is authorized.
 
-Current status: **Patches 1 through 5 complete**. The target is established; `load_pulp()`,
-`load_sugarcane()`, and `load_tobacco()` use dataset-neutral private resource-loading machinery, and
-every maintained reference-data consumer uses the corresponding loader. Sugarcane and Tobacco
-repository copies remain parity fixtures only. The Tobacco attribution notice is correct in both
-locations.
+Current status: **complete**. `load_pulp()`, `load_sugarcane()`, and `load_tobacco()` use dataset-
+neutral private resource-loading machinery, and every maintained reference-data consumer uses the
+corresponding loader. The duplicate top-level spectral resources are removed, the package
+directories are the sole active matrix locations, all five files per dataset are protected in both
+distributions, and language-neutral raw-file locations are public.
 
 ### Three-stage user onboarding transition
 
@@ -1019,13 +1017,9 @@ numerics, tie rules, fitting semantics, or OOF provenance.
 
 ## Current next increment
 
-Implement Decision 0142 Patch 6: remove the duplicate Sugarcane and Tobacco repository matrices,
-document language-neutral raw-file access, enforce one active package-resource matrix pair per named
-dataset, and close Decision 0142.
-
-Decision 0139 Patch 3 remains an independent paused documentation increment. Decision 0138 remains
-the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface,
-or compatibility layer is authorized.
+Decision 0142 is closed. Decision 0139 Patch 3 remains an independent paused documentation
+increment. Decision 0138 remains the fully implemented Pulp baseline. No generic dataset registry,
+downloader, `as_frame` surface, or compatibility layer is authorized.
 
 Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
 validation splits; final models and selection-conditioned OOF reports are produced only by explicit

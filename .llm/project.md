@@ -34,10 +34,9 @@ revision at *Computers & Chemical Engineering* (CACE-D-26-00847). Dataset-specif
 remain separate.
 
 The real-dataset suite contains package-owned Pulp, Sugarcane, and Tobacco. Every maintained
-consumer uses the named loaders; Sugarcane and Tobacco retain temporary repository parity copies only
-until the single-copy cleanup patch. Decision 0142 accepts a six-patch transition to three package-
-owned named reference
-datasets with ordinary language-neutral resources and one active matrix copy each. A licensing
+consumer uses the named loaders, and `src/pipls/_data/<dataset>/` is the sole active matrix location.
+Decision 0142 completes the transition to three named reference datasets with ordinary language-
+neutral resources and one active matrix copy each. A licensing
 review of the remaining companion-analysis candidates intentionally excluded Corn, the legacy
 Citrination Steel table, SARCOS, and FRED-MD from this repository because the exact source
 materials do not carry sufficiently clear redistribution rights. Public navigation now separates
@@ -58,9 +57,8 @@ lookup. Every maintained example, tutorial renderer, and living user document us
 `PiPLSComponentPath` is now limited to aligned numerical evidence and immutable serialization.
 
 Pulp, Sugarcane, and Tobacco acquisition uses `load_pulp()`, `load_sugarcane()`, and
-`load_tobacco()`, respectively. The spectral package resources retain exact matrix parity to
-repository copies that now serve only as temporary cleanup fixtures. All loaders are backed by
-documented CSV resources usable outside Python. Pulp also exposes
+`load_tobacco()`, respectively. All loaders are backed by the sole active package-resource copies,
+with documented CSV resources usable outside Python. Pulp also exposes
 the conditional predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
 `main()` and group rendering in private functions within their numbered scripts. Tobacco retains
 full-SVD spectral figures, source-order response pagination, and raw observation diagnostics.
@@ -165,10 +163,9 @@ implementing or reviewing this surface.
 
 ## Product-asset ownership
 
-- `datasets/`: transitional Sugarcane and Tobacco parity resources using the standard `X.csv`,
-  `Y.csv`, and `metadata.yaml` layout. Their canonical active copies are under `src/pipls/_data/`,
-  every maintained consumer uses the named loaders, and Decision 0142 Patch 6 removes this duplicate
-  layout after final parity verification. No generic runtime registry is required.
+- `src/pipls/_data/`: canonical Pulp, Sugarcane, and Tobacco CSV, metadata, README, and license
+  resources. These are the sole active matrix copies, are shipped in both distributions, and remain
+  directly usable outside Python. No generic runtime registry is required.
 - `examples/`: self-contained numbered user workflows with a package-owned Pulp fitted-value
   quick start first, followed by an explained synthetic train/test use case, one explicit
   comparison example, and
@@ -222,7 +219,7 @@ implementing or reviewing this surface.
 
 ## Architectural invariants
 
-- Runtime code does not import from `.llm`, tests, examples, docs, scripts, or datasets.
+- Runtime code does not import from `.llm`, tests, examples, docs, or tools.
 - Served Markdown under `docs/` is self-contained and does not link outside the documentation
   source tree. It defines Pi-PLS, component count, predictor rank, and the CV-MSE selection curve
   before specialized path or factorization terminology. `.llm` contracts and `docs/decisions/` may

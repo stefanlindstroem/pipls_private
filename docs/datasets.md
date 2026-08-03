@@ -4,9 +4,8 @@ The optional dataset interface provides a structured in-memory boundary for pack
 Sugarcane, and Tobacco datasets, package-owned synthetic data, and experiments. Real-data users may
 pass ordinary arrays or
 data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
-Sugarcane and Tobacco also have installed named loaders and canonical package resources. Every
-maintained reference-data example uses those loaders; byte-identical repository copies remain only
-as temporary parity sources until single-copy cleanup.
+Pulp, Sugarcane, and Tobacco have installed named loaders backed by canonical package resources.
+Every maintained reference-data example uses those resources.
 
 ## Validated dataset container
 
@@ -221,8 +220,42 @@ X, Y = load_tobacco(return_X_y=True)
 
 The default result is an immutable `PiPLSDataset`; the direct return mode supplies the same read-only
 `float64` matrices. The loaders apply no imputation, centering, scaling, row filtering, or learned
-preprocessing. Tobacco and user datasets continue to use explicit user-owned reading during this
-transition, and Sugarcane's maintained examples are migrated in a later patch.
+preprocessing.
+
+## Using the raw files outside Python
+
+The named loaders read ordinary language-neutral resources. The same files can be consumed directly
+from R, C++, MATLAB, Julia, or another environment. For reproducible non-Python use, prefer a tagged
+source release, source distribution, or wheel rather than a moving development branch or an
+installation path tied to one environment.
+
+In a source checkout or unpacked source distribution, the canonical files are:
+
+```text
+src/pipls/_data/pulp/X.csv
+src/pipls/_data/pulp/Y.csv
+src/pipls/_data/pulp/metadata.json
+src/pipls/_data/pulp/README.md
+src/pipls/_data/pulp/LICENSE.txt
+
+src/pipls/_data/sugarcane/X.csv
+src/pipls/_data/sugarcane/Y.csv
+src/pipls/_data/sugarcane/metadata.json
+src/pipls/_data/sugarcane/README.md
+src/pipls/_data/sugarcane/LICENSE.txt
+
+src/pipls/_data/tobacco/X.csv
+src/pipls/_data/tobacco/Y.csv
+src/pipls/_data/tobacco/metadata.json
+src/pipls/_data/tobacco/README.md
+src/pipls/_data/tobacco/LICENSE.txt
+```
+
+A wheel is a ZIP archive. Inside a wheel, the corresponding directories are
+`pipls/_data/pulp/`, `pipls/_data/sugarcane/`, and `pipls/_data/tobacco/`. In an installed
+environment they normally appear below the environment-specific
+`<site-packages>/pipls/_data/<dataset>/` directory. Each `X.csv` and `Y.csv` pair is exactly the
+matrix pair returned by its Python loader; loading applies no additional preprocessing.
 
 ## Pulp real-data integration
 
@@ -272,8 +305,7 @@ wavelength labels, and response names from that result, evaluates the default pa
 `component_path_` in memory, and fits a separate fixed model after a visible user component choice.
 It obtains the conditional predictor-rank profile at the selected component count, obtains
 selection-conditioned OOF predictions through `search.validation_report()`, and writes six final
-PDF figures directly from immutable public results. The compact spectral-axis
-description in `metadata.yaml` avoids
+PDF figures directly from immutable public results. The compact spectral-axis description in `metadata.json` avoids
 repeating 1,721 equivalent per-wavelength descriptions while still defining every predictor column
 exactly.
 

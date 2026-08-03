@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation in progress.
+Accepted; implemented.
 
 ## Context
 
@@ -134,17 +134,17 @@ Implement the transition in six reviewable patches:
 
 ## Implementation status
 
-Patches 1 through 5 are implemented. The decision and guide-layer target are established, and the
-shared private machinery handles resource access, metadata and CSV parsing, shape validation,
-resource and canonical-array integrity checks, provenance, and stable sample identifiers.
-`load_pulp()` preserves its original public contract. `load_sugarcane()` exposes the immutable
-57 by 1,721 LabSpec matrix and four responses, and `load_tobacco()` exposes the immutable 347 by
-1,557 raw FT-NIR matrix and 13 responses. Both spectral package resources have exact matrix parity
-with their temporary repository copies and pass clean wheel/source-distribution loading. The
-Tobacco attribution file is corrected before packaging so the canonical and temporary copies both
-identify the Tobacco source. Every maintained Pulp, Sugarcane, and Tobacco consumer now uses its
-named loader. The repository spectral copies remain only as parity sources for Patch 6 single-copy
-cleanup and language-neutral raw-file publication.
+All six patches are implemented. `load_pulp()`, `load_sugarcane()`, and `load_tobacco()` share one
+private package-resource pipeline for CSV and JSON parsing, dimensional validation, raw-resource and
+canonical-array integrity checks, provenance, and stable sample identifiers. Every maintained
+reference-data consumer uses its named loader.
+
+The duplicate top-level Sugarcane and Tobacco resources are removed. Pulp, Sugarcane, and Tobacco
+now each have one active `X.csv`/`Y.csv` pair under `src/pipls/_data/<dataset>/`, accompanied by
+`metadata.json`, `README.md`, and `LICENSE.txt`. Wheels and source distributions include all five
+files for each dataset, isolated installations load all three datasets, and tests protect one active
+matrix location. Public documentation lists the complete source-tree paths, wheel locations, and
+normal installed-package locations for direct use outside Python.
 
 This decision refines Decision 0138 from one package-owned Pulp exception to a closed set of three
 maintained reference datasets. It also refines Decision 0103 by removing pandas from the `examples`

@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Complete the package-owned reference-dataset transition: remove the duplicate top-level
+  Sugarcane and Tobacco matrices, leave `src/pipls/_data/<dataset>/` as the sole active resource
+  location for Pulp, Sugarcane, and Tobacco, publish direct raw-file access for non-Python users,
+  and enforce resource completeness, integrity, distribution inclusion, and single-copy ownership.
 - Migrate every maintained Sugarcane and Tobacco consumer to the installed `load_sugarcane()` and
   `load_tobacco()` resources. Examples 04, 06, and 07 no longer import pandas or use repository-
   relative dataset paths; spectral coordinates and response names come from immutable

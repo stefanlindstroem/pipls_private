@@ -11,6 +11,9 @@ import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+_REFERENCE_DATASETS = ("pulp", "sugarcane", "tobacco")
+_REFERENCE_RESOURCE_FILES = ("X.csv", "Y.csv", "metadata.json", "README.md", "LICENSE.txt")
+
 _SMOKE_TEST = """\
 from importlib.metadata import version
 from pathlib import Path
@@ -139,18 +142,38 @@ def _single_artifact(artifacts: Path, pattern: str, label: str) -> Path:
     return matches[0]
 
 
-def _assert_development_archive_excluded(artifact: Path) -> None:
+def _artifact_members(artifact: Path) -> list[str]:
     if artifact.suffix == ".whl":
         with zipfile.ZipFile(artifact) as archive:
-            members = archive.namelist()
-    else:
-        with tarfile.open(artifact, mode="r:gz") as archive:
-            members = archive.getnames()
+            return archive.namelist()
+    with tarfile.open(artifact, mode="r:gz") as archive:
+        return archive.getnames()
 
+
+def _assert_development_archive_excluded(artifact: Path) -> None:
+    members = _artifact_members(artifact)
     forbidden = [name for name in members if "/.llm/archive/" in f"/{name}"]
     if forbidden:
         raise RuntimeError(
             f"Development archive leaked into {artifact.name}: {sorted(forbidden)}"
+        )
+
+
+def _assert_reference_resources_included(artifact: Path) -> None:
+    members = _artifact_members(artifact)
+    missing: list[str] = []
+    for dataset_id in _REFERENCE_DATASETS:
+        for filename in _REFERENCE_RESOURCE_FILES:
+            relative = f"pipls/_data/{dataset_id}/{filename}"
+            if artifact.suffix == ".whl":
+                present = relative in members
+            else:
+                present = any(name.endswith(f"/src/{relative}") for name in members)
+            if not present:
+                missing.append(relative)
+    if missing:
+        raise RuntimeError(
+            f"Reference resources missing from {artifact.name}: {sorted(missing)}"
         )
 
 
@@ -305,6 +328,8 @@ def main() -> None:
         source_distribution = _single_artifact(artifacts, "*.tar.gz", "source distribution")
         _assert_development_archive_excluded(wheel)
         _assert_development_archive_excluded(source_distribution)
+        _assert_reference_resources_included(wheel)
+        _assert_reference_resources_included(source_distribution)
 
         checks = (
             ("wheel", wheel, False),

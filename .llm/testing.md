@@ -30,7 +30,8 @@ Tests may verify:
   refusal of committed generated files below `examples/results/`;
 - the Git-tracked example-result tree containing only `.gitkeep` directory placeholders, while
   ignored local outputs remain permitted;
-- repository dataset tables being readable numeric comma-separated files with aligned rows;
+- package-owned reference resources having complete, readable, aligned, and integrity-checked
+  CSV/JSON/README/license contents;
 
 ## What tests should not freeze
 
@@ -38,16 +39,14 @@ Tests must not assert current prose fragments or individual documentary field va
 
 - `.llm/state.md`, `.llm/strategy.md`, roadmaps, handoff text, or maintenance instructions;
 - changelogs, README prose, narrative documentation, or example commentary;
-- dataset titles, summaries, descriptions, citations, provenance wording, preparation narrative,
-  dimensions, variable lists, or integrity values stored in `metadata.yaml`;
+- dataset titles, summaries, descriptions, citations, provenance wording, or preparation
+  narrative stored in `metadata.json`;
 - a hard-coded list of historical decision filenames when index-to-directory consistency can be
   checked generically.
 
-The repository may still document required metadata sections in `.llm/dataset_layout.md`. Review
-and schema evolution govern that documentary contract; ordinary tests check that each metadata
-file exists and parses as a non-empty YAML mapping rather than pinning its contents. A generic
-consistency test may collect DOI values from each metadata source block and require matching
-resolvable links in the served dataset guide; it must not hard-code the current DOI values.
+The repository documents required metadata sections in `.llm/dataset_layout.md`. Tests verify the
+resource schema, declared hashes, loader arrays, and generic DOI-link consistency without freezing
+incidental narrative wording.
 
 ## Historical removal boundary
 
@@ -149,35 +148,24 @@ changes.
 
 ## Dataset boundary
 
-Repository dataset tests should check file layout and
-technical readability, not exact scientific values, row examples, column lists, dimensions, or
-metadata checksums. Public container tests should verify recursive freezing, defensive array copies,
-acceptance of non-object metadata arrays, and rejection of object-dtype arrays whose elements could
-remain mutable. Git history, review, public provenance, and the dataset documentation remain the
-source of record for documentary contents.
+Public container tests verify recursive freezing, defensive array copies, acceptance of non-object
+metadata arrays, and rejection of object-dtype arrays whose elements could remain mutable. Loader
+tests protect return modes, immutable arrays and metadata, stable package sample identifiers,
+ordered labels, public provenance, pickle reconstruction, and resource and canonical-array hashes.
 
-Decision 0138 adds the implemented package-owned Pulp contract. Decision 0142 extends the final
-test boundary to Sugarcane and Tobacco through staged patches. All three loader tests protect return
-modes, immutable arrays and metadata, stable package sample identifiers, ordered labels, public
-provenance, pickle reconstruction, resource and canonical-array hashes, and clean
-wheel/source-distribution loading. Sugarcane and Tobacco additionally retain exact byte and array
-parity with temporary repository copies until final duplicate removal. Maintained-consumer ownership
-is protected at Patch 5; one active matrix location follows in Patch 6. Ordinary documentary-
-metadata tests should still avoid freezing narrative wording.
+Decision 0142 is complete. Generic package-resource tests verify that Pulp, Sugarcane, and Tobacco
+have exactly `X.csv`, `Y.csv`, `metadata.json`, `README.md`, and `LICENSE.txt` under
+`src/pipls/_data/<dataset>/`; that no active top-level `datasets/` copy remains; and that each named
+dataset has one active matrix pair. Distribution tests verify all five resources in wheels and
+source distributions and load each dataset from isolated installations. Documentation tests protect
+source DOI links and complete raw-resource paths without freezing prose or an environment-specific
+absolute `site-packages` path.
 
-Patch 2 generalizes private resource loading without changing public behavior. Tests protect the
-complete `load_pulp()` result and distribution contract rather than freezing private helper names
-or call structure. During Patches 3–5, the repository Sugarcane and Tobacco matrices are temporary
-parity sources and tests may require exact equality with the package resources. Maintained workflow
-tests require their named loaders and reject pandas or repository CSV access. Patch 6 replaces
-those temporary checks with positive package-resource and generic single-location contracts. The
-`.llm/archive/pulp-repository-layout-v1/` copy remains excluded development history and must never
-enter runtime, distributions, served documentation, or active-dataset tests.
-
-Distribution tests must verify `X.csv`, `Y.csv`, `metadata.json`, `README.md`, and `LICENSE.txt` for
-each implemented package-owned dataset. Final documentation tests should protect discoverable raw-
-file paths and source DOI links without freezing prose or environment-specific `site-packages`
-locations.
+Tests protect the public result and distribution contracts rather than private resource-helper
+names or call structure. Maintained workflow tests require the named loaders and reject pandas or
+repository-relative CSV ingestion. The `.llm/archive/pulp-repository-layout-v1/` copy remains
+excluded development history and must never enter runtime, distributions, served documentation, or
+active-dataset tests.
 
 Post-analysis inspection tests should verify mathematical identities, shapes, direct-construction
 and pickle invariants, finite-value validation, defensive copying, read-only results, deterministic

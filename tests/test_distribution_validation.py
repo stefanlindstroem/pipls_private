@@ -32,6 +32,7 @@ def test_distribution_check_is_a_public_make_target_and_sdist_input() -> None:
     assert "tools/check_distributions.py" in dry_run.stdout
     assert "dist-check" in help_output
     assert "prune .llm" in manifest
+    assert not any(line.startswith("recursive-include datasets ") for line in manifest)
     assert "include CITATION.cff" in manifest
     assert "include tools/check_distributions.py" in manifest
     assert "recursive-include src/pipls/_data/pulp *.csv *.json *.md *.txt" in manifest
@@ -74,6 +75,10 @@ def test_distribution_helper_builds_once_and_checks_both_artifacts() -> None:
     assert 'environment.pop("PYTHONPATH", None)' in helper
     assert "_assert_development_archive_excluded(wheel)" in helper
     assert "_assert_development_archive_excluded(source_distribution)" in helper
+    assert "_assert_reference_resources_included(wheel)" in helper
+    assert "_assert_reference_resources_included(source_distribution)" in helper
+    assert "_REFERENCE_DATASETS = (\"pulp\", \"sugarcane\", \"tobacco\")" in helper
+    assert "_REFERENCE_RESOURCE_FILES" in helper
     assert "_check_source_distribution_example" in helper
     assert 'f"pipls[examples] @ {artifact.resolve().as_uri()}"' in helper
     assert 'source / "examples" / "01_pulp_quick_start.py"' in helper

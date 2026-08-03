@@ -11,7 +11,8 @@
 - Weighted fitting or unsupported metadata/composite behavior was not introduced implicitly.
 - Real-data examples read and form `X` and `Y` visibly; no registry, generic loader,
   metadata-driven runtime path, or hidden I/O helper was introduced.
-- Committed real datasets use comma-delimited `X.csv`, `Y.csv`, and a valid `metadata.yaml`.
+- Package-owned reference datasets keep one canonical `X.csv`/`Y.csv` pair with valid
+  `metadata.json`, README, license, integrity, distribution, and raw-access contracts.
 - Phase/default/roadmap changes update `.llm/state.md` and `.llm/strategy.md`.
 - New accepted decisions have a numbered record and `.llm/decisions.md` entry.
 - No generated files, caches, archive clutter, or unverified data are included.

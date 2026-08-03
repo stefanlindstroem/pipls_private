@@ -792,7 +792,8 @@ def test_llm_prompt_templates_are_nonempty_utf8_files() -> None:
         assert "\x00" not in text
 
 
-def test_repository_datasets_are_not_top_level_runtime_exports() -> None:
-    datasets_root = _repository_root() / "datasets"
-    dataset_names = {path.name for path in datasets_root.iterdir() if path.is_dir()}
-    assert dataset_names.isdisjoint(pipls.__all__)
+def test_named_reference_loaders_are_not_top_level_runtime_exports() -> None:
+    loader_names = {"load_pulp", "load_sugarcane", "load_tobacco"}
+
+    assert loader_names.isdisjoint(pipls.__all__)
+    assert all(not hasattr(pipls, name) for name in loader_names)

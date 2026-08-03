@@ -156,9 +156,11 @@ def main() -> None:
             source / "examples" / "01_pulp_quick_start.py",
             source / "examples" / "02_synthetic_path_selection.py",
             source / "examples" / "05_pulp_real_data.py",
-            source / "src" / "pipls" / "_data" / "pulp" / "X.csv",
-            source / "src" / "pipls" / "_data" / "pulp" / "Y.csv",
-            source / "src" / "pipls" / "_data" / "pulp" / "metadata.json",
+            *(
+                source / "src" / "pipls" / "_data" / dataset_id / filename
+                for dataset_id in ("pulp", "sugarcane", "tobacco")
+                for filename in ("X.csv", "Y.csv", "metadata.json", "README.md", "LICENSE.txt")
+            ),
             source / "src" / "pipls" / "__init__.py",
         ]
         missing = [path.relative_to(source).as_posix() for path in required if not path.is_file()]

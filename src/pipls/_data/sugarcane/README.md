@@ -25,3 +25,10 @@ retained row order; the original source identifiers remain in `metadata.json`.
 
 Loading applies no imputation, smoothing, derivative, scatter correction, centering, scaling, or
 other spectral preprocessing. The CSV matrices are exactly those returned by the Python loader.
+## Raw-file access
+
+These files are intentionally usable independently of Python. In a source checkout or unpacked
+source distribution, this directory is `src/pipls/_data/sugarcane/`. In a wheel, which is a ZIP
+archive, it is `pipls/_data/sugarcane/`. In an installed environment it normally appears below
+`<site-packages>/pipls/_data/sugarcane/`. Prefer a tagged source release, source distribution,
+or wheel when a reproducible external-data input is required.
