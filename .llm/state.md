@@ -67,9 +67,11 @@ and later retired by Decision 0125 after its development-validation purpose had 
 - a repository real-dataset convention using comma-delimited `X.csv`, `Y.csv`, and documentary
   `metadata.yaml`;
 - a current reference suite containing package-owned Pulp plus repository-owned Sugarcane and
-  Tobacco;
+  Tobacco, with Decision 0142 accepting their transition to three package-owned named reference
+  datasets;
 - the implemented `pipls.datasets.load_pulp()` dataset, backed by the sole active Pulp matrix
-  resources in the installed package;
+  resources in the installed package, and accepted future `load_sugarcane()` and `load_tobacco()`
+  loaders using the same immutable contract;
 - a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
   table, SARCOS, and FRED-MD from repository redistribution;
 - pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
@@ -240,9 +242,9 @@ case, or public behavior.
 | Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
 | Group handling | path-only keyword `groups` routed to group-aware splitters |
 | OOF output | explicit post-fit `search.validation_report(X, y, rule=... or n_components=...)`; reports are returned directly and not attached to search state |
-| Dataset namespace | immutable container, named package-owned `load_pulp()`, and seeded generators under `pipls.datasets` |
+| Dataset namespace | immutable container, implemented `load_pulp()`, accepted `load_sugarcane()` and `load_tobacco()`, and seeded generators under `pipls.datasets` |
 | Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Repository datasets | Sugarcane and Tobacco remain repository CSV datasets; Pulp is package-owned and has one active resource location |
+| Reference datasets | final target is one package-resource location each for Pulp, Sugarcane, and Tobacco; only Pulp is migrated at Patch 1 |
 | Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
 | Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
 | Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
@@ -534,18 +536,39 @@ Decision 0141 adds `predictor_rank_profile.pdf` to both spectral complete analys
 profiles its explicit selected count; Tobacco profiles `selected.n_components` from the
 one-standard-error rule. All three complete real-data workflows now write six PDFs.
 
+## Package-owned reference-dataset transition
+
+Decision 0142 authorizes six patches:
+
+1. establish the decision and guide-layer target;
+2. generalize the private Pulp resource-loading implementation without public behavior changes;
+3. add packaged Sugarcane resources, `load_sugarcane()`, integrity tests, and distribution checks;
+4. add packaged Tobacco resources, `load_tobacco()`, integrity tests, and distribution checks;
+5. migrate maintained consumers and active documentation to the three named loaders;
+6. remove duplicate repository matrices, document raw-file access for non-Python users, and
+   enforce one active matrix pair per dataset.
+
+The final resources remain ordinary CSV, JSON, README, and license files under
+`src/pipls/_data/<dataset>/`, directly usable from tagged source releases, source distributions,
+wheels, and installed packages. The transition introduces no registry, downloader, `as_frame`
+surface, hidden preprocessing, or top-level loader exports.
+
+Current status: **Patch 1 complete; implementation pending**. Pulp remains the sole implemented
+named package loader. Sugarcane and Tobacco still use repository CSV inputs until their resource
+and migration patches.
+
 ## Current next increment
 
-Resume Decision 0139 Patch 3: complete the landing-page and reference reframing around the final
-search-owned selection vocabulary.
+Implement Decision 0142 Patch 2: generalize the private packaged-resource loading machinery while
+preserving every observable `load_pulp()` result and adding no new public loader. Decision 0139
+Patch 3 remains paused until the owner resumes that independent presentation increment.
 
-Decision 0138 is fully implemented. `load_pulp()` and the canonical package resources are
-available in clean wheel and source-distribution installations, every maintained Pulp consumer uses
-the loader, the former repository layout is archived under `.llm/archive/`, and active tests verify
-package-resource integrity plus one active Pulp matrix location. The archive is excluded from
-runtime, distributions, served documentation, and active dataset tests.
+Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
+package resources are available in clean wheel and source-distribution installations, every
+maintained Pulp consumer uses the loader, and the former repository layout remains excluded
+development history under `.llm/archive/`.
 
-There is no remaining Pulp dataset-transition increment. Any unrelated release-preparation work
+Any unrelated release-preparation work
 requires a separate owner-authorized increment. Block-aware scaling still requires a separate
 owner decision. Corn, the legacy Steel table, SARCOS, and FRED-MD
 remain intentionally outside the repository under Decision 0041. The representative Pulp,

@@ -33,11 +33,13 @@ Fritjof Nilsson, and Stefan B. Lindström are the package authors and current co
 revision at *Computers & Chemical Engineering* (CACE-D-26-00847). Dataset-specific licenses
 remain separate.
 
-The real-dataset suite contains package-owned Pulp plus repository-owned Sugarcane and Tobacco. A licensing review of
-the remaining companion-analysis candidates intentionally excluded Corn, the legacy Citrination
-Steel table, SARCOS, and FRED-MD from this repository because the exact source materials do not
-carry sufficiently clear redistribution rights. Public navigation now separates tutorials, examples, programming reference, project
-validation, and scientific background.
+The real-dataset suite currently contains package-owned Pulp plus repository-owned Sugarcane and
+Tobacco. Decision 0142 accepts a six-patch transition to three package-owned named reference
+datasets with ordinary language-neutral resources and one active matrix copy each. A licensing
+review of the remaining companion-analysis candidates intentionally excluded Corn, the legacy
+Citrination Steel table, SARCOS, and FRED-MD from this repository because the exact source
+materials do not carry sufficiently clear redistribution rights. Public navigation now separates
+tutorials, examples, programming reference, project validation, and scientific background.
 The former benchmark layer has been retired after serving its development-validation purpose.
 Pulp, Sugarcane, and Tobacco remain component-path examples rather than test-suite executions.
 `make examples` runs every numbered example explicitly, beginning with the package-owned Pulp
@@ -54,8 +56,10 @@ lookup. Every maintained example, tutorial renderer, and living user document us
 `PiPLSComponentPath` is now limited to aligned numerical evidence and immutable serialization.
 
 Pulp acquisition uses the sole active package resources through `load_pulp()`; Sugarcane
-and Tobacco retain direct repository CSV reading. Pulp also exposes the conditional
-predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
+and Tobacco retain direct repository CSV reading until Decisions 0142 Patches 3–5 add resources
+and migrate consumers. The final loaders are `load_pulp()`, `load_sugarcane()`, and
+`load_tobacco()`, all backed by documented CSV resources usable outside Python. Pulp also exposes
+the conditional predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
 `main()` and group rendering in private functions within their numbered scripts. Tobacco retains
 full-SVD spectral figures, source-order response pagination, and raw observation diagnostics.
 No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
@@ -159,9 +163,10 @@ implementing or reviewing this surface.
 
 ## Product-asset ownership
 
-- `datasets/`: committed redistributable real datasets using the standard `X.csv`, `Y.csv`, and
-  `metadata.yaml` layout with public-only provenance and an explicit source-level redistribution
-  grant for the exact included material. No generic runtime registry is required.
+- `datasets/`: transitional Sugarcane and Tobacco repository resources using the standard
+  `X.csv`, `Y.csv`, and `metadata.yaml` layout. Decision 0142 moves their canonical active copies
+  into `src/pipls/_data/` and removes this duplicate layout after parity and consumer migration.
+  No generic runtime registry is required.
 - `examples/`: self-contained numbered user workflows with a package-owned Pulp fitted-value
   quick start first, followed by an explained synthetic train/test use case, one explicit
   comparison example, and
@@ -177,7 +182,7 @@ implementing or reviewing this surface.
   owns tutorial snippets. Their pandas, Matplotlib, and optional
   `adjustText` requirements are grouped in the `examples` extra and repeated in `dev` for complete
   repository validation. The `docs` extra owns the strict site and tutorial-rendering toolchain.
-  There is no dataset-access extra: the named Pulp loader is runtime package data, while the
+  There is no dataset-access extra: the named reference loaders use runtime package data, while the
   complete real-data analyses retain their currently assigned repository inputs. Real-data
   analyses are not duplicated here.
 - `docs/`: the self-contained documentation source, including served user guides, implemented

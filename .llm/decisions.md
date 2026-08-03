@@ -147,6 +147,7 @@ This index is navigation, not a substitute for those records.
 | `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
 | `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
 | `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot the conditional rank profile at the selected component count, including the Tobacco 1-SE result |
+| `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named immutable loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
 
 ## Implemented estimator/search transition
 
@@ -193,10 +194,14 @@ plan contains an earlier or more general proposal:
   external-test estimates;
 - real-data users supply `X` and `Y` directly; metadata files, registry lookup, generic loaders,
   and `PiPLSDataset` are not prerequisites for fitting;
-- Decision 0138 authorizes one named package-owned `load_pulp()` exception, returning
-  `PiPLSDataset` or read-only `(X, Y)` arrays without network access, pandas, a generic registry,
-  or any requirement that users load their own real data through the package; implementation is
-  staged and the current repository CSV layout remains active until the later migration patches;
+- Decision 0138 implemented the first named package-owned `load_pulp()` dataset without network
+  access, pandas, a generic registry, or any requirement that users load their own real data
+  through the package;
+- Decision 0142 accepts a six-patch extension of that same narrow contract to
+  `load_sugarcane()` and `load_tobacco()`. The final canonical resources remain ordinary CSV,
+  JSON, README, and license files usable independently of Python, while the current repository
+  Sugarcane and Tobacco copies remain transitional until consumer migration and single-copy
+  cleanup are complete;
 - examples show their data-reading and matrix-construction code rather than relying on hidden
   utility functions;
 - the first numbered example uses literal NumPy matrices and one fixed fit; complete-workflow
@@ -205,8 +210,9 @@ plan contains an earlier or more general proposal:
 - numbered examples are self-contained user tasks with explained data and labeled output; they do not rely on paper or manuscript context, and the context-free advanced-CV script is removed;
 - committed repository datasets use comma-delimited `X.csv`, `Y.csv`, and `metadata.yaml`, while
   external users remain free to use any data source or file organization;
-- the current real-data integration suite is pulp, sugarcane, and tobacco; all are repository
-  example data, not runtime loaders or publication-result claims;
+- the current real-data integration suite is Pulp, Sugarcane, and Tobacco; Decision 0142 assigns
+  all three named package ownership as the accepted final state while preserving direct
+  language-neutral raw-file access and making no publication-result claim;
 - committed dataset assets use public or included provenance only, and the exact source material
   must carry an explicit redistribution and adaptation grant; private archive references and
   preparation-only scripts stay outside the repository;

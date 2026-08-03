@@ -4,20 +4,36 @@
 
 This contract standardizes committed analysis-facing repository datasets without changing the
 public estimator API. External programming users still read and prepare their own `X` and `Y`; they
-do not need a metadata file or package loader. Decision 0138 defines one completed package-owned
-Pulp exception outside this repository-dataset layout.
+do not need a metadata file or package loader. Decisions 0138 and 0142 define a closed set of
+package-owned reference datasets outside the final repository-dataset layout.
 
-## Package-owned Pulp exception
+## Package-owned reference-dataset exception
 
 Decision 0138 places the canonical Pulp assets under `src/pipls/_data/pulp/` and exposes them
-through `pipls.datasets.load_pulp()`. The package-owned representation uses `metadata.json` so
-runtime loading requires only the standard library. It is the sole active Pulp matrix
-representation and does not create a generic dataset registry.
+through `pipls.datasets.load_pulp()`. Decision 0142 extends the final resource and loader contract
+to Sugarcane and Tobacco under `src/pipls/_data/sugarcane/` and
+`src/pipls/_data/tobacco/`. Every package-owned representation uses `metadata.json`,
+standard-library runtime parsing, and ordinary language-neutral CSV resources. No generic dataset
+registry follows.
 
-The former repository layout is preserved byte-for-byte under
-`.llm/archive/pulp-repository-layout-v1/` as development history only. It is excluded from runtime,
-active tests, served documentation, wheels, and source distributions. This repository-layout
-contract therefore applies only to Sugarcane and Tobacco; Decision 0138 governs Pulp.
+At the current Patch 1 state, Pulp is the sole implemented package resource and Sugarcane and
+Tobacco still follow the repository layout below. Their repository copies become temporary parity
+sources only after package resources are added, and are removed in the final single-copy patch. The
+former Pulp layout remains excluded development history under
+`.llm/archive/pulp-repository-layout-v1/`.
+
+## Language-neutral package-resource contract
+
+The final package-owned directory for each named reference dataset contains `X.csv`, `Y.csv`,
+`metadata.json`, `README.md`, and `LICENSE.txt`. These are public data assets, not hidden Python
+objects. Documentation must list their source-tree paths and explain their corresponding wheel and
+installed-package paths. The individual README files must state that the matrices can be consumed
+independently of Python. A tagged source release, source distribution, or wheel is the recommended
+reproducible access point for non-Python users.
+
+The exact CSV matrices must equal the arrays returned by the named loaders. Once Decision 0142 is
+complete, each named dataset has one active `X.csv`/`Y.csv` pair under `src/pipls/_data/`; active
+repository or archive duplicates are prohibited.
 
 ## Required files
 
@@ -41,9 +57,10 @@ Do not add internal conversion scripts or references to private development inpu
 - preserve a documented common row order;
 - use the exact filenames `X.csv` and `Y.csv`.
 
-Sugarcane and Tobacco examples read these files directly with ordinary NumPy or pandas code. They
-must not parse `metadata.yaml` to construct the model matrices. Pulp consumers use `load_pulp()`
-instead and do not read this repository layout.
+Until Decision 0142 consumer migration, Sugarcane and Tobacco examples read these files directly
+with ordinary NumPy or pandas code and must not parse `metadata.yaml` to construct model matrices.
+After migration, all three named reference-dataset consumers use their public loaders and no
+maintained example reads this repository layout.
 
 ## Metadata contract
 

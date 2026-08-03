@@ -28,10 +28,12 @@ the regression behavior after `X` and `Y` are supplied; it does not own general-
 access.
 
 `PiPLSDataset` remains an optional structured container and the return type of the package-owned
-synthetic generators. It is not required for real data, and examples must not imply otherwise.
-Pulp is now one named installed package dataset, while Sugarcane and Tobacco remain repository CSV
-assets. Package metadata exposes no `data` extra because the Pulp resources are included in the base
-installation. This does not create a general data-access extra or registry.
+synthetic generators and named reference datasets. It is not required for real data, and examples
+must not imply otherwise. Decision 0142 assigns package ownership to Pulp, Sugarcane, and Tobacco
+through three named loaders, with their resources included in the base installation. This creates
+neither a general data-access extra nor a registry. During the accepted transition, only Pulp is
+implemented as a package loader; Sugarcane and Tobacco continue to use repository CSV files until
+their resource and consumer patches land.
 
 ## Example transparency
 
@@ -64,10 +66,10 @@ model = PiPLSRegression(n_components=2, predictor_rank=2).fit(X, Y)
 
 The example must not need to parse `metadata.yaml`; that file documents the repository asset.
 
-## Package-owned Pulp dataset
+## Package-owned reference datasets
 
-Decision 0138 defines one specific exception to the repository-CSV example rule. The implemented
-loader exposes:
+Decision 0138 implemented the first named package-owned dataset. Decision 0142 extends the final
+closed set to Pulp, Sugarcane, and Tobacco. The currently implemented loader exposes:
 
 ```python
 from pipls.datasets import load_pulp
@@ -76,14 +78,20 @@ data = load_pulp()
 X, Y = load_pulp(return_X_y=True)
 ```
 
-The loader returns the existing immutable `PiPLSDataset` or fresh read-only arrays from installed
-package resources. It is optional, named, local, and dataset-specific: no registry, download,
-`as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows from it.
-General users and every other real dataset continue to supply `X` and `Y` directly.
+Each named loader returns the existing immutable `PiPLSDataset` or fresh read-only arrays from
+installed package resources. Loaders are optional, local, and dataset-specific: no registry,
+download, `as_frame` mode, pandas/PyYAML runtime dependency, or required loader protocol follows
+from them. General users and every other real dataset continue to supply `X` and `Y` directly.
 
-The loader and package resources are implemented, and every maintained Pulp consumer uses them.
-The package resources are the sole active Pulp matrices. The former repository layout is retained
-only in an excluded `.llm` development archive and is not a loading convention or test fixture.
+`load_pulp()` and its sole active package resources are implemented, and every maintained Pulp
+consumer uses them. `load_sugarcane()` and `load_tobacco()` are accepted targets but are not added
+until Decisions 0142 Patches 3 and 4. Their current repository matrices remain temporary parity
+sources until consumer migration and final duplicate removal.
+
+The final resource directories under `src/pipls/_data/<dataset>/` are intentionally ordinary
+CSV, JSON, README, and license assets. Public documentation must identify their locations in a
+tagged source release, source distribution, wheel, and installed package so programming users in
+R, C++, MATLAB, Julia, or another environment can use the exact loader matrices without Python.
 
 ## Public provenance boundary
 
@@ -147,17 +155,18 @@ layer.
 
 - **Programming user:** reads and prepares `X` and `Y` from their own source.
 - **Estimator API:** validates supplied model matrices and fits Pi-PLS.
-- **Repository dataset integration:** provides consistently named analysis files plus public
-  documentary metadata and provenance.
-- **Examples:** visibly read `X.csv` and `Y.csv` and show all analytical choices that form the
-  matrices.
+- **Package-owned reference integration:** provides one canonical language-neutral resource set,
+  named Python loading, public documentary metadata, provenance, and licenses.
+- **Examples:** use the named loader for a package-owned reference dataset and show all later
+  analytical choices; examples for user-owned data continue to form `X` and `Y` visibly.
 
 ## Prohibited directions
 
 Do not introduce merely for repository examples:
 
 - a public dataset registry;
-- a generic real-data loader; the accepted named `load_pulp()` exception does not authorize one;
+- a generic real-data loader; the accepted named `load_pulp()`, `load_sugarcane()`, and
+  `load_tobacco()` set does not authorize one;
 - automatic downloading;
 - runtime dependence on `metadata.yaml`;
 - hidden example helpers that conceal how `X` and `Y` were formed;

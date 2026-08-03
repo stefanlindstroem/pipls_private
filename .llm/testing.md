@@ -156,17 +156,23 @@ acceptance of non-object metadata arrays, and rejection of object-dtype arrays w
 remain mutable. Git history, review, public provenance, and the dataset documentation remain the
 source of record for documentary contents.
 
-Decision 0138 adds a separate package-owned Pulp contract. Tests protect the named loader's return
-modes, immutable arrays and metadata, stable names and sample identifiers, public provenance,
-pickle reconstruction, resource and canonical-array hashes, clean wheel/source-distribution
-loading, loader ownership by every maintained Pulp consumer, and one active Pulp matrix location.
-Ordinary documentary-metadata tests should still avoid freezing narrative wording.
+Decision 0138 adds the implemented package-owned Pulp contract. Decision 0142 extends the final
+test boundary to Sugarcane and Tobacco through staged patches. For each named loader, tests protect
+return modes, immutable arrays and metadata, stable package sample identifiers, ordered labels,
+public provenance, pickle reconstruction, resource and canonical-array hashes, clean wheel/source-
+distribution loading, maintained-consumer ownership, and one active matrix location. Ordinary
+documentary-metadata tests should still avoid freezing narrative wording.
 
-The `.llm/archive/pulp-repository-layout-v1/` copy is development history only and must be excluded
-from runtime, distributions, served documentation, and active-dataset tests. Do not retain a
-permanent tombstone assertion for the former repository path; use positive package-resource and
-generic active-location checks. Sugarcane and Tobacco continue under the repository-dataset
-readability contract.
+During Patches 3–5, the repository Sugarcane and Tobacco matrices are temporary parity sources and
+tests may require exact equality with the package resources. Patch 6 replaces those temporary
+checks with positive package-resource and generic single-location contracts. The
+`.llm/archive/pulp-repository-layout-v1/` copy remains excluded development history and must never
+enter runtime, distributions, served documentation, or active-dataset tests.
+
+Distribution tests must verify `X.csv`, `Y.csv`, `metadata.json`, `README.md`, and `LICENSE.txt` for
+each implemented package-owned dataset. Final documentation tests should protect discoverable raw-
+file paths and source DOI links without freezing prose or environment-specific `site-packages`
+locations.
 
 Post-analysis inspection tests should verify mathematical identities, shapes, direct-construction
 and pickle invariants, finite-value validation, defensive copying, read-only results, deterministic
@@ -234,10 +240,11 @@ numerical, direct-rendering, and source-distribution execution tests. Protect it
 search/refit call, fitted-value provenance, standardized single-axis plot, and absence of OOF claims;
 do not duplicate Pulp arrays as a second frozen scientific fixture. Do not execute the
 artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
-analyses as duplicate repository scripts. `make examples` is the explicit application-validation target and runs every numbered example,
-including the slower Tobacco analysis. Durable tests instead protect repository dataset
-readability, package-owned Pulp loading and numerical behavior, Pulp, Sugarcane, and Tobacco
-workflow structure, component-path API, conditional predictor-rank extraction at the selected
+analyses as duplicate repository scripts. `make examples` is the explicit application-validation
+target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead
+protect the current repository-dataset transition state, implemented named-loader behavior and
+numerical integrity, and Pulp, Sugarcane, and Tobacco workflow structure. They also protect the
+component-path API, conditional predictor-rank extraction at the selected
 component count, inspection equations, direct rendering from immutable inspection arrays, and
 the immutable ordinary-PLS comparison-helper contract.
 Do not require a universal manifest, universal schema, or shared wide result row across unrelated

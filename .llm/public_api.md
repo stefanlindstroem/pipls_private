@@ -251,12 +251,19 @@ from pipls.datasets import (
 )
 ```
 
-`load_pulp(*, return_X_y=False)` is implemented. It returns `PiPLSDataset` by default and a
-pair of fresh read-only `float64` arrays when `return_X_y=True`. It is backed by installed package
-resources, verifies resource and canonical-array integrity, performs no network access or
-preprocessing, and is exported only from `pipls.datasets`; no `as_frame`, registry, or generic
-loader is authorized. All maintained Pulp consumers use this loader, and the package resources are
-the sole active Pulp matrix representation.
+`load_pulp(*, return_X_y=False)` is implemented. Decision 0142 accepts
+`load_sugarcane(*, return_X_y=False)` and `load_tobacco(*, return_X_y=False)` with the same public
+contract for later patches. Each returns `PiPLSDataset` by default and a pair of fresh read-only
+`float64` arrays when `return_X_y=True`. The loaders are backed by installed package resources,
+verify resource and canonical-array integrity, perform no network access or preprocessing, and are
+exported only from `pipls.datasets`; no `as_frame`, registry, or generic loader is authorized.
+At Patch 1, only Pulp is implemented and has a sole active package representation. Sugarcane and
+Tobacco retain their repository CSV inputs until the resource and consumer-migration patches.
+
+The final `src/pipls/_data/<dataset>/` directories contain ordinary `X.csv`, `Y.csv`,
+`metadata.json`, `README.md`, and `LICENSE.txt` resources. The exact same files are documented for
+language-neutral use from tagged source releases, source distributions, wheels, and installed
+packages.
 
 `PiPLSDataset` is an optional immutable in-memory container, primarily useful for package-owned
 synthetic data and structured experiments. Plain arrays and data frames passed directly to
@@ -299,8 +306,9 @@ selection. Complete grids, comparator pipelines, and paper figure/table orchestr
 downstream publication assets.
 
 No metadata file, registry lookup, or package-owned loader is required for real-data fitting.
-Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Repository examples
-must show these steps directly rather than hiding them behind convenience utilities.
+Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Named reference-dataset
+examples may use their explicit public loaders; user-owned data preparation must still remain
+visible rather than being hidden behind a generic convenience utility.
 
 ## Accepted model-inspection boundary
 

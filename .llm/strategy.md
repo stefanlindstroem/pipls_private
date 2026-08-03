@@ -325,13 +325,15 @@ preparation-only scripts. Before implementation, verify that the exact source ma
 explicit source-level license or permission granting redistribution and adaptation for general
 repository use; public download access alone is insufficient.
 
-Current status: **complete for the current reference suite and licensing audit**. Pulp provides a
-compact named multivariate process dataset; sugarcane adds a 1,721-column regular wavelength grid;
-and tobacco adds 347 samples, 1,557 raw FT-NIR predictors, and 13 responses. Every integration uses
-public provenance, direct `X.csv`/`Y.csv` reading, documentary metadata, and no runtime loader or
-hidden preparation utility. Decision 0033 removed the former Linnerud integration because it no
-longer served a useful package-level example or validation role. Decision 0041 intentionally
-excludes Corn, the legacy Citrination Steel table, SARCOS, and FRED-MD because the exact source
+Current status: **complete for scientific integration and licensing; package-resource migration
+accepted under Decision 0142**. Pulp provides a compact multivariate process dataset; Sugarcane adds
+a 1,721-column regular wavelength grid; and Tobacco adds 347 samples, 1,557 raw FT-NIR predictors,
+and 13 responses. Every integration uses public provenance and no hidden preparation utility. Pulp
+already uses a named package loader; Sugarcane and Tobacco retain direct repository CSV reading
+only until the six-patch package-owned reference-dataset transition is complete. Decision 0033
+removed the former Linnerud integration because it no longer served a useful package-level example
+or validation role. Decision 0041 intentionally excludes Corn, the legacy Citrination Steel table,
+SARCOS, and FRED-MD because the exact source
 materials do not provide sufficiently clear redistribution rights. No legacy dataset remains
 pending.
 
@@ -947,6 +949,28 @@ loading, every maintained Pulp consumer uses the package-owned dataset, and tuto
 identify its resource and canonical-array hashes. The former repository layout is archived under
 `.llm/archive/`, while active tests verify one package-resource matrix location.
 
+### Package-owned reference-dataset transition
+
+Decision 0142 authorizes a six-patch extension of the named package-resource contract:
+
+1. establish the decision and guide-layer target;
+2. generalize private packaged-resource loading while preserving `load_pulp()` exactly;
+3. add Sugarcane resources, `load_sugarcane()`, integrity tests, and distribution checks;
+4. add Tobacco resources, `load_tobacco()`, integrity tests, and distribution checks;
+5. migrate maintained consumers and active documentation to the named loaders;
+6. remove duplicate repository matrices, document language-neutral raw-file access, and verify
+   one active matrix pair per dataset.
+
+The final loaders return immutable `PiPLSDataset` results or fresh read-only `(X, Y)` arrays.
+Their canonical package directories retain ordinary CSV, JSON, README, and license files that are
+documented for use from tagged source releases, source distributions, wheels, installed Python
+environments, and non-Python languages. No registry, downloader, pandas return mode, hidden
+preprocessing, optional data extra, or duplicate active representation is authorized.
+
+Current status: **Patch 1 complete**. Only the decision and guide-layer target change. Source,
+resources, examples, tests, packaging, and public documentation retain the current Pulp-only
+implementation until their assigned later patches.
+
 ### Three-stage user onboarding transition
 
 Decision 0139 authorizes a three-patch documentation and example transition:
@@ -989,12 +1013,13 @@ numerics, tie rules, fitting semantics, or OOF provenance.
 
 ## Current next increment
 
-Resume Decision 0139 Patch 3. Reframe the landing page, tutorials, and path reference around the
-completed search-owned selection vocabulary without reopening the selection API.
+Implement Decision 0142 Patch 2: refactor the Pulp-specific private resource reader into a
+dataset-neutral internal mechanism while preserving the complete public `load_pulp()` contract and
+adding no Sugarcane or Tobacco public loader yet.
 
-
-Decision 0138 is fully implemented and no Pulp dataset-transition increment remains. No generic
-dataset registry, downloader, `as_frame` surface, or compatibility layer is authorized.
+Decision 0139 Patch 3 remains an independent paused documentation increment. Decision 0138 remains
+the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface,
+or compatibility layer is authorized.
 
 Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
 validation splits; final models and selection-conditioned OOF reports are produced only by explicit
