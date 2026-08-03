@@ -184,11 +184,12 @@ report = search.oof_report(X, Y, selection=selection)
 `oof_report()` is optional numerical analysis, not a modeling statement. Fitted-model inspection and
 all rendering follow these retained search and OOF results. Workflows with an external test set may
 omit the OOF report. Validation-only and path-comparison-only examples retain their
-specialized roles and need not construct unused final models. Patches 1 through 6 are complete:
-selection results carry rule and 1-SE reference evidence, refitted models retain `selection_`, and
-`oof_report(selection=...)` owns OOF analysis. All model-producing workflows now implement this
-ordering. The leave-one-out workflow remains model-free, resolves one `best_score` selection, and
-passes it to `oof_report()`. Only former-API removal remains for Patch 7.
+specialized roles and need not construct unused final models. All seven patches are complete.
+Selection results carry rule and 1-SE reference evidence, refitted models retain `selection_`, and
+`oof_report(selection=...)` owns OOF analysis. All
+model-producing workflows implement this ordering. The leave-one-out workflow remains model-free,
+resolves one `best_score` selection, and passes it to `oof_report()`. The former report API has been
+removed without aliases.
 
 Pulp is the canonical manual-selection tutorial analysis. `examples/05_pulp_real_data.py` owns its
 public `load_pulp()` acquisition, visible three-component choice, path-evaluating search, full-data
@@ -487,3 +488,19 @@ state. Explicit `oof_report(selection=...)` reuses the exact materialized splits
 arrays without attaching the report. Validated
 input grids, adaptive batches, candidate counters, search-method echoes, and duplicate direct-rank
 parameter dictionaries are private implementation details.
+
+
+## Accepted pre-release public-surface cleanup
+
+Decision 0144 applies one ownership rule to returned numerical records: expose each quantity through
+the object that owns it. The seven-patch target removes OOF forwarding properties and impossible
+absent-array states, adopts `PiPLSSelection` terminology, removes duplicated fitted-search `best_*`
+state and candidate parameter representations, standardizes `PiPLSDataset` on `X` and `Y`, removes
+unused shape-only inspection properties, and narrows top-level `pipls` exports to estimators and the
+public support warning.
+
+The cleanup retains capabilities with distinct roles. `search.select()` remains the fitting-free
+selection operation; all five numerical inspection helpers remain public; balanced biplot scaling
+factors remain visible; immutable records retain direct-construction and pickle validation; and
+caller-owned Matplotlib rendering remains the plotting boundary. Patch 1 changes only decisions and
+maintainer guidance. OOF-report simplification is the next implementation increment.

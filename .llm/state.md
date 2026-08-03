@@ -585,22 +585,30 @@ structure. The leave-one-out workflow remains selection-only and passes its `bes
 to `oof_report()`. The former report surface has been removed without aliases, and all maintained
 workflows use the final selection-driven interface.
 
+## Pre-release public-surface cleanup transition
+
+Decision 0144 authorizes seven patches that remove duplicated access without removing distinct
+capabilities. The final target simplifies OOF reports, adopts `PiPLSSelection`, removes
+fitted-search `best_*` state and duplicate candidate parameter columns, standardizes package
+datasets on `X` and
+`Y`, removes unused shape-only inspection properties, and narrows top-level result exports.
+
+`search.select()` remains the fitting-free selection operation. All five numerical inspection
+functions, component-path and rank-profile evidence, advanced candidate scores and timings,
+immutable direct-construction validation, biplot scaling factors, and caller-owned plotting remain
+public contracts.
+
+Current status: **Patch 1 complete**. Decision and guide-layer targets are recorded. Source, tests,
+examples, tutorial renderers, and served public documentation remain unchanged.
+
 ## Current next increment
 
-Decision 0139 Patch 3 remains paused until the owner resumes that independent presentation
-increment. No further Decision 0143 implementation work remains.
+Implement Decision 0144 Patch 2: simplify `PiPLSOOFReport` by removing selection-forwarding
+properties, require OOF prediction and count arrays, remove impossible `None` checks from consumers,
+and preserve all OOF numerics, coverage behavior, immutability, and pickle contracts.
 
-Decision 0138 remains fully implemented as the Pulp baseline. `load_pulp()` and the canonical
-package resources are available in clean wheel and source-distribution installations, every
-maintained Pulp consumer uses the loader, and the former repository layout remains excluded
-development history under `.llm/archive/`.
-
-Any unrelated release-preparation work
-requires a separate owner-authorized increment. Block-aware scaling still requires a separate
-owner decision. Corn, the legacy Steel table, SARCOS, and FRED-MD
-remain intentionally outside the repository under Decision 0041. The representative Pulp,
-Sugarcane, and Tobacco analyses remain complete at the current implemented stage, and
-paper-reproduction repositories remain outside this roadmap.
+Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
+other unrelated work still require separate owner decisions.
 
 ## Authority and drift handling
 

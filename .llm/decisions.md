@@ -149,6 +149,7 @@ This index is navigation, not a substitute for those records.
 | `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot the conditional rank profile at the selected component count, including the Tobacco 1-SE result |
 | `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named immutable loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
 | `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain the exact refit selection as `model.selection_`, enrich 1-SE provenance, and replace repeated-rule validation reporting with `oof_report(selection=...)` |
+| `0144-pre-release-public-surface-cleanup.md` | pre-release public-surface cleanup | remove duplicated result access, search aliases, candidate parameter representations, dataset aliases, shape-only properties, and top-level result re-exports while retaining distinct selection, inspection, OOF, and plotting roles |
 
 ## Implemented estimator/search transition
 
@@ -198,10 +199,11 @@ plan contains an earlier or more general proposal:
 - Decision 0138 implemented the first named package-owned `load_pulp()` dataset without network
   access, pandas, a generic registry, or any requirement that users load their own real data
   through the package;
-- Decision 0143 authorizes a seven-patch model-selection provenance and OOF-reporting
-  transition. The target retains the exact refit selection as `model.selection_`, enriches a
-  1-SE selection with its reference minimum and derived threshold, and replaces repeated-rule
-  repeated-rule report calls with `oof_report(selection=...)`; Patch 1 records the target only;
+- Decision 0143 completes the model-selection provenance and OOF-reporting transition:
+  refitted models retain `model.selection_`, one-standard-error selections carry their reference
+  minimum and derived threshold, and OOF diagnostics use `oof_report(selection=...)`;
+- Decision 0144 authorizes a seven-patch pre-release public-surface cleanup. Patch 1 records the
+  target only; source, examples, tests, and served public documentation remain unchanged;
 - Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable

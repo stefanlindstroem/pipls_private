@@ -1041,15 +1041,30 @@ All model-producing workflows and the synthetic and Pulp renderers now
 complete search and refitting before retrieving `model.selection_`, path and rank-profile evidence,
 optional OOF diagnostics, fitted-model inspection results, and rendering.
 
+### Pre-release public-surface cleanup transition
+
+Decision 0144 authorizes seven reviewable patches:
+
+1. establish the decision and guide-layer target;
+2. simplify `PiPLSOOFReport` and remove impossible absent-array handling;
+3. adopt `PiPLSSelection` and `rank_profile.selection` terminology;
+4. remove public fitted-search `best_*` attributes;
+5. remove duplicate candidate parameter representations from `cv_results_`;
+6. remove dataset aliases and unused shape-only inspection properties;
+7. reduce top-level exports, synchronize documentation, audit the final active surface, and close
+   the transition.
+
+The cleanup retains fitting-free `search.select()`, all numerical inspection functions, biplot
+scaling factors, advanced candidate scores and timings, immutable result validation, and
+caller-owned plotting. No alias or deprecation layer is authorized at version `0.0.0`.
+
+Current status: **Patch 1 complete**. Only the decision and normative guide layer are changed.
+
 ## Current next increment
 
-Decision 0139 Patch 3 remains an independent paused documentation increment. Decision 0138 remains
-the fully implemented Pulp baseline. No generic dataset registry, downloader, `as_frame` surface,
-or compatibility layer is authorized. Decision 0143 requires no further implementation work.
-
-Decision 0137 remains fully implemented. Search owns candidate evidence and exact stored
-validation splits; final models and selection-conditioned OOF reports are produced only by explicit
-post-fit operations. That search-lifecycle transition and its workflow audit remain closed.
+Decision 0144 Patch 2 should simplify `PiPLSOOFReport` without changing selection names, fitted
+search state, `cv_results_`, datasets, inspection records, or top-level exports. Decision 0139 Patch
+3 remains paused as an independent documentation increment.
 
 ## Maintenance protocol
 

@@ -454,3 +454,27 @@ pagination through multipage PDFs.
 
 The package exposes no generic real-data I/O, tutorial workflow, predictor-rank-profile plotting
 helper, or component-path plotting helper. The comparison-only `PLSComponentPath` remains example-local.
+
+
+## Accepted pre-release public-surface cleanup
+
+Decision 0144 authorizes a seven-patch reduction of duplicated public access. The current source and
+served API remain unchanged in Patch 1. The final target is:
+
+- `PiPLSOOFReport` owns OOF arrays and coverage only; selection fields are accessed through
+  `report.selection`, and prediction arrays are required;
+- `PiPLSComponentResult` becomes `PiPLSSelection`, and predictor-rank profiles expose
+  `profile.selection`;
+- fitted-search `best_*` attributes are replaced by `search.select(rule="best_score")`;
+- `cv_results_` keeps stable `n_components` and `predictor_rank` columns but removes duplicated
+  `params` and pipeline-prefixed `param_*` representations;
+- `PiPLSDataset` uses `X` and `Y` without `data` and `target` aliases;
+- unused shape-only inspection properties are removed while component-count properties and all five
+  inspection functions remain;
+- top-level `pipls` retains `PiPLSRegression`, `PiPLSSearchCV`, and
+  `PredictorRankSupportWarning`; result types remain public from focused modules.
+
+`search.select()` remains public for selection without fitting. After refitting, the canonical
+selection is `model.selection_`. Direct-construction validation, immutable result safety,
+`component_path_`, predictor-rank profiles, advanced candidate data, and caller-owned plotting are
+retained.

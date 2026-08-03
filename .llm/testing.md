@@ -147,6 +147,31 @@ manual synthetic, Pulp, and Sugarcane workflows and both tutorial renderers: no 
 diagnostics are required, modeling-before-analysis order, and rendering after all numerical results
 are complete.
 
+
+## Pre-release public-surface cleanup transition
+
+Decision 0144 removes duplicate access paths without changing numerical algorithms. Across seven
+patches, focused tests must protect:
+
+- required OOF prediction and count arrays, report immutability, partial coverage, repeated CV,
+  leave-one-out behavior, and access to selection fields only through `report.selection`;
+- complete `PiPLSSelection` terminology across search, model, rank profile, report, typing,
+  construction, and pickle contracts;
+- unchanged best-score tie rules and refit/OOF numerics after removal of public fitted-search
+  `best_*` attributes;
+- stable candidate-level scores, ranks, split values, MSE fields, and timings after removing
+  duplicate `params` and `param_*` columns;
+- `PiPLSDataset.X` and `.Y`, loader equality, immutability, distribution resources, and migrated
+  maintained consumers after removal of `data` and `target` aliases;
+- retained component-count properties and equations after removal of unused shape-only inspection
+  properties;
+- focused-module availability of result classes after their top-level re-exports are removed;
+- retained fitting-free `search.select()`, every public inspection function, biplot scaling factors,
+  direct-construction validation, and caller-owned rendering.
+
+Use positive surface tests and compact active-surface audits rather than one tombstone test per
+removed name. Patch 1 changes no executable contract and therefore adds no runtime test.
+
 ## Three-stage onboarding transition
 
 Decision 0139 introduces staged presentation contracts rather than package behavior. Patch 2 now

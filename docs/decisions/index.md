@@ -162,3 +162,4 @@ reference describe the current public behavior directly.
 - [0126: historical-removal test policy](0126-historical-removal-test-policy.md)
 - [0127: artifact-based rendering validation](0127-artifact-based-rendering-validation.md)
 - [0128: same-file rendering functions](0128-same-file-rendering-functions.md)
+- [0144: pre-release public-surface cleanup](0144-pre-release-public-surface-cleanup.md)
