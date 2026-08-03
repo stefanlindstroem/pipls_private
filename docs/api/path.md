@@ -12,7 +12,8 @@ search object caps the path by the minimum predictor rank verified across those 
 `PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Explicit post-fit
 `search.select(...)` returns one immutable stored component-path row without fitting.
 `search.refit(X, Y, ...)` resolves the same row, clones the configured estimator or pipeline, fits
-that clone, and returns it. `search.validation_report(X, Y, ...)` selects a row through the same
+that clone, attaches the exact immutable row as `model.selection_`, and returns the model.
+`search.validation_report(X, Y, ...)` selects a row through the same
 rules and produces ordered OOF
 diagnostics from the exact validation splits materialized by `fit()`. The search object does not
 delegate model methods or retain the returned estimator or supplied training matrices.
@@ -38,6 +39,7 @@ response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 | Both ranks are already known | Fit `PiPLSRegression` directly |
 | Inspect one selected row without fitting | Call `search.select(rule=... or n_components=h)` |
 | Choose a component count after inspecting the path | Call `search.refit(X, Y, n_components=h)` |
+| Inspect the exact row used by a refitted model | Read `model.selection_` |
 | Apply an automatic final rule | Call `search.refit(X, Y, rule=...)` after path evaluation |
 | Inspect OOF diagnostics for one selected row | Call `search.validation_report(X, Y, rule=... or n_components=h)` |
 
@@ -61,10 +63,11 @@ model = search.refit(
     Y,
     n_components=CHOSEN_N_COMPONENTS,
 )
+selected = model.selection_
 ```
 
-This example shows the executable selection-to-fit contract. `select()` is optional and useful for
-annotations or reports; `refit()` resolves the same stored row internally. The
+This example shows the executable selection-to-fit contract. `select()` remains optional for
+selection-only inspection; a refitted model exposes the exact row it used through `selection_`. The
 [synthetic tutorial](../tutorials/synthetic.md#evaluate-the-component-path) explains how to inspect
 and interpret the component path before making the application-specific choice.
 

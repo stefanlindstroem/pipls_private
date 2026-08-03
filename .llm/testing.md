@@ -136,8 +136,11 @@ OOF numerics. Across its seven patches, tests must protect:
 Patch 2 adds executable selection provenance. Focused tests protect direct construction,
 normalization, immutability, nested-result pickle stability, exact minimum ties, minimum-row
 standard-error use, smallest eligible count, exact threshold boundaries, nonfinite thresholds,
-unchanged search state, and propagation into the current validation report. Refit and OOF-report
-ownership remain assigned to later patches.
+unchanged search state, and propagation into the current validation report. Patch 3 additionally
+protects `model.selection_` for manual and named-rule direct refits, outer-pipeline ownership,
+equality with search and report selections, post-fit attachment, model pickle stability, clone
+cleanup, direct-fit absence, output configuration, and unchanged search state. OOF-report ownership
+remains assigned to Patch 4.
 
 ## Three-stage onboarding transition
 

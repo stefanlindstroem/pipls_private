@@ -539,7 +539,9 @@ class PiPLSSearchCV(
         Returns
         -------
         estimator
-            Fitted clone of the configured direct estimator or pipeline.
+            Fitted clone of the configured direct estimator or pipeline. The
+            returned outer estimator exposes the exact immutable selected row as
+            ``selection_``.
 
         Raises
         ------
@@ -552,9 +554,11 @@ class PiPLSSearchCV(
         Notes
         -----
         The search object is not mutated and does not retain ``X``, ``y``, or
-        the returned estimator. For an exact manually specified
-        ``(n_components, predictor_rank)`` pair, fit
-        :class:`pipls.PiPLSRegression` directly.
+        the returned estimator. ``selection_`` is attached only after the
+        full-data fit succeeds. A :class:`pipls.PiPLSRegression` fitted directly
+        through :meth:`~pipls.PiPLSRegression.fit` has no selection provenance.
+        For an exact manually specified ``(n_components, predictor_rank)`` pair,
+        fit :class:`pipls.PiPLSRegression` directly.
         """
 
         selected = self._resolve_selection_result(
@@ -575,6 +579,7 @@ class PiPLSSearchCV(
             }
         )
         _fit_path_estimator(estimator, X, y)
+        estimator.selection_ = selected
         return estimator
 
     def validation_report(

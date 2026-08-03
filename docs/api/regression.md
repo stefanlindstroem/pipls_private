@@ -26,6 +26,21 @@ For the normal path-selection workflow, begin with the
 fixed. Common fit and data problems are summarized in
 [Troubleshooting](../troubleshooting.md).
 
+## Selection provenance on refitted models
+
+A model returned by `PiPLSSearchCV.refit()` exposes the exact immutable component-path selection
+that configured it:
+
+```python
+search = PiPLSSearchCV().fit(X, Y)
+model = search.refit(X, Y, rule="one_standard_error")
+selection = model.selection_
+```
+
+For a pipeline template, `selection_` belongs to the returned outer pipeline. The terminal
+`PiPLSRegression` step remains an ordinary fixed-pair estimator. A `PiPLSRegression` fitted directly
+through `fit()` has no `selection_` because no search selection occurred.
+
 ## Preprocessing and fit safety
 
 Every fit centers predictors and responses using statistics learned from that fit's training data.

@@ -142,9 +142,10 @@ model = search.refit(X, y, n_components=4)
 `"best_score"`, `"minimum_cv_mse"`, and `"one_standard_error"`. Manual component selection uses the
 predictor rank already selected conditionally for that component-path row. The method clones the
 configured direct estimator or terminal-Pi-PLS pipeline, fits that clone on the supplied full data,
-and returns it. It does not mutate the search, retain the supplied data, or attach the returned model
-to search state. Exact manual `(n_components, predictor_rank)` pairs are fitted directly with
-`PiPLSRegression`.
+and returns it. After a successful fit, the returned outer estimator exposes the exact immutable
+row as `model.selection_`. The attribute is not duplicated on a terminal pipeline step. The method
+does not mutate the search, retain the supplied data, or attach the returned model to search state.
+Exact manual `(n_components, predictor_rank)` pairs are fitted directly with `PiPLSRegression`.
 
 The default `scoring` value is the stable package string
 `"neg_response_standardized_mse"`, which resolves to the public callable
@@ -214,11 +215,12 @@ full-data refitting before retrieving selection, path, rank-profile, OOF, fitted
 evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
 `oof_report()`.
 
-Patches 1 and 2 are complete. `PiPLSComponentResult` now implements `rule`,
-`reference_minimum`, and the derived `one_standard_error_threshold`. The current source and served
-report API remain `validation_report(...)` and `PiPLSValidationReport`, and refitted models still
-lack `selection_` until the assigned patches. No compatibility alias is authorized in the final
-state.
+Patches 1 through 3 are complete. `PiPLSComponentResult` implements `rule`,
+`reference_minimum`, and the derived `one_standard_error_threshold`, and every successful refit
+result exposes the exact resolved selection as `model.selection_`. Directly fitted
+`PiPLSRegression` instances remain provenance-free. The current source and served report API remain
+`validation_report(...)` and `PiPLSValidationReport` until their assigned patches. No compatibility
+alias is authorized in the final state.
 
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable

@@ -303,6 +303,8 @@ def test_refit_returns_pipeline_without_flattening_coefficients() -> None:
 
     assert isinstance(model, Pipeline)
     assert isinstance(model.named_steps["regression"], PiPLSRegression)
+    assert model.selection_ == search.select(n_components=2)
+    assert not hasattr(model.named_steps["regression"], "selection_")
     assert not hasattr(search, "coef_")
     assert not hasattr(search, "selected_estimator_")
 
@@ -330,6 +332,10 @@ def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
     selected_pipls = model.named_steps["regression"]
     assert selected_pipls.n_components == expected.n_components
     assert selected_pipls.predictor_rank == expected.predictor_rank
+    assert model.selection_ == expected
+    assert model.selection_.reference_minimum == search.select(
+        rule="minimum_cv_mse"
+    )
     assert model.predict(X).shape == Y.shape
 
 

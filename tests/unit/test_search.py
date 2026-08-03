@@ -6,7 +6,7 @@ from dataclasses import FrozenInstanceError
 
 import numpy as np
 import pytest
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -566,6 +566,7 @@ def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     assert model.predictor_rank == search.best_predictor_rank_
     assert hasattr(model, "coef_")
     assert model.predict(X).shape == Y.shape
+    assert model.selection_ == search.select(rule="best_score")
     assert not hasattr(search, "selected_estimator_")
     assert not hasattr(search, "selected_pipls_")
 
@@ -586,6 +587,8 @@ def test_post_fit_refit_supports_manual_component_selection() -> None:
     assert isinstance(model, PiPLSRegression)
     assert model.n_components == expected.n_components
     assert model.predictor_rank == expected.predictor_rank
+    assert model.selection_ == expected
+    assert model.selection_.rule is None
 
 
 def test_post_fit_refit_supports_component_path_rules() -> None:
@@ -607,6 +610,8 @@ def test_post_fit_refit_supports_component_path_rules() -> None:
         assert isinstance(model, PiPLSRegression)
         assert model.n_components == expected.n_components
         assert model.predictor_rank == expected.predictor_rank
+        assert model.selection_ == expected
+        assert model.selection_.rule == rule
 
 
 def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> None:
@@ -671,6 +676,8 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
     assert report.selected_result.one_standard_error_threshold is not None
     assert model.n_components == expected.n_components
     assert model.predictor_rank == expected.predictor_rank
+    assert model.selection_ == expected
+    assert model.selection_ == report.selected_result
     for name in ("selected_result_", "selected_params_", "validation_report_"):
         assert not hasattr(search, name)
 
@@ -728,6 +735,48 @@ def test_post_fit_refit_does_not_mutate_search_state() -> None:
     search.refit(X, Y, n_components=1)
 
     assert pickle.dumps(search) == before
+
+
+def test_refitted_model_selection_is_pickle_stable_and_not_cloned() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    model = search.refit(X, Y, rule="one_standard_error")
+    restored = pickle.loads(pickle.dumps(model))
+    cloned = clone(model)
+
+    assert restored.selection_ == model.selection_
+    assert restored.selection_.reference_minimum == search.select(
+        rule="minimum_cv_mse"
+    )
+    assert not hasattr(cloned, "selection_")
+
+
+def test_refit_attaches_selection_only_after_successful_fit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        cv=3,
+    ).fit(X, Y)
+
+    def fail_fit(estimator: object, X_fit: object, y_fit: object) -> None:
+        del X_fit, y_fit
+        assert not hasattr(estimator, "selection_")
+        raise RuntimeError("intentional refit failure")
+
+    monkeypatch.setattr("pipls.search._fit_path_estimator", fail_fit)
+
+    with pytest.raises(RuntimeError, match="intentional refit failure"):
+        search.refit(X, Y, n_components=1)
 
 
 def test_failed_post_fit_refit_leaves_search_state_unchanged() -> None:

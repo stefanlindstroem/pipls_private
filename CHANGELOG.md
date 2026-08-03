@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Retain the exact immutable selected component-path row as `model.selection_` on every successful
+  `PiPLSSearchCV.refit()` result. Attach provenance only after the full-data fit succeeds, keep it on
+  the returned outer pipeline when pipelines are used, preserve search non-mutation, and leave
+  directly fitted `PiPLSRegression` instances without selection provenance.
 - Enrich `PiPLSComponentResult` with immutable selection-rule provenance. Named selections now
   record `rule`; one-standard-error selections retain the exact minimum-CV-MSE result as
   `reference_minimum` and derive `one_standard_error_threshold` without duplicating threshold
