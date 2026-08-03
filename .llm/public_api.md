@@ -226,9 +226,10 @@ The former report API has been removed without compatibility aliases.
 Public path attributes include standard candidate-level search results in `cv_results_`, global
 `best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
 component-path result. The search stores no selected row, OOF report, or fitted final model.
-`PiPLSOOFReport` composes one immutable selection; its `n_components`, `predictor_rank`, `n_splits`, `mean_test_score`, and
-`cv_mse_mean` properties forward to that selection rather than duplicating state.
-`has_complete_oof_coverage` exposes row coverage. The former report surface has been removed without aliases.
+`PiPLSOOFReport` composes one immutable selection and owns required ordered OOF predictions,
+required prediction counts, coverage, leave-one-out provenance, and optional pooled OOF $R^2$.
+Selection metrics are accessed through `report.selection`; `has_complete_oof_coverage` exposes row
+coverage. The former report surface has been removed without aliases.
 
 Validated input grids, adaptive-search batch history, candidate counters, direct-rank parameter
 aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and supplied training matrices
@@ -458,8 +459,9 @@ helper, or component-path plotting helper. The comparison-only `PLSComponentPath
 
 ## Accepted pre-release public-surface cleanup
 
-Decision 0144 authorizes a seven-patch reduction of duplicated public access. The current source and
-served API remain unchanged in Patch 1. The final target is:
+Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1 and 2 are
+complete: the target is recorded, and OOF reports now own required OOF arrays and coverage while
+selection metrics remain on `report.selection`. The remaining target is:
 
 - `PiPLSOOFReport` owns OOF arrays and coverage only; selection fields are accessed through
   `report.selection`, and prediction arrays are required;

@@ -40,7 +40,6 @@ def pulp_result() -> SimpleNamespace:
         Y,
         selection=selected,
     )
-    assert report.oof_predictions is not None
     oof_predictions = report.oof_predictions
     factors = pipls_display_factors(
         model.decomposition_,

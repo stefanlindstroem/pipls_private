@@ -52,8 +52,6 @@ report = search.oof_report(
     Y,
     selection=selection,
 )
-if report.oof_predictions is None:
-    raise RuntimeError("OOF reporting did not produce predictions.")
 oof_predictions = report.oof_predictions
 # --8<-- [end:pulp-oof-predictions]
 

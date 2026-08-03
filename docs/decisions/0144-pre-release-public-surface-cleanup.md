@@ -263,9 +263,11 @@ deprecation warnings, or compatibility shims are introduced.
 
 ## Implementation status
 
-Patch 1 records the accepted target in the decision and guide layer. The implemented source and
-served public documentation remain unchanged. Patch 2 should next simplify `PiPLSOOFReport` without
-renaming selection types or changing search state.
+Patches 1 and 2 are complete. The decision and guide-layer target are recorded, and
+`PiPLSOOFReport` now requires OOF prediction and count arrays while exposing selection metrics only
+through `report.selection`. Maintained consumers contain no impossible absent-prediction checks.
+Patch 3 should next adopt `PiPLSSelection` and rank-profile `selection` terminology without changing
+search numerics.
 
 This decision refines Decisions 0051, 0052, 0071, 0072, 0086, 0087, 0090, 0094, 0111, 0116, 0129,
 0134, 0138, 0140, and 0143. It preserves their numerical, immutability, direct-construction,

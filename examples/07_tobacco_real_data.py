@@ -434,8 +434,6 @@ def main() -> None:
     display_components = tuple(
         range(min(DISPLAY_COMPONENT_COUNT, selection.n_components))
     )
-    if report.oof_predictions is None:
-        raise RuntimeError("OOF reporting did not produce predictions.")
     oof_predictions = report.oof_predictions
 
     # Calculate immutable fitted-model and prediction inspection results.

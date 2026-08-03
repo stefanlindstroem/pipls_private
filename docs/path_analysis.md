@@ -162,7 +162,7 @@ parameterization once per stored training fold, and returns an immutable report:
 - `oof_predictions` preserves input row order;
 - repeated validation predictions are averaged and their counts are recorded;
 - rows without validation coverage have count 0 and a NaN prediction;
-- `n_components` and `predictor_rank` remain convenient views of the selection;
+- selection metrics remain available through `report.selection`;
 - `pooled_oof_r2` uses only rows with OOF coverage.
 
 `fit()` stores defensive read-only copies of the exact materialized validation indices. Therefore an

@@ -321,8 +321,6 @@ def main() -> None:
         Y,
         selection=selection,
     )
-    if report.oof_predictions is None:
-        raise RuntimeError("OOF reporting did not produce predictions.")
     oof_predictions = report.oof_predictions
 
     # Calculate fitted-model and prediction inspection results.

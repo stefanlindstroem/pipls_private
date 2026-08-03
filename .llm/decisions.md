@@ -202,8 +202,9 @@ plan contains an earlier or more general proposal:
 - Decision 0143 completes the model-selection provenance and OOF-reporting transition:
   refitted models retain `model.selection_`, one-standard-error selections carry their reference
   minimum and derived threshold, and OOF diagnostics use `oof_report(selection=...)`;
-- Decision 0144 authorizes a seven-patch pre-release public-surface cleanup. Patch 1 records the
-  target only; source, examples, tests, and served public documentation remain unchanged;
+- Decision 0144 authorizes a seven-patch pre-release public-surface cleanup. Patches 1 and 2 record
+  the target and simplify OOF reports to required prediction/count arrays with selection metrics
+  accessed through `report.selection`;
 - Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable

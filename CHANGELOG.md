@@ -4,6 +4,9 @@
 
 ### Repository
 
+- Simplify `PiPLSOOFReport`: require ordered OOF predictions and prediction counts, remove
+  selection-forwarding properties, access selection metrics through `report.selection`, and remove
+  impossible absent-array checks without changing OOF numerics.
 - Complete the model-selection provenance and OOF-reporting transition: remove the pre-release
   report method and result type without aliases, retain all ordered-OOF numerical contracts under
   `oof_report(selection=...)` and `PiPLSOOFReport`, and normalize the final API, tests, and

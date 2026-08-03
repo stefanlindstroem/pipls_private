@@ -366,15 +366,8 @@ def test_oof_report_normalizes_and_freezes_arrays() -> None:
     )
 
     assert report.selection == selection
-    assert type(report.n_components) is int
-    assert type(report.predictor_rank) is int
-    assert type(report.n_splits) is int
-    assert type(report.mean_test_score) is float
-    assert type(report.cv_mse_mean) is float
     assert type(report.has_complete_oof_coverage) is bool
     assert type(report.is_leave_one_out) is bool
-    assert report.oof_predictions is not None
-    assert report.oof_prediction_counts is not None
     assert not report.oof_predictions.flags.writeable
     assert not report.oof_prediction_counts.flags.writeable
     assert not report.has_complete_oof_coverage
@@ -382,7 +375,6 @@ def test_oof_report_normalizes_and_freezes_arrays() -> None:
     restored = pickle.loads(pickle.dumps(report))
     assert isinstance(restored, PiPLSOOFReport)
     assert restored.selection == report.selection
-    assert restored.oof_predictions is not None
     assert not restored.oof_predictions.flags.writeable
     np.testing.assert_array_equal(
         restored.oof_prediction_counts,
@@ -395,6 +387,8 @@ def test_oof_report_requires_component_result() -> None:
         PiPLSOOFReport(
             selection=object(),  # type: ignore[arg-type]
             is_leave_one_out=False,
+            oof_predictions=[1.0, 2.0],  # type: ignore[arg-type]
+            oof_prediction_counts=[1, 1],  # type: ignore[arg-type]
         )
 
 
@@ -403,8 +397,20 @@ def test_oof_report_enforces_oof_coverage_representation() -> None:
         "selection": _validation_result(),
         "is_leave_one_out": False,
     }
-    with pytest.raises(ValueError, match="required"):
-        PiPLSOOFReport(**kwargs, oof_predictions=[1.0, 2.0])
+    with pytest.raises(TypeError):
+        PiPLSOOFReport(**kwargs)
+    with pytest.raises(ValueError, match="oof_predictions are required"):
+        PiPLSOOFReport(
+            **kwargs,
+            oof_predictions=None,  # type: ignore[arg-type]
+            oof_prediction_counts=[1, 1],  # type: ignore[arg-type]
+        )
+    with pytest.raises(ValueError, match="oof_prediction_counts are required"):
+        PiPLSOOFReport(
+            **kwargs,
+            oof_predictions=[1.0, 2.0],  # type: ignore[arg-type]
+            oof_prediction_counts=None,  # type: ignore[arg-type]
+        )
     with pytest.raises(ValueError, match="nonnegative"):
         PiPLSOOFReport(
             **kwargs,

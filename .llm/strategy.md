@@ -800,11 +800,11 @@ Current status: **normalized path-result simplification complete**.
 
 ### Composed validation-report state simplification
 
-Decision 0116 made one immutable `PiPLSComponentResult` authoritative for report selection. The
-current `PiPLSOOFReport` preserves component-count, predictor-rank, split-count, score, and CV-MSE
-names as properties and retains report-owned OOF coverage and provenance state.
+Decision 0116 made one immutable `PiPLSComponentResult` authoritative for report selection.
+Decision 0144 later removes selection-forwarding properties: `PiPLSOOFReport` owns required OOF
+arrays, coverage, and provenance, while selection metrics remain on `report.selection`.
 
-Current status: **composed validation-report simplification complete**.
+Current status: **composed validation-report simplification refined by Decision 0144 Patch 2**.
 
 ### Post-series audit cleanup
 
@@ -1058,13 +1058,14 @@ The cleanup retains fitting-free `search.select()`, all numerical inspection fun
 scaling factors, advanced candidate scores and timings, immutable result validation, and
 caller-owned plotting. No alias or deprecation layer is authorized at version `0.0.0`.
 
-Current status: **Patch 1 complete**. Only the decision and normative guide layer are changed.
+Current status: **Patches 1 and 2 complete**. OOF reports require prediction and count arrays, expose
+selection metrics only through `report.selection`, and retain unchanged OOF numerics and coverage.
 
 ## Current next increment
 
-Decision 0144 Patch 2 should simplify `PiPLSOOFReport` without changing selection names, fitted
-search state, `cv_results_`, datasets, inspection records, or top-level exports. Decision 0139 Patch
-3 remains paused as an independent documentation increment.
+Decision 0144 Patch 3 should adopt `PiPLSSelection` and `rank_profile.selection` terminology without
+changing fitted search state, `cv_results_`, datasets, inspection records, or top-level exports.
+Decision 0139 Patch 3 remains paused as an independent documentation increment.
 
 ## Maintenance protocol
 

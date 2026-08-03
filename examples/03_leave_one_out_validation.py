@@ -30,20 +30,20 @@ search = PiPLSSearchCV(
 
 selection = search.select(rule="best_score")
 report = search.oof_report(data.X, data.Y, selection=selection)
-if report.oof_predictions is None or report.pooled_oof_r2 is None:
-    raise RuntimeError("Leave-one-out validation did not produce complete OOF diagnostics.")
+if report.pooled_oof_r2 is None:
+    raise RuntimeError("Leave-one-out validation did not produce pooled OOF R2.")
 
 print(f"Observations: {data.n_samples}")
-print(f"Leave-one-out splits: {report.n_splits}")
+print(f"Leave-one-out splits: {selection.n_splits}")
 print(
     "Selected pair: "
-    f"n_components={report.n_components}, predictor_rank={report.predictor_rank}"
+    f"n_components={selection.n_components}, predictor_rank={selection.predictor_rank}"
 )
 print(f"Complete OOF coverage: {report.has_complete_oof_coverage}")
 print(f"OOF prediction shape: {report.oof_predictions.shape}")
 print(
     "Mean response-standardized CV-MSE: "
-    f"{report.cv_mse_mean:.4f}"
+    f"{selection.cv_mse_mean:.4f}"
 )
 print(
     "Pooled OOF R2 (not mean foldwise R2): "

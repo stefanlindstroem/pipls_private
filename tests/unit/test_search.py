@@ -1044,7 +1044,6 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_post_fit_ref
     assert search.best_predictor_rank_ == 4
     assert isinstance(model, PiPLSRegression)
     assert model.predictor_rank_ == 4
-    assert report.oof_prediction_counts is not None
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
 
 
@@ -1300,8 +1299,6 @@ def test_oof_report_uses_existing_model_selection() -> None:
         rule="minimum_cv_mse"
     )
     assert report.selection.one_standard_error_threshold is not None
-    assert report.oof_predictions is not None
-    assert report.oof_prediction_counts is not None
     assert pickle.dumps(search) == before
 
 

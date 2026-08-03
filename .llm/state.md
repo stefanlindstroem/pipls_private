@@ -385,9 +385,9 @@ only.
 The six owner-authorized simplifications are complete. Search inputs are resolved once;
 decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction
 diagnostics are derived from independent state; path-wide metadata and profile selection are not
-duplicated; and `PiPLSOOFReport` composes an immutable `PiPLSComponentResult` while preserving
-its convenience properties. No package release preparation or Python-package publication
-work is authorized.
+duplicated; and `PiPLSOOFReport` composes an immutable `PiPLSComponentResult` while keeping
+selection metrics on `report.selection`. No package release preparation or Python-package
+publication work is authorized.
 A follow-up behavior-preserving audit cleanup removes the now-unused private finite-vector
 inspection helper and the no-op reassignment of the already validated selected result.
 
@@ -598,14 +598,16 @@ functions, component-path and rank-profile evidence, advanced candidate scores a
 immutable direct-construction validation, biplot scaling factors, and caller-owned plotting remain
 public contracts.
 
-Current status: **Patch 1 complete**. Decision and guide-layer targets are recorded. Source, tests,
-examples, tutorial renderers, and served public documentation remain unchanged.
+Current status: **Patches 1 and 2 complete**. `PiPLSOOFReport` requires OOF prediction and count
+arrays, exposes selection metrics only through `report.selection`, and preserves all OOF numerics,
+coverage behavior, immutability, and pickle contracts. Maintained consumers contain no impossible
+absent-array checks.
 
 ## Current next increment
 
-Implement Decision 0144 Patch 2: simplify `PiPLSOOFReport` by removing selection-forwarding
-properties, require OOF prediction and count arrays, remove impossible `None` checks from consumers,
-and preserve all OOF numerics, coverage behavior, immutability, and pickle contracts.
+Implement Decision 0144 Patch 3: rename `PiPLSComponentResult` to `PiPLSSelection` and
+`PiPLSPredictorRankProfile.selected_result` to `selection` without changing search numerics, result
+immutability, or workflow behavior.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

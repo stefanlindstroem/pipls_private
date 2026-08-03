@@ -26,7 +26,7 @@ def _validated_oof_fields(
     oof_predictions: object,
     oof_prediction_counts: object,
     pooled_oof_r2: object,
-) -> tuple[bool, FloatArray | None, IntArray | None, float | None]:
+) -> tuple[bool, FloatArray, IntArray, float | None]:
     """Normalize common immutable OOF report fields."""
 
     leave_one_out = _boolean(is_leave_one_out, name="is_leave_one_out")
@@ -36,15 +36,10 @@ def _validated_oof_fields(
         else _finite_float(pooled_oof_r2, name="pooled_oof_r2")
     )
 
-    predictions: FloatArray | None = None
-    counts: IntArray | None = None
     if oof_predictions is None:
-        if oof_prediction_counts is not None or pooled is not None:
-            raise ValueError("OOF counts and pooled OOF R2 require oof_predictions.")
-        return leave_one_out, predictions, counts, pooled
-
+        raise ValueError("oof_predictions are required.")
     if oof_prediction_counts is None:
-        raise ValueError("oof_prediction_counts are required with oof_predictions.")
+        raise ValueError("oof_prediction_counts are required.")
     predictions = _read_only_float_array(
         cast(ArrayLike, oof_predictions),
         name="oof_predictions",
@@ -93,12 +88,12 @@ class PiPLSOOFReport:
         Exact immutable selection evaluated by the report.
     is_leave_one_out : bool
         Whether the materialized splitter is leave-one-out.
-    oof_predictions : ndarray or None, default=None
+    oof_predictions : ndarray
         Ordered OOF predictions. One-dimensional responses produce shape
         ``(n_samples,)``; multi-output responses produce
         ``(n_samples, n_targets)``. Covered rows are finite; uncovered rows are
         represented entirely by NaN.
-    oof_prediction_counts : ndarray of shape (n_samples,) or None, default=None
+    oof_prediction_counts : ndarray of shape (n_samples,)
         Nonnegative number of validation predictions contributing to each OOF row.
     pooled_oof_r2 : float or None, default=None
         Finite pooled $R^2$ over rows with OOF coverage.
@@ -113,8 +108,8 @@ class PiPLSOOFReport:
 
     selection: PiPLSComponentResult
     is_leave_one_out: bool
-    oof_predictions: FloatArray | None = None
-    oof_prediction_counts: IntArray | None = None
+    oof_predictions: FloatArray
+    oof_prediction_counts: IntArray
     pooled_oof_r2: float | None = None
 
     def __post_init__(self) -> None:
@@ -146,38 +141,7 @@ class PiPLSOOFReport:
         )
 
     @property
-    def n_components(self) -> int:
-        """Number of paired latent modes represented by the report."""
-
-        return self.selection.n_components
-
-    @property
-    def predictor_rank(self) -> int:
-        """Predictor rank represented by the report."""
-
-        return self.selection.predictor_rank
-
-    @property
-    def n_splits(self) -> int:
-        """Number of cross-validation splits."""
-
-        return self.selection.n_splits
-
-    @property
-    def mean_test_score(self) -> float:
-        """Mean configured test score."""
-
-        return self.selection.mean_test_score
-
-    @property
-    def cv_mse_mean(self) -> float:
-        """Mean response-standardized validation MSE."""
-
-        return self.selection.cv_mse_mean
-
-    @property
     def has_complete_oof_coverage(self) -> bool:
         """Whether every input row received at least one validation prediction."""
 
-        counts = self.oof_prediction_counts
-        return counts is not None and bool(np.all(counts > 0))
+        return bool(np.all(self.oof_prediction_counts > 0))

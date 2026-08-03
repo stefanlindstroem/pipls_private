@@ -170,7 +170,9 @@ patches, focused tests must protect:
   direct-construction validation, and caller-owned rendering.
 
 Use positive surface tests and compact active-surface audits rather than one tombstone test per
-removed name. Patch 1 changes no executable contract and therefore adds no runtime test.
+removed name. Patch 1 changes no executable contract. Patch 2 protects required OOF arrays, direct
+construction, read-only copies, pickling, repeated CV, partial coverage, one-dimensional responses,
+leave-one-out provenance, and unchanged OOF numerics after forwarding-property removal.
 
 ## Three-stage onboarding transition
 

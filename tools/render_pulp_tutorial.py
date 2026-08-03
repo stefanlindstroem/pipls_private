@@ -180,8 +180,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         Y,
         selection=selection,
     )
-    if report.oof_predictions is None:
-        raise RuntimeError("OOF reporting did not produce predictions.")
     oof_predictions = report.oof_predictions
     factors = pipls_display_factors(
         model.decomposition_,
