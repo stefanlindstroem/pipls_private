@@ -76,7 +76,9 @@ def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespac
     assert result.selected.predictor_rank == 9
     assert isinstance(result.model, PiPLSRegression)
     assert result.model.n_components == 3
-    assert result.model.predictor_rank_ == 9
+    assert result.model.predictor_rank == 9
+    assert result.model.selection_.predictor_rank == 9
+    assert not hasattr(result.model, "predictor_rank_")
 
 
 def test_pulp_rank_profile_exposes_the_interior_selection(

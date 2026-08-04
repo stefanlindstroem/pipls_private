@@ -73,8 +73,6 @@ class PiPLSRegression(
         names are strings.
     n_targets_ : int
         Number of response columns seen during fitting.
-    predictor_rank_ : int
-        Predictor rank used by the fitted model.
     max_predictor_rank_ : int
         Algebraic upper bound ``min(n_features_in_, n_samples - 1)`` for the
         fitted data.
@@ -503,7 +501,6 @@ class PiPLSRegression(
             )
 
         _require_finite_core_result(result)
-        self.predictor_rank_ = predictor_rank
         self.max_predictor_rank_ = max_predictor_rank
         self.decomposition_ = PiPLSDecomposition._from_core_result(result)
         self.x_rotations_ = self.decomposition_.predictor_directions

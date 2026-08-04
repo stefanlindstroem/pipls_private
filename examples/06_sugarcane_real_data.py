@@ -368,7 +368,7 @@ def main() -> None:
     print(f"X shape: {X.shape}; Y shape: {Y.shape}")
     print(
         "Selected Pi-PLS: "
-        f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
+        f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
     )
     print(
         "Predictor-rank profile: "

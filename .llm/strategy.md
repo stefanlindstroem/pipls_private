@@ -1072,7 +1072,7 @@ remain public from focused modules.
 Decision 0145 authorizes four reviewable patches:
 
 1. establish the decision and guide-layer contract;
-2. remove `cv_n_train_min_` and `predictor_rank_` while preserving fitted behavior and numerics;
+2. remove `cv_n_train_min_` and `predictor_rank_` while preserving fitted behavior and numerics — complete;
 3. privatize `model_selection.py`, remove `PiPLSCoreResult.predict()`, and remove the constant OOF
    operation-name parameter;
 4. add exact module export declarations, correct tutorial wording, synchronize documentation, run
@@ -1082,11 +1082,11 @@ The cleanup retains `search.select()`, `model.selection_`, learned search state,
 inspection functions, model-selection algorithms, OOF reporting, and caller-owned plotting. No alias
 or deprecation layer is authorized at version `0.0.0`.
 
-Current status: **Patch 1 complete**. Patch 2 is the next increment.
+Current status: **Patches 1 and 2 complete**. Patch 3 is the next increment.
 
 ## Current next increment
 
-Decision 0145 Patch 2: remove redundant fitted attributes.
+Decision 0145 Patch 3: privatize model-selection internals and remove unused private helpers.
 
 Decision 0139 Patch 3 remains paused as an independent documentation increment.
 

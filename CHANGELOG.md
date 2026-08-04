@@ -4,6 +4,9 @@
 
 ### Repository
 
+- Removed the redundant fitted attributes `PiPLSSearchCV.cv_n_train_min_` and
+  `PiPLSRegression.predictor_rank_`. Use `max_predictor_rank_`, the configured
+  `predictor_rank`, or `model.selection_.predictor_rank` according to ownership.
 - Complete the pre-release public-surface cleanup by limiting top-level `pipls` exports to
   `PiPLSRegression`, `PiPLSSearchCV`, `PredictorRankSupportWarning`, and version metadata. Keep
   component-path, selection, predictor-rank-profile, decomposition, and OOF result classes public

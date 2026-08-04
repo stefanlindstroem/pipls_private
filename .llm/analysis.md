@@ -521,5 +521,6 @@ and constant OOF operation-name parameter, declares exact exports for the remain
 and exception modules, and replaces negative `search.select()` wording with its fitting-free role.
 
 The cleanup retains learned search state, selection provenance, model-selection algorithms, all five
-numerical inspection functions, OOF reporting, and caller-owned plotting. Patch 1 changes only the
-decision and guide layer; Patch 2 is the next increment.
+numerical inspection functions, OOF reporting, and caller-owned plotting. Patches 1 and 2 are
+complete: the contract is established and the redundant fitted attributes are removed. Patch 3
+privatizes model-selection internals and removes unused private helpers.

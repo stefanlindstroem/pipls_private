@@ -188,8 +188,6 @@ class PiPLSSearchCV(
         Number of response columns seen during fitting.
     n_splits_ : int
         Number of materialized cross-validation splits.
-    cv_n_train_min_ : int
-        Smallest training-fold size.
     max_predictor_rank_ : int
         Effective predictor-rank upper bound after support, dimensional, and
         verified fold-numerical-rank constraints.
@@ -302,7 +300,6 @@ class PiPLSSearchCV(
         self._n_samples_fit_ = int(X_array.shape[0])
         _validate_singleton_fold_scoring(self.scoring, self._cv_splits_)
         self.n_splits_ = len(self._cv_splits_)
-        self.cv_n_train_min_ = materialized.n_train_min
         fold_feature_limit, fold_numerical_rank_limit = _fold_predictor_limits(
             template=template,
             X=X_indexable,

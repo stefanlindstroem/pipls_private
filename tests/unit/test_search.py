@@ -1004,6 +1004,7 @@ def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
     ).fit(X, Y)
 
     assert search.max_predictor_rank_ == 3
+    assert not hasattr(search, "cv_n_train_min_")
     np.testing.assert_array_equal(
         search.predictor_rank_profile(1).predictor_rank,
         np.array([1, 2, 3]),
@@ -1066,7 +1067,8 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_post_fit_ref
 
     assert model.selection_.predictor_rank == 4
     assert isinstance(model, PiPLSRegression)
-    assert model.predictor_rank_ == 4
+    assert model.predictor_rank == 4
+    assert not hasattr(model, "predictor_rank_")
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
 
 

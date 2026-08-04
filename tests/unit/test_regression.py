@@ -16,7 +16,8 @@ def test_fit_exposes_expected_fixed_rank_attributes() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
 
-    assert model.predictor_rank_ == 4
+    assert model.predictor_rank == 4
+    assert not hasattr(model, "predictor_rank_")
     assert model.max_predictor_rank_ == min(X.shape[1], X.shape[0] - 1)
     assert model.decomposition_.predictor_directions.shape == (8, 2)
     assert model.decomposition_.dilation.shape == (2,)

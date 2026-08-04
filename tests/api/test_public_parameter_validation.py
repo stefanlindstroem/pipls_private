@@ -52,7 +52,8 @@ def test_predictor_rank_rejects_nonpositive_noninteger_and_mode_values(value: ob
 def test_predictor_rank_accepts_numpy_integer() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=2, predictor_rank=np.int64(3)).fit(X, Y)
-    assert model.predictor_rank_ == 3
+    assert model.predictor_rank == 3
+    assert not hasattr(model, "predictor_rank_")
 
 
 def test_predictor_rank_rejects_rank_above_matrix_dimensions() -> None:
@@ -140,7 +141,8 @@ def test_numpy_boolean_parameters_are_accepted() -> None:
         scale=np.bool_(True),
         copy=np.bool_(False),
     ).fit(X, Y)
-    assert model.predictor_rank_ == 2
+    assert model.predictor_rank == 2
+    assert not hasattr(model, "predictor_rank_")
 
 
 @pytest.mark.parametrize("value", [1, None, [], np.asarray(["full"])])

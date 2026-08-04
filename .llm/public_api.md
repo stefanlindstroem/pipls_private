@@ -42,7 +42,6 @@ available from `pipls.metrics`.
 | `n_components` | number of paired latent modes $h$ |
 | `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
 | `samples_per_predictor_rank` | $c$ in `PiPLSSearchCV` |
-| `predictor_rank_` | fitted explicit $r_\pi$ |
 | `max_predictor_rank_` | centered algebraic limit on the fixed estimator; search ceiling on the path |
 
 Do not expose constructor aliases named `h`, `r_pi`, or `c`.
@@ -110,7 +109,7 @@ remain private.
 
 The fixed estimator does not expose cross-validation results, OOF predictions, validation
 reports, predictor-rank search diagnostics, or scorer plumbing. The response scale required by the
-default scorer is private fitted state. `predictor_rank_` is the requested fitted integer and
+default scorer is private fitted state. `predictor_rank` is the configured integer and
 `max_predictor_rank_` is `min(n_features, n_samples - 1)` for the supplied centered training
 data.
 
@@ -488,7 +487,7 @@ Decision 0145 authorizes removal of two residual duplicate fitted attributes. A 
 uses `model.predictor_rank`; a search-refitted model uses
 `model.selection_.predictor_rank` for exact
 selection provenance. `search.max_predictor_rank_` remains because it is learned from data and the
-materialized CV splits, while `cv_n_train_min_` is implementation-local evidence.
+materialized CV splits. The minimum training-fold size remains implementation-local evidence.
 
 The final module boundaries will declare `PiPLSRegression`, `PiPLSSearchCV`, and
 `PredictorRankSupportWarning` as the sole wildcard exports of `pipls.regression`,

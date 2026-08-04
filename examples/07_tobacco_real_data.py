@@ -491,7 +491,7 @@ def main() -> None:
     print(f"X shape: {X.shape}; Y shape: {Y.shape}")
     print(
         "1-SE-recommended Pi-PLS: "
-        f"n_components={model.n_components}, predictor_rank={model.predictor_rank_}"
+        f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
     )
     print(
         "Predictor-rank profile at the 1-SE component count: "
