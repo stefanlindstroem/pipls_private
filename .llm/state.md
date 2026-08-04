@@ -407,10 +407,10 @@ Decision 0134 gives public result properties type-revealing names: predictor-ran
 `selection`, OOF reports expose `cv_mse_mean`, and their coverage summary uses
 `has_complete_oof_coverage`. Former pre-release names are not retained as aliases.
 
-Decision 0136 makes every maintained ordinary five-fold example and tutorial renderer use
-`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Path selection, matched PLS
-comparison, and selection-conditioned OOF prediction use the same seeded partition within a
-workflow. Example 03 retains exhaustive `LeaveOneOut`, for which shuffling is not defined.
+Decision 0136 established seeded shuffled ordinary five-fold examples. Decision 0146 now makes
+the complete Pulp workflow the deliberate repeated-CV exception through ten repeated five-fold
+partitions. Other ordinary workflows retain one seeded partition, and Example 03 retains exhaustive
+`LeaveOneOut`, for which shuffling is not defined.
 
 Decision 0119 adds `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth` as an additive
 manuscript-aligned synthetic capability. It implements independent standard-normal latent scores
@@ -623,16 +623,16 @@ Tobacco, and introduce ten repeated five-fold partitions in the complete Pulp wo
 3. The transition does not add outer validation or demonstrate absolute tolerance in a maintained
 example.
 
-Current status: **Patches 1–5 of 7 complete**. The public result layer uses `cv_mse_std`,
-`minimum_cv_mse` applies simultaneous validated relative and absolute tolerances with complete
-immutable provenance, and maintained CV-MSE plots show descriptive split SD. The temporary derived
-`cv_mse_standard_error` bridge remains only for the still-active one-standard-error rule.
+Current status: **Patches 1–6 of 7 complete**. The complete Pulp workflow, renderer, and
+Tutorial 3 use ten repeated five-fold partitions, materialize 50 splits, and average ten OOF
+predictions per observation. The temporary derived `cv_mse_standard_error` bridge remains only for
+the still-active one-standard-error rule.
 
 ## Current next increment
 
-Implement Decision 0146 Patch 6: use repeated five-fold CV with ten repetitions in the complete
-Pulp workflow, renderer, Tutorial 3, and corresponding tests and manifests.
-Decision 0139 Patch 3 remains an independent paused presentation increment.
+Implement Decision 0146 Patch 7: remove the one-standard-error rule and all remaining active SE
+selection surface, then complete documentation and stale-surface audits. Decision 0139 Patch 3
+remains an independent paused presentation increment.
 
 ## Authority and drift handling
 

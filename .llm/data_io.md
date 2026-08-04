@@ -151,6 +151,7 @@ grow into manuscript pipelines or complete comparison grids.
 ## Tutorial assets
 
 The synthetic tutorial uses `make_pipls_train_test()` directly. Pulp tutorial renderers use
-`load_pulp()` and record the packaged dataset identifier, provenance, resource hashes,
-canonical-array hashes, selected pair, evaluated predictor ranks, and generated-figure hashes in
-ignored manifests. Generated tutorial assets are not alternative dataset representations.
+`load_pulp()` and record the packaged dataset identifier, provenance,
+resource hashes, canonical-array hashes, repeated-CV protocol, OOF prediction count, selected pair,
+evaluated predictor ranks, and generated-figure hashes in ignored manifests. Generated tutorial
+assets are not alternative dataset representations.

@@ -42,10 +42,13 @@ The script writes `examples/results/pulp_quick_start.pdf`. The package loader pr
 matrices and documentary labels, while the plot uses only the standardized numerical diagnostics.
 
 Example 01 intentionally uses the default `cv=5` to keep the first complete search and refit in one
-expression. Maintained analytical examples that use ordinary five-fold regression CV construct
-`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. The fixed seed makes those analyses
-reproducible while preventing row order from defining the folds. Example 03 uses `LeaveOneOut`,
-which exhaustively holds out each observation and therefore has no shuffle option.
+expression. Maintained analytical examples that use one ordinary five-fold regression partition
+construct
+`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Example 05 instead uses
+`RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)` for the complete Pulp analysis. The fixed
+seed makes these analyses reproducible while preventing row order from defining the folds. Example
+03 uses `LeaveOneOut`, which exhaustively holds out each observation and therefore has no shuffle
+option.
 
 ## Explicit comparison
 
@@ -135,8 +138,9 @@ comparison figures directly. Sugarcane demonstrates the complete manual-analysis
 
 Pulp is the canonical tutorial workflow. Example 05 follows the same ordering: search and refitting
 complete modeling, `model.selection_` identifies the fitted row, the search supplies path and rank
-profile evidence, `oof_report()` evaluates that selection on the stored folds, and rendering occurs
-only after the numerical analysis is complete. Tobacco follows the same direct
+profile evidence, `oof_report()` averages ten predictions per observation across the 50 stored
+splits, and rendering occurs only after the numerical analysis is complete. Tobacco follows the same
+direct
 result-to-Matplotlib pattern but applies the named `"minimum_cv_mse"` refit rule with a 10%
 relative tolerance. Its `model.selection_` supplies the selected row, exact reference minimum,
 resolved tolerance, and threshold used by the component-path figure; the selected count then supplies

@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 import numpy as np
 import pytest
-from sklearn.model_selection import KFold
+from sklearn.model_selection import RepeatedKFold
 
 from pipls import PiPLSRegression, PiPLSSearchCV
 from pipls.component_path import PiPLSComponentPath, PiPLSPredictorRankProfile
@@ -21,7 +21,7 @@ def pulp_result() -> SimpleNamespace:
     data = load_pulp()
     X, Y = data.X, data.Y
 
-    cv = KFold(n_splits=5, shuffle=True, random_state=0)
+    cv = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
     search = PiPLSSearchCV(cv=cv).fit(X, Y)
     model = search.refit(
         X,
@@ -71,6 +71,7 @@ def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespac
     assert isinstance(result.search, PiPLSSearchCV)
     assert result.search.estimator is None
     assert callable(result.search.refit)
+    assert result.search.n_splits_ == 50
     assert isinstance(result.component_path, PiPLSComponentPath)
     assert result.selected.n_components == 3
     assert result.selected.predictor_rank == 9
@@ -94,6 +95,10 @@ def test_pulp_rank_profile_exposes_the_interior_selection(
     selected_index = int(np.flatnonzero(profile.predictor_rank == 9)[0])
     upper_index = int(np.flatnonzero(profile.predictor_rank == 10)[0])
     assert profile.cv_mse_mean[selected_index] < profile.cv_mse_mean[upper_index]
+    assert profile.cv_mse_mean[selected_index] == pytest.approx(0.258427287979069)
+    assert profile.cv_mse_mean[upper_index] == pytest.approx(0.2742883932741335)
+    assert profile.cv_mse_std[selected_index] == pytest.approx(0.0965526957919972)
+    assert profile.cv_mse_std[upper_index] == pytest.approx(0.09984580272725549)
     assert (
         profile.cv_mse_mean[upper_index] - profile.cv_mse_mean[selected_index]
         < min(
@@ -110,6 +115,10 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
     assert result.Y.shape == (46, 8)
     assert result.report.selection == result.selected
     assert result.report.has_complete_oof_coverage
+    np.testing.assert_array_equal(
+        result.report.oof_prediction_counts,
+        np.full(result.X.shape[0], 10, dtype=np.int64),
+    )
     assert result.oof_predictions.shape == result.Y.shape
     assert np.all(np.isfinite(result.oof_predictions))
     assert result.diagnostics.prediction_kind == "selection-conditioned OOF predictions"

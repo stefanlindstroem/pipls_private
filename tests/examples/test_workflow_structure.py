@@ -234,11 +234,9 @@ def test_retained_search_objects_use_search_name(
     [
         "examples/02_synthetic_path_selection.py",
         "examples/04_pls_path_comparison.py",
-        "examples/05_pulp_real_data.py",
         "examples/06_sugarcane_real_data.py",
         "examples/07_tobacco_real_data.py",
         "tools/render_synthetic_tutorial.py",
-        "tools/render_pulp_tutorial.py",
     ],
 )
 def test_kfold_examples_use_seeded_shuffled_folds(relative_path: str) -> None:
@@ -249,6 +247,26 @@ def test_kfold_examples_use_seeded_shuffled_folds(relative_path: str) -> None:
         assert _keyword_constant(call, "n_splits") == 5
         assert _keyword_constant(call, "shuffle") is True
         assert _keyword_constant(call, "random_state") == 0
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "examples/05_pulp_real_data.py",
+        "tools/render_pulp_tutorial.py",
+    ],
+)
+def test_complete_pulp_workflows_use_ten_repeated_five_fold_partitions(
+    relative_path: str,
+) -> None:
+    tree = _tree(_repository_root() / relative_path)
+    repeated_calls = _calls_with_name(tree, "RepeatedKFold")
+    assert len(repeated_calls) == 1
+    call = repeated_calls[0]
+    assert _keyword_constant(call, "n_splits") == 5
+    assert _keyword_constant(call, "n_repeats") == 10
+    assert _keyword_constant(call, "random_state") == 0
+    assert "KFold" not in _call_names(tree)
 
 
 def test_leave_one_out_example_uses_its_exhaustive_splitter() -> None:

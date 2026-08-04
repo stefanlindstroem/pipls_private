@@ -416,8 +416,9 @@ one
 $2\times2$ latent/observation figure, and one full-width coefficient figure per response page.
 
 Pulp, Sugarcane, and Tobacco obtain OOF predictions through explicit
-`oof_report(selection=model.selection_)` calls. Every report reuses the exact
-`KFold(n_splits=5, shuffle=True, random_state=0)` partition materialized by its path search.
+`oof_report(selection=model.selection_)` calls. Pulp reuses 50 splits from ten repeated five-fold
+partitions and averages ten OOF predictions per observation. Sugarcane and Tobacco reuse one seeded
+shuffled five-fold partition.
 Because component count and predictor rank are chosen after inspecting paths
 computed from the same observations, the resulting OOF predictions are selection-conditioned rather
 than independent validation. The standardized display values in `PredictionDiagnostics` use the
@@ -538,10 +539,9 @@ A row qualifies only when its mean is below both the relative and absolute thres
 qualifying component count is selected, retaining the path-owned predictor rank. The default
 relative tolerance resolves to `sqrt(float64 epsilon)` and the default absolute tolerance is
 positive infinity. Tobacco will demonstrate `relative_tolerance=0.10`; absolute tolerance is
-documented but not demonstrated. The complete Pulp workflow and Tutorial 3 will use repeated
+documented but not demonstrated. The complete Pulp workflow and Tutorial 3 use repeated
 five-fold CV with ten repetitions, while quick and other workflows remain lighter.
 
-Current status: **Patches 1–5 of 7 complete**. `minimum_cv_mse` accepts simultaneous relative and
-absolute tolerances with immutable provenance, and maintained CV-MSE figures use `cv_mse_std` as
-descriptive split variability. The derived `cv_mse_standard_error` remains temporarily available
-only for still-active 1-SE selection.
+Current status: **Patches 1–6 of 7 complete**. The complete Pulp workflow materializes 50
+repeated-CV splits and averages ten OOF predictions per observation. The derived
+`cv_mse_standard_error` remains temporarily available only for still-active 1-SE selection.

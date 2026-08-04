@@ -248,12 +248,11 @@ incidental artist counts. Structural tests should require the absence of a packa
 and public `plot_*` functions, keep Matplotlib and `adjustText` optional, and ensure that example
 support code does not hide chart construction.
 
-Structural tests require maintained analytical ordinary K-fold examples and tutorial renderers to
-use `KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Every rendered example that uses
-an explicit splitter must also display the splitter import and definition before a shown snippet
-uses its `CV` or `cv` variable; tutorial snippets must not depend on hidden module-level validation
-configuration. The compact first example is the intentional exception: it uses default `cv=5` to
-demonstrate the shortest installed-data workflow.
+Structural tests require ordinary K-fold examples and renderers to use seeded shuffled five-fold
+partitions explicitly. The complete Pulp example and renderer instead use
+`RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Every rendered example that uses an
+explicit splitter must display its import and definition before a shown snippet uses `CV` or `cv`.
+The compact first example remains the shortest-path exception with default `cv=5`.
 The leave-one-out example retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane,
 and Tobacco protect direct `component_path_` access, immutable inspection results, explicit
 Matplotlib
@@ -377,7 +376,9 @@ selection thresholds.
 Patch 5 protects that maintained automatic workflows use `minimum_cv_mse`, the quick start uses the
 machine-scale default, and Tobacco passes `relative_tolerance=0.10`, derives its annotations from
 `selection.reference_minimum`, `selection.relative_tolerance`, and `selection.cv_mse_threshold`,
-and passes that exact selection to its rank profile and OOF report.
+and passes that exact selection to its rank profile and OOF report. Patch 6 protects the exact
+`RepeatedKFold(5, 10, 0)` Pulp protocol, 50 materialized splits, ten OOF predictions per row,
+updated deterministic rank-profile values, semantic manifest fields, and parseable generated SVGs.
 
 ## CV-MSE tolerance selection
 

@@ -25,7 +25,7 @@ from adjustText import adjust_text  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 from matplotlib.patches import FancyArrowPatch  # noqa: E402
-from sklearn.model_selection import KFold  # noqa: E402
+from sklearn.model_selection import RepeatedKFold  # noqa: E402
 
 from pipls import PiPLSSearchCV  # noqa: E402
 from pipls.component_path import (  # noqa: E402
@@ -44,7 +44,7 @@ from pipls.inspection import (  # noqa: E402
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
-CV = KFold(n_splits=5, shuffle=True, random_state=0)
+CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
     "component_path.svg",
@@ -181,6 +181,10 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         selection=selection,
     )
     oof_predictions = report.oof_predictions
+    if not np.all(report.oof_prediction_counts == 10):
+        raise RuntimeError(
+            "Repeated Pulp CV must produce ten OOF predictions per observation."
+        )
     factors = pipls_display_factors(
         model.decomposition_,
         response_index=response_names.index("TI"),
@@ -425,6 +429,16 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
                 response_names[index] for index in detailed_response_indices
             ],
             "prediction_kind": diagnostics.prediction_kind,
+            "cross_validation": {
+                "splitter": type(CV).__name__,
+                "n_splits": 5,
+                "n_repeats": 10,
+                "random_state": 0,
+                "materialized_splits": search.n_splits_,
+            },
+            "oof_predictions_per_observation": int(
+                report.oof_prediction_counts[0]
+            ),
         },
         "figures": figures,
     }

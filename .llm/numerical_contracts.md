@@ -87,7 +87,8 @@
 ## Accepted CV-MSE tolerance transition target
 
 Decision 0146 replaces the current fold-SE selection contract through a staged migration. The final
-contract gives every materialized validation split equal weight:
+contract gives every materialized validation split equal weight. The complete Pulp workflow is the
+maintained repeated-CV example, with 50 split losses and ten OOF predictions per observation:
 
 ```python
 cv_mse_mean = np.mean(split_cv_mse)

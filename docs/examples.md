@@ -48,13 +48,16 @@ workflows and may take substantially longer than the package test suite.
 ## Cross-validation partitions
 
 Example 01 intentionally uses the scikit-learn-compatible default `cv=5` to keep the opening
-workflow to one search/refit expression. Examples 02 and 04–07 use explicit five-fold shuffled
-regression splits with `KFold(n_splits=5, shuffle=True, random_state=0)`. The complete Pulp,
-Sugarcane, and Tobacco workflows use `oof_report(..., selection=model.selection_)` to reuse the
-exact partition materialized by the path search. Example 03 deliberately fits no final model: it
-uses `search.select(rule="best_score")` and passes that selection to `oof_report()`. Its
-`LeaveOneOut` splitter is exhaustive, so shuffling is not defined. Grouped,
-temporal, or otherwise structured data require an application-specific splitter instead.
+workflow to one search/refit expression. Examples 02, 04, 06, and 07 use one explicit shuffled
+five-fold partition. The complete Pulp workflow instead uses
+`RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`: 50 materialized splits and ten OOF
+predictions per observation. This deliberate stability analysis costs approximately ten times one
+five-fold partition; the quick start remains lighter. The complete Pulp, Sugarcane, and Tobacco
+workflows use `oof_report(..., selection=model.selection_)` to reuse the splits materialized by the
+path search. Example 03 deliberately fits no final model: it uses
+`search.select(rule="best_score")` and passes that selection to `oof_report()`. Its `LeaveOneOut`
+splitter is exhaustive, so shuffling is not defined. Grouped, temporal, or otherwise structured data
+require an application-specific splitter instead.
 
 ## Leave-one-out validation
 

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from adjustText import adjust_text
 from matplotlib.patches import FancyArrowPatch
-from sklearn.model_selection import KFold
+from sklearn.model_selection import RepeatedKFold
 
 from pipls import PiPLSSearchCV
 from pipls.datasets import load_pulp
@@ -21,7 +21,7 @@ from pipls.inspection import (
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
 CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
-CV = KFold(n_splits=5, shuffle=True, random_state=0)
+CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 # --8<-- [end:pulp-tutorial-setup]
 
 # --8<-- [start:load-pulp-data]

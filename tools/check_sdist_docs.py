@@ -244,6 +244,20 @@ def main() -> None:
         }
         if manifest_dataset != expected_dataset:
             raise RuntimeError("Generated Pulp tutorial dataset identity disagrees.")
+        pulp_analysis = pulp_manifest.get("analysis", {})
+        expected_cv = {
+            "splitter": "RepeatedKFold",
+            "n_splits": 5,
+            "n_repeats": 10,
+            "random_state": 0,
+            "materialized_splits": 50,
+        }
+        if pulp_analysis.get("cross_validation") != expected_cv:
+            raise RuntimeError("Generated Pulp tutorial CV protocol changed unexpectedly.")
+        if pulp_analysis.get("oof_predictions_per_observation") != 10:
+            raise RuntimeError(
+                "Generated Pulp tutorial must average ten OOF predictions per row."
+            )
         for filename in ("X.csv", "Y.csv"):
             expected_hash = expected_dataset["resource_sha256"][filename]
             if expected_hash != _sha256(pulp_resources / filename):

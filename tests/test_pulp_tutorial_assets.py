@@ -1,8 +1,16 @@
 from __future__ import annotations
 
+import hashlib
+import importlib.util
+import json
+import os
 import re
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import pytest
 import yaml
 
 try:
@@ -24,6 +32,87 @@ FIGURE_FILENAMES = (
 
 def _repository_root() -> Path:
     return Path(__file__).resolve().parents[1]
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    digest.update(path.read_bytes())
+    return digest.hexdigest()
+
+
+@pytest.fixture(scope="module")
+def generated_pulp_assets(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    repository = _repository_root()
+    output_dir = tmp_path_factory.mktemp("pulp-tutorial-assets") / "pulp"
+    environment = os.environ.copy()
+    python_path = str(repository / "src")
+    if importlib.util.find_spec("adjustText") is None:
+        stub_dir = tmp_path_factory.mktemp("pulp-adjusttext-stub")
+        (stub_dir / "adjustText.py").write_text(
+            "def adjust_text(texts, *args, **kwargs):\n    return texts\n",
+            encoding="utf-8",
+        )
+        python_path = f"{stub_dir}{os.pathsep}{python_path}"
+    environment.update(
+        {
+            "PYTHONPATH": python_path,
+            "MPLBACKEND": "Agg",
+            "OMP_NUM_THREADS": "1",
+            "OPENBLAS_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "NUMEXPR_NUM_THREADS": "1",
+        }
+    )
+    subprocess.run(
+        [
+            sys.executable,
+            str(repository / "tools" / "render_pulp_tutorial.py"),
+            "--output-dir",
+            str(output_dir),
+        ],
+        cwd=repository,
+        env=environment,
+        check=True,
+    )
+    return output_dir
+
+
+def test_pulp_tutorial_renderer_records_repeated_cv_and_valid_figures(
+    generated_pulp_assets: Path,
+) -> None:
+    manifest = json.loads(
+        (generated_pulp_assets / "manifest.json").read_text(encoding="utf-8")
+    )
+
+    assert manifest["schema_version"] == 1
+    assert manifest["dataset"]["id"] == "pulp"
+    assert manifest["dataset"]["version"] == "1"
+    analysis = manifest["analysis"]
+    assert analysis["chosen_n_components"] == 3
+    assert analysis["chosen_predictor_rank"] == 9
+    assert analysis["evaluated_predictor_ranks"] == list(range(3, 11))
+    assert analysis["cross_validation"] == {
+        "splitter": "RepeatedKFold",
+        "n_splits": 5,
+        "n_repeats": 10,
+        "random_state": 0,
+        "materialized_splits": 50,
+    }
+    assert analysis["oof_predictions_per_observation"] == 10
+    assert analysis["prediction_kind"] == (
+        "selection-conditioned OOF predictions"
+    )
+
+    figures = manifest["figures"]
+    assert tuple(item["filename"] for item in figures) == FIGURE_FILENAMES
+    assert set(path.name for path in generated_pulp_assets.iterdir()) == {
+        *FIGURE_FILENAMES,
+        "manifest.json",
+    }
+    for item in figures:
+        figure_path = generated_pulp_assets / item["filename"]
+        ET.parse(figure_path)
+        assert item["sha256"] == _sha256(figure_path)
 
 
 def test_documentation_targets_own_generated_pulp_assets() -> None:
@@ -50,6 +139,12 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert 'source / "examples" / "05_pulp_real_data.py"' in sdist_checker
     assert 'source / "site" / "tutorials" / "pulp" / "index.html"' in sdist_checker
     assert "PULP_TUTORIAL_FIGURES" in sdist_checker
+    assert '"splitter": "RepeatedKFold"' in sdist_checker
+    assert '"materialized_splits": 50' in sdist_checker
+    assert (
+        'pulp_analysis.get("oof_predictions_per_observation") != 10'
+        in sdist_checker
+    )
 
 
 def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
@@ -72,6 +167,11 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
         if isinstance(extension, dict) and "pymdownx.snippets" in extension
     )
     assert snippets["check_paths"] is True
+    assert "from sklearn.model_selection import RepeatedKFold" in example
+    assert (
+        "RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)" in example
+    )
+    assert "from sklearn.model_selection import RepeatedKFold" in renderer
 
     linked_targets = set(re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial))
     assert {

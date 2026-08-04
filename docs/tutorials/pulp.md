@@ -25,8 +25,9 @@ Install the example dependencies before running the analysis from a source check
 python -m pip install ".[examples]"
 ```
 
-The example imports the estimators, numerical inspection functions, Matplotlib, and `adjustText`,
-then states the component choice and diagnostic-response limit used below:
+The example imports the estimators, repeated cross-validation, numerical inspection functions,
+Matplotlib, and `adjustText`, then states the component choice and diagnostic-response limit used
+below:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-tutorial-setup"
@@ -78,9 +79,14 @@ Search and full-data refitting are kept together:
 ```
 
 The search evaluates admissible paired-mode counts and conditionally selects one predictor rank at
-each count. `refit()` resolves the stored row for `CHOSEN_N_COMPONENTS` and fits that fixed pair on
-all 46 observations. The returned [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression)
-supplies predictions and fitted-model inspection; the search retains the cross-validation evidence.
+each count. It uses ten repeated five-fold partitions, so every candidate is evaluated on 50
+materialized validation splits. `refit()` resolves the stored row for `CHOSEN_N_COMPONENTS` and fits
+that fixed pair on all 46 observations. The returned
+[`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression) supplies predictions and
+fitted-model inspection; the search retains the cross-validation evidence.
+
+Repeated CV makes this complete analysis approximately ten times as expensive as the former single
+five-fold partition. The quick start remains deliberately lighter.
 
 At this point modeling is complete.
 
@@ -111,7 +117,7 @@ and do not enter selection. This manual workflow keeps the three-component choic
 diamond marks the row used by the fitted model.
 
 The selection contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at three
-components under the seeded shuffled folds.
+components across the 50 seeded repeated-CV splits.
 
 ### Conditional predictor-rank profile
 
@@ -121,10 +127,10 @@ components under the seeded shuffled folds.
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
-For these 46 rows, 14 predictors, and five-fold CV, the support rule gives
-$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The seeded shuffled folds select the
-interior rank 9. Ranks 9 and 10 have mean CV-MSE values of approximately 0.288 and 0.302, with
-population split SDs of approximately 0.078 and 0.060. Their mean difference is small relative
+For these 46 rows, 14 predictors, and repeated five-fold CV, the support rule gives
+$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The ten seeded repetitions select the
+interior rank 9. Ranks 9 and 10 have mean CV-MSE values of approximately 0.258 and 0.274, with
+population split SDs of approximately 0.097 and 0.100. Their mean difference is small relative
 to the displayed split-to-split variability.
 
 The profile supports rank 9 for this fitted model, but it does not establish a distinct scientific
@@ -141,11 +147,12 @@ the model rather than resolving the component count again:
 --8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
 ```
 
-`oof_report()` reuses the exact five seeded shuffled splits materialized during path evaluation and
-recomputes row-ordered predictions for `selection`. The fixed random seed makes that partition
-reproducible while avoiding a fold assignment determined by row order. Replace the search splitter
-with a grouped, temporal, or otherwise appropriate protocol when the sampling design carries
-experimental structure.
+`oof_report()` reuses the exact 50 seeded splits materialized during path evaluation and recomputes
+row-ordered predictions for `selection`. Each observation is held out once per repetition, so the
+report averages ten OOF predictions for every Pulp row and records a prediction count of ten. The
+fixed random seed makes the repeated partitions reproducible while avoiding fold assignments
+determined by row order. Replace the search splitter with a grouped, temporal, or otherwise
+appropriate protocol when the sampling design carries experimental structure.
 
 !!! important "Validation scope"
     These are **selection-conditioned OOF predictions**. The selected rank pair is fitted on each
@@ -302,8 +309,9 @@ See [Standardized RMSE](../model_inspection.md#standardized-rmse).
 
 ## Reproduce this tutorial
 
-The analysis and selection snippets are maintained in `examples/05_pulp_real_data.py`. Run the
-complete example from the repository root:
+The analysis and selection snippets are maintained in `examples/05_pulp_real_data.py`. The repeated
+search is the deliberately expensive tutorial workflow; run the complete example from the repository
+root:
 
 ```bash
 python examples/05_pulp_real_data.py

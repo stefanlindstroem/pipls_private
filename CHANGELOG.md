@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Use `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)` in the complete Pulp
+  workflow and Tutorial 3. Materialize 50 validation splits, average ten OOF predictions per
+  observation, record the repeated-CV protocol in the tutorial manifest, update deterministic
+  Pulp path values and documentation, and keep quicker workflows on lighter validation protocols.
 - Migrate maintained automatic model-producing workflows from the temporary one-standard-error
   rule to `minimum_cv_mse`. Use the machine-scale relative default in the quick start and general
   documentation, and make Tobacco demonstrate `relative_tolerance=0.10` with its exact minimum,
