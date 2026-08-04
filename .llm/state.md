@@ -587,8 +587,8 @@ workflows use the final selection-driven interface.
 ## Pre-release public-surface cleanup transition
 
 Decision 0144 authorizes seven patches that remove duplicated access without removing distinct
-capabilities. OOF reports are simplified, `PiPLSSelection` is adopted, and fitted-search global-best
-state is removed. The remaining target removes duplicate candidate parameter columns,
+capabilities. OOF reports are simplified, `PiPLSSelection` is adopted, fitted-search global-best
+state is removed, and `cv_results_` uses only stable direct parameter columns. The remaining target
 standardizes package datasets on `X` and `Y`, removes unused shape-only inspection properties, and
 narrows top-level result exports.
 
@@ -597,17 +597,17 @@ functions, component-path and rank-profile evidence, advanced candidate scores a
 immutable direct-construction validation, biplot scaling factors, and caller-owned plotting remain
 public contracts.
 
-Current status: **Patches 1–3 complete**. `PiPLSOOFReport` requires OOF prediction and count
-arrays and exposes selection metrics only through `report.selection`. The active API now uses
-`PiPLSSelection` and `PiPLSPredictorRankProfile.selection` throughout source, tests, maintained
-workflows, API documentation, and guide-layer contracts without compatibility aliases or numerical
-changes.
+Current status: **Patches 1–5 complete**. `PiPLSOOFReport` requires OOF prediction and count
+arrays and exposes selection metrics only through `report.selection`; the active API uses
+`PiPLSSelection` and `PiPLSPredictorRankProfile.selection`; fitted searches expose no public
+`best_*` state; and `cv_results_` retains only stable direct `n_components` and `predictor_rank`
+parameter columns while preserving all scores, split values, MSE fields, ranks, and timings.
 
 ## Current next increment
 
-Implement Decision 0144 Patch 5: remove duplicated `cv_results_` parameter representations while
-preserving stable direct component-count and predictor-rank columns plus all scores, split values,
-MSE fields, ranks, and timings.
+Implement Decision 0144 Patch 6: remove `PiPLSDataset.data` and `.target` aliases and the accepted
+unused shape-only inspection properties while preserving `X`, `Y`, dataset-level dimensions,
+component-count properties, numerical arrays, and all five inspection functions.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

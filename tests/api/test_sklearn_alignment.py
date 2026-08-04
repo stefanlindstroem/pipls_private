@@ -523,6 +523,51 @@ def test_path_search_diagnostics_and_refitted_model_are_sklearn_like() -> None:
     np.testing.assert_allclose(Y_reconstructed, direct_Y)
 
 
+def test_path_cv_results_use_pipeline_independent_candidate_columns() -> None:
+    X, Y = _data()
+    estimator = Pipeline(
+        [
+            ("scale", StandardScaler()),
+            ("pipls", _fixed_estimator()),
+        ]
+    )
+    search = PiPLSSearchCV(
+        estimator=estimator,
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3],
+        max_predictor_rank=3,
+        search_method="optimal",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    expected_columns = {
+        "n_components",
+        "predictor_rank",
+        "mean_test_score",
+        "std_test_score",
+        "rank_test_score",
+        "mean_fit_time",
+        "std_fit_time",
+        "mean_score_time",
+        "std_score_time",
+        "mean_response_standardized_mse",
+        "std_response_standardized_mse",
+    }
+    for split_index in range(search.n_splits_):
+        expected_columns.add(f"split{split_index}_test_score")
+        expected_columns.add(
+            f"split{split_index}_response_standardized_mse"
+        )
+
+    assert set(search.cv_results_) == expected_columns
+    candidate_count = search.cv_results_["n_components"].size
+    assert all(
+        isinstance(values, np.ndarray) and values.shape == (candidate_count,)
+        for values in search.cv_results_.values()
+    )
+
+
 def test_refitted_pipeline_exposes_only_pipeline_supported_transformations() -> None:
     X, Y = _data()
     pipeline = Pipeline(

@@ -197,8 +197,9 @@ class PiPLSSearchCV(
         Whether every admissible pair was evaluated.
     scorer_ : callable
         Validated scikit-learn scorer used during fitting.
-    cv_results_ : dict of str to array-like
-        Full candidate-level results. It includes parameter pairs, split scores,
+    cv_results_ : dict of str to ndarray
+        Full candidate-level results with stable ``n_components`` and
+        ``predictor_rank`` columns, split and summary scores,
         response-standardized MSE values, timing summaries, and minimum score
         ranks formed with the same tolerant comparison used for selection.
     component_path_ : PiPLSComponentPath
@@ -414,8 +415,6 @@ class PiPLSSearchCV(
         self.cv_results_ = _build_path_cv_results(
             cache=cache,
             evaluated_pairs=evaluated_pairs,
-            n_components_key=n_components_key,
-            predictor_rank_key=predictor_rank_key,
         )
         conditional_indices: list[int] = []
         for h_value in component_values:
@@ -1091,8 +1090,6 @@ def _build_path_cv_results(
     *,
     cache: CandidateCache,
     evaluated_pairs: tuple[tuple[int, int], ...],
-    n_components_key: str,
-    predictor_rank_key: str,
 ) -> dict[str, Any]:
     n_components = np.asarray([pair[0] for pair in evaluated_pairs], dtype=np.intp)
     predictor_rank = np.asarray([pair[1] for pair in evaluated_pairs], dtype=np.intp)
@@ -1104,14 +1101,8 @@ def _build_path_cv_results(
     split_score_times = np.vstack([cache[pair].split_score_times for pair in evaluated_pairs])
     mean_scores = np.mean(split_scores, axis=1)
     results: dict[str, Any] = {
-        "params": [
-            {n_components_key: int(h), predictor_rank_key: int(r)}
-            for h, r in evaluated_pairs
-        ],
         "n_components": n_components,
         "predictor_rank": predictor_rank,
-        f"param_{n_components_key}": n_components.copy(),
-        f"param_{predictor_rank_key}": predictor_rank.copy(),
         "mean_test_score": mean_scores,
         "std_test_score": np.std(split_scores, axis=1),
         "mean_fit_time": np.mean(split_fit_times, axis=1),

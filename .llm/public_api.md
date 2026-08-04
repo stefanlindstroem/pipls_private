@@ -224,7 +224,10 @@ workflow remains selection-only and passes its `best_score` result directly to `
 The former report API has been removed without compatibility aliases.
 
 Public path attributes include candidate-level search results in `cv_results_`,
-`search_is_exhaustive_`, and the canonical immutable component-path result. The global
+`search_is_exhaustive_`, and the canonical immutable component-path result. `cv_results_` uses
+pipeline-independent `n_components` and `predictor_rank` arrays as its only parameter columns; all
+other aligned arrays contain scores, response-standardized MSE values, ranks, split values, or
+timings. The global
 configured-score optimum is returned by `search.select(rule="best_score")`. The search stores no
 selected row, OOF report, or fitted final model.
 `PiPLSOOFReport` composes one immutable selection and owns required ordered OOF predictions,
@@ -460,14 +463,14 @@ helper, or component-path plotting helper. The comparison-only `PLSComponentPath
 
 ## Accepted pre-release public-surface cleanup
 
-Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1–3 are
+Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1–5 are
 complete: the target is recorded; OOF reports own required OOF arrays and coverage while selection
 metrics remain on `report.selection`; the active API uses `PiPLSSelection` and
-`profile.selection` without aliases; and fitted-search global-best attributes have been replaced by
-`search.select(rule="best_score")`. The remaining target is:
+`profile.selection` without aliases; fitted-search global-best attributes have been replaced by
+`search.select(rule="best_score")`; and `cv_results_` now retains only stable `n_components` and
+`predictor_rank` parameter columns while preserving all candidate scores, split values, MSE fields,
+ranks, and timings. The remaining target is:
 
-- `cv_results_` keeps stable `n_components` and `predictor_rank` columns but removes duplicated
-  `params` and pipeline-prefixed `param_*` representations;
 - `PiPLSDataset` uses `X` and `Y` without `data` and `target` aliases;
 - unused shape-only inspection properties are removed while component-count properties and all five
   inspection functions remain;

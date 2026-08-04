@@ -172,7 +172,10 @@ patches, focused tests must protect:
 Use positive surface tests and compact active-surface audits rather than one tombstone test per
 removed name. Patch 1 changes no executable contract. Patch 2 protects required OOF arrays, direct
 construction, read-only copies, pickling, repeated CV, partial coverage, one-dimensional responses,
-leave-one-out provenance, and unchanged OOF numerics after forwarding-property removal.
+leave-one-out provenance, and unchanged OOF numerics after forwarding-property removal. Patch 5
+protects an exact aligned-array `cv_results_` surface with stable pipeline-independent
+`n_components` and `predictor_rank` parameter columns plus all score, split, MSE, rank, and timing
+columns; selection, refit, profile, and OOF numerical tests protect unchanged consumers.
 
 ## Three-stage onboarding transition
 

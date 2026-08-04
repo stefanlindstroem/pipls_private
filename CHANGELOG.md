@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Simplify `PiPLSSearchCV.cv_results_` to stable pipeline-independent `n_components` and
+  `predictor_rank` parameter columns. Remove duplicated `params` and pipeline-prefixed `param_*`
+  representations while preserving all candidate scores, split values, response-standardized MSE
+  fields, ranks, timings, selection, refit, rank-profile, and OOF behavior.
 - Remove the five fitted-search global-best attributes without aliases. Resolve the configured-score
   optimum on demand through `search.select(rule="best_score")`, preserving tie-breaking, refit, OOF,
   fitted-state, pickle, and candidate-ranking behavior while eliminating duplicated selected-row

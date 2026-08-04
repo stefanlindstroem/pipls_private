@@ -22,8 +22,10 @@ tie-breaking, pipelines, and detailed result surfaces, see
 [Path-selection details](../path_analysis.md). For candidate-feasibility, refit, scoring, or metadata
 problems, see [Troubleshooting](../troubleshooting.md).
 
-`cv_results_` is the complete candidate-level record. `component_path_` and
-`predictor_rank_profile()` provide concise immutable views. Use
+`cv_results_` is the complete candidate-level record. Its parameter columns are the stable,
+pipeline-independent `n_components` and `predictor_rank` arrays; the remaining columns contain
+candidate scores, split values, response-standardized MSE diagnostics, ranks, and timings.
+`component_path_` and `predictor_rank_profile()` provide concise immutable views. Use
 `search.select(rule="best_score")` for the global configured-score optimum. Post-fit `select()`,
 `refit()`, and `oof_report()` do not alter search state. No final selection, model, or OOF report is
 stored on the search object.

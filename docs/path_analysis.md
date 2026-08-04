@@ -306,9 +306,10 @@ candidate evidence and reusable split indices, but no report or fitted final mod
 ## Search and model diagnostics
 
 Use `component_path_` for the concise component-count curve and `predictor_rank_profile(h)` for the
-evaluated ranks at one count. `cv_results_` contains candidate parameters, split test scores,
-response-standardized MSE diagnostics, score ranks, and fit/score timing summaries. It contains only
-evaluated candidates.
+evaluated ranks at one count. `cv_results_` contains aligned `n_components` and `predictor_rank`
+arrays, split and summary test scores, response-standardized MSE diagnostics, score ranks, and
+fit/score timing summaries. The direct parameter columns are stable for both direct estimators and
+pipelines, and the dictionary contains only evaluated candidates.
 
 Use the returned estimator for fixed-model diagnostics such as `decomposition_`, coefficients,
 latent scores, predictions, and inspection helpers. Retain the search variable when both search
