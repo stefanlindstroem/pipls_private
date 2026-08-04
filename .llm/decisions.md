@@ -206,9 +206,10 @@ plan contains an earlier or more general proposal:
 - Decision 0144 completes a seven-patch pre-release public-surface cleanup: required OOF arrays,
   consistent selection terminology, removal of duplicate search and candidate state, canonical dataset
   access, reduced inspection conveniences, and focused result-module exports;
-- Decision 0145 authorizes a four-patch final implementation-surface cleanup. Patch 1 records
-  removal of residual duplicate fitted attributes, private module/helper cleanup, exact remaining
-  module export declarations, and positive fitting-free `search.select()` wording;
+- Decision 0145 completes a four-patch final implementation-surface cleanup: residual duplicate
+  fitted attributes are removed, model-selection algorithms are private, unused private helpers are
+  gone, remaining public modules declare exact exports, and fitting-free `search.select()` wording
+  is positive;
 - Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable

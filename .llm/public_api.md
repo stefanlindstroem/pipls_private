@@ -483,15 +483,12 @@ retained.
 
 ## Accepted final implementation-surface cleanup
 
-Decision 0145 authorizes removal of two residual duplicate fitted attributes. A direct fixed model
-uses `model.predictor_rank`; a search-refitted model uses
-`model.selection_.predictor_rank` for exact
+Decision 0145 removes two residual duplicate fitted attributes. A direct fixed model uses
+`model.predictor_rank`; a search-refitted model uses `model.selection_.predictor_rank` for exact
 selection provenance. `search.max_predictor_rank_` remains because it is learned from data and the
 materialized CV splits. The minimum training-fold size remains implementation-local evidence.
 
-The final module boundaries will declare `PiPLSRegression`, `PiPLSSearchCV`, and
-`PredictorRankSupportWarning` as the sole wildcard exports of `pipls.regression`,
-`pipls.search`, and
-`pipls.exceptions`, respectively. `search.select()` remains public for selection without fitting;
-after `refit()`, use `model.selection_`. Patch 1 records this target without changing the currently
-implemented API.
+`PiPLSRegression`, `PiPLSSearchCV`, and `PredictorRankSupportWarning` are the sole wildcard exports
+of `pipls.regression`, `pipls.search`, and `pipls.exceptions`, respectively. `search.select()`
+remains public for selection without fitting; after `refit()`, use `model.selection_`. Decision 0145
+is fully implemented without compatibility aliases.

@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Complete the final implementation-surface cleanup by declaring exact exports for
+  `pipls.regression`, `pipls.search`, and `pipls.exceptions`; state the fitting-free role of
+  `search.select()` positively in model-producing tutorials; and close Decision 0145 with exact
+  module-boundary and documentation contracts.
 - Privatize model-selection algorithms in `pipls._model_selection`, remove the unused private
   `PiPLSCoreResult.predict()` convenience method, and simplify the sole OOF calculation path by
   removing its constant operation-name argument. Preserve exhaustive and adaptive search, split

@@ -54,6 +54,8 @@ from .metrics import neg_response_standardized_mse
 from .regression import PiPLSRegression, _clear_fitted_state
 from .validation import PiPLSOOFReport
 
+__all__ = ["PiPLSSearchCV"]
+
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]

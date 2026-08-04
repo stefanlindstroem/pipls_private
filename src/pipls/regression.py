@@ -27,6 +27,8 @@ from .decomposition import PiPLSDecomposition
 from .exceptions import PredictorRankSupportWarning
 from .metrics import _safe_column_mean, _safe_sample_scale, _training_response_scale
 
+__all__ = ["PiPLSRegression"]
+
 FloatArray = NDArray[np.float64]
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 3.0
 

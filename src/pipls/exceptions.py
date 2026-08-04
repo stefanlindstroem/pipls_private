@@ -1,5 +1,7 @@
 """Public warning categories for Pi-PLS."""
 
+__all__ = ["PredictorRankSupportWarning"]
+
 
 class PredictorRankSupportWarning(UserWarning):
     """Warning for low sample support relative to retained predictor rank.

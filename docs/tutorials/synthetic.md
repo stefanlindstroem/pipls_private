@@ -172,8 +172,8 @@ rank_profile = search.predictor_rank_profile(selection.n_components)
 Y_pred = model.predict(X_test)
 ```
 
-`search.select()` is not required in this model-producing workflow. It remains available when a
-user wants to inspect a selection without fitting a final model.
+After `refit()`, obtain the fitted selection from `model.selection_`. Use `search.select()` when a
+selection is needed without fitting a final model.
 
 ## Continue with real data
 

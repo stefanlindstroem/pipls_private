@@ -123,6 +123,20 @@ def test_api_overview_maps_the_public_result_objects() -> None:
         assert f"`{object_name}`" in api_overview
 
 
+def test_model_producing_tutorials_state_selection_ownership_positively() -> None:
+    tutorial_root = _repository_root() / "docs" / "tutorials"
+
+    for filename in ("synthetic.md", "pulp.md"):
+        text = (tutorial_root / filename).read_text(encoding="utf-8")
+
+        assert "model.selection_" in text
+        assert "without fitting a final model" in text
+        assert re.search(
+            r"`search\.select\(\)`[^.\n]*\bnot required\b",
+            text,
+        ) is None
+
+
 def test_required_public_guides_are_reachable_through_navigation() -> None:
     root = _repository_root()
     with (root / "mkdocs.yml").open(encoding="utf-8") as stream:

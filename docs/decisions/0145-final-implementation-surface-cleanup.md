@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. Patches 1 through 3 of 4 are complete: the guide-layer contract is established, the
-redundant fitted attributes are removed, and model-selection internals and private helpers are
-simplified.
+Accepted and implemented. All four patches are complete: the guide-layer contract is established,
+redundant fitted attributes are removed, model-selection internals and private helpers are
+simplified, remaining public modules declare exact exports, and selection ownership is stated
+positively.
 
 ## Context
 
@@ -148,7 +149,7 @@ This cleanup does not remove:
    remove the constant OOF `operation_name` argument — complete.
 4. Add remaining module `__all__` declarations, correct tutorial wording, synchronize public
    documentation and maintainer guidance, run final active-surface audits, and mark the decision
-   implemented.
+   implemented — complete.
 
 No compatibility aliases or deprecation period are required before the first release.
 

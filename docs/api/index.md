@@ -1,8 +1,9 @@
 # API reference
 
 The generated reference documents supported public objects directly from their Python docstrings.
-Core estimators are available from `pipls`; returned result records, numerical inspection, dataset,
-and metric tools live in focused submodules. Rendering is caller-owned.
+Core estimators and the public warning are available from `pipls`; their defining modules expose
+only the corresponding public object. Returned result records, numerical inspection, dataset, and
+metric tools live in focused submodules. Rendering is caller-owned.
 
 ## Mathematical notation and Python names
 

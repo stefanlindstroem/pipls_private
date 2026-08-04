@@ -338,7 +338,9 @@ patches, focused tests must protect:
   and OOF results after private refactoring;
 - core standardized-regression-map invariants without `PiPLSCoreResult.predict()`;
 - clear `oof_report()` validation messages without a constant operation-name parameter; and
-- exact `__all__` declarations for `pipls.regression`, `pipls.search`, and `pipls.exceptions`.
+- exact `__all__` declarations and wildcard-import surfaces for `pipls.regression`, `pipls.search`,
+  and `pipls.exceptions`; and
+- positive selection-ownership wording in model-producing tutorials.
 
-Patch 1 changes no executable contract. Use positive behavioral tests and compact active-surface
+All four patches are complete. Continue using positive behavioral tests and compact active-surface
 audits rather than preserving removed names as broad compatibility fixtures.

@@ -93,8 +93,8 @@ complete predictor-rank profile at that selected component count are then retrie
 --8<-- "examples/05_pulp_real_data.py:inspect-pulp-selection"
 ```
 
-`search.select()` is not required. The fitted model already carries the selection that configured
-it.
+After `refit()`, obtain the fitted selection from `model.selection_`. Use `search.select()` when a
+selection is needed without fitting a final model.
 
 ### Component path
 

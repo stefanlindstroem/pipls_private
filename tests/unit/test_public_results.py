@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import pickle
 from dataclasses import FrozenInstanceError, fields
+from types import ModuleType
 
 import numpy as np
 import pytest
 
 import pipls
+import pipls.exceptions as exceptions_module
+import pipls.regression as regression_module
+import pipls.search as search_module
 from pipls.component_path import (
     PiPLSComponentPath,
     PiPLSPredictorRankProfile,
@@ -50,6 +54,25 @@ def _validation_result() -> PiPLSSelection:
         cv_mse_fold_sd=np.float32(0.1),
         n_splits=np.int64(3),
     )
+
+
+@pytest.mark.parametrize(
+    ("module", "expected_name"),
+    [
+        (regression_module, "PiPLSRegression"),
+        (search_module, "PiPLSSearchCV"),
+        (exceptions_module, "PredictorRankSupportWarning"),
+    ],
+)
+def test_primary_modules_declare_exact_exports(
+    module: ModuleType,
+    expected_name: str,
+) -> None:
+    namespace: dict[str, object] = {}
+    exec(f"from {module.__name__} import *", namespace)
+
+    assert module.__all__ == [expected_name]
+    assert {name for name in namespace if name != "__builtins__"} == {expected_name}
 
 
 def test_result_records_are_public_only_from_focused_modules() -> None:

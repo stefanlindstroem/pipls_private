@@ -521,7 +521,7 @@ and constant OOF operation-name parameter, declares exact exports for the remain
 and exception modules, and replaces negative `search.select()` wording with its fitting-free role.
 
 The cleanup retains learned search state, selection provenance, model-selection algorithms, all five
-numerical inspection functions, OOF reporting, and caller-owned plotting. Patches 1 through 3 are
+numerical inspection functions, OOF reporting, and caller-owned plotting. All four patches are
 complete: the contract is established, redundant fitted attributes are removed, model-selection
-algorithms live in `_model_selection.py`, and unused private helper layers are gone. Patch 4 closes
-module exports, tutorial wording, and final audits.
+algorithms live in `_model_selection.py`, unused private helper layers are gone, remaining public
+modules declare exact exports, and tutorial wording states selection ownership positively.
