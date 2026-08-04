@@ -60,5 +60,5 @@ Tobacco smoke benchmark copy was removed by Decision 0037.
 - The overlaid PDF supports interpretation but is generated only from the canonical CSV files.
 - No superiority claim, formal confidence interval, nested CV, preprocessing comparison, or final
   PLS model recommendation is added.
-- Decision 0035 is superseded with respect to the Tobacco solver choice and bounded randomized-SVD
-  demonstration.
+- The retired Tobacco randomized-path precursor is replaced for solver choice and bounded
+  randomized-SVD demonstration.

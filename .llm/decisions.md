@@ -5,10 +5,10 @@ This file is the machine-checkable registry of numbered decisions currently ship
 before changing its subject. Table descriptions summarize the original record and may describe an
 intermediate state later superseded by a newer decision.
 
-Decision 0147 governs consolidation. Until a retirement patch supplies an explicit map and removes
-the corresponding record, every shipped numbered file remains listed here. After consolidation,
-this registry will contain only current numbered decisions and will link to the compact historical
-summary. Git remains the archive for retired records, and numbers are never reused.
+Decision 0147 governs consolidation. This registry lists only numbered decisions currently shipped
+under `docs/decisions/`. Retired filenames and canonical replacements are recorded in
+`docs/decisions/retirements.md`; Git remains the archive and decision numbers are never reused. A
+compact development-era summary will be added in Patch 4.
 
 | Record | Subject | Original durable consequence or current disposition |
 |---|---|---|
@@ -28,7 +28,6 @@ summary. Git remains the archive for retired records, and numbers are never reus
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
 | `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional immutable datasets plus local seeded latent-structure generation |
 | `0016-transparent-data-ingestion.md` | real-data and example boundary | users and examples read `X` and `Y` explicitly; no required registry or generic loader |
-| `0017-first-real-dataset.md` | former first transparent real-data integration | superseded by Decision 0033; the Linnerud integration is removed |
 | `0018-repository-dataset-layout.md` | historical repository-only dataset convention | retained for future repository-only assets; current named reference datasets follow Decision 0142 package resources |
 | `0019-pulp-dataset-integration.md` | pulp dataset integration | pulp uses public supplementary provenance, CC BY 4.0 attribution, named column selection, and direct X/Y reading |
 | `0020-public-dataset-provenance-boundary.md` | public versus internal dataset materials | public-only provenance and no private paths or preparation-only scripts; Corn-specific plan superseded by 0041 |
@@ -38,15 +37,10 @@ summary. Git remains the archive for retired records, and numbers are never reus
 | `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction stays downstream; future block-aware API design is deferred |
 | `0025-model-internal-standardization-boundary.md` | current versus future scaling | estimator centering/scaling is current and fold-local; only future block-aware variants are deferred |
 | `0026-package-navigation-cleanup.md` | public repository navigation | remove paper placeholders and organize entry points around the installable software product |
-| `0027-synthetic-benchmark-contract.md` | earlier broad synthetic benchmark contract | historical manifest/schema design superseded by Decision 0030 |
-| `0028-synthetic-ci-benchmark-runner.md` | earlier broad CI runner | historical implementation removed by Decision 0030 |
-| `0029-human-and-machine-readable-results.md` | historical benchmark result usability | superseded by Decisions 0030 and 0125 |
-| `0030-focused-benchmark-design.md` | historical focused benchmark design | benchmark layer retired by Decision 0125 |
 | `0031-default-selection-support.md` | ordinary rank-selection defaults | five samples per retained predictor direction and five-fold CV by default |
 | `0032-full-sample-rank-support.md` | rank-support sample-count convention | full supplied $n$ defines support; centered training folds impose feasibility caps |
 | `0033-remove-linnerud-integration.md` | reference dataset scope | remove the Linnerud dataset, example, test, and active navigation |
 | `0034-two-stage-component-path-workflow.md` | component-path presentation | one CSV row per component count, explicit predictor-rank policy, CSV-derived PDF, and separate fixed final fit |
-| `0035-tobacco-randomized-auto-path.md` | former Tobacco solver demonstration | superseded by Decision 0036; randomized SVD remains covered by solver consistency |
 | `0036-real-data-pls-path-comparison.md` | real-data example comparison | separate Pi-PLS and PLS CSV paths, overlaid PDF, and full-SVD Tobacco workflow |
 | `0037-user-run-real-data-analyses.md` | real-data execution boundary | examples remain user-run; duplicate smoke benchmarks and full example tests are removed |
 | `0038-single-examples-target.md` | explicit application validation | `make examples` runs every numbered example; `make check` remains fast internal validation |
@@ -117,17 +111,11 @@ summary. Git remains the archive for retired records, and numbers are never reus
 | `0103-installation-and-optional-dependency-boundary.md` | installation and optional dependencies | retain only maintained `dev`, `examples`, and `docs` extras; use noneditable public installation and editable contributor setup |
 | `0104-new-user-documentation-route.md` | new-user documentation route | motivate the separate ranks without performance claims and defer tutorial maintenance details to reproduction sections |
 | `0105-documentation-implementation-alignment.md` | documentation and implementation alignment | demonstrate current path defaults and document complete decomposition, output, and adaptive-search surfaces |
-| `0106-fold-based-cv-standard-error.md` | fold-based CV standard error | derive read-only standard errors from stored population fold SD and split counts without changing selection or plots |
-| `0107-component-path-recommendation-methods.md` | component-path recommendation methods | return exact stored minimum-CV-MSE and one-standard-error rows without fitting, mutation, tolerances, or redundant state |
-| `0108-tobacco-one-standard-error-workflow.md` | Tobacco one-standard-error workflow | use the stored 1-SE recommendation for example 07 while keeping introductory workflows explicit |
-| `0109-tobacco-one-standard-error-threshold-figure.md` | Tobacco one-standard-error threshold figure | show the minimum row, horizontal 1-SE threshold, and recommended row with direct documentation cross-links |
 | `0110-response-anchored-display-factors.md` | response-anchored Pi-PLS display factors | retain predictor-canonical defaults; optionally orient every component by a selected response row and requested sign |
-| `0111-explicit-path-selection-rules.md` | explicit path selection rules | preserve global `best_*`; expose a separate selected path row and optionally refit the best-score or 1-SE choice |
 | `0112-search-cv-public-name.md` | public selection-class name | rename the unreleased meta-estimator to `PiPLSSearchCV` without an alias; retain component-path result terminology |
 | `0113-derived-weighted-response-directions.md` | derived weighted response directions | store only independent display factors and expose checked read-only $QD$ as a derived property |
 | `0114-derived-prediction-diagnostics.md` | derived prediction diagnostics | accept observed values, predicted values, and provenance; derive all dependent diagnostic arrays once |
 | `0115-normalized-path-result-state.md` | normalized path result state | store path-wide policy and split count once; derive predictor-rank-profile selection from candidate arrays |
-| `0116-composed-validation-report-result.md` | composed validation-report result | store one selected component result and derive the existing selected-row convenience attributes |
 | `0117-commercial-license-authorship-and-citation.md` | commercial license, authorship, and citation | retain complete BSD-3-Clause terms, name the three copyright holders, and publish software plus companion-paper citation metadata |
 | `0118-maintained-figure-labeling-and-axis-policy.md` | maintained figure labeling and axis policy | consistent $\Pi$-PLS notation, factor symbols, numeric dilation ticks, tile titles, path/profile scales, and Tobacco response labels |
 | `0119-manuscript-latent-geometry-generator.md` | manuscript latent-geometry generator | additive exact Gaussian manuscript generator with manuscript-oriented immutable truth; existing synthetic and real-data workflows unchanged |
@@ -140,7 +128,6 @@ summary. Git remains the archive for retired records, and numbers are never reus
 | `0126-historical-removal-test-policy.md` | historical-removal test policy | retain negative tests for current boundaries, not one tombstone per pre-release removal |
 | `0127-artifact-based-rendering-validation.md` | artifact-based rendering validation | protect rendering ownership, numerical meaning, and generated artifacts without exact Matplotlib source locks |
 | `0128-same-file-rendering-functions.md` | same-file rendering functions | keep complete-example analysis in `main()` while private functions in the numbered script own rendering and report writing |
-| `0129-remove-pre-release-search-aliases.md` | pre-release search alias removal | historical fitted-model alias cleanup, superseded by Decision 0137; retain candidate-level `best_*` diagnostics |
 | `0130-mathematical-decomposition-field-names.md` | mathematical decomposition field names | expose `predictor_directions` and `response_directions` without pre-release aliases; retain standard PLS-style estimator rotation attributes |
 | `0131-concise-response-standardized-mse-names.md` | concise response-standardized MSE names | expose concise public scorer callables and stable default scorer string without aliases or numerical changes |
 | `0132-predicate-search-exhaustiveness-name.md` | predicate-style search exhaustiveness name | expose `search_is_exhaustive_` as the completed-search coverage predicate without an alias or behavioral change |
@@ -152,9 +139,9 @@ summary. Git remains the archive for retired records, and numbers are never reus
 | `0138-package-owned-pulp-dataset-loader.md` | package-owned Pulp dataset loader | provide one installed immutable `load_pulp()` dataset and archive the former repository layout without a duplicate active copy |
 | `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
 | `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
-| `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot the conditional rank profile at the selected component count, including the Tobacco 1-SE result |
+| `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot split-SD rank profiles at the fitted model selection, including Tobacco tolerance selection |
 | `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named immutable loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
-| `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain the exact refit selection as `model.selection_`, enrich 1-SE provenance, and replace repeated-rule validation reporting with `oof_report(selection=...)` |
+| `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain the exact refit selection as `model.selection_` and make `oof_report(selection=...)` reuse every materialized search split |
 | `0144-pre-release-public-surface-cleanup.md` | pre-release public-surface cleanup | remove duplicated result access, search aliases, candidate parameter representations, dataset aliases, shape-only properties, and top-level result re-exports while retaining distinct selection, inspection, OOF, and plotting roles |
 | `0145-final-implementation-surface-cleanup.md` | final implementation-surface cleanup | remove residual duplicate fitted attributes, privatize model-selection internals, remove unused private helpers, declare remaining module exports, and state fitting-free selection positively |
 | `0146-cv-mse-tolerance-selection.md` | CV-MSE tolerance selection and split-SD reporting | replace the 1-SE heuristic with dual-tolerance minimum-CV-MSE selection, descriptive split SD, a 10% Tobacco demonstration, and repeated Pulp validation |
@@ -174,12 +161,12 @@ most directly governed by these clusters:
 - **Examples and documentation:** 0037--0038, 0044--0057, 0062--0078, 0090--0101, and
   0139.
 - **Packaging, compatibility, and repository policy:** 0021, 0024, 0054--0056, 0103--0105,
-  0110--0111, 0124--0128, and 0147.
+  0110, 0124--0128, and 0147.
 - **Pre-release API normalization:** 0112--0136 and 0144--0146. Later records in this cluster
   supersede intermediate names and migration surfaces.
 
-These ranges are navigation aids, not a substitute for the full records or the retirement map that
-will be produced in Decision 0147 Patches 3 and 4.
+These ranges are navigation aids, not a substitute for the full records, the retirement map, or
+the historical summary that will be added in Decision 0147 Patch 4.
 
 ## Implemented clarifications
 

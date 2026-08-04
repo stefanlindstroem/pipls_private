@@ -5,7 +5,8 @@ engineering records, not prerequisites for using Pi-PLS. The user guides and gen
 reference describe the current public behavior directly.
 
 Decision 0147 establishes a current-decision lifecycle with compact historical summaries and Git
-recovery for retired intermediate records. No existing decision is removed in Patch 1.
+recovery for retired intermediate records. This index lists current numbered decisions. The
+[retirement map](retirements.md) records deleted filenames and their canonical replacements.
 
 ## Numerical method and estimator API
 
@@ -38,16 +39,11 @@ recovery for retired intermediate records. No existing decision is removed in Pa
 - [0095: required fixed Pi-PLS rank pair](0095-required-fixed-rank-pair.md)
 - [0096: notation, path ceilings, and inspection navigation]
   (0096-notation-path-ceilings-and-inspection-navigation.md)
-- [0106: fold-based CV standard error](0106-fold-based-cv-standard-error.md)
-- [0107: component-path recommendation methods](0107-component-path-recommendation-methods.md)
-- [0111: explicit path selection rules](0111-explicit-path-selection-rules.md)
 - [0112: search-CV public name](0112-search-cv-public-name.md)
 - [0115: normalized path result state](0115-normalized-path-result-state.md)
-- [0116: composed validation report result](0116-composed-validation-report-result.md)
 - [0120: companion-manuscript theory alignment](0120-companion-manuscript-theory-alignment.md)
 - [0121: canonical Pi-PLS terminology](0121-canonical-pipls-terminology.md)
 - [0122: public terminology propagation](0122-public-terminology-propagation.md)
-- [0129: remove pre-release search compatibility aliases](0129-remove-pre-release-search-aliases.md)
 - [0130: mathematical decomposition field names](0130-mathematical-decomposition-field-names.md)
 - [0131: concise response-standardized MSE names](0131-concise-response-standardized-mse-names.md)
 - [0132: predicate-style search exhaustiveness name](0132-predicate-search-exhaustiveness-name.md)
@@ -64,18 +60,12 @@ recovery for retired intermediate records. No existing decision is removed in Pa
 - [0014: validation metadata scope](0014-validation-metadata-scope.md)
 - [0015: dataset and synthetic API](0015-dataset-and-synthetic-api.md)
 - [0016: transparent data ingestion](0016-transparent-data-ingestion.md)
-- [0017: first real dataset](0017-first-real-dataset.md)
 - [0018: repository dataset layout](0018-repository-dataset-layout.md)
 - [0019: Pulp integration](0019-pulp-dataset-integration.md)
 - [0020: public dataset provenance](0020-public-dataset-provenance-boundary.md)
 - [0022: Sugarcane integration](0022-sugarcane-dataset-integration.md)
 - [0023: Tobacco integration](0023-tobacco-dataset-integration.md)
-- [0027: synthetic benchmark contract](0027-synthetic-benchmark-contract.md)
-- [0028: synthetic CI benchmark runner](0028-synthetic-ci-benchmark-runner.md)
-- [0029: human- and machine-readable results](0029-human-and-machine-readable-results.md)
-- [0030: focused benchmark design](0030-focused-benchmark-design.md)
 - [0033: remove Linnerud integration](0033-remove-linnerud-integration.md)
-- [0035: former Tobacco randomized path](0035-tobacco-randomized-auto-path.md)
 - [0041: legacy dataset licensing](0041-legacy-dataset-licensing-roadmap.md)
 - [0119: manuscript latent-geometry generator](0119-manuscript-latent-geometry-generator.md)
 - [0123: companion-manuscript synthetic-data guide]
@@ -109,8 +99,6 @@ recovery for retired intermediate records. No existing decision is removed in Pa
 - [0097: focused leave-one-out example](0097-focused-leave-one-out-example.md)
 - [0101: continuous numbered examples](0101-continuous-numbered-examples.md)
 - [0102: path-search defaults and scorer presentation](0102-path-search-defaults.md)
-- [0108: Tobacco one-standard-error workflow](0108-tobacco-one-standard-error-workflow.md)
-- [0109: Tobacco one-standard-error threshold figure](0109-tobacco-one-standard-error-threshold-figure.md)
 - [0110: response-anchored Pi-PLS display factors](0110-response-anchored-display-factors.md)
 - [0113: derived weighted response directions](0113-derived-weighted-response-directions.md)
 - [0114: derived prediction diagnostics](0114-derived-prediction-diagnostics.md)

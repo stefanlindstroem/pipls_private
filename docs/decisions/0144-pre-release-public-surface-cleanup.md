@@ -276,10 +276,11 @@ tie-breaking, split values, score/MSE summaries, ranks, timings, dataset arrays 
 inspection arrays, all five inspection functions, direct construction, and pickle safety are
 preserved.
 
-This decision refines Decisions 0051, 0052, 0071, 0072, 0086, 0087, 0090, 0094, 0111, 0116, 0129,
-0134, 0138, 0140, and 0143. It preserves their numerical, immutability, direct-construction,
-selection, OOF, dataset-resource, and caller-owned-rendering boundaries while narrowing duplicated
-access paths.
+This decision refines Decisions 0051, 0052, 0071, 0072, 0086, 0087, 0090, 0094, 0134, 0138,
+0140, and 0143. It preserves their numerical, immutability, direct-construction, selection, OOF,
+dataset-resource, and caller-owned-rendering boundaries while narrowing duplicated access paths.
+The removed pre-release selection, report, and alias records are listed in the Decision 0147
+retirement map.
 
 ## Consequences
 

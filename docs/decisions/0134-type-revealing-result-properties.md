@@ -36,10 +36,9 @@ Use the new names throughout implementation, tests, examples, renderers, public 
 active guide-layer contracts. Do not add aliases, fallback attribute lookup, or serialization
 migration for the former unreleased names.
 
-Historical decision records remain unchanged. This decision supersedes Decisions 0072 and 0115
-only where they require the former predictor-rank-profile property spelling, and Decision 0116 only
-where it requires the former validation-report convenience-property spellings. Their immutable
-state, tie-breaking, composition, OOF, and numerical contracts otherwise remain in force.
+This decision supersedes Decisions 0072 and 0115 only where they require the former
+predictor-rank-profile property spelling. Its former validation-report naming changes were later
+replaced by the OOF-report surface in Decisions 0143 and 0144.
 
 ## Consequences
 

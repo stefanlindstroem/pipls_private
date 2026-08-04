@@ -160,15 +160,15 @@ Decision 0147 governs the current seven-patch cleanup:
 
 1. establish decision lifecycle policy -- complete;
 2. compact and correct the active `.llm` layer -- complete;
-3. retire explicitly superseded decisions through an explicit map;
+3. retire explicitly superseded decisions through an explicit map -- complete;
 4. add a compact historical summary and retire completed micro-decisions;
 5. simplify brittle structural tests and harden snapshots against tracked generated artifacts;
 6. split `datasets.py` into private implementation modules without changing public imports;
 7. normalize links and indexes and complete repository-wide stale-surface audits.
 
-The next admissible increment is Decision 0147 Patch 3: retire explicitly superseded decisions
-through a reviewed map. Decision 0139 Patch 3 remains a separate paused presentation increment and
-must not be mixed into this maintenance sequence.
+The next admissible increment is Decision 0147 Patch 4: add the compact historical summary and
+retire completed micro-decisions. Decision 0139 Patch 3 remains a separate paused presentation
+increment and must not be mixed into this maintenance sequence.
 
 ## Authority and drift handling
 

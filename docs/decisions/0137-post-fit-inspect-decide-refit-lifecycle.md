@@ -92,10 +92,9 @@ second `cross_val_predict()` workflow. Decision 0140 assigns scalar selected-row
 Do not add aliases, deprecation warnings, ignored constructor arguments, fallback attributes, or
 serialization migrations for the removed pre-release surface.
 
-This decision supersedes Decisions 0005, 0066, 0087, 0102, 0111, 0116, and 0129 only where they
-require constructor-time final selection, selected-model state on the search object, or
-constructor-owned OOF reporting. Their splitter, immutable-result, scoring, and numerical contracts
-otherwise remain in force.
+This decision supersedes Decisions 0005, 0066, 0087, and 0102 where they require
+constructor-time final selection or constructor-owned OOF reporting. The Decision 0147 retirement
+map records the removed pre-release selection, report-composition, and fitted-search-alias records.
 
 ## Consequences
 

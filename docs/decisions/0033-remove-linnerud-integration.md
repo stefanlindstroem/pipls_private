@@ -24,7 +24,8 @@ dataset.
 - Remove Linnerud from active dataset, example, reproducibility, roadmap, and product navigation.
 - Keep the general repository dataset-layout contract and direct pandas I/O policy unchanged.
 - Keep Pulp, sugarcane, and tobacco as the current transparent real-data suite.
-- Preserve historical changelog and decision context, but mark Decision 0017 as superseded.
+- Record the retired first-dataset decision in the Decision 0147 retirement map; Git preserves
+  its full text.
 
 ## Consequences
 

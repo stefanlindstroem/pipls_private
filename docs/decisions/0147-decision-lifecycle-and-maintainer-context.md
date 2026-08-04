@@ -2,9 +2,9 @@
 
 ## Status
 
-Accepted. Patches 1 and 2 of seven are complete. The decision lifecycle is established and the
-active `.llm` layer now describes current contracts rather than completed transition history. No
-existing decision record is retired before Patch 3 supplies an explicit supersession map.
+Accepted. Patches 1--3 of seven are complete. The decision lifecycle is established, the active
+`.llm` layer describes current contracts, and the first explicit retirement map removes 13 fully
+superseded records. The maintained tree now contains 134 numbered decisions.
 
 ## Context
 
@@ -73,6 +73,20 @@ The same patch must remove or redirect active links from `.llm`, tests, document
 decisions. No copied archive, tarball, or hidden duplicate of the retired Markdown files is added to
 the repository.
 
+### First retirement map
+
+Patch 3 adds `docs/decisions/retirements.md` and removes 13 records in five unambiguous groups:
+
+- the removed Linnerud integration;
+- the retired benchmark contract, runner, output schema, and focused benchmark design;
+- the former Tobacco randomized-solver demonstration;
+- the removed standard-error, path-recommendation, 1-SE workflow, and 1-SE figure sequence;
+- the superseded constructor-selection, validation-report-composition, and selected-search-alias
+  records.
+
+Every deleted filename maps directly to one or more retained canonical decisions. No historical
+summary is introduced ahead of Patch 4, and no one-off micro-decision is retired in this patch.
+
 ### Keep the active indexes current-focused
 
 After consolidation:
@@ -109,7 +123,7 @@ split internally.
 
 1. Establish this decision and synchronize the guide-layer phase state -- complete.
 2. Compact and correct the active `.llm` layer around current contracts -- complete.
-3. Retire explicitly superseded decisions using a reviewed retirement map.
+3. Retire explicitly superseded decisions using a reviewed retirement map -- complete.
 4. Add `docs/decisions/history.md` and consolidate completed micro-decisions, targeting roughly
    35--50 current records.
 5. Simplify brittle repository and workflow-structure tests and harden snapshot creation against

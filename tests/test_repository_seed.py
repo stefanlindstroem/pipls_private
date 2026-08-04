@@ -37,6 +37,11 @@ _REQUIRED_LLM_CONTRACTS = {
     ".llm/strategy.md",
 }
 _DECISION_ROW = re.compile(r"^\| `(?P<filename>\d{4}-[a-z0-9-]+\.md)` \|", re.MULTILINE)
+_RETIREMENT_ROW = re.compile(
+    r"^\| `(?P<filename>\d{4}-[a-z0-9-]+\.md)` \| "
+    r"(?P<replacement>.*?) \|",
+    re.MULTILINE,
+)
 
 
 def _repository_root() -> Path:
@@ -559,6 +564,33 @@ def test_maintainer_decision_index_links_every_record() -> None:
 
     assert len(linked_entries) == len(linked_files), "decision records must be indexed exactly once"
     assert linked_files == decision_files
+
+
+def test_decision_retirement_map_is_complete_and_nonconflicting() -> None:
+    root = _repository_root()
+    decisions = root / "docs" / "decisions"
+    retirement_text = (decisions / "retirements.md").read_text(encoding="utf-8")
+    rows = list(_RETIREMENT_ROW.finditer(retirement_text))
+    retired_files = [match.group("filename") for match in rows]
+    shipped_files = {
+        path.name for path in decisions.glob("[0-9][0-9][0-9][0-9]-*.md")
+    }
+
+    assert rows, "the retirement map must contain at least one retired decision"
+    assert len(retired_files) == len(set(retired_files))
+    assert set(retired_files).isdisjoint(shipped_files)
+
+    retired_numbers = {filename[:4] for filename in retired_files}
+    shipped_numbers = {filename[:4] for filename in shipped_files}
+    assert retired_numbers.isdisjoint(shipped_numbers), "decision numbers must not be reused"
+
+    for match in rows:
+        replacements = re.findall(
+            r"\((\d{4}-[a-z0-9-]+\.md)\)",
+            match.group("replacement"),
+        )
+        assert replacements, match.group("filename")
+        assert all((decisions / replacement).is_file() for replacement in replacements)
 
 
 def test_llm_layer_is_outside_installable_package() -> None:

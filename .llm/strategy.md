@@ -85,14 +85,15 @@ Acceptance conditions:
 
 ### Patch 3 -- retire explicitly superseded decisions
 
-Next. Create a reviewed retirement map for decisions whose active contract is fully replaced by a
-later canonical record. Remove or redirect every active reference in the same patch. Do not add
-tombstone files or reuse decision numbers.
+Complete. The first retirement map removes 13 records whose active effects are fully replaced by
+later canonical decisions. Current indexes list only shipped records; deleted filenames remain
+recoverable from Git and decision numbers are not reused.
 
 ### Patch 4 -- historical summary and micro-decision consolidation
 
-Add `docs/decisions/history.md` with compact development-era summaries and canonical links. Retire
-one-off migration, naming, figure, documentation-arrangement, and completed cleanup decisions when
+Next. Add `docs/decisions/history.md` with compact development-era summaries and canonical
+links. Retire one-off migration, naming, figure, documentation-arrangement, and completed cleanup
+decisions when
 Git history or the summary is sufficient. The target of roughly 35--50 current decisions is a
 review goal, not a test invariant.
 

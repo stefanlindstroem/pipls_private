@@ -133,10 +133,9 @@ Decision 0139 Patch 3 is paused after its first two completed patches. It resume
 transition so the landing page, tutorials, and path reference are reframed once around the final
 selection API.
 
-This decision refines Decisions 0066, 0107, 0111, and 0137 where they assign public selection or
-recommendation methods to `PiPLSComponentPath`. Their immutable path arrays, exact stored-value
-selection numerics, named rules, inspect-decide-refit lifecycle, and explicit validation-report
-contracts remain in force.
+This decision refines Decisions 0066 and 0137 where public selection responsibility overlaps
+with `PiPLSComponentPath`. The retired path-recommendation and constructor-selection records are
+covered by the Decision 0147 retirement map.
 
 ## Implementation status
 
