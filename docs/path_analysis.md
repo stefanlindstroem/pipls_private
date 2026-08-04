@@ -143,7 +143,7 @@ from sklearn.model_selection import KFold
 
 cv = KFold(n_splits=5, shuffle=True, random_state=0)
 search = PiPLSSearchCV(cv=cv).fit(X, Y)
-model = search.refit(X, Y, rule="one_standard_error")
+model = search.refit(X, Y, rule="minimum_cv_mse")
 
 selection = model.selection_
 report = search.oof_report(X, Y, selection=selection)
@@ -231,9 +231,9 @@ CV-MSE and define
 The rule chooses the smallest evaluated component count whose mean CV-MSE does not exceed $\tau$.
 It is a heuristic for identifying a simpler model within one estimated standard error of the
 minimum; it does not establish equivalence between the candidates. It is particularly convenient
-when the CV-MSE curve has no clear elbow that would otherwise motivate a component count. The
-[Tobacco one-standard-error workflow](examples.md#tobacco-one-standard-error-selection) demonstrates this case and
-shows the minimum row, horizontal threshold, and recommended row in the component-path figure.
+when the CV-MSE curve has no clear elbow that would otherwise motivate a component count. This temporary rule remains available during the migration, but no maintained workflow depends on
+it. The [Tobacco relative-tolerance workflow](examples.md#tobacco-relative-tolerance-selection)
+now demonstrates explicit parsimony without using a resampling standard error.
 
 ### Search-owned selection rules
 
@@ -270,12 +270,12 @@ predictor rank need not minimize CV-MSE within its component-count profile. Mode
 workflows obtain the fitted row from `model.selection_`; `search.select(...)` remains useful for
 selection-only analysis. `component_path_` remains the aligned numerical curve.
 
-The Tobacco workflow applies the named 1-SE rule once through `refit()`. The returned
-`model.selection_` carries the selected row, exact `reference_minimum`, and derived
-`one_standard_error_threshold`. The same selection supplies the conditional predictor-rank profile
-and `oof_report()`. Predictor-rank profile error bars use the stored split SD, while the stored
-predictor rank for each component count continues to maximize the configured mean CV score
-rather than applying the 1-SE rule.
+The Tobacco workflow applies `rule="minimum_cv_mse"` with `relative_tolerance=0.10` once through
+`refit()`. The returned `model.selection_` carries the selected row, exact `reference_minimum`,
+resolved tolerance, and derived `cv_mse_threshold`. The same selection supplies the conditional
+predictor-rank profile and `oof_report()`. Predictor-rank profile error bars use the stored split SD,
+while the stored predictor rank for each component count continues to maximize the configured mean
+CV score. The optional `absolute_tolerance` remains at positive infinity in this example.
 
 ## Post-fit final-model selection
 
@@ -284,7 +284,7 @@ fixed model on the supplied full data:
 
 ```python
 search = PiPLSSearchCV(search_method="auto").fit(X, Y)
-model = search.refit(X, Y, rule="one_standard_error")
+model = search.refit(X, Y, rule="minimum_cv_mse")
 Y_pred = model.predict(X_new)
 ```
 

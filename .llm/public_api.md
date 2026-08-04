@@ -136,7 +136,7 @@ Final full-data fitting is an explicit post-fit operation:
 
 ```python
 search = PiPLSSearchCV(cv=cv).fit(X, y)
-model = search.refit(X, y, rule="one_standard_error")
+model = search.refit(X, y, rule="minimum_cv_mse")
 model = search.refit(X, y, n_components=4)
 ```
 
@@ -194,7 +194,7 @@ search = PiPLSSearchCV(cv=cv).fit(X, y)
 model = search.refit(
     X,
     y,
-    rule="one_standard_error",
+    rule="minimum_cv_mse",
 )
 
 # Analysis follows modeling.
@@ -459,7 +459,8 @@ component paths directly in memory. Pulp, Sugarcane, and Tobacco use path-evalua
 `KFold(n_splits=5, shuffle=True, random_state=0)` partition materialized by the path search. They
 render immutable Pi-PLS factors, latent structure, observation diagnostics, and prediction
 diagnostics directly with Matplotlib and write only final PDF figures. Tobacco obtains its count,
-minimum reference, and threshold from the one-standard-error `model.selection_` and uses
+exact minimum reference, resolved 10% relative tolerance, and threshold from the
+minimum-CV-MSE `model.selection_` and uses
 full predictor SVD, direct observation diagnostics, and caller-owned source-order response
 pagination through multipage PDFs.
 
@@ -526,6 +527,7 @@ and removes `rule="one_standard_error"`, `cv_mse_standard_error`, and
 `one_standard_error_threshold`. Maintained plots use mean CV-MSE ± split SD. Tobacco demonstrates a
 10% relative tolerance; absolute tolerance is documented without an example.
 
-Current status: **Patches 1–4 of 7 complete**. The tolerance arguments and immutable provenance are
-implemented, and maintained plots use descriptive split SD. The one-standard-error rule and
-derived SE remain temporarily active until workflows migrate and Patch 7 removes them.
+Current status: **Patches 1–5 of 7 complete**. The tolerance arguments and immutable provenance are
+implemented, maintained plots use descriptive split SD, and maintained automatic workflows now
+use minimum-CV-MSE selection. The one-standard-error rule and derived SE remain temporarily active
+only until Patch 7 removes them.

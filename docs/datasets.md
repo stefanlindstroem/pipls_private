@@ -334,9 +334,9 @@ No imputation, smoothing, derivatives, scatter correction, centering, scaling, o
 preprocessing is applied. `load_tobacco()` returns the immutable labeled package dataset or its
 read-only matrices. `examples/07_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
 labels, and source-order response names from that result, evaluates a Pi-PLS component path with
-adaptive predictor-rank scanning and full predictor SVD, and refits the one-standard-error
-selection. Analysis then obtains the selected row, reference minimum, and threshold from
-`model.selection_`, derives the conditional predictor-rank profile, evaluates the same selection
+adaptive predictor-rank scanning and full predictor SVD, and refits the smallest component row
+within a 10% relative tolerance of the minimum mean CV-MSE. Analysis then obtains the selected row,
+exact reference minimum, resolved tolerance, and threshold from `model.selection_`, derives the conditional predictor-rank profile, evaluates the same selection
 through `search.oof_report()`, calculates raw observation diagnostics, and writes six final PDFs.
 Prediction diagnostics and coefficients are
 paginated in source response order. The separate ordinary-PLS comparison remains in example 04.

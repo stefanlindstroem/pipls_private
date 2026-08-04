@@ -30,14 +30,13 @@ ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analy
 DISPLAY_COMPONENT_COUNT = 4
 RESPONSES_PER_PAGE = 5
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
-
-
 def _plot_component_path(
     path: PiPLSComponentPath,
     minimum: PiPLSSelection,
     selected: PiPLSSelection,
     *,
-    one_se_threshold: float,
+    cv_mse_threshold: float,
+    relative_tolerance: float,
     output_path: Path,
 ) -> None:
     figure, axis = plt.subplots(
@@ -60,11 +59,11 @@ def _plot_component_path(
         zorder=3,
     )
     axis.axhline(
-        one_se_threshold,
+        cv_mse_threshold,
         linewidth=1.2,
         linestyle="--",
         color="0.35",
-        label="1-SE threshold",
+        label=f"{100.0 * relative_tolerance:.0f}% relative-tolerance threshold",
     )
     axis.scatter(
         [selected.n_components],
@@ -72,7 +71,8 @@ def _plot_component_path(
         marker="D",
         s=70,
         label=(
-            f"1-SE recommendation: {selected.n_components} components, "
+            f"{100.0 * relative_tolerance:.0f}% tolerance recommendation: "
+            f"{selected.n_components} components, "
             f"predictor rank {selected.predictor_rank}"
         ),
         zorder=3,
@@ -83,7 +83,7 @@ def _plot_component_path(
     axis.set_xticks(path.n_components)
     upper = max(
         float(np.max(path.cv_mse_mean + path.cv_mse_std)),
-        float(one_se_threshold),
+        float(cv_mse_threshold),
     )
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
@@ -122,7 +122,7 @@ def _plot_predictor_rank_profile(
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_title(
         rf"Tobacco $\Pi$-PLS predictor-rank profile at "
-        f"{profile.n_components} components (1-SE choice)"
+        f"{profile.n_components} components (10% tolerance choice)"
     )
     axis.set_xticks(profile.predictor_rank)
     upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_std))
@@ -404,7 +404,7 @@ def main() -> None:
         for start in range(0, len(response_names), RESPONSES_PER_PAGE)
     )
 
-    # Evaluate the Pi-PLS component path and fit the 1-SE-selected model.
+    # Evaluate the Pi-PLS component path and fit the 10%-tolerance model.
     search = PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,
@@ -418,7 +418,8 @@ def main() -> None:
     model = search.refit(
         X,
         Y,
-        rule="one_standard_error",
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
     )
 
     # Analyze the fitted selection, retained search evidence, and OOF behavior.
@@ -427,9 +428,10 @@ def main() -> None:
     rank_profile = search.predictor_rank_profile(selection.n_components)
     report = search.oof_report(X, Y, selection=selection)
     minimum = selection.reference_minimum
-    one_se_threshold = selection.one_standard_error_threshold
-    if minimum is None or one_se_threshold is None:
-        raise RuntimeError("The 1-SE selection lacks its reference evidence.")
+    cv_mse_threshold = selection.cv_mse_threshold
+    relative_tolerance = selection.relative_tolerance
+    if minimum is None or cv_mse_threshold is None or relative_tolerance is None:
+        raise RuntimeError("The tolerance selection lacks its reference evidence.")
     display_components = tuple(
         range(min(DISPLAY_COMPONENT_COUNT, selection.n_components))
     )
@@ -450,7 +452,8 @@ def main() -> None:
         path,
         minimum,
         selection,
-        one_se_threshold=one_se_threshold,
+        cv_mse_threshold=cv_mse_threshold,
+        relative_tolerance=relative_tolerance,
         output_path=ANALYSIS_DIR / "component_path.pdf",
     )
     _plot_predictor_rank_profile(
@@ -490,11 +493,11 @@ def main() -> None:
 
     print(f"X shape: {X.shape}; Y shape: {Y.shape}")
     print(
-        "1-SE-recommended Pi-PLS: "
+        "10%-tolerance Pi-PLS: "
         f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
     )
     print(
-        "Predictor-rank profile at the 1-SE component count: "
+        "Predictor-rank profile at the tolerance-selected component count: "
         f"evaluated {rank_profile.predictor_rank[0]} to "
         f"{rank_profile.predictor_rank[-1]}; "
         f"selected rank {rank_profile.selection.predictor_rank}"

@@ -97,7 +97,7 @@ of at least one.
 ### `examples/`
 
 `examples/01_pulp_quick_start.py` is the primary onboarding path: package-owned Pulp data,
-one chained default path search and one-standard-error refit, one fitted-value prediction call,
+one chained default path search and minimum-CV-MSE refit, one fitted-value prediction call,
 standardized response diagnostics, and one caller-composed observed-versus-fitted plot. It must not
 depend on complete-workflow helpers, pandas, an explicit splitter, or OOF reporting, and its prose
 must identify the predictions as full-data fitted values rather than predictive validation.
@@ -122,7 +122,7 @@ preparation area.
 
 Decision 0139 establishes a three-stage served tutorial target. The first stage is a short rendered
 Pulp quick start sourced from the renamed `examples/01_pulp_quick_start.py`; it owns the automatic
-one-standard-error fit, full-data fitted-value diagnostics, one standardized observed-versus-fitted
+minimum-CV-MSE fit, full-data fitted-value diagnostics, one standardized observed-versus-fitted
 axis, and the explicit boundary that calibration fit is not validation. The second stage is the
 synthetic tutorial, which retains the fitted search object and owns component-path inspection,
 conditional-rank inspection, manual component selection, fixed fitting, and external-test
@@ -168,7 +168,7 @@ obtain the fitted row from `model.selection_`.
 Decision 0141 makes every complete real-data workflow inspect the conditional predictor-rank
 profile at its selected component count. Sugarcane and Tobacco call
 `search.predictor_rank_profile(selection.n_components)`; for Tobacco, `selection` is the exact row
-retained by the one-standard-error refit.
+retained by the 10%-relative-tolerance minimum-CV-MSE refit.
 
 Decision 0143 accepts a seven-patch workflow normalization. In the final model-producing examples,
 modeling ends when `search.refit(...)` returns the full-data model. Analysis then begins in this
@@ -541,7 +541,7 @@ positive infinity. Tobacco will demonstrate `relative_tolerance=0.10`; absolute 
 documented but not demonstrated. The complete Pulp workflow and Tutorial 3 will use repeated
 five-fold CV with ten repetitions, while quick and other workflows remain lighter.
 
-Current status: **Patches 1–4 of 7 complete**. `minimum_cv_mse` accepts simultaneous relative and
+Current status: **Patches 1–5 of 7 complete**. `minimum_cv_mse` accepts simultaneous relative and
 absolute tolerances with immutable provenance, and maintained CV-MSE figures use `cv_mse_std` as
 descriptive split variability. The derived `cv_mse_standard_error` remains temporarily available
 only for still-active 1-SE selection.

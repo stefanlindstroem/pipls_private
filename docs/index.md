@@ -25,7 +25,7 @@ from pipls import PiPLSSearchCV
 from pipls.datasets import load_pulp
 
 X, Y = load_pulp(return_X_y=True)
-model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")
+model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="minimum_cv_mse")
 Y_fitted = model.predict(X)
 ```
 

@@ -57,7 +57,7 @@ def render_quick_start_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) ->
 
     data = load_pulp()
     X, Y = data.X, data.Y
-    model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")
+    model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="minimum_cv_mse")
     diagnostics = prediction_diagnostics(
         Y,
         model.predict(X),

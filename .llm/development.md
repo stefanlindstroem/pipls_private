@@ -138,8 +138,8 @@
   lookup must not fit, refit, or mutate search state. Decision 0140 assigns that ownership to
   `search.select(...)`, and all
   maintained examples, tutorial snippets, and living API pages now use that operation. Example 07
-  shows the minimum row, horizontal 1-SE threshold, and recommended row by resolving both
-  annotations through the fitted search. Keep generated pages and cross-links synchronized with
+  shows the exact minimum row, horizontal 10% relative-tolerance threshold, and recommended row
+  from `model.selection_`. Keep generated pages and cross-links synchronized with
   the implemented stage.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory

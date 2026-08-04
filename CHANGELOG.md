@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Migrate maintained automatic model-producing workflows from the temporary one-standard-error
+  rule to `minimum_cv_mse`. Use the machine-scale relative default in the quick start and general
+  documentation, and make Tobacco demonstrate `relative_tolerance=0.10` with its exact minimum,
+  resolved tolerance, and derived CV-MSE threshold supplying the component-path annotations.
 - Replace maintained component-path and predictor-rank-profile error bars with the stored
   population `cv_mse_std` across materialized validation splits. Label the bars as descriptive mean
   CV-MSE ± SD, update axis limits, tutorials, rendering contracts, and path documentation, and

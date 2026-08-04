@@ -46,7 +46,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
   optimum available through `search.select(rule="best_score")`;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
   `predictor_rank_profile(n_components)`, derived from `cv_results_`;
-- a package-owned Pulp first example showing one chained path search and one-standard-error refit,
+- a package-owned Pulp first example showing one chained path search and minimum-CV-MSE refit,
   standardized fitted-value diagnostics, and one caller-owned observed-versus-fitted plot;
 - a public documentation entry that defines paired latent variables, component-count scanning,
   and elbow-based CV-MSE interpretation before specialized terminology;
@@ -269,10 +269,11 @@ Additional fixed decisions:
 - Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
   separate fixed model
   after a visible component-path choice. Pulp and Sugarcane use explicit component counts, while
-  Tobacco obtains its selected row, minimum reference, and 1-SE threshold from
-  `model.selection_`. All three call `search.predictor_rank_profile(selection.n_components)`; for
-  Tobacco the profiled
-  count is therefore the result of the 1-SE rule. All three use `component_path_`, explicit search
+  Tobacco obtains its selected row, exact minimum reference, resolved 10% relative tolerance, and
+  CV-MSE threshold from `model.selection_`. All three call
+  `search.predictor_rank_profile(selection.n_components)`; for Tobacco the profiled count is
+  therefore the result of the explicit tolerance policy. All three use `component_path_`, explicit
+  search
   validation reports, and inspection results
   directly in memory. All three use direct fixed estimators. Selection evidence is consumed as
   immutable `PiPLSSelection` values rather than duplicated fitted-search attributes.
@@ -523,7 +524,7 @@ contracts are tested at the search boundary.
 
 Decision 0141 adds `predictor_rank_profile.pdf` to both spectral complete analyses. Sugarcane
 profiles its explicit selected count; Tobacco profiles `selection.n_components` from the exact row
-retained by the one-standard-error refit. All three complete real-data workflows write six PDFs.
+retained by the 10%-relative-tolerance refit. All three complete real-data workflows write six PDFs.
 
 ## Package-owned reference-dataset transition
 
@@ -622,15 +623,15 @@ Tobacco, and introduce ten repeated five-fold partitions in the complete Pulp wo
 3. The transition does not add outer validation or demonstrate absolute tolerance in a maintained
 example.
 
-Current status: **Patches 1–4 of 7 complete**. The public result layer uses `cv_mse_std`,
+Current status: **Patches 1–5 of 7 complete**. The public result layer uses `cv_mse_std`,
 `minimum_cv_mse` applies simultaneous validated relative and absolute tolerances with complete
 immutable provenance, and maintained CV-MSE plots show descriptive split SD. The temporary derived
 `cv_mse_standard_error` bridge remains only for the still-active one-standard-error rule.
 
 ## Current next increment
 
-Implement Decision 0146 Patch 5: migrate maintained automatic workflows to minimum-CV-MSE
-tolerance selection, including Tobacco with `relative_tolerance=0.10`.
+Implement Decision 0146 Patch 6: use repeated five-fold CV with ten repetitions in the complete
+Pulp workflow, renderer, Tutorial 3, and corresponding tests and manifests.
 Decision 0139 Patch 3 remains an independent paused presentation increment.
 
 ## Authority and drift handling

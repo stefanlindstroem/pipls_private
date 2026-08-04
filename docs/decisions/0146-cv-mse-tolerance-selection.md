@@ -220,7 +220,7 @@ search-select-refit procedure remains a separate future design problem.
    selection provenance — complete.
 4. Replace maintained SE error bars and wording with SD across validation splits — complete.
 5. Migrate maintained automatic workflows to `minimum_cv_mse`; use `relative_tolerance=0.10` in
-   Tobacco and machine-scale defaults elsewhere.
+   Tobacco and machine-scale defaults elsewhere — complete.
 6. Use repeated five-fold CV with ten repetitions in the Pulp example, renderer, Tutorial 3, and
    corresponding tests and manifests.
 7. Remove the one-standard-error rule and all remaining active SE surface, synchronize public

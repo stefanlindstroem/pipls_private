@@ -68,7 +68,7 @@ X, Y = load_pulp(return_X_y=True)
 model = PiPLSSearchCV().fit(X, Y).refit(
     X,
     Y,
-    rule="one_standard_error",
+    rule="minimum_cv_mse",
 )
 
 Y_fitted = model.predict(X)
@@ -131,7 +131,7 @@ predictor-rank plots. The [path-selection reference](docs/api/path.md) and
 validation protocols.
 
 When the complete protocol is known in advance, search and final fitting can remain compact. This
-example uses adaptive predictor-rank search and the 1-SE component rule:
+example uses adaptive predictor-rank search and the minimum-CV-MSE component rule:
 
 ```python
 model = PiPLSSearchCV(search_method="auto").fit(
@@ -140,7 +140,7 @@ model = PiPLSSearchCV(search_method="auto").fit(
 ).refit(
     X_train,
     Y_train,
-    rule="one_standard_error",
+    rule="minimum_cv_mse",
 )
 
 Y_pred = model.predict(X_test)
@@ -153,7 +153,7 @@ calculated:
 
 ```python
 search = PiPLSSearchCV(search_method="auto").fit(X_train, Y_train)
-model = search.refit(X_train, Y_train, rule="one_standard_error")
+model = search.refit(X_train, Y_train, rule="minimum_cv_mse")
 
 selection = model.selection_
 path = search.component_path_

@@ -14,7 +14,7 @@ X, Y = data.X, data.Y
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:fit-selected-pulp-model]
-model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")
+model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="minimum_cv_mse")
 
 diagnostics = prediction_diagnostics(
     Y,

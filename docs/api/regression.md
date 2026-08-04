@@ -33,7 +33,7 @@ that configured it:
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
-model = search.refit(X, Y, rule="one_standard_error")
+model = search.refit(X, Y, rule="minimum_cv_mse")
 selection = model.selection_
 ```
 

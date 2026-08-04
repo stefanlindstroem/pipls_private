@@ -1134,4 +1134,4 @@ The default relative tolerance is machine-scale numerical equivalence and the de
 tolerance is positive infinity. Both tolerance conditions must hold. This transition does not add
 an outer-validation API and does not propagate repeated CV to every maintained example.
 
-Current status: **Patches 1–4 of 7 complete**. Patch 5 is the next increment.
+Current status: **Patches 1–5 of 7 complete**. Patch 6 is the next increment.

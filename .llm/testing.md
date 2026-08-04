@@ -374,6 +374,11 @@ axis labels the display as $\pm 1$ SD, axis limits include the SD range, and tut
 that the bars are descriptive split-to-split variability rather than confidence intervals or
 selection thresholds.
 
+Patch 5 protects that maintained automatic workflows use `minimum_cv_mse`, the quick start uses the
+machine-scale default, and Tobacco passes `relative_tolerance=0.10`, derives its annotations from
+`selection.reference_minimum`, `selection.relative_tolerance`, and `selection.cv_mse_threshold`,
+and passes that exact selection to its rank profile and OOF report.
+
 ## CV-MSE tolerance selection
 
 Decision 0146 Patch 3 protects machine-scale default resolution, explicit zero and finite relative

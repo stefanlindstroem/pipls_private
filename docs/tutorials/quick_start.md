@@ -19,8 +19,8 @@ responses.
 ## Search, select, and refit
 
 The complete automatic workflow is one chained expression. `fit()` evaluates the cross-validated
-path, and `refit(rule="one_standard_error")` resolves the selected path row and fits that fixed
-model on all observations:
+path, and `refit(rule="minimum_cv_mse")` selects the smallest component count within the default
+machine-scale tolerance of the minimum mean CV-MSE and fits that fixed model on all observations:
 
 ```python
 --8<-- "examples/01_pulp_quick_start.py:fit-selected-pulp-model"
@@ -56,7 +56,7 @@ count manually, or request selection-conditioned OOF diagnostics:
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
-model = search.refit(X, Y, rule="one_standard_error")
+model = search.refit(X, Y, rule="minimum_cv_mse")
 
 selection = model.selection_
 path = search.component_path_

@@ -17,7 +17,7 @@ the maintained scripts.
 | `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
 | `05_pulp_real_data.py` | Fit a manual Pulp model, then inspect its selection, rank profile, OOF behavior, and latent structure | Six PDF figures |
 | `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Six PDF figures |
-| `07_tobacco_real_data.py` | Apply the one-standard-error rule in a complete Tobacco spectral workflow | Six PDFs, including a conditional rank profile and multipage reports |
+| `07_tobacco_real_data.py` | Apply a 10% relative CV-MSE tolerance in a complete Tobacco spectral workflow | Six PDFs, including a conditional rank profile and multipage reports |
 
 The [path-selection reference](api/path.md) documents the search and post-fit refit operation used
 by example 01. The [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02
@@ -78,22 +78,24 @@ component path and fit one selected fixed model:
   before the six figures are rendered;
 - `examples/06_sugarcane_real_data.py`: the direct reference workflow with the same ordering,
   wavelength-aware inspection, and six final PDF figures;
-- `examples/07_tobacco_real_data.py`: a complete spectral workflow that uses the
-  [one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) to recommend
-  the final component count, then inspects the conditional predictor-rank profile at that returned
-  count before fixed-model inspection. See the focused explanation below.
+- `examples/07_tobacco_real_data.py`: a complete spectral workflow that selects the smallest
+  component count within 10% of the minimum mean CV-MSE, then inspects the conditional
+  predictor-rank profile at that returned count before fixed-model inspection. See the focused
+  explanation below.
 
-### Tobacco: one-standard-error selection
+### Tobacco: relative-tolerance selection
 
 The Tobacco component path has no clear elbow that would by itself motivate one component count.
-Example 07 therefore demonstrates the conventional
-[one-standard-error rule](path_analysis.md#one-standard-error-component-heuristic) as a reproducible
-parsimony heuristic. The search first refits the 1-SE-selected full-data model. Analysis then reads
-`model.selection_`, whose `reference_minimum` and `one_standard_error_threshold` provide the
-minimum-row and threshold annotations without repeated selection calls. The example obtains the
-conditional rank profile through
-`search.predictor_rank_profile(selection.n_components)` and evaluates the same selection through
-`search.oof_report(X, Y, selection=selection)` before rendering fitted-model diagnostics.
+Example 07 therefore demonstrates an explicit 10% relative CV-MSE tolerance as a reproducible
+parsimony policy. The search refits the smallest component-count row whose mean CV-MSE is no more
+than 10% above the exact minimum. Analysis then reads `model.selection_`, whose
+`reference_minimum`, `relative_tolerance`, and `cv_mse_threshold` provide the minimum-row and
+threshold annotations without repeated selection calls. The example obtains the conditional rank
+profile through `search.predictor_rank_profile(selection.n_components)` and evaluates the same
+selection through `search.oof_report(X, Y, selection=selection)` before rendering fitted-model
+diagnostics. The additional `absolute_tolerance` cap is documented in the
+[search-owned selection rules](path_analysis.md#search-owned-selection-rules) but is not used in
+this example.
 
 The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) define the
 selection object, and the [component-path API reference](api/path.md) gives the exact method surface.

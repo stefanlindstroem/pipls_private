@@ -400,7 +400,8 @@ def test_maintained_reference_consumers_use_package_loaders(
             {
                 "model.selection_",
                 "selection.reference_minimum",
-                "selection.one_standard_error_threshold",
+                "selection.cv_mse_threshold",
+                "selection.relative_tolerance",
                 "search.component_path_",
                 "rank_profile.selection",
                 "factors.predictor_directions",
@@ -668,7 +669,8 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     assert "select" not in calls
     refit_calls = _calls_with_name(tree, "refit")
     assert len(refit_calls) == 1
-    assert _keyword_string(refit_calls[0], "rule") == "one_standard_error"
+    assert _keyword_string(refit_calls[0], "rule") == "minimum_cv_mse"
+    assert _keyword_constant(refit_calls[0], "relative_tolerance") == 0.10
 
     report_calls = _calls_with_name(tree, "oof_report")
     assert len(report_calls) == 1
@@ -681,8 +683,12 @@ def test_tobacco_owns_full_svd_selection_and_paginated_reports() -> None:
     assert _assigned_value_path(tree, "selection") == "model.selection_"
     assert _assigned_value_path(tree, "minimum") == "selection.reference_minimum"
     assert (
-        _assigned_value_path(tree, "one_se_threshold")
-        == "selection.one_standard_error_threshold"
+        _assigned_value_path(tree, "cv_mse_threshold")
+        == "selection.cv_mse_threshold"
+    )
+    assert (
+        _assigned_value_path(tree, "relative_tolerance")
+        == "selection.relative_tolerance"
     )
 
     search_calls = _calls_with_name(tree, "PiPLSSearchCV")

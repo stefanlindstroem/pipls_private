@@ -79,7 +79,7 @@ Y_pred = model.predict(X_new)
 Automatic choices use the same post-fit operation:
 
 ```python
-model = search.refit(X, Y, rule="one_standard_error")
+model = search.refit(X, Y, rule="minimum_cv_mse")
 ```
 
 The accepted rules are `"best_score"`, `"minimum_cv_mse"`, and the temporary
@@ -95,7 +95,7 @@ to minimizing mean response-standardized CV-MSE. With a custom scorer, the CV-MS
 diagnostics and need not identify the selected candidate.
 
 Use `search.select(rule="best_score")` for the global configured-score optimum. Use
-`search.select(rule="minimum_cv_mse")` or `search.select(rule="one_standard_error")` for
+`search.select(rule="minimum_cv_mse")` or `search.select(rule="minimum_cv_mse")` for
 fitting-free recommendation inspection. A final model is returned directly by `refit()` and records
 the exact fitted row as `model.selection_`; it is not stored on the search. See
 [Scoring and the best evaluated pair](path_analysis.md#scoring-and-the-best-evaluated-pair).
