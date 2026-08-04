@@ -52,7 +52,7 @@
   choose the lexicographically smallest tied complexity. `rank_test_score` uses minimum ranks and
   anchors each tolerant group to its leading score; adjacent near-ties must not chain candidates
   that are not tied with the same group reference. The derived
-  `PiPLSPredictorRankProfile.selected_result` result applies the same reference-anchored
+  `PiPLSPredictorRankProfile.selection` result applies the same reference-anchored
   comparison and chooses the first tied row because profile ranks are strictly ascending.
 - Component-path and predictor-rank-profile records may represent a valid one-split protocol. Their
   stored `cv_mse_fold_sd` is the population standard deviation across realized fold MSE values,

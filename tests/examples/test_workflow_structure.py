@@ -376,7 +376,7 @@ def test_maintained_reference_consumers_use_package_loaders(
             {
                 "model.selection_",
                 "search.component_path_",
-                "rank_profile.selected_result",
+                "rank_profile.selection",
                 "factors.predictor_directions",
                 "structure.x_scores",
                 "diagnostics.observed_standardized",
@@ -402,7 +402,7 @@ def test_maintained_reference_consumers_use_package_loaders(
                 "selection.reference_minimum",
                 "selection.one_standard_error_threshold",
                 "search.component_path_",
-                "rank_profile.selected_result",
+                "rank_profile.selection",
                 "factors.predictor_directions",
                 "structure.x_scores",
                 "diagnostics.observed_standardized",

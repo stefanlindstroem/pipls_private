@@ -2,8 +2,8 @@
 
 from .component_path import (
     PiPLSComponentPath,
-    PiPLSComponentResult,
     PiPLSPredictorRankProfile,
+    PiPLSSelection,
 )
 from .decomposition import PiPLSDecomposition
 from .exceptions import PredictorRankSupportWarning
@@ -13,7 +13,7 @@ from .validation import PiPLSOOFReport
 
 __all__ = [
     "PiPLSComponentPath",
-    "PiPLSComponentResult",
+    "PiPLSSelection",
     "PiPLSPredictorRankProfile",
     "PiPLSDecomposition",
     "PiPLSRegression",

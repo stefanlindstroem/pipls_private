@@ -263,11 +263,11 @@ deprecation warnings, or compatibility shims are introduced.
 
 ## Implementation status
 
-Patches 1 and 2 are complete. The decision and guide-layer target are recorded, and
-`PiPLSOOFReport` now requires OOF prediction and count arrays while exposing selection metrics only
-through `report.selection`. Maintained consumers contain no impossible absent-prediction checks.
-Patch 3 should next adopt `PiPLSSelection` and rank-profile `selection` terminology without changing
-search numerics.
+Patches 1–3 are complete. The decision and guide-layer target are recorded; `PiPLSOOFReport`
+requires OOF prediction and count arrays while exposing selection metrics only through
+`report.selection`; and the complete active API now uses `PiPLSSelection` and rank-profile
+`selection` terminology without changing search numerics. Patch 4 should next remove the public
+fitted-search `best_*` attributes while preserving best-score selection behavior.
 
 This decision refines Decisions 0051, 0052, 0071, 0072, 0086, 0087, 0090, 0094, 0111, 0116, 0129,
 0134, 0138, 0140, and 0143. It preserves their numerical, immutability, direct-construction,

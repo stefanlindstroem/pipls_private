@@ -138,7 +138,7 @@ definitions and scope. The path object itself provides no public row-selection m
       members:
         - cv_mse_standard_error
 
-## One component result
+## One selection
 
 `search.select(n_components=h)` returns the frozen scalar row for one evaluated paired-mode count,
 including its conditionally selected predictor rank, score, CV-MSE summary, policy, and split count.
@@ -147,7 +147,7 @@ Direct component-count lookup has `rule is None`. Named rules record their rule 
 `reference_minimum` and derives `one_standard_error_threshold` from that row's mean CV-MSE and
 standard error. The threshold is not stored independently.
 
-::: pipls.PiPLSComponentResult
+::: pipls.PiPLSSelection
     options:
       show_signature: false
 
@@ -155,7 +155,7 @@ standard error. The threshold is not stored independently.
 
 `predictor_rank_profile(h)` contains every predictor rank actually evaluated for one paired-mode
 count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks;
-its `selected_result` property derives the same conditionally selected scalar values returned by
+its `selection` property derives the same conditional selection returned by
 `search.select(n_components=h)` from the immutable candidate arrays and shared policy and
 split-count scalars.
 

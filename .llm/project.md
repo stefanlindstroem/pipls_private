@@ -20,7 +20,7 @@ cleanup steps API1--API3, the six-patch new-user onboarding series, and the docu
 pass are complete. The owner-led human audit continues from the current clean snapshot.
 The current public surface includes
 `PiPLSRegression`,
-`PiPLSSearchCV`, `PiPLSComponentPath`, `PiPLSComponentResult`,
+`PiPLSSearchCV`, `PiPLSComponentPath`, `PiPLSSelection`,
 `PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
 `PiPLSOOFReport`, public selection metrics,
 `PredictorRankSupportWarning`, deterministic synthetic dataset generation, pure numerical
@@ -133,7 +133,7 @@ implementing or reviewing this surface.
 - `src/pipls/_result_validation.py`: shared private scalar, array, shape, finiteness, and pickle
   validation for immutable public result records.
 - `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation and tags.
-- `src/pipls/component_path.py`: immutable component-path, scalar component-result, and conditional
+- `src/pipls/component_path.py`: immutable component-path, scalar selection, and conditional
   predictor-rank-profile records.
 - `src/pipls/decomposition.py`: immutable public Pi-PLS factorization result.
 - `src/pipls/datasets.py`: optional immutable dataset container and deterministic synthetic

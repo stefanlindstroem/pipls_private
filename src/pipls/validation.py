@@ -14,7 +14,7 @@ from ._result_validation import (
     _read_only_float_array,
     _read_only_int_array,
 )
-from .component_path import PiPLSComponentResult
+from .component_path import PiPLSSelection
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -84,7 +84,7 @@ class PiPLSOOFReport:
 
     Parameters
     ----------
-    selection : PiPLSComponentResult
+    selection : PiPLSSelection
         Exact immutable selection evaluated by the report.
     is_leave_one_out : bool
         Whether the materialized splitter is leave-one-out.
@@ -106,15 +106,15 @@ class PiPLSOOFReport:
     performance estimate. Arrays are defensive, read-only copies.
     """
 
-    selection: PiPLSComponentResult
+    selection: PiPLSSelection
     is_leave_one_out: bool
     oof_predictions: FloatArray
     oof_prediction_counts: IntArray
     pooled_oof_r2: float | None = None
 
     def __post_init__(self) -> None:
-        if not isinstance(self.selection, PiPLSComponentResult):
-            raise TypeError("selection must be a PiPLSComponentResult.")
+        if not isinstance(self.selection, PiPLSSelection):
+            raise TypeError("selection must be a PiPLSSelection.")
         leave_one_out, predictions, counts, pooled = _validated_oof_fields(
             is_leave_one_out=self.is_leave_one_out,
             oof_predictions=self.oof_predictions,

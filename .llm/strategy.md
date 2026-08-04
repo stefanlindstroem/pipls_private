@@ -502,7 +502,7 @@ Implementation order:
 6. package-wide cleanup, documentation migration, and structural enforcement.
 
 Current status: **complete**. Decision 0066 adds `PiPLSComponentPath`,
-`PiPLSComponentResult`, and `PiPLSSearchCV.component_path_`. Decisions 0067–0069 make Sugarcane,
+`PiPLSSelection`, and `PiPLSSearchCV.component_path_`. Decisions 0067–0069 make Sugarcane,
 Pulp, and Tobacco direct and remove their analytical CSV/report machinery. Decision 0070 makes the
 Pi-PLS/PLS comparison direct, replaces its DataFrame result with immutable arrays, and removes the
 CSV plotting helper. Decision 0071 removes duplicate matrix-path aliases, makes `cv_results_` the
@@ -800,7 +800,7 @@ Current status: **normalized path-result simplification complete**.
 
 ### Composed validation-report state simplification
 
-Decision 0116 made one immutable `PiPLSComponentResult` authoritative for report selection.
+Decision 0116 made one immutable `PiPLSSelection` authoritative for report selection.
 Decision 0144 later removes selection-forwarding properties: `PiPLSOOFReport` owns required OOF
 arrays, coverage, and provenance, while selection metrics remain on `report.selection`.
 
@@ -1020,7 +1020,7 @@ numerics, tie rules, fitting semantics, or OOF provenance.
 Decision 0143 authorizes a seven-patch API and workflow transition:
 
 1. establish the decision and guide-layer target;
-2. enrich `PiPLSComponentResult` with rule and 1-SE reference evidence;
+2. enrich `PiPLSSelection` with rule and 1-SE reference evidence;
 3. attach the exact resolved selection as `model.selection_` after successful refitting;
 4. introduce `oof_report(selection=...)` and `PiPLSOOFReport` on the stored search splits;
 5. migrate manual-selection examples, tutorials, renderers, and structural tests;
@@ -1058,13 +1058,14 @@ The cleanup retains fitting-free `search.select()`, all numerical inspection fun
 scaling factors, advanced candidate scores and timings, immutable result validation, and
 caller-owned plotting. No alias or deprecation layer is authorized at version `0.0.0`.
 
-Current status: **Patches 1 and 2 complete**. OOF reports require prediction and count arrays, expose
-selection metrics only through `report.selection`, and retain unchanged OOF numerics and coverage.
+Current status: **Patches 1–3 complete**. OOF reports require prediction and count arrays and expose
+selection metrics only through `report.selection`. The active surface now uses `PiPLSSelection` and
+`rank_profile.selection` without aliases or numerical changes.
 
 ## Current next increment
 
-Decision 0144 Patch 3 should adopt `PiPLSSelection` and `rank_profile.selection` terminology without
-changing fitted search state, `cv_results_`, datasets, inspection records, or top-level exports.
+Decision 0144 Patch 4 should remove public fitted-search `best_*` attributes while preserving
+`search.select(rule="best_score")`, refit, OOF, tie-breaking, and fitted-state contracts.
 Decision 0139 Patch 3 remains paused as an independent documentation increment.
 
 ## Maintenance protocol

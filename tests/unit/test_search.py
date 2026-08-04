@@ -13,10 +13,10 @@ from sklearn.preprocessing import StandardScaler
 
 from pipls import (
     PiPLSComponentPath,
-    PiPLSComponentResult,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSSearchCV,
+    PiPLSSelection,
     PredictorRankSupportWarning,
 )
 from pipls.metrics import neg_response_standardized_mse
@@ -335,7 +335,7 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     state_before = dict(search.__dict__)
 
     selected = search.select(n_components=np.int64(2))
-    assert selected == search.predictor_rank_profile(2).selected_result
+    assert selected == search.predictor_rank_profile(2).selection
     assert selected.rule is None
     assert selected.reference_minimum is None
     assert selected.one_standard_error_threshold is None
@@ -417,7 +417,7 @@ def test_select_component_count_returns_the_complete_exact_stored_row() -> None:
 
     selected = search.select(n_components=np.int64(2))
 
-    assert selected == PiPLSComponentResult(
+    assert selected == PiPLSSelection(
         n_components=2,
         predictor_rank=4,
         predictor_rank_policy="optimized",
@@ -445,7 +445,7 @@ def test_select_minimum_cv_mse_returns_first_exact_stored_tie() -> None:
 
     selected = search.select(rule="minimum_cv_mse")
 
-    assert selected == PiPLSComponentResult(
+    assert selected == PiPLSSelection(
         n_components=2,
         predictor_rank=4,
         predictor_rank_policy="optimized",
@@ -899,7 +899,7 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
         np.sort(search.cv_results_["predictor_rank"]),
     )
     assert profile.predictor_rank.size == search.cv_results_["predictor_rank"].size
-    assert profile.selected_result.predictor_rank == 1
+    assert profile.selection.predictor_rank == 1
 
 
 def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
@@ -965,7 +965,7 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
     )
 
     profile = search.predictor_rank_profile(2)
-    assert profile.selected_result.predictor_rank == 2
+    assert profile.selection.predictor_rank == 2
     assert np.all(profile.mean_test_score == 1.0)
     assert not np.allclose(profile.cv_mse_mean, -profile.mean_test_score)
 
@@ -1210,7 +1210,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
         profile.cv_mse_fold_sd,
         search.cv_results_["std_response_standardized_mse"][indices],
     )
-    assert profile.selected_result == search.select(n_components=2)
+    assert profile.selection == search.select(n_components=2)
 
 
 def test_predictor_rank_profile_requires_fitted_evaluated_component_count() -> None:
@@ -1261,7 +1261,7 @@ def test_component_path_records_predictor_rank_policy(
         )
 
     profile = search.predictor_rank_profile(2)
-    assert profile.selected_result.predictor_rank == search.select(
+    assert profile.selection.predictor_rank == search.select(
         n_components=2
     ).predictor_rank
     if expected_policy in {"fixed", "maximum"}:
@@ -1313,7 +1313,7 @@ def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    with pytest.raises(TypeError, match="selection must be a PiPLSComponentResult"):
+    with pytest.raises(TypeError, match="selection must be a PiPLSSelection"):
         search.oof_report(X, Y, selection=object())  # type: ignore[arg-type]
 
     other = PiPLSSearchCV(
@@ -1334,7 +1334,7 @@ def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:
 def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
     X, Y = _data()
     unfitted = PiPLSSearchCV()
-    selection = PiPLSComponentResult(
+    selection = PiPLSSelection(
         n_components=1,
         predictor_rank=1,
         predictor_rank_policy="optimized",

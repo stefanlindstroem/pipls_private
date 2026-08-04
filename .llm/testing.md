@@ -114,7 +114,7 @@ API-surface checks plus a compact active-surface audit.
 Decision 0143 changes provenance ownership and workflow composition without changing selection or
 OOF numerics. Across its seven patches, tests must protect:
 
-- immutable rule provenance on `PiPLSComponentResult`, including exact 1-SE reference-minimum and
+- immutable rule provenance on `PiPLSSelection`, including exact 1-SE reference-minimum and
   derived-threshold contracts;
 - `model.selection_` on every successful direct-estimator or pipeline result from `refit()`, with no
   attribute on directly fitted fixed estimators and no partial exposure after failed fits;

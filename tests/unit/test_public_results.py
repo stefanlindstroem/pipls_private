@@ -6,17 +6,18 @@ from dataclasses import FrozenInstanceError, fields
 import numpy as np
 import pytest
 
+import pipls
 from pipls import (
     PiPLSComponentPath,
-    PiPLSComponentResult,
     PiPLSDecomposition,
     PiPLSOOFReport,
     PiPLSPredictorRankProfile,
+    PiPLSSelection,
 )
 
 
-def _component_result() -> PiPLSComponentResult:
-    return PiPLSComponentResult(
+def _selection() -> PiPLSSelection:
+    return PiPLSSelection(
         n_components=np.int64(2),
         predictor_rank=np.int64(3),
         predictor_rank_policy="optimized",
@@ -39,8 +40,8 @@ def _decomposition() -> PiPLSDecomposition:
     )
 
 
-def _validation_result() -> PiPLSComponentResult:
-    return PiPLSComponentResult(
+def _validation_result() -> PiPLSSelection:
+    return PiPLSSelection(
         n_components=np.int64(1),
         predictor_rank=np.int64(2),
         predictor_rank_policy="optimized",
@@ -51,19 +52,35 @@ def _validation_result() -> PiPLSComponentResult:
     )
 
 
+def test_selection_terminology_has_no_pre_release_aliases() -> None:
+    profile = PiPLSPredictorRankProfile(
+        n_components=1,
+        predictor_rank=np.array([1]),
+        mean_test_score=np.array([-0.5]),
+        cv_mse_mean=np.array([0.5]),
+        cv_mse_fold_sd=np.array([0.1]),
+        predictor_rank_policy="optimized",
+        n_splits=3,
+    )
+
+    assert not hasattr(pipls, "PiPLSComponentResult")
+    assert not hasattr(profile, "selected_result")
+    assert isinstance(profile.selection, PiPLSSelection)
+
+
 
 def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     for result_type in (
-        PiPLSComponentResult,
+        PiPLSSelection,
         PiPLSPredictorRankProfile,
         PiPLSComponentPath,
     ):
         assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
 
     assert "one_standard_error_threshold" not in {
-        field.name for field in fields(PiPLSComponentResult)
+        field.name for field in fields(PiPLSSelection)
     }
-    assert "selected_result" not in {
+    assert "selection" not in {
         field.name for field in fields(PiPLSPredictorRankProfile)
     }
     derived_report_fields = {
@@ -79,8 +96,8 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     )
 
 
-def test_component_result_validates_and_normalizes_python_scalars() -> None:
-    result = _component_result()
+def test_selection_validates_and_normalizes_python_scalars() -> None:
+    result = _selection()
 
     assert type(result.n_components) is int
     assert type(result.predictor_rank) is int
@@ -114,7 +131,7 @@ def test_component_result_validates_and_normalizes_python_scalars() -> None:
         ("rule", "unknown", "must be one of"),
     ],
 )
-def test_component_result_rejects_invalid_fields(
+def test_selection_rejects_invalid_fields(
     field: str,
     value: object,
     message: str,
@@ -130,11 +147,11 @@ def test_component_result_rejects_invalid_fields(
     }
 
     with pytest.raises(ValueError, match=message):
-        PiPLSComponentResult(**{**kwargs, field: value})  # type: ignore[arg-type]
+        PiPLSSelection(**{**kwargs, field: value})  # type: ignore[arg-type]
 
 
-def test_component_result_records_one_standard_error_provenance() -> None:
-    minimum = PiPLSComponentResult(
+def test_selection_records_one_standard_error_provenance() -> None:
+    minimum = PiPLSSelection(
         n_components=3,
         predictor_rank=5,
         predictor_rank_policy="optimized",
@@ -144,7 +161,7 @@ def test_component_result_records_one_standard_error_provenance() -> None:
         n_splits=5,
         rule="minimum_cv_mse",
     )
-    selection = PiPLSComponentResult(
+    selection = PiPLSSelection(
         n_components=2,
         predictor_rank=4,
         predictor_rank_policy="optimized",
@@ -166,8 +183,8 @@ def test_component_result_records_one_standard_error_provenance() -> None:
     assert restored.one_standard_error_threshold == selection.one_standard_error_threshold
 
 
-def test_component_result_rejects_invalid_selection_provenance() -> None:
-    minimum = PiPLSComponentResult(
+def test_selection_rejects_invalid_selection_provenance() -> None:
+    minimum = PiPLSSelection(
         n_components=3,
         predictor_rank=5,
         predictor_rank_policy="optimized",
@@ -188,23 +205,23 @@ def test_component_result_rejects_invalid_selection_provenance() -> None:
     }
 
     with pytest.raises(ValueError, match="required"):
-        PiPLSComponentResult(**base, rule="one_standard_error")
+        PiPLSSelection(**base, rule="one_standard_error")
     with pytest.raises(ValueError, match="defined only"):
-        PiPLSComponentResult(**base, reference_minimum=minimum)
-    with pytest.raises(TypeError, match="PiPLSComponentResult or None"):
-        PiPLSComponentResult(
+        PiPLSSelection(**base, reference_minimum=minimum)
+    with pytest.raises(TypeError, match="PiPLSSelection or None"):
+        PiPLSSelection(
             **base,
             rule="one_standard_error",
             reference_minimum=object(),  # type: ignore[arg-type]
         )
     with pytest.raises(ValueError, match='rule="minimum_cv_mse"'):
-        PiPLSComponentResult(
+        PiPLSSelection(
             **base,
             rule="one_standard_error",
-            reference_minimum=_component_result(),
+            reference_minimum=_selection(),
         )
     with pytest.raises(ValueError, match="must not exceed the one-standard-error"):
-        PiPLSComponentResult(
+        PiPLSSelection(
             **{**base, "cv_mse_mean": 0.45},
             rule="one_standard_error",
             reference_minimum=minimum,
@@ -382,8 +399,8 @@ def test_oof_report_normalizes_and_freezes_arrays() -> None:
     )
 
 
-def test_oof_report_requires_component_result() -> None:
-    with pytest.raises(TypeError, match="selection must be a PiPLSComponentResult"):
+def test_oof_report_requires_selection() -> None:
+    with pytest.raises(TypeError, match="selection must be a PiPLSSelection"):
         PiPLSOOFReport(
             selection=object(),  # type: ignore[arg-type]
             is_leave_one_out=False,

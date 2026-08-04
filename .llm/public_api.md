@@ -5,7 +5,7 @@
 ```python
 from pipls import (
     PiPLSComponentPath,
-    PiPLSComponentResult,
+    PiPLSSelection,
     PiPLSDecomposition,
     PiPLSSearchCV,
     PiPLSPredictorRankProfile,
@@ -163,7 +163,7 @@ selected = search.select(n_components=4)
 ```
 
 The method requires exactly one selection input and returns one immutable stored
-`PiPLSComponentResult`. It performs no fitting, rescoring, split materialization, or mutation. The
+`PiPLSSelection`. It performs no fitting, rescoring, split materialization, or mutation. The
 private `SelectionRule` vocabulary and search-owned resolver are shared with `refit()`.
 
 Explicit OOF reporting is a post-fit analysis operation:
@@ -173,7 +173,7 @@ selection = model.selection_
 report = search.oof_report(X, y, selection=selection)
 ```
 
-The method accepts one existing `PiPLSComponentResult`, validates it exactly against the fitted
+The method accepts one existing `PiPLSSelection`, validates it exactly against the fitted
 search, and reuses defensive read-only copies of the validation indices materialized by `fit()`. It
 returns immutable `PiPLSOOFReport` with the supplied `selection`, ordered OOF predictions and counts,
 repeated-prediction averaging, uncovered-row NaNs and zero counts, pooled OOF $R^2$ over covered rows,
@@ -214,7 +214,7 @@ full-data refitting before retrieving selection, path, rank-profile, OOF, fitted
 evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
 `oof_report()`.
 
-All seven patches are complete. `PiPLSComponentResult` implements `rule`,
+All seven patches are complete. `PiPLSSelection` implements `rule`,
 `reference_minimum`, and the derived `one_standard_error_threshold`; every successful refit result
 exposes the exact resolved selection as `model.selection_`; and `oof_report(selection=...)` returns
 immutable `PiPLSOOFReport` after exact compatibility validation. Directly fitted
@@ -253,7 +253,7 @@ template and is preserved through cloning; the path object adds no separate `set
 `PiPLSSearchCV.predictor_rank_profile(h)` derives an immutable
 `PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
 predictor ranks actually evaluated at `h`, sorted in ascending order. Its path-wide policy and split
-count are scalars, and its `selected_result` property derives the same conditionally selected scalar
+count are scalars, and its `selection` property derives the same conditionally selected scalar
 values as `search.select(n_components=h)` from immutable candidate state. The profile does not
 add another fitted attribute or stored selected-row representation. It exposes an aligned read-only
 `cv_mse_standard_error` property derived by the same contract as the component path. Selection
@@ -265,7 +265,7 @@ public selected-row lookup, the shared private rule vocabulary is `SelectionRule
 inspection, refitting, OOF reporting, and predictor-rank profile composition use
 search-owned helpers. Durable numerical selection tests are located at this search boundary.
 
-All five current top-level result records (`PiPLSDecomposition`, `PiPLSComponentResult`,
+All five current top-level result records (`PiPLSDecomposition`, `PiPLSSelection`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSOOFReport`) validate direct
 construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and
 reconstruct through the same validation path when unpickled. Invalid dimensions, nonfinite scores,
@@ -459,14 +459,11 @@ helper, or component-path plotting helper. The comparison-only `PLSComponentPath
 
 ## Accepted pre-release public-surface cleanup
 
-Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1 and 2 are
-complete: the target is recorded, and OOF reports now own required OOF arrays and coverage while
-selection metrics remain on `report.selection`. The remaining target is:
+Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1–3 are
+complete: the target is recorded; OOF reports own required OOF arrays and coverage while selection
+metrics remain on `report.selection`; and the active API uses `PiPLSSelection` and
+`profile.selection` without aliases. The remaining target is:
 
-- `PiPLSOOFReport` owns OOF arrays and coverage only; selection fields are accessed through
-  `report.selection`, and prediction arrays are required;
-- `PiPLSComponentResult` becomes `PiPLSSelection`, and predictor-rank profiles expose
-  `profile.selection`;
 - fitted-search `best_*` attributes are replaced by `search.select(rule="best_score")`;
 - `cv_results_` keeps stable `n_components` and `predictor_rank` columns but removes duplicated
   `params` and pipeline-prefixed `param_*` representations;

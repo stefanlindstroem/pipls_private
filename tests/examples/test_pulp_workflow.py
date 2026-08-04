@@ -91,8 +91,8 @@ def test_pulp_rank_profile_exposes_the_interior_selection(
     profile = result.rank_profile
     assert isinstance(profile, PiPLSPredictorRankProfile)
     np.testing.assert_array_equal(profile.predictor_rank, np.arange(3, 11))
-    assert profile.selected_result == result.selected
-    assert profile.selected_result.predictor_rank == 9
+    assert profile.selection == result.selected
+    assert profile.selection.predictor_rank == 9
     selected_index = int(np.flatnonzero(profile.predictor_rank == 9)[0])
     upper_index = int(np.flatnonzero(profile.predictor_rank == 10)[0])
     assert profile.cv_mse_mean[selected_index] < profile.cv_mse_mean[upper_index]

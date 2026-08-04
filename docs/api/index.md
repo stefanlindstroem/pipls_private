@@ -28,7 +28,7 @@ predictor and response directions; they are distinct from reconstruction loading
 | Object | Obtained from | Main purpose |
 |---|---|---|
 | [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
-| [`PiPLSComponentResult`](path.md#pipls.PiPLSComponentResult) | `search.select(...)`, `model.selection_`, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
+| [`PiPLSSelection`](path.md#pipls.PiPLSSelection) | `search.select(...)`, `model.selection_`, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
 | [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
 | [`PiPLSOOFReport`](path.md#pipls.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |
 | [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |

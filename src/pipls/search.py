@@ -31,8 +31,8 @@ from ._cv_engine import (
 from ._sklearn_compat import _validate_estimator_data
 from .component_path import (
     PiPLSComponentPath,
-    PiPLSComponentResult,
     PiPLSPredictorRankProfile,
+    PiPLSSelection,
     PredictorRankPolicy,
     SelectionRule,
 )
@@ -72,10 +72,10 @@ def _default_pipls_template() -> PiPLSRegression:
     return PiPLSRegression(n_components=1, predictor_rank=1)
 
 
-def _component_result_at_count(
+def _selection_at_count(
     path: PiPLSComponentPath,
     n_components: int,
-) -> PiPLSComponentResult:
+) -> PiPLSSelection:
     """Return one stored component-path row by paired-mode count."""
 
     if isinstance(n_components, bool) or not isinstance(
@@ -93,19 +93,19 @@ def _component_result_at_count(
             f"n_components={requested} was not evaluated. Available values are "
             f"[{available}]."
         )
-    return path._result_at_index(index)
+    return path._selection_at_index(index)
 
 
-def _select_minimum_cv_mse(path: PiPLSComponentPath) -> PiPLSComponentResult:
+def _select_minimum_cv_mse(path: PiPLSComponentPath) -> PiPLSSelection:
     """Return the first stored path row with minimum mean CV-MSE."""
 
     return replace(
-        path._result_at_index(int(np.argmin(path.cv_mse_mean))),
+        path._selection_at_index(int(np.argmin(path.cv_mse_mean))),
         rule="minimum_cv_mse",
     )
 
 
-def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSComponentResult:
+def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSSelection:
     """Return the smallest stored component count within one standard error."""
 
     reference = _select_minimum_cv_mse(path)
@@ -114,7 +114,7 @@ def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSComponentResult
         raise ValueError("The one-standard-error threshold must be finite.")
     eligible = np.flatnonzero(path.cv_mse_mean <= threshold)
     return replace(
-        path._result_at_index(int(eligible[0])),
+        path._selection_at_index(int(eligible[0])),
         rule="one_standard_error",
         reference_minimum=reference,
     )
@@ -462,8 +462,8 @@ class PiPLSSearchCV(
         *,
         rule: SelectionRule | None = None,
         n_components: int | None = None,
-    ) -> PiPLSComponentResult:
-        """Return one immutable selected component-path result.
+    ) -> PiPLSSelection:
+        """Return one immutable Pi-PLS selection.
 
         Exactly one of ``rule`` and ``n_components`` must be supplied. A named
         rule selects one stored component-path row; a component count retrieves
@@ -483,8 +483,8 @@ class PiPLSSearchCV(
 
         Returns
         -------
-        PiPLSComponentResult
-            Immutable stored result for the selected paired-mode count and its
+        PiPLSSelection
+            Immutable selection for the paired-mode count and its
             conditionally selected predictor rank.
 
         Raises
@@ -587,7 +587,7 @@ class PiPLSSearchCV(
         X: ArrayLike,
         y: ArrayLike,
         *,
-        selection: PiPLSComponentResult,
+        selection: PiPLSSelection,
     ) -> PiPLSOOFReport:
         """Return ordered OOF diagnostics for one existing selection.
 
@@ -605,7 +605,7 @@ class PiPLSSearchCV(
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
             Response vector or matrix aligned row-for-row with ``X`` and the
             data supplied to :meth:`fit`.
-        selection : PiPLSComponentResult
+        selection : PiPLSSelection
             Existing immutable selection compatible with this fitted search.
             A model returned by :meth:`refit` exposes the exact value as
             ``model.selection_``.
@@ -622,7 +622,7 @@ class PiPLSSearchCV(
         sklearn.exceptions.NotFittedError
             If the search has not been fitted.
         TypeError
-            If ``selection`` is not a :class:`PiPLSComponentResult`.
+            If ``selection`` is not a :class:`PiPLSSelection`.
         ValueError
             If the selection is incompatible with this search or the supplied
             data do not match the fitted search shape.
@@ -652,12 +652,12 @@ class PiPLSSearchCV(
 
     def _validate_oof_selection(
         self,
-        selection: PiPLSComponentResult,
-    ) -> PiPLSComponentResult:
+        selection: PiPLSSelection,
+    ) -> PiPLSSelection:
         """Return a selection after exact compatibility validation."""
 
-        if not isinstance(selection, PiPLSComponentResult):
-            raise TypeError("selection must be a PiPLSComponentResult.")
+        if not isinstance(selection, PiPLSSelection):
+            raise TypeError("selection must be a PiPLSSelection.")
         if selection.rule is None:
             expected = self._resolve_selection_result(
                 rule=None,
@@ -680,7 +680,7 @@ class PiPLSSearchCV(
         X: ArrayLike,
         y: ArrayLike,
         *,
-        selection: PiPLSComponentResult,
+        selection: PiPLSSelection,
         operation_name: str,
     ) -> tuple[bool, FloatArray, IntArray, float | None]:
         """Compute common ordered OOF report values without mutation."""
@@ -751,7 +751,7 @@ class PiPLSSearchCV(
         *,
         rule: SelectionRule | None,
         n_components: int | None,
-    ) -> PiPLSComponentResult:
+    ) -> PiPLSSelection:
         """Resolve one stored component-path row without mutating search state."""
 
         check_is_fitted(
@@ -763,13 +763,13 @@ class PiPLSSearchCV(
                 "Exactly one of rule and n_components must be supplied."
             )
         if n_components is not None:
-            return _component_result_at_count(
+            return _selection_at_count(
                 self.component_path_,
                 n_components,
             )
         if rule == "best_score":
             return replace(
-                _component_result_at_count(
+                _selection_at_count(
                     self.component_path_,
                     self.best_n_components_,
                 ),
@@ -791,7 +791,7 @@ class PiPLSSearchCV(
         """Return evaluated predictor-rank results for one paired-mode count.
 
         Rows are sorted by ascending predictor rank and include only candidates
-        actually evaluated by the fitted search. The selected scalar result
+        actually evaluated by the fitted search. The conditional selection
         maximizes the configured mean test score, with the fitted conditional
         tie-breaking rule. Under the default scorer, this is equivalent to
         minimizing mean response-standardized CV-MSE.
@@ -805,7 +805,7 @@ class PiPLSSearchCV(
         -------
         PiPLSPredictorRankProfile
             Frozen result containing aligned read-only candidate arrays and the
-            conditionally selected scalar result.
+            conditional selection.
 
         Raises
         ------
@@ -816,7 +816,7 @@ class PiPLSSearchCV(
         """
 
         check_is_fitted(self, attributes=["cv_results_", "component_path_", "n_splits_"])
-        selected = _component_result_at_count(
+        selected = _selection_at_count(
             self.component_path_,
             n_components,
         )

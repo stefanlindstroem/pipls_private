@@ -29,8 +29,8 @@ _ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "maximum"})
 
 
 @dataclass(frozen=True)
-class PiPLSComponentResult:
-    """Conditionally selected result for one paired-mode count.
+class PiPLSSelection:
+    """Immutable Pi-PLS selection for one evaluated rank pair.
 
     Attributes
     ----------
@@ -51,10 +51,10 @@ class PiPLSComponentResult:
     n_splits : int
         Number of cross-validation splits.
     rule : {"best_score", "minimum_cv_mse", "one_standard_error"} or None
-        Search-owned rule that produced this result. ``None`` denotes direct
+        Search-owned rule that produced this selection. ``None`` denotes direct
         lookup by component count.
-    reference_minimum : PiPLSComponentResult or None
-        Minimum-CV-MSE result used to derive a one-standard-error selection.
+    reference_minimum : PiPLSSelection or None
+        Minimum-CV-MSE selection used to derive a one-standard-error selection.
         Defined only when ``rule="one_standard_error"``.
     one_standard_error_threshold : float or None
         Derived minimum-CV-MSE plus its fold-based standard error. Defined only
@@ -69,7 +69,7 @@ class PiPLSComponentResult:
     cv_mse_fold_sd: float
     n_splits: int
     rule: SelectionRule | None = None
-    reference_minimum: PiPLSComponentResult | None = None
+    reference_minimum: PiPLSSelection | None = None
 
     def __post_init__(self) -> None:
         n_components = _positive_int(self.n_components, name="n_components")
@@ -106,10 +106,10 @@ class PiPLSComponentResult:
         reference_minimum = self.reference_minimum
         if reference_minimum is not None and not isinstance(
             reference_minimum,
-            PiPLSComponentResult,
+            PiPLSSelection,
         ):
             raise TypeError(
-                "reference_minimum must be a PiPLSComponentResult or None."
+                "reference_minimum must be a PiPLSSelection or None."
             )
 
         if rule == "one_standard_error":
@@ -188,7 +188,7 @@ class PiPLSComponentResult:
             )
         return float(reference.cv_mse_mean + reference.cv_mse_standard_error)
 
-    def __reduce__(self) -> tuple[type[PiPLSComponentResult], tuple[object, ...]]:
+    def __reduce__(self) -> tuple[type[PiPLSSelection], tuple[object, ...]]:
         """Reconstruct through validation during unpickling."""
 
         return (
@@ -234,8 +234,8 @@ class PiPLSPredictorRankProfile:
         Predictor-rank policy shared by every evaluated candidate.
     n_splits : int
         Number of cross-validation splits.
-    selected_result : PiPLSComponentResult
-        Derived conditionally selected scalar result for ``n_components``.
+    selection : PiPLSSelection
+        Derived conditional selection for ``n_components``.
     """
 
     n_components: int
@@ -305,13 +305,13 @@ class PiPLSPredictorRankProfile:
         )
 
     @property
-    def selected_result(self) -> PiPLSComponentResult:
-        """Return the conditionally selected predictor-rank result."""
+    def selection(self) -> PiPLSSelection:
+        """Return the conditional predictor-rank selection."""
 
         maximum = float(np.max(self.mean_test_score))
         tied = np.flatnonzero(_tied_score_mask(self.mean_test_score, maximum))
         index = int(tied[0])
-        return PiPLSComponentResult(
+        return PiPLSSelection(
             n_components=self.n_components,
             predictor_rank=int(self.predictor_rank[index]),
             predictor_rank_policy=self.predictor_rank_policy,
@@ -455,10 +455,10 @@ class PiPLSComponentPath:
             ),
         )
 
-    def _result_at_index(self, index: int) -> PiPLSComponentResult:
-        """Return one scalar result from an internally validated row index."""
+    def _selection_at_index(self, index: int) -> PiPLSSelection:
+        """Return one selection from an internally validated row index."""
 
-        return PiPLSComponentResult(
+        return PiPLSSelection(
             n_components=int(self.n_components[index]),
             predictor_rank=int(self.predictor_rank[index]),
             predictor_rank_policy=self.predictor_rank_policy,

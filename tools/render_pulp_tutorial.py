@@ -29,9 +29,9 @@ from sklearn.model_selection import KFold  # noqa: E402
 
 from pipls import (  # noqa: E402
     PiPLSComponentPath,
-    PiPLSComponentResult,
     PiPLSPredictorRankProfile,
     PiPLSSearchCV,
+    PiPLSSelection,
 )
 from pipls.datasets import load_pulp  # noqa: E402
 from pipls.inspection import (  # noqa: E402
@@ -85,7 +85,7 @@ def _save_svg(figure: Figure, path: Path) -> None:
 def _render_component_path(
     component_path: PiPLSComponentPath,
     *,
-    selected: PiPLSComponentResult,
+    selected: PiPLSSelection,
     output_path: Path,
 ) -> None:
     figure, axis = _figure(figsize=(7.4, 4.8))
@@ -131,11 +131,11 @@ def _render_predictor_rank_profile(
         capsize=4,
     )
     axis.scatter(
-        [profile.selected_result.predictor_rank],
-        [profile.selected_result.cv_mse_mean],
+        [profile.selection.predictor_rank],
+        [profile.selection.cv_mse_mean],
         marker="D",
         s=70,
-        label=f"CV-MSE minimum: rank {profile.selected_result.predictor_rank}",
+        label=f"CV-MSE minimum: rank {profile.selection.predictor_rank}",
         zorder=3,
     )
     axis.set_title(

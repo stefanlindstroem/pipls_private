@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Rename the immutable selected-row result from `PiPLSComponentResult` to `PiPLSSelection` and
+  rename `PiPLSPredictorRankProfile.selected_result` to `selection`. Update all active source,
+  tests, examples, tutorial renderers, API documentation, and maintainer guidance without changing
+  selection, refit, rank-profile, OOF, or pickle behavior; retain no pre-release compatibility aliases.
 - Simplify `PiPLSOOFReport`: require ordered OOF predictions and prediction counts, remove
   selection-forwarding properties, access selection metrics through `report.selection`, and remove
   impossible absent-array checks without changing OOF numerics.

@@ -62,11 +62,11 @@ def _plot_predictor_rank_profile(
         capsize=4,
     )
     axis.scatter(
-        [profile.selected_result.predictor_rank],
-        [profile.selected_result.cv_mse_mean],
+        [profile.selection.predictor_rank],
+        [profile.selection.cv_mse_mean],
         marker="D",
         s=70,
-        label=f"CV-MSE minimum: rank {profile.selected_result.predictor_rank}",
+        label=f"CV-MSE minimum: rank {profile.selection.predictor_rank}",
         zorder=3,
     )
     axis.set_xlabel("Predictor rank")
@@ -373,7 +373,7 @@ def main() -> None:
         "Predictor-rank profile: "
         f"evaluated {rank_profile.predictor_rank[0]} to "
         f"{rank_profile.predictor_rank[-1]}; "
-        f"selected rank {rank_profile.selected_result.predictor_rank}"
+        f"selected rank {rank_profile.selection.predictor_rank}"
     )
     print(f"Wrote PDF figures to {ANALYSIS_DIR}")
 

@@ -57,7 +57,7 @@ and later retired by Decision 0125 after its development-validation purpose had 
 - grouped, repeated, predefined, temporal, and leave-one-out split workflows, with a focused
   small-sample LOO example reporting ordered OOF predictions and pooled OOF $R^2$;
 - optional ordered OOF predictions and immutable `PiPLSOOFReport` composed from an existing
-  `PiPLSComponentResult`, with explicit selection-conditioned interpretation;
+  `PiPLSSelection`, with explicit selection-conditioned interpretation;
 - immutable validated `PiPLSDataset` with recursively frozen metadata, explicit rejection of
   object-dtype metadata arrays, and deterministic synthetic generators with shared,
   predictor-specific, and response-specific latent structure;
@@ -182,7 +182,7 @@ The current top-level package exports are:
 ```python
 from pipls import (
     PiPLSComponentPath,
-    PiPLSComponentResult,
+    PiPLSSelection,
     PiPLSDecomposition,
     PiPLSSearchCV,
     PiPLSPredictorRankProfile,
@@ -385,7 +385,7 @@ only.
 The six owner-authorized simplifications are complete. Search inputs are resolved once;
 decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction
 diagnostics are derived from independent state; path-wide metadata and profile selection are not
-duplicated; and `PiPLSOOFReport` composes an immutable `PiPLSComponentResult` while keeping
+duplicated; and `PiPLSOOFReport` composes an immutable `PiPLSSelection` while keeping
 selection metrics on `report.selection`. No package release preparation or Python-package
 publication work is authorized.
 A follow-up behavior-preserving audit cleanup removes the now-unused private finite-vector
@@ -410,7 +410,7 @@ Decision 0133 names the configurable-generator truth record `PiPLSRegressionTrut
 pre-release truth-class name is not retained as an alias.
 
 Decision 0134 gives public result properties type-revealing names: predictor-rank profiles expose
-`selected_result`, OOF reports expose `cv_mse_mean`, and their coverage summary uses
+`selection`, OOF reports expose `cv_mse_mean`, and their coverage summary uses
 `has_complete_oof_coverage`. Former pre-release names are not retained as aliases.
 
 Decision 0136 makes every maintained ordinary five-fold example and tutorial renderer use
@@ -561,7 +561,7 @@ raw files for non-Python use.
 Decision 0143 authorizes seven patches:
 
 1. establish the accepted decision and guide-layer target;
-2. enrich `PiPLSComponentResult` with rule, reference-minimum, and derived 1-SE-threshold
+2. enrich `PiPLSSelection` with rule, reference-minimum, and derived 1-SE-threshold
    provenance;
 3. retain the resolved selection as `model.selection_` on successful `refit()` results;
 4. add `oof_report(selection=...)` and `PiPLSOOFReport` while retaining the former report surface
@@ -598,16 +598,16 @@ functions, component-path and rank-profile evidence, advanced candidate scores a
 immutable direct-construction validation, biplot scaling factors, and caller-owned plotting remain
 public contracts.
 
-Current status: **Patches 1 and 2 complete**. `PiPLSOOFReport` requires OOF prediction and count
-arrays, exposes selection metrics only through `report.selection`, and preserves all OOF numerics,
-coverage behavior, immutability, and pickle contracts. Maintained consumers contain no impossible
-absent-array checks.
+Current status: **Patches 1–3 complete**. `PiPLSOOFReport` requires OOF prediction and count
+arrays and exposes selection metrics only through `report.selection`. The active API now uses
+`PiPLSSelection` and `PiPLSPredictorRankProfile.selection` throughout source, tests, maintained
+workflows, API documentation, and guide-layer contracts without compatibility aliases or numerical
+changes.
 
 ## Current next increment
 
-Implement Decision 0144 Patch 3: rename `PiPLSComponentResult` to `PiPLSSelection` and
-`PiPLSPredictorRankProfile.selected_result` to `selection` without changing search numerics, result
-immutability, or workflow behavior.
+Implement Decision 0144 Patch 4: remove public fitted-search `best_*` attributes while preserving
+`search.select(rule="best_score")`, refit, tie-breaking, OOF, and fitted-state behavior.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

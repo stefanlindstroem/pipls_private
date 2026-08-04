@@ -10,10 +10,10 @@ from sklearn.model_selection import KFold
 
 from pipls import (
     PiPLSComponentPath,
-    PiPLSComponentResult,
     PiPLSPredictorRankProfile,
     PiPLSRegression,
     PiPLSSearchCV,
+    PiPLSSelection,
 )
 from pipls.datasets import load_tobacco
 from pipls.inspection import (
@@ -35,8 +35,8 @@ CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 def _plot_component_path(
     path: PiPLSComponentPath,
-    minimum: PiPLSComponentResult,
-    selected: PiPLSComponentResult,
+    minimum: PiPLSSelection,
+    selected: PiPLSSelection,
     *,
     one_se_threshold: float,
     output_path: Path,
@@ -109,13 +109,13 @@ def _plot_predictor_rank_profile(
         capsize=4,
     )
     axis.scatter(
-        [profile.selected_result.predictor_rank],
-        [profile.selected_result.cv_mse_mean],
+        [profile.selection.predictor_rank],
+        [profile.selection.cv_mse_mean],
         marker="D",
         s=70,
         label=(
             "Conditional CV-MSE minimum: "
-            f"rank {profile.selected_result.predictor_rank}"
+            f"rank {profile.selection.predictor_rank}"
         ),
         zorder=3,
     )
@@ -498,7 +498,7 @@ def main() -> None:
         "Predictor-rank profile at the 1-SE component count: "
         f"evaluated {rank_profile.predictor_rank[0]} to "
         f"{rank_profile.predictor_rank[-1]}; "
-        f"selected rank {rank_profile.selected_result.predictor_rank}"
+        f"selected rank {rank_profile.selection.predictor_rank}"
     )
     print(f"Wrote PDF figures to {ANALYSIS_DIR}")
 
