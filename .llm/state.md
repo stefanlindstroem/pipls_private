@@ -622,16 +622,17 @@ Tobacco, and introduce ten repeated five-fold partitions in the complete Pulp wo
 3. The transition does not add outer validation or demonstrate absolute tolerance in a maintained
 example.
 
-Current status: **Patch 1 of 7 complete**. The decision and guide-layer target are established. The
-current executable API still contains the one-standard-error and fold-SE surface until later
-patches migrate and remove it.
+Current status: **Patches 1–2 of 7 complete**. The public result layer now uses
+`cv_mse_std` for population SD across all materialized validation splits. The temporary derived
+`cv_mse_standard_error` bridge remains only to keep the current one-standard-error consumers
+operational until later patches migrate and remove them.
 
 ## Current next increment
 
-Implement Decision 0146 Patch 2: rename `cv_mse_fold_sd` to `cv_mse_std`, lock equal-split mean and
-population-SD numerics, and retain only the temporary derived-SE bridge required to keep current
-consumers operational during migration. Decision 0139 Patch 3 remains an independent paused
-presentation increment.
+Implement Decision 0146 Patch 3: add simultaneous relative and absolute tolerance arguments,
+validation, threshold selection, and immutable selection provenance while preserving custom-score,
+pipeline, OOF, pickle, and search non-mutation behavior. Decision 0139 Patch 3 remains an
+independent paused presentation increment.
 
 ## Authority and drift handling
 

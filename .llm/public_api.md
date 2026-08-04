@@ -242,9 +242,9 @@ aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and suppli
 are not public fitted state. Advanced users can inspect aligned `cv_results_` columns when needed.
 
 `PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
-`mean_test_score`, `cv_mse_mean`, and `cv_mse_fold_sd` arrays. The predictor-rank policy and number of
+`mean_test_score`, `cv_mse_mean`, and `cv_mse_std` arrays. The predictor-rank policy and number of
 validation splits are path-wide Python scalars. It derives the aligned read-only
-`cv_mse_standard_error` array from the stored population fold SD and shared split count. New code
+`cv_mse_standard_error` array from the stored population split SD and shared split count. New code
 retrieves one complete stored row through `search.select(...)`. Maintained consumers and living
 documentation use no path-level scalar selection. `PiPLSComponentPath` exposes aligned numerical
 properties and immutable serialization behavior, not public selected-row operations.

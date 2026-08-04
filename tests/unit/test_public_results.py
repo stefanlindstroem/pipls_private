@@ -27,7 +27,7 @@ def _selection() -> PiPLSSelection:
         predictor_rank_policy="optimized",
         mean_test_score=np.float32(-0.4),
         cv_mse_mean=np.float32(0.4),
-        cv_mse_fold_sd=np.float32(0.1),
+        cv_mse_std=np.float32(0.1),
         n_splits=np.int64(5),
     )
 
@@ -51,7 +51,7 @@ def _validation_result() -> PiPLSSelection:
         predictor_rank_policy="optimized",
         mean_test_score=np.float32(-0.5),
         cv_mse_mean=np.float32(0.5),
-        cv_mse_fold_sd=np.float32(0.1),
+        cv_mse_std=np.float32(0.1),
         n_splits=np.int64(3),
     )
 
@@ -99,7 +99,7 @@ def test_selection_terminology_has_no_pre_release_aliases() -> None:
         predictor_rank=np.array([1]),
         mean_test_score=np.array([-0.5]),
         cv_mse_mean=np.array([0.5]),
-        cv_mse_fold_sd=np.array([0.1]),
+        cv_mse_std=np.array([0.1]),
         predictor_rank_policy="optimized",
         n_splits=3,
     )
@@ -144,7 +144,8 @@ def test_selection_validates_and_normalizes_python_scalars() -> None:
     assert type(result.predictor_rank) is int
     assert type(result.mean_test_score) is float
     assert type(result.cv_mse_mean) is float
-    assert type(result.cv_mse_fold_sd) is float
+    assert type(result.cv_mse_std) is float
+    assert not hasattr(result, "cv_mse_fold_sd")
     assert type(result.cv_mse_standard_error) is float
     assert result.cv_mse_standard_error == pytest.approx(0.05)
     assert type(result.n_splits) is int
@@ -167,7 +168,7 @@ def test_selection_validates_and_normalizes_python_scalars() -> None:
         ("predictor_rank_policy", "unknown", "must be one of"),
         ("mean_test_score", np.inf, "finite real"),
         ("cv_mse_mean", -0.1, "nonnegative"),
-        ("cv_mse_fold_sd", np.nan, "finite real"),
+        ("cv_mse_std", np.nan, "finite real"),
         ("n_splits", 0, "positive integer"),
         ("rule", "unknown", "must be one of"),
     ],
@@ -183,7 +184,7 @@ def test_selection_rejects_invalid_fields(
         "predictor_rank_policy": "optimized",
         "mean_test_score": -0.4,
         "cv_mse_mean": 0.4,
-        "cv_mse_fold_sd": 0.1,
+        "cv_mse_std": 0.1,
         "n_splits": 5,
     }
 
@@ -198,7 +199,7 @@ def test_selection_records_one_standard_error_provenance() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=-0.40,
         cv_mse_mean=0.40,
-        cv_mse_fold_sd=0.08,
+        cv_mse_std=0.08,
         n_splits=5,
         rule="minimum_cv_mse",
     )
@@ -208,7 +209,7 @@ def test_selection_records_one_standard_error_provenance() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=-0.43,
         cv_mse_mean=0.43,
-        cv_mse_fold_sd=0.10,
+        cv_mse_std=0.10,
         n_splits=5,
         rule="one_standard_error",
         reference_minimum=minimum,
@@ -231,7 +232,7 @@ def test_selection_rejects_invalid_selection_provenance() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=-0.40,
         cv_mse_mean=0.40,
-        cv_mse_fold_sd=0.08,
+        cv_mse_std=0.08,
         n_splits=5,
         rule="minimum_cv_mse",
     )
@@ -241,7 +242,7 @@ def test_selection_rejects_invalid_selection_provenance() -> None:
         "predictor_rank_policy": "optimized",
         "mean_test_score": -0.43,
         "cv_mse_mean": 0.43,
-        "cv_mse_fold_sd": 0.10,
+        "cv_mse_std": 0.10,
         "n_splits": 5,
     }
 
@@ -276,7 +277,7 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
         "predictor_rank_policy": "optimized",
         "mean_test_score": [-0.5, -0.4],
         "cv_mse_mean": [0.5, 0.4],
-        "cv_mse_fold_sd": [0.1, 0.1],
+        "cv_mse_std": [0.1, 0.1],
         "n_splits": 3,
     }
     with pytest.raises(ValueError, match="finite"):
@@ -294,7 +295,7 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
         "predictor_rank": [2, 3],
         "mean_test_score": [-0.5, -0.4],
         "cv_mse_mean": [0.5, 0.4],
-        "cv_mse_fold_sd": [0.1, 0.1],
+        "cv_mse_std": [0.1, 0.1],
         "predictor_rank_policy": "optimized",
         "n_splits": 5,
     }

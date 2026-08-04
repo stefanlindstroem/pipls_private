@@ -97,8 +97,8 @@ def test_pulp_rank_profile_exposes_the_interior_selection(
     assert (
         profile.cv_mse_mean[upper_index] - profile.cv_mse_mean[selected_index]
         < min(
-            profile.cv_mse_fold_sd[selected_index],
-            profile.cv_mse_fold_sd[upper_index],
+            profile.cv_mse_std[selected_index],
+            profile.cv_mse_std[upper_index],
         )
     )
 

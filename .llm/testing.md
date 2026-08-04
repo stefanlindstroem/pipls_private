@@ -362,6 +362,9 @@ Decision 0146 requires focused tests across seven patches for:
 - Pulp materializing 50 repeated five-fold splits and averaging ten OOF predictions per sample; and
 - final absence of the active one-standard-error and standard-error selection surface.
 
-Patch 1 changes no executable contract. Historical decisions and changelog entries may retain
-historically accurate one-standard-error wording; active source, tests, examples, tutorials, API
-documentation, and guide contracts must converge by Patch 7.
+Patch 1 changes no executable contract. Patch 2 protects the renamed `cv_mse_std` field, exact
+equal-split arithmetic means, `ddof=0` population SDs, one-split behavior, repeated CV, unequal
+validation lengths, direct construction, immutability, and pickle stability while retaining the
+temporary derived-SE bridge. Historical decisions and changelog entries may retain historically
+accurate one-standard-error wording; active source, tests, examples, tutorials, API documentation,
+and guide contracts must converge by Patch 7.

@@ -4,6 +4,11 @@
 
 ### Repository
 
+- Rename public component-path, predictor-rank-profile, selection, and ordinary-PLS path
+  dispersion from `cv_mse_fold_sd` to `cv_mse_std`. Preserve the exact arithmetic mean and
+  population standard deviation across all materialized validation splits, immutable result
+  and pickle contracts, and the temporary derived `cv_mse_standard_error` bridge required by
+  the still-active one-standard-error workflow.
 - Complete the final implementation-surface cleanup by declaring exact exports for
   `pipls.regression`, `pipls.search`, and `pipls.exceptions`; state the fitting-free role of
   `search.select()` positively in model-producing tutorials; and close Decision 0145 with exact

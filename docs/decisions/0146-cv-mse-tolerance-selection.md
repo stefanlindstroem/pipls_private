@@ -214,7 +214,7 @@ search-select-refit procedure remains a separate future design problem.
 
 1. Establish this decision and synchronize the guide layer — complete.
 2. Rename `cv_mse_fold_sd` to `cv_mse_std` and lock equal-split mean and population-SD numerics,
-   temporarily retaining derived SE support as a migration bridge.
+   temporarily retaining derived SE support as a migration bridge — complete.
 3. Add relative and absolute tolerance arguments, validation, threshold selection, and immutable
    selection provenance.
 4. Replace maintained SE error bars and wording with SD across validation splits.

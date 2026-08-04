@@ -55,13 +55,13 @@
   `PiPLSPredictorRankProfile.selection` result applies the same reference-anchored
   comparison and chooses the first tied row because profile ranks are strictly ascending.
 - Component-path and predictor-rank-profile records may represent a valid one-split protocol. Their
-  stored `cv_mse_fold_sd` is the population standard deviation across realized fold MSE values,
-  while the derived `cv_mse_standard_error` is `cv_mse_fold_sd / sqrt(n_splits - 1)`, equivalently
-  the sample fold standard deviation divided by `sqrt(n_splits)`. Derived arrays are finite
+  stored `cv_mse_std` is the population standard deviation across realized split MSE values,
+  while the derived `cv_mse_standard_error` is `cv_mse_std / sqrt(n_splits - 1)`, equivalently
+  the sample split standard deviation divided by `sqrt(n_splits)`. Derived arrays are finite
   read-only `float64` and are a conventional CV heuristic rather than confidence intervals. The
   property raises explicitly when fewer than two split values make the estimate undefined.
   Maintained CV-MSE figures use this derived quantity for symmetric $\pm 1$ standard-error bars;
-  they do not use the stored fold SD as `yerr`.
+  they do not use the stored split SD as `yerr`.
 - Search-owned component selection uses the immutable stored path values exactly. The
   `"minimum_cv_mse"` rule returns the first `np.argmin(cv_mse_mean)` row. The
   `"one_standard_error"` rule uses that row's mean plus that row's derived standard error as its
@@ -109,4 +109,4 @@ and may be positive infinity. Both restrictions apply simultaneously.
 
 `cv_mse_std` is descriptive split variability and is not divided by a split count. Maintained plots
 will use it directly for symmetric error bars. Until Patches 2–7 are applied, the preceding
-fold-SD/derived-SE and one-standard-error paragraphs describe the current implementation.
+split-SD/derived-SE and one-standard-error paragraphs describe the current implementation.

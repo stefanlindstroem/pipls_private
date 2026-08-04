@@ -1122,7 +1122,7 @@ Decision 0146 authorizes seven reviewable patches:
 
 1. establish the decision and guide-layer contract — complete;
 2. rename `cv_mse_fold_sd` to `cv_mse_std` and lock equal-split mean/population-SD numerics while
-   retaining temporary SE compatibility internally;
+   retaining temporary SE compatibility internally — complete;
 3. add relative and absolute tolerance selection with complete immutable provenance;
 4. replace maintained SE error bars and language with SD across validation splits;
 5. migrate automatic workflows to minimum-CV-MSE tolerance selection, including Tobacco at 10%;
@@ -1133,4 +1133,4 @@ The default relative tolerance is machine-scale numerical equivalence and the de
 tolerance is positive infinity. Both tolerance conditions must hold. This transition does not add
 an outer-validation API and does not propagate repeated CV to every maintained example.
 
-Current status: **Patch 1 of 7 complete**. Patch 2 is the next increment.
+Current status: **Patches 1–2 of 7 complete**. Patch 3 is the next increment.

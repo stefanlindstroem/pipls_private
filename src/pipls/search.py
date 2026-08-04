@@ -807,7 +807,7 @@ class PiPLSSearchCV(
                 FloatArray,
                 self.cv_results_["mean_response_standardized_mse"],
             )[indices],
-            cv_mse_fold_sd=cast(
+            cv_mse_std=cast(
                 FloatArray,
                 self.cv_results_["std_response_standardized_mse"],
             )[indices],
@@ -1136,7 +1136,7 @@ def _build_component_path(
             FloatArray,
             results["mean_response_standardized_mse"],
         )[conditional_indices],
-        cv_mse_fold_sd=cast(
+        cv_mse_std=cast(
             FloatArray,
             results["std_response_standardized_mse"],
         )[conditional_indices],

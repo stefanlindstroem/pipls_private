@@ -50,10 +50,11 @@ class PiPLSSelection:
         Mean configured test score for the selected candidate.
     cv_mse_mean : float
         Mean response-standardized validation MSE.
-    cv_mse_fold_sd : float
-        Population standard deviation of response-standardized MSE across folds.
+    cv_mse_std : float
+        Population standard deviation of response-standardized MSE across
+        validation splits.
     cv_mse_standard_error : float
-        Fold-based standard error of the mean response-standardized CV-MSE.
+        Temporary split-based standard error of mean response-standardized CV-MSE.
     n_splits : int
         Number of cross-validation splits.
     rule : {"best_score", "minimum_cv_mse", "one_standard_error"} or None
@@ -63,7 +64,8 @@ class PiPLSSelection:
         Minimum-CV-MSE selection used to derive a one-standard-error selection.
         Defined only when ``rule="one_standard_error"``.
     one_standard_error_threshold : float or None
-        Derived minimum-CV-MSE plus its fold-based standard error. Defined only
+        Derived minimum-CV-MSE plus its temporary split-based standard error.
+        Defined only
         when ``rule="one_standard_error"``.
     """
 
@@ -72,7 +74,7 @@ class PiPLSSelection:
     predictor_rank_policy: PredictorRankPolicy
     mean_test_score: float
     cv_mse_mean: float
-    cv_mse_fold_sd: float
+    cv_mse_std: float
     n_splits: int
     rule: SelectionRule | None = None
     reference_minimum: PiPLSSelection | None = None
@@ -92,9 +94,9 @@ class PiPLSSelection:
         )
         mean_test_score = _finite_float(self.mean_test_score, name="mean_test_score")
         cv_mse_mean = _nonnegative_finite_float(self.cv_mse_mean, name="cv_mse_mean")
-        cv_mse_fold_sd = _nonnegative_finite_float(
-            self.cv_mse_fold_sd,
-            name="cv_mse_fold_sd",
+        cv_mse_std = _nonnegative_finite_float(
+            self.cv_mse_std,
+            name="cv_mse_std",
         )
         n_splits = _positive_int(self.n_splits, name="n_splits")
         rule = (
@@ -161,16 +163,16 @@ class PiPLSSelection:
         object.__setattr__(self, "predictor_rank_policy", predictor_rank_policy)
         object.__setattr__(self, "mean_test_score", mean_test_score)
         object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
-        object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
+        object.__setattr__(self, "cv_mse_std", cv_mse_std)
         object.__setattr__(self, "n_splits", n_splits)
         object.__setattr__(self, "rule", rule)
         object.__setattr__(self, "reference_minimum", reference_minimum)
 
     @property
     def cv_mse_standard_error(self) -> float:
-        """Return the fold-based standard error of mean CV-MSE.
+        """Return the temporary split-based standard error of mean CV-MSE.
 
-        ``cv_mse_fold_sd`` stores a population standard deviation. Dividing it
+        ``cv_mse_std`` stores a population standard deviation. Dividing it
         by ``sqrt(n_splits - 1)`` is equivalent to converting it to the sample
         standard deviation and then dividing by ``sqrt(n_splits)``.
         """
@@ -179,7 +181,7 @@ class PiPLSSelection:
             raise ValueError(
                 "cv_mse_standard_error requires at least two validation splits."
             )
-        return float(self.cv_mse_fold_sd / np.sqrt(self.n_splits - 1))
+        return float(self.cv_mse_std / np.sqrt(self.n_splits - 1))
 
     @property
     def one_standard_error_threshold(self) -> float | None:
@@ -205,7 +207,7 @@ class PiPLSSelection:
                 self.predictor_rank_policy,
                 self.mean_test_score,
                 self.cv_mse_mean,
-                self.cv_mse_fold_sd,
+                self.cv_mse_std,
                 self.n_splits,
                 self.rule,
                 self.reference_minimum,
@@ -232,10 +234,11 @@ class PiPLSPredictorRankProfile:
         Mean configured test score for each evaluated rank.
     cv_mse_mean : ndarray of shape (n_evaluated_ranks,)
         Mean response-standardized validation MSE for each evaluated rank.
-    cv_mse_fold_sd : ndarray of shape (n_evaluated_ranks,)
-        Population standard deviation of response-standardized MSE across folds.
+    cv_mse_std : ndarray of shape (n_evaluated_ranks,)
+        Population standard deviation of response-standardized MSE across
+        validation splits.
     cv_mse_standard_error : ndarray of shape (n_evaluated_ranks,)
-        Fold-based standard error of mean response-standardized CV-MSE.
+        Temporary split-based standard error of mean response-standardized CV-MSE.
     predictor_rank_policy : {"optimized", "fixed", "maximum"}
         Predictor-rank policy shared by every evaluated candidate.
     n_splits : int
@@ -248,7 +251,7 @@ class PiPLSPredictorRankProfile:
     predictor_rank: IntArray
     mean_test_score: FloatArray
     cv_mse_mean: FloatArray
-    cv_mse_fold_sd: FloatArray
+    cv_mse_std: FloatArray
     predictor_rank_policy: PredictorRankPolicy
     n_splits: int
 
@@ -263,9 +266,9 @@ class PiPLSPredictorRankProfile:
             name="mean_test_score",
         )
         cv_mse_mean = _read_only_float_array(self.cv_mse_mean, name="cv_mse_mean")
-        cv_mse_fold_sd = _read_only_float_array(
-            self.cv_mse_fold_sd,
-            name="cv_mse_fold_sd",
+        cv_mse_std = _read_only_float_array(
+            self.cv_mse_std,
+            name="cv_mse_std",
         )
         predictor_rank_policy = cast(
             PredictorRankPolicy,
@@ -277,7 +280,7 @@ class PiPLSPredictorRankProfile:
         )
         n_splits = _positive_int(self.n_splits, name="n_splits")
 
-        arrays = (mean_test_score, cv_mse_mean, cv_mse_fold_sd)
+        arrays = (mean_test_score, cv_mse_mean, cv_mse_std)
         if predictor_rank.size == 0:
             raise ValueError("A predictor-rank profile must contain at least one result.")
         if any(array.size != predictor_rank.size for array in arrays):
@@ -290,23 +293,23 @@ class PiPLSPredictorRankProfile:
             raise ValueError("predictor_rank must be unique and strictly ascending.")
         if np.any(cv_mse_mean < 0.0):
             raise ValueError("cv_mse_mean must contain nonnegative values.")
-        if np.any(cv_mse_fold_sd < 0.0):
-            raise ValueError("cv_mse_fold_sd must contain nonnegative values.")
+        if np.any(cv_mse_std < 0.0):
+            raise ValueError("cv_mse_std must contain nonnegative values.")
 
         object.__setattr__(self, "n_components", n_components)
         object.__setattr__(self, "predictor_rank", predictor_rank)
         object.__setattr__(self, "mean_test_score", mean_test_score)
         object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
-        object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
+        object.__setattr__(self, "cv_mse_std", cv_mse_std)
         object.__setattr__(self, "predictor_rank_policy", predictor_rank_policy)
         object.__setattr__(self, "n_splits", n_splits)
 
     @property
     def cv_mse_standard_error(self) -> FloatArray:
-        """Return read-only fold-based standard errors of mean CV-MSE."""
+        """Return temporary read-only split-based standard errors of mean CV-MSE."""
 
         return _read_only_cv_mse_standard_error(
-            self.cv_mse_fold_sd,
+            self.cv_mse_std,
             self.n_splits,
         )
 
@@ -323,7 +326,7 @@ class PiPLSPredictorRankProfile:
             predictor_rank_policy=self.predictor_rank_policy,
             mean_test_score=float(self.mean_test_score[index]),
             cv_mse_mean=float(self.cv_mse_mean[index]),
-            cv_mse_fold_sd=float(self.cv_mse_fold_sd[index]),
+            cv_mse_std=float(self.cv_mse_std[index]),
             n_splits=self.n_splits,
         )
 
@@ -337,7 +340,7 @@ class PiPLSPredictorRankProfile:
                 self.predictor_rank,
                 self.mean_test_score,
                 self.cv_mse_mean,
-                self.cv_mse_fold_sd,
+                self.cv_mse_std,
                 self.predictor_rank_policy,
                 self.n_splits,
             ),
@@ -364,10 +367,11 @@ class PiPLSComponentPath:
         Mean configured test score for each selected candidate.
     cv_mse_mean : ndarray of shape (n_component_values,)
         Mean response-standardized validation MSE for each selected candidate.
-    cv_mse_fold_sd : ndarray of shape (n_component_values,)
-        Population standard deviation of response-standardized MSE across folds.
+    cv_mse_std : ndarray of shape (n_component_values,)
+        Population standard deviation of response-standardized MSE across
+        validation splits.
     cv_mse_standard_error : ndarray of shape (n_component_values,)
-        Fold-based standard error of mean response-standardized CV-MSE.
+        Temporary split-based standard error of mean response-standardized CV-MSE.
     n_splits : int
         Number of cross-validation splits shared by every path row.
     """
@@ -377,7 +381,7 @@ class PiPLSComponentPath:
     predictor_rank_policy: PredictorRankPolicy
     mean_test_score: FloatArray
     cv_mse_mean: FloatArray
-    cv_mse_fold_sd: FloatArray
+    cv_mse_std: FloatArray
     n_splits: int
 
     def __post_init__(self) -> None:
@@ -399,9 +403,9 @@ class PiPLSComponentPath:
             name="mean_test_score",
         )
         cv_mse_mean = _read_only_float_array(self.cv_mse_mean, name="cv_mse_mean")
-        cv_mse_fold_sd = _read_only_float_array(
-            self.cv_mse_fold_sd,
-            name="cv_mse_fold_sd",
+        cv_mse_std = _read_only_float_array(
+            self.cv_mse_std,
+            name="cv_mse_std",
         )
         n_splits = _positive_int(self.n_splits, name="n_splits")
 
@@ -409,7 +413,7 @@ class PiPLSComponentPath:
             predictor_rank,
             mean_test_score,
             cv_mse_mean,
-            cv_mse_fold_sd,
+            cv_mse_std,
         )
         if n_components.size == 0:
             raise ValueError("A component path must contain at least one result.")
@@ -425,23 +429,23 @@ class PiPLSComponentPath:
             )
         if np.any(cv_mse_mean < 0.0):
             raise ValueError("cv_mse_mean must contain nonnegative values.")
-        if np.any(cv_mse_fold_sd < 0.0):
-            raise ValueError("cv_mse_fold_sd must contain nonnegative values.")
+        if np.any(cv_mse_std < 0.0):
+            raise ValueError("cv_mse_std must contain nonnegative values.")
 
         object.__setattr__(self, "n_components", n_components)
         object.__setattr__(self, "predictor_rank", predictor_rank)
         object.__setattr__(self, "predictor_rank_policy", predictor_rank_policy)
         object.__setattr__(self, "mean_test_score", mean_test_score)
         object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
-        object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
+        object.__setattr__(self, "cv_mse_std", cv_mse_std)
         object.__setattr__(self, "n_splits", n_splits)
 
     @property
     def cv_mse_standard_error(self) -> FloatArray:
-        """Return read-only fold-based standard errors of mean CV-MSE."""
+        """Return temporary read-only split-based standard errors of mean CV-MSE."""
 
         return _read_only_cv_mse_standard_error(
-            self.cv_mse_fold_sd,
+            self.cv_mse_std,
             self.n_splits,
         )
 
@@ -456,7 +460,7 @@ class PiPLSComponentPath:
                 self.predictor_rank_policy,
                 self.mean_test_score,
                 self.cv_mse_mean,
-                self.cv_mse_fold_sd,
+                self.cv_mse_std,
                 self.n_splits,
             ),
         )
@@ -470,16 +474,16 @@ class PiPLSComponentPath:
             predictor_rank_policy=self.predictor_rank_policy,
             mean_test_score=float(self.mean_test_score[index]),
             cv_mse_mean=float(self.cv_mse_mean[index]),
-            cv_mse_fold_sd=float(self.cv_mse_fold_sd[index]),
+            cv_mse_std=float(self.cv_mse_std[index]),
             n_splits=self.n_splits,
         )
 
 
 def _read_only_cv_mse_standard_error(
-    cv_mse_fold_sd: FloatArray,
+    cv_mse_std: FloatArray,
     n_splits: IntArray | int,
 ) -> FloatArray:
-    """Derive sample-standard-error values from stored population fold SDs."""
+    """Derive sample-standard-error values from stored population split SDs."""
 
     split_counts = np.asarray(n_splits, dtype=np.float64)
     if np.any(split_counts < 2.0):
@@ -487,7 +491,7 @@ def _read_only_cv_mse_standard_error(
             "cv_mse_standard_error requires at least two validation splits."
         )
     standard_error = np.asarray(
-        cv_mse_fold_sd / np.sqrt(split_counts - 1.0),
+        cv_mse_std / np.sqrt(split_counts - 1.0),
         dtype=np.float64,
     )
     standard_error.setflags(write=False)

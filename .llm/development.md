@@ -132,7 +132,7 @@
   prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
 - Numbered examples migrated under Phase F4 operate directly on immutable path and inspection results
   in memory. They must not write generated CSV files as analytical or plotting intermediates.
-- Preserve `cv_mse_fold_sd` as descriptive population fold dispersion. Maintained CV-MSE figures
+- Preserve `cv_mse_std` as descriptive population split dispersion. Maintained CV-MSE figures
   use the derived `cv_mse_standard_error` for symmetric $\pm 1$ standard-error bars that can support
   the conventional one-standard-error (1-SE) heuristic. Selection lookup must not fit, refit, or
   mutate search state. Decision 0140 assigns that ownership to `search.select(...)`, and all

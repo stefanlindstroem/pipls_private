@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.exceptions import NotFittedError
+from sklearn.model_selection import RepeatedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -430,7 +431,7 @@ def test_select_component_count_returns_the_complete_exact_stored_row() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=[-0.8, -0.5, -0.45],
         cv_mse_mean=[0.8, 0.5, 0.45],
-        cv_mse_fold_sd=[0.1, 0.08, 0.07],
+        cv_mse_std=[0.1, 0.08, 0.07],
         n_splits=5,
     )
     search = _search_with_component_path(path)
@@ -443,7 +444,7 @@ def test_select_component_count_returns_the_complete_exact_stored_row() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=-0.5,
         cv_mse_mean=0.5,
-        cv_mse_fold_sd=0.08,
+        cv_mse_std=0.08,
         n_splits=5,
     )
     assert type(selected.n_components) is int
@@ -458,7 +459,7 @@ def test_select_minimum_cv_mse_returns_first_exact_stored_tie() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=[-0.5, -0.4, -0.4],
         cv_mse_mean=[0.5, 0.4, 0.4],
-        cv_mse_fold_sd=[0.1, 0.08, 0.07],
+        cv_mse_std=[0.1, 0.08, 0.07],
         n_splits=5,
     )
     search = _search_with_component_path(path)
@@ -471,7 +472,7 @@ def test_select_minimum_cv_mse_returns_first_exact_stored_tie() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=-0.4,
         cv_mse_mean=0.4,
-        cv_mse_fold_sd=0.08,
+        cv_mse_std=0.08,
         n_splits=5,
         rule="minimum_cv_mse",
     )
@@ -484,7 +485,7 @@ def test_select_one_standard_error_uses_the_minimum_rows_standard_error() -> Non
         predictor_rank_policy="optimized",
         mean_test_score=[-0.48, -0.45, -0.40, -0.42],
         cv_mse_mean=[0.48, 0.45, 0.40, 0.42],
-        cv_mse_fold_sd=[1.0, 0.4, 0.08, 0.2],
+        cv_mse_std=[1.0, 0.4, 0.08, 0.2],
         n_splits=5,
     )
     search = _search_with_component_path(path)
@@ -505,7 +506,7 @@ def test_select_one_standard_error_returns_smallest_eligible_count() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=[-0.50, -0.44, -0.40],
         cv_mse_mean=[0.50, 0.44, 0.40],
-        cv_mse_fold_sd=[0.1, 0.1, 0.10],
+        cv_mse_std=[0.1, 0.1, 0.10],
         n_splits=5,
     )
     search = _search_with_component_path(path)
@@ -528,7 +529,7 @@ def test_select_one_standard_error_uses_no_extra_tolerance() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=[-0.5, -just_above_threshold, -minimum],
         cv_mse_mean=[0.5, just_above_threshold, minimum],
-        cv_mse_fold_sd=[0.1, 0.1, 2.0 * reference_standard_error],
+        cv_mse_std=[0.1, 0.1, 2.0 * reference_standard_error],
         n_splits=5,
     )
     search = _search_with_component_path(path)
@@ -547,7 +548,7 @@ def test_select_rules_handle_split_and_finite_threshold_edges() -> None:
             predictor_rank_policy="optimized",
             mean_test_score=[-0.4, -0.5],
             cv_mse_mean=[0.4, 0.5],
-            cv_mse_fold_sd=[0.0, 0.1],
+            cv_mse_std=[0.0, 0.1],
             n_splits=1,
         )
     )
@@ -562,7 +563,7 @@ def test_select_rules_handle_split_and_finite_threshold_edges() -> None:
             predictor_rank_policy="fixed",
             mean_test_score=[-1.0e308],
             cv_mse_mean=[1.0e308],
-            cv_mse_fold_sd=[1.0e308],
+            cv_mse_std=[1.0e308],
             n_splits=2,
         )
     )
@@ -1173,7 +1174,7 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
         assert path.cv_mse_mean[row_index] == pytest.approx(
             search.cv_results_["mean_response_standardized_mse"][index]
         )
-        assert path.cv_mse_fold_sd[row_index] == pytest.approx(
+        assert path.cv_mse_std[row_index] == pytest.approx(
             search.cv_results_["std_response_standardized_mse"][index]
         )
         assert path.cv_mse_standard_error[row_index] == pytest.approx(
@@ -1196,6 +1197,74 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
     assert not restored.component_path_.n_components.flags.writeable
 
 
+@pytest.mark.parametrize(
+    ("cv", "expected_n_splits"),
+    [
+        pytest.param(
+            RepeatedKFold(n_splits=3, n_repeats=2, random_state=0),
+            6,
+            id="repeated-k-fold",
+        ),
+        pytest.param(
+            [(np.arange(6, 18), np.arange(0, 6))],
+            1,
+            id="one-split",
+        ),
+        pytest.param(
+            [
+                (np.arange(3, 18), np.arange(0, 3)),
+                (np.concatenate((np.arange(0, 3), np.arange(8, 18))), np.arange(3, 8)),
+                (np.arange(0, 8), np.arange(8, 18)),
+            ],
+            3,
+            id="unequal-validation-lengths",
+        ),
+    ],
+)
+def test_cv_mse_summaries_use_equal_weight_for_every_materialized_split(
+    cv: object,
+    expected_n_splits: int,
+) -> None:
+    X, Y = _data(n_samples=18)
+    search = PiPLSSearchCV(
+        n_components_values=[1],
+        predictor_rank_values=[1],
+        search_method="optimal",
+        cv=cv,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    split_mse = np.array(
+        [
+            search.cv_results_[f"split{split_index}_response_standardized_mse"][0]
+            for split_index in range(expected_n_splits)
+        ],
+        dtype=np.float64,
+    )
+    path = search.component_path_
+
+    assert search.n_splits_ == expected_n_splits
+    assert path.n_splits == expected_n_splits
+    assert path.cv_mse_mean[0] == pytest.approx(np.mean(split_mse))
+    assert path.cv_mse_std[0] == pytest.approx(np.std(split_mse, ddof=0))
+    assert search.cv_results_["mean_response_standardized_mse"][0] == pytest.approx(
+        np.mean(split_mse)
+    )
+    assert search.cv_results_["std_response_standardized_mse"][0] == pytest.approx(
+        np.std(split_mse, ddof=0)
+    )
+
+    if expected_n_splits == 1:
+        assert path.cv_mse_std[0] == 0.0
+        with pytest.raises(ValueError, match="requires at least two"):
+            _ = path.cv_mse_standard_error
+    else:
+        np.testing.assert_allclose(
+            path.cv_mse_standard_error,
+            path.cv_mse_std / np.sqrt(expected_n_splits - 1),
+        )
+
+
 def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
@@ -1213,7 +1282,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
     assert profile.n_splits == 3
     np.testing.assert_allclose(
         profile.cv_mse_standard_error,
-        profile.cv_mse_fold_sd / np.sqrt(profile.n_splits - 1),
+        profile.cv_mse_std / np.sqrt(profile.n_splits - 1),
     )
     assert not profile.cv_mse_standard_error.flags.writeable
     np.testing.assert_array_equal(profile.predictor_rank, np.array([2, 3, 4]))
@@ -1223,7 +1292,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
             profile.predictor_rank,
             profile.mean_test_score,
             profile.cv_mse_mean,
-            profile.cv_mse_fold_sd,
+            profile.cv_mse_std,
         )
     )
     rows = np.flatnonzero(search.cv_results_["n_components"] == 2)
@@ -1238,7 +1307,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
         search.cv_results_["mean_response_standardized_mse"][indices],
     )
     np.testing.assert_allclose(
-        profile.cv_mse_fold_sd,
+        profile.cv_mse_std,
         search.cv_results_["std_response_standardized_mse"][indices],
     )
     assert profile.selection == search.select(n_components=2)
@@ -1371,7 +1440,7 @@ def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
         predictor_rank_policy="optimized",
         mean_test_score=-1.0,
         cv_mse_mean=1.0,
-        cv_mse_fold_sd=0.1,
+        cv_mse_std=0.1,
         n_splits=3,
     )
     with pytest.raises(NotFittedError):

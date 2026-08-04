@@ -24,20 +24,23 @@ class PLSComponentPath:
 
     n_components: IntArray
     cv_mse_mean: FloatArray
-    cv_mse_fold_sd: FloatArray
+    cv_mse_std: FloatArray
     algorithm: str
     n_splits: int
 
     def __post_init__(self) -> None:
         n_components = _read_only_int_array(self.n_components, name="n_components")
         cv_mse_mean = _read_only_float_array(self.cv_mse_mean, name="cv_mse_mean")
-        cv_mse_fold_sd = _read_only_float_array(
-            self.cv_mse_fold_sd,
-            name="cv_mse_fold_sd",
+        cv_mse_std = _read_only_float_array(
+            self.cv_mse_std,
+            name="cv_mse_std",
         )
         if n_components.size == 0:
             raise ValueError("A PLS component path must contain at least one result.")
-        if cv_mse_mean.size != n_components.size or cv_mse_fold_sd.size != n_components.size:
+        if (
+            cv_mse_mean.size != n_components.size
+            or cv_mse_std.size != n_components.size
+        ):
             raise ValueError("All PLS component-path arrays must have the same length.")
         if np.any(n_components <= 0):
             raise ValueError("n_components must contain positive integers.")
@@ -45,8 +48,8 @@ class PLSComponentPath:
             raise ValueError("n_components must be unique and strictly ascending.")
         if not np.isfinite(cv_mse_mean).all():
             raise ValueError("cv_mse_mean must contain only finite values.")
-        if not np.isfinite(cv_mse_fold_sd).all() or np.any(cv_mse_fold_sd < 0.0):
-            raise ValueError("cv_mse_fold_sd must contain finite nonnegative values.")
+        if not np.isfinite(cv_mse_std).all() or np.any(cv_mse_std < 0.0):
+            raise ValueError("cv_mse_std must contain finite nonnegative values.")
         algorithm = str(self.algorithm).strip()
         if not algorithm:
             raise ValueError("algorithm must be a nonempty string.")
@@ -58,20 +61,20 @@ class PLSComponentPath:
 
         object.__setattr__(self, "n_components", n_components)
         object.__setattr__(self, "cv_mse_mean", cv_mse_mean)
-        object.__setattr__(self, "cv_mse_fold_sd", cv_mse_fold_sd)
+        object.__setattr__(self, "cv_mse_std", cv_mse_std)
         object.__setattr__(self, "algorithm", algorithm)
         object.__setattr__(self, "n_splits", n_splits)
 
     @property
     def cv_mse_standard_error(self) -> FloatArray:
-        """Return read-only fold-based standard errors of mean CV-MSE."""
+        """Return temporary read-only split-based standard errors of mean CV-MSE."""
 
         if self.n_splits < 2:
             raise ValueError(
                 "cv_mse_standard_error requires at least two validation splits."
             )
         standard_error = np.asarray(
-            self.cv_mse_fold_sd / np.sqrt(self.n_splits - 1),
+            self.cv_mse_std / np.sqrt(self.n_splits - 1),
             dtype=np.float64,
         )
         standard_error.setflags(write=False)
@@ -85,7 +88,7 @@ class PLSComponentPath:
             (
                 self.n_components,
                 self.cv_mse_mean,
-                self.cv_mse_fold_sd,
+                self.cv_mse_std,
                 self.algorithm,
                 self.n_splits,
             ),
@@ -161,7 +164,7 @@ def evaluate_pls_component_path(
     return PLSComponentPath(
         n_components=np.arange(1, max_n_components + 1, dtype=np.intp),
         cv_mse_mean=np.mean(split_mse, axis=1),
-        cv_mse_fold_sd=np.std(split_mse, axis=1),
+        cv_mse_std=np.std(split_mse, axis=1),
         algorithm=ALGORITHM,
         n_splits=n_splits,
     )

@@ -191,11 +191,11 @@ observations, a compact explicit candidate grid, the singleton-safe default scor
 predictions. Its OOF report is selection-conditioned because the same LOO path selects the rank
 pair and supplies the pooled diagnostic.
 
-## Fold variation and standard error
+## Split variation and temporary standard error
 
-`component_path_.cv_mse_fold_sd` is the population standard deviation of the realized fold-specific
-MSE values. It describes fold variation. The derived read-only
-`component_path_.cv_mse_standard_error` converts that stored quantity to the usual fold-based
+`component_path_.cv_mse_std` is the population standard deviation of the realized split-specific
+MSE values. It describes variation across the materialized validation splits. The derived read-only
+`component_path_.cv_mse_standard_error` converts that stored quantity to the temporary split-based
 standard error of the mean CV-MSE:
 
 \begin{equation}
@@ -206,7 +206,7 @@ standard error of the mean CV-MSE:
 
 where $K$ is the number of validation splits, stored once as the path-wide scalar
 `component_path_.n_splits`. This is equivalent to dividing the sample standard deviation of the
-fold MSE values by $\sqrt{K}$. At least two splits are required. Maintained
+split MSE values by $\sqrt{K}$. At least two splits are required. Maintained
 component-path and predictor-rank-profile figures plot the mean response-standardized CV-MSE with
 symmetric $\pm 1$ standard-error bars from this property. Because CV training sets overlap, these
 bars are a conventional resampling heuristic rather than confidence intervals or a formal

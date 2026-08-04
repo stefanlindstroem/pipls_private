@@ -190,7 +190,7 @@ def test_maintained_cv_mse_error_bars_use_fold_based_standard_error() -> None:
         ]
 
         assert errorbar_calls, path
-        assert "cv_mse_fold_sd" not in text, path
+        assert "cv_mse_std" not in text, path
         for call in errorbar_calls:
             yerr = next(
                 (keyword.value for keyword in call.keywords if keyword.arg == "yerr"),
