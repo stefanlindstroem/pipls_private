@@ -106,7 +106,7 @@ corresponding named loader:
 
 ```python
 data = load_sugarcane()
-X, Y = data.data, data.target
+X, Y = data.X, data.Y
 wavelengths = np.asarray(data.feature_names, dtype=np.float64)
 response_names = list(data.target_names)
 ```

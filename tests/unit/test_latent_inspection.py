@@ -65,10 +65,13 @@ def test_latent_structure_copies_public_fitted_arrays(kind: ModelKind) -> None:
     np.testing.assert_array_equal(structure.x_loadings, model.x_loadings_)
     np.testing.assert_array_equal(structure.y_loadings, model.y_loadings_)
     np.testing.assert_array_equal(structure.coefficients, model.coef_)
-    assert structure.n_samples == 36
-    assert structure.n_features == 7
-    assert structure.n_targets == 3
+    assert structure.x_scores.shape == (36, 3)
+    assert structure.x_loadings.shape == (7, 3)
+    assert structure.y_loadings.shape == (3, 3)
     assert structure.n_components == 3
+    assert not hasattr(structure, "n_samples")
+    assert not hasattr(structure, "n_features")
+    assert not hasattr(structure, "n_targets")
 
 
 @pytest.mark.parametrize("kind", ["pls", "pipls"])
@@ -130,7 +133,7 @@ def test_latent_structure_supports_one_response(kind: ModelKind) -> None:
 
     assert structure.y_loadings.shape == (1, 1)
     assert structure.coefficients.shape == (1, 5)
-    assert structure.n_targets == 1
+    assert structure.y_loadings.shape[0] == 1
 
 
 @pytest.mark.parametrize("kind", ["pls", "pipls"])
@@ -169,7 +172,8 @@ def test_observation_diagnostics_match_public_method_calculation(kind: ModelKind
         diagnostics.x_reconstruction_residual,
         expected_residual,
     )
-    assert diagnostics.n_samples == len(X)
+    assert diagnostics.score_distance.shape == (len(X),)
+    assert not hasattr(diagnostics, "n_samples")
     assert not diagnostics.score_distance.flags.writeable
     assert not diagnostics.x_reconstruction_residual.flags.writeable
 
@@ -218,8 +222,10 @@ def test_biplot_coordinates_preserve_reconstruction_and_balance_norms(
         np.linalg.norm(coordinates.predictor_coordinates, axis=0),
     )
     np.testing.assert_array_equal(coordinates.component_indices, np.array([0, 2]))
-    assert coordinates.n_samples == structure.n_samples
-    assert coordinates.n_features == structure.n_features
+    assert coordinates.sample_coordinates.shape[0] == structure.x_scores.shape[0]
+    assert coordinates.predictor_coordinates.shape[0] == structure.x_loadings.shape[0]
+    assert not hasattr(coordinates, "n_samples")
+    assert not hasattr(coordinates, "n_features")
     for values in (
         coordinates.sample_coordinates,
         coordinates.predictor_coordinates,

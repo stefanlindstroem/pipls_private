@@ -23,39 +23,29 @@ between these quantities, begin with [Model inspection concepts](../model_inspec
 ::: pipls.inspection.BiplotCoordinates
     options:
       show_signature: false
-      members:
-        - n_samples
-        - n_features
+      members: false
 
 ::: pipls.inspection.LatentStructure
     options:
       show_signature: false
       members:
-        - n_samples
-        - n_features
-        - n_targets
         - n_components
 
 ::: pipls.inspection.ObservationDiagnostics
     options:
       show_signature: false
-      members:
-        - n_samples
+      members: false
 
 ::: pipls.inspection.PiPLSDisplayFactors
     options:
       show_signature: false
       members:
-        - n_features
-        - n_targets
         - n_components
 
 ::: pipls.inspection.PredictionDiagnostics
     options:
       show_signature: false
-      members:
-        - n_samples
-        - n_targets
+      members: false
 
 ## PLS-family analysis
 

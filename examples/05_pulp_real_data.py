@@ -26,7 +26,7 @@ CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 # --8<-- [start:load-pulp-data]
 data = load_pulp()
-X, Y = data.data, data.target
+X, Y = data.X, data.Y
 predictor_names = data.feature_names
 response_names = data.target_names
 # --8<-- [end:load-pulp-data]

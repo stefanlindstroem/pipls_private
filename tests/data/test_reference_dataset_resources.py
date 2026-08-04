@@ -82,8 +82,10 @@ def test_reference_dataset_resources_match_declared_integrity() -> None:
 
         dataset = loader()
         array_hashes = metadata["integrity"]["array_sha256"]
-        assert _canonical_array_hash(dataset.data) == array_hashes["data_float64_c_order"]
-        assert _canonical_array_hash(dataset.target) == array_hashes["target_float64_c_order"]
+        assert _canonical_array_hash(dataset.X) == array_hashes["data_float64_c_order"]
+        assert _canonical_array_hash(dataset.Y) == array_hashes[
+            "target_float64_c_order"
+        ]
 
 
 def test_reference_dataset_matrices_have_one_active_location() -> None:

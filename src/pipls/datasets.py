@@ -354,18 +354,6 @@ class PiPLSDataset:
         object.__setattr__(self, "metadata", metadata)
 
     @property
-    def data(self) -> FloatArray:
-        """Scikit-learn-style alias for :attr:`X`."""
-
-        return self.X
-
-    @property
-    def target(self) -> FloatArray:
-        """Scikit-learn-style alias for :attr:`Y`."""
-
-        return self.Y
-
-    @property
     def n_samples(self) -> int:
         """Number of aligned observations."""
 
@@ -613,7 +601,7 @@ def _load_packaged_dataset(
         metadata=metadata,
     )
     if return_X_y:
-        return dataset.data, dataset.target
+        return dataset.X, dataset.Y
     return dataset
 
 

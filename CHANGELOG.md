@@ -4,6 +4,12 @@
 
 ### Repository
 
+- Standardize `PiPLSDataset` on the canonical `X` and `Y` matrix attributes and remove the
+  pre-release `data` and `target` aliases. Remove ten unused shape-only inspection properties while
+  retaining dataset dimensions, latent/display component counts, every numerical array, all five
+  inspection functions, biplot scaling factors, direct-construction validation, and pickle safety.
+  Migrate all maintained examples, tutorial renderers, distribution checks, tests, and API
+  documentation without changing dataset or inspection numerics.
 - Simplify `PiPLSSearchCV.cv_results_` to stable pipeline-independent `n_components` and
   `predictor_rank` parameter columns. Remove duplicated `params` and pipeline-prefixed `param_*`
   representations while preserving all candidate scores, split values, response-standardized MSE

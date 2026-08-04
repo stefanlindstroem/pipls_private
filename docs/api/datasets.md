@@ -52,8 +52,6 @@ representation.
 ::: pipls.datasets.PiPLSDataset
     options:
       members:
-        - data
-        - target
         - n_samples
         - n_features
         - n_targets

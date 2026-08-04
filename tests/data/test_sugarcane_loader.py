@@ -49,19 +49,19 @@ def test_load_sugarcane_returns_labeled_immutable_dataset() -> None:
     dataset = load_sugarcane()
 
     assert isinstance(dataset, PiPLSDataset)
-    assert dataset.data.shape == (57, 1721)
-    assert dataset.target.shape == (57, 4)
-    assert dataset.data.dtype == np.float64
-    assert dataset.target.dtype == np.float64
+    assert dataset.X.shape == (57, 1721)
+    assert dataset.Y.shape == (57, 4)
+    assert dataset.X.dtype == np.float64
+    assert dataset.Y.dtype == np.float64
     assert dataset.feature_names == FEATURE_NAMES
     assert dataset.target_names == TARGET_NAMES
     assert dataset.sample_ids == tuple(
         f"sugarcane-{index:02d}" for index in range(1, 58)
     )
-    assert not dataset.data.flags.writeable
-    assert not dataset.target.flags.writeable
-    assert np.isfinite(dataset.data).all()
-    assert np.isfinite(dataset.target).all()
+    assert not dataset.X.flags.writeable
+    assert not dataset.Y.flags.writeable
+    assert np.isfinite(dataset.X).all()
+    assert np.isfinite(dataset.Y).all()
 
     assert dataset.provenance["source"].endswith("10.17632/mjttsjfj2s.1")
     assert dataset.provenance["license"] == "CC-BY-4.0"
@@ -93,10 +93,10 @@ def test_load_sugarcane_return_X_y_matches_default_result_and_is_fresh() -> None
     X, Y = load_sugarcane(return_X_y=True)
     second_X, second_Y = load_sugarcane(return_X_y=True)
 
-    assert not np.shares_memory(dataset.data, second_dataset.data)
-    assert not np.shares_memory(dataset.target, second_dataset.target)
-    np.testing.assert_array_equal(X, dataset.data)
-    np.testing.assert_array_equal(Y, dataset.target)
+    assert not np.shares_memory(dataset.X, second_dataset.X)
+    assert not np.shares_memory(dataset.Y, second_dataset.Y)
+    np.testing.assert_array_equal(X, dataset.X)
+    np.testing.assert_array_equal(Y, dataset.Y)
     assert not X.flags.writeable
     assert not Y.flags.writeable
     assert not np.shares_memory(X, second_X)
@@ -119,8 +119,8 @@ def test_packaged_sugarcane_resources_are_canonical() -> None:
         assert resource_root.joinpath(name).is_file()
 
     dataset = load_sugarcane()
-    assert _canonical_array_hash(dataset.data) == ARRAY_HASHES["data"]
-    assert _canonical_array_hash(dataset.target) == ARRAY_HASHES["target"]
+    assert _canonical_array_hash(dataset.X) == ARRAY_HASHES["data"]
+    assert _canonical_array_hash(dataset.Y) == ARRAY_HASHES["target"]
 
 
 def test_load_sugarcane_result_is_pickleable() -> None:
@@ -128,12 +128,12 @@ def test_load_sugarcane_result_is_pickleable() -> None:
     restored = pickle.loads(pickle.dumps(dataset))
 
     assert isinstance(restored, PiPLSDataset)
-    np.testing.assert_array_equal(restored.data, dataset.data)
-    np.testing.assert_array_equal(restored.target, dataset.target)
+    np.testing.assert_array_equal(restored.X, dataset.X)
+    np.testing.assert_array_equal(restored.Y, dataset.Y)
     assert restored.feature_names == dataset.feature_names
     assert restored.target_names == dataset.target_names
     assert restored.sample_ids == dataset.sample_ids
     assert restored.provenance == dataset.provenance
     assert restored.metadata == dataset.metadata
-    assert not restored.data.flags.writeable
-    assert not restored.target.flags.writeable
+    assert not restored.X.flags.writeable
+    assert not restored.Y.flags.writeable

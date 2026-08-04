@@ -150,18 +150,6 @@ class BiplotCoordinates:
             ),
         )
 
-    @property
-    def n_samples(self) -> int:
-        """Number of represented observations."""
-
-        return int(self.sample_coordinates.shape[0])
-
-    @property
-    def n_features(self) -> int:
-        """Number of represented predictor variables."""
-
-        return int(self.predictor_coordinates.shape[0])
-
 
 @dataclass(frozen=True)
 class LatentStructure:
@@ -225,24 +213,6 @@ class LatentStructure:
         )
 
     @property
-    def n_samples(self) -> int:
-        """Number of observations represented by the X scores."""
-
-        return int(self.x_scores.shape[0])
-
-    @property
-    def n_features(self) -> int:
-        """Number of predictor variables."""
-
-        return int(self.x_loadings.shape[0])
-
-    @property
-    def n_targets(self) -> int:
-        """Number of response variables."""
-
-        return int(self.y_loadings.shape[0])
-
-    @property
     def n_components(self) -> int:
         """Number of retained latent components."""
 
@@ -298,12 +268,6 @@ class ObservationDiagnostics:
         """Reconstruct through validation so unpickled arrays remain read-only."""
 
         return type(self), (self.score_distance, self.x_reconstruction_residual)
-
-    @property
-    def n_samples(self) -> int:
-        """Number of supplied observations."""
-
-        return int(self.score_distance.shape[0])
 
 
 @dataclass(frozen=True)
@@ -396,18 +360,6 @@ class PiPLSDisplayFactors:
         )
         weighted.setflags(write=False)
         return weighted
-
-    @property
-    def n_features(self) -> int:
-        """Number of predictor variables represented by the factors."""
-
-        return int(self.predictor_directions.shape[0])
-
-    @property
-    def n_targets(self) -> int:
-        """Number of response variables represented by the factors."""
-
-        return int(self.response_directions.shape[0])
 
     @property
     def n_components(self) -> int:
@@ -544,18 +496,6 @@ class PredictionDiagnostics:
         """Reconstruct through validation so unpickled arrays remain read-only."""
 
         return type(self), (self.observed, self.predicted, self.prediction_kind)
-
-    @property
-    def n_samples(self) -> int:
-        """Number of aligned observations."""
-
-        return int(self.observed.shape[0])
-
-    @property
-    def n_targets(self) -> int:
-        """Number of response variables."""
-
-        return int(self.observed.shape[1])
 
 
 def biplot_coordinates(

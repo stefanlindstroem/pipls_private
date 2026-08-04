@@ -597,17 +597,18 @@ functions, component-path and rank-profile evidence, advanced candidate scores a
 immutable direct-construction validation, biplot scaling factors, and caller-owned plotting remain
 public contracts.
 
-Current status: **Patches 1–5 complete**. `PiPLSOOFReport` requires OOF prediction and count
+Current status: **Patches 1–6 complete**. `PiPLSOOFReport` requires OOF prediction and count
 arrays and exposes selection metrics only through `report.selection`; the active API uses
 `PiPLSSelection` and `PiPLSPredictorRankProfile.selection`; fitted searches expose no public
-`best_*` state; and `cv_results_` retains only stable direct `n_components` and `predictor_rank`
-parameter columns while preserving all scores, split values, MSE fields, ranks, and timings.
+`best_*` state; `cv_results_` retains only stable direct `n_components` and `predictor_rank`
+parameter columns while preserving all scores, split values, MSE fields, ranks, and timings;
+`PiPLSDataset` exposes only `X` and `Y` matrix names while retaining dataset dimensions; and
+inspection records retain component counts but not unused shape-only properties.
 
 ## Current next increment
 
-Implement Decision 0144 Patch 6: remove `PiPLSDataset.data` and `.target` aliases and the accepted
-unused shape-only inspection properties while preserving `X`, `Y`, dataset-level dimensions,
-component-count properties, numerical arrays, and all five inspection functions.
+Implement Decision 0144 Patch 7: reduce top-level result exports, synchronize the final public and
+maintainer documentation, complete active-surface audits, and mark Decision 0144 implemented.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

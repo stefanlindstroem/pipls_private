@@ -68,17 +68,17 @@ def test_load_pulp_returns_labeled_immutable_dataset() -> None:
     dataset = load_pulp()
 
     assert isinstance(dataset, PiPLSDataset)
-    assert dataset.data.shape == (46, 14)
-    assert dataset.target.shape == (46, 8)
-    assert dataset.data.dtype == np.float64
-    assert dataset.target.dtype == np.float64
+    assert dataset.X.shape == (46, 14)
+    assert dataset.Y.shape == (46, 8)
+    assert dataset.X.dtype == np.float64
+    assert dataset.Y.dtype == np.float64
     assert dataset.feature_names == FEATURE_NAMES
     assert dataset.target_names == TARGET_NAMES
     assert dataset.sample_ids == tuple(f"pulp-{index:02d}" for index in range(1, 47))
-    assert not dataset.data.flags.writeable
-    assert not dataset.target.flags.writeable
-    assert np.isfinite(dataset.data).all()
-    assert np.isfinite(dataset.target).all()
+    assert not dataset.X.flags.writeable
+    assert not dataset.Y.flags.writeable
+    assert np.isfinite(dataset.X).all()
+    assert np.isfinite(dataset.Y).all()
 
     assert dataset.provenance["source"].endswith("10.1016/j.compchemeng.2025.109143")
     assert dataset.provenance["license"] == "CC-BY-4.0"
@@ -103,8 +103,8 @@ def test_load_pulp_return_X_y_matches_default_result_and_is_fresh() -> None:
     X, Y = load_pulp(return_X_y=True)
     second_X, second_Y = load_pulp(return_X_y=True)
 
-    np.testing.assert_array_equal(X, dataset.data)
-    np.testing.assert_array_equal(Y, dataset.target)
+    np.testing.assert_array_equal(X, dataset.X)
+    np.testing.assert_array_equal(Y, dataset.Y)
     assert not X.flags.writeable
     assert not Y.flags.writeable
     assert not np.shares_memory(X, second_X)
@@ -143,12 +143,12 @@ def test_load_pulp_result_is_pickleable() -> None:
     restored = pickle.loads(pickle.dumps(dataset))
 
     assert isinstance(restored, PiPLSDataset)
-    np.testing.assert_array_equal(restored.data, dataset.data)
-    np.testing.assert_array_equal(restored.target, dataset.target)
+    np.testing.assert_array_equal(restored.X, dataset.X)
+    np.testing.assert_array_equal(restored.Y, dataset.Y)
     assert restored.feature_names == dataset.feature_names
     assert restored.target_names == dataset.target_names
     assert restored.sample_ids == dataset.sample_ids
     assert restored.provenance == dataset.provenance
     assert restored.metadata == dataset.metadata
-    assert not restored.data.flags.writeable
-    assert not restored.target.flags.writeable
+    assert not restored.X.flags.writeable
+    assert not restored.Y.flags.writeable

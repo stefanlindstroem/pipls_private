@@ -43,8 +43,8 @@ The container validates and then freezes its contents:
   objects; use nested sequences or mappings instead;
 - nested metadata mappings and sequences are frozen recursively.
 
-The scikit-learn-style aliases `data` and `target` refer to `X` and `Y`. The container also exposes
-`n_samples`, `n_features`, and `n_targets`.
+The canonical matrix attributes are `X` and `Y`. The container also exposes `n_samples`,
+`n_features`, and `n_targets` as dataset-level dimensions.
 
 ## Deterministic latent-structure generator
 

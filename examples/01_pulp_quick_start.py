@@ -10,7 +10,7 @@ from pipls.datasets import load_pulp
 from pipls.inspection import prediction_diagnostics
 
 data = load_pulp()
-X, Y = data.data, data.target
+X, Y = data.X, data.Y
 # --8<-- [end:load-pulp-data]
 
 # --8<-- [start:fit-selected-pulp-model]

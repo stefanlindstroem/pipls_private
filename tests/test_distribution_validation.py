@@ -105,16 +105,16 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
     assert "prediction.shape == (2, 2)" in helper
     assert "pulp = load_pulp()" in helper
     assert "pulp_X, pulp_Y = load_pulp(return_X_y=True)" in helper
-    assert "pulp.data.shape == (46, 14)" in helper
-    assert "pulp.target.shape == (46, 8)" in helper
+    assert "pulp.X.shape == (46, 14)" in helper
+    assert "pulp.Y.shape == (46, 8)" in helper
     assert "sugarcane = load_sugarcane()" in helper
     assert "sugarcane_X, sugarcane_Y = load_sugarcane(return_X_y=True)" in helper
-    assert "sugarcane.data.shape == (57, 1721)" in helper
-    assert "sugarcane.target.shape == (57, 4)" in helper
+    assert "sugarcane.X.shape == (57, 1721)" in helper
+    assert "sugarcane.Y.shape == (57, 4)" in helper
     assert "tobacco = load_tobacco()" in helper
     assert "tobacco_X, tobacco_Y = load_tobacco(return_X_y=True)" in helper
-    assert "tobacco.data.shape == (347, 1557)" in helper
-    assert "tobacco.target.shape == (347, 13)" in helper
+    assert "tobacco.X.shape == (347, 1557)" in helper
+    assert "tobacco.Y.shape == (347, 13)" in helper
 
 
 def test_build_workflow_validates_installed_distributions() -> None:

@@ -63,10 +63,10 @@ def test_load_tobacco_returns_labeled_immutable_dataset() -> None:
     wavenumbers = np.asarray(dataset.feature_names, dtype=np.float64)
 
     assert isinstance(dataset, PiPLSDataset)
-    assert dataset.data.shape == (347, 1557)
-    assert dataset.target.shape == (347, 13)
-    assert dataset.data.dtype == np.float64
-    assert dataset.target.dtype == np.float64
+    assert dataset.X.shape == (347, 1557)
+    assert dataset.Y.shape == (347, 13)
+    assert dataset.X.dtype == np.float64
+    assert dataset.Y.dtype == np.float64
     assert dataset.feature_names[0] == "10001.0283203125"
     assert dataset.feature_names[-1] == "3999.63989257813"
     assert np.all(np.diff(wavenumbers) < 0.0)
@@ -74,10 +74,10 @@ def test_load_tobacco_returns_labeled_immutable_dataset() -> None:
     assert dataset.sample_ids == tuple(
         f"tobacco-{index:03d}" for index in range(1, 348)
     )
-    assert not dataset.data.flags.writeable
-    assert not dataset.target.flags.writeable
-    assert np.isfinite(dataset.data).all()
-    assert np.isfinite(dataset.target).all()
+    assert not dataset.X.flags.writeable
+    assert not dataset.Y.flags.writeable
+    assert np.isfinite(dataset.X).all()
+    assert np.isfinite(dataset.Y).all()
 
     assert dataset.provenance["source"].endswith("10.17632/9z7dgdtggk.1")
     assert dataset.provenance["license"] == "CC-BY-4.0"
@@ -113,10 +113,10 @@ def test_load_tobacco_return_X_y_matches_default_result_and_is_fresh() -> None:
     X, Y = load_tobacco(return_X_y=True)
     second_X, second_Y = load_tobacco(return_X_y=True)
 
-    assert not np.shares_memory(dataset.data, second_dataset.data)
-    assert not np.shares_memory(dataset.target, second_dataset.target)
-    np.testing.assert_array_equal(X, dataset.data)
-    np.testing.assert_array_equal(Y, dataset.target)
+    assert not np.shares_memory(dataset.X, second_dataset.X)
+    assert not np.shares_memory(dataset.Y, second_dataset.Y)
+    np.testing.assert_array_equal(X, dataset.X)
+    np.testing.assert_array_equal(Y, dataset.Y)
     assert not X.flags.writeable
     assert not Y.flags.writeable
     assert not np.shares_memory(X, second_X)
@@ -143,8 +143,8 @@ def test_packaged_tobacco_resources_are_canonical() -> None:
     assert "Sugarcane dataset attribution" not in license_text
 
     dataset = load_tobacco()
-    assert _canonical_array_hash(dataset.data) == ARRAY_HASHES["data"]
-    assert _canonical_array_hash(dataset.target) == ARRAY_HASHES["target"]
+    assert _canonical_array_hash(dataset.X) == ARRAY_HASHES["data"]
+    assert _canonical_array_hash(dataset.Y) == ARRAY_HASHES["target"]
 
 
 def test_load_tobacco_result_is_pickleable() -> None:
@@ -152,12 +152,12 @@ def test_load_tobacco_result_is_pickleable() -> None:
     restored = pickle.loads(pickle.dumps(dataset))
 
     assert isinstance(restored, PiPLSDataset)
-    np.testing.assert_array_equal(restored.data, dataset.data)
-    np.testing.assert_array_equal(restored.target, dataset.target)
+    np.testing.assert_array_equal(restored.X, dataset.X)
+    np.testing.assert_array_equal(restored.Y, dataset.Y)
     assert restored.feature_names == dataset.feature_names
     assert restored.target_names == dataset.target_names
     assert restored.sample_ids == dataset.sample_ids
     assert restored.provenance == dataset.provenance
     assert restored.metadata == dataset.metadata
-    assert not restored.data.flags.writeable
-    assert not restored.target.flags.writeable
+    assert not restored.X.flags.writeable
+    assert not restored.Y.flags.writeable

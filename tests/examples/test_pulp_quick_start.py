@@ -15,7 +15,7 @@ def test_pulp_quick_start_is_the_automatic_search_refit_workflow() -> None:
     assert "from pipls import PiPLSSearchCV" in text
     assert "from pipls.datasets import load_pulp" in text
     assert "data = load_pulp()" in text
-    assert "X, Y = data.data, data.target" in text
+    assert "X, Y = data.X, data.Y" in text
     assert (
         'model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="one_standard_error")'
         in text

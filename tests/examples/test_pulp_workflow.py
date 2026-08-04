@@ -23,7 +23,7 @@ from pipls.inspection import (
 @pytest.fixture(scope="module")
 def pulp_result() -> SimpleNamespace:
     data = load_pulp()
-    X, Y = data.data, data.target
+    X, Y = data.X, data.Y
 
     cv = KFold(n_splits=5, shuffle=True, random_state=0)
     search = PiPLSSearchCV(cv=cv).fit(X, Y)
@@ -120,9 +120,9 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
     assert np.all(result.factors.weighted_response_directions[ti_response_index] > 0.0)
     assert result.diagnostics.observed.shape == result.Y.shape
     assert result.factors.n_components == result.selected.n_components
-    assert result.structure.n_samples == len(result.X)
-    assert result.structure.n_features == result.X.shape[1]
-    assert result.structure.n_targets == result.Y.shape[1]
+    assert result.structure.x_scores.shape[0] == len(result.X)
+    assert result.structure.x_loadings.shape[0] == result.X.shape[1]
+    assert result.structure.y_loadings.shape[0] == result.Y.shape[1]
     assert result.structure.n_components == result.selected.n_components
 
 

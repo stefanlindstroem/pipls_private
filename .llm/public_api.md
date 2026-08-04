@@ -318,10 +318,11 @@ packages.
 synthetic data and structured experiments. Plain arrays and data frames passed directly to
 `fit(X, Y)` remain the primary real-data interface. The container stores read-only `float64` `X` and
 2D `Y`, unique feature/target/sample names, required provenance, recursively frozen metadata, and
-optional synthetic truth. Metadata arrays preserve non-object dtypes, are copied, and are made
-read-only; object-dtype arrays are rejected because their Python elements cannot be frozen by
-making the array container read-only. `data` and `target` are scikit-learn-style aliases. Required
-provenance keys are `source`, `license`, `citation`, and `version`.
+optional synthetic truth. `X` and `Y` are the sole matrix attribute names; `n_samples`,
+`n_features`, and `n_targets` remain dataset-level dimensions. Metadata arrays preserve non-object
+dtypes, are copied, and are made read-only; object-dtype arrays are rejected because their Python
+elements cannot be frozen by making the array container read-only. Required provenance keys are
+`source`, `license`, `citation`, and `version`.
 
 `make_pipls_regression` creates one side-effect-free dataset with local seeded random generation.
 It supports shared, predictor-specific, and response-specific latent ranks; scalar or per-direction
@@ -463,19 +464,18 @@ helper, or component-path plotting helper. The comparison-only `PLSComponentPath
 
 ## Accepted pre-release public-surface cleanup
 
-Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1–5 are
+Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1–6 are
 complete: the target is recorded; OOF reports own required OOF arrays and coverage while selection
 metrics remain on `report.selection`; the active API uses `PiPLSSelection` and
 `profile.selection` without aliases; fitted-search global-best attributes have been replaced by
-`search.select(rule="best_score")`; and `cv_results_` now retains only stable `n_components` and
+`search.select(rule="best_score")`; `cv_results_` retains only stable `n_components` and
 `predictor_rank` parameter columns while preserving all candidate scores, split values, MSE fields,
-ranks, and timings. The remaining target is:
+ranks, and timings; `PiPLSDataset` uses only `X` and `Y` matrix names; and inspection records retain
+component counts but not unused shape-only conveniences. The remaining target is:
 
-- `PiPLSDataset` uses `X` and `Y` without `data` and `target` aliases;
-- unused shape-only inspection properties are removed while component-count properties and all five
-  inspection functions remain;
 - top-level `pipls` retains `PiPLSRegression`, `PiPLSSearchCV`, and
-  `PredictorRankSupportWarning`; result types remain public from focused modules.
+  `PredictorRankSupportWarning`; result types remain public from focused modules;
+- final active-surface and documentation audits confirm the completed cleanup.
 
 `search.select()` remains public for selection without fitting. After refitting, the canonical
 selection is `model.selection_`. Direct-construction validation, immutable result safety,

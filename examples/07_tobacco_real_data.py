@@ -396,8 +396,8 @@ def _write_coefficients_report(
 
 def main() -> None:
     data = load_tobacco()
-    X = data.data
-    Y = data.target
+    X = data.X
+    Y = data.Y
     wavenumbers = np.asarray(data.feature_names, dtype=np.float64)
     response_names = list(data.target_names)
     response_pages = tuple(

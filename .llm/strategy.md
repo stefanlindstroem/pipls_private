@@ -1059,17 +1059,17 @@ The cleanup retains fitting-free `search.select()`, all numerical inspection fun
 scaling factors, advanced candidate scores and timings, immutable result validation, and
 caller-owned plotting. No alias or deprecation layer is authorized at version `0.0.0`.
 
-Current status: **Patches 1–5 complete**. OOF reports require prediction and count arrays and expose
+Current status: **Patches 1–6 complete**. OOF reports require prediction and count arrays and expose
 selection metrics only through `report.selection`; the active surface uses `PiPLSSelection` and
-`rank_profile.selection`; fitted searches store no public global-best attributes; and `cv_results_`
+`rank_profile.selection`; fitted searches store no public global-best attributes; `cv_results_`
 uses only stable direct component-count and predictor-rank parameter columns while preserving all
-candidate evidence.
+candidate evidence; `PiPLSDataset` exposes only `X` and `Y`; and unused shape-only inspection
+properties are removed while dataset dimensions and component counts remain.
 
 ## Current next increment
 
-Decision 0144 Patch 6 should remove `PiPLSDataset.data` and `.target` aliases plus the accepted
-unused shape-only inspection properties while preserving `X`, `Y`, dataset dimensions, component
-counts, numerical arrays, and all five inspection functions.
+Decision 0144 Patch 7 should reduce top-level result exports, synchronize the final documentation,
+complete active-surface audits, and mark the transition implemented.
 Decision 0139 Patch 3 remains paused as an independent documentation increment.
 
 ## Maintenance protocol

@@ -62,39 +62,39 @@ assert np.isfinite(prediction).all()
 
 pulp = load_pulp()
 pulp_X, pulp_Y = load_pulp(return_X_y=True)
-assert pulp.data.shape == (46, 14)
-assert pulp.target.shape == (46, 8)
+assert pulp.X.shape == (46, 14)
+assert pulp.Y.shape == (46, 8)
 assert pulp.feature_names[0] == "Shives"
 assert pulp.target_names[-1] == "s"
-assert not pulp.data.flags.writeable
-assert not pulp.target.flags.writeable
-assert np.array_equal(pulp_X, pulp.data)
-assert np.array_equal(pulp_Y, pulp.target)
+assert not pulp.X.flags.writeable
+assert not pulp.Y.flags.writeable
+assert np.array_equal(pulp_X, pulp.X)
+assert np.array_equal(pulp_Y, pulp.Y)
 
 sugarcane = load_sugarcane()
 sugarcane_X, sugarcane_Y = load_sugarcane(return_X_y=True)
-assert sugarcane.data.shape == (57, 1721)
-assert sugarcane.target.shape == (57, 4)
+assert sugarcane.X.shape == (57, 1721)
+assert sugarcane.Y.shape == (57, 4)
 assert sugarcane.feature_names[0] == "780"
 assert sugarcane.feature_names[-1] == "2500"
 assert sugarcane.target_names == ("TS", "CP", "ADF", "IVOMD")
-assert not sugarcane.data.flags.writeable
-assert not sugarcane.target.flags.writeable
-assert np.array_equal(sugarcane_X, sugarcane.data)
-assert np.array_equal(sugarcane_Y, sugarcane.target)
+assert not sugarcane.X.flags.writeable
+assert not sugarcane.Y.flags.writeable
+assert np.array_equal(sugarcane_X, sugarcane.X)
+assert np.array_equal(sugarcane_Y, sugarcane.Y)
 
 tobacco = load_tobacco()
 tobacco_X, tobacco_Y = load_tobacco(return_X_y=True)
-assert tobacco.data.shape == (347, 1557)
-assert tobacco.target.shape == (347, 13)
+assert tobacco.X.shape == (347, 1557)
+assert tobacco.Y.shape == (347, 13)
 assert tobacco.feature_names[0] == "10001.0283203125"
 assert tobacco.feature_names[-1] == "3999.63989257813"
 assert tobacco.target_names[0] == "Total Alkaloids"
 assert tobacco.target_names[-1] == "Rutin"
-assert not tobacco.data.flags.writeable
-assert not tobacco.target.flags.writeable
-assert np.array_equal(tobacco_X, tobacco.data)
-assert np.array_equal(tobacco_Y, tobacco.target)
+assert not tobacco.X.flags.writeable
+assert not tobacco.Y.flags.writeable
+assert np.array_equal(tobacco_X, tobacco.X)
+assert np.array_equal(tobacco_Y, tobacco.Y)
 assert pipls.__version__
 
 print(

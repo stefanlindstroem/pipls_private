@@ -161,7 +161,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     output_dir.mkdir(parents=True)
 
     data = load_pulp()
-    X, Y = data.data, data.target
+    X, Y = data.X, data.Y
     predictor_names = data.feature_names
     response_names = data.target_names
 

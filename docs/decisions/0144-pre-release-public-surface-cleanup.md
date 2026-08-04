@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Implementation is in progress through seven patches; Patches 1–5 are complete.
+Accepted. Implementation is in progress through seven patches; Patches 1–6 are complete.
 
 ## Context
 
@@ -263,14 +263,17 @@ deprecation warnings, or compatibility shims are introduced.
 
 ## Implementation status
 
-Patches 1–5 are complete. The decision and guide-layer target are recorded; `PiPLSOOFReport`
+Patches 1–6 are complete. The decision and guide-layer target are recorded; `PiPLSOOFReport`
 requires OOF prediction and count arrays while exposing selection metrics only through
 `report.selection`; the complete active API uses `PiPLSSelection` and rank-profile `selection`
-terminology; fitted searches no longer store duplicated global-best attributes; and `cv_results_`
-uses stable direct `n_components` and `predictor_rank` parameter columns without `params` or
-pipeline-prefixed `param_*` representations. Best-score selection, refit, OOF, fitted-state,
-tie-breaking, split values, score/MSE summaries, ranks, and timings are preserved. Patch 6 should
-next remove dataset aliases and unused shape-only inspection properties.
+terminology; fitted searches no longer store duplicated global-best attributes; `cv_results_` uses
+stable direct `n_components` and `predictor_rank` parameter columns without `params` or
+pipeline-prefixed `param_*` representations; `PiPLSDataset` exposes only `X` and `Y` matrix names;
+and inspection records retain component-count properties but not unused shape-only conveniences.
+Best-score selection, refit, OOF, fitted-state, tie-breaking, split values, score/MSE summaries,
+ranks, timings, dataset arrays and dimensions, inspection arrays, and all five inspection functions
+are preserved. Patch 7 should next reduce top-level exports, synchronize the final documentation,
+complete active-surface audits, and mark this decision implemented.
 
 This decision refines Decisions 0051, 0052, 0071, 0072, 0086, 0087, 0090, 0094, 0111, 0116, 0129,
 0134, 0138, 0140, and 0143. It preserves their numerical, immutability, direct-construction,

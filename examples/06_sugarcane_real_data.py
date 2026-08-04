@@ -299,8 +299,8 @@ def _plot_coefficients(
 
 def main() -> None:
     data = load_sugarcane()
-    X = data.data
-    Y = data.target
+    X = data.X
+    Y = data.Y
     wavelengths = np.asarray(data.feature_names, dtype=np.float64)
     response_names = list(data.target_names)
 

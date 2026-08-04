@@ -36,7 +36,7 @@ def _dataset(**overrides: object) -> PiPLSDataset:
     return PiPLSDataset(**values)  # type: ignore[arg-type]
 
 
-def test_dataset_normalizes_single_target_and_exposes_sklearn_aliases() -> None:
+def test_dataset_normalizes_single_target_and_exposes_canonical_dimensions() -> None:
     dataset = _dataset(
         Y=np.arange(4, dtype=np.float64),
         target_names=("response",),
@@ -44,8 +44,8 @@ def test_dataset_normalizes_single_target_and_exposes_sklearn_aliases() -> None:
 
     assert dataset.X.shape == (4, 3)
     assert dataset.Y.shape == (4, 1)
-    assert dataset.data is dataset.X
-    assert dataset.target is dataset.Y
+    assert not hasattr(dataset, "data")
+    assert not hasattr(dataset, "target")
     assert dataset.n_samples == 4
     assert dataset.n_features == 3
     assert dataset.n_targets == 1
