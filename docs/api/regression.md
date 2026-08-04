@@ -112,7 +112,7 @@ rank is a verified lower bound rather than a complete rank calculation. The esti
 the centered/scaled map back to original predictor and response units when constructing `coef_`,
 `intercept_`, and prediction output.
 
-::: pipls.PiPLSDecomposition
+::: pipls.decomposition.PiPLSDecomposition
     options:
       show_signature: false
       members:

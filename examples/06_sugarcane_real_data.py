@@ -7,7 +7,8 @@ import numpy as np
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
-from pipls import PiPLSComponentPath, PiPLSPredictorRankProfile, PiPLSSearchCV
+from pipls import PiPLSSearchCV
+from pipls.component_path import PiPLSComponentPath, PiPLSPredictorRankProfile
 from pipls.datasets import load_sugarcane
 from pipls.inspection import (
     LatentStructure,

@@ -27,10 +27,10 @@ from matplotlib.figure import Figure  # noqa: E402
 from matplotlib.patches import FancyArrowPatch  # noqa: E402
 from sklearn.model_selection import KFold  # noqa: E402
 
-from pipls import (  # noqa: E402
+from pipls import PiPLSSearchCV  # noqa: E402
+from pipls.component_path import (  # noqa: E402
     PiPLSComponentPath,
     PiPLSPredictorRankProfile,
-    PiPLSSearchCV,
     PiPLSSelection,
 )
 from pipls.datasets import load_pulp  # noqa: E402

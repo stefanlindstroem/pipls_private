@@ -6,7 +6,7 @@ from dataclasses import FrozenInstanceError
 import numpy as np
 import pytest
 
-from pipls import (
+from pipls.component_path import (
     PiPLSComponentPath,
     PiPLSPredictorRankProfile,
     PiPLSSelection,

@@ -502,11 +502,11 @@ public support warning.
 The cleanup retains capabilities with distinct roles. `search.select()` remains the fitting-free
 selection operation; all five numerical inspection helpers remain public; balanced biplot scaling
 factors remain visible; immutable records retain direct-construction and pickle validation; and
-caller-owned Matplotlib rendering remains the plotting boundary. Patches 1–6 are complete:
-OOF reports now require prediction and count arrays and expose selection metrics only through
+caller-owned Matplotlib rendering remains the plotting boundary. All seven patches are complete:
+OOF reports require prediction and count arrays and expose selection metrics only through
 `report.selection`; the active API uses `PiPLSSelection` terminology; global-best fitted-search
-attributes have been replaced by `search.select(rule="best_score")`; `cv_results_` now uses only
-stable `n_components` and `predictor_rank` parameter columns; `PiPLSDataset` uses only `X` and `Y`;
-and unused shape-only inspection properties are removed while component counts remain. Top-level
-result-export reduction and final active-surface synchronization are the next implementation
-increment.
+attributes have been replaced by `search.select(rule="best_score")`; `cv_results_` uses only stable
+`n_components` and `predictor_rank` parameter columns; `PiPLSDataset` uses only `X` and `Y`; unused
+shape-only inspection properties are removed while component counts remain; and top-level `pipls`
+exports only estimators, the public support warning, and version metadata. Result records remain
+public from focused modules.

@@ -15,12 +15,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
 
 import pipls
-from pipls import (
-    PiPLSComponentPath,
-    PiPLSDecomposition,
-    PiPLSRegression,
-    PiPLSSearchCV,
-)
+from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls.component_path import PiPLSComponentPath
+from pipls.decomposition import PiPLSDecomposition
 
 
 def _data() -> tuple[np.ndarray, np.ndarray]:

@@ -16,6 +16,10 @@ from ._result_validation import (
 )
 from .component_path import PiPLSSelection
 
+__all__ = [
+    "PiPLSOOFReport",
+]
+
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 

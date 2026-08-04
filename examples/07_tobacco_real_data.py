@@ -8,11 +8,10 @@ from matplotlib.backends.backend_pdf import PdfPages
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
-from pipls import (
+from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls.component_path import (
     PiPLSComponentPath,
     PiPLSPredictorRankProfile,
-    PiPLSRegression,
-    PiPLSSearchCV,
     PiPLSSelection,
 )
 from pipls.datasets import load_tobacco

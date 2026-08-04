@@ -18,12 +18,10 @@ implemented boundary and next increment; this file records where responsibilitie
 Phases A through F4, documentation Patches D1--D4, plotting migrations G1--G5, public-result
 cleanup steps API1--API3, the six-patch new-user onboarding series, and the documentation alignment
 pass are complete. The owner-led human audit continues from the current clean snapshot.
-The current public surface includes
-`PiPLSRegression`,
-`PiPLSSearchCV`, `PiPLSComponentPath`, `PiPLSSelection`,
-`PiPLSPredictorRankProfile`, `PiPLSDecomposition`,
-`PiPLSOOFReport`, public selection metrics,
-`PredictorRankSupportWarning`, deterministic synthetic dataset generation, pure numerical
+The top-level public surface includes `PiPLSRegression`, `PiPLSSearchCV`, and
+`PredictorRankSupportWarning`. Returned path, selection, decomposition, and OOF result records
+remain public from `pipls.component_path`, `pipls.decomposition`, and `pipls.validation`. The
+broader public surface also includes deterministic synthetic dataset generation, pure numerical
 `pipls.inspection`, and immutable inspection results. All maintained figures are rendered directly
 from those results with Matplotlib; annotated biplots use optional `adjustText`.
 

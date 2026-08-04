@@ -6,12 +6,8 @@ import numpy as np
 import pytest
 from sklearn.model_selection import KFold
 
-from pipls import (
-    PiPLSComponentPath,
-    PiPLSPredictorRankProfile,
-    PiPLSRegression,
-    PiPLSSearchCV,
-)
+from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls.component_path import PiPLSComponentPath, PiPLSPredictorRankProfile
 from pipls.datasets import load_pulp
 from pipls.inspection import (
     latent_structure,

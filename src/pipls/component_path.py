@@ -18,6 +18,12 @@ from ._result_validation import (
 )
 from .model_selection import _tied_score_mask
 
+__all__ = [
+    "PiPLSComponentPath",
+    "PiPLSPredictorRankProfile",
+    "PiPLSSelection",
+]
+
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 SelectionRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]

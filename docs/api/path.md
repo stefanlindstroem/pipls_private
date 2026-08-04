@@ -135,7 +135,7 @@ complete scalar row is needed for annotation or reporting. See
 [Search-owned selection rules](../path_analysis.md#search-owned-selection-rules) for the rule
 definitions and scope. The path object itself provides no public row-selection methods.
 
-::: pipls.PiPLSComponentPath
+::: pipls.component_path.PiPLSComponentPath
     options:
       show_signature: false
       members:
@@ -150,7 +150,7 @@ Direct component-count lookup has `rule is None`. Named rules record their rule 
 `reference_minimum` and derives `one_standard_error_threshold` from that row's mean CV-MSE and
 standard error. The threshold is not stored independently.
 
-::: pipls.PiPLSSelection
+::: pipls.component_path.PiPLSSelection
     options:
       show_signature: false
 
@@ -162,7 +162,7 @@ its `selection` property derives the same conditional selection returned by
 `search.select(n_components=h)` from the immutable candidate arrays and shared policy and
 split-count scalars.
 
-::: pipls.PiPLSPredictorRankProfile
+::: pipls.component_path.PiPLSPredictorRankProfile
     options:
       show_signature: false
 
@@ -185,13 +185,12 @@ operation does not rescore candidates, perform a full-data fit, mutate the searc
 supplied matrices.
 
 The caller must provide the same observations in the same row order and with the same sample and
-response-column counts as the fitted search. The report's `n_components`, `predictor_rank`,
-`n_splits`, `mean_test_score`, and `cv_mse_mean` properties are read-only views of `selection`.
+response-column counts as the fitted search. Selection metrics remain on `report.selection`;
 `has_complete_oof_coverage` summarizes row coverage. Because the search splits also produced the
-selection, the report is a selection-conditioned diagnostic rather than an independent performance
-estimate.
+selection, the report is a
+selection-conditioned diagnostic rather than an independent performance estimate.
 
-::: pipls.PiPLSOOFReport
+::: pipls.validation.PiPLSOOFReport
     options:
       show_signature: false
       members:

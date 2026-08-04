@@ -7,7 +7,7 @@ import pytest
 
 import pipls
 import pipls.inspection as inspection
-from pipls import PiPLSDecomposition
+from pipls.decomposition import PiPLSDecomposition
 from pipls.inspection import pipls_display_factors, prediction_diagnostics
 
 

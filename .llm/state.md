@@ -180,17 +180,11 @@ model.
 The current top-level package exports are:
 
 ```python
-from pipls import (
-    PiPLSComponentPath,
-    PiPLSSelection,
-    PiPLSDecomposition,
-    PiPLSSearchCV,
-    PiPLSPredictorRankProfile,
-    PiPLSRegression,
-    PiPLSOOFReport,
-    PredictorRankSupportWarning,
-)
+from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
 ```
+
+Returned result records are imported from `pipls.component_path`, `pipls.decomposition`, and
+`pipls.validation` when explicit type imports are needed.
 
 Dataset functionality is public from `pipls.datasets`:
 
@@ -586,29 +580,28 @@ workflows use the final selection-driven interface.
 
 ## Pre-release public-surface cleanup transition
 
-Decision 0144 authorizes seven patches that remove duplicated access without removing distinct
-capabilities. OOF reports are simplified, `PiPLSSelection` is adopted, fitted-search global-best
-state is removed, and `cv_results_` uses only stable direct parameter columns. The remaining target
-standardizes package datasets on `X` and `Y`, removes unused shape-only inspection properties, and
-narrows top-level result exports.
+Decision 0144 is implemented through seven patches that remove duplicated access without removing
+distinct capabilities. OOF reports are simplified, `PiPLSSelection` is adopted, fitted-search
+global-best state is removed, `cv_results_` uses only stable direct parameter columns, package
+datasets use `X` and `Y`, unused shape-only inspection properties are removed, and top-level result
+re-exports are replaced by focused-module imports.
 
 `search.select()` remains the fitting-free selection operation. All five numerical inspection
 functions, component-path and rank-profile evidence, advanced candidate scores and timings,
 immutable direct-construction validation, biplot scaling factors, and caller-owned plotting remain
 public contracts.
 
-Current status: **Patches 1–6 complete**. `PiPLSOOFReport` requires OOF prediction and count
-arrays and exposes selection metrics only through `report.selection`; the active API uses
-`PiPLSSelection` and `PiPLSPredictorRankProfile.selection`; fitted searches expose no public
-`best_*` state; `cv_results_` retains only stable direct `n_components` and `predictor_rank`
-parameter columns while preserving all scores, split values, MSE fields, ranks, and timings;
-`PiPLSDataset` exposes only `X` and `Y` matrix names while retaining dataset dimensions; and
-inspection records retain component counts but not unused shape-only properties.
+Current status: **complete**. `PiPLSOOFReport` requires OOF prediction and count arrays and exposes
+selection metrics only through `report.selection`; the active API uses `PiPLSSelection` and
+`PiPLSPredictorRankProfile.selection`; fitted searches expose no public `best_*` state;
+`cv_results_` retains only stable direct `n_components` and `predictor_rank` parameter columns;
+`PiPLSDataset` exposes only `X` and `Y`; inspection records retain component counts but not unused
+shape-only properties; and top-level `pipls` exports only estimators, the public support warning,
+and version metadata. Result records remain public from focused modules.
 
 ## Current next increment
 
-Implement Decision 0144 Patch 7: reduce top-level result exports, synchronize the final public and
-maintainer documentation, complete active-surface audits, and mark Decision 0144 implemented.
+Decision 0139 Patch 3 remains the next independent documentation increment.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

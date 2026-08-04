@@ -17,6 +17,10 @@ from ._result_validation import (
     _read_only_float_array,
 )
 
+__all__ = [
+    "PiPLSDecomposition",
+]
+
 FloatArray = NDArray[np.float64]
 _ALLOWED_RESOLVED_SVD_SOLVERS = frozenset({"full", "randomized"})
 

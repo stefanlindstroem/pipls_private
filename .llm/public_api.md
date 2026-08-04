@@ -3,22 +3,25 @@
 ## Current top-level API
 
 ```python
-from pipls import (
-    PiPLSComponentPath,
-    PiPLSSelection,
-    PiPLSDecomposition,
-    PiPLSSearchCV,
-    PiPLSPredictorRankProfile,
-    PiPLSRegression,
-    PiPLSOOFReport,
-    PredictorRankSupportWarning,
-)
+from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
 ```
 
-The generated reference under `docs/api/` documents exactly these supported top-level objects and
-the declared public names from `pipls.inspection`, `pipls.datasets`, and `pipls.metrics`;
-`__version__` remains package metadata rather than an API reference page.
-Private modules and `pipls.model_selection` are not reference surfaces.
+Returned result records remain public from focused modules:
+
+```python
+from pipls.component_path import (
+    PiPLSComponentPath,
+    PiPLSPredictorRankProfile,
+    PiPLSSelection,
+)
+from pipls.decomposition import PiPLSDecomposition
+from pipls.validation import PiPLSOOFReport
+```
+
+The generated reference under `docs/api/` documents exactly these top-level and focused-module
+objects plus the declared public names from `pipls.inspection`, `pipls.datasets`, and
+`pipls.metrics`; `__version__` remains package metadata rather than an API reference page. Private
+modules and `pipls.model_selection` are not reference surfaces.
 
 Mathematical documentation denotes the response matrix by $Y$. Public estimator methods follow the
 scikit-learn `fit(X, y)` naming convention, so `y` may be a one-dimensional response or a
@@ -269,7 +272,7 @@ public selected-row lookup, the shared private rule vocabulary is `SelectionRule
 inspection, refitting, OOF reporting, and predictor-rank profile composition use
 search-owned helpers. Durable numerical selection tests are located at this search boundary.
 
-All five current top-level result records (`PiPLSDecomposition`, `PiPLSSelection`,
+The five focused-module result records (`PiPLSDecomposition`, `PiPLSSelection`,
 `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSOOFReport`) validate direct
 construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and
 reconstruct through the same validation path when unpickled. Invalid dimensions, nonfinite scores,
@@ -464,18 +467,15 @@ helper, or component-path plotting helper. The comparison-only `PLSComponentPath
 
 ## Accepted pre-release public-surface cleanup
 
-Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1–6 are
-complete: the target is recorded; OOF reports own required OOF arrays and coverage while selection
-metrics remain on `report.selection`; the active API uses `PiPLSSelection` and
-`profile.selection` without aliases; fitted-search global-best attributes have been replaced by
-`search.select(rule="best_score")`; `cv_results_` retains only stable `n_components` and
-`predictor_rank` parameter columns while preserving all candidate scores, split values, MSE fields,
-ranks, and timings; `PiPLSDataset` uses only `X` and `Y` matrix names; and inspection records retain
-component counts but not unused shape-only conveniences. The remaining target is:
-
-- top-level `pipls` retains `PiPLSRegression`, `PiPLSSearchCV`, and
-  `PredictorRankSupportWarning`; result types remain public from focused modules;
-- final active-surface and documentation audits confirm the completed cleanup.
+Decision 0144 is implemented through seven patches. OOF reports own required OOF arrays and
+coverage while selection metrics remain on `report.selection`; the active API uses
+`PiPLSSelection` and `profile.selection` without aliases; fitted-search global-best attributes have
+been replaced by `search.select(rule="best_score")`; `cv_results_` retains only stable
+`n_components` and `predictor_rank` parameter columns while preserving all candidate scores, split
+values, MSE fields, ranks, and timings; `PiPLSDataset` uses only `X` and `Y`; inspection records
+retain component counts but not unused shape-only conveniences; and top-level `pipls` exports only
+`PiPLSRegression`, `PiPLSSearchCV`, `PredictorRankSupportWarning`, and version metadata. Result
+records remain public from focused modules, and the final active-surface audits are clean.
 
 `search.select()` remains public for selection without fitting. After refitting, the canonical
 selection is `model.selection_`. Direct-construction validation, immutable result safety,

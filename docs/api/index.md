@@ -1,8 +1,8 @@
 # API reference
 
 The generated reference documents supported public objects directly from their Python docstrings.
-Core estimators are available from `pipls`; numerical inspection, dataset, and metric tools live in
-focused submodules. Rendering is caller-owned.
+Core estimators are available from `pipls`; returned result records, numerical inspection, dataset,
+and metric tools live in focused submodules. Rendering is caller-owned.
 
 ## Mathematical notation and Python names
 
@@ -27,11 +27,11 @@ predictor and response directions; they are distinct from reconstruction loading
 
 | Object | Obtained from | Main purpose |
 |---|---|---|
-| [`PiPLSComponentPath`](path.md#pipls.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
-| [`PiPLSSelection`](path.md#pipls.PiPLSSelection) | `search.select(...)`, `model.selection_`, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
-| [`PiPLSPredictorRankProfile`](path.md#pipls.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
-| [`PiPLSOOFReport`](path.md#pipls.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |
-| [`PiPLSDecomposition`](regression.md#pipls.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
+| [`PiPLSComponentPath`](path.md#pipls.component_path.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
+| [`PiPLSSelection`](path.md#pipls.component_path.PiPLSSelection) | `search.select(...)`, `model.selection_`, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
+| [`PiPLSPredictorRankProfile`](path.md#pipls.component_path.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
+| [`PiPLSOOFReport`](path.md#pipls.validation.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |
+| [`PiPLSDecomposition`](regression.md#pipls.decomposition.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
 | [`LatentStructure`](inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, and coefficients for PLS-family inspection |
 | [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors |
 | [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |

@@ -4,6 +4,12 @@
 
 ### Repository
 
+- Complete the pre-release public-surface cleanup by limiting top-level `pipls` exports to
+  `PiPLSRegression`, `PiPLSSearchCV`, `PredictorRankSupportWarning`, and version metadata. Keep
+  component-path, selection, predictor-rank-profile, decomposition, and OOF result classes public
+  from focused modules; migrate all explicit type imports and generated API references; and add
+  active-surface tests without changing result construction, pickle, selection, refit, OOF, or
+  inspection numerics.
 - Standardize `PiPLSDataset` on the canonical `X` and `Y` matrix attributes and remove the
   pre-release `data` and `target` aliases. Remove ten unused shape-only inspection properties while
   retaining dataset dimensions, latent/display component counts, every numerical array, all five

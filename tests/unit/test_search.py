@@ -11,13 +11,11 @@ from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from pipls import (
+from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
+from pipls.component_path import (
     PiPLSComponentPath,
     PiPLSPredictorRankProfile,
-    PiPLSRegression,
-    PiPLSSearchCV,
     PiPLSSelection,
-    PredictorRankSupportWarning,
 )
 from pipls.metrics import neg_response_standardized_mse
 

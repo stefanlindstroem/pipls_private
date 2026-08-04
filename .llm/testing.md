@@ -166,6 +166,7 @@ patches, focused tests must protect:
 - retained component-count properties and equations after removal of unused shape-only inspection
   properties;
 - focused-module availability of result classes after their top-level re-exports are removed;
+- exact minimal top-level `pipls.__all__` and absence of result-class aliases;
 - retained fitting-free `search.select()`, every public inspection function, biplot scaling factors,
   direct-construction validation, and caller-owned rendering.
 

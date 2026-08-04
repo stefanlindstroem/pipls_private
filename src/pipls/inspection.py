@@ -760,7 +760,7 @@ def pipls_display_factors(
 
     Parameters
     ----------
-    decomposition : pipls.PiPLSDecomposition
+    decomposition : pipls.decomposition.PiPLSDecomposition
         Public fitted Pi-PLS decomposition.
     response_index : int or None, default=None
         Zero-based response row used to orient every component. ``None`` uses the

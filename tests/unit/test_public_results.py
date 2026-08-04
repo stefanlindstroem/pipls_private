@@ -7,13 +7,13 @@ import numpy as np
 import pytest
 
 import pipls
-from pipls import (
+from pipls.component_path import (
     PiPLSComponentPath,
-    PiPLSDecomposition,
-    PiPLSOOFReport,
     PiPLSPredictorRankProfile,
     PiPLSSelection,
 )
+from pipls.decomposition import PiPLSDecomposition
+from pipls.validation import PiPLSOOFReport
 
 
 def _selection() -> PiPLSSelection:
@@ -50,6 +50,24 @@ def _validation_result() -> PiPLSSelection:
         cv_mse_fold_sd=np.float32(0.1),
         n_splits=np.int64(3),
     )
+
+
+def test_result_records_are_public_only_from_focused_modules() -> None:
+    removed_top_level_names = (
+        "PiPLSComponentPath",
+        "PiPLSSelection",
+        "PiPLSPredictorRankProfile",
+        "PiPLSDecomposition",
+        "PiPLSOOFReport",
+    )
+
+    assert set(pipls.__all__) == {
+        "PiPLSRegression",
+        "PiPLSSearchCV",
+        "PredictorRankSupportWarning",
+        "__version__",
+    }
+    assert all(not hasattr(pipls, name) for name in removed_top_level_names)
 
 
 def test_selection_terminology_has_no_pre_release_aliases() -> None:

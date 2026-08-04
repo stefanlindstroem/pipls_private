@@ -53,9 +53,12 @@ def test_submodule_api_pages_cover_declared_public_objects() -> None:
     expected = {
         module_name: set(importlib.import_module(module_name).__all__)
         for module_name in (
+            "pipls.component_path",
             "pipls.datasets",
+            "pipls.decomposition",
             "pipls.inspection",
             "pipls.metrics",
+            "pipls.validation",
         )
     }
 
@@ -73,11 +76,11 @@ def test_api_pages_reference_only_public_import_paths() -> None:
 def test_returned_result_records_hide_constructor_signatures() -> None:
     api_text = _api_text()
     returned_records = {
-        "pipls.PiPLSComponentPath",
-        "pipls.PiPLSSelection",
-        "pipls.PiPLSPredictorRankProfile",
-        "pipls.PiPLSOOFReport",
-        "pipls.PiPLSDecomposition",
+        "pipls.component_path.PiPLSComponentPath",
+        "pipls.component_path.PiPLSSelection",
+        "pipls.component_path.PiPLSPredictorRankProfile",
+        "pipls.validation.PiPLSOOFReport",
+        "pipls.decomposition.PiPLSDecomposition",
         "pipls.inspection.BiplotCoordinates",
         "pipls.inspection.LatentStructure",
         "pipls.inspection.ObservationDiagnostics",
