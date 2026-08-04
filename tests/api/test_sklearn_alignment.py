@@ -362,36 +362,6 @@ def test_minimum_cv_mse_tolerance_refit_preserves_pipeline_composition() -> None
     assert model.selection_.cv_mse_threshold == expected.cv_mse_threshold
 
 
-def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
-    X, Y = _data()
-    pipeline = Pipeline(
-        [
-            ("scale", StandardScaler()),
-            ("regression", _fixed_estimator()),
-        ]
-    )
-    search = PiPLSSearchCV(
-        estimator=pipeline,
-        n_components_values=[1, 2, 3],
-        predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
-        cv=3,
-        n_jobs=1,
-    ).fit(X, Y)
-    expected = search.select(rule="one_standard_error")
-    model = search.refit(X, Y, rule="one_standard_error")
-
-    assert isinstance(model, Pipeline)
-    selected_pipls = model.named_steps["regression"]
-    assert selected_pipls.n_components == expected.n_components
-    assert selected_pipls.predictor_rank == expected.predictor_rank
-    assert model.selection_ == expected
-    assert model.selection_.reference_minimum == search.select(
-        rule="minimum_cv_mse"
-    ).reference_minimum
-    assert model.predict(X).shape == Y.shape
-
-
 def test_refitted_model_score_accepts_sample_weight_like_regression() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(

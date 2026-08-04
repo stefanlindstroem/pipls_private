@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Complete Decision 0146 by removing the one-standard-error rule, the derived
+  `cv_mse_standard_error` properties, `one_standard_error_threshold`, and all active transitional
+  documentation and tests. The final selection surface contains `best_score`, tolerance-based
+  `minimum_cv_mse`, and manual component-count lookup; `cv_mse_std` remains descriptive split
+  variability only.
 ### Repository
 
 - Use `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)` in the complete Pulp

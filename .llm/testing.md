@@ -71,8 +71,8 @@ behaviors:
   prediction, transformation, scoring, inverse-transformation, or feature-name surface;
 - manual component selection uses the conditionally selected predictor rank stored for that path
   row;
-- `"best_score"`, `"minimum_cv_mse"`, and `"one_standard_error"` resolve through their documented
-  evidence and can differ under a custom scorer;
+- `"best_score"` and `"minimum_cv_mse"` resolve through their documented evidence and can differ
+  under a custom scorer;
 - explicit validation reporting reuses the exact materialized search splits, preserves ordered OOF
   coverage semantics, and does not perform a full-data refit;
 - the search does not retain supplied training matrices or returned fitted estimators;
@@ -360,14 +360,14 @@ Decision 0146 requires focused tests across seven patches for:
 - maintained CV-MSE figures using SD rather than SE and describing it as variability across splits;
 - Tobacco selecting the first path row within a 10% relative tolerance of the exact minimum;
 - Pulp materializing 50 repeated five-fold splits and averaging ten OOF predictions per sample; and
-- final absence of the active one-standard-error and standard-error selection surface.
+- final absence of the active SE-based selection and standard-error result surface.
 
 Patch 1 changes no executable contract. Patch 2 protects the renamed `cv_mse_std` field, exact
 equal-split arithmetic means, `ddof=0` population SDs, one-split behavior, repeated CV, unequal
-validation lengths, direct construction, immutability, and pickle stability while retaining the
-temporary derived-SE bridge. Historical decisions and changelog entries may retain historically
-accurate one-standard-error wording; active source, tests, examples, tutorials, API documentation,
-and guide contracts must converge by Patch 7.
+validation lengths, direct construction, immutability, and pickle stability. During migration it
+retained the temporary derived-SE bridge; Patch 7 removes that bridge. Historical decisions and
+changelog entries may retain historically accurate wording, while active source, tests, examples,
+tutorials, API documentation, and guide contracts use only the final surface.
 Patch 4 protects that every maintained CV-MSE `errorbar()` call uses `cv_mse_std`, every maintained
 axis labels the display as $\pm 1$ SD, axis limits include the SD range, and tutorial prose states
 that the bars are descriptive split-to-split variability rather than confidence intervals or

@@ -191,53 +191,18 @@ observations, a compact explicit candidate grid, the singleton-safe default scor
 predictions. Its OOF report is selection-conditioned because the same LOO path selects the rank
 pair and supplies the pooled diagnostic.
 
-## Split variation and temporary standard error
+## Split variation and tolerance selection
 
 `component_path_.cv_mse_std` is the population standard deviation of the realized split-specific
 MSE values. It describes variation across the materialized validation splits. Maintained
 component-path and predictor-rank-profile figures plot mean response-standardized CV-MSE with
 symmetric $\pm 1$ SD bars from this stored quantity. The bars are descriptive split-to-split
-variability; they are not confidence intervals and do not enter selection.
-
-The derived read-only `component_path_.cv_mse_standard_error` remains temporarily available only to
-support the still-active one-standard-error rule. It converts the stored split SD to
-
-\begin{equation}
-\widehat{\mathrm{SE}}_{\mathrm{CV}}
-=
-\frac{\widehat{\sigma}_{\mathrm{fold,pop}}}{\sqrt{K-1}},
-\end{equation}
-
-where $K$ is the number of validation splits, stored once as the path-wide scalar
-`component_path_.n_splits`. This is equivalent to dividing the sample standard deviation of the
-split MSE values by $\sqrt{K}$. At least two splits are required. Because CV training sets overlap,
-this temporary quantity is a conventional resampling heuristic rather than a confidence interval or
-formal uncertainty guarantee.
-
-### One-standard-error component heuristic
-
-The conventional one-standard-error rule, usually abbreviated the 1-SE rule, can use the component
-path to favor a more parsimonious component count. Let $h_{\mathrm{min}}$ minimize the displayed mean
-CV-MSE and define
-
-\begin{equation}
-\tau
-=
-\widehat{\operatorname{CV\text{-}MSE}}(h_{\mathrm{min}})
-+
-\widehat{\operatorname{SE}}_{\mathrm{CV}}(h_{\mathrm{min}}).
-\end{equation}
-
-The rule chooses the smallest evaluated component count whose mean CV-MSE does not exceed $\tau$.
-It is a heuristic for identifying a simpler model within one estimated standard error of the
-minimum; it does not establish equivalence between the candidates. It is particularly convenient
-when the CV-MSE curve has no clear elbow that would otherwise motivate a component count. This temporary rule remains available during the migration, but no maintained workflow depends on
-it. The [Tobacco relative-tolerance workflow](examples.md#tobacco-relative-tolerance-selection)
-now demonstrates explicit parsimony without using a resampling standard error.
+variability; they are not confidence intervals and do not enter selection. The path and profile
+objects expose no standard-error property.
 
 ### Search-owned selection rules
 
-`PiPLSSearchCV.select()` returns complete immutable stored rows for these choices without fitting:
+`PiPLSSearchCV.select()` returns complete immutable stored rows without fitting:
 
 ```python
 minimum = search.select(rule="minimum_cv_mse")
@@ -246,7 +211,7 @@ tolerant = search.select(
     relative_tolerance=0.02,
     absolute_tolerance=np.inf,
 )
-one_se = search.select(rule="one_standard_error")
+best = search.select(rule="best_score")
 manual = search.select(n_components=3)
 ```
 
@@ -256,12 +221,8 @@ $M_{\min}+\delta_{\mathrm{abs}}$. The first qualifying row is returned because c
 are stored in strictly ascending order. `relative_tolerance=None` resolves to
 `sqrt(np.finfo(np.float64).eps)`, while positive-infinity `absolute_tolerance` disables the absolute
 cap. The result retains the exact unruled minimum row as `reference_minimum`, the resolved
-`tolerances`, and the derived `cv_mse_threshold`.
-
-The temporary 1-SE rule returns the first stored row satisfying the fold-based threshold above and
-requires at least two validation splits. It references the same exact unruled minimum path row and
-derives `one_standard_error_threshold`. Direct lookup by component count records no rule or
-tolerance provenance.
+tolerances, and the derived `cv_mse_threshold`. Direct lookup by component count and `best_score`
+selection carry no tolerance provenance.
 
 The associated predictor rank is the rank already selected conditionally for that component count
 under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an
@@ -298,15 +259,13 @@ Exactly one of `rule` and `n_components` is required. The accepted post-fit rule
 
 - `rule="best_score"`, the global optimum under the configured scorer;
 - `rule="minimum_cv_mse"`, the smallest stored component-path row satisfying simultaneous relative
-  and absolute tolerances around the exact minimum mean response-standardized CV-MSE;
-- `rule="one_standard_error"`, the smallest stored component count within one fold-based standard
-  error of that minimum.
+  and absolute tolerances around the exact minimum mean response-standardized CV-MSE.
 
 Each rule retains the predictor rank already selected conditionally for the chosen component count.
 With a nondefault scorer, that rank remains conditioned on the scorer even when the component rule
 uses response-standardized CV-MSE. Relative tolerance must be finite and nonnegative; absolute
 tolerance must be nonnegative and may be positive infinity. Nondefault tolerance arguments apply
-only to `rule="minimum_cv_mse"`. The temporary 1-SE rule requires at least two validation splits.
+only to `rule="minimum_cv_mse"`.
 
 `refit()` clones the configured direct estimator or pipeline, replaces the terminal Pi-PLS rank
 pair, fits the clone, attaches the exact immutable row as `model.selection_`, and returns the model.

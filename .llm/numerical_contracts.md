@@ -55,18 +55,15 @@
   `PiPLSPredictorRankProfile.selection` result applies the same reference-anchored
   comparison and chooses the first tied row because profile ranks are strictly ascending.
 - Component-path and predictor-rank-profile records may represent a valid one-split protocol. Their
-  stored `cv_mse_std` is the population standard deviation across realized split MSE values,
-  while the derived `cv_mse_standard_error` is `cv_mse_std / sqrt(n_splits - 1)`, equivalently
-  the sample split standard deviation divided by `sqrt(n_splits)`. Derived arrays are finite
-  read-only `float64` and are a conventional CV heuristic rather than confidence intervals. The
+  stored `cv_mse_std` is the population standard deviation across realized split MSE values. No
+  standard-error result is derived from correlated validation splits. The
   property raises explicitly when fewer than two split values make the estimate undefined.
   Maintained CV-MSE figures use the stored `cv_mse_std` directly for symmetric $\pm 1$ SD bars.
   The derived SE remains only as a temporary input to the still-active 1-SE rule.
 - Search-owned minimum-CV-MSE selection identifies the first exact `np.argmin(cv_mse_mean)` row as
   an unruled reference, derives simultaneous relative and absolute thresholds, and returns the first
   ascending path row at or below their minimum. `relative_tolerance=None` resolves to square root of
-  float64 epsilon; positive-infinity absolute tolerance disables the absolute cap. The temporary
-  `"one_standard_error"` rule uses the same exact reference row plus its derived standard error.
+  float64 epsilon; positive-infinity absolute tolerance disables the absolute cap.
 - CV splits are materialized once, validated, copied, and reused for rank preflight and every
   candidate. The samples-per-rank term uses total `n`; the smallest centered training fold supplies
   the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical
@@ -108,5 +105,5 @@ positive infinity. Relative tolerance is finite and nonnegative; absolute tolera
 and may be positive infinity. Both restrictions apply simultaneously.
 
 `cv_mse_std` is descriptive split variability and is not divided by a split count. Maintained plots
-use it directly for symmetric error bars. The derived SE remains temporarily available only for
-the still-active one-standard-error rule until Patch 7 removes that surface.
+use it directly for symmetric error bars. No standard-error result or selection threshold is derived
+from it.

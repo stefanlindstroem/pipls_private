@@ -464,8 +464,8 @@ profile = search.predictor_rank_profile(n_components=4)
 model = search.refit(X, Y, n_components=4)
 ```
 
-`refit()` accepts exactly one of `rule` and `n_components`, supports `"best_score"`,
-`"minimum_cv_mse"`, and `"one_standard_error"`, returns a fitted clone of the direct estimator or
+`refit()` accepts exactly one of `rule` and `n_components`, supports `"best_score"` and
+`"minimum_cv_mse"`, returns a fitted clone of the direct estimator or
 terminal-Pi-PLS pipeline, and leaves the search unchanged. The constructor boolean `refit`, selected
 fitted-model attributes, and search-level model delegation were removed in the same increment
 because a same-named constructor attribute would shadow the method.
@@ -616,23 +616,22 @@ ownership positively.
 
 ## CV-MSE tolerance and split-SD transition
 
-Decision 0146 authorizes seven patches that replace one-standard-error selection with
+Decision 0146 authorizes seven patches that replace the superseded SE-based selection with
 minimum-CV-MSE selection under simultaneous relative and absolute tolerances, rename split
 dispersion to `cv_mse_std`, use descriptive SD error bars, demonstrate a 10% relative tolerance in
 Tobacco, and introduce ten repeated five-fold partitions in the complete Pulp workflow and Tutorial
 3. The transition does not add outer validation or demonstrate absolute tolerance in a maintained
 example.
 
-Current status: **Patches 1–6 of 7 complete**. The complete Pulp workflow, renderer, and
-Tutorial 3 use ten repeated five-fold partitions, materialize 50 splits, and average ten OOF
-predictions per observation. The temporary derived `cv_mse_standard_error` bridge remains only for
-the still-active one-standard-error rule.
+Current status: **all seven patches complete**. The complete Pulp workflow, renderer, and Tutorial 3
+use ten repeated five-fold partitions, materialize 50 splits, and average ten OOF predictions per
+observation. The active API contains only best-score and tolerance-based minimum-CV-MSE selection,
+and no standard-error result surface remains.
 
 ## Current next increment
 
-Implement Decision 0146 Patch 7: remove the one-standard-error rule and all remaining active SE
-selection surface, then complete documentation and stale-surface audits. Decision 0139 Patch 3
-remains an independent paused presentation increment.
+Decision 0146 is complete. Decision 0139 Patch 3 remains an independent paused presentation
+increment.
 
 ## Authority and drift handling
 

@@ -133,16 +133,12 @@ requiring manual masking of `cv_results_`. The predictor-rank policy and validat
 stored once as path-wide scalars rather than repeated in every row. Use `search.select(...)` when a
 complete scalar row is needed for annotation or reporting. See
 [Search-owned selection rules](../path_analysis.md#search-owned-selection-rules) for the rule
-definitions and scope. Maintained plots use `cv_mse_std` directly as descriptive
-split-to-split variability. The temporary derived `cv_mse_standard_error` property remains only for
-the still-active one-standard-error selection rule. The path object itself provides no public
-row-selection methods.
+definitions and scope. Maintained plots use `cv_mse_std` directly as descriptive split-to-split variability. The path
+object provides no standard-error property and no public row-selection methods.
 
 ::: pipls.component_path.PiPLSComponentPath
     options:
       show_signature: false
-      members:
-        - cv_mse_standard_error
 
 ## One selection
 
@@ -152,9 +148,8 @@ Direct component-count lookup has `rule is None`. Named rules record their rule 
 A `"minimum_cv_mse"` selection accepts simultaneous relative and absolute tolerances, retains the
 exact unruled minimum path row as `reference_minimum`, stores the resolved tolerances, and derives
 `cv_mse_threshold`. The default relative tolerance is `sqrt(float64 epsilon)` and the default
-absolute tolerance is positive infinity. A temporary `"one_standard_error"` result also references
-the exact unruled minimum row and derives `one_standard_error_threshold`. Neither threshold is
-stored independently.
+absolute tolerance is positive infinity. The threshold is derived from the retained provenance rather
+than stored independently.
 
 ::: pipls.component_path.PiPLSSelection
     options:

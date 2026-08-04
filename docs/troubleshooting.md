@@ -82,10 +82,9 @@ Automatic choices use the same post-fit operation:
 model = search.refit(X, Y, rule="minimum_cv_mse")
 ```
 
-The accepted rules are `"best_score"`, `"minimum_cv_mse"`, and the temporary
-`"one_standard_error"`. `minimum_cv_mse` additionally accepts `relative_tolerance` and
-`absolute_tolerance`; nondefault tolerances are rejected for every other rule and for manual
-component-count selection. The search object retains the path evidence but does not delegate
+The accepted rules are `"best_score"` and `"minimum_cv_mse"`. `minimum_cv_mse` additionally accepts
+`relative_tolerance` and `absolute_tolerance`; nondefault tolerances are rejected for `best_score`
+and for manual component-count selection. The search object retains the path evidence but does not delegate
 prediction or store the returned model. See the [path API](api/path.md).
 
 ## The CV-MSE minimum, best candidate, and selected model disagree

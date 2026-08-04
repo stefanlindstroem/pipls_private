@@ -71,7 +71,7 @@ def _plot_component_path(
         marker="D",
         s=70,
         label=(
-            f"{100.0 * relative_tolerance:.0f}% tolerance recommendation: "
+            f"{100.0 * relative_tolerance:.0f}% tolerance selection: "
             f"{selected.n_components} components, "
             f"predictor rank {selected.predictor_rank}"
         ),

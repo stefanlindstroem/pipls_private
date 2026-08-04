@@ -529,19 +529,19 @@ modules declare exact exports, and tutorial wording states selection ownership p
 
 ## Accepted CV-MSE tolerance and split-SD transition
 
-Decision 0146 replaces one-standard-error component selection with minimum-CV-MSE selection plus
+Decision 0146 replaces the superseded SE-based component rule with minimum-CV-MSE selection plus
 explicit relative and absolute tolerances. For each component-path row, every materialized
 validation split contributes equally to `cv_mse_mean`; `cv_mse_std` is the population SD across the
-same split losses and is descriptive only. Maintained figures will show mean CV-MSE ± SD across
+same split losses and is descriptive only. Maintained figures show mean CV-MSE ± SD across
 validation splits.
 
 A row qualifies only when its mean is below both the relative and absolute thresholds. The first
 qualifying component count is selected, retaining the path-owned predictor rank. The default
 relative tolerance resolves to `sqrt(float64 epsilon)` and the default absolute tolerance is
-positive infinity. Tobacco will demonstrate `relative_tolerance=0.10`; absolute tolerance is
+positive infinity. Tobacco demonstrates `relative_tolerance=0.10`; absolute tolerance is
 documented but not demonstrated. The complete Pulp workflow and Tutorial 3 use repeated
 five-fold CV with ten repetitions, while quick and other workflows remain lighter.
 
-Current status: **Patches 1–6 of 7 complete**. The complete Pulp workflow materializes 50
-repeated-CV splits and averages ten OOF predictions per observation. The derived
-`cv_mse_standard_error` remains temporarily available only for still-active 1-SE selection.
+Current status: **all seven patches complete**. The complete Pulp workflow materializes 50
+repeated-CV splits and averages ten OOF predictions per observation. The active result and selection
+surface contains no standard-error quantity or SE-based selection rule.

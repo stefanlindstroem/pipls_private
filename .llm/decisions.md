@@ -202,8 +202,8 @@ plan contains an earlier or more general proposal:
   access, pandas, a generic registry, or any requirement that users load their own real data
   through the package;
 - Decision 0143 completes the model-selection provenance and OOF-reporting transition:
-  refitted models retain `model.selection_`, one-standard-error selections carry their reference
-  minimum and derived threshold, and OOF diagnostics use `oof_report(selection=...)`;
+  refitted models retain `model.selection_`, selection provenance remains attached to the model,
+  and OOF diagnostics use `oof_report(selection=...)`;
 - Decision 0144 completes a seven-patch pre-release public-surface cleanup: required OOF arrays,
   consistent selection terminology, removal of duplicate search and candidate state, canonical dataset
   access, reduced inspection conveniences, and focused result-module exports;

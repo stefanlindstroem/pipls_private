@@ -59,17 +59,12 @@ def test_standard_pls_path_is_deterministic_and_immutable() -> None:
     assert first.n_components.dtype == np.dtype(np.intp)
     assert first.cv_mse_mean.dtype == np.dtype(np.float64)
     assert first.cv_mse_std.dtype == np.dtype(np.float64)
-    assert first.cv_mse_standard_error.dtype == np.dtype(np.float64)
+    assert not hasattr(first, "cv_mse_standard_error")
     assert np.isfinite(first.cv_mse_mean).all()
     assert (first.cv_mse_std >= 0.0).all()
     assert not first.n_components.flags.writeable
     assert not first.cv_mse_mean.flags.writeable
     assert not first.cv_mse_std.flags.writeable
-    assert not first.cv_mse_standard_error.flags.writeable
-    np.testing.assert_allclose(
-        first.cv_mse_standard_error,
-        first.cv_mse_std / np.sqrt(first.n_splits - 1),
-    )
 
 
 def test_standard_pls_path_defensively_copies_and_pickles() -> None:
@@ -90,10 +85,7 @@ def test_standard_pls_path_defensively_copies_and_pickles() -> None:
     assert path.n_components.tolist() == [1, 2, 3]
     assert path.cv_mse_mean.tolist() == [0.9, 0.6, 0.55]
     assert path.cv_mse_std.tolist() == [0.12, 0.09, 0.08]
-    np.testing.assert_allclose(
-        path.cv_mse_standard_error,
-        np.array([0.12, 0.09, 0.08]) / np.sqrt(path.n_splits - 1),
-    )
+    assert not hasattr(path, "cv_mse_standard_error")
 
     restored = pickle.loads(pickle.dumps(path))
     np.testing.assert_array_equal(restored.n_components, path.n_components)
@@ -102,7 +94,6 @@ def test_standard_pls_path_defensively_copies_and_pickles() -> None:
     assert not restored.n_components.flags.writeable
     assert not restored.cv_mse_mean.flags.writeable
     assert not restored.cv_mse_std.flags.writeable
-    assert not restored.cv_mse_standard_error.flags.writeable
 
 
 def test_standard_pls_path_rejects_invalid_arrays() -> None:
@@ -137,8 +128,7 @@ def test_standard_pls_path_rejects_invalid_arrays() -> None:
         algorithm="NIPALS",
         n_splits=1,
     )
-    with pytest.raises(ValueError, match="requires at least two"):
-        _ = one_split_path.cv_mse_standard_error
+    assert not hasattr(one_split_path, "cv_mse_standard_error")
 
 
 def test_nested_pls_path_matches_separate_pls_fits() -> None:
@@ -163,6 +153,3 @@ def test_nested_pls_path_matches_separate_pls_fits() -> None:
         index = n_components - 1
         assert path.cv_mse_mean[index] == pytest.approx(np.mean(split_mse))
         assert path.cv_mse_std[index] == pytest.approx(np.std(split_mse))
-        assert path.cv_mse_standard_error[index] == pytest.approx(
-            np.std(split_mse, ddof=1) / np.sqrt(path.n_splits)
-        )

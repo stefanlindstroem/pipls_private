@@ -27,11 +27,9 @@ __all__ = [
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
-SelectionRule = Literal["best_score", "minimum_cv_mse", "one_standard_error"]
+SelectionRule = Literal["best_score", "minimum_cv_mse"]
 PredictorRankPolicy = Literal["optimized", "fixed", "maximum"]
-_ALLOWED_SELECTION_RULES = frozenset(
-    {"best_score", "minimum_cv_mse", "one_standard_error"}
-)
+_ALLOWED_SELECTION_RULES = frozenset({"best_score", "minimum_cv_mse"})
 _ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "maximum"})
 
 
@@ -101,16 +99,14 @@ class PiPLSSelection:
     cv_mse_std : float
         Population standard deviation of response-standardized MSE across
         validation splits.
-    cv_mse_standard_error : float
-        Temporary split-based standard error of mean response-standardized CV-MSE.
     n_splits : int
         Number of cross-validation splits.
-    rule : {"best_score", "minimum_cv_mse", "one_standard_error"} or None
+    rule : {"best_score", "minimum_cv_mse"} or None
         Search-owned rule that produced this selection. ``None`` denotes direct
         lookup by component count.
     reference_minimum : PiPLSSelection or None
-        Exact minimum-CV-MSE path row used to derive a tolerance or temporary
-        one-standard-error selection. The reference row has no rule provenance.
+        Exact minimum-CV-MSE path row used to derive a tolerance selection.
+        The reference row has no rule provenance.
     relative_tolerance : float or None
         Resolved nonnegative relative tolerance for ``rule="minimum_cv_mse"``.
     absolute_tolerance : float or None
@@ -118,8 +114,6 @@ class PiPLSSelection:
         positive infinity disables the absolute cap.
     cv_mse_threshold : float or None
         Derived effective threshold for ``rule="minimum_cv_mse"``.
-    one_standard_error_threshold : float or None
-        Temporary derived one-standard-error threshold.
     """
 
     n_components: int
@@ -175,7 +169,7 @@ class PiPLSSelection:
         relative_tolerance = _optional_relative_tolerance(self.relative_tolerance)
         absolute_tolerance = _optional_absolute_tolerance(self.absolute_tolerance)
 
-        if rule in {"minimum_cv_mse", "one_standard_error"}:
+        if rule == "minimum_cv_mse":
             if reference_minimum is None:
                 raise ValueError(
                     f"reference_minimum is required for {rule!r} selection."
@@ -222,24 +216,10 @@ class PiPLSSelection:
                 raise ValueError(
                     "Selected CV-MSE must not exceed the effective CV-MSE threshold."
                 )
-        elif rule == "one_standard_error":
-            if relative_tolerance is not None or absolute_tolerance is not None:
-                raise ValueError(
-                    "Tolerance provenance is defined only for minimum-CV-MSE selection."
-                )
-            reference = cast(PiPLSSelection, reference_minimum)
-            threshold = reference.cv_mse_mean + reference.cv_mse_standard_error
-            if not np.isfinite(threshold):
-                raise ValueError("The one-standard-error threshold must be finite.")
-            if cv_mse_mean > threshold:
-                raise ValueError(
-                    "Selected CV-MSE must not exceed the one-standard-error threshold."
-                )
         else:
             if reference_minimum is not None:
                 raise ValueError(
-                    "reference_minimum is defined only for minimum-CV-MSE or "
-                    "one-standard-error selection."
+                    "reference_minimum is defined only for minimum-CV-MSE selection."
                 )
             if relative_tolerance is not None or absolute_tolerance is not None:
                 raise ValueError(
@@ -257,21 +237,6 @@ class PiPLSSelection:
         object.__setattr__(self, "reference_minimum", reference_minimum)
         object.__setattr__(self, "relative_tolerance", relative_tolerance)
         object.__setattr__(self, "absolute_tolerance", absolute_tolerance)
-
-    @property
-    def cv_mse_standard_error(self) -> float:
-        """Return the temporary split-based standard error of mean CV-MSE.
-
-        ``cv_mse_std`` stores a population standard deviation. Dividing it
-        by ``sqrt(n_splits - 1)`` is equivalent to converting it to the sample
-        standard deviation and then dividing by ``sqrt(n_splits)``.
-        """
-
-        if self.n_splits < 2:
-            raise ValueError(
-                "cv_mse_standard_error requires at least two validation splits."
-            )
-        return float(self.cv_mse_std / np.sqrt(self.n_splits - 1))
 
     @property
     def cv_mse_threshold(self) -> float | None:
@@ -295,19 +260,6 @@ class PiPLSSelection:
             relative_tolerance,
             absolute_tolerance,
         )
-
-    @property
-    def one_standard_error_threshold(self) -> float | None:
-        """Return the temporary threshold used by one-standard-error selection."""
-
-        if self.rule != "one_standard_error":
-            return None
-        reference = self.reference_minimum
-        if reference is None:  # pragma: no cover - guarded by construction
-            raise RuntimeError(
-                "A one-standard-error selection requires a reference minimum."
-            )
-        return float(reference.cv_mse_mean + reference.cv_mse_standard_error)
 
     def __reduce__(self) -> tuple[type[PiPLSSelection], tuple[object, ...]]:
         """Reconstruct through validation during unpickling."""
@@ -352,8 +304,6 @@ class PiPLSPredictorRankProfile:
     cv_mse_std : ndarray of shape (n_evaluated_ranks,)
         Population standard deviation of response-standardized MSE across
         validation splits.
-    cv_mse_standard_error : ndarray of shape (n_evaluated_ranks,)
-        Temporary split-based standard error of mean response-standardized CV-MSE.
     predictor_rank_policy : {"optimized", "fixed", "maximum"}
         Predictor-rank policy shared by every evaluated candidate.
     n_splits : int
@@ -420,15 +370,6 @@ class PiPLSPredictorRankProfile:
         object.__setattr__(self, "n_splits", n_splits)
 
     @property
-    def cv_mse_standard_error(self) -> FloatArray:
-        """Return temporary read-only split-based standard errors of mean CV-MSE."""
-
-        return _read_only_cv_mse_standard_error(
-            self.cv_mse_std,
-            self.n_splits,
-        )
-
-    @property
     def selection(self) -> PiPLSSelection:
         """Return the conditional predictor-rank selection."""
 
@@ -485,8 +426,6 @@ class PiPLSComponentPath:
     cv_mse_std : ndarray of shape (n_component_values,)
         Population standard deviation of response-standardized MSE across
         validation splits.
-    cv_mse_standard_error : ndarray of shape (n_component_values,)
-        Temporary split-based standard error of mean response-standardized CV-MSE.
     n_splits : int
         Number of cross-validation splits shared by every path row.
     """
@@ -555,15 +494,6 @@ class PiPLSComponentPath:
         object.__setattr__(self, "cv_mse_std", cv_mse_std)
         object.__setattr__(self, "n_splits", n_splits)
 
-    @property
-    def cv_mse_standard_error(self) -> FloatArray:
-        """Return temporary read-only split-based standard errors of mean CV-MSE."""
-
-        return _read_only_cv_mse_standard_error(
-            self.cv_mse_std,
-            self.n_splits,
-        )
-
     def __reduce__(self) -> tuple[type[PiPLSComponentPath], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""
 
@@ -592,22 +522,3 @@ class PiPLSComponentPath:
             cv_mse_std=float(self.cv_mse_std[index]),
             n_splits=self.n_splits,
         )
-
-
-def _read_only_cv_mse_standard_error(
-    cv_mse_std: FloatArray,
-    n_splits: IntArray | int,
-) -> FloatArray:
-    """Derive sample-standard-error values from stored population split SDs."""
-
-    split_counts = np.asarray(n_splits, dtype=np.float64)
-    if np.any(split_counts < 2.0):
-        raise ValueError(
-            "cv_mse_standard_error requires at least two validation splits."
-        )
-    standard_error = np.asarray(
-        cv_mse_std / np.sqrt(split_counts - 1.0),
-        dtype=np.float64,
-    )
-    standard_error.setflags(write=False)
-    return standard_error

@@ -43,9 +43,9 @@ predictor and response directions; they are distinct from reconstruction loading
 | [`PiPLSLatentGeometryTruth`](datasets.md#pipls.datasets.PiPLSLatentGeometryTruth) | `make_pipls_latent_geometry(...).truth` | Inspect the manuscript-oriented Gaussian latent geometry |
 
 `PiPLSSearchCV.select()` returns complete stored component rows by component count or by the
-`best_score`, `minimum_cv_mse`, and temporary `one_standard_error` rules without fitting or mutating
-the search. The minimum-CV-MSE rule accepts simultaneous relative and absolute tolerances and
-retains their complete selection provenance. Rule scope and scorer qualification are described under
+`best_score` and `minimum_cv_mse` rules without fitting or mutating the search. The
+minimum-CV-MSE rule accepts simultaneous relative and absolute tolerances and retains their complete
+selection provenance. Rule scope and scorer qualification are described under
 [search-owned selection rules](../path_analysis.md#search-owned-selection-rules).
 
 Pulp, Sugarcane, and Tobacco are available as named package-owned datasets through

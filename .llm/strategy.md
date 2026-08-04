@@ -398,7 +398,7 @@ consistency are implemented as independent scripts with minimal question-specifi
 Pulp, Sugarcane, and Tobacco provide transparent component-path analyses with direct `X.csv` and
 `Y.csv` reading. Example 04 owns the Pi-PLS and standard PLS comparison figures; examples 05–06
 perform separate Pi-PLS-only fixed fits after explicit component choices, while example 07 uses the
-stored one-standard-error recommendation for its final fixed fit. Phase F4 subsequently makes
+stored path recommendation for its final fixed fit. Phase F4 subsequently makes
 all four real-data workflows direct in-memory analyses.
 
 The initial real-data smoke benchmark scripts and tests were removed after review because they
@@ -509,12 +509,9 @@ CSV plotting helper. Decision 0071 removes duplicate matrix-path aliases, makes 
 sole detailed candidate surface, and enforces the direct in-memory example policy structurally.
 Decision 0072 adds a derived immutable one-component predictor-rank profile so ordinary inspection
 does not require manual `cv_results_` masking while preserving that dictionary as the source of
-truth. Decision 0106 adds a derived fold-based CV-MSE standard error to the concise path and profile
-records without changing their stored arrays, selection semantics, or pickle payloads. Decision
-0107 adds exact stored-value minimum-CV-MSE and one-standard-error recommendation methods to
-`PiPLSComponentPath`; they return immutable scalar rows and do not fit, refit, or mutate search
-state. Decision 0108 makes example 07 the single maintained application of the one-standard-error
-method.
+truth. Decisions 0106–0108 record the historical split-uncertainty and recommendation work. Decision
+0146 supersedes that active surface with descriptive split SD and tolerance-based selection while
+retaining immutable scalar path rows and search-owned selection.
 
 ### Product documentation and release hardening
 
@@ -692,39 +689,34 @@ is a maintenance synchronization and introduces no new public or architectural d
 
 Current status: **guide layer synchronized with the current repository**.
 
-### One-standard-error visualization series
+### Historical split-uncertainty visualization series
 
-The owner-authorized series has two focused increments:
+The historical series had two focused increments:
 
 1. establish one public derived fold-based CV-MSE standard-error contract without changing plots;
 2. migrate maintained CV-MSE figures and explanations while keeping the component choice manual.
 
-Decision 0106 completes the first increment. It uses the conventional name one-standard-error rule
-(1-SE rule), preserves the stored population fold SD, and derives the sample-standard-error-
-equivalent quantity from the fold SD and split count. Automatic 1-SE selection remained outside
-that visualization increment; Decision 0111 later adds it as an explicit path-level rule.
+Decision 0106 established the earlier fold-based uncertainty quantity, and Decision 0111 later
+added the corresponding path-level rule. Decision 0146 supersedes both active surfaces.
 
-Current status: **historical implementation complete and superseded for plotting by Decision
-0146 Patch 4**. Maintained CV-MSE plots now use population split SD; the derived fold-based SE
-remains temporarily only for the still-active 1-SE selection rule.
+Current status: **historical implementation complete and superseded by Decision 0146**. Maintained
+CV-MSE plots use population split SD, and no derived SE result remains.
 
 ### Component-path recommendation references
 
-Decision 0107 adds exact stored-value minimum-CV-MSE and one-standard-error methods to
+Decision 0107 added historical stored-value recommendation methods to
 `PiPLSComponentPath`. The implementation returns complete immutable path rows without fitting,
 refitting, mutation, comparison tolerances, or redundant state. A restrained follow-through
 documents the methods in `docs/path_analysis.md` and the generated API route while keeping the
 README, documentation home, tutorials, and renderers on explicit component choices. Decision 0108
-then initially uses a path-level 1-SE lookup in the advanced Tobacco workflow while retaining
+then initially used a path-level historical lookup in the advanced Tobacco workflow while retaining
 explicit choices in the introductory and other numbered examples. Decision 0109 completes that
 demonstration
-with the minimum row, horizontal 1-SE threshold, recommended row, and direct documentation
-cross-links.
+with the minimum row, historical threshold, recommended row, and direct documentation cross-links.
 
 Current status: **historical implementation complete and superseded at the public ownership
-boundary by Decision 0140 and the selection rule by Decision 0146**. The Tobacco demonstration now
-resolves its minimum and 1-SE rows
-through `search.select(...)`; the path object is retained as numerical evidence only.
+boundary by Decision 0140 and the selection rule by Decision 0146**. The Tobacco demonstration now resolves its selection through tolerance-based
+`search.select(...)`; the path object is retained as numerical evidence only.
 
 ### Response-anchored factor display
 
@@ -897,7 +889,7 @@ Current status: **companion-manuscript synthetic-data guide complete**.
 
 ### Example-catalogue heading-scope cleanup
 
-A documentation audit separated the Tobacco-specific one-standard-error explanation from the
+A documentation audit separated the historical Tobacco selection explanation from the
 generic output-artifact and rendering-ownership notes that follow it in the served example
 catalogue. This is a heading-structure correction only; no example, rendering, or package behavior
 changes.
@@ -1129,7 +1121,7 @@ Decision 0146 authorizes seven reviewable patches:
 5. migrate automatic workflows to minimum-CV-MSE tolerance selection, including Tobacco at 10%
    — complete;
 6. give the complete Pulp workflow and Tutorial 3 ten repetitions of five-fold CV — complete;
-7. remove the one-standard-error surface and complete active-surface audits.
+7. remove the superseded SE-based surface and complete active-surface audits — complete.
 
 The default relative tolerance is machine-scale numerical equivalence and the default absolute
 tolerance is positive infinity. Both tolerance conditions must hold. This transition does not add

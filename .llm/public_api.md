@@ -141,7 +141,7 @@ model = search.refit(X, y, n_components=4)
 ```
 
 `refit()` requires exactly one of `rule` and `n_components`. The supported named rules are
-`"best_score"`, `"minimum_cv_mse"`, and `"one_standard_error"`. Manual component selection uses the
+`"best_score"` and `"minimum_cv_mse"`. Manual component selection uses the
 predictor rank already selected conditionally for that component-path row. The method clones the
 configured direct estimator or terminal-Pi-PLS pipeline, fits that clone on the supplied full data,
 and returns it. After a successful fit, the returned outer estimator exposes the exact immutable
@@ -160,7 +160,7 @@ unevaluated admissible pairs.
 Explicit selected-row inspection is a post-fit operation:
 
 ```python
-selected = search.select(rule="one_standard_error")
+selected = search.select(rule="minimum_cv_mse")
 selected = search.select(n_components=4)
 ```
 
@@ -204,9 +204,9 @@ rank_profile = search.predictor_rank_profile(selection.n_components)
 report = search.oof_report(X, y, selection=selection)
 ```
 
-The final `refit()` result carries the exact immutable selection as `model.selection_`. A 1-SE
-selection carries `rule="one_standard_error"`, its `reference_minimum`, and a derived
-`one_standard_error_threshold`. `search.oof_report(...)` accepts an existing selection rather than
+The final `refit()` result carries the exact immutable selection as `model.selection_`. A
+minimum-CV-MSE selection carries its resolved tolerances, exact `reference_minimum`, and derived
+`cv_mse_threshold`. `search.oof_report(...)` accepts an existing selection rather than
 resolving `rule` or `n_components` again and returns `PiPLSOOFReport` with
 `report.selection`, ordered OOF predictions and counts, pooled OOF $R^2$, leave-one-out provenance,
 and complete-coverage status.
@@ -216,8 +216,8 @@ full-data refitting before retrieving selection, path, rank-profile, OOF, fitted
 evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
 `oof_report()`.
 
-All seven patches are complete. `PiPLSSelection` implements `rule`,
-`reference_minimum`, and the derived `one_standard_error_threshold`; every successful refit result
+All seven patches are complete. `PiPLSSelection` implements tolerance provenance for
+`rule="minimum_cv_mse"`; every successful refit result
 exposes the exact resolved selection as `model.selection_`; and `oof_report(selection=...)` returns
 immutable `PiPLSOOFReport` after exact compatibility validation. Directly fitted
 `PiPLSRegression` instances remain provenance-free. All model-producing workflows use
@@ -243,10 +243,8 @@ are not public fitted state. Advanced users can inspect aligned `cv_results_` co
 
 `PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
 `mean_test_score`, `cv_mse_mean`, and `cv_mse_std` arrays. The predictor-rank policy and number of
-validation splits are path-wide Python scalars. It derives the aligned read-only
-`cv_mse_standard_error` array from the stored population split SD and shared split count.
-Maintained plots use `cv_mse_std` directly; the derived SE remains only for the temporary 1-SE
-rule. New code retrieves one complete stored row through `search.select(...)`. Maintained
+validation splits are path-wide Python scalars. Maintained plots use `cv_mse_std` directly; no
+standard-error array is derived from the split results. New code retrieves one complete stored row through `search.select(...)`. Maintained
 consumers and living
 documentation use no path-level scalar selection. `PiPLSComponentPath` exposes aligned numerical
 properties and immutable serialization behavior, not public selected-row operations.
@@ -263,9 +261,8 @@ template and is preserved through cloning; the path object adds no separate `set
 predictor ranks actually evaluated at `h`, sorted in ascending order. Its path-wide policy and split
 count are scalars, and its `selection` property derives the same conditionally selected scalar
 values as `search.select(n_components=h)` from immutable candidate state. The profile does not
-add another fitted attribute or stored selected-row representation. It exposes an aligned read-only
-`cv_mse_standard_error` property derived by the same contract as the component path. Maintained
-profile plots use `cv_mse_std` directly. Selection
+add another fitted attribute or stored selected-row representation. Maintained profile plots use
+`cv_mse_std` directly, and the profile exposes no standard-error property. Selection
 maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
 mean response-standardized CV-MSE.
 
@@ -524,10 +521,10 @@ is selected. Tolerance-based selections retain resolved relative and absolute to
 reference minimum, and a derived CV-MSE threshold.
 
 The final result surface uses `cv_mse_std` for population SD across materialized validation splits
-and removes `rule="one_standard_error"`, `cv_mse_standard_error`, and
-`one_standard_error_threshold`. Maintained plots use mean CV-MSE ± split SD. Tobacco demonstrates a
-10% relative tolerance; absolute tolerance is documented without an example.
+and contains no standard-error selection or result properties. Maintained plots use mean CV-MSE ±
+split SD. Tobacco demonstrates a 10% relative tolerance; absolute tolerance is documented without
+an example.
 
-Current status: **Patches 1–6 of 7 complete**. The tolerance API, split-SD plots, automatic
-workflow migration, and repeated Pulp protocol are implemented. The one-standard-error rule and
-derived SE remain temporarily active only until Patch 7 removes them.
+Current status: **all seven patches complete**. The tolerance API, split-SD plots, automatic
+workflow migration, repeated Pulp protocol, and removal of the superseded SE-based surface are
+implemented.

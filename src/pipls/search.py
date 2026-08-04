@@ -181,20 +181,6 @@ def _select_minimum_cv_mse(
     )
 
 
-def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSSelection:
-    """Return the smallest stored component count within one standard error."""
-
-    reference = _minimum_cv_mse_reference(path)
-    threshold = reference.cv_mse_mean + reference.cv_mse_standard_error
-    if not np.isfinite(threshold):
-        raise ValueError("The one-standard-error threshold must be finite.")
-    eligible = np.flatnonzero(path.cv_mse_mean <= threshold)
-    return replace(
-        path._selection_at_index(int(eligible[0])),
-        rule="one_standard_error",
-        reference_minimum=reference,
-    )
-
 
 class PiPLSSearchCV(
     MultiOutputMixin,  # type: ignore[misc]
@@ -522,12 +508,10 @@ class PiPLSSearchCV(
 
         Parameters
         ----------
-        rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
+        rule : {"best_score", "minimum_cv_mse"}, optional
             Stored-row selection rule. ``"best_score"`` uses the global
             configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
-            stored component count within both supplied CV-MSE tolerances, and
-            ``"one_standard_error"`` uses the smallest stored component count
-            within one fold-based standard error of the exact minimum.
+            stored component count within both supplied CV-MSE tolerances.
         n_components : int, optional
             Evaluated paired-mode count to retrieve manually.
         relative_tolerance : float or None, default=None
@@ -587,12 +571,10 @@ class PiPLSSearchCV(
             Predictor matrix used for the final full-data fit.
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
             Response vector or matrix used for the final full-data fit.
-        rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
+        rule : {"best_score", "minimum_cv_mse"}, optional
             Stored-row selection rule. ``"best_score"`` uses the global
             configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
-            stored component count within both supplied CV-MSE tolerances, and
-            ``"one_standard_error"`` uses the smallest stored component count
-            within one fold-based standard error of the exact minimum.
+            stored component count within both supplied CV-MSE tolerances.
         n_components : int, optional
             Evaluated paired-mode count to refit manually.
         relative_tolerance : float or None, default=None
@@ -873,15 +855,8 @@ class PiPLSSearchCV(
                     absolute_tolerance
                 ),
             )
-        if rule == "one_standard_error":
-            _require_default_tolerances(
-                relative_tolerance=relative_tolerance,
-                absolute_tolerance=absolute_tolerance,
-            )
-            return _select_one_standard_error(self.component_path_)
         raise ValueError(
-            'rule must be "best_score", "minimum_cv_mse", or '
-            '"one_standard_error".'
+            'rule must be "best_score" or "minimum_cv_mse".'
         )
 
     def predictor_rank_profile(

@@ -2,14 +2,14 @@
 
 ## Status
 
-Accepted; implementation in progress. Patches 1–6 of 7 are complete. The complete Pulp workflow
-and Tutorial 3 now use ten repeated five-fold partitions, while the temporary derived SE remains
-only for the still-active one-standard-error rule until Patch 7.
+Accepted and implemented. All seven patches are complete. The active API uses tolerance-based
+minimum-CV-MSE selection and descriptive split SD, and the complete Pulp workflow and Tutorial 3 use
+ten repeated five-fold partitions.
 
 ## Context
 
-The current component-path API supports `rule="one_standard_error"`. It derives a fold-based
-standard error from the population standard deviation of the realized split losses and uses the
+Before this transition, the component-path API supported a fold-based SE rule. It derived a
+standard error from the population standard deviation of the realized split losses and used the
 minimum-CV-MSE row plus one such standard error as a component-count threshold. This is a familiar
 heuristic for one ordinary cross-validation partition, but its uncertainty interpretation becomes
 increasingly weak when a splitter materializes repeated folds. For example, repeated five-fold CV
@@ -224,7 +224,7 @@ search-select-refit procedure remains a separate future design problem.
 6. Use repeated five-fold CV with ten repetitions in the Pulp example, renderer, Tutorial 3, and
    corresponding tests and manifests — complete.
 7. Remove the one-standard-error rule and all remaining active SE surface, synchronize public
-   documentation and guide material, and run complete stale-surface audits.
+   documentation and guide material, and run complete stale-surface audits — complete.
 
 ## Validation
 
