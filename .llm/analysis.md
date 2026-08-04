@@ -502,6 +502,8 @@ public support warning.
 The cleanup retains capabilities with distinct roles. `search.select()` remains the fitting-free
 selection operation; all five numerical inspection helpers remain public; balanced biplot scaling
 factors remain visible; immutable records retain direct-construction and pickle validation; and
-caller-owned Matplotlib rendering remains the plotting boundary. Patches 1 and 2 are complete:
+caller-owned Matplotlib rendering remains the plotting boundary. Patches 1–4 are complete:
 OOF reports now require prediction and count arrays and expose selection metrics only through
-`report.selection`. Selection terminology is the next implementation increment.
+`report.selection`; the active API uses `PiPLSSelection` terminology; and global-best fitted-search
+attributes have been replaced by `search.select(rule="best_score")`. Candidate parameter-column
+cleanup is the next implementation increment.

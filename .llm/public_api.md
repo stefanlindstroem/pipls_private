@@ -105,7 +105,7 @@ diagnostics, the resolved predictor solver, and the derived centered/scaled regr
 construction matrices $\Pi$, $C$, and $W$, the redundant diagonal matrix $D$, and symbolic aliases
 remain private.
 
-The fixed estimator does not expose `cv_results_`, `best_params_`, OOF predictions, validation
+The fixed estimator does not expose cross-validation results, OOF predictions, validation
 reports, predictor-rank search diagnostics, or scorer plumbing. The response scale required by the
 default scorer is private fitted state. `predictor_rank_` is the requested fitted integer and
 `max_predictor_rank_` is `min(n_features, n_samples - 1)` for the supplied centered training
@@ -223,9 +223,10 @@ immutable `PiPLSOOFReport` after exact compatibility validation. Directly fitted
 workflow remains selection-only and passes its `best_score` result directly to `oof_report()`.
 The former report API has been removed without compatibility aliases.
 
-Public path attributes include standard candidate-level search results in `cv_results_`, global
-`best_*` selection attributes, `search_is_exhaustive_`, and the canonical immutable
-component-path result. The search stores no selected row, OOF report, or fitted final model.
+Public path attributes include candidate-level search results in `cv_results_`,
+`search_is_exhaustive_`, and the canonical immutable component-path result. The global
+configured-score optimum is returned by `search.select(rule="best_score")`. The search stores no
+selected row, OOF report, or fitted final model.
 `PiPLSOOFReport` composes one immutable selection and owns required ordered OOF predictions,
 required prediction counts, coverage, leave-one-out provenance, and optional pooled OOF $R^2$.
 Selection metrics are accessed through `report.selection`; `has_complete_oof_coverage` exposes row
@@ -243,9 +244,9 @@ retrieves one complete stored row through `search.select(...)`. Maintained consu
 documentation use no path-level scalar selection. `PiPLSComponentPath` exposes aligned numerical
 properties and immutable serialization behavior, not public selected-row operations.
 
-`best_index_`, `best_score_`, `best_params_`, `best_n_components_`, and
-`best_predictor_rank_` always describe the global configured-score optimum. They are search evidence,
-not a stored final estimator. The search exposes no `predict`, `transform`, `fit_transform`,
+`search.select(rule="best_score")` returns the global configured-score optimum as one immutable
+selection. The search stores no duplicated scalar or parameter representation of that selection and
+no final estimator. The search exposes no `predict`, `transform`, `fit_transform`,
 `inverse_transform`, `score`, or `get_feature_names_out` delegation. Call those methods on the
 estimator or pipeline returned by `refit()`. Output-container configuration is owned by the estimator
 template and is preserved through cloning; the path object adds no separate `set_output` layer.
@@ -461,10 +462,10 @@ helper, or component-path plotting helper. The comparison-only `PLSComponentPath
 
 Decision 0144 authorizes a seven-patch reduction of duplicated public access. Patches 1–3 are
 complete: the target is recorded; OOF reports own required OOF arrays and coverage while selection
-metrics remain on `report.selection`; and the active API uses `PiPLSSelection` and
-`profile.selection` without aliases. The remaining target is:
+metrics remain on `report.selection`; the active API uses `PiPLSSelection` and
+`profile.selection` without aliases; and fitted-search global-best attributes have been replaced by
+`search.select(rule="best_score")`. The remaining target is:
 
-- fitted-search `best_*` attributes are replaced by `search.select(rule="best_score")`;
 - `cv_results_` keeps stable `n_components` and `predictor_rank` columns but removes duplicated
   `params` and pipeline-prefixed `param_*` representations;
 - `PiPLSDataset` uses `X` and `Y` without `data` and `target` aliases;

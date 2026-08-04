@@ -77,9 +77,10 @@ the stable package name `"neg_response_standardized_mse"`, which resolves to
 to minimizing mean response-standardized CV-MSE. With another scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 
-Ordinary scikit-learn scorer names, scorer callables, and `scoring=None` are accepted.
-`best_params_`, `best_score_`, and `best_index_` describe the best evaluated pair.
-`rank_test_score` uses minimum ranks with the same `rtol=1e-12` and `atol=1e-15` comparison as
+Ordinary scikit-learn scorer names, scorer callables, and `scoring=None` are accepted. Retrieve
+the best evaluated pair through `best = search.select(rule="best_score")`; its component count,
+predictor rank, and mean score are available on that immutable selection. `rank_test_score` uses
+minimum ranks with the same `rtol=1e-12` and `atol=1e-15` comparison as
 selection. Every rank-1 candidate is tied directly with the maximum score; lower rank groups are
 likewise anchored to their leading score rather than formed through adjacent-score chaining.
 Adaptive search makes no claim about pairs it did not evaluate. The component path remains a
@@ -252,7 +253,7 @@ threshold value. Direct lookup by component count records no rule provenance.
 
 The associated predictor rank is the rank already selected conditionally for that component count
 under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an
-estimator, mutate the search object, or alter `best_*`. With a nondefault scorer, the stored
+estimator, mutate the search object, or attach selected state. With a nondefault scorer, the stored
 predictor rank need not minimize CV-MSE within its component-count profile. Model-producing
 workflows obtain the fitted row from `model.selection_`; `search.select(...)` remains useful for
 selection-only analysis. `component_path_` remains the aligned numerical curve.

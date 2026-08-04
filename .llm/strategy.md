@@ -745,10 +745,11 @@ Current status: **search-CV public rename implemented and documented**.
 
 ### Explicit final path selection
 
-Decision 0111 originally placed final-row orchestration on `PiPLSSearchCV`. Decision 0137 supersedes
-that ownership: global `best_*` attributes remain search evidence, while named or manual final-row
-choices occur only through post-fit selection and refitting operations. `PiPLSRegression` remains a
-fixed-pair estimator with no hidden selection.
+Decision 0111 originally placed final-row orchestration on `PiPLSSearchCV`. Decisions 0137 and
+0144 supersede that ownership: named and manual choices occur through post-fit selection and
+refitting operations, and the global configured-score optimum is returned by
+`search.select(rule="best_score")` rather than duplicated fitted attributes. `PiPLSRegression`
+remains a fixed-pair estimator with no hidden selection.
 
 Current status: **superseded by the post-fit inspect-decide-refit lifecycle**.
 
@@ -1064,8 +1065,9 @@ selection metrics only through `report.selection`. The active surface now uses `
 
 ## Current next increment
 
-Decision 0144 Patch 4 should remove public fitted-search `best_*` attributes while preserving
-`search.select(rule="best_score")`, refit, OOF, tie-breaking, and fitted-state contracts.
+Decision 0144 Patch 5 should remove duplicated `cv_results_` parameter representations while
+preserving direct parameter columns and all candidate scores, split values, MSE fields, ranks, and
+timings.
 Decision 0139 Patch 3 remains paused as an independent documentation increment.
 
 ## Maintenance protocol
@@ -1089,7 +1091,8 @@ For every patch, the LLM maintainer should:
 API1 is complete under Decision 0086. `PiPLSDecomposition` exposes descriptive final factors and
 rank/solver diagnostics while the private core retains construction matrices. API2 is complete
 under Decision 0087: scorer state is private, exact weight aliases are removed, and
-`PiPLSSearchCV` retains `cv_results_`, concise immutable path/profile results, standard `best_*`
-attributes, and `search_is_exhaustive_` without execution-history, selected report state, or flat
-OOF duplicates. Decision 0088 completes API3 by removing display-sign bookkeeping and redundant
-synthetic zero blocks and by suppressing constructor signatures for returned immutable records.
+`PiPLSSearchCV` retains `cv_results_`, concise immutable path/profile results,
+`search_is_exhaustive_`, and global-best selection through `select(rule="best_score")` without
+execution-history, selected report state, or flat OOF duplicates. Decision 0088 completes API3 by
+removing display-sign bookkeeping and redundant synthetic zero blocks and by suppressing constructor
+signatures for returned immutable records.

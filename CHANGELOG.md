@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Remove the five fitted-search global-best attributes without aliases. Resolve the configured-score
+  optimum on demand through `search.select(rule="best_score")`, preserving tie-breaking, refit, OOF,
+  fitted-state, pickle, and candidate-ranking behavior while eliminating duplicated selected-row
+  state.
 - Rename the immutable selected-row result from `PiPLSComponentResult` to `PiPLSSelection` and
   rename `PiPLSPredictorRankProfile.selected_result` to `selection`. Update all active source,
   tests, examples, tutorial renderers, API documentation, and maintainer guidance without changing

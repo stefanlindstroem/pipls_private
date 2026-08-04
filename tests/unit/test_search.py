@@ -85,21 +85,16 @@ def _one_standard_error_data() -> tuple[np.ndarray, np.ndarray]:
     return X, Y
 
 
-def _search_with_component_path(
-    path: PiPLSComponentPath,
-    *,
-    best_n_components: int | None = None,
-) -> PiPLSSearchCV:
+def _search_with_component_path(path: PiPLSComponentPath) -> PiPLSSearchCV:
     """Return minimal fitted-state evidence for exact selection tests."""
 
     search = PiPLSSearchCV()
-    search.cv_results_ = {}
+    search.cv_results_ = {
+        "n_components": path.n_components,
+        "predictor_rank": path.predictor_rank,
+        "mean_test_score": path.mean_test_score,
+    }
     search.component_path_ = path
-    search.best_n_components_ = (
-        int(path.n_components[-1])
-        if best_n_components is None
-        else best_n_components
-    )
     return search
 
 
@@ -276,6 +271,33 @@ def test_no_positive_fold_numerical_rank_fails_transactionally() -> None:
         "max_predictor_rank_",
         "cv_results_",
         "component_path_",
+        "best_index_",
+        "best_score_",
+        "best_n_components_",
+        "best_predictor_rank_",
+        "best_params_",
+    ):
+        assert not hasattr(search, name)
+
+
+def test_fit_exposes_no_global_best_attributes() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3],
+        search_method="optimal",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    best = search.select(rule="best_score")
+    assert best.n_components in {1, 2}
+    assert best.predictor_rank in {1, 2, 3}
+    for name in (
+        "best_index_",
+        "best_score_",
+        "best_n_components_",
+        "best_predictor_rank_",
         "best_params_",
     ):
         assert not hasattr(search, name)
@@ -341,7 +363,7 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     assert selected.one_standard_error_threshold is None
 
     best = search.select(rule="best_score")
-    best_row = search.select(n_components=search.best_n_components_)
+    best_row = search.select(n_components=best.n_components)
     assert best.rule == "best_score"
     assert best.reference_minimum is None
     assert best.one_standard_error_threshold is None
@@ -562,8 +584,8 @@ def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     model = search.refit(X, Y, rule="best_score")
 
     assert isinstance(model, PiPLSRegression)
-    assert model.n_components == search.best_n_components_
-    assert model.predictor_rank == search.best_predictor_rank_
+    assert model.n_components == model.selection_.n_components
+    assert model.predictor_rank == model.selection_.predictor_rank
     assert hasattr(model, "coef_")
     assert model.predict(X).shape == Y.shape
     assert model.selection_ == search.select(rule="best_score")
@@ -888,8 +910,9 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
         n_jobs=1,
     ).fit(X, Y)
 
-    assert search.best_n_components_ == 1
-    assert search.best_predictor_rank_ == 1
+    best = search.select(rule="best_score")
+    assert best.n_components == 1
+    assert best.predictor_rank == 1
     assert search.cv_results_["predictor_rank"].size < 12
     assert not search.search_is_exhaustive_
 
@@ -937,8 +960,9 @@ def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
         search.cv_results_["rank_test_score"],
         np.array([1, 1, 3]),
     )
-    assert search.best_predictor_rank_ == 1
-    assert search.best_index_ == 0
+    best = search.select(rule="best_score")
+    assert best.predictor_rank == 1
+    assert best.mean_test_score == pytest.approx(1.0)
 
 
 def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
@@ -955,8 +979,9 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
         cv=3,
     ).fit(X, Y)
 
-    assert search.best_n_components_ == 1
-    assert search.best_predictor_rank_ == 1
+    best = search.select(rule="best_score")
+    assert best.n_components == 1
+    assert best.predictor_rank == 1
     np.testing.assert_array_equal(search.component_path_.predictor_rank, np.array([1, 2]))
     np.testing.assert_allclose(search.component_path_.mean_test_score, np.array([1.0, 1.0]))
     assert not np.allclose(
@@ -1041,7 +1066,7 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_post_fit_ref
         model = search.refit(X, Y, rule="best_score")
         report = search.oof_report(X, Y, selection=model.selection_)
 
-    assert search.best_predictor_rank_ == 4
+    assert model.selection_.predictor_rank == 4
     assert isinstance(model, PiPLSRegression)
     assert model.predictor_rank_ == 4
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
@@ -1156,9 +1181,15 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
             / np.sqrt(path.n_splits - 1)
         )
 
-    selected = search.select(n_components=search.best_n_components_)
-    assert selected.predictor_rank == search.best_predictor_rank_
-    assert selected.mean_test_score == pytest.approx(search.best_score_)
+    selected = search.select(rule="best_score")
+    best_index = np.flatnonzero(
+        (search.cv_results_["n_components"] == selected.n_components)
+        & (search.cv_results_["predictor_rank"] == selected.predictor_rank)
+    )
+    assert best_index.size == 1
+    assert selected.mean_test_score == pytest.approx(
+        search.cv_results_["mean_test_score"][int(best_index[0])]
+    )
 
     restored = pickle.loads(pickle.dumps(search))
     np.testing.assert_array_equal(restored.component_path_.n_components, path.n_components)

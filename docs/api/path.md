@@ -23,9 +23,10 @@ tie-breaking, pipelines, and detailed result surfaces, see
 problems, see [Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. `component_path_` and
-`predictor_rank_profile()` provide concise immutable views. Standard `best_*` attributes identify
-the global configured-score optimum. Post-fit `select()`, `refit()`, and `oof_report()` do not alter
-search state. No final selection, model, or OOF report is stored on the search object.
+`predictor_rank_profile()` provide concise immutable views. Use
+`search.select(rule="best_score")` for the global configured-score optimum. Post-fit `select()`,
+`refit()`, and `oof_report()` do not alter search state. No final selection, model, or OOF report is
+stored on the search object.
 Python method signatures use `y` by scikit-learn convention even when the
 response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 [API overview](index.md#mathematical-notation-and-python-names).

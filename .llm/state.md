@@ -42,8 +42,8 @@ and later retired by Decision 0125 after its development-validation purpose had 
   derived fold-based CV-MSE standard errors; selected rows are resolved through
   `PiPLSSearchCV.select()`;
 - explicit post-fit full-data refitting and selection-conditioned OOF reporting from a named rule
-  or manually chosen component-path row, with exact split reuse and global `best_*` evidence kept
-  separate from each post-fit choice;
+  or manually chosen component-path row, with exact split reuse and the global configured-score
+  optimum available through `search.select(rule="best_score")`;
 - on-demand immutable `PiPLSPredictorRankProfile` results through
   `predictor_rank_profile(n_components)`, derived from `cv_results_`;
 - a package-owned Pulp first example showing one chained path search and one-standard-error refit,
@@ -268,7 +268,7 @@ Additional fixed decisions:
 - `PiPLSSearchCV` is a path evaluator rather than a delegated fitted model. Post-fit `refit()`
   requires exactly one named rule or one component count, returns a fitted clone, and leaves search
   evidence unchanged. Non-mutating `select()` uses the same vocabulary and resolver to return one
-  immutable stored row. `best_*` remains the global configured-score optimum.
+  immutable stored row, including the global configured-score optimum through `rule="best_score"`.
   Output-container configuration remains carried by the estimator template and returned clone.
 - `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
   `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
@@ -280,8 +280,8 @@ Additional fixed decisions:
   Tobacco the profiled
   count is therefore the result of the 1-SE rule. All three use `component_path_`, explicit search
   validation reports, and inspection results
-  directly in memory. All three use direct fixed estimators. `best_params_` remains a convenience,
-  not the required user decision.
+  directly in memory. All three use direct fixed estimators. Selection evidence is consumed as
+  immutable `PiPLSSelection` values rather than duplicated fitted-search attributes.
 - Refit coefficients and fitted-model methods are accessed on the direct estimator or pipeline
   returned by `search.refit(...)`. No fitted model is attached to `PiPLSSearchCV`, and coefficients
   are not flattened onto search state when preprocessing may change the feature space.
@@ -378,9 +378,8 @@ package-level use case and pass the source-level licensing gate before implement
 ## Recent completed increments
 
 Decisions 0107--0116 are complete and partly superseded by Decisions 0137 and 0140.
-`PiPLSSearchCV.select()` now owns non-mutating stored-row inspection, `PiPLSSearchCV` retains
-global `best_*` evidence without a declared final row, and `PiPLSRegression` remains fixed-pair
-only.
+`PiPLSSearchCV.select()` owns non-mutating stored-row inspection, including the global
+configured-score optimum, and `PiPLSRegression` remains fixed-pair only.
 
 The six owner-authorized simplifications are complete. Search inputs are resolved once;
 decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction
@@ -588,10 +587,10 @@ workflows use the final selection-driven interface.
 ## Pre-release public-surface cleanup transition
 
 Decision 0144 authorizes seven patches that remove duplicated access without removing distinct
-capabilities. The final target simplifies OOF reports, adopts `PiPLSSelection`, removes
-fitted-search `best_*` state and duplicate candidate parameter columns, standardizes package
-datasets on `X` and
-`Y`, removes unused shape-only inspection properties, and narrows top-level result exports.
+capabilities. OOF reports are simplified, `PiPLSSelection` is adopted, and fitted-search global-best
+state is removed. The remaining target removes duplicate candidate parameter columns,
+standardizes package datasets on `X` and `Y`, removes unused shape-only inspection properties, and
+narrows top-level result exports.
 
 `search.select()` remains the fitting-free selection operation. All five numerical inspection
 functions, component-path and rank-profile evidence, advanced candidate scores and timings,
@@ -606,8 +605,9 @@ changes.
 
 ## Current next increment
 
-Implement Decision 0144 Patch 4: remove public fitted-search `best_*` attributes while preserving
-`search.select(rule="best_score")`, refit, tie-breaking, OOF, and fitted-state behavior.
+Implement Decision 0144 Patch 5: remove duplicated `cv_results_` parameter representations while
+preserving stable direct component-count and predictor-rank columns plus all scores, split values,
+MSE fields, ranks, and timings.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

@@ -92,7 +92,7 @@ Candidate selection always maximizes `mean_test_score`. With the default scorer,
 to minimizing mean response-standardized CV-MSE. With a custom scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 
-Use `mean_test_score` and `best_score_` for the global configured-score optimum. Use
+Use `search.select(rule="best_score")` for the global configured-score optimum. Use
 `search.select(rule="minimum_cv_mse")` or `search.select(rule="one_standard_error")` for
 fitting-free recommendation inspection. A final model is returned directly by `refit()` and records
 the exact fitted row as `model.selection_`; it is not stored on the search. See

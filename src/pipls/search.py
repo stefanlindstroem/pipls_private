@@ -205,17 +205,6 @@ class PiPLSSearchCV(
         Immutable concise view with one conditionally selected predictor-rank
         result per paired-mode count. Use :meth:`predictor_rank_profile` for the
         evaluated rank candidates at one paired-mode count.
-    best_index_ : int
-        Row of ``cv_results_`` selected by maximum mean test score, with smaller
-        paired-mode count and predictor rank used as deterministic tie-breakers.
-    best_score_ : float
-        Mean cross-validation score at ``best_index_``.
-    best_n_components_ : int
-        Selected number of paired latent modes.
-    best_predictor_rank_ : int
-        Selected predictor rank.
-    best_params_ : dict of str to int
-        Parameters required to configure the supplied estimator or pipeline.
     """
 
     def __init__(
@@ -428,19 +417,6 @@ class PiPLSSearchCV(
             n_components_key=n_components_key,
             predictor_rank_key=predictor_rank_key,
         )
-        self.best_index_ = _select_best_index(self.cv_results_)
-        self.best_score_ = float(self.cv_results_["mean_test_score"][self.best_index_])
-        self.best_n_components_ = int(
-            self.cv_results_["n_components"][self.best_index_]
-        )
-        self.best_predictor_rank_ = int(
-            self.cv_results_["predictor_rank"][self.best_index_]
-        )
-        self.best_params_ = {
-            n_components_key: self.best_n_components_,
-            predictor_rank_key: self.best_predictor_rank_,
-        }
-
         conditional_indices: list[int] = []
         for h_value in component_values:
             indices = np.flatnonzero(self.cv_results_["n_components"] == int(h_value))
@@ -756,7 +732,7 @@ class PiPLSSearchCV(
 
         check_is_fitted(
             self,
-            attributes=["cv_results_", "component_path_", "best_n_components_"],
+            attributes=["cv_results_", "component_path_"],
         )
         if (rule is None) == (n_components is None):
             raise ValueError(
@@ -768,10 +744,11 @@ class PiPLSSearchCV(
                 n_components,
             )
         if rule == "best_score":
+            best_index = _select_best_index(self.cv_results_)
             return replace(
                 _selection_at_count(
                     self.component_path_,
-                    self.best_n_components_,
+                    int(self.cv_results_["n_components"][best_index]),
                 ),
                 rule="best_score",
             )

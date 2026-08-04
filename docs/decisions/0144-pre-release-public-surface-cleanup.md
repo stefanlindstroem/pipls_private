@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Implementation is planned in seven patches; Patch 1 records the target only.
+Accepted. Implementation is in progress through seven patches; Patches 1–4 are complete.
 
 ## Context
 
@@ -263,11 +263,13 @@ deprecation warnings, or compatibility shims are introduced.
 
 ## Implementation status
 
-Patches 1–3 are complete. The decision and guide-layer target are recorded; `PiPLSOOFReport`
+Patches 1–4 are complete. The decision and guide-layer target are recorded; `PiPLSOOFReport`
 requires OOF prediction and count arrays while exposing selection metrics only through
-`report.selection`; and the complete active API now uses `PiPLSSelection` and rank-profile
-`selection` terminology without changing search numerics. Patch 4 should next remove the public
-fitted-search `best_*` attributes while preserving best-score selection behavior.
+`report.selection`; the complete active API uses `PiPLSSelection` and rank-profile `selection`
+terminology; and fitted searches no longer store duplicated global-best attributes. Best-score
+selection, refit, OOF, fitted-state, and tie-breaking behavior are preserved through
+`search.select(rule="best_score")`. Patch 5 should next remove duplicated `cv_results_` parameter
+representations.
 
 This decision refines Decisions 0051, 0052, 0071, 0072, 0086, 0087, 0090, 0094, 0111, 0116, 0129,
 0134, 0138, 0140, and 0143. It preserves their numerical, immutability, direct-construction,

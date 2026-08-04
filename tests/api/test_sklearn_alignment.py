@@ -266,8 +266,9 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
     ).fit(X, Y)
     model = search.refit(X, Y, n_components=2)
 
-    assert search.best_n_components_ == 2
-    assert search.best_predictor_rank_ == 3
+    best = search.select(rule="best_score")
+    assert best.n_components == 2
+    assert best.predictor_rank == 3
     selected = search.select(n_components=2)
     assert selected.predictor_rank == 3
     assert isinstance(model, PiPLSRegression)

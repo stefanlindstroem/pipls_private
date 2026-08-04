@@ -58,12 +58,17 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
     assert report.selection is selection
     np.testing.assert_allclose(report.oof_predictions, expected)
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
-    assert report.selection.n_components == search.best_n_components_
-    assert report.selection.predictor_rank == search.best_predictor_rank_
+    assert report.selection.n_components == selection.n_components
+    assert report.selection.predictor_rank == selection.predictor_rank
     assert report.is_leave_one_out
     assert report.has_complete_oof_coverage
+    best_index = np.flatnonzero(
+        (search.cv_results_["n_components"] == selection.n_components)
+        & (search.cv_results_["predictor_rank"] == selection.predictor_rank)
+    )
+    assert best_index.size == 1
     assert report.selection.cv_mse_mean == pytest.approx(
-        search.cv_results_["mean_response_standardized_mse"][search.best_index_]
+        search.cv_results_["mean_response_standardized_mse"][int(best_index[0])]
     )
     assert report.pooled_oof_r2 == pytest.approx(
         r2_score(Y, expected, multioutput="uniform_average")
