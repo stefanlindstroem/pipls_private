@@ -324,3 +324,21 @@ beyond the maintained official Pages action majors.
 When a test reads a documentation or metadata file, ask whether the assertion protects a stable
 machine contract or merely repeats today's content. Prefer a parser, executable behavior, or a
 generic structural invariant. Do not use tests as a second copy of a living document.
+
+## Final implementation-surface cleanup transition
+
+Decision 0145 removes residual duplication without changing numerical algorithms. Across four
+patches, focused tests must protect:
+
+- absence of `cv_n_train_min_` and `predictor_rank_` after their removal, with unchanged learned
+  `max_predictor_rank_`, selections, fitted maps, predictions, clone behavior, and pickle behavior;
+- private-module availability of model-selection algorithms and absence of the public-looking
+  `pipls.model_selection` module;
+- unchanged exhaustive and adaptive search, score tolerance, tie-breaking, split materialization,
+  and OOF results after private refactoring;
+- core standardized-regression-map invariants without `PiPLSCoreResult.predict()`;
+- clear `oof_report()` validation messages without a constant operation-name parameter; and
+- exact `__all__` declarations for `pipls.regression`, `pipls.search`, and `pipls.exceptions`.
+
+Patch 1 changes no executable contract. Use positive behavioral tests and compact active-surface
+audits rather than preserving removed names as broad compatibility fixtures.

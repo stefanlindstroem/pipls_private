@@ -150,6 +150,7 @@ This index is navigation, not a substitute for those records.
 | `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named immutable loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
 | `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain the exact refit selection as `model.selection_`, enrich 1-SE provenance, and replace repeated-rule validation reporting with `oof_report(selection=...)` |
 | `0144-pre-release-public-surface-cleanup.md` | pre-release public-surface cleanup | remove duplicated result access, search aliases, candidate parameter representations, dataset aliases, shape-only properties, and top-level result re-exports while retaining distinct selection, inspection, OOF, and plotting roles |
+| `0145-final-implementation-surface-cleanup.md` | final implementation-surface cleanup | remove residual duplicate fitted attributes, privatize model-selection internals, remove unused private helpers, declare remaining module exports, and state fitting-free selection positively |
 
 ## Implemented estimator/search transition
 
@@ -202,9 +203,12 @@ plan contains an earlier or more general proposal:
 - Decision 0143 completes the model-selection provenance and OOF-reporting transition:
   refitted models retain `model.selection_`, one-standard-error selections carry their reference
   minimum and derived threshold, and OOF diagnostics use `oof_report(selection=...)`;
-- Decision 0144 authorizes a seven-patch pre-release public-surface cleanup. Patches 1 and 2 record
-  the target and simplify OOF reports to required prediction/count arrays with selection metrics
-  accessed through `report.selection`;
+- Decision 0144 completes a seven-patch pre-release public-surface cleanup: required OOF arrays,
+  consistent selection terminology, removal of duplicate search and candidate state, canonical dataset
+  access, reduced inspection conveniences, and focused result-module exports;
+- Decision 0145 authorizes a four-patch final implementation-surface cleanup. Patch 1 records
+  removal of residual duplicate fitted attributes, private module/helper cleanup, exact remaining
+  module export declarations, and positive fitting-free `search.select()` wording;
 - Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
   Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
   implemented. The resources remain ordinary CSV, JSON, README, and license files usable

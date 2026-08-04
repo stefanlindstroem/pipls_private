@@ -1067,7 +1067,26 @@ exposes only `X` and `Y`; unused shape-only inspection properties are removed; a
 `pipls` exports only estimators, the public support warning, and version metadata. Result records
 remain public from focused modules.
 
+### Final implementation-surface cleanup transition
+
+Decision 0145 authorizes four reviewable patches:
+
+1. establish the decision and guide-layer contract;
+2. remove `cv_n_train_min_` and `predictor_rank_` while preserving fitted behavior and numerics;
+3. privatize `model_selection.py`, remove `PiPLSCoreResult.predict()`, and remove the constant OOF
+   operation-name parameter;
+4. add exact module export declarations, correct tutorial wording, synchronize documentation, run
+   final active-surface audits, and close the transition.
+
+The cleanup retains `search.select()`, `model.selection_`, learned search state, all numerical
+inspection functions, model-selection algorithms, OOF reporting, and caller-owned plotting. No alias
+or deprecation layer is authorized at version `0.0.0`.
+
+Current status: **Patch 1 complete**. Patch 2 is the next increment.
+
 ## Current next increment
+
+Decision 0145 Patch 2: remove redundant fitted attributes.
 
 Decision 0139 Patch 3 remains paused as an independent documentation increment.
 

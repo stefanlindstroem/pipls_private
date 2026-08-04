@@ -510,3 +510,16 @@ attributes have been replaced by `search.select(rule="best_score")`; `cv_results
 shape-only inspection properties are removed while component counts remain; and top-level `pipls`
 exports only estimators, the public support warning, and version metadata. Result records remain
 public from focused modules.
+
+## Accepted final implementation-surface cleanup
+
+Decision 0145 addresses residual implementation and module-boundary duplication after the broader
+public-surface cleanup. The four-patch target removes `cv_n_train_min_` and the duplicate
+fixed-model
+`predictor_rank_`, privatizes `model_selection.py`, removes the unused core-result prediction method
+and constant OOF operation-name parameter, declares exact exports for the remaining public estimator
+and exception modules, and replaces negative `search.select()` wording with its fitting-free role.
+
+The cleanup retains learned search state, selection provenance, model-selection algorithms, all five
+numerical inspection functions, OOF reporting, and caller-owned plotting. Patch 1 changes only the
+decision and guide layer; Patch 2 is the next increment.

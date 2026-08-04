@@ -599,9 +599,22 @@ selection metrics only through `report.selection`; the active API uses `PiPLSSel
 shape-only properties; and top-level `pipls` exports only estimators, the public support warning,
 and version metadata. Result records remain public from focused modules.
 
+## Final implementation-surface cleanup transition
+
+Decision 0145 authorizes four patches that remove the residual duplicate fitted attributes,
+privatize model-selection algorithms, remove two unused private helper layers, declare the remaining
+module export boundaries, and correct the last negative `search.select()` wording.
+
+The transition retains learned search state, fitting-free selection, selection provenance, all
+numerical inspection functions, OOF reporting, model-selection behavior, and caller-owned plotting.
+
+Current status: **Patch 1 complete**. The decision and guide-layer contract are established. Patch 2
+removes `cv_n_train_min_` and `predictor_rank_` while preserving selections, fitted maps,
+predictions, cloning, pickling, and `max_predictor_rank_`.
+
 ## Current next increment
 
-Decision 0139 Patch 3 remains the next independent documentation increment.
+Decision 0145 Patch 2: remove redundant fitted attributes.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

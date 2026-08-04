@@ -163,3 +163,4 @@ reference describe the current public behavior directly.
 - [0127: artifact-based rendering validation](0127-artifact-based-rendering-validation.md)
 - [0128: same-file rendering functions](0128-same-file-rendering-functions.md)
 - [0144: pre-release public-surface cleanup](0144-pre-release-public-surface-cleanup.md)
+- [0145: final implementation-surface cleanup](0145-final-implementation-surface-cleanup.md)
