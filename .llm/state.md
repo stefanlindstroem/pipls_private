@@ -608,13 +608,15 @@ module export boundaries, and correct the last negative `search.select()` wordin
 The transition retains learned search state, fitting-free selection, selection provenance, all
 numerical inspection functions, OOF reporting, model-selection behavior, and caller-owned plotting.
 
-Current status: **Patches 1 and 2 complete**. The decision and guide-layer contract are
-established, and the redundant fitted attributes have been removed while preserving selections,
-fitted maps, predictions, cloning, pickling, and `max_predictor_rank_`.
+Current status: **Patches 1 through 3 complete**. The decision and guide-layer contract are
+established, redundant fitted attributes are removed, model-selection algorithms are private, the
+unused core prediction method is gone, and OOF validation no longer carries a constant operation
+name.
 
 ## Current next increment
 
-Decision 0145 Patch 3: privatize model-selection internals and remove unused private helpers.
+Decision 0145 Patch 4: complete module exports, tutorial wording, documentation synchronization,
+and final active-surface audits.
 
 Decision 0139 Patch 3 remains an independent paused presentation increment. Block-aware scaling and
 other unrelated work still require separate owner decisions.

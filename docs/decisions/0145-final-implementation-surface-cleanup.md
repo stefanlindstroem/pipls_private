@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted. Patches 1 and 2 of 4 are complete: the guide-layer contract is established, and the
-two redundant fitted attributes have been removed.
+Accepted. Patches 1 through 3 of 4 are complete: the guide-layer contract is established, the
+redundant fitted attributes are removed, and model-selection internals and private helpers are
+simplified.
 
 ## Context
 
@@ -144,7 +145,7 @@ This cleanup does not remove:
 2. Remove `cv_n_train_min_` and `predictor_rank_`, migrate consumers, and protect unchanged fitted
    behavior and numerics — complete.
 3. Rename `model_selection.py` to `_model_selection.py`, remove `PiPLSCoreResult.predict()`, and
-   remove the constant OOF `operation_name` argument.
+   remove the constant OOF `operation_name` argument — complete.
 4. Add remaining module `__all__` declarations, correct tutorial wording, synchronize public
    documentation and maintainer guidance, run final active-surface audits, and mark the decision
    implemented.

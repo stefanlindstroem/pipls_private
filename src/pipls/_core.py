@@ -99,18 +99,6 @@ class PiPLSCoreResult:
         standardized_regression_map: FloatArray = self.P @ self.D @ self.Q.T
         return standardized_regression_map
 
-    def predict(self, X: ArrayLike) -> FloatArray:
-        """Predict centered/scaled responses from a compatible predictor matrix."""
-
-        X_array = _as_finite_matrix(X, name="X")
-        if X_array.shape[1] != self.P.shape[0]:
-            raise ValueError(
-                "X has an incompatible number of features: "
-                f"expected {self.P.shape[0]}, got {X_array.shape[1]}."
-            )
-        return X_array @ self.standardized_regression_map
-
-
 def fit_pipls_core(
     X: ArrayLike,
     Y: ArrayLike,

@@ -8,6 +8,7 @@ from typing import Literal, cast
 import numpy as np
 from numpy.typing import NDArray
 
+from ._model_selection import _tied_score_mask
 from ._result_validation import (
     _finite_float,
     _literal_string,
@@ -16,7 +17,6 @@ from ._result_validation import (
     _read_only_float_array,
     _read_only_int_array,
 )
-from .model_selection import _tied_score_mask
 
 __all__ = [
     "PiPLSComponentPath",

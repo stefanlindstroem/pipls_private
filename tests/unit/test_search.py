@@ -1387,5 +1387,8 @@ def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
     compatible = search.select(n_components=1)
     with pytest.raises(ValueError, match=r"oof_report\(\) requires the same number"):
         search.oof_report(X[:-1], Y[:-1], selection=compatible)
-    with pytest.raises(ValueError, match="same number of response columns"):
+    with pytest.raises(
+        ValueError,
+        match=r"oof_report\(\) requires the same number of response columns",
+    ):
         search.oof_report(X, Y[:, :1], selection=compatible)

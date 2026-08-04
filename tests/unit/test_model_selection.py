@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import importlib.util
+
 import numpy as np
 import pytest
 from sklearn.model_selection import KFold
 
-from pipls.model_selection import (
+from pipls._model_selection import (
     _adaptive_refinement_interval,
     _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
@@ -13,6 +15,11 @@ from pipls.model_selection import (
     _select_predictor_rank,
     _tied_score_mask,
 )
+
+
+def test_model_selection_algorithms_are_private() -> None:
+    assert importlib.util.find_spec("pipls.model_selection") is None
+    assert importlib.util.find_spec("pipls._model_selection") is not None
 
 
 def test_max_predictor_rank_uses_ceiling_rule() -> None:

@@ -332,8 +332,8 @@ patches, focused tests must protect:
 
 - absence of `cv_n_train_min_` and `predictor_rank_`, with unchanged learned
   `max_predictor_rank_`, selections, fitted maps, predictions, clone behavior, and pickle behavior;
-- private-module availability of model-selection algorithms and absence of the public-looking
-  `pipls.model_selection` module;
+- private-module availability of model-selection algorithms from `pipls._model_selection` and
+  absence of the public-looking `pipls.model_selection` module;
 - unchanged exhaustive and adaptive search, score tolerance, tie-breaking, split materialization,
   and OOF results after private refactoring;
 - core standardized-regression-map invariants without `PiPLSCoreResult.predict()`;

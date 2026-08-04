@@ -4,6 +4,10 @@
 
 ### Repository
 
+- Privatize model-selection algorithms in `pipls._model_selection`, remove the unused private
+  `PiPLSCoreResult.predict()` convenience method, and simplify the sole OOF calculation path by
+  removing its constant operation-name argument. Preserve exhaustive and adaptive search, split
+  materialization, tie-breaking, regression maps, OOF numerics, and public validation messages.
 - Removed the redundant fitted attributes `PiPLSSearchCV.cv_n_train_min_` and
   `PiPLSRegression.predictor_rank_`. Use `max_predictor_rank_`, the configured
   `predictor_rank`, or `model.selection_.predictor_rank` according to ownership.

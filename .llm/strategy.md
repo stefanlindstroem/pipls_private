@@ -240,7 +240,7 @@ corresponding estimator rank search.
 Current status: **historically complete and superseded by Decision 0039**. Candidate cloning,
 fold-local fitting, scoring, standardized loss, and caching remain path-owned. Unused solver
 diagnostics, duplicate candidate metadata, and former estimator-search helpers have been removed.
-Exhaustive and adaptive rank refinement remain in `model_selection.py`.
+Exhaustive and adaptive rank refinement remain in the private `_model_selection.py` module.
 
 ### Phase D1b: scikit-learn and PLS-style API alignment
 
@@ -1074,7 +1074,7 @@ Decision 0145 authorizes four reviewable patches:
 1. establish the decision and guide-layer contract;
 2. remove `cv_n_train_min_` and `predictor_rank_` while preserving fitted behavior and numerics — complete;
 3. privatize `model_selection.py`, remove `PiPLSCoreResult.predict()`, and remove the constant OOF
-   operation-name parameter;
+   operation-name parameter — complete;
 4. add exact module export declarations, correct tutorial wording, synchronize documentation, run
    final active-surface audits, and close the transition.
 
@@ -1082,11 +1082,12 @@ The cleanup retains `search.select()`, `model.selection_`, learned search state,
 inspection functions, model-selection algorithms, OOF reporting, and caller-owned plotting. No alias
 or deprecation layer is authorized at version `0.0.0`.
 
-Current status: **Patches 1 and 2 complete**. Patch 3 is the next increment.
+Current status: **Patches 1 through 3 complete**. Patch 4 is the next increment.
 
 ## Current next increment
 
-Decision 0145 Patch 3: privatize model-selection internals and remove unused private helpers.
+Decision 0145 Patch 4: complete module exports, tutorial wording, documentation synchronization,
+and final active-surface audits.
 
 Decision 0139 Patch 3 remains paused as an independent documentation increment.
 

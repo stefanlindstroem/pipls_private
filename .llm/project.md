@@ -139,8 +139,8 @@ implementing or reviewing this surface.
 - `src/pipls/exceptions.py`: package warning and exception types.
 - `src/pipls/metrics.py`: response-standardized selection metrics.
 - `src/pipls/inspection.py`: pure immutable fitted-model inspection computations.
-- `src/pipls/model_selection.py`: path-owned rank limits, split materialization, and rank-search
-  orchestration.
+- `src/pipls/_model_selection.py`: private path-owned rank limits, split materialization, and
+  rank-search orchestration.
 - `src/pipls/search.py`: pipeline-aware `PiPLSSearchCV` meta-estimator.
 - `src/pipls/regression.py`: direct fixed-model `PiPLSRegression` estimator.
 - `src/pipls/validation.py`: immutable validation and OOF reporting.

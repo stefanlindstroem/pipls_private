@@ -20,8 +20,8 @@ from pipls.validation import PiPLSOOFReport
 
 The generated reference under `docs/api/` documents exactly these top-level and focused-module
 objects plus the declared public names from `pipls.inspection`, `pipls.datasets`, and
-`pipls.metrics`; `__version__` remains package metadata rather than an API reference page. Private
-modules and `pipls.model_selection` are not reference surfaces.
+`pipls.metrics`; `__version__` remains package metadata rather than an API reference page.
+Private modules, including `pipls._model_selection`, are not reference surfaces.
 
 Mathematical documentation denotes the response matrix by $Y$. Public estimator methods follow the
 scikit-learn `fit(X, y)` naming convention, so `y` may be a one-dimensional response or a

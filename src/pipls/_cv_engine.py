@@ -14,8 +14,8 @@ from numpy.typing import ArrayLike, NDArray
 from sklearn.base import clone
 from sklearn.utils import _safe_indexing
 
+from ._model_selection import CVSplit
 from .metrics import _response_standardized_mse, _training_response_scale
-from .model_selection import CVSplit
 
 FloatArray = NDArray[np.float64]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]

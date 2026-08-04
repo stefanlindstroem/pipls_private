@@ -28,17 +28,7 @@ from ._cv_engine import (
     _ordered_oof_predictions,
     _PiPLSCandidate,
 )
-from ._sklearn_compat import _validate_estimator_data
-from .component_path import (
-    PiPLSComponentPath,
-    PiPLSPredictorRankProfile,
-    PiPLSSelection,
-    PredictorRankPolicy,
-    SelectionRule,
-)
-from .exceptions import PredictorRankSupportWarning
-from .metrics import neg_response_standardized_mse
-from .model_selection import (
+from ._model_selection import (
     CVSplit,
     _as_positive_float,
     _materialize_cv_splits,
@@ -51,6 +41,16 @@ from .model_selection import (
     _validate_positive_int,
     _validate_singleton_fold_scoring,
 )
+from ._sklearn_compat import _validate_estimator_data
+from .component_path import (
+    PiPLSComponentPath,
+    PiPLSPredictorRankProfile,
+    PiPLSSelection,
+    PredictorRankPolicy,
+    SelectionRule,
+)
+from .exceptions import PredictorRankSupportWarning
+from .metrics import neg_response_standardized_mse
 from .regression import PiPLSRegression, _clear_fitted_state
 from .validation import PiPLSOOFReport
 
@@ -612,7 +612,6 @@ class PiPLSSearchCV(
             X,
             y,
             selection=compatible,
-            operation_name="oof_report",
         )
         return PiPLSOOFReport(
             selection=compatible,
@@ -653,7 +652,6 @@ class PiPLSSearchCV(
         y: ArrayLike,
         *,
         selection: PiPLSSelection,
-        operation_name: str,
     ) -> tuple[bool, FloatArray, IntArray, float | None]:
         """Compute common ordered OOF report values without mutation."""
 
@@ -674,14 +672,14 @@ class PiPLSSearchCV(
         y_array = np.asarray(y_checked, dtype=np.float64)
         if int(np.shape(X_checked)[0]) != self._n_samples_fit_:
             raise ValueError(
-                f"{operation_name}() requires the same number of samples used "
+                "oof_report() requires the same number of samples used "
                 f"during search.fit(); expected {self._n_samples_fit_}, got "
                 f"{np.shape(X_checked)[0]}."
             )
         n_targets = 1 if y_array.ndim == 1 else int(y_array.shape[1])
         if n_targets != self.n_targets_:
             raise ValueError(
-                f"{operation_name}() requires the same number of response columns "
+                "oof_report() requires the same number of response columns "
                 f"used during search.fit(); expected {self.n_targets_}, got {n_targets}."
             )
 

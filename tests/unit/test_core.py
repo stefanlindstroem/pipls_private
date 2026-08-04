@@ -11,7 +11,7 @@ def _center(array: np.ndarray) -> np.ndarray:
     return array - array.mean(axis=0, keepdims=True)
 
 
-def test_core_shapes_and_prediction_method() -> None:
+def test_core_shapes_and_regression_map() -> None:
     rng = np.random.default_rng(12)
     X = _center(rng.normal(size=(15, 7)))
     Y = _center(rng.normal(size=(15, 4)))
@@ -25,7 +25,14 @@ def test_core_shapes_and_prediction_method() -> None:
     assert result.D.shape == (3, 3)
     assert result.Q.shape == (4, 3)
     assert result.standardized_regression_map.shape == (7, 4)
-    assert_allclose(result.predict(X), X @ result.standardized_regression_map)
+    assert_allclose(
+        result.standardized_regression_map,
+        result.P @ result.D @ result.Q.T,
+    )
+    assert not hasattr(result, "predict")
+    prediction = X @ result.standardized_regression_map
+    assert prediction.shape == Y.shape
+    assert np.all(np.isfinite(prediction))
 
 
 def test_core_rejects_inadmissible_inputs() -> None:
