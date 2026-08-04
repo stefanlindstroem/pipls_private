@@ -5,6 +5,7 @@ from __future__ import annotations
 import warnings
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import replace
+from numbers import Real
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -48,6 +49,7 @@ from .component_path import (
     PiPLSSelection,
     PredictorRankPolicy,
     SelectionRule,
+    _cv_mse_tolerance_threshold,
 )
 from .exceptions import PredictorRankSupportWarning
 from .metrics import neg_response_standardized_mse
@@ -98,19 +100,91 @@ def _selection_at_count(
     return path._selection_at_index(index)
 
 
-def _select_minimum_cv_mse(path: PiPLSComponentPath) -> PiPLSSelection:
-    """Return the first stored path row with minimum mean CV-MSE."""
+_DEFAULT_RELATIVE_CV_MSE_TOLERANCE = float(
+    np.sqrt(np.finfo(np.float64).eps)
+)
 
+
+def _minimum_cv_mse_reference(path: PiPLSComponentPath) -> PiPLSSelection:
+    """Return the first exact minimum-CV-MSE path row without rule provenance."""
+
+    return path._selection_at_index(int(np.argmin(path.cv_mse_mean)))
+
+
+def _validated_relative_tolerance(value: object) -> float:
+    """Return one finite nonnegative relative tolerance."""
+
+    if value is None:
+        return _DEFAULT_RELATIVE_CV_MSE_TOLERANCE
+    if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
+        raise ValueError("relative_tolerance must be a finite nonnegative real number.")
+    converted = float(value)
+    if not np.isfinite(converted) or converted < 0.0:
+        raise ValueError("relative_tolerance must be a finite nonnegative real number.")
+    return converted
+
+
+def _validated_absolute_tolerance(value: object) -> float:
+    """Return one nonnegative absolute tolerance, allowing positive infinity."""
+
+    if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
+        raise ValueError(
+            "absolute_tolerance must be a nonnegative real number or positive infinity."
+        )
+    converted = float(value)
+    if np.isnan(converted) or converted < 0.0:
+        raise ValueError(
+            "absolute_tolerance must be a nonnegative real number or positive infinity."
+        )
+    return converted
+
+
+def _require_default_tolerances(
+    *,
+    relative_tolerance: object,
+    absolute_tolerance: object,
+) -> None:
+    """Reject tolerance arguments outside minimum-CV-MSE selection."""
+
+    if relative_tolerance is not None:
+        raise ValueError(
+            'relative_tolerance is supported only with rule="minimum_cv_mse".'
+        )
+    absolute = _validated_absolute_tolerance(absolute_tolerance)
+    if not np.isposinf(absolute):
+        raise ValueError(
+            'absolute_tolerance is supported only with rule="minimum_cv_mse".'
+        )
+
+
+def _select_minimum_cv_mse(
+    path: PiPLSComponentPath,
+    *,
+    relative_tolerance: float,
+    absolute_tolerance: float,
+) -> PiPLSSelection:
+    """Return the smallest path row within both CV-MSE tolerances."""
+
+    reference = _minimum_cv_mse_reference(path)
+    threshold = _cv_mse_tolerance_threshold(
+        reference.cv_mse_mean,
+        relative_tolerance,
+        absolute_tolerance,
+    )
+    eligible = np.flatnonzero(path.cv_mse_mean <= threshold)
     return replace(
-        path._selection_at_index(int(np.argmin(path.cv_mse_mean))),
+        path._selection_at_index(int(eligible[0])),
         rule="minimum_cv_mse",
+        reference_minimum=reference,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
     )
 
 
 def _select_one_standard_error(path: PiPLSComponentPath) -> PiPLSSelection:
     """Return the smallest stored component count within one standard error."""
 
-    reference = _select_minimum_cv_mse(path)
+    reference = _minimum_cv_mse_reference(path)
     threshold = reference.cv_mse_mean + reference.cv_mse_standard_error
     if not np.isfinite(threshold):
         raise ValueError("The one-standard-error threshold must be finite.")
@@ -436,6 +510,8 @@ class PiPLSSearchCV(
         *,
         rule: SelectionRule | None = None,
         n_components: int | None = None,
+        relative_tolerance: float | None = None,
+        absolute_tolerance: float = np.inf,
     ) -> PiPLSSelection:
         """Return one immutable Pi-PLS selection.
 
@@ -449,11 +525,17 @@ class PiPLSSearchCV(
         rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
             Stored-row selection rule. ``"best_score"`` uses the global
             configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
-            stored mean response-standardized CV-MSE, and
+            stored component count within both supplied CV-MSE tolerances, and
             ``"one_standard_error"`` uses the smallest stored component count
-            within one fold-based standard error of that minimum.
+            within one fold-based standard error of the exact minimum.
         n_components : int, optional
             Evaluated paired-mode count to retrieve manually.
+        relative_tolerance : float or None, default=None
+            Relative CV-MSE tolerance used only with ``rule="minimum_cv_mse"``.
+            ``None`` resolves to ``sqrt(machine epsilon)``.
+        absolute_tolerance : float, default=inf
+            Absolute CV-MSE tolerance used only with ``rule="minimum_cv_mse"``.
+            Positive infinity disables the absolute cap.
 
         Returns
         -------
@@ -478,6 +560,8 @@ class PiPLSSearchCV(
         return self._resolve_selection_result(
             rule=rule,
             n_components=n_components,
+            relative_tolerance=relative_tolerance,
+            absolute_tolerance=absolute_tolerance,
         )
 
     def refit(
@@ -487,6 +571,8 @@ class PiPLSSearchCV(
         *,
         rule: SelectionRule | None = None,
         n_components: int | None = None,
+        relative_tolerance: float | None = None,
+        absolute_tolerance: float = np.inf,
     ) -> Any:
         """Fit and return one selected path model on the supplied full data.
 
@@ -504,11 +590,17 @@ class PiPLSSearchCV(
         rule : {"best_score", "minimum_cv_mse", "one_standard_error"}, optional
             Stored-row selection rule. ``"best_score"`` uses the global
             configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
-            stored mean response-standardized CV-MSE, and
+            stored component count within both supplied CV-MSE tolerances, and
             ``"one_standard_error"`` uses the smallest stored component count
-            within one fold-based standard error of that minimum.
+            within one fold-based standard error of the exact minimum.
         n_components : int, optional
             Evaluated paired-mode count to refit manually.
+        relative_tolerance : float or None, default=None
+            Relative CV-MSE tolerance used only with ``rule="minimum_cv_mse"``.
+            ``None`` resolves to ``sqrt(machine epsilon)``.
+        absolute_tolerance : float, default=inf
+            Absolute CV-MSE tolerance used only with ``rule="minimum_cv_mse"``.
+            Positive infinity disables the absolute cap.
 
         Returns
         -------
@@ -538,6 +630,8 @@ class PiPLSSearchCV(
         selected = self._resolve_selection_result(
             rule=rule,
             n_components=n_components,
+            relative_tolerance=relative_tolerance,
+            absolute_tolerance=absolute_tolerance,
         )
         template = (
             _default_pipls_template() if self.estimator is None else self.estimator
@@ -635,11 +729,22 @@ class PiPLSSearchCV(
             expected = self._resolve_selection_result(
                 rule=None,
                 n_components=selection.n_components,
+                relative_tolerance=None,
+                absolute_tolerance=np.inf,
+            )
+        elif selection.rule == "minimum_cv_mse":
+            expected = self._resolve_selection_result(
+                rule=selection.rule,
+                n_components=None,
+                relative_tolerance=selection.relative_tolerance,
+                absolute_tolerance=selection.absolute_tolerance,
             )
         else:
             expected = self._resolve_selection_result(
                 rule=selection.rule,
                 n_components=None,
+                relative_tolerance=None,
+                absolute_tolerance=np.inf,
             )
         if selection != expected:
             raise ValueError(
@@ -723,6 +828,8 @@ class PiPLSSearchCV(
         *,
         rule: SelectionRule | None,
         n_components: int | None,
+        relative_tolerance: object,
+        absolute_tolerance: object,
     ) -> PiPLSSelection:
         """Resolve one stored component-path row without mutating search state."""
 
@@ -735,11 +842,19 @@ class PiPLSSearchCV(
                 "Exactly one of rule and n_components must be supplied."
             )
         if n_components is not None:
+            _require_default_tolerances(
+                relative_tolerance=relative_tolerance,
+                absolute_tolerance=absolute_tolerance,
+            )
             return _selection_at_count(
                 self.component_path_,
                 n_components,
             )
         if rule == "best_score":
+            _require_default_tolerances(
+                relative_tolerance=relative_tolerance,
+                absolute_tolerance=absolute_tolerance,
+            )
             best_index = _select_best_index(self.cv_results_)
             return replace(
                 _selection_at_count(
@@ -749,8 +864,20 @@ class PiPLSSearchCV(
                 rule="best_score",
             )
         if rule == "minimum_cv_mse":
-            return _select_minimum_cv_mse(self.component_path_)
+            return _select_minimum_cv_mse(
+                self.component_path_,
+                relative_tolerance=_validated_relative_tolerance(
+                    relative_tolerance
+                ),
+                absolute_tolerance=_validated_absolute_tolerance(
+                    absolute_tolerance
+                ),
+            )
         if rule == "one_standard_error":
+            _require_default_tolerances(
+                relative_tolerance=relative_tolerance,
+                absolute_tolerance=absolute_tolerance,
+            )
             return _select_one_standard_error(self.component_path_)
         raise ValueError(
             'rule must be "best_score", "minimum_cv_mse", or '

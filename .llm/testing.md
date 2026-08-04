@@ -94,8 +94,8 @@ surface protects:
 
 - fitted-state enforcement and exactly-one-of validation for `search.select(...)`;
 - parity between `select()` and `refit()` for component counts and all three named rules;
-- exact stored minimum and tie behavior, minimum-row standard-error use, smallest eligible 1-SE
-  component count, and absence of an added floating-point tolerance;
+- exact stored minimum and tie behavior under zero tolerance, plus temporary minimum-row
+  standard-error use and smallest eligible 1-SE component count until Decision 0146 removes them;
 - custom-scorer separation between `"best_score"` and `"minimum_cv_mse"`;
 - immutable returned results and unchanged search state;
 - invalid, unavailable, nonintegral, and insufficient-split failures;
@@ -368,3 +368,12 @@ validation lengths, direct construction, immutability, and pickle stability whil
 temporary derived-SE bridge. Historical decisions and changelog entries may retain historically
 accurate one-standard-error wording; active source, tests, examples, tutorials, API documentation,
 and guide contracts must converge by Patch 7.
+
+## CV-MSE tolerance selection
+
+Decision 0146 Patch 3 protects machine-scale default resolution, explicit zero and finite relative
+tolerance, finite and positive-infinity absolute tolerance, simultaneous-cap semantics, exact
+threshold inclusion, zero minimum MSE, invalid scalar rejection, rule-scope validation, immutable
+reference-minimum provenance, direct construction, pickling, pipeline refitting, OOF compatibility,
+and unchanged search state. Tolerance arguments belong to post-fit `select()` and `refit()` rather
+than estimator constructor parameters.

@@ -62,12 +62,11 @@
   property raises explicitly when fewer than two split values make the estimate undefined.
   Maintained CV-MSE figures use this derived quantity for symmetric $\pm 1$ standard-error bars;
   they do not use the stored split SD as `yerr`.
-- Search-owned component selection uses the immutable stored path values exactly. The
-  `"minimum_cv_mse"` rule returns the first `np.argmin(cv_mse_mean)` row. The
-  `"one_standard_error"` rule uses that row's mean plus that row's derived standard error as its
-  threshold and returns the first ascending path row satisfying `cv_mse_mean <= threshold`. No
-  comparison tolerance or redundant recommendation state is part of this contract; a nonfinite
-  threshold raises explicitly.
+- Search-owned minimum-CV-MSE selection identifies the first exact `np.argmin(cv_mse_mean)` row as
+  an unruled reference, derives simultaneous relative and absolute thresholds, and returns the first
+  ascending path row at or below their minimum. `relative_tolerance=None` resolves to square root of
+  float64 epsilon; positive-infinity absolute tolerance disables the absolute cap. The temporary
+  `"one_standard_error"` rule uses the same exact reference row plus its derived standard error.
 - CV splits are materialized once, validated, copied, and reused for rank preflight and every
   candidate. The samples-per-rank term uses total `n`; the smallest centered training fold supplies
   the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical

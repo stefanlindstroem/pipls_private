@@ -118,6 +118,9 @@ def test_cv_mse_standard_error_is_derived_not_stored_state() -> None:
     ):
         assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
 
+    assert "cv_mse_threshold" not in {
+        field.name for field in fields(PiPLSSelection)
+    }
     assert "one_standard_error_threshold" not in {
         field.name for field in fields(PiPLSSelection)
     }
@@ -151,6 +154,9 @@ def test_selection_validates_and_normalizes_python_scalars() -> None:
     assert type(result.n_splits) is int
     assert result.rule is None
     assert result.reference_minimum is None
+    assert result.relative_tolerance is None
+    assert result.absolute_tolerance is None
+    assert result.cv_mse_threshold is None
     assert result.one_standard_error_threshold is None
     with pytest.raises(FrozenInstanceError):
         result.n_components = 1  # type: ignore[misc]
@@ -192,7 +198,7 @@ def test_selection_rejects_invalid_fields(
         PiPLSSelection(**{**kwargs, field: value})  # type: ignore[arg-type]
 
 
-def test_selection_records_one_standard_error_provenance() -> None:
+def test_selection_records_tolerance_and_one_standard_error_provenance() -> None:
     minimum = PiPLSSelection(
         n_components=3,
         predictor_rank=5,
@@ -201,9 +207,21 @@ def test_selection_records_one_standard_error_provenance() -> None:
         cv_mse_mean=0.40,
         cv_mse_std=0.08,
         n_splits=5,
-        rule="minimum_cv_mse",
     )
-    selection = PiPLSSelection(
+    tolerance_selection = PiPLSSelection(
+        n_components=2,
+        predictor_rank=4,
+        predictor_rank_policy="optimized",
+        mean_test_score=-0.43,
+        cv_mse_mean=0.43,
+        cv_mse_std=0.10,
+        n_splits=5,
+        rule="minimum_cv_mse",
+        reference_minimum=minimum,
+        relative_tolerance=0.10,
+        absolute_tolerance=np.inf,
+    )
+    one_se_selection = PiPLSSelection(
         n_components=2,
         predictor_rank=4,
         predictor_rank_policy="optimized",
@@ -215,14 +233,22 @@ def test_selection_records_one_standard_error_provenance() -> None:
         reference_minimum=minimum,
     )
 
-    assert selection.rule == "one_standard_error"
-    assert selection.reference_minimum is minimum
-    assert selection.one_standard_error_threshold == pytest.approx(0.44)
+    assert tolerance_selection.rule == "minimum_cv_mse"
+    assert tolerance_selection.reference_minimum is minimum
+    assert tolerance_selection.relative_tolerance == pytest.approx(0.10)
+    assert np.isposinf(tolerance_selection.absolute_tolerance)
+    assert tolerance_selection.cv_mse_threshold == pytest.approx(0.44)
+    assert tolerance_selection.one_standard_error_threshold is None
 
-    restored = pickle.loads(pickle.dumps(selection))
-    assert restored == selection
+    assert one_se_selection.rule == "one_standard_error"
+    assert one_se_selection.reference_minimum is minimum
+    assert one_se_selection.cv_mse_threshold is None
+    assert one_se_selection.one_standard_error_threshold == pytest.approx(0.44)
+
+    restored = pickle.loads(pickle.dumps(tolerance_selection))
+    assert restored == tolerance_selection
     assert restored.reference_minimum == minimum
-    assert restored.one_standard_error_threshold == selection.one_standard_error_threshold
+    assert restored.cv_mse_threshold == tolerance_selection.cv_mse_threshold
 
 
 def test_selection_rejects_invalid_selection_provenance() -> None:
@@ -234,7 +260,6 @@ def test_selection_rejects_invalid_selection_provenance() -> None:
         cv_mse_mean=0.40,
         cv_mse_std=0.08,
         n_splits=5,
-        rule="minimum_cv_mse",
     )
     base = {
         "n_components": 2,
@@ -246,8 +271,27 @@ def test_selection_rejects_invalid_selection_provenance() -> None:
         "n_splits": 5,
     }
 
-    with pytest.raises(ValueError, match="required"):
-        PiPLSSelection(**base, rule="one_standard_error")
+    with pytest.raises(ValueError, match="reference_minimum is required"):
+        PiPLSSelection(
+            **base,
+            rule="minimum_cv_mse",
+            relative_tolerance=0.10,
+            absolute_tolerance=np.inf,
+        )
+    with pytest.raises(ValueError, match="required for.*minimum_cv_mse"):
+        PiPLSSelection(
+            **base,
+            rule="minimum_cv_mse",
+            reference_minimum=minimum,
+        )
+    with pytest.raises(ValueError, match="effective CV-MSE threshold"):
+        PiPLSSelection(
+            **{**base, "cv_mse_mean": 0.45},
+            rule="minimum_cv_mse",
+            reference_minimum=minimum,
+            relative_tolerance=0.10,
+            absolute_tolerance=np.inf,
+        )
     with pytest.raises(ValueError, match="defined only"):
         PiPLSSelection(**base, reference_minimum=minimum)
     with pytest.raises(TypeError, match="PiPLSSelection or None"):
@@ -256,18 +300,61 @@ def test_selection_rejects_invalid_selection_provenance() -> None:
             rule="one_standard_error",
             reference_minimum=object(),  # type: ignore[arg-type]
         )
-    with pytest.raises(ValueError, match='rule="minimum_cv_mse"'):
+    with pytest.raises(ValueError, match="unruled path row"):
+        ruled_reference = PiPLSSelection(
+            **base,
+            rule="minimum_cv_mse",
+            reference_minimum=minimum,
+            relative_tolerance=0.10,
+            absolute_tolerance=np.inf,
+        )
         PiPLSSelection(
             **base,
             rule="one_standard_error",
-            reference_minimum=_selection(),
+            reference_minimum=ruled_reference,
         )
-    with pytest.raises(ValueError, match="must not exceed the one-standard-error"):
+    with pytest.raises(ValueError, match="one-standard-error threshold"):
         PiPLSSelection(
             **{**base, "cv_mse_mean": 0.45},
             rule="one_standard_error",
             reference_minimum=minimum,
         )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("relative_tolerance", -0.1, "finite nonnegative"),
+        ("relative_tolerance", np.inf, "finite nonnegative"),
+        ("relative_tolerance", True, "finite nonnegative"),
+        ("absolute_tolerance", -0.1, "nonnegative real"),
+        ("absolute_tolerance", np.nan, "nonnegative real"),
+        ("absolute_tolerance", -np.inf, "nonnegative real"),
+        ("absolute_tolerance", False, "nonnegative real"),
+    ],
+)
+def test_selection_rejects_invalid_tolerance_provenance(
+    field: str,
+    value: object,
+    message: str,
+) -> None:
+    minimum = _selection()
+    kwargs = {
+        "n_components": 2,
+        "predictor_rank": 3,
+        "predictor_rank_policy": "optimized",
+        "mean_test_score": -0.4,
+        "cv_mse_mean": 0.4,
+        "cv_mse_std": 0.1,
+        "n_splits": 5,
+        "rule": "minimum_cv_mse",
+        "reference_minimum": minimum,
+        "relative_tolerance": 0.0,
+        "absolute_tolerance": np.inf,
+    }
+
+    with pytest.raises(ValueError, match=message):
+        PiPLSSelection(**{**kwargs, field: value})  # type: ignore[arg-type]
 
 
 def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> None:

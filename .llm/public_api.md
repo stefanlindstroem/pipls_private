@@ -523,5 +523,6 @@ and removes `rule="one_standard_error"`, `cv_mse_standard_error`, and
 `one_standard_error_threshold`. Maintained plots use mean CV-MSE ± split SD. Tobacco demonstrates a
 10% relative tolerance; absolute tolerance is documented without an example.
 
-Current status: **Patch 1 of 7 complete**. These signatures and removals are the accepted target,
-not yet the implemented API.
+Current status: **Patches 1–3 of 7 complete**. The tolerance arguments and immutable provenance are
+implemented. The one-standard-error rule and derived SE remain temporarily active until maintained
+plots and workflows migrate in Patches 4–7.

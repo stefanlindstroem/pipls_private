@@ -722,7 +722,8 @@ with the minimum row, horizontal 1-SE threshold, recommended row, and direct doc
 cross-links.
 
 Current status: **historical implementation complete and superseded at the public ownership
-boundary by Decision 0140**. The Tobacco demonstration now resolves its minimum and 1-SE rows
+boundary by Decision 0140 and the selection rule by Decision 0146**. The Tobacco demonstration now
+resolves its minimum and 1-SE rows
 through `search.select(...)`; the path object is retained as numerical evidence only.
 
 ### Response-anchored factor display
@@ -1133,4 +1134,4 @@ The default relative tolerance is machine-scale numerical equivalence and the de
 tolerance is positive infinity. Both tolerance conditions must hold. This transition does not add
 an outer-validation API and does not propagate repeated CV to every maintained example.
 
-Current status: **Patches 1–2 of 7 complete**. Patch 3 is the next increment.
+Current status: **Patches 1–3 of 7 complete**. Patch 4 is the next increment.

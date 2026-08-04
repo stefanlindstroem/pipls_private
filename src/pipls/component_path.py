@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from numbers import Real
 from typing import Literal, cast
 
 import numpy as np
@@ -34,6 +35,53 @@ _ALLOWED_SELECTION_RULES = frozenset(
 _ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "maximum"})
 
 
+def _optional_relative_tolerance(value: object) -> float | None:
+    """Validate optional finite nonnegative relative tolerance provenance."""
+
+    if value is None:
+        return None
+    if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
+        raise ValueError("relative_tolerance must be a finite nonnegative real number.")
+    converted = float(value)
+    if not np.isfinite(converted) or converted < 0.0:
+        raise ValueError("relative_tolerance must be a finite nonnegative real number.")
+    return converted
+
+
+def _optional_absolute_tolerance(value: object) -> float | None:
+    """Validate optional nonnegative absolute tolerance provenance."""
+
+    if value is None:
+        return None
+    if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
+        raise ValueError(
+            "absolute_tolerance must be a nonnegative real number or positive infinity."
+        )
+    converted = float(value)
+    if np.isnan(converted) or converted < 0.0:
+        raise ValueError(
+            "absolute_tolerance must be a nonnegative real number or positive infinity."
+        )
+    return converted
+
+
+def _cv_mse_tolerance_threshold(
+    minimum_cv_mse: float,
+    relative_tolerance: float,
+    absolute_tolerance: float,
+) -> float:
+    """Return the simultaneous relative-and-absolute CV-MSE threshold."""
+
+    with np.errstate(over="ignore", invalid="ignore"):
+        relative_threshold = np.float64(minimum_cv_mse) * np.float64(
+            1.0 + relative_tolerance
+        )
+        absolute_threshold = np.float64(minimum_cv_mse) + np.float64(
+            absolute_tolerance
+        )
+    return float(np.minimum(relative_threshold, absolute_threshold))
+
+
 @dataclass(frozen=True)
 class PiPLSSelection:
     """Immutable Pi-PLS selection for one evaluated rank pair.
@@ -61,12 +109,17 @@ class PiPLSSelection:
         Search-owned rule that produced this selection. ``None`` denotes direct
         lookup by component count.
     reference_minimum : PiPLSSelection or None
-        Minimum-CV-MSE selection used to derive a one-standard-error selection.
-        Defined only when ``rule="one_standard_error"``.
+        Exact minimum-CV-MSE path row used to derive a tolerance or temporary
+        one-standard-error selection. The reference row has no rule provenance.
+    relative_tolerance : float or None
+        Resolved nonnegative relative tolerance for ``rule="minimum_cv_mse"``.
+    absolute_tolerance : float or None
+        Resolved nonnegative absolute tolerance for ``rule="minimum_cv_mse"``;
+        positive infinity disables the absolute cap.
+    cv_mse_threshold : float or None
+        Derived effective threshold for ``rule="minimum_cv_mse"``.
     one_standard_error_threshold : float or None
-        Derived minimum-CV-MSE plus its temporary split-based standard error.
-        Defined only
-        when ``rule="one_standard_error"``.
+        Temporary derived one-standard-error threshold.
     """
 
     n_components: int
@@ -78,6 +131,8 @@ class PiPLSSelection:
     n_splits: int
     rule: SelectionRule | None = None
     reference_minimum: PiPLSSelection | None = None
+    relative_tolerance: float | None = None
+    absolute_tolerance: float | None = None
 
     def __post_init__(self) -> None:
         n_components = _positive_int(self.n_components, name="n_components")
@@ -116,21 +171,28 @@ class PiPLSSelection:
             reference_minimum,
             PiPLSSelection,
         ):
-            raise TypeError(
-                "reference_minimum must be a PiPLSSelection or None."
-            )
+            raise TypeError("reference_minimum must be a PiPLSSelection or None.")
+        relative_tolerance = _optional_relative_tolerance(self.relative_tolerance)
+        absolute_tolerance = _optional_absolute_tolerance(self.absolute_tolerance)
 
-        if rule == "one_standard_error":
+        if rule in {"minimum_cv_mse", "one_standard_error"}:
             if reference_minimum is None:
                 raise ValueError(
-                    "reference_minimum is required for one-standard-error selection."
+                    f"reference_minimum is required for {rule!r} selection."
                 )
-            if reference_minimum.rule != "minimum_cv_mse":
-                raise ValueError(
-                    'reference_minimum must use rule="minimum_cv_mse".'
-                )
+            if reference_minimum.rule is not None:
+                raise ValueError("reference_minimum must be an unruled path row.")
             if reference_minimum.reference_minimum is not None:
-                raise ValueError("reference_minimum must not contain nested provenance.")
+                raise ValueError(
+                    "reference_minimum must not contain nested provenance."
+                )
+            if (
+                reference_minimum.relative_tolerance is not None
+                or reference_minimum.absolute_tolerance is not None
+            ):
+                raise ValueError(
+                    "reference_minimum must not contain tolerance provenance."
+                )
             if reference_minimum.predictor_rank_policy != predictor_rank_policy:
                 raise ValueError(
                     "reference_minimum must use the same predictor-rank policy."
@@ -143,20 +205,46 @@ class PiPLSSelection:
                 raise ValueError(
                     "reference_minimum CV-MSE must not exceed the selected CV-MSE."
                 )
-            threshold = (
-                reference_minimum.cv_mse_mean
-                + reference_minimum.cv_mse_standard_error
+
+        if rule == "minimum_cv_mse":
+            if relative_tolerance is None or absolute_tolerance is None:
+                raise ValueError(
+                    "relative_tolerance and absolute_tolerance are required for "
+                    'rule="minimum_cv_mse".'
+                )
+            reference = cast(PiPLSSelection, reference_minimum)
+            threshold = _cv_mse_tolerance_threshold(
+                reference.cv_mse_mean,
+                relative_tolerance,
+                absolute_tolerance,
             )
+            if cv_mse_mean > threshold:
+                raise ValueError(
+                    "Selected CV-MSE must not exceed the effective CV-MSE threshold."
+                )
+        elif rule == "one_standard_error":
+            if relative_tolerance is not None or absolute_tolerance is not None:
+                raise ValueError(
+                    "Tolerance provenance is defined only for minimum-CV-MSE selection."
+                )
+            reference = cast(PiPLSSelection, reference_minimum)
+            threshold = reference.cv_mse_mean + reference.cv_mse_standard_error
             if not np.isfinite(threshold):
                 raise ValueError("The one-standard-error threshold must be finite.")
             if cv_mse_mean > threshold:
                 raise ValueError(
                     "Selected CV-MSE must not exceed the one-standard-error threshold."
                 )
-        elif reference_minimum is not None:
-            raise ValueError(
-                "reference_minimum is defined only for one-standard-error selection."
-            )
+        else:
+            if reference_minimum is not None:
+                raise ValueError(
+                    "reference_minimum is defined only for minimum-CV-MSE or "
+                    "one-standard-error selection."
+                )
+            if relative_tolerance is not None or absolute_tolerance is not None:
+                raise ValueError(
+                    "Tolerance provenance is defined only for minimum-CV-MSE selection."
+                )
 
         object.__setattr__(self, "n_components", n_components)
         object.__setattr__(self, "predictor_rank", predictor_rank)
@@ -167,6 +255,8 @@ class PiPLSSelection:
         object.__setattr__(self, "n_splits", n_splits)
         object.__setattr__(self, "rule", rule)
         object.__setattr__(self, "reference_minimum", reference_minimum)
+        object.__setattr__(self, "relative_tolerance", relative_tolerance)
+        object.__setattr__(self, "absolute_tolerance", absolute_tolerance)
 
     @property
     def cv_mse_standard_error(self) -> float:
@@ -184,8 +274,31 @@ class PiPLSSelection:
         return float(self.cv_mse_std / np.sqrt(self.n_splits - 1))
 
     @property
+    def cv_mse_threshold(self) -> float | None:
+        """Return the effective threshold for minimum-CV-MSE selection."""
+
+        if self.rule != "minimum_cv_mse":
+            return None
+        reference = self.reference_minimum
+        relative_tolerance = self.relative_tolerance
+        absolute_tolerance = self.absolute_tolerance
+        if (
+            reference is None
+            or relative_tolerance is None
+            or absolute_tolerance is None
+        ):  # pragma: no cover - guarded by construction
+            raise RuntimeError(
+                "A minimum-CV-MSE selection requires complete tolerance provenance."
+            )
+        return _cv_mse_tolerance_threshold(
+            reference.cv_mse_mean,
+            relative_tolerance,
+            absolute_tolerance,
+        )
+
+    @property
     def one_standard_error_threshold(self) -> float | None:
-        """Return the exact threshold used by one-standard-error selection."""
+        """Return the temporary threshold used by one-standard-error selection."""
 
         if self.rule != "one_standard_error":
             return None
@@ -211,6 +324,8 @@ class PiPLSSelection:
                 self.n_splits,
                 self.rule,
                 self.reference_minimum,
+                self.relative_tolerance,
+                self.absolute_tolerance,
             ),
         )
 

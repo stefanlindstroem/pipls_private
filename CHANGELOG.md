@@ -4,6 +4,12 @@
 
 ### Repository
 
+- Extend `minimum_cv_mse` selection and refitting with simultaneous relative and absolute CV-MSE
+  tolerances. Resolve the relative default to square root of float64 machine epsilon, disable the
+  absolute cap by default with positive infinity, select the smallest qualifying component count,
+  and retain the exact minimum row, resolved tolerances, and derived threshold in immutable
+  selection provenance. Preserve pipelines, custom scoring, OOF compatibility, pickling, and the
+  temporary one-standard-error bridge.
 - Rename public component-path, predictor-rank-profile, selection, and ordinary-PLS path
   dispersion from `cv_mse_fold_sd` to `cv_mse_std`. Preserve the exact arithmetic mean and
   population standard deviation across all materialized validation splits, immutable result

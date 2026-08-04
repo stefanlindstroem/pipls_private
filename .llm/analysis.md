@@ -541,6 +541,7 @@ positive infinity. Tobacco will demonstrate `relative_tolerance=0.10`; absolute 
 documented but not demonstrated. The complete Pulp workflow and Tutorial 3 will use repeated
 five-fold CV with ten repetitions, while quick and other workflows remain lighter.
 
-Current status: **Patches 1–2 of 7 complete**. The public result layer now exposes
-`cv_mse_std` as the immutable population SD across materialized validation splits. The derived
-`cv_mse_standard_error` remains temporarily available for the still-active 1-SE consumers.
+Current status: **Patches 1–3 of 7 complete**. `minimum_cv_mse` now accepts simultaneous relative
+and absolute tolerances, resolves the machine-scale relative default, selects the smallest row below
+the effective threshold, and retains immutable reference-minimum and tolerance provenance. The
+derived `cv_mse_standard_error` remains temporarily available for still-active 1-SE consumers.

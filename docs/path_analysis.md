@@ -239,17 +239,27 @@ shows the minimum row, horizontal threshold, and recommended row in the componen
 
 ```python
 minimum = search.select(rule="minimum_cv_mse")
+tolerant = search.select(
+    rule="minimum_cv_mse",
+    relative_tolerance=0.02,
+    absolute_tolerance=np.inf,
+)
 one_se = search.select(rule="one_standard_error")
 manual = search.select(n_components=3)
 ```
 
-The minimum rule returns the first stored row attaining the exact minimum mean CV-MSE. Because
-component counts are stored in strictly ascending order, an exact tie returns the smallest tied
-count. Its result records `rule="minimum_cv_mse"`. The 1-SE rule returns the first stored row
-satisfying the threshold above and requires at least two validation splits so that the reference-row
-standard error is defined. Its result records `rule="one_standard_error"`, retains the exact minimum
-result as `reference_minimum`, and derives `one_standard_error_threshold` without storing a second
-threshold value. Direct lookup by component count records no rule provenance.
+For the minimum-CV-MSE rule, let $M_{\min}$ be the exact minimum stored mean CV-MSE. A row qualifies
+only when its mean is no larger than both $(1+\delta_{\mathrm{rel}})M_{\min}$ and
+$M_{\min}+\delta_{\mathrm{abs}}$. The first qualifying row is returned because component counts
+are stored in strictly ascending order. `relative_tolerance=None` resolves to
+`sqrt(np.finfo(np.float64).eps)`, while positive-infinity `absolute_tolerance` disables the absolute
+cap. The result retains the exact unruled minimum row as `reference_minimum`, the resolved
+`tolerances`, and the derived `cv_mse_threshold`.
+
+The temporary 1-SE rule returns the first stored row satisfying the fold-based threshold above and
+requires at least two validation splits. It references the same exact unruled minimum path row and
+derives `one_standard_error_threshold`. Direct lookup by component count records no rule or
+tolerance provenance.
 
 The associated predictor rank is the rank already selected conditionally for that component count
 under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an
@@ -285,14 +295,16 @@ model = search.refit(X, Y, n_components=4)
 Exactly one of `rule` and `n_components` is required. The accepted post-fit rules are:
 
 - `rule="best_score"`, the global optimum under the configured scorer;
-- `rule="minimum_cv_mse"`, the stored component-path row with minimum mean
-  response-standardized CV-MSE;
+- `rule="minimum_cv_mse"`, the smallest stored component-path row satisfying simultaneous relative
+  and absolute tolerances around the exact minimum mean response-standardized CV-MSE;
 - `rule="one_standard_error"`, the smallest stored component count within one fold-based standard
   error of that minimum.
 
 Each rule retains the predictor rank already selected conditionally for the chosen component count.
 With a nondefault scorer, that rank remains conditioned on the scorer even when the component rule
-uses response-standardized CV-MSE. The 1-SE rule requires at least two validation splits.
+uses response-standardized CV-MSE. Relative tolerance must be finite and nonnegative; absolute
+tolerance must be nonnegative and may be positive infinity. Nondefault tolerance arguments apply
+only to `rule="minimum_cv_mse"`. The temporary 1-SE rule requires at least two validation splits.
 
 `refit()` clones the configured direct estimator or pipeline, replaces the terminal Pi-PLS rank
 pair, fits the clone, attaches the exact immutable row as `model.selection_`, and returns the model.

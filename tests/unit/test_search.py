@@ -377,7 +377,14 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     assert minimum.predictor_rank == int(path.predictor_rank[minimum_index])
     assert minimum.cv_mse_mean == path.cv_mse_mean[minimum_index]
     assert minimum.rule == "minimum_cv_mse"
-    assert minimum.reference_minimum is None
+    assert minimum.reference_minimum == search.select(
+        n_components=minimum.reference_minimum.n_components
+    )
+    assert minimum.relative_tolerance == pytest.approx(
+        np.sqrt(np.finfo(np.float64).eps)
+    )
+    assert np.isposinf(minimum.absolute_tolerance)
+    assert minimum.cv_mse_threshold is not None
     assert minimum.one_standard_error_threshold is None
 
     threshold = minimum.cv_mse_mean + minimum.cv_mse_standard_error
@@ -386,7 +393,7 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     assert one_se.n_components == int(path.n_components[eligible_index])
     assert one_se.predictor_rank == int(path.predictor_rank[eligible_index])
     assert one_se.rule == "one_standard_error"
-    assert one_se.reference_minimum == minimum
+    assert one_se.reference_minimum == minimum.reference_minimum
     assert one_se.one_standard_error_threshold == threshold
 
     with pytest.raises(FrozenInstanceError):
@@ -466,6 +473,7 @@ def test_select_minimum_cv_mse_returns_first_exact_stored_tie() -> None:
 
     selected = search.select(rule="minimum_cv_mse")
 
+    reference = path._selection_at_index(1)
     assert selected == PiPLSSelection(
         n_components=2,
         predictor_rank=4,
@@ -475,7 +483,196 @@ def test_select_minimum_cv_mse_returns_first_exact_stored_tie() -> None:
         cv_mse_std=0.08,
         n_splits=5,
         rule="minimum_cv_mse",
+        reference_minimum=reference,
+        relative_tolerance=np.sqrt(np.finfo(np.float64).eps),
+        absolute_tolerance=np.inf,
     )
+
+
+def test_select_minimum_cv_mse_default_resolves_machine_tolerance() -> None:
+    minimum = 0.4
+    default = np.sqrt(np.finfo(np.float64).eps)
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3],
+        predictor_rank=[2, 3, 4],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-(minimum * (1.0 + 0.5 * default)), -0.5, -minimum],
+        cv_mse_mean=[minimum * (1.0 + 0.5 * default), 0.5, minimum],
+        cv_mse_std=[0.1, 0.1, 0.1],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(rule="minimum_cv_mse")
+
+    assert selected.n_components == 1
+    assert selected.reference_minimum == path._selection_at_index(2)
+    assert selected.relative_tolerance == pytest.approx(default)
+    assert np.isposinf(selected.absolute_tolerance)
+    assert selected.cv_mse_threshold == pytest.approx(minimum * (1.0 + default))
+
+
+def test_select_minimum_cv_mse_zero_tolerances_select_exact_minimum() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3],
+        predictor_rank=[2, 3, 4],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-0.41, -0.40, -0.42],
+        cv_mse_mean=[0.41, 0.40, 0.42],
+        cv_mse_std=[0.1, 0.1, 0.1],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(
+        rule="minimum_cv_mse",
+        relative_tolerance=0.0,
+        absolute_tolerance=0.0,
+    )
+
+    assert selected.n_components == 2
+    assert selected.reference_minimum == path._selection_at_index(1)
+    assert selected.cv_mse_threshold == pytest.approx(0.40)
+
+
+def test_select_minimum_cv_mse_requires_both_tolerances() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3],
+        predictor_rank=[2, 3, 4],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-1.05, -1.02, -1.00],
+        cv_mse_mean=[1.05, 1.02, 1.00],
+        cv_mse_std=[0.1, 0.1, 0.1],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
+        absolute_tolerance=0.02,
+    )
+
+    assert selected.n_components == 2
+    assert selected.cv_mse_threshold == pytest.approx(1.02)
+    assert selected.relative_tolerance == pytest.approx(0.10)
+    assert selected.absolute_tolerance == pytest.approx(0.02)
+
+
+def test_select_minimum_cv_mse_includes_exact_threshold_only() -> None:
+    minimum = 0.4
+    threshold = minimum * 1.10
+    path = PiPLSComponentPath(
+        n_components=[1, 2, 3],
+        predictor_rank=[2, 3, 4],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-np.nextafter(threshold, np.inf), -threshold, -minimum],
+        cv_mse_mean=[np.nextafter(threshold, np.inf), threshold, minimum],
+        cv_mse_std=[0.1, 0.1, 0.1],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
+    )
+
+    assert selected.n_components == 2
+    assert selected.cv_mse_threshold == pytest.approx(threshold)
+
+
+def test_select_minimum_cv_mse_zero_minimum_disables_relative_allowance() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2],
+        predictor_rank=[2, 3],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-1e-12, 0.0],
+        cv_mse_mean=[1e-12, 0.0],
+        cv_mse_std=[0.0, 0.0],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    selected = search.select(
+        rule="minimum_cv_mse",
+        relative_tolerance=1.0,
+        absolute_tolerance=1.0,
+    )
+
+    assert selected.n_components == 2
+    assert selected.cv_mse_threshold == 0.0
+
+
+@pytest.mark.parametrize(
+    ("name", "value", "message"),
+    [
+        ("relative_tolerance", -0.1, "finite nonnegative"),
+        ("relative_tolerance", np.inf, "finite nonnegative"),
+        ("relative_tolerance", np.nan, "finite nonnegative"),
+        ("relative_tolerance", True, "finite nonnegative"),
+        ("absolute_tolerance", -0.1, "nonnegative real"),
+        ("absolute_tolerance", np.nan, "nonnegative real"),
+        ("absolute_tolerance", -np.inf, "nonnegative real"),
+        ("absolute_tolerance", False, "nonnegative real"),
+    ],
+)
+def test_select_minimum_cv_mse_rejects_invalid_tolerances(
+    name: str,
+    value: object,
+    message: str,
+) -> None:
+    path = PiPLSComponentPath(
+        n_components=[1],
+        predictor_rank=[1],
+        predictor_rank_policy="fixed",
+        mean_test_score=[-0.4],
+        cv_mse_mean=[0.4],
+        cv_mse_std=[0.1],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+    kwargs = {name: value}
+
+    with pytest.raises(ValueError, match=message):
+        search.select(rule="minimum_cv_mse", **kwargs)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("rule", ["best_score", "one_standard_error"])
+def test_nonminimum_rules_reject_tolerance_arguments(rule: str) -> None:
+    path = PiPLSComponentPath(
+        n_components=[1, 2],
+        predictor_rank=[2, 3],
+        predictor_rank_policy="optimized",
+        mean_test_score=[-0.5, -0.4],
+        cv_mse_mean=[0.5, 0.4],
+        cv_mse_std=[0.1, 0.1],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    with pytest.raises(ValueError, match="supported only"):
+        search.select(rule=rule, relative_tolerance=0.1)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="supported only"):
+        search.select(rule=rule, absolute_tolerance=0.1)  # type: ignore[arg-type]
+
+
+def test_manual_selection_rejects_tolerance_arguments() -> None:
+    path = PiPLSComponentPath(
+        n_components=[1],
+        predictor_rank=[1],
+        predictor_rank_policy="fixed",
+        mean_test_score=[-0.4],
+        cv_mse_mean=[0.4],
+        cv_mse_std=[0.1],
+        n_splits=5,
+    )
+    search = _search_with_component_path(path)
+
+    with pytest.raises(ValueError, match="supported only"):
+        search.select(n_components=1, relative_tolerance=0.1)
+    with pytest.raises(ValueError, match="supported only"):
+        search.select(n_components=1, absolute_tolerance=0.1)
 
 
 def test_select_one_standard_error_uses_the_minimum_rows_standard_error() -> None:
@@ -495,7 +692,9 @@ def test_select_one_standard_error_uses_the_minimum_rows_standard_error() -> Non
     assert selected.n_components == 3
     assert selected.predictor_rank == 5
     assert selected.rule == "one_standard_error"
-    assert selected.reference_minimum == search.select(rule="minimum_cv_mse")
+    assert selected.reference_minimum == search.select(
+        rule="minimum_cv_mse"
+    ).reference_minimum
     assert selected.one_standard_error_threshold == pytest.approx(0.44)
 
 
@@ -515,7 +714,9 @@ def test_select_one_standard_error_returns_smallest_eligible_count() -> None:
 
     assert selected.n_components == 2
     assert selected.predictor_rank == 3
-    assert selected.reference_minimum == search.select(rule="minimum_cv_mse")
+    assert selected.reference_minimum == search.select(
+        rule="minimum_cv_mse"
+    ).reference_minimum
 
 
 def test_select_one_standard_error_uses_no_extra_tolerance() -> None:
@@ -693,7 +894,7 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
     assert report.selection.rule == "one_standard_error"
     assert report.selection.reference_minimum == search.select(
         rule="minimum_cv_mse"
-    )
+    ).reference_minimum
     assert report.selection.one_standard_error_threshold is not None
     assert model.n_components == expected.n_components
     assert model.predictor_rank == expected.predictor_rank
@@ -701,6 +902,80 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
     assert model.selection_ == report.selection
     for name in ("selected_params_", "oof_report_"):
         assert not hasattr(search, name)
+
+
+def test_refit_and_oof_report_preserve_custom_tolerance_provenance() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    before = pickle.dumps(search)
+    expected = search.select(
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
+        absolute_tolerance=0.05,
+    )
+    model = search.refit(
+        X,
+        Y,
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
+        absolute_tolerance=0.05,
+    )
+    report = search.oof_report(X, Y, selection=model.selection_)
+
+    assert model.selection_ == expected
+    assert report.selection == expected
+    assert report.selection.relative_tolerance == pytest.approx(0.10)
+    assert report.selection.absolute_tolerance == pytest.approx(0.05)
+    restored = pickle.loads(pickle.dumps(model))
+    assert restored.selection_ == expected
+    assert pickle.dumps(search) == before
+
+
+def test_oof_report_rejects_changed_tolerance_provenance() -> None:
+    X, Y = _one_standard_error_data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+    selected = search.select(
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
+    )
+    false_reference = PiPLSSelection(
+        n_components=selected.n_components,
+        predictor_rank=selected.predictor_rank,
+        predictor_rank_policy=selected.predictor_rank_policy,
+        mean_test_score=selected.mean_test_score,
+        cv_mse_mean=selected.cv_mse_mean,
+        cv_mse_std=selected.cv_mse_std,
+        n_splits=selected.n_splits,
+    )
+    incompatible = PiPLSSelection(
+        n_components=selected.n_components,
+        predictor_rank=selected.predictor_rank,
+        predictor_rank_policy=selected.predictor_rank_policy,
+        mean_test_score=selected.mean_test_score,
+        cv_mse_mean=selected.cv_mse_mean,
+        cv_mse_std=selected.cv_mse_std,
+        n_splits=selected.n_splits,
+        rule="minimum_cv_mse",
+        reference_minimum=false_reference,
+        relative_tolerance=0.10,
+        absolute_tolerance=np.inf,
+    )
+
+    with pytest.raises(ValueError, match="not compatible"):
+        search.oof_report(X, Y, selection=incompatible)
 
 
 def test_post_fit_refit_requires_exactly_one_selection_input() -> None:
@@ -775,7 +1050,7 @@ def test_refitted_model_selection_is_pickle_stable_and_not_cloned() -> None:
     assert restored.selection_ == model.selection_
     assert restored.selection_.reference_minimum == search.select(
         rule="minimum_cv_mse"
-    )
+    ).reference_minimum
     assert not hasattr(cloned, "selection_")
 
 
@@ -1397,7 +1672,7 @@ def test_oof_report_uses_existing_model_selection() -> None:
     assert report.selection.rule == "one_standard_error"
     assert report.selection.reference_minimum == search.select(
         rule="minimum_cv_mse"
-    )
+    ).reference_minimum
     assert report.selection.one_standard_error_threshold is not None
     assert pickle.dumps(search) == before
 

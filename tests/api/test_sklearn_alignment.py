@@ -77,6 +77,22 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     assert callable(cloned.oof_report)
 
 
+def test_selection_method_signatures_expose_tolerances_only_post_fit() -> None:
+    for method in (PiPLSSearchCV.select, PiPLSSearchCV.refit):
+        signature = inspect.signature(method)
+        assert signature.parameters["relative_tolerance"].default is None
+        assert np.isposinf(signature.parameters["absolute_tolerance"].default)
+        assert signature.parameters["relative_tolerance"].kind is (
+            inspect.Parameter.KEYWORD_ONLY
+        )
+        assert signature.parameters["absolute_tolerance"].kind is (
+            inspect.Parameter.KEYWORD_ONLY
+        )
+
+    assert "relative_tolerance" not in PiPLSSearchCV().get_params(deep=False)
+    assert "absolute_tolerance" not in PiPLSSearchCV().get_params(deep=False)
+
+
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
     signature = inspect.signature(PiPLSRegression)
     for name in ("n_components", "predictor_rank"):
@@ -307,6 +323,45 @@ def test_refit_returns_pipeline_without_flattening_coefficients() -> None:
     assert not hasattr(search, "selected_estimator_")
 
 
+def test_minimum_cv_mse_tolerance_refit_preserves_pipeline_composition() -> None:
+    X, Y = _data()
+    pipeline = Pipeline(
+        [
+            ("scale", StandardScaler()),
+            ("regression", _fixed_estimator()),
+        ]
+    )
+    search = PiPLSSearchCV(
+        estimator=pipeline,
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[1, 2, 3, 4],
+        search_method="optimal",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+    expected = search.select(
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
+        absolute_tolerance=0.05,
+    )
+
+    model = search.refit(
+        X,
+        Y,
+        rule="minimum_cv_mse",
+        relative_tolerance=0.10,
+        absolute_tolerance=0.05,
+    )
+
+    assert isinstance(model, Pipeline)
+    selected_pipls = model.named_steps["regression"]
+    assert selected_pipls.n_components == expected.n_components
+    assert selected_pipls.predictor_rank == expected.predictor_rank
+    assert model.selection_ == expected
+    assert model.selection_.reference_minimum == expected.reference_minimum
+    assert model.selection_.cv_mse_threshold == expected.cv_mse_threshold
+
+
 def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
     X, Y = _data()
     pipeline = Pipeline(
@@ -333,7 +388,7 @@ def test_one_standard_error_refit_preserves_pipeline_composition() -> None:
     assert model.selection_ == expected
     assert model.selection_.reference_minimum == search.select(
         rule="minimum_cv_mse"
-    )
+    ).reference_minimum
     assert model.predict(X).shape == Y.shape
 
 
