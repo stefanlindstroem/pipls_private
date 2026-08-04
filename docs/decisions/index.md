@@ -4,6 +4,9 @@ The decision records document accepted repository contracts for maintainers. The
 engineering records, not prerequisites for using Pi-PLS. The user guides and generated API
 reference describe the current public behavior directly.
 
+Decision 0147 establishes a current-decision lifecycle with compact historical summaries and Git
+recovery for retired intermediate records. No existing decision is removed in Patch 1.
+
 ## Numerical method and estimator API
 
 - [0001: core definition](0001-core-definition.md)
@@ -165,3 +168,5 @@ reference describe the current public behavior directly.
 - [0144: pre-release public-surface cleanup](0144-pre-release-public-surface-cleanup.md)
 - [0145: final implementation-surface cleanup](0145-final-implementation-surface-cleanup.md)
 - [0146: CV-MSE tolerance selection and split-SD reporting](0146-cv-mse-tolerance-selection.md)
+- [0147: decision lifecycle and maintainer-context consolidation]
+  (0147-decision-lifecycle-and-maintainer-context.md)

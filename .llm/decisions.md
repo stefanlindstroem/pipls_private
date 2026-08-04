@@ -152,6 +152,7 @@ This index is navigation, not a substitute for those records.
 | `0144-pre-release-public-surface-cleanup.md` | pre-release public-surface cleanup | remove duplicated result access, search aliases, candidate parameter representations, dataset aliases, shape-only properties, and top-level result re-exports while retaining distinct selection, inspection, OOF, and plotting roles |
 | `0145-final-implementation-surface-cleanup.md` | final implementation-surface cleanup | remove residual duplicate fitted attributes, privatize model-selection internals, remove unused private helpers, declare remaining module exports, and state fitting-free selection positively |
 | `0146-cv-mse-tolerance-selection.md` | CV-MSE tolerance selection and split-SD reporting | replace the 1-SE heuristic with dual-tolerance minimum-CV-MSE selection, descriptive split SD, a 10% Tobacco demonstration, and repeated Pulp validation |
+| `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, compact historical summaries, and retired records; compact `.llm`, curate the decision set, simplify brittle tests, harden snapshots, and split dataset internals without changing public behavior |
 
 ## Implemented estimator/search transition
 
@@ -299,4 +300,7 @@ plan contains an earlier or more general proposal:
   private functions within the same numbered script, while Pulp remains sequential;
 
 When a new accepted architectural or public-API decision is added, create a numbered decision
-record and add it to this index in the same patch.
+record and add it to this registry in the same patch. Decision 0147 governs later classification:
+current numbered records remain indexed, completed eras may be summarized in
+`docs/decisions/history.md`, retired numbers are never reused, and Git is the authoritative archive
+for deleted intermediate records. No existing decision is retired in Decision 0147 Patch 1.

@@ -628,10 +628,21 @@ use ten repeated five-fold partitions, materialize 50 splits, and average ten OO
 observation. The active API contains only best-score and tolerance-based minimum-CV-MSE selection,
 and no standard-error result surface remains.
 
+## Decision lifecycle and maintainer-context consolidation
+
+Decision 0147 authorizes seven patches that classify maintained decision material, compact the
+active `.llm` layer, retire superseded and one-off records through an explicit map, add a compact
+historical summary, simplify brittle repository tests, harden snapshots against tracked generated
+artifacts, split `datasets.py` internally, and finish with link and stale-surface audits.
+
+Current status: **Patch 1 of 7 complete**. No numbered decision has been removed and no executable
+behavior has changed. Patch 2 compacts and corrects the active `.llm` layer before retirement
+begins.
+
 ## Current next increment
 
-Decision 0146 is complete. Decision 0139 Patch 3 remains an independent paused presentation
-increment.
+Decision 0147 Patch 2: compact and correct the active `.llm` layer around the implemented package.
+Decision 0139 Patch 3 remains an independent paused presentation increment.
 
 ## Authority and drift handling
 

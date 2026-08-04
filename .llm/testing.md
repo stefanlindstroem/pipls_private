@@ -388,3 +388,24 @@ threshold inclusion, zero minimum MSE, invalid scalar rejection, rule-scope vali
 reference-minimum provenance, direct construction, pickling, pipeline refitting, OOF compatibility,
 and unchanged search state. Tolerance arguments belong to post-fit `select()` and `refit()` rather
 than estimator constructor parameters.
+
+## Decision lifecycle and maintainer-context consolidation
+
+Decision 0147 requires generic lifecycle tests rather than a hard-coded historical inventory:
+
+- every shipped numbered decision appears in `docs/decisions/index.md` and `.llm/decisions.md`;
+- every indexed current decision and historical-summary link resolves;
+- deleted decision numbers are never reused;
+- each decision-retirement patch supplies a complete reviewed map for its deleted records;
+- active `.llm`, tests, and retained decisions contain no broken links to retired files;
+- no test pins the final number of retained decisions or requires every historical intermediate
+  record to remain in the working tree;
+- `docs/decisions/history.md` summarizes durable outcomes and canonical records rather than copying
+  retired Markdown files;
+- snapshot tests reject tracked caches, bytecode, coverage output, built documentation, and other
+  generated artifacts while continuing to omit untracked ignored caches; and
+- the internal dataset split preserves public imports, exact resources, deterministic generators,
+  pickling, and distribution contents.
+
+Patch 1 changes documentation and guide-layer phase state only. It adds no retirement, history file,
+test relaxation, snapshot behavior, or source refactoring ahead of the later patches.

@@ -1078,9 +1078,28 @@ or deprecation layer is authorized at version `0.0.0`.
 Current status: **all four patches complete**. Decision 0145 is implemented without compatibility
 aliases.
 
+## Decision lifecycle and maintainer-context consolidation
+
+Decision 0147 authorizes seven reviewable patches:
+
+1. establish the decision and guide-layer phase state -- complete;
+2. compact and correct current `.llm` contracts;
+3. retire explicitly superseded decisions through a reviewed map;
+4. add a compact historical summary and consolidate completed micro-decisions;
+5. simplify brittle repository and workflow-structure tests and harden snapshot creation;
+6. split `datasets.py` behind its unchanged public façade;
+7. normalize links and indexes, run final audits, and close the transition.
+
+The target is a current-focused decision registry and active maintainer layer, not deletion for its
+own sake. Age is not a retirement criterion. Git preserves removed intermediate records, and no
+copied archive is added to the tree.
+
+Current status: **Patch 1 of 7 complete**. Patch 2 is the next increment.
+
 ## Current next increment
 
-Decision 0139 Patch 3 remains paused as an independent documentation increment.
+Decision 0147 Patch 2 compacts and corrects the active `.llm` layer. Decision 0139 Patch 3 remains
+paused as an independent documentation increment.
 
 ## Maintenance protocol
 

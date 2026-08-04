@@ -545,3 +545,14 @@ five-fold CV with ten repetitions, while quick and other workflows remain lighte
 Current status: **all seven patches complete**. The complete Pulp workflow materializes 50
 repeated-CV splits and averages ten OOF predictions per observation. The active result and selection
 surface contains no standard-error quantity or SE-based selection rule.
+
+## Decision lifecycle and maintainer-context consolidation
+
+Decision 0147 distinguishes current numbered decisions, compact historical summaries, and retired
+intermediate records recoverable from Git. Retirement depends on present relevance rather than age:
+foundational numerical, scientific, data, API, distribution, and repository policies remain while
+they still constrain the package. Superseded APIs, patch-only migration records, duplicated
+canonical decisions, and one-time cleanups may be retired only through an explicit retirement map.
+
+Patch 1 changes no implementation and removes no records. Patch 2 first compacts and corrects the
+active `.llm` layer so later retirement decisions are evaluated against an accurate current state.
