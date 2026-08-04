@@ -344,3 +344,24 @@ patches, focused tests must protect:
 
 All four patches are complete. Continue using positive behavioral tests and compact active-surface
 audits rather than preserving removed names as broad compatibility fixtures.
+
+## CV-MSE tolerance and split-SD transition
+
+Decision 0146 requires focused tests across seven patches for:
+
+- exact arithmetic means and population SDs across all materialized split losses, including
+  repeated CV and one-split protocols;
+- `cv_mse_std` construction, immutability, direct validation, and pickle stability;
+- machine-scale relative-default resolution, positive-infinity absolute default, finite dual-cap
+  semantics, exact boundary inclusion, zero minimum MSE, and invalid tolerance rejection;
+- selection provenance through relative tolerance, absolute tolerance, reference minimum, and
+  derived effective threshold;
+- unchanged custom-score, pipeline, OOF compatibility, search non-mutation, and refit behavior;
+- maintained CV-MSE figures using SD rather than SE and describing it as variability across splits;
+- Tobacco selecting the first path row within a 10% relative tolerance of the exact minimum;
+- Pulp materializing 50 repeated five-fold splits and averaging ten OOF predictions per sample; and
+- final absence of the active one-standard-error and standard-error selection surface.
+
+Patch 1 changes no executable contract. Historical decisions and changelog entries may retain
+historically accurate one-standard-error wording; active source, tests, examples, tutorials, API
+documentation, and guide contracts must converge by Patch 7.

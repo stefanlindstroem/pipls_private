@@ -84,3 +84,29 @@
 - Randomized SVD requires a nonnegative integer seed. With randomized truncated SVD, `x_rank` is
   a verified retained-rank lower bound rather than the complete numerical rank; diagnostics must
   expose this distinction.
+
+## Accepted CV-MSE tolerance transition target
+
+Decision 0146 replaces the current fold-SE selection contract through a staged migration. The final
+contract gives every materialized validation split equal weight:
+
+```python
+cv_mse_mean = np.mean(split_cv_mse)
+cv_mse_std = np.std(split_cv_mse, ddof=0)
+```
+
+For path minimum `minimum`, resolved relative tolerance `rtol`, and resolved absolute tolerance
+`atol`, the effective threshold is:
+
+```python
+min((1.0 + rtol) * minimum, minimum + atol)
+```
+
+The first ascending component-path row at or below that threshold is selected. The default relative
+tolerance resolves to `sqrt(np.finfo(np.float64).eps)` and the default absolute tolerance is
+positive infinity. Relative tolerance is finite and nonnegative; absolute tolerance is nonnegative
+and may be positive infinity. Both restrictions apply simultaneously.
+
+`cv_mse_std` is descriptive split variability and is not divided by a split count. Maintained plots
+will use it directly for symmetric error bars. Until Patches 2–7 are applied, the preceding
+fold-SD/derived-SE and one-standard-error paragraphs describe the current implementation.

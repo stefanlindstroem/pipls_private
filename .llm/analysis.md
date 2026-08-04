@@ -525,3 +525,21 @@ numerical inspection functions, OOF reporting, and caller-owned plotting. All fo
 complete: the contract is established, redundant fitted attributes are removed, model-selection
 algorithms live in `_model_selection.py`, unused private helper layers are gone, remaining public
 modules declare exact exports, and tutorial wording states selection ownership positively.
+
+## Accepted CV-MSE tolerance and split-SD transition
+
+Decision 0146 replaces one-standard-error component selection with minimum-CV-MSE selection plus
+explicit relative and absolute tolerances. For each component-path row, every materialized
+validation split contributes equally to `cv_mse_mean`; `cv_mse_std` is the population SD across the
+same split losses and is descriptive only. Maintained figures will show mean CV-MSE ± SD across
+validation splits.
+
+A row qualifies only when its mean is below both the relative and absolute thresholds. The first
+qualifying component count is selected, retaining the path-owned predictor rank. The default
+relative tolerance resolves to `sqrt(float64 epsilon)` and the default absolute tolerance is
+positive infinity. Tobacco will demonstrate `relative_tolerance=0.10`; absolute tolerance is
+documented but not demonstrated. The complete Pulp workflow and Tutorial 3 will use repeated
+five-fold CV with ten repetitions, while quick and other workflows remain lighter.
+
+Current status: **Patch 1 of 7 complete**. This section records the accepted target only; current
+source still exposes the one-standard-error and fold-SE surface until the migration patches land.

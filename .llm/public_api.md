@@ -492,3 +492,36 @@ materialized CV splits. The minimum training-fold size remains implementation-lo
 of `pipls.regression`, `pipls.search`, and `pipls.exceptions`, respectively. `search.select()`
 remains public for selection without fitting; after `refit()`, use `model.selection_`. Decision 0145
 is fully implemented without compatibility aliases.
+
+## Accepted CV-MSE tolerance-selection transition
+
+Decision 0146 retains `rule="minimum_cv_mse"` and extends it with:
+
+```python
+search.select(
+    rule="minimum_cv_mse",
+    relative_tolerance=None,
+    absolute_tolerance=np.inf,
+)
+
+search.refit(
+    X,
+    Y,
+    rule="minimum_cv_mse",
+    relative_tolerance=None,
+    absolute_tolerance=np.inf,
+)
+```
+
+The relative default resolves to `sqrt(np.finfo(np.float64).eps)`; the absolute default disables
+the absolute cap. Both tolerance conditions must hold, and the smallest qualifying component count
+is selected. Tolerance-based selections retain resolved relative and absolute tolerances, the exact
+reference minimum, and a derived CV-MSE threshold.
+
+The final result surface uses `cv_mse_std` for population SD across materialized validation splits
+and removes `rule="one_standard_error"`, `cv_mse_standard_error`, and
+`one_standard_error_threshold`. Maintained plots use mean CV-MSE ± split SD. Tobacco demonstrates a
+10% relative tolerance; absolute tolerance is documented without an example.
+
+Current status: **Patch 1 of 7 complete**. These signatures and removals are the accepted target,
+not yet the implemented API.

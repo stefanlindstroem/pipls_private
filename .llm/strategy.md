@@ -1115,3 +1115,22 @@ under Decision 0087: scorer state is private, exact weight aliases are removed, 
 execution-history, selected report state, or flat OOF duplicates. Decision 0088 completes API3 by
 removing display-sign bookkeeping and redundant synthetic zero blocks and by suppressing constructor
 signatures for returned immutable records.
+
+### CV-MSE tolerance and split-SD transition
+
+Decision 0146 authorizes seven reviewable patches:
+
+1. establish the decision and guide-layer contract — complete;
+2. rename `cv_mse_fold_sd` to `cv_mse_std` and lock equal-split mean/population-SD numerics while
+   retaining temporary SE compatibility internally;
+3. add relative and absolute tolerance selection with complete immutable provenance;
+4. replace maintained SE error bars and language with SD across validation splits;
+5. migrate automatic workflows to minimum-CV-MSE tolerance selection, including Tobacco at 10%;
+6. give the complete Pulp workflow and Tutorial 3 ten repetitions of five-fold CV;
+7. remove the one-standard-error surface and complete active-surface audits.
+
+The default relative tolerance is machine-scale numerical equivalence and the default absolute
+tolerance is positive infinity. Both tolerance conditions must hold. This transition does not add
+an outer-validation API and does not propagate repeated CV to every maintained example.
+
+Current status: **Patch 1 of 7 complete**. Patch 2 is the next increment.

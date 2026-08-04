@@ -613,10 +613,25 @@ fitted attributes are removed; model-selection algorithms are private; unused pr
 are gone; remaining public modules declare exact exports; and tutorial wording states selection
 ownership positively.
 
+## CV-MSE tolerance and split-SD transition
+
+Decision 0146 authorizes seven patches that replace one-standard-error selection with
+minimum-CV-MSE selection under simultaneous relative and absolute tolerances, rename split
+dispersion to `cv_mse_std`, use descriptive SD error bars, demonstrate a 10% relative tolerance in
+Tobacco, and introduce ten repeated five-fold partitions in the complete Pulp workflow and Tutorial
+3. The transition does not add outer validation or demonstrate absolute tolerance in a maintained
+example.
+
+Current status: **Patch 1 of 7 complete**. The decision and guide-layer target are established. The
+current executable API still contains the one-standard-error and fold-SE surface until later
+patches migrate and remove it.
+
 ## Current next increment
 
-Decision 0145 is complete. Decision 0139 Patch 3 remains an independent paused presentation
-increment. Block-aware scaling and other unrelated work still require separate owner decisions.
+Implement Decision 0146 Patch 2: rename `cv_mse_fold_sd` to `cv_mse_std`, lock equal-split mean and
+population-SD numerics, and retain only the temporary derived-SE bridge required to keep current
+consumers operational during migration. Decision 0139 Patch 3 remains an independent paused
+presentation increment.
 
 ## Authority and drift handling
 

@@ -164,3 +164,4 @@ reference describe the current public behavior directly.
 - [0128: same-file rendering functions](0128-same-file-rendering-functions.md)
 - [0144: pre-release public-surface cleanup](0144-pre-release-public-surface-cleanup.md)
 - [0145: final implementation-surface cleanup](0145-final-implementation-surface-cleanup.md)
+- [0146: CV-MSE tolerance selection and split-SD reporting](0146-cv-mse-tolerance-selection.md)
