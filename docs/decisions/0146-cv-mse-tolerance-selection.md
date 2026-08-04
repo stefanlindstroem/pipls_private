@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted; implementation in progress. Patch 1 of 7 establishes this decision and the guide-layer
-contract. The executable API remains unchanged until the later patches are applied.
+Accepted; implementation in progress. Patches 1–4 of 7 are complete. Maintained CV-MSE figures
+now use population SD across materialized validation splits, while the temporary derived SE remains
+only for the still-active one-standard-error rule until Patch 7.
 
 ## Context
 
@@ -217,7 +218,7 @@ search-select-refit procedure remains a separate future design problem.
    temporarily retaining derived SE support as a migration bridge — complete.
 3. Add relative and absolute tolerance arguments, validation, threshold selection, and immutable
    selection provenance — complete.
-4. Replace maintained SE error bars and wording with SD across validation splits.
+4. Replace maintained SE error bars and wording with SD across validation splits — complete.
 5. Migrate maintained automatic workflows to `minimum_cv_mse`; use `relative_tolerance=0.10` in
    Tobacco and machine-scale defaults elsewhere.
 6. Use repeated five-fold CV with ten repetitions in the Pulp example, renderer, Tutorial 3, and

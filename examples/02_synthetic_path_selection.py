@@ -63,7 +63,7 @@ figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
 axis.errorbar(
     path.n_components,
     path.cv_mse_mean,
-    yerr=path.cv_mse_standard_error,
+    yerr=path.cv_mse_std,
     fmt="o-",
     capsize=4,
 )
@@ -76,10 +76,10 @@ axis.scatter(
     zorder=3,
 )
 axis.set_xlabel("Number of components")
-axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
 axis.set_title(r"Synthetic $\Pi$-PLS component path")
 axis.set_xticks(path.n_components)
-upper = float(np.max(path.cv_mse_mean + path.cv_mse_standard_error))
+upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
 axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)
 axis.legend()
@@ -92,7 +92,7 @@ figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
 axis.errorbar(
     rank_profile.predictor_rank,
     rank_profile.cv_mse_mean,
-    yerr=rank_profile.cv_mse_standard_error,
+    yerr=rank_profile.cv_mse_std,
     fmt="o-",
     capsize=4,
 )
@@ -105,14 +105,14 @@ axis.scatter(
     zorder=3,
 )
 axis.set_xlabel("Predictor rank")
-axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
 axis.set_title(
     rf"Synthetic $\Pi$-PLS predictor-rank profile at "
     f"{selection.n_components} components"
 )
 axis.set_xticks(rank_profile.predictor_rank)
 upper = float(
-    np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_standard_error)
+    np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_std)
 )
 axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)

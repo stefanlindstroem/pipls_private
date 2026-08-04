@@ -92,7 +92,7 @@ def _render_component_path(
     axis.errorbar(
         component_path.n_components,
         component_path.cv_mse_mean,
-        yerr=component_path.cv_mse_standard_error,
+        yerr=component_path.cv_mse_std,
         fmt="o-",
         capsize=4,
     )
@@ -106,10 +106,10 @@ def _render_component_path(
     )
     axis.set_title(r"Pulp $\Pi$-PLS component path")
     axis.set_xlabel("Number of components")
-    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_xticks(component_path.n_components)
     upper = float(
-        np.max(component_path.cv_mse_mean + component_path.cv_mse_standard_error)
+        np.max(component_path.cv_mse_mean + component_path.cv_mse_std)
     )
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
@@ -126,7 +126,7 @@ def _render_predictor_rank_profile(
     axis.errorbar(
         profile.predictor_rank,
         profile.cv_mse_mean,
-        yerr=profile.cv_mse_standard_error,
+        yerr=profile.cv_mse_std,
         fmt="o-",
         capsize=4,
     )
@@ -143,9 +143,9 @@ def _render_predictor_rank_profile(
         f"{profile.n_components} components"
     )
     axis.set_xlabel("Predictor rank")
-    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_xticks(profile.predictor_rank)
-    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_standard_error))
+    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_std))
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     axis.legend()

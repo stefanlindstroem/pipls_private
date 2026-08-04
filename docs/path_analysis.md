@@ -194,9 +194,13 @@ pair and supplies the pooled diagnostic.
 ## Split variation and temporary standard error
 
 `component_path_.cv_mse_std` is the population standard deviation of the realized split-specific
-MSE values. It describes variation across the materialized validation splits. The derived read-only
-`component_path_.cv_mse_standard_error` converts that stored quantity to the temporary split-based
-standard error of the mean CV-MSE:
+MSE values. It describes variation across the materialized validation splits. Maintained
+component-path and predictor-rank-profile figures plot mean response-standardized CV-MSE with
+symmetric $\pm 1$ SD bars from this stored quantity. The bars are descriptive split-to-split
+variability; they are not confidence intervals and do not enter selection.
+
+The derived read-only `component_path_.cv_mse_standard_error` remains temporarily available only to
+support the still-active one-standard-error rule. It converts the stored split SD to
 
 \begin{equation}
 \widehat{\mathrm{SE}}_{\mathrm{CV}}
@@ -206,11 +210,9 @@ standard error of the mean CV-MSE:
 
 where $K$ is the number of validation splits, stored once as the path-wide scalar
 `component_path_.n_splits`. This is equivalent to dividing the sample standard deviation of the
-split MSE values by $\sqrt{K}$. At least two splits are required. Maintained
-component-path and predictor-rank-profile figures plot the mean response-standardized CV-MSE with
-symmetric $\pm 1$ standard-error bars from this property. Because CV training sets overlap, these
-bars are a conventional resampling heuristic rather than confidence intervals or a formal
-uncertainty guarantee.
+split MSE values by $\sqrt{K}$. At least two splits are required. Because CV training sets overlap,
+this temporary quantity is a conventional resampling heuristic rather than a confidence interval or
+formal uncertainty guarantee.
 
 ### One-standard-error component heuristic
 
@@ -271,8 +273,8 @@ selection-only analysis. `component_path_` remains the aligned numerical curve.
 The Tobacco workflow applies the named 1-SE rule once through `refit()`. The returned
 `model.selection_` carries the selected row, exact `reference_minimum`, and derived
 `one_standard_error_threshold`. The same selection supplies the conditional predictor-rank profile
-and `oof_report()`. Predictor-rank profile error bars use the same standard-error scale, but the
-stored predictor rank for each component count continues to maximize the configured mean CV score
+and `oof_report()`. Predictor-rank profile error bars use the stored split SD, while the stored
+predictor rank for each component count continues to maximize the configured mean CV score
 rather than applying the 1-SE rule.
 
 ## Post-fit final-model selection

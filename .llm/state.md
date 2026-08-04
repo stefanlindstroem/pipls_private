@@ -622,15 +622,15 @@ Tobacco, and introduce ten repeated five-fold partitions in the complete Pulp wo
 3. The transition does not add outer validation or demonstrate absolute tolerance in a maintained
 example.
 
-Current status: **Patches 1–3 of 7 complete**. The public result layer uses `cv_mse_std`, and
-`minimum_cv_mse` now applies simultaneous validated relative and absolute tolerances with complete
-immutable provenance. The temporary derived `cv_mse_standard_error` bridge remains only to keep the
-current one-standard-error consumers operational until later patches migrate and remove them.
+Current status: **Patches 1–4 of 7 complete**. The public result layer uses `cv_mse_std`,
+`minimum_cv_mse` applies simultaneous validated relative and absolute tolerances with complete
+immutable provenance, and maintained CV-MSE plots show descriptive split SD. The temporary derived
+`cv_mse_standard_error` bridge remains only for the still-active one-standard-error rule.
 
 ## Current next increment
 
-Implement Decision 0146 Patch 4: replace maintained CV-MSE standard-error bars and wording with
-population SD across materialized validation splits, without changing selection or search numerics.
+Implement Decision 0146 Patch 5: migrate maintained automatic workflows to minimum-CV-MSE
+tolerance selection, including Tobacco with `relative_tolerance=0.10`.
 Decision 0139 Patch 3 remains an independent paused presentation increment.
 
 ## Authority and drift handling

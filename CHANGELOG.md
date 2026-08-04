@@ -4,6 +4,11 @@
 
 ### Repository
 
+- Replace maintained component-path and predictor-rank-profile error bars with the stored
+  population `cv_mse_std` across materialized validation splits. Label the bars as descriptive mean
+  CV-MSE ± SD, update axis limits, tutorials, rendering contracts, and path documentation, and
+  retain the derived `cv_mse_standard_error` only as a temporary bridge for the still-active
+  one-standard-error rule.
 - Extend `minimum_cv_mse` selection and refitting with simultaneous relative and absolute CV-MSE
   tolerances. Resolve the relative default to square root of float64 machine epsilon, disable the
   absolute cap by default with positive infinity, select the smallest qualifying component count,

@@ -97,10 +97,10 @@ numerical results derived from the completed modeling workflow.
 ![Synthetic component path](../assets/generated/synthetic/component_path.svg)
 
 The mean CV-MSE falls markedly from one to two components and changes little at three. The bars
-show one fold-based standard error on either side of each mean; they are not confidence intervals.
-Such bars can inform the conventional
-[one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic). This tutorial
-keeps the component choice explicit. The diamond marks the row that produced the fitted model.
+show one population standard deviation across the materialized validation splits on either side
+of each mean. They describe split-to-split variability; they are not confidence intervals and do
+not enter selection. This tutorial keeps the component choice explicit. The diamond marks the row
+that produced the fitted model.
 
 ### Conditional predictor-rank profile
 

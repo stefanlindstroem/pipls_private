@@ -105,11 +105,10 @@ selection is needed without fitting a final model.
 ![Pulp component path](../assets/generated/pulp/component_path.svg)
 
 The mean CV-MSE falls substantially through three components and is nearly flat thereafter. The
-bars show one fold-based standard error on either side of each mean; they are not confidence
-intervals. Such bars can inform the conventional
-[one-standard-error rule](../path_analysis.md#one-standard-error-component-heuristic), but this
-manual workflow keeps the three-component choice explicit. The diamond marks the row used by the
-fitted model.
+bars show one population standard deviation across the materialized validation splits on either
+side of each mean. They describe split-to-split variability; they are not confidence intervals
+and do not enter selection. This manual workflow keeps the three-component choice explicit. The
+diamond marks the row used by the fitted model.
 
 The selection contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at three
 components under the seeded shuffled folds.
@@ -125,8 +124,8 @@ components under the seeded shuffled folds.
 For these 46 rows, 14 predictors, and five-fold CV, the support rule gives
 $r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The seeded shuffled folds select the
 interior rank 9. Ranks 9 and 10 have mean CV-MSE values of approximately 0.288 and 0.302, with
-fold-based standard errors of approximately 0.039 and 0.030. Their mean difference is small
-relative to the displayed uncertainty scale.
+population split SDs of approximately 0.078 and 0.060. Their mean difference is small relative
+to the displayed split-to-split variability.
 
 The profile supports rank 9 for this fitted model, but it does not establish a distinct scientific
 advantage over nearby retained dimensions. The fixed model still contains three paired latent

@@ -48,7 +48,7 @@ for dataset, (X, Y), search in (
     axis.errorbar(
         pipls_path.n_components,
         pipls_path.cv_mse_mean,
-        yerr=pipls_path.cv_mse_standard_error,
+        yerr=pipls_path.cv_mse_std,
         fmt="o-",
         capsize=4,
         label=r"$\Pi$-PLS",
@@ -69,20 +69,20 @@ for dataset, (X, Y), search in (
     axis.errorbar(
         pls_path.n_components,
         pls_path.cv_mse_mean,
-        yerr=pls_path.cv_mse_standard_error,
+        yerr=pls_path.cv_mse_std,
         fmt="s--",
         capsize=4,
         label=f"PLS ({pls_path.algorithm})",
     )
     upper = max(
-        float(np.max(pipls_path.cv_mse_mean + pipls_path.cv_mse_standard_error)),
-        float(np.max(pls_path.cv_mse_mean + pls_path.cv_mse_standard_error)),
+        float(np.max(pipls_path.cv_mse_mean + pipls_path.cv_mse_std)),
+        float(np.max(pls_path.cv_mse_mean + pls_path.cv_mse_std)),
     )
     axis.set_title(
         rf"{dataset.capitalize()} $\Pi$-PLS and PLS component-path comparison"
     )
     axis.set_xlabel("Number of response components")
-    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_xticks(pipls_path.n_components)
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.margins(x=0.05)

@@ -133,9 +133,10 @@
 - Numbered examples migrated under Phase F4 operate directly on immutable path and inspection results
   in memory. They must not write generated CSV files as analytical or plotting intermediates.
 - Preserve `cv_mse_std` as descriptive population split dispersion. Maintained CV-MSE figures
-  use the derived `cv_mse_standard_error` for symmetric $\pm 1$ standard-error bars that can support
-  the conventional one-standard-error (1-SE) heuristic. Selection lookup must not fit, refit, or
-  mutate search state. Decision 0140 assigns that ownership to `search.select(...)`, and all
+  use it directly for symmetric $\pm 1$ SD bars. The temporary derived
+  `cv_mse_standard_error` remains only for the still-active one-standard-error rule. Selection
+  lookup must not fit, refit, or mutate search state. Decision 0140 assigns that ownership to
+  `search.select(...)`, and all
   maintained examples, tutorial snippets, and living API pages now use that operation. Example 07
   shows the minimum row, horizontal 1-SE threshold, and recommended row by resolving both
   annotations through the fitted search. Keep generated pages and cross-links synchronized with

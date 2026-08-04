@@ -47,7 +47,7 @@ def _plot_component_path(
     axis.errorbar(
         path.n_components,
         path.cv_mse_mean,
-        yerr=path.cv_mse_standard_error,
+        yerr=path.cv_mse_std,
         fmt="o-",
         capsize=4,
     )
@@ -78,11 +78,11 @@ def _plot_component_path(
         zorder=3,
     )
     axis.set_xlabel("Number of components")
-    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_title(r"Tobacco $\Pi$-PLS component path")
     axis.set_xticks(path.n_components)
     upper = max(
-        float(np.max(path.cv_mse_mean + path.cv_mse_standard_error)),
+        float(np.max(path.cv_mse_mean + path.cv_mse_std)),
         float(one_se_threshold),
     )
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
@@ -103,7 +103,7 @@ def _plot_predictor_rank_profile(
     axis.errorbar(
         profile.predictor_rank,
         profile.cv_mse_mean,
-        yerr=profile.cv_mse_standard_error,
+        yerr=profile.cv_mse_std,
         fmt="o-",
         capsize=4,
     )
@@ -119,13 +119,13 @@ def _plot_predictor_rank_profile(
         zorder=3,
     )
     axis.set_xlabel("Predictor rank")
-    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SE)")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_title(
         rf"Tobacco $\Pi$-PLS predictor-rank profile at "
         f"{profile.n_components} components (1-SE choice)"
     )
     axis.set_xticks(profile.predictor_rank)
-    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_standard_error))
+    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_std))
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     axis.legend()

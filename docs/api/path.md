@@ -133,7 +133,10 @@ requiring manual masking of `cv_results_`. The predictor-rank policy and validat
 stored once as path-wide scalars rather than repeated in every row. Use `search.select(...)` when a
 complete scalar row is needed for annotation or reporting. See
 [Search-owned selection rules](../path_analysis.md#search-owned-selection-rules) for the rule
-definitions and scope. The path object itself provides no public row-selection methods.
+definitions and scope. Maintained plots use `cv_mse_std` directly as descriptive
+split-to-split variability. The temporary derived `cv_mse_standard_error` property remains only for
+the still-active one-standard-error selection rule. The path object itself provides no public
+row-selection methods.
 
 ::: pipls.component_path.PiPLSComponentPath
     options:

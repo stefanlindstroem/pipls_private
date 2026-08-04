@@ -704,9 +704,9 @@ Decision 0106 completes the first increment. It uses the conventional name one-s
 equivalent quantity from the fold SD and split count. Automatic 1-SE selection remained outside
 that visualization increment; Decision 0111 later adds it as an explicit path-level rule.
 
-Current status: **complete**. Maintained CV-MSE plots use the derived fold-based standard error and
-the documentation explains the conventional 1-SE component heuristic. Maintained examples retain
-their explicit choices, while Decision 0111 permits a predeclared automated rule.
+Current status: **historical implementation complete and superseded for plotting by Decision
+0146 Patch 4**. Maintained CV-MSE plots now use population split SD; the derived fold-based SE
+remains temporarily only for the still-active 1-SE selection rule.
 
 ### Component-path recommendation references
 
@@ -1134,4 +1134,4 @@ The default relative tolerance is machine-scale numerical equivalence and the de
 tolerance is positive infinity. Both tolerance conditions must hold. This transition does not add
 an outer-validation API and does not propagate repeated CV to every maintained example.
 
-Current status: **Patches 1–3 of 7 complete**. Patch 4 is the next increment.
+Current status: **Patches 1–4 of 7 complete**. Patch 5 is the next increment.

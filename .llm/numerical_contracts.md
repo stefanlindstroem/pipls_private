@@ -60,8 +60,8 @@
   the sample split standard deviation divided by `sqrt(n_splits)`. Derived arrays are finite
   read-only `float64` and are a conventional CV heuristic rather than confidence intervals. The
   property raises explicitly when fewer than two split values make the estimate undefined.
-  Maintained CV-MSE figures use this derived quantity for symmetric $\pm 1$ standard-error bars;
-  they do not use the stored split SD as `yerr`.
+  Maintained CV-MSE figures use the stored `cv_mse_std` directly for symmetric $\pm 1$ SD bars.
+  The derived SE remains only as a temporary input to the still-active 1-SE rule.
 - Search-owned minimum-CV-MSE selection identifies the first exact `np.argmin(cv_mse_mean)` row as
   an unruled reference, derives simultaneous relative and absolute thresholds, and returns the first
   ascending path row at or below their minimum. `relative_tolerance=None` resolves to square root of
@@ -107,5 +107,5 @@ positive infinity. Relative tolerance is finite and nonnegative; absolute tolera
 and may be positive infinity. Both restrictions apply simultaneously.
 
 `cv_mse_std` is descriptive split variability and is not divided by a split count. Maintained plots
-will use it directly for symmetric error bars. Until Patches 2–7 are applied, the preceding
-split-SD/derived-SE and one-standard-error paragraphs describe the current implementation.
+use it directly for symmetric error bars. The derived SE remains temporarily available only for
+the still-active one-standard-error rule until Patch 7 removes that surface.

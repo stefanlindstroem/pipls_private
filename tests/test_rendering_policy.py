@@ -167,7 +167,7 @@ def test_tutorial_examples_render_named_result_arrays_directly() -> None:
     assert pulp.index("biplot_axis.legend()") < pulp.index("adjust_text(")
 
 
-def test_maintained_cv_mse_error_bars_use_fold_based_standard_error() -> None:
+def test_maintained_cv_mse_error_bars_use_split_standard_deviation() -> None:
     root = _repository_root()
     relative_paths = (
         "examples/02_synthetic_path_selection.py",
@@ -190,7 +190,9 @@ def test_maintained_cv_mse_error_bars_use_fold_based_standard_error() -> None:
         ]
 
         assert errorbar_calls, path
-        assert "cv_mse_std" not in text, path
+        assert "cv_mse_standard_error" not in text, path
+        assert "(±1 SE)" not in text, path
+        assert "(±1 SD)" in text, path
         for call in errorbar_calls:
             yerr = next(
                 (keyword.value for keyword in call.keywords if keyword.arg == "yerr"),
@@ -199,4 +201,4 @@ def test_maintained_cv_mse_error_bars_use_fold_based_standard_error() -> None:
             assert yerr is not None, path
             attribute = _attribute_path(yerr)
             assert attribute is not None, path
-            assert attribute.endswith(".cv_mse_standard_error"), (path, attribute)
+            assert attribute.endswith(".cv_mse_std"), (path, attribute)

@@ -206,7 +206,8 @@ example are now the tested implementation.
 
 Protect rendering through executable artifact generation, parseable declared outputs, optional
 dependency boundaries, caller-owned chart construction, direct immutable-result use, and numerical
-semantics such as fold-based standard errors. Same-file private rendering functions remain
+semantics such as descriptive population SD across validation splits. Same-file private rendering
+functions remain
 caller-owned; structural tests may verify that scientific computation stays in `main()` and that
 those functions do not load data, fit models, run cross-validation, select models, or calculate
 inspection results. Do not freeze exact private function names or signatures, title text, axis-label
@@ -368,6 +369,10 @@ validation lengths, direct construction, immutability, and pickle stability whil
 temporary derived-SE bridge. Historical decisions and changelog entries may retain historically
 accurate one-standard-error wording; active source, tests, examples, tutorials, API documentation,
 and guide contracts must converge by Patch 7.
+Patch 4 protects that every maintained CV-MSE `errorbar()` call uses `cv_mse_std`, every maintained
+axis labels the display as $\pm 1$ SD, axis limits include the SD range, and tutorial prose states
+that the bars are descriptive split-to-split variability rather than confidence intervals or
+selection thresholds.
 
 ## CV-MSE tolerance selection
 

@@ -244,8 +244,10 @@ are not public fitted state. Advanced users can inspect aligned `cv_results_` co
 `PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
 `mean_test_score`, `cv_mse_mean`, and `cv_mse_std` arrays. The predictor-rank policy and number of
 validation splits are path-wide Python scalars. It derives the aligned read-only
-`cv_mse_standard_error` array from the stored population split SD and shared split count. New code
-retrieves one complete stored row through `search.select(...)`. Maintained consumers and living
+`cv_mse_standard_error` array from the stored population split SD and shared split count.
+Maintained plots use `cv_mse_std` directly; the derived SE remains only for the temporary 1-SE
+rule. New code retrieves one complete stored row through `search.select(...)`. Maintained
+consumers and living
 documentation use no path-level scalar selection. `PiPLSComponentPath` exposes aligned numerical
 properties and immutable serialization behavior, not public selected-row operations.
 
@@ -262,7 +264,8 @@ predictor ranks actually evaluated at `h`, sorted in ascending order. Its path-w
 count are scalars, and its `selection` property derives the same conditionally selected scalar
 values as `search.select(n_components=h)` from immutable candidate state. The profile does not
 add another fitted attribute or stored selected-row representation. It exposes an aligned read-only
-`cv_mse_standard_error` property derived by the same contract as the component path. Selection
+`cv_mse_standard_error` property derived by the same contract as the component path. Maintained
+profile plots use `cv_mse_std` directly. Selection
 maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
 mean response-standardized CV-MSE.
 
@@ -523,6 +526,6 @@ and removes `rule="one_standard_error"`, `cv_mse_standard_error`, and
 `one_standard_error_threshold`. Maintained plots use mean CV-MSE ± split SD. Tobacco demonstrates a
 10% relative tolerance; absolute tolerance is documented without an example.
 
-Current status: **Patches 1–3 of 7 complete**. The tolerance arguments and immutable provenance are
-implemented. The one-standard-error rule and derived SE remain temporarily active until maintained
-plots and workflows migrate in Patches 4–7.
+Current status: **Patches 1–4 of 7 complete**. The tolerance arguments and immutable provenance are
+implemented, and maintained plots use descriptive split SD. The one-standard-error rule and
+derived SE remain temporarily active until workflows migrate and Patch 7 removes them.
