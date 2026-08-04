@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted. Patch 1 of seven is complete. No existing decision record is retired by this patch;
-Patch 2 compacts and corrects the active `.llm` layer before any historical records are removed.
+Accepted. Patches 1 and 2 of seven are complete. The decision lifecycle is established and the
+active `.llm` layer now describes current contracts rather than completed transition history. No
+existing decision record is retired before Patch 3 supplies an explicit supersession map.
 
 ## Context
 
@@ -107,7 +108,7 @@ split internally.
 ## Patch sequence
 
 1. Establish this decision and synchronize the guide-layer phase state -- complete.
-2. Compact and correct the active `.llm` layer around current contracts.
+2. Compact and correct the active `.llm` layer around current contracts -- complete.
 3. Retire explicitly superseded decisions using a reviewed retirement map.
 4. Add `docs/decisions/history.md` and consolidate completed micro-decisions, targeting roughly
    35--50 current records.

@@ -1,10 +1,16 @@
 # Decision-record navigation
 
-This file is a compact index for LLM-assisted work. The records under `docs/decisions/` contain the
-accepted rationale and consequences. Read the full record whenever a change touches its subject.
-This index is navigation, not a substitute for those records.
+This file is the machine-checkable registry of numbered decisions currently shipped under
+`docs/decisions/`. The full records contain rationale and consequences; read the relevant record
+before changing its subject. Table descriptions summarize the original record and may describe an
+intermediate state later superseded by a newer decision.
 
-| Record | Subject | Consequence |
+Decision 0147 governs consolidation. Until a retirement patch supplies an explicit map and removes
+the corresponding record, every shipped numbered file remains listed here. After consolidation,
+this registry will contain only current numbered decisions and will link to the compact historical
+summary. Git remains the archive for retired records, and numbers are never reused.
+
+| Record | Subject | Original durable consequence or current disposition |
 |---|---|---|
 | `0001-core-definition.md` | fixed Pi-PLS construction | SVD/least-squares core with explicit `(h, r_pi)` admissibility |
 | `0002-preprocessing-semantics.md` | centering and scaling | preprocessing remains outside the fixed numerical core |
@@ -154,153 +160,45 @@ This index is navigation, not a substitute for those records.
 | `0146-cv-mse-tolerance-selection.md` | CV-MSE tolerance selection and split-SD reporting | replace the 1-SE heuristic with dual-tolerance minimum-CV-MSE selection, descriptive split SD, a 10% Tobacco demonstration, and repeated Pulp validation |
 | `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, compact historical summaries, and retired records; compact `.llm`, curate the decision set, simplify brittle tests, harden snapshots, and split dataset internals without changing public behavior |
 
-## Implemented estimator/search transition
+## Current canonical clusters
 
-Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` is a fixed-pair estimator with
-the direct-fit support warning at $n/r_\pi<3$. `PiPLSSearchCV` owns the complete triangular-selection
-lifecycle and defaults to the explicit complete-component sentinel `n_components_values="all"`.
-Decision 0112 renames the sole package selection meta-estimator to `PiPLSSearchCV` without a
-legacy alias; component-path result names and numerical behavior are unchanged. Decision 0102 makes path evaluation selection-only by default and represents the default scorer by
-a stable package string resolving to the existing public callable. Conventional scikit-learn
-random-state forms remain accepted, and Pi-PLS-specific fitted output is canonicalized in
-`decomposition_`.
+Use the newest applicable accepted decision when records overlap. The current implementation is
+most directly governed by these clusters:
 
-## Accepted clarifications after earlier proposals
+- **Mathematics and numerical construction:** 0001--0009, refined by 0025, 0031--0032, 0039--0040,
+  0073, 0086, and 0121--0123.
+- **Search, selection, and validation:** 0010--0014, 0039--0040, 0066, 0072--0073, 0102,
+  0137, 0140, 0143--0146.
+- **Datasets and data ownership:** 0015--0016, 0019, 0022--0025, 0041, 0138, and 0142.
+- **Inspection and rendering:** 0042--0045, 0058--0061, 0079--0089, and 0141.
+- **Examples and documentation:** 0037--0038, 0044--0057, 0062--0078, 0090--0101, and
+  0139.
+- **Packaging, compatibility, and repository policy:** 0021, 0024, 0054--0056, 0103--0105,
+  0110--0111, 0124--0128, and 0147.
+- **Pre-release API normalization:** 0112--0136 and 0144--0146. Later records in this cluster
+  supersede intermediate names and migration surfaces.
 
-These points are fixed by implemented decisions and owner review even where the broad publication
-plan contains an earlier or more general proposal:
+These ranges are navigation aids, not a substitute for the full records or the retirement map that
+will be produced in Decision 0147 Patches 3 and 4.
 
-- both adaptive public defaults use the name `"auto"`; exhaustive search is explicit `"optimal"`;
-- `PiPLSSearchCV` defaults to `n_components_values="all"`; explicit sequences request a subset;
-- the implemented search now performs final full-data fitting only through post-fit `refit()` and
-  exposes no constructor boolean, selected fitted-model state, or delegated model methods;
-  explicit post-fit OOF reporting reuses exact stored split indices without rescoring candidates or
-  mutating search; constructor-selected report controls and state are removed;
-- Decision 0140 implements search-owned `select()` as the sole public selected-row lookup;
-  `PiPLSComponentPath` is aligned numerical evidence rather than a selection service;
-- Decision 0141 adds conditional predictor-rank profile figures to the Sugarcane and Tobacco
-  workflows, with Tobacco deriving the profiled component count from its 1-SE selection;
-- the default scoring parameter is the stable package name `"neg_response_standardized_mse"`, which resolves to the public scorer callable;
-- `PiPLSSearchCV` defaults to `samples_per_predictor_rank=5` and `cv=5`;
-- the samples-per-rank support term uses the total number of observations supplied to `fit()`,
-  while transformed feature count, centered training-fold dimensions, and minimum verified
-  fold numerical rank remain hard candidate-feasibility caps;
-- randomized SVD is controlled independently and follows the same policy inside regression and
-  path candidate fits;
-- `PiPLSRegression` fits explicit ranks only; `PiPLSSearchCV` owns package selection and fits fixed
-  estimator clones;
-- `PiPLSSearchCV` supports a direct estimator or a scikit-learn `Pipeline` ending in
-  `PiPLSRegression`, not arbitrary nested meta-estimators;
-- D2 supports explicit group metadata for splitters, but weighted fitting and general-purpose
-  sample metadata routing are not project goals;
-- repeated and partial-coverage OOF predictions are a documented Pi-PLS extension rather than a
-  claim of exact `cross_val_predict` equivalence;
-- selection-conditioned validation reports are descriptive diagnostics, not unbiased nested-CV or
-  external-test estimates;
-- real-data users supply `X` and `Y` directly; metadata files, registry lookup, generic loaders,
-  and `PiPLSDataset` are not prerequisites for fitting;
-- Decision 0138 implemented the first named package-owned `load_pulp()` dataset without network
-  access, pandas, a generic registry, or any requirement that users load their own real data
-  through the package;
-- Decision 0143 completes the model-selection provenance and OOF-reporting transition:
-  refitted models retain `model.selection_`, selection provenance remains attached to the model,
-  and OOF diagnostics use `oof_report(selection=...)`;
-- Decision 0144 completes a seven-patch pre-release public-surface cleanup: required OOF arrays,
-  consistent selection terminology, removal of duplicate search and candidate state, canonical dataset
-  access, reduced inspection conveniences, and focused result-module exports;
-- Decision 0145 completes a four-patch final implementation-surface cleanup: residual duplicate
-  fitted attributes are removed, model-selection algorithms are private, unused private helpers are
-  gone, remaining public modules declare exact exports, and fitting-free `search.select()` wording
-  is positive;
-- Decision 0142 completes a six-patch extension of that same narrow contract to Sugarcane and
-  Tobacco. `load_sugarcane()` and `load_tobacco()` and their canonical package resources are
-  implemented. The resources remain ordinary CSV, JSON, README, and license files usable
-  independently of Python, and every maintained consumer uses the named loaders;
-- examples show their data-reading and matrix-construction code rather than relying on hidden
-  utility functions;
-- the first numbered example uses literal NumPy matrices and one fixed fit; complete-workflow
-  helpers are separated under `examples/_support/`;
-- numbered examples trust committed dataset and result-directory structure, avoid one-use configuration constants and repeated validation scaffolding, and leave reusable contract validation to focused tests;
-- numbered examples are self-contained user tasks with explained data and labeled output; they do not rely on paper or manuscript context, and the context-free advanced-CV script is removed;
-- package-owned reference datasets use one canonical comma-delimited `X.csv`/`Y.csv` pair with
-  `metadata.json`, README, and license resources, while external users remain free to use any data
-  source or file organization;
-- the current real-data integration suite is Pulp, Sugarcane, and Tobacco; Decision 0142 assigns
-  all three named package ownership as the accepted final state while preserving direct
-  language-neutral raw-file access and making no publication-result claim;
-- committed dataset assets use public or included provenance only, and the exact source material
-  must carry an explicit redistribution and adaptation grant; private archive references and
-  preparation-only scripts stay outside the repository;
-- Corn, the legacy Citrination Steel table, SARCOS, and FRED-MD are intentionally excluded under
-  Decision 0041; separately licensed derivatives are new candidate datasets, not retroactive
-  clearance of the companion-analysis files;
-- fitted-model analysis is separated into selection diagnostics, full-data interpretation, and
-  prediction diagnostics under Decision 0042; numerical inspection is package-owned and
-  dataset-specific artifacts remain example-owned; Decisions 0079--0083 supersede the former
-  package plotting layer with direct caller-owned rendering;
-- Decision 0045 further separates model roles: ordinary PLS remains in component-path comparisons
-  and the dedicated comparison example; $P$, $D$, and $Q$ inspection stays Pi-PLS-specific; shared
-  score, loading, coefficient, biplot, observation, and prediction analysis uses estimator-neutral
-  APIs and is applied only to the selected Pi-PLS model in numbered examples;
-- Decision 0047 isolates all real-data Pi-PLS-versus-PLS path comparisons in the dedicated
-  comparison example; Decision 0101 assigns it the current number 04, while examples 05–07 are the
-  direct Pi-PLS-only Pulp, Sugarcane, and Tobacco workflows.
-- repository tests validate executable behavior and durable file structure rather than pinning
-  living roadmap prose or documentary metadata values;
-- `pipls` is the long-lived package repository; paper figures, full experiment grids, paper-only
-  OLS/CCA comparisons, cached results, and publication environments belong downstream;
-- current estimator centering and optional scaling are integral to every fit, are learned inside
-  each training fold during selection, and are refitted on all supplied training data;
-- future block-aware scaling remains a valid direction, but only its API design and schedule are
-  deferred until the owner starts a dedicated phase;
-  separates oracle model validation from Pi-PLS selection validation, and freezes no predictive or
-  performance claim before calibration;
-- the complete benchmark layer was retired by Decision 0125 after its development-validation
-  purpose was complete;
-- Decision 0129 removes the unreleased duplicate fitted-estimator `best_*` aliases; selected-model
-  attributes now apply uniformly to every final selection rule;
-- Decision 0130 renames the unreleased decomposition fields to `predictor_directions` and
-  `response_directions` without aliases, while retaining standard PLS-style `x_rotations_` and
-  `y_rotations_`;
-- Decision 0131 shortens the public response-standardized scorer callables and stable default
-  scorer string to the established `mse` terminology without aliases or numerical changes;
-- Decision 0132 renames the fitted completed-search coverage flag to
-  `search_is_exhaustive_` without an alias or search-behavior change;
-- Decision 0133 renames the configurable-generator truth record to `PiPLSRegressionTruth`
-  and adopts regression-specific private generator terminology without aliases or data changes;
-- Decision 0134 gives public result properties type-revealing names without aliases or
-  changes to selected values, validation metrics, or OOF coverage;
-- Decision 0135 renames the public low-sample predictor-rank support warning to
-  `PredictorRankSupportWarning` without aliases, threshold changes, or suppression changes;
-- Decision 0136 makes maintained ordinary five-fold examples use
-  `KFold(n_splits=5, shuffle=True, random_state=0)` consistently for path selection, matched
-  comparison, and selection-conditioned OOF prediction; leave-one-out remains exhaustive;
-- example 04 plots immutable Pi-PLS and ordinary-PLS component paths directly in memory; Pulp,
-  Sugarcane, and Tobacco examples 05–07 plot `component_path_` directly in memory; Pulp and
-  Sugarcane fit separate fixed models after explicit component-count choices, while Tobacco calls
-  the stored 1-SE recommendation explicitly and fits the returned component-count/predictor-rank
-  pair;
-- fold SD remains stored descriptive dispersion; maintained CV-MSE figures use the derived
-  fold-based standard error. Maintained examples keep component choice visible, while a named
-  post-fit rule may automate the final choice after path evaluation;
-- example 04 compares separate immutable Pi-PLS and standard PLS component paths in one PDF per
-  dataset; examples 05–07 write final PDFs directly from in-memory Pi-PLS results, with all three
-  exposing conditional predictor-rank profiles and Tobacco preserving full-SVD
-  spectral plots,
-  source-order response pagination, and raw observation diagnostics; randomized SVD is covered by
-  focused randomized-SVD tests;
-- Python 3.10–3.14 are supported; runtime metadata admits NumPy 1.26--2.x,
-  scikit-learn 1.4--1.x, and joblib 1.2--1.x; the complete minimum stack is tested only on
-  Python 3.10 because its oldest binary releases do not cover every newer interpreter;
-- complete Pulp, Sugarcane, and Tobacco analyses are not duplicated as real-data benchmark scripts
-  or executed by the default test suite; `make examples` runs all numbered examples explicitly;
-- the package exposes no public plotting module; maintained reports render immutable inspection
-  arrays directly with Matplotlib, group related charts in dataset-appropriate panels, and retain
-  full-width coefficient pages; Sugarcane and Tobacco keep analysis in `main()` and rendering in
-  private functions within the same numbered script, while Pulp remains sequential;
+## Implemented clarifications
 
-When a new accepted architectural or public-API decision is added, create a numbered decision
-record and add it to this registry in the same patch. Decision 0147 governs later classification:
-current numbered records remain indexed, completed eras may be summarized in
-`docs/decisions/history.md`, retired numbers are never reused, and Git is the authoritative archive
-for deleted intermediate records. No existing decision is retired in Decision 0147 Patch 1.
+The implemented package has the following current boundaries regardless of earlier intermediate
+records:
+
+- `PiPLSRegression` fits one explicit rank pair; `PiPLSSearchCV` owns path evaluation and post-fit
+  selection, refitting, and OOF reporting.
+- The only named selection rules are `best_score` and tolerance-based `minimum_cv_mse`.
+- CV-MSE dispersion is population SD across materialized splits; no standard-error result or rule
+  exists.
+- Refitted models retain the exact immutable `model.selection_`; OOF reporting requires an existing
+  compatible selection and reuses the fitted search splits.
+- Top-level `pipls` exports only the two estimators, `PredictorRankSupportWarning`, and version
+  metadata; result records remain public from focused modules.
+- Pulp, Sugarcane, and Tobacco are the named package-owned reference datasets, with one active
+  language-neutral resource copy each.
+- Numerical inspection is package-owned; plotting and report composition are caller-owned.
+- The package repository is distinct from downstream paper-reproduction environments.
+
+When adding a decision, create the numbered file and add one table row in the same patch. Retirement
+requires the explicit mapping, reference cleanup, and validation defined by Decision 0147.

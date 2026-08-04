@@ -1,109 +1,127 @@
 # Numerical contracts
 
-- Use thin SVDs and avoid forming a $p\times p$ covariance matrix when $p\gg n$.
-- Use `numpy.linalg.eigh` only for symmetric matrices, after explicit symmetrization.
+## Linear algebra and rank
+
+- Use thin SVDs and avoid forming a predictor covariance matrix when `p >> n`.
+- Use `numpy.linalg.eigh` only for explicitly symmetrized matrices.
 - Do not form explicit inverses. Use solves, least squares, SVDs, or documented pseudoinverses.
-- The fixed core uses $\tau_{\mathrm{X}}=\max(n,p)\,\epsilon_{64}\,s_1$ for predictor
-  numerical rank; requested predictor rank above that numerical rank raises `ValueError`.
-- The search meta-estimator verifies predictor rank separately in every transformed training fold before
-  candidate evaluation. With `r_num_min` denoting the minimum verified fold rank, the shared
-  rule-derived upper predictor rank is
-  `min(p_min, n_train_min - 1, r_num_min, ceil(n / c))`, where `n` is the total number of
-  observations supplied to `fit()`, `p_min` is the minimum transformed feature count, and
-  `n_train_min` is the smallest materialized training-fold size. `c` must be positive and finite,
-  and the ceiling operation is normative.
-- Constant columns, rank deficiency, $p\gg n$, and nearly repeated singular values require deterministic behavior.
-- Singular/eigenvector signs are not identifiers.
-- Basis equality is not required when only the spanned subspace is identifiable.
-- All public fitted arrays must be finite unless an input validation error is raised.
-- Public fixed and path fits are transactional: any failed fit removes previous and partial fitted
-  state, so scikit-learn fitted-state checks report the estimator as unfitted.
-- Ordinary means and sample standard deviations remain the default calculations. Range-safe
-  fallbacks apply only when finite data overflow those calculations or a nonconstant column
-  underflows to a zero sample scale.
-- Public fixed fitting rejects magnitudes that can overflow the core predictor-response
-  cross-product. Prediction, transformation, inverse reconstruction, and response-standardized MSE
-  must either return finite float64 values or raise a clear exception.
-- Invalid requested dimensions raise errors; they are not silently clamped.
-- Numerical changes must include a boundary-case test and state the tolerance used.
-- Core public result records defensively copy arrays, make them read-only, normalize accepted
-  NumPy scalars, and validate direct construction and pickle reconstruction. Component/rank/split
-  counts are positive, `n_components <= predictor_rank`, score-like scalars and arrays are finite,
-  response-standardized MSE and fold-SD values are nonnegative, and decomposition factors are
-  finite and component-aligned.
-- Validation-report OOF rows use one explicit coverage representation: positive counts require
-  finite predictions, while zero counts require NaN predictions across the complete response row.
-  Counts are nonnegative integer arrays and align one-to-one with prediction rows.
-- Inspection result records defensively copy and freeze arrays, validate direct construction, and
-  reconstruct through the same validation path when unpickled. Shape relationships, provenance,
-  nonnegative diagnostics, positive display scales, factor weighting, and prediction-standardization
-  relationships are enforced.
-- Inspection helpers use range-safe scaled means, sample scales, norms, covariance products,
-  squared residual norms, and RMSE calculations. Finite inputs must either produce finite float64
-  inspection quantities or raise a clear `ValueError` naming the unrepresentable derived quantity.
-- Score-distance covariance scaling uses one common scalar for fitted and supplied centered scores,
-  preserving the Moore--Penrose quadratic form. Biplot balancing uses scaled column norms and a
-  quotient of square roots. These safeguards do not alter ordinary finite results.
+- The fixed core classifies predictor singular values with
+  `tau_X = max(n, p) * eps64 * s_1`; requested predictor rank above the verified numerical rank
+  raises `ValueError`.
+- Repeated or nearly repeated singular values identify subspaces, not stable signed basis columns.
+  Compare projectors, principal angles, singular values, regression maps, or predictions.
+- Invalid dimensions are errors and are never silently clamped.
 
-- Automatic-selection response scales are estimated from the matching training fold with `ddof=1`; zero scales and singleton-training-fold scales are replaced by 1.0.
-- Response-standardized MSE uniformly averages squared residuals over validation samples and response columns after division by the matching fold-local response scales.
-- Candidate score ties use `numpy.isclose` with `rtol=1e-12` and `atol=1e-15`. Global
-  and conditional selection compare every candidate directly with the relevant maximum score, then
-  choose the lexicographically smallest tied complexity. `rank_test_score` uses minimum ranks and
-  anchors each tolerant group to its leading score; adjacent near-ties must not chain candidates
-  that are not tied with the same group reference. The derived
-  `PiPLSPredictorRankProfile.selection` result applies the same reference-anchored
-  comparison and chooses the first tied row because profile ranks are strictly ascending.
-- Component-path and predictor-rank-profile records may represent a valid one-split protocol. Their
-  stored `cv_mse_std` is the population standard deviation across realized split MSE values. No
-  standard-error result is derived from correlated validation splits. The
-  property raises explicitly when fewer than two split values make the estimate undefined.
-  Maintained CV-MSE figures use the stored `cv_mse_std` directly for symmetric $\pm 1$ SD bars.
-  The derived SE remains only as a temporary input to the still-active 1-SE rule.
-- Search-owned minimum-CV-MSE selection identifies the first exact `np.argmin(cv_mse_mean)` row as
-  an unruled reference, derives simultaneous relative and absolute thresholds, and returns the first
-  ascending path row at or below their minimum. `relative_tolerance=None` resolves to square root of
-  float64 epsilon; positive-infinity absolute tolerance disables the absolute cap.
-- CV splits are materialized once, validated, copied, and reused for rank preflight and every
-  candidate. The samples-per-rank term uses total `n`; the smallest centered training fold supplies
-  the dimensional cap `n_train_min - 1`, and the minimum verified fold rank supplies the numerical
-  cap. Explicit requested ranks above the resolved ceiling fail before candidate scoring.
-- Fold-rank preflight preserves NumPy global random state, uses the configured terminal estimator
-  scaling and predictor-SVD policy, and suppresses only `PredictorRankSupportWarning`.
+## Estimator preprocessing and finite behavior
 
-- Predictor SVD policy is independent of rank-search policy. `"full"` is the exact reference,
-  `"randomized"` is explicit approximation, and `"auto"` randomizes only when
-  `min(n, p) >= 500`, `n * p >= 1_000_000`, and
-  `predictor_rank <= 0.2 * min(n, p)`.
-- Only the predictor-matrix SVD may be randomized; the response cross-product and coupling SVDs
-  remain exact.
-- Randomized SVD requires a nonnegative integer seed. With randomized truncated SVD, `x_rank` is
-  a verified retained-rank lower bound rather than the complete numerical rank; diagnostics must
-  expose this distinction.
+Every fixed fit learns predictor and response means from its own training observations. With
+`scale=True`, safe sample standard deviations use `ddof=1`; with `scale=False`, both blocks are
+still centered and unit scales are stored. Search candidates learn these quantities independently
+inside each training fold, and `refit()` learns them again from the supplied full training data.
 
-## Accepted CV-MSE tolerance transition target
+Public fits are transactional. A failed fit removes old and partial fitted state. A failed search
+refit leaves the fitted search unchanged because refitting operates on a fresh clone.
 
-Decision 0146 replaces the current fold-SE selection contract through a staged migration. The final
-contract gives every materialized validation split equal weight. The complete Pulp workflow is the
-maintained repeated-CV example, with 50 split losses and ten OOF predictions per observation:
+Finite float64 inputs must either produce finite public fitted/output arrays or raise a clear
+exception. Range-safe fallbacks are allowed only where ordinary finite calculations overflow or a
+nonconstant column underflows to zero scale. Public fixed fitting rejects magnitudes that would
+make the core predictor-response product unrepresentable.
 
-```python
+`copy=False` may reuse independent writable arrays, but read-only inputs and overlapping predictor
+and response storage must be copied when needed for correctness.
+
+## Search feasibility and candidate evaluation
+
+The search materializes one split set and verifies predictor feasibility in every transformed
+training fold. With:
+
+- `p_min`: minimum transformed feature count;
+- `n_train_min`: minimum materialized training-fold size;
+- `r_num_min`: minimum verified fold numerical rank;
+- `n`: total observations supplied to `fit()`;
+- `c = samples_per_predictor_rank`;
+
+the rule-derived ceiling is:
+
+```text
+min(p_min, n_train_min - 1, r_num_min, ceil(n / c))
+```
+
+`c` is positive and finite; the ceiling operation is normative. Candidate pairs satisfy
+`1 <= n_components <= min(n_targets, predictor_rank)` and are fixed-model clones. Fold-local
+preprocessing, scoring, and warning suppression must not leak validation data.
+
+Adaptive rank search is deterministic for fixed inputs and configuration. Exhaustive
+`search_method="optimal"` evaluates every admissible requested pair. Tie behavior uses the
+implemented score tolerance and deterministic smaller-rank ordering.
+
+## Response-standardized MSE
+
+For each response, residuals are divided by the sample standard deviation learned from the
+candidate's training responses. The scalar loss is the uniform mean over observations and response
+columns. Constant response columns use the package's safe training-scale contract.
+
+Path CV-MSE statistics give every materialized validation split equal weight, including repeated CV
+and unequal validation-set lengths:
+
+```text
 cv_mse_mean = np.mean(split_cv_mse)
-cv_mse_std = np.std(split_cv_mse, ddof=0)
+cv_mse_std  = np.std(split_cv_mse, ddof=0)
 ```
 
-For path minimum `minimum`, resolved relative tolerance `rtol`, and resolved absolute tolerance
-`atol`, the effective threshold is:
+A one-split path therefore has `cv_mse_std == 0`. `cv_mse_std` is descriptive population SD across
+splits; no standard error is derived or exposed.
 
-```python
-min((1.0 + rtol) * minimum, minimum + atol)
+## Selection tolerances
+
+Let `M_min` be the exact minimum stored path mean. For a resolved nonnegative relative tolerance
+`delta_rel` and nonnegative absolute tolerance `delta_abs`:
+
+```text
+T_rel = (1 + delta_rel) * M_min
+T_abs = M_min + delta_abs
+T     = min(T_rel, T_abs)
 ```
 
-The first ascending component-path row at or below that threshold is selected. The default relative
-tolerance resolves to `sqrt(np.finfo(np.float64).eps)` and the default absolute tolerance is
-positive infinity. Relative tolerance is finite and nonnegative; absolute tolerance is nonnegative
-and may be positive infinity. Both restrictions apply simultaneously.
+The selected row is the smallest stored component count with `cv_mse_mean <= T`. Both caps must
+hold, exact boundary equality is eligible, and a zero minimum keeps the relative cap at zero.
 
-`cv_mse_std` is descriptive split variability and is not divided by a split count. Maintained plots
-use it directly for symmetric error bars. No standard-error result or selection threshold is derived
-from it.
+`relative_tolerance=None` resolves to `sqrt(np.finfo(np.float64).eps)`. Relative tolerance must be
+finite and nonnegative. Absolute tolerance may also be positive infinity, which disables that cap;
+NaN, negative values, and negative infinity are invalid. Tolerances apply only to
+`rule="minimum_cv_mse"`.
+
+The selection retains an unruled exact-minimum row, resolved tolerances, and a derived effective
+threshold. It must remain exactly reproducible for OOF compatibility validation.
+
+## OOF reporting
+
+`oof_report()` reuses defensive copies of every split materialized by the fitted search. Each
+selected fixed pair is refitted on every training fold. Multiple validation predictions for one
+observation are averaged. Counts record how many predictions contributed.
+
+Coverage representation is exact:
+
+- positive count: complete finite prediction row;
+- zero count: complete NaN prediction row.
+
+Pooled OOF R2 is computed only over covered observations and is `None` when fewer than two covered
+rows make it undefined. The report does not rescore candidates or fit a full-data model.
+
+## Immutable public results
+
+Public result records defensively copy arrays, make them read-only, normalize accepted NumPy
+scalars, validate direct construction, and revalidate during pickle reconstruction. Counts and
+ranks are positive; `n_components <= predictor_rank`; score-like fields are finite; MSE and SD are
+nonnegative; component-aligned arrays have exact compatible shapes.
+
+Inspection helpers must return finite derived arrays or raise `ValueError`. Display-factor sign
+changes must preserve `P D Q.T`; balanced biplot scaling must preserve the selected `T P.T`
+reconstruction; prediction residuals use `observed - predicted` and response standardization uses
+observed-response sample scales with `ddof=1`.
+
+## Numerical review
+
+Every numerical change must state its comparison tolerance and add at least one boundary-case test.
+When behavior should not change, compare before/after arrays or scalar results directly rather than
+relying only on the test suite.

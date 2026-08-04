@@ -2,679 +2,196 @@
 
 ## Purpose
 
-This is the concise handoff document for starting work from a repository snapshot without prior
-chat history. It records the current implemented boundary, accepted owner decisions, deferred
-scope, and next admissible increment. Update it whenever a patch changes a phase, public default,
-supported composition boundary, product scope, or roadmap order.
+This is the fresh-chat handoff for the implemented repository. It records the current package
+boundary, accepted exclusions, active maintenance work, and authority order. Historical patch
+sequences belong in numbered decisions and Git history, not here.
 
-A new chat should read this file and `.llm/product_scope.md` before proposing implementation work.
-Do not infer current state from an earlier conversation, an old patch, or superseded planning
-material alone.
+Read this file with `.llm/product_scope.md` before proposing work. Confirm every relevant claim
+against the affected source and tests in the uploaded snapshot.
 
-## Implemented boundary
+## Implemented package boundary
 
-Numbered examples are self-contained user tasks rather than publication-oriented or
-context-free API demonstrations. The former context-free advanced-validation script remains
-removed; example 02 supplies the short synthetic path-selection tutorial and independent-test
-prediction workflow, while example 03 gives leave-one-out validation one focused small-calibration
-use case.
+Pi-PLS is an installable scikit-learn-compatible package for multivariate regression. The runtime
+package contains:
 
-Phases A through F4 are complete and committed. The former E4 benchmark sequence was completed
-and later retired by Decision 0125 after its development-validation purpose had been served:
+- `PiPLSRegression`, which fits one explicit `(n_components, predictor_rank)` pair;
+- `PiPLSSearchCV`, which evaluates the admissible triangular component/rank path;
+- immutable component-path, selection, predictor-rank-profile, decomposition, and OOF records;
+- public response-standardized MSE scorers;
+- immutable datasets, deterministic synthetic generators, and package-owned Pulp, Sugarcane, and
+  Tobacco reference resources;
+- pure numerical fitted-model inspection under `pipls.inspection`.
 
-- repository, packaging, clean committed-tree root-relative snapshots, and direct Git patch
-  workflow;
-- example output directories represented by committed `.gitkeep` files in both Git and source
-  distributions, with generated PDFs excluded from snapshots and example 01 exercised from an
-  extracted source distribution;
-- fixed-parameter Pi-PLS numerical core;
-- scikit-learn-compatible fixed-model `PiPLSRegression` for one explicit
-  `(n_components, predictor_rank)` pair;
-- independent full, randomized, and automatic predictor-SVD policies;
-- hardened public validation and `PredictorRankSupportWarning` for direct fixed fits with
-  fewer than three observations per retained predictor-rank direction;
-- transactional fixed and path fits, range-safe boundary preprocessing, safe read-only or
-  overlapping `copy=False` inputs, and finite public fitted/output values;
-- pipeline-aware `PiPLSSearchCV` for triangular `(n_components, predictor_rank)` search;
-- the direct pre-release `PiPLSSearchCV` public name and `src/pipls/search.py` implementation,
-  with no former-name alias and unchanged component-path result terminology;
-- immutable `PiPLSComponentPath` row arrays with path-wide policy and split-count scalars plus
-  derived fold-based CV-MSE standard errors; selected rows are resolved through
-  `PiPLSSearchCV.select()`;
-- explicit post-fit full-data refitting and selection-conditioned OOF reporting from a named rule
-  or manually chosen component-path row, with exact split reuse and the global configured-score
-  optimum available through `search.select(rule="best_score")`;
-- on-demand immutable `PiPLSPredictorRankProfile` results through
-  `predictor_rank_profile(n_components)`, derived from `cv_results_`;
-- a package-owned Pulp first example showing one chained path search and minimum-CV-MSE refit,
-  standardized fitted-value diagnostics, and one caller-owned observed-versus-fitted plot;
-- a public documentation entry that defines paired latent variables, component-count scanning,
-  and elbow-based CV-MSE interpretation before specialized terminology;
-- shared private fold-evaluation and adaptive-search machinery;
-- PLS-style fitted attributes, feature names, pandas output, inverse reconstruction, and a public
-  immutable `PiPLSDecomposition` limited to interpretable directions, dilation, rank diagnostics,
-  solver provenance, and the derived centered/scaled regression map;
-- grouped, repeated, predefined, temporal, and leave-one-out split workflows, with a focused
-  small-sample LOO example reporting ordered OOF predictions and pooled OOF $R^2$;
-- optional ordered OOF predictions and immutable `PiPLSOOFReport` composed from an existing
-  `PiPLSSelection`, with explicit selection-conditioned interpretation;
-- immutable validated `PiPLSDataset` with recursively frozen metadata, explicit rejection of
-  object-dtype metadata arrays, and deterministic synthetic generators with shared,
-  predictor-specific, and response-specific latent structure;
-- a transparent real-data input contract: users and examples read `X` and `Y` explicitly, with no
-  metadata, registry, or package-owned loader required for fitting;
-- a package-owned reference-resource convention using one canonical `X.csv`/`Y.csv` pair plus
-  `metadata.json`, `README.md`, and `LICENSE.txt` under `src/pipls/_data/<dataset>/`;
-- a current reference suite containing package-owned Pulp, Sugarcane, and Tobacco with one active
-  matrix pair each, named loaders, direct non-Python raw-file access, and distribution checks;
-- the implemented `pipls.datasets.load_pulp()`, `load_sugarcane()`, and `load_tobacco()` datasets,
-  backed by installed package resources and the same immutable contract;
-- a completed licensing review that intentionally excludes Corn, the legacy Citrination Steel
-  table, SARCOS, and FRED-MD from repository redistribution;
-- pure immutable Pi-PLS display factors and standardized explicit-provenance prediction
-  diagnostics under `pipls.inspection`;
-- estimator-neutral latent-structure, biplot, observation-diagnostic, and prediction-diagnostic
-  names that accept compatible fitted Pi-PLS and ordinary PLS models;
-- a data-first biplot boundary: `biplot_coordinates()` owns balanced numerical coordinates, while
-  the Pulp example and tutorial use direct Matplotlib arrows and optional `adjustText` label layout;
-- direct standard PLS-family inspection rendering: scores, loadings, coefficients, and raw
-  observation diagnostics are plotted from immutable arrays with ordinary Matplotlib;
-- direct Pi-PLS factor rendering from immutable `PiPLSDisplayFactors` arrays with ordinary
-  Matplotlib; the package exposes no plotting submodule or convenience renderer;
-- direct Pulp, Sugarcane, and Tobacco reference workflows that keep `component_path_`, conditional
-  predictor-rank profiles, fixed-model OOF predictions, and immutable inspection results in memory
-  and write six explicit final PDF figures; Sugarcane and Tobacco separate `main()`-owned analysis
-  from private same-file rendering;
-- a two-tier tutorial route: a short deterministic synthetic selection-and-prediction workflow
-  from example 02, followed by a focused Pulp real-data workflow from example 05; both use
-  checked snippets and deterministic single-chart SVG assets;
-- direct Tobacco response pagination through two same-file multipage report writers, with full
-  predictor SVD, decreasing-wavenumber spectral axes, and raw observation diagnostics;
-- a direct Pi-PLS/ordinary-PLS comparison whose two immutable component paths are plotted together
-  in example 04 without DataFrame conversion, generated CSV intermediates, or a plotting helper;
-- a tutorial-first served site whose synthetic entry tutorial owns the minimum selection contract
-  and whose second Pulp tutorial owns real-data selection qualification, selection-conditioned
-  OOF analysis, and representative interpretation plots including both $P$ and $QD$ factor views;
-  both link to the generated API and advanced references;
-- a compact documentation navigation without separate quickstart, estimator, parameter-selection,
-  or preprocessing guides: the home page provides the minimal fixed fit, generated API pages own
-  exact estimator contracts, and retained path and validation pages cover advanced behavior;
-- an audience-oriented documentation entry: the root README owns restrained application-oriented
-  motivation, installation, two compact workflows, and tutorial routes; `CONTRIBUTING.md` owns
-  development and repository maintenance; served navigation separates programming reference from
-  project validation;
-- tutorial openings that present purpose, coverage, setup or data, and modeling workflow before
-  source provenance, renderer ownership, and figure-generation commands in terminal reproduction
-  sections;
-- a completed documentation reference layer with a public result-object map, task-oriented
-  troubleshooting, generic local-link and anchor validation, and tests that protect structure
-  without freezing explanatory prose.
-- a served example catalogue whose dataset-specific selection notes and cross-example output or
-  rendering notes occupy separate heading scopes, so a narrow Tobacco subsection does not govern
-  generic documentation that follows it.
-- a consolidated programming reference with eight navigation entries: small generated result and
-  utility groups live with their owning estimators, path selection and cross-validation share one
-  advanced page, and model inspection retains all stable interpretation anchors without repeating
-  elementary plotting recipes.
-- documentation and maintained example constructions aligned with the current public defaults:
-  `PiPLSSearchCV()` demonstrates path-evaluation operation, decomposition documentation includes
-  rank/solver diagnostics, and Pulp rank profiles use `predictor_rank_profile()`;
-- a grouped self-documenting maintainer command index that presents `make install` and `make check`
-  first, then separates development, documentation/example, and distribution/maintenance targets
-  without renaming or changing any recipe.
-- a current-boundary testing policy that retires one-off migration tombstones while preserving
-  negative tests for explicit public and architectural exclusions.
-
-Decision 0086 reduces the public decomposition to quantities used for fitted-model interpretation;
-private construction matrices remain in `PiPLSCoreResult`. Decision 0087 removes scorer plumbing,
-exact rotation aliases, adaptive-search bookkeeping, and flat OOF duplicates from the public fitted
-surface. Decision 0088 completes API3 by removing result-record bookkeeping and redundant zero
-loading blocks and by presenting returned records without constructor-first generated signatures.
-
-Decisions 0079--0083 establish and enforce data-first rendering for biplots, prediction
-diagnostics, standard PLS-family inspection, and Pi-PLS factors. Decision 0084 completes the
-prediction-diagnostic figure trio. Decision 0085 makes Tutorial 2 sequential and self-contained:
-setup and display choices precede use, and every displayed interpretation figure has a matching
-standalone renderer snippet. Decision 0089 balances the tutorial's Pi-PLS-specific section by
-displaying both $P$ and $QD$, while the complete example retains the separate $D$ and $Q$ plots.
-Decision 0090 consolidates the programming reference without changing public objects or numerical
-behavior.
-Decision 0091 makes every successful handoff snapshot a clean `HEAD` archive: tracked, staged, and
-nonignored untracked changes are refused, while ignored generated files are excluded by
-construction. Decision 0092 makes the path ceiling respect the minimum predictor rank verified
-after fold-local preprocessing, so rank-deficient folds bound the candidate path instead of
-aborting it. The third pre-release hardening increment aligns `rank_test_score` with selection by
-using one reference-anchored tolerant comparison and forbidding adjacent near-tie chaining.
-Decision 0093 makes the core public result records validate direct construction, defensive copies,
-scalar values, aligned arrays, OOF coverage, and pickle reconstruction uniformly. Decision 0094
-applies the same defensive boundary to inspection records and requires inspection helpers to return
-finite float64 quantities or fail explicitly when a derived value is not representable.
-Decision 0095 requires every fixed estimator to state its complete rank pair. Decision 0096
-distinguishes mathematical $Y$ from scikit-learn `y`, defines both resolved path ceilings before
-policy details, and groups inspection concepts with the generated inspection API. Decision 0097
-adds one focused small-sample leave-one-out workflow without restoring a context-free splitter
-catalogue.
-Decision 0098 retains every maintained Make target while grouping the command index around setup,
-routine validation, development, documentation and examples, and distribution maintenance.
-Decision 0099 restores the example artifact boundary: only output-directory placeholders are
-committed or snapshotted, source distributions include those placeholders, and distribution
-validation runs the introductory example from a clean extraction.
-Decision 0100 moves rendered documentation into a dedicated GitHub Pages workflow: every push and
-pull request validates the strict checkout and source-distribution builds, while `master` pushes
-receive repository-derived canonical URLs and deploy the built site. The README routes GitHub users
-through the current Pages deployment without hard-coding an unconfirmed owner name. Decision 0101
-renumbers maintained examples continuously from 01 to 07. Decision 0102 separated path evaluation
-from automatic constructor-time refitting and gave the default scorer a stable package string. Decision 0103
-retains only the maintained `dev`, `examples`, and `docs` extras. Decision 0104 refines the new-user
-documentation route, and Decision 0105 aligns maintained documentation and examples with the
-resulting implementation. Decision 0137 now supersedes Decision 0102's former constructor-refit
-surface with explicit post-fit refitting.
-Plotting migration G1--G5 and public-result cleanup API1--API3 are
-complete. Decision 0042 defines the staged fitted-model architecture, and Decision
-0045 corrects the
-analysis-model boundary. The shared API and numbered-example migrations are complete. Ordinary PLS
-is retained only in the dedicated example-04 CV-MSE comparison. Examples
-05–07 evaluate Pi-PLS paths only, and every post-analysis quantity comes from the selected Pi-PLS
-model.
-
-The current top-level package exports are:
+The top-level wildcard surface is intentionally narrow:
 
 ```python
 from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
 ```
 
-Returned result records are imported from `pipls.component_path`, `pipls.decomposition`, and
-`pipls.validation` when explicit type imports are needed.
+Result records and utility functions remain public from their focused modules. There is no
+compatibility alias for removed pre-release names.
 
-Dataset functionality is public from `pipls.datasets`:
+## Modeling and selection lifecycle
 
-```python
-from pipls.datasets import (
-    PiPLSDataset,
-    PiPLSRegressionTruth,
-    make_pipls_regression,
-    make_pipls_train_test,
-)
-```
+`PiPLSRegression` owns fixed fitting only. It learns centering and optional scaling from the data
+supplied to each fit, validates the requested ranks, and exposes standard PLS-style fitted arrays
+plus `decomposition_`.
 
-## Accepted repository-product boundary
-
-Decision 0024 defines `pipls` as a long-lived software-product repository. It owns:
-
-- the installable package and public API;
-- user documentation and numbered examples from a minimal fixed fit through complete analyses;
-- transparent reference datasets;
-- tests, packaging, compatibility policy, and releases.
-
-It does not own manuscript figures, complete publication experiment grids, paper-only OLS/CCA
-comparisons, cached paper results, or publication-specific environments. Those belong in downstream
-reproduction repositories that pin tagged `pipls` releases.
-
-Ordinary PLS remains the comparator in the dedicated component-path example because it is the nearest practical baseline
-for Pi-PLS users. OLS or CCA are included only when they protect a package-level identity, limiting
-case, or public behavior.
-
-## Accepted public defaults and boundaries
-
-| Concern | Current contract |
-|---|---|
-| Conditional predictor-rank selection | `PiPLSSearchCV(search_method="auto")` |
-| Component counts | `n_components_values="all"` by default; explicit integer sequences request a subset |
-| Path search | `PiPLSSearchCV(search_method="auto")` by default |
-| Component-path artifact | immutable `component_path_` with aligned score, CV-MSE, fold-SD, derived fold-based standard-error, predictor-rank, policy, and split-count arrays for plotting and inspection |
-| Conditional rank profile | `predictor_rank_profile(h)` returns evaluated ranks and aligned score/CV-MSE arrays on demand, plus the selected scalar row |
-| Exhaustive search | explicit `PiPLSSearchCV(search_method="optimal")` |
-| Predictor SVD | `svd_solver="auto"`, with the documented conservative threshold |
-| Reproducibility | estimator `random_state` accepts integer, NumPy `RandomState`, or `None`; default `0` is reproducible |
-| Rank support rule | path-only `samples_per_predictor_rank=5`; total supplied $n$ defines support and centered training folds impose feasibility caps |
-| Validation | path-only `cv=5`; `cv=None` requests standard five-fold regression CV |
-| Selection score | stable package string `"neg_response_standardized_mse"` by default, resolving to the public callable; sklearn scorer names, callables, and `None` accepted |
-| Final refit | post-fit `search.refit(X, y, rule=...)` or `search.refit(X, y, n_components=...)` returns a fitted clone without mutating search state |
-| Path composition | direct `PiPLSRegression` or `Pipeline` whose final step is `PiPLSRegression` |
-| Group handling | path-only keyword `groups` routed to group-aware splitters |
-| OOF output | explicit post-fit `search.oof_report(X, y, selection=...)`; reports are returned directly and not attached to search state |
-| Dataset namespace | immutable container, implemented `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`, plus seeded generators under `pipls.datasets` |
-| Real-data input | user-owned explicit reading of `X` and `Y`; no registry, metadata, or package loader is required for fitting |
-| Reference datasets | Pulp, Sugarcane, and Tobacco are public package resources used by every maintained consumer; each has one active matrix pair and documented raw-file access |
-| Weighting | weighted fitting and general sample-weight routing are intentionally out of scope |
-| Repository tests | executable behavior and durable file structure; no pinned living prose or documentary metadata values |
-| Historical removals | accepted decisions preserve removal history; tests retain negative assertions only for current public or architectural boundaries |
-| Publication assets | downstream repositories pin released `pipls` versions |
-| Retired benchmark layer | the former focused synthetic scripts, result contracts, tests, and documentation were removed by Decision 0125 |
-| Model standardization | current estimator behavior: fold-local centering and optional scaling, followed by full-training refit |
-| Future block-aware scaling | valid long-term product scope, but no accepted API or current implementation phase |
-| Model inspection | immutable numerical inspection is implemented; examples render every chart directly with Matplotlib and own all panel and report composition |
-| Python compatibility | supported and classified on Python 3.10–3.14; metadata keeps `requires-python = ">=3.10"` without an upper bound |
-| Runtime dependencies | `numpy>=1.26,<3`, `scikit-learn>=1.4,<2`, and `joblib>=1.2,<2`; the minimum lines are constrained together on Python 3.10 |
-| Compatibility CI | separate minimum, supported-Python, and latest-compatible jobs; every job prints resolved interpreter and runtime dependency versions |
-| Distribution validation | `make dist-check` builds once and verifies separate clean wheel and sdist installations with one shared public smoke test |
-| Served documentation | user guides and API reference only; `docs/decisions/` remains maintainer history and is excluded from MkDocs |
-
-Additional fixed decisions:
-
-- `"auto"` rank search is deterministic and approximate. It becomes exhaustive only inside the
-  final small integer interval. `"optimal"` is exhaustive over the complete admissible range.
-- Randomized SVD affects only the initial predictor-matrix decomposition. Response and coupling
-  decompositions remain exact.
-- interpretable Pi-PLS directions, dilation, rank/solver diagnostics, and the standardized map live
-  in the read-only `decomposition_` object; construction matrices remain private and standard
-  PLS-style fitted attributes remain top-level.
-- `PiPLSSearchCV` is a path evaluator rather than a delegated fitted model. Post-fit `refit()`
-  requires exactly one named rule or one component count, returns a fitted clone, and leaves search
-  evidence unchanged. Non-mutating `select()` uses the same vocabulary and resolver to return one
-  immutable stored row, including the global configured-score optimum through `rule="best_score"`.
-  Output-container configuration remains carried by the estimator template and returned clone.
-- `PiPLSRegression` is the fixed-model estimator and owns no CV, scoring, or selection results;
-  `PiPLSSearchCV` is the search meta-estimator and sole package selection interface.
-- Real-data examples use the default path-evaluating `PiPLSSearchCV()` for the path and fit a
-  separate fixed model
-  after a visible component-path choice. Pulp and Sugarcane use explicit component counts, while
-  Tobacco obtains its selected row, exact minimum reference, resolved 10% relative tolerance, and
-  CV-MSE threshold from `model.selection_`. All three call
-  `search.predictor_rank_profile(selection.n_components)`; for Tobacco the profiled count is
-  therefore the result of the explicit tolerance policy. All three use `component_path_`, explicit
-  search
-  validation reports, and inspection results
-  directly in memory. All three use direct fixed estimators. Selection evidence is consumed as
-  immutable `PiPLSSelection` values rather than duplicated fitted-search attributes.
-- Refit coefficients and fitted-model methods are accessed on the direct estimator or pipeline
-  returned by `search.refit(...)`. No fitted model is attached to `PiPLSSearchCV`, and coefficients
-  are not flattened onto search state when preprocessing may change the feature space.
-- OOF results produced after using the same splits for model selection are labeled
-  `selection-conditioned`, not unbiased external-test estimates.
-- Arbitrary nested meta-estimators and general metadata routing are not supported merely because
-  scikit-learn can represent them.
-- Repository tests follow `.llm/testing.md`: living handoff, roadmap, and dataset metadata contents
-  are reviewed but are not mirrored as fixed phrase or field-value assertions.
-
-## Implemented estimator/search correction and API polish
-
-Decisions 0039 and 0040 are fully implemented:
-
-- `PiPLSRegression` now fits one explicit `(n_components, predictor_rank)` pair;
-- it owns no CV, scoring, OOF, or search-result parameters and attributes;
-- direct fits warn when $n/r_\pi<3$;
-- `PiPLSSearchCV` owns feature probes, candidate folds, conditional path selection, explicit OOF
-  reporting from stored split indices, and post-fit full-data refitting through a fresh estimator clone;
-- the path supplies the private fold engine with the one warning category it may suppress, while
-  unrelated warnings remain visible;
-- unused rank-grid construction, solver tracing, duplicate candidate metadata, and OOF rescoring
-  have been removed from the private selection layer.
-- the complete component path is explicit through `n_components_values="all"`;
-- random-state forms, cloning, and estimator-template parameter propagation follow scikit-learn
-  conventions;
-- the stable package string `"neg_response_standardized_mse"` is the default selection parameter and resolves to the public scorer callable;
-- duplicate Pi-PLS-specific fitted aliases are removed in favor of canonical `decomposition_` fields;
-- the public guides distinguish best evaluated score from a global surface optimum, explain that
-  response-standardized MSE is diagnostic when a nondefault scorer drives selection, and are
-  included in source distributions.
-
-The estimator/search correction and final minimality audit are complete. The redundant public
-path parameter-prefix control has been removed, supported pipelines infer their terminal Pi-PLS
-step, and fixed explicit rank pairs are covered by a focused `GridSearchCV` interoperability test.
-
-## Current standardization boundary and deferred block-aware direction
-
-`PiPLSRegression` currently owns leakage-safe model standardization. Every fit centers `X` and `Y`;
-`scale=True` also divides both blocks by safe training-sample standard deviations, while
-`scale=False` retains centering. Candidate estimators learn these statistics independently in each
-training fold. After rank or path selection, the chosen estimator learns them again from the full
-training set supplied to `fit()`. Prediction uses the stored statistics and returns responses in
-original units.
-
-This existing behavior is not a future preprocessing feature and must not be externalized into a
-one-time transform fitted before cross-validation.
-
-Future development may add block-aware variants of model standardization inside the supported
-estimator/model-pipeline fitting boundary. Their exact public placement is not decided. The
-direction is preserved, but it is expected months from now and has no current API design.
-
-Until the owner starts a dedicated phase:
-
-- do not add provisional block-scaling classes or public names;
-- do not reserve constructor parameters or block semantics;
-- do not refactor current code in anticipation of a speculative API;
-- keep the fixed numerical core independent from preprocessing while retaining standardization in
-  the estimator/model-selection layer;
-- require every future learned scaling rule to fit inside its corresponding training fold and the
-  final full-training refit.
-
-## Retired benchmark layer
-
-Decision 0125 removes the four focused synthetic benchmark scripts, their dedicated tests, the
-public benchmark page, and the normative benchmark contract. Their development-validation purpose
-was complete, and they did not define package acceptance thresholds. Numerical, estimator, search,
-synthetic-data, and randomized-SVD behavior remain protected by focused package tests. Historical
-decision records remain unchanged.
-
-## Legacy dataset licensing review
-
-Decision 0041 closes the companion-analysis dataset inventory for the current repository. The
-review applied a strict inclusion rule: public download access is not enough; the exact source
-material committed or transformed by `pipls` must carry an explicit license or permission granting
-redistribution and adaptation for the repository's general use.
-
-- Corn is intentionally excluded because redistribution permission for the exact source file is not
-  sufficiently explicit and the dataset adds little beyond the existing NIR examples.
-- The companion materials identify the legacy Steel table as Citrination-processed. The matching
-  public source candidate, Citrination dataset 153092, provides neither a documented derivation for
-  the exact 267-row table nor an explicit dataset license, and its service terms do not grant
-  general redistribution of hosted data. Separately licensed 312-row Steel Strength derivatives are
-  different datasets and do not establish rights for the companion table.
-- The canonical GPML SARCOS page provides the train and test files and attribution but no dataset
-  license or redistribution grant.
-- FRED-MD is publicly accessible for research, but current FRED terms reserve rights in the
-  compilation and require users to resolve third-party series rights; the repository therefore
-  cannot redistribute the historical derived regression table with confidence.
-
-No additional legacy dataset is pending integration. A future real dataset must add a distinct
-package-level use case and pass the source-level licensing gate before implementation work begins.
-
-## Recent completed increments
-
-Decisions 0107--0116 are complete and partly superseded by Decisions 0137 and 0140.
-`PiPLSSearchCV.select()` owns non-mutating stored-row inspection, including the global
-configured-score optimum, and `PiPLSRegression` remains fixed-pair only.
-
-The six owner-authorized simplifications are complete. Search inputs are resolved once;
-decomposition inspection trusts validated factor arrays; display-factor $QD$ and prediction
-diagnostics are derived from independent state; path-wide metadata and profile selection are not
-duplicated; and `PiPLSOOFReport` composes an immutable `PiPLSSelection` while keeping
-selection metrics on `report.selection`. No package release preparation or Python-package
-publication work is authorized.
-A follow-up behavior-preserving audit cleanup removes the now-unused private finite-vector
-inspection helper and the no-op reassignment of the already validated selected result.
-
-Decision 0117 completes the standard BSD 3-Clause license text, names Vishal Agrawal,
-Fritjof Nilsson, and Stefan B. Lindström as package authors and current copyright holders of the
-repository-authored code and documentation, and adds public plus machine-readable citation
-metadata. The companion manuscript is under revision at *Computers & Chemical Engineering* as
-CACE-D-26-00847. Dataset-specific licenses remain authoritative, and no release or publication
-claim is implied.
-
-Decision 0118 standardizes every maintained example and documentation figure: rendered method
-names use `$\Pi$`-PLS, factor labels use upper-case `$P$` and `$Q$` with lower-case diagonal `$d$`,
-tiled factor/latent/prediction figures omit redundant subplot titles, prediction main titles remain
-on one line, path/profile y-axes start at zero with an upper limit of at least one, dilation plots
-use numeric component ticks without repeating the x-axis label, and dense Tobacco response labels
-are rotated explicitly.
-
-Decision 0133 names the configurable-generator truth record `PiPLSRegressionTruth` and keeps
-`PiPLSLatentGeometryTruth` for the separate manuscript-aligned generator. The former generic
-pre-release truth-class name is not retained as an alias.
-
-Decision 0134 gives public result properties type-revealing names: predictor-rank profiles expose
-`selection`, OOF reports expose `cv_mse_mean`, and their coverage summary uses
-`has_complete_oof_coverage`. Former pre-release names are not retained as aliases.
-
-Decision 0136 established seeded shuffled ordinary five-fold examples. Decision 0146 now makes
-the complete Pulp workflow the deliberate repeated-CV exception through ten repeated five-fold
-partitions. Other ordinary workflows retain one seeded partition, and Example 03 retains exhaustive
-`LeaveOneOut`, for which shuffling is not defined.
-
-Decision 0119 adds `make_pipls_latent_geometry()` and `PiPLSLatentGeometryTruth` as an additive
-manuscript-aligned synthetic capability. It implements independent standard-normal latent scores
-and loading entries plus independent Gaussian predictor/response noise, with no normalization,
-orthonormalization, strength, or observed-scale transformation. Existing configurable generators,
-examples, estimator/search behavior, and practical real-data workflows are unchanged.
-
-Decision 0120 makes the companion manuscript the scientific source for the canonical public theory
-page. The documentation now includes the retained-subspace projector decomposition, the
-cross-covariance response-subspace optimization, the latent least-squares and diagonal relations,
-the panoramic interpretation, comparative limiting cases, and the nominal fitted dimension
-$(r_\pi+q-h)h$ after $\Pi$ is fixed. It distinguishes retained observed predictor directions from
-known synthetic signal rank and leaves every package behavior and practical workflow unchanged.
-
-Decision 0121 establishes the canonical terminology for the fixed construction. $\Pi$ is the
-retained predictor basis, $\Pi\Pi^{\mathsf T}$ the retained-subspace projector, $P$ and $Q$
-orthonormal predictor and response directions, and $d_k$ the dilation of paired latent mode $k$.
-`n_components` counts paired latent modes and `predictor_rank` is the retained predictor-subspace
-dimension. `PiPLSDecomposition` exposes `predictor_directions` and
-`response_directions`, while the standard estimator attributes `x_rotations_` and `y_rotations_`
-remain for PLS-family compatibility. $P$ and $Q$ remain distinct from reconstruction loadings. The
-package's $QD$ orientation is the transpose of manuscript-facing $DQ^{\mathsf T}$.
-
-Decision 0122 propagates that vocabulary through the living README, served guides, generated API
-introductions, tutorials, example prose, and public source docstrings. It defines the two public
-rank names at their owning entry points, uses directions and dilations for the Pi-PLS factors, and
-uses mathematically direct decomposition-field names and retains generic component-path
-terminology. Decision 0130 later renames the pre-release decomposition fields without changing
-numerical behavior.
-
-Decision 0123 adds the focused companion-manuscript synthetic-data guide. It demonstrates the exact
-Gaussian latent generator and truth equations, documents the known oracle synthetic dimensions,
-and distinguishes distribution-level, seeded-realization, and complete-publication reproduction.
-Complete manuscript grids, comparators, and reporting remain downstream, and package search plus
-real-data workflows remain unchanged.
-
-Decision 0130 aligns the public immutable decomposition with the canonical mathematics by renaming
-its pre-release fields to `predictor_directions` and `response_directions` without compatibility
-aliases. Standard PLS-style `x_rotations_` and `y_rotations_` remain fitted estimator attributes and
-reference the same read-only arrays.
-
-## Implemented inspect-decide-refit lifecycle
-
-Decision 0137 governs the implemented `PiPLSSearchCV` lifecycle. The search exposes explicit
-post-fit full-data refitting:
+`PiPLSSearchCV.fit(X, y)` materializes one validation split set and evaluates fixed-model clones.
+It does not retain `X` or `y` and does not automatically fit a final full-data model. Post-fit work
+is explicit:
 
 ```python
-search = PiPLSSearchCV(cv=cv).fit(X, Y)
-path = search.component_path_
-profile = search.predictor_rank_profile(n_components=4)
-model = search.refit(X, Y, n_components=4)
+search = PiPLSSearchCV(cv=cv).fit(X, y)
+selection = search.select(rule="minimum_cv_mse")
+model = search.refit(X, y, rule="minimum_cv_mse")
+report = search.oof_report(X, y, selection=model.selection_)
 ```
 
-`refit()` accepts exactly one of `rule` and `n_components`, supports `"best_score"` and
-`"minimum_cv_mse"`, returns a fitted clone of the direct estimator or
-terminal-Pi-PLS pipeline, and leaves the search unchanged. The constructor boolean `refit`, selected
-fitted-model attributes, and search-level model delegation were removed in the same increment
-because a same-named constructor attribute would shadow the method.
+The supported named rules are:
 
-`PiPLSSearchCV.oof_report(X, Y, selection=...)` reuses defensive read-only copies of the exact
-materialized search splits, always returns ordered OOF predictions and counts, does not rescore
-candidates or fit a full-data model, and leaves the search unchanged. The supplied data must have
-the fitted sample, feature, and response-column shape and remain in the original row order; the
-search retains indices, not values.
+- `best_score`: global optimum under the configured scorer;
+- `minimum_cv_mse`: smallest component-path row satisfying simultaneous relative and absolute
+  tolerances around the exact minimum CV-MSE row.
 
-The search surface contains candidate evidence, immutable path/profile inspection, exact stored
-splits for explicit follow-up reporting, and the post-fit `select()`, `refit()`, and `oof_report()`
-operations.
+Manual selection uses an evaluated `n_components` value and the predictor rank already selected
+conditionally for that row. A successful refit attaches the exact immutable row as
+`model.selection_`; the fitted search is not mutated.
 
-## Three-stage user onboarding transition
+`oof_report()` accepts an existing compatible selection and reuses every split materialized by the
+search. Repeated validation predictions are averaged per observation and their counts are exposed.
+The report is selection-conditioned descriptive validation, not nested-CV or external-test
+performance.
 
-Decision 0139 authorizes a three-patch presentation transition:
+## Current statistical reporting
 
-1. establish the three-stage onboarding decision and guide-layer target;
-2. rename the first example to `01_pulp_quick_start.py`, add a rendered Pulp quick-start tutorial
-   and generated asset contract, and place it first in served navigation;
-3. reframe the landing page, synthetic tutorial, path reference, example catalogues, and active OOF
-   terminology around automatic fit, inspect-decide-refit, and selection-conditioned validation.
+For each evaluated component-path row, validation MSE is summarized with equal weight per
+materialized split:
 
-The target route starts with the shortest automatic Pulp fit and full-data fitted-value plot,
-continues with synthetic path inspection and manual component choice, and ends with the complete
-Pulp selection-conditioned validation and interpretation workflow. The quick start must never call
-its calibration-fit predictions validation. The transition retains no old example filename,
-duplicate tutorial, or compatibility navigation because the package remains at version `0.0.0`.
+```text
+cv_mse_mean = mean(split_cv_mse)
+cv_mse_std  = std(split_cv_mse, ddof=0)
+```
 
-Current status: **Patches 1 and 2 complete; final reframing paused**. The maintained first example
-is now `examples/01_pulp_quick_start.py`, the rendered quick-start tutorial owns one generated SVG
-and semantic manifest, and served navigation presents quick start, synthetic inspection, and
-complete Pulp analysis in that order. Patch 3 resumes after the search-owned selection transition so
-those pages target the final vocabulary once.
+`cv_mse_std` is descriptive split-to-split variability. Maintained plots use mean CV-MSE plus or
+minus one split SD. The package exposes no standard-error result and no standard-error selection
+rule.
 
-## Search-owned path-selection transition
+For `minimum_cv_mse`, `relative_tolerance=None` resolves to
+`sqrt(np.finfo(np.float64).eps)` and `absolute_tolerance=np.inf` disables the absolute cap. Both
+caps must hold. The selection retains the resolved tolerances, the exact unruled reference minimum,
+and the derived effective threshold.
 
-Decision 0140 authorizes a four-patch public-API transition:
+## Data and example boundary
 
-1. establish the decision and guide-layer target;
-2. add non-mutating `PiPLSSearchCV.select()`, consolidate the private resolver, and protect parity
-   during consumer migration;
-3. migrate maintained examples, renderers, tests, and living documentation to `search.select(...)`;
-4. remove the three public selected-row methods from `PiPLSComponentPath`, relocate their durable
-   contracts to the search boundary, and close the transition with active-surface audits.
+Users may fit ordinary array-like `X` and `y` from any source. No generic registry, downloader,
+DataFrame requirement, or package-specific data-ingestion layer is required.
 
-The final boundary makes the component path aligned numerical evidence only. `select()` and
-`refit()` share exactly one rule/component-count vocabulary and one resolver. Selection numerics,
-tie behavior, and final fitting do not change.
+Named reference datasets are available from `pipls.datasets`:
 
-Current status: **complete**. `PiPLSSearchCV.select()` uses the shared `SelectionRule` vocabulary as
-the fitting-free selection-only operation. Model-producing consumers recover the fitted row from
-`model.selection_`. The path object exposes aligned immutable evidence only, while exact selection
-contracts are tested at the search boundary.
+```python
+load_pulp()
+load_sugarcane()
+load_tobacco()
+```
 
-Decision 0141 adds `predictor_rank_profile.pdf` to both spectral complete analyses. Sugarcane
-profiles its explicit selected count; Tobacco profiles `selection.n_components` from the exact row
-retained by the 10%-relative-tolerance refit. All three complete real-data workflows write six PDFs.
+Each loader reads one canonical package-resource `X.csv`/`Y.csv` pair plus metadata, README, and
+license files. The resources are usable directly outside Python. Corn, the legacy Citrination
+Steel table, SARCOS, and FRED-MD are intentionally excluded because the exact candidate materials
+do not have sufficiently clear redistribution rights.
 
-## Package-owned reference-dataset transition
+The maintained numbered examples are user tasks:
 
-Decision 0142 authorizes six patches:
+1. compact Pulp automatic fit and fitted-value diagnostic;
+2. synthetic inspect-decide-refit workflow with external-test prediction;
+3. focused leave-one-out validation;
+4. Pi-PLS versus ordinary-PLS component-path comparison;
+5. complete repeated-CV Pulp analysis;
+6. complete Sugarcane analysis;
+7. complete Tobacco analysis with a 10% relative CV-MSE tolerance.
 
-1. establish the decision and guide-layer target;
-2. generalize the private Pulp resource-loading implementation without public behavior changes;
-3. add packaged Sugarcane resources, `load_sugarcane()`, integrity tests, and distribution checks;
-4. add packaged Tobacco resources, `load_tobacco()`, integrity tests, and distribution checks;
-5. migrate maintained consumers and active documentation to the three named loaders;
-6. remove duplicate repository matrices, document raw-file access for non-Python users, and
-   enforce one active matrix pair per dataset.
+Example 05 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 06 and 07 use
+`KFold(n_splits=5, shuffle=True, random_state=0)`. Complete real-data examples are exercised by
+`make examples`, not duplicated in the default test suite.
 
-The final resources remain ordinary CSV, JSON, README, and license files under
-`src/pipls/_data/<dataset>/`, directly usable from tagged source releases, source distributions,
-wheels, and installed packages. The transition introduces no registry, downloader, `as_frame`
-surface, hidden preprocessing, or top-level loader exports.
+## Inspection and rendering boundary
 
-Current status: **complete**. Pulp, Sugarcane, and Tobacco are implemented through one dataset-
-neutral private resource loader, return immutable labeled datasets or fresh read-only matrices, and
-work from clean wheel and source-distribution installations. Every maintained reference-data
-consumer uses the corresponding loader. The duplicate top-level spectral resources are removed;
-`src/pipls/_data/<dataset>/` is the sole active location, and public documentation identifies the
-raw files for non-Python use.
+`pipls.inspection` returns validated immutable NumPy results for Pi-PLS factor displays, shared
+PLS-family latent structure, balanced biplot coordinates, observation diagnostics, and explicit-
+provenance prediction diagnostics.
 
-## Model-selection provenance and OOF-reporting transition
+The runtime package contains no plotting module. Examples and users compose Matplotlib artists,
+labels, layouts, saving, and optional `adjustText` placement directly from immutable numerical
+results. Generated figures are artifacts, not package state.
 
-Decision 0143 authorizes seven patches:
+## Documentation and distribution boundary
 
-1. establish the accepted decision and guide-layer target;
-2. enrich `PiPLSSelection` with rule, reference-minimum, and derived 1-SE-threshold
-   provenance;
-3. retain the resolved selection as `model.selection_` on successful `refit()` results;
-4. add `oof_report(selection=...)` and `PiPLSOOFReport` while retaining the former report surface
-   only as a temporary migration bridge;
-5. migrate manual-selection examples, tutorial renderers, tutorials, and structural tests;
-6. migrate automatic and validation-only workflows;
-7. remove the former report surface, normalize every maintained workflow, complete active-surface
-   audits, and close the transition.
+The repository is the long-lived software product, not a paper-reproduction environment. Paper-
+specific experiment grids, cached results, figure reproduction, and publication environments
+belong in downstream repositories that pin a released package version.
 
-The final model-producing order is search, refit, then analysis: `model.selection_`,
-`component_path_`, `predictor_rank_profile(...)`, optional `oof_report(...)`, fitted-model
-inspection, and rendering. OOF reporting is not part of modeling. `search.select()` remains an
-optional fitting-free operation for selection-only workflows.
+The served site separates tutorials, programming reference, advanced scientific guidance, and
+project validation. Numbered decisions and `.llm` are maintainer records and are not served as user
+documentation.
 
-Current status: **complete**. Selection results record validated named-rule and
-1-SE reference provenance; successful direct-estimator and pipeline refits retain the exact resolved
-row as `model.selection_`; and `oof_report(selection=...)` returns immutable `PiPLSOOFReport` after
-exact search-compatibility validation. All model-producing workflows use `model.selection_`,
-selection-driven OOF reporting where applicable, modeling-before-analysis order, and rendering-last
-structure. The leave-one-out workflow remains selection-only and passes its `best_score` selection
-to `oof_report()`. The former report surface has been removed without aliases, and all maintained
-workflows use the final selection-driven interface.
+Python 3.10--3.14 is supported within the dependency ranges declared in `pyproject.toml`. Clean
+wheel and source-distribution installations are validated. Package snapshots are root-relative
+archives of a clean committed tree.
 
-## Pre-release public-surface cleanup transition
+## Explicit exclusions and deferred work
 
-Decision 0144 is implemented through seven patches that remove duplicated access without removing
-distinct capabilities. OOF reports are simplified, `PiPLSSelection` is adopted, fitted-search
-global-best state is removed, `cv_results_` uses only stable direct parameter columns, package
-datasets use `X` and `Y`, unused shape-only inspection properties are removed, and top-level result
-re-exports are replaced by focused-module imports.
+Do not add without a new owner decision:
 
-`search.select()` remains the fitting-free selection operation. All five numerical inspection
-functions, component-path and rank-profile evidence, advanced candidate scores and timings,
-immutable direct-construction validation, biplot scaling factors, and caller-owned plotting remain
-public contracts.
+- block-aware scaling or preprocessing semantics;
+- automatic outer validation or unbiased-performance claims;
+- weighted fitting or general-purpose metadata routing;
+- arbitrary nested meta-estimator support;
+- public plotting helpers or style objects;
+- generic dataset registries, network downloaders, or hidden preprocessing;
+- publication-only analyses in this repository;
+- compatibility aliases for removed pre-release APIs.
 
-Current status: **complete**. `PiPLSOOFReport` requires OOF prediction and count arrays and exposes
-selection metrics only through `report.selection`; the active API uses `PiPLSSelection` and
-`PiPLSPredictorRankProfile.selection`; fitted searches expose no public `best_*` state;
-`cv_results_` retains only stable direct `n_components` and `predictor_rank` parameter columns;
-`PiPLSDataset` exposes only `X` and `Y`; inspection records retain component counts but not unused
-shape-only properties; and top-level `pipls` exports only estimators, the public support warning,
-and version metadata. Result records remain public from focused modules.
+Current centering and optional scaling are not deferred: they are integral to every estimator fit
+and are learned within each training fold during search.
 
-## Final implementation-surface cleanup transition
+## Active maintenance sequence
 
-Decision 0145 authorizes four patches that remove the residual duplicate fitted attributes,
-privatize model-selection algorithms, remove two unused private helper layers, declare the remaining
-module export boundaries, and correct the last negative `search.select()` wording.
+Decision 0147 governs the current seven-patch cleanup:
 
-The transition retains learned search state, fitting-free selection, selection provenance, all
-numerical inspection functions, OOF reporting, model-selection behavior, and caller-owned plotting.
+1. establish decision lifecycle policy -- complete;
+2. compact and correct the active `.llm` layer -- complete;
+3. retire explicitly superseded decisions through an explicit map;
+4. add a compact historical summary and retire completed micro-decisions;
+5. simplify brittle structural tests and harden snapshots against tracked generated artifacts;
+6. split `datasets.py` into private implementation modules without changing public imports;
+7. normalize links and indexes and complete repository-wide stale-surface audits.
 
-Current status: **all four patches complete**. The guide-layer contract is established; redundant
-fitted attributes are removed; model-selection algorithms are private; unused private helper layers
-are gone; remaining public modules declare exact exports; and tutorial wording states selection
-ownership positively.
-
-## CV-MSE tolerance and split-SD transition
-
-Decision 0146 authorizes seven patches that replace the superseded SE-based selection with
-minimum-CV-MSE selection under simultaneous relative and absolute tolerances, rename split
-dispersion to `cv_mse_std`, use descriptive SD error bars, demonstrate a 10% relative tolerance in
-Tobacco, and introduce ten repeated five-fold partitions in the complete Pulp workflow and Tutorial
-3. The transition does not add outer validation or demonstrate absolute tolerance in a maintained
-example.
-
-Current status: **all seven patches complete**. The complete Pulp workflow, renderer, and Tutorial 3
-use ten repeated five-fold partitions, materialize 50 splits, and average ten OOF predictions per
-observation. The active API contains only best-score and tolerance-based minimum-CV-MSE selection,
-and no standard-error result surface remains.
-
-## Decision lifecycle and maintainer-context consolidation
-
-Decision 0147 authorizes seven patches that classify maintained decision material, compact the
-active `.llm` layer, retire superseded and one-off records through an explicit map, add a compact
-historical summary, simplify brittle repository tests, harden snapshots against tracked generated
-artifacts, split `datasets.py` internally, and finish with link and stale-surface audits.
-
-Current status: **Patch 1 of 7 complete**. No numbered decision has been removed and no executable
-behavior has changed. Patch 2 compacts and corrects the active `.llm` layer before retirement
-begins.
-
-## Current next increment
-
-Decision 0147 Patch 2: compact and correct the active `.llm` layer around the implemented package.
-Decision 0139 Patch 3 remains an independent paused presentation increment.
+The next admissible increment is Decision 0147 Patch 3: retire explicitly superseded decisions
+through a reviewed map. Decision 0139 Patch 3 remains a separate paused presentation increment and
+must not be mixed into this maintenance sequence.
 
 ## Authority and drift handling
 
-Use this order when sources disagree:
+When sources disagree, use this order:
 
-1. explicit decisions from the project owner in the current request;
-2. accepted decision records under `docs/decisions/`;
-3. normative `.llm/product_scope.md`, `.llm/mathematics.md`, `.llm/numerical_contracts.md`,
-   `.llm/public_api.md`, `.llm/data_io.md`, `.llm/dataset_layout.md`, and
+1. an explicit owner instruction in the current request;
+2. accepted numbered decisions;
+3. normative `.llm` contracts, especially `product_scope.md`, `mathematics.md`,
+   `numerical_contracts.md`, `public_api.md`, `data_io.md`, and `dataset_layout.md`;
 4. source and tests as evidence of implemented behavior;
-5. this current-state handoff and `.llm/strategy.md`.
+5. this handoff and `.llm/strategy.md`.
 
-When documentation, tests, and implementation conflict, stop, identify the exact conflict, and
-resolve it in the same patch or ask the project owner for a scientific/public-API decision.
+Do not silently choose between conflicting scientific or public-API contracts. Identify the exact
+conflict and resolve it in the same patch or obtain an owner decision.
 
-## Fresh-chat startup checklist
+## Fresh-chat checklist
 
-From an uploaded snapshot, a maintainer should:
-
-1. inspect `.llm/SNAPSHOT_INFO` and confirm whether the snapshot was created from a clean commit;
-2. read `.llm/README.md`, this file, `.llm/product_scope.md`, `.llm/strategy.md`, and
-   `.llm/project.md`;
-3. read `.llm/decisions.md` and the decision records relevant to the requested increment;
-4. read the applicable mathematical, numerical, API, and development contracts;
-5. inspect the affected source and tests rather than trusting document claims alone;
-6. read `.llm/data_io.md` and `.llm/dataset_layout.md` for dataset, real-data, or example work;
-8. read `.llm/analysis.md` for fitted-model interpretation, plotting, prediction diagnostics, or
-   analysis artifacts;
-9. read `.llm/testing.md` before changing repository-document, metadata, or fixture tests;
-10. verify that the requested work is the current increment or that the owner explicitly changed
-    the order;
-11. return a downloadable root-relative unified Git patch, its SHA-256 checksum, validation results, and the concise apply/check/commit/snapshot command sequence.
-
-Routine package work should not require re-uploading a manuscript. Request external scientific
-material only when the repository contracts identify a genuine unresolved scientific choice.
+1. Inspect `.llm/SNAPSHOT_INFO` and confirm the clean source commit.
+2. Read `.llm/README.md`, this file, `.llm/product_scope.md`, and `.llm/strategy.md`.
+3. Read `.llm/decisions.md` and every decision directly relevant to the requested change.
+4. Read the applicable mathematical, numerical, API, data, analysis, testing, and development
+   contracts.
+5. Inspect affected source and tests before editing.
+6. Verify that the request belongs to the active increment or explicitly changes the order.
+7. Return one root-relative Git patch, its SHA-256 checksum, validation evidence, and concise
+   apply/check/commit/snapshot commands.

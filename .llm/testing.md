@@ -2,410 +2,191 @@
 
 ## Purpose
 
-Tests should protect executable behavior and durable repository contracts without turning living
-planning documents or documentary metadata into frozen implementation data. A documentation edit
-must not require changing tests merely because wording, roadmap status, examples, citations, or
-descriptive metadata values changed.
+Tests protect durable numerical, API, repository, documentation, data, and distribution contracts.
+They must not become a second copy of living prose or preserve removed migration scaffolding.
 
 ## What tests should protect
 
-Tests may verify:
+### Numerical core and estimator
 
-- public Python behavior, numerical invariants, validation, fitted attributes, and supported
-  scikit-learn composition;
-- small example helper contracts;
-- package and source-distribution contents, plus clean installed wheel and source-distribution
-  runtime behavior at the public import and representative fit/predict boundary; extracted source
-  distributions must retain example output-directory placeholders and run example 01 after the
-  `examples` extra is installed;
-- optional dependency metadata matching maintained `dev`, `examples`, and `docs` workflows, with
-  public source-install commands remaining noneditable and contributor setup remaining editable;
-- presence, encoding, parsability, and structural format of shipped Markdown, YAML, CSV, TOML, and
-  shell files;
-- generic consistency rules, such as every indexed decision record existing and every shipped
-  decision record appearing in the index, and every top-level runtime Python module appearing in the
-  project ownership map;
-- snapshot integrity in isolated Git repositories: clean committed-tree contents, refusal of
-  tracked/staged/nonignored-untracked changes, exclusion of ignored files, truthful metadata, and
-  refusal of committed generated files below `examples/results/`;
-- the Git-tracked example-result tree containing only `.gitkeep` directory placeholders, while
-  ignored local outputs remain permitted;
-- package-owned reference resources having complete, readable, aligned, and integrity-checked
-  CSV/JSON/README/license contents;
+- fixed-model equations, dimensions, rank admissibility, and finite outputs;
+- centering/scaling learned inside each fit and each training fold;
+- full/randomized/auto predictor-SVD consistency within stated tolerances;
+- deterministic behavior for fixed seeds and stable subspace comparisons under sign or basis
+  ambiguity;
+- transactional fitted state after failed fits;
+- copy/read-only/overlapping-input safety;
+- PLS-style methods, feature names, output containers, cloning, and pickling;
+- exact public warning type and suppression boundary.
+
+### Search and selection
+
+- materialized split reuse and fold-local feasibility;
+- exhaustive and adaptive candidate behavior, score tolerance, tie breaking, and pipeline support;
+- stable `cv_results_`, component path, and conditional rank-profile evidence;
+- equal-split CV-MSE means and `ddof=0` SD, including repeated CV, one split, and unequal validation
+  lengths;
+- `best_score`, manual component selection, and dual-tolerance `minimum_cv_mse` behavior;
+- default tolerance resolution, simultaneous caps, exact boundary inclusion, zero minimum, invalid
+  arguments, provenance, search non-mutation, refit, pipelines, and pickle behavior;
+- absence of retired standard-error properties and rules.
+
+### OOF reporting
+
+- exact compatibility with the supplied selection and fitted search;
+- reuse of every stored split without rematerialization;
+- ordered predictions, repeated-prediction averaging, counts, partial coverage, and leave-one-out
+  provenance;
+- pooled OOF R2 over covered rows only;
+- no candidate rescoring, search mutation, retained input data, or implicit full-data fit.
+
+### Immutable public results and inspection
+
+- defensive copies, read-only arrays, shape/scalar validation, direct construction, and pickle
+  revalidation;
+- finite derived decomposition, path, OOF, and inspection arrays;
+- display-factor regression-map preservation;
+- balanced biplot reconstruction preservation;
+- observation-diagnostic equations;
+- prediction provenance, residual orientation, standardization, and RMSE;
+- absence of public plotting helpers and private construction state.
+
+### Datasets and synthetic generation
+
+- immutable `PiPLSDataset`, recursively frozen metadata, names, sample identity, and truth records;
+- exact Pulp, Sugarcane, and Tobacco resource bytes, shapes, names, hashes, provenance, and
+  licenses;
+- fresh loader outputs, read-only `(X, Y)` returns, and no network/pandas dependency;
+- deterministic synthetic arrays and truth for fixed seeds;
+- one active package-resource matrix pair per named reference dataset;
+- clean wheel and source-distribution inclusion and loading.
+
+### Examples, rendering, and documentation
+
+- public imports, visible data preparation, seeded CV, modeling-before-analysis, and rendering-last
+  structure;
+- caller-owned Matplotlib rendering from immutable arrays;
+- no private runtime imports or duplicate workflow implementations;
+- quick-start and small leave-one-out executable behavior;
+- focused module-scoped Pulp numerical coverage where justified;
+- maintained tutorial snippets, semantic manifests, asset names, parseable SVGs, and stable links;
+- strict MkDocs build, generated API ownership, local links/anchors, source-distribution docs, and
+  Pages workflow boundaries;
+- final generated examples through `make examples`, not ordinary `make check`.
+
+### Repository and release policy
+
+- required tracked files and UTF-8 Markdown structure;
+- public-module `__all__` boundaries;
+- package metadata, supported Python/dependency ranges, citation, authorship, and licenses;
+- clean wheel and source-distribution smoke tests;
+- clean root-relative snapshot and patch helper behavior;
+- decision-index and active-link integrity under Decision 0147.
 
 ## What tests should not freeze
 
-Tests must not assert current prose fragments or individual documentary field values in:
+Do not pin:
 
-- `.llm/state.md`, `.llm/strategy.md`, roadmaps, handoff text, or maintenance instructions;
-- changelogs, README prose, narrative documentation, or example commentary;
-- dataset titles, summaries, descriptions, citations, provenance wording, or preparation
-  narrative stored in `metadata.json`;
-- a hard-coded list of historical decision filenames when index-to-directory consistency can be
-  checked generically.
+- exact explanatory prose, line counts, heading wording beyond stable navigation contracts, or
+  roadmap status paragraphs;
+- local variable names, incidental assignment patterns, or helper names when executable behavior
+  already protects the contract;
+- Matplotlib styles, artist coordinates, optional label-adjustment positions, or page aesthetics;
+- implementation-local arrays and aliases that are not public results;
+- one tombstone assertion for every removed pre-release name;
+- a fixed final number of decision records;
+- performance or scientific claims not explicitly accepted by the owner.
 
-The repository documents required metadata sections in `.llm/dataset_layout.md`. Tests verify the
-resource schema, declared hashes, loader arrays, and generic DOI-link consistency without freezing
-incidental narrative wording.
+When source-structure testing is necessary, prefer reusable AST predicates and parameterization over
+large repeated source-text checks.
 
-## Historical removal boundary
+## Test layers
 
-Do not keep a test solely to prove that a former internal name, helper, dataset integration,
-documentation wrapper, or repository path remains absent. Accepted decision records preserve that
-history. Prefer positive tests of the supported surface and generic structural checks.
+### Focused tests
 
-A negative test remains appropriate when absence is itself a current public or architectural
-contract, such as the package exposing no plotting API, optional rendering libraries remaining
-outside runtime dependencies, or repository datasets remaining outside top-level exports. Do not
-turn every pre-release deletion into a permanent executable tombstone.
+Run the smallest relevant modules during implementation. A focused command is evidence for rapid
+iteration, not a substitute for complete validation.
 
-## Inspect-decide-refit lifecycle
+### Complete package checks
 
-Decision 0137 changes ownership rather than numerical selection. Tests protect these durable
-behaviors:
+The authoritative local target is:
 
-- a fitted search exposes candidate evidence and immutable path/profile views;
-- post-fit `refit()` accepts exactly one named rule or one component count, returns a fitted clone of
-  the configured estimator or pipeline, and leaves the search unchanged;
-- constructor parameters do not shadow the post-fit method, and search exposes no delegated
-  prediction, transformation, scoring, inverse-transformation, or feature-name surface;
-- manual component selection uses the conditionally selected predictor rank stored for that path
-  row;
-- `"best_score"` and `"minimum_cv_mse"` resolve through their documented evidence and can differ
-  under a custom scorer;
-- explicit validation reporting reuses the exact materialized search splits, preserves ordered OOF
-  coverage semantics, and does not perform a full-data refit;
-- the search does not retain supplied training matrices or returned fitted estimators;
-- maintained search examples and tutorial renderers use `search.refit(...)` rather than manually
-  reconstructing the selected fixed estimator.
+```bash
+make check
+```
 
-The explicit report stage must additionally test single-use splitters, defensive read-only split
-copies, unchanged scorer-call counts, one-dimensional response shape, repeated and partial coverage,
-shape mismatch rejection, warning boundaries, and search-state immutability.
+It should cover formatting/linting, typing, unit/API/repository tests, and any configured package
+checks. Also run `python -m compileall` and `git diff --check` when producing a patch.
+Documentation,
+distribution, or example changes require their dedicated targets.
 
-The final surface should be tested through positive constructor and method contracts plus one
-compact assertion that removed pre-release constructor controls are rejected. Do not accumulate one
-historical tombstone test per removed fitted attribute.
+### Application and documentation checks
 
-## Search-owned path-selection transition
+Use as applicable:
 
-Decision 0140 completes a public ownership change without changing selection numerics. The test
-surface protects:
+```bash
+make docs
+make docs-figures
+make dist-check
+make examples
+```
 
-- fitted-state enforcement and exactly-one-of validation for `search.select(...)`;
-- parity between `select()` and `refit()` for component counts and all three named rules;
-- exact stored minimum and tie behavior under zero tolerance, plus temporary minimum-row
-  standard-error use and smallest eligible 1-SE component count until Decision 0146 removes them;
-- custom-scorer separation between `"best_score"` and `"minimum_cv_mse"`;
-- immutable returned results and unchanged search state;
-- invalid, unavailable, nonintegral, and insufficient-split failures;
-- maintained examples and tutorial renderers use `search.select(...)` for every scalar annotation;
-- living documentation presents the component path as numerical evidence and `select()` as the
-  selected-row lookup;
-- component-path array validation, immutability, derived standard errors, and pickle stability
-  independently of selection.
+Complete Pulp, Sugarcane, and Tobacco workflows are application validation and may be expensive.
+Do not silently duplicate them inside ordinary pytest.
 
-The path object has no public selected-row methods. Durable numerical selection tests belong at the
-search-selection boundary. Do not retain one tombstone test per removed method; use positive
-API-surface checks plus a compact active-surface audit.
+### Independent patch validation
 
-## Model-selection provenance and OOF-reporting transition
+Before delivery, apply the generated patch to a fresh extraction of the same snapshot, compare every
+changed file byte-for-byte with the working tree, and rerun all applicable checks. Verify the
+published SHA-256 checksum.
 
-Decision 0143 changes provenance ownership and workflow composition without changing selection or
-OOF numerics. Across its seven patches, tests must protect:
+If one monolithic pytest process is unreliable in the execution environment, run a complete set of
+nonoverlapping test groups and report the grouping honestly. Never describe a timeout or unavailable
+tool as a pass.
 
-- immutable rule provenance on `PiPLSSelection`, including exact 1-SE reference-minimum and
-  derived-threshold contracts;
-- `model.selection_` on every successful direct-estimator or pipeline result from `refit()`, with no
-  attribute on directly fitted fixed estimators and no partial exposure after failed fits;
-- equality among the selection used by `refit()`, optional `search.select(...)`, and the selection
-  retained by OOF reporting;
-- `oof_report(selection=...)` compatibility validation against the fitted search and numerical
-  parity with the former OOF implementation during migration;
-- repeated, partial-coverage, leave-one-out, one-dimensional-response, pickle, and unchanged-search
-  behavior;
-- absence of the former report method, report type, estimate-kind state, selection-conditioned
-  predicate, and transitional aliases;
-- structural example order: search and refit complete modeling; analysis then retrieves
-  `model.selection_`, path evidence, rank-profile evidence, optional OOF reporting, fitted-model
-  inspection, and finally rendering;
-- maintained manual and automatic model-producing workflows do not call `search.select()` merely to
-  recover the refit row, while the validation-only example may use selection-only inspection.
+## Numerical comparison policy
 
-Patch 2 adds executable selection provenance. Focused tests protect direct construction,
-normalization, immutability, nested-result pickle stability, exact minimum ties, minimum-row
-standard-error use, smallest eligible count, exact threshold boundaries, nonfinite thresholds,
-unchanged search state, and propagation into the current validation report. Patch 3 additionally
-protects `model.selection_` for manual and named-rule direct refits, outer-pipeline ownership,
-equality with search and report selections, post-fit attachment, model pickle stability, clone
-cleanup, direct-fit absence, output configuration, and unchanged search state. Patch 4 protects
-`PiPLSOOFReport` construction and pickling, exact selection compatibility, numerical parity with the
-transitional report, repeated-CV averaging, partial coverage, leave-one-out provenance, shape
-validation, and unchanged search state. Patch 5 adds structural and numerical coverage for the
-manual synthetic, Pulp, and Sugarcane workflows and both tutorial renderers: no redundant
-`search.select()` calls, exact use of `model.selection_`, selection-driven `oof_report()` where OOF
-diagnostics are required, modeling-before-analysis order, and rendering after all numerical results
-are complete.
+Numerical changes require explicit tolerances and boundary cases. Behavior-preserving refactors
+require direct before/after comparisons of the affected arrays, selections, predictions, reports,
+resource bytes, or generator outputs. Do not rely only on aggregate test success.
 
+For repeated or nearly repeated singular values, compare identifiable quantities rather than raw
+basis columns. For deterministic assets, prefer semantic manifests and parsed structure over only a
+binary hash; retain hashes when byte identity itself is the contract.
 
-## Pre-release public-surface cleanup transition
+## Documentation test policy
 
-Decision 0144 removes duplicate access paths without changing numerical algorithms. Across seven
-patches, focused tests must protect:
+When a test reads Markdown or metadata, ask whether it protects a stable machine contract. Prefer:
 
-- required OOF prediction and count arrays, report immutability, partial coverage, repeated CV,
-  leave-one-out behavior, and access to selection fields only through `report.selection`;
-- complete `PiPLSSelection` terminology across search, model, rank profile, report, typing,
-  construction, and pickle contracts;
-- unchanged best-score tie rules and refit/OOF numerics after removal of public fitted-search
-  `best_*` attributes;
-- stable candidate-level scores, ranks, split values, MSE fields, and timings after removing
-  duplicate `params` and `param_*` columns;
-- `PiPLSDataset.X` and `.Y`, loader equality, immutability, distribution resources, and migrated
-  maintained consumers after removal of `data` and `target` aliases;
-- retained component-count properties and equations after removal of unused shape-only inspection
-  properties;
-- focused-module availability of result classes after their top-level re-exports are removed;
-- exact minimal top-level `pipls.__all__` and absence of result-class aliases;
-- retained fitting-free `search.select()`, every public inspection function, biplot scaling factors,
-  direct-construction validation, and caller-owned rendering.
+- parsable configuration;
+- executable snippets;
+- generic local-link and anchor resolution;
+- required navigation destinations;
+- public object availability;
+- source-distribution buildability.
 
-Use positive surface tests and compact active-surface audits rather than one tombstone test per
-removed name. Patch 1 changes no executable contract. Patch 2 protects required OOF arrays, direct
-construction, read-only copies, pickling, repeated CV, partial coverage, one-dimensional responses,
-leave-one-out provenance, and unchanged OOF numerics after forwarding-property removal. Patch 5
-protects an exact aligned-array `cv_results_` surface with stable pipeline-independent
-`n_components` and `predictor_rank` parameter columns plus all score, split, MSE, rank, and timing
-columns; selection, refit, profile, and OOF numerical tests protect unchanged consumers.
+Avoid exact prose assertions. Historical decisions and changelog entries may retain terminology
+that is intentionally absent from the active API.
 
-## Three-stage onboarding transition
+## Decision 0147 obligations
 
-Decision 0139 introduces staged presentation contracts rather than package behavior. Patch 2 now
-protects the renamed example, generated quick-start asset, semantic manifest, navigation order, and
-source-distribution documentation route. Patch 3 must complete the broader wording and reference
-reframing. Durable tests protect:
+During decision consolidation, tests must verify:
 
-- one maintained `examples/01_pulp_quick_start.py` source and no compatibility copy under the former
-  name;
-- checked tutorial snippets owned by that example;
-- one parseable generated quick-start SVG plus a semantic manifest identifying package-owned Pulp,
-  the selected rank pair, fitted-value provenance, standardized RMSE, and the SVG hash;
-- strict navigation order: quick start, synthetic inspection, complete Pulp analysis;
-- source-distribution inclusion and clean rendered-documentation execution;
-- a single standardized observed-versus-fitted plotting axis and explicit absence of OOF or
-  predictive-validation claims in the quick-start tutorial;
-- synthetic-tutorial wording and structure that retain the search for evidence and manual
-  component selection;
-- selection-conditioned terminology for the maintained Pulp OOF workflow.
+- every shipped numbered decision is indexed until retirement;
+- every retained current decision and historical-summary link resolves;
+- retirement maps cover every deleted record and decision numbers are never reused;
+- active `.llm`, tests, documentation, and retained decisions have no broken references;
+- no test pins the final retained decision count;
+- `history.md` summarizes outcomes rather than copying retired files.
 
-Prefer parsed navigation, executable snippets, manifest semantics, artifact existence, and focused
-source-structure checks over frozen prose or pixel output. The three-page route and renamed first
-example are now the tested implementation.
+The snapshot-hardening patch must demonstrate both sides of the policy: ignored untracked caches and
+generated files remain absent from snapshots, while deliberately tracked cache, bytecode, coverage,
+built-site, build, or generated-example artifacts cause snapshot creation to fail clearly.
 
-## Rendering validation boundary
-
-Protect rendering through executable artifact generation, parseable declared outputs, optional
-dependency boundaries, caller-owned chart construction, direct immutable-result use, and numerical
-semantics such as descriptive population SD across validation splits. Same-file private rendering
-functions remain
-caller-owned; structural tests may verify that scientific computation stays in `main()` and that
-those functions do not load data, fit models, run cross-validation, select models, or calculate
-inspection results. Do not freeze exact private function names or signatures, title text, axis-label
-wording, Matplotlib call counts, source-code ranges, axis-limit expressions, tick-label expressions,
-or label rotation syntax. Review regenerated SVG and PDF artifacts when visible rendering behavior
-changes.
-
-## Dataset boundary
-
-Public container tests verify recursive freezing, defensive array copies, acceptance of non-object
-metadata arrays, and rejection of object-dtype arrays whose elements could remain mutable. Loader
-tests protect return modes, immutable arrays and metadata, stable package sample identifiers,
-ordered labels, public provenance, pickle reconstruction, and resource and canonical-array hashes.
-
-Decision 0142 is complete. Generic package-resource tests verify that Pulp, Sugarcane, and Tobacco
-have exactly `X.csv`, `Y.csv`, `metadata.json`, `README.md`, and `LICENSE.txt` under
-`src/pipls/_data/<dataset>/`; that no active top-level `datasets/` copy remains; and that each named
-dataset has one active matrix pair. Distribution tests verify all five resources in wheels and
-source distributions and load each dataset from isolated installations. Documentation tests protect
-source DOI links and complete raw-resource paths without freezing prose or an environment-specific
-absolute `site-packages` path.
-
-Tests protect the public result and distribution contracts rather than private resource-helper
-names or call structure. Maintained workflow tests require the named loaders and reject pandas or
-repository-relative CSV ingestion. The `.llm/archive/pulp-repository-layout-v1/` copy remains
-excluded development history and must never enter runtime, distributions, served documentation, or
-active-dataset tests.
-
-Post-analysis inspection tests should verify mathematical identities, shapes, direct-construction
-and pickle invariants, finite-value validation, defensive copying, read-only results, deterministic
-predictor- and response-anchored sign handling, zero-anchor fallback, prediction provenance,
-representable extreme inputs, explicit failure for
-unrepresentable derived values, and absence of estimator mutation. Rendering tests belong at the example or tutorial
-boundary and should use a headless Matplotlib backend. Protect named result-field access, direct
-figure and axis construction, physical coordinate order, final files, and successful SVG or PDF
-creation without pinning pixels, exact styling, automatically adjusted label positions, or
-incidental artist counts. Structural tests should require the absence of a package plotting module
-and public `plot_*` functions, keep Matplotlib and `adjustText` optional, and ensure that example
-support code does not hide chart construction.
-
-Structural tests require ordinary K-fold examples and renderers to use seeded shuffled five-fold
-partitions explicitly. The complete Pulp example and renderer instead use
-`RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Every rendered example that uses an
-explicit splitter must display its import and definition before a shown snippet uses `CV` or `cv`.
-The compact first example remains the shortest-path exception with default `cv=5`.
-The leave-one-out example retains exhaustive `LeaveOneOut`. Structural tests for Pulp, Sugarcane,
-and Tobacco protect direct `component_path_` access, immutable inspection results, explicit
-Matplotlib
-construction, absence of analytical CSV output, physical coordinate order, and the declared final
-PDF filenames without running the artifact-writing scripts. Pulp, Sugarcane, and Tobacco require
-`model.selection_` and `oof_report(selection=...)`; Tobacco additionally requires its minimum and
-threshold evidence to come from the retained selection. Keep these source scans consolidated as
-AST-level ownership and data-flow checks
-rather than repeating per-example string inventories.
-Sugarcane and Tobacco tests also protect the boundary between `main()`-owned analysis and private
-same-file rendering. Tobacco tests retain its full-SVD configuration, source-order response
-pagination, raw observation diagnostics, and two same-file multipage report loops. Biplot tests
-protect
-balanced-coordinate numerics in `pipls.inspection`; maintained example and
-renderer structure must expose direct Matplotlib arrows and labels, call `adjust_text()` after axis
-configuration, and avoid pinning adjusted label coordinates.
-
-Ordinary pytest must not execute the Pulp tutorial renderer because it requires the optional
-`adjustText` dependency. Static tests protect its Makefile, source-distribution, snippet, asset-name,
-and ownership contracts; `make docs-figures` and `make docs` execute and validate the renderer in the
-complete documentation environment. Tutorial structure tests may verify the three-step navigation,
-generated-asset references, checked
-snippet sections from examples 02 and 05, links to stable API objects, and links to stable
-model-inspection anchors without freezing narrative wording. Documentation-entry tests may verify
-that the README contains the two compact public workflows and tutorial routes while maintainer-only
-commands and the repository map remain in `CONTRIBUTING.md`; do not pin line counts or exact
-prose. Maintained user-facing examples and tutorial renderers should demonstrate current public
-defaults rather than repeat redundant default arguments; tests may prohibit stale explicit defaults
-while leaving historical decision records unchanged. Generic served-Markdown tests should resolve
-local files and anchors, including explicit and
-mkdocstrings-generated object anchors. The API overview should keep one discoverable map of public
-result objects, and troubleshooting should remain a task-oriented reference rather than a third
-tutorial. Generated API pages should suppress constructor signatures for returned immutable result
-records while keeping the directly constructible `PiPLSDataset` signature visible. Tests should
-protect the absence of sign-canonicalization bookkeeping and structurally impossible zero loading
-blocks without pinning private local calculations. Structural
-tests may also require generated Pulp image references to remain tutorial-owned and keep
-example-specific report implementation out of the general inspection reference. Small synthetic
-matrices protect generic OOF and report contracts. The focused leave-one-out example may be executed
-directly because it is small and artifact-free; tests should check labeled output and semantic
-coverage without freezing exact selected scores. One module-scoped Pulp numerical run may verify
-the selected fixed pair, upper-boundary rank profile, aligned validation-report OOF predictions,
-and inspection shapes
-without writing application artifacts.
-
-The Pulp quick-start example may be protected structurally and through package-level Pulp-loader,
-numerical, direct-rendering, and source-distribution execution tests. Protect its chained
-search/refit call, fitted-value provenance, standardized single-axis plot, and absence of OOF claims;
-do not duplicate Pulp arrays as a second frozen scientific fixture. Do not execute the
-artifact-producing Pulp, Sugarcane, or Tobacco scripts in `make check`, and do not duplicate their
-analyses as duplicate repository scripts. `make examples` is the explicit application-validation
-target and runs every numbered example, including the slower Tobacco analysis. Durable tests instead
-protect the current repository-dataset transition state, implemented named-loader behavior and
-numerical integrity, and Pulp, Sugarcane, and Tobacco workflow structure. They also protect the
-component-path API, conditional predictor-rank extraction at the selected
-component count, inspection equations, direct rendering from immutable inspection arrays, and
-the immutable ordinary-PLS comparison-helper contract.
-Do not require a universal manifest, universal schema, or shared wide result row across unrelated
-comparative studies.
-
-Documentation workflow tests should protect strict checkout and source-distribution validation,
-master-only Pages deployment, least-privilege deployment permissions, canonical repository-derived
-configuration, and generated-artifact upload. They should not pin action implementation details
-beyond the maintained official Pages action majors.
-
+The dataset-module split must preserve public imports, resources, generated arrays, validation,
+immutability, pickling, and distribution contents exactly.
 
 ## Review rule
 
-When a test reads a documentation or metadata file, ask whether the assertion protects a stable
-machine contract or merely repeats today's content. Prefer a parser, executable behavior, or a
-generic structural invariant. Do not use tests as a second copy of a living document.
-
-## Final implementation-surface cleanup transition
-
-Decision 0145 removes residual duplication without changing numerical algorithms. Across four
-patches, focused tests must protect:
-
-- absence of `cv_n_train_min_` and `predictor_rank_`, with unchanged learned
-  `max_predictor_rank_`, selections, fitted maps, predictions, clone behavior, and pickle behavior;
-- private-module availability of model-selection algorithms from `pipls._model_selection` and
-  absence of the public-looking `pipls.model_selection` module;
-- unchanged exhaustive and adaptive search, score tolerance, tie-breaking, split materialization,
-  and OOF results after private refactoring;
-- core standardized-regression-map invariants without `PiPLSCoreResult.predict()`;
-- clear `oof_report()` validation messages without a constant operation-name parameter; and
-- exact `__all__` declarations and wildcard-import surfaces for `pipls.regression`, `pipls.search`,
-  and `pipls.exceptions`; and
-- positive selection-ownership wording in model-producing tutorials.
-
-All four patches are complete. Continue using positive behavioral tests and compact active-surface
-audits rather than preserving removed names as broad compatibility fixtures.
-
-## CV-MSE tolerance and split-SD transition
-
-Decision 0146 requires focused tests across seven patches for:
-
-- exact arithmetic means and population SDs across all materialized split losses, including
-  repeated CV and one-split protocols;
-- `cv_mse_std` construction, immutability, direct validation, and pickle stability;
-- machine-scale relative-default resolution, positive-infinity absolute default, finite dual-cap
-  semantics, exact boundary inclusion, zero minimum MSE, and invalid tolerance rejection;
-- selection provenance through relative tolerance, absolute tolerance, reference minimum, and
-  derived effective threshold;
-- unchanged custom-score, pipeline, OOF compatibility, search non-mutation, and refit behavior;
-- maintained CV-MSE figures using SD rather than SE and describing it as variability across splits;
-- Tobacco selecting the first path row within a 10% relative tolerance of the exact minimum;
-- Pulp materializing 50 repeated five-fold splits and averaging ten OOF predictions per sample; and
-- final absence of the active SE-based selection and standard-error result surface.
-
-Patch 1 changes no executable contract. Patch 2 protects the renamed `cv_mse_std` field, exact
-equal-split arithmetic means, `ddof=0` population SDs, one-split behavior, repeated CV, unequal
-validation lengths, direct construction, immutability, and pickle stability. During migration it
-retained the temporary derived-SE bridge; Patch 7 removes that bridge. Historical decisions and
-changelog entries may retain historically accurate wording, while active source, tests, examples,
-tutorials, API documentation, and guide contracts use only the final surface.
-Patch 4 protects that every maintained CV-MSE `errorbar()` call uses `cv_mse_std`, every maintained
-axis labels the display as $\pm 1$ SD, axis limits include the SD range, and tutorial prose states
-that the bars are descriptive split-to-split variability rather than confidence intervals or
-selection thresholds.
-
-Patch 5 protects that maintained automatic workflows use `minimum_cv_mse`, the quick start uses the
-machine-scale default, and Tobacco passes `relative_tolerance=0.10`, derives its annotations from
-`selection.reference_minimum`, `selection.relative_tolerance`, and `selection.cv_mse_threshold`,
-and passes that exact selection to its rank profile and OOF report. Patch 6 protects the exact
-`RepeatedKFold(5, 10, 0)` Pulp protocol, 50 materialized splits, ten OOF predictions per row,
-updated deterministic rank-profile values, semantic manifest fields, and parseable generated SVGs.
-
-## CV-MSE tolerance selection
-
-Decision 0146 Patch 3 protects machine-scale default resolution, explicit zero and finite relative
-tolerance, finite and positive-infinity absolute tolerance, simultaneous-cap semantics, exact
-threshold inclusion, zero minimum MSE, invalid scalar rejection, rule-scope validation, immutable
-reference-minimum provenance, direct construction, pickling, pipeline refitting, OOF compatibility,
-and unchanged search state. Tolerance arguments belong to post-fit `select()` and `refit()` rather
-than estimator constructor parameters.
-
-## Decision lifecycle and maintainer-context consolidation
-
-Decision 0147 requires generic lifecycle tests rather than a hard-coded historical inventory:
-
-- every shipped numbered decision appears in `docs/decisions/index.md` and `.llm/decisions.md`;
-- every indexed current decision and historical-summary link resolves;
-- deleted decision numbers are never reused;
-- each decision-retirement patch supplies a complete reviewed map for its deleted records;
-- active `.llm`, tests, and retained decisions contain no broken links to retired files;
-- no test pins the final number of retained decisions or requires every historical intermediate
-  record to remain in the working tree;
-- `docs/decisions/history.md` summarizes durable outcomes and canonical records rather than copying
-  retired Markdown files;
-- snapshot tests reject tracked caches, bytecode, coverage output, built documentation, and other
-  generated artifacts while continuing to omit untracked ignored caches; and
-- the internal dataset split preserves public imports, exact resources, deterministic generators,
-  pickling, and distribution contents.
-
-Patch 1 changes documentation and guide-layer phase state only. It adds no retirement, history file,
-test relaxation, snapshot behavior, or source refactoring ahead of the later patches.
+A durable behavioral or machine-readable contract justifies a test. A statement that merely repeats
+today's implementation or prose should remain review guidance, not an assertion.

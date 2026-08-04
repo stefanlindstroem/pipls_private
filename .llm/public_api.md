@@ -1,12 +1,15 @@
 # Public API contract
 
-## Current top-level API
+## Namespace boundary
+
+The top-level package exports only:
 
 ```python
 from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
 ```
 
-Returned result records remain public from focused modules:
+`__version__` is package metadata. Public result records and utilities are imported from focused
+modules:
 
 ```python
 from pipls.component_path import (
@@ -18,513 +21,234 @@ from pipls.decomposition import PiPLSDecomposition
 from pipls.validation import PiPLSOOFReport
 ```
 
-The generated reference under `docs/api/` documents exactly these top-level and focused-module
-objects plus the declared public names from `pipls.inspection`, `pipls.datasets`, and
-`pipls.metrics`; `__version__` remains package metadata rather than an API reference page.
-Private modules, including `pipls._model_selection`, are not reference surfaces.
+`pipls.datasets`, `pipls.inspection`, and `pipls.metrics` expose exactly their declared `__all__`
+names. Private modules, including `_core`, `_cv_engine`, `_model_selection`, `_result_validation`,
+and `_sklearn_compat`, are not compatibility surfaces.
 
-Mathematical documentation denotes the response matrix by $Y$. Public estimator methods follow the
-scikit-learn `fit(X, y)` naming convention, so `y` may be a one-dimensional response or a
-two-dimensional multivariate response matrix. Related public names such as `y_pred`, `y_scores_`,
-and `y_loadings_` retain the same convention. User-facing plot labels should describe responses
-and residuals without implying that a multivariate response is scalar.
+Mathematical prose uses `Y`; estimator signatures follow scikit-learn's `fit(X, y)` convention,
+where `y` may be one- or two-dimensional.
 
-`PiPLSRegression` fits one explicit fixed pair `(n_components, predictor_rank)` and performs no
-cross-validation or parameter selection. Both rank parameters are required keyword-only
-constructor arguments; neither has a default or accepts a missing-value sentinel. `PiPLSSearchCV` is
-the standard package workflow for the bounded triangular scan and conditional predictor-rank selection. Public scoring callables remain
-available from `pipls.metrics`.
+## `PiPLSRegression`
 
-## Public names
+The fixed estimator fits one explicit pair. Required keyword-only parameters are
+`n_components` and `predictor_rank`; neither has a default, `None`, or automatic sentinel. Optional
+parameters are `scale`, `copy`, `svd_solver`, and `random_state`.
 
-| Public name | Mathematical meaning |
-|---|---|
-| `n_components` | number of paired latent modes $h$ |
-| `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
-| `samples_per_predictor_rank` | $c$ in `PiPLSSearchCV` |
-| `max_predictor_rank_` | centered algebraic limit on the fixed estimator; search ceiling on the path |
+Validation rules:
 
-Do not expose constructor aliases named `h`, `r_pi`, or `c`.
+- ranks are positive Python or NumPy integers; booleans and floats are invalid;
+- `n_components <= predictor_rank`;
+- `predictor_rank <= min(n_features, n_samples - 1)` after centering and no greater than the
+  verified numerical rank;
+- `scale` and `copy` are booleans;
+- `svd_solver` is `"full"`, `"randomized"`, or `"auto"`;
+- `random_state` accepts `None`, a valid integer seed, or NumPy `RandomState`.
 
-The immutable decomposition fields are `predictor_directions` and `response_directions`. The
-estimator also exposes the standard PLS-style fitted attributes `x_rotations_` and `y_rotations_`,
-which reference the same arrays. Mathematical prose calls their $P$ and $Q$ columns predictor and
-response directions. These directions are distinct from the reconstruction loadings exposed as
-`x_loadings_` and `y_loadings_`.
+A direct fit emits `PredictorRankSupportWarning` when fewer than three observations support each
+retained predictor-rank direction. The warning is diagnostic and does not alter the requested rank.
+Controlled search probes, candidate fits, OOF fits, and full-data refits suppress only this expected
+warning category.
 
-## Fixed-estimator validation and warning contract
+The estimator provides PLS-style `fit`, `predict`, `transform`, `fit_transform`,
+`inverse_transform`, and scalar R2 `score`. It supports feature names and inherited scikit-learn
+`set_output()` behavior. Standard fitted scores, loadings, rotations, coefficients, intercept, and
+means/scales remain available.
 
-`PiPLSRegression` constructor parameters are required keyword-only `n_components` and
-`predictor_rank`, followed by optional `scale`, `copy`, `svd_solver`, and `random_state`.
+`decomposition_` is an immutable `PiPLSDecomposition` containing:
 
-- `n_components` and `predictor_rank` have no defaults and accept no `None` or automatic sentinel.
-- They are positive Python or NumPy integers; booleans and
-  integral-valued floats are invalid.
-- `n_components <= predictor_rank`.
-- `predictor_rank <= min(n_features, n_samples - 1)` after centering and must not exceed the
-  verified numerical rank.
-- `random_state` accepts an integer in $[0, 2^{32}-1]$, a NumPy `RandomState`, or `None`;
-  the default integer `0` is reproducible and `None` uses NumPy global state.
-- `scale` and `copy` are Python or NumPy booleans.
+- `predictor_directions` (`P`);
+- `dilation` (the diagonal entries of `D`);
+- `response_directions` (`Q`);
+- predictor numerical-rank evidence and tolerance;
+- resolved predictor SVD solver;
+- derived centered/scaled regression map.
 
-A direct fixed fit emits `PredictorRankSupportWarning` when $n/r_\pi<3$. This warning is diagnostic;
-it does not choose or cap the rank. `PiPLSSearchCV` suppresses only this expected warning inside its
-controlled feature probes, candidate fits, explicit OOF reports, and post-fit full-data refits.
-Other warning categories remain visible.
+Private construction matrices and redundant aliases are not exposed. A directly fitted fixed model
+has no selection provenance.
 
-Both public `fit()` methods are transactional. A failed search fit or fixed-estimator fit removes
-fitted attributes from the object being fitted, including any state from an earlier successful fit.
-A failed `PiPLSSearchCV.refit()` leaves the fitted search unchanged because it operates on a fresh
-clone. A successful fixed fit exposes only finite fitted arrays. `copy=False` may reuse independent
-writable arrays, but read-only arrays and overlapping predictor/response storage are copied as needed
-to preserve correctness.
+## `PiPLSSearchCV`
 
-## Model-internal standardization contract
+The search owns cross-validated path evaluation. It accepts a direct `PiPLSRegression`, a
+scikit-learn pipeline with one terminal Pi-PLS step, or `None` for the default template. Arbitrary
+nested meta-estimators are unsupported.
 
-Every `PiPLSRegression.fit` estimates `x_mean_` and `y_mean_` from the observations supplied to
-that fit. `scale=True` estimates safe sample-standard-deviation vectors with `ddof=1` and
-standardizes both blocks; `scale=False` still centers and stores unit scales. During path
-selection, every candidate clone learns these statistics only from its training fold. An explicit
-post-fit `PiPLSSearchCV.refit(X, y, ...)` learns them again from all observations supplied to that
-operation.
+Important defaults and controls:
 
-## Predictor SVD policy
+- `n_components_values="all"` scans every admissible component count;
+- `predictor_rank_values=None` uses conditional rank search;
+- `search_method="auto"` is deterministic adaptive search;
+- `search_method="optimal"` is exhaustive;
+- `samples_per_predictor_rank=5` and `cv=5` define the ordinary support/search defaults;
+- `scoring="neg_response_standardized_mse"` resolves to the package scorer;
+- standard scorer names, callables, and `None` remain accepted.
 
-`svd_solver` accepts `"full"`, `"randomized"`, or `"auto"`; the default is `"auto"`.
-`random_state=0` makes randomized decomposition reproducible; a NumPy `RandomState` and `None` are
-also accepted. Only the first SVD of the centered/scaled predictor matrix may be randomized. The
-response-subspace and coupling SVDs remain exact.
+`fit()` materializes one validation split set, evaluates candidate clones, and stores immutable
+candidate/path evidence. It does not retain the training matrices or fit a final model.
 
-## Fitted fixed-estimator behavior
-
-The estimator provides PLS-style `fit`, `predict(X, copy=True)`,
-`transform(X, y=None, copy=True)`, tuple-valued `fit_transform(X, y)`, `inverse_transform`, and
-scalar R2 `score`. It supports feature names and inherited scikit-learn `set_output()`
-configuration for transform containers, including pandas output. Standard PLS-style fitted
-attributes, coefficients, and scores remain available. The frozen `decomposition_` object exposes
-only interpretable predictor directions, dilation values, response directions, numerical-rank
-diagnostics, the resolved predictor solver, and the derived centered/scaled regression map. The
-construction matrices $\Pi$, $C$, and $W$, the redundant diagonal matrix $D$, and symbolic aliases
-remain private.
-
-The fixed estimator does not expose cross-validation results, OOF predictions, validation
-reports, predictor-rank search diagnostics, or scorer plumbing. The response scale required by the
-default scorer is private fitted state. `predictor_rank` is the configured integer and
-`max_predictor_rank_` is `min(n_features, n_samples - 1)` for the supplied centered training
-data.
-
-## Path-analysis API
-
-`PiPLSSearchCV` owns all package model selection. It defaults to
-`n_components_values="all"`, which resolves every admissible component count. Explicit integer
-sequences request a subset; `None` is not a component-path alias. It also defaults to adaptive
-`search_method="auto"`; explicit `"optimal"` exhaustively evaluates every admissible pair. The
-surface satisfies
-
-\[
-1 \le h \le \min(q,r_{\pi,\mathrm{max}}), \qquad h \le r_\pi \le r_{\pi,\mathrm{max}}.
-\]
-
-The default ceiling uses total supplied $n$ for the support term with
-`samples_per_predictor_rank=5`. Centered fold dimensions and the minimum predictor rank verified
-after fold-local pipeline preprocessing and terminal-estimator preprocessing are hard feasibility
-caps. Explicit component and predictor-rank sequences are validated against the resolved ceiling
-before scoring. The class accepts a direct fixed `PiPLSRegression` or a pipeline ending in one,
-materializes one CV split set, and clones fixed candidates for path evaluation.
-
-Final full-data fitting is an explicit post-fit operation:
+### Selection
 
 ```python
-search = PiPLSSearchCV(cv=cv).fit(X, y)
+selection = search.select(rule="best_score")
+selection = search.select(
+    rule="minimum_cv_mse",
+    relative_tolerance=None,
+    absolute_tolerance=np.inf,
+)
+selection = search.select(n_components=4)
+```
+
+Exactly one of `rule` and `n_components` is required. Selection performs no fitting, rescoring,
+split materialization, or mutation.
+
+`best_score` returns the global configured-score optimum. `minimum_cv_mse` returns the smallest
+component count satisfying both CV-MSE tolerance caps. `relative_tolerance=None` resolves to the
+square root of float64 machine epsilon; positive-infinity absolute tolerance disables that cap.
+Tolerance arguments are invalid for other rules and manual selection.
+
+### Full-data refit
+
+```python
 model = search.refit(X, y, rule="minimum_cv_mse")
 model = search.refit(X, y, n_components=4)
 ```
 
-`refit()` requires exactly one of `rule` and `n_components`. The supported named rules are
-`"best_score"` and `"minimum_cv_mse"`. Manual component selection uses the
-predictor rank already selected conditionally for that component-path row. The method clones the
-configured direct estimator or terminal-Pi-PLS pipeline, fits that clone on the supplied full data,
-and returns it. After a successful fit, the returned outer estimator exposes the exact immutable
-row as `model.selection_`. The attribute is not duplicated on a terminal pipeline step. The method
-does not mutate the search, retain the supplied data, or attach the returned model to search state.
-Exact manual `(n_components, predictor_rank)` pairs are fitted directly with `PiPLSRegression`.
+`refit()` resolves one stored row, clones the configured estimator or pipeline, fits it on the
+supplied full data, and attaches the exact immutable row to the returned outer estimator as
+`selection_`. It does not mutate the fitted search, retain the supplied data, or store the returned
+model. To fit an exact manually specified `(n_components, predictor_rank)` pair, use
+`PiPLSRegression` directly.
 
-The default `scoring` value is the stable package string
-`"neg_response_standardized_mse"`, which resolves to the public callable
-`pipls.metrics.neg_response_standardized_mse`. Ordinary scikit-learn scorer names, other callables,
-and `None` remain accepted. Conditional and overall selections among evaluated candidates maximize
-the configured mean test score. Under the default scorer this is equivalent to minimizing mean
-response-standardized MSE among evaluated candidates; adaptive search makes no claim about
-unevaluated admissible pairs.
-
-Explicit selected-row inspection is a post-fit operation:
+### OOF report
 
 ```python
-selected = search.select(rule="minimum_cv_mse")
-selected = search.select(n_components=4)
+report = search.oof_report(X, y, selection=model.selection_)
 ```
 
-The method requires exactly one selection input and returns one immutable stored
-`PiPLSSelection`. It performs no fitting, rescoring, split materialization, or mutation. The
-private `SelectionRule` vocabulary and search-owned resolver are shared with `refit()`.
+The selection must match the same fitted search exactly, including tolerance provenance. The caller
+must provide the same row-aligned observations because the search stores indices and shapes, not the
+original values. The method reuses all materialized splits, averages repeated predictions per row,
+and returns `PiPLSOOFReport`. It neither selects again nor fits a full-data model.
 
-Explicit OOF reporting is a post-fit analysis operation:
+### Fitted search evidence
+
+The main public evidence is:
+
+- `component_path_`: one conditionally selected predictor-rank row per evaluated component count;
+- `predictor_rank_profile(n_components)`: all evaluated predictor ranks at one component count;
+- `cv_results_`: stable direct parameter columns, configured scores, split values, CV-MSE fields,
+  ranks, and timings;
+- `max_predictor_rank_`, `n_splits_`, `n_targets_`, `search_is_exhaustive_`, and standard
+  scikit-learn feature metadata.
+
+There is no fitted `best_*` state and no automatic final estimator.
+
+## Path and selection records
+
+`PiPLSComponentPath` contains aligned read-only arrays for component counts, conditionally selected
+predictor ranks, configured mean scores, mean CV-MSE, split SD, plus path-wide predictor-rank policy
+and split count.
+
+`PiPLSPredictorRankProfile` contains the evaluated predictor ranks and aligned evidence for one
+component count. Its `selection` is the conditional configured-score optimum for that profile.
+
+`PiPLSSelection` contains one evaluated pair, predictor-rank policy, configured score, CV-MSE mean,
+CV-MSE split SD, split count, and optional rule provenance. A `minimum_cv_mse` result additionally
+contains:
+
+- `reference_minimum`: exact unruled minimum row;
+- resolved `relative_tolerance`;
+- resolved `absolute_tolerance`;
+- derived `cv_mse_threshold`.
+
+There is no standard-error property or selection rule.
+
+## OOF result
+
+`PiPLSOOFReport` contains:
+
+- the exact compatible `selection`;
+- `is_leave_one_out`;
+- ordered `oof_predictions`;
+- per-observation `oof_prediction_counts`;
+- optional pooled OOF R2.
+
+Selection metrics are accessed through `report.selection`; they are not duplicated on the report.
+Rows without validation coverage have zero counts and NaN predictions.
+
+## Metrics
+
+`pipls.metrics` exports `response_standardized_mse` and
+`neg_response_standardized_mse`. They use response scales learned from the fitted Pi-PLS estimator
+or terminal Pi-PLS pipeline step and average uniformly across observations and response columns.
+
+## Datasets and synthetic generators
+
+`pipls.datasets` exports:
 
 ```python
-selection = model.selection_
-report = search.oof_report(X, y, selection=selection)
+PiPLSDataset
+PiPLSLatentGeometryTruth
+PiPLSRegressionTruth
+load_pulp
+load_sugarcane
+load_tobacco
+make_pipls_latent_geometry
+make_pipls_regression
+make_pipls_train_test
 ```
 
-The method accepts one existing `PiPLSSelection`, validates it exactly against the fitted
-search, and reuses defensive read-only copies of the validation indices materialized by `fit()`. It
-returns immutable `PiPLSOOFReport` with the supplied `selection`, ordered OOF predictions and counts,
-repeated-prediction averaging, uncovered-row NaNs and zero counts, pooled OOF $R^2$ over covered rows,
-and leave-one-out provenance. It performs neither candidate rescoring nor a full-data fit. Callers
-must preserve the original row alignment because the search stores split indices but not supplied
-training matrices. All maintained consumers use this surface.
+`PiPLSDataset` uses canonical matrix attributes `X` and `Y`; metadata, names, sample identifiers,
+provenance, and optional truth records are immutable. Reference loaders return a fresh immutable
+object by default or fresh read-only `(X, Y)` arrays with `return_X_y=True`. They perform no hidden
+preprocessing and require no network access or pandas.
 
-## Accepted selection-provenance and OOF-reporting transition
+The synthetic generators are deterministic for fixed validated seeds and return immutable truth
+records where applicable. They are package utilities, not benchmark or publication-result APIs.
 
-Decision 0143 authorizes a seven-patch pre-release transition. Its final model-producing workflow
-is:
+## Inspection
+
+`pipls.inspection` exports immutable result types and five pure functions:
 
 ```python
-search = PiPLSSearchCV(cv=cv).fit(X, y)
-
-model = search.refit(
-    X,
-    y,
-    rule="minimum_cv_mse",
-)
-
-# Analysis follows modeling.
-selection = model.selection_
-path = search.component_path_
-rank_profile = search.predictor_rank_profile(selection.n_components)
-report = search.oof_report(X, y, selection=selection)
+pipls_display_factors
+latent_structure
+biplot_coordinates
+observation_diagnostics
+prediction_diagnostics
 ```
 
-The final `refit()` result carries the exact immutable selection as `model.selection_`. A
-minimum-CV-MSE selection carries its resolved tolerances, exact `reference_minimum`, and derived
-`cv_mse_threshold`. `search.oof_report(...)` accepts an existing selection rather than
-resolving `rule` or `n_components` again and returns `PiPLSOOFReport` with
-`report.selection`, ordered OOF predictions and counts, pooled OOF $R^2$, leave-one-out provenance,
-and complete-coverage status.
+`pipls_display_factors()` is Pi-PLS-specific and returns sign-oriented copies of `P`, dilation, `Q`,
+and derived `QD` while preserving the regression map.
 
-OOF reporting is optional analysis, not model construction. Maintained workflows complete search and
-full-data refitting before retrieving selection, path, rank-profile, OOF, fitted-model, or rendering
-evidence. Selection-only workflows may still call `search.select(...)` and pass that result to
-`oof_report()`.
+`latent_structure()`, `biplot_coordinates()`, and `observation_diagnostics()` accept compatible
+fitted PLS-family models through public fitted operations. `prediction_diagnostics()` accepts
+observed and predicted responses explicitly and requires a `PredictionKind` provenance label.
+Residuals are `observed - predicted`.
 
-All seven patches are complete. `PiPLSSelection` implements tolerance provenance for
-`rule="minimum_cv_mse"`; every successful refit result
-exposes the exact resolved selection as `model.selection_`; and `oof_report(selection=...)` returns
-immutable `PiPLSOOFReport` after exact compatibility validation. Directly fitted
-`PiPLSRegression` instances remain provenance-free. All model-producing workflows use
-`model.selection_` and `oof_report(selection=...)` where OOF analysis is required. The leave-one-out
-workflow remains selection-only and passes its `best_score` result directly to `oof_report()`.
-The former report API has been removed without compatibility aliases.
+Inspection results are defensive, read-only, finite, directly validated, and pickle-safe. The
+package exposes no plotting module, Matplotlib artist result, or public `plot_*` helper.
 
-Public path attributes include candidate-level search results in `cv_results_`,
-`search_is_exhaustive_`, and the canonical immutable component-path result. `cv_results_` uses
-pipeline-independent `n_components` and `predictor_rank` arrays as its only parameter columns; all
-other aligned arrays contain scores, response-standardized MSE values, ranks, split values, or
-timings. The global
-configured-score optimum is returned by `search.select(rule="best_score")`. The search stores no
-selected row, OOF report, or fitted final model.
-`PiPLSOOFReport` composes one immutable selection and owns required ordered OOF predictions,
-required prediction counts, coverage, leave-one-out provenance, and optional pooled OOF $R^2$.
-Selection metrics are accessed through `report.selection`; `has_complete_oof_coverage` exposes row
-coverage. The former report surface has been removed without aliases.
+## Example and rendering boundary
 
-Validated input grids, adaptive-search batch history, candidate counters, direct-rank parameter
-aliases, matrix-shaped score/MSE aliases, returned fitted estimators, and supplied training matrices
-are not public fitted state. Advanced users can inspect aligned `cv_results_` columns when needed.
+Examples 05--07 fit Pi-PLS paths, explicitly refit one row, use `model.selection_`, optionally
+compute a matching OOF report, inspect the fitted model, and render final PDFs directly with
+Matplotlib. Pulp uses 50 repeated five-fold splits and averages ten OOF predictions per
+observation. Sugarcane and Tobacco use seeded shuffled five-fold CV. Tobacco demonstrates
+`relative_tolerance=0.10`.
 
-`PiPLSComponentPath` stores aligned read-only `n_components`, `predictor_rank`,
-`mean_test_score`, `cv_mse_mean`, and `cv_mse_std` arrays. The predictor-rank policy and number of
-validation splits are path-wide Python scalars. Maintained plots use `cv_mse_std` directly; no
-standard-error array is derived from the split results. New code retrieves one complete stored row through `search.select(...)`. Maintained
-consumers and living
-documentation use no path-level scalar selection. `PiPLSComponentPath` exposes aligned numerical
-properties and immutable serialization behavior, not public selected-row operations.
+The example-local ordinary-PLS path helper is not package API. Optional Matplotlib and `adjustText`
+dependencies remain outside the runtime dependency set.
 
-`search.select(rule="best_score")` returns the global configured-score optimum as one immutable
-selection. The search stores no duplicated scalar or parameter representation of that selection and
-no final estimator. The search exposes no `predict`, `transform`, `fit_transform`,
-`inverse_transform`, `score`, or `get_feature_names_out` delegation. Call those methods on the
-estimator or pipeline returned by `refit()`. Output-container configuration is owned by the estimator
-template and is preserved through cloning; the path object adds no separate `set_output` layer.
+## Explicit public exclusions
 
-`PiPLSSearchCV.predictor_rank_profile(h)` derives an immutable
-`PiPLSPredictorRankProfile` on demand from `cv_results_`. Its aligned read-only arrays contain only
-predictor ranks actually evaluated at `h`, sorted in ascending order. Its path-wide policy and split
-count are scalars, and its `selection` property derives the same conditionally selected scalar
-values as `search.select(n_components=h)` from immutable candidate state. The profile does not
-add another fitted attribute or stored selected-row representation. Maintained profile plots use
-`cv_mse_std` directly, and the profile exposes no standard-error property. Selection
-maximizes the configured mean test score; only the default scorer makes this equivalent to minimizing
-mean response-standardized CV-MSE.
+The package does not expose:
 
-Decision 0140 is fully implemented. `search.select(rule=... or n_components=...)` is the sole
-public selected-row lookup, the shared private rule vocabulary is `SelectionRule`, and selection
-inspection, refitting, OOF reporting, and predictor-rank profile composition use
-search-owned helpers. Durable numerical selection tests are located at this search boundary.
-
-The five focused-module result records (`PiPLSDecomposition`, `PiPLSSelection`,
-`PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSOOFReport`) validate direct
-construction, normalize accepted NumPy scalars to Python scalars, defensively copy arrays, and
-reconstruct through the same validation path when unpickled. Invalid dimensions, nonfinite scores,
-negative MSE summaries, unsupported policy values, and inconsistent OOF coverage are rejected.
-Generated documentation keeps these records returned-first by suppressing constructor signatures.
-
-Group-aware splitters and keyword-only `groups` belong to `PiPLSSearchCV.fit`, not to the fixed
-estimator. Explicit selection-conditioned reporting belongs to
-`PiPLSSearchCV.oof_report(selection=...)`. No report is constructed or attached during search
-fitting.
-
-## E1 dataset and synthetic-data API
-
-Dataset functionality is public from the dedicated `pipls.datasets` namespace and is declared by
-that module's `__all__`:
-
-```python
-from pipls.datasets import (
-    PiPLSDataset,
-    PiPLSLatentGeometryTruth,
-    PiPLSRegressionTruth,
-    load_pulp,
-    load_sugarcane,
-    load_tobacco,
-    make_pipls_latent_geometry,
-    make_pipls_regression,
-    make_pipls_train_test,
-)
-```
-
-`load_pulp(*, return_X_y=False)`, `load_sugarcane(*, return_X_y=False)`, and
-`load_tobacco(*, return_X_y=False)` are implemented. Each loader returns `PiPLSDataset` by default
-and a pair of fresh read-only `float64` arrays when `return_X_y=True`. The loaders are backed by
-installed package resources, verify resource and canonical-array integrity, perform no network
-access or preprocessing, and are exported only from `pipls.datasets`; no `as_frame`, registry, or
-generic loader is authorized. All three use dataset-neutral private loading machinery, every
-maintained reference-data consumer uses the corresponding loader, and the package directories are
-the sole active matrix locations.
-
-The final `src/pipls/_data/<dataset>/` directories contain ordinary `X.csv`, `Y.csv`,
-`metadata.json`, `README.md`, and `LICENSE.txt` resources. The exact same files are documented for
-language-neutral use from tagged source releases, source distributions, wheels, and installed
-packages.
-
-`PiPLSDataset` is an optional immutable in-memory container, primarily useful for package-owned
-synthetic data and structured experiments. Plain arrays and data frames passed directly to
-`fit(X, Y)` remain the primary real-data interface. The container stores read-only `float64` `X` and
-2D `Y`, unique feature/target/sample names, required provenance, recursively frozen metadata, and
-optional synthetic truth. `X` and `Y` are the sole matrix attribute names; `n_samples`,
-`n_features`, and `n_targets` remain dataset-level dimensions. Metadata arrays preserve non-object
-dtypes, are copied, and are made read-only; object-dtype arrays are rejected because their Python
-elements cannot be frozen by making the array container read-only. Required provenance keys are
-`source`, `license`, `citation`, and `version`.
-
-`make_pipls_regression` creates one side-effect-free dataset with local seeded random generation.
-It supports shared, predictor-specific, and response-specific latent ranks; scalar or per-direction
-strengths; normal or uniform source distributions; scalar or per-variable observed scales; and
-scalar or separate predictor/response noise. `random_state=0` is the deterministic default and
-must be an unsigned 32-bit integer. Each sample block must contain more rows than the larger
-centered latent rank requested for `X` or `Y`.
-
-`make_pipls_train_test` creates two datasets from one shared loading/strength/scale model and
-independent train/test score and noise draws. It performs no fitted preprocessing and the training
-block does not depend on the requested test size.
-
-`make_pipls_latent_geometry` is a separate manuscript-aligned generator. It draws independent
-standard-normal predictor-specific, shared, and response-specific score matrices; independent
-standard-normal loading matrices; and independent Gaussian predictor/response noise. It applies no
-score centering or standardization, loading orthonormalization, strength scaling, or observed-scale
-transformation. Its loading matrices use manuscript orientation with latent dimensions on rows.
-
-`PiPLSRegressionTruth` exposes read-only latent scores, contributing loading blocks, signal/noise
-matrices, strengths, and scales for the configurable package generators. Structurally absent
-cross-side loading blocks are not stored as redundant zero arrays. `PiPLSLatentGeometryTruth`
-exposes the manuscript matrices directly and validates the two signal equations. Both truth forms
-may be carried by `PiPLSDataset.truth`.
-
-The served companion-manuscript synthetic-data guide must distinguish reproducing the exact
-data-generating distribution, reproducing one seeded realization, and reproducing complete
-publication results. It may document the known oracle dimensions
-$r_\pi=d_{\mathrm{p}}+d_{\mathrm{s}}$ and $h=d_{\mathrm{s}}$ for
-the synthetic experiments, but it must not redefine package search defaults or practical real-data
-selection. Complete grids, comparator pipelines, and paper figure/table orchestration remain
-downstream publication assets.
-
-No metadata file, registry lookup, or package-owned loader is required for real-data fitting.
-Users read and prepare `X` and `Y` with ordinary domain-appropriate code. Named reference-dataset
-examples may use their explicit public loaders; user-owned data preparation must still remain
-visible rather than being hidden behind a generic convenience utility.
-
-## Accepted model-inspection boundary
-
-Decision 0045 distinguishes method-specific Pi-PLS factorization inspection from shared PLS-family
-analysis. Final public names for $P$, $D$, and $Q$ inspection retain an explicit `pipls` marker.
-Scores, loadings, coefficients, biplots, observation diagnostics, and prediction diagnostics use
-estimator-neutral names and may accept compatible fitted `PLSRegression` or `PiPLSRegression`
-objects. Numbered examples apply these shared tools only to the selected Pi-PLS model. Ordinary PLS
-remains available in the dedicated component-path comparison example. Examples 05–07 evaluate only Pi-PLS paths.
-
-Decision 0042 introduced a staged inspection and plotting design. Decisions 0079--0082 establish
-the final boundary: `pipls.inspection` owns pure NumPy computations and immutable result objects,
-while examples and users render those arrays directly with Matplotlib.
-
-`pipls.inspection` is implemented and exports from its own namespace:
-
-```python
-from pipls.inspection import (
-    BiplotCoordinates,
-    LatentStructure,
-    ObservationDiagnostics,
-    PiPLSDisplayFactors,
-    PredictionDiagnostics,
-    PredictionKind,
-    pipls_display_factors,
-    biplot_coordinates,
-    latent_structure,
-    observation_diagnostics,
-    prediction_diagnostics,
-)
-```
-
-These names are not top-level `pipls` exports. `pipls_display_factors()` accepts a
-`PiPLSDecomposition`, copies $P$, $D$, and $Q$, and preserves $PDQ^\mathsf{T}$. Its default display
-signs come from the first largest-magnitude predictor entry. A caller may instead supply a zero-based
-`response_index` and request a positive or negative response orientation; exact zero anchor entries
-fall back to the predictor convention. It returns $P$, the dilation vector, $Q$, and $QD$ as
-read-only arrays; labels and sign bookkeeping remain outside the result record.
-
-`prediction_diagnostics()` accepts one- or two-dimensional observed and predicted responses,
-normalizes outputs to two dimensions, uses residuals $y-\hat y$, and applies observed-response
-sample centers and standard deviations with `ddof=1`. `PredictionDiagnostics` accepts only the
-independent observed values, predicted values, and prediction provenance; it derives and stores the
-read-only residual, standardized arrays, response centers and scales, and response-wise standardized
-RMSE. Constant response columns and ambiguous labels are rejected.
-
-`latent_structure()` accepts a compatible fitted PLS-family model through the public
-`x_scores_`, `x_loadings_`, `y_loadings_`, and `coef_` attributes. Both `PiPLSRegression` and
-scikit-learn `PLSRegression` satisfy this contract. The returned arrays are defensive and read-only;
-coefficients retain the common `(n_targets, n_features)` orientation.
-
-`observation_diagnostics()` accepts a compatible fitted model with public X scores, X loadings,
-`transform()`, and `inverse_transform()`. It calculates squared score distance relative to the
-fitted training-score covariance and the row-wise squared X-reconstruction residual from the public
-transform/inverse-transform round trip. The result contains read-only raw arrays and no theoretical
-probability limits.
-
-`biplot_coordinates()` accepts a `LatentStructure` and exactly two zero-based components. It returns balanced read-only sample and predictor coordinates that preserve the selected
-$TP^\mathsf{T}$ reconstruction.
-
-All five inspection records validate direct construction, store defensive read-only arrays, and
-revalidate through pickle reconstruction. Display-factor weighting and prediction-diagnostic
-quantities are derived from independent constructor state rather than accepted redundantly. Their
-helper functions guarantee finite public arrays:
-range-safe scaled calculations are used where ordinary means, norms, covariance products, squared
-residuals, or RMSE calculations could overflow, and an unrepresentable derived quantity raises a
-clear `ValueError` instead of returning `inf` or `nan`.
-
-The package exposes no `pipls.plotting` module and no public `plot_*` convenience functions.
-The immutable numerical results are the compatibility surface; Matplotlib artists, styles, and
-`adjustText` label positions are caller-owned and are not package results.
-`PiPLSDisplayFactors`, `LatentStructure`, `ObservationDiagnostics`, `PredictionDiagnostics`, and
-`BiplotCoordinates` expose the numerical quantities required for rendering.
-`PiPLSDisplayFactors.weighted_response_directions` is derived as a checked read-only $QD$ array
-from the stored response directions and dilation rather than accepted as independent constructor
-state. Maintained examples
-create Matplotlib figures and axes directly, including component and response selection, physical
-coordinates, grouped-bar widths, labels, legends, titles, saving, and closing.
-
-Annotated biplots are rendered from `BiplotCoordinates` with optional `adjustText` label placement.
-Matplotlib and `adjustText` remain optional under the `examples`, `docs`, and `dev` extras and are
-not imported by the runtime package. No `data` extra is exposed; real-data reading is user-owned.
-No estimator method, fitted attribute, path-search parameter, or top-level export is added by the
-rendering layer.
-
-## Example workflow boundary
-
-Example 04 owns the explicit Pi-PLS-versus-ordinary-PLS path comparisons and plots both immutable
-component paths directly in memory. Pulp, Sugarcane, and Tobacco use path-evaluating
-`PiPLSSearchCV()`, fit the chosen row through `search.refit(...)`, and then retrieve
-`model.selection_`, `component_path_`, `predictor_rank_profile(...)`, and selection-driven
-`oof_report(...)` results before rendering. The Pulp OOF report reuses 50 splits from ten repeated
-five-fold partitions and averages ten predictions per observation. Sugarcane and Tobacco reuse one
-explicit `KFold(n_splits=5, shuffle=True, random_state=0)` partition. They
-render immutable Pi-PLS factors, latent structure, observation diagnostics, and prediction
-diagnostics directly with Matplotlib and write only final PDF figures. Tobacco obtains its count,
-exact minimum reference, resolved 10% relative tolerance, and threshold from the
-minimum-CV-MSE `model.selection_` and uses
-full predictor SVD, direct observation diagnostics, and caller-owned source-order response
-pagination through multipage PDFs.
-
-The package exposes no generic real-data I/O, tutorial workflow, predictor-rank-profile plotting
-helper, or component-path plotting helper. The comparison-only `PLSComponentPath` remains example-local.
-
-
-## Accepted pre-release public-surface cleanup
-
-Decision 0144 is implemented through seven patches. OOF reports own required OOF arrays and
-coverage while selection metrics remain on `report.selection`; the active API uses
-`PiPLSSelection` and `profile.selection` without aliases; fitted-search global-best attributes have
-been replaced by `search.select(rule="best_score")`; `cv_results_` retains only stable
-`n_components` and `predictor_rank` parameter columns while preserving all candidate scores, split
-values, MSE fields, ranks, and timings; `PiPLSDataset` uses only `X` and `Y`; inspection records
-retain component counts but not unused shape-only conveniences; and top-level `pipls` exports only
-`PiPLSRegression`, `PiPLSSearchCV`, `PredictorRankSupportWarning`, and version metadata. Result
-records remain public from focused modules, and the final active-surface audits are clean.
-
-`search.select()` remains public for selection without fitting. After refitting, the canonical
-selection is `model.selection_`. Direct-construction validation, immutable result safety,
-`component_path_`, predictor-rank profiles, advanced candidate data, and caller-owned plotting are
-retained.
-
-## Accepted final implementation-surface cleanup
-
-Decision 0145 removes two residual duplicate fitted attributes. A direct fixed model uses
-`model.predictor_rank`; a search-refitted model uses `model.selection_.predictor_rank` for exact
-selection provenance. `search.max_predictor_rank_` remains because it is learned from data and the
-materialized CV splits. The minimum training-fold size remains implementation-local evidence.
-
-`PiPLSRegression`, `PiPLSSearchCV`, and `PredictorRankSupportWarning` are the sole wildcard exports
-of `pipls.regression`, `pipls.search`, and `pipls.exceptions`, respectively. `search.select()`
-remains public for selection without fitting; after `refit()`, use `model.selection_`. Decision 0145
-is fully implemented without compatibility aliases.
-
-## Accepted CV-MSE tolerance-selection transition
-
-Decision 0146 retains `rule="minimum_cv_mse"` and extends it with:
-
-```python
-search.select(
-    rule="minimum_cv_mse",
-    relative_tolerance=None,
-    absolute_tolerance=np.inf,
-)
-
-search.refit(
-    X,
-    Y,
-    rule="minimum_cv_mse",
-    relative_tolerance=None,
-    absolute_tolerance=np.inf,
-)
-```
-
-The relative default resolves to `sqrt(np.finfo(np.float64).eps)`; the absolute default disables
-the absolute cap. Both tolerance conditions must hold, and the smallest qualifying component count
-is selected. Tolerance-based selections retain resolved relative and absolute tolerances, the exact
-reference minimum, and a derived CV-MSE threshold.
-
-The final result surface uses `cv_mse_std` for population SD across materialized validation splits
-and contains no standard-error selection or result properties. Maintained plots use mean CV-MSE ±
-split SD. Tobacco demonstrates a 10% relative tolerance; absolute tolerance is documented without
-an example.
-
-Current status: **all seven patches complete**. The tolerance API, split-SD plots, automatic
-workflow migration, repeated Pulp protocol, and removal of the superseded SE-based surface are
-implemented.
+- automatic outer validation;
+- a final estimator from `search.fit()`;
+- general weighted fitting or metadata routing;
+- generic dataset download/registry APIs;
+- block-aware scaling;
+- public plotting or report-composition helpers;
+- adaptive-search execution history as result state;
+- private scorer/preprocessing state needed only internally;
+- aliases for retired pre-release names.
