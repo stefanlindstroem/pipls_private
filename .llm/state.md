@@ -61,7 +61,10 @@ profiles carry immutable `PiPLSPredictorRankEvidence`; fixed and maximum policie
 
 Manual selection uses an evaluated `n_components` value and the predictor rank already selected
 conditionally for that row. A successful refit attaches the exact immutable row as
-`model.selection_`; the fitted search is not mutated.
+`model.selection_`; the fitted search is not mutated. Decision 0151 authorizes an additional
+`refit(selection=...)` route so one pre-existing compatible selection can configure OOF reporting
+and final fitting. That runtime change begins in Patch 2 and is not implemented by the current
+decision-only patch.
 
 `oof_report()` accepts an existing compatible selection and reuses every split materialized by the
 search. Repeated validation predictions are averaged per observation and their counts are exposed.
@@ -176,7 +179,12 @@ Decision 0150 is implemented. The served computational-performance guide documen
 scaling, validation repetitions, adaptive and exhaustive rank coverage, fixed and restricted
 paths, randomized predictor SVD, parallel execution, OOF reuse, and work inspection. Public guides
 route to it, and source-distribution documentation validation protects its shipped and rendered
-forms. Decision 0139 Patch 3 remains separate paused work.
+forms.
+
+Decision 0151 is active. Patch 1 establishes the selection-driven refit, evidence-before-refit
+workflow, route-specific example order, and Mermaid tutorial target without changing runtime or
+served documentation. Patches 2--6 implement and integrate that target. The paused presentation
+increment from Decision 0139 is superseded by this sequence.
 
 ## Authority and drift handling
 

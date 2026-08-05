@@ -45,7 +45,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select, refit, and compute OOF diagnostics through explicit post-fit operations |
 | `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
 | `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
-| `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot split-SD rank profiles at the fitted model selection, including Tobacco tolerance selection |
+| `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot split-SD rank profiles at the exact selection used for final fitting, including Tobacco tolerance selection |
 | `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named immutable loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
 | `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain the exact refit selection as `model.selection_` and make `oof_report(selection=...)` reuse every materialized search split |
 | `0145-final-implementation-surface-cleanup.md` | final implementation-surface cleanup | remove residual duplicate fitted attributes, privatize model-selection internals, remove unused private helpers, declare remaining module exports, and state fitting-free selection positively |
@@ -54,17 +54,29 @@ This registry lists only numbered decisions that still define current behavior o
 | `0148-predictor-rank-tolerance-selection.md` | predictor-rank tolerance selection | constructor tolerances, immutable rank evidence, conditioned component rules, and separate 10% Tobacco predictor-rank and component-count demonstration |
 | `0149-predictor-rank-search-terminology.md` | predictor-rank search terminology | use `"adaptive"`/`"exhaustive"`, preserve algorithms and achieved-coverage diagnostics, reject retired values, and reject inapplicable nondefault exhaustive mode |
 | `0150-computational-performance-guidance.md` | computational-performance guidance | central reference page, explicit cost categories, fold-local preprocessing, reproducible examples, and current implementation semantics |
+| `0151-selection-driven-refit-workflow.md` | selection-driven refit workflow | pass one compatible immutable selection through OOF reporting and final refitting; reorder analytical examples and add source-level tutorial flowcharts |
 
 ## Current canonical clusters
 
 - **Mathematics and numerical construction:** 0001--0004, 0007--0009, 0014, 0025, 0032, 0092,
   0120--0121, and 0146--0149.
-- **Estimator, search, and result ownership:** 0039, 0066, 0093, 0102, 0137, 0140, 0143, and
-  0145--0149.
+- **Estimator, search, and result ownership:** 0039, 0066, 0093, 0102, 0137, 0140, 0143,
+  0145--0149, and 0151.
 - **Datasets and product scope:** 0015, 0024--0025, 0041, 0119, 0123, and 0142.
 - **Inspection and rendering:** 0042, 0045, 0061, 0083, 0094, 0110, 0124, 0127, and 0141.
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
-  0147, and 0150.
+  0147, 0150, and 0151.
+
+## Active Decision 0151 contract
+
+- Add `selection=` to `PiPLSSearchCV.refit()` while retaining rule-based and component-count routes.
+- Use one exact compatibility validator for selections consumed by `refit()` and `oof_report()`.
+- Reorder evidence-retaining examples around search evidence, one selection, optional OOF
+  qualification, and final refitting from that same selection.
+- Keep validation-only and comparison-only routes free of unnecessary final models.
+- Add one supplementary vertical Mermaid flowchart plus equivalent prose to each served tutorial,
+  without committed generated diagram assets.
+- Patch 1 of 6 establishes the target; runtime, examples, tutorials, and final audits remain staged.
 
 ## Implemented Decision 0150 contract
 
@@ -105,8 +117,9 @@ This registry lists only numbered decisions that still define current behavior o
 - The only named selection rules are `best_score` and tolerance-based `minimum_cv_mse`.
 - CV-MSE dispersion is population SD across materialized splits; no standard-error result or rule
   exists.
-- Refitted models retain the exact immutable `model.selection_`; OOF reporting reuses the fitted
-  search splits and averages repeated validation predictions per observation.
+- Refitted models retain the exact immutable `model.selection_`; under Decision 0151, OOF
+  reporting and final refitting can consume the same pre-existing compatible selection while reusing
+  the fitted search splits and averaging repeated validation predictions per observation.
 - Pulp, Sugarcane, and Tobacco are the closed set of package-owned reference datasets. Arbitrary
   user data remains ordinary array-like `X` and `y`.
 - Numerical inspection is package-owned; plotting and report composition are caller-owned.

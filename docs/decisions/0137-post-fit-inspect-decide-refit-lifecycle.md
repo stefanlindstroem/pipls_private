@@ -4,6 +4,8 @@
 
 Accepted and implemented. Decisions 0140, 0143, 0146, and 0148 refine selected-row ownership,
 selection provenance, OOF reporting, hierarchical rank retention, and the final rule vocabulary.
+Decision 0151 refines the evidence-to-refit order and lets one existing selection configure both OOF
+reporting and final fitting.
 
 ## Context
 
@@ -22,16 +24,17 @@ Post-fit operations are explicit:
 ```python
 search = PiPLSSearchCV(cv=cv).fit(X, y)
 path = search.component_path_
-profile = search.predictor_rank_profile(n_components=4)
 
 selection = search.select(rule="minimum_cv_mse")
-model = search.refit(X, y, rule="minimum_cv_mse")
-report = search.oof_report(X, y, selection=model.selection_)
+profile = search.predictor_rank_profile(selection.n_components)
+report = search.oof_report(X, y, selection=selection)
+model = search.refit(X, y, selection=selection)
 ```
 
-`select()` resolves one stored row without fitting. `refit()` resolves the same row, clones the
-configured estimator or pipeline, fits it on all supplied data, and attaches the exact immutable
-selection as `model.selection_`. `oof_report()` accepts an existing compatible selection, refits its
+`select()` resolves one stored row without fitting. `refit()` either resolves a rule or component
+count directly or consumes an existing compatible selection, clones the configured estimator or
+pipeline, fits it on all supplied data, and attaches the exact immutable selection as
+`model.selection_`. `oof_report()` accepts an existing compatible selection, refits its
 fixed rank pair on every split materialized by the search, averages repeated validation predictions
 per observation, and returns immutable ordered diagnostics.
 

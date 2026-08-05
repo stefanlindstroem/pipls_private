@@ -18,7 +18,8 @@ validation evidence.
 - Preserve the mathematical construction in `.llm/mathematics.md` and `.llm/theory.md`.
 - Keep the fixed estimator separate from cross-validated path search.
 - Learn all model preprocessing inside each fit, including every training fold.
-- Prefer explicit post-fit selection, refitting, OOF reporting, and inspection over hidden state.
+- Prefer explicit post-fit selection, selection handoff, OOF reporting, refitting, and inspection
+  over hidden state.
 - Keep public result objects immutable, validated, finite where required, and pickle-safe.
 - Use scikit-learn conventions where they do not obscure Pi-PLS-specific semantics.
 - Keep user data preparation visible; package-owned loaders are named reference conveniences, not a
@@ -53,6 +54,10 @@ policy and `search_method="exhaustive"` requests complete admissible-rank covera
 name and `search_is_exhaustive_` fitted diagnostic remain unchanged, and the former values have no
 compatibility aliases.
 
+Decision 0151 authorizes `refit(selection=...)` as the exact-selection handoff for analytical
+workflows. Rule-based and component-count refitting remain the compact route. Existing selections
+must use one compatibility definition across OOF reporting and final refitting.
+
 ### Analysis
 
 Pi-PLS-specific factorization inspection and shared PLS-family diagnostics are pure numerical
@@ -72,15 +77,15 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decisions 0148, 0149, and 0150 are implemented. The predictor-rank tolerance and terminology
-changes, together with the central computational-performance guide and its documentation routes,
-tests, and source-distribution checks, form the current package contract. No further package
-increment is authorized.
+Decisions 0148, 0149, and 0150 are implemented. Decision 0151 is the active six-patch increment.
+Patch 1 establishes the contract; Patch 2 adds selection-driven refitting; Patches 3 and 4 reorder
+the synthetic and complete real-data workflows; Patch 5 adds Mermaid tutorial flowcharts and strict
+documentation integration; Patch 6 completes public and maintainer audits.
 
 ## Independent paused work
 
-Decision 0139 Patch 3 may later refine presentation and navigation after an explicit owner request.
-It is not part of Decision 0148 and must not be bundled into the predictor-rank tolerance sequence.
+Decision 0139 Patch 3 is superseded by the integrated workflow and tutorial sequence in Decision
+0151.
 
 Future block-aware standardization remains intentionally undesigned. Do not reserve public names,
 constructor parameters, or hidden abstractions before a dedicated owner-led design phase.

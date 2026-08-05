@@ -67,8 +67,8 @@ They must not become a second copy of living prose or preserve removed migration
 
 ### Examples, rendering, and documentation
 
-- public imports, visible data preparation, seeded CV, modeling-before-analysis, and rendering-last
-  structure;
+- public imports, visible data preparation, seeded CV, route-specific
+  evidence/selection/refit order, and rendering-last structure;
 - caller-owned Matplotlib rendering from immutable arrays;
 - no private runtime imports or duplicate workflow implementations;
 - quick-start and small leave-one-out executable behavior;
@@ -205,6 +205,25 @@ Tests verify that:
 - multi-rank explicit sequences retain adaptive and exhaustive choices;
 - current source, examples, public guides, and retained decisions use the final terminology while
   unrelated `svd_solver="auto"` uses remain intact.
+
+## Selection-driven refit and tutorial-workflow obligations
+
+Tests must verify that:
+
+- exactly one of `selection`, `rule`, and `n_components` configures `refit()`;
+- `refit(selection=...)` and `oof_report(selection=...)` share one exact compatibility contract;
+- nondefault component-count tolerances are rejected when a selection is supplied;
+- compatible direct-estimator and terminal-pipeline refits attach the exact supplied immutable
+  selection only after successful fitting;
+- invalid types, incompatible provenance, and failed fits do not mutate the search or leave partial
+  selection state;
+- rule-based and manual component-count refitting remain supported;
+- evidence-retaining examples create one selection before OOF reporting and final refitting, while
+  validation-only and comparison-only examples do not acquire unnecessary final models;
+- before/after selected pairs, OOF arrays, fitted predictions, and generated semantic artifacts are
+  unchanged;
+- each served tutorial has one vertical Mermaid flowchart, equivalent prose, and strict local,
+  Pages-overlay, and source-distribution rendering without committed diagram assets.
 
 ## Computational-performance documentation obligations
 

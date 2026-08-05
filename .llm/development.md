@@ -22,10 +22,11 @@
 - Keep the fixed numerical core independent from preprocessing, CV, datasets,
   and publication-specific workflows.
 - Reuse the shared private evaluation/search machinery rather than adding a second fold loop.
-- Use one private selected-row resolver for selection and refitting, and one private OOF engine for
-  report calculation. `refit()` returns a fitted estimator clone and does not mutate search state or
-  retain training data. `oof_report(selection=...)` reuses the exact splits materialized by the
-  search and does not perform a full-data fit.
+- Use one private selected-row resolver for rule/component-count selection and one shared private
+  exact-compatibility validator for existing selections consumed by `refit(selection=...)` and
+  `oof_report(selection=...)`. `refit()` returns a fitted estimator clone and does not mutate search
+  state or retain training data. `oof_report(selection=...)` reuses the exact splits materialized by
+  the search and does not perform a full-data fit.
 - Preserve current estimator-internal centering/scaling: fit its statistics inside every
   candidate training fold and refit them on the complete training set after selection.
 - Fit every additional learned preprocessing operation inside its matching training fold.
@@ -51,10 +52,11 @@
 - Every numbered example must present a recognizable user task, explicit comparison, or focused
   comparison. It must explain its data and label its output without relying on publication context or
   earlier project history. Do not ship context-free API demonstrations as numbered examples.
-- After path inspection, maintained search examples fit the final full-data model through
-  `search.refit(...)`; do not manually transfer the selected predictor rank into a new estimator.
-  Resolve scalar selected rows through `search.select(...)` only where plotting, reporting, or an
-  explicit recommendation display needs that evidence.
+- In maintained evidence-retaining workflows, inspect path evidence, create one selection through
+  `search.select(...)`, pass that same object to any OOF report, and fit the final full-data model
+  through `search.refit(..., selection=selection)`. Do not recover the working selection from the
+  fitted model or manually transfer the selected predictor rank into a new estimator. Compact
+  automatic workflows may continue to refit directly from a rule or component count.
 - For real-data examples, form `X` and `Y` visibly in the script. Package-owned Pulp, Sugarcane,
   and Tobacco use their named loaders; ordinary user data retain explicit user-owned reading. Do not
   introduce a registry, generic loader, metadata-driven runtime path, or helper that obscures data
@@ -98,8 +100,10 @@
   links. Do not make general performance claims. Development environments, Make targets,
   distribution checks, repository layout, and snapshot instructions belong in `CONTRIBUTING.md`.
 - Keep tutorial openings focused on purpose, coverage, setup or data, and the modeling workflow.
-  Put maintained source paths, renderer ownership, and figure-generation commands in a terminal
-  reproduction section.
+  The three served tutorials each include one compact vertical Mermaid flowchart plus equivalent
+  prose; diagrams remain supplementary source-level documentation and produce no committed image
+  assets. Put maintained source paths, renderer ownership, and figure-generation commands in a
+  terminal reproduction section.
 - Keep repository commands discoverable through the grouped self-documenting Makefile. `make`
   and `make help` show first setup and routine validation before the maintained task groups; each
   public target carries one `##` description and each group one `##@` heading.
@@ -134,11 +138,11 @@
   in memory. They must not write generated CSV files as analytical or plotting intermediates.
 - Preserve `cv_mse_std` as descriptive population split dispersion. Maintained CV-MSE figures
   use it directly for symmetric $\pm 1$ SD bars. No standard-error result or selection rule is
-  public. Selection lookup must not fit, refit, or mutate search state. Decision 0140 assigns that ownership to
-  `search.select(...)`, and all
-  maintained examples, tutorial snippets, and living API pages now use that operation. Example 07
-  shows the exact minimum row, horizontal 10% relative-tolerance threshold, and recommended row
-  from `model.selection_`. Keep generated pages and cross-links synchronized with
+  public. Selection lookup must not fit, refit, or mutate search state. Decision 0140 assigns that
+  ownership to `search.select(...)`, and maintained examples, tutorial snippets, and living API
+  pages use that operation. Under Decision 0151, Example 07 shows the exact minimum row, horizontal
+  10% relative-tolerance threshold, and recommended pre-refit selection, then passes that same
+  object to OOF reporting and final fitting. Keep generated pages and cross-links synchronized with
   the implemented stage.
 - Every behavioral change requires focused tests at the most public relevant boundary.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory

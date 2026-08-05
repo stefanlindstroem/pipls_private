@@ -54,6 +54,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0148: predictor-rank tolerance selection](0148-predictor-rank-tolerance-selection.md)
 - [0149: predictor-rank search terminology](0149-predictor-rank-search-terminology.md)
 - [0150: computational-performance guidance](0150-computational-performance-guidance.md)
+- [0151: selection-driven refit workflow](0151-selection-driven-refit-workflow.md)
 
 ## Historical navigation
 

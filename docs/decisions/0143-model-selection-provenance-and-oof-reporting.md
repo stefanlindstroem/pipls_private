@@ -3,8 +3,9 @@
 ## Status
 
 Accepted and implemented. Decisions 0146 and 0148 refine component-count and conditional
-predictor-rank provenance while this decision remains canonical for model-owned selection
-provenance and selection-conditioned OOF reporting.
+predictor-rank provenance. Decision 0151 further lets `refit()` consume an existing compatible
+selection and refines the evidence-to-validation-to-refit workflow order, while this decision
+remains canonical for model-owned selection provenance and selection-conditioned OOF reporting.
 
 ## Context
 
@@ -32,8 +33,10 @@ The value is the exact immutable `PiPLSSelection` used to configure the full-dat
 attached to the returned outer object only after fitting succeeds. A `PiPLSRegression` fitted
 directly has no `selection_` attribute because no search-owned selection occurred.
 
-`refit()` returns only the fitted estimator. It does not retain a selected fitted model on the
-search object and does not return a wrapper or tuple.
+`refit()` returns only the fitted estimator. It can resolve a rule or component count directly or,
+under Decision 0151, consume an existing exactly compatible `PiPLSSelection`. In the latter case the
+exact supplied immutable object becomes `model.selection_`. The method does not retain a selected
+fitted model on the search object and does not return a wrapper or tuple.
 
 ### Selection results retain policy provenance
 
@@ -94,22 +97,21 @@ nested cross-validation or an external-test estimate.
 
 ### Workflow order
 
-The standard model-producing workflow is:
+The standard evidence-retaining model-producing workflow is:
 
 ```python
 search = PiPLSSearchCV(cv=cv).fit(X, Y)
-model = search.refit(X, Y, rule="minimum_cv_mse")
-
-# Analysis follows modeling.
-selection = model.selection_
 path = search.component_path_
+selection = search.select(rule="minimum_cv_mse")
 rank_profile = search.predictor_rank_profile(selection.n_components)
 report = search.oof_report(X, Y, selection=selection)
+model = search.refit(X, Y, selection=selection)
 ```
 
-Manual component-count selection uses the same order with `n_components=...`. A selection-only
-workflow may call `search.select(...)` and pass that result to `oof_report()`. OOF reporting remains
-optional because it performs one additional fit per stored validation split.
+Manual component-count selection uses the same order with `search.select(n_components=...)`. OOF
+reporting remains optional because it performs one additional fit per stored validation split. The
+compact automatic route may still call `refit(..., rule=...)` without retaining a selection first. A
+selection-only or validation-only workflow need not fit a final model.
 
 ### Method roles
 
@@ -117,8 +119,11 @@ optional because it performs one additional fit per stored validation split.
 search.select()
     inspect one immutable selection without fitting
 
-search.refit()
-    fit one full-data model and retain model.selection_
+search.refit(selection=...)
+    fit one full-data model from an existing compatible selection and retain model.selection_
+
+search.refit(rule=... or n_components=...)
+    resolve and fit one full-data model directly for compact workflows
 
 search.oof_report(selection=...)
     compute OOF diagnostics for an existing compatible selection
@@ -133,8 +138,8 @@ search.predictor_rank_profile(h)
 ## Consequences
 
 - A fitted model records exactly which component-count and predictor-rank pair constructed it.
-- OOF reporting cannot silently evaluate a different selection than the fitted model when supplied
-  with `model.selection_`.
+- OOF reporting and final refitting can consume the same pre-existing selection, preventing an
+  independent second resolution request.
 - Repeated-CV reports inherit every search repetition and expose the resulting prediction counts.
 - Search remains the owner of path evidence and materialized splits, but not of a refitted model.
 - Selection, OOF analysis, fitted-model inspection, and rendering remain separate operations.

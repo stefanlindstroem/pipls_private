@@ -128,20 +128,28 @@ returns the conditioned row.
 ### Full-data refit
 
 ```python
+selection = search.select(rule="minimum_cv_mse")
+model = search.refit(X, y, selection=selection)
+
 model = search.refit(X, y, rule="minimum_cv_mse")
 model = search.refit(X, y, n_components=4)
 ```
 
-`refit()` resolves one stored row, clones the configured estimator or pipeline, fits it on the
-supplied full data, and attaches the exact immutable row to the returned outer estimator as
-`selection_`. It does not mutate the fitted search, retain the supplied data, or store the returned
-model. To fit an exact manually specified `(n_components, predictor_rank)` pair, use
-`PiPLSRegression` directly.
+Exactly one of `selection`, `rule`, and `n_components` determines the stored row. A supplied
+selection must be a `PiPLSSelection` exactly compatible with the fitted search, and nondefault
+component-count tolerances are invalid because the row is already resolved. `refit()` uses the same
+compatibility definition as `oof_report()`, clones the configured estimator or pipeline, fits it on
+the supplied full data, and attaches the exact supplied or resolved immutable row to the returned
+outer estimator as `selection_`. It does not mutate the fitted search, retain the supplied data, or
+store the returned model. To fit an exact manually specified `(n_components, predictor_rank)` pair,
+use `PiPLSRegression` directly.
 
 ### OOF report
 
 ```python
-report = search.oof_report(X, y, selection=model.selection_)
+selection = search.select(rule="minimum_cv_mse")
+report = search.oof_report(X, y, selection=selection)
+model = search.refit(X, y, selection=selection)
 ```
 
 The selection must match the same fitted search exactly, including tolerance provenance. The caller
@@ -255,8 +263,8 @@ package exposes no plotting module, Matplotlib artist result, or public `plot_*`
 
 ## Example and rendering boundary
 
-Examples 05--07 fit Pi-PLS paths, explicitly refit one row, use `model.selection_`, optionally
-compute a matching OOF report, inspect the fitted model, and render final PDFs directly with
+Examples 05--07 fit Pi-PLS paths, create one immutable selection, optionally compute a matching
+OOF report, refit that same selection, inspect the fitted model, and render final PDFs directly with
 Matplotlib. Pulp uses 50 repeated five-fold splits and averages ten OOF predictions per
 observation. Sugarcane and Tobacco use seeded shuffled five-fold CV. Tobacco demonstrates a
 constructor-level `predictor_rank_relative_tolerance=0.10` and a separate component-count

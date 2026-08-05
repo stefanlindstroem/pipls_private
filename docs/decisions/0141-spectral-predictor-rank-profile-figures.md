@@ -4,7 +4,8 @@
 
 Accepted and implemented. Decision 0146 refines the Tobacco component-count rule and replaces
 standard-error presentation with split-SD presentation. Decision 0148 adds the separate predictor-
-rank tolerance demonstration.
+rank tolerance demonstration. Decision 0151 refines the workflow so the profile and final refit
+consume one selection created before fitting the final model.
 
 ## Context
 
@@ -14,16 +15,17 @@ Sugarcane and Tobacco should expose the same conditional evidence rather than pr
 predictor rank only as one scalar.
 
 The selected component count may be manual or rule-based. The profile must therefore consume the
-component count retained by the actual fitted-model selection rather than duplicate it as a literal
-or reconstruct candidate rows from `cv_results_`.
+component count retained by the exact selection that also configures the final model rather than
+duplicate it as a literal or reconstruct candidate rows from `cv_results_`.
 
 ## Decision
 
 Examples 06 and 07 use the public composition:
 
 ```python
-selection = model.selection_
+selection = search.select(...)
 rank_profile = search.predictor_rank_profile(selection.n_components)
+model = search.refit(X, Y, selection=selection)
 ```
 
 Sugarcane retains its declared component count. Tobacco obtains its component count from

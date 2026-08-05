@@ -29,7 +29,9 @@ Tolerance thresholds come from `PiPLSSelection.cv_mse_threshold`.
 
 ### 2. Fixed-model interpretation
 
-Fit one exact row with `search.refit(...)` or fit `PiPLSRegression` directly. Then inspect:
+Fit the exact selected row with `search.refit(..., selection=selection)` or fit
+`PiPLSRegression` directly. Compact workflows may instead resolve a rule or component count inside
+`refit()`. Then inspect:
 
 - Pi-PLS-specific predictor directions, dilation, response directions, and weighted response
   directions;
@@ -156,14 +158,16 @@ and direct ownership but must not freeze final adjusted label coordinates.
 ## Maintained workflow roles
 
 - Example 01: fitted-value prediction diagnostic only; no OOF claim.
-- Example 02: selection evidence, fixed refit, and external-test prediction.
+- Example 02: selection evidence, selection-driven fixed refit, and external-test prediction.
 - Example 03: selection-only leave-one-out report with ordered OOF predictions.
 - Example 04: Pi-PLS and ordinary-PLS path comparison only.
-- Example 05: repeated-CV Pulp selection, matching OOF report, representative interpretation.
-- Example 06: Sugarcane selection, OOF report, spectral interpretation, rank profile.
+- Example 05: repeated-CV Pulp selection, matching OOF report, selection-driven refit, and
+  representative interpretation.
+- Example 06: Sugarcane selection, OOF report, selection-driven refit, spectral interpretation, and
+  rank profile.
 - Example 07: Tobacco with separately labeled 10% predictor-rank and component-count tolerance
-  decisions, OOF report, full-SVD spectral analysis, rank profile, raw observation diagnostics, and
-  source-order response pagination.
+  decisions, OOF report, selection-driven refit, full-SVD spectral analysis, rank profile, raw
+  observation diagnostics, and source-order response pagination.
 
 Pulp, Sugarcane, and Tobacco keep scientific computation in memory and write only final PDF
 figures. Sugarcane and Tobacco keep analysis in `main()` and group rendering in private functions in

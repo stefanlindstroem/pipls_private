@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted. Patches 1 and 2 are implemented; Patch 3 remains a paused presentation-only increment.
+Accepted. Patches 1 and 2 are implemented. The paused Patch 3 is superseded by Decision 0151,
+which integrates the remaining presentation work with selection-driven refitting and tutorial
+flowcharts.
 
 ## Context
 
@@ -68,7 +70,8 @@ the fitted search object, inspecting `component_path_` and
 pair through:
 
 ```python
-model = search.refit(X, Y, n_components=chosen_n_components)
+selection = search.select(n_components=chosen_n_components)
+model = search.refit(X, Y, selection=selection)
 ```
 
 Its introduction must explain that it expands the quick start by retaining the search evidence. It
@@ -77,10 +80,10 @@ must not describe itself as the first Pi-PLS model or the shortest complete path
 ### 3. Validate and interpret
 
 The complete Pulp tutorial remains the third stage. It owns real-data selection qualification,
-explicit final refitting, selection-conditioned OOF reporting through
-`oof_report(selection=...)`, and
-representative model-interpretation figures. Pulp OOF predictions must not be described as
-fixed-parameter OOF because the selected row is chosen using the same observations.
+selection-conditioned OOF reporting through `oof_report(selection=...)`, explicit final refitting
+from the same selection, and representative model-interpretation figures. Pulp OOF predictions must
+not be described as fixed-parameter OOF because the selected row is chosen using the same
+observations.
 
 ### Navigation and reference order
 
@@ -118,12 +121,13 @@ Implement the transition in three reviewable patches:
 2. rename the first example, add the rendered quick-start tutorial and asset pipeline, update
    navigation, and protect its distribution and rendering contracts;
 3. reframe the landing page, synthetic tutorial, path reference, catalogues, and active terminology
-   around the three-stage route, then close the transition with stale-surface audits.
+   around the three-stage route, then close the transition with stale-surface audits -- superseded
+   by the integrated sequence in Decision 0151.
 
 Patch 1 changed no executable example, renderer, navigation, or living user documentation. Patch 2
 implements the renamed quick-start example, rendered tutorial, generated asset pipeline, and first
-navigation position. Patch 3 remains responsible for reframing the broader landing page, path
-reference, catalogues, and active terminology around the complete three-stage route.
+navigation position. Decision 0151 now owns the remaining workflow reframing, exact-selection
+handoff, tutorial diagrams, and stale-surface audit.
 
 This decision consolidates the earlier onboarding and tutorial-route increments. Their durable
 self-contained-example, tutorial-ownership, documentation-layering, and user-orientation outcomes

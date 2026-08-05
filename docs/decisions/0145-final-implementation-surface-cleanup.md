@@ -5,7 +5,8 @@
 Accepted and implemented. All four patches are complete: the guide-layer contract is established,
 redundant fitted attributes are removed, model-selection internals and private helpers are
 simplified, remaining public modules declare exact exports, and selection ownership is stated
-positively.
+positively. Decision 0151 refines the model-producing workflow to create one selection before OOF
+reporting and final refitting.
 
 ## Context
 
@@ -122,10 +123,12 @@ advanced users from explicitly importing documented public names from their focu
 
 Documentation uses this ownership rule:
 
-- after `refit()`, obtain the fitted selection from `model.selection_`;
-- use `search.select()` when a selection is needed without fitting a final model.
+- `search.select()` obtains an immutable selection without fitting a final model;
+- evidence-retaining workflows pass that selection to OOF reporting and `refit(selection=...)`;
+- compact workflows may resolve a rule or component count directly in `refit()`;
+- every successfully refitted model still exposes the exact fitted selection as `model.selection_`.
 
-Documentation must not explain the method only by saying that it is not required.
+Documentation must not explain `search.select()` only by saying that it is not required.
 
 ### Retained functionality
 
