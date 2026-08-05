@@ -52,7 +52,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0146-cv-mse-tolerance-selection.md` | CV-MSE tolerance selection and split-SD reporting | replace the 1-SE heuristic with dual-tolerance minimum-CV-MSE selection, descriptive split SD, a 10% Tobacco demonstration, and repeated Pulp validation |
 | `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, compact historical summaries, and retired records; normalize `.llm`, decision links, structural tests, snapshot hygiene, and private dataset ownership without changing public behavior |
 | `0148-predictor-rank-tolerance-selection.md` | predictor-rank tolerance selection | constructor tolerances, immutable rank evidence, conditioned component rules, and separate 10% Tobacco predictor-rank and component-count demonstration |
-| `0149-predictor-rank-search-terminology.md` | predictor-rank search terminology | rename `"auto"`/`"optimal"` to `"adaptive"`/`"exhaustive"`, preserve algorithms and achieved-coverage diagnostics, and reject inapplicable nondefault exhaustive mode |
+| `0149-predictor-rank-search-terminology.md` | predictor-rank search terminology | use `"adaptive"`/`"exhaustive"`, preserve algorithms and achieved-coverage diagnostics, reject retired values, and reject inapplicable nondefault exhaustive mode |
 
 ## Current canonical clusters
 
@@ -65,7 +65,7 @@ This registry lists only numbered decisions that still define current behavior o
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
   and 0147.
 
-## Accepted Decision 0149 contract
+## Implemented Decision 0149 contract
 
 - Keep the `search_method` parameter and rename its values to `"adaptive"` (default) and
   `"exhaustive"` without compatibility aliases.
@@ -73,8 +73,8 @@ This registry lists only numbered decisions that still define current behavior o
   achieved-coverage diagnostic.
 - Omit `search_method` from fixed and maximum-rank examples, accept the default for constructor
   consistency, and reject the inapplicable nondefault exhaustive method.
-- Complete the terminology migration before adding Decision 0150 computational-performance
-  guidance.
+- The terminology migration is complete; Decision 0150 may now add computational-performance
+  guidance against the final values.
 
 ## Implemented Decision 0148 contract
 

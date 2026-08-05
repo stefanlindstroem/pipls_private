@@ -2,10 +2,11 @@
 
 ## Status
 
-Accepted. Patches 1 and 2 of the authorized six-patch sequence are complete. The runtime API now
-accepts `search_method="adaptive"` and `search_method="exhaustive"`, rejects the former values, and
-preserves the mapped candidate sets and numerical evidence. Patch 3 completes the remaining public
-documentation, example, retained-decision, and distribution migration.
+Accepted and implemented. Patches 1--3 of the authorized six-patch sequence are complete. The
+runtime API, maintained examples, public documentation, retained decisions, tests, and distribution
+checks now use `search_method="adaptive"` and `search_method="exhaustive"`. The former values are
+rejected without aliases, and the mapped candidate sets and numerical evidence remain unchanged.
+Patches 4--6 establish and integrate Decision 0150 computational-performance guidance.
 
 ## Context
 
@@ -155,7 +156,7 @@ approximation.
 2. Rename the runtime values, validate one-candidate policies, and prove old/new numerical
    equivalence under the direct value mapping -- complete.
 3. Migrate remaining source prose, examples, public documentation, retained decisions, distribution checks,
-   and tests; reject stale current uses and complete Decision 0149.
+   and tests; reject stale current uses and complete Decision 0149 -- complete.
 4. Add Decision 0150 and the central computational-performance guide structure.
 5. Write the complete training-performance guidance using `"adaptive"` and `"exhaustive"`.
 6. Integrate links, troubleshooting, examples, changelog, documentation tests, and distribution

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Rename `PiPLSSearchCV.search_method` values from the pre-release `"auto"` and `"optimal"`
+  names to `"adaptive"` and `"exhaustive"`. Preserve the candidate-generation algorithms, keep
+  `search_is_exhaustive_` as the achieved-coverage diagnostic, reject the retired values without
+  aliases, and reject nondefault exhaustive coverage for one-candidate rank policies.
 - Align dilation notation with the companion manuscript by writing the diagonal elements of
   $\mathbf{D}$ as $D_k=D_{kk}$ throughout theory, API prose, generated docstrings, and
   maintained figure labels. Retain lower-case $d$ for distinct descriptive dimensions such as

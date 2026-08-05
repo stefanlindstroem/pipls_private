@@ -450,7 +450,7 @@ def main() -> None:
             svd_solver="full",
         ),
         predictor_rank_relative_tolerance=PREDICTOR_RANK_RELATIVE_TOLERANCE,
-        search_method="auto",
+        search_method="adaptive",
         n_jobs=1,
         cv=CV,
     ).fit(X, Y)

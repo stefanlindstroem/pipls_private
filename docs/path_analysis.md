@@ -62,7 +62,7 @@ With `predictor_rank_values=None`, predictor rank is selected independently for 
 count. A one-element sequence fixes one rank across the path, a longer sequence defines the
 admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\mathrm{max}}$ directly.
 
-`search_method="optimal"` evaluates every admissible pair. `search_method="auto"` performs a
+`search_method="exhaustive"` evaluates every admissible pair. `search_method="adaptive"` performs a
 deterministic adaptive coarse-to-fine search independently for each component count and may leave
 admissible ranks unevaluated. After fitting, `search_is_exhaustive_` states whether every
 admissible pair was evaluated. Adaptive refinement and `rank_test_score` continue to use private
@@ -80,7 +80,7 @@ search = PiPLSSearchCV(
 
 For each component count, the smallest evaluated rank satisfying both configured-score caps is
 retained. Fixed and maximum policies accept only the default tolerances and have no predictor-rank
-evidence. `search_method="auto"` selects among evaluated ranks; `"optimal"` selects among all
+evidence. `search_method="adaptive"` selects among evaluated ranks; `"exhaustive"` selects among all
 admissible ranks.
 
 ## Scoring and conditioned path selection { #scoring-and-conditioned-path-selection }
@@ -263,7 +263,7 @@ After path evaluation, `refit()` selects one stored component-path row and fits 
 fixed model on the supplied full data:
 
 ```python
-search = PiPLSSearchCV(search_method="auto").fit(X, Y)
+search = PiPLSSearchCV(search_method="adaptive").fit(X, Y)
 model = search.refit(X, Y, rule="minimum_cv_mse")
 Y_pred = model.predict(X_new)
 ```

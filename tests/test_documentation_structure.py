@@ -276,3 +276,38 @@ def test_public_python_blocks_do_not_use_an_undefined_cv_variable() -> None:
         for block in code_fence.findall(document.read_text(encoding="utf-8")):
             if "cv=cv" in block:
                 assert re.search(r"^cv\s*=", block, flags=re.MULTILINE) is not None
+
+
+def test_current_predictor_rank_search_terminology_is_consistent() -> None:
+    root = _repository_root()
+    current_documents = [
+        root / "README.md",
+        *sorted(
+            path
+            for path in (root / "docs").rglob("*.md")
+            if "decisions" not in path.relative_to(root / "docs").parts
+        ),
+        *sorted((root / "examples").glob("[0-9][0-9]_*.py")),
+        *sorted((root / "tools").glob("*.py")),
+        root / "src" / "pipls" / "search.py",
+        root / "src" / "pipls" / "_model_selection.py",
+    ]
+    retired_assignment = re.compile(
+        r"search_method\s*=\s*[\"'](?:auto|optimal)[\"']"
+    )
+
+    for path in current_documents:
+        assert retired_assignment.search(path.read_text(encoding="utf-8")) is None, path
+
+    retained_decisions = sorted(
+        path
+        for path in (root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md")
+        if not path.name.startswith("0149-")
+    )
+    for path in retained_decisions:
+        assert retired_assignment.search(path.read_text(encoding="utf-8")) is None, path
+
+    regression_text = (root / "src" / "pipls" / "regression.py").read_text(
+        encoding="utf-8"
+    )
+    assert 'svd_solver : {"auto", "full", "randomized"}' in regression_text

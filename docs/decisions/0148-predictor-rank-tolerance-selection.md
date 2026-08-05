@@ -149,10 +149,10 @@ private tie constants continue to govern:
 - deterministic low-rank ordering among exact numerical ties;
 - adaptive-search refinement around the exact evaluated optimum.
 
-`search_method="auto"` must not alter its evaluated candidate set when only predictor-rank
+`search_method="adaptive"` must not alter its evaluated candidate set when only predictor-rank
 tolerances change. It refines around the exact configured-score optimum and applies the public
 tolerances after candidate evaluation. The retained result is therefore the smallest **evaluated**
-qualifying rank. `search_method="optimal"` evaluates every admissible rank and therefore returns the
+qualifying rank. `search_method="exhaustive"` evaluates every admissible rank and therefore returns the
 smallest admissible qualifying rank.
 
 Candidate-level `cv_results_`, split scores, mean scores, CV-MSE summaries, timing results,

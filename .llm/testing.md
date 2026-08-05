@@ -189,21 +189,19 @@ Tests verify that:
 
 ## Predictor-rank search terminology obligations
 
-Decision 0149 migration tests must verify that:
+Tests verify that:
 
-- `"adaptive"` is the constructor default and reproduces the former `"auto"` candidate coverage and
-  numerical evidence exactly;
-- `"exhaustive"` reproduces the former `"optimal"` candidate coverage and numerical evidence
-  exactly;
-- the former values are rejected without aliases;
-- cloning, parameter surfaces, repr, pipelines, and pickles contain only the new values;
+- `"adaptive"` is the constructor default and preserves deterministic coarse-to-fine coverage;
+- `"exhaustive"` evaluates every admissible predictor-rank candidate;
+- the former pre-release values are rejected without aliases;
+- cloning, parameter surfaces, repr, pipelines, and pickles contain only the current values;
 - `search_is_exhaustive_` remains an achieved-coverage diagnostic and can be true after an adaptive
   request;
 - maximum and one-element fixed-rank policies accept the default and reject nondefault exhaustive
   coverage;
 - multi-rank explicit sequences retain adaptive and exhaustive choices;
-- unrelated `"auto"` values, including `svd_solver="auto"`, are not changed by context-insensitive
-  migration checks.
+- current source, examples, public guides, and retained decisions use the final terminology while
+  unrelated `svd_solver="auto"` uses remain intact.
 
 ## Decision lifecycle and repository-hygiene obligations
 

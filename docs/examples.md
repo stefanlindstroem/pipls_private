@@ -97,7 +97,7 @@ COMPONENT_RELATIVE_TOLERANCE = 0.10
 
 search = PiPLSSearchCV(
     predictor_rank_relative_tolerance=PREDICTOR_RANK_RELATIVE_TOLERANCE,
-    search_method="auto",
+    search_method="adaptive",
     cv=CV,
 ).fit(X, Y)
 

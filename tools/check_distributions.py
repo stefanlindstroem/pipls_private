@@ -108,6 +108,7 @@ evidence = selection.predictor_rank_evidence
 profile = search.predictor_rank_profile(1)
 
 assert PiPLSPredictorRankEvidence.__module__ == "pipls.component_path"
+assert search.search_method == "exhaustive"
 assert selection.predictor_rank == 1
 assert isinstance(evidence, PiPLSPredictorRankEvidence)
 assert evidence.relative_tolerance == 1e6

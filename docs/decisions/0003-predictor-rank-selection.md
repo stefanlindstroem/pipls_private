@@ -20,14 +20,13 @@ n_{\mathrm{train,min}}-1,
 The ceiling operation and all three caps are normative. The helper rejects nonpositive,
 nonfinite, or boolean values of $c$.
 
-In `predictor_rank="max"` mode there is no internal cross-validation, so
-$n_{\mathrm{train,min}}=n$. In both CV modes, the estimator materializes and copies one CV split
-set, derives the smallest training-fold size from it as a feasibility cap, and reuses the same
-splits for every evaluated candidate. The statistical-support term continues to use the full $n$
-because the selected model is refitted on all supplied observations.
+`PiPLSSearchCV` materializes and copies one CV split set, derives the smallest training-fold size
+from it as a feasibility cap, and reuses the same splits for every evaluated candidate. The
+statistical-support term continues to use the full $n$ because the selected model is refitted on all
+supplied observations.
 
-`predictor_rank="optimal"` scans every integer rank from `n_components` through the fold-safe
-upper bound. `predictor_rank="auto"` uses the adaptive policy in decision 0007 and may evaluate
+`search_method="exhaustive"` scans every admissible predictor rank from `n_components` through the
+fold-safe upper bound. `search_method="adaptive"` uses the policy in Decision 0007 and may evaluate
 only a subset. Private numerical score ties are resolved deterministically in favor of the smaller
 predictor rank. Decision 0148 supersedes exact conditional score maximization as the final retained-
 rank rule by adding separate public relative and absolute predictor-rank tolerances in
@@ -40,5 +39,6 @@ rule-derived bound even when an explicit integer rank is used.
 
 ## Refinement
 
-Decision 0007 establishes the implemented naming: `"optimal"` is exhaustive and `"auto"` is
-adaptive approximate search with cached evaluations and explicit diagnostics.
+Decision 0007 defines exhaustive and adaptive candidate coverage. Decision 0149 establishes the
+implemented public values `"exhaustive"` and `"adaptive"`, with cached evaluations and explicit
+diagnostics.

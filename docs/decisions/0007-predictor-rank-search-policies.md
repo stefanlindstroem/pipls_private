@@ -5,11 +5,10 @@ Status: accepted and implemented in `PiPLSSearchCV`; Decision 0039 removes these
 
 ## Context
 
-For fixed `n_components`, the current estimator evaluates every admissible predictor rank under
-the name `predictor_rank="auto"`. This is statistically clear but can be prohibitively expensive
-when the fold-safe upper bound is large. The public API needs both an exhaustive reference mode
-and a scalable default mode without conflating rank-search approximation with numerical SVD
-approximation.
+For fixed `n_components`, exhaustive evaluation of every admissible predictor rank can be
+prohibitively expensive when the fold-safe upper bound is large. The public API therefore needs
+both an exhaustive reference mode and a scalable default mode without conflating candidate-coverage
+approximation with numerical SVD approximation.
 
 The CV objective is discrete and may be noisy or non-unimodal. Strict bisection, ternary search,
 or golden-section search would assume more structure than the objective guarantees and could
@@ -17,20 +16,17 @@ irreversibly discard the region containing the global minimum.
 
 ## Decision
 
-The target predictor-rank modes are:
+`PiPLSSearchCV.search_method` exposes two candidate-coverage policies:
 
-- a positive integer: fit the supplied rank directly;
-- `"max"`: fit the rule-derived upper rank without CV search;
-- `"optimal"`: exhaustively evaluate every admissible integer rank;
-- `"auto"`: use deterministic adaptive logarithmic coarse-to-fine search and accept that the
-  evaluated candidate set is approximate relative to exhaustive search.
+- `"exhaustive"`: evaluate every admissible integer predictor rank;
+- `"adaptive"`: use deterministic logarithmic coarse-to-fine coverage and accept that the
+  evaluated candidate set may be a subset of the exhaustive set.
 
-Decision 0148 refines final retained-rank selection: after either policy finishes candidate
+`predictor_rank_values="max"` and one-element explicit sequences are separate fixed policies with
+one rank candidate per component count. They do not require a candidate-coverage choice. Decision
+0148 refines final retained-rank selection: after either optimized coverage policy finishes candidate
 evaluation, separate public relative and absolute tolerances retain the smallest qualifying
-evaluated rank.
-
-Because the package is pre-alpha, the current exhaustive `"auto"` behavior will be renamed to
-`"optimal"` without a deprecated compatibility alias.
+evaluated rank. Decision 0149 establishes the public values above without compatibility aliases.
 
 ## Adaptive-search contract
 
@@ -73,7 +69,7 @@ At minimum, adaptive fitting should record:
 
 ## Limitations
 
-`"auto"` does not guarantee the exhaustive optimum for an arbitrary non-unimodal CV curve. This
+`"adaptive"` does not guarantee the exhaustive optimum for an arbitrary non-unimodal CV curve. This
 limitation must be explicit in API documentation. Tests should show deterministic behavior,
 correct caching, exhaustive equivalence on small intervals, and substantial candidate reduction
 on large intervals. Comparative benchmarks should quantify how often adaptive and exhaustive
@@ -81,10 +77,10 @@ selection agree on representative synthetic and publication datasets.
 
 ## Separate numerical policy
 
-Randomized SVD is not implicit in `predictor_rank="auto"`. A later increment will add an explicit
-`svd_solver` policy such as `"full"`, `"randomized"`, and `"auto"`, together with `random_state`
-and fitted solver diagnostics. This separation allows users to distinguish approximate search
-coverage from approximate linear algebra.
+Randomized SVD is not implicit in `search_method="adaptive"`. `search_method` controls predictor-
+rank candidate coverage, while `svd_solver` independently controls the predictor decomposition
+through `"full"`, `"randomized"`, or `"auto"`. This separation lets users distinguish incomplete
+candidate coverage from approximate linear algebra.
 
 ## Consequences for path analysis
 

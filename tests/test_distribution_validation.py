@@ -113,6 +113,8 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
     assert "PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)" in helper
     assert "prediction.shape == (2, 2)" in helper
     assert "predictor_rank_relative_tolerance=1e6" in helper
+    assert 'search_method="exhaustive"' in helper
+    assert 'search.search_method == "exhaustive"' in helper
     assert "selection = search.select(n_components=1)" in helper
     assert "isinstance(evidence, PiPLSPredictorRankEvidence)" in helper
     assert "profile.selection == selection" in helper

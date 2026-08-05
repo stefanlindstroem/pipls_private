@@ -139,7 +139,7 @@ and the later minimum-CV-MSE component rule:
 
 ```python
 model = PiPLSSearchCV(
-    search_method="auto",
+    search_method="adaptive",
     predictor_rank_relative_tolerance=0.10,
 ).fit(
     X_train,
@@ -160,7 +160,7 @@ search object. Modeling completes before the retained evidence and optional OOF 
 calculated:
 
 ```python
-search = PiPLSSearchCV(search_method="auto").fit(X_train, Y_train)
+search = PiPLSSearchCV(search_method="adaptive").fit(X_train, Y_train)
 model = search.refit(X_train, Y_train, rule="minimum_cv_mse")
 
 selection = model.selection_

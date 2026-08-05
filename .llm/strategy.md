@@ -48,10 +48,10 @@ tolerances are search-constructor controls because they determine `component_pat
 tolerances remain post-fit `select()` and `refit()` controls. Exact numerical ties and adaptive
 candidate coverage remain separate from substantive parsimony tolerances.
 
-Decision 0149 renames only the predictor-rank coverage values: `search_method="adaptive"` is the
-default and `search_method="exhaustive"` requests complete admissible-rank coverage. The parameter
-name and `search_is_exhaustive_` fitted diagnostic remain unchanged. Runtime code and executable
-validation now use the new values; Patch 3 completes remaining prose and distribution migration.
+Decision 0149 is implemented. `search_method="adaptive"` is the default predictor-rank coverage
+policy and `search_method="exhaustive"` requests complete admissible-rank coverage. The parameter
+name and `search_is_exhaustive_` fitted diagnostic remain unchanged, and the former values have no
+compatibility aliases.
 
 ### Analysis
 
@@ -72,11 +72,10 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0148 is implemented. Decision 0149 authorizes a six-patch sequence. Patches 1--2 are
-complete: the terminology contract and runtime rename are implemented. Patch 3 completes remaining
-prose, example, retained-decision, test, and distribution migration and closes Decision 0149.
-Patches 4--6 then establish and integrate Decision 0150 computational-performance guidance. Do not
-write the performance guide before the terminology migration is complete.
+Decisions 0148 and 0149 are implemented. The next authorized increment is Patch 4 of the six-patch
+sequence: establish Decision 0150 and the central computational-performance guide structure. Patches
+5--6 then write, integrate, test, and audit the guidance using only the final `"adaptive"` and
+`"exhaustive"` terminology.
 
 ## Independent paused work
 

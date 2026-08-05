@@ -39,13 +39,12 @@ fold. The subtraction by one reflects model-internal centering, which limits the
 training matrix with $n_{\mathrm{train,min}}$ rows to at most
 $n_{\mathrm{train,min}}-1$.
 
-For `PiPLSRegression(predictor_rank="max")`, no rank-selection CV is used, so
-$n_{\mathrm{train,min}}=n$ and $p_{\min}=p$. For `"auto"`, `"optimal"`, and `PiPLSSearchCV`, one
-split set is materialized and reused for every candidate. Centering, scaling, decomposition,
+`PiPLSSearchCV` materializes one split set and reuses it for every candidate under both
+`search_method="adaptive"` and `search_method="exhaustive"`. Centering, scaling, decomposition,
 fitting, and scoring remain training-fold local.
 
 The ordinary defaults remain `samples_per_predictor_rank=5` and `cv=5`. Values below 5 remain
-legal in rule-based modes but emit `StatisticalSupportWarning`.
+legal with `max_predictor_rank="rule"` but emit `PredictorRankSupportWarning`.
 
 ## Consequences
 

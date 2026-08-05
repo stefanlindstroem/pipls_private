@@ -29,11 +29,11 @@ materialization, or numerical decomposition.
 - Invalid scalar `scoring`, `svd_solver`, and rank-mode values fail with package-level `ValueError`
   messages rather than incidental errors from dependencies.
 
-When `samples_per_predictor_rank < 5` is used by `predictor_rank="max"`, `"optimal"`, or
-`"auto"`, one public `StatisticalSupportWarning` is emitted per top-level fit. The warning states
-that the resulting rank bound may not have sufficient statistical support to be trusted without
-external validation. No warning is emitted for an explicit integer rank because $c$ does not
-constrain that model.
+When `samples_per_predictor_rank < 5` is used with `max_predictor_rank="rule"`, one public
+`PredictorRankSupportWarning` is emitted per top-level search fit. The warning states that the
+resulting rank bound may not have sufficient statistical support to be trusted without external
+validation. Explicit integer `max_predictor_rank` values bypass the support rule and therefore do
+not use $c$.
 
 The rank-bound calculation saturates safely at the algebraic limit for extremely small positive
 $c$, avoiding floating-point overflow.
