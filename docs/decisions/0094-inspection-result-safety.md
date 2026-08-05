@@ -24,9 +24,9 @@ quantities.
    fields. Nonnegative or positive quantities retain those constraints.
 2. `PiPLSDisplayFactors` validates that `weighted_response_directions` equals
    `response_directions * dilation`. `PredictionDiagnostics` validates its residual,
-   standardization, center, scale, RMSE, and provenance relationships. Decisions 0113 and 0114
-   later replace these redundant constructor fields with derived public quantities while retaining
-   the same finite-value boundary.
+   standardization, center, scale, RMSE, and provenance relationships. Weighted response
+   directions and prediction-diagnostic dependent arrays are derived from independent inputs while
+   retaining the same finite-value boundary.
 3. Pickle reconstruction passes through the same validating constructors.
 4. Biplot norms use max-scaled Euclidean calculations, and the balancing factor is formed as a
    quotient of square roots rather than by first forming a potentially overflowing norm ratio.

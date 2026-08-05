@@ -7,7 +7,7 @@ Accepted.
 ## Context
 
 The public fixed-estimator and path layers return five frozen result records:
-`PiPLSDecomposition`, `PiPLSComponentResult`, `PiPLSPredictorRankProfile`,
+`PiPLSDecomposition`, `PiPLSSelection`, `PiPLSPredictorRankProfile`,
 `PiPLSComponentPath`, and `PiPLSValidationReport`. Estimator-produced instances were mostly
 well formed, but direct construction did not apply one consistent policy. Some records retained
 aliased writable arrays, some normalized values and others did not, and several accepted invalid

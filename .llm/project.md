@@ -2,264 +2,148 @@
 
 ## Purpose
 
-Pi-PLS is a PLS-family method for multivariate regression. The repository is the long-lived home of
-the installable `pipls` package: its numerical core, scikit-learn-compatible public interfaces,
-validation utilities, synthetic generators, user documentation, numbered examples, staged fitted-
-model analysis tools, transparent reference datasets, tests, packaging, and releases.
+Pi-PLS is a PLS-family method for multivariate regression. This repository is the long-lived home of
+the installable `pipls` package: numerical construction, scikit-learn-compatible estimators,
+selection and validation results, synthetic and reference datasets, numerical inspection,
+documentation, examples, tests, packaging, and releases.
 
-The repository is not the reproduction environment for any one paper. Read
-`.llm/product_scope.md` for the normative product/publication boundary.
+The repository is not a paper-reproduction environment. Read `.llm/product_scope.md` for the
+normative product/publication boundary and `.llm/state.md` for the current handoff and active
+maintenance increment.
 
-For a fresh-chat handoff, read `.llm/state.md` before using this map. That file records the current
-implemented boundary and next increment; this file records where responsibilities live.
+## Current package
 
-## Current state
+The top-level public surface is deliberately narrow:
 
-Phases A through F4, documentation Patches D1--D4, plotting migrations G1--G5, public-result
-cleanup steps API1--API3, the six-patch new-user onboarding series, and the documentation alignment
-pass are complete. The owner-led human audit continues from the current clean snapshot.
-The top-level public surface includes `PiPLSRegression`, `PiPLSSearchCV`, and
-`PredictorRankSupportWarning`. Returned path, selection, decomposition, and OOF result records
-remain public from `pipls.component_path`, `pipls.decomposition`, and `pipls.validation`. The
-broader public surface also includes deterministic synthetic dataset generation, pure numerical
-`pipls.inspection`, and immutable inspection results. All maintained figures are rendered directly
-from those results with Matplotlib; annotated biplots use optional `adjustText`.
+```python
+from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
+```
 
-The repository-authored code and documentation use the BSD 3-Clause License. Vishal Agrawal,
-Fritjof Nilsson, and Stefan B. Lindström are the package authors and current copyright holders.
-`CITATION.cff` and `docs/citation.md` record the software and the companion manuscript under
-revision at *Computers & Chemical Engineering* (CACE-D-26-00847). Dataset-specific licenses
-remain separate.
+Focused modules expose immutable result records, response-standardized metrics, datasets, synthetic
+generators, validation results, and pure numerical inspection.
 
-The real-dataset suite contains package-owned Pulp, Sugarcane, and Tobacco. Every maintained
-consumer uses the named loaders, and `src/pipls/_data/<dataset>/` is the sole active matrix location.
-Decision 0142 completes the transition to three named reference datasets with ordinary language-
-neutral resources and one active matrix copy each. A licensing
-review of the remaining companion-analysis candidates intentionally excluded Corn, the legacy
-Citrination Steel table, SARCOS, and FRED-MD from this repository because the exact source
-materials do not carry sufficiently clear redistribution rights. Public navigation now separates
-tutorials, examples, programming reference, project validation, and scientific background.
-The former benchmark layer has been retired after serving its development-validation purpose.
-Pulp, Sugarcane, and Tobacco remain component-path examples rather than test-suite executions.
-`make examples` runs every numbered example explicitly, beginning with the package-owned Pulp
-quick start in `01_pulp_quick_start.py`, followed by the synthetic path-selection tutorial
-example 02, and
-including the complete real-data analyses. Example 04
-plots immutable Pi-PLS and standard PLS (NIPALS) paths directly and writes only the comparison PDFs.
-Pulp, Sugarcane, and Tobacco plot their Pi-PLS paths directly, obtain OOF predictions through
-explicit search validation reports, keep inspection results in memory, and write only final PDF
-figures. Decision 0139 Patches 1 and 2 have added the renamed Pulp quick start, its rendered tutorial,
-and the three-page served navigation. Its final landing-page and reference reframing is paused while
-Decision 0140 now provides non-mutating `PiPLSSearchCV.select()` as the search-owned selected-row
-lookup. Every maintained example, tutorial renderer, and living user document uses that operation;
-`PiPLSComponentPath` is now limited to aligned numerical evidence and immutable serialization.
+`PiPLSRegression` fits one explicit `(n_components, predictor_rank)` pair. `PiPLSSearchCV` evaluates
+the triangular path and supports explicit post-fit `select()`, `refit()`, and `oof_report()`
+operations. The supported named selection rules are `best_score` and tolerance-based
+`minimum_cv_mse`. Refitted models retain the exact immutable `selection_`.
 
-Pulp, Sugarcane, and Tobacco acquisition uses `load_pulp()`, `load_sugarcane()`, and
-`load_tobacco()`, respectively. All loaders are backed by the sole active package-resource copies,
-with documented CSV resources usable outside Python. Pulp also exposes
-the conditional predictor-rank profile at three components. Sugarcane and Tobacco keep scientific computation in
-`main()` and group rendering in private functions within their numbered scripts. Tobacco retains
-full-SVD spectral figures, source-order response pagination, and raw observation diagnostics.
-No block-aware scaling API is designed or scheduled. Decision 0054 defines Python 3.10–3.14
-support, guarded runtime dependency ranges, and a Python 3.10 minimum-dependency constraint
-environment. Decision 0055 implements separate minimum, supported-Python, and latest-compatible CI
-environments with resolved-version diagnostics. Decision 0056 adds clean installed wheel and
-source-distribution validation. Decisions 0058--0061 established caller-embeddable one-axis primitives and example-owned reports;
-Decisions 0079--0083 subsequently replace those plotters with direct Matplotlib rendering from
-immutable results and establish the final optional-dependency and structural policy. Decision 0062
-establishes the canonical Pulp workflow for the tutorial-first documentation phase. Decision 0063
-generates its deterministic single-chart SVG assets and manifest. Decision 0064 established the detailed Pulp tutorial as the first pedagogical route. Decision 0065
-separates tutorial, scientific-reference, and generated-API ownership. Decision 0074 removes the
-redundant task-guide layer. Decision 0075 refines the learning order: a short synthetic tutorial
-introduces selection and external-test prediction before the complete Pulp analysis; generated API
-pages and advanced guides retain their existing ownership. Decision 0066 introduces the
-immutable concise component-path API. Decision 0067 makes Sugarcane direct, and
-Decision 0068 makes the Pulp example and tutorial direct while removing the shared workflow wrapper.
-Decision 0069 makes Tobacco direct and removes the final post-analysis table and OOF helpers.
-Decision 0076 shortens the second tutorial to the distinctive Pulp real-data, OOF, and
-representative-interpretation content. Decision 0077 makes the root README a concise user landing
-page, moves maintenance commands to `CONTRIBUTING.md`, and separates programming reference from
-project validation in the served navigation. Decision 0078 adds the public result-object map,
-troubleshooting, and generic link-and-anchor enforcement without pinning living prose.
-Decision 0070 makes the Pi-PLS/ordinary-PLS comparison
-direct.
-Decision 0071 removes duplicate
-matrix-path aliases and completes structural enforcement of in-memory numbered examples.
-Decision 0072 adds an on-demand immutable predictor-rank profile derived from `cv_results_`.
-Decision 0073 hardens the public numerical boundary and fitted-state transaction.
-Decision 0086 limits `PiPLSDecomposition` to interpretable directions, dilation, rank/solver
-diagnostics, and the derived standardized regression map.
-Decision 0087 limits fitted estimator and path surfaces to independent numerical results:
-rotation aliases, scorer plumbing, adaptive-search execution history, and flat OOF duplicates are
-not public API.
-Decision 0088 removes display-sign bookkeeping and structurally impossible synthetic loading
-blocks from public records and makes generated reference pages field-oriented for returned
-immutable results. Decision 0089 adds the weighted response directions $QD$ to Tutorial 2 beside
-the retained predictor directions $P$, while the complete Pulp example retains all four
-factorization views.
+The package owns no plotting module. Maintained examples and tutorial renderers build Matplotlib
+figures directly from immutable numerical results. Optional `adjustText` may reposition annotated
+biplot labels but is not part of the numerical contract.
 
-## Implemented estimator and selection boundary
+## Data and product assets
 
-Decisions 0039 and 0040 are fully implemented. `PiPLSRegression` owns one explicit fixed rank
-pair and no cross-validation or selection results. `PiPLSSearchCV` owns the complete triangular-
-selection lifecycle and defaults to the explicit complete-component sentinel `"all"`. Obsolete
-private selection machinery and duplicate fitted aliases have been removed; interpretable
-Pi-PLS-specific output is canonical in `decomposition_`, while construction matrices remain private. Supported pipelines infer their unique terminal Pi-PLS step and
-carry their own output-container configuration through cloning and refit.
+Pulp, Sugarcane, and Tobacco are the closed set of package-owned reference datasets. Their sole
+active matrix copies are language-neutral resources under `src/pipls/_data/<dataset>/`, with
+metadata, README, and license files. Public loaders are available from `pipls.datasets`.
 
-## Accepted analysis ownership
+Arbitrary user data remains ordinary array-like `X` and `y`. The package has no generic registry,
+network downloader, DataFrame requirement, or hidden preprocessing layer. Corn, the legacy
+Citrination Steel table, SARCOS, and FRED-MD remain excluded because the exact candidate materials
+do not have sufficiently clear redistribution rights.
 
-Decisions 0042 and 0045 define the staged fitted-model analysis surface. Pi-PLS-specific $P$, $D$,
-and $Q$ inspection remains explicitly method-owned. Scores, loadings, coefficients, biplots,
-observation diagnostics, and prediction diagnostics are shared PLS-family analyses with an
-estimator-neutral API. Ordinary PLS remains the component-path comparator. The numbered post-analysis examples apply shared tools only to the selected Pi-PLS model and fit no
-final ordinary PLS model. Pulp, Sugarcane, and Tobacco own their OOF prediction, inspection,
-figure composition, and final PDF output directly. Sugarcane and Tobacco separate `main()`-owned
-scientific computation from private same-file rendering functions. Tobacco additionally owns
-source-order response pagination and raw observation diagnostics.
+The maintained numbered examples are:
 
-The current component-path plotting code remains example-local diagnostic presentation. Full-data
-decomposition, score, loading, and coefficient plots are interpretive. Prediction diagnostics must
-receive predictions explicitly and record their provenance. Read `.llm/analysis.md` before
-implementing or reviewing this surface.
+1. Pulp automatic fit and fitted-value diagnostic;
+2. synthetic inspect-decide-refit workflow with external-test prediction;
+3. focused leave-one-out validation;
+4. Pi-PLS versus ordinary-PLS component-path comparison;
+5. repeated-CV Pulp analysis;
+6. Sugarcane analysis;
+7. Tobacco analysis with a 10% relative CV-MSE tolerance.
+
+`make examples` owns complete application validation. The default test suite does not duplicate the
+full real-data workflows.
 
 ## Runtime ownership
 
-- `src/pipls/_core.py`: fixed-`(n_components, predictor_rank)` numerical core.
-- `src/pipls/_cv_engine.py`: path-owned fold-local candidate evaluation, scoring, timing, caching,
-  warning filtering, and OOF support.
-- `src/pipls/_result_validation.py`: shared private scalar, array, shape, finiteness, and pickle
-  validation for immutable public result records.
-- `src/pipls/_sklearn_compat.py`: cross-version estimator-aware validation and tags.
-- `src/pipls/component_path.py`: immutable component-path, scalar selection, and conditional
-  predictor-rank-profile records.
-- `src/pipls/decomposition.py`: immutable public Pi-PLS factorization result.
-- `src/pipls/datasets.py`: optional immutable dataset container and deterministic synthetic
-  generators; it is not required for user-supplied real data.
-- `src/pipls/exceptions.py`: package warning and exception types.
-- `src/pipls/metrics.py`: response-standardized selection metrics.
-- `src/pipls/inspection.py`: pure immutable fitted-model inspection computations.
-- `src/pipls/_model_selection.py`: private path-owned rank limits, split materialization, and
-  rank-search orchestration.
-- `src/pipls/search.py`: pipeline-aware `PiPLSSearchCV` meta-estimator.
-- `src/pipls/regression.py`: direct fixed-model `PiPLSRegression` estimator.
-- `src/pipls/validation.py`: immutable validation and OOF reporting.
-- `src/pipls/__init__.py`: deliberate top-level public exports.
+- `src/pipls/_core.py`: fixed-rank numerical construction.
+- `src/pipls/_cv_engine.py`: fold-local candidate evaluation, scoring, timing, and OOF support.
+- `src/pipls/_model_selection.py`: private rank limits, split materialization, and rank-search
+  orchestration.
+- `src/pipls/_result_validation.py`: shared immutable-result validation.
+- `src/pipls/_sklearn_compat.py`: supported scikit-learn validation and tag compatibility.
+- `src/pipls/regression.py`: `PiPLSRegression`.
+- `src/pipls/search.py`: `PiPLSSearchCV`.
+- `src/pipls/component_path.py`: component path, scalar selection, and predictor-rank profile.
+- `src/pipls/decomposition.py`: immutable Pi-PLS decomposition.
+- `src/pipls/validation.py`: immutable OOF report.
+- `src/pipls/inspection.py`: fitted-model numerical inspection.
+- `src/pipls/metrics.py`: response-standardized metrics.
+- `src/pipls/datasets.py`: current public dataset façade, resource loading, and synthetic
+  generation; Decision 0147 Patch 6 will split its private implementation without changing imports.
+- `src/pipls/exceptions.py`: package warning types.
+- `src/pipls/__init__.py`: deliberate top-level exports.
 
 ## Test ownership
 
-- `tests/unit/`: local behavior, boundary conditions, search orchestration, and leakage boundaries.
+- `tests/unit/`: local behavior, boundary conditions, search orchestration, and leakage prevention.
 - `tests/invariants/`: mathematical identities, dimensions, orthogonality, and subspace properties.
-- `tests/api/`: exposed parameter validation, scikit-learn estimator compatibility and composition,
-  PLS alignment, and validation protocols.
+- `tests/api/`: public validation, estimator compatibility, pipelines, and validation protocols.
 - `tests/regression/`: frozen comparisons with trusted implementations.
-  fixtures require separate review.
-- `tests/examples/`: small-data helper, CSV, PDF, and workflow-structure contracts; complete real-data
-  examples are user-run and are not executed by the default test suite.
-- `tests/test_repository_seed.py`: `.llm` navigation, runtime-ownership coverage, patch-handoff
-  structure, snapshot layout, and workflow invariants.
+- `tests/examples/`: focused workflow, rendering, and application-structure contracts.
+- root-level tests: repository, documentation, distribution, generated-asset, and decision
+  integrity.
 
-## Product-asset ownership
+Tests protect durable behavior and policy. They do not preserve every historical implementation
+arrangement or exact explanatory sentence.
 
-- `src/pipls/_data/`: canonical Pulp, Sugarcane, and Tobacco CSV, metadata, README, and license
-  resources. These are the sole active matrix copies, are shipped in both distributions, and remain
-  directly usable outside Python. No generic runtime registry is required.
-- `examples/`: self-contained numbered user workflows with a package-owned Pulp fitted-value
-  quick start first, followed by an explained synthetic train/test use case, one explicit
-  comparison example, and
-  complete Pi-PLS real-data analyses. Advanced splitters are documented rather than combined into a
-  context-free numbered script.
-  Underscore-prefixed `examples/_support/` contains only the ordinary-PLS path evaluator needed by
-  the comparison rather than primary entry points. Example 04 owns the immutable Pi-PLS and standard
-  PLS (NIPALS) paths and direct comparison PDFs. Pulp, Sugarcane, and Tobacco own direct Pi-PLS
-  paths, explicit search validation reports, immutable inspection results, and explicit final
-  figures.
-  Sugarcane and Tobacco keep rendering functions in their numbered scripts; all three complete
-  real-data workflows own conditional predictor-rank profile figures, while Pulp additionally
-  owns tutorial snippets. Their Matplotlib and optional `adjustText` requirements are grouped in
-  the `examples` extra and repeated in `dev` for complete repository validation. Pandas remains a
-  development dependency for interoperability tests but is no longer required by numbered examples.
-  The `docs` extra owns the strict site and tutorial-rendering toolchain.
-  There is no dataset-access extra: the named reference loaders use runtime package data, while the
-  complete real-data analyses retain their currently assigned repository inputs. Real-data
-  analyses are not duplicated here.
-- `docs/`: the self-contained documentation source, including served user guides, implemented
-  theory, generated-API source pages, release notes, local MathJax configuration, and maintainer
-  records under `docs/decisions/`. Root `mkdocs.yml` defines the strict Material site and excludes
-  the maintainer records from rendered pages and search.
-- packaging and distribution configuration: installable distributions, compatibility policy, and
-  version metadata. `constraints/minimum.txt` records the maintainer-only lower-bound test
-  environment; `.github/workflows/tests.yml` owns the three compatibility CI environments;
-  `.github/workflows/build.yml` and `tools/check_distributions.py` own clean artifact-installation
-  validation; `.github/workflows/documentation.yml` and `tools/configure_pages_docs.py` own strict
-  documentation CI and repository-derived GitHub Pages deployment; `docs/compatibility.md` owns the
-  public support statement. Package-release automation is not implemented or authorized.
+## Documentation and distribution ownership
 
-## Contract and documentation ownership
+- `docs/`: self-contained served documentation plus maintainer decisions under `docs/decisions/`.
+- `docs/decisions/index.md`: current numbered decisions.
+- `docs/decisions/history.md`: compact completed-era summary.
+- `docs/decisions/retirements.md`: exhaustive retired-filename replacement map.
+- `.llm/`: current maintainer contracts and workflow helpers; not served or installed.
+- `mkdocs.yml`: strict Material site; decision records are excluded from served navigation.
+- `constraints/minimum.txt`: maintainer-only minimum dependency test input.
+- `.github/workflows/`: compatibility, build, documentation, and deployment validation.
+- `tools/`: distribution and documentation validation and deterministic tutorial rendering.
 
-- `.llm/state.md`: current handoff, accepted scope, and roadmap.
-- `.llm/product_scope.md`: package-product and publication-reproduction boundary.
-- `.llm/strategy.md`: increment history, acceptance conditions, and maintenance protocol.
-- `.llm/decisions.md`: navigation for accepted decision records.
-- `.llm/theory.md`: persistent conceptual derivation and scientific interpretation.
-- `.llm/mathematics.md`: concise normative mathematical contract.
-- `.llm/numerical_contracts.md`: numerical policy and degeneracy behavior.
-- `.llm/public_api.md`: public constructors, methods, outputs, defaults, and exclusions.
-- `.llm/data_io.md`: transparent real-data reading and example policy.
-- `.llm/dataset_layout.md`: normative committed-dataset file and metadata convention.
-  and implementation order.
-- `.llm/analysis.md`: normative fitted-model interpretation, prediction-diagnostic, plotting, and
-  analysis-artifact contracts.
-- `.llm/testing.md`: durable testing boundary.
-- `.llm/development.md`: implementation, testing, patch, and documentation rules.
-- `docs/decisions/`: accepted maintainer history. These records remain versioned and distributed
-  but are excluded from the served MkDocs site.
+Python 3.10--3.14 is supported within the guarded NumPy, scikit-learn, and joblib ranges declared in
+`pyproject.toml`. Compatibility validation separates the minimum stack, normal resolution on every
+supported Python, and latest-compatible upgrades. Wheel and source-distribution installations are
+checked in clean environments.
+
+Snapshots are root-relative archives of a clean committed Git tree. Generated `site/`, build
+outputs, caches, bytecode, and example artifacts are not package state.
+
+## Contract ownership
+
+- `.llm/state.md`: current handoff, exclusions, and roadmap.
+- `.llm/product_scope.md`: package and publication boundary.
+- `.llm/strategy.md`: current development principles and active sequence.
+- `.llm/decisions.md`: current decision registry.
+- `.llm/theory.md` and `.llm/mathematics.md`: conceptual and normative mathematical contracts.
+- `.llm/numerical_contracts.md`: numerical and degeneracy policy.
+- `.llm/public_api.md`: constructors, methods, results, defaults, and exclusions.
+- `.llm/data_io.md` and `.llm/dataset_layout.md`: data ownership and resource layout.
+- `.llm/analysis.md`: interpretation, OOF provenance, rendering, and artifact boundaries.
+- `.llm/testing.md`: durable testing obligations.
+- `.llm/development.md`: implementation, patch, and validation procedure.
 
 ## Architectural invariants
 
 - Runtime code does not import from `.llm`, tests, examples, docs, or tools.
-- Served Markdown under `docs/` is self-contained and does not link outside the documentation
-  source tree. It defines Pi-PLS, component count, predictor rank, and the CV-MSE selection curve
-  before specialized path or factorization terminology. `.llm` contracts and `docs/decisions/` may
-  be more detailed but are never user prerequisites.
-- The source distribution ships `mkdocs.yml`, the Makefile, documentation sources and assets, the
-  minimum-dependency constraint file, and the helpers needed for clean strict documentation and
-  installed-distribution checks. Generated `site/` output is excluded from Git, distributions, and
-  snapshots.
-- Runtime metadata and public documentation agree on Python 3.10–3.14 and the guarded NumPy,
-  scikit-learn, and joblib ranges. CI separates the Python 3.10 minimum stack, normal resolution on
-  every supported interpreter, and explicit latest-compatible upgrades on Python 3.14; every job
-  prints the resolved interpreter and runtime dependency versions. The build workflow separately
-  installs the wheel and source distribution into clean environments and verifies public runtime
-  behavior outside the checkout.
-- The fixed numerical core does not own preprocessing, CV, datasets, or
-  publication workflows.
-- Real-data input remains user-owned: examples form `X` and `Y` explicitly without a required
-  registry or generic loader.
-- `PiPLSRegression` and `PiPLSSearchCV` do not wrap each other; selection machinery is owned by the
-  path interface.
-- `PiPLSRegression` owns current centering and optional scaling: every candidate fit learns its
-  statistics from the corresponding training fold, and a model returned by post-fit `refit()`
-  learns them on all data supplied to that operation.
-- Future block-aware variants of that standardization are valid product scope but currently have no
-  accepted API, names, schedule, or implementation plan. They must preserve the same fold-local and
-  full-training-refit boundary.
-- Public behavior changes include focused tests and contract/documentation updates.
-- Paper-specific figures, complete comparison grids, and reporting workflows belong in downstream
-  repositories that pin tagged `pipls` releases.
-- Generated files, archive clutter, and unverified datasets are not committed.
-- Changes are small, testable, and returned as root-relative unified Git patches.
+- The fixed core owns no preprocessing, cross-validation, datasets, or publication workflow.
+- Centering and optional scaling are learned inside every fit and every search training fold.
+- Fixed fitting and path search do not wrap each other.
+- Search retains evidence but not training matrices or an implicit final estimator.
+- OOF reporting reuses the exact materialized search splits and accepts an existing compatible
+  selection.
+- Numerical inspection is package-owned; plotting and report composition are caller-owned.
+- Public behavior changes include focused tests and synchronized documentation and decisions.
+- Paper-specific experiments and reporting belong downstream of tagged package releases.
+- Changes are bounded, reviewable, and returned as root-relative Git patches.
 
 ## Validation
 
 ```bash
 make check
+make docs
 make examples
 make build
 make dist-check
 ```
 
-Use `make examples` whenever numbered examples or their generated application artifacts change.
-Use `make build` for a quick artifact build, and use `make dist-check` whenever packaging,
-dependencies, public modules, or included data files change.
-Record each validation target as passed, failed, or not run.
+Run only the targets applicable to the patch, but record each as passed, failed, or unavailable.

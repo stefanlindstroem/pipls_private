@@ -6,7 +6,7 @@ This contract defines the active layout for package-owned reference datasets. It
 loader representation and the language-neutral raw-file representation identical and prevents
 duplicate active matrix copies.
 
-Decision 0138 established Pulp. Decision 0142 extends the same final contract to Sugarcane and
+Decision 0142 established Pulp. Decision 0142 extends the same final contract to Sugarcane and
 Tobacco.
 
 ## Canonical active layout

@@ -584,13 +584,44 @@ def test_decision_retirement_map_is_complete_and_nonconflicting() -> None:
     shipped_numbers = {filename[:4] for filename in shipped_files}
     assert retired_numbers.isdisjoint(shipped_numbers), "decision numbers must not be reused"
 
+    history_text = (decisions / "history.md").read_text(encoding="utf-8")
+    history_anchors = {
+        re.sub(r"[^a-z0-9 -]", "", heading.lower()).replace(" ", "-")
+        for heading in re.findall(r"^## (.+)$", history_text, re.MULTILINE)
+    }
+
     for match in rows:
-        replacements = re.findall(
-            r"\((\d{4}-[a-z0-9-]+\.md)\)",
-            match.group("replacement"),
-        )
+        replacements = re.findall(r"\]\(([^)]+)\)", match.group("replacement"))
         assert replacements, match.group("filename")
-        assert all((decisions / replacement).is_file() for replacement in replacements)
+        for replacement in replacements:
+            target, _, anchor = replacement.partition("#")
+            assert (decisions / target).is_file(), replacement
+            if anchor:
+                assert target == "history.md", replacement
+                assert anchor in history_anchors, replacement
+
+
+def test_decision_history_and_active_references_are_consistent() -> None:
+    root = _repository_root()
+    decisions = root / "docs" / "decisions"
+    index = (decisions / "index.md").read_text(encoding="utf-8")
+    retirement_text = (decisions / "retirements.md").read_text(encoding="utf-8")
+    retired_numbers = {
+        match.group("filename")[:4]
+        for match in _RETIREMENT_ROW.finditer(retirement_text)
+    }
+
+    assert "[Compact development history](history.md)" in index
+    assert "[Explicit retirement map](retirements.md)" in index
+
+    active_paths = sorted(decisions.glob("[0-9][0-9][0-9][0-9]-*.md"))
+    active_paths.extend(sorted((root / ".llm").glob("*.md")))
+    retired_number_pattern = re.compile(
+        rf"\b(?:{'|'.join(sorted(retired_numbers))})\b"
+    )
+    for path in active_paths:
+        text = path.read_text(encoding="utf-8")
+        assert retired_number_pattern.search(text) is None, path
 
 
 def test_llm_layer_is_outside_installable_package() -> None:

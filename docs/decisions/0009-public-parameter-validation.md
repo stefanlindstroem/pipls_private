@@ -23,7 +23,7 @@ materialization, or numerical decomposition.
 - `n_jobs` must be `None` or a nonzero Python or NumPy integer. Negative joblib values remain
   valid.
 - `random_state` accepts an integer in the unsigned 32-bit seed interval $[0, 2^{32}-1]$,
-  a NumPy `RandomState`, or `None`, as refined by Decision 0040. The integer default `0` is
+  a NumPy `RandomState`, or `None`, under the current public API. The integer default `0` is
   reproducible; `None` follows NumPy's global random state.
 - `scale` and `copy` accept only Python or NumPy booleans.
 - Invalid scalar `scoring`, `svd_solver`, and rank-mode values fail with package-level `ValueError`

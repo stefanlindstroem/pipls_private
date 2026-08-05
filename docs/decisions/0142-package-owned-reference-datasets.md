@@ -6,7 +6,7 @@ Accepted; implemented.
 
 ## Context
 
-Decision 0138 made Pulp the first named dataset distributed with Pi-PLS. The resulting
+Pulp was the first named dataset distributed with Pi-PLS. The resulting
 `load_pulp()` workflow is useful in an installed package, preserves immutable labels and provenance,
 and avoids a repository-relative file dependency. Sugarcane and Tobacco now have the same relevant
 properties: they are licensed, curated reference analyses with fixed predictor and response
@@ -113,47 +113,22 @@ distribution, or wheel rather than a moving development branch or an environment
 path. Each resource README states that the files may be used independently of Python and identifies
 the local matrix, metadata, provenance, and license resources.
 
-At the end of the transition there is one active matrix representation for each named dataset. The
-current `datasets/sugarcane/` and `datasets/tobacco/` copies may remain only as temporary parity
-sources while their package resources and consumers are migrated. They are then removed rather than
-archived as duplicate active data. The existing hidden Pulp archive remains excluded development
-history and is not restored as an active data source.
+There is one active matrix representation for each named dataset. Pulp, Sugarcane, and Tobacco
+each have one `X.csv`/`Y.csv` pair under `src/pipls/_data/<dataset>/`, accompanied by
+`metadata.json`, `README.md`, and `LICENSE.txt`. Former repository-level Sugarcane and Tobacco
+matrix copies are removed rather than retained as duplicate active data. The hidden historical Pulp
+archive remains excluded development history and is not an active data source.
 
-Implement the transition in six reviewable patches:
+All three loaders share one private package-resource pipeline for CSV and JSON parsing, dimensional
+validation, raw-resource and canonical-array integrity checks, provenance, and stable sample
+identifiers. Every maintained reference-data consumer uses its named loader. Wheels and source
+distributions include all five files for each dataset, isolated installations load all three
+datasets, and tests protect one active matrix location.
 
-1. establish this decision and the guide-layer target;
-2. generalize the current Pulp-specific private resource loader without changing public behavior;
-3. add Sugarcane resources, `load_sugarcane()`, integrity tests, and clean-distribution validation
-   while retaining the repository copy as a temporary parity source;
-4. add Tobacco resources, `load_tobacco()`, integrity tests, and clean-distribution validation under
-   the same temporary parity rule;
-5. migrate every maintained Sugarcane and Tobacco consumer to the named loaders and update active
-   API, dataset, example, and maintainer documentation;
-6. remove the duplicate repository matrices, publish the language-neutral raw-file locations,
-   enforce one active resource pair per dataset, and mark this decision implemented.
-
-## Implementation status
-
-All six patches are implemented. `load_pulp()`, `load_sugarcane()`, and `load_tobacco()` share one
-private package-resource pipeline for CSV and JSON parsing, dimensional validation, raw-resource and
-canonical-array integrity checks, provenance, and stable sample identifiers. Every maintained
-reference-data consumer uses its named loader.
-
-The duplicate top-level Sugarcane and Tobacco resources are removed. Pulp, Sugarcane, and Tobacco
-now each have one active `X.csv`/`Y.csv` pair under `src/pipls/_data/<dataset>/`, accompanied by
-`metadata.json`, `README.md`, and `LICENSE.txt`. Wheels and source distributions include all five
-files for each dataset, isolated installations load all three datasets, and tests protect one active
-matrix location. Public documentation lists the complete source-tree paths, wheel locations, and
-normal installed-package locations for direct use outside Python.
-
-This decision refines Decision 0138 from one package-owned Pulp exception to a closed set of three
-maintained reference datasets. It also refines Decision 0103 by removing pandas from the `examples`
-extra once every numbered reference-data workflow uses the named loaders. It supersedes Decisions
-0022, 0023, 0067, 0069, and 0070 only where
-they require direct reading from `datasets/sugarcane/` or `datasets/tobacco/`. Their scientific
-matrix definitions, provenance, selection, validation, interpretation, and rendering contracts
-otherwise remain in force. Decisions 0016 and 0018 continue to govern user-owned real data and any
-repository dataset not explicitly assigned package ownership.
+This decision generalizes the former Pulp-only loader to a closed set of three maintained reference
+datasets. Arbitrary user-owned data remains ordinary array-like `X` and `Y`; no generic registry,
+downloader, repository-only layout, compatibility alias, pandas return mode, or hidden preprocessing
+layer is introduced.
 
 ## Consequences
 

@@ -81,7 +81,8 @@ They must not become a second copy of living prose or preserve removed migration
 - package metadata, supported Python/dependency ranges, citation, authorship, and licenses;
 - clean wheel and source-distribution smoke tests;
 - clean root-relative snapshot and patch helper behavior;
-- decision-index and active-link integrity under Decision 0147.
+- current-decision index integrity, historical-summary anchors, exhaustive retirement mapping, and
+  active-reference integrity under Decision 0147.
 
 ## What tests should not freeze
 

@@ -91,15 +91,13 @@ recoverable from Git and decision numbers are not reused.
 
 ### Patch 4 -- historical summary and micro-decision consolidation
 
-Next. Add `docs/decisions/history.md` with compact development-era summaries and canonical
-links. Retire one-off migration, naming, figure, documentation-arrangement, and completed cleanup
-decisions when
-Git history or the summary is sufficient. The target of roughly 35--50 current decisions is a
-review goal, not a test invariant.
+Complete. `docs/decisions/history.md` summarizes completed development eras, the explicit retirement
+map covers 102 removed records, and 45 current numbered decisions remain. Retired records map to a
+retained canonical decision, a history section, or both; Git remains the full archive.
 
 ### Patch 5 -- tests and snapshot policy
 
-Reduce brittle AST/source-text assertions while retaining durable workflow and repository
+Next. Reduce brittle AST/source-text assertions while retaining durable workflow and repository
 boundaries. Split oversized repository-policy tests by responsibility where useful. Harden
 snapshot creation so tracked caches, bytecode, generated documentation, coverage output, build
 artifacts, and generated example outputs cause a clear failure, while ignored untracked local

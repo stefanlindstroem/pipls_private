@@ -42,7 +42,7 @@ file reading for its dataset only.
 
 ## Package-owned reference datasets
 
-Decisions 0138 and 0142 establish the final closed set of named reference datasets:
+Decision 0142 establish the final closed set of named reference datasets:
 
 ```python
 from pipls.datasets import load_pulp, load_sugarcane, load_tobacco

@@ -31,6 +31,11 @@ possible nor necessary.
 - Treat the constraint file as a maintainer test input, not as an application lock file or an
   installation recommendation for users.
 - Keep optional dependency ranges separate from the core runtime compatibility claim.
+- Exercise three explicit CI responsibilities: the Python 3.10 minimum stack, normal dependency
+  resolution on every supported Python version, and latest-compatible upgrades on Python 3.14.
+- Print resolved Python and runtime dependency versions in compatibility jobs.
+- Build release artifacts once, then validate clean wheel and source-distribution installations in
+  isolated environments with the same public smoke contract.
 
 ## Consequences
 
@@ -39,7 +44,6 @@ coherent support policy. The lower bounds are executable rather than aspirationa
 is included in the supported matrix. New compatible minor dependency releases remain installable,
 while unreviewed major releases are excluded until the project deliberately expands its range.
 
-The compatibility matrix remains intentionally small. A subsequent increment will separate its
-minimum, supported-Python, and latest-compatible responsibilities more visibly and print resolved
-versions for diagnosis. Clean installed-wheel and installed-source-distribution validation remains
-a separate packaging increment.
+The compatibility matrix remains intentionally small and separates minimum, supported-Python, and
+latest-compatible responsibilities. Clean installed wheel and source-distribution validation is
+part of the same release-compatibility boundary rather than an editable-checkout substitute.

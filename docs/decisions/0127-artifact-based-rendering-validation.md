@@ -6,8 +6,8 @@ Accepted and implemented.
 
 ## Context
 
-Decision 0118 established a consistent visual policy for maintained numbered-example PDFs and
-repository-generated tutorial SVGs. Its implementation added source-level tests for exact title
+The maintained examples and tutorial renderers established a consistent visual policy for PDFs
+and repository-generated SVGs. Early enforcement added source-level tests for exact title
 strings, label spellings, subplot-title absence, axis-limit expressions, tick-label expressions,
 and categorical-label rotation. Those tests verified the migration, but they also made ordinary
 rendering edits depend on the exact arrangement and wording of Matplotlib calls.
@@ -20,7 +20,7 @@ fold-based standard errors for maintained CV-MSE error bars.
 
 ## Decision
 
-Retain the visual conventions of Decision 0118 as the maintained rendering policy, but do not
+Retain the visual conventions summarized by Decisions 0083, 0124, and 0141, but do not
 encode every convention as an exact source-string test.
 
 Automated rendering tests protect:
@@ -40,8 +40,8 @@ axis-limit call, tick-label expression, label rotation syntax, or the absence of
 Matplotlib call inside a source-code range. Review regenerated artifacts through `make docs-figures`
 and `make examples` when rendering behavior changes.
 
-This decision supersedes Decision 0118 only where its consequences require source-level tests to
-protect the complete renderer set. It does not reverse the visual policy, add a plotting API, alter
+This decision replaces source-string enforcement with artifact and semantic validation. It does
+not reverse the visual policy, add a plotting API, alter
 numerical results, or change the ownership of rendering.
 
 ## Consequences

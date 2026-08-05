@@ -91,7 +91,7 @@ required confidence, so FRED-MD is excluded.
   committed materials.
 - The current real-data suite remains intentionally small rather than mirroring every companion
   analysis.
-- Corn-specific language in Decision 0020 and the guide layer is superseded.
+- Earlier Corn-integration planning is superseded.
 - Steel, SARCOS, and FRED-MD may be reconsidered only after a new owner decision based on an exact,
   explicitly licensed source and a distinct package-level purpose.
 - Dataset licensing is resolved before data preparation, examples, or tests are designed.

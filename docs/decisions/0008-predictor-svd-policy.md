@@ -35,9 +35,9 @@ predictor_rank <= 0.2 * min(n_samples, n_features)
 Otherwise it uses the full thin SVD. Explicit `"full"` and `"randomized"` choices override the
 automatic rule.
 
-`random_state` accepts an integer seed, a NumPy `RandomState`, or `None`, as refined by Decision
-0040. The default value `0` makes the default estimator reproducible. Candidate models in path CV
-receive the same solver policy and cloned random-state parameter.
+`random_state` accepts an integer seed, a NumPy `RandomState`, or `None`, under the current
+public validation contract. The default value `0` makes the default estimator reproducible.
+Candidate models in path CV receive the same solver policy and cloned random-state parameter.
 
 The resolved solver and numerical-rank diagnostics are canonical fields of `decomposition_`:
 `predictor_svd_solver`, `x_rank`, `x_rank_is_exact`, and `rank_tolerance`. Under full SVD, `x_rank`

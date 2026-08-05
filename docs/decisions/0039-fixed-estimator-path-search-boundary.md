@@ -70,9 +70,10 @@ parameter prefix is now inferred. A focused interoperability test confirms that 
 rank pairs remain usable with ordinary `GridSearchCV`, while repository examples continue to
 recommend `PiPLSSearchCV`.
 
-Decision 0040 completes a separate public-surface polish: explicit `n_components_values="all"`,
-conventional random-state forms, a public callable default scorer, conditional refit method
-availability, and one canonical `decomposition_` location for Pi-PLS-specific fitted output.
+The implemented public surface additionally uses the explicit `n_components_values="all"`
+sentinel, conventional random-state forms, a public callable default scorer, and one canonical
+`decomposition_` location for Pi-PLS-specific fitted output. Later pre-release cleanup is summarized
+in [history.md](history.md) and canonicalized by Decision 0145.
 
 ## Consequences
 
@@ -82,7 +83,7 @@ availability, and one canonical `decomposition_` location for Pi-PLS-specific fi
   selection procedure inside an external assessment procedure.
 - The $c=5$ path ceiling and the $c=3$ direct-fit warning have distinct purposes.
 - Decision 0032's full-sample support convention remains in force.
-- The selection-responsibility portions of Decisions 0003, 0009, 0011, 0012, and 0031 are
-  superseded or refined by this implemented boundary.
+- Earlier constructor-owned and shared-engine selection arrangements are superseded by this
+  implemented boundary.
 - Supported pipelines require no public parameter-prefix control because the terminal Pi-PLS step
   is unique and inferred.

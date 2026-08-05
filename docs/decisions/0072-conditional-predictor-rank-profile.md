@@ -2,67 +2,50 @@
 
 ## Status
 
-Accepted and implemented.
+Accepted and implemented. Public result naming and selection ownership are refined by Decisions
+0140, 0145, and 0146.
 
 ## Context
 
-`PiPLSComponentPath` provides one conditionally selected predictor rank for each evaluated component
-count. The complete candidate rows remain available through `PiPLSSearchCV.cv_results_`.
-
-The Pulp workflow also needs the complete one-dimensional predictor-rank profile at one chosen
-component count. Obtaining that profile from `cv_results_` required user code to construct a Boolean
-mask, apply the mask independently to several columns, sort the masked rows, and preserve their
-alignment. The numbered example, tutorial renderer, and workflow test duplicated this low-level
-selection logic.
-
-A stored mapping of profiles would recreate the synchronization problem removed by Decision 0071.
-Putting competing candidate arrays inside `PiPLSComponentResult` would also blur the meaning of that
-single selected result.
+The concise component path stores one conditionally selected predictor rank per component count.
+Scientific inspection sometimes requires every predictor rank actually evaluated at one fixed
+component count, especially for spectral examples. Duplicating all candidate arrays in every path
+row would make the concise path large and create synchronization risk with `cv_results_`.
 
 ## Decision
 
-Add the public method:
+A fitted search exposes:
 
 ```python
 profile = search.predictor_rank_profile(n_components)
 ```
 
-The method derives the profile on demand from the fitted `cv_results_` dictionary. It returns a
-frozen `PiPLSPredictorRankProfile` containing:
+The returned immutable `PiPLSPredictorRankProfile` is derived on demand from `cv_results_` and
+contains:
 
 ```text
 n_components
 predictor_rank
 mean_test_score
 cv_mse_mean
-cv_mse_fold_sd
+cv_mse_std
+predictor_rank_policy
 n_splits
-selected
+selection
 ```
 
-The four numerical arrays are defensive, read-only copies aligned by row. `predictor_rank` is unique
-and strictly ascending and contains only candidates actually evaluated by the fitted search.
-`selected` is the same `PiPLSComponentResult` returned by
-`component_path_.for_n_components(n_components)`.
+Candidate arrays contain only ranks actually evaluated for the requested component count and are
+sorted in strictly ascending predictor-rank order. The derived `selection` is a `PiPLSSelection`
+using the same configured-score optimum and tolerant tie-breaking rule as the fitted search. Under
+the default scorer this is equivalent to the minimum mean response-standardized CV-MSE candidate
+at that component count.
 
-Conditional selection remains scorer-general: it maximizes the configured mean test score and uses
-the fitted lower-rank tie-break. Under the default negative response-standardized-MSE scorer, this
-is equivalent to minimizing mean response-standardized CV-MSE. The CV-MSE arrays remain descriptive
-when another scorer controls selection.
-
-The method raises the standard scikit-learn not-fitted error before fitting and the same clear
-component-count error as `for_n_components()` when the requested count was not evaluated.
-
-Migrate the Pulp example, tutorial renderer, and their tests to this public result. Retain
-`cv_results_` as the complete candidate-level source of truth for split scores, timing columns, and
-multi-component analyses.
+The method requires a fitted search and an evaluated integer component count. It does not cache a
+mapping of every possible profile, mutate the search, fit a model, or select a component count.
 
 ## Consequences
 
-- A standard rank-profile workflow becomes two direct lines rather than manual masking and sorting.
-- Adaptive-search omissions remain explicit: the profile includes only evaluated ranks.
-- The result is immutable and pickleable, with defensive read-only arrays.
-- No additional fitted attribute or duplicate stored search representation is introduced.
-- `PiPLSComponentResult` remains a scalar selected row rather than a container for competing rows.
-- The Pulp example and tutorial renderer no longer depend on `cv_results_` column names for this
-  ordinary inspection task.
+- The component path remains concise.
+- `cv_results_` remains the single candidate-level source of truth.
+- Spectral examples can show rank-wise mean CV-MSE and split SD at the fitted component count.
+- Profile inspection and path selection remain separate operations with separate result types.

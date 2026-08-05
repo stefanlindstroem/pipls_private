@@ -2,14 +2,15 @@
 
 ## Status
 
-Accepted. Patches 1--3 of seven are complete. The decision lifecycle is established, the active
-`.llm` layer describes current contracts, and the first explicit retirement map removes 13 fully
-superseded records. The maintained tree now contains 134 numbered decisions.
+Accepted. Patches 1--4 of seven are complete. The active `.llm` layer describes current contracts,
+`history.md` summarizes completed eras, the retirement map covers 102 removed records, and the
+maintained tree contains 45 current numbered decisions.
 
 ## Context
 
-The repository now contains 146 numbered decision records and more than five thousand lines of
-active `.llm` guidance. These records document valuable architectural reasoning, but many describe
+At adoption, the repository contained 146 numbered decision records and more than five thousand
+lines of active `.llm` guidance. These records document valuable architectural reasoning, but many
+describe
 superseded APIs, one-off migrations, completed patch sequences, or cleanup work whose durable
 outcome is already captured by a later canonical decision. Keeping every intermediate record in the
 active decision index makes current policy harder to identify and encourages stale wording to remain
@@ -84,8 +85,9 @@ Patch 3 adds `docs/decisions/retirements.md` and removes 13 records in five unam
 - the superseded constructor-selection, validation-report-composition, and selected-search-alias
   records.
 
-Every deleted filename maps directly to one or more retained canonical decisions. No historical
-summary is introduced ahead of Patch 4, and no one-off micro-decision is retired in this patch.
+Every deleted filename maps directly to one or more retained canonical decisions. Patch 4 adds the
+historical summary and expands the retirement map to completed migration, naming, rendering,
+documentation-arrangement, and cleanup records.
 
 ### Keep the active indexes current-focused
 
@@ -124,8 +126,8 @@ split internally.
 1. Establish this decision and synchronize the guide-layer phase state -- complete.
 2. Compact and correct the active `.llm` layer around current contracts -- complete.
 3. Retire explicitly superseded decisions using a reviewed retirement map -- complete.
-4. Add `docs/decisions/history.md` and consolidate completed micro-decisions, targeting roughly
-   35--50 current records.
+4. Add `docs/decisions/history.md` and consolidate completed micro-decisions -- complete with 45
+   current records.
 5. Simplify brittle repository and workflow-structure tests and harden snapshot creation against
    tracked caches and generated artifacts.
 6. Split `datasets.py` into private type, resource-loading, and synthetic-generation modules while

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation in progress.
+Accepted. Patches 1 and 2 are implemented; Patch 3 remains a paused presentation-only increment.
 
 ## Context
 
@@ -41,7 +41,7 @@ X, Y = load_pulp(return_X_y=True)
 model = PiPLSSearchCV().fit(X, Y).refit(
     X,
     Y,
-    rule="one_standard_error",
+    rule="minimum_cv_mse",
 )
 ```
 
@@ -77,7 +77,8 @@ must not describe itself as the first Pi-PLS model or the shortest complete path
 ### 3. Validate and interpret
 
 The complete Pulp tutorial remains the third stage. It owns real-data selection qualification,
-explicit final refitting, selection-conditioned OOF reporting through `validation_report()`, and
+explicit final refitting, selection-conditioned OOF reporting through
+`oof_report(selection=...)`, and
 representative model-interpretation figures. Pulp OOF predictions must not be described as
 fixed-parameter OOF because the selected row is chosen using the same observations.
 
@@ -95,10 +96,11 @@ The documentation landing page presents the same conceptual order before detaile
 
 1. discard the temporary search when only the automatic final model matters;
 2. retain the search when path evidence and manual selection matter;
-3. call `validation_report()` when selection-conditioned OOF diagnostics matter.
+3. pass an existing selection to `oof_report()` when selection-conditioned OOF diagnostics matter.
 
 The path API reference begins with the shortest automatic workflow, then manual path and profile
-inspection, then selected-row validation. Its wording must make clear that `refit()` resolves and
+inspection, then selection-conditioned OOF reporting. Its wording must make clear that `refit()`
+resolves and
 transfers the complete stored pair $(h,r_\pi^*(h))$ internally; ordinary users do not manually copy
 `predictor_rank` into another estimator.
 
@@ -123,15 +125,15 @@ implements the renamed quick-start example, rendered tutorial, generated asset p
 navigation position. Patch 3 remains responsible for reframing the broader landing page, path
 reference, catalogues, and active terminology around the complete three-stage route.
 
-This decision refines Decisions 0044, 0064, 0075, 0076, and 0104 where they assign the first or
-shortest pedagogical route. Their broader self-contained-example, tutorial ownership, documentation
-layering, and user-orientation contracts remain in force.
+This decision consolidates the earlier onboarding and tutorial-route increments. Their durable
+self-contained-example, tutorial-ownership, documentation-layering, and user-orientation outcomes
+are represented here and in Decision 0065.
 
 ## Consequences
 
 - The first rendered page shows the most attractive installed-package workflow and an immediate
   result.
-- Users encounter automatic fitting before optional search inspection and validation machinery.
+- Users encounter automatic fitting before optional search inspection and OOF-reporting machinery.
 - The search object's lifetime becomes intuitive: temporary for automatic use, retained for
   evidence and OOF reporting.
 - Fitted training-data diagnostics remain visibly distinct from predictive validation.

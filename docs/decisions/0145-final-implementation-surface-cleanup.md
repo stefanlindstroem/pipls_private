@@ -9,9 +9,10 @@ positively.
 
 ## Context
 
-Decision 0144 removed duplicated result access, inconsistent selection terminology, redundant
-candidate parameter representations, dataset aliases, unused shape-only inspection properties, and
-top-level result re-exports. A follow-up implementation audit found a smaller set of residual
+A prior pre-release cleanup removed duplicated result access, inconsistent selection terminology,
+redundant candidate parameter representations, dataset aliases, unused shape-only inspection
+properties, and top-level result re-exports. A follow-up implementation audit found a smaller set
+of residual
 surface and internal inconsistencies:
 
 - `PiPLSSearchCV.cv_n_train_min_` stores an intermediate fold-size quantity whose only public

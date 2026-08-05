@@ -6,10 +6,10 @@ Accepted and implemented.
 
 ## Context
 
-Decisions 0079--0082 migrated biplots, prediction diagnostics, standard PLS-family inspection,
-and Pi-PLS factors from package-owned plotters to direct Matplotlib construction. After the final
-plotting module was removed, the repository still needed one durable policy covering documentation,
-optional dependencies, examples, distribution checks, and structural enforcement.
+A sequence of rendering migrations moved biplots, prediction diagnostics, standard PLS-family
+inspection, and Pi-PLS factors from package-owned plotters to direct Matplotlib construction. After
+the final plotting module was removed, the repository still needed one durable policy covering
+documentation, optional dependencies, examples, distribution checks, and structural enforcement.
 
 ## Decision
 
@@ -36,4 +36,3 @@ construction or read serialized analytical results for plotting.
   biplot-coordinate use, and runtime imports without graphics dependencies.
 - Exact visual styling, automatically adjusted label positions, and incidental artist counts are
   not compatibility contracts.
-- The plotting migration is complete; first-release preparation is the next increment.

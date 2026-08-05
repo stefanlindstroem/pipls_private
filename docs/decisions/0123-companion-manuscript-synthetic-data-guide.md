@@ -7,7 +7,7 @@ Accepted and implemented.
 ## Context
 
 Decision 0119 added `make_pipls_latent_geometry()` as the exact Gaussian latent-data generator used
-by the companion manuscript. Decisions 0120--0122 aligned the canonical theory and terminology.
+by the companion manuscript. Decisions 0120 and 0121 align the canonical theory and terminology.
 The public documentation still lacked one focused route explaining what the generator reproduces,
 how a fixed seed identifies one realization, and why complete manuscript tables and figures require
 additional publication-specific assets.

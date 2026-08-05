@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted, with the ordinary-PLS-specific analysis ownership and numbered-example use superseded by
-Decision 0045, and the package-owned figure-composition contract superseded by Decision 0058. The
+Accepted, with ordinary-PLS comparison ownership refined by Decision 0045 and rendering ownership
+refined by Decisions 0061 and 0083. The
 separation of selection diagnostics, fitted-model interpretation, prediction diagnostics,
 immutable inspection results, optional plotting, explicit labels, physical axes, and canonical
 artifacts remains in force. The corrective API, numbered-example, artifact, and boundary-test
@@ -14,8 +14,8 @@ migration required by Decision 0045 is complete.
 Before this architecture was implemented, the real-data workflows answered a model-development
 question through canonical Pi-PLS and ordinary PLS component-path CSV files and a CSV-derived
 comparison PDF, then fitted one fixed Pi-PLS model chosen through a visible component-count
-constant. Decision 0047 later moved the comparison into example 09 while retaining a Pi-PLS-only
-path in examples 10–12. Those artifacts were selection diagnostics but did not yet provide supported analysis
+constant. The maintained numbered series later isolated comparison from Pi-PLS-only real-data
+analysis. Those artifacts were selection diagnostics but did not yet provide supported analysis
 of the fitted factorization, shared PLS-family latent structure, predictions, or residuals.
 
 The companion Pi-PLS implementation contains a combined display of the predictor rotations $P$,
@@ -34,10 +34,10 @@ significance procedures.
 
 The repository distinguishes three analysis stages:
 
-1. **Model-selection diagnostics.** Component-path CSV files and their comparison PDF describe the
-   conditional path over component counts and predictor ranks. The existing
-   `examples/_support/pls_component_path.py` and `examples/_support/plot_component_path.py` remain example-local
-   helpers for this stage.
+1. **Model-selection diagnostics.** Immutable component paths, conditional predictor-rank
+   profiles, and caller-rendered figures describe the path over component counts and predictor
+   ranks. `examples/_support/pls_component_path.py` remains an example-local ordinary-PLS comparison
+   evaluator.
 2. **Fixed-model interpretation.** A full-data fitted Pi-PLS model provides the method-specific
    factorization and the shared PLS-family score, loading, coefficient, biplot, and observation
    quantities. These plots describe the fitted model and are not validation results. Ordinary PLS
@@ -46,11 +46,10 @@ The repository distinguishes three analysis stages:
    supplied explicitly by the caller. Every diagnostic records whether the values are fitted,
    fixed-parameter out-of-fold, selection-conditioned out-of-fold, or external-test predictions.
 
-Reusable numerical analysis belongs in a public `pipls.inspection` submodule. It will contain pure
-NumPy computations and immutable result objects, with no pandas or Matplotlib dependency. Reusable
-plotting belongs in a public `pipls.plotting` submodule. Matplotlib remains optional and is imported
-only when that submodule's plotting functions are called. These submodule names are not added to
-the top-level `pipls` exports.
+Reusable numerical analysis belongs in the public `pipls.inspection` submodule. It contains pure
+NumPy computations and immutable result objects, with no pandas or Matplotlib dependency. Plotting
+and report composition are caller-owned under Decisions 0061 and 0083; the runtime package exposes
+no plotting submodule or public `plot_*` convenience functions.
 
 Dataset-specific orchestration, explicit data reading, variable-name acquisition, fixed model
 choices, out-of-fold prediction loops, table construction, artifact writing, and multipage-report
@@ -93,10 +92,10 @@ Predictor rendering is selected explicitly by the example or caller:
 Categorical predictor and response displays require caller-supplied scientific labels. Real-data
 examples read `X.csv` and `Y.csv` headers visibly when those headers contain the relevant names; a
 programming user may instead supply labels from a schema or any other explicit metadata source.
-Selected components share one axis per plotted quantity, with side-by-side bars for categorical
-variables and overlaid lines for a physical predictor axis. The plotting API does not read files,
-infer whether predictors are spectra, generate substitute variable names, smooth or interpolate
-supplied curves, or reorder a supplied physical axis.
+Maintained renderers use side-by-side bars for categorical variables and overlaid lines for a
+physical predictor axis. Numerical inspection does not read files, infer whether predictors are
+spectra, generate substitute variable names, smooth or interpolate supplied curves, or reorder a
+supplied physical axis.
 
 ### Prediction-diagnostic contract
 
@@ -190,7 +189,7 @@ Implementation proceeds as a series of small patches:
    Pulp — complete;
 5. Sugarcane spectral line analysis — complete;
 6. Tobacco pagination and observation diagnostics — complete;
-7. the Pulp biplot and a final cross-dataset analysis-surface review — completed by Decision 0043.
+7. the Pulp biplot and a final cross-dataset analysis-surface review — complete.
 
 The temporary standalone `09_model_inspection.py` demonstration was removed after the complete
 Pulp, Sugarcane, and Tobacco workflows superseded it. The reusable package APIs remain documented
@@ -208,8 +207,8 @@ helpers do not change as part of this decision.
 - Prediction provenance is part of every prediction-diagnostic result and artifact.
 - Pi-PLS-specific $P$, $D$, and $Q$ interpretation is supported without conflating rotations with
   ordinary PLS loadings.
-- Low-dimensional scalar and high-dimensional spectral examples can share one plotting surface
-  while making their rendering choice explicit.
-- Optional plotting does not become a core installation requirement.
+- Low-dimensional scalar and high-dimensional spectral examples can share one numerical
+  inspection surface while making their caller-owned rendering choice explicit.
+- Optional rendering dependencies do not become core installation requirements.
 - Advanced PLS diagnostics remain deferred until their definitions and interpretation boundaries
   are reviewed separately.
