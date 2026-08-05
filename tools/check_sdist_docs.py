@@ -143,6 +143,7 @@ def main() -> None:
             source / "Makefile",
             source / "mkdocs.yml",
             source / "docs" / "citation.md",
+            source / "docs" / "computational_performance.md",
             source / "docs" / "index.md",
             source / "docs" / "tutorials" / "quick_start.md",
             source / "docs" / "tutorials" / "synthetic.md",
@@ -269,6 +270,7 @@ def main() -> None:
             source / "site" / "tutorials" / "synthetic" / "index.html",
             source / "site" / "tutorials" / "pulp" / "index.html",
             source / "site" / "api" / "regression" / "index.html",
+            source / "site" / "computational_performance" / "index.html",
             source / "site" / "troubleshooting" / "index.html",
             source / "site" / "api" / "inspection" / "index.html",
             source

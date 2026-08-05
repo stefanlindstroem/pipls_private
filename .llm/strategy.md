@@ -72,10 +72,10 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decisions 0148 and 0149 are implemented. Decision 0150 is accepted and its complete central
-computational-performance guide is present. The next authorized increment is Patch 6 of the
-six-patch sequence: integrate links and troubleshooting, add final documentation and distribution
-checks, audit the repository, and close Decision 0150.
+Decisions 0148, 0149, and 0150 are implemented. The predictor-rank tolerance and terminology
+changes, together with the central computational-performance guide and its documentation routes,
+tests, and source-distribution checks, form the current package contract. No further package
+increment is authorized.
 
 ## Independent paused work
 

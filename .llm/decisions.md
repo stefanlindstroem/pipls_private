@@ -66,7 +66,7 @@ This registry lists only numbered decisions that still define current behavior o
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
   0147, and 0150.
 
-## Active Decision 0150 contract
+## Implemented Decision 0150 contract
 
 - Add one canonical served guide at `docs/computational_performance.md`, positioned after
   path-selection details and before troubleshooting.
@@ -75,7 +75,8 @@ This registry lists only numbered decisions that still define current behavior o
 - Preserve fold-local preprocessing and use explicit seeds for shuffled CV and randomized SVD.
 - Document current candidate, parallelism, OOF, and timing behavior without universal benchmark
   claims.
-- The complete guide is present; Patch 6 integrates, tests, distributes, and audits it.
+- Public guides route to the central page; semantic documentation tests and isolated
+  source-distribution builds protect its executable examples, shipped source, and rendered page.
 
 ## Implemented Decision 0149 contract
 

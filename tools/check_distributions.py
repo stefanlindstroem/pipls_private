@@ -13,6 +13,7 @@ from pathlib import Path
 
 _REFERENCE_DATASETS = ("pulp", "sugarcane", "tobacco")
 _REFERENCE_RESOURCE_FILES = ("X.csv", "Y.csv", "metadata.json", "README.md", "LICENSE.txt")
+_COMPUTATIONAL_PERFORMANCE_GUIDE = "docs/computational_performance.md"
 
 _SMOKE_TEST = """\
 from importlib.metadata import version
@@ -232,6 +233,18 @@ def _assert_reference_resources_included(artifact: Path) -> None:
         )
 
 
+def _assert_documentation_sources_included(source_distribution: Path) -> None:
+    members = _artifact_members(source_distribution)
+    if not any(
+        name.endswith(f"/{_COMPUTATIONAL_PERFORMANCE_GUIDE}")
+        for name in members
+    ):
+        raise RuntimeError(
+            "Computational-performance guide missing from "
+            f"{source_distribution.name}."
+        )
+
+
 def _extract_source_distribution(artifact: Path, destination: Path) -> Path:
     destination.mkdir()
     resolved_destination = destination.resolve()
@@ -385,6 +398,7 @@ def main() -> None:
         _assert_development_archive_excluded(source_distribution)
         _assert_reference_resources_included(wheel)
         _assert_reference_resources_included(source_distribution)
+        _assert_documentation_sources_included(source_distribution)
 
         checks = (
             ("wheel", wheel, False),

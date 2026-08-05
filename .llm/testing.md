@@ -76,6 +76,9 @@ They must not become a second copy of living prose or preserve removed migration
 - maintained tutorial snippets, semantic manifests, asset names, parseable SVGs, and stable links;
 - strict MkDocs build, generated API ownership, local links/anchors, source-distribution docs, and
   Pages workflow boundaries;
+- computational-performance examples with valid public constructor keywords, current search and
+  solver values, seeded randomized operations, one-candidate policy clarity, and distinction
+  between fit counts and wall time;
 - final generated examples through `make examples`, not ordinary `make check`.
 
 ### Repository and release policy

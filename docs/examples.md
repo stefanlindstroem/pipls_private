@@ -57,7 +57,11 @@ workflows use `oof_report(..., selection=model.selection_)` to reuse the splits 
 path search. Example 03 deliberately fits no final model: it uses
 `search.select(rule="best_score")` and passes that selection to `oof_report()`. Its `LeaveOneOut`
 splitter is exhaustive, so shuffling is not defined. Grouped, temporal, or otherwise structured data
-require an application-specific splitter instead.
+require an application-specific splitter instead. The
+[computational-performance
+guide](computational_performance.md#develop-with-a-smaller-validation-protocol)
+explains how to use a lighter seeded protocol during development and restore the final declared
+validation effort for reported results.
 
 ## Leave-one-out validation
 

@@ -131,7 +131,9 @@ that does not fit a final model.
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
 predictor-rank plots. The [path-selection reference](docs/api/path.md) and
 [path-selection details](docs/path_analysis.md) cover alternative policies, splitters, and
-validation protocols.
+validation protocols. See [Computational performance](docs/computational_performance.md) for
+the cost of validation splits and candidate coverage, large-problem SVD choices, parallelism,
+and OOF-report reuse.
 
 When the complete protocol is known in advance, search and final fitting can remain compact. The
 Tobacco workflow demonstrates separate 10% relative tolerances for adaptive predictor-rank search
@@ -211,6 +213,7 @@ Install the `examples` extra before running them.
   - [Tutorial 3: complete Pulp analysis](docs/tutorials/pulp.md)
   - [API overview](docs/api/index.md)
   - [Path-selection details](docs/path_analysis.md)
+  - [Computational performance](docs/computational_performance.md)
   - [Troubleshooting](docs/troubleshooting.md)
   - [Model inspection](docs/model_inspection.md)
   - [Reference datasets](docs/datasets.md)

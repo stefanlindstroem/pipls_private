@@ -58,7 +58,10 @@ and overlapping predictor/response storage are copied where mutation would be un
 
 `svd_solver` accepts `"full"`, `"randomized"`, or `"auto"`. Only the predictor SVD may be
 randomized. `random_state` follows the ordinary scikit-learn forms; the default `0` makes randomized
-SVD reproducible.
+SVD reproducible. Randomized predictor SVD can be useful when matrices are large and the retained
+rank is well below their dimensions; it is an approximate route and is not necessarily faster near
+full rank. See
+[Computational performance](../computational_performance.md#use-randomized-predictor-svd-for-large-problems).
 
 A direct fixed fit emits `PredictorRankSupportWarning` when $n/r_\pi<3$. The warning is diagnostic and
 does not alter the requested rank. Algebraically or numerically infeasible ranks remain errors. The

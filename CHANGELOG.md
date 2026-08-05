@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Add a central computational-performance guide for Pi-PLS training. Document candidate-fold fit
+  counts, validation repetitions, adaptive and exhaustive predictor-rank coverage, fixed and
+  restricted paths, randomized predictor SVD, parallel execution, OOF-report reuse, and direct
+  inspection of performed work. Link the guide from the README, API, examples, Pulp tutorial, and
+  troubleshooting; validate its source-distribution and rendered-site inclusion.
 - Rename `PiPLSSearchCV.search_method` values from the pre-release `"auto"` and `"optimal"`
   names to `"adaptive"` and `"exhaustive"`. Preserve the candidate-generation algorithms, keep
   `search_is_exhaustive_` as the achieved-coverage diagnostic, reject the retired values without

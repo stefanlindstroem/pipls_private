@@ -77,12 +77,26 @@ def test_distribution_helper_builds_once_and_checks_both_artifacts() -> None:
     assert "_assert_development_archive_excluded(source_distribution)" in helper
     assert "_assert_reference_resources_included(wheel)" in helper
     assert "_assert_reference_resources_included(source_distribution)" in helper
+    assert "_assert_documentation_sources_included(source_distribution)" in helper
+    assert '_COMPUTATIONAL_PERFORMANCE_GUIDE = "docs/computational_performance.md"' in helper
     assert "_REFERENCE_DATASETS = (\"pulp\", \"sugarcane\", \"tobacco\")" in helper
     assert "_REFERENCE_RESOURCE_FILES" in helper
     assert "_check_source_distribution_example" in helper
     assert 'f"pipls[examples] @ {artifact.resolve().as_uri()}"' in helper
     assert 'source / "examples" / "01_pulp_quick_start.py"' in helper
     assert 'source / "examples" / "results" / "pulp_quick_start.pdf"' in helper
+
+
+def test_source_distribution_docs_include_and_render_performance_guide() -> None:
+    helper = (_repository_root() / "tools" / "check_sdist_docs.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'source / "docs" / "computational_performance.md"' in helper
+    assert (
+        'source / "site" / "computational_performance" / "index.html"'
+        in helper
+    )
 
 
 def test_distribution_smoke_test_covers_public_installed_behavior() -> None:

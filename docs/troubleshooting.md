@@ -56,6 +56,26 @@ also depend on sample count, transformed training-fold dimensions, the minimum n
 verified across those folds, configured rank bounds, and the selected search policy. See
 [Path-selection details](path_analysis.md).
 
+## The path search is too slow or uses too much memory
+
+Start by inspecting the number of materialized validation splits and evaluated candidate pairs:
+
+```python
+n_pairs = search.cv_results_["n_components"].size
+n_splits = search.n_splits_
+print(n_pairs, n_splits, n_pairs * n_splits)
+```
+
+During development, use one seeded shuffled partition or fewer repetitions. Then decide whether
+adaptive rather than exhaustive rank coverage, a fixed or maximum predictor-rank policy, a
+restricted rank or component set, or randomized predictor SVD is justified by the analysis. Use
+`n_jobs` only after measuring memory and wall time on the actual matrices, and retain one
+`oof_report()` result rather than recomputing it for each output.
+
+Fewer repetitions and narrower candidate policies change the evidence or model-selection question;
+randomized SVD changes the numerical route. The complete ordering, examples, cost accounting, and
+trade-off table are in [Computational performance](computational_performance.md).
+
 ## The path search has no admissible candidate
 
 Reduce the requested component count or predictor-rank range, provide more observations, remove

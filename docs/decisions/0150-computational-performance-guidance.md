@@ -2,10 +2,10 @@
 
 ## Status
 
-Accepted. Patch 5 of the authorized six-patch sequence is complete. The central served guide now
-contains the cost model, practical configurations, implementation-specific execution boundaries,
-caveats, inspection route, development-to-final workflow, and trade-off table. Patch 6 integrates
-links, troubleshooting, final documentation tests, distribution checks, and current-state wording.
+Accepted and implemented. The central served guide contains the cost model, practical
+configurations, implementation-specific execution boundaries, caveats, inspection route,
+development-to-final workflow, and trade-off table. The README, path and regression references,
+example catalogue, Pulp tutorial, and troubleshooting page provide concise routes to it.
 
 ## Context
 
@@ -99,8 +99,8 @@ The guide uses these sections:
 10. Separate development and final-analysis workflows.
 11. Summary of trade-offs.
 
-Patch 5 fills these sections with the complete formulas, examples, caveats, and decision table.
-Patch 6 adds concise routes from existing documentation and a troubleshooting entry.
+The implemented guide fills these sections with formulas, examples, caveats, and a decision table.
+Concise routes from existing documentation and troubleshooting lead users to the canonical page.
 
 ### Keep advice task-oriented and evidence-based
 
@@ -113,10 +113,17 @@ Fixed and maximum-rank examples must omit `search_method`; randomized-SVD and sh
 must be seeded. The text should recommend measurement on the user's matrices and machine rather
 than universal worker-count or speed claims.
 
-## Authorized remaining sequence
+## Implementation outcome
 
-6. Add concise cross-links, troubleshooting, changelog, final documentation and distribution
-   tests, then mark this decision implemented and return `.llm` to current-state wording.
+The guide is integrated through concise cross-links rather than duplicated prose. Troubleshooting
+provides an ordered first-response route for slow or memory-intensive searches. Semantic tests
+validate constructor keywords, supported policy values, seeded randomized examples, and omission
+of inapplicable search methods from one-candidate rank policies.
+
+Documentation sources are a source-distribution concern under Decision 0065; runtime wheels do not
+carry the served guide. Distribution validation therefore requires the Markdown source and rendered
+page from an isolated source-distribution build, while wheel and source-distribution installation
+smoke tests validate the public parameters demonstrated by the guide.
 
 ## Validation obligations
 
@@ -134,7 +141,8 @@ The completed documentation increment must verify that:
   as changing the evaluated evidence or policy;
 - randomized SVD is described as an approximate numerical route;
 - local links and anchors resolve;
-- wheel and source distributions contain the new page.
+- the source distribution contains the guide and its isolated strict build renders the page;
+- clean wheel and source-distribution installations accept the documented public parameters.
 
 ## Consequences
 

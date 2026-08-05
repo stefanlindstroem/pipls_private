@@ -1,14 +1,19 @@
 from __future__ import annotations
 
+import ast
+import inspect
 import re
 import unicodedata
 from pathlib import Path
 
 import yaml
 
+from pipls import PiPLSRegression, PiPLSSearchCV
+
 _MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((?P<target>[^)]+)\)")
 _HEADING = re.compile(r"^(?P<marks>#{1,6})\s+(?P<title>.+?)\s*$", re.MULTILINE)
 _EXPLICIT_ANCHOR = re.compile(r"\{\s*#(?P<anchor>[A-Za-z0-9_.:-]+)\s*\}")
+_PYTHON_BLOCK = re.compile(r"```python\n(.*?)\n```", flags=re.DOTALL)
 _MKDOCSTRINGS_DIRECTIVE = re.compile(
     r"^::: (?P<object>[A-Za-z_][A-Za-z0-9_.]*)\s*$",
     re.MULTILINE,
@@ -66,6 +71,35 @@ def _linked_paths(path: Path) -> set[str]:
         for match in _MARKDOWN_LINK.finditer(path.read_text(encoding="utf-8"))
         if (parsed := _local_target(match.group("target"))) is not None
     }
+
+
+def _python_calls(path: Path) -> list[ast.Call]:
+    calls: list[ast.Call] = []
+    for block in _PYTHON_BLOCK.findall(path.read_text(encoding="utf-8")):
+        tree = ast.parse(block)
+        calls.extend(node for node in ast.walk(tree) if isinstance(node, ast.Call))
+    return calls
+
+
+def _call_name(call: ast.Call) -> str | None:
+    if isinstance(call.func, ast.Name):
+        return call.func.id
+    if isinstance(call.func, ast.Attribute):
+        return call.func.attr
+    return None
+
+
+def _keyword_map(call: ast.Call) -> dict[str, ast.expr]:
+    assert all(keyword.arg is not None for keyword in call.keywords)
+    return {keyword.arg: keyword.value for keyword in call.keywords if keyword.arg is not None}
+
+
+def _integer_literal(node: ast.expr | None) -> bool:
+    return (
+        isinstance(node, ast.Constant)
+        and isinstance(node.value, int)
+        and not isinstance(node.value, bool)
+    )
 
 
 def test_served_markdown_local_links_and_anchors_resolve() -> None:
@@ -198,6 +232,78 @@ def test_computational_performance_guide_has_reference_position_and_structure() 
     assert required_headings <= headings
 
 
+def test_computational_performance_guide_is_linked_from_user_routes() -> None:
+    root = _repository_root()
+    expected = {
+        root / "README.md": "docs/computational_performance.md",
+        root / "docs" / "api" / "path.md": "../computational_performance.md",
+        root / "docs" / "api" / "regression.md": "../computational_performance.md",
+        root / "docs" / "examples.md": "computational_performance.md",
+        root / "docs" / "tutorials" / "pulp.md": "../computational_performance.md",
+        root / "docs" / "troubleshooting.md": "computational_performance.md",
+    }
+
+    for source, target in expected.items():
+        assert target in _linked_paths(source), source
+
+
+def test_computational_performance_examples_match_public_constructor_contracts() -> None:
+    page = _repository_root() / "docs" / "computational_performance.md"
+    signatures = {
+        "PiPLSRegression": set(inspect.signature(PiPLSRegression).parameters),
+        "PiPLSSearchCV": set(inspect.signature(PiPLSSearchCV).parameters),
+    }
+
+    for call in _python_calls(page):
+        name = _call_name(call)
+        keywords = _keyword_map(call)
+        if name in signatures:
+            assert set(keywords) <= signatures[name]
+
+        if name == "PiPLSSearchCV":
+            method = keywords.get("search_method")
+            if method is not None:
+                assert isinstance(method, ast.Constant)
+                assert method.value in {"adaptive", "exhaustive"}
+
+            ranks = keywords.get("predictor_rank_values")
+            one_candidate = (isinstance(ranks, ast.Constant) and ranks.value == "max") or (
+                isinstance(ranks, (ast.List, ast.Tuple)) and len(ranks.elts) == 1
+            )
+            if one_candidate:
+                assert "search_method" not in keywords
+
+        if name == "PiPLSRegression":
+            solver = keywords.get("svd_solver")
+            if isinstance(solver, ast.Constant) and solver.value == "randomized":
+                assert _integer_literal(keywords.get("random_state"))
+
+        if name == "KFold":
+            shuffle = keywords.get("shuffle")
+            if isinstance(shuffle, ast.Constant) and shuffle.value is True:
+                assert _integer_literal(keywords.get("random_state"))
+
+        if name == "RepeatedKFold":
+            assert _integer_literal(keywords.get("random_state"))
+
+
+def test_computational_performance_guide_separates_work_counts_from_wall_time() -> None:
+    page = (_repository_root() / "docs" / "computational_performance.md").read_text(
+        encoding="utf-8"
+    )
+
+    for result_key in (
+        'cv_results_["n_components"]',
+        'cv_results_["mean_fit_time"]',
+        'cv_results_["std_fit_time"]',
+        'cv_results_["mean_score_time"]',
+        'cv_results_["std_score_time"]',
+    ):
+        assert result_key in page
+    assert "wall time" in page.lower()
+    assert ".fit_transform(" not in page
+
+
 def test_dataset_api_routes_to_repository_reference_material() -> None:
     page = _repository_root() / "docs" / "api" / "datasets.md"
 
@@ -208,7 +314,12 @@ def test_troubleshooting_routes_to_stable_programming_references() -> None:
     root = _repository_root()
     page = root / "docs" / "troubleshooting.md"
 
-    assert {"api/regression.md", "api/path.md", "path_analysis.md"} <= _linked_paths(page)
+    assert {
+        "api/regression.md",
+        "api/path.md",
+        "computational_performance.md",
+        "path_analysis.md",
+    } <= _linked_paths(page)
     text = page.read_text(encoding="utf-8")
     assert "assets/generated/" not in text
     assert "--8<--" not in text

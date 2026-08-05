@@ -19,8 +19,10 @@ delegate model methods or retain the returned estimator, report, or supplied tra
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see
-[Path-selection details](../path_analysis.md). For candidate-feasibility, refit, scoring, or metadata
-problems, see [Troubleshooting](../troubleshooting.md).
+[Path-selection details](../path_analysis.md). For training-cost controls and their statistical or
+numerical trade-offs, see [Computational performance](../computational_performance.md). For
+candidate-feasibility, refit, scoring, or metadata problems, see
+[Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. Its parameter columns are the stable,
 pipeline-independent `n_components` and `predictor_rank` arrays; the remaining columns contain
@@ -223,7 +225,9 @@ repeated-prediction counts, partial-coverage NaNs, leave-one-out provenance, and
 when at least two rows have coverage. The supplied selection is validated exactly against the fitted
 search, preventing a report for an unrelated component-count or predictor-rank decision. The
 operation does not rescore candidates, perform a full-data fit, mutate the search, or retain the
-supplied matrices.
+supplied matrices. Each repeated call performs the selected-pair fold fits again; retain and reuse
+one report when several tables or figures need the same diagnostics. See
+[Computational performance](../computational_performance.md#avoid-repeated-oof-computation).
 
 The caller must provide the same observations in the same row order and with the same sample and
 response-column counts as the fitted search. Selection metrics remain on `report.selection`;

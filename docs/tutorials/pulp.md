@@ -136,7 +136,12 @@ to the displayed split-to-split variability.
 The profile supports rank 9 for this fitted model, but it does not establish a distinct scientific
 advantage over nearby retained dimensions. The fixed model still contains three paired latent
 modes; predictor rank 9 is the retained predictor-subspace dimension used to estimate those modes.
-See [Path-selection details](../path_analysis.md) for other bounds and policies.
+The 50-split protocol is a final stability choice rather than a recommended development default; a
+single seeded five-fold partition is much cheaper while the workflow is being assembled. See
+[Computational
+performance](../computational_performance.md#develop-with-a-smaller-validation-protocol)
+for that development-to-final distinction and [Path-selection details](../path_analysis.md) for
+other bounds and policies.
 
 ## Generate selection-conditioned OOF predictions
 
