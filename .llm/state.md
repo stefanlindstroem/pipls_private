@@ -170,9 +170,12 @@ are part of the current package contract.
 
 Decision 0149 is implemented. The runtime API, maintained examples, public documentation,
 retained decisions, tests, and distribution checks use `search_method="adaptive"` and
-`search_method="exhaustive"`; the former values are rejected without aliases. The next authorized
-increment is Decision 0150 Patch 4, which establishes the computational-performance guide structure.
-Decision 0139 Patch 3 remains separate paused work.
+`search_method="exhaustive"`; the former values are rejected without aliases.
+
+Decision 0150 is accepted and Patch 4 is complete. The served computational-performance guide, its
+Reference navigation position, scope, stable section structure, and maintainer contracts are now
+established. The next authorized increment is Patch 5, which writes the complete guidance. Decision
+0139 Patch 3 remains separate paused work.
 
 ## Authority and drift handling
 

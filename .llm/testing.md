@@ -203,6 +203,14 @@ Tests verify that:
 - current source, examples, public guides, and retained decisions use the final terminology while
   unrelated `svd_solver="auto"` uses remain intact.
 
+## Computational-performance documentation obligations
+
+Tests should protect the guide as a stable documentation contract rather than freeze its prose.
+Verify its Reference navigation position, section structure, current public parameter names, seeded
+randomized examples, omission of `search_method` for one-candidate rank policies, fold-local
+preprocessing boundary, and distinction between candidate-fit counts and wall-clock timing. Final
+distribution checks must include the served page.
+
 ## Decision lifecycle and repository-hygiene obligations
 
 Tests must verify:

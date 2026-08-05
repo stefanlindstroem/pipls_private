@@ -170,6 +170,18 @@ figures. Sugarcane and Tobacco keep analysis in `main()` and group rendering in 
 the same script. Reusable numerical logic belongs in the package; dataset-specific report layout
 does not.
 
+## Computational-performance documentation boundary
+
+Decision 0150 owns one central served reference page for training cost. It must distinguish changes
+to validation evidence, candidate coverage or model policy, numerical approximation, parallel wall
+time, and repeated OOF work. It may describe candidate-fit scaling and current execution boundaries,
+but it must not publish machine-independent speed claims or imply that narrower validation or search
+policies are statistically equivalent.
+
+All advice preserves fold-local learned preprocessing. Shuffled validation and randomized predictor
+SVD examples use explicit integer seeds. Fixed and maximum-rank examples omit `search_method`;
+`"adaptive"` and `"exhaustive"` are used only when predictor-rank coverage is an actual choice.
+
 ## Artifact and testing contract
 
 Generated figures, manifests, and example outputs are not fitted package state and must not be

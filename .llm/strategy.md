@@ -72,10 +72,10 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decisions 0148 and 0149 are implemented. The next authorized increment is Patch 4 of the six-patch
-sequence: establish Decision 0150 and the central computational-performance guide structure. Patches
-5--6 then write, integrate, test, and audit the guidance using only the final `"adaptive"` and
-`"exhaustive"` terminology.
+Decisions 0148 and 0149 are implemented. Decision 0150 is accepted and its central guide
+structure is present. The next authorized increment is Patch 5 of the six-patch sequence: write the
+complete computational-performance guidance. Patch 6 then integrates links and troubleshooting,
+adds final documentation and distribution checks, audits the repository, and closes Decision 0150.
 
 ## Independent paused work
 

@@ -153,6 +153,7 @@ def test_required_public_guides_are_reachable_through_navigation() -> None:
         "api/regression.md",
         "api/path.md",
         "path_analysis.md",
+        "computational_performance.md",
         "troubleshooting.md",
         "model_inspection.md",
         "api/inspection.md",
@@ -167,6 +168,34 @@ def test_required_public_guides_are_reachable_through_navigation() -> None:
 
     assert required_paths <= navigation_paths
     assert all((root / "docs" / relative).is_file() for relative in navigation_paths)
+
+
+def test_computational_performance_guide_has_reference_position_and_structure() -> None:
+    root = _repository_root()
+    with (root / "mkdocs.yml").open(encoding="utf-8") as stream:
+        navigation = yaml.safe_load(stream)["nav"]
+
+    reference = next(item["Reference"] for item in navigation if "Reference" in item)
+    labels = [next(iter(item)) for item in reference]
+    assert labels.index("Computational performance") == labels.index("Path-selection details") + 1
+    assert labels.index("Troubleshooting") == labels.index("Computational performance") + 1
+
+    page = (root / "docs" / "computational_performance.md").read_text(encoding="utf-8")
+    required_headings = {
+        "A cost model for path training",
+        "Develop with a smaller validation protocol",
+        "Choose predictor-rank coverage deliberately",
+        "Use fixed or restricted predictor-rank policies when justified",
+        "Restrict the component path when justified",
+        "Use randomized predictor SVD for large problems",
+        "Use parallelism deliberately",
+        "Avoid repeated OOF computation",
+        "Inspect the work performed",
+        "Separate development and final-analysis workflows",
+        "Summary of trade-offs",
+    }
+    headings = {match.group("title") for match in _HEADING.finditer(page)}
+    assert required_headings <= headings
 
 
 def test_dataset_api_routes_to_repository_reference_material() -> None:

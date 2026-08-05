@@ -23,6 +23,7 @@ nav:
       - Fixed regression: api/regression.md
       - Path selection: api/path.md
       - Path-selection details: path_analysis.md
+      - Computational performance: computational_performance.md
       - Troubleshooting: troubleshooting.md
       - Model inspection:
           - Concepts: model_inspection.md

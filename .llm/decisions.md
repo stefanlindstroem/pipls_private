@@ -53,6 +53,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, compact historical summaries, and retired records; normalize `.llm`, decision links, structural tests, snapshot hygiene, and private dataset ownership without changing public behavior |
 | `0148-predictor-rank-tolerance-selection.md` | predictor-rank tolerance selection | constructor tolerances, immutable rank evidence, conditioned component rules, and separate 10% Tobacco predictor-rank and component-count demonstration |
 | `0149-predictor-rank-search-terminology.md` | predictor-rank search terminology | use `"adaptive"`/`"exhaustive"`, preserve algorithms and achieved-coverage diagnostics, reject retired values, and reject inapplicable nondefault exhaustive mode |
+| `0150-computational-performance-guidance.md` | computational-performance guidance | central reference page, explicit cost categories, fold-local preprocessing, reproducible examples, and current implementation semantics |
 
 ## Current canonical clusters
 
@@ -63,7 +64,18 @@ This registry lists only numbered decisions that still define current behavior o
 - **Datasets and product scope:** 0015, 0024--0025, 0041, 0119, 0123, and 0142.
 - **Inspection and rendering:** 0042, 0045, 0061, 0083, 0094, 0110, 0124, 0127, and 0141.
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
-  and 0147.
+  0147, and 0150.
+
+## Active Decision 0150 contract
+
+- Add one canonical served guide at `docs/computational_performance.md`, positioned after
+  path-selection details and before troubleshooting.
+- Separate validation evidence, candidate policy, numerical approximation, parallel execution, and
+  repeated diagnostic work.
+- Preserve fold-local preprocessing and use explicit seeds for shuffled CV and randomized SVD.
+- Document current candidate, parallelism, OOF, and timing behavior without universal benchmark
+  claims.
+- Patch 5 writes the complete guide; Patch 6 integrates and audits it.
 
 ## Implemented Decision 0149 contract
 
