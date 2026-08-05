@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -26,6 +27,13 @@ def _pages_site_url(repository: str) -> str:
     return f"https://{owner}.github.io/{name}/"
 
 
+def _inherit_path(*, source: Path, output: Path) -> str:
+    if not source.is_file():
+        raise ValueError(f"MkDocs configuration does not exist: {source}")
+    relative = os.path.relpath(source.resolve(), start=output.parent.resolve())
+    return Path(relative).as_posix()
+
+
 def write_pages_config(
     *,
     source: Path,
@@ -33,14 +41,13 @@ def write_pages_config(
     repository: str,
     server_url: str,
 ) -> None:
-    config = yaml.safe_load(source.read_text(encoding="utf-8"))
-    if not isinstance(config, dict):
-        raise ValueError("MkDocs configuration must be a mapping")
-
     repository_url = f"{_https_url(server_url, name='server_url')}/{repository}"
-    config["site_url"] = _pages_site_url(repository)
-    config["repo_url"] = repository_url
-    config["edit_uri"] = "edit/master/docs/"
+    config = {
+        "INHERIT": _inherit_path(source=source, output=output),
+        "site_url": _pages_site_url(repository),
+        "repo_url": repository_url,
+        "edit_uri": "edit/master/docs/",
+    }
     output.write_text(yaml.safe_dump(config, sort_keys=False), encoding="utf-8")
 
 

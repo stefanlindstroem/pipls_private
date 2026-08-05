@@ -6,6 +6,23 @@ selection to the final full-data refit. Deterministic synthetic training and tes
 latent structure known and keep prediction assessment independent of model selection. For Pi-PLS,
 `n_components` is the number of paired latent modes.
 
+The workflow is to generate independent training and test data, search the candidate models, inspect
+the search evidence, create one selection, refit that exact selection, predict the external test
+data, and render the completed results.
+
+```mermaid
+flowchart TD
+    generate["Generate training and test data"]
+    search["Search candidate models"]
+    inspect["Inspect search evidence"]
+    select["Create one selection"]
+    refit["Refit the exact selection"]
+    predict["Predict external test data"]
+    render["Render results"]
+
+    generate --> search --> inspect --> select --> refit --> predict --> render
+```
+
 ## What this tutorial covers
 
 You will:
@@ -113,20 +130,6 @@ selected row that will be refitted.
 At two components, the lowest evaluated mean CV-MSE occurs at predictor rank four. In this
 controlled example, that matches the two shared and two predictor-specific directions in the
 predictor block. This agreement is informative but not a general selection guarantee.
-
-The programming sequence is:
-
-```text
-search candidate pairs
-        ↓
-inspect the conditioned component path
-        ↓
-create one immutable selection
-        ↓
-inspect its conditional predictor-rank profile
-        ↓
-refit that exact selection on all training observations
-```
 
 ## Refit the selected pair
 

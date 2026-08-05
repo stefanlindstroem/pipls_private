@@ -4,6 +4,19 @@ This tutorial fits a selected Pi-PLS model to the package-owned Pulp dataset and
 observed-versus-fitted plot. It is the shortest installed-package route from data to a usable final
 model.
 
+The workflow is to load the Pulp data, search the candidate models, select by rule and refit on all
+observations, and then inspect fitted values.
+
+```mermaid
+flowchart TD
+    load["Load Pulp data"]
+    search["Search candidate models"]
+    refit["Select by rule and refit"]
+    inspect["Inspect fitted values"]
+
+    load --> search --> refit --> inspect
+```
+
 ## Load the data
 
 `load_pulp()` returns the predictor matrix, response matrix, labels, sample identifiers, and

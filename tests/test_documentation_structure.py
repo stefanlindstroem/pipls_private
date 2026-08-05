@@ -6,14 +6,14 @@ import re
 import unicodedata
 from pathlib import Path
 
-import yaml
-
 from pipls import PiPLSRegression, PiPLSSearchCV
+from tests._mkdocs import load_mkdocs_config
 
 _MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((?P<target>[^)]+)\)")
 _HEADING = re.compile(r"^(?P<marks>#{1,6})\s+(?P<title>.+?)\s*$", re.MULTILINE)
 _EXPLICIT_ANCHOR = re.compile(r"\{\s*#(?P<anchor>[A-Za-z0-9_.:-]+)\s*\}")
 _PYTHON_BLOCK = re.compile(r"```python\n(.*?)\n```", flags=re.DOTALL)
+_MERMAID_BLOCK = re.compile(r"```mermaid\n(?P<body>.*?)\n```", flags=re.DOTALL)
 _MKDOCSTRINGS_DIRECTIVE = re.compile(
     r"^::: (?P<object>[A-Za-z_][A-Za-z0-9_.]*)\s*$",
     re.MULTILINE,
@@ -158,6 +158,82 @@ def test_api_overview_maps_the_public_result_objects() -> None:
         assert f"`{object_name}`" in api_overview
 
 
+def test_served_tutorials_have_one_vertical_workflow_flowchart() -> None:
+    tutorial_root = _repository_root() / "docs" / "tutorials"
+    expected = {
+        "quick_start.md": {
+            "labels": (
+                "Load Pulp data",
+                "Search candidate models",
+                "Select by rule and refit",
+                "Inspect fitted values",
+            ),
+            "prose": (
+                "load the Pulp data",
+                "search the candidate models",
+                "select by rule and refit",
+                "inspect fitted values",
+            ),
+        },
+        "synthetic.md": {
+            "labels": (
+                "Generate training and test data",
+                "Search candidate models",
+                "Inspect search evidence",
+                "Create one selection",
+                "Refit the exact selection",
+                "Predict external test data",
+                "Render results",
+            ),
+            "prose": (
+                "generate independent training and test data",
+                "search the candidate models",
+                "inspect the search evidence",
+                "create one selection",
+                "refit that exact selection",
+                "predict the external test data",
+                "render the completed results",
+            ),
+        },
+        "pulp.md": {
+            "labels": (
+                "Load Pulp data",
+                "Search candidate models",
+                "Inspect search evidence",
+                "Create one selection",
+                "Qualify with OOF predictions",
+                "Refit the exact selection",
+                "Inspect the fitted model",
+                "Render reports",
+            ),
+            "prose": (
+                "load the Pulp data",
+                "search the candidate models",
+                "inspect the search evidence",
+                "create one selection",
+                "qualify it with OOF predictions",
+                "refit that exact selection",
+                "inspect the fitted model",
+                "render the completed reports",
+            ),
+        },
+    }
+
+    for filename, contract in expected.items():
+        text = (tutorial_root / filename).read_text(encoding="utf-8")
+        blocks = list(_MERMAID_BLOCK.finditer(text))
+        assert len(blocks) == 1
+        body = blocks[0].group("body")
+        assert body.splitlines()[0] in {"flowchart TD", "flowchart TB"}
+        assert all(label in body for label in contract["labels"])
+
+        prose = text[: blocks[0].start()] + text[blocks[0].end() :]
+        normalized_prose = " ".join(prose.split())
+        assert all(fragment in normalized_prose for fragment in contract["prose"])
+        first_section = text.index("\n## ")
+        assert blocks[0].start() < first_section
+
+
 def test_model_producing_tutorials_state_selection_ownership_positively() -> None:
     tutorial_root = _repository_root() / "docs" / "tutorials"
 
@@ -174,8 +250,7 @@ def test_model_producing_tutorials_state_selection_ownership_positively() -> Non
 
 def test_required_public_guides_are_reachable_through_navigation() -> None:
     root = _repository_root()
-    with (root / "mkdocs.yml").open(encoding="utf-8") as stream:
-        navigation = yaml.safe_load(stream)["nav"]
+    navigation = load_mkdocs_config(root / "mkdocs.yml")["nav"]
 
     navigation_paths = _navigation_paths(navigation)
     required_paths = {
@@ -206,8 +281,7 @@ def test_required_public_guides_are_reachable_through_navigation() -> None:
 
 def test_computational_performance_guide_has_reference_position_and_structure() -> None:
     root = _repository_root()
-    with (root / "mkdocs.yml").open(encoding="utf-8") as stream:
-        navigation = yaml.safe_load(stream)["nav"]
+    navigation = load_mkdocs_config(root / "mkdocs.yml")["nav"]
 
     reference = next(item["Reference"] for item in navigation if "Reference" in item)
     labels = [next(iter(item)) for item in reference]

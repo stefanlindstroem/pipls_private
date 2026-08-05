@@ -10,13 +10,14 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import pytest
-import yaml
-
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - Python 3.10
     import tomli as tomllib
+
+import pytest
+
+from tests._mkdocs import load_mkdocs_config
 
 FIGURE_FILENAMES = (
     "component_path.svg",
@@ -133,8 +134,7 @@ def test_synthetic_tutorial_uses_checked_snippets_assets_and_public_links() -> N
     example = (
         repository / "examples" / "02_synthetic_path_selection.py"
     ).read_text(encoding="utf-8")
-    with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
-        mkdocs = yaml.safe_load(stream)
+    mkdocs = load_mkdocs_config(repository / "mkdocs.yml")
 
     tutorials = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
     assert [next(iter(item.values())) for item in tutorials] == [

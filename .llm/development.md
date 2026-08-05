@@ -109,16 +109,19 @@
   public target carries one `##` description and each group one `##@` heading.
 - Build public documentation with the dedicated `docs` dependency extra and `make docs`. Use
   `make docs-serve` for a live local preview at `http://127.0.0.1:8000/`. The build
-  is strict: navigation, internal links, anchors, mathematics support, and generated API targets must
-  remain warning-free. Core generated pages use explicit public objects and source docstrings; do not
+  is strict: navigation, internal links, anchors, mathematics support, Mermaid workflow rendering,
+  and generated API targets must remain warning-free. GitHub Pages uses a generated overlay that
+  inherits `mkdocs.yml`; do not parse and rewrite the base configuration when deployment-only values
+  are added. Core generated pages use explicit public objects and source docstrings; do not
   expose private modules or inherited implementation machinery by broad module expansion. Never commit
   generated `site/` output or `docs/assets/generated/` tutorial assets. `make docs` and
   `make docs-serve` regenerate the synthetic and Pulp assets through `make docs-figures`. Tutorial
   code excerpts use checked `pymdownx.snippets` sections from repository source; do not copy the
   maintained example analyses into Markdown. Use `make docs-dist`
   when changing documentation packaging or the source-distribution documentation boundary; it
-  performs a clean install and strict build from
-  the unpacked sdist and therefore remains outside the ordinary fast test target. Use
+  performs a clean install plus strict base and inherited Pages-overlay builds from the unpacked
+  sdist, including rendered Mermaid-container checks, and therefore remains outside the ordinary
+  fast test target. Use
   `make dist-check` for packaging, dependency, public-module, or included-data changes; it builds
   once and checks separate clean wheel and sdist installations outside the checkout. The sdist
   check also installs the `examples` extra, runs example 01 from the extracted source tree, and

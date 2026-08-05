@@ -6,6 +6,24 @@ to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path
 with real data: an interior predictor-rank result, selection-conditioned out-of-fold (OOF)
 predictions, and interpretation of a selected model.
 
+The workflow is to load the Pulp data, search the candidate models, inspect the search evidence,
+create one selection, qualify it with OOF predictions, refit that exact selection, inspect the
+fitted model, and render the completed reports.
+
+```mermaid
+flowchart TD
+    load["Load Pulp data"]
+    search["Search candidate models"]
+    inspect["Inspect search evidence"]
+    select["Create one selection"]
+    qualify["Qualify with OOF predictions"]
+    refit["Refit the exact selection"]
+    analyze["Inspect the fitted model"]
+    render["Render reports"]
+
+    load --> search --> inspect --> select --> qualify --> refit --> analyze --> render
+```
+
 ## What this tutorial covers
 
 You will:

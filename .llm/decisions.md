@@ -76,7 +76,8 @@ This registry lists only numbered decisions that still define current behavior o
 - Keep validation-only and comparison-only routes free of unnecessary final models.
 - Add one supplementary vertical Mermaid flowchart plus equivalent prose to each served tutorial,
   without committed generated diagram assets.
-- Patch 1 of 6 establishes the target; runtime, examples, tutorials, and final audits remain staged.
+- Patches 1--5 establish the runtime, reordered workflows, and strict source-level Mermaid tutorial
+  integration; Patch 6 completes the remaining public and maintainer audits.
 
 ## Implemented Decision 0150 contract
 

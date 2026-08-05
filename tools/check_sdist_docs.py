@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -32,6 +34,35 @@ PULP_TUTORIAL_FIGURES = (
 )
 
 
+TUTORIAL_WORKFLOWS = {
+    "quick_start": (
+        "Load Pulp data",
+        "Search candidate models",
+        "Select by rule and refit",
+        "Inspect fitted values",
+    ),
+    "synthetic": (
+        "Generate training and test data",
+        "Search candidate models",
+        "Inspect search evidence",
+        "Create one selection",
+        "Refit the exact selection",
+        "Predict external test data",
+        "Render results",
+    ),
+    "pulp": (
+        "Load Pulp data",
+        "Search candidate models",
+        "Inspect search evidence",
+        "Create one selection",
+        "Qualify with OOF predictions",
+        "Refit the exact selection",
+        "Inspect the fitted model",
+        "Render reports",
+    ),
+}
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -43,6 +74,27 @@ def _sha256(path: Path) -> str:
 def _run(command: list[str], *, cwd: Path | None = None) -> None:
     print("+", " ".join(command), flush=True)
     subprocess.run(command, cwd=cwd, check=True)
+
+
+def _validate_workflow_diagrams(site: Path) -> None:
+    for tutorial, labels in TUTORIAL_WORKFLOWS.items():
+        page = site / "tutorials" / tutorial / "index.html"
+        rendered = html.unescape(page.read_text(encoding="utf-8"))
+        classes = re.findall(r'class="([^"]*)"', rendered)
+        mermaid_containers = sum("mermaid" in value.split() for value in classes)
+        if mermaid_containers != 1:
+            raise RuntimeError(
+                f"Rendered {tutorial} tutorial must contain one Mermaid container."
+            )
+        if "flowchart TD" not in rendered:
+            raise RuntimeError(
+                f"Rendered {tutorial} tutorial must retain a vertical flowchart."
+            )
+        missing = [label for label in labels if label not in rendered]
+        if missing:
+            raise RuntimeError(
+                f"Rendered {tutorial} workflow is missing labels: {missing}."
+            )
 
 
 def _safe_extract(archive: tarfile.TarFile, destination: Path) -> Path:
@@ -151,6 +203,7 @@ def main() -> None:
             source / "docs" / "api" / "index.md",
             source / "docs" / "troubleshooting.md",
             source / "docs" / "javascripts" / "mathjax.js",
+            source / "tools" / "configure_pages_docs.py",
             source / "tools" / "render_quick_start_tutorial.py",
             source / "tools" / "render_synthetic_tutorial.py",
             source / "tools" / "render_pulp_tutorial.py",
@@ -308,6 +361,35 @@ def main() -> None:
             raise RuntimeError(
                 f"Documentation build did not create expected pages: {missing_rendered}"
             )
+        _validate_workflow_diagrams(source / "site")
+
+        pages_config = source / ".mkdocs-pages.yml"
+        _run(
+            [
+                str(python),
+                str(source / "tools" / "configure_pages_docs.py"),
+                "--repository",
+                "example/pipls",
+                "--server-url",
+                "https://github.com",
+                "--output",
+                str(pages_config),
+            ],
+            cwd=source,
+        )
+        _run(
+            [
+                str(python),
+                "-m",
+                "mkdocs",
+                "build",
+                "--strict",
+                "--config-file",
+                str(pages_config),
+            ],
+            cwd=source,
+        )
+        _validate_workflow_diagrams(source / "site")
 
     print("Source-distribution documentation build passed.")
 

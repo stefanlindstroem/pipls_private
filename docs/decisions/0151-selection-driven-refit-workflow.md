@@ -2,11 +2,12 @@
 
 ## Status
 
-Accepted. Patches 1--4 of 6 are implemented: the target contract is synchronized,
-`PiPLSSearchCV.refit(selection=...)` uses the shared exact compatibility validator, and the
-synthetic, Pulp, Sugarcane, and Tobacco workflows pass one pre-refit selection through evidence
-inspection, optional OOF qualification, and final fitting. Mermaid configuration and the final
-documentation audit remain for Patches 5 and 6.
+Accepted. Patches 1--5 of 6 are implemented: the target contract is synchronized,
+`PiPLSSearchCV.refit(selection=...)` uses the shared exact compatibility validator, the analytical
+workflows pass one pre-refit selection through evidence inspection, optional OOF qualification, and
+final fitting, and every served tutorial includes one source-level Mermaid flowchart with equivalent
+prose. Strict base, inherited Pages-overlay, and source-distribution checks protect diagram
+rendering. The final public and maintainer audit remains for Patch 6.
 
 ## Context
 
@@ -173,7 +174,7 @@ workflow work in this decision.
 4. Reorder the complete Pulp, Sugarcane, and Tobacco workflows and replace the global refit-first
    source contract with route-specific lifecycle tests -- complete.
 5. Add Mermaid support, one flowchart per served tutorial, a safe Pages configuration overlay, and
-   strict rendering and source-distribution checks.
+   strict rendering and source-distribution checks -- complete.
 6. Update remaining public routes, examples catalogue, changelog, maintainer records, and stale-
    surface audits; complete this decision.
 

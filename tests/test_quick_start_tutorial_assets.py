@@ -10,7 +10,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
-import yaml
+
+from tests._mkdocs import load_mkdocs_config
 
 FIGURE_FILENAMES = ("observed_vs_fitted.svg",)
 
@@ -91,8 +92,7 @@ def test_quick_start_tutorial_owns_snippets_asset_and_navigation() -> None:
     example = (repository / "examples" / "01_pulp_quick_start.py").read_text(
         encoding="utf-8"
     )
-    with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
-        mkdocs = yaml.safe_load(stream)
+    mkdocs = load_mkdocs_config(repository / "mkdocs.yml")
 
     tutorials = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
     assert [next(iter(item.values())) for item in tutorials] == [

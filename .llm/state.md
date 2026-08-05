@@ -181,11 +181,12 @@ paths, randomized predictor SVD, parallel execution, OOF reuse, and work inspect
 route to it, and source-distribution documentation validation protects its shipped and rendered
 forms.
 
-Decision 0151 is active. Patches 1--4 establish the target contract, implement
-`refit(selection=...)` with shared exact compatibility validation, and convert the synthetic,
-Pulp, Sugarcane, and Tobacco workflows to inspect and optionally qualify one selection before
-passing it to final refitting. Patches 5 and 6 add Mermaid tutorial diagrams and complete the public
-and maintainer audits. The paused presentation increment from Decision 0139 is superseded by this
+Decision 0151 is active. Patches 1--5 establish the target contract, implement
+`refit(selection=...)` with shared exact compatibility validation, convert the synthetic, Pulp,
+Sugarcane, and Tobacco workflows to one pre-refit selection, and add one source-level Mermaid
+flowchart with equivalent prose to every served tutorial. Strict local, inherited Pages-overlay,
+and source-distribution checks protect the diagram rendering. Patch 6 completes the public and
+maintainer audits. The paused presentation increment from Decision 0139 is superseded by this
 sequence.
 
 ## Authority and drift handling

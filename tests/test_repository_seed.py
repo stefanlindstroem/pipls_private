@@ -14,6 +14,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python 3.10
 import yaml
 
 import pipls
+from tests._mkdocs import MERMAID_FENCE_FORMAT, load_mkdocs_config
 
 _REQUIRED_LLM_CONTRACTS = {
     ".llm/README.md",
@@ -133,6 +134,7 @@ def test_source_distribution_manifest_includes_documentation_build_inputs() -> N
         "include mkdocs.yml",
         "include tools/check_sdist_docs.py",
         "include tools/check_distributions.py",
+        "include tools/configure_pages_docs.py",
         "include tools/render_synthetic_tutorial.py",
         "include tools/render_pulp_tutorial.py",
         "recursive-include docs *.md *.js",
@@ -185,7 +187,7 @@ def test_public_installation_is_noneditable_and_contributor_setup_is_editable() 
 
 def test_mkdocs_configuration_has_valid_user_navigation() -> None:
     root = _repository_root()
-    config = yaml.safe_load((root / "mkdocs.yml").read_text(encoding="utf-8"))
+    config = load_mkdocs_config(root / "mkdocs.yml")
 
     def targets(items: list[object]) -> set[str]:
         found: set[str] = set()
@@ -217,6 +219,23 @@ def test_mkdocs_configuration_has_valid_user_navigation() -> None:
     assert "not_in_nav" not in config
     assert not any(target.startswith("decisions/") for target in nav_targets)
     assert "javascripts/mathjax.js" in config["extra_javascript"]
+    superfences = next(
+        extension["pymdownx.superfences"]
+        for extension in config["markdown_extensions"]
+        if isinstance(extension, dict) and "pymdownx.superfences" in extension
+    )
+    assert superfences == {
+        "custom_fences": [
+            {
+                "name": "mermaid",
+                "class": "mermaid",
+                "format": MERMAID_FENCE_FORMAT,
+            }
+        ]
+    }
+    assert (root / "mkdocs.yml").read_text(encoding="utf-8").count(
+        "!!python/name:pymdownx.superfences.fence_code_format"
+    ) == 1
     mkdocstrings = next(
         plugin["mkdocstrings"]
         for plugin in config["plugins"]
@@ -325,6 +344,9 @@ def test_documentation_distribution_target_uses_the_validation_helper() -> None:
     assert 'f"{source}[docs]"' in helper
     assert '"docs"' in helper
     assert "PYTHON={python}" in helper
+    assert "configure_pages_docs.py" in helper
+    assert '"--config-file"' in helper
+    assert "_validate_workflow_diagrams" in helper
 
 
 def test_documentation_ci_builds_checkout_and_source_distribution() -> None:
@@ -388,6 +410,8 @@ def test_documentation_ci_deploys_only_the_master_pages_site(tmp_path: Path) -> 
         check=True,
     )
     config = yaml.safe_load(output.read_text(encoding="utf-8"))
+    assert set(config) == {"INHERIT", "site_url", "repo_url", "edit_uri"}
+    assert (output.parent / config["INHERIT"]).resolve() == (root / "mkdocs.yml").resolve()
     assert config["site_url"] == "https://example.github.io/pipls/"
     assert config["repo_url"] == "https://github.com/example/pipls"
     assert config["edit_uri"] == "edit/master/docs/"

@@ -10,13 +10,14 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-import pytest
-import yaml
-
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - Python 3.10
     import tomli as tomllib
+
+import pytest
+
+from tests._mkdocs import load_mkdocs_config
 
 FIGURE_FILENAMES = (
     "component_path.svg",
@@ -158,8 +159,7 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
     renderer = (repository / "tools" / "render_pulp_tutorial.py").read_text(
         encoding="utf-8"
     )
-    with (repository / "mkdocs.yml").open(encoding="utf-8") as stream:
-        mkdocs = yaml.safe_load(stream)
+    mkdocs = load_mkdocs_config(repository / "mkdocs.yml")
 
     snippets = next(
         extension["pymdownx.snippets"]
