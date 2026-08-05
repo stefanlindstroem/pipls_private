@@ -48,6 +48,11 @@ tolerances are search-constructor controls because they determine `component_pat
 tolerances remain post-fit `select()` and `refit()` controls. Exact numerical ties and adaptive
 candidate coverage remain separate from substantive parsimony tolerances.
 
+Decision 0149 renames only the predictor-rank coverage values: `search_method="adaptive"` becomes
+the default and `search_method="exhaustive"` requests complete admissible-rank coverage. The
+parameter name and `search_is_exhaustive_` fitted diagnostic remain unchanged. Current runtime code
+uses the former values until Patch 2.
+
 ### Analysis
 
 Pi-PLS-specific factorization inspection and shared PLS-family diagnostics are pure numerical
@@ -67,11 +72,11 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0148 is implemented. The package now has separate predictor-rank and component-count
-tolerance stages, complete immutable provenance, conditioned-path named rules, and a maintained
-Tobacco demonstration of both 10% choices. No additional package increment is authorized. New work
-that changes scientific behavior, public API, or repository policy requires an explicit owner
-request and, where necessary, a new decision.
+Decision 0148 is implemented. Decision 0149 authorizes a six-patch sequence. Patch 1 establishes
+the terminology contract; Patch 2 renames the runtime values to `"adaptive"` and `"exhaustive"`;
+Patch 3 completes migration and Decision 0149; Patches 4--6 establish and integrate Decision 0150
+computational-performance guidance. Do not write the performance guide against the legacy values or
+combine runtime migration with the guide prose.
 
 ## Independent paused work
 

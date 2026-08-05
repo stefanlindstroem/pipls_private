@@ -51,9 +51,13 @@ min(p_min, n_train_min - 1, r_num_min, ceil(n / c))
 `1 <= n_components <= min(n_targets, predictor_rank)` and are fixed-model clones. Fold-local
 preprocessing, scoring, and warning suppression must not leak validation data.
 
-Adaptive rank search is deterministic for fixed inputs and configuration. Exhaustive
-`search_method="optimal"` evaluates every admissible requested pair. Private numerical tie behavior
-uses dedicated numerical tie tolerances and deterministic smaller-rank ordering.
+Adaptive rank search is deterministic for fixed inputs and configuration. Snapshot 509 names the
+exhaustive mode `search_method="optimal"`; Decision 0149 renames the two coverage values to
+`"adaptive"` and `"exhaustive"` in Patch 2 without changing either algorithm. The fitted
+`search_is_exhaustive_` diagnostic continues to report achieved coverage, so an adaptive request may
+still report exhaustive coverage on a sufficiently small or fully refined candidate interval.
+Private numerical tie behavior uses dedicated numerical tie tolerances and deterministic
+smaller-rank ordering.
 
 Decision 0148 preserves that private comparison for exact-reference identification,
 `rank_test_score`, and adaptive refinement. Its accepted final retained-rank rule uses separate

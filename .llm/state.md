@@ -166,8 +166,13 @@ policy, and dataset-module ownership are in their normalized current form.
 
 Decision 0148 is implemented. Predictor-rank tolerances, conditioned component-path selection,
 immutable rank evidence, and the separate Tobacco predictor-rank and component-count demonstrations
-are part of the current package contract. There is no authorized active package increment. Decision
-0139 Patch 3 remains separate paused work.
+are part of the current package contract.
+
+Decision 0149 is accepted and Patch 1 of its authorized sequence is complete. The current snapshot
+still implements `search_method="auto"` and `search_method="optimal"`; Patch 2 must rename those
+values to `"adaptive"` and `"exhaustive"` without changing candidate generation or numerical
+results. Patches 4--6 will add computational-performance guidance only after the terminology
+migration is complete. Decision 0139 Patch 3 remains separate paused work.
 
 ## Authority and drift handling
 

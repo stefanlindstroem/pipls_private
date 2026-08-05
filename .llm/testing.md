@@ -180,11 +180,31 @@ Tests verify that:
 - private exact-score comparison remains distinct from public tolerance qualification;
 - changing only predictor-rank tolerances does not change evaluated candidates, split scores,
   candidate summaries, `rank_test_score`, or adaptive/exhaustive diagnostics;
-- `"auto"` selects only among evaluated ranks and `"optimal"` selects among all admissible ranks;
+- before Decision 0149 Patch 2, `"auto"` selects only among evaluated ranks and `"optimal"`
+  selects among all admissible ranks; after the rename, the corresponding values are `"adaptive"`
+  and `"exhaustive"` with byte-identical mapped evidence;
 - fixed and maximum policies reject nondefault tolerances and expose no inapplicable evidence;
 - optimized path rows, selections, profiles, component references, OOF reports, clones, pipelines,
   and pickles retain complete validated predictor-rank provenance;
 - Tobacco applies and labels separate 10% predictor-rank and component-count tolerances.
+
+## Predictor-rank search terminology obligations
+
+Decision 0149 migration tests must verify that:
+
+- `"adaptive"` is the constructor default and reproduces the former `"auto"` candidate coverage and
+  numerical evidence exactly;
+- `"exhaustive"` reproduces the former `"optimal"` candidate coverage and numerical evidence
+  exactly;
+- the former values are rejected without aliases;
+- cloning, parameter surfaces, repr, pipelines, and pickles contain only the new values;
+- `search_is_exhaustive_` remains an achieved-coverage diagnostic and can be true after an adaptive
+  request;
+- maximum and one-element fixed-rank policies accept the default and reject nondefault exhaustive
+  coverage;
+- multi-rank explicit sequences retain adaptive and exhaustive choices;
+- unrelated `"auto"` values, including `svd_solver="auto"`, are not changed by context-insensitive
+  migration checks.
 
 ## Decision lifecycle and repository-hygiene obligations
 

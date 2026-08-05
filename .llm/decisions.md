@@ -10,7 +10,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0002-preprocessing-semantics.md` | centering and scaling | preprocessing remains outside the fixed numerical core |
 | `0003-predictor-rank-selection.md` | rank bound and conditional selection | ceiling rule, materialized splits, deterministic low-rank ties; sample-count convention refined by 0032 |
 | `0004-response-standardized-mse.md` | selection loss | fold-local response scales and uniform response weighting |
-| `0007-predictor-rank-search-policies.md` | exhaustive versus adaptive search | `"optimal"` is exhaustive; `"auto"` is deterministic approximate search |
+| `0007-predictor-rank-search-policies.md` | exhaustive versus adaptive search | deterministic adaptive and exhaustive algorithms; public value migration is governed by 0149 |
 | `0008-predictor-svd-policy.md` | scalable predictor decomposition | independent `full`, `randomized`, and `auto` solver policy |
 | `0009-public-parameter-validation.md` | exposed controls | early validation and low-statistical-support warning |
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
@@ -52,17 +52,29 @@ This registry lists only numbered decisions that still define current behavior o
 | `0146-cv-mse-tolerance-selection.md` | CV-MSE tolerance selection and split-SD reporting | replace the 1-SE heuristic with dual-tolerance minimum-CV-MSE selection, descriptive split SD, a 10% Tobacco demonstration, and repeated Pulp validation |
 | `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, compact historical summaries, and retired records; normalize `.llm`, decision links, structural tests, snapshot hygiene, and private dataset ownership without changing public behavior |
 | `0148-predictor-rank-tolerance-selection.md` | predictor-rank tolerance selection | constructor tolerances, immutable rank evidence, conditioned component rules, and separate 10% Tobacco predictor-rank and component-count demonstration |
+| `0149-predictor-rank-search-terminology.md` | predictor-rank search terminology | rename `"auto"`/`"optimal"` to `"adaptive"`/`"exhaustive"`, preserve algorithms and achieved-coverage diagnostics, and reject inapplicable nondefault exhaustive mode |
 
 ## Current canonical clusters
 
 - **Mathematics and numerical construction:** 0001--0004, 0007--0009, 0014, 0025, 0032, 0092,
-  0120--0121, and 0146--0148.
+  0120--0121, and 0146--0149.
 - **Estimator, search, and result ownership:** 0039, 0066, 0093, 0102, 0137, 0140, 0143, and
-  0145--0148.
+  0145--0149.
 - **Datasets and product scope:** 0015, 0024--0025, 0041, 0119, 0123, and 0142.
 - **Inspection and rendering:** 0042, 0045, 0061, 0083, 0094, 0110, 0124, 0127, and 0141.
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
   and 0147.
+
+## Accepted Decision 0149 contract
+
+- Keep the `search_method` parameter and rename its values to `"adaptive"` (default) and
+  `"exhaustive"` without compatibility aliases.
+- Preserve the existing candidate-generation algorithms and `search_is_exhaustive_` as the
+  achieved-coverage diagnostic.
+- Omit `search_method` from fixed and maximum-rank examples, accept the default for constructor
+  consistency, and reject the inapplicable nondefault exhaustive method.
+- Complete the terminology migration before adding Decision 0150 computational-performance
+  guidance.
 
 ## Implemented Decision 0148 contract
 
