@@ -16,7 +16,7 @@ provided.
 Mathematical notation on this page follows the package convention: complete matrices are bold,
 descriptive role and block subscripts are upright, and variable indices remain italic. For example,
 $\boldsymbol{\Lambda}_{\mathrm{p}}$ and $\mathbf{L}_{\mathrm{sp}}$ are complete matrices,
-while $d_k$ retains the variable index $k$.
+while $D_k$ retains the variable index $k$.
 
 ## Packaged datasets
 

@@ -205,7 +205,7 @@ def _plot_pipls_factors(
     axes[0, 1].set_xticks(dilation_positions)
     axes[0, 1].set_xticklabels(np.arange(1, factors.n_components + 1))
     axes[0, 1].set_xlabel("Component")
-    axes[0, 1].set_ylabel(r"Dilation $d_k$")
+    axes[0, 1].set_ylabel(r"Dilation $D_k$")
 
     response_positions = np.arange(len(response_names))
     response_width = 0.8 / factors.n_components
@@ -225,7 +225,7 @@ def _plot_pipls_factors(
         )
     for axis, ylabel in (
         (axes[1, 0], r"Response direction $Q_{:k}$"),
-        (axes[1, 1], r"Weighted response direction $d_kQ_{:k}$"),
+        (axes[1, 1], r"Weighted response direction $D_kQ_{:k}$"),
     ):
         axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
         axis.set_xticks(response_positions)

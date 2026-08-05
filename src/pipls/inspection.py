@@ -291,7 +291,7 @@ class PiPLSDisplayFactors:
     response_directions : ndarray of shape (n_targets, n_components)
         Display-signed copy of $\mathbf{Q}$.
     weighted_response_directions : ndarray of shape (n_targets, n_components)
-        Derived read-only columns $d_k Q_{:k}$, equal to the corresponding
+        Derived read-only columns $D_k Q_{:k}$, equal to the corresponding
         columns of $\mathbf{Q}\mathbf{D}$ and to
         ``response_directions * dilation``.
     """
@@ -351,7 +351,7 @@ class PiPLSDisplayFactors:
 
     @property
     def weighted_response_directions(self) -> FloatArray:
-        r"""Derived read-only columns $d_k Q_{:k}$ of $\mathbf{Q}\mathbf{D}$."""
+        r"""Derived read-only columns $D_k Q_{:k}$ of $\mathbf{Q}\mathbf{D}$."""
 
         weighted = _finite_product(
             self.response_directions,

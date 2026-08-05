@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Align dilation notation with the companion manuscript by writing the diagonal elements of
+  $\mathbf{D}$ as $D_k=D_{kk}$ throughout theory, API prose, generated docstrings, and
+  maintained figure labels. Retain lower-case $d$ for distinct descriptive dimensions such as
+  $d_{\mathrm{p}}$ and $d_{\mathrm{s}}$.
 - Add independent constructor-level relative and absolute tolerances for conditional predictor-
   rank retention. Build the component path from the smallest evaluated qualifying rank at each
   component count, keep adaptive candidate coverage tied to the exact score optimum, expose
@@ -232,14 +236,14 @@
 - propagated the canonical Pi-PLS vocabulary through onboarding, generated API prose, path and
   inspection guides, tutorials, example prose, and public source docstrings: `n_components` now
   consistently counts paired latent modes, `predictor_rank` denotes retained predictor-subspace
-  dimension, $P$ and $Q$ are predictor and response directions, and $d_k$ is a mode dilation;
+  dimension, $P$ and $Q$ are predictor and response directions, and $D_k$ is a mode dilation;
   `PiPLSDecomposition` now uses the mathematically direct `predictor_directions` and
   `response_directions` field names; standard estimator attributes `x_rotations_` and
   `y_rotations_` remain for scikit-learn PLS compatibility.
 
 - established canonical Pi-PLS terminology: $\Pi$ is the retained predictor basis,
   $\Pi\Pi^{\mathsf T}$ the retained-subspace projector, $P$ and $Q$ orthonormal predictor and
-  response directions, $d_k$ a mode dilation, and `n_components` the number of paired latent modes;
+  response directions, $D_k$ a mode dilation, and `n_components` the number of paired latent modes;
   uses direction terminology for the decomposition fields, distinguishes directions from
   reconstruction loadings, and relates $QD$ to $(DQ^{\mathsf T})^{\mathsf T}$.
 

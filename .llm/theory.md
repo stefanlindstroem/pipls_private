@@ -108,10 +108,10 @@ Use these terms in mathematical and explanatory prose:
 - $\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}$ is the **retained-subspace projector**;
 - $\mathbf{P}$ and $\mathbf{Q}$ contain **orthonormal predictor directions** and
   **orthonormal response directions**;
-- $d_k=D_{kk}$ is the **dilation** of paired latent mode $k$;
+- $D_k=D_{kk}$ is the **dilation** of paired latent mode $k$;
 - $\mathbf{X}\mathbf{P}$ and $\mathbf{Y}\mathbf{Q}$ are the **predictor scores** and
   **response scores**;
-- $(P_{:k},d_k,Q_{:k})$ is **paired latent mode** $k$;
+- $(P_{:k},D_k,Q_{:k})$ is **paired latent mode** $k$;
 - public `n_components` is the number of paired latent modes $h$;
 - public `predictor_rank` is the retained predictor-subspace dimension $r_\pi$.
 
@@ -122,7 +122,7 @@ direction span. Do not call $P$ or $Q$ reconstruction loadings: the estimator's 
 estimator retains the standard PLS-style names `x_rotations_` and `y_rotations_`, but **direction**
 is the canonical mathematical term.
 
-The package's response-by-mode weighted directions are $QD$, with column $k$ equal to $d_kQ_{:k}$.
+The package's response-by-mode weighted directions are $QD$, with column $k$ equal to $D_kQ_{:k}$.
 The mode-by-response form used in parts of the manuscript is exactly
 
 $$
@@ -261,9 +261,9 @@ $$
 and
 
 $$
-\mathbf{D}=\operatorname{diag}(d_1,\ldots,d_h),
+\mathbf{D}=\operatorname{diag}(D_1,\ldots,D_h),
 \qquad
-d_1\ge d_2\ge\cdots\ge d_h\ge0.
+D_1\ge D_2\ge\cdots\ge D_h\ge0.
 $$
 
 Define
@@ -607,7 +607,7 @@ following:
 - $\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}$;
 - $\mathbf{P}^{\mathsf T}\mathbf{P}=\mathbf{I}$;
 - $\mathbf{Q}^{\mathsf T}\mathbf{Q}=\mathbf{I}$;
-- $d_1\ge\cdots\ge d_h\ge0$;
+- $D_1\ge\cdots\ge D_h\ge0$;
 - $\mathbf{B}_{\mathrm{cs}}=\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$;
 - $\mathbf{B}_{\mathrm{cs}}=\mathbf{\Pi}\mathbf{W}\mathbf{C}^{\mathsf T}$;
 - predictions from the two factorizations agree;

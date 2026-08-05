@@ -302,7 +302,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_xticks(response_positions)
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
-    axis.set_ylabel(r"Weighted response direction $d_kQ_{:k}$")
+    axis.set_ylabel(r"Weighted response direction $D_kQ_{:k}$")
     axis.legend()
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():

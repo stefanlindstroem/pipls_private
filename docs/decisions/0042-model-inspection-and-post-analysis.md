@@ -67,8 +67,8 @@ B_{\mathrm{cs}} = P D Q^\mathsf{T}.
 The primary Pi-PLS decomposition display contains:
 
 - the predictor rotations $P$;
-- the dilation values $d_k=D_{kk}$;
-- the dilation-weighted response rotations $d_k q_{jk}$, represented by $QD$.
+- the dilation values $D_k=D_{kk}$;
+- the dilation-weighted response rotations $D_k q_{jk}$, represented by $QD$.
 
 The display calls $P$ predictor rotations or predictor directions, not ordinary PLS loadings.
 `PiPLSRegression.x_rotations_` equals $P$, whereas `x_loadings_` is a separately calculated score
@@ -174,7 +174,7 @@ For real-data analyses, numerical CSV files are canonical and PDFs are views rec
 those tables. Prediction tables retain original-unit and standardized observed values, predictions,
 residuals, sample identity, response identity, and prediction provenance. The numbered reports
 contain one selected Pi-PLS model, so no redundant model column is stored. Pi-PLS
-response-direction tables retain $q_{jk}$, $d_k$, and $d_kq_{jk}$ separately rather than exporting
+response-direction tables retain $q_{jk}$, $D_k$, and $D_kq_{jk}$ separately rather than exporting
 only the plotted product. Pickled estimators are not analysis artifacts.
 
 ## Implementation sequence

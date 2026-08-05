@@ -62,10 +62,10 @@ The package uses the following terms for the fixed Pi-PLS construction:
 | $\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}$ | retained-subspace projector |
 | $\mathbf{P}$ | orthonormal predictor directions |
 | $\mathbf{Q}$ | orthonormal response directions |
-| $d_k=D_{kk}$ | dilation of paired latent mode $k$ |
+| $D_k=D_{kk}$ | dilation of paired latent mode $k$ |
 | $\mathbf{X}\mathbf{P}$ | predictor scores |
 | $\mathbf{Y}\mathbf{Q}$ | response scores |
-| $(P_{:k},d_k,Q_{:k})$ | paired latent mode $k$ |
+| $(P_{:k},D_k,Q_{:k})$ | paired latent mode $k$ |
 | `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
 | `n_components` | number of paired latent modes $h$ |
 
@@ -79,7 +79,7 @@ $\mathbf{Q}\mathbf{Q}^{\mathsf T}$.
 The Pi-PLS directions are also distinct from `x_loadings_` and `y_loadings_`, which are
 least-squares reconstruction loadings for the centered or centered-and-scaled training blocks.
 For response-side factor displays, the package stores response-by-mode weighted directions
-$\mathbf{Q}\mathbf{D}$, where column $k$ is $d_kQ_{:k}$. The manuscript's mode-by-response
+$\mathbf{Q}\mathbf{D}$, where column $k$ is $D_kQ_{:k}$. The manuscript's mode-by-response
 orientation is the transpose:
 
 \begin{equation}
@@ -219,9 +219,9 @@ $\mathbf{N}\in\mathbb{R}^{h\times h}$ have orthonormal columns,
 and
 
 \begin{equation}
-\mathbf{D}=\operatorname{diag}(d_1,\ldots,d_h),
+\mathbf{D}=\operatorname{diag}(D_1,\ldots,D_h),
 \qquad
-d_1\geq d_2\geq\cdots\geq d_h\geq0.
+D_1\geq D_2\geq\cdots\geq D_h\geq0.
 \end{equation}
 
 Define
@@ -249,7 +249,7 @@ and the reduced regression relation becomes
 \end{equation}
 
 The predictor score vector $\mathbf{X}P_{:k}$ is coupled only to the response score
-vector $\mathbf{Y}Q_{:k}$, with dilation $d_k$. This is the one-to-one, mode-wise interpretation
+vector $\mathbf{Y}Q_{:k}$, with dilation $D_k$. This is the one-to-one, mode-wise interpretation
 central to Pi-PLS. Orthogonal rotation by $\mathbf{N}$ preserves the Frobenius norm of the
 residual and orthogonally transforms its covariance; it preserves covariance
 eigenvalues but does not generally leave the covariance matrix itself unchanged.
@@ -365,7 +365,7 @@ units for `coef_`, `intercept_`, and `predict()`.
 A fitted estimator exposes the Pi-PLS-specific factorization in `decomposition_`:
 
 - `predictor_directions`: $\mathbf{P}$;
-- `dilation`: $(d_1,\ldots,d_h)$;
+- `dilation`: $(D_1,\ldots,D_h)$;
 - `response_directions`: $\mathbf{Q}$;
 - `standardized_regression_map`: $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$;
 - numerical-rank and resolved predictor-SVD diagnostics.

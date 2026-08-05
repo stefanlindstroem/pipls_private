@@ -24,7 +24,7 @@ docstrings, and normative `.llm` contracts:
 - descriptive role, block, method, and extremum subscripts use upright `\mathrm`, for example
   $d_{\mathrm{p}}$, $\boldsymbol{\Lambda}_{\mathrm{s}}$,
   $\mathbf{L}_{\mathrm{sp}}$, $\mathbf{U}_{\mathrm{X}}$, and $h_{\mathrm{max}}$;
-- mathematical indices and dimensions remain italic, for example $d_k$, $D_{kk}$, $P_{:k}$,
+- mathematical indices and dimensions remain italic, for example $D_k$, $D_{kk}$, $P_{:k}$,
   $s_i$, $r_\pi$, and $\mathbf{I}_p$;
 - display mathematics in public Markdown and generated Markdown docstrings uses the supported
   equation environment rather than reStructuredText math directives.

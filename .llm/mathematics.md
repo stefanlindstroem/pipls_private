@@ -16,7 +16,7 @@ matrix symbols that must render in bold. Descriptive, role, block, method, and e
 are upright with `\mathrm`, for example $d_{\mathrm{p}}$,
 $\boldsymbol{\Lambda}_{\mathrm{s}}$, $\mathbf{L}_{\mathrm{sp}}$,
 $\mathbf{U}_{\mathrm{X}}$, and $h_{\mathrm{max}}$. Mathematical indices and dimensions remain
-italic, for example $d_k$, $D_{kk}$, $P_{:k}$, $s_i$, $r_\pi$, and $\mathbf{I}_p$.
+italic, for example $D_k$, $D_{kk}$, $P_{:k}$, $s_i$, $r_\pi$, and $\mathbf{I}_p$.
 
 | Quantity | Shape | Meaning |
 |---|---:|---|
@@ -49,8 +49,8 @@ onto their final spans are $\mathbf{P}\mathbf{P}^{\mathsf T}$ and
 $\mathbf{Q}\mathbf{Q}^{\mathsf T}$; neither $\mathbf{P}$ nor $\mathbf{Q}$ is itself a
 projection matrix.
 
-For each $k$, $d_k=D_{kk}$ is the dilation of paired latent mode
-$(P_{:k},d_k,Q_{:k})$. The matrices $\mathbf{X}_{\mathrm{cs}}\mathbf{P}$ and
+For each $k$, $D_k=D_{kk}$ is the dilation of paired latent mode
+$(P_{:k},D_k,Q_{:k})$. The matrices $\mathbf{X}_{\mathrm{cs}}\mathbf{P}$ and
 $\mathbf{Y}_{\mathrm{cs}}\mathbf{Q}$ contain predictor and response scores. Public
 `n_components` counts the $h$ paired latent modes, while public `predictor_rank` denotes the retained
 predictor-subspace dimension $r_\pi$.
@@ -136,9 +136,9 @@ by minimum-norm least squares, then factor
 \begin{equation}
 \mathbf{W}=\mathbf{M}\mathbf{D}\mathbf{N}^{\mathsf T},
 \qquad
-\mathbf{D}=\operatorname{diag}(d_1,\ldots,d_h),
+\mathbf{D}=\operatorname{diag}(D_1,\ldots,D_h),
 \qquad
-d_1\ge\cdots\ge d_h\ge0.
+D_1\ge\cdots\ge D_h\ge0.
 \end{equation}
 
 Define

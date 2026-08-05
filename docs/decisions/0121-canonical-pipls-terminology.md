@@ -28,10 +28,10 @@ Use the following canonical terms:
 | $\Pi\Pi^{\mathsf T}$ | retained-subspace projector |
 | $P$ | orthonormal predictor directions |
 | $Q$ | orthonormal response directions |
-| $d_k=D_{kk}$ | dilation of paired latent mode $k$ |
+| $D_k=D_{kk}$ | dilation of paired latent mode $k$ |
 | $XP$ | predictor scores |
 | $YQ$ | response scores |
-| $(P_{:k},d_k,Q_{:k})$ | paired latent mode $k$ |
+| $(P_{:k},D_k,Q_{:k})$ | paired latent mode $k$ |
 | `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
 | `n_components` | number of paired latent modes $h$ |
 
@@ -45,8 +45,10 @@ Retain the established public Python names `predictor_rotations`, `response_rota
 word “rotation” remains acceptable when referring to those identifiers or to the orthogonal change
 of latent coordinates, but it is not the primary name of the mathematical objects.
 
-Use lower-case $d_k$ for the scalar diagonal element of $D$. The package's weighted response
-directions use response-by-mode orientation $QD$, with column $k$ equal to $d_kQ_{:k}$. The
+Use upper-case $D_k$ for the scalar diagonal element of $D$, matching the companion
+manuscript. This keeps the dilation notation visually distinct from the manuscript's other
+variables written with lower-case $d$ and superscripts. The package's weighted response
+directions use response-by-mode orientation $QD$, with column $k$ equal to $D_kQ_{:k}$. The
 manuscript's mode-by-response orientation is its transpose:
 
 \[
@@ -64,7 +66,7 @@ Recommended manuscript edits are:
   loadings or weight factors;
 - replace “projection matrix $P$” with “predictor-direction matrix $P$,” because $P$ itself is not
   a projector;
-- use lower-case $d_k$ for diagonal entries of $D$;
+- use upper-case $D_k$ for diagonal entries of $D$;
 - define $h$ as the number of paired latent modes while retaining “components” where a generic
   comparison with PLS or CCA requires shared terminology;
 - state explicitly that $DQ^{\mathsf T}$ and package-facing $QD$ are transposed orientations of the

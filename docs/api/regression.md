@@ -98,7 +98,7 @@ directions defined in the
 | Field | Method notation | Meaning |
 |---|---|---|
 | `predictor_directions` | $\mathbf{P}$ | orthonormal predictor directions |
-| `dilation` | $d_k=D_{kk}$ | nonnegative dilation of each paired latent mode |
+| `dilation` | $D_k=D_{kk}$ | nonnegative dilation of each paired latent mode |
 | `response_directions` | $\mathbf{Q}$ | orthonormal response directions |
 | `predictor_numerical_rank` | — | complete numerical rank under full SVD, or a verified lower bound under randomized SVD |
 | `predictor_numerical_rank_is_exact` | — | whether the reported numerical rank is complete |

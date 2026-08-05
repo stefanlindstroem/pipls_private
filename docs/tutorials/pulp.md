@@ -251,7 +251,7 @@ The grouped bars are constructed directly from `factors.weighted_response_direct
 
 The first component has its largest absolute entries for `TI`, `TEA`, `Tear index`, and `TSI`.
 The second component is most pronounced for `Tear index` and `s`, while the third contrasts `CSF`
-with `Elongation`. Because column $k$ of $\mathbf{Q}\mathbf{D}$ is $d_kQ_{:k}$, it combines each
+with `Elongation`. Because column $k$ of $\mathbf{Q}\mathbf{D}$ is $D_kQ_{:k}$, it combines each
 response direction with the dilation of its paired latent mode and shows orientation and strength
 rather than $\mathbf{Q}$ alone.
 

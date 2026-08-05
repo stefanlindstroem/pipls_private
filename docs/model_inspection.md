@@ -102,7 +102,7 @@ outlier labels, or contribution diagnostics.
 | How do predictors reconstruct scores? | `structure.x_loadings` | Plot or group selected loading columns; these are not regression coefficients |
 | How do responses enter the latent representation? | `structure.y_loadings` | Compare selected loading columns across named responses |
 | What are the Pi-PLS predictor directions? | `factors.predictor_directions` | Plot columns of $\mathbf{P}$ against names or a physical predictor coordinate |
-| How strong is each paired latent mode? | `factors.dilation` | Compare the nonnegative dilations $d_k=D_{kk}$ |
+| How strong is each paired latent mode? | `factors.dilation` | Compare the nonnegative dilations $D_k=D_{kk}$ |
 | What are the Pi-PLS response directions? | `factors.response_directions` | Compare columns of $\mathbf{Q}$ across responses |
 | What is each response mode after dilation? | `factors.weighted_response_directions` | Compare columns of $\mathbf{Q}\mathbf{D}$ across responses |
 | What is the original-unit linear map? | `structure.coefficients` | Plot one coefficient row per response, respecting variable units |
@@ -145,7 +145,7 @@ Theory: [Diagonal latent coupling](theory.md#diagonal-latent-coupling).
 
 ### Dilation $\mathbf{D}$ { #dilation }
 
-Each value $d_k=D_{kk}$ is the dilation of paired latent mode $k$ and should be interpreted
+Each value $D_k=D_{kk}$ is the dilation of paired latent mode $k$ and should be interpreted
 together with the matching columns of $\mathbf{P}$ and $\mathbf{Q}$.
 
 ### Response directions $\mathbf{Q}$ { #response-directions }
@@ -156,7 +156,7 @@ latent modes before dilation. Use explicit response labels when comparing them.
 ### Weighted response directions $\mathbf{Q}\mathbf{D}$ { #weighted-response-directions }
 
 `factors.weighted_response_directions` is a derived read-only array that combines response-side
-orientation and mode strength. Column $k$ is $d_kQ_{:k}$. Compare it with $\mathbf{Q}$ when
+orientation and mode strength. Column $k$ is $D_kQ_{:k}$. Compare it with $\mathbf{Q}$ when
 distinguishing direction from scaled contribution to the centered/scaled regression map.
 
 ### Regression coefficients { #regression-coefficients }

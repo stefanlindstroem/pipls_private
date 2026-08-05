@@ -40,7 +40,7 @@ class PiPLSDecomposition:
         Orthonormal predictor directions $\mathbf{P}$ of the centered/scaled regression
         map.
     dilation : ndarray of shape (n_components,)
-        Nonnegative dilations $d_k=D_{kk}$ of the paired latent modes.
+        Nonnegative dilations $D_k=D_{kk}$ of the paired latent modes.
     response_directions : ndarray of shape (n_targets, n_components)
         Orthonormal response directions $\mathbf{Q}$.
     predictor_numerical_rank : int
