@@ -98,7 +98,7 @@ def _search_with_component_path(path: PiPLSComponentPath) -> PiPLSSearchCV:
     return search
 
 
-def test_optimal_path_evaluates_complete_triangular_grid() -> None:
+def test_default_adaptive_path_can_achieve_exhaustive_coverage() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
         samples_per_predictor_rank=8,
@@ -129,6 +129,62 @@ def test_optimal_path_evaluates_complete_triangular_grid() -> None:
     assert (3, 2) not in evaluated_pairs
 
 
+def test_search_method_default_and_parameter_surface_use_current_values() -> None:
+    search = PiPLSSearchCV()
+
+    assert search.search_method == "adaptive"
+    assert search.get_params(deep=False)["search_method"] == "adaptive"
+    assert clone(search).search_method == "adaptive"
+    search.set_params(search_method="exhaustive")
+    assert search.search_method == "exhaustive"
+    assert pickle.loads(pickle.dumps(search)).search_method == "exhaustive"
+    assert "search_method='exhaustive'" in repr(search)
+
+
+@pytest.mark.parametrize("retired_value", ["auto", "optimal"])
+def test_retired_search_method_values_are_rejected(retired_value: str) -> None:
+    X, Y = _data()
+
+    with pytest.raises(
+        ValueError,
+        match='search_method must be \"adaptive\" or \"exhaustive\"',
+    ):
+        PiPLSSearchCV(search_method=retired_value).fit(X, Y)  # type: ignore[arg-type]
+
+
+@pytest.mark.parametrize("predictor_rank_values", ([2], "max"))
+def test_one_candidate_rank_policies_reject_exhaustive_search(
+    predictor_rank_values: object,
+) -> None:
+    X, Y = _data()
+
+    with pytest.raises(
+        ValueError,
+        match='search_method="exhaustive" requires an optimized predictor-rank policy',
+    ):
+        PiPLSSearchCV(
+            predictor_rank_values=predictor_rank_values,  # type: ignore[arg-type]
+            search_method="exhaustive",
+            cv=3,
+        ).fit(X, Y)
+
+
+@pytest.mark.parametrize("predictor_rank_values", ([2], "max"))
+def test_one_candidate_rank_policies_accept_default_adaptive_search(
+    predictor_rank_values: object,
+) -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=predictor_rank_values,  # type: ignore[arg-type]
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.search_method == "adaptive"
+    assert search.search_is_exhaustive_
+
+
 @pytest.mark.parametrize("svd_solver", ["full", "randomized"])
 def test_path_caps_candidates_at_minimum_fold_numerical_rank(
     svd_solver: str,
@@ -141,7 +197,7 @@ def test_path_caps_candidates_at_minimum_fold_numerical_rank(
             svd_solver=svd_solver,
             random_state=0,
         ),
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -188,7 +244,7 @@ def test_path_uses_the_minimum_numerical_rank_across_training_folds() -> None:
             svd_solver="full",
         ),
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         cv=splits,
         n_jobs=1,
     ).fit(X, Y)
@@ -216,7 +272,7 @@ def test_pipeline_rank_preflight_uses_fold_local_transformed_predictors() -> Non
 
     search = PiPLSSearchCV(
         estimator=pipeline,
-        search_method="optimal",
+        search_method="exhaustive",
         max_predictor_rank=4,
         cv=3,
         n_jobs=1,
@@ -245,7 +301,6 @@ def test_explicit_rank_above_fold_numerical_limit_is_rejected_before_scoring() -
         PiPLSSearchCV(
             predictor_rank_values=[3],
             max_predictor_rank=5,
-            search_method="optimal",
             cv=3,
             scoring=counting_scorer,
             n_jobs=1,
@@ -285,7 +340,7 @@ def test_fit_exposes_no_global_best_attributes() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -309,14 +364,14 @@ def test_all_component_sentinel_matches_explicit_complete_range() -> None:
         n_components_values="all",
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
     ).fit(X, Y)
     explicit_search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
     ).fit(X, Y)
 
@@ -350,7 +405,7 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -715,7 +770,7 @@ def test_post_fit_refit_supports_manual_component_selection() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -735,7 +790,7 @@ def test_post_fit_refit_supports_component_path_rules() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -759,7 +814,6 @@ def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> No
         "n_components_values": [1, 2, 3],
         "predictor_rank_values": [3],
         "max_predictor_rank": 3,
-        "search_method": "optimal",
         "cv": 3,
         "n_jobs": 1,
     }
@@ -798,7 +852,7 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -832,7 +886,7 @@ def test_refit_and_oof_report_preserve_custom_tolerance_provenance() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -866,7 +920,7 @@ def test_oof_report_rejects_changed_tolerance_provenance() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -948,7 +1002,7 @@ def test_refitted_model_selection_is_pickle_stable_and_not_cloned() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -1079,7 +1133,7 @@ def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
     assert model is not pipeline
 
 
-def test_auto_path_skips_candidates_with_constant_scorer() -> None:
+def test_adaptive_path_skips_candidates_with_constant_scorer() -> None:
     rng = np.random.default_rng(20260717)
     X = rng.normal(size=(80, 20))
     Y = X @ rng.normal(size=(20, 3)) + 0.05 * rng.normal(size=(80, 3))
@@ -1092,7 +1146,7 @@ def test_auto_path_skips_candidates_with_constant_scorer() -> None:
         n_components_values=[1],
         predictor_rank_values=list(range(1, 13)),
         max_predictor_rank=12,
-        search_method="auto",
+        search_method="adaptive",
         samples_per_predictor_rank=5,
         cv=4,
         scoring=constant_scorer,
@@ -1135,7 +1189,7 @@ def test_rank_test_score_one_matches_the_best_score_tolerance_group() -> None:
         n_components_values=[1],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         scoring=chained_scores,
         cv=3,
         n_jobs=1,
@@ -1312,7 +1366,7 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
 @pytest.mark.parametrize(
     ("keyword", "value", "message"),
     [
-        ("search_method", "exhaustive", "search_method"),
+        ("search_method", "unsupported", "search_method"),
         ("max_predictor_rank", 0, "max_predictor_rank"),
         ("n_components_values", [], "must not be empty"),
         ("n_components_values", None, 'must be "all"'),
@@ -1339,7 +1393,7 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
     search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -1417,7 +1471,6 @@ def test_cv_mse_summaries_use_equal_weight_for_every_materialized_split(
     search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
-        search_method="optimal",
         cv=cv,
         n_jobs=1,
     ).fit(X, Y)
@@ -1452,7 +1505,7 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
     search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -1566,7 +1619,7 @@ def test_oof_report_uses_existing_model_selection() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
@@ -1593,7 +1646,7 @@ def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -1604,7 +1657,6 @@ def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:
     other = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
-        search_method="optimal",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -1634,7 +1686,6 @@ def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
     search = PiPLSSearchCV(
         n_components_values=[1],
         predictor_rank_values=[1],
-        search_method="optimal",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -1660,7 +1711,7 @@ def test_predictor_rank_relative_tolerance_conditions_the_component_path() -> No
         n_components_values=[1],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         predictor_rank_relative_tolerance=0.10,
         scoring=scorer,
         cv=3,
@@ -1703,7 +1754,7 @@ def test_predictor_rank_absolute_tolerance_can_control_qualification() -> None:
         n_components_values=[1],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         predictor_rank_relative_tolerance=0.10,
         predictor_rank_absolute_tolerance=0.05,
         scoring=scorer,
@@ -1736,7 +1787,7 @@ def test_best_score_selects_from_the_conditioned_component_path() -> None:
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         predictor_rank_relative_tolerance=0.10,
         scoring=scorer,
         cv=3,
@@ -1756,13 +1807,13 @@ def test_best_score_selects_from_the_conditioned_component_path() -> None:
     assert best.mean_test_score == pytest.approx(0.95)
 
 
-def test_predictor_rank_tolerance_does_not_change_auto_candidate_coverage() -> None:
+def test_predictor_rank_tolerance_does_not_change_adaptive_candidate_coverage() -> None:
     X, Y = _data(n_samples=80)
     common = {
         "n_components_values": [1],
         "predictor_rank_values": list(range(1, 9)),
         "max_predictor_rank": 8,
-        "search_method": "auto",
+        "search_method": "adaptive",
         "cv": 3,
         "n_jobs": 1,
     }

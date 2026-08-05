@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. Patch 1 of the authorized six-patch sequence is complete. This patch establishes the
-terminology and migration contract only; the accepted baseline still implements
-`search_method="auto"` and `search_method="optimal"`. Patch 2 performs the runtime rename.
+Accepted. Patches 1 and 2 of the authorized six-patch sequence are complete. The runtime API now
+accepts `search_method="adaptive"` and `search_method="exhaustive"`, rejects the former values, and
+preserves the mapped candidate sets and numerical evidence. Patch 3 completes the remaining public
+documentation, example, retained-decision, and distribution migration.
 
 ## Context
 
@@ -152,8 +153,8 @@ approximation.
 1. Establish this terminology and migration contract in Decision 0149 and synchronize the active
    maintainer layer -- complete.
 2. Rename the runtime values, validate one-candidate policies, and prove old/new numerical
-   equivalence under the direct value mapping.
-3. Migrate source prose, examples, public documentation, retained decisions, distribution checks,
+   equivalence under the direct value mapping -- complete.
+3. Migrate remaining source prose, examples, public documentation, retained decisions, distribution checks,
    and tests; reject stale current uses and complete Decision 0149.
 4. Add Decision 0150 and the central computational-performance guide structure.
 5. Write the complete training-performance guidance using `"adaptive"` and `"exhaustive"`.

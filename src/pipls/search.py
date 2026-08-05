@@ -64,7 +64,7 @@ FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
-SearchMethod = Literal["optimal", "auto"]
+SearchMethod = Literal["adaptive", "exhaustive"]
 ComponentValues = Sequence[int] | Literal["all"]
 PredictorRankValues = Sequence[int] | Literal["max"] | None
 _DEFAULT_SCORING_NAME = "neg_response_standardized_mse"
@@ -229,7 +229,7 @@ class PiPLSSearchCV(
     full-data fitting, and selection-conditioned out-of-fold reporting are
     explicit post-fit :meth:`select`, :meth:`refit`,
     and :meth:`oof_report` operations. The default
-    ``search_method="auto"`` applies
+    ``search_method="adaptive"`` applies
     a deterministic logarithmic coarse-to-fine predictor-rank search separately
     for each paired-mode count.
 
@@ -264,9 +264,9 @@ class PiPLSSearchCV(
         dimensional and verified numerical-rank caps from every training fold.
         A positive integer imposes an additional upper bound but bypasses only
         the support rule.
-    search_method : {"auto", "optimal"}, default="auto"
-        ``"optimal"`` evaluates every admissible pair. ``"auto"`` uses the
-        deterministic adaptive search and may skip pairs.
+    search_method : {"adaptive", "exhaustive"}, default="adaptive"
+        ``"exhaustive"`` evaluates every admissible pair. ``"adaptive"`` uses
+        the deterministic adaptive search and may skip pairs.
     samples_per_predictor_rank : float, default=5
         Positive support parameter $c$ for ``max_predictor_rank="rule"``. Values
         below five issue :class:`pipls.PredictorRankSupportWarning`.
@@ -318,7 +318,7 @@ class PiPLSSearchCV(
         predictor_rank_relative_tolerance: float | None = None,
         predictor_rank_absolute_tolerance: float = np.inf,
         max_predictor_rank: int | Literal["rule"] = "rule",
-        search_method: SearchMethod = "auto",
+        search_method: SearchMethod = "adaptive",
         samples_per_predictor_rank: float = 5.0,
         cv: object = 5,
         scoring: Scoring = _DEFAULT_SCORING_NAME,
@@ -481,7 +481,7 @@ class PiPLSSearchCV(
             )
         self.scorer_ = scorer
         cache: CandidateCache = {}
-        if self.search_method == "optimal":
+        if self.search_method == "exhaustive":
             _evaluate_path_batch(
                 pairs=admissible,
                 cache=cache,
@@ -1028,8 +1028,6 @@ class PiPLSSearchCV(
         return tags
 
     def _validate_constructor_parameters(self, template: Any) -> Scorer:
-        if self.search_method not in ("optimal", "auto"):
-            raise ValueError('search_method must be "optimal" or "auto".')
         samples_per_rank = _as_positive_float(
             self.samples_per_predictor_rank,
             name="samples_per_predictor_rank",
@@ -1050,8 +1048,13 @@ class PiPLSSearchCV(
             _validate_positive_int(self.max_predictor_rank, name="max_predictor_rank")
         _validate_component_values(self.n_components_values)
         _validate_predictor_rank_values(self.predictor_rank_values)
+        predictor_rank_policy = _predictor_rank_policy(self.predictor_rank_values)
+        _validate_search_method(
+            self.search_method,
+            predictor_rank_policy=predictor_rank_policy,
+        )
         _resolved_predictor_rank_tolerances(
-            predictor_rank_policy=_predictor_rank_policy(self.predictor_rank_values),
+            predictor_rank_policy=predictor_rank_policy,
             relative_tolerance=self.predictor_rank_relative_tolerance,
             absolute_tolerance=self.predictor_rank_absolute_tolerance,
         )
@@ -1272,7 +1275,7 @@ def _adaptive_path_search(
 
     _search_predictor_ranks(
         allowed_ranks=allowed_ranks,
-        search_method="auto",
+        search_method="adaptive",
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
     )
@@ -1444,6 +1447,22 @@ def _validate_integer_sequence(values: object, *, name: str) -> None:
         raise ValueError(f"{name} must not be empty.")
     for value in sequence:
         _validate_positive_int(value, name=name)
+
+
+def _validate_search_method(
+    value: object,
+    *,
+    predictor_rank_policy: PredictorRankPolicy,
+) -> None:
+    """Validate predictor-rank candidate coverage for one rank policy."""
+
+    if not isinstance(value, str) or value not in ("adaptive", "exhaustive"):
+        raise ValueError('search_method must be "adaptive" or "exhaustive".')
+    if predictor_rank_policy != "optimized" and value == "exhaustive":
+        raise ValueError(
+            'search_method="exhaustive" requires an optimized '
+            "predictor-rank policy."
+        )
 
 
 def _predictor_rank_policy(values: PredictorRankValues) -> PredictorRankPolicy:

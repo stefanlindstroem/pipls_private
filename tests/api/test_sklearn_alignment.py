@@ -64,6 +64,7 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     assert signature.parameters["scoring"].default == (
         "neg_response_standardized_mse"
     )
+    assert signature.parameters["search_method"].default == "adaptive"
     assert "refit" not in signature.parameters
     assert "selection_rule" not in signature.parameters
     assert "return_oof_predictions" not in signature.parameters
@@ -284,7 +285,6 @@ def test_path_and_regression_selected_outputs_are_easy_to_switch() -> None:
         n_components_values=[2],
         predictor_rank_values=[3],
         max_predictor_rank=3,
-        search_method="optimal",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -346,7 +346,7 @@ def test_minimum_cv_mse_tolerance_refit_preserves_pipeline_composition() -> None
         estimator=pipeline,
         n_components_values=[1, 2, 3],
         predictor_rank_values=[1, 2, 3, 4],
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
@@ -569,7 +569,7 @@ def test_path_cv_results_use_pipeline_independent_candidate_columns() -> None:
         n_components_values=[1, 2],
         predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        search_method="optimal",
+        search_method="exhaustive",
         cv=3,
         n_jobs=1,
     ).fit(X, Y)

@@ -99,7 +99,7 @@ search = PiPLSSearchCV(
     n_components_values=(1,),
     predictor_rank_values=(1, 2),
     predictor_rank_relative_tolerance=1e6,
-    search_method="optimal",
+    search_method="exhaustive",
     cv=2,
     n_jobs=1,
 ).fit(X, Y)

@@ -180,9 +180,8 @@ Tests verify that:
 - private exact-score comparison remains distinct from public tolerance qualification;
 - changing only predictor-rank tolerances does not change evaluated candidates, split scores,
   candidate summaries, `rank_test_score`, or adaptive/exhaustive diagnostics;
-- before Decision 0149 Patch 2, `"auto"` selects only among evaluated ranks and `"optimal"`
-  selects among all admissible ranks; after the rename, the corresponding values are `"adaptive"`
-  and `"exhaustive"` with byte-identical mapped evidence;
+- `"adaptive"` selects only among evaluated ranks and `"exhaustive"` selects among all admissible
+  ranks, with byte-identical evidence under the Decision 0149 mapping from the former values;
 - fixed and maximum policies reject nondefault tolerances and expose no inapplicable evidence;
 - optimized path rows, selections, profiles, component references, OOF reports, clones, pipelines,
   and pickles retain complete validated predictor-rank provenance;

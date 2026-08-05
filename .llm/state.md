@@ -168,11 +168,12 @@ Decision 0148 is implemented. Predictor-rank tolerances, conditioned component-p
 immutable rank evidence, and the separate Tobacco predictor-rank and component-count demonstrations
 are part of the current package contract.
 
-Decision 0149 is accepted and Patch 1 of its authorized sequence is complete. The current snapshot
-still implements `search_method="auto"` and `search_method="optimal"`; Patch 2 must rename those
-values to `"adaptive"` and `"exhaustive"` without changing candidate generation or numerical
-results. Patches 4--6 will add computational-performance guidance only after the terminology
-migration is complete. Decision 0139 Patch 3 remains separate paused work.
+Decision 0149 is accepted and Patches 1--2 of its authorized sequence are complete. The runtime
+API now uses `search_method="adaptive"` and `search_method="exhaustive"`, rejects the former values,
+and rejects nondefault exhaustive coverage for maximum and one-element fixed-rank policies. Patch 3
+must complete the remaining public documentation, retained-decision, example, and distribution
+migration before Patches 4--6 add computational-performance guidance. Decision 0139 Patch 3 remains
+separate paused work.
 
 ## Authority and drift handling
 

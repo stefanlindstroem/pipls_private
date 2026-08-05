@@ -23,7 +23,7 @@ data = make_pipls_regression(
 search = PiPLSSearchCV(
     n_components_values=[1, 2],
     predictor_rank_values=[1, 2],
-    search_method="optimal",
+    search_method="exhaustive",
     cv=LeaveOneOut(),
     n_jobs=1,
 ).fit(data.X, data.Y)

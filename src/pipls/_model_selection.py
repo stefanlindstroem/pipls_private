@@ -249,7 +249,7 @@ def _adaptive_refinement_interval(
 def _search_predictor_ranks(
     *,
     allowed_ranks: ArrayLike,
-    search_method: Literal["optimal", "auto"],
+    search_method: Literal["adaptive", "exhaustive"],
     evaluate: Callable[[IntArray], None],
     evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
 ) -> None:
@@ -261,12 +261,12 @@ def _search_predictor_ranks(
     allowed = np.asarray(np.unique(allowed), dtype=np.intp)
     if np.any(allowed < 1):
         raise ValueError("allowed_ranks must contain positive integers.")
-    if search_method not in ("optimal", "auto"):
-        raise ValueError('search_method must be "optimal" or "auto".')
+    if search_method not in ("adaptive", "exhaustive"):
+        raise ValueError('search_method must be "adaptive" or "exhaustive".')
 
     interval = allowed
     while True:
-        if search_method == "optimal" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+        if search_method == "exhaustive" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
             proposed = interval
         else:
             logarithmic = _logarithmic_predictor_rank_values(
@@ -278,7 +278,7 @@ def _search_predictor_ranks(
 
         evaluate(proposed)
 
-        if search_method == "optimal" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+        if search_method == "exhaustive" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
             break
 
         ranks, scores = evaluated_scores()

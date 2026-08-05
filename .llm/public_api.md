@@ -77,10 +77,9 @@ Important defaults and controls:
 
 - `n_components_values="all"` scans every admissible component count;
 - `predictor_rank_values=None` uses conditional rank search;
-- snapshot 509 still implements `search_method="auto"` as deterministic adaptive search;
-- snapshot 509 still implements `search_method="optimal"` as exhaustive search;
-- Decision 0149 replaces those values with `"adaptive"` (default) and `"exhaustive"` in Patch 2,
-  without aliases or a parameter rename;
+- `search_method="adaptive"` is the default deterministic adaptive rank search;
+- `search_method="exhaustive"` evaluates every admissible predictor rank;
+- the former pre-release values are rejected without aliases, and the parameter name is unchanged;
 - `samples_per_predictor_rank=5` and `cv=5` define the ordinary support/search defaults;
 - `scoring="neg_response_standardized_mse"` resolves to the package scorer;
 - standard scorer names, callables, and `None` remain accepted.
@@ -95,8 +94,8 @@ predictor_rank_absolute_tolerance=np.inf
 They are separate from `select()` and `refit()` tolerances. `None` resolves to the square root of
 float64 machine epsilon; positive-infinity absolute tolerance disables that cap. Nondefault values
 are invalid for fixed and maximum predictor-rank policies. Decision 0149 applies the same principle
-to the future nondefault `search_method="exhaustive"`: maximum-rank and one-element fixed-rank
-policies retain the default method but reject the inapplicable nondefault method.
+to nondefault `search_method="exhaustive"`: maximum-rank and one-element fixed-rank policies retain
+the default method but reject the inapplicable nondefault method.
 
 `fit()` materializes one validation split set, evaluates candidate clones, and stores immutable
 candidate/path evidence. It does not retain the training matrices or fit a final model.

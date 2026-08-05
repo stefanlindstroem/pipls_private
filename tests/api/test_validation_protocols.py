@@ -44,7 +44,6 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
         n_components_values=[1],
         predictor_rank_values=[2],
         max_predictor_rank=2,
-        search_method="optimal",
         cv=splitter,
         n_jobs=1,
     ).fit(X, Y)
