@@ -4,11 +4,11 @@ Pi-PLS predicts through paired latent modes, each containing one predictor direc
 direction, and one dilation. Applied workflows normally scan `n_components`, the number of paired
 latent modes, by cross-validation and inspect CV-MSE against that count.
 The resulting table or curve is called the component path. A clear elbow or plateau can motivate a
-component count; when no clear elbow is present, an explicit relative CV-MSE tolerance provides a
-transparent parsimony policy. Example 07 demonstrates a 10% tolerance. See the
-[component-path discussion](../docs/path_analysis.md#search-owned-selection-rules) and the
-[served example catalogue](../docs/examples.md#tobacco-relative-tolerance-selection). For the
-mathematical construction, see `docs/theory.md`.
+component count; when no clear elbow is present, explicit relative tolerances provide a transparent
+parsimony policy. Example 07 demonstrates separate 10% predictor-rank and component-count
+tolerances. See the [component-path discussion](../docs/path_analysis.md#search-owned-selection-rules)
+and the [served example catalogue](../docs/examples.md#tobacco-two-relative-tolerance-decisions).
+For the mathematical construction, see `docs/theory.md`.
 
 The examples are arranged by user task rather than by implementation complexity. Each numbered
 script is self-contained: it explains its data, purpose, and printed or written results without
@@ -71,20 +71,20 @@ use case rather than combining unrelated split protocols in one context-free scr
   OOF report for that selection. It writes six wavelength-aware final PDF figures without generated
   analytical CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
-  SVD. `search.refit(..., rule="minimum_cv_mse", relative_tolerance=0.10)` completes modeling,
-  after which `model.selection_` provides the selected row, its exact reference minimum, resolved
-  tolerance, and derived CV-MSE threshold. The workflow then obtains the conditional rank profile
-  and selection-driven OOF report before rendering the component-path annotations,
-  decreasing-wavenumber spectral displays, deterministic response pagination, and raw observation
-  diagnostics through caller-owned PDFs. See the
+  SVD and two separately named 10% relative tolerances. The search constructor applies the
+  predictor-rank tolerance independently at each component count; `refit()` then applies the
+  component-count tolerance to the conditioned path. The workflow obtains exact and retained rank
+  evidence, the component-path reference minimum, and a selection-driven OOF report before
+  rendering both thresholds, decreasing-wavenumber spectral displays, deterministic response
+  pagination, and raw observation diagnostics through caller-owned PDFs. See the
   [selection rules](../docs/path_analysis.md#search-owned-selection-rules) and the
-  [focused Tobacco explanation](../docs/examples.md#tobacco-relative-tolerance-selection).
+  [focused Tobacco explanation](../docs/examples.md#tobacco-two-relative-tolerance-decisions).
 
 These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
 complete search and full-data refitting before retrieving the fitted selection, retained path
 evidence, conditional rank profile, optional OOF diagnostics, immutable fitted-model inspection
 results, and caller-owned Matplotlib composition. Tobacco replaces the manual component-count
-choice with the explicit 10% relative-tolerance recommendation described above.
+choice with the two explicit 10% relative-tolerance decisions described above.
 Pulp, Sugarcane, and Tobacco each write `component_path.pdf`,
 `predictor_rank_profile.pdf`, `pipls_factors.pdf`, `latent_structure.pdf`, `coefficients.pdf`, and
 `prediction_diagnostics.pdf`. For Tobacco,

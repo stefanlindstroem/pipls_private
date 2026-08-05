@@ -324,17 +324,55 @@ def test_spectral_examples_request_rank_profile_at_a_selected_component_count(
     assert argument.endswith(".n_components")
 
 
-def test_tobacco_keeps_explicit_robust_selection_and_paginated_reports() -> None:
+def test_tobacco_keeps_two_explicit_tolerance_decisions_and_paginated_reports() -> None:
     tree = parse_module(_repository_root() / "examples" / "07_tobacco_real_data.py")
+
+    constants = {
+        target.id: node.value.value
+        for node in tree.body
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance((target := node.targets[0]), ast.Name)
+        and isinstance(node.value, ast.Constant)
+    }
+    assert constants["PREDICTOR_RANK_RELATIVE_TOLERANCE"] == 0.10
+    assert constants["COMPONENT_RELATIVE_TOLERANCE"] == 0.10
 
     regression_calls = calls_named(tree, "PiPLSRegression")
     assert len(regression_calls) == 1
     assert keyword_constant(regression_calls[0], "svd_solver") == "full"
 
+    search_calls = calls_named(tree, "PiPLSSearchCV")
+    assert len(search_calls) == 1
+    predictor_keyword = next(
+        keyword
+        for keyword in search_calls[0].keywords
+        if keyword.arg == "predictor_rank_relative_tolerance"
+    )
+    assert isinstance(predictor_keyword.value, ast.Name)
+    assert predictor_keyword.value.id == "PREDICTOR_RANK_RELATIVE_TOLERANCE"
+
     refit_calls = calls_named(tree, "refit")
     assert len(refit_calls) == 1
     assert keyword_constant(refit_calls[0], "rule") == "minimum_cv_mse"
-    assert keyword_constant(refit_calls[0], "relative_tolerance") == 0.10
+    component_keyword = next(
+        keyword
+        for keyword in refit_calls[0].keywords
+        if keyword.arg == "relative_tolerance"
+    )
+    assert isinstance(component_keyword.value, ast.Name)
+    assert component_keyword.value.id == "COMPONENT_RELATIVE_TOLERANCE"
+
+    text_literals = {
+        node.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Constant) and isinstance(node.value, str)
+    }
+    rendered_text = "\n".join(text_literals)
+    assert "predictor-rank threshold" in rendered_text
+    assert "component-count threshold" in rendered_text
+    assert "exact optimum r_pi=" in rendered_text
+    assert "exact minimum h=" in rendered_text
 
     assert len(calls_named(tree, "PdfPages")) == 2
     assert "observation_diagnostics" in call_names(tree)

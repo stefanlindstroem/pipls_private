@@ -255,9 +255,10 @@ package exposes no plotting module, Matplotlib artist result, or public `plot_*`
 Examples 05--07 fit Pi-PLS paths, explicitly refit one row, use `model.selection_`, optionally
 compute a matching OOF report, inspect the fitted model, and render final PDFs directly with
 Matplotlib. Pulp uses 50 repeated five-fold splits and averages ten OOF predictions per
-observation. Sugarcane and Tobacco use seeded shuffled five-fold CV. Tobacco currently
-demonstrates component-count `relative_tolerance=0.10`. Decision 0148 Patch 4 will add a separate
-constructor-level 10% predictor-rank tolerance and label the two decisions independently.
+observation. Sugarcane and Tobacco use seeded shuffled five-fold CV. Tobacco demonstrates a
+constructor-level `predictor_rank_relative_tolerance=0.10` and a separate component-count
+`relative_tolerance=0.10`; its figures and console output identify both exact references,
+thresholds, and retained choices.
 
 The example-local ordinary-PLS path helper is not package API. Optional Matplotlib and `adjustText`
 dependencies remain outside the runtime dependency set.

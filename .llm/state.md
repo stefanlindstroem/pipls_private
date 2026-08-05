@@ -164,11 +164,12 @@ and are learned within each training fold during search.
 Decision 0147 is implemented. Decision records, maintainer context, structural tests, snapshot
 policy, and dataset-module ownership are in their normalized current form.
 
-Decision 0148 is the active five-patch increment. Patches 1 through 3 have established the
-hierarchical contract, separated exact and substantive comparisons, and implemented the public
-constructor controls, conditioned path, evidence records, and integration tests. The next admissible
-increment is Patch 4: demonstrate separate 10% predictor-rank and component-count tolerances in the
-Tobacco workflow. Decision 0139 Patch 3 remains separate paused work.
+Decision 0148 is the active five-patch increment. Patches 1 through 4 have established the
+hierarchical contract, separated exact and substantive comparisons, implemented the public
+constructor controls and evidence records, and demonstrated separate 10% predictor-rank and
+component-count tolerances in Tobacco. The next admissible increment is Patch 5: complete migration,
+documentation, distribution, and repository audits. Decision 0139 Patch 3 remains separate paused
+work.
 
 ## Authority and drift handling
 

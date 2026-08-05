@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. Patches 1 through 3 of five are complete. The public constructor controls, hierarchical
-conditioned path, immutable predictor-rank evidence, and conditioned-path selection rules are now
-implemented. Patch 4 adds the separate 10% Tobacco demonstration and user-facing workflow update.
+Accepted. Patches 1 through 4 of five are complete. The public constructor controls, hierarchical
+conditioned path, immutable predictor-rank evidence, conditioned-path selection rules, and separate
+10% Tobacco predictor-rank and component-count demonstration are implemented. Patch 5 completes the
+migration, distribution, link, and repository audits.
 
 ## Context
 
@@ -255,7 +256,7 @@ is not built into the scorer-neutral evidence record.
 3. Add the constructor parameters, hierarchical path behavior, immutable public evidence, and full
    API/integration tests -- complete.
 4. Demonstrate separate 10% predictor-rank and component-count tolerances in the Tobacco workflow
-   and update user documentation and generated example artifacts.
+   and update user documentation and generated example artifacts -- complete.
 5. Complete migration wording, distribution and link audits, update the changelog, and mark this
    decision implemented.
 

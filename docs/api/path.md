@@ -179,6 +179,30 @@ matches `search.select(n_components=h)`.
 summary, and the resolved relative and absolute tolerances. `score_threshold` is derived in
 configured-score units. Fixed and maximum predictor-rank policies have no such evidence.
 
+The Tobacco example uses this evidence to present a scorer-specific CV-MSE threshold while keeping
+the API scorer-neutral:
+
+```python
+search = PiPLSSearchCV(
+    predictor_rank_relative_tolerance=0.10,
+).fit(X, Y)
+model = search.refit(
+    X,
+    Y,
+    rule="minimum_cv_mse",
+    relative_tolerance=0.10,
+)
+
+profile = search.predictor_rank_profile(model.selection_.n_components)
+evidence = profile.predictor_rank_evidence
+if evidence is None:
+    raise RuntimeError("Predictor-rank evidence is unavailable.")
+predictor_rank_cv_mse_threshold = -evidence.score_threshold
+```
+
+The constructor tolerance controls conditional predictor-rank retention. The `refit()` tolerance is
+a separate component-count decision on the already conditioned path.
+
 ::: pipls.component_path.PiPLSPredictorRankEvidence
     options:
       show_signature: false

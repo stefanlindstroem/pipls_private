@@ -118,29 +118,37 @@ rank_profile = search.predictor_rank_profile(selection.n_components)
 Y_pred = model.predict(X_test)
 ```
 
-For every evaluated component count, the default search selects the predictor rank that minimizes
-mean response-standardized CV-MSE. `refit(..., n_components=h)` transfers that stored pair into a fitted clone without requiring
-the user to copy `predictor_rank`. The returned model exposes that complete row as
-`model.selection_`; use `search.predictor_rank_profile(model.selection_.n_components)` to inspect all
-ranks evaluated at the fitted component count. `search.select(...)` remains available for
-selection-only work that does not fit a final model.
+For every evaluated component count, the search conditionally retains one predictor rank.
+Constructor-level `predictor_rank_relative_tolerance` and
+`predictor_rank_absolute_tolerance` can favor the smallest evaluated rank within a bounded
+configured-score allowance; their defaults reproduce an effectively exact optimum.
+`refit(..., n_components=h)` transfers the stored pair into a fitted clone without requiring the
+user to copy `predictor_rank`. The returned model exposes that complete row as `model.selection_`;
+use `search.predictor_rank_profile(model.selection_.n_components)` to compare the exact rank optimum
+with the conditionally retained rank. `search.select(...)` remains available for selection-only work
+that does not fit a final model.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
 predictor-rank plots. The [path-selection reference](docs/api/path.md) and
 [path-selection details](docs/path_analysis.md) cover alternative policies, splitters, and
 validation protocols.
 
-When the complete protocol is known in advance, search and final fitting can remain compact. This
-example uses adaptive predictor-rank search and the minimum-CV-MSE component rule:
+When the complete protocol is known in advance, search and final fitting can remain compact. The
+Tobacco workflow demonstrates separate 10% relative tolerances for adaptive predictor-rank search
+and the later minimum-CV-MSE component rule:
 
 ```python
-model = PiPLSSearchCV(search_method="auto").fit(
+model = PiPLSSearchCV(
+    search_method="auto",
+    predictor_rank_relative_tolerance=0.10,
+).fit(
     X_train,
     Y_train,
 ).refit(
     X_train,
     Y_train,
     rule="minimum_cv_mse",
+    relative_tolerance=0.10,
 )
 
 Y_pred = model.predict(X_test)

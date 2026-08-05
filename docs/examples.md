@@ -17,7 +17,7 @@ the maintained scripts.
 | `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
 | `05_pulp_real_data.py` | Fit a manual Pulp model, then inspect its selection, rank profile, OOF behavior, and latent structure | Six PDF figures |
 | `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Six PDF figures |
-| `07_tobacco_real_data.py` | Apply a 10% relative CV-MSE tolerance in a complete Tobacco spectral workflow | Six PDFs, including a conditional rank profile and multipage reports |
+| `07_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow | Six PDFs, including threshold-annotated rank and component profiles |
 
 The [path-selection reference](api/path.md) documents the search and post-fit refit operation used
 by example 01. The [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02
@@ -81,24 +81,48 @@ component path and fit one selected fixed model:
   before the six figures are rendered;
 - `examples/06_sugarcane_real_data.py`: the direct reference workflow with the same ordering,
   wavelength-aware inspection, and six final PDF figures;
-- `examples/07_tobacco_real_data.py`: a complete spectral workflow that selects the smallest
-  component count within 10% of the minimum mean CV-MSE, then inspects the conditional
-  predictor-rank profile at that returned count before fixed-model inspection. See the focused
-  explanation below.
+- `examples/07_tobacco_real_data.py`: a complete spectral workflow with two explicit parsimony
+  decisions. For every component count, the search retains the smallest evaluated predictor rank
+  within 10% of the exact conditional optimum. It then refits the smallest component-count row
+  within 10% of the minimum on that conditioned path. See the focused explanation below.
 
-### Tobacco: relative-tolerance selection
+### Tobacco: two relative-tolerance decisions
 
-The Tobacco component path has no clear elbow that would by itself motivate one component count.
-Example 07 therefore demonstrates an explicit 10% relative CV-MSE tolerance as a reproducible
-parsimony policy. The search refits the smallest component-count row whose mean CV-MSE is no more
-than 10% above the exact minimum. Analysis then reads `model.selection_`, whose
-`reference_minimum`, `relative_tolerance`, and `cv_mse_threshold` provide the minimum-row and
-threshold annotations without repeated selection calls. The example obtains the conditional rank
-profile through `search.predictor_rank_profile(selection.n_components)` and evaluates the same
-selection through `search.oof_report(X, Y, selection=selection)` before rendering fitted-model
-diagnostics. The additional `absolute_tolerance` cap is documented in the
-[search-owned selection rules](path_analysis.md#search-owned-selection-rules) but is not used in
-this example.
+The Tobacco workflow demonstrates the hierarchical selection contract with two separately named
+10% tolerances:
+
+```python
+PREDICTOR_RANK_RELATIVE_TOLERANCE = 0.10
+COMPONENT_RELATIVE_TOLERANCE = 0.10
+
+search = PiPLSSearchCV(
+    predictor_rank_relative_tolerance=PREDICTOR_RANK_RELATIVE_TOLERANCE,
+    search_method="auto",
+    cv=CV,
+).fit(X, Y)
+
+model = search.refit(
+    X,
+    Y,
+    rule="minimum_cv_mse",
+    relative_tolerance=COMPONENT_RELATIVE_TOLERANCE,
+)
+```
+
+The first tolerance acts independently within each evaluated component count and determines the
+predictor rank stored in `component_path_`. The second acts only on that conditioned path and
+determines the final component count. They do not form one global 10% rule; under the default
+CV-MSE scorer, two limiting 10% allowances can compound to $1.1^2=1.21$ relative to the global
+candidate minimum.
+
+The predictor-rank profile renders its exact conditional optimum, the scorer-derived 10% CV-MSE
+threshold, and the smaller retained rank. The component path separately renders its exact
+conditioned-path minimum, 10% threshold, and retained component count. The console report names both
+reference and retained choices. Analysis obtains the rank evidence through
+`search.predictor_rank_profile(selection.n_components)` and the component evidence through
+`model.selection_`, then evaluates the same final row through
+`search.oof_report(X, Y, selection=selection)`. Absolute caps remain available for both stages but
+are not used in this example.
 
 The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) define the
 selection object, and the [component-path API reference](api/path.md) gives the exact method surface.

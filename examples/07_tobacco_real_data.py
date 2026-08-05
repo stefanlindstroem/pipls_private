@@ -5,6 +5,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.ticker import MaxNLocator
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
@@ -29,14 +30,18 @@ from pipls.inspection import (
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analysis"
 DISPLAY_COMPONENT_COUNT = 4
 RESPONSES_PER_PAGE = 5
+PREDICTOR_RANK_RELATIVE_TOLERANCE = 0.10
+COMPONENT_RELATIVE_TOLERANCE = 0.10
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
+
+
 def _plot_component_path(
     path: PiPLSComponentPath,
     minimum: PiPLSSelection,
     selected: PiPLSSelection,
     *,
     cv_mse_threshold: float,
-    relative_tolerance: float,
+    component_relative_tolerance: float,
     output_path: Path,
 ) -> None:
     figure, axis = plt.subplots(
@@ -55,7 +60,10 @@ def _plot_component_path(
         [minimum.cv_mse_mean],
         marker="X",
         s=70,
-        label=f"Minimum mean CV-MSE: {minimum.n_components} components",
+        label=(
+            "Conditioned-path minimum: "
+            f"{minimum.n_components} components"
+        ),
         zorder=3,
     )
     axis.axhline(
@@ -63,7 +71,10 @@ def _plot_component_path(
         linewidth=1.2,
         linestyle="--",
         color="0.35",
-        label=f"{100.0 * relative_tolerance:.0f}% relative-tolerance threshold",
+        label=(
+            f"{100.0 * component_relative_tolerance:.0f}% "
+            "component-count threshold"
+        ),
     )
     axis.scatter(
         [selected.n_components],
@@ -71,7 +82,8 @@ def _plot_component_path(
         marker="D",
         s=70,
         label=(
-            f"{100.0 * relative_tolerance:.0f}% tolerance selection: "
+            f"{100.0 * component_relative_tolerance:.0f}% "
+            "component-count selection: "
             f"{selected.n_components} components, "
             f"predictor rank {selected.predictor_rank}"
         ),
@@ -94,8 +106,13 @@ def _plot_component_path(
 
 def _plot_predictor_rank_profile(
     profile: PiPLSPredictorRankProfile,
+    *,
+    cv_mse_threshold: float,
+    predictor_rank_relative_tolerance: float,
     output_path: Path,
 ) -> None:
+    reference = profile.reference_selection
+    selected = profile.selection
     figure, axis = plt.subplots(
         figsize=(7.0, 4.5),
         layout="constrained",
@@ -108,13 +125,31 @@ def _plot_predictor_rank_profile(
         capsize=4,
     )
     axis.scatter(
-        [profile.selection.predictor_rank],
-        [profile.selection.cv_mse_mean],
+        [reference.predictor_rank],
+        [reference.cv_mse_mean],
+        marker="X",
+        s=70,
+        label=f"Exact conditional minimum: rank {reference.predictor_rank}",
+        zorder=3,
+    )
+    axis.axhline(
+        cv_mse_threshold,
+        linewidth=1.2,
+        linestyle="--",
+        color="0.35",
+        label=(
+            f"{100.0 * predictor_rank_relative_tolerance:.0f}% "
+            "predictor-rank threshold"
+        ),
+    )
+    axis.scatter(
+        [selected.predictor_rank],
+        [selected.cv_mse_mean],
         marker="D",
         s=70,
         label=(
-            "Conditional CV-MSE minimum: "
-            f"rank {profile.selection.predictor_rank}"
+            f"{100.0 * predictor_rank_relative_tolerance:.0f}% "
+            f"predictor-rank selection: rank {selected.predictor_rank}"
         ),
         zorder=3,
     )
@@ -122,10 +157,13 @@ def _plot_predictor_rank_profile(
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_title(
         rf"Tobacco $\Pi$-PLS predictor-rank profile at "
-        f"{profile.n_components} components (10% tolerance choice)"
+        f"{profile.n_components} components"
     )
-    axis.set_xticks(profile.predictor_rank)
-    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_std))
+    axis.xaxis.set_major_locator(MaxNLocator(nbins=8, integer=True))
+    upper = max(
+        float(np.max(profile.cv_mse_mean + profile.cv_mse_std)),
+        float(cv_mse_threshold),
+    )
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
@@ -404,13 +442,14 @@ def main() -> None:
         for start in range(0, len(response_names), RESPONSES_PER_PAGE)
     )
 
-    # Evaluate the Pi-PLS component path and fit the 10%-tolerance model.
+    # Apply separate 10% parsimony tolerances at the two selection levels.
     search = PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,
             predictor_rank=1,
             svd_solver="full",
         ),
+        predictor_rank_relative_tolerance=PREDICTOR_RANK_RELATIVE_TOLERANCE,
         search_method="auto",
         n_jobs=1,
         cv=CV,
@@ -419,7 +458,7 @@ def main() -> None:
         X,
         Y,
         rule="minimum_cv_mse",
-        relative_tolerance=0.10,
+        relative_tolerance=COMPONENT_RELATIVE_TOLERANCE,
     )
 
     # Analyze the fitted selection, retained search evidence, and OOF behavior.
@@ -428,10 +467,19 @@ def main() -> None:
     rank_profile = search.predictor_rank_profile(selection.n_components)
     report = search.oof_report(X, Y, selection=selection)
     minimum = selection.reference_minimum
-    cv_mse_threshold = selection.cv_mse_threshold
-    relative_tolerance = selection.relative_tolerance
-    if minimum is None or cv_mse_threshold is None or relative_tolerance is None:
-        raise RuntimeError("The tolerance selection lacks its reference evidence.")
+    component_cv_mse_threshold = selection.cv_mse_threshold
+    component_relative_tolerance = selection.relative_tolerance
+    predictor_rank_evidence = rank_profile.predictor_rank_evidence
+    if (
+        minimum is None
+        or component_cv_mse_threshold is None
+        or component_relative_tolerance is None
+        or predictor_rank_evidence is None
+    ):
+        raise RuntimeError("The tolerance selections lack their reference evidence.")
+    predictor_rank_cv_mse_threshold = -predictor_rank_evidence.score_threshold
+    predictor_rank_reference = rank_profile.reference_selection
+    predictor_rank_selection = rank_profile.selection
     display_components = tuple(
         range(min(DISPLAY_COMPONENT_COUNT, selection.n_components))
     )
@@ -452,13 +500,17 @@ def main() -> None:
         path,
         minimum,
         selection,
-        cv_mse_threshold=cv_mse_threshold,
-        relative_tolerance=relative_tolerance,
+        cv_mse_threshold=component_cv_mse_threshold,
+        component_relative_tolerance=component_relative_tolerance,
         output_path=ANALYSIS_DIR / "component_path.pdf",
     )
     _plot_predictor_rank_profile(
         rank_profile,
-        ANALYSIS_DIR / "predictor_rank_profile.pdf",
+        cv_mse_threshold=predictor_rank_cv_mse_threshold,
+        predictor_rank_relative_tolerance=(
+            predictor_rank_evidence.relative_tolerance
+        ),
+        output_path=ANALYSIS_DIR / "predictor_rank_profile.pdf",
     )
     _plot_pipls_factors(
         factors,
@@ -493,14 +545,23 @@ def main() -> None:
 
     print(f"X shape: {X.shape}; Y shape: {Y.shape}")
     print(
-        "10%-tolerance Pi-PLS: "
-        f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
+        "Predictor-rank choice at "
+        f"n_components={selection.n_components}: "
+        f"exact optimum r_pi={predictor_rank_reference.predictor_rank}, "
+        f"{100.0 * predictor_rank_evidence.relative_tolerance:.0f}% "
+        f"retained r_pi={predictor_rank_selection.predictor_rank}, "
+        f"CV-MSE threshold={predictor_rank_cv_mse_threshold:.6g}"
     )
     print(
-        "Predictor-rank profile at the tolerance-selected component count: "
-        f"evaluated {rank_profile.predictor_rank[0]} to "
-        f"{rank_profile.predictor_rank[-1]}; "
-        f"selected rank {rank_profile.selection.predictor_rank}"
+        "Component-count choice on the conditioned path: "
+        f"exact minimum h={minimum.n_components}, "
+        f"{100.0 * component_relative_tolerance:.0f}% "
+        f"retained h={selection.n_components}, "
+        f"CV-MSE threshold={component_cv_mse_threshold:.6g}"
+    )
+    print(
+        "Final Pi-PLS model: "
+        f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
     )
     print(f"Wrote PDF figures to {ANALYSIS_DIR}")
 

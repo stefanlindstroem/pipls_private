@@ -250,9 +250,12 @@ predictor rank need not minimize CV-MSE within its component-count profile. Mode
 workflows obtain the fitted row from `model.selection_`; `search.select(...)` remains useful for
 selection-only analysis. `component_path_` remains the aligned numerical curve.
 
-The Tobacco workflow still applies its 10% component-count tolerance through `refit()` in this
-patch. Patch 4 adds a separate 10% constructor-level predictor-rank tolerance and presents the two
-decisions independently. Predictor-rank profile error bars use the stored split SD.
+The Tobacco workflow demonstrates the hierarchy with separate 10% relative tolerances. The search
+constructor applies `predictor_rank_relative_tolerance=0.10` within every component count, and
+`refit(..., relative_tolerance=0.10)` then acts on the resulting conditioned component path. The
+predictor-rank profile shows its exact configured-score reference, converted CV-MSE threshold, and
+retained rank; the component path shows its own exact minimum, threshold, and retained component
+count. Predictor-rank profile error bars use the stored split SD.
 
 ## Post-fit final-model selection
 

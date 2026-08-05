@@ -89,15 +89,18 @@ prediction or store the returned model. See the [path API](api/path.md).
 
 ## The CV-MSE minimum, best candidate, and selected model disagree
 
-Candidate selection always maximizes `mean_test_score`. With the default scorer, this is equivalent
-to minimizing mean response-standardized CV-MSE. With a custom scorer, the CV-MSE columns remain
-diagnostics and need not identify the selected candidate.
+Candidate evaluation always orients `mean_test_score` so that larger values are better. Predictor-
+rank tolerance may deliberately retain a smaller rank whose score is below the exact conditional
+optimum, and component-count tolerance may then retain a smaller component count above the exact
+conditioned-path CV-MSE minimum. With a custom scorer, the CV-MSE columns remain diagnostics and
+need not identify either score-based reference.
 
-Use `search.select(rule="best_score")` for the configured-score optimum on the
-predictor-rank-conditioned component path. Use
-`search.select(rule="minimum_cv_mse")` or `search.select(rule="minimum_cv_mse")` for
-fitting-free recommendation inspection. A final model is returned directly by `refit()` and records
-the exact fitted row as `model.selection_`; it is not stored on the search. See
+Use `search.select(rule="best_score")` for the configured-score optimum on the predictor-rank-
+conditioned component path. Use `search.select(rule="minimum_cv_mse")` for fitting-free inspection
+of the component-count tolerance rule. Inspect `search.predictor_rank_profile(h)` to compare the
+exact conditional rank optimum with the tolerance-retained rank at one component count. A final
+model is returned directly by `refit()` and records the exact fitted row as `model.selection_`; it is
+not stored on the search. See
 [Scoring and the best evaluated pair](path_analysis.md#scoring-and-the-best-evaluated-pair).
 
 ## A grouped splitter reports missing metadata

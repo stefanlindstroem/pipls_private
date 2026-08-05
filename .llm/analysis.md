@@ -163,7 +163,7 @@ and direct ownership but must not freeze final adjusted label coordinates.
 - Example 06: Sugarcane selection, OOF report, spectral interpretation, rank profile.
 - Example 07: Tobacco with separately labeled 10% predictor-rank and component-count tolerance
   decisions, OOF report, full-SVD spectral analysis, rank profile, raw observation diagnostics, and
-  source-order response pagination after Decision 0148 Patch 4.
+  source-order response pagination.
 
 Pulp, Sugarcane, and Tobacco keep scientific computation in memory and write only final PDF
 figures. Sugarcane and Tobacco keep analysis in `main()` and group rendering in private functions in
