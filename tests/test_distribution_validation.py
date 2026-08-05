@@ -94,11 +94,18 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
         "import pipls.metrics",
         "import pipls.search",
         "from pipls import PiPLSRegression, PiPLSSearchCV",
-        "from pipls.datasets import load_pulp, load_sugarcane, load_tobacco",
+        "PiPLSDataset,",
+        "PiPLSLatentGeometryTruth,",
+        "PiPLSRegressionTruth,",
+        "make_pipls_latent_geometry,",
+        "make_pipls_regression,",
+        "make_pipls_train_test,",
     ):
         assert public_import in helper
 
     assert 'version("pipls") == pipls.__version__' in helper
+    assert 'item.__module__ == "pipls.datasets"' in helper
+    assert "isinstance(synthetic.truth, PiPLSRegressionTruth)" in helper
     assert "package_file.relative_to(source_root)" in helper
     assert "package_file.relative_to(environment_root)" in helper
     assert "PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)" in helper

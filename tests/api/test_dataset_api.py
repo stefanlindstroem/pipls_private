@@ -5,6 +5,7 @@ import inspect
 import numpy as np
 import pytest
 
+import pipls.datasets as dataset_api
 from pipls.datasets import (
     PiPLSDataset,
     PiPLSLatentGeometryTruth,
@@ -12,6 +13,24 @@ from pipls.datasets import (
     make_pipls_regression,
     make_pipls_train_test,
 )
+
+_PUBLIC_DATASET_NAMES = [
+    "PiPLSDataset",
+    "PiPLSLatentGeometryTruth",
+    "PiPLSRegressionTruth",
+    "load_pulp",
+    "load_sugarcane",
+    "load_tobacco",
+    "make_pipls_latent_geometry",
+    "make_pipls_regression",
+    "make_pipls_train_test",
+]
+
+
+def test_dataset_module_is_a_stable_public_facade() -> None:
+    assert dataset_api.__all__ == _PUBLIC_DATASET_NAMES
+    for name in _PUBLIC_DATASET_NAMES:
+        assert getattr(dataset_api, name).__module__ == "pipls.datasets"
 
 
 def test_dataset_api_is_exposed_from_pipls_datasets_namespace() -> None:
@@ -103,7 +122,6 @@ def test_generator_rejects_latent_dimensions_larger_than_observed_spaces() -> No
             n_shared=2,
             n_response_specific=1,
         )
-
 
 
 @pytest.mark.parametrize(

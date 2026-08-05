@@ -164,12 +164,14 @@ Decision 0147 governs the current seven-patch cleanup:
 4. add a compact historical summary and retire completed micro-decisions -- complete;
 5. simplify brittle structural tests and harden snapshots against tracked generated artifacts --
    complete;
-6. split `datasets.py` into private implementation modules without changing public imports;
+6. split `datasets.py` into private implementation modules without changing public imports --
+   complete;
 7. normalize links and indexes and complete repository-wide stale-surface audits.
 
-The next admissible increment is Decision 0147 Patch 6: split `datasets.py` into private
-implementation modules while preserving the complete public dataset surface and exact behavior. Decision 0139 Patch 3 remains a
-separate paused presentation increment and must not be mixed into this maintenance sequence.
+The next admissible increment is Decision 0147 Patch 7: normalize links and indexes, complete the
+repository-wide stale-surface and artifact audits, and mark the decision implemented. Decision 0139
+Patch 3 remains a separate paused presentation increment and must not be mixed into this maintenance
+sequence.
 
 ## Authority and drift handling
 

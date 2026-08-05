@@ -106,10 +106,10 @@ untracked ignored artifacts.
 
 ### Patch 6 -- dataset-module split
 
-Next. Move immutable dataset types, packaged-resource loading, and synthetic generation into private
-modules. Keep `pipls.datasets` as the stable public facade. Require exact public imports, resource
-bytes, deterministic generated arrays, validation, immutability, pickling, and distribution
-contents.
+Complete. `pipls.datasets` is now a small public façade over private type, packaged-resource, and
+synthetic-generation modules. The complete nine-name public surface, public module identity,
+resource bytes, deterministic arrays and truth, validation, immutability, pickle lookup, and clean
+installed-distribution behavior remain unchanged.
 
 ### Patch 7 -- normalization and final audit
 

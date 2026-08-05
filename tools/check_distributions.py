@@ -26,7 +26,17 @@ import pipls.inspection
 import pipls.metrics
 import pipls.search
 from pipls import PiPLSRegression, PiPLSSearchCV
-from pipls.datasets import load_pulp, load_sugarcane, load_tobacco
+from pipls.datasets import (
+    PiPLSDataset,
+    PiPLSLatentGeometryTruth,
+    PiPLSRegressionTruth,
+    load_pulp,
+    load_sugarcane,
+    load_tobacco,
+    make_pipls_latent_geometry,
+    make_pipls_regression,
+    make_pipls_train_test,
+)
 
 repository = Path(sys.argv[1]).resolve()
 artifact_label = sys.argv[2]
@@ -50,6 +60,29 @@ except ValueError as error:
 
 assert version("pipls") == pipls.__version__
 assert PiPLSSearchCV.__name__ == "PiPLSSearchCV"
+
+public_dataset_objects = (
+    PiPLSDataset,
+    PiPLSLatentGeometryTruth,
+    PiPLSRegressionTruth,
+    load_pulp,
+    load_sugarcane,
+    load_tobacco,
+    make_pipls_latent_geometry,
+    make_pipls_regression,
+    make_pipls_train_test,
+)
+assert all(item.__module__ == "pipls.datasets" for item in public_dataset_objects)
+synthetic = make_pipls_regression(
+    n_samples=8,
+    n_features=4,
+    n_targets=2,
+    n_shared=1,
+    random_state=0,
+)
+assert synthetic.X.shape == (8, 4)
+assert synthetic.Y.shape == (8, 2)
+assert isinstance(synthetic.truth, PiPLSRegressionTruth)
 
 rng = np.random.default_rng(0)
 X = rng.normal(size=(12, 4))

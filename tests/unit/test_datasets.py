@@ -71,7 +71,11 @@ def test_dataset_copies_and_freezes_arrays_and_metadata() -> None:
     with pytest.raises(TypeError):
         dataset.metadata["new"] = 1  # type: ignore[index]
 
-    restored = pickle.loads(pickle.dumps(dataset))
+    payload = pickle.dumps(dataset)
+    assert b"pipls.datasets" in payload
+    assert b"pipls._dataset_types" not in payload
+
+    restored = pickle.loads(payload)
     assert isinstance(restored, PiPLSDataset)
     np.testing.assert_array_equal(restored.X, dataset.X)
     assert restored.metadata["items"] == (1, 2)
@@ -159,7 +163,6 @@ def test_regression_truth_is_read_only() -> None:
         assert not getattr(truth, name).flags.writeable
 
 
-
 def test_manuscript_latent_geometry_truth_is_read_only_and_pickleable() -> None:
     dataset = make_pipls_latent_geometry(
         n_samples=9,
@@ -180,7 +183,11 @@ def test_manuscript_latent_geometry_truth_is_read_only_and_pickleable() -> None:
     for name in truth.__dataclass_fields__:
         assert not getattr(truth, name).flags.writeable
 
-    restored = pickle.loads(pickle.dumps(truth))
+    payload = pickle.dumps(truth)
+    assert b"pipls.datasets" in payload
+    assert b"pipls._dataset_types" not in payload
+
+    restored = pickle.loads(payload)
     assert isinstance(restored, PiPLSLatentGeometryTruth)
     for name in truth.__dataclass_fields__:
         np.testing.assert_array_equal(getattr(restored, name), getattr(truth, name))
