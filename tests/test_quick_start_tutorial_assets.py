@@ -118,6 +118,18 @@ def test_quick_start_tutorial_owns_snippets_asset_and_navigation() -> None:
     assert "model.selection_" in tutorial
     assert "search.oof_report" in tutorial
 
+    evidence_section = tutorial.split("## Retain the search when evidence matters", 1)[1]
+    evidence_section = evidence_section.split("## Reproduce this tutorial", 1)[0]
+    assert 'selection = search.select(rule="minimum_cv_mse")' in evidence_section
+    assert "selection = model.selection_" not in evidence_section
+    assert "selection=selection" in evidence_section
+    assert evidence_section.index("selection = search.select") < evidence_section.index(
+        "search.oof_report"
+    )
+    assert evidence_section.index("search.oof_report") < evidence_section.index(
+        "search.refit"
+    )
+
 
 def test_documentation_targets_own_generated_quick_start_assets() -> None:
     repository = _repository_root()

@@ -18,8 +18,8 @@ validation evidence.
 - Preserve the mathematical construction in `.llm/mathematics.md` and `.llm/theory.md`.
 - Keep the fixed estimator separate from cross-validated path search.
 - Learn all model preprocessing inside each fit, including every training fold.
-- Prefer explicit post-fit selection, selection handoff, OOF reporting, refitting, and inspection
-  over hidden state.
+- Prefer explicit post-search selection, immutable selection handoff, OOF reporting, refitting, and
+  inspection over hidden state.
 - Keep public result objects immutable, validated, finite where required, and pickle-safe.
 - Use scikit-learn conventions where they do not obscure Pi-PLS-specific semantics.
 - Keep user data preparation visible; package-owned loaders are named reference conveniences, not a
@@ -46,7 +46,7 @@ materialized split and population SD (`ddof=0`). There is no standard-error rule
 
 Decision 0148 adds a separate tolerance stage for conditional predictor-rank choice. Predictor-rank
 tolerances are search-constructor controls because they determine `component_path_`; component-count
-tolerances remain post-fit `select()` and `refit()` controls. Exact numerical ties and adaptive
+tolerances remain post-search `select()` and `refit()` controls. Exact numerical ties and adaptive
 candidate coverage remain separate from substantive parsimony tolerances.
 
 Decision 0149 is implemented. `search_method="adaptive"` is the default predictor-rank coverage
@@ -77,15 +77,13 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decisions 0148, 0149, and 0150 are implemented. Decision 0151 is the active six-patch increment.
-Patches 1--5 establish the contract, selection-driven refitting, reordered analytical workflows,
-and Mermaid tutorial integration with strict local, Pages-overlay, and source-distribution checks.
-Patch 6 completes public and maintainer audits.
+Decisions 0148--0151 are implemented. The current repository has no active public-API or tutorial
+migration increment. New work should begin with an owner decision when it changes scientific scope,
+public behavior, or maintained workflow structure.
 
-## Independent paused work
+## Deferred work
 
-Decision 0139 Patch 3 is superseded by the integrated workflow and tutorial sequence in Decision
-0151.
+Decision 0139 Patch 3 is superseded by Decision 0151 and is no longer paused work.
 
 Future block-aware standardization remains intentionally undesigned. Do not reserve public names,
 constructor parameters, or hidden abstractions before a dedicated owner-led design phase.

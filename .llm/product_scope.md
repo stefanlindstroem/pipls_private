@@ -104,11 +104,11 @@ purpose. Package-owned Pulp, Sugarcane, and Tobacco are user-run examples rather
 jobs. Every maintained consumer uses the installed loaders, and the package resources are the sole
 active matrix copies. Example 04 keeps the Pi-PLS and
 standard PLS (NIPALS) comparison paths in memory
-and writes only the overlaid final PDFs. Sugarcane keeps its Pi-PLS path, fixed-model OOF predictions,
-and inspection results in memory and writes only final PDF figures. Pulp follows the same in-memory
-boundary through `load_pulp()` and adds a conditional predictor-rank-profile figure. Tobacco is
-also direct while preserving full-SVD spectral analysis, response pagination, and observation diagnostics. Every
-workflow fits a fixed
-Pi-PLS model only after a visible user component choice. None of this includes a block-aware
+and writes only the overlaid final PDFs. Sugarcane keeps its Pi-PLS path, selection-conditioned OOF
+predictions, and inspection results in memory and writes only final PDF figures. Pulp follows the
+same in-memory boundary through `load_pulp()` and adds a conditional predictor-rank-profile figure.
+Tobacco is also direct while preserving full-SVD spectral analysis, response pagination, and
+observation diagnostics. Every analytical model-producing workflow creates one visible selection
+before optional OOF qualification and final fixed-model fitting. None of this includes a block-aware
 standardization API design; future block-aware variants remain deferred for months or until the
 project owner explicitly starts a separate phase.

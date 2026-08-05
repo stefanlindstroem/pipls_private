@@ -2,13 +2,13 @@
 
 Pi-PLS predicts through paired latent modes, each containing one predictor direction, one response
 direction, and one dilation. Applied workflows normally scan `n_components`, the number of paired
-latent modes, by cross-validation and inspect CV-MSE against that count.
-The resulting table or curve is called the component path. A clear elbow or plateau can motivate a
-component count; when no clear elbow is present, explicit relative tolerances provide a transparent
-parsimony policy. Example 07 demonstrates separate 10% predictor-rank and component-count
-tolerances. See the [component-path discussion](../docs/path_analysis.md#search-owned-selection-rules)
-and the [served example catalogue](../docs/examples.md#tobacco-two-relative-tolerance-decisions).
-For the mathematical construction, see `docs/theory.md`.
+latent modes, by cross-validation and inspect CV-MSE against that count. The resulting table or
+curve is called the component path. A clear elbow or plateau can motivate a component count; when
+no clear elbow is present, explicit relative tolerances provide a transparent parsimony policy.
+Example 07 demonstrates separate 10% predictor-rank and component-count tolerances. See the
+[component-path discussion](../docs/path_analysis.md#search-owned-selection-rules) and the
+[served example catalogue](../docs/examples.md#tobacco-two-relative-tolerance-decisions). For the
+mathematical construction, see `docs/theory.md`.
 
 The examples are arranged by user task rather than by implementation complexity. Each numbered
 script is self-contained: it explains its data, purpose, and printed or written results without
@@ -23,15 +23,15 @@ workflows are intentionally more extensive than ordinary estimator use.
   `refit()`, and combines all standardized observed and fitted responses in one plot. The plotted
   values describe full-data calibration fit, not OOF validation.
 - `02_synthetic_path_selection.py`: the short manual-selection workflow. It generates independent
-  synthetic train/test data, completes search and refitting for the declared component count, then
-  inspects `model.selection_`, the component path, and the conditional predictor-rank profile before
-  writing three final PDF figures.
+  synthetic train/test data, evaluates the search, creates one selection for the declared component
+  count, inspects the component path and conditional predictor-rank profile, refits that selection,
+  and writes three final PDF figures including independent-test prediction diagnostics.
 - `03_leave_one_out_validation.py`: a focused small-sample calibration workflow. It evaluates a
   compact explicit path with `LeaveOneOut`, obtains one fitting-free selection through
   `search.select(rule="best_score")`, evaluates it through `search.oof_report()`, and distinguishes
   pooled OOF $R^2$ from undefined mean foldwise $R^2$.
 
-Run it with:
+Run the quick start with:
 
 ```bash
 python -m pip install -e ".[examples]"
@@ -43,8 +43,7 @@ matrices and documentary labels, while the plot uses only the standardized numer
 
 Example 01 intentionally uses the default `cv=5` to keep the first complete search and refit in one
 expression. Maintained analytical examples that use one ordinary five-fold regression partition
-construct
-`KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Example 05 instead uses
+construct `KFold(n_splits=5, shuffle=True, random_state=0)` explicitly. Example 05 instead uses
 `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)` for the complete Pulp analysis. The fixed
 seed makes these analyses reproducible while preventing row order from defining the folds. Example
 03 uses `LeaveOneOut`, which exhaustively holds out each observation and therefore has no shuffle
@@ -53,7 +52,8 @@ option.
 ## Explicit comparison
 
 - `04_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
-  component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model.
+  component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model, and the
+  workflow fits no final model.
 
 Grouped and temporal validation require application-specific sampling semantics and remain in
 `docs/path_analysis.md`. Example 03 gives leave-one-out validation one concrete small-calibration
@@ -61,36 +61,35 @@ use case rather than combining unrelated split protocols in one context-free scr
 
 ## Complete Pi-PLS reference workflows
 
-- `05_pulp_real_data.py`: the direct canonical tutorial analysis. It completes search and manual
-  refitting at three components, retrieves the fitted model's `selection_`, component path, and
-  conditional predictor-rank profile, requests selection-conditioned OOF predictions through
-  `search.oof_report(..., selection=selection)`, orients the displayed factors so the tensile-index
-  response is positive, and writes six final PDF figures directly from in-memory results.
-- `06_sugarcane_real_data.py`: the direct reference workflow. It completes modeling before
-  retrieving `model.selection_`, the component path, the conditional predictor-rank profile, and an
-  OOF report for that selection. It writes six wavelength-aware final PDF figures without generated
-  analytical CSV files.
+- `05_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the repeated-CV path,
+  creates the declared three-component selection, inspects its component and rank evidence,
+  requests selection-conditioned OOF predictions, refits the exact same selection, orients the
+  displayed factors so the tensile-index response is positive, and writes six final PDF figures
+  directly from in-memory results.
+- `06_sugarcane_real_data.py`: the direct reference workflow. It evaluates the path, creates one
+  manual selection, inspects its conditional predictor-rank evidence, computes an OOF report, refits
+  that selection, and writes six wavelength-aware final PDF figures without generated analytical
+  CSV files.
 - `07_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
   SVD and two separately named 10% relative tolerances. The search constructor applies the
-  predictor-rank tolerance independently at each component count; `refit()` then applies the
+  predictor-rank tolerance independently at each component count; `search.select()` then applies the
   component-count tolerance to the conditioned path. The workflow obtains exact and retained rank
-  evidence, the component-path reference minimum, and a selection-driven OOF report before
-  rendering both thresholds, decreasing-wavenumber spectral displays, deterministic response
-  pagination, and raw observation diagnostics through caller-owned PDFs. See the
-  [selection rules](../docs/path_analysis.md#search-owned-selection-rules) and the
+  evidence, the component-path reference minimum, and a selection-conditioned OOF report before it
+  refits the same selection and renders both thresholds, decreasing-wavenumber spectral displays,
+  deterministic response pagination, and raw observation diagnostics through caller-owned PDFs.
+  See the [selection rules](../docs/path_analysis.md#search-owned-selection-rules) and the
   [focused Tobacco explanation](../docs/examples.md#tobacco-two-relative-tolerance-decisions).
 
 These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
-complete search and full-data refitting before retrieving the fitted selection, retained path
-evidence, conditional rank profile, optional OOF diagnostics, immutable fitted-model inspection
-results, and caller-owned Matplotlib composition. Tobacco replaces the manual component-count
-choice with the two explicit 10% relative-tolerance decisions described above.
-Pulp, Sugarcane, and Tobacco each write `component_path.pdf`,
-`predictor_rank_profile.pdf`, `pipls_factors.pdf`, `latent_structure.pdf`, `coefficients.pdf`, and
-`prediction_diagnostics.pdf`. For Tobacco,
+inspect search evidence, create one immutable selection, optionally qualify it through OOF
+reporting, refit the same row on all observations, calculate immutable fitted-model inspection
+results, and only then compose figures. Tobacco replaces the manual component-count choice with the
+two explicit 10% relative-tolerance decisions described above. Pulp, Sugarcane, and Tobacco each
+write `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
+`latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. For Tobacco,
 `prediction_diagnostics.pdf` and `coefficients.pdf` each contain three source-order response pages.
-`make examples` runs every numbered example in filename order, including the slower
-real-data workflows. It remains separate from `make check`.
+`make examples` runs every numbered example in filename order, including the slower real-data
+workflows. It remains separate from `make check`.
 
 ## Example support module
 
@@ -100,8 +99,8 @@ The comparison workflow imports one implementation helper from `examples/_suppor
 
 Example 04 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
 comparison helper. Reusable numerical inspection belongs in `pipls.inspection`; every maintained
-figure is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot
-uses optional `adjustText` only to reposition its Matplotlib text labels.
+figure is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot uses
+optional `adjustText` only to reposition its Matplotlib text labels.
 
 ## Real-data workflow contract
 
@@ -124,28 +123,26 @@ Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the thr
 comparison figures directly. Sugarcane demonstrates the complete manual-analysis workflow:
 
 1. `PiPLSSearchCV(cv=CV).fit(X, Y)` evaluates the path.
-2. `search.refit(..., n_components=CHOSEN_N_COMPONENTS)` fits the declared component count and its
-   conditionally selected predictor rank on all observations.
-3. `selection = model.selection_` retrieves the exact row used by the fitted model.
-4. `component_path_` and `predictor_rank_profile(selection.n_components)` provide the retained
+2. `selection = search.select(n_components=CHOSEN_N_COMPONENTS)` creates the complete stored row
+   without fitting.
+3. `component_path_` and `predictor_rank_profile(selection.n_components)` provide the retained
    selection evidence.
-5. `search.oof_report(X, Y, selection=selection)` reuses the exact seeded shuffled folds and returns
-   selection-conditioned OOF predictions for that fitted specification.
+4. `search.oof_report(X, Y, selection=selection)` reuses the exact seeded shuffled folds and returns
+   selection-conditioned OOF predictions for that row.
+5. `search.refit(X, Y, selection=selection)` fits the same component-count and predictor-rank pair on
+   all observations and records it as `model.selection_`.
 6. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return immutable
    in-memory results.
 7. The script renders the completed path, rank-profile, latent-structure, prediction-diagnostic, and
    factor results with Matplotlib and saves the six final figures itself.
 
-Pulp is the canonical tutorial workflow. Example 05 follows the same ordering: search and refitting
-complete modeling, `model.selection_` identifies the fitted row, the search supplies path and rank
-profile evidence, `oof_report()` averages ten predictions per observation across the 50 stored
-splits, and rendering occurs only after the numerical analysis is complete. Tobacco follows the same
-direct
-result-to-Matplotlib pattern but applies the named `"minimum_cv_mse"` refit rule with a 10%
-relative tolerance. Its `model.selection_` supplies the selected row, exact reference minimum,
-resolved tolerance, and threshold used by the component-path figure; the selected count then supplies
-`predictor_rank_profile()`. It owns its
-full-SVD configuration, response pagination, and multipage PDF output visibly.
+Pulp is the canonical tutorial workflow. Example 05 follows the same ordering, with
+`oof_report()` averaging ten predictions per observation across the 50 stored splits before the
+same selection is refitted. Tobacco applies `search.select(rule="minimum_cv_mse",
+relative_tolerance=0.10)` to the conditioned path. That selection supplies the exact reference
+minimum, resolved tolerance, threshold, and component count used by both the rank-profile and
+component-path figures; the same object is then passed to OOF reporting and final refitting.
+Tobacco owns its full-SVD configuration, response pagination, and multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
 figures retain explicit provenance. Numbered examples never serialize analytical results for later

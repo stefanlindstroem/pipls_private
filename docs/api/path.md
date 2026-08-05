@@ -9,7 +9,7 @@ and pass that exact selection to final refitting.
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
 search object caps the path by the minimum predictor rank verified across those transformed folds.
-`PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Explicit post-fit
+`PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Explicit post-search
 `search.select(...)` returns one immutable stored component-path row without fitting.
 `search.refit(X, Y, selection=...)` validates an existing selection, clones the configured
 estimator or pipeline, fits that clone, attaches the exact supplied object as `model.selection_`,
@@ -31,7 +31,7 @@ pipeline-independent `n_components` and `predictor_rank` arrays; the remaining c
 candidate scores, split values, response-standardized MSE diagnostics, ranks, and timings.
 `component_path_` and `predictor_rank_profile()` provide concise immutable views. Use
 `search.select(rule="best_score")` for the configured-score optimum on the predictor-rank-conditioned
-component path. Post-fit `select()`,
+component path. Post-search `select()`,
 `refit()`, and `oof_report()` do not alter search state. No final selection, model, or OOF report is
 stored on the search object.
 Python method signatures use `y` by scikit-learn convention even when the

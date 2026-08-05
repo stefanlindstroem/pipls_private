@@ -276,14 +276,14 @@ std_score_time = search.cv_results_["std_score_time"]
 
 These arrays help locate expensive candidates and separate fitting from scoring. They are not total
 search wall times, particularly when candidates are evaluated in parallel. They also exclude the
-fold-level feasibility probes, final `refit()`, and later OOF reporting.
+fold-level feasibility probes, explicit OOF reporting, and final `refit()`.
 
 ## Separate development and final-analysis workflows
 
 A practical sequence is:
 
 1. Begin with one seeded shuffled partition, adaptive rank coverage, and a measured worker count.
-2. Confirm data handling, fold-local preprocessing, selection, refitting, and reporting.
+2. Confirm data handling, fold-local preprocessing, selection, OOF reporting, and final refitting.
 3. If the search remains too costly, decide whether maximum or fixed predictor rank, a restricted
    rank set, or a restricted component path is scientifically justified.
 4. For sufficiently large predictor matrices, compare randomized and full predictor SVD on a

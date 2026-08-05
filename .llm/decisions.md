@@ -42,7 +42,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0123-companion-manuscript-synthetic-data-guide.md` | companion-manuscript synthetic-data guide | distinguish exact distribution, seeded realization, and complete-study reproduction without changing package workflows |
 | `0124-mathematical-typography-and-subscripts.md` | mathematical typography and descriptive subscripts | bold complete matrices, upright descriptive subscripts, italic variable indices, and renderable generated equations |
 | `0127-artifact-based-rendering-validation.md` | artifact-based rendering validation | protect rendering ownership, numerical meaning, and generated artifacts without exact Matplotlib source locks |
-| `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select, refit, and compute OOF diagnostics through explicit post-fit operations |
+| `0137-post-fit-inspect-decide-refit-lifecycle.md` | post-fit inspect-decide-refit lifecycle | make search a path-evidence object; select, refit, and compute OOF diagnostics through explicit post-search operations |
 | `0139-three-stage-user-onboarding.md` | three-stage user onboarding | lead with an automatic Pulp fit, then inspect-decide-refit mechanics, then selection-conditioned validation and interpretation |
 | `0140-search-owned-path-selection.md` | search-owned path selection | make `PiPLSSearchCV.select()` the sole public selected-row lookup and reduce `PiPLSComponentPath` to aligned numerical evidence |
 | `0141-spectral-predictor-rank-profile-figures.md` | spectral predictor-rank profiles | make Sugarcane and Tobacco plot split-SD rank profiles at the exact selection used for final fitting, including Tobacco tolerance selection |
@@ -105,7 +105,7 @@ This registry lists only numbered decisions that still define current behavior o
 ## Implemented Decision 0148 contract
 
 - Separate constructor-level relative and absolute tolerances govern conditional predictor-rank
-  retention; component-count tolerances remain post-fit controls.
+  retention; component-count tolerances remain post-search controls.
 - Adaptive refinement and `rank_test_score` use private exact-score comparison; public
   predictor-rank tolerances act only after candidates have been evaluated.
 - Named component-count rules operate on the rank-conditioned path, and optimized rows expose
@@ -113,7 +113,7 @@ This registry lists only numbered decisions that still define current behavior o
 
 ## Implemented clarifications
 
-- `PiPLSRegression` fits one explicit pair; `PiPLSSearchCV` owns path evaluation and post-fit
+- `PiPLSRegression` fits one explicit pair; `PiPLSSearchCV` owns path evaluation and post-search
   selection, refitting, and OOF reporting.
 - The only named selection rules are `best_score` and tolerance-based `minimum_cv_mse`.
 - CV-MSE dispersion is population SD across materialized splits; no standard-error result or rule

@@ -13,11 +13,11 @@ Pi-PLS preferable for every regression problem; ordinary PLS and other multivari
 appropriate alternatives whose suitability depends on the data and validation design.
 
 For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
-selects a predictor rank conditionally for each count. Users may inspect the path and fit one fixed
-model manually, or apply a named post-fit rule through `search.refit(X, Y, rule=...)`. The search
-retains the complete selection evidence, while `refit()` returns the fitted final estimator with
-its exact `selection_`, and `oof_report()` returns ordered selection-conditioned OOF diagnostics for
-that selection.
+selects a predictor rank conditionally for each count. Evidence-retaining workflows inspect the
+path, create one immutable selection, optionally qualify that selection through OOF reporting, and
+pass the same object to final refitting. Compact workflows may instead apply a named rule directly
+through `search.refit(X, Y, rule=...)`. The fitted model records the exact row as `selection_`, while
+the search retains the complete path and split evidence.
 
 The rendered documentation is the primary user guide. On GitHub, open the latest
 [`github-pages` deployment](../../deployments/github-pages). The source links below remain useful
@@ -76,7 +76,8 @@ Y_fitted = model.predict(X)
 
 `examples/01_pulp_quick_start.py` standardizes each response and places all observed and fitted
 values in one figure. These are fitted values from the final full-data model, not out-of-fold
-predictions; retain the search and use `search.oof_report(..., selection=model.selection_)` when OOF diagnostics are required.
+predictions. When OOF diagnostics are required, retain the search, create the selection explicitly,
+and pass that same object to both `oof_report()` and `refit()` as shown below.
 
 ## Fit one known model
 
@@ -105,16 +106,15 @@ When the ranks are not known, evaluate the path first:
 from pipls import PiPLSSearchCV
 
 search = PiPLSSearchCV().fit(X_train, Y_train)
+path = search.component_path_
+selection = search.select(n_components=2)
+rank_profile = search.predictor_rank_profile(selection.n_components)
+
 model = search.refit(
     X_train,
     Y_train,
-    n_components=2,
+    selection=selection,
 )
-
-selection = model.selection_
-path = search.component_path_
-rank_profile = search.predictor_rank_profile(selection.n_components)
-
 Y_pred = model.predict(X_test)
 ```
 
@@ -122,11 +122,11 @@ For every evaluated component count, the search conditionally retains one predic
 Constructor-level `predictor_rank_relative_tolerance` and
 `predictor_rank_absolute_tolerance` can favor the smallest evaluated rank within a bounded
 configured-score allowance; their defaults reproduce an effectively exact optimum.
-`refit(..., n_components=h)` transfers the stored pair into a fitted clone without requiring the
-user to copy `predictor_rank`. The returned model exposes that complete row as `model.selection_`;
-use `search.predictor_rank_profile(model.selection_.n_components)` to compare the exact rank optimum
-with the conditionally retained rank. `search.select(...)` remains available for selection-only work
-that does not fit a final model.
+`search.select(n_components=h)` returns the complete stored pair without fitting and avoids asking
+the user to copy `predictor_rank`. The same immutable object can then configure OOF reporting and
+final refitting. After a successful fit, `model.selection_` is that exact selection and can be used
+to verify fitted-model provenance. Rule-based and component-count refitting remain available for
+compact workflows that do not need to retain an earlier selection.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
 predictor-rank plots. The [path-selection reference](docs/api/path.md) and
@@ -136,8 +136,8 @@ the cost of validation splits and candidate coverage, large-problem SVD choices,
 and OOF-report reuse.
 
 When the complete protocol is known in advance, search and final fitting can remain compact. The
-Tobacco workflow demonstrates separate 10% relative tolerances for adaptive predictor-rank search
-and the later minimum-CV-MSE component rule:
+same separate 10% relative tolerances used in the Tobacco analysis can be written as one automatic
+search-and-refit expression:
 
 ```python
 model = PiPLSSearchCV(
@@ -156,20 +156,25 @@ model = PiPLSSearchCV(
 Y_pred = model.predict(X_test)
 ```
 
-Retain the fitted search in a variable when component-path, predictor-rank-profile, or candidate
-inspection is needed. `refit()` returns a fitted estimator or pipeline and does not attach it to the
-search object. Modeling completes before the retained evidence and optional OOF diagnostics are
-calculated:
+Retain the fitted search in a variable when component-path, predictor-rank-profile, candidate, or
+OOF evidence matters. In that route, create one selection before validation and final fitting so
+every operation refers to the same stored row:
 
 ```python
 search = PiPLSSearchCV(search_method="adaptive").fit(X_train, Y_train)
-model = search.refit(X_train, Y_train, rule="minimum_cv_mse")
-
-selection = model.selection_
 path = search.component_path_
+selection = search.select(
+    rule="minimum_cv_mse",
+    relative_tolerance=0.10,
+)
 rank_profile = search.predictor_rank_profile(selection.n_components)
 report = search.oof_report(X_train, Y_train, selection=selection)
+model = search.refit(X_train, Y_train, selection=selection)
 ```
+
+`refit()` returns a fitted estimator or pipeline and does not attach it to the search object.
+`model.selection_` records the exact supplied selection after fitting succeeds; it is fitted-model
+provenance rather than the handoff used to select or qualify the row.
 
 The caller must pass the same observations in the same row order; the search retains split indices,
 not the training matrices.

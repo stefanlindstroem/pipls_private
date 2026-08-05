@@ -38,7 +38,7 @@ supplied to each fit, validates the requested ranks, and exposes standard PLS-st
 plus `decomposition_`.
 
 `PiPLSSearchCV.fit(X, y)` materializes one validation split set and evaluates fixed-model clones.
-It does not retain `X` or `y` and does not automatically fit a final full-data model. Post-fit work
+It does not retain `X` or `y` and does not automatically fit a final full-data model. Post-search work
 is explicit:
 
 ```python
@@ -181,13 +181,12 @@ paths, randomized predictor SVD, parallel execution, OOF reuse, and work inspect
 route to it, and source-distribution documentation validation protects its shipped and rendered
 forms.
 
-Decision 0151 is active. Patches 1--5 establish the target contract, implement
-`refit(selection=...)` with shared exact compatibility validation, convert the synthetic, Pulp,
-Sugarcane, and Tobacco workflows to one pre-refit selection, and add one source-level Mermaid
-flowchart with equivalent prose to every served tutorial. Strict local, inherited Pages-overlay,
-and source-distribution checks protect the diagram rendering. Patch 6 completes the public and
-maintainer audits. The paused presentation increment from Decision 0139 is superseded by this
-sequence.
+Decision 0151 is implemented. `refit(selection=...)` shares exact compatibility validation with
+`oof_report(selection=...)`; evidence-retaining examples and guides pass one pre-refit selection
+through search inspection, optional OOF qualification, and final fitting. Every served tutorial has
+one source-level Mermaid flowchart with equivalent prose, and strict local, inherited Pages-overlay,
+and source-distribution checks protect diagram rendering. The former presentation increment from
+Decision 0139 is superseded.
 
 ## Authority and drift handling
 

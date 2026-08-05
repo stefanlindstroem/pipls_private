@@ -128,7 +128,7 @@ search = PiPLSSearchCV(estimator=pipeline).fit(X, Y)
 
 The terminal estimator needs the valid construction seed pair `(1, 1)` because
 `PiPLSRegression` always represents one explicit fixed pair. `PiPLSSearchCV` replaces both values
-before fold-rank preflight, every candidate fit, explicit OOF reporting, and each post-fit refit,
+before fold-rank preflight, every candidate fit, explicit OOF reporting, and each full-data refit,
 so the seed pair does not restrict or select the path. Other template settings, including `scale`,
 `svd_solver`, and `random_state`, do affect candidate fitting.
 
@@ -153,20 +153,20 @@ routing when routing is enabled and requested. Split metadata belongs to the sea
 
 ## Ordered out-of-fold predictions
 
-Request ordered OOF diagnostics for an existing selection after modeling or selection-only analysis:
+Request ordered OOF diagnostics for an existing selection before optional final refitting:
 
 ```python
 from sklearn.model_selection import KFold
 
 cv = KFold(n_splits=5, shuffle=True, random_state=0)
 search = PiPLSSearchCV(cv=cv).fit(X, Y)
-model = search.refit(X, Y, rule="minimum_cv_mse")
-
-selection = model.selection_
+selection = search.select(rule="minimum_cv_mse")
 report = search.oof_report(X, Y, selection=selection)
+model = search.refit(X, Y, selection=selection)
 ```
 
-A workflow that deliberately fits no final model may obtain the selection directly:
+A workflow whose purpose is only validation may stop after the report. Manual lookup uses the same
+selection handoff:
 
 ```python
 selection = search.select(n_components=4)
@@ -246,35 +246,39 @@ under the configured scorer and constructor-level predictor-rank tolerances. Its
 `predictor_rank_evidence` remains attached to direct, named-rule, refitted-model, and OOF selections.
 `select()` does not revisit the predictor-rank profile, fit or refit an
 estimator, mutate the search object, or attach selected state. With a nondefault scorer, the stored
-predictor rank need not minimize CV-MSE within its component-count profile. Model-producing
-workflows obtain the fitted row from `model.selection_`; `search.select(...)` remains useful for
-selection-only analysis. `component_path_` remains the aligned numerical curve.
+predictor rank need not minimize CV-MSE within its component-count profile. Evidence-retaining
+model-producing workflows create one selection and pass that same object to OOF reporting and final
+refitting. After a successful fit, `model.selection_` confirms the fitted model's exact provenance.
+`component_path_` remains the aligned numerical curve.
 
 The Tobacco workflow demonstrates the hierarchy with separate 10% relative tolerances. The search
 constructor applies `predictor_rank_relative_tolerance=0.10` within every component count, and
-`refit(..., relative_tolerance=0.10)` then acts on the resulting conditioned component path. The
-predictor-rank profile shows its exact configured-score reference, converted CV-MSE threshold, and
+`search.select(rule="minimum_cv_mse", relative_tolerance=0.10)` then acts on the resulting
+conditioned component path. The predictor-rank profile shows its exact configured-score reference,
+converted CV-MSE threshold, and
 retained rank; the component path shows its own exact minimum, threshold, and retained component
 count. Predictor-rank profile error bars use the stored split SD.
 
-## Post-fit final-model selection
+## Final-model refitting
 
-After path evaluation, `refit()` selects one stored component-path row and fits the corresponding
-fixed model on the supplied full data:
+After path evaluation, `refit()` fits one stored component-path row on the supplied full data. In
+an evidence-retaining workflow, create the row first and pass the exact object forward:
 
 ```python
 search = PiPLSSearchCV(search_method="adaptive").fit(X, Y)
-model = search.refit(X, Y, rule="minimum_cv_mse")
+selection = search.select(rule="minimum_cv_mse")
+model = search.refit(X, Y, selection=selection)
 Y_pred = model.predict(X_new)
 ```
 
-Manual selection uses the same operation:
+Rule-based and manual component-count refitting remain compact alternatives:
 
 ```python
-model = search.refit(X, Y, n_components=4)
+model_by_rule = search.refit(X, Y, rule="minimum_cv_mse")
+model_by_count = search.refit(X, Y, n_components=4)
 ```
 
-Exactly one of `rule` and `n_components` is required. The accepted post-fit rules are:
+Exactly one of `selection`, `rule`, and `n_components` is required. The accepted named rules are:
 
 - `rule="best_score"`, the maximum configured-score row on the conditioned component path;
 - `rule="minimum_cv_mse"`, the smallest stored component-path row satisfying simultaneous relative
@@ -284,10 +288,12 @@ Each rule retains the predictor rank already selected conditionally for the chos
 With a nondefault scorer, that rank remains conditioned on the scorer even when the component rule
 uses response-standardized CV-MSE. Relative tolerance must be finite and nonnegative; absolute
 tolerance must be nonnegative and may be positive infinity. Nondefault tolerance arguments apply
-only to `rule="minimum_cv_mse"`.
+only to `rule="minimum_cv_mse"`; a supplied selection has already resolved those controls.
 
-`refit()` clones the configured direct estimator or pipeline, replaces the terminal Pi-PLS rank
-pair, fits the clone, attaches the exact immutable row as `model.selection_`, and returns the model.
+`refit()` validates an existing selection against the fitted search or resolves one from the compact
+rule/count arguments. It then clones the configured direct estimator or pipeline, replaces the
+terminal Pi-PLS rank pair, fits the clone, attaches the exact immutable row as `model.selection_`,
+and returns the model.
 It does not mutate the search, store the supplied matrices, or attach the model to search state.
 Prediction, transformation, scoring, inverse transformation, and feature-name behavior belong to
 the returned model.

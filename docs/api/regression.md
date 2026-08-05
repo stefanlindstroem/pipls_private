@@ -33,13 +33,16 @@ that configured it:
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
-model = search.refit(X, Y, rule="minimum_cv_mse")
-selection = model.selection_
+selection = search.select(rule="minimum_cv_mse")
+model = search.refit(X, Y, selection=selection)
+assert model.selection_ is selection
 ```
 
 For a pipeline template, `selection_` belongs to the returned outer pipeline. The terminal
 `PiPLSRegression` step remains an ordinary fixed-pair estimator. A `PiPLSRegression` fitted directly
-through `fit()` has no `selection_` because no search selection occurred.
+through `fit()` has no `selection_` because no search selection occurred. In evidence-retaining
+workflows, the pre-existing selection is the handoff to OOF reporting and refitting;
+`model.selection_` confirms the provenance of the successful final fit.
 
 ## Preprocessing and fit safety
 

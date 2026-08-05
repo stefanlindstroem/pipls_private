@@ -69,17 +69,16 @@ count manually, or request selection-conditioned OOF diagnostics:
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
-model = search.refit(X, Y, rule="minimum_cv_mse")
-
-selection = model.selection_
 path = search.component_path_
+selection = search.select(rule="minimum_cv_mse")
 rank_profile = search.predictor_rank_profile(selection.n_components)
 report = search.oof_report(X, Y, selection=selection)
+model = search.refit(X, Y, selection=selection)
 ```
 
-Modeling is complete when `refit()` returns. The later statements retrieve the fitted selection,
-component path, conditional predictor-rank profile, and optional selection-conditioned OOF
-diagnostics.
+This longer route inspects and optionally qualifies one immutable row before fitting the final
+model. The same `selection` configures both OOF reporting and refitting, while `model.selection_`
+records that exact provenance after the full-data fit succeeds.
 
 Continue with [Inspect and select with synthetic data](synthetic.md) for a manual component choice
 and independent-test prediction. The [complete Pulp analysis](pulp.md) adds selection-conditioned

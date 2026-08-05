@@ -6,6 +6,13 @@
   configure both OOF reporting and final full-data fitting; `refit()` and `oof_report()` share exact
   provenance validation, the returned estimator retains the exact supplied object as `selection_`,
   and rule-based and manual component-count refitting remain supported.
+- Reorder the evidence-retaining synthetic, Pulp, Sugarcane, and Tobacco workflows around one
+  pre-refit selection: inspect search evidence, optionally compute a matching OOF report, refit that
+  exact selection, and then inspect the fitted model. Preserve the compact automatic quick start and
+  the validation-only and comparison-only routes.
+- Add one source-level Mermaid workflow chart with equivalent prose to each served tutorial. Preserve
+  strict local, inherited Pages-overlay, and source-distribution documentation builds without
+  committing generated diagram assets.
 - Add a central computational-performance guide for Pi-PLS training. Document candidate-fold fit
   counts, validation repetitions, adaptive and exhaustive predictor-rank coverage, fixed and
   restricted paths, randomized predictor SVD, parallel execution, OOF-report reuse, and direct

@@ -96,7 +96,7 @@ model = search.refit(X, Y, n_components=h)
 Y_pred = model.predict(X_new)
 ```
 
-Automatic choices use the same post-fit operation:
+Automatic choices use the same post-search operation:
 
 ```python
 model = search.refit(X, Y, rule="minimum_cv_mse")
@@ -118,9 +118,10 @@ need not identify either score-based reference.
 Use `search.select(rule="best_score")` for the configured-score optimum on the predictor-rank-
 conditioned component path. Use `search.select(rule="minimum_cv_mse")` for fitting-free inspection
 of the component-count tolerance rule. Inspect `search.predictor_rank_profile(h)` to compare the
-exact conditional rank optimum with the tolerance-retained rank at one component count. A final
-model is returned directly by `refit()` and records the exact fitted row as `model.selection_`; it is
-not stored on the search. See
+exact conditional rank optimum with the tolerance-retained rank at one component count. Pass the
+same compatible selection to `oof_report()` and `refit()` when those operations must describe one
+exact row. The returned model records that row as `model.selection_`; it is not stored on the search.
+See
 [Scoring and conditioned path selection](path_analysis.md#scoring-and-conditioned-path-selection).
 
 ## A grouped splitter reports missing metadata

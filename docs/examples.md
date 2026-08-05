@@ -11,18 +11,18 @@ the maintained scripts.
 
 | Script | Programming task | Main output |
 |---|---|---|
-| `01_pulp_quick_start.py` | Search, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
-| `02_synthetic_path_selection.py` | Fit a declared component count, inspect the retained selection evidence, and evaluate independent test predictions | Three PDF figures and printed external-test $R^2$ |
+| `01_pulp_quick_start.py` | Apply an automatic selection rule, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
+| `02_synthetic_path_selection.py` | Inspect the path, create one manual selection, refit it, and evaluate independent test predictions | Three PDF figures and printed external-test $R^2$ |
 | `03_leave_one_out_validation.py` | Select one path row without fitting a final model, then evaluate it with leave-one-out OOF reporting | Printed selected rank pair and immutable OOF summary |
-| `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths | One comparison PDF for each reference dataset |
-| `05_pulp_real_data.py` | Fit a manual Pulp model, then inspect its selection, rank profile, OOF behavior, and latent structure | Six PDF figures |
-| `06_sugarcane_real_data.py` | Run the complete wavelength-aware Sugarcane workflow | Six PDF figures |
+| `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths without fitting a final model | One comparison PDF for each reference dataset |
+| `05_pulp_real_data.py` | Inspect and qualify one manual Pulp selection, refit it, and interpret the fitted model | Six PDF figures |
+| `06_sugarcane_real_data.py` | Run the complete selection-driven wavelength-aware Sugarcane workflow | Six PDF figures |
 | `07_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow | Six PDFs, including threshold-annotated rank and component profiles |
 
-The [path-selection reference](api/path.md) documents the search and post-fit refit operation used
-by example 01. The [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02
-workflow directly. The comparison in example 04 is optional and is not part of routine Pi-PLS
-fitting.
+The [path-selection reference](api/path.md) documents both the compact automatic route used by
+example 01 and the explicit selection handoff used by the analytical examples. The
+[synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02 workflow directly.
+The comparison in example 04 is optional and is not part of routine Pi-PLS fitting.
 
 ## Run one example
 
@@ -44,20 +44,19 @@ make examples
 The complete real-data analyses are intentionally outside `make check` because they are application
 workflows and may take substantially longer than the package test suite.
 
-
 ## Cross-validation partitions
 
 Example 01 intentionally uses the scikit-learn-compatible default `cv=5` to keep the opening
-workflow to one search/refit expression. Examples 02, 04, 06, and 07 use one explicit shuffled
-five-fold partition. The complete Pulp workflow instead uses
+workflow to one automatic search/refit expression. Examples 02, 04, 06, and 07 use one explicit
+shuffled five-fold partition. The complete Pulp workflow instead uses
 `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`: 50 materialized splits and ten OOF
 predictions per observation. This deliberate stability analysis costs approximately ten times one
 five-fold partition; the quick start remains lighter. The complete Pulp, Sugarcane, and Tobacco
-workflows use `oof_report(..., selection=model.selection_)` to reuse the splits materialized by the
-path search. Example 03 deliberately fits no final model: it uses
-`search.select(rule="best_score")` and passes that selection to `oof_report()`. Its `LeaveOneOut`
-splitter is exhaustive, so shuffling is not defined. Grouped, temporal, or otherwise structured data
-require an application-specific splitter instead. The
+workflows create one selection before OOF reporting and pass that same object to final refitting.
+Example 03 deliberately fits no final model: it uses `search.select(rule="best_score")` and passes
+that selection to `oof_report()`. Its `LeaveOneOut` splitter is exhaustive, so shuffling is not
+defined. Grouped, temporal, or otherwise structured data require an application-specific splitter
+instead. The
 [computational-performance
 guide](computational_performance.md#develop-with-a-smaller-validation-protocol)
 explains how to use a lighter seeded protocol during development and restore the final declared
@@ -77,18 +76,20 @@ scoring and selection qualifications.
 
 The [dataset documentation](datasets.md) gives the original source, DOI, license, and repository
 adaptation for each real-data integration. The three complete analyses evaluate one Pi-PLS
-component path and fit one selected fixed model:
+component path, create one immutable selection, optionally qualify it through OOF reporting, and
+then fit that exact row on all observations:
 
 - `examples/05_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
-  responses. Search and refitting complete modeling; `model.selection_`, `component_path_`,
-  `predictor_rank_profile()`, `oof_report()`, and immutable inspection results are then calculated
-  before the six figures are rendered;
+  responses. It retrieves the component path, creates the declared manual selection, inspects the
+  conditional predictor-rank profile, computes selection-conditioned OOF predictions, refits the
+  same selection, calculates immutable fitted-model results, and then renders six figures;
 - `examples/06_sugarcane_real_data.py`: the direct reference workflow with the same ordering,
   wavelength-aware inspection, and six final PDF figures;
 - `examples/07_tobacco_real_data.py`: a complete spectral workflow with two explicit parsimony
   decisions. For every component count, the search retains the smallest evaluated predictor rank
-  within 10% of the exact conditional optimum. It then refits the smallest component-count row
-  within 10% of the minimum on that conditioned path. See the focused explanation below.
+  within 10% of the exact conditional optimum. The workflow then selects the smallest
+  component-count row within 10% of the minimum on that conditioned path, qualifies that selection,
+  and refits it. See the focused explanation below.
 
 ### Tobacco: two relative-tolerance decisions
 
@@ -105,12 +106,13 @@ search = PiPLSSearchCV(
     cv=CV,
 ).fit(X, Y)
 
-model = search.refit(
-    X,
-    Y,
+selection = search.select(
     rule="minimum_cv_mse",
     relative_tolerance=COMPONENT_RELATIVE_TOLERANCE,
 )
+rank_profile = search.predictor_rank_profile(selection.n_components)
+report = search.oof_report(X, Y, selection=selection)
+model = search.refit(X, Y, selection=selection)
 ```
 
 The first tolerance acts independently within each evaluated component count and determines the
@@ -122,11 +124,10 @@ candidate minimum.
 The predictor-rank profile renders its exact conditional optimum, the scorer-derived 10% CV-MSE
 threshold, and the smaller retained rank. The component path separately renders its exact
 conditioned-path minimum, 10% threshold, and retained component count. The console report names both
-reference and retained choices. Analysis obtains the rank evidence through
-`search.predictor_rank_profile(selection.n_components)` and the component evidence through
-`model.selection_`, then evaluates the same final row through
-`search.oof_report(X, Y, selection=selection)`. Absolute caps remain available for both stages but
-are not used in this example.
+reference and retained choices. The immutable `selection` carries the component evidence and
+identifies the rank profile, OOF report, and final full-data fit. After fitting succeeds,
+`model.selection_` records that exact object as model provenance. Absolute caps remain available for
+both stages but are not used in this example.
 
 The [search-owned selection rules](path_analysis.md#search-owned-selection-rules) define the
 selection object, and the [component-path API reference](api/path.md) gives the exact method surface.
@@ -135,15 +136,14 @@ selection object, and the [component-path API reference](api/path.md) gives the 
 
 Pulp, Sugarcane, and Tobacco each write six final PDF figures, including
 `predictor_rank_profile.pdf`. Tobacco retains three-page prediction-diagnostic and coefficient
-PDFs. No numbered
-example writes a generated CSV file: Pulp, Sugarcane, and Tobacco are supplied by their named
-`pipls.datasets` loaders. Every figure is constructed directly from
+PDFs. No numbered example writes a generated CSV file: Pulp, Sugarcane, and Tobacco are supplied by
+their named `pipls.datasets` loaders. Every figure is constructed directly from
 `component_path_`, conditional predictor-rank profiles, explicit OOF reports for retained
-selections, and immutable inspection results. The Pulp factor view anchors every component to a positive tensile-
-index (`TI`) response entry; Sugarcane and Tobacco retain the default predictor-based orientation.
-The example layer owns Matplotlib chart construction, physical coordinates, subplot layouts,
-legends, figure-level titles, PDF output, and closing. Pi-PLS factor panels use the same direct
-array-to-Matplotlib boundary.
+selections, and immutable inspection results. The Pulp factor view anchors every component to a
+positive tensile-index (`TI`) response entry; Sugarcane and Tobacco retain the default
+predictor-based orientation. The example layer owns Matplotlib chart construction, physical
+coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Pi-PLS factor
+panels use the same direct array-to-Matplotlib boundary.
 
 The Pulp tutorial extracts its checked snippets directly from `examples/05_pulp_real_data.py`.
 The sole module under `examples/_support/` evaluates the nontrivial fold-local ordinary-PLS path for

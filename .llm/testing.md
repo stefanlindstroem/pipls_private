@@ -223,7 +223,9 @@ Tests must verify that:
 - before/after selected pairs, OOF arrays, fitted predictions, and generated semantic artifacts are
   unchanged;
 - each served tutorial has one vertical Mermaid flowchart, equivalent prose, and strict local,
-  Pages-overlay, and source-distribution rendering without committed diagram assets.
+  Pages-overlay, and source-distribution rendering without committed diagram assets;
+- active public workflow guides describe analytical routes with a pre-refit `search.select()`
+  handoff and do not recover the working selection from `model.selection_`.
 
 ## Computational-performance documentation obligations
 

@@ -23,7 +23,7 @@ Focused modules expose immutable result records, response-standardized metrics, 
 generators, validation results, and pure numerical inspection.
 
 `PiPLSRegression` fits one explicit `(n_components, predictor_rank)` pair. `PiPLSSearchCV` evaluates
-the triangular path and supports explicit post-fit `select()`, `refit()`, and `oof_report()`
+the triangular path and supports explicit post-search `select()`, `refit()`, and `oof_report()`
 operations. The supported named selection rules are `best_score` and tolerance-based
 `minimum_cv_mse`. Refitted models retain the exact immutable `selection_`.
 
@@ -50,7 +50,7 @@ The maintained numbered examples are:
 4. Pi-PLS versus ordinary-PLS component-path comparison;
 5. repeated-CV Pulp analysis;
 6. Sugarcane analysis;
-7. Tobacco analysis with a 10% relative CV-MSE tolerance.
+7. Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
 
 `make examples` owns complete application validation. The default test suite does not duplicate the
 full real-data workflows.
@@ -132,7 +132,7 @@ outputs, caches, bytecode, and example artifacts are not package state.
 - Fixed fitting and path search do not wrap each other.
 - Search retains evidence but not training matrices or an implicit final estimator.
 - OOF reporting reuses the exact materialized search splits and accepts an existing compatible
-  selection.
+  selection; evidence-retaining workflows pass that same object to final refitting.
 - Numerical inspection is package-owned; plotting and report composition are caller-owned.
 - Public behavior changes include focused tests and synchronized documentation and decisions.
 - Paper-specific experiments and reporting belong downstream of tagged package releases.

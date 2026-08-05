@@ -248,6 +248,36 @@ def test_model_producing_tutorials_state_selection_ownership_positively() -> Non
         ) is None
 
 
+def test_active_workflow_guides_use_pre_refit_selection_handoff() -> None:
+    root = _repository_root()
+    analytical_guides = (
+        root / "README.md",
+        root / "docs" / "examples.md",
+        root / "docs" / "path_analysis.md",
+        root / "docs" / "tutorials" / "quick_start.md",
+        root / "examples" / "README.md",
+    )
+    stale_phrases = (
+        "selection = model.selection_",
+        "selection=model.selection_",
+        "Modeling completes before",
+        "complete modeling before",
+        "completes modeling before",
+        "Search and refitting complete modeling",
+        "complete search and full-data refitting before",
+        "workflows obtain the fitted row from `model.selection_`",
+    )
+
+    for path in analytical_guides:
+        text = path.read_text(encoding="utf-8")
+        assert "selection = search.select" in text, path
+        assert "selection=selection" in text, path
+        assert all(phrase not in text for phrase in stale_phrases), path
+
+    dataset_guide = (root / "docs" / "datasets.md").read_text(encoding="utf-8")
+    assert all(phrase not in dataset_guide for phrase in stale_phrases)
+
+
 def test_required_public_guides_are_reachable_through_navigation() -> None:
     root = _repository_root()
     navigation = load_mkdocs_config(root / "mkdocs.yml")["nav"]
