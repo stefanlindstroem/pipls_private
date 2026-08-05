@@ -157,8 +157,9 @@
   datasets.
 - Create handoff snapshots only from a clean committed Git tree. `make snapshot` must refuse
   tracked, staged, or nonignored untracked changes and must archive `HEAD`, so ignored generated
-  files cannot enter the handoff. It must also refuse a clean `HEAD` that contains committed files
-  below `examples/results/` other than `.gitkeep` placeholders.
+  files cannot enter the handoff. It must also refuse a clean `HEAD` that contains tracked caches, bytecode, coverage output,
+  generated documentation, build products, or files below `examples/results/` other than
+  `.gitkeep` placeholders.
 
 ## Delivery and validation
 

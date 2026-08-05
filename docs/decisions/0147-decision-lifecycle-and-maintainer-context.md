@@ -129,7 +129,7 @@ split internally.
 4. Add `docs/decisions/history.md` and consolidate completed micro-decisions -- complete with 45
    current records.
 5. Simplify brittle repository and workflow-structure tests and harden snapshot creation against
-   tracked caches and generated artifacts.
+   tracked caches and generated artifacts -- complete.
 6. Split `datasets.py` into private type, resource-loading, and synthetic-generation modules while
    preserving the public façade.
 7. Normalize links and indexes, complete stale-surface and repository-artifact audits, and mark this

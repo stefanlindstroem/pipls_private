@@ -15,6 +15,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python 3.10
 
 import pipls
 import pipls.inspection as inspection
+from tests._source_contracts import call_name, dotted_name, import_roots, parse_module
 
 _RENDERING_PACKAGES = {"matplotlib", "adjustText"}
 _RENDERING_METHODS = {
@@ -39,36 +40,6 @@ def _numbered_examples() -> list[Path]:
     return sorted((_repository_root() / "examples").glob("[0-9][0-9]_*.py"))
 
 
-def _call_name(node: ast.Call) -> str | None:
-    if isinstance(node.func, ast.Name):
-        return node.func.id
-    if isinstance(node.func, ast.Attribute):
-        return node.func.attr
-    return None
-
-
-def _attribute_path(node: ast.expr) -> str | None:
-    parts: list[str] = []
-    current: ast.expr = node
-    while isinstance(current, ast.Attribute):
-        parts.append(current.attr)
-        current = current.value
-    if not isinstance(current, ast.Name):
-        return None
-    parts.append(current.id)
-    return ".".join(reversed(parts))
-
-
-def _import_roots(tree: ast.AST) -> set[str]:
-    roots: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            roots.update(alias.name.split(".", 1)[0] for alias in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module is not None:
-            roots.add(node.module.split(".", 1)[0])
-    return roots
-
-
 def _pyproject() -> dict[str, Any]:
     with (_repository_root() / "pyproject.toml").open("rb") as stream:
         return tomllib.load(stream)
@@ -83,8 +54,8 @@ def test_runtime_package_exposes_no_plotting_api() -> None:
         assert all(not name.startswith("plot_") for name in module.__all__)
 
     for path in (root / "src" / "pipls").glob("*.py"):
-        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-        assert _import_roots(tree).isdisjoint(_RENDERING_PACKAGES), path
+        tree = parse_module(path)
+        assert import_roots(tree).isdisjoint(_RENDERING_PACKAGES), path
 
 
 def test_rendering_dependencies_are_optional_and_example_owned() -> None:
@@ -182,11 +153,11 @@ def test_maintained_cv_mse_error_bars_use_split_standard_deviation() -> None:
     for relative_path in relative_paths:
         path = root / relative_path
         text = path.read_text(encoding="utf-8")
-        tree = ast.parse(text, filename=str(path))
+        tree = parse_module(path)
         errorbar_calls = [
             node
             for node in ast.walk(tree)
-            if isinstance(node, ast.Call) and _call_name(node) == "errorbar"
+            if isinstance(node, ast.Call) and call_name(node) == "errorbar"
         ]
 
         assert errorbar_calls, path
@@ -199,6 +170,6 @@ def test_maintained_cv_mse_error_bars_use_split_standard_deviation() -> None:
                 None,
             )
             assert yerr is not None, path
-            attribute = _attribute_path(yerr)
+            attribute = dotted_name(yerr)
             assert attribute is not None, path
             assert attribute.endswith(".cv_mse_std"), (path, attribute)

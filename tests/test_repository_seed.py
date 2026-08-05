@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import re
-import shutil
 import subprocess
 import sys
-import tarfile
 from pathlib import Path
 from typing import Any
 
@@ -36,12 +34,6 @@ _REQUIRED_LLM_CONTRACTS = {
     ".llm/create_patch.sh",
     ".llm/strategy.md",
 }
-_DECISION_ROW = re.compile(r"^\| `(?P<filename>\d{4}-[a-z0-9-]+\.md)` \|", re.MULTILINE)
-_RETIREMENT_ROW = re.compile(
-    r"^\| `(?P<filename>\d{4}-[a-z0-9-]+\.md)` \| "
-    r"(?P<replacement>.*?) \|",
-    re.MULTILINE,
-)
 
 
 def _repository_root() -> Path:
@@ -553,272 +545,9 @@ def test_public_documentation_is_self_contained() -> None:
     assert ".llm" not in theory
 
 
-def test_maintainer_decision_index_links_every_record() -> None:
-    root = _repository_root()
-    index = (root / "docs" / "decisions" / "index.md").read_text(encoding="utf-8")
-    linked_entries = re.findall(r"\((\d{4}-[a-z0-9-]+\.md)\)", index)
-    linked_files = set(linked_entries)
-    decision_files = {
-        path.name for path in (root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md")
-    }
-
-    assert len(linked_entries) == len(linked_files), "decision records must be indexed exactly once"
-    assert linked_files == decision_files
-
-
-def test_decision_retirement_map_is_complete_and_nonconflicting() -> None:
-    root = _repository_root()
-    decisions = root / "docs" / "decisions"
-    retirement_text = (decisions / "retirements.md").read_text(encoding="utf-8")
-    rows = list(_RETIREMENT_ROW.finditer(retirement_text))
-    retired_files = [match.group("filename") for match in rows]
-    shipped_files = {
-        path.name for path in decisions.glob("[0-9][0-9][0-9][0-9]-*.md")
-    }
-
-    assert rows, "the retirement map must contain at least one retired decision"
-    assert len(retired_files) == len(set(retired_files))
-    assert set(retired_files).isdisjoint(shipped_files)
-
-    retired_numbers = {filename[:4] for filename in retired_files}
-    shipped_numbers = {filename[:4] for filename in shipped_files}
-    assert retired_numbers.isdisjoint(shipped_numbers), "decision numbers must not be reused"
-
-    history_text = (decisions / "history.md").read_text(encoding="utf-8")
-    history_anchors = {
-        re.sub(r"[^a-z0-9 -]", "", heading.lower()).replace(" ", "-")
-        for heading in re.findall(r"^## (.+)$", history_text, re.MULTILINE)
-    }
-
-    for match in rows:
-        replacements = re.findall(r"\]\(([^)]+)\)", match.group("replacement"))
-        assert replacements, match.group("filename")
-        for replacement in replacements:
-            target, _, anchor = replacement.partition("#")
-            assert (decisions / target).is_file(), replacement
-            if anchor:
-                assert target == "history.md", replacement
-                assert anchor in history_anchors, replacement
-
-
-def test_decision_history_and_active_references_are_consistent() -> None:
-    root = _repository_root()
-    decisions = root / "docs" / "decisions"
-    index = (decisions / "index.md").read_text(encoding="utf-8")
-    retirement_text = (decisions / "retirements.md").read_text(encoding="utf-8")
-    retired_numbers = {
-        match.group("filename")[:4]
-        for match in _RETIREMENT_ROW.finditer(retirement_text)
-    }
-
-    assert "[Compact development history](history.md)" in index
-    assert "[Explicit retirement map](retirements.md)" in index
-
-    active_paths = sorted(decisions.glob("[0-9][0-9][0-9][0-9]-*.md"))
-    active_paths.extend(sorted((root / ".llm").glob("*.md")))
-    retired_number_pattern = re.compile(
-        rf"\b(?:{'|'.join(sorted(retired_numbers))})\b"
-    )
-    for path in active_paths:
-        text = path.read_text(encoding="utf-8")
-        assert retired_number_pattern.search(text) is None, path
-
-
 def test_llm_layer_is_outside_installable_package() -> None:
     package_root = Path(pipls.__file__).resolve().parent
     assert ".llm" not in {part.name for part in package_root.parents}
-
-
-def _create_snapshot_test_repository(path: Path) -> Path:
-    root = path / "repository"
-    (root / ".llm").mkdir(parents=True)
-    shutil.copy2(_repository_root() / ".llm" / "snapshot.sh", root / ".llm" / "snapshot.sh")
-    (root / "README.md").write_text("# Snapshot fixture\n", encoding="utf-8")
-    (root / ".gitignore").write_text(
-        "docs/assets/generated/\n.pytest_cache/\n*-snapshot.tar.gz\n",
-        encoding="utf-8",
-    )
-
-    result_directories = (
-        "examples/results",
-        "examples/results/pls_path_comparison",
-        "examples/results/synthetic_tutorial",
-        "examples/results/pulp_post_analysis",
-        "examples/results/sugarcane_post_analysis",
-        "examples/results/tobacco_post_analysis",
-    )
-    for relative in result_directories:
-        directory = root / relative
-        directory.mkdir(parents=True, exist_ok=True)
-        (directory / ".gitkeep").touch()
-
-    subprocess.run(["git", "init", "--quiet"], cwd=root, check=True)
-    subprocess.run(
-        ["git", "config", "user.email", "snapshot@example.invalid"], cwd=root, check=True
-    )
-    subprocess.run(["git", "config", "user.name", "Snapshot Test"], cwd=root, check=True)
-    subprocess.run(["git", "add", "-A"], cwd=root, check=True)
-    subprocess.run(
-        ["git", "commit", "--quiet", "-m", "Create snapshot fixture"],
-        cwd=root,
-        check=True,
-    )
-    return root
-
-
-def test_snapshot_has_committed_repository_contents_at_archive_root(tmp_path: Path) -> None:
-    root = _create_snapshot_test_repository(tmp_path)
-    archive = root / "fixture-snapshot.tar.gz"
-
-    subprocess.run(
-        [str(root / ".llm" / "snapshot.sh"), archive.name],
-        cwd=root,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-
-    with tarfile.open(archive, "r:gz") as handle:
-        members = handle.getmembers()
-        names = {member.name.removeprefix("./") for member in members}
-        metadata_member = handle.extractfile(".llm/SNAPSHOT_INFO")
-        assert metadata_member is not None
-        metadata = metadata_member.read().decode("utf-8")
-
-    commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=root,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-    assert "README.md" in names
-    assert ".llm/SNAPSHOT_INFO" in names
-    assert not any(name.startswith(f"{root.name}/") for name in names)
-    assert f"commit: {commit}" in metadata
-    assert "dirty: false" in metadata
-    expected_result_placeholders = {
-        "examples/results/.gitkeep",
-        "examples/results/pls_path_comparison/.gitkeep",
-        "examples/results/synthetic_tutorial/.gitkeep",
-        "examples/results/pulp_post_analysis/.gitkeep",
-        "examples/results/sugarcane_post_analysis/.gitkeep",
-        "examples/results/tobacco_post_analysis/.gitkeep",
-    }
-    archived_results = {
-        member.name.removeprefix("./")
-        for member in members
-        if member.isfile() and member.name.removeprefix("./").startswith("examples/results/")
-    }
-    assert archived_results == expected_result_placeholders
-
-
-def test_example_result_tree_contains_placeholders_and_ignored_outputs() -> None:
-    repository_root = _repository_root()
-    result_root = repository_root / "examples" / "results"
-    expected_placeholders = {
-        ".gitkeep",
-        "pls_path_comparison/.gitkeep",
-        "pulp_post_analysis/.gitkeep",
-        "sugarcane_post_analysis/.gitkeep",
-        "synthetic_tutorial/.gitkeep",
-        "tobacco_post_analysis/.gitkeep",
-    }
-    result_files = {
-        path.relative_to(result_root).as_posix()
-        for path in result_root.rglob("*")
-        if path.is_file()
-    }
-
-    assert expected_placeholders <= result_files
-
-    generated_paths = sorted(
-        f"examples/results/{path}" for path in result_files - expected_placeholders
-    )
-    if generated_paths:
-        ignored = subprocess.run(
-            ["git", "check-ignore", "--no-index", "--stdin"],
-            cwd=repository_root,
-            input="\n".join(generated_paths),
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        assert set(ignored.stdout.splitlines()) == set(generated_paths)
-
-
-def test_snapshot_refuses_modified_staged_and_untracked_files(tmp_path: Path) -> None:
-    for state in ("modified", "staged", "untracked"):
-        root = _create_snapshot_test_repository(tmp_path / state)
-        if state == "untracked":
-            (root / "notes.txt").write_text("untracked\n", encoding="utf-8")
-        else:
-            (root / "README.md").write_text(f"# {state}\n", encoding="utf-8")
-            if state == "staged":
-                subprocess.run(["git", "add", "README.md"], cwd=root, check=True)
-
-        archive = tmp_path / f"{state}.tar.gz"
-        completed = subprocess.run(
-            [str(root / ".llm" / "snapshot.sh"), str(archive)],
-            cwd=root,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-
-        assert completed.returncode != 0
-        assert "Refusing to create a snapshot from a dirty worktree" in completed.stderr
-        assert not archive.exists()
-
-
-def test_snapshot_refuses_committed_generated_example_outputs(tmp_path: Path) -> None:
-    root = _create_snapshot_test_repository(tmp_path)
-    generated = root / "examples" / "results" / "generated.pdf"
-    generated.write_bytes(b"%PDF-generated fixture\n")
-    subprocess.run(["git", "add", "examples/results/generated.pdf"], cwd=root, check=True)
-    subprocess.run(
-        ["git", "commit", "--quiet", "-m", "Commit generated output"],
-        cwd=root,
-        check=True,
-    )
-    archive = tmp_path / "snapshot.tar.gz"
-
-    completed = subprocess.run(
-        [str(root / ".llm" / "snapshot.sh"), str(archive)],
-        cwd=root,
-        check=False,
-        capture_output=True,
-        text=True,
-    )
-
-    assert completed.returncode != 0
-    assert "committed generated example outputs" in completed.stderr
-    assert "examples/results/generated.pdf" in completed.stderr
-    assert not archive.exists()
-
-
-def test_snapshot_ignores_ignored_generated_files(tmp_path: Path) -> None:
-    root = _create_snapshot_test_repository(tmp_path)
-    generated = root / "docs" / "assets" / "generated" / "tutorial.svg"
-    generated.parent.mkdir(parents=True)
-    generated.write_text("<svg/>\n", encoding="utf-8")
-    cache = root / ".pytest_cache" / "state"
-    cache.parent.mkdir()
-    cache.write_text("cache\n", encoding="utf-8")
-    archive = tmp_path / "snapshot.tar.gz"
-
-    subprocess.run(
-        [str(root / ".llm" / "snapshot.sh"), str(archive)],
-        cwd=root,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-
-    with tarfile.open(archive, "r:gz") as handle:
-        names = {member.name.removeprefix("./") for member in handle.getmembers()}
-    assert not any(name.startswith("docs/assets/generated/") for name in names)
-    assert not any(name.startswith(".pytest_cache/") for name in names)
 
 
 def test_llm_workflow_scripts_are_executable() -> None:
@@ -828,22 +557,6 @@ def test_llm_workflow_scripts_are_executable() -> None:
         root / ".llm" / "create_patch.sh",
     ]
     assert all(path.stat().st_mode & 0o111 for path in scripts)
-
-
-def test_decision_index_and_records_are_structurally_consistent() -> None:
-    root = _repository_root()
-    index = (root / ".llm" / "decisions.md").read_text(encoding="utf-8")
-    indexed_files = set(_DECISION_ROW.findall(index))
-    decision_paths = sorted((root / "docs" / "decisions").glob("[0-9][0-9][0-9][0-9]-*.md"))
-    shipped_files = {path.name for path in decision_paths}
-
-    assert indexed_files == shipped_files
-    assert decision_paths
-
-    for path in decision_paths:
-        text = path.read_text(encoding="utf-8")
-        assert text.startswith("# Decision"), path
-        assert "\x00" not in text, path
 
 
 def test_llm_prompt_templates_are_nonempty_utf8_files() -> None:

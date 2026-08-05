@@ -20,15 +20,28 @@ if [[ -n "$status" ]]; then
     exit 1
 fi
 
-committed_example_outputs=()
+tracked_artifacts=()
 while IFS= read -r -d '' path; do
-    if [[ "$(basename "$path")" != ".gitkeep" ]]; then
-        committed_example_outputs+=("$path")
-    fi
-done < <(git -C "$root" ls-tree -r -z --name-only HEAD -- examples/results)
-if (( ${#committed_example_outputs[@]} > 0 )); then
-    printf 'Refusing to create a snapshot with committed generated example outputs:\n' >&2
-    printf '  %s\n' "${committed_example_outputs[@]}" >&2
+    case "$path" in
+        __pycache__/*|*/__pycache__/*|\
+        .pytest_cache/*|*/.pytest_cache/*|\
+        .mypy_cache/*|*/.mypy_cache/*|\
+        .ruff_cache/*|*/.ruff_cache/*|\
+        .ipynb_checkpoints/*|*/.ipynb_checkpoints/*|\
+        docs/_build/*|docs/assets/generated/*|site/*|htmlcov/*|build/*|dist/*|\
+        *.egg-info/*|*.pyc|*.pyo|.coverage|.coverage.*|coverage.xml)
+            tracked_artifacts+=("$path")
+            ;;
+        examples/results/*)
+            if [[ "$(basename "$path")" != ".gitkeep" ]]; then
+                tracked_artifacts+=("$path")
+            fi
+            ;;
+    esac
+done < <(git -C "$root" ls-tree -r -z --name-only HEAD)
+if (( ${#tracked_artifacts[@]} > 0 )); then
+    printf 'Refusing to create a snapshot with tracked cache or generated artifacts:\n' >&2
+    printf '  %s\n' "${tracked_artifacts[@]}" >&2
     exit 1
 fi
 

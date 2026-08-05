@@ -97,15 +97,16 @@ retained canonical decision, a history section, or both; Git remains the full ar
 
 ### Patch 5 -- tests and snapshot policy
 
-Next. Reduce brittle AST/source-text assertions while retaining durable workflow and repository
-boundaries. Split oversized repository-policy tests by responsibility where useful. Harden
-snapshot creation so tracked caches, bytecode, generated documentation, coverage output, build
-artifacts, and generated example outputs cause a clear failure, while ignored untracked local
-artifacts remain excluded.
+Complete. Structural workflow tests now use shared AST helpers and assert durable CV, import,
+modeling-order, analysis, rendering-ownership, and dataset-loading contracts rather than local
+variable names, helper names, or exact assignment shapes. Decision-registry and snapshot tests are
+separated by responsibility. Snapshot creation rejects tracked caches, bytecode, coverage output,
+built documentation, build products, and generated example outputs while continuing to ignore
+untracked ignored artifacts.
 
 ### Patch 6 -- dataset-module split
 
-Move immutable dataset types, packaged-resource loading, and synthetic generation into private
+Next. Move immutable dataset types, packaged-resource loading, and synthetic generation into private
 modules. Keep `pipls.datasets` as the stable public facade. Require exact public imports, resource
 bytes, deterministic generated arrays, validation, immutability, pickling, and distribution
 contents.
