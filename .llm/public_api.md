@@ -21,6 +21,14 @@ from pipls.decomposition import PiPLSDecomposition
 from pipls.validation import PiPLSOOFReport
 ```
 
+Decision 0148 accepts `PiPLSPredictorRankEvidence` as an additional focused-module public record.
+It is not implemented or exported until the Decision 0148 public-API patch. The final focused import
+will also permit:
+
+```python
+from pipls.component_path import PiPLSPredictorRankEvidence
+```
+
 `pipls.datasets`, `pipls.inspection`, and `pipls.metrics` expose exactly their declared `__all__`
 names. Private modules, including `_core`, `_cv_engine`, `_model_selection`, `_result_validation`,
 and `_sklearn_compat`, are not compatibility surfaces.
@@ -82,6 +90,17 @@ Important defaults and controls:
 - `scoring="neg_response_standardized_mse"` resolves to the package scorer;
 - standard scorer names, callables, and `None` remain accepted.
 
+Decision 0148 adds these accepted constructor controls in its implementation patch:
+
+```python
+predictor_rank_relative_tolerance=None
+predictor_rank_absolute_tolerance=np.inf
+```
+
+They are separate from `select()` and `refit()` tolerances. `None` resolves to the square root of
+float64 machine epsilon; positive-infinity absolute tolerance disables that cap. Nondefault values
+are invalid for fixed and maximum predictor-rank policies.
+
 `fit()` materializes one validation split set, evaluates candidate clones, and stores immutable
 candidate/path evidence. It does not retain the training matrices or fit a final model.
 
@@ -100,10 +119,15 @@ selection = search.select(n_components=4)
 Exactly one of `rule` and `n_components` is required. Selection performs no fitting, rescoring,
 split materialization, or mutation.
 
-`best_score` returns the global configured-score optimum. `minimum_cv_mse` returns the smallest
-component count satisfying both CV-MSE tolerance caps. `relative_tolerance=None` resolves to the
-square root of float64 machine epsilon; positive-infinity absolute tolerance disables that cap.
-Tolerance arguments are invalid for other rules and manual selection.
+The currently implemented `best_score` returns the global configured-score optimum.
+`minimum_cv_mse` returns the smallest component count satisfying both CV-MSE tolerance caps.
+`relative_tolerance=None` resolves to the square root of float64 machine epsilon; positive-infinity
+absolute tolerance disables that cap. Tolerance arguments are invalid for other rules and manual
+selection.
+
+Under Decision 0148, both named rules operate on the predictor-rank-conditioned component path.
+`best_score` therefore becomes the maximum configured-score retained path row rather than an
+unretained global candidate from `cv_results_`. Manual lookup also returns the conditioned row.
 
 ### Full-data refit
 
@@ -149,7 +173,13 @@ predictor ranks, configured mean scores, mean CV-MSE, split SD, plus path-wide p
 and split count.
 
 `PiPLSPredictorRankProfile` contains the evaluated predictor ranks and aligned evidence for one
-component count. Its `selection` is the conditional configured-score optimum for that profile.
+component count. Its currently implemented `selection` is the exact configured-score choice.
+Decision 0148 adds `reference_selection`, a tolerance-qualified `selection`, and
+`predictor_rank_evidence`.
+
+Decision 0148 also adds immutable `PiPLSPredictorRankEvidence` with exact-reference rank and score,
+reference CV-MSE mean and SD, resolved predictor-rank tolerances, and derived `score_threshold`.
+Optimized path rows and selections carry this evidence; fixed and maximum policies carry `None`.
 
 `PiPLSSelection` contains one evaluated pair, predictor-rank policy, configured score, CV-MSE mean,
 CV-MSE split SD, split count, and optional rule provenance. A `minimum_cv_mse` result additionally
@@ -233,8 +263,9 @@ package exposes no plotting module, Matplotlib artist result, or public `plot_*`
 Examples 05--07 fit Pi-PLS paths, explicitly refit one row, use `model.selection_`, optionally
 compute a matching OOF report, inspect the fitted model, and render final PDFs directly with
 Matplotlib. Pulp uses 50 repeated five-fold splits and averages ten OOF predictions per
-observation. Sugarcane and Tobacco use seeded shuffled five-fold CV. Tobacco demonstrates
-`relative_tolerance=0.10`.
+observation. Sugarcane and Tobacco use seeded shuffled five-fold CV. Tobacco currently
+demonstrates component-count `relative_tolerance=0.10`. Decision 0148 Patch 4 will add a separate
+constructor-level 10% predictor-rank tolerance and label the two decisions independently.
 
 The example-local ordinary-PLS path helper is not package API. Optional Matplotlib and `adjustText`
 dependencies remain outside the runtime dependency set.

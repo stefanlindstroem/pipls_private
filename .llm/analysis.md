@@ -18,6 +18,11 @@ Inspect cross-validated evidence before fitting the final model:
 - `search.predictor_rank_profile(n_components)` for the conditional rank profile;
 - `search.select(...)` when a fitting-free selected row is needed.
 
+Decision 0148 makes this route explicitly hierarchical. The predictor-rank profile distinguishes
+the exact configured-score reference from the smaller tolerance-qualified retained rank. The
+component path then contains only those conditionally retained rows, and component-count rules act
+on that path. Candidate evidence in `cv_results_` remains broader than named-rule eligibility.
+
 CV-MSE plots show arithmetic mean plus or minus population SD across materialized validation
 splits. SD is descriptive variability, not a confidence interval and not a selection threshold.
 Tolerance thresholds come from `PiPLSSelection.cv_mse_threshold`.
@@ -156,8 +161,9 @@ and direct ownership but must not freeze final adjusted label coordinates.
 - Example 04: Pi-PLS and ordinary-PLS path comparison only.
 - Example 05: repeated-CV Pulp selection, matching OOF report, representative interpretation.
 - Example 06: Sugarcane selection, OOF report, spectral interpretation, rank profile.
-- Example 07: Tobacco 10%-tolerance selection, OOF report, full-SVD spectral analysis, rank
-  profile, raw observation diagnostics, and source-order response pagination.
+- Example 07: Tobacco with separately labeled 10% predictor-rank and component-count tolerance
+  decisions, OOF report, full-SVD spectral analysis, rank profile, raw observation diagnostics, and
+  source-order response pagination after Decision 0148 Patch 4.
 
 Pulp, Sugarcane, and Tobacco keep scientific computation in memory and write only final PDF
 figures. Sugarcane and Tobacco keep analysis in `main()` and group rendering in private functions in

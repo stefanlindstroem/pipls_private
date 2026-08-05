@@ -48,11 +48,15 @@ model = search.refit(X, y, rule="minimum_cv_mse")
 report = search.oof_report(X, y, selection=model.selection_)
 ```
 
-The supported named rules are:
+The currently implemented named rules are:
 
 - `best_score`: global optimum under the configured scorer;
 - `minimum_cv_mse`: smallest component-path row satisfying simultaneous relative and absolute
   tolerances around the exact minimum CV-MSE row.
+
+Conditional predictor-rank selection currently maximizes the configured mean score and uses private
+numerical tie tolerances. Decision 0148 accepts separate public predictor-rank relative and absolute
+tolerances, but that target API is not implemented until its remaining patches are applied.
 
 Manual selection uses an evaluated `n_components` value and the predictor rank already selected
 conditionally for that row. A successful refit attaches the exact immutable row as
@@ -154,24 +158,15 @@ Do not add without a new owner decision:
 Current centering and optional scaling are not deferred: they are integral to every estimator fit
 and are learned within each training fold during search.
 
-## Active maintenance sequence
+## Current maintenance status
 
-Decision 0147 governs the current seven-patch cleanup:
+Decision 0147 is implemented. Decision records, maintainer context, structural tests, snapshot
+policy, and dataset-module ownership are in their normalized current form.
 
-1. establish decision lifecycle policy -- complete;
-2. compact and correct the active `.llm` layer -- complete;
-3. retire explicitly superseded decisions through an explicit map -- complete;
-4. add a compact historical summary and retire completed micro-decisions -- complete;
-5. simplify brittle structural tests and harden snapshots against tracked generated artifacts --
-   complete;
-6. split `datasets.py` into private implementation modules without changing public imports --
-   complete;
-7. normalize links and indexes and complete repository-wide stale-surface audits.
-
-The next admissible increment is Decision 0147 Patch 7: normalize links and indexes, complete the
-repository-wide stale-surface and artifact audits, and mark the decision implemented. Decision 0139
-Patch 3 remains a separate paused presentation increment and must not be mixed into this maintenance
-sequence.
+Decision 0148 is the active five-patch increment. Patch 1 has accepted the hierarchical predictor-
+rank tolerance contract. The next admissible increment is Patch 2: separate private exact-score
+comparison from substantive tolerance qualification without changing the public API or adaptive
+candidate coverage. Decision 0139 Patch 3 remains separate paused work.
 
 ## Authority and drift handling
 
@@ -195,6 +190,6 @@ conflict and resolve it in the same patch or obtain an owner decision.
 4. Read the applicable mathematical, numerical, API, data, analysis, testing, and development
    contracts.
 5. Inspect affected source and tests before editing.
-6. Verify that the request belongs to the active increment or explicitly changes the order.
+6. Verify that the request fits accepted scope and identify any decision that governs it.
 7. Return one root-relative Git patch, its SHA-256 checksum, validation evidence, and concise
    apply/check/commit/snapshot commands.

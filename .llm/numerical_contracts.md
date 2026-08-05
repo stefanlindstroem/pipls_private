@@ -52,8 +52,35 @@ min(p_min, n_train_min - 1, r_num_min, ceil(n / c))
 preprocessing, scoring, and warning suppression must not leak validation data.
 
 Adaptive rank search is deterministic for fixed inputs and configuration. Exhaustive
-`search_method="optimal"` evaluates every admissible requested pair. Tie behavior uses the
-implemented score tolerance and deterministic smaller-rank ordering.
+`search_method="optimal"` evaluates every admissible requested pair. Private numerical tie behavior
+uses the implemented score tolerance and deterministic smaller-rank ordering.
+
+Decision 0148 preserves that private comparison for exact-reference identification,
+`rank_test_score`, and adaptive refinement. Its accepted final retained-rank rule uses separate
+public tolerances. For fixed component count $h$ and exact reference score $S_{h,\max}$, evaluated
+rank $r$ qualifies when both
+
+\begin{equation}
+S_{hr}
+\geq
+S_{h,\max}
+-
+\delta_{\mathrm{rel},r}
+\left|S_{h,\max}\right|
+\end{equation}
+
+and
+
+\begin{equation}
+S_{hr}
+\geq
+S_{h,\max}
+-
+\delta_{\mathrm{abs},r}.
+\end{equation}
+
+The smallest evaluated qualifying rank is retained. Adaptive candidate coverage remains determined
+by the exact score optimum and must not depend on these public tolerances.
 
 ## Response-standardized MSE
 
@@ -74,6 +101,11 @@ splits; no standard error is derived or exposed.
 
 ## Selection tolerances
 
+Predictor-rank and component-count tolerances are separate stages. Predictor-rank tolerances are
+configured on `PiPLSSearchCV` and act in configured-score units within each component count.
+Component-count tolerances are supplied to `select()` or `refit()` and act on the resulting
+conditioned path in CV-MSE units.
+
 Let `M_min` be the exact minimum stored path mean. For a resolved nonnegative relative tolerance
 `delta_rel` and nonnegative absolute tolerance `delta_abs`:
 
@@ -91,8 +123,11 @@ finite and nonnegative. Absolute tolerance may also be positive infinity, which 
 NaN, negative values, and negative infinity are invalid. Tolerances apply only to
 `rule="minimum_cv_mse"`.
 
-The selection retains an unruled exact-minimum row, resolved tolerances, and a derived effective
-threshold. It must remain exactly reproducible for OOF compatibility validation.
+The component-count selection retains an unruled exact-minimum path row, resolved tolerances, and
+a derived effective threshold. Under Decision 0148, that reference row retains its own independent
+predictor-rank evidence. Direct component lookup and `best_score` have no component-count tolerance
+provenance but still carry predictor-rank evidence for optimized policies. All provenance must remain
+exactly reproducible for OOF compatibility validation.
 
 ## OOF reporting
 

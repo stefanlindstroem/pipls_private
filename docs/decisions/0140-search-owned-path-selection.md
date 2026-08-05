@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented. Decisions 0143 and 0146 define the final provenance and
-minimum-CV-MSE tolerance details.
+Accepted and implemented. Decisions 0143, 0146, and 0148 define the final provenance,
+component-count tolerances, and conditioned-path rule semantics.
 
 ## Context
 
@@ -26,9 +26,10 @@ Exactly one of `rule` and `n_components` is supplied. The method returns an immu
 
 Rule semantics are:
 
-- `best_score`: the global optimum under the configured scorer and fitted tie-breaking rule;
-- `minimum_cv_mse`: the smallest component-path row satisfying simultaneous relative and absolute
-  tolerances around the exact minimum mean CV-MSE row.
+- `best_score`: the maximum configured-score row on the predictor-rank-conditioned component
+  path, with deterministic smaller-component and smaller-rank ordering for exact numerical ties;
+- `minimum_cv_mse`: the smallest conditioned component-path row satisfying simultaneous relative
+  and absolute tolerances around the exact minimum mean CV-MSE path row.
 
 Manual component-count selection returns the stored row at that count with no rule provenance. The
 predictor rank is the rank already selected conditionally for that component count.

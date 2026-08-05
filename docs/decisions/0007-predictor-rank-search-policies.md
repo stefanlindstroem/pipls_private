@@ -21,9 +21,13 @@ The target predictor-rank modes are:
 
 - a positive integer: fit the supplied rank directly;
 - `"max"`: fit the rule-derived upper rank without CV search;
-- `"optimal"`: exhaustively evaluate every admissible integer rank and select the best CV score;
+- `"optimal"`: exhaustively evaluate every admissible integer rank;
 - `"auto"`: use deterministic adaptive logarithmic coarse-to-fine search and accept that the
-  selected rank is approximate relative to exhaustive search.
+  evaluated candidate set is approximate relative to exhaustive search.
+
+Decision 0148 refines final retained-rank selection: after either policy finishes candidate
+evaluation, separate public relative and absolute tolerances retain the smallest qualifying
+evaluated rank.
 
 Because the package is pre-alpha, the current exhaustive `"auto"` behavior will be renamed to
 `"optimal"` without a deprecated compatibility alias.
@@ -42,14 +46,15 @@ adaptive search must:
 2. fit all learned preprocessing inside each training fold;
 3. begin with a deterministic logarithmically spaced set that includes both endpoints;
 4. cache every evaluated rank and never refit a cached candidate unnecessarily;
-5. identify the best evaluated rank using the same scorer orientation and low-rank tie rule as
-   exhaustive search;
-6. refine the integer interval bounded by the neighboring evaluated ranks around the current best
-   rank;
+5. identify the exact evaluated reference rank using the configured scorer and private low-rank
+   numerical tie rule;
+6. refine the integer interval bounded by the neighboring evaluated ranks around that exact
+   reference rank;
 7. switch to exhaustive evaluation when the remaining interval contains no more than a small
    fixed implementation threshold, initially targeted at 10 ranks;
-8. return the best rank among all evaluated candidates;
-9. expose diagnostics sufficient to reconstruct the search path.
+8. after evaluation, apply Decision 0148 and retain the smallest evaluated rank satisfying both
+   public tolerance caps;
+9. expose diagnostics sufficient to reconstruct both candidate coverage and final retention.
 
 The implementation uses private deterministic constants of seven logarithmic points and an
 exhaustive-switch threshold of 10 ranks. These are not public constructor parameters and should
@@ -64,7 +69,7 @@ At minimum, adaptive fitting should record:
 - the number of admissible and evaluated candidates;
 - the final refinement interval;
 - whether every admissible rank was evaluated;
-- the selected rank and standard best-score diagnostics.
+- the exact reference rank, tolerance-qualified retained rank, and standard score diagnostics.
 
 ## Limitations
 

@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented. Decisions 0140, 0143, and 0146 refine selected-row ownership,
-selection provenance, OOF reporting, and the final rule vocabulary.
+Accepted and implemented. Decisions 0140, 0143, 0146, and 0148 refine selected-row ownership,
+selection provenance, OOF reporting, hierarchical rank retention, and the final rule vocabulary.
 
 ## Context
 

@@ -22,13 +22,17 @@ They must not become a second copy of living prose or preserve removed migration
 ### Search and selection
 
 - materialized split reuse and fold-local feasibility;
-- exhaustive and adaptive candidate behavior, score tolerance, tie breaking, and pipeline support;
-- stable `cv_results_`, component path, and conditional rank-profile evidence;
+- exhaustive and adaptive candidate behavior, private numerical score ties, tolerance-independent
+  candidate coverage, and pipeline support;
+- stable `cv_results_`, conditioned component path, exact and retained rank-profile selections, and
+  immutable predictor-rank evidence;
 - equal-split CV-MSE means and `ddof=0` SD, including repeated CV, one split, and unequal validation
   lengths;
-- `best_score`, manual component selection, and dual-tolerance `minimum_cv_mse` behavior;
-- default tolerance resolution, simultaneous caps, exact boundary inclusion, zero minimum, invalid
-  arguments, provenance, search non-mutation, refit, pipelines, and pickle behavior;
+- conditioned-path `best_score`, manual component selection, and dual-tolerance `minimum_cv_mse`
+  behavior;
+- independent predictor-rank and component-count tolerance defaults, simultaneous caps, exact
+  boundary inclusion, positive, negative, and zero score references, invalid arguments, provenance,
+  search non-mutation, refit, pipelines, and pickle behavior;
 - absence of retired standard-error properties and rules.
 
 ### OOF reporting
@@ -169,23 +173,33 @@ When a test reads Markdown or metadata, ask whether it protects a stable machine
 Avoid exact prose assertions. Historical decisions and changelog entries may retain terminology
 that is intentionally absent from the active API.
 
-## Decision 0147 obligations
+## Decision 0148 obligations
 
-During decision consolidation, tests must verify:
+The predictor-rank tolerance sequence must verify that:
 
-- every shipped numbered decision is indexed until retirement;
-- every retained current decision and historical-summary link resolves;
-- retirement maps cover every deleted record and decision numbers are never reused;
-- active `.llm`, tests, documentation, and retained decisions have no broken references;
-- no test pins the final retained decision count;
-- `history.md` summarizes outcomes rather than copying retired files.
+- private exact-score comparison remains distinct from public tolerance qualification;
+- changing only predictor-rank tolerances does not change evaluated candidates, split scores,
+  candidate summaries, `rank_test_score`, or adaptive/exhaustive diagnostics;
+- `"auto"` selects only among evaluated ranks and `"optimal"` selects among all admissible ranks;
+- fixed and maximum policies reject nondefault tolerances and expose no inapplicable evidence;
+- optimized path rows, selections, profiles, component references, OOF reports, clones, pipelines,
+  and pickles retain complete validated predictor-rank provenance;
+- Tobacco applies and labels separate 10% predictor-rank and component-count tolerances.
 
-The snapshot-hardening patch must demonstrate both sides of the policy: ignored untracked caches and
-generated files remain absent from snapshots, while deliberately tracked cache, bytecode, coverage,
-built-site, build, or generated-example artifacts cause snapshot creation to fail clearly.
+## Decision lifecycle and repository-hygiene obligations
 
-The dataset-module split must preserve public imports, resources, generated arrays, validation,
-immutability, pickling, and distribution contents exactly.
+Tests must verify:
+
+- every shipped numbered decision is indexed;
+- every retained current decision, history link, and retirement replacement resolves;
+- retirement maps are nonconflicting and retired numbers are never reused;
+- active maintainer and decision records do not reference retired records;
+- no test pins the retained decision count or copies deleted decisions into tombstone fixtures;
+- `history.md` summarizes outcomes rather than reproducing retired files;
+- ignored untracked caches and generated files remain absent from snapshots, while equivalent
+  deliberately tracked artifacts cause snapshot creation to fail clearly;
+- the public `pipls.datasets` façade, module identity, resources, deterministic generators,
+  immutability, pickling, and installed-distribution behavior remain stable across internal splits.
 
 ## Review rule
 

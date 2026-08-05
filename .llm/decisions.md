@@ -4,7 +4,7 @@ This registry lists only numbered decisions that still define current behavior o
 `docs/decisions/history.md` for compact development history and
 `docs/decisions/retirements.md` for the exhaustive retired-filename map.
 
-| Decision | Current subject | Implemented outcome |
+| Decision | Current subject | Current contract or outcome |
 |---|---|---|
 | `0001-core-definition.md` | fixed Pi-PLS construction | SVD/least-squares core with explicit `(h, r_pi)` admissibility |
 | `0002-preprocessing-semantics.md` | centering and scaling | preprocessing remains outside the fixed numerical core |
@@ -50,18 +50,28 @@ This registry lists only numbered decisions that still define current behavior o
 | `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain the exact refit selection as `model.selection_` and make `oof_report(selection=...)` reuse every materialized search split |
 | `0145-final-implementation-surface-cleanup.md` | final implementation-surface cleanup | remove residual duplicate fitted attributes, privatize model-selection internals, remove unused private helpers, declare remaining module exports, and state fitting-free selection positively |
 | `0146-cv-mse-tolerance-selection.md` | CV-MSE tolerance selection and split-SD reporting | replace the 1-SE heuristic with dual-tolerance minimum-CV-MSE selection, descriptive split SD, a 10% Tobacco demonstration, and repeated Pulp validation |
-| `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, compact historical summaries, and retired records; compact `.llm`, curate the decision set, simplify brittle tests, harden snapshots, and split dataset internals without changing public behavior |
+| `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, compact historical summaries, and retired records; normalize `.llm`, decision links, structural tests, snapshot hygiene, and private dataset ownership without changing public behavior |
+| `0148-predictor-rank-tolerance-selection.md` | predictor-rank tolerance selection | accepted hierarchical configured-score tolerances, immutable rank-selection evidence, conditioned component rules, and separate 10% Tobacco controls; implementation pending |
 
 ## Current canonical clusters
 
 - **Mathematics and numerical construction:** 0001--0004, 0007--0009, 0014, 0025, 0032, 0092,
-  0120--0121, and 0146.
+  0120--0121, and 0146--0148.
 - **Estimator, search, and result ownership:** 0039, 0066, 0093, 0102, 0137, 0140, 0143, and
-  0145--0146.
+  0145--0148.
 - **Datasets and product scope:** 0015, 0024--0025, 0041, 0119, 0123, and 0142.
 - **Inspection and rendering:** 0042, 0045, 0061, 0083, 0094, 0110, 0124, 0127, and 0141.
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
   and 0147.
+
+## Accepted active transition
+
+- Decision 0148 adds separate constructor-level relative and absolute tolerances for conditional
+  predictor-rank retention, while component-count tolerances remain post-fit controls.
+- Adaptive refinement and `rank_test_score` continue to use private exact-score comparison; public
+  predictor-rank tolerances act only after candidates have been evaluated.
+- Named component-count rules operate on the rank-conditioned path, and optimized rows expose
+  immutable exact-reference and tolerance provenance.
 
 ## Implemented clarifications
 

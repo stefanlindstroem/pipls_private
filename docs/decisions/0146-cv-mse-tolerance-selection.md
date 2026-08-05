@@ -96,8 +96,9 @@ M_{\min}+\delta_{\mathrm{abs}}
 \end{equation}
 
 The rule selects the smallest evaluated component count satisfying `cv_mse_mean <= T`. The selected
-predictor rank is the rank already associated with that component-path row. The path remains ordered
-by ascending component count, so the first qualifying row is the selected row.
+predictor rank is the rank already associated with that component-path row. Decision 0148 defines
+how optimized ranks are tolerance-conditioned before this component path is formed. The path remains
+ordered by ascending component count, so the first qualifying row is the selected row.
 
 The public arguments are:
 
@@ -147,9 +148,10 @@ selection.cv_mse_threshold
 ```
 
 The stored tolerance values are the resolved numeric values. `reference_minimum` is the exact
-minimum-CV-MSE path row used to form the threshold and must not contain nested tolerance provenance.
-`cv_mse_threshold` is derived from the reference minimum and the two tolerances; it is not stored as
-independent state.
+minimum-CV-MSE path row used to form the threshold and must not contain nested component-count
+tolerance provenance. Under Decision 0148 it retains independent predictor-rank evidence when the
+path policy is optimized. `cv_mse_threshold` is derived from the reference minimum and the two
+component-count tolerances; it is not stored as independent state.
 
 Manual component-count selections and `rule="best_score"` selections do not carry tolerance
 provenance.

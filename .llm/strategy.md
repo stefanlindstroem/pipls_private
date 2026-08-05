@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This file records current development principles, unresolved work, and the active review sequence.
-Completed implementation history belongs in numbered decisions and Git history. `.llm/state.md`
-contains the concise implemented-state handoff.
+This file records current development principles, unresolved work, and review protocol. Completed
+implementation history belongs in numbered decisions and Git history. `.llm/state.md` contains the
+concise implemented-state handoff.
 
 ## Ownership
 
@@ -43,6 +43,11 @@ The final named rule vocabulary is `best_score` and tolerance-based `minimum_cv_
 selection is by evaluated component count. CV-MSE path summaries use equal weighting per
 materialized split and population SD (`ddof=0`). There is no standard-error rule or result surface.
 
+Decision 0148 adds a separate tolerance stage for conditional predictor-rank choice. Predictor-rank
+tolerances are search-constructor controls because they determine `component_path_`; component-count
+tolerances remain post-fit `select()` and `refit()` controls. Exact numerical ties and adaptive
+candidate coverage remain separate from substantive parsimony tolerances.
+
 ### Analysis
 
 Pi-PLS-specific factorization inspection and shared PLS-family diagnostics are pure numerical
@@ -60,67 +65,23 @@ dataset must have explicit redistribution and adaptation rights before inclusion
 This repository owns the installable package, user documentation, examples, tests, packaging, and
 release validation. Paper reproduction and publication-only analyses remain downstream.
 
-## Active sequence: Decision 0147
+## Current roadmap
 
-### Patch 1 -- decision lifecycle
+Decision 0148 governs the active five-patch predictor-rank tolerance increment:
 
-Complete. Decision material is classified as current decisions, compact historical summaries, or
-retired records recoverable from Git. Retirement is based on continuing relevance rather than age.
+1. establish the decision and accepted contracts -- complete;
+2. separate exact numerical score comparison from substantive rank-tolerance qualification;
+3. implement constructor controls, hierarchical path selection, public evidence, and API tests;
+4. demonstrate separate 10% predictor-rank and component-count tolerances in Tobacco;
+5. complete migration, documentation, distribution, and repository audits.
 
-### Patch 2 -- compact maintainer context
-
-Complete. Rewrite active `.llm` guidance around implemented contracts and unresolved work. Remove
-completed patch narratives and stale intermediate API descriptions without changing executable or
-served user behavior.
-
-Acceptance conditions:
-
-- no active guide claims that removed standard-error or transitional report APIs exist;
-- `state.md` is a usable fresh-chat handoff;
-- `strategy.md` contains current principles and roadmap rather than full increment history;
-- `testing.md` describes current obligations rather than migration-by-migration fixtures;
-- `analysis.md`, `public_api.md`, and `numerical_contracts.md` match the implementation;
-- `.llm/decisions.md` remains structurally complete until decision retirement begins;
-- the active guide layer is materially smaller without dropping durable contracts.
-
-### Patch 3 -- retire explicitly superseded decisions
-
-Complete. The first retirement map removes 13 records whose active effects are fully replaced by
-later canonical decisions. Current indexes list only shipped records; deleted filenames remain
-recoverable from Git and decision numbers are not reused.
-
-### Patch 4 -- historical summary and micro-decision consolidation
-
-Complete. `docs/decisions/history.md` summarizes completed development eras, the explicit retirement
-map covers 102 removed records, and 45 current numbered decisions remain. Retired records map to a
-retained canonical decision, a history section, or both; Git remains the full archive.
-
-### Patch 5 -- tests and snapshot policy
-
-Complete. Structural workflow tests now use shared AST helpers and assert durable CV, import,
-modeling-order, analysis, rendering-ownership, and dataset-loading contracts rather than local
-variable names, helper names, or exact assignment shapes. Decision-registry and snapshot tests are
-separated by responsibility. Snapshot creation rejects tracked caches, bytecode, coverage output,
-built documentation, build products, and generated example outputs while continuing to ignore
-untracked ignored artifacts.
-
-### Patch 6 -- dataset-module split
-
-Complete. `pipls.datasets` is now a small public façade over private type, packaged-resource, and
-synthetic-generation modules. The complete nine-name public surface, public module identity,
-resource bytes, deterministic arrays and truth, validation, immutability, pickle lookup, and clean
-installed-distribution behavior remain unchanged.
-
-### Patch 7 -- normalization and final audit
-
-Normalize decision indexes and links; remove stale references; audit public/private imports,
-removed names, generated artifacts, helper reachability, distribution contents, and `.llm`
-duplication; then mark Decision 0147 implemented.
+Patch 2 is next. It must not change constructor signatures, evaluated candidates, adaptive coverage,
+or public results.
 
 ## Independent paused work
 
 Decision 0139 Patch 3 may later refine presentation and navigation after an explicit owner request.
-It is not part of Decision 0147 and must not be bundled into the cleanup sequence.
+It is not part of Decision 0148 and must not be bundled into the predictor-rank tolerance sequence.
 
 Future block-aware standardization remains intentionally undesigned. Do not reserve public names,
 constructor parameters, or hidden abstractions before a dedicated owner-led design phase.

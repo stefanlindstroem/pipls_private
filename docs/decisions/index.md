@@ -51,6 +51,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0145: final implementation-surface cleanup](0145-final-implementation-surface-cleanup.md)
 - [0146: CV-MSE tolerance selection and split-SD reporting](0146-cv-mse-tolerance-selection.md)
 - [0147: decision lifecycle](0147-decision-lifecycle-and-maintainer-context.md)
+- [0148: predictor-rank tolerance selection](0148-predictor-rank-tolerance-selection.md)
 
 ## Historical navigation
 

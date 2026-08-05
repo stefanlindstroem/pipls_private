@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented. Decisions 0140, 0145, and 0146 refine selection ownership, public names,
-and CV-MSE tolerance provenance.
+Accepted and implemented. Decisions 0140, 0145, 0146, and 0148 refine selection ownership, public
+names, component-count tolerance provenance, and conditional predictor-rank evidence.
 
 ## Context
 
@@ -34,9 +34,11 @@ predictor_rank_policy
 n_splits
 ```
 
-Each row contains the predictor rank selected conditionally for that component count under the
-configured scorer and tie-breaking rule. Component counts are unique and strictly increasing.
-`cv_mse_std` is population SD across the materialized validation splits.
+Decision 0148 adds an immutable `predictor_rank_evidence` sequence aligned with optimized path rows;
+fixed and maximum policies use `None`. Each row contains the predictor rank selected conditionally
+for that component count under the accepted configured-score tolerance rule. Component counts are
+unique and strictly increasing. `cv_mse_std` is population SD across the materialized validation
+splits.
 
 The path exposes no public selected-row lookup or recommendation methods. Use:
 
@@ -48,8 +50,9 @@ selection = search.select(n_components=3)
 
 Each operation returns an immutable `PiPLSSelection`. A selection contains one evaluated rank pair,
 its score and CV-MSE summaries, the path policy, split count, and optional rule provenance. A
-minimum-CV-MSE selection additionally retains the exact unruled minimum row, resolved relative and
-absolute tolerances, and a derived effective threshold.
+minimum-CV-MSE selection additionally retains the exact unruled minimum path row, resolved
+component-count relative and absolute tolerances, and a derived effective threshold. Decision 0148
+adds independent predictor-rank evidence to optimized selections and their reference rows.
 
 All public path and selection records defensively copy arrays, normalize scalars, validate direct
 construction, remain read-only, and reconstruct through the same validation when unpickled.

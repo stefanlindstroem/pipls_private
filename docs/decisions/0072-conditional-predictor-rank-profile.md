@@ -3,7 +3,7 @@
 ## Status
 
 Accepted and implemented. Public result naming and selection ownership are refined by Decisions
-0140, 0145, and 0146.
+0140, 0145, 0146, and 0148.
 
 ## Context
 
@@ -31,14 +31,17 @@ cv_mse_mean
 cv_mse_std
 predictor_rank_policy
 n_splits
+reference_selection
 selection
+predictor_rank_evidence
 ```
 
 Candidate arrays contain only ranks actually evaluated for the requested component count and are
-sorted in strictly ascending predictor-rank order. The derived `selection` is a `PiPLSSelection`
-using the same configured-score optimum and tolerant tie-breaking rule as the fitted search. Under
-the default scorer this is equivalent to the minimum mean response-standardized CV-MSE candidate
-at that component count.
+sorted in strictly ascending predictor-rank order. Decision 0148 makes `reference_selection` the
+exact configured-score optimum under the private numerical tie rule and makes `selection` the
+smallest evaluated rank satisfying the public predictor-rank tolerances. Under the default scorer,
+the reference is the exact conditional mean CV-MSE minimum and the retained rank is the smallest
+candidate within both accepted CV-MSE-equivalent caps.
 
 The method requires a fitted search and an evaluated integer component count. It does not cache a
 mapping of every possible profile, mutate the search, fit a model, or select a component count.

@@ -2,9 +2,9 @@
 
 ## Status
 
-Accepted. Patches 1--4 of seven are complete. The active `.llm` layer describes current contracts,
-`history.md` summarizes completed eras, the retirement map covers 102 removed records, and the
-maintained tree contains 45 current numbered decisions.
+Accepted and implemented. All seven patches are complete. The active `.llm` layer describes current
+contracts without patch-progress narration, `history.md` summarizes completed eras, the retirement
+map covers 102 removed records, and the maintained tree contains 45 current numbered decisions.
 
 ## Context
 
@@ -133,7 +133,20 @@ split internally.
 6. Split `datasets.py` into private type, resource-loading, and synthetic-generation modules while
    preserving the public façade -- complete.
 7. Normalize links and indexes, complete stale-surface and repository-artifact audits, and mark this
-   decision implemented.
+   decision implemented -- complete.
+
+## Final audit outcome
+
+The closing audit found no broken local decision links, active references to retired decision files,
+tracked cache or generated artifacts, private package imports from maintained examples or rendering
+tools, obsolete pre-release API names in active user or maintainer material, unreferenced top-level
+private source helpers, or uncalled example-owned plotting and rendering functions. Distribution
+configuration includes the private dataset implementation modules through ordinary package
+discovery while retaining the public `pipls.datasets` façade.
+
+The active maintainer layer now records current state and unresolved work only. The completed
+seven-patch sequence remains in this decision and Git history rather than in `state.md`,
+`strategy.md`, or `testing.md`.
 
 ## Validation
 

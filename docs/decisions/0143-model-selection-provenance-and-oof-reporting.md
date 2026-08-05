@@ -2,8 +2,9 @@
 
 ## Status
 
-Accepted and implemented. Decision 0146 refines the selection-policy details while this decision
-remains canonical for model-owned selection provenance and selection-conditioned OOF reporting.
+Accepted and implemented. Decisions 0146 and 0148 refine component-count and conditional
+predictor-rank provenance while this decision remains canonical for model-owned selection
+provenance and selection-conditioned OOF reporting.
 
 ## Context
 

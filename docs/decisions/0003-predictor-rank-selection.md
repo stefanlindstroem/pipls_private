@@ -28,9 +28,10 @@ because the selected model is refitted on all supplied observations.
 
 `predictor_rank="optimal"` scans every integer rank from `n_components` through the fold-safe
 upper bound. `predictor_rank="auto"` uses the adaptive policy in decision 0007 and may evaluate
-only a subset. Both select the maximum mean scikit-learn score. Scores equal within `rtol=1e-12`
-and `atol=1e-15` are resolved in favor of the smaller predictor rank. The selected fixed-rank
-model is refitted on all data supplied to `fit()`.
+only a subset. Private numerical score ties are resolved deterministically in favor of the smaller
+predictor rank. Decision 0148 supersedes exact conditional score maximization as the final retained-
+rank rule by adding separate public relative and absolute predictor-rank tolerances in
+`PiPLSSearchCV`; the rank ceiling and candidate-coverage policies in this record remain normative.
 
 An explicit integer `predictor_rank` bypasses the rule-derived upper bound. It remains subject to
 the fixed-core numerical-rank and dimensional checks. `max_predictor_rank_` records the
