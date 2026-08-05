@@ -21,11 +21,13 @@ import sys
 
 import numpy as np
 import pipls
+import pipls.component_path
 import pipls.datasets
 import pipls.inspection
 import pipls.metrics
 import pipls.search
 from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls.component_path import PiPLSPredictorRankEvidence
 from pipls.datasets import (
     PiPLSDataset,
     PiPLSLatentGeometryTruth,
@@ -92,6 +94,25 @@ prediction = model.predict(X[:2])
 
 assert prediction.shape == (2, 2)
 assert np.isfinite(prediction).all()
+
+search = PiPLSSearchCV(
+    n_components_values=(1,),
+    predictor_rank_values=(1, 2),
+    predictor_rank_relative_tolerance=1e6,
+    search_method="optimal",
+    cv=2,
+    n_jobs=1,
+).fit(X, Y)
+selection = search.select(n_components=1)
+evidence = selection.predictor_rank_evidence
+profile = search.predictor_rank_profile(1)
+
+assert PiPLSPredictorRankEvidence.__module__ == "pipls.component_path"
+assert selection.predictor_rank == 1
+assert isinstance(evidence, PiPLSPredictorRankEvidence)
+assert evidence.relative_tolerance == 1e6
+assert profile.selection == selection
+assert profile.reference_selection.predictor_rank_evidence is None
 
 pulp = load_pulp()
 pulp_X, pulp_Y = load_pulp(return_X_y=True)

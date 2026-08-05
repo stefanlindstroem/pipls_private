@@ -101,7 +101,7 @@ of the component-count tolerance rule. Inspect `search.predictor_rank_profile(h)
 exact conditional rank optimum with the tolerance-retained rank at one component count. A final
 model is returned directly by `refit()` and records the exact fitted row as `model.selection_`; it is
 not stored on the search. See
-[Scoring and the best evaluated pair](path_analysis.md#scoring-and-the-best-evaluated-pair).
+[Scoring and conditioned path selection](path_analysis.md#scoring-and-conditioned-path-selection).
 
 ## A grouped splitter reports missing metadata
 

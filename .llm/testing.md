@@ -173,9 +173,9 @@ When a test reads Markdown or metadata, ask whether it protects a stable machine
 Avoid exact prose assertions. Historical decisions and changelog entries may retain terminology
 that is intentionally absent from the active API.
 
-## Decision 0148 obligations
+## Predictor-rank tolerance obligations
 
-The predictor-rank tolerance sequence must verify that:
+Tests verify that:
 
 - private exact-score comparison remains distinct from public tolerance qualification;
 - changing only predictor-rank tolerances does not change evaluated candidates, split scores,

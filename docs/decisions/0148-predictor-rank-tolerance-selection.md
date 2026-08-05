@@ -2,10 +2,10 @@
 
 ## Status
 
-Accepted. Patches 1 through 4 of five are complete. The public constructor controls, hierarchical
-conditioned path, immutable predictor-rank evidence, conditioned-path selection rules, and separate
-10% Tobacco predictor-rank and component-count demonstration are implemented. Patch 5 completes the
-migration, distribution, link, and repository audits.
+Accepted and implemented. All five patches are complete. The public constructor controls,
+hierarchical conditioned path, immutable predictor-rank evidence, conditioned-path selection
+rules, separate 10% Tobacco predictor-rank and component-count demonstration, and final migration,
+distribution, link, and repository audits are complete.
 
 ## Context
 
@@ -231,7 +231,7 @@ parsimony decisions.
 
 ### Demonstrate both decisions in the Tobacco workflow
 
-Example 07 will define separately named constants:
+Example 07 defines separately named constants:
 
 ```python
 PREDICTOR_RANK_RELATIVE_TOLERANCE = 0.10
@@ -258,7 +258,7 @@ is not built into the scorer-neutral evidence record.
 4. Demonstrate separate 10% predictor-rank and component-count tolerances in the Tobacco workflow
    and update user documentation and generated example artifacts -- complete.
 5. Complete migration wording, distribution and link audits, update the changelog, and mark this
-   decision implemented.
+   decision implemented -- complete.
 
 ## Validation
 

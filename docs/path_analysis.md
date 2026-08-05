@@ -83,7 +83,7 @@ retained. Fixed and maximum policies accept only the default tolerances and have
 evidence. `search_method="auto"` selects among evaluated ranks; `"optimal"` selects among all
 admissible ranks.
 
-## Scoring and conditioned path selection { #scoring-and-the-best-evaluated-pair }
+## Scoring and conditioned path selection { #scoring-and-conditioned-path-selection }
 
 Candidate evaluation uses the configured mean test score. The default scoring parameter is
 the stable package name `"neg_response_standardized_mse"`, which resolves to

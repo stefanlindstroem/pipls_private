@@ -83,7 +83,7 @@ Important defaults and controls:
 - `scoring="neg_response_standardized_mse"` resolves to the package scorer;
 - standard scorer names, callables, and `None` remain accepted.
 
-Decision 0148 adds these accepted constructor controls in its implementation patch:
+Decision 0148 defines these constructor controls:
 
 ```python
 predictor_rank_relative_tolerance=None

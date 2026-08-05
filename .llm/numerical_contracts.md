@@ -53,7 +53,7 @@ preprocessing, scoring, and warning suppression must not leak validation data.
 
 Adaptive rank search is deterministic for fixed inputs and configuration. Exhaustive
 `search_method="optimal"` evaluates every admissible requested pair. Private numerical tie behavior
-uses the implemented score tolerance and deterministic smaller-rank ordering.
+uses dedicated numerical tie tolerances and deterministic smaller-rank ordering.
 
 Decision 0148 preserves that private comparison for exact-reference identification,
 `rank_test_score`, and adaptive refinement. Its accepted final retained-rank rule uses separate

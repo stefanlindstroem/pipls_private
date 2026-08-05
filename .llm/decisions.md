@@ -64,11 +64,11 @@ This registry lists only numbered decisions that still define current behavior o
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
   and 0147.
 
-## Accepted active transition
+## Implemented Decision 0148 contract
 
-- Decision 0148 adds separate constructor-level relative and absolute tolerances for conditional
-  predictor-rank retention, while component-count tolerances remain post-fit controls.
-- Adaptive refinement and `rank_test_score` continue to use private exact-score comparison; public
+- Separate constructor-level relative and absolute tolerances govern conditional predictor-rank
+  retention; component-count tolerances remain post-fit controls.
+- Adaptive refinement and `rank_test_score` use private exact-score comparison; public
   predictor-rank tolerances act only after candidates have been evaluated.
 - Named component-count rules operate on the rank-conditioned path, and optimized rows expose
   immutable exact-reference and tolerance provenance.

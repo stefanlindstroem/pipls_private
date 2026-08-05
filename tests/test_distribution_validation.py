@@ -89,11 +89,13 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
     helper = (_repository_root() / "tools" / "check_distributions.py").read_text(encoding="utf-8")
 
     for public_import in (
+        "import pipls.component_path",
         "import pipls.datasets",
         "import pipls.inspection",
         "import pipls.metrics",
         "import pipls.search",
         "from pipls import PiPLSRegression, PiPLSSearchCV",
+        "from pipls.component_path import PiPLSPredictorRankEvidence",
         "PiPLSDataset,",
         "PiPLSLatentGeometryTruth,",
         "PiPLSRegressionTruth,",
@@ -110,6 +112,10 @@ def test_distribution_smoke_test_covers_public_installed_behavior() -> None:
     assert "package_file.relative_to(environment_root)" in helper
     assert "PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)" in helper
     assert "prediction.shape == (2, 2)" in helper
+    assert "predictor_rank_relative_tolerance=1e6" in helper
+    assert "selection = search.select(n_components=1)" in helper
+    assert "isinstance(evidence, PiPLSPredictorRankEvidence)" in helper
+    assert "profile.selection == selection" in helper
     assert "pulp = load_pulp()" in helper
     assert "pulp_X, pulp_Y = load_pulp(return_X_y=True)" in helper
     assert "pulp.X.shape == (46, 14)" in helper

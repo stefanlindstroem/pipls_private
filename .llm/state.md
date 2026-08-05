@@ -113,7 +113,7 @@ The maintained numbered examples are user tasks:
 4. Pi-PLS versus ordinary-PLS component-path comparison;
 5. complete repeated-CV Pulp analysis;
 6. complete Sugarcane analysis;
-7. complete Tobacco analysis with a 10% relative CV-MSE tolerance.
+7. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
 
 Example 05 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 06 and 07 use
 `KFold(n_splits=5, shuffle=True, random_state=0)`. Complete real-data examples are exercised by
@@ -164,12 +164,10 @@ and are learned within each training fold during search.
 Decision 0147 is implemented. Decision records, maintainer context, structural tests, snapshot
 policy, and dataset-module ownership are in their normalized current form.
 
-Decision 0148 is the active five-patch increment. Patches 1 through 4 have established the
-hierarchical contract, separated exact and substantive comparisons, implemented the public
-constructor controls and evidence records, and demonstrated separate 10% predictor-rank and
-component-count tolerances in Tobacco. The next admissible increment is Patch 5: complete migration,
-documentation, distribution, and repository audits. Decision 0139 Patch 3 remains separate paused
-work.
+Decision 0148 is implemented. Predictor-rank tolerances, conditioned component-path selection,
+immutable rank evidence, and the separate Tobacco predictor-rank and component-count demonstrations
+are part of the current package contract. There is no authorized active package increment. Decision
+0139 Patch 3 remains separate paused work.
 
 ## Authority and drift handling
 

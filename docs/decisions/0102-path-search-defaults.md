@@ -1,39 +1,44 @@
 # Decision 0102: path-search defaults and scorer presentation
 
+## Status
+
+Accepted and implemented for selection-only path evaluation and stable scorer presentation.
+Decision 0137 supersedes the former constructor-time refit and delegated fitted-model surfaces;
+Decisions 0140 and 0148 define current conditioned-path selection.
+
 ## Context
 
-The routine documented workflow evaluates a component path, lets the user choose a parsimonious
-component count, and then fits one explicit fixed `PiPLSRegression`. `PiPLSSearchCV` nevertheless
-defaulted to `refit=True`, which automatically fitted the globally best evaluated pair and exposed
-delegated prediction methods. Its default `scoring` value was also a function object, so generated
-Python signatures displayed a process-specific memory address.
+The routine workflow evaluates candidate evidence, lets the user choose a parsimonious component
+count, and then fits one explicit fixed `PiPLSRegression`. Earlier pre-release search behavior could
+fit a global candidate automatically and delegate prediction methods from the search object. Its
+default `scoring` value was also a function object, so generated Python signatures displayed a
+process-specific memory address.
 
-The package has not been released, so accidental defaults do not require compatibility handling.
-The response-standardized scoring formula and public scorer callable are already accepted and must
+The response-standardized scoring formula and public scorer callable were already accepted and must
 not change.
 
 ## Decision
 
-1. `PiPLSSearchCV` defaults to `refit=False`.
-2. The default object evaluates and records the path, global best pair, concise component path,
-   predictor-rank profiles, and validation report without fitting a full-data prediction model.
-3. Users request automatic full-data fitting of the globally best evaluated pair explicitly with
-   `refit=True`; only then are delegated prediction, transformation, scoring, feature-name, and
-   refitted-estimator surfaces available.
-4. The default `scoring` parameter is the stable string
-   `"neg_response_standardized_mean_squared_error"`.
-5. That package-specific name resolves internally to the existing public callable
-   `pipls.metrics.neg_response_standardized_mean_squared_error` and retains the same fold-local
-   response-standardized MSE values, candidate ordering, and selection rule.
+1. `PiPLSSearchCV.fit()` evaluates and stores candidate evidence without fitting a final full-data
+   model.
+2. The fitted search exposes `cv_results_`, the predictor-rank-conditioned `component_path_`, and
+   on-demand predictor-rank profiles. It exposes no fitted global-best attributes or delegated
+   prediction methods.
+3. Users construct a final full-data model explicitly with post-fit `refit(...)`, using a named
+   conditioned-path rule or an evaluated component count.
+4. The default `scoring` parameter is the stable string `"neg_response_standardized_mse"`.
+5. That package-specific name resolves internally to the public callable
+   `pipls.metrics.neg_response_standardized_mse` and retains the same fold-local
+   response-standardized MSE values and configured-score orientation.
 6. Ordinary scikit-learn scorer names, scorer callables, and `None` remain supported.
-7. Repository consumers that require refitted-model behavior state `refit=True`; path-inspection
-   workflows may continue to state `refit=False` explicitly when doing so improves readability.
-8. No compatibility alias or legacy default is retained.
+7. No compatibility alias for the removed constructor-time refit or obsolete scorer name is
+   retained.
 
 ## Consequences
 
-`PiPLSSearchCV()` now represents the documented selection workflow directly. Its generated signature
-is stable across processes, and users can copy the default scorer name through parameter grids,
-cloning, and serialized configuration without embedding a function representation. The public
-scorer function remains importable and reusable. Numerical scores, candidate feasibility,
-selection tolerance, tie-breaking, OOF behavior, and explicit `refit=True` behavior are unchanged.
+`PiPLSSearchCV()` represents path evaluation and explicit post-fit selection. Its generated
+signature is stable across processes, and users can copy the default scorer name through parameter
+grids, cloning, and serialized configuration without embedding a function representation. The
+public scorer function remains importable and reusable. Candidate evaluation, fold-local response
+scales, rank feasibility, adaptive coverage, and immutable selection provenance remain governed by
+their focused decisions.

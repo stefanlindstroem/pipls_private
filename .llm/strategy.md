@@ -67,19 +67,11 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0148 governs the active five-patch predictor-rank tolerance increment:
-
-1. establish the decision and accepted contracts -- complete;
-2. separate exact numerical score comparison from substantive rank-tolerance qualification --
-   complete;
-3. implement constructor controls, hierarchical path selection, public evidence, and API tests --
-   complete;
-4. demonstrate separate 10% predictor-rank and component-count tolerances in Tobacco -- complete;
-5. complete migration, documentation, distribution, and repository audits.
-
-Patch 5 is next. It must remove stale pre-tolerance wording, complete the changelog and decision
-status, verify distribution and local-link integrity, and confirm that all public and example
-surfaces describe the hierarchical selection procedure consistently.
+Decision 0148 is implemented. The package now has separate predictor-rank and component-count
+tolerance stages, complete immutable provenance, conditioned-path named rules, and a maintained
+Tobacco demonstration of both 10% choices. No additional package increment is authorized. New work
+that changes scientific behavior, public API, or repository policy requires an explicit owner
+request and, where necessary, a new decision.
 
 ## Independent paused work
 

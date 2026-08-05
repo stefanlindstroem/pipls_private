@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Add independent constructor-level relative and absolute tolerances for conditional predictor-
+  rank retention. Build the component path from the smallest evaluated qualifying rank at each
+  component count, keep adaptive candidate coverage tied to the exact score optimum, expose
+  immutable `PiPLSPredictorRankEvidence`, and make named component-count rules operate on the
+  conditioned path. The Tobacco workflow demonstrates separate 10% predictor-rank and
+  component-count tolerances.
 - Complete Decision 0146 by removing the one-standard-error rule, the derived
   `cv_mse_standard_error` properties, `one_standard_error_threshold`, and all active transitional
   documentation and tests. The final selection surface contains `best_score`, tolerance-based

@@ -21,7 +21,6 @@ The implementation computes this quantity in original response units after predi
 concatenates responses transformed under different fold-specific scalers. Responses receive
 uniform weight. Candidate losses are the unweighted mean of split losses.
 
-`response_standardized_mean_squared_error` returns the positive loss and
-`neg_response_standardized_mean_squared_error` returns its negative for scikit-learn scorer
-maximization. Both follow the `(estimator, X, y)` scorer signature and use the estimator's
-training-derived `response_scale_for_scoring_`.
+`response_standardized_mse` returns the positive loss and `neg_response_standardized_mse` returns
+its negative for scikit-learn scorer maximization. Both follow the `(estimator, X, y)` scorer
+signature and use the estimator's training-derived `response_scale_for_scoring_`.
