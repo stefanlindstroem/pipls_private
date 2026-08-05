@@ -75,7 +75,7 @@ This registry lists only numbered decisions that still define current behavior o
 - Preserve fold-local preprocessing and use explicit seeds for shuffled CV and randomized SVD.
 - Document current candidate, parallelism, OOF, and timing behavior without universal benchmark
   claims.
-- Patch 5 writes the complete guide; Patch 6 integrates and audits it.
+- The complete guide is present; Patch 6 integrates, tests, distributes, and audits it.
 
 ## Implemented Decision 0149 contract
 

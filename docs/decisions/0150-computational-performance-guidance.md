@@ -2,10 +2,10 @@
 
 ## Status
 
-Accepted. Patch 4 of the authorized six-patch sequence is complete. The central served guide,
-its navigation position, scope, section structure, and maintainer contracts are established.
-Patch 5 writes the complete practical guidance. Patch 6 integrates links, troubleshooting,
-documentation tests, distribution checks, and final current-state wording.
+Accepted. Patch 5 of the authorized six-patch sequence is complete. The central served guide now
+contains the cost model, practical configurations, implementation-specific execution boundaries,
+caveats, inspection route, development-to-final workflow, and trade-off table. Patch 6 integrates
+links, troubleshooting, final documentation tests, distribution checks, and current-state wording.
 
 ## Context
 
@@ -115,10 +115,8 @@ than universal worker-count or speed claims.
 
 ## Authorized remaining sequence
 
-5. Write the complete computational-performance guide using only the final predictor-rank search
-   terminology.
-6. Add concise cross-links, troubleshooting, changelog, documentation and distribution tests, then
-   mark this decision implemented and return `.llm` to current-state wording.
+6. Add concise cross-links, troubleshooting, changelog, final documentation and distribution
+   tests, then mark this decision implemented and return `.llm` to current-state wording.
 
 ## Validation obligations
 

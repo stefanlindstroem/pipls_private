@@ -178,6 +178,12 @@ time, and repeated OOF work. It may describe candidate-fit scaling and current e
 but it must not publish machine-independent speed claims or imply that narrower validation or search
 policies are statistically equivalent.
 
+The guide uses candidate-fold fits as its first accounting unit. For $N_{\mathrm{pair}}$ evaluated
+pairs and $N_{\mathrm{split}}$ materialized splits, candidate evaluation performs
+$N_{\mathrm{pair}}N_{\mathrm{split}}$ fold-local fits, while the feasibility pass adds one Pi-PLS
+probe per split. Full-data refitting adds one fit and each OOF report adds one selected-pair fit per
+split. These counts are not presented as wall-clock formulas.
+
 All advice preserves fold-local learned preprocessing. Shuffled validation and randomized predictor
 SVD examples use explicit integer seeds. Fixed and maximum-rank examples omit `search_method`;
 `"adaptive"` and `"exhaustive"` are used only when predictor-rank coverage is an actual choice.

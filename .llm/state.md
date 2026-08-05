@@ -172,10 +172,11 @@ Decision 0149 is implemented. The runtime API, maintained examples, public docum
 retained decisions, tests, and distribution checks use `search_method="adaptive"` and
 `search_method="exhaustive"`; the former values are rejected without aliases.
 
-Decision 0150 is accepted and Patch 4 is complete. The served computational-performance guide, its
-Reference navigation position, scope, stable section structure, and maintainer contracts are now
-established. The next authorized increment is Patch 5, which writes the complete guidance. Decision
-0139 Patch 3 remains separate paused work.
+Decision 0150 is accepted and Patch 5 is complete. The served computational-performance guide now
+documents candidate-fit scaling, validation repetitions, adaptive and exhaustive rank coverage,
+fixed and restricted paths, randomized predictor SVD, parallel execution, OOF reuse, and work
+inspection. The next authorized increment is Patch 6, which integrates and audits the guide.
+Decision 0139 Patch 3 remains separate paused work.
 
 ## Authority and drift handling
 
