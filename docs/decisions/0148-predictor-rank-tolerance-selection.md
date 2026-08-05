@@ -2,9 +2,9 @@
 
 ## Status
 
-Accepted. Patches 1 and 2 of five are complete. The private implementation now separates exact
-numerical score comparison from substantive configured-score tolerance qualification. The public
-constructor, fitted path behavior, and result provenance remain unchanged until Patch 3.
+Accepted. Patches 1 through 3 of five are complete. The public constructor controls, hierarchical
+conditioned path, immutable predictor-rank evidence, and conditioned-path selection rules are now
+implemented. Patch 4 adds the separate 10% Tobacco demonstration and user-facing workflow update.
 
 ## Context
 
@@ -13,8 +13,8 @@ count $h$, it first chooses a retained predictor rank $r_{\pi}$. It then builds 
 from those conditional choices and selects a component count from that path.
 
 The second choice already has public relative and absolute CV-MSE tolerances through Decision 0146.
-The first choice currently maximizes `mean_test_score` and uses private `rtol=1e-12` and
-`atol=1e-15` values only to identify numerical ties. Those private constants are appropriate for
+Before this decision, the first choice maximized `mean_test_score` and used private `rtol=1e-12`
+and `atol=1e-15` values only to identify numerical ties. Those private constants remain appropriate for
 stable equality handling, ranking, and adaptive-search refinement, but they do not provide a
 user-controlled tradeoff between predictor-subspace dimension and observed validation performance.
 
@@ -253,7 +253,7 @@ is not built into the scorer-neutral evidence record.
 2. Separate exact numerical score comparison from substantive predictor-rank tolerance primitives,
    without changing the public API or adaptive candidate coverage -- complete.
 3. Add the constructor parameters, hierarchical path behavior, immutable public evidence, and full
-   API/integration tests.
+   API/integration tests -- complete.
 4. Demonstrate separate 10% predictor-rank and component-count tolerances in the Tobacco workflow
    and update user documentation and generated example artifacts.
 5. Complete migration wording, distribution and link audits, update the changelog, and mark this

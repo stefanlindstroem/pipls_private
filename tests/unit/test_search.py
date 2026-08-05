@@ -15,6 +15,7 @@ from sklearn.preprocessing import StandardScaler
 from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
 from pipls.component_path import (
     PiPLSComponentPath,
+    PiPLSPredictorRankEvidence,
     PiPLSPredictorRankProfile,
     PiPLSSelection,
 )
@@ -1348,6 +1349,8 @@ def test_component_path_exposes_conditional_scores_and_cv_mse_summaries() -> Non
     np.testing.assert_array_equal(path.n_components, np.array([1, 2]))
     assert path.n_splits == 3
     assert path.predictor_rank_policy == "optimized"
+    assert path.predictor_rank_evidence is not None
+    assert len(path.predictor_rank_evidence) == path.n_components.size
 
     for row_index, h in enumerate((1, 2)):
         rank = int(path.predictor_rank[row_index])
@@ -1524,6 +1527,10 @@ def test_component_path_records_predictor_rank_policy(
     ).fit(X, Y)
 
     assert search.component_path_.predictor_rank_policy == expected_policy
+    if expected_policy == "optimized":
+        assert search.component_path_.predictor_rank_evidence is not None
+    else:
+        assert search.component_path_.predictor_rank_evidence is None
     if expected_policy == "fixed":
         np.testing.assert_array_equal(
             search.component_path_.predictor_rank,
@@ -1639,3 +1646,200 @@ def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
         match=r"oof_report\(\) requires the same number of response columns",
     ):
         search.oof_report(X, Y[:, :1], selection=compatible)
+
+
+def test_predictor_rank_relative_tolerance_conditions_the_component_path() -> None:
+    X, Y = _data()
+    score_by_rank = {1: 0.91, 2: 1.0, 3: 0.95}
+
+    def scorer(estimator: object, X_validation: object, y_validation: object) -> float:
+        del X_validation, y_validation
+        return score_by_rank[int(estimator.predictor_rank)]
+
+    search = PiPLSSearchCV(
+        n_components_values=[1],
+        predictor_rank_values=[1, 2, 3],
+        max_predictor_rank=3,
+        search_method="optimal",
+        predictor_rank_relative_tolerance=0.10,
+        scoring=scorer,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    selected = search.select(n_components=1)
+    profile = search.predictor_rank_profile(1)
+    evidence = selected.predictor_rank_evidence
+
+    assert isinstance(evidence, PiPLSPredictorRankEvidence)
+    assert evidence.reference_predictor_rank == 2
+    assert evidence.reference_mean_test_score == pytest.approx(1.0)
+    assert evidence.relative_tolerance == pytest.approx(0.10)
+    assert np.isposinf(evidence.absolute_tolerance)
+    assert evidence.score_threshold == pytest.approx(0.90)
+    assert selected.predictor_rank == 1
+    assert selected.mean_test_score == pytest.approx(0.91)
+    assert profile.reference_selection.predictor_rank == 2
+    assert profile.reference_selection.predictor_rank_evidence is None
+    assert profile.selection == selected
+    assert search.component_path_.predictor_rank_evidence == (evidence,)
+
+    model = search.refit(X, Y, n_components=1)
+    report = search.oof_report(X, Y, selection=model.selection_)
+    assert model.selection_ == selected
+    assert report.selection == selected
+    assert report.selection.predictor_rank_evidence is evidence
+
+
+def test_predictor_rank_absolute_tolerance_can_control_qualification() -> None:
+    X, Y = _data()
+    score_by_rank = {1: 0.91, 2: 1.0, 3: 0.96}
+
+    def scorer(estimator: object, X_validation: object, y_validation: object) -> float:
+        del X_validation, y_validation
+        return score_by_rank[int(estimator.predictor_rank)]
+
+    search = PiPLSSearchCV(
+        n_components_values=[1],
+        predictor_rank_values=[1, 2, 3],
+        max_predictor_rank=3,
+        search_method="optimal",
+        predictor_rank_relative_tolerance=0.10,
+        predictor_rank_absolute_tolerance=0.05,
+        scoring=scorer,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    selected = search.select(n_components=1)
+    assert selected.predictor_rank == 2
+    assert selected.predictor_rank_evidence is not None
+    assert selected.predictor_rank_evidence.score_threshold == pytest.approx(0.95)
+
+
+def test_best_score_selects_from_the_conditioned_component_path() -> None:
+    X, Y = _data()
+    score_by_pair = {
+        (1, 1): 0.91,
+        (1, 2): 1.00,
+        (1, 3): 0.95,
+        (2, 2): 0.95,
+        (2, 3): 0.94,
+    }
+
+    def scorer(estimator: object, X_validation: object, y_validation: object) -> float:
+        del X_validation, y_validation
+        key = (int(estimator.n_components), int(estimator.predictor_rank))
+        return score_by_pair[key]
+
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3],
+        max_predictor_rank=3,
+        search_method="optimal",
+        predictor_rank_relative_tolerance=0.10,
+        scoring=scorer,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    global_index = int(np.argmax(search.cv_results_["mean_test_score"]))
+    assert tuple(
+        int(search.cv_results_[name][global_index])
+        for name in ("n_components", "predictor_rank")
+    ) == (1, 2)
+    np.testing.assert_array_equal(search.component_path_.predictor_rank, [1, 2])
+    np.testing.assert_allclose(search.component_path_.mean_test_score, [0.91, 0.95])
+
+    best = search.select(rule="best_score")
+    assert (best.n_components, best.predictor_rank) == (2, 2)
+    assert best.mean_test_score == pytest.approx(0.95)
+
+
+def test_predictor_rank_tolerance_does_not_change_auto_candidate_coverage() -> None:
+    X, Y = _data(n_samples=80)
+    common = {
+        "n_components_values": [1],
+        "predictor_rank_values": list(range(1, 9)),
+        "max_predictor_rank": 8,
+        "search_method": "auto",
+        "cv": 3,
+        "n_jobs": 1,
+    }
+    exact = PiPLSSearchCV(
+        **common,
+        predictor_rank_relative_tolerance=0.0,
+        predictor_rank_absolute_tolerance=0.0,
+    ).fit(X, Y)
+    tolerant = PiPLSSearchCV(
+        **common,
+        predictor_rank_relative_tolerance=0.50,
+        predictor_rank_absolute_tolerance=np.inf,
+    ).fit(X, Y)
+
+    for name in ("n_components", "predictor_rank"):
+        np.testing.assert_array_equal(exact.cv_results_[name], tolerant.cv_results_[name])
+    for name in exact.cv_results_:
+        if name.startswith("split") and name.endswith("_test_score"):
+            np.testing.assert_allclose(exact.cv_results_[name], tolerant.cv_results_[name])
+    assert exact.search_is_exhaustive_ == tolerant.search_is_exhaustive_
+
+
+@pytest.mark.parametrize("predictor_rank_values", ([3], "max"))
+@pytest.mark.parametrize(
+    "tolerance_kwargs",
+    (
+        {"predictor_rank_relative_tolerance": 0.10},
+        {"predictor_rank_absolute_tolerance": 0.10},
+    ),
+)
+def test_nondefault_predictor_rank_tolerances_require_optimized_policy(
+    predictor_rank_values: object,
+    tolerance_kwargs: dict[str, float],
+) -> None:
+    X, Y = _data()
+    with pytest.raises(ValueError, match="optimized predictor-rank policy"):
+        PiPLSSearchCV(
+            n_components_values=[1, 2],
+            predictor_rank_values=predictor_rank_values,
+            cv=3,
+            **tolerance_kwargs,
+        ).fit(X, Y)
+
+
+@pytest.mark.parametrize(
+    ("keyword", "value", "message"),
+    [
+        ("predictor_rank_relative_tolerance", -0.1, "finite nonnegative"),
+        ("predictor_rank_relative_tolerance", np.inf, "finite nonnegative"),
+        ("predictor_rank_relative_tolerance", np.nan, "finite nonnegative"),
+        ("predictor_rank_relative_tolerance", True, "finite nonnegative"),
+        ("predictor_rank_absolute_tolerance", -0.1, "nonnegative real"),
+        ("predictor_rank_absolute_tolerance", np.nan, "nonnegative real"),
+        ("predictor_rank_absolute_tolerance", -np.inf, "nonnegative real"),
+        ("predictor_rank_absolute_tolerance", False, "nonnegative real"),
+    ],
+)
+def test_invalid_predictor_rank_tolerances_are_rejected(
+    keyword: str,
+    value: object,
+    message: str,
+) -> None:
+    X, Y = _data()
+    with pytest.raises(ValueError, match=message):
+        PiPLSSearchCV(**{keyword: value}).fit(X, Y)
+
+
+def test_predictor_rank_tolerance_parameters_clone_repr_and_pickle() -> None:
+    search = PiPLSSearchCV(
+        predictor_rank_relative_tolerance=0.10,
+        predictor_rank_absolute_tolerance=0.25,
+    )
+    cloned = clone(search)
+    restored = pickle.loads(pickle.dumps(search))
+
+    for result in (cloned, restored):
+        assert result.predictor_rank_relative_tolerance == pytest.approx(0.10)
+        assert result.predictor_rank_absolute_tolerance == pytest.approx(0.25)
+    assert "predictor_rank_relative_tolerance=0.1" in repr(search)
+    assert "predictor_rank_absolute_tolerance=0.25" in repr(search)

@@ -8,6 +8,7 @@ import pytest
 
 from pipls.component_path import (
     PiPLSComponentPath,
+    PiPLSPredictorRankEvidence,
     PiPLSPredictorRankProfile,
     PiPLSSelection,
 )
@@ -236,3 +237,137 @@ def test_predictor_rank_profile_is_pickleable_with_read_only_arrays() -> None:
     assert restored.predictor_rank_policy == "optimized"
     assert restored.selection.predictor_rank == 4
     assert not hasattr(restored, "cv_mse_standard_error")
+
+
+def test_predictor_rank_evidence_is_immutable_validated_and_pickleable() -> None:
+    evidence = PiPLSPredictorRankEvidence(
+        reference_predictor_rank=np.int64(3),
+        reference_mean_test_score=np.float32(-0.40),
+        reference_cv_mse_mean=np.float32(0.40),
+        reference_cv_mse_std=np.float32(0.08),
+        relative_tolerance=np.float32(0.10),
+        absolute_tolerance=np.inf,
+    )
+
+    assert type(evidence.reference_predictor_rank) is int
+    assert type(evidence.reference_mean_test_score) is float
+    assert evidence.score_threshold == pytest.approx(-0.44)
+    with pytest.raises(FrozenInstanceError):
+        evidence.reference_predictor_rank = 2  # type: ignore[misc]
+    assert pickle.loads(pickle.dumps(evidence)) == evidence
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("reference_predictor_rank", 0, "positive integer"),
+        ("reference_mean_test_score", np.inf, "finite real"),
+        ("reference_cv_mse_mean", -0.1, "nonnegative"),
+        ("reference_cv_mse_std", np.nan, "finite real"),
+        ("relative_tolerance", -0.1, "finite nonnegative"),
+        ("absolute_tolerance", -np.inf, "nonnegative real"),
+    ],
+)
+def test_predictor_rank_evidence_rejects_invalid_fields(
+    field: str,
+    value: object,
+    message: str,
+) -> None:
+    kwargs = {
+        "reference_predictor_rank": 3,
+        "reference_mean_test_score": -0.4,
+        "reference_cv_mse_mean": 0.4,
+        "reference_cv_mse_std": 0.08,
+        "relative_tolerance": 0.1,
+        "absolute_tolerance": np.inf,
+    }
+    with pytest.raises(ValueError, match=message):
+        PiPLSPredictorRankEvidence(**{**kwargs, field: value})
+
+
+def test_predictor_rank_profile_exposes_exact_and_tolerant_selections() -> None:
+    evidence = PiPLSPredictorRankEvidence(
+        reference_predictor_rank=3,
+        reference_mean_test_score=1.0,
+        reference_cv_mse_mean=0.40,
+        reference_cv_mse_std=0.08,
+        relative_tolerance=0.10,
+        absolute_tolerance=np.inf,
+    )
+    profile = PiPLSPredictorRankProfile(
+        n_components=1,
+        predictor_rank=[1, 2, 3],
+        mean_test_score=[0.91, 0.95, 1.0],
+        cv_mse_mean=[0.50, 0.45, 0.40],
+        cv_mse_std=[0.10, 0.09, 0.08],
+        predictor_rank_policy="optimized",
+        n_splits=5,
+        predictor_rank_evidence=evidence,
+    )
+
+    assert profile.reference_selection.predictor_rank == 3
+    assert profile.reference_selection.predictor_rank_evidence is None
+    assert profile.selection.predictor_rank == 1
+    assert profile.selection.predictor_rank_evidence is evidence
+
+
+def test_component_path_aligns_predictor_rank_evidence_with_rows() -> None:
+    evidence = (
+        PiPLSPredictorRankEvidence(2, 1.0, 0.4, 0.08, 0.1, np.inf),
+        PiPLSPredictorRankEvidence(3, 0.9, 0.5, 0.09, 0.1, np.inf),
+    )
+    path = PiPLSComponentPath(
+        n_components=[1, 2],
+        predictor_rank=[1, 2],
+        predictor_rank_policy="optimized",
+        mean_test_score=[0.91, 0.9],
+        cv_mse_mean=[0.45, 0.5],
+        cv_mse_std=[0.09, 0.09],
+        n_splits=5,
+        predictor_rank_evidence=evidence,
+    )
+
+    assert isinstance(path.predictor_rank_evidence, tuple)
+    assert path._selection_at_index(0).predictor_rank_evidence is evidence[0]
+    restored = pickle.loads(pickle.dumps(path))
+    assert restored.predictor_rank_evidence == evidence
+
+    with pytest.raises(ValueError, match="one-for-one"):
+        PiPLSComponentPath(
+            n_components=[1, 2],
+            predictor_rank=[1, 2],
+            predictor_rank_policy="optimized",
+            mean_test_score=[0.91, 0.9],
+            cv_mse_mean=[0.45, 0.5],
+            cv_mse_std=[0.09, 0.09],
+            n_splits=5,
+            predictor_rank_evidence=evidence[:1],
+        )
+
+
+def test_predictor_rank_evidence_rejects_selection_beyond_reference_rank() -> None:
+    evidence = PiPLSPredictorRankEvidence(2, 1.0, 0.4, 0.08, 0.1, np.inf)
+
+    with pytest.raises(ValueError, match="must not exceed"):
+        PiPLSSelection(
+            n_components=1,
+            predictor_rank=3,
+            predictor_rank_policy="optimized",
+            mean_test_score=0.95,
+            cv_mse_mean=0.45,
+            cv_mse_std=0.09,
+            n_splits=5,
+            predictor_rank_evidence=evidence,
+        )
+
+    with pytest.raises(ValueError, match="must not exceed"):
+        PiPLSComponentPath(
+            n_components=[1],
+            predictor_rank=[3],
+            predictor_rank_policy="optimized",
+            mean_test_score=[0.95],
+            cv_mse_mean=[0.45],
+            cv_mse_std=[0.09],
+            n_splits=5,
+            predictor_rank_evidence=(evidence,),
+        )

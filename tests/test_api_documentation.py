@@ -77,6 +77,7 @@ def test_returned_result_records_hide_constructor_signatures() -> None:
     api_text = _api_text()
     returned_records = {
         "pipls.component_path.PiPLSComponentPath",
+        "pipls.component_path.PiPLSPredictorRankEvidence",
         "pipls.component_path.PiPLSSelection",
         "pipls.component_path.PiPLSPredictorRankProfile",
         "pipls.validation.PiPLSOOFReport",

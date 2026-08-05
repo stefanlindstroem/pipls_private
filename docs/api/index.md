@@ -29,6 +29,7 @@ predictor and response directions; they are distinct from reconstruction loading
 | Object | Obtained from | Main purpose |
 |---|---|---|
 | [`PiPLSComponentPath`](path.md#pipls.component_path.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
+| [`PiPLSPredictorRankEvidence`](path.md#pipls.component_path.PiPLSPredictorRankEvidence) | conditioned path rows and rank profiles | Reconstruct the exact rank reference and tolerance threshold |
 | [`PiPLSSelection`](path.md#pipls.component_path.PiPLSSelection) | `search.select(...)`, `model.selection_`, or a post-fit report | Retrieve one evaluated fixed rank pair and its diagnostics |
 | [`PiPLSPredictorRankProfile`](path.md#pipls.component_path.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
 | [`PiPLSOOFReport`](path.md#pipls.validation.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |

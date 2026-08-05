@@ -14,19 +14,12 @@ modules:
 ```python
 from pipls.component_path import (
     PiPLSComponentPath,
+    PiPLSPredictorRankEvidence,
     PiPLSPredictorRankProfile,
     PiPLSSelection,
 )
 from pipls.decomposition import PiPLSDecomposition
 from pipls.validation import PiPLSOOFReport
-```
-
-Decision 0148 accepts `PiPLSPredictorRankEvidence` as an additional focused-module public record.
-It is not implemented or exported until the Decision 0148 public-API patch. The final focused import
-will also permit:
-
-```python
-from pipls.component_path import PiPLSPredictorRankEvidence
 ```
 
 `pipls.datasets`, `pipls.inspection`, and `pipls.metrics` expose exactly their declared `__all__`
@@ -119,15 +112,15 @@ selection = search.select(n_components=4)
 Exactly one of `rule` and `n_components` is required. Selection performs no fitting, rescoring,
 split materialization, or mutation.
 
-The currently implemented `best_score` returns the global configured-score optimum.
-`minimum_cv_mse` returns the smallest component count satisfying both CV-MSE tolerance caps.
+`best_score` returns the maximum configured-score row on the predictor-rank-conditioned component
+path. `minimum_cv_mse` returns the smallest component count satisfying both CV-MSE tolerance caps.
 `relative_tolerance=None` resolves to the square root of float64 machine epsilon; positive-infinity
 absolute tolerance disables that cap. Tolerance arguments are invalid for other rules and manual
 selection.
 
-Under Decision 0148, both named rules operate on the predictor-rank-conditioned component path.
-`best_score` therefore becomes the maximum configured-score retained path row rather than an
-unretained global candidate from `cv_results_`. Manual lookup also returns the conditioned row.
+Both named rules operate on the predictor-rank-conditioned component path. An unretained global
+candidate from `cv_results_` is not eligible for a named component-count rule. Manual lookup also
+returns the conditioned row.
 
 ### Full-data refit
 
@@ -173,11 +166,10 @@ predictor ranks, configured mean scores, mean CV-MSE, split SD, plus path-wide p
 and split count.
 
 `PiPLSPredictorRankProfile` contains the evaluated predictor ranks and aligned evidence for one
-component count. Its currently implemented `selection` is the exact configured-score choice.
-Decision 0148 adds `reference_selection`, a tolerance-qualified `selection`, and
-`predictor_rank_evidence`.
+component count. `reference_selection` is the exact configured-score choice; `selection` is the
+smallest evaluated tolerance-qualified rank and carries `predictor_rank_evidence`.
 
-Decision 0148 also adds immutable `PiPLSPredictorRankEvidence` with exact-reference rank and score,
+Immutable `PiPLSPredictorRankEvidence` contains the exact-reference rank and score,
 reference CV-MSE mean and SD, resolved predictor-rank tolerances, and derived `score_threshold`.
 Optimized path rows and selections carry this evidence; fixed and maximum policies carry `None`.
 

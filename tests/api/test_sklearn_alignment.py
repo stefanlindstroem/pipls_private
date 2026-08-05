@@ -77,7 +77,7 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     assert callable(cloned.oof_report)
 
 
-def test_selection_method_signatures_expose_tolerances_only_post_fit() -> None:
+def test_selection_method_signatures_separate_component_and_rank_tolerances() -> None:
     for method in (PiPLSSearchCV.select, PiPLSSearchCV.refit):
         signature = inspect.signature(method)
         assert signature.parameters["relative_tolerance"].default is None
@@ -89,8 +89,17 @@ def test_selection_method_signatures_expose_tolerances_only_post_fit() -> None:
             inspect.Parameter.KEYWORD_ONLY
         )
 
-    assert "relative_tolerance" not in PiPLSSearchCV().get_params(deep=False)
-    assert "absolute_tolerance" not in PiPLSSearchCV().get_params(deep=False)
+    parameters = PiPLSSearchCV().get_params(deep=False)
+    assert "relative_tolerance" not in parameters
+    assert "absolute_tolerance" not in parameters
+    assert parameters["predictor_rank_relative_tolerance"] is None
+    assert np.isposinf(parameters["predictor_rank_absolute_tolerance"])
+
+    constructor = inspect.signature(PiPLSSearchCV)
+    assert constructor.parameters["predictor_rank_relative_tolerance"].default is None
+    assert np.isposinf(
+        constructor.parameters["predictor_rank_absolute_tolerance"].default
+    )
 
 
 def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
@@ -117,6 +126,8 @@ def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
         "max_predictor_rank",
         "n_components_values",
         "n_jobs",
+        "predictor_rank_absolute_tolerance",
+        "predictor_rank_relative_tolerance",
         "predictor_rank_values",
         "samples_per_predictor_rank",
         "scoring",

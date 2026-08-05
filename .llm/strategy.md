@@ -72,12 +72,15 @@ Decision 0148 governs the active five-patch predictor-rank tolerance increment:
 1. establish the decision and accepted contracts -- complete;
 2. separate exact numerical score comparison from substantive rank-tolerance qualification --
    complete;
-3. implement constructor controls, hierarchical path selection, public evidence, and API tests;
+3. implement constructor controls, hierarchical path selection, public evidence, and API tests --
+   complete;
 4. demonstrate separate 10% predictor-rank and component-count tolerances in Tobacco;
 5. complete migration, documentation, distribution, and repository audits.
 
-Patch 3 is next. It must use the private score-tolerance primitives without changing adaptive
-candidate coverage, candidate-level results, or numerical score-ranking semantics.
+Patch 4 is next. It must apply a separately named 10% predictor-rank relative tolerance on the
+Tobacco search constructor while retaining the existing separately named 10% component-count
+relative tolerance on `refit()`. The workflow must report and render both reference and retained
+choices without conflating their thresholds.
 
 ## Independent paused work
 

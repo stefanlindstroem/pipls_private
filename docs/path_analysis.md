@@ -65,27 +65,44 @@ admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\mathrm{max}}$ di
 `search_method="optimal"` evaluates every admissible pair. `search_method="auto"` performs a
 deterministic adaptive coarse-to-fine search independently for each component count and may leave
 admissible ranks unevaluated. After fitting, `search_is_exhaustive_` states whether every
-admissible pair was evaluated. Score ties within numerical tolerance favor the smaller predictor
-rank for a fixed component count. The global best then favors the smaller component count and the
-smaller predictor rank.
+admissible pair was evaluated. Adaptive refinement and `rank_test_score` continue to use private
+numerical tie handling around the exact configured-score optimum. Final conditional rank retention
+then applies the separate public predictor-rank tolerances.
 
-## Scoring and the best evaluated pair
+For optimized policies, configure those tolerances on the search constructor:
 
-Candidate selection maximizes the configured mean test score. The default scoring parameter is
+```python
+search = PiPLSSearchCV(
+    predictor_rank_relative_tolerance=0.10,
+    predictor_rank_absolute_tolerance=np.inf,
+).fit(X, Y)
+```
+
+For each component count, the smallest evaluated rank satisfying both configured-score caps is
+retained. Fixed and maximum policies accept only the default tolerances and have no predictor-rank
+evidence. `search_method="auto"` selects among evaluated ranks; `"optimal"` selects among all
+admissible ranks.
+
+## Scoring and conditioned path selection { #scoring-and-the-best-evaluated-pair }
+
+Candidate evaluation uses the configured mean test score. The default scoring parameter is
 the stable package name `"neg_response_standardized_mse"`, which resolves to
 `pipls.metrics.neg_response_standardized_mse`. Maximizing that score is equivalent
 to minimizing mean response-standardized CV-MSE. With another scorer, the CV-MSE columns remain
 diagnostics and need not identify the selected candidate.
 
-Ordinary scikit-learn scorer names, scorer callables, and `scoring=None` are accepted. Retrieve
-the best evaluated pair through `best = search.select(rule="best_score")`; its component count,
-predictor rank, and mean score are available on that immutable selection. `rank_test_score` uses
-minimum ranks with the same `rtol=1e-12` and `atol=1e-15` comparison as
-selection. Every rank-1 candidate is tied directly with the maximum score; lower rank groups are
-likewise anchored to their leading score rather than formed through adjacent-score chaining.
-Adaptive search makes no claim about pairs it did not evaluate. The component path remains a
-model-selection diagnostic; its numerical minimum does not replace a scientifically justified
-complexity choice.
+Ordinary scikit-learn scorer names, scorer callables, and `scoring=None` are accepted. Candidate-level
+`cv_results_` remains unchanged by parsimony tolerances. `rank_test_score` uses minimum ranks with
+private `rtol=1e-12` and `atol=1e-15` numerical comparison. Every rank-1 candidate is tied directly
+with the maximum score; lower rank groups are likewise anchored to their leading score rather than
+formed through adjacent-score chaining. Adaptive search makes no claim about ranks it did not
+evaluate.
+
+For each component count, `PiPLSPredictorRankEvidence` records the exact configured-score reference
+rank, its score and CV-MSE summary, the resolved tolerances, and the derived `score_threshold`.
+`predictor_rank_profile(h).reference_selection` exposes the exact optimum, while `.selection`
+exposes the retained tolerance-qualified rank. `search.select(rule="best_score")` then chooses the
+maximum configured-score row on this conditioned component path, not an unretained global candidate.
 
 ## Pipelines and fold-local preprocessing
 
@@ -224,19 +241,18 @@ cap. The result retains the exact unruled minimum row as `reference_minimum`, th
 tolerances, and the derived `cv_mse_threshold`. Direct lookup by component count and `best_score`
 selection carry no tolerance provenance.
 
-The associated predictor rank is the rank already selected conditionally for that component count
-under the configured scorer. `select()` does not revisit the predictor-rank profile, fit or refit an
+The associated predictor rank is the rank already retained conditionally for that component count
+under the configured scorer and constructor-level predictor-rank tolerances. Its
+`predictor_rank_evidence` remains attached to direct, named-rule, refitted-model, and OOF selections.
+`select()` does not revisit the predictor-rank profile, fit or refit an
 estimator, mutate the search object, or attach selected state. With a nondefault scorer, the stored
 predictor rank need not minimize CV-MSE within its component-count profile. Model-producing
 workflows obtain the fitted row from `model.selection_`; `search.select(...)` remains useful for
 selection-only analysis. `component_path_` remains the aligned numerical curve.
 
-The Tobacco workflow applies `rule="minimum_cv_mse"` with `relative_tolerance=0.10` once through
-`refit()`. The returned `model.selection_` carries the selected row, exact `reference_minimum`,
-resolved tolerance, and derived `cv_mse_threshold`. The same selection supplies the conditional
-predictor-rank profile and `oof_report()`. Predictor-rank profile error bars use the stored split SD,
-while the stored predictor rank for each component count continues to maximize the configured mean
-CV score. The optional `absolute_tolerance` remains at positive infinity in this example.
+The Tobacco workflow still applies its 10% component-count tolerance through `refit()` in this
+patch. Patch 4 adds a separate 10% constructor-level predictor-rank tolerance and presents the two
+decisions independently. Predictor-rank profile error bars use the stored split SD.
 
 ## Post-fit final-model selection
 
@@ -257,7 +273,7 @@ model = search.refit(X, Y, n_components=4)
 
 Exactly one of `rule` and `n_components` is required. The accepted post-fit rules are:
 
-- `rule="best_score"`, the global optimum under the configured scorer;
+- `rule="best_score"`, the maximum configured-score row on the conditioned component path;
 - `rule="minimum_cv_mse"`, the smallest stored component-path row satisfying simultaneous relative
   and absolute tolerances around the exact minimum mean response-standardized CV-MSE.
 

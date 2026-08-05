@@ -13,6 +13,7 @@ import pipls.regression as regression_module
 import pipls.search as search_module
 from pipls.component_path import (
     PiPLSComponentPath,
+    PiPLSPredictorRankEvidence,
     PiPLSPredictorRankProfile,
     PiPLSSelection,
 )
@@ -78,6 +79,7 @@ def test_primary_modules_declare_exact_exports(
 def test_result_records_are_public_only_from_focused_modules() -> None:
     removed_top_level_names = (
         "PiPLSComponentPath",
+        "PiPLSPredictorRankEvidence",
         "PiPLSSelection",
         "PiPLSPredictorRankProfile",
         "PiPLSDecomposition",
@@ -114,12 +116,16 @@ def test_derived_result_properties_are_not_stored_state() -> None:
     for result_type in (
         PiPLSSelection,
         PiPLSPredictorRankProfile,
+        PiPLSPredictorRankEvidence,
         PiPLSComponentPath,
     ):
         assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
 
     assert "cv_mse_threshold" not in {
         field.name for field in fields(PiPLSSelection)
+    }
+    assert "score_threshold" not in {
+        field.name for field in fields(PiPLSPredictorRankEvidence)
     }
     assert "selection" not in {
         field.name for field in fields(PiPLSPredictorRankProfile)
@@ -152,6 +158,7 @@ def test_selection_validates_and_normalizes_python_scalars() -> None:
     assert result.reference_minimum is None
     assert result.relative_tolerance is None
     assert result.absolute_tolerance is None
+    assert result.predictor_rank_evidence is None
     assert result.cv_mse_threshold is None
     assert not hasattr(result, "one_standard_error_threshold")
     with pytest.raises(FrozenInstanceError):

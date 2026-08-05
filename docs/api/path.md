@@ -26,7 +26,8 @@ problems, see [Troubleshooting](../troubleshooting.md).
 pipeline-independent `n_components` and `predictor_rank` arrays; the remaining columns contain
 candidate scores, split values, response-standardized MSE diagnostics, ranks, and timings.
 `component_path_` and `predictor_rank_profile()` provide concise immutable views. Use
-`search.select(rule="best_score")` for the global configured-score optimum. Post-fit `select()`,
+`search.select(rule="best_score")` for the configured-score optimum on the predictor-rank-conditioned
+component path. Post-fit `select()`,
 `refit()`, and `oof_report()` do not alter search state. No final selection, model, or OOF report is
 stored on the search object.
 Python method signatures use `y` by scikit-learn convention even when the
@@ -128,9 +129,13 @@ When the configured template is a pipeline, inspect its fitted terminal `PiPLSRe
 ## Concise component path
 
 `component_path_` contains one conditionally chosen predictor-rank result for each evaluated
-paired-mode count. Its aligned read-only arrays support complete path plots and comparisons without
-requiring manual masking of `cv_results_`. The predictor-rank policy and validation split count are
-stored once as path-wide scalars rather than repeated in every row. Use `search.select(...)` when a
+paired-mode count. With an optimized predictor-rank policy, the search applies its constructor-level
+relative and absolute score tolerances independently at every component count and retains the
+smallest evaluated qualifying rank. Its aligned read-only arrays support complete path plots and
+comparisons without requiring manual masking of `cv_results_`. The predictor-rank policy and
+validation split count are stored once as path-wide scalars; row-aligned
+`predictor_rank_evidence` records the exact score optimum and resolved tolerances. Use
+`search.select(...)` when a
 complete scalar row is needed for annotation or reporting. See
 [Search-owned selection rules](../path_analysis.md#search-owned-selection-rules) for the rule
 definitions and scope. Maintained plots use `cv_mse_std` directly as descriptive split-to-split variability. The path
@@ -143,8 +148,9 @@ object provides no standard-error property and no public row-selection methods.
 ## One selection
 
 `search.select(n_components=h)` returns the frozen scalar row for one evaluated paired-mode count,
-including its conditionally selected predictor rank, score, CV-MSE summary, policy, and split count.
-Direct component-count lookup has `rule is None`. Named rules record their rule on the result.
+including its conditionally selected predictor rank, score, CV-MSE summary, policy, split count, and
+`predictor_rank_evidence` when rank was optimized. Direct component-count lookup has `rule is None`.
+Named rules record their rule on the result.
 A `"minimum_cv_mse"` selection accepts simultaneous relative and absolute tolerances, retains the
 exact unruled minimum path row as `reference_minimum`, stores the resolved tolerances, and derives
 `cv_mse_threshold`. The default relative tolerance is `sqrt(float64 epsilon)` and the default
@@ -158,12 +164,22 @@ than stored independently.
 ## Predictor-rank profile
 
 `predictor_rank_profile(h)` contains every predictor rank actually evaluated for one paired-mode
-count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks;
-its `selection` property derives the same conditional selection returned by
-`search.select(n_components=h)` from the immutable candidate arrays and shared policy and
-split-count scalars.
+count, sorted by rank. Under adaptive search this may be a strict subset of the admissible ranks.
+`reference_selection` gives the exact configured-score optimum under the private numerical tie rule;
+`selection` gives the smallest evaluated rank satisfying the public predictor-rank tolerances and
+matches `search.select(n_components=h)`.
 
 ::: pipls.component_path.PiPLSPredictorRankProfile
+    options:
+      show_signature: false
+
+## Predictor-rank evidence
+
+`PiPLSPredictorRankEvidence` stores the exact reference rank, its configured score and CV-MSE
+summary, and the resolved relative and absolute tolerances. `score_threshold` is derived in
+configured-score units. Fixed and maximum predictor-rank policies have no such evidence.
+
+::: pipls.component_path.PiPLSPredictorRankEvidence
     options:
       show_signature: false
 

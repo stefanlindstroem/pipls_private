@@ -37,6 +37,7 @@ from ._model_selection import (
     _pooled_oof_r2,
     _rank_test_scores,
     _search_predictor_ranks,
+    _select_tolerant_predictor_rank,
     _splits_are_leave_one_out,
     _tied_score_mask,
     _validate_positive_int,
@@ -45,6 +46,7 @@ from ._model_selection import (
 from ._sklearn_compat import _validate_estimator_data
 from .component_path import (
     PiPLSComponentPath,
+    PiPLSPredictorRankEvidence,
     PiPLSPredictorRankProfile,
     PiPLSSelection,
     PredictorRankPolicy,
@@ -111,32 +113,66 @@ def _minimum_cv_mse_reference(path: PiPLSComponentPath) -> PiPLSSelection:
     return path._selection_at_index(int(np.argmin(path.cv_mse_mean)))
 
 
-def _validated_relative_tolerance(value: object) -> float:
+def _validated_relative_tolerance(
+    value: object,
+    *,
+    name: str = "relative_tolerance",
+) -> float:
     """Return one finite nonnegative relative tolerance."""
 
     if value is None:
         return _DEFAULT_RELATIVE_CV_MSE_TOLERANCE
     if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
-        raise ValueError("relative_tolerance must be a finite nonnegative real number.")
+        raise ValueError(f"{name} must be a finite nonnegative real number.")
     converted = float(value)
     if not np.isfinite(converted) or converted < 0.0:
-        raise ValueError("relative_tolerance must be a finite nonnegative real number.")
+        raise ValueError(f"{name} must be a finite nonnegative real number.")
     return converted
 
 
-def _validated_absolute_tolerance(value: object) -> float:
+def _validated_absolute_tolerance(
+    value: object,
+    *,
+    name: str = "absolute_tolerance",
+) -> float:
     """Return one nonnegative absolute tolerance, allowing positive infinity."""
 
     if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
         raise ValueError(
-            "absolute_tolerance must be a nonnegative real number or positive infinity."
+            f"{name} must be a nonnegative real number or positive infinity."
         )
     converted = float(value)
     if np.isnan(converted) or converted < 0.0:
         raise ValueError(
-            "absolute_tolerance must be a nonnegative real number or positive infinity."
+            f"{name} must be a nonnegative real number or positive infinity."
         )
     return converted
+
+
+def _resolved_predictor_rank_tolerances(
+    *,
+    predictor_rank_policy: PredictorRankPolicy,
+    relative_tolerance: object,
+    absolute_tolerance: object,
+) -> tuple[float | None, float | None]:
+    """Return resolved predictor-rank tolerances for one applicable policy."""
+
+    relative = _validated_relative_tolerance(
+        relative_tolerance,
+        name="predictor_rank_relative_tolerance",
+    )
+    absolute = _validated_absolute_tolerance(
+        absolute_tolerance,
+        name="predictor_rank_absolute_tolerance",
+    )
+    if predictor_rank_policy != "optimized":
+        if relative_tolerance is not None or not np.isposinf(absolute):
+            raise ValueError(
+                "Nondefault predictor-rank tolerances require an optimized "
+                "predictor-rank policy."
+            )
+        return None, None
+    return relative, absolute
 
 
 def _require_default_tolerances(
@@ -181,7 +217,6 @@ def _select_minimum_cv_mse(
     )
 
 
-
 class PiPLSSearchCV(
     MultiOutputMixin,  # type: ignore[misc]
     MetaEstimatorMixin,  # type: ignore[misc]
@@ -218,6 +253,12 @@ class PiPLSSearchCV(
         are evaluated. A one-element sequence fixes one rank, a longer sequence
         defines an explicit set, and ``"max"`` uses ``max_predictor_rank_`` for
         every paired-mode count.
+    predictor_rank_relative_tolerance : float or None, default=None
+        Configured-score relative tolerance for conditional predictor-rank
+        selection. ``None`` resolves to ``sqrt(machine epsilon)``.
+    predictor_rank_absolute_tolerance : float, default=inf
+        Configured-score absolute tolerance for conditional predictor-rank
+        selection. Positive infinity disables the absolute cap.
     max_predictor_rank : int or "rule", default="rule"
         ``"rule"`` applies the total-sample support rule together with
         dimensional and verified numerical-rank caps from every training fold.
@@ -261,7 +302,7 @@ class PiPLSSearchCV(
         Full candidate-level results with stable ``n_components`` and
         ``predictor_rank`` columns, split and summary scores,
         response-standardized MSE values, timing summaries, and minimum score
-        ranks formed with the same tolerant comparison used for selection.
+        ranks formed with the private numerical tie comparison.
     component_path_ : PiPLSComponentPath
         Immutable concise view with one conditionally selected predictor-rank
         result per paired-mode count. Use :meth:`predictor_rank_profile` for the
@@ -274,6 +315,8 @@ class PiPLSSearchCV(
         *,
         n_components_values: ComponentValues = "all",
         predictor_rank_values: PredictorRankValues = None,
+        predictor_rank_relative_tolerance: float | None = None,
+        predictor_rank_absolute_tolerance: float = np.inf,
         max_predictor_rank: int | Literal["rule"] = "rule",
         search_method: SearchMethod = "auto",
         samples_per_predictor_rank: float = 5.0,
@@ -284,6 +327,8 @@ class PiPLSSearchCV(
         self.estimator = estimator
         self.n_components_values = n_components_values
         self.predictor_rank_values = predictor_rank_values
+        self.predictor_rank_relative_tolerance = predictor_rank_relative_tolerance
+        self.predictor_rank_absolute_tolerance = predictor_rank_absolute_tolerance
         self.max_predictor_rank = max_predictor_rank
         self.search_method = search_method
         self.samples_per_predictor_rank = samples_per_predictor_rank
@@ -393,6 +438,14 @@ class PiPLSSearchCV(
             upper=h_limit,
         )
         predictor_rank_policy = _predictor_rank_policy(self.predictor_rank_values)
+        (
+            predictor_rank_relative_tolerance,
+            predictor_rank_absolute_tolerance,
+        ) = _resolved_predictor_rank_tolerances(
+            predictor_rank_policy=predictor_rank_policy,
+            relative_tolerance=self.predictor_rank_relative_tolerance,
+            absolute_tolerance=self.predictor_rank_absolute_tolerance,
+        )
         if isinstance(self.predictor_rank_values, str):
             predictor_rank_values = np.asarray(
                 [self.max_predictor_rank_], dtype=np.intp
@@ -476,18 +529,60 @@ class PiPLSSearchCV(
             evaluated_pairs=evaluated_pairs,
         )
         conditional_indices: list[int] = []
+        predictor_rank_evidence: list[PiPLSPredictorRankEvidence] = []
         for h_value in component_values:
             indices = np.flatnonzero(self.cv_results_["n_components"] == int(h_value))
-            if indices.size:
-                conditional_indices.append(
-                    _select_best_index(self.cv_results_, indices)
+            if not indices.size:
+                continue
+            if predictor_rank_policy == "optimized":
+                assert predictor_rank_relative_tolerance is not None
+                assert predictor_rank_absolute_tolerance is not None
+                ranks = cast(IntArray, self.cv_results_["predictor_rank"])[indices]
+                scores = cast(FloatArray, self.cv_results_["mean_test_score"])[indices]
+                rank_selection = _select_tolerant_predictor_rank(
+                    ranks,
+                    scores,
+                    relative_tolerance=predictor_rank_relative_tolerance,
+                    absolute_tolerance=predictor_rank_absolute_tolerance,
                 )
+                selected_local = int(
+                    np.flatnonzero(ranks == rank_selection.selected_rank)[0]
+                )
+                reference_local = int(
+                    np.flatnonzero(ranks == rank_selection.reference_rank)[0]
+                )
+                conditional_indices.append(int(indices[selected_local]))
+                predictor_rank_evidence.append(
+                    PiPLSPredictorRankEvidence(
+                        reference_predictor_rank=rank_selection.reference_rank,
+                        reference_mean_test_score=rank_selection.reference_score,
+                        reference_cv_mse_mean=float(
+                            self.cv_results_["mean_response_standardized_mse"][
+                                indices[reference_local]
+                            ]
+                        ),
+                        reference_cv_mse_std=float(
+                            self.cv_results_["std_response_standardized_mse"][
+                                indices[reference_local]
+                            ]
+                        ),
+                        relative_tolerance=predictor_rank_relative_tolerance,
+                        absolute_tolerance=predictor_rank_absolute_tolerance,
+                    )
+                )
+            else:
+                conditional_indices.append(_select_best_index(self.cv_results_, indices))
 
         self.component_path_ = _build_component_path(
             results=self.cv_results_,
             conditional_indices=np.asarray(conditional_indices, dtype=np.intp),
             predictor_rank_policy=predictor_rank_policy,
             n_splits=self.n_splits_,
+            predictor_rank_evidence=(
+                tuple(predictor_rank_evidence)
+                if predictor_rank_policy == "optimized"
+                else None
+            ),
         )
         return self
 
@@ -509,9 +604,10 @@ class PiPLSSearchCV(
         Parameters
         ----------
         rule : {"best_score", "minimum_cv_mse"}, optional
-            Stored-row selection rule. ``"best_score"`` uses the global
-            configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
-            stored component count within both supplied CV-MSE tolerances.
+            Stored-row selection rule. ``"best_score"`` uses the configured-score
+            optimum on the conditioned component path. ``"minimum_cv_mse"`` uses
+            the smallest stored component count within both supplied CV-MSE
+            tolerances.
         n_components : int, optional
             Evaluated paired-mode count to retrieve manually.
         relative_tolerance : float or None, default=None
@@ -572,9 +668,10 @@ class PiPLSSearchCV(
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
             Response vector or matrix used for the final full-data fit.
         rule : {"best_score", "minimum_cv_mse"}, optional
-            Stored-row selection rule. ``"best_score"`` uses the global
-            configured-score optimum, ``"minimum_cv_mse"`` uses the smallest
-            stored component count within both supplied CV-MSE tolerances.
+            Stored-row selection rule. ``"best_score"`` uses the configured-score
+            optimum on the conditioned component path. ``"minimum_cv_mse"`` uses
+            the smallest stored component count within both supplied CV-MSE
+            tolerances.
         n_components : int, optional
             Evaluated paired-mode count to refit manually.
         relative_tolerance : float or None, default=None
@@ -837,12 +934,9 @@ class PiPLSSearchCV(
                 relative_tolerance=relative_tolerance,
                 absolute_tolerance=absolute_tolerance,
             )
-            best_index = _select_best_index(self.cv_results_)
+            best_index = _select_best_path_index(self.component_path_)
             return replace(
-                _selection_at_count(
-                    self.component_path_,
-                    int(self.cv_results_["n_components"][best_index]),
-                ),
+                self.component_path_._selection_at_index(best_index),
                 rule="best_score",
             )
         if rule == "minimum_cv_mse":
@@ -866,10 +960,9 @@ class PiPLSSearchCV(
         """Return evaluated predictor-rank results for one paired-mode count.
 
         Rows are sorted by ascending predictor rank and include only candidates
-        actually evaluated by the fitted search. The conditional selection
-        maximizes the configured mean test score, with the fitted conditional
-        tie-breaking rule. Under the default scorer, this is equivalent to
-        minimizing mean response-standardized CV-MSE.
+        actually evaluated by the fitted search. ``reference_selection`` is the
+        exact configured-score optimum; ``selection`` is the smallest evaluated
+        rank satisfying the fitted predictor-rank tolerances.
 
         Parameters
         ----------
@@ -915,6 +1008,7 @@ class PiPLSSearchCV(
             )[indices],
             predictor_rank_policy=selected.predictor_rank_policy,
             n_splits=self.n_splits_,
+            predictor_rank_evidence=selected.predictor_rank_evidence,
         )
 
     def _more_tags(self) -> dict[str, bool]:
@@ -956,6 +1050,11 @@ class PiPLSSearchCV(
             _validate_positive_int(self.max_predictor_rank, name="max_predictor_rank")
         _validate_component_values(self.n_components_values)
         _validate_predictor_rank_values(self.predictor_rank_values)
+        _resolved_predictor_rank_tolerances(
+            predictor_rank_policy=_predictor_rank_policy(self.predictor_rank_values),
+            relative_tolerance=self.predictor_rank_relative_tolerance,
+            absolute_tolerance=self.predictor_rank_absolute_tolerance,
+        )
         _validate_n_jobs(self.n_jobs)
         _validate_cv(self.cv)
         return _resolve_path_scorer(self.scoring, template)
@@ -1226,6 +1325,7 @@ def _build_component_path(
     conditional_indices: IntArray,
     predictor_rank_policy: PredictorRankPolicy,
     n_splits: int,
+    predictor_rank_evidence: tuple[PiPLSPredictorRankEvidence, ...] | None,
 ) -> PiPLSComponentPath:
     """Return one conditionally selected predictor-rank result per paired-mode count."""
 
@@ -1243,6 +1343,24 @@ def _build_component_path(
             results["std_response_standardized_mse"],
         )[conditional_indices],
         n_splits=n_splits,
+        predictor_rank_evidence=predictor_rank_evidence,
+    )
+
+
+def _select_best_path_index(path: PiPLSComponentPath) -> int:
+    """Return the configured-score optimum on the conditioned component path."""
+
+    maximum = float(np.max(path.mean_test_score))
+    tied = np.flatnonzero(_tied_score_mask(path.mean_test_score, maximum))
+    return int(
+        tied[
+            np.lexsort(
+                (
+                    path.predictor_rank[tied],
+                    path.n_components[tied],
+                )
+            )[0]
+        ]
     )
 
 

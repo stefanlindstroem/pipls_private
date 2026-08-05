@@ -105,6 +105,7 @@ def test_api_overview_maps_the_public_result_objects() -> None:
     )
     result_objects = {
         "PiPLSComponentPath",
+        "PiPLSPredictorRankEvidence",
         "PiPLSSelection",
         "PiPLSPredictorRankProfile",
         "PiPLSOOFReport",

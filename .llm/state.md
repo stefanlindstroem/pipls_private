@@ -48,15 +48,16 @@ model = search.refit(X, y, rule="minimum_cv_mse")
 report = search.oof_report(X, y, selection=model.selection_)
 ```
 
-The currently implemented named rules are:
+The implemented named rules are:
 
-- `best_score`: global optimum under the configured scorer;
-- `minimum_cv_mse`: smallest component-path row satisfying simultaneous relative and absolute
+- `best_score`: maximum configured-score row on the predictor-rank-conditioned component path;
+- `minimum_cv_mse`: smallest conditioned path row satisfying simultaneous relative and absolute
   tolerances around the exact minimum CV-MSE row.
 
-Conditional predictor-rank selection currently maximizes the configured mean score and uses private
-numerical tie tolerances. Decision 0148 accepts separate public predictor-rank relative and absolute
-tolerances, but that target API is not implemented until its remaining patches are applied.
+For optimized predictor-rank policies, `PiPLSSearchCV` applies separate constructor-level relative
+and absolute configured-score tolerances at every component count. Adaptive refinement and
+`rank_test_score` retain private numerical tie semantics. Optimized path rows, selections, and
+profiles carry immutable `PiPLSPredictorRankEvidence`; fixed and maximum policies carry none.
 
 Manual selection uses an evaluated `n_components` value and the predictor rank already selected
 conditionally for that row. A successful refit attaches the exact immutable row as
@@ -163,11 +164,11 @@ and are learned within each training fold during search.
 Decision 0147 is implemented. Decision records, maintainer context, structural tests, snapshot
 policy, and dataset-module ownership are in their normalized current form.
 
-Decision 0148 is the active five-patch increment. Patches 1 and 2 have accepted the hierarchical
-predictor-rank tolerance contract and separated private exact-score comparison from substantive
-tolerance qualification. The next admissible increment is Patch 3: add constructor controls,
-hierarchical path retention, immutable public evidence, and integration tests. Decision 0139 Patch 3
-remains separate paused work.
+Decision 0148 is the active five-patch increment. Patches 1 through 3 have established the
+hierarchical contract, separated exact and substantive comparisons, and implemented the public
+constructor controls, conditioned path, evidence records, and integration tests. The next admissible
+increment is Patch 4: demonstrate separate 10% predictor-rank and component-count tolerances in the
+Tobacco workflow. Decision 0139 Patch 3 remains separate paused work.
 
 ## Authority and drift handling
 
