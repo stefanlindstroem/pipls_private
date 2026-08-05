@@ -2,10 +2,9 @@
 
 ## Status
 
-Accepted. Patch 1 of five is complete. This record fixes the target numerical, public-API,
-provenance, documentation, and example contracts. The runtime implementation still uses exact
-configured-score selection with private numerical tie tolerances until the remaining patches are
-applied.
+Accepted. Patches 1 and 2 of five are complete. The private implementation now separates exact
+numerical score comparison from substantive configured-score tolerance qualification. The public
+constructor, fitted path behavior, and result provenance remain unchanged until Patch 3.
 
 ## Context
 
@@ -252,7 +251,7 @@ is not built into the scorer-neutral evidence record.
 
 1. Establish this decision and synchronize the accepted target contracts in `.llm` -- complete.
 2. Separate exact numerical score comparison from substantive predictor-rank tolerance primitives,
-   without changing the public API or adaptive candidate coverage.
+   without changing the public API or adaptive candidate coverage -- complete.
 3. Add the constructor parameters, hierarchical path behavior, immutable public evidence, and full
    API/integration tests.
 4. Demonstrate separate 10% predictor-rank and component-count tolerances in the Tobacco workflow

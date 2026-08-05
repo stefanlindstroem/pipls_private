@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
+from numbers import Real
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -17,8 +18,8 @@ IntArray = NDArray[np.intp]
 BoolArray = NDArray[np.bool_]
 CVSplit = tuple[IntArray, IntArray]
 
-_SELECTION_RTOL = 1e-12
-_SELECTION_ATOL = 1e-15
+_NUMERICAL_TIE_RTOL = 1e-12
+_NUMERICAL_TIE_ATOL = 1e-15
 _ADAPTIVE_INITIAL_POINTS = 7
 _ADAPTIVE_EXHAUSTIVE_THRESHOLD = 10
 
@@ -29,6 +30,17 @@ class _MaterializedCV:
 
     splits: tuple[CVSplit, ...]
     n_train_min: int
+
+
+@dataclass(frozen=True)
+class _PredictorRankScoreSelection:
+    """Exact-reference and tolerance-qualified predictor-rank score evidence."""
+
+    reference_rank: int
+    reference_score: float
+    selected_rank: int
+    selected_score: float
+    score_threshold: float
 
 
 def _max_predictor_rank(
@@ -225,7 +237,7 @@ def _adaptive_refinement_interval(
 
     ranks = np.asarray(predictor_ranks)
     losses = np.asarray(mean_losses, dtype=np.float64)
-    selected_rank, _ = _select_predictor_rank(ranks, losses)
+    selected_rank, _ = _select_minimum_loss_predictor_rank(ranks, losses)
     order = np.argsort(ranks)
     sorted_ranks = ranks[order]
     selected_index = int(np.flatnonzero(sorted_ranks == selected_rank)[0])
@@ -287,10 +299,10 @@ def _tied_score_mask(
     scores: ArrayLike,
     reference: float,
     *,
-    rtol: float = _SELECTION_RTOL,
-    atol: float = _SELECTION_ATOL,
+    rtol: float = _NUMERICAL_TIE_RTOL,
+    atol: float = _NUMERICAL_TIE_ATOL,
 ) -> BoolArray:
-    """Return scores tied with one reference under the selection tolerance."""
+    """Return scores numerically tied with one finite reference."""
 
     score_array = np.asarray(scores, dtype=np.float64)
     reference_value = float(reference)
@@ -309,11 +321,133 @@ def _tied_score_mask(
     )
 
 
+def _score_tolerance_threshold(
+    reference: object,
+    *,
+    relative_tolerance: object,
+    absolute_tolerance: object,
+) -> float:
+    """Return the simultaneous relative-and-absolute configured-score threshold."""
+
+    if isinstance(reference, (bool, np.bool_)) or not isinstance(reference, Real):
+        raise ValueError("reference must be a finite real number.")
+    reference_value = float(reference)
+    if not np.isfinite(reference_value):
+        raise ValueError("reference must be a finite real number.")
+
+    if isinstance(relative_tolerance, (bool, np.bool_)) or not isinstance(
+        relative_tolerance,
+        Real,
+    ):
+        raise ValueError(
+            "relative_tolerance must be a finite nonnegative real number."
+        )
+    relative_value = float(relative_tolerance)
+    if not np.isfinite(relative_value) or relative_value < 0.0:
+        raise ValueError(
+            "relative_tolerance must be a finite nonnegative real number."
+        )
+
+    if isinstance(absolute_tolerance, (bool, np.bool_)) or not isinstance(
+        absolute_tolerance,
+        Real,
+    ):
+        raise ValueError(
+            "absolute_tolerance must be a nonnegative real number or positive infinity."
+        )
+    absolute_value = float(absolute_tolerance)
+    if np.isnan(absolute_value) or absolute_value < 0.0:
+        raise ValueError(
+            "absolute_tolerance must be a nonnegative real number or positive infinity."
+        )
+
+    with np.errstate(over="ignore", invalid="ignore"):
+        relative_threshold = np.float64(reference_value) - np.float64(
+            relative_value
+        ) * np.abs(np.float64(reference_value))
+        absolute_threshold = np.float64(reference_value) - np.float64(absolute_value)
+    return float(np.maximum(relative_threshold, absolute_threshold))
+
+
+def _tolerant_score_mask(
+    scores: ArrayLike,
+    reference: object,
+    *,
+    relative_tolerance: object,
+    absolute_tolerance: object,
+) -> BoolArray:
+    """Return scores satisfying both substantive caps around one reference."""
+
+    score_array = np.asarray(scores, dtype=np.float64)
+    if score_array.size == 0 or not np.all(np.isfinite(score_array)):
+        raise ValueError("scores must contain at least one finite value.")
+    threshold = _score_tolerance_threshold(
+        reference,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
+    )
+    if np.isneginf(threshold):
+        return np.ones(score_array.shape, dtype=np.bool_)
+    return np.asarray(
+        (score_array > threshold) | _tied_score_mask(score_array, threshold),
+        dtype=np.bool_,
+    )
+
+
+def _select_tolerant_predictor_rank(
+    predictor_ranks: ArrayLike,
+    mean_scores: ArrayLike,
+    *,
+    relative_tolerance: object,
+    absolute_tolerance: object,
+) -> _PredictorRankScoreSelection:
+    """Return exact-reference and smallest tolerance-qualified rank evidence."""
+
+    ranks = np.asarray(predictor_ranks)
+    scores = np.asarray(mean_scores, dtype=np.float64)
+    if ranks.ndim != 1 or ranks.size == 0:
+        raise ValueError("predictor_ranks must be a nonempty one-dimensional array.")
+    if ranks.dtype.kind not in "iu" or np.any(ranks < 1):
+        raise ValueError("predictor_ranks must contain positive integers.")
+    if np.unique(ranks).size != ranks.size:
+        raise ValueError("predictor_ranks must not contain duplicates.")
+    if scores.ndim != 1 or scores.shape != ranks.shape:
+        raise ValueError(
+            "mean_scores must be one-dimensional with one value per predictor rank."
+        )
+    if not np.all(np.isfinite(scores)):
+        raise ValueError("mean_scores must contain only finite values.")
+
+    reference_score = float(np.max(scores))
+    reference_mask = _tied_score_mask(scores, reference_score)
+    reference_rank = int(np.min(ranks[reference_mask]))
+    selected_mask = _tolerant_score_mask(
+        scores,
+        reference_score,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
+    )
+    selected_rank = int(np.min(ranks[selected_mask]))
+    selected_index = int(np.flatnonzero(ranks == selected_rank)[0])
+    threshold = _score_tolerance_threshold(
+        reference_score,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
+    )
+    return _PredictorRankScoreSelection(
+        reference_rank=reference_rank,
+        reference_score=reference_score,
+        selected_rank=selected_rank,
+        selected_score=float(scores[selected_index]),
+        score_threshold=threshold,
+    )
+
+
 def _rank_test_scores(
     mean_scores: ArrayLike,
     *,
-    rtol: float = _SELECTION_RTOL,
-    atol: float = _SELECTION_ATOL,
+    rtol: float = _NUMERICAL_TIE_RTOL,
+    atol: float = _NUMERICAL_TIE_ATOL,
 ) -> IntArray:
     """Return minimum ranks using reference-anchored tolerant score groups."""
 
@@ -339,14 +473,14 @@ def _rank_test_scores(
     return ranks
 
 
-def _select_predictor_rank(
+def _select_minimum_loss_predictor_rank(
     predictor_ranks: ArrayLike,
     mean_losses: ArrayLike,
     *,
-    rtol: float = _SELECTION_RTOL,
-    atol: float = _SELECTION_ATOL,
+    rtol: float = _NUMERICAL_TIE_RTOL,
+    atol: float = _NUMERICAL_TIE_ATOL,
 ) -> tuple[int, float]:
-    """Select the smallest rank whose loss ties the minimum within tolerance."""
+    """Select the smallest rank numerically tied with the exact minimum loss."""
 
     ranks = np.asarray(predictor_ranks)
     losses = np.asarray(mean_losses, dtype=np.float64)

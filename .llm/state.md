@@ -163,10 +163,11 @@ and are learned within each training fold during search.
 Decision 0147 is implemented. Decision records, maintainer context, structural tests, snapshot
 policy, and dataset-module ownership are in their normalized current form.
 
-Decision 0148 is the active five-patch increment. Patch 1 has accepted the hierarchical predictor-
-rank tolerance contract. The next admissible increment is Patch 2: separate private exact-score
-comparison from substantive tolerance qualification without changing the public API or adaptive
-candidate coverage. Decision 0139 Patch 3 remains separate paused work.
+Decision 0148 is the active five-patch increment. Patches 1 and 2 have accepted the hierarchical
+predictor-rank tolerance contract and separated private exact-score comparison from substantive
+tolerance qualification. The next admissible increment is Patch 3: add constructor controls,
+hierarchical path retention, immutable public evidence, and integration tests. Decision 0139 Patch 3
+remains separate paused work.
 
 ## Authority and drift handling
 

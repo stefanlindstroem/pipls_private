@@ -12,8 +12,11 @@ from pipls._model_selection import (
     _materialize_cv_splits,
     _max_predictor_rank,
     _rank_test_scores,
-    _select_predictor_rank,
+    _score_tolerance_threshold,
+    _select_minimum_loss_predictor_rank,
+    _select_tolerant_predictor_rank,
     _tied_score_mask,
+    _tolerant_score_mask,
 )
 
 
@@ -170,8 +173,8 @@ def test_materialize_cv_splits_rejects_invalid_splits(splits: object) -> None:
         _materialize_cv_splits(splits, X, y)
 
 
-def test_select_predictor_rank_uses_low_rank_tie_breaking() -> None:
-    rank, loss = _select_predictor_rank(
+def test_select_minimum_loss_predictor_rank_uses_low_rank_tie_breaking() -> None:
+    rank, loss = _select_minimum_loss_predictor_rank(
         np.array([5, 2, 4], dtype=np.intp),
         np.array([0.7, 0.5 + 5e-14, 0.5]),
     )
@@ -180,8 +183,8 @@ def test_select_predictor_rank_uses_low_rank_tie_breaking() -> None:
     assert loss == pytest.approx(0.5 + 5e-14)
 
 
-def test_select_predictor_rank_prefers_strictly_lower_loss_outside_tolerance() -> None:
-    rank, loss = _select_predictor_rank(
+def test_select_minimum_loss_predictor_rank_prefers_strictly_lower_loss_outside_tolerance() -> None:
+    rank, loss = _select_minimum_loss_predictor_rank(
         np.array([2, 3], dtype=np.intp),
         np.array([0.5 + 1e-8, 0.5]),
     )
@@ -199,12 +202,12 @@ def test_select_predictor_rank_prefers_strictly_lower_loss_outside_tolerance() -
         ([1, 2], [0.2, np.nan]),
     ],
 )
-def test_select_predictor_rank_rejects_invalid_surfaces(
+def test_select_minimum_loss_predictor_rank_rejects_invalid_surfaces(
     ranks: list[int],
     losses: list[float],
 ) -> None:
     with pytest.raises(ValueError):
-        _select_predictor_rank(ranks, losses)
+        _select_minimum_loss_predictor_rank(ranks, losses)
 
 
 def test_logarithmic_predictor_rank_values_are_deterministic_and_include_endpoints() -> None:
@@ -266,3 +269,186 @@ def test_tied_score_mask_uses_one_reference_score() -> None:
     )
 
     np.testing.assert_array_equal(tied, np.array([True, True, False]))
+
+
+@pytest.mark.parametrize(
+    ("reference", "relative_tolerance", "absolute_tolerance", "expected"),
+    [
+        (10.0, 0.10, np.inf, 9.0),
+        (-10.0, 0.10, np.inf, -11.0),
+        (0.0, 0.10, np.inf, 0.0),
+        (10.0, 1.0, 0.25, 9.75),
+        (-10.0, 1.0, 0.25, -10.25),
+        (10.0, 0.10, 0.25, 9.75),
+    ],
+)
+def test_score_tolerance_threshold_uses_simultaneous_caps(
+    reference: float,
+    relative_tolerance: float,
+    absolute_tolerance: float,
+    expected: float,
+) -> None:
+    threshold = _score_tolerance_threshold(
+        reference,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
+    )
+
+    assert threshold == pytest.approx(expected)
+
+
+def test_score_tolerance_threshold_allows_an_effectively_unbounded_allowance() -> None:
+    threshold = _score_tolerance_threshold(
+        np.finfo(np.float64).max,
+        relative_tolerance=np.finfo(np.float64).max,
+        absolute_tolerance=np.inf,
+    )
+
+    assert np.isneginf(threshold)
+
+
+@pytest.mark.parametrize(
+    ("argument", "value", "message"),
+    [
+        ("reference", np.nan, "reference"),
+        ("reference", np.inf, "reference"),
+        ("reference", True, "reference"),
+        ("relative_tolerance", -0.1, "relative_tolerance"),
+        ("relative_tolerance", np.inf, "relative_tolerance"),
+        ("relative_tolerance", np.nan, "relative_tolerance"),
+        ("relative_tolerance", True, "relative_tolerance"),
+        ("absolute_tolerance", -0.1, "absolute_tolerance"),
+        ("absolute_tolerance", np.nan, "absolute_tolerance"),
+        ("absolute_tolerance", -np.inf, "absolute_tolerance"),
+        ("absolute_tolerance", False, "absolute_tolerance"),
+    ],
+)
+def test_score_tolerance_threshold_rejects_invalid_inputs(
+    argument: str,
+    value: object,
+    message: str,
+) -> None:
+    kwargs: dict[str, object] = {
+        "reference": 1.0,
+        "relative_tolerance": 0.1,
+        "absolute_tolerance": np.inf,
+    }
+    kwargs[argument] = value
+
+    with pytest.raises(ValueError, match=message):
+        _score_tolerance_threshold(**kwargs)
+
+
+def test_tolerant_score_mask_includes_the_exact_boundary() -> None:
+    mask = _tolerant_score_mask(
+        np.array([10.0, 9.75, 9.749, 9.0]),
+        10.0,
+        relative_tolerance=0.10,
+        absolute_tolerance=0.25,
+    )
+
+    np.testing.assert_array_equal(mask, np.array([True, True, False, False]))
+
+
+def test_tolerant_score_mask_keeps_numerical_equality_separate_from_allowance() -> None:
+    mask = _tolerant_score_mask(
+        np.array([1.0, 1.0 - 5e-14, 1.0 - 1e-8]),
+        1.0,
+        relative_tolerance=0.0,
+        absolute_tolerance=0.0,
+    )
+
+    np.testing.assert_array_equal(mask, np.array([True, True, False]))
+
+
+@pytest.mark.parametrize("scores", [[], [1.0, np.nan], [1.0, np.inf]])
+def test_tolerant_score_mask_rejects_nonfinite_or_empty_scores(
+    scores: list[float],
+) -> None:
+    with pytest.raises(ValueError, match="scores"):
+        _tolerant_score_mask(
+            scores,
+            1.0,
+            relative_tolerance=0.1,
+            absolute_tolerance=np.inf,
+        )
+
+
+def test_select_tolerant_predictor_rank_returns_reference_and_selected_evidence() -> None:
+    selection = _select_tolerant_predictor_rank(
+        np.array([8, 2, 6, 4], dtype=np.intp),
+        np.array([-1.00, -1.08, -1.04, -1.06]),
+        relative_tolerance=0.10,
+        absolute_tolerance=np.inf,
+    )
+
+    assert selection.reference_rank == 8
+    assert selection.reference_score == pytest.approx(-1.00)
+    assert selection.selected_rank == 2
+    assert selection.selected_score == pytest.approx(-1.08)
+    assert selection.score_threshold == pytest.approx(-1.10)
+
+
+def test_select_tolerant_predictor_rank_applies_both_caps() -> None:
+    selection = _select_tolerant_predictor_rank(
+        np.array([2, 4, 6], dtype=np.intp),
+        np.array([9.6, 9.8, 10.0]),
+        relative_tolerance=0.10,
+        absolute_tolerance=0.25,
+    )
+
+    assert selection.reference_rank == 6
+    assert selection.selected_rank == 4
+    assert selection.score_threshold == pytest.approx(9.75)
+
+
+def test_select_tolerant_predictor_rank_uses_low_rank_numerical_reference_ties() -> None:
+    selection = _select_tolerant_predictor_rank(
+        np.array([5, 2, 4], dtype=np.intp),
+        np.array([0.7, 0.8 - 5e-14, 0.8]),
+        relative_tolerance=0.0,
+        absolute_tolerance=0.0,
+    )
+
+    assert selection.reference_rank == 2
+    assert selection.reference_score == pytest.approx(0.8)
+    assert selection.selected_rank == 2
+    assert selection.selected_score == pytest.approx(0.8 - 5e-14)
+
+
+@pytest.mark.parametrize(
+    ("ranks", "scores"),
+    [
+        ([], []),
+        ([1, 1], [0.2, 0.3]),
+        ([0, 2], [0.2, 0.3]),
+        ([1.0, 2.0], [0.2, 0.3]),
+        ([1, 2], [0.2]),
+        ([1, 2], [0.2, np.nan]),
+    ],
+)
+def test_select_tolerant_predictor_rank_rejects_invalid_surfaces(
+    ranks: list[float],
+    scores: list[float],
+) -> None:
+    with pytest.raises(ValueError):
+        _select_tolerant_predictor_rank(
+            ranks,
+            scores,
+            relative_tolerance=0.1,
+            absolute_tolerance=np.inf,
+        )
+
+
+def test_adaptive_refinement_remains_anchored_to_the_exact_optimum() -> None:
+    ranks = np.array([2, 4, 8, 16, 32], dtype=np.intp)
+    losses = np.array([1.09, 1.08, 1.07, 1.00, 1.05])
+    tolerant = _select_tolerant_predictor_rank(
+        ranks,
+        -losses,
+        relative_tolerance=0.10,
+        absolute_tolerance=np.inf,
+    )
+
+    assert tolerant.selected_rank == 2
+    assert _adaptive_refinement_interval(ranks, losses) == (8, 32)
