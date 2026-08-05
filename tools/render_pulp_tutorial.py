@@ -166,14 +166,8 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     response_names = data.target_names
 
     search = PiPLSSearchCV(cv=CV).fit(X, Y)
-    model = search.refit(
-        X,
-        Y,
-        n_components=CHOSEN_N_COMPONENTS,
-    )
-
-    selection = model.selection_
     component_path = search.component_path_
+    selection = search.select(n_components=CHOSEN_N_COMPONENTS)
     rank_profile = search.predictor_rank_profile(selection.n_components)
     report = search.oof_report(
         X,
@@ -185,6 +179,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         raise RuntimeError(
             "Repeated Pulp CV must produce ten OOF predictions per observation."
         )
+    model = search.refit(X, Y, selection=selection)
     factors = pipls_display_factors(
         model.decomposition_,
         response_index=response_names.index("TI"),

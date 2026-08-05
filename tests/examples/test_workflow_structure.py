@@ -32,19 +32,22 @@ _RENDERING_METHODS = {
     "subplots",
     "text",
 }
-_ANALYSIS_CALLS = {
-    "latent_structure",
-    "observation_diagnostics",
+_SEARCH_EVIDENCE_CALLS = {
     "oof_report",
-    "pipls_display_factors",
-    "prediction_diagnostics",
     "predictor_rank_profile",
 }
+_FITTED_MODEL_ANALYSIS_CALLS = {
+    "latent_structure",
+    "observation_diagnostics",
+    "pipls_display_factors",
+    "prediction_diagnostics",
+}
+_ANALYSIS_CALLS = _SEARCH_EVIDENCE_CALLS | _FITTED_MODEL_ANALYSIS_CALLS
 _SYNTHETIC_SELECTION_WORKFLOWS = (
     "examples/02_synthetic_path_selection.py",
     "tools/render_synthetic_tutorial.py",
 )
-_REFIT_FIRST_REAL_DATA_WORKFLOWS = (
+_SELECTION_DRIVEN_REAL_DATA_WORKFLOWS = (
     "examples/05_pulp_real_data.py",
     "examples/06_sugarcane_real_data.py",
     "examples/07_tobacco_real_data.py",
@@ -277,23 +280,42 @@ def test_synthetic_selection_evidence_precedes_refit_and_rendering(
     assert _keyword_path(refit_call, "n_components") is None
 
 
-@pytest.mark.parametrize("relative_path", _REFIT_FIRST_REAL_DATA_WORKFLOWS)
-def test_current_real_data_modeling_precedes_analysis_and_rendering(
+@pytest.mark.parametrize("relative_path", _SELECTION_DRIVEN_REAL_DATA_WORKFLOWS)
+def test_real_data_selection_evidence_precedes_refit_and_rendering(
     relative_path: str,
 ) -> None:
-    tree = parse_module(_repository_root() / relative_path)
+    path = _repository_root() / relative_path
+    tree = parse_module(path)
     scope = _workflow_scope(tree)
 
+    select_lines = call_lines(scope, {"select"})
+    profile_lines = call_lines(scope, {"predictor_rank_profile"})
+    report_lines = call_lines(scope, {"oof_report"})
     refit_lines = call_lines(scope, {"refit"})
-    analysis_lines = call_lines(scope, _ANALYSIS_CALLS)
+    fitted_analysis_lines = call_lines(scope, _FITTED_MODEL_ANALYSIS_CALLS)
     rendering_names = _RENDERING_METHODS | _rendering_function_names(tree)
     rendering_lines = call_lines(scope, rendering_names)
 
+    assert len(select_lines) == 1
+    assert len(profile_lines) == 1
+    assert len(report_lines) == 1
     assert len(refit_lines) == 1
-    assert analysis_lines
+    assert fitted_analysis_lines
     assert rendering_lines
-    assert refit_lines[0] < min(analysis_lines)
-    assert max(analysis_lines) < min(rendering_lines)
+    assert select_lines[0] < profile_lines[0] < report_lines[0] < refit_lines[0]
+    assert refit_lines[0] < min(fitted_analysis_lines)
+    assert max(fitted_analysis_lines) < min(rendering_lines)
+
+    report_call = calls_named(scope, "oof_report")[0]
+    refit_call = calls_named(scope, "refit")[0]
+    assert _keyword_path(report_call, "selection") == "selection"
+    assert _keyword_path(refit_call, "selection") == "selection"
+    assert _keyword_path(refit_call, "rule") is None
+    assert _keyword_path(refit_call, "n_components") is None
+    assert all(
+        not (isinstance(node, ast.Attribute) and node.attr == "selection_")
+        for node in ast.walk(scope)
+    ), path
 
 
 @pytest.mark.parametrize(
@@ -329,7 +351,7 @@ def test_complete_examples_separate_analysis_from_rendering(
         ),
     ],
 )
-def test_real_data_examples_use_public_post_fit_analysis(
+def test_real_data_examples_use_public_selection_and_inspection(
     relative_path: str,
     extra_analysis_calls: set[str],
 ) -> None:
@@ -343,8 +365,44 @@ def test_real_data_examples_use_public_post_fit_analysis(
     }
 
     assert required <= calls
-    assert "select" not in calls
-    assert "refit" in calls
+    assert {"select", "refit"} <= calls
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "examples/05_pulp_real_data.py",
+        "examples/06_sugarcane_real_data.py",
+    ],
+)
+def test_manual_real_data_workflows_select_the_declared_component_count(
+    relative_path: str,
+) -> None:
+    tree = parse_module(_repository_root() / relative_path)
+    select_calls = calls_named(tree, "select")
+
+    assert len(select_calls) == 1
+    component_keyword = next(
+        keyword
+        for keyword in select_calls[0].keywords
+        if keyword.arg == "n_components"
+    )
+    assert isinstance(component_keyword.value, ast.Name)
+    assert component_keyword.value.id == "CHOSEN_N_COMPONENTS"
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "examples/03_leave_one_out_validation.py",
+        "examples/04_pls_path_comparison.py",
+    ],
+)
+def test_validation_and_comparison_routes_do_not_refit_a_final_model(
+    relative_path: str,
+) -> None:
+    calls = call_names(parse_module(_repository_root() / relative_path))
+    assert "refit" not in calls
 
 
 @pytest.mark.parametrize(
@@ -394,16 +452,24 @@ def test_tobacco_keeps_two_explicit_tolerance_decisions_and_paginated_reports() 
     assert isinstance(predictor_keyword.value, ast.Name)
     assert predictor_keyword.value.id == "PREDICTOR_RANK_RELATIVE_TOLERANCE"
 
-    refit_calls = calls_named(tree, "refit")
-    assert len(refit_calls) == 1
-    assert keyword_constant(refit_calls[0], "rule") == "minimum_cv_mse"
+    select_calls = calls_named(tree, "select")
+    assert len(select_calls) == 1
+    assert keyword_constant(select_calls[0], "rule") == "minimum_cv_mse"
     component_keyword = next(
         keyword
-        for keyword in refit_calls[0].keywords
+        for keyword in select_calls[0].keywords
         if keyword.arg == "relative_tolerance"
     )
     assert isinstance(component_keyword.value, ast.Name)
     assert component_keyword.value.id == "COMPONENT_RELATIVE_TOLERANCE"
+
+    refit_calls = calls_named(tree, "refit")
+    assert len(refit_calls) == 1
+    assert _keyword_path(refit_calls[0], "selection") == "selection"
+    assert _keyword_path(refit_calls[0], "rule") is None
+    assert all(
+        keyword.arg != "relative_tolerance" for keyword in refit_calls[0].keywords
+    )
 
     text_literals = {
         node.value

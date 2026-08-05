@@ -305,24 +305,26 @@ def main() -> None:
     wavelengths = np.asarray(data.feature_names, dtype=np.float64)
     response_names = list(data.target_names)
 
-    # Complete search and full-data modeling before numerical analysis.
+    # Inspect the search evidence and create one exact selection.
     search = PiPLSSearchCV(cv=CV).fit(X, Y)
-    model = search.refit(
-        X,
-        Y,
-        n_components=CHOSEN_N_COMPONENTS,
-    )
-
-    # Retrieve selection, path, rank-profile, and OOF evidence after modeling.
-    selection = model.selection_
     path = search.component_path_
+    selection = search.select(n_components=CHOSEN_N_COMPONENTS)
     rank_profile = search.predictor_rank_profile(selection.n_components)
+
+    # Qualify that same selection through the materialized validation splits.
     report = search.oof_report(
         X,
         Y,
         selection=selection,
     )
     oof_predictions = report.oof_predictions
+
+    # Refit the exact qualified selection on all development observations.
+    model = search.refit(
+        X,
+        Y,
+        selection=selection,
+    )
 
     # Calculate fitted-model and prediction inspection results.
     factors = pipls_display_factors(model.decomposition_)

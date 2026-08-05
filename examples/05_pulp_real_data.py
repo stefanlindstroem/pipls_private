@@ -31,18 +31,10 @@ predictor_names = data.feature_names
 response_names = data.target_names
 # --8<-- [end:load-pulp-data]
 
-# --8<-- [start:fit-pulp-model]
-search = PiPLSSearchCV(cv=CV).fit(X, Y)
-model = search.refit(
-    X,
-    Y,
-    n_components=CHOSEN_N_COMPONENTS,
-)
-# --8<-- [end:fit-pulp-model]
-
 # --8<-- [start:inspect-pulp-selection]
-selection = model.selection_
+search = PiPLSSearchCV(cv=CV).fit(X, Y)
 path = search.component_path_
+selection = search.select(n_components=CHOSEN_N_COMPONENTS)
 rank_profile = search.predictor_rank_profile(selection.n_components)
 # --8<-- [end:inspect-pulp-selection]
 
@@ -54,6 +46,14 @@ report = search.oof_report(
 )
 oof_predictions = report.oof_predictions
 # --8<-- [end:pulp-oof-predictions]
+
+# --8<-- [start:fit-pulp-model]
+model = search.refit(
+    X,
+    Y,
+    selection=selection,
+)
+# --8<-- [end:fit-pulp-model]
 
 # --8<-- [start:pulp-inspection-results]
 factors = pipls_display_factors(

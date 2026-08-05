@@ -11,9 +11,9 @@ predictions, and interpretation of a selected model.
 You will:
 
 1. load the Pulp predictors and responses;
-2. declare a component count and fit the corresponding model;
-3. retrieve the model's selection, component path, and conditional predictor-rank profile;
-4. generate OOF predictions for that exact selection;
+2. search the admissible path and inspect the evidence at an explicit component count;
+3. create one immutable selection and generate OOF predictions for that exact row;
+4. refit the same selection on all development observations;
 5. compute immutable latent-structure, factorization, and prediction-diagnostic results;
 6. render and interpret representative standard PLS-family and Pi-PLS-specific plots.
 
@@ -70,37 +70,24 @@ The named loader returns immutable matrices together with scientific predictor a
 The resulting arrays have shapes `(46, 14)` and `(46, 8)`. The same loader works from a source
 checkout, wheel, or source distribution and applies no preprocessing.
 
-## Fit the manually selected model
+## Search and retrieve selection evidence { #retrieve-selection-evidence }
 
-Search and full-data refitting are kept together:
-
-```python
---8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
-```
-
-The search evaluates admissible paired-mode counts and conditionally selects one predictor rank at
-each count. It uses ten repeated five-fold partitions, so every candidate is evaluated on 50
-materialized validation splits. `refit()` resolves the stored row for `CHOSEN_N_COMPONENTS` and fits
-that fixed pair on all 46 observations. The returned
-[`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression) supplies predictions and
-fitted-model inspection; the search retains the cross-validation evidence.
-
-Repeated CV makes this complete analysis approximately ten times as expensive as the former single
-five-fold partition. The quick start remains deliberately lighter.
-
-At this point modeling is complete.
-
-## Retrieve selection evidence
-
-The exact row used by `refit()` is available from `model.selection_`. The component path and the
-complete predictor-rank profile at that selected component count are then retrieved for analysis:
+The search, component path, exact manual selection, and conditional predictor-rank profile are
+constructed before a final full-data model is fitted:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:inspect-pulp-selection"
 ```
 
-After `refit()`, obtain the fitted selection from `model.selection_`. Use `search.select()` when a
-selection is needed without fitting a final model.
+The search evaluates admissible paired-mode counts and conditionally selects one predictor rank at
+each count. It uses ten repeated five-fold partitions, so every candidate is evaluated on 50
+materialized validation splits. `search.select(n_components=CHOSEN_N_COMPONENTS)` retrieves the
+complete immutable row at the declared component count, and `predictor_rank_profile()` exposes the
+rank evidence conditional on that same count. These search-owned results can be inspected
+without fitting a final model.
+
+Repeated CV makes this complete analysis approximately ten times as expensive as the former single
+five-fold partition. The quick start remains deliberately lighter.
 
 ### Component path
 
@@ -114,7 +101,7 @@ The mean CV-MSE falls substantially through three components and is nearly flat 
 bars show one population standard deviation across the materialized validation splits on either
 side of each mean. They describe split-to-split variability; they are not confidence intervals
 and do not enter selection. This manual workflow keeps the three-component choice explicit. The
-diamond marks the row used by the fitted model.
+diamond marks the row that is later refitted on all development observations.
 
 The selection contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at three
 components across the 50 seeded repeated-CV splits.
@@ -133,7 +120,7 @@ interior rank 9. Ranks 9 and 10 have mean CV-MSE values of approximately 0.258 a
 population split SDs of approximately 0.097 and 0.100. Their mean difference is small relative
 to the displayed split-to-split variability.
 
-The profile supports rank 9 for this fitted model, but it does not establish a distinct scientific
+The profile supports rank 9 for this selection, but it does not establish a distinct scientific
 advantage over nearby retained dimensions. The fixed model still contains three paired latent
 modes; predictor rank 9 is the retained predictor-subspace dimension used to estimate those modes.
 The 50-split protocol is a final stability choice rather than a recommended development default; a
@@ -145,8 +132,8 @@ other bounds and policies.
 
 ## Generate selection-conditioned OOF predictions
 
-OOF reporting is optional post-model analysis. The report consumes the exact selection retained by
-the model rather than resolving the component count again:
+OOF reporting optionally qualifies the selected row before final refitting. The report consumes the
+exact selection already inspected above rather than resolving the component count again:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
@@ -165,6 +152,21 @@ appropriate protocol when the sampling design carries experimental structure.
     Nested cross-validation or an external test set is required for an independent estimate of
     post-selection performance. See
     [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
+
+## Refit the qualified selection
+
+After the search evidence and selection-conditioned OOF behavior have been examined, the exact same
+selection is fitted on all 46 development observations:
+
+```python
+--8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
+```
+
+`refit(selection=selection)` does not repeat the component-count decision. It validates the supplied
+selection against the fitted search, fits its fixed component and predictor ranks, and attaches the
+exact immutable object as `model.selection_` after fitting succeeds. The returned
+[`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression) supplies predictions and fitted-model
+inspection, while the search continues to own the cross-validation evidence.
 
 ## Compute immutable inspection results
 

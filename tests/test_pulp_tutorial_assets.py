@@ -195,6 +195,23 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
         assert f"# --8<-- [start:{section}]" in example
         assert f"# --8<-- [end:{section}]" in example
 
+    assert tutorial.index("inspect-pulp-selection") < tutorial.index(
+        "pulp-oof-predictions"
+    )
+    assert tutorial.index("pulp-oof-predictions") < tutorial.index(
+        "fit-pulp-model"
+    )
+    assert tutorial.index("fit-pulp-model") < tutorial.index(
+        "pulp-inspection-results"
+    )
+    assert "selection = model.selection_" not in example
+    assert "selection = model.selection_" not in renderer
+    assert "selection = search.select(n_components=CHOSEN_N_COMPONENTS)" in example
+    assert "selection = search.select(n_components=CHOSEN_N_COMPONENTS)" in renderer
+    assert "model = search.refit(" in example
+    assert "selection=selection" in example
+    assert "model = search.refit(X, Y, selection=selection)" in renderer
+
     renderer_sections = {
         "render-pulp-biplot",
         "render-pulp-predictor-directions",

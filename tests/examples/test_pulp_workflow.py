@@ -23,13 +23,8 @@ def pulp_result() -> SimpleNamespace:
 
     cv = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
     search = PiPLSSearchCV(cv=cv).fit(X, Y)
-    model = search.refit(
-        X,
-        Y,
-        n_components=3,
-    )
-    selected = model.selection_
     component_path = search.component_path_
+    selected = search.select(n_components=3)
     rank_profile = search.predictor_rank_profile(selected.n_components)
     report = search.oof_report(
         X,
@@ -37,6 +32,7 @@ def pulp_result() -> SimpleNamespace:
         selection=selected,
     )
     oof_predictions = report.oof_predictions
+    model = search.refit(X, Y, selection=selected)
     factors = pipls_display_factors(
         model.decomposition_,
         response_index=data.target_names.index("TI"),
@@ -78,7 +74,8 @@ def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespac
     assert isinstance(result.model, PiPLSRegression)
     assert result.model.n_components == 3
     assert result.model.predictor_rank == 9
-    assert result.model.selection_.predictor_rank == 9
+    assert result.model.selection_ is result.selected
+    assert result.report.selection is result.selected
     assert not hasattr(result.model, "predictor_rank_")
 
 

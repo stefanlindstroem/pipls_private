@@ -78,9 +78,9 @@ release validation. Paper reproduction and publication-only analyses remain down
 ## Current roadmap
 
 Decisions 0148, 0149, and 0150 are implemented. Decision 0151 is the active six-patch increment.
-Patches 1--3 establish the contract, selection-driven refitting, and the reordered synthetic
-workflow. Patch 4 reorders the complete real-data workflows; Patch 5 adds Mermaid tutorial
-flowcharts and strict documentation integration; Patch 6 completes public and maintainer audits.
+Patches 1--4 establish the contract, selection-driven refitting, and the reordered synthetic and
+complete real-data workflows. Patch 5 adds Mermaid tutorial flowcharts and strict documentation
+integration; Patch 6 completes public and maintainer audits.
 
 ## Independent paused work
 
