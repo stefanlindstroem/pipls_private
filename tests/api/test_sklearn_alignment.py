@@ -16,7 +16,7 @@ from sklearn.utils.estimator_checks import check_estimator
 
 import pipls
 from pipls import PiPLSRegression, PiPLSSearchCV
-from pipls.component_path import PiPLSComponentPath
+from pipls.component_path import PiPLSComponentPath, PiPLSSelection
 from pipls.decomposition import PiPLSDecomposition
 
 
@@ -89,6 +89,13 @@ def test_selection_method_signatures_separate_component_and_rank_tolerances() ->
         assert signature.parameters["absolute_tolerance"].kind is (
             inspect.Parameter.KEYWORD_ONLY
         )
+
+    refit_signature = inspect.signature(PiPLSSearchCV.refit)
+    selection_parameter = refit_signature.parameters["selection"]
+    assert selection_parameter.default is None
+    assert selection_parameter.kind is inspect.Parameter.KEYWORD_ONLY
+    assert selection_parameter.annotation == "PiPLSSelection | None"
+    assert "selection" not in inspect.signature(PiPLSSearchCV.select).parameters
 
     parameters = PiPLSSearchCV().get_params(deep=False)
     assert "relative_tolerance" not in parameters
@@ -356,19 +363,14 @@ def test_minimum_cv_mse_tolerance_refit_preserves_pipeline_composition() -> None
         absolute_tolerance=0.05,
     )
 
-    model = search.refit(
-        X,
-        Y,
-        rule="minimum_cv_mse",
-        relative_tolerance=0.10,
-        absolute_tolerance=0.05,
-    )
+    model = search.refit(X, Y, selection=expected)
 
     assert isinstance(model, Pipeline)
     selected_pipls = model.named_steps["regression"]
     assert selected_pipls.n_components == expected.n_components
     assert selected_pipls.predictor_rank == expected.predictor_rank
-    assert model.selection_ == expected
+    assert isinstance(model.selection_, PiPLSSelection)
+    assert model.selection_ is expected
     assert model.selection_.reference_minimum == expected.reference_minimum
     assert model.selection_.cv_mse_threshold == expected.cv_mse_threshold
 

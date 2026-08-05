@@ -649,6 +649,7 @@ class PiPLSSearchCV(
         X: ArrayLike,
         y: ArrayLike,
         *,
+        selection: PiPLSSelection | None = None,
         rule: SelectionRule | None = None,
         n_components: int | None = None,
         relative_tolerance: float | None = None,
@@ -656,10 +657,11 @@ class PiPLSSearchCV(
     ) -> Any:
         """Fit and return one selected path model on the supplied full data.
 
-        Exactly one of ``rule`` and ``n_components`` must be supplied. A named
-        rule selects one stored component-path row; a component count retrieves
-        that row directly. In every case, the predictor rank is the rank already
-        selected conditionally for the chosen component count.
+        Exactly one of ``selection``, ``rule``, and ``n_components`` must be
+        supplied. An existing selection is validated exactly against this fitted
+        search. A named rule selects one stored component-path row; a component
+        count retrieves that row directly. In every case, the predictor rank is
+        the rank already selected conditionally for the chosen component count.
 
         Parameters
         ----------
@@ -667,6 +669,10 @@ class PiPLSSearchCV(
             Predictor matrix used for the final full-data fit.
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
             Response vector or matrix used for the final full-data fit.
+        selection : PiPLSSelection, optional
+            Existing immutable selection exactly compatible with this fitted
+            search. Nondefault component-count tolerances are invalid because
+            the selection has already resolved them.
         rule : {"best_score", "minimum_cv_mse"}, optional
             Stored-row selection rule. ``"best_score"`` uses the configured-score
             optimum on the conditioned component path. ``"minimum_cv_mse"`` uses
@@ -685,33 +691,52 @@ class PiPLSSearchCV(
         -------
         estimator
             Fitted clone of the configured direct estimator or pipeline. The
-            returned outer estimator exposes the exact immutable selected row as
-            ``selection_``.
+            returned outer estimator exposes the exact supplied or resolved
+            immutable row as ``selection_``.
 
         Raises
         ------
         sklearn.exceptions.NotFittedError
             If the search has not been fitted.
+        TypeError
+            If ``selection`` is not a :class:`PiPLSSelection`.
         ValueError
-            If exactly one selection input is not supplied, a rule is invalid,
-            or the requested component count was not evaluated.
+            If exactly one selection input is not supplied, a supplied selection
+            is incompatible, a rule is invalid, tolerance arguments conflict
+            with the selection source, or the requested component count was not
+            evaluated.
 
         Notes
         -----
         The search object is not mutated and does not retain ``X``, ``y``, or
-        the returned estimator. ``selection_`` is attached only after the
-        full-data fit succeeds. A :class:`pipls.PiPLSRegression` fitted directly
-        through :meth:`~pipls.PiPLSRegression.fit` has no selection provenance.
+        the returned estimator. When ``selection`` is supplied, the exact object
+        is attached as ``selection_`` only after the full-data fit succeeds. A
+        :class:`pipls.PiPLSRegression` fitted directly through
+        :meth:`~pipls.PiPLSRegression.fit` has no selection provenance.
         For an exact manually specified ``(n_components, predictor_rank)`` pair,
         fit :class:`pipls.PiPLSRegression` directly.
         """
 
-        selected = self._resolve_selection_result(
-            rule=rule,
-            n_components=n_components,
-            relative_tolerance=relative_tolerance,
-            absolute_tolerance=absolute_tolerance,
+        selection_sources = sum(
+            value is not None for value in (selection, rule, n_components)
         )
+        if selection_sources != 1:
+            raise ValueError(
+                "Exactly one of selection, rule, and n_components must be supplied."
+            )
+        if selection is not None:
+            _require_default_tolerances(
+                relative_tolerance=relative_tolerance,
+                absolute_tolerance=absolute_tolerance,
+            )
+            selected = self._validate_selection_compatibility(selection)
+        else:
+            selected = self._resolve_selection_result(
+                rule=rule,
+                n_components=n_components,
+                relative_tolerance=relative_tolerance,
+                absolute_tolerance=absolute_tolerance,
+            )
         template = (
             _default_pipls_template() if self.estimator is None else self.estimator
         )
@@ -753,9 +778,9 @@ class PiPLSSearchCV(
             Response vector or matrix aligned row-for-row with ``X`` and the
             data supplied to :meth:`fit`.
         selection : PiPLSSelection
-            Existing immutable selection compatible with this fitted search.
-            A model returned by :meth:`refit` exposes the exact value as
-            ``model.selection_``.
+            Existing immutable selection compatible with this fitted search,
+            typically returned by :meth:`select`. A model returned by
+            :meth:`refit` also exposes the exact value as ``model.selection_``.
 
         Returns
         -------
@@ -782,7 +807,7 @@ class PiPLSSearchCV(
         no full-data model is fitted or retained.
         """
 
-        compatible = self._validate_oof_selection(selection)
+        compatible = self._validate_selection_compatibility(selection)
         values = self._compute_oof_report_values(
             X,
             y,
@@ -796,7 +821,7 @@ class PiPLSSearchCV(
             pooled_oof_r2=values[3],
         )
 
-    def _validate_oof_selection(
+    def _validate_selection_compatibility(
         self,
         selection: PiPLSSelection,
     ) -> PiPLSSelection:
@@ -828,7 +853,7 @@ class PiPLSSearchCV(
         if selection != expected:
             raise ValueError(
                 "selection is not compatible with this fitted search. Use "
-                "model.selection_ or search.select(...) from the same search."
+                "search.select(...) from this search or its exact model.selection_."
             )
         return selection
 

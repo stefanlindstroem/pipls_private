@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add `selection=` to `PiPLSSearchCV.refit()`. One existing compatible immutable selection can now
+  configure both OOF reporting and final full-data fitting; `refit()` and `oof_report()` share exact
+  provenance validation, the returned estimator retains the exact supplied object as `selection_`,
+  and rule-based and manual component-count refitting remain supported.
 - Add a central computational-performance guide for Pi-PLS training. Document candidate-fold fit
   counts, validation repetitions, adaptive and exhaustive predictor-rank coverage, fixed and
   restricted paths, randomized predictor SVD, parallel execution, OOF-report reuse, and direct

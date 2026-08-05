@@ -3,16 +3,18 @@
 Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
 `n_components` counts paired latent modes $h$; `predictor_rank` is the retained predictor-subspace
 dimension $r_\pi$. The [synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence)
-shows the ordinary manual workflow: declare a component count, complete search and refitting, then
-inspect `model.selection_`, `component_path_`, and the conditional predictor-rank profile.
+shows the ordinary manual workflow: inspect the search evidence, create one immutable selection,
+and pass that exact selection to final refitting.
 
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
 search object caps the path by the minimum predictor rank verified across those transformed folds.
 `PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Explicit post-fit
 `search.select(...)` returns one immutable stored component-path row without fitting.
-`search.refit(X, Y, ...)` resolves the same row, clones the configured estimator or pipeline, fits
-that clone, attaches the exact immutable row as `model.selection_`, and returns the model.
+`search.refit(X, Y, selection=...)` validates an existing selection, clones the configured
+estimator or pipeline, fits that clone, attaches the exact supplied object as `model.selection_`,
+and returns the model. Rule-based and component-count refitting remain available for compact
+workflows.
 `search.oof_report(X, Y, selection=...)` consumes an existing selection and produces ordered OOF
 diagnostics from the exact validation splits materialized by `fit()`. The search object does not
 delegate model methods or retain the returned estimator, report, or supplied training matrices.
@@ -42,7 +44,8 @@ response is a matrix denoted by $\mathbf{Y}$ in equations; see the
 |---|---|
 | Both ranks are already known | Fit `PiPLSRegression` directly |
 | Inspect one selected row without fitting | Call `search.select(rule=... or n_components=h)` |
-| Choose a component count after inspecting the path | Call `search.refit(X, Y, n_components=h)` |
+| Choose a component count after inspecting the path | Create `selection = search.select(n_components=h)` |
+| Refit one existing selection | Call `search.refit(X, Y, selection=selection)` |
 | Inspect the exact row used by a refitted model | Read `model.selection_` |
 | Apply an automatic final rule | Call `search.refit(X, Y, rule=...)` after path evaluation |
 | Inspect OOF diagnostics for one selected row | Call `search.oof_report(X, Y, selection=selection)` |
@@ -51,7 +54,7 @@ These search-owned operations use the same stored-row vocabulary. Retaining `sea
 the complete path and candidate evidence; the returned model owns prediction, transformation,
 scoring, and inspection of the final fixed fit.
 
-## Fit one fixed model and inspect the path { #inspect-the-path-and-fit-one-fixed-model }
+## Inspect the path and fit one fixed model { #inspect-the-path-and-fit-one-fixed-model }
 
 ```python
 from pipls import PiPLSSearchCV
@@ -59,21 +62,17 @@ from pipls import PiPLSSearchCV
 CHOSEN_N_COMPONENTS = 2  # application-specific declared choice
 
 search = PiPLSSearchCV().fit(X, Y)
-model = search.refit(
-    X,
-    Y,
-    n_components=CHOSEN_N_COMPONENTS,
-)
-
-# Analysis follows completed modeling.
-selection = model.selection_
 path = search.component_path_
+selection = search.select(n_components=CHOSEN_N_COMPONENTS)
 rank_profile = search.predictor_rank_profile(selection.n_components)
+
+model = search.refit(X, Y, selection=selection)
 ```
 
-This example keeps model construction together and performs numerical analysis afterward. A
-refitted model exposes the exact row it used through `selection_`. `select()` remains optional for
-selection-only workflows that do not construct a final model. The
+This example creates the immutable row while inspecting the search evidence, then passes that same
+object to final refitting. The returned model exposes the exact supplied object through
+`selection_`. Rule-based or component-count refitting remains available when the caller does not
+need to retain an earlier selection. The
 [synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence) explains how retained
 path evidence can be used to justify an application-specific declared choice.
 
@@ -188,14 +187,12 @@ the API scorer-neutral:
 search = PiPLSSearchCV(
     predictor_rank_relative_tolerance=0.10,
 ).fit(X, Y)
-model = search.refit(
-    X,
-    Y,
+selection = search.select(
     rule="minimum_cv_mse",
     relative_tolerance=0.10,
 )
-
-profile = search.predictor_rank_profile(model.selection_.n_components)
+profile = search.predictor_rank_profile(selection.n_components)
+model = search.refit(X, Y, selection=selection)
 evidence = profile.predictor_rank_evidence
 if evidence is None:
     raise RuntimeError("Predictor-rank evidence is unavailable.")
@@ -212,12 +209,13 @@ a separate component-count decision on the already conditioned path.
 ## Out-of-fold report
 
 `search.oof_report(X, Y, selection=...)` fits one existing selection independently on every training
-fold from the exact split set materialized by `search.fit()`. A model returned by `search.refit(...)`
-exposes the intended value as `model.selection_`:
+fold from the exact split set materialized by `search.fit()`. The same immutable object can configure
+both OOF reporting and final refitting:
 
 ```python
-selection = model.selection_
+selection = search.select(rule="minimum_cv_mse")
 report = search.oof_report(X, Y, selection=selection)
+model = search.refit(X, Y, selection=selection)
 ```
 
 The immutable `PiPLSOOFReport` contains the exact supplied `selection`, ordered OOF predictions,

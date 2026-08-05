@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. Patch 1 of 6 is implemented: this target contract and the active maintainer guidance are
-synchronized. The runtime API, maintained examples, served tutorials, Mermaid configuration, and
-final documentation audit remain for Patches 2--6.
+Accepted. Patches 1 and 2 of 6 are implemented: the target contract is synchronized and
+`PiPLSSearchCV.refit(selection=...)` uses the shared exact compatibility validator. Maintained
+example order, served tutorials, Mermaid configuration, and the final documentation audit remain
+for Patches 3--6.
 
 ## Context
 
@@ -165,7 +166,7 @@ workflow work in this decision.
 1. Establish this decision, refine the affected lifecycle records, and synchronize active
    maintainer contracts without changing runtime or served documentation -- complete.
 2. Add `selection=` to `PiPLSSearchCV.refit()`, share exact compatibility validation with
-   `oof_report()`, and add API, pipeline, failure, cloning, and pickle coverage.
+   `oof_report()`, and add API, pipeline, failure, cloning, and pickle coverage -- complete.
 3. Reorder the synthetic inspect-and-select example, renderer, tutorial, and tests around one
    pre-refit selection while preserving numerical artifacts.
 4. Reorder the complete Pulp, Sugarcane, and Tobacco workflows and replace the global refit-first

@@ -139,10 +139,10 @@ Exactly one of `selection`, `rule`, and `n_components` determines the stored row
 selection must be a `PiPLSSelection` exactly compatible with the fitted search, and nondefault
 component-count tolerances are invalid because the row is already resolved. `refit()` uses the same
 compatibility definition as `oof_report()`, clones the configured estimator or pipeline, fits it on
-the supplied full data, and attaches the exact supplied or resolved immutable row to the returned
-outer estimator as `selection_`. It does not mutate the fitted search, retain the supplied data, or
-store the returned model. To fit an exact manually specified `(n_components, predictor_rank)` pair,
-use `PiPLSRegression` directly.
+the supplied full data, and attaches the exact supplied object or resolved immutable row to the
+returned outer estimator as `selection_`. It does not mutate the fitted search, retain the supplied
+data, or store the returned model. To fit an exact manually specified
+`(n_components, predictor_rank)` pair, use `PiPLSRegression` directly.
 
 ### OOF report
 

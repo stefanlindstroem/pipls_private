@@ -54,9 +54,9 @@ policy and `search_method="exhaustive"` requests complete admissible-rank covera
 name and `search_is_exhaustive_` fitted diagnostic remain unchanged, and the former values have no
 compatibility aliases.
 
-Decision 0151 authorizes `refit(selection=...)` as the exact-selection handoff for analytical
+Decision 0151 implements `refit(selection=...)` as the exact-selection handoff for analytical
 workflows. Rule-based and component-count refitting remain the compact route. Existing selections
-must use one compatibility definition across OOF reporting and final refitting.
+use one compatibility definition across OOF reporting and final refitting.
 
 ### Analysis
 
@@ -78,8 +78,8 @@ release validation. Paper reproduction and publication-only analyses remain down
 ## Current roadmap
 
 Decisions 0148, 0149, and 0150 are implemented. Decision 0151 is the active six-patch increment.
-Patch 1 establishes the contract; Patch 2 adds selection-driven refitting; Patches 3 and 4 reorder
-the synthetic and complete real-data workflows; Patch 5 adds Mermaid tutorial flowcharts and strict
+Patches 1 and 2 establish the contract and selection-driven refitting. Patches 3 and 4 reorder the
+synthetic and complete real-data workflows; Patch 5 adds Mermaid tutorial flowcharts and strict
 documentation integration; Patch 6 completes public and maintainer audits.
 
 ## Independent paused work

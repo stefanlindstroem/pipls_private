@@ -107,8 +107,9 @@ splits; no standard error is derived or exposed.
 
 Predictor-rank and component-count tolerances are separate stages. Predictor-rank tolerances are
 configured on `PiPLSSearchCV` and act in configured-score units within each component count.
-Component-count tolerances are supplied to `select()` or `refit()` and act on the resulting
-conditioned path in CV-MSE units.
+Component-count tolerances are supplied to `select()` or rule-based `refit()` and act on the
+resulting conditioned path in CV-MSE units. `refit(selection=...)` rejects nondefault tolerances
+because the immutable selection has already resolved that decision.
 
 Let `M_min` be the exact minimum stored path mean. For a resolved nonnegative relative tolerance
 `delta_rel` and nonnegative absolute tolerance `delta_abs`:
@@ -131,7 +132,7 @@ The component-count selection retains an unruled exact-minimum path row, resolve
 a derived effective threshold. Under Decision 0148, that reference row retains its own independent
 predictor-rank evidence. Direct component lookup and `best_score` have no component-count tolerance
 provenance but still carry predictor-rank evidence for optimized policies. All provenance must remain
-exactly reproducible for OOF compatibility validation.
+exactly reproducible for the shared OOF-report and full-data-refit compatibility validation.
 
 ## OOF reporting
 

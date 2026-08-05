@@ -44,8 +44,8 @@ is explicit:
 ```python
 search = PiPLSSearchCV(cv=cv).fit(X, y)
 selection = search.select(rule="minimum_cv_mse")
-model = search.refit(X, y, rule="minimum_cv_mse")
-report = search.oof_report(X, y, selection=model.selection_)
+report = search.oof_report(X, y, selection=selection)
+model = search.refit(X, y, selection=selection)
 ```
 
 The implemented named rules are:
@@ -61,10 +61,10 @@ profiles carry immutable `PiPLSPredictorRankEvidence`; fixed and maximum policie
 
 Manual selection uses an evaluated `n_components` value and the predictor rank already selected
 conditionally for that row. A successful refit attaches the exact immutable row as
-`model.selection_`; the fitted search is not mutated. Decision 0151 authorizes an additional
-`refit(selection=...)` route so one pre-existing compatible selection can configure OOF reporting
-and final fitting. That runtime change begins in Patch 2 and is not implemented by the current
-decision-only patch.
+`model.selection_`; the fitted search is not mutated. `refit(selection=...)` validates one
+pre-existing selection with the same exact compatibility contract used by `oof_report()`, fits the
+selected pair, and attaches the exact supplied object after fitting succeeds. Rule-based and manual
+component-count refitting remain supported.
 
 `oof_report()` accepts an existing compatible selection and reuses every split materialized by the
 search. Repeated validation predictions are averaged per observation and their counts are exposed.
@@ -181,10 +181,11 @@ paths, randomized predictor SVD, parallel execution, OOF reuse, and work inspect
 route to it, and source-distribution documentation validation protects its shipped and rendered
 forms.
 
-Decision 0151 is active. Patch 1 establishes the selection-driven refit, evidence-before-refit
-workflow, route-specific example order, and Mermaid tutorial target without changing runtime or
-served documentation. Patches 2--6 implement and integrate that target. The paused presentation
-increment from Decision 0139 is superseded by this sequence.
+Decision 0151 is active. Patches 1 and 2 establish the target contract and implement
+`refit(selection=...)` with shared exact compatibility validation, direct-estimator and pipeline
+coverage, and API reference guidance. Patches 3--6 reorder the maintained workflows, add Mermaid
+tutorial diagrams, and complete the public and maintainer audits. The paused presentation increment
+from Decision 0139 is superseded by this sequence.
 
 ## Authority and drift handling
 
