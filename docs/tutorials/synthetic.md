@@ -12,15 +12,18 @@ data, and render the completed results.
 
 ```mermaid
 flowchart TD
-    generate["Generate training and test data"]
-    search["Search candidate models"]
-    inspect["Inspect search evidence"]
-    select["Create one selection"]
-    refit["Refit the exact selection"]
-    predict["Predict external test data"]
-    render["Render results"]
+    A[Fit search at dummy number of components]
+    B[Inspect component path]
+    C[Identify suitable number of components h*]
+    D[Set chosen component count]
+    E[Create selection with n_components = h*]
+    F[Inspect predictor-rank profile]
+    G[Refit using selection]
+    H[Predict independent test data]
 
-    generate --> search --> inspect --> select --> refit --> predict --> render
+    A --> B --> C
+    C -. go back and set value .-> D
+    D --> E --> F --> G --> H
 ```
 
 ## What this tutorial covers
