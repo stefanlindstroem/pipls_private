@@ -2,10 +2,11 @@
 
 ## Status
 
-Accepted. Patches 1 and 2 of 6 are implemented: the target contract is synchronized and
-`PiPLSSearchCV.refit(selection=...)` uses the shared exact compatibility validator. Maintained
-example order, served tutorials, Mermaid configuration, and the final documentation audit remain
-for Patches 3--6.
+Accepted. Patches 1--3 of 6 are implemented: the target contract is synchronized,
+`PiPLSSearchCV.refit(selection=...)` uses the shared exact compatibility validator, and the
+synthetic example, renderer, and tutorial pass one pre-refit selection through evidence inspection
+and final fitting. Complete real-data workflow order, Mermaid configuration, and the final
+documentation audit remain for Patches 4--6.
 
 ## Context
 
@@ -168,7 +169,7 @@ workflow work in this decision.
 2. Add `selection=` to `PiPLSSearchCV.refit()`, share exact compatibility validation with
    `oof_report()`, and add API, pipeline, failure, cloning, and pickle coverage -- complete.
 3. Reorder the synthetic inspect-and-select example, renderer, tutorial, and tests around one
-   pre-refit selection while preserving numerical artifacts.
+   pre-refit selection while preserving numerical artifacts -- complete.
 4. Reorder the complete Pulp, Sugarcane, and Tobacco workflows and replace the global refit-first
    source contract with route-specific lifecycle tests.
 5. Add Mermaid support, one flowchart per served tutorial, a safe Pages configuration overlay, and

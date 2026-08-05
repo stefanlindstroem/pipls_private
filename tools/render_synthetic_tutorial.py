@@ -78,15 +78,15 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         random_state=0,
     )
     search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
+    path = search.component_path_
+    selection = search.select(n_components=CHOSEN_N_COMPONENTS)
+    rank_profile = search.predictor_rank_profile(selection.n_components)
+
     model = search.refit(
         train.X,
         train.Y,
-        n_components=CHOSEN_N_COMPONENTS,
+        selection=selection,
     )
-
-    selection = model.selection_
-    path = search.component_path_
-    rank_profile = search.predictor_rank_profile(selection.n_components)
     predictions = model.predict(test.X)
     diagnostics = prediction_diagnostics(
         test.Y,

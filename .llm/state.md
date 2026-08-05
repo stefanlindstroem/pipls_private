@@ -181,11 +181,12 @@ paths, randomized predictor SVD, parallel execution, OOF reuse, and work inspect
 route to it, and source-distribution documentation validation protects its shipped and rendered
 forms.
 
-Decision 0151 is active. Patches 1 and 2 establish the target contract and implement
-`refit(selection=...)` with shared exact compatibility validation, direct-estimator and pipeline
-coverage, and API reference guidance. Patches 3--6 reorder the maintained workflows, add Mermaid
-tutorial diagrams, and complete the public and maintainer audits. The paused presentation increment
-from Decision 0139 is superseded by this sequence.
+Decision 0151 is active. Patches 1--3 establish the target contract, implement
+`refit(selection=...)` with shared exact compatibility validation, and convert the synthetic
+example, renderer, and tutorial to inspect one selection before passing it to final refitting.
+Patches 4--6 reorder the complete real-data workflows, add Mermaid tutorial diagrams, and complete
+the public and maintainer audits. The paused presentation increment from Decision 0139 is
+superseded by this sequence.
 
 ## Authority and drift handling
 

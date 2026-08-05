@@ -40,12 +40,14 @@ _ANALYSIS_CALLS = {
     "prediction_diagnostics",
     "predictor_rank_profile",
 }
-_MANUAL_WORKFLOWS = (
+_SYNTHETIC_SELECTION_WORKFLOWS = (
     "examples/02_synthetic_path_selection.py",
+    "tools/render_synthetic_tutorial.py",
+)
+_REFIT_FIRST_REAL_DATA_WORKFLOWS = (
     "examples/05_pulp_real_data.py",
     "examples/06_sugarcane_real_data.py",
     "examples/07_tobacco_real_data.py",
-    "tools/render_synthetic_tutorial.py",
     "tools/render_pulp_tutorial.py",
 )
 
@@ -237,8 +239,48 @@ def test_ordinary_pls_is_confined_to_the_comparison_support() -> None:
         )
 
 
-@pytest.mark.parametrize("relative_path", _MANUAL_WORKFLOWS)
-def test_modeling_precedes_analysis_and_rendering(relative_path: str) -> None:
+@pytest.mark.parametrize("relative_path", _SYNTHETIC_SELECTION_WORKFLOWS)
+def test_synthetic_selection_evidence_precedes_refit_and_rendering(
+    relative_path: str,
+) -> None:
+    tree = parse_module(_repository_root() / relative_path)
+    scope = _workflow_scope(tree)
+
+    select_lines = call_lines(scope, {"select"})
+    profile_lines = call_lines(scope, {"predictor_rank_profile"})
+    refit_lines = call_lines(scope, {"refit"})
+    prediction_lines = call_lines(scope, {"prediction_diagnostics"})
+    rendering_names = _RENDERING_METHODS | _rendering_function_names(tree)
+    rendering_lines = call_lines(scope, rendering_names)
+
+    assert len(select_lines) == 1
+    assert len(profile_lines) == 1
+    assert len(refit_lines) == 1
+    assert len(prediction_lines) == 1
+    assert rendering_lines
+    assert select_lines[0] < profile_lines[0] < refit_lines[0]
+    assert refit_lines[0] < prediction_lines[0] < min(rendering_lines)
+
+    select_call = calls_named(scope, "select")[0]
+    assert keyword_constant(select_call, "n_components") is None
+    component_keyword = next(
+        keyword
+        for keyword in select_call.keywords
+        if keyword.arg == "n_components"
+    )
+    assert isinstance(component_keyword.value, ast.Name)
+    assert component_keyword.value.id == "CHOSEN_N_COMPONENTS"
+
+    refit_call = calls_named(scope, "refit")[0]
+    assert _keyword_path(refit_call, "selection") == "selection"
+    assert _keyword_path(refit_call, "rule") is None
+    assert _keyword_path(refit_call, "n_components") is None
+
+
+@pytest.mark.parametrize("relative_path", _REFIT_FIRST_REAL_DATA_WORKFLOWS)
+def test_current_real_data_modeling_precedes_analysis_and_rendering(
+    relative_path: str,
+) -> None:
     tree = parse_module(_repository_root() / relative_path)
     scope = _workflow_scope(tree)
 

@@ -34,20 +34,23 @@ train, test = make_pipls_train_test(
 )
 # --8<-- [end:generate-synthetic-data]
 
-# --8<-- [start:fit-synthetic-model]
+# --8<-- [start:fit-synthetic-search]
 search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
+# --8<-- [end:fit-synthetic-search]
+
+# --8<-- [start:inspect-synthetic-selection]
+path = search.component_path_
+selection = search.select(n_components=CHOSEN_N_COMPONENTS)
+rank_profile = search.predictor_rank_profile(selection.n_components)
+# --8<-- [end:inspect-synthetic-selection]
+
+# --8<-- [start:refit-synthetic-model]
 model = search.refit(
     train.X,
     train.Y,
-    n_components=CHOSEN_N_COMPONENTS,
+    selection=selection,
 )
-# --8<-- [end:fit-synthetic-model]
-
-# --8<-- [start:inspect-synthetic-selection]
-selection = model.selection_
-path = search.component_path_
-rank_profile = search.predictor_rank_profile(selection.n_components)
-# --8<-- [end:inspect-synthetic-selection]
+# --8<-- [end:refit-synthetic-model]
 
 # --8<-- [start:evaluate-synthetic-predictions]
 test_predictions = model.predict(test.X)
