@@ -399,8 +399,7 @@ strict documentation-build and source-distribution checks.
 - Use [Model inspection](../model_inspection.md) for the complete quantity catalogue and
   interpretation boundaries.
 - Use [Path-selection details](../path_analysis.md) for nondefault bounds, policies, pipelines,
-  scorer behavior, grouped or temporal splitters, leave-one-out interpretation, OOF coverage,
-  and automatic refitting.
+  scorer behavior, grouped or temporal splitters, OOF coverage, and automatic refitting.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
 - Use the [`PiPLSSearchCV` reference](../api/path.md#pipls.PiPLSSearchCV) and
   [inspection API](../api/inspection.md) for exact signatures.

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove leave-one-out-specific public and maintainer guidance. Keep one concise non-support boundary
+  in the path-analysis guide while preserving generic splitter interoperability, ordered OOF
+  reporting, pooled OOF $R^2$, and protocol-neutral singleton-validation scorer safety.
 - Remove the dedicated leave-one-out example and executable test, renumber the remaining numbered
   examples from 01 through 06, and update tutorial snippets, distribution checks, catalogues,
   decisions, and structural tests without changing their numerical workflows.

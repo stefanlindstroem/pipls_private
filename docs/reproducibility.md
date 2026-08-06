@@ -104,9 +104,9 @@ not be fitted globally before CV.
 
 Maintained examples that use one ordinary five-fold regression partition specify
 `KFold(n_splits=5, shuffle=True, random_state=0)` rather than relying on the package default. The
-complete Pulp workflow instead uses ten seeded repetitions of five-fold CV. Both choices avoid fold
-assignments determined by file row order. The leave-one-out example is exhaustive and has no
-shuffle setting.
+complete Pulp workflow instead uses ten seeded repetitions of five-fold CV. These choices avoid fold
+assignments determined by file row order, and every stochastic maintained partition has an explicit
+seed.
 
 ## Synthetic validation
 

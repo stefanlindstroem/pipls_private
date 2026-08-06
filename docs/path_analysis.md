@@ -136,9 +136,10 @@ Do not fit learned preprocessing on the complete dataset before path evaluation.
 
 ## Cross-validation protocols and metadata
 
-`PiPLSSearchCV` accepts scikit-learn splitters for grouped, repeated, predefined, temporal, or
-leave-one-out protocols when their scientific assumptions match the data. Suitable examples include
-`GroupKFold`, `RepeatedKFold`, `PredefinedSplit`, `TimeSeriesSplit`, and `LeaveOneOut`.
+`PiPLSSearchCV` accepts scikit-learn-compatible splitters and explicit split iterables for
+grouped, repeated, predefined, temporal, or other protocols when their scientific assumptions match
+the data. Suitable examples include `GroupKFold`, `RepeatedKFold`, `PredefinedSplit`, and
+`TimeSeriesSplit`.
 
 ```python
 from sklearn.model_selection import GroupKFold
@@ -189,22 +190,21 @@ new partition. `oof_report()` requires the same sample count, feature count, and
 count as the fitted search, but it does not retain or compare original values. The caller is
 responsible for passing the same observations in the same row order.
 
-The report separately records OOF coverage and whether the splitter is structurally leave-one-out.
-These results are selection-conditioned because the same path search produced the supplied
-selection. Use nested cross-validation or an external test set when an unbiased post-selection
-estimate is required.
+`has_complete_oof_coverage` records whether every row received at least one validation
+prediction. These results are selection-conditioned because the same path search produced the
+supplied selection. Use nested cross-validation or an external test set when an unbiased
+post-selection estimate is required.
 
-## Leave-one-out interpretation
+## Validation-protocol boundary
 
-`LeaveOneOut()` is not a special Pi-PLS mode. The support term uses the full $n$, while centered-fold
-feasibility is capped by $n-2$. The default standardized MSE remains defined for singleton
-validation folds because response scales are estimated from each training fold.
+Pi-PLS does not provide a dedicated leave-one-out mode, provenance flag, example, or compatibility
+guarantee. Users may still intentionally supply any splitter or explicit split iterable accepted by
+the generic `cv` interface, including protocols with singleton validation folds, but they own the
+protocol choice and interpretation.
 
-Mean foldwise $R^2$ is rejected when validation folds contain one sample. The explicit report's
-`pooled_oof_r2` may report $R^2$ from pooled LOO predictions; it is not mean foldwise $R^2$.
-
-Users who intentionally choose singleton validation folds must apply these scoring and
-interpretation distinctions directly in their own validation protocol.
+Foldwise $R^2$ is rejected whenever a validation split contains fewer than two observations. Use a
+scorer defined for the realized validation-set sizes. Pooled OOF $R^2$, when available, remains a
+single statistic over covered rows and is not mean foldwise $R^2$.
 
 ## Split variation and tolerance selection
 

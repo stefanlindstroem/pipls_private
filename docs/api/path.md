@@ -219,8 +219,8 @@ model = search.refit(X, Y, selection=selection)
 ```
 
 The immutable `PiPLSOOFReport` contains the exact supplied `selection`, ordered OOF predictions,
-repeated-prediction counts, partial-coverage NaNs, leave-one-out provenance, and pooled OOF $R^2$
-when at least two rows have coverage. The supplied selection is validated exactly against the fitted
+repeated-prediction counts, partial-coverage NaNs, and pooled OOF $R^2$ when at least two rows have
+coverage. The supplied selection is validated exactly against the fitted
 search, preventing a report for an unrelated component-count or predictor-rank decision. The
 operation does not rescore candidates, perform a full-data fit, mutate the search, or retain the
 supplied matrices. Each repeated call performs the selected-pair fold fits again; retain and reuse

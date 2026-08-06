@@ -2,11 +2,11 @@
 
 ## Status
 
-Accepted. Implementation is planned in five patches. Patches 1--3 are implemented. The public
-leave-one-out provenance field and private detector are removed, singleton-validation scorer safety
-is protocol-neutral, the dedicated example and test are deleted, and the maintained examples are
-renumbered contiguously. Support documentation and historical decision consolidation remain for
-Patches 4 and 5.
+Accepted. Implementation is planned in five patches. Patches 1--4 are implemented. The public
+provenance field and private detector are removed, singleton-validation scorer safety is
+protocol-neutral, the dedicated example and test are deleted, the maintained examples are
+renumbered contiguously, and active support documentation is removed. Historical decision
+consolidation remains for Patch 5.
 
 ## Context
 

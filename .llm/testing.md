@@ -39,16 +39,14 @@ They must not become a second copy of living prose or preserve removed migration
 
 - exact compatibility with the supplied selection and fitted search;
 - reuse of every stored split without rematerialization;
-- ordered predictions, repeated-prediction averaging, counts, partial coverage, and leave-one-out
-  provenance;
+- ordered predictions, repeated-prediction averaging, counts, and partial coverage;
 - pooled OOF R2 over covered rows only;
+- protocol-neutral scorer safety for realized validation-set sizes;
 - no candidate rescoring, search mutation, retained input data, or implicit full-data fit.
 
-Decision 0153 Patch 2 removes leave-one-out provenance and private split recognition. Generic OOF
-ordering, averaging, counts, partial coverage, pooled OOF R2, and protocol-neutral singleton-
-validation scorer safety are the durable contracts. API tests use ordinary $K$-fold or explicit
-split iterables rather than importing `LeaveOneOut` to establish package support. The dedicated
-example-level test remains only until Patch 3 deletes and renumbers the example catalogue.
+Generic OOF ordering, averaging, counts, partial coverage, pooled OOF R2, and singleton-validation
+scorer safety are the durable contracts. API tests use ordinary $K$-fold or explicit split
+iterables and do not establish protocol-specific package support.
 
 ### Immutable public results and inspection
 

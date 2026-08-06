@@ -83,11 +83,11 @@ release validation. Paper reproduction and publication-only analyses remain down
 ## Current roadmap
 
 Decisions 0148--0152 are implemented. Decision 0153 is accepted and active as a five-patch removal
-of package-owned leave-one-out support. Patches 1--3 are implemented: the runtime detector, public
-provenance field, dedicated example, and example-level test are removed, while generic splitter
-interoperability, ordered OOF reporting, and protocol-neutral singleton-validation scorer safety
-remain. The maintained catalogue is contiguous from 01 through 06. Patches 4 and 5 remove support
-claims and consolidate decisions.
+of package-owned leave-one-out support. Patches 1--4 are implemented: protocol-specific runtime
+provenance, the dedicated example and test, and active support documentation are removed, while
+generic splitter interoperability, ordered OOF reporting, and protocol-neutral singleton-validation
+scorer safety remain. The maintained catalogue is contiguous from 01 through 06. Patch 5
+consolidates historical decisions and closes the removal sequence.
 
 ## Deferred work
 

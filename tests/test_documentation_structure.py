@@ -285,6 +285,22 @@ def test_selection_conditioned_oof_is_described_as_inspection_not_qualification(
     assert "return to the selection step" in pulp
 
 
+def test_served_guides_do_not_advertise_leave_one_out_support() -> None:
+    docs_root = _repository_root() / "docs"
+    boundary = docs_root / "path_analysis.md"
+
+    for path in sorted(docs_root.rglob("*.md")):
+        if "decisions" in path.relative_to(docs_root).parts:
+            continue
+        text = path.read_text(encoding="utf-8")
+        assert "LeaveOneOut" not in text, path
+        if path == boundary:
+            assert text.lower().count("leave-one-out") == 1
+            assert "does not provide a dedicated leave-one-out mode" in text
+        else:
+            assert "leave-one-out" not in text.lower(), path
+
+
 def test_active_workflow_guides_use_pre_refit_selection_handoff() -> None:
     root = _repository_root()
     analytical_guides = (
