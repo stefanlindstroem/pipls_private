@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Replace the ineffective Mermaid `extra.css` override with a project-owned Mermaid initialization script that injects `themeCSS` for edge-label backgrounds.
 - Reuse local component-path plotting helpers in the synthetic and Pulp examples, keep all
   plotting code caller-owned, and use an orange diamond consistently for selected rows across
   numbered examples and tutorial renderers.
