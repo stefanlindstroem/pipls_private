@@ -225,8 +225,8 @@ Tests must verify that:
 - rule-based and manual component-count refitting remain supported;
 - manual evidence-retaining examples inspect an unselected component path before defining the
   chosen component count, create one selection, then inspect the selected path, conditional rank,
-  and OOF evidence before final refitting, while validation-only and comparison-only examples do
-  not acquire unnecessary final models;
+  and OOF evidence before final refitting, while comparison-only examples do not acquire
+  unnecessary final models;
 - affected tutorial diagrams contain one feedback edge from selected-evidence review to selection,
   initial path artifacts omit a selected marker, and selected path artifacts contain it;
 - before/after selected pairs, OOF arrays, fitted predictions, and generated numerical results are

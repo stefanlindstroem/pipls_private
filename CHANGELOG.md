@@ -24,7 +24,7 @@
 - Reorder the evidence-retaining synthetic, Pulp, Sugarcane, and Tobacco workflows around one
   pre-refit selection: inspect search evidence, optionally compute a matching OOF report, refit that
   exact selection, and then inspect the fitted model. Preserve the compact automatic quick start and
-  the validation-only and comparison-only routes.
+  the comparison-only route.
 - Add one source-level Mermaid workflow chart with equivalent prose to each served tutorial. Preserve
   strict local, inherited Pages-overlay, and source-distribution documentation builds without
   committing generated diagram assets.

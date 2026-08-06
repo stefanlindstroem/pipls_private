@@ -2,11 +2,11 @@
 
 ## Status
 
-Accepted. Implementation is planned in five patches. Patches 1--4 are implemented. The public
-provenance field and private detector are removed, singleton-validation scorer safety is
-protocol-neutral, the dedicated example and test are deleted, the maintained examples are
-renumbered contiguously, and active support documentation is removed. Historical decision
-consolidation remains for Patch 5.
+Accepted and implemented. All five patches are complete. The public provenance field and private
+detector are removed, singleton-validation scorer safety is protocol-neutral, the dedicated example
+and test are deleted, the maintained examples are renumbered contiguously, active support
+documentation is removed, and the current decisions and retirement map describe only the retained
+generic splitter and OOF contracts.
 
 ## Context
 
@@ -141,8 +141,20 @@ copy of the removed example, detector, field, or decisions.
    renderer, distribution, and structural references without changing their numerical behavior.
 4. Remove leave-one-out-specific public and maintainer documentation, replace repeated support
    claims with one concise non-support boundary, and keep generic CV and OOF guidance.
-5. Consolidate Decisions 0139, 0143, 0151, and 0152, correct the retirement map, complete stale-
-   surface audits, and return maintainer state to a completed current-state description.
+5. Consolidate Decisions 0139, 0143, 0146, 0151, and 0152, correct the retirement map, complete
+   stale-surface audits, and return maintainer state to a completed current-state description --
+   complete.
+
+## Implementation outcome
+
+The runtime and result records contain no protocol-specific detector or provenance field. The
+numbered catalogue is contiguous from 01 through 06, with Example 03 owning path comparison and
+Examples 04--06 owning the complete real-data workflows. Generic OOF reporting remains selection-
+conditioned and protocol-neutral.
+
+Current decisions no longer list the removed report field, name the removed protocol as a supported
+case, or retain the former example numbering. The retirement map directs the retired protocol and
+example records to this removal decision and to Decision 0143 only for generic OOF behavior.
 
 ## Validation obligations
 

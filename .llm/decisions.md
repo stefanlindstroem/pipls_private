@@ -69,14 +69,15 @@ This registry lists only numbered decisions that still define current behavior o
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
   0147, 0150, and 0151--0153.
 
-## Accepted Decision 0153 contract
+## Implemented Decision 0153 contract
 
 - Remove package-owned leave-one-out detection, provenance, examples, documentation, and tests.
 - Retain generic scikit-learn-compatible splitters, explicit split iterables, and protocol-neutral
   OOF reporting.
 - Keep singleton-validation scorer safety without leave-one-out-specific wording or imports.
 - Do not add a compatibility alias, deprecation scaffold, replacement helper, or dedicated mode.
-- Implement the removal in five patches; Patch 1 changes decisions and maintainer contracts only.
+- The five-patch removal is complete; active decisions and retirement entries describe only the
+  retained generic contracts.
 
 ## Implemented Decision 0152 contract
 
@@ -93,7 +94,7 @@ This registry lists only numbered decisions that still define current behavior o
 - Use one exact compatibility validator for selections consumed by `refit()` and `oof_report()`.
 - Reorder evidence-retaining examples around search evidence, one selection, optional OOF
   inspection, and final refitting from that same selection.
-- Keep validation-only and comparison-only routes free of unnecessary final models.
+- Keep comparison-only routes free of unnecessary final models.
 - Add one supplementary vertical Mermaid flowchart plus equivalent prose to each served tutorial,
   without committed generated diagram assets.
 - The six-patch implementation is complete; Decision 0152 refines the manual tutorial review

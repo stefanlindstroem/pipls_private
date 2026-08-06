@@ -114,7 +114,7 @@ remaining contracts are unchanged:
 - one immutable selection is passed to every selection-conditioned operation;
 - the same accepted selection is passed to final refitting;
 - `model.selection_` remains fitted-model provenance;
-- automatic, validation-only, and comparison-only routes remain distinct.
+- automatic and comparison-only routes remain distinct from analytical refit workflows.
 
 ## Implementation outcome
 
@@ -125,7 +125,9 @@ include a dashed return edge from selected-evidence review to selection.
 
 The Pulp, Sugarcane, and Tobacco workflows calculate selection-conditioned OOF diagnostics before
 final refitting. Fitted-model inspection remains after refitting. Public catalogues, maintainer
-records, and the changelog use the same terminology.
+records, and the changelog use the same terminology. Decision 0153 subsequently removes the
+dedicated protocol-specific validation example and renumbers the complete real-data examples to
+04--06 without changing this review sequence.
 
 ## Validation obligations
 

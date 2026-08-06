@@ -4,8 +4,8 @@
 
 Accepted and implemented. Decisions 0146 and 0148 refine component-count and conditional
 predictor-rank provenance. Decision 0151 further lets `refit()` consume an existing compatible
-selection and refines the evidence-to-validation-to-refit workflow order, while this decision
-remains canonical for model-owned selection provenance and selection-conditioned OOF reporting.
+selection and refines the evidence-to-review-to-refit workflow order. Decision 0153 removes
+protocol-specific classification from the report while preserving this generic OOF contract.
 
 ## Context
 
@@ -83,7 +83,6 @@ report.selection
 report.oof_predictions
 report.oof_prediction_counts
 report.pooled_oof_r2
-report.is_leave_one_out
 report.has_complete_oof_coverage
 ```
 
@@ -93,7 +92,8 @@ $R^2$ uses covered rows only. The operation does not rescore candidates, fit a f
 retain supplied matrices, or mutate the search.
 
 An OOF report based on a search-owned selection is a selection-conditioned diagnostic. It is not
-nested cross-validation or an external-test estimate.
+nested cross-validation or an external-test estimate. The report carries no classifier for the
+validation protocol represented by the stored splits.
 
 ### Workflow order
 
@@ -111,7 +111,8 @@ model = search.refit(X, Y, selection=selection)
 Manual component-count selection uses the same order with `search.select(n_components=...)`. OOF
 reporting remains optional because it performs one additional fit per stored validation split. The
 compact automatic route may still call `refit(..., rule=...)` without retaining a selection first. A
-selection-only or validation-only workflow need not fit a final model.
+workflow that only inspects selection or OOF evidence, or compares paths, need not fit a final
+model.
 
 ### Method roles
 

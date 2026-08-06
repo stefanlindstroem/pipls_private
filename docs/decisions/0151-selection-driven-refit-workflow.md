@@ -11,7 +11,9 @@ maintainer records, and stale-surface audits now use the same lifecycle.
 
 Decision 0152 refines the manual tutorial presentation: it separates the unselected path from
 selection-conditioned review, adds one possible feedback edge to the selection step, and reserves
-qualification or validation for independent assessment.
+qualification or validation for independent assessment. Decision 0153 removes the former dedicated
+protocol-specific validation example and renumbers the remaining catalogue without changing this
+selection handoff.
 
 ## Context
 
@@ -128,11 +130,10 @@ The maintained routes are:
 | Route | Examples | Required order |
 |---|---|---|
 | Automatic selection and final refit | 01 | search and rule-based refit, then fitted-value diagnostics |
-| Inspect, select, review, and refit | 02 and 05--07 | search evidence, one selection, optional OOF report, selection-driven refit, fitted-model analysis |
-| Selection-conditioned validation without a final model | 03 | search, selection, OOF report |
-| Path comparison without a final model | 04 | evaluate and compare paths |
+| Inspect, select, review, and refit | 02 and 04--06 | search evidence, one selection, optional OOF report, selection-driven refit, fitted-model analysis |
+| Path comparison without a final model | 03 | evaluate and compare paths |
 
-Examples 02 and 05--07 must not recover their working selection from `model.selection_`. They create
+Examples 02 and 04--06 must not recover their working selection from `model.selection_`. They create
 the selection before final fitting and pass that same named object to every selection-conditioned
 operation. Numerical outputs and selected pairs are intended to remain unchanged.
 
@@ -193,7 +194,7 @@ The completed sequence must verify that:
 - direct estimators and terminal pipelines behave identically at the public boundary;
 - incompatible types and provenance fail before model fitting and do not mutate the search;
 - rule-based and manual component-count refitting remain compatible;
-- Examples 02 and 05--07 create one selection before OOF reporting and final refitting;
+- Examples 02 and 04--06 create one selection before OOF reporting and final refitting;
 - Example 03 retains its no-final-model comparison role;
 - selected pairs, predictions, OOF results, and generated numerical artifacts remain unchanged;
 - every served tutorial contains one vertical Mermaid flowchart and equivalent prose;

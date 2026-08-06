@@ -130,18 +130,12 @@ def test_derived_result_properties_are_not_stored_state() -> None:
     assert "selection" not in {
         field.name for field in fields(PiPLSPredictorRankProfile)
     }
-    derived_report_fields = {
-        "n_components",
-        "predictor_rank",
-        "n_splits",
-        "mean_test_score",
-        "cv_mse_mean",
-        "has_complete_oof_coverage",
-        "is_leave_one_out",
+    assert {field.name for field in fields(PiPLSOOFReport)} == {
+        "selection",
+        "oof_predictions",
+        "oof_prediction_counts",
+        "pooled_oof_r2",
     }
-    assert derived_report_fields.isdisjoint(
-        field.name for field in fields(PiPLSOOFReport)
-    )
 
 
 def test_selection_validates_and_normalizes_python_scalars() -> None:

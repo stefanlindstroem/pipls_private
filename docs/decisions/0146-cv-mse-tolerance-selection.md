@@ -254,7 +254,7 @@ that no active one-standard-error or standard-error selection surface remains.
 ## Consequences
 
 Selection is defined by observed mean predictive error plus explicit user tolerances rather than an
-uncertain SE heuristic. The same API works for one fold partition, repeated CV, leave-one-out, and
+uncertain SE heuristic. The same API works for one fold partition, repeated CV, and compatible
 custom split iterables. SD error bars remain useful descriptive evidence without implying
 independent resamples. The default remains practically minimum-CV-MSE selection, while users can
 request transparent parsimony through relative tolerance and optionally impose an absolute cap.

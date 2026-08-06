@@ -207,10 +207,10 @@ There is no standard-error property or selection rule.
 Selection metrics are accessed through `report.selection`; they are not duplicated on the report.
 Rows without validation coverage have zero counts and NaN predictions.
 
-Decision 0153 removed `is_leave_one_out` in Patch 2 without an alias or deprecation scaffold.
-Generic OOF predictions, counts, coverage, and pooled OOF R2 remain public and protocol-neutral.
-`cv` continues to accept compatible splitters and explicit split iterables, but the package does
-not identify a validation protocol from its materialized split structure.
+OOF reports carry no validation-protocol classifier. Generic predictions, counts, coverage, and
+pooled OOF R2 remain public and protocol-neutral. `cv` continues to accept compatible splitters and
+explicit split iterables, but the package does not identify a protocol from its materialized split
+structure.
 
 ## Metrics
 

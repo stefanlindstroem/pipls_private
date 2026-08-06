@@ -10,7 +10,7 @@ flowcharts.
 
 The implemented API now supports a particularly clear progression. A user can obtain a final model
 with one chained search and refit expression, retain the search object when selection evidence
-matters, and request selection-conditioned out-of-fold diagnostics explicitly when validation
+matters, and request selection-conditioned out-of-fold diagnostics explicitly when review evidence
 matters. The package-owned Pulp loader also makes the shortest workflow available from an installed
 package without a repository checkout.
 
@@ -77,7 +77,7 @@ model = search.refit(X, Y, selection=selection)
 Its introduction must explain that it expands the quick start by retaining the search evidence. It
 must not describe itself as the first Pi-PLS model or the shortest complete path.
 
-### 3. Validate and interpret
+### 3. Review and interpret
 
 The complete Pulp tutorial remains the third stage. It owns real-data selection-conditioned OOF
 inspection,
@@ -137,7 +137,9 @@ are represented here and in Decision 0065.
 Decision 0152 further refines the manual tutorial sequence: first inspect the unselected
 component path, then choose the component count and create the selection, then review the
 selected path and conditional evidence with an optional return to selection. Same-search OOF
-reporting is inspection rather than independent qualification.
+reporting is inspection rather than independent qualification. Decision 0153 removes the former
+dedicated protocol-specific validation example; the complete Pulp tutorial remains the onboarding
+owner for generic selection-conditioned OOF evidence.
 
 ## Consequences
 
