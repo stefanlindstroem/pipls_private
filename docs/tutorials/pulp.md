@@ -16,6 +16,11 @@ selected evidence is unsatisfactory, return to the selection step before refitti
 config:
   htmlLabels: false
   theme: neutral
+  flowchart:
+    diagramPadding: 4
+    padding: 6
+    nodeSpacing: 28
+    rankSpacing: 34
 ---
 flowchart TD
     load["Load Pulp data"]

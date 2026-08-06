@@ -57,6 +57,9 @@
   variability only.
 ### Repository
 
+- Add project-level Mermaid flowchart styling through Material for MkDocs `extra_css`. Use
+  compact per-diagram spacing, reduce label margins, and give edge labels a theme-aware
+  background in both light and dark modes.
 - Complete the behavioral test-suite cleanup by consolidating durable testing, rendering,
   selection-handoff, and search-policy outcomes into current canonical decisions; retire eight
   completed migration and cleanup records; and return active maintainer state to current-policy
