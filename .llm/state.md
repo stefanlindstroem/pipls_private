@@ -183,10 +183,17 @@ forms.
 
 Decision 0151 is implemented. `refit(selection=...)` shares exact compatibility validation with
 `oof_report(selection=...)`; evidence-retaining examples and guides pass one pre-refit selection
-through search inspection, optional OOF qualification, and final fitting. Every served tutorial has
+through search inspection, optional OOF inspection, and final fitting. Every served tutorial has
 one source-level Mermaid flowchart with equivalent prose, and strict local, inherited Pages-overlay,
 and source-distribution checks protect diagram rendering. The former presentation increment from
 Decision 0139 is superseded.
+
+Decision 0152 is implemented. Manual component-count tutorials first inspect an unselected path,
+then choose the component count and create one selection, then review the selected path and
+conditional rank or OOF evidence. Their diagrams contain one possible return to the selection
+step. Same-search OOF results are descriptive selection-conditioned evidence rather than
+independent qualification. Tutorials 2 and 3 retain separate unselected and selected path
+artifacts.
 
 ## Authority and drift handling
 

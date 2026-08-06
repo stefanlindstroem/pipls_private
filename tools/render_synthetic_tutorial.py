@@ -25,16 +25,17 @@ from matplotlib.figure import Figure  # noqa: E402
 from sklearn.model_selection import KFold  # noqa: E402
 
 from pipls import PiPLSSearchCV  # noqa: E402
+from pipls.component_path import PiPLSComponentPath, PiPLSSelection  # noqa: E402
 from pipls.datasets import make_pipls_train_test  # noqa: E402
 from pipls.inspection import prediction_diagnostics  # noqa: E402
 
 DEFAULT_OUTPUT_DIR = (
     REPOSITORY_ROOT / "docs" / "assets" / "generated" / "synthetic"
 )
-CHOSEN_N_COMPONENTS = 2
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
 FIGURE_FILENAMES = (
     "component_path.svg",
+    "selected_component_path.svg",
     "predictor_rank_profile.svg",
     "observed_vs_predicted.svg",
 )
@@ -57,8 +58,43 @@ def _save_svg(figure: Figure, path: Path) -> None:
     plt.close(figure)
 
 
+def _render_component_path(
+    path: PiPLSComponentPath,
+    *,
+    selected: PiPLSSelection | None,
+    title: str,
+    output_path: Path,
+) -> None:
+    figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
+    axis.errorbar(
+        path.n_components,
+        path.cv_mse_mean,
+        yerr=path.cv_mse_std,
+        fmt="o-",
+        capsize=4,
+    )
+    if selected is not None:
+        axis.scatter(
+            [selected.n_components],
+            [selected.cv_mse_mean],
+            marker="D",
+            s=70,
+            label=f"Chosen: {selected.n_components} components",
+            zorder=3,
+        )
+        axis.legend()
+    axis.set_xlabel("Number of components")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
+    axis.set_title(title)
+    axis.set_xticks(path.n_components)
+    upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
+    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
+    axis.grid(axis="y", alpha=0.25)
+    _save_svg(figure, output_path)
+
+
 def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
-    """Generate the three synthetic tutorial figures and return the manifest path."""
+    """Generate the four synthetic tutorial figures and return the manifest path."""
 
     output_dir = output_dir.resolve()
     if output_dir.exists():
@@ -79,46 +115,23 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     )
     search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
     path = search.component_path_
-    selection = search.select(n_components=CHOSEN_N_COMPONENTS)
+    _render_component_path(
+        path,
+        selected=None,
+        title=r"Synthetic $\Pi$-PLS component path before selection",
+        output_path=output_dir / "component_path.svg",
+    )
+
+    chosen_n_components = 2
+    selection = search.select(n_components=chosen_n_components)
+    selected_path = search.component_path_
     rank_profile = search.predictor_rank_profile(selection.n_components)
-
-    model = search.refit(
-        train.X,
-        train.Y,
-        selection=selection,
+    _render_component_path(
+        selected_path,
+        selected=selection,
+        title=r"Synthetic $\Pi$-PLS selected component path",
+        output_path=output_dir / "selected_component_path.svg",
     )
-    predictions = model.predict(test.X)
-    diagnostics = prediction_diagnostics(
-        test.Y,
-        predictions,
-        prediction_kind="external test predictions",
-    )
-
-    figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
-    axis.errorbar(
-        path.n_components,
-        path.cv_mse_mean,
-        yerr=path.cv_mse_std,
-        fmt="o-",
-        capsize=4,
-    )
-    axis.scatter(
-        [selection.n_components],
-        [selection.cv_mse_mean],
-        marker="D",
-        s=70,
-        label=f"Chosen: {selection.n_components} components",
-        zorder=3,
-    )
-    axis.set_xlabel("Number of components")
-    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
-    axis.set_title(r"Synthetic $\Pi$-PLS component path")
-    axis.set_xticks(path.n_components)
-    upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
-    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
-    axis.grid(axis="y", alpha=0.25)
-    axis.legend()
-    _save_svg(figure, output_dir / "component_path.svg")
 
     figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
     axis.errorbar(
@@ -143,13 +156,23 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         f"{selection.n_components} components"
     )
     axis.set_xticks(rank_profile.predictor_rank)
-    upper = float(
-        np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_std)
-    )
+    upper = float(np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_std))
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
     _save_svg(figure, output_dir / "predictor_rank_profile.svg")
+
+    model = search.refit(
+        train.X,
+        train.Y,
+        selection=selection,
+    )
+    predictions = model.predict(test.X)
+    diagnostics = prediction_diagnostics(
+        test.Y,
+        predictions,
+        prediction_kind="external test predictions",
+    )
 
     figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
     for response, name in enumerate(test.target_names):

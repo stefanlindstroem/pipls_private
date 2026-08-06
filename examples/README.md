@@ -23,9 +23,10 @@ workflows are intentionally more extensive than ordinary estimator use.
   `refit()`, and combines all standardized observed and fitted responses in one plot. The plotted
   values describe full-data calibration fit, not OOF validation.
 - `02_synthetic_path_selection.py`: the short manual-selection workflow. It generates independent
-  synthetic train/test data, evaluates the search, creates one selection for the declared component
-  count, inspects the component path and conditional predictor-rank profile, refits that selection,
-  and writes three final PDF figures including independent-test prediction diagnostics.
+  synthetic train/test data, evaluates and first inspects the unselected component path, chooses a
+  component count and creates one selection, inspects the selected path and conditional
+  predictor-rank profile, refits that selection, and writes four final PDF figures including
+  independent-test prediction diagnostics.
 - `03_leave_one_out_validation.py`: a focused small-sample calibration workflow. It evaluates a
   compact explicit path with `LeaveOneOut`, obtains one fitting-free selection through
   `search.select(rule="best_score")`, evaluates it through `search.oof_report()`, and distinguishes
@@ -62,9 +63,10 @@ use case rather than combining unrelated split protocols in one context-free scr
 ## Complete Pi-PLS reference workflows
 
 - `05_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the repeated-CV path,
-  creates the declared three-component selection, inspects its component and rank evidence,
-  requests selection-conditioned OOF predictions, refits the exact same selection, orients the
-  displayed factors so the tensile-index response is positive, and writes six final PDF figures
+  first inspects the unselected component path, creates the declared three-component selection,
+  inspects its selected path, rank evidence, and selection-conditioned OOF predictions, refits the
+  exact same selection, orients the displayed factors so the tensile-index response is positive,
+  and writes seven final PDF figures
   directly from in-memory results.
 - `06_sugarcane_real_data.py`: the direct reference workflow. It evaluates the path, creates one
   manual selection, inspects its conditional predictor-rank evidence, computes an OOF report, refits
@@ -81,12 +83,13 @@ use case rather than combining unrelated split protocols in one context-free scr
   [focused Tobacco explanation](../docs/examples.md#tobacco-two-relative-tolerance-decisions).
 
 These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
-inspect search evidence, create one immutable selection, optionally qualify it through OOF
-reporting, refit the same row on all observations, calculate immutable fitted-model inspection
+inspect the component path, create one immutable selection, inspect its selected path and optional
+OOF evidence, refit the same row on all observations, calculate immutable fitted-model inspection
 results, and only then compose figures. Tobacco replaces the manual component-count choice with the
-two explicit 10% relative-tolerance decisions described above. Pulp, Sugarcane, and Tobacco each
-write `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
-`latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. For Tobacco,
+two explicit 10% relative-tolerance decisions described above. Sugarcane and Tobacco each write
+`component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
+`latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Pulp writes those
+six figures plus `selected_component_path.pdf`. For Tobacco,
 `prediction_diagnostics.pdf` and `coefficients.pdf` each contain three source-order response pages.
 `make examples` runs every numbered example in filename order, including the slower real-data
 workflows. It remains separate from `make check`.
@@ -123,16 +126,14 @@ Example 04 keeps the Pi-PLS and ordinary PLS paths in memory and creates the thr
 comparison figures directly. Sugarcane demonstrates the complete manual-analysis workflow:
 
 1. `PiPLSSearchCV(cv=CV).fit(X, Y)` evaluates the path.
-2. `selection = search.select(n_components=CHOSEN_N_COMPONENTS)` creates the complete stored row
-   without fitting.
-3. `component_path_` and `predictor_rank_profile(selection.n_components)` provide the retained
-   selection evidence.
-4. `search.oof_report(X, Y, selection=selection)` reuses the exact seeded shuffled folds and returns
-   selection-conditioned OOF predictions for that row.
-5. `search.refit(X, Y, selection=selection)` fits the same component-count and predictor-rank pair on
-   all observations and records it as `model.selection_`.
-6. `pipls_display_factors()`, `latent_structure()`, and `prediction_diagnostics()` return immutable
-   in-memory results.
+2. `component_path_` provides the unconditional evidence used to choose a component count.
+3. `selection = search.select(n_components=CHOSEN_N_COMPONENTS)` records that choice as one complete
+   immutable row without fitting.
+4. `predictor_rank_profile(selection.n_components)`, `oof_report(...)`, and
+   `prediction_diagnostics()` provide selection-conditioned evidence for reviewing that row.
+5. `search.refit(X, Y, selection=selection)` fits the accepted component-count and predictor-rank
+   pair on all observations and records it as `model.selection_`.
+6. `pipls_display_factors()` and `latent_structure()` return immutable fitted-model results.
 7. The script renders the completed path, rank-profile, latent-structure, prediction-diagnostic, and
    factor results with Matplotlib and saves the six final figures itself.
 

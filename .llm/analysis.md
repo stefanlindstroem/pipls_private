@@ -47,7 +47,9 @@ are fitted, OOF, or external-test predictions through `PredictionKind`. Diagnost
 provenance from array shape or estimator state.
 
 OOF predictions come from `search.oof_report(..., selection=...)` and remain selection-conditioned.
-External-test predictions require an independently held-out matrix supplied by the user.
+When the same fitted search informed the selection, those predictions support review of that
+selection but do not independently qualify or validate it. External-test predictions require an
+independently held-out matrix supplied by the user.
 
 ## Package ownership
 

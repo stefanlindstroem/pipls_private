@@ -21,6 +21,7 @@ from tests._mkdocs import load_mkdocs_config
 
 FIGURE_FILENAMES = (
     "component_path.svg",
+    "selected_component_path.svg",
     "predictor_rank_profile.svg",
     "biplot.svg",
     "predictor_directions.svg",
@@ -115,6 +116,15 @@ def test_pulp_tutorial_renderer_records_repeated_cv_and_valid_figures(
         ET.parse(figure_path)
         assert item["sha256"] == _sha256(figure_path)
 
+    initial_path = (generated_pulp_assets / "component_path.svg").read_text(
+        encoding="utf-8"
+    )
+    selected_path = (
+        generated_pulp_assets / "selected_component_path.svg"
+    ).read_text(encoding="utf-8")
+    assert "Chosen:" not in initial_path
+    assert "Chosen:" in selected_path
+
 
 def test_documentation_targets_own_generated_pulp_assets() -> None:
     repository = _repository_root()
@@ -183,31 +193,38 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
     example_sections = {
         "pulp-tutorial-setup",
         "load-pulp-data",
-        "fit-pulp-model",
-        "inspect-pulp-selection",
+        "inspect-pulp-component-path",
+        "choose-pulp-selection",
+        "inspect-pulp-selected-evidence",
         "plot-pulp-component-path",
+        "plot-pulp-selected-component-path",
         "plot-pulp-rank-profile",
         "pulp-oof-predictions",
-        "pulp-inspection-results",
+        "pulp-oof-inspection-results",
+        "fit-pulp-model",
+        "pulp-fitted-model-inspection-results",
     }
     for section in example_sections:
         assert f"examples/05_pulp_real_data.py:{section}" in tutorial
         assert f"# --8<-- [start:{section}]" in example
         assert f"# --8<-- [end:{section}]" in example
 
-    assert tutorial.index("inspect-pulp-selection") < tutorial.index(
+    assert tutorial.index("inspect-pulp-selected-evidence") < tutorial.index(
         "pulp-oof-predictions"
     )
     assert tutorial.index("pulp-oof-predictions") < tutorial.index(
+        "pulp-oof-inspection-results"
+    )
+    assert tutorial.index("pulp-oof-inspection-results") < tutorial.index(
         "fit-pulp-model"
     )
     assert tutorial.index("fit-pulp-model") < tutorial.index(
-        "pulp-inspection-results"
+        "pulp-fitted-model-inspection-results"
     )
     assert "selection = model.selection_" not in example
     assert "selection = model.selection_" not in renderer
     assert "selection = search.select(n_components=CHOSEN_N_COMPONENTS)" in example
-    assert "selection = search.select(n_components=CHOSEN_N_COMPONENTS)" in renderer
+    assert "selection = search.select(n_components=chosen_n_components)" in renderer
     assert "model = search.refit(" in example
     assert "selection=selection" in example
     assert "model = search.refit(X, Y, selection=selection)" in renderer

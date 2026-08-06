@@ -42,12 +42,12 @@ from pipls.inspection import (  # noqa: E402
 )
 
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
-CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
 CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
     "component_path.svg",
+    "selected_component_path.svg",
     "predictor_rank_profile.svg",
     "biplot.svg",
     "predictor_directions.svg",
@@ -85,7 +85,8 @@ def _save_svg(figure: Figure, path: Path) -> None:
 def _render_component_path(
     component_path: PiPLSComponentPath,
     *,
-    selected: PiPLSSelection,
+    selected: PiPLSSelection | None,
+    title: str,
     output_path: Path,
 ) -> None:
     figure, axis = _figure(figsize=(7.4, 4.8))
@@ -96,15 +97,17 @@ def _render_component_path(
         fmt="o-",
         capsize=4,
     )
-    axis.scatter(
-        [selected.n_components],
-        [selected.cv_mse_mean],
-        marker="D",
-        s=70,
-        label=f"Chosen: {selected.n_components} components",
-        zorder=3,
-    )
-    axis.set_title(r"Pulp $\Pi$-PLS component path")
+    if selected is not None:
+        axis.scatter(
+            [selected.n_components],
+            [selected.cv_mse_mean],
+            marker="D",
+            s=70,
+            label=f"Chosen: {selected.n_components} components",
+            zorder=3,
+        )
+        axis.legend()
+    axis.set_title(title)
     axis.set_xlabel("Number of components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_xticks(component_path.n_components)
@@ -113,7 +116,6 @@ def _render_component_path(
     )
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
-    axis.legend()
     _save_svg(figure, output_path)
 
 
@@ -167,7 +169,16 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
 
     search = PiPLSSearchCV(cv=CV).fit(X, Y)
     component_path = search.component_path_
-    selection = search.select(n_components=CHOSEN_N_COMPONENTS)
+    _render_component_path(
+        component_path,
+        selected=None,
+        title=r"Pulp $\Pi$-PLS component path before selection",
+        output_path=output_dir / "component_path.svg",
+    )
+
+    chosen_n_components = 3
+    selection = search.select(n_components=chosen_n_components)
+    selected_component_path = search.component_path_
     rank_profile = search.predictor_rank_profile(selection.n_components)
     report = search.oof_report(
         X,
@@ -179,6 +190,22 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         raise RuntimeError(
             "Repeated Pulp CV must produce ten OOF predictions per observation."
         )
+    diagnostics = prediction_diagnostics(
+        Y,
+        oof_predictions,
+        prediction_kind=PREDICTION_KIND,
+    )
+    _render_component_path(
+        selected_component_path,
+        selected=selection,
+        title=r"Pulp $\Pi$-PLS selected component path",
+        output_path=output_dir / "selected_component_path.svg",
+    )
+    _render_predictor_rank_profile(
+        rank_profile,
+        output_path=output_dir / "predictor_rank_profile.svg",
+    )
+
     model = search.refit(X, Y, selection=selection)
     factors = pipls_display_factors(
         model.decomposition_,
@@ -186,22 +213,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         response_sign="positive",
     )
     structure = latent_structure(model)
-    diagnostics = prediction_diagnostics(
-        Y,
-        oof_predictions,
-        prediction_kind=PREDICTION_KIND,
-    )
     display_components = tuple(range(selection.n_components))
-
-    _render_component_path(
-        component_path,
-        selected=selection,
-        output_path=output_dir / "component_path.svg",
-    )
-    _render_predictor_rank_profile(
-        rank_profile,
-        output_path=output_dir / "predictor_rank_profile.svg",
-    )
 
     # --8<-- [start:render-pulp-biplot]
     figure, axis = plt.subplots(figsize=(9.0, 7.0), layout="constrained")
@@ -260,9 +272,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     # --8<-- [start:render-pulp-predictor-directions]
     figure, axis = plt.subplots(figsize=(10.0, 5.4), layout="constrained")
     predictor_positions = np.arange(len(predictor_names))
-    predictor_width = 0.8 / CHOSEN_N_COMPONENTS
+    predictor_width = 0.8 / selection.n_components
     for series, component in enumerate(display_components):
-        offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2.0) * predictor_width
+        offset = (series - (selection.n_components - 1) / 2.0) * predictor_width
         axis.bar(
             predictor_positions + offset,
             factors.predictor_directions[:, component],
@@ -284,9 +296,9 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     # --8<-- [start:render-pulp-weighted-response-directions]
     figure, axis = plt.subplots(figsize=(8.2, 5.4), layout="constrained")
     response_positions = np.arange(len(response_names))
-    response_width = 0.8 / CHOSEN_N_COMPONENTS
+    response_width = 0.8 / selection.n_components
     for series, component in enumerate(display_components):
-        offset = (series - (CHOSEN_N_COMPONENTS - 1) / 2.0) * response_width
+        offset = (series - (selection.n_components - 1) / 2.0) * response_width
         axis.bar(
             response_positions + offset,
             factors.weighted_response_directions[:, component],

@@ -4,24 +4,26 @@ This tutorial applies [Inspect a manually selected Pi-PLS model with synthetic d
 to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`,
 `predictor_rank_profile()`, and fixed-model fitting are already familiar. The focus is what changes
 with real data: an interior predictor-rank result, selection-conditioned out-of-fold (OOF)
-predictions, and interpretation of a selected model.
+predictions, and interpretation of an accepted model.
 
-The workflow is to load the Pulp data, search the candidate models, inspect the search evidence,
-create one selection, qualify it with OOF predictions, refit that exact selection, inspect the
-fitted model, and render the completed reports.
+The workflow is to load the Pulp data, fit the search, inspect the component path, choose a component
+count and create one selection, inspect the selected path, conditional predictor-rank profile, and
+OOF predictions, refit the same selection, inspect the fitted model, and render the reports. If the
+selected evidence is unsatisfactory, return to the selection step before refitting.
 
 ```mermaid
 flowchart TD
     load["Load Pulp data"]
-    search["Search candidate models"]
-    inspect["Inspect search evidence"]
-    select["Create one selection"]
-    qualify["Qualify with OOF predictions"]
-    refit["Refit the exact selection"]
+    search["Fit search"]
+    path["Inspect component path"]
+    select["Choose component count and create selection"]
+    review["Inspect selected path, conditional rank profile, and OOF predictions"]
+    refit["Refit the same selection"]
     analyze["Inspect the fitted model"]
     render["Render reports"]
 
-    load --> search --> inspect --> select --> qualify --> refit --> analyze --> render
+    load --> search --> path --> select --> review --> refit --> analyze --> render
+    review -. revise if dissatisfied .-> select
 ```
 
 ## What this tutorial covers
@@ -29,11 +31,13 @@ flowchart TD
 You will:
 
 1. load the Pulp predictors and responses;
-2. search the admissible path and inspect the evidence at an explicit component count;
-3. create one immutable selection and generate OOF predictions for that exact row;
-4. refit the same selection on all development observations;
-5. compute immutable latent-structure, factorization, and prediction-diagnostic results;
-6. render and interpret representative standard PLS-family and Pi-PLS-specific plots.
+2. search the admissible path and inspect it before fixing a component count;
+3. choose the component count and create one immutable selection;
+4. inspect the selected path, conditional predictor-rank profile, and OOF predictions;
+5. revise the selection if that evidence is unsatisfactory;
+6. refit the accepted selection on all development observations;
+7. compute immutable latent-structure and factorization results;
+8. render and interpret representative standard PLS-family and Pi-PLS-specific plots.
 
 ## Setup
 
@@ -44,17 +48,17 @@ python -m pip install ".[examples]"
 ```
 
 The example imports the estimators, repeated cross-validation, numerical inspection functions,
-Matplotlib, and `adjustText`, then states the component choice and diagnostic-response limit used
-below:
+Matplotlib, and `adjustText`, then defines the output location, diagnostic-response limit, and
+validation splitter:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-tutorial-setup"
 ```
 
-`CHOSEN_N_COMPONENTS=3` is the explicit modeling choice. Because every fitted component is shown,
-the plotting code derives its zero-based component indices from that value instead of maintaining a
-second display setting. The first three response columns are shown only in pointwise diagnostic
-figures to keep the demonstration legible; the RMSE summary still includes all eight responses.
+The component count is intentionally absent from this setup block. It is introduced only after the
+component path has been inspected. The first three response columns are shown only in pointwise
+diagnostic figures to keep the demonstration legible; the RMSE summary still includes all eight
+responses.
 
 ## The data and modeling question
 
@@ -73,8 +77,8 @@ arithmetic, length-weighted, and length-length-weighted means. The response labe
 energy absorption), `TSI` (tensile stiffness index), `Tear index`, and `s` (light-scattering
 coefficient).
 
-The analysis uses three paired latent modes and the predictor rank selected conditionally at that
-component count. The distinction is summarized in
+The accepted analysis uses three paired latent modes and the predictor rank selected conditionally
+at that component count. The distinction is summarized in
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 ## Load the data
@@ -88,41 +92,71 @@ The named loader returns immutable matrices together with scientific predictor a
 The resulting arrays have shapes `(46, 14)` and `(46, 8)`. The same loader works from a source
 checkout, wheel, or source distribution and applies no preprocessing.
 
-## Search and retrieve selection evidence { #retrieve-selection-evidence }
+## Inspect the component path { #retrieve-selection-evidence }
 
-The search, component path, exact manual selection, and conditional predictor-rank profile are
-constructed before a final full-data model is fitted:
+Fit the search and retrieve the conditioned component path without creating a selection:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:inspect-pulp-selection"
+--8<-- "examples/05_pulp_real_data.py:inspect-pulp-component-path"
 ```
 
-The search evaluates admissible paired-mode counts and conditionally selects one predictor rank at
+The search evaluates admissible paired-mode counts and conditionally retains one predictor rank at
 each count. It uses ten repeated five-fold partitions, so every candidate is evaluated on 50
-materialized validation splits. `search.select(n_components=CHOSEN_N_COMPONENTS)` retrieves the
-complete immutable row at the declared component count, and `predictor_rank_profile()` exposes the
-rank evidence conditional on that same count. These search-owned results can be inspected
-without fitting a final model.
+materialized validation splits. These search-owned results can be inspected without fitting a final
+model.
 
 Repeated CV makes this complete analysis approximately ten times as expensive as the former single
 five-fold partition. The quick start remains deliberately lighter.
 
-### Component path
+Render the path before fixing a component count:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:plot-pulp-component-path"
 ```
 
-![Pulp component path](../assets/generated/pulp/component_path.svg)
+![Pulp component path before selection](../assets/generated/pulp/component_path.svg)
 
 The mean CV-MSE falls substantially through three components and is nearly flat thereafter. The
 bars show one population standard deviation across the materialized validation splits on either
-side of each mean. They describe split-to-split variability; they are not confidence intervals
-and do not enter selection. This manual workflow keeps the three-component choice explicit. The
-diamond marks the row that is later refitted on all development observations.
+side of each mean. They describe split-to-split variability; they are not confidence intervals and
+do not enter selection. No row is marked in this first figure because it supplies the evidence for
+the component-count decision.
 
-The selection contains `predictor_rank=9`, the rank with the lowest evaluated mean CV-MSE at three
-components across the 50 seeded repeated-CV splits.
+## Choose the component count and create the selection
+
+After inspecting the path, record the chosen count and create the corresponding immutable row:
+
+```python
+--8<-- "examples/05_pulp_real_data.py:choose-pulp-selection"
+```
+
+Setting `CHOSEN_N_COMPONENTS=3` and calling `search.select(...)` are one conceptual operation. The
+static example records the resulting choice so the analysis is reproducible. In an interactive
+analysis, inspect the first path figure, set the value, and rerun from this selection stage.
+
+## Inspect the selected path and conditional rank profile
+
+Retrieve the path again for its selected presentation and the predictor-rank evidence conditional
+on the chosen component count:
+
+```python
+--8<-- "examples/05_pulp_real_data.py:inspect-pulp-selected-evidence"
+```
+
+The selected path is numerically identical to the first path; the second presentation adds the
+chosen-row marker. The profile exposes the evaluated predictor ranks at the selected component
+count.
+
+### Selected component path
+
+```python
+--8<-- "examples/05_pulp_real_data.py:plot-pulp-selected-component-path"
+```
+
+![Pulp selected component path](../assets/generated/pulp/selected_component_path.svg)
+
+The diamond marks the selected three-component row. Its stored predictor rank is 9, the rank with
+the lowest evaluated mean CV-MSE at three components across the 50 seeded repeated-CV splits.
 
 ### Conditional predictor-rank profile
 
@@ -148,10 +182,10 @@ performance](../computational_performance.md#develop-with-a-smaller-validation-p
 for that development-to-final distinction and [Path-selection details](../path_analysis.md) for
 other bounds and policies.
 
-## Generate selection-conditioned OOF predictions
+## Inspect selection-conditioned OOF behavior
 
-OOF reporting optionally qualifies the selected row before final refitting. The report consumes the
-exact selection already inspected above rather than resolving the component count again:
+The OOF report consumes the exact selection already inspected above rather than resolving the
+component count again:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
@@ -164,17 +198,74 @@ fixed random seed makes the repeated partitions reproducible while avoiding fold
 determined by row order. Replace the search splitter with a grouped, temporal, or otherwise
 appropriate protocol when the sampling design carries experimental structure.
 
+Convert those predictions to an immutable diagnostic result before refitting:
+
+```python
+--8<-- "examples/05_pulp_real_data.py:pulp-oof-inspection-results"
+```
+
 !!! important "Validation scope"
     These are **selection-conditioned OOF predictions**. The selected rank pair is fitted on each
     stored training fold, but the same observations were already used to inspect the selection path.
-    Nested cross-validation or an external test set is required for an independent estimate of
-    post-selection performance. See
+    This report is additional evidence within model selection, not independent qualification of the
+    selected model. Nested cross-validation or an external test set is required for an independent
+    estimate of post-selection performance. See
     [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
 
-## Refit the qualified selection
+The pointwise figures show the first three response columns (`CSF`, `Density`, and `TI`) solely for
+visibility. The summary retains all responses. All charts use named arrays from
+`PredictionDiagnostics` directly.
 
-After the search evidence and selection-conditioned OOF behavior have been examined, the exact same
-selection is fitted on all 46 development observations:
+### Observed versus predicted
+
+```python
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-observed-vs-predicted"
+```
+
+![Pulp observed versus predicted](../assets/generated/pulp/observed_vs_predicted.svg)
+
+`CSF` lies more tightly around the identity line than `Density` and `TI`; all three displays remain
+selection-conditioned rather than independent-test results.
+
+See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
+
+### Residual versus predicted
+
+```python
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-residuals-vs-predicted"
+```
+
+![Pulp residual versus predicted](../assets/generated/pulp/residuals_vs_predicted.svg)
+
+No dominant global curvature is apparent in the displayed responses, although `TI` has the largest
+residual excursions. The zero line is descriptive; it does not establish a formal variance model or
+calibration claim.
+
+See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted).
+
+### Standardized RMSE
+
+```python
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-standardized-rmse"
+```
+
+![Pulp standardized RMSE](../assets/generated/pulp/standardized_rmse.svg)
+
+Response-wise RMSE is divided by the observed sample standard deviation. `CSF` has the lowest value
+(approximately 0.30), while `Tear index` has the highest (approximately 0.68). These values are not
+identical to the fold-local standardized losses used during path selection.
+
+See [Standardized RMSE](../model_inspection.md#standardized-rmse).
+
+If the selected path, conditional rank profile, or OOF behavior is unsatisfactory, return to
+`CHOSEN_N_COMPONENTS`, create another selection, and inspect the resulting evidence. That feedback
+step remains part of model selection; it does not turn the same-search OOF report into an independent
+performance estimate.
+
+## Refit the accepted selection
+
+After the selection evidence has been examined, fit the exact same selection on all 46 development
+observations:
 
 ```python
 --8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
@@ -186,20 +277,19 @@ exact immutable object as `model.selection_` after fitting succeeds. The returne
 [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression) supplies predictions and fitted-model
 inspection, while the search continues to own the cross-validation evidence.
 
-## Compute immutable inspection results
+## Compute immutable fitted-model results
 
-The fitted estimator and OOF predictions are converted to numerical result objects before any
-figure is rendered:
+The fitted estimator is converted to numerical result objects before the fitted-model figures are
+rendered:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:pulp-inspection-results"
+--8<-- "examples/05_pulp_real_data.py:pulp-fitted-model-inspection-results"
 ```
 
 | Result | Question answered |
 |---|---|
 | `LatentStructure` | How are samples and variables represented by the fitted PLS-family model? |
 | `PiPLSDisplayFactors` | What are the Pi-PLS-specific $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors? |
-| `PredictionDiagnostics` | How do the selection-conditioned OOF predictions and residuals behave? |
 
 The Pulp workflow uses `response_names.index("TI")` as the response sign anchor and requests a
 positive orientation. The resulting TI entry is nonnegative for every displayed component, and the
@@ -209,8 +299,9 @@ how an equivalent factorization is displayed; it does not change predictions or 
 physical effect on TI is positive. If an anchored entry were exactly zero, the helper would use its
 default predictor-based sign for that component.
 
-At this point all numerical analysis is complete. The remaining code only renders completed public
-result objects. The full catalogue is in [Model inspection](../model_inspection.md).
+At this point all numerical analysis is complete. The remaining fitted-model code only renders
+completed public result objects. The full catalogue is in
+[Model inspection](../model_inspection.md).
 
 ## Interpret representative fitted-model plots
 
@@ -285,53 +376,6 @@ four-panel Pi-PLS factorization figure. See [Dilation](../model_inspection.md#di
 [Response directions](../model_inspection.md#response-directions), and
 [Weighted response directions](../model_inspection.md#weighted-response-directions).
 
-### Standard PLS-family prediction diagnostics
-
-The pointwise figures show the first three response columns (`CSF`, `Density`, and `TI`) solely for
-visibility. The summary retains all responses. All charts use named arrays from
-`PredictionDiagnostics` directly.
-
-#### Observed versus predicted
-
-```python
---8<-- "tools/render_pulp_tutorial.py:render-pulp-observed-vs-predicted"
-```
-
-![Pulp observed versus predicted](../assets/generated/pulp/observed_vs_predicted.svg)
-
-`CSF` lies more tightly around the identity line than `Density` and `TI`; all three figures remain
-selection-conditioned rather than independent-test results.
-
-See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
-
-#### Residual versus predicted
-
-```python
---8<-- "tools/render_pulp_tutorial.py:render-pulp-residuals-vs-predicted"
-```
-
-![Pulp residual versus predicted](../assets/generated/pulp/residuals_vs_predicted.svg)
-
-No dominant global curvature is apparent in the displayed responses, although `TI` has the largest
-residual excursions. The zero line is descriptive; it does not establish a formal variance model or
-calibration claim.
-
-See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted).
-
-#### Standardized RMSE
-
-```python
---8<-- "tools/render_pulp_tutorial.py:render-pulp-standardized-rmse"
-```
-
-![Pulp standardized RMSE](../assets/generated/pulp/standardized_rmse.svg)
-
-Response-wise RMSE is divided by the observed sample standard deviation. `CSF` has the lowest value
-(approximately 0.30), while `Tear index` has the highest (approximately 0.68). These values are not
-identical to the fold-local standardized losses used during path selection.
-
-See [Standardized RMSE](../model_inspection.md#standardized-rmse).
-
 ## Reproduce this tutorial
 
 The analysis and selection snippets are maintained in `examples/05_pulp_real_data.py`. The repeated
@@ -343,8 +387,8 @@ python examples/05_pulp_real_data.py
 ```
 
 Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.
-`make docs-figures` regenerates the eight representative single-chart SVGs displayed here, while
-the numbered example writes six caller-owned PDFs with additional score, loading, factorization,
+`make docs-figures` regenerates the nine representative single-chart SVGs displayed here, while
+the numbered example writes seven caller-owned PDFs with additional score, loading, factorization,
 and coefficient views. Both routes calculate directly from in-memory results and write no
 analytical CSV intermediates. See
 [Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the
@@ -365,6 +409,5 @@ strict documentation-build and source-distribution checks.
 
 Stefan B. Lindström, Rita Ferritsius, Johan E. Carlson, Johan Persson, and Fritjof Nilsson,
 “Predicting handsheet properties and enhancing refiner control using fiber analyzer data and
-latent
-variable modeling,” *Computers & Chemical Engineering* **199** (2025), 109143,
+latent variable modeling,” *Computers & Chemical Engineering* **199** (2025), 109143,
 [doi:10.1016/j.compchemeng.2025.109143](https://doi.org/10.1016/j.compchemeng.2025.109143).

@@ -52,9 +52,11 @@
 - Every numbered example must present a recognizable user task, explicit comparison, or focused
   comparison. It must explain its data and label its output without relying on publication context or
   earlier project history. Do not ship context-free API demonstrations as numbered examples.
-- In maintained evidence-retaining workflows, inspect path evidence, create one selection through
-  `search.select(...)`, pass that same object to any OOF report, and fit the final full-data model
-  through `search.refit(..., selection=selection)`. Do not recover the working selection from the
+- Under Decision 0152, maintained manual-selection workflows inspect the unselected component
+  path, choose the component count and create one selection through `search.select(...)`, inspect
+  the selected path, conditional rank profile, and any selection-conditioned OOF report, then fit
+  the final full-data model through
+  `search.refit(..., selection=selection)`. Do not recover the working selection from the
   fitted model or manually transfer the selected predictor rank into a new estimator. Compact
   automatic workflows may continue to refit directly from a rule or component count.
 - For real-data examples, form `X` and `Y` visibly in the script. Package-owned Pulp, Sugarcane,
@@ -143,7 +145,8 @@
   use it directly for symmetric $\pm 1$ SD bars. No standard-error result or selection rule is
   public. Selection lookup must not fit, refit, or mutate search state. Decision 0140 assigns that
   ownership to `search.select(...)`, and maintained examples, tutorial snippets, and living API
-  pages use that operation. Under Decision 0151, Example 07 shows the exact minimum row, horizontal
+  pages use that operation. Under Decisions 0151--0152, Example 07 shows the exact minimum row,
+  horizontal
   10% relative-tolerance threshold, and recommended pre-refit selection, then passes that same
   object to OOF reporting and final fitting. Keep generated pages and cross-links synchronized with
   the implemented stage.

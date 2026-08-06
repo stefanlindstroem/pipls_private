@@ -461,7 +461,7 @@ def main() -> None:
     )
     rank_profile = search.predictor_rank_profile(selection.n_components)
 
-    # Qualify the same tolerance-derived selection before final full-data fitting.
+    # Inspect the same tolerance-derived selection before final full-data fitting.
     report = search.oof_report(X, Y, selection=selection)
     minimum = selection.reference_minimum
     component_cv_mse_threshold = selection.cv_mse_threshold
@@ -481,18 +481,18 @@ def main() -> None:
         range(min(DISPLAY_COMPONENT_COUNT, selection.n_components))
     )
     oof_predictions = report.oof_predictions
-
-    # Refit the exact qualified selection on all development observations.
-    model = search.refit(X, Y, selection=selection)
-
-    # Calculate immutable fitted-model and prediction inspection results.
-    factors = pipls_display_factors(model.decomposition_)
-    structure = latent_structure(model)
     diagnostics = prediction_diagnostics(
         Y,
         oof_predictions,
         prediction_kind="selection-conditioned OOF predictions",
     )
+
+    # Refit the accepted selection on all development observations.
+    model = search.refit(X, Y, selection=selection)
+
+    # Calculate immutable fitted-model inspection results.
+    factors = pipls_display_factors(model.decomposition_)
+    structure = latent_structure(model)
     observations = observation_diagnostics(model, X)
 
     # Render the final reports from completed public result objects.

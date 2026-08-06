@@ -79,7 +79,8 @@ must not describe itself as the first Pi-PLS model or the shortest complete path
 
 ### 3. Validate and interpret
 
-The complete Pulp tutorial remains the third stage. It owns real-data selection qualification,
+The complete Pulp tutorial remains the third stage. It owns real-data selection-conditioned OOF
+inspection,
 selection-conditioned OOF reporting through `oof_report(selection=...)`, explicit final refitting
 from the same selection, and representative model-interpretation figures. Pulp OOF predictions must
 not be described as fixed-parameter OOF because the selected row is chosen using the same
@@ -132,6 +133,11 @@ handoff, tutorial diagrams, and stale-surface audit.
 This decision consolidates the earlier onboarding and tutorial-route increments. Their durable
 self-contained-example, tutorial-ownership, documentation-layering, and user-orientation outcomes
 are represented here and in Decision 0065.
+
+Decision 0152 further refines the manual tutorial sequence: first inspect the unselected
+component path, then choose the component count and create the selection, then review the
+selected path and conditional evidence with an optional return to selection. Same-search OOF
+reporting is inspection rather than independent qualification.
 
 ## Consequences
 

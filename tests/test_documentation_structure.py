@@ -174,48 +174,55 @@ def test_served_tutorials_have_one_vertical_workflow_flowchart() -> None:
                 "select by rule and refit",
                 "inspect fitted values",
             ),
+            "feedback": False,
         },
         "synthetic.md": {
             "labels": (
                 "Generate training and test data",
-                "Search candidate models",
-                "Inspect search evidence",
-                "Create one selection",
-                "Refit the exact selection",
+                "Fit search",
+                "Inspect component path",
+                "Choose component count and create selection",
+                "Inspect selected path and conditional rank profile",
+                "Refit the same selection",
                 "Predict external test data",
-                "Render results",
+                "revise if dissatisfied",
             ),
             "prose": (
                 "generate independent training and test data",
-                "search the candidate models",
-                "inspect the search evidence",
-                "create one selection",
-                "refit that exact selection",
+                "fit the search",
+                "inspect the component path",
+                "choose a component count and create one selection",
+                "inspect the selected path and conditional predictor-rank profile",
+                "refit the same selection",
                 "predict the external test data",
-                "render the completed results",
+                "return to the selection step",
             ),
+            "feedback": True,
         },
         "pulp.md": {
             "labels": (
                 "Load Pulp data",
-                "Search candidate models",
-                "Inspect search evidence",
-                "Create one selection",
-                "Qualify with OOF predictions",
-                "Refit the exact selection",
+                "Fit search",
+                "Inspect component path",
+                "Choose component count and create selection",
+                "Inspect selected path, conditional rank profile, and OOF predictions",
+                "Refit the same selection",
                 "Inspect the fitted model",
                 "Render reports",
+                "revise if dissatisfied",
             ),
             "prose": (
                 "load the Pulp data",
-                "search the candidate models",
-                "inspect the search evidence",
-                "create one selection",
-                "qualify it with OOF predictions",
-                "refit that exact selection",
+                "fit the search",
+                "inspect the component path",
+                "choose a component count and create one selection",
+                "inspect the selected path, conditional predictor-rank profile, and OOF predictions",
+                "refit the same selection",
                 "inspect the fitted model",
-                "render the completed reports",
+                "render the reports",
+                "return to the selection step",
             ),
+            "feedback": True,
         },
     }
 
@@ -226,6 +233,8 @@ def test_served_tutorials_have_one_vertical_workflow_flowchart() -> None:
         body = blocks[0].group("body")
         assert body.splitlines()[0] in {"flowchart TD", "flowchart TB"}
         assert all(label in body for label in contract["labels"])
+        if contract["feedback"]:
+            assert "-. revise if dissatisfied .->" in body
 
         prose = text[: blocks[0].start()] + text[blocks[0].end() :]
         normalized_prose = " ".join(prose.split())
@@ -240,12 +249,39 @@ def test_model_producing_tutorials_state_selection_ownership_positively() -> Non
     for filename in ("synthetic.md", "pulp.md"):
         text = (tutorial_root / filename).read_text(encoding="utf-8")
 
+        normalized = " ".join(text.split())
         assert "model.selection_" in text
-        assert "without fitting a final model" in text
+        assert "without fitting a final model" in normalized
         assert re.search(
             r"`search\.select\(\)`[^.\n]*\bnot required\b",
             text,
         ) is None
+
+
+def test_selection_conditioned_oof_is_described_as_inspection_not_qualification() -> None:
+    root = _repository_root()
+    active_guides = (
+        root / "README.md",
+        root / "docs" / "index.md",
+        root / "docs" / "examples.md",
+        root / "docs" / "tutorials" / "pulp.md",
+        root / "examples" / "README.md",
+    )
+    stale = (
+        "qualify it with OOF predictions",
+        "qualify one manual Pulp selection",
+        "optionally qualify",
+        "OOF qualification",
+        "qualified selection",
+    )
+
+    for path in active_guides:
+        text = path.read_text(encoding="utf-8")
+        assert all(phrase not in text for phrase in stale), path
+
+    pulp = (root / "docs" / "tutorials" / "pulp.md").read_text(encoding="utf-8")
+    assert "not independent qualification" in pulp
+    assert "return to the selection step" in pulp
 
 
 def test_active_workflow_guides_use_pre_refit_selection_handoff() -> None:

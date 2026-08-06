@@ -21,6 +21,7 @@ from tests._mkdocs import load_mkdocs_config
 
 FIGURE_FILENAMES = (
     "component_path.svg",
+    "selected_component_path.svg",
     "predictor_rank_profile.svg",
     "observed_vs_predicted.svg",
 )
@@ -102,6 +103,15 @@ def test_synthetic_tutorial_renderer_writes_declared_parseable_svgs(
         ET.parse(figure_path)
         assert item["sha256"] == _sha256(figure_path)
 
+    initial_path = (generated_synthetic_assets / "component_path.svg").read_text(
+        encoding="utf-8"
+    )
+    selected_path = (
+        generated_synthetic_assets / "selected_component_path.svg"
+    ).read_text(encoding="utf-8")
+    assert "Chosen:" not in initial_path
+    assert "Chosen:" in selected_path
+
 
 def test_documentation_targets_own_generated_synthetic_assets() -> None:
     repository = _repository_root()
@@ -148,10 +158,13 @@ def test_synthetic_tutorial_uses_checked_snippets_assets_and_public_links() -> N
         "define-synthetic-cv",
         "generate-synthetic-data",
         "fit-synthetic-search",
-        "inspect-synthetic-selection",
+        "inspect-synthetic-component-path",
+        "choose-synthetic-selection",
+        "inspect-synthetic-selected-evidence",
         "refit-synthetic-model",
         "evaluate-synthetic-predictions",
         "plot-synthetic-component-path",
+        "plot-synthetic-selected-component-path",
         "plot-synthetic-rank-profile",
         "plot-synthetic-predictions",
     }

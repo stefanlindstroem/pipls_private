@@ -53,6 +53,6 @@ def test_synthetic_example_owns_the_short_selection_workflow() -> None:
     assert "diagnostics.predicted_standardized" in source
     assert "axis.scatter(" in source
     assert "axis.plot(limits, limits" in source
-    assert source.count("figure.savefig(") == 3
+    assert source.count("figure.savefig(") == 4
     assert ".to_csv(" not in source
     assert "pandas" not in source

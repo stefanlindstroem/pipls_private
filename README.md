@@ -14,7 +14,7 @@ appropriate alternatives whose suitability depends on the data and validation de
 
 For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
 selects a predictor rank conditionally for each count. Evidence-retaining workflows inspect the
-path, create one immutable selection, optionally qualify that selection through OOF reporting, and
+component path, create one immutable selection, inspect its conditional rank and OOF evidence, and
 pass the same object to final refitting. Compact workflows may instead apply a named rule directly
 through `search.refit(X, Y, rule=...)`. The fitted model records the exact row as `selection_`, while
 the search retains the complete path and split evidence.
@@ -107,8 +107,10 @@ from pipls import PiPLSSearchCV
 
 search = PiPLSSearchCV().fit(X_train, Y_train)
 path = search.component_path_
+# Inspect the path before choosing a component count.
 selection = search.select(n_components=2)
 rank_profile = search.predictor_rank_profile(selection.n_components)
+# Reinspect the path with the selected row and inspect the conditional rank profile.
 
 model = search.refit(
     X_train,
@@ -157,12 +159,14 @@ Y_pred = model.predict(X_test)
 ```
 
 Retain the fitted search in a variable when component-path, predictor-rank-profile, candidate, or
-OOF evidence matters. In that route, create one selection before validation and final fitting so
-every operation refers to the same stored row:
+OOF evidence matters. In that route, inspect the component path first, create one selection, and
+review its conditional evidence before final fitting so every operation refers to the same stored
+row:
 
 ```python
 search = PiPLSSearchCV(search_method="adaptive").fit(X_train, Y_train)
 path = search.component_path_
+# Inspect path before choosing a component-count rule or tolerance.
 selection = search.select(
     rule="minimum_cv_mse",
     relative_tolerance=0.10,
@@ -174,7 +178,7 @@ model = search.refit(X_train, Y_train, selection=selection)
 
 `refit()` returns a fitted estimator or pipeline and does not attach it to the search object.
 `model.selection_` records the exact supplied selection after fitting succeeds; it is fitted-model
-provenance rather than the handoff used to select or qualify the row.
+provenance rather than the handoff used to select or review the row.
 
 The caller must pass the same observations in the same row order; the search retains split indices,
 not the training matrices.

@@ -4,23 +4,27 @@
 
 Implemented. All six patches are complete. `PiPLSSearchCV.refit(selection=...)` uses the shared
 exact compatibility validator, analytical workflows pass one pre-refit selection through evidence
-inspection, optional OOF qualification, and final fitting, and every served tutorial includes one
+inspection, optional OOF reporting, and final fitting, and every served tutorial includes one
 source-level Mermaid flowchart with equivalent prose. Strict base, inherited Pages-overlay, and
 source-distribution checks protect diagram rendering. Public routes, example catalogues, changelog,
 maintainer records, and stale-surface audits now use the same lifecycle.
+
+Decision 0152 refines the manual tutorial presentation: it separates the unselected path from
+selection-conditioned review, adds one possible feedback edge to the selection step, and reserves
+qualification or validation for independent assessment.
 
 ## Context
 
 `PiPLSSearchCV.select()` already returns the complete immutable path row needed for later work, and
 `oof_report(selection=...)` already consumes such an existing compatible selection. In contrast,
 `refit()` currently asks the caller to repeat a rule or component count. A detailed workflow can
-therefore inspect one selection, validate it through OOF reporting, and then independently repeat
+therefore inspect one selection, report its OOF behavior, and then independently repeat
 the request that determines the final model.
 
 That repetition weakens provenance. It also encourages the maintained examples to fit the final
 model before they inspect or report the search evidence supporting the fit. The compact automatic
 route remains useful, but the evidence-retaining route should pass one selection object through
-inspection, validation, and final full-data fitting.
+inspection, OOF reporting, and final full-data fitting.
 
 The three served tutorials also describe distinct workflows whose operation order is easier to
 understand graphically. The documentation stack should represent those workflows directly in
@@ -96,7 +100,7 @@ The conceptual order is:
 search
 -> inspect search evidence
 -> create one selection
--> qualify that selection when validation is part of the task
+-> inspect selection-conditioned evidence when OOF reporting is part of the task
 -> refit the same selection on all development data
 -> inspect the fitted model
 -> predict
@@ -124,7 +128,7 @@ The maintained routes are:
 | Route | Examples | Required order |
 |---|---|---|
 | Automatic selection and final refit | 01 | search and rule-based refit, then fitted-value diagnostics |
-| Inspect, select, qualify, and refit | 02 and 05--07 | search evidence, one selection, optional OOF report, selection-driven refit, fitted-model analysis |
+| Inspect, select, review, and refit | 02 and 05--07 | search evidence, one selection, optional OOF report, selection-driven refit, fitted-model analysis |
 | Selection-conditioned validation without a final model | 03 | search, selection, OOF report |
 | Path comparison without a final model | 04 | evaluate and compare paths |
 
@@ -199,7 +203,7 @@ The completed sequence must verify that:
 ## Consequences
 
 The automatic route stays concise, while analytical workflows gain an explicit immutable handoff
-from evidence to validation and final fitting. The same selection cannot be silently re-resolved
+from evidence to OOF inspection and final fitting. The same selection cannot be silently re-resolved
 with different arguments between OOF reporting and refitting. Tutorial order reflects the actual
 scientific decisions, and compact source-level diagrams make the distinct routes easier to scan
 without expanding the runtime package or numerical surface.

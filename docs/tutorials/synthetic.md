@@ -1,29 +1,28 @@
 # Inspect and refit a manually selected Pi-PLS model
 
 This tutorial expands the [Pulp quick start](quick_start.md) by retaining the fitted search object,
-inspecting its component path, creating one explicit selection, and passing that same immutable
-selection to the final full-data refit. Deterministic synthetic training and test data make the
-latent structure known and keep prediction assessment independent of model selection. For Pi-PLS,
-`n_components` is the number of paired latent modes.
+inspecting its component path before choosing a component count, creating one explicit selection,
+and passing that same immutable selection to the final full-data refit. Deterministic synthetic
+training and test data make the latent structure known and keep prediction assessment independent
+of model selection. For Pi-PLS, `n_components` is the number of paired latent modes.
 
-The workflow is to generate independent training and test data, search the candidate models, inspect
-the search evidence, create one selection, refit that exact selection, predict the external test
-data, and render the completed results.
+The workflow is to generate independent training and test data, fit the search, inspect the
+component path, choose a component count and create one selection, inspect the selected path and
+conditional predictor-rank profile, refit the same selection, and predict the external test data.
+If the selected evidence is unsatisfactory, return to the selection step before refitting.
 
 ```mermaid
 flowchart TD
-    A[Fit search at dummy number of components]
-    B[Inspect component path]
-    C[Identify suitable number of components h*]
-    D[Set chosen component count]
-    E[Create selection with n_components = h*]
-    F[Inspect predictor-rank profile]
-    G[Refit using selection]
-    H[Predict independent test data]
+    data["Generate training and test data"]
+    search["Fit search"]
+    path["Inspect component path"]
+    select["Choose component count and create selection"]
+    review["Inspect selected path and conditional rank profile"]
+    refit["Refit the same selection"]
+    predict["Predict external test data"]
 
-    A --> B --> C
-    C -. go back and set value .-> D
-    D --> E --> F --> G --> H
+    data --> search --> path --> select --> review --> refit --> predict
+    review -. revise if dissatisfied .-> select
 ```
 
 ## What this tutorial covers
@@ -32,10 +31,11 @@ You will:
 
 1. generate independent training and test observations;
 2. evaluate the component and predictor-rank search;
-3. inspect the component path and create one manual selection;
-4. inspect the conditional predictor-rank profile for that selection;
-5. refit the exact selected pair on all training observations;
-6. predict the independent test responses and render the numerical results.
+3. inspect the component path before fixing a component count;
+4. choose the component count and create one manual selection;
+5. inspect the selected path and conditional predictor-rank profile;
+6. refit the exact selected pair on all training observations;
+7. predict the independent test responses and render the numerical results.
 
 The tutorial deliberately stops after one prediction plot. Scores, loadings, Pi-PLS factorization
 plots, and selection-conditioned OOF diagnostics are introduced in the
@@ -72,11 +72,10 @@ The shared dimension, and therefore the intended predictive paired-mode count, i
 predictor block contains four structured directions in total. These known values help interpret the
 example, but cross-validation is not required to recover them exactly in a finite noisy sample.
 
-## Evaluate the search
+## Fit the search
 
-The example declares `CHOSEN_N_COMPONENTS=2` before fitting the search. The search evaluates
-admissible pairs of paired-mode count $h$ (`n_components`) and retained predictor-subspace dimension
-$r_\pi$ (`predictor_rank`):
+The search evaluates admissible pairs of paired-mode count $h$ (`n_components`) and retained
+predictor-subspace dimension $r_\pi$ (`predictor_rank`):
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:fit-synthetic-search"
@@ -92,35 +91,68 @@ r_\pi^*(h)
 \operatorname{CV\text{-}MSE}(h,r_\pi).
 \end{equation}
 
-At this stage the search owns validation evidence. It has not fitted a final model on all training
-observations.
+At this stage the search owns validation evidence. It has not selected a component count or fitted
+a final model on all training observations.
 
-## Retrieve selection evidence
+## Inspect the component path { #retrieve-selection-evidence }
 
-Retrieve the conditioned component path, create the manual selection at two components, and inspect
-the predictor-rank profile for that selected component count:
+Retrieve the component path without creating a selection:
 
 ```python
---8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-selection"
+--8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-component-path"
 ```
 
-`selection` is the complete immutable row $[h,r_\pi^*(h)]$. These search-owned results can be
-retrieved without fitting a final model. The selection is created before final fitting and will be
-passed unchanged to `refit()`.
-
-### Component path
+Render that unconditional path first:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-component-path"
 ```
 
-![Synthetic component path](../assets/generated/synthetic/component_path.svg)
+![Synthetic component path before selection](../assets/generated/synthetic/component_path.svg)
 
 The mean CV-MSE falls markedly from one to two components and changes little at three. The bars
 show one population standard deviation across the materialized validation splits on either side
 of each mean. They describe split-to-split variability; they are not confidence intervals and do
-not enter selection. This tutorial keeps the component choice explicit. The diamond marks the
-selected row that will be refitted.
+not enter selection. No row is marked because the purpose of this first figure is to support the
+component-count decision.
+
+## Choose the component count and create the selection
+
+After inspecting the path, record the chosen value and create the corresponding immutable search
+selection:
+
+```python
+--8<-- "examples/02_synthetic_path_selection.py:choose-synthetic-selection"
+```
+
+Setting `CHOSEN_N_COMPONENTS` and calling `search.select(...)` are one conceptual operation. The
+static script records the resulting choice so that the complete example is reproducible. In an
+interactive analysis, inspect the first path figure, set the value, and rerun from this selection
+stage.
+
+## Inspect the selected evidence
+
+Retrieve the path again for its selected presentation and the predictor-rank profile conditional on
+the chosen component count:
+
+```python
+--8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-selected-evidence"
+```
+
+`selection` is the complete immutable row $[h,r_\pi^*(h)]$. These search-owned results can be
+inspected without fitting a final model. The selection will be passed unchanged to `refit()` if the
+evidence is accepted.
+
+### Selected component path
+
+```python
+--8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-selected-component-path"
+```
+
+![Synthetic selected component path](../assets/generated/synthetic/selected_component_path.svg)
+
+The path is unchanged; the diamond now identifies the selected two-component row. Showing the path
+again makes the recorded decision explicit without implying that path evaluation was repeated.
 
 ### Conditional predictor-rank profile
 
@@ -134,9 +166,13 @@ At two components, the lowest evaluated mean CV-MSE occurs at predictor rank fou
 controlled example, that matches the two shared and two predictor-specific directions in the
 predictor block. This agreement is informative but not a general selection guarantee.
 
+The selected path and rank profile are still model-selection evidence. If they make the chosen
+component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection. This is a
+return within the selection process, not independent post-selection validation.
+
 ## Refit the selected pair
 
-The final estimator consumes the already inspected selection:
+The final estimator consumes the accepted selection:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:refit-synthetic-model"
@@ -182,8 +218,11 @@ cv = KFold(n_splits=5, shuffle=True, random_state=0)
 search = PiPLSSearchCV(cv=cv).fit(X_train, Y_train)
 
 path = search.component_path_
+# Inspect path before assigning chosen_n_components.
 selection = search.select(n_components=chosen_n_components)
+selected_path = search.component_path_
 rank_profile = search.predictor_rank_profile(selection.n_components)
+# Inspect selected_path and rank_profile; revise selection if needed.
 
 model = search.refit(
     X_train,
@@ -212,6 +251,6 @@ For exact signatures and advanced behavior, see:
 
 The executable calculation is maintained in `examples/02_synthetic_path_selection.py`, and the
 code blocks above are checked snippets from that file. From a source checkout, `make docs-figures`
-regenerates the three SVG figures and `make docs` regenerates them before building the strict site.
+regenerates the four SVG figures and `make docs` regenerates them before building the strict site.
 See [Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the
 required dependencies and distribution-level checks.

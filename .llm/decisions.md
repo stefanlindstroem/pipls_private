@@ -55,29 +55,39 @@ This registry lists only numbered decisions that still define current behavior o
 | `0149-predictor-rank-search-terminology.md` | predictor-rank search terminology | use `"adaptive"`/`"exhaustive"`, preserve algorithms and achieved-coverage diagnostics, reject retired values, and reject inapplicable nondefault exhaustive mode |
 | `0150-computational-performance-guidance.md` | computational-performance guidance | central reference page, explicit cost categories, fold-local preprocessing, reproducible examples, and current implementation semantics |
 | `0151-selection-driven-refit-workflow.md` | selection-driven refit workflow | pass one compatible immutable selection through OOF reporting and final refitting; reorder analytical examples and add source-level tutorial flowcharts |
+| `0152-selection-review-feedback-workflow.md` | selection-review feedback workflow | inspect the unselected path before selecting, review conditional evidence with one feedback edge, and reserve qualification or validation for independent assessment |
 
 ## Current canonical clusters
 
 - **Mathematics and numerical construction:** 0001--0004, 0007--0009, 0014, 0025, 0032, 0092,
   0120--0121, and 0146--0149.
 - **Estimator, search, and result ownership:** 0039, 0066, 0093, 0102, 0137, 0140, 0143,
-  0145--0149, and 0151.
+  0145--0149, and 0151--0152.
 - **Datasets and product scope:** 0015, 0024--0025, 0041, 0119, 0123, and 0142.
 - **Inspection and rendering:** 0042, 0045, 0061, 0083, 0094, 0110, 0124, 0127, and 0141.
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
-  0147, 0150, and 0151.
+  0147, 0150, and 0151--0152.
 
-## Active Decision 0151 contract
+## Implemented Decision 0152 contract
+
+- Manual component-count tutorials inspect the unselected path before creating a selection.
+- Setting the chosen count and calling `search.select(...)` are one conceptual operation.
+- Selected-path, conditional-rank, and same-search OOF results form one review stage with a
+  possible feedback edge to selection; they are not independent qualification.
+- Tutorial 2 and Tutorial 3 expose separate unselected and selected component-path artifacts.
+- The accepted selection remains the exact object passed to final refitting.
+
+## Implemented Decision 0151 contract
 
 - Add `selection=` to `PiPLSSearchCV.refit()` while retaining rule-based and component-count routes.
 - Use one exact compatibility validator for selections consumed by `refit()` and `oof_report()`.
 - Reorder evidence-retaining examples around search evidence, one selection, optional OOF
-  qualification, and final refitting from that same selection.
+  inspection, and final refitting from that same selection.
 - Keep validation-only and comparison-only routes free of unnecessary final models.
 - Add one supplementary vertical Mermaid flowchart plus equivalent prose to each served tutorial,
   without committed generated diagram assets.
-- Patches 1--5 establish the runtime, reordered workflows, and strict source-level Mermaid tutorial
-  integration; Patch 6 completes the remaining public and maintainer audits.
+- The six-patch implementation is complete; Decision 0152 refines the manual tutorial review
+  sequence without changing the runtime handoff.
 
 ## Implemented Decision 0150 contract
 

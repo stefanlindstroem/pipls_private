@@ -68,7 +68,8 @@ They must not become a second copy of living prose or preserve removed migration
 ### Examples, rendering, and documentation
 
 - public imports, visible data preparation, seeded CV, route-specific
-  evidence/selection/refit order, and rendering-last structure;
+  unselected-path/selection/review/refit order, feedback-aware tutorial structure, and
+  caller-owned rendering;
 - caller-owned Matplotlib rendering from immutable arrays;
 - no private runtime imports or duplicate workflow implementations;
 - quick-start and small leave-one-out executable behavior;
@@ -218,14 +219,19 @@ Tests must verify that:
 - invalid types, incompatible provenance, and failed fits do not mutate the search or leave partial
   selection state;
 - rule-based and manual component-count refitting remain supported;
-- evidence-retaining examples create one selection before OOF reporting and final refitting, while
-  validation-only and comparison-only examples do not acquire unnecessary final models;
-- before/after selected pairs, OOF arrays, fitted predictions, and generated semantic artifacts are
+- manual evidence-retaining examples inspect an unselected component path before defining the
+  chosen component count, create one selection, then inspect the selected path, conditional rank,
+  and OOF evidence before final refitting, while validation-only and comparison-only examples do
+  not acquire unnecessary final models;
+- affected tutorial diagrams contain one feedback edge from selected-evidence review to selection,
+  initial path artifacts omit a selected marker, and selected path artifacts contain it;
+- before/after selected pairs, OOF arrays, fitted predictions, and generated numerical results are
   unchanged;
 - each served tutorial has one vertical Mermaid flowchart, equivalent prose, and strict local,
   Pages-overlay, and source-distribution rendering without committed diagram assets;
 - active public workflow guides describe analytical routes with a pre-refit `search.select()`
-  handoff and do not recover the working selection from `model.selection_`.
+  handoff, do not recover the working selection from `model.selection_`, and do not call same-search
+  OOF reporting independent qualification or validation.
 
 ## Computational-performance documentation obligations
 

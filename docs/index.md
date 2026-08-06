@@ -38,12 +38,12 @@ selection-conditioned out-of-fold validation when the fitted search is retained.
 ## Choose a tutorial
 
 After the quick start, [Inspect and select with synthetic data](tutorials/synthetic.md) introduces
-the complete selection contract in a small deterministic problem: evaluate the component path,
-create one selection for a declared paired-mode count, inspect its conditionally selected predictor
-rank, refit that exact row, and predict an independent test set.
+the complete selection contract in a small deterministic problem: inspect the unselected component
+path, choose a paired-mode count and create one selection, inspect the selected path and conditional
+predictor rank, refit that exact row, and predict an independent test set.
 
 Continue with [Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) for real-data loading,
-selection-conditioned OOF qualification before final refitting, immutable inspection results, and
+selection-conditioned OOF inspection before final refitting, immutable inspection results, and
 representative interpretation of standard PLS-family and Pi-PLS-specific plots.
 
 ## Programming reference

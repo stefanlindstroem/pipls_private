@@ -19,7 +19,6 @@ from pipls.inspection import (
 )
 
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
-CHOSEN_N_COMPONENTS = 3
 DETAILED_RESPONSE_COUNT = 3
 CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 # --8<-- [end:pulp-tutorial-setup]
@@ -31,12 +30,20 @@ predictor_names = data.feature_names
 response_names = data.target_names
 # --8<-- [end:load-pulp-data]
 
-# --8<-- [start:inspect-pulp-selection]
+# --8<-- [start:inspect-pulp-component-path]
 search = PiPLSSearchCV(cv=CV).fit(X, Y)
 path = search.component_path_
+# --8<-- [end:inspect-pulp-component-path]
+
+# --8<-- [start:choose-pulp-selection]
+CHOSEN_N_COMPONENTS = 3
 selection = search.select(n_components=CHOSEN_N_COMPONENTS)
+# --8<-- [end:choose-pulp-selection]
+
+# --8<-- [start:inspect-pulp-selected-evidence]
+selected_path = search.component_path_
 rank_profile = search.predictor_rank_profile(selection.n_components)
-# --8<-- [end:inspect-pulp-selection]
+# --8<-- [end:inspect-pulp-selected-evidence]
 
 # --8<-- [start:pulp-oof-predictions]
 report = search.oof_report(
@@ -47,6 +54,14 @@ report = search.oof_report(
 oof_predictions = report.oof_predictions
 # --8<-- [end:pulp-oof-predictions]
 
+# --8<-- [start:pulp-oof-inspection-results]
+diagnostics = prediction_diagnostics(
+    Y,
+    oof_predictions,
+    prediction_kind="selection-conditioned OOF predictions",
+)
+# --8<-- [end:pulp-oof-inspection-results]
+
 # --8<-- [start:fit-pulp-model]
 model = search.refit(
     X,
@@ -55,19 +70,14 @@ model = search.refit(
 )
 # --8<-- [end:fit-pulp-model]
 
-# --8<-- [start:pulp-inspection-results]
+# --8<-- [start:pulp-fitted-model-inspection-results]
 factors = pipls_display_factors(
     model.decomposition_,
     response_index=response_names.index("TI"),
     response_sign="positive",
 )
 structure = latent_structure(model)
-diagnostics = prediction_diagnostics(
-    Y,
-    oof_predictions,
-    prediction_kind="selection-conditioned OOF predictions",
-)
-# --8<-- [end:pulp-inspection-results]
+# --8<-- [end:pulp-fitted-model-inspection-results]
 
 # --8<-- [start:plot-pulp-component-path]
 figure, axis = plt.subplots(
@@ -81,6 +91,29 @@ axis.errorbar(
     fmt="o-",
     capsize=4,
 )
+axis.set_xlabel("Number of components")
+axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
+axis.set_title(r"Pulp $\Pi$-PLS component path before selection")
+axis.set_xticks(path.n_components)
+upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
+axis.set_ylim(0.0, max(1.0, 1.05 * upper))
+axis.grid(axis="y", alpha=0.25)
+figure.savefig(ANALYSIS_DIR / "component_path.pdf")
+plt.close(figure)
+# --8<-- [end:plot-pulp-component-path]
+
+# --8<-- [start:plot-pulp-selected-component-path]
+figure, axis = plt.subplots(
+    figsize=(7.4, 4.8),
+    layout="constrained",
+)
+axis.errorbar(
+    selected_path.n_components,
+    selected_path.cv_mse_mean,
+    yerr=selected_path.cv_mse_std,
+    fmt="o-",
+    capsize=4,
+)
 axis.scatter(
     [selection.n_components],
     [selection.cv_mse_mean],
@@ -91,15 +124,15 @@ axis.scatter(
 )
 axis.set_xlabel("Number of components")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
-axis.set_title(r"Pulp $\Pi$-PLS component path")
-axis.set_xticks(path.n_components)
-upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
+axis.set_title(r"Pulp $\Pi$-PLS selected component path")
+axis.set_xticks(selected_path.n_components)
+upper = float(np.max(selected_path.cv_mse_mean + selected_path.cv_mse_std))
 axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)
 axis.legend()
-figure.savefig(ANALYSIS_DIR / "component_path.pdf")
+figure.savefig(ANALYSIS_DIR / "selected_component_path.pdf")
 plt.close(figure)
-# --8<-- [end:plot-pulp-component-path]
+# --8<-- [end:plot-pulp-selected-component-path]
 
 # --8<-- [start:plot-pulp-rank-profile]
 # Plot the conditional predictor-rank profile at the chosen component count.

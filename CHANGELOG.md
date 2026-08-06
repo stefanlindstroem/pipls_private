@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Refine the manual tutorial workflow around an explicit review step. Tutorials 2 and 3 now show
+  the unselected component path before the component count is chosen, combine setting that count
+  with creating the immutable selection, review the selected path and conditional rank or OOF
+  evidence with one possible return to selection, and reserve qualification or validation for
+  independent assessment. Add separate selected-path figures without changing numerical results.
 - Add `selection=` to `PiPLSSearchCV.refit()`. One existing compatible immutable selection can now
   configure both OOF reporting and final full-data fitting; `refit()` and `oof_report()` share exact
   provenance validation, the returned estimator retains the exact supplied object as `selection_`,

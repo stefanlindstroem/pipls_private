@@ -1,4 +1,4 @@
-"""Select a paired-mode count and fit Pi-PLS on deterministic synthetic data."""
+"""Inspect a component path, select one pair, and fit synthetic Pi-PLS."""
 
 from pathlib import Path
 
@@ -14,7 +14,6 @@ from pipls.datasets import make_pipls_train_test
 from pipls.inspection import prediction_diagnostics
 
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "synthetic_tutorial"
-CHOSEN_N_COMPONENTS = 2
 # --8<-- [start:define-synthetic-cv]
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
 # --8<-- [end:define-synthetic-cv]
@@ -38,11 +37,19 @@ train, test = make_pipls_train_test(
 search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
 # --8<-- [end:fit-synthetic-search]
 
-# --8<-- [start:inspect-synthetic-selection]
+# --8<-- [start:inspect-synthetic-component-path]
 path = search.component_path_
+# --8<-- [end:inspect-synthetic-component-path]
+
+# --8<-- [start:choose-synthetic-selection]
+CHOSEN_N_COMPONENTS = 2
 selection = search.select(n_components=CHOSEN_N_COMPONENTS)
+# --8<-- [end:choose-synthetic-selection]
+
+# --8<-- [start:inspect-synthetic-selected-evidence]
+selected_path = search.component_path_
 rank_profile = search.predictor_rank_profile(selection.n_components)
-# --8<-- [end:inspect-synthetic-selection]
+# --8<-- [end:inspect-synthetic-selected-evidence]
 
 # --8<-- [start:refit-synthetic-model]
 model = search.refit(
@@ -70,6 +77,26 @@ axis.errorbar(
     fmt="o-",
     capsize=4,
 )
+axis.set_xlabel("Number of components")
+axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
+axis.set_title(r"Synthetic $\Pi$-PLS component path before selection")
+axis.set_xticks(path.n_components)
+upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
+axis.set_ylim(0.0, max(1.0, 1.05 * upper))
+axis.grid(axis="y", alpha=0.25)
+figure.savefig(ANALYSIS_DIR / "component_path.pdf")
+plt.close(figure)
+# --8<-- [end:plot-synthetic-component-path]
+
+# --8<-- [start:plot-synthetic-selected-component-path]
+figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
+axis.errorbar(
+    selected_path.n_components,
+    selected_path.cv_mse_mean,
+    yerr=selected_path.cv_mse_std,
+    fmt="o-",
+    capsize=4,
+)
 axis.scatter(
     [selection.n_components],
     [selection.cv_mse_mean],
@@ -80,15 +107,15 @@ axis.scatter(
 )
 axis.set_xlabel("Number of components")
 axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
-axis.set_title(r"Synthetic $\Pi$-PLS component path")
-axis.set_xticks(path.n_components)
-upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
+axis.set_title(r"Synthetic $\Pi$-PLS selected component path")
+axis.set_xticks(selected_path.n_components)
+upper = float(np.max(selected_path.cv_mse_mean + selected_path.cv_mse_std))
 axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)
 axis.legend()
-figure.savefig(ANALYSIS_DIR / "component_path.pdf")
+figure.savefig(ANALYSIS_DIR / "selected_component_path.pdf")
 plt.close(figure)
-# --8<-- [end:plot-synthetic-component-path]
+# --8<-- [end:plot-synthetic-selected-component-path]
 
 # --8<-- [start:plot-synthetic-rank-profile]
 figure, axis = plt.subplots(figsize=(7.0, 4.5), layout="constrained")
@@ -114,9 +141,7 @@ axis.set_title(
     f"{selection.n_components} components"
 )
 axis.set_xticks(rank_profile.predictor_rank)
-upper = float(
-    np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_std)
-)
+upper = float(np.max(rank_profile.cv_mse_mean + rank_profile.cv_mse_std))
 axis.set_ylim(0.0, max(1.0, 1.05 * upper))
 axis.grid(axis="y", alpha=0.25)
 axis.legend()

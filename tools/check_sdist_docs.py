@@ -19,11 +19,13 @@ from pathlib import Path
 QUICK_START_FIGURES = ("observed_vs_fitted.svg",)
 SYNTHETIC_TUTORIAL_FIGURES = (
     "component_path.svg",
+    "selected_component_path.svg",
     "predictor_rank_profile.svg",
     "observed_vs_predicted.svg",
 )
 PULP_TUTORIAL_FIGURES = (
     "component_path.svg",
+    "selected_component_path.svg",
     "predictor_rank_profile.svg",
     "biplot.svg",
     "predictor_directions.svg",
@@ -43,22 +45,24 @@ TUTORIAL_WORKFLOWS = {
     ),
     "synthetic": (
         "Generate training and test data",
-        "Search candidate models",
-        "Inspect search evidence",
-        "Create one selection",
-        "Refit the exact selection",
+        "Fit search",
+        "Inspect component path",
+        "Choose component count and create selection",
+        "Inspect selected path and conditional rank profile",
+        "Refit the same selection",
         "Predict external test data",
-        "Render results",
+        "revise if dissatisfied",
     ),
     "pulp": (
         "Load Pulp data",
-        "Search candidate models",
-        "Inspect search evidence",
-        "Create one selection",
-        "Qualify with OOF predictions",
-        "Refit the exact selection",
+        "Fit search",
+        "Inspect component path",
+        "Choose component count and create selection",
+        "Inspect selected path, conditional rank profile, and OOF predictions",
+        "Refit the same selection",
         "Inspect the fitted model",
         "Render reports",
+        "revise if dissatisfied",
     ),
 }
 
@@ -338,8 +342,20 @@ def main() -> None:
             / "assets"
             / "generated"
             / "synthetic"
+            / "selected_component_path.svg",
+            source
+            / "site"
+            / "assets"
+            / "generated"
+            / "synthetic"
             / "observed_vs_predicted.svg",
             source / "site" / "assets" / "generated" / "pulp" / "component_path.svg",
+            source
+            / "site"
+            / "assets"
+            / "generated"
+            / "pulp"
+            / "selected_component_path.svg",
             source
             / "site"
             / "assets"

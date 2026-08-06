@@ -58,6 +58,11 @@ Decision 0151 implements `refit(selection=...)` as the exact-selection handoff f
 workflows. Rule-based and component-count refitting remain the compact route. Existing selections
 use one compatibility definition across OOF reporting and final refitting.
 
+Decision 0152 refines manual tutorial presentation. Inspect the unselected component path before
+choosing a component count, treat setting that value and `search.select(...)` as one operation,
+then review the selected path and conditional evidence with one possible return to selection.
+Same-search OOF reporting is inspection rather than independent qualification.
+
 ### Analysis
 
 Pi-PLS-specific factorization inspection and shared PLS-family diagnostics are pure numerical
@@ -77,7 +82,7 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decisions 0148--0151 are implemented. The current repository has no active public-API or tutorial
+Decisions 0148--0152 are implemented. The current repository has no active public-API or tutorial
 migration increment. New work should begin with an owner decision when it changes scientific scope,
 public behavior, or maintained workflow structure.
 

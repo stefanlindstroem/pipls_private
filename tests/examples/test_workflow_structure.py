@@ -36,13 +36,17 @@ _SEARCH_EVIDENCE_CALLS = {
     "oof_report",
     "predictor_rank_profile",
 }
+_SELECTION_EVIDENCE_ANALYSIS_CALLS = {"prediction_diagnostics"}
 _FITTED_MODEL_ANALYSIS_CALLS = {
     "latent_structure",
     "observation_diagnostics",
     "pipls_display_factors",
-    "prediction_diagnostics",
 }
-_ANALYSIS_CALLS = _SEARCH_EVIDENCE_CALLS | _FITTED_MODEL_ANALYSIS_CALLS
+_ANALYSIS_CALLS = (
+    _SEARCH_EVIDENCE_CALLS
+    | _SELECTION_EVIDENCE_ANALYSIS_CALLS
+    | _FITTED_MODEL_ANALYSIS_CALLS
+)
 _SYNTHETIC_SELECTION_WORKFLOWS = (
     "examples/02_synthetic_path_selection.py",
     "tools/render_synthetic_tutorial.py",
@@ -243,7 +247,7 @@ def test_ordinary_pls_is_confined_to_the_comparison_support() -> None:
 
 
 @pytest.mark.parametrize("relative_path", _SYNTHETIC_SELECTION_WORKFLOWS)
-def test_synthetic_selection_evidence_precedes_refit_and_rendering(
+def test_synthetic_selection_review_precedes_refit(
     relative_path: str,
 ) -> None:
     tree = parse_module(_repository_root() / relative_path)
@@ -262,17 +266,23 @@ def test_synthetic_selection_evidence_precedes_refit_and_rendering(
     assert len(prediction_lines) == 1
     assert rendering_lines
     assert select_lines[0] < profile_lines[0] < refit_lines[0]
-    assert refit_lines[0] < prediction_lines[0] < min(rendering_lines)
+    assert refit_lines[0] < prediction_lines[0]
+
+    if relative_path.startswith("tools/"):
+        assert min(rendering_lines) < select_lines[0]
+        assert any(profile_lines[0] < line < refit_lines[0] for line in rendering_lines)
+        assert prediction_lines[0] < max(rendering_lines)
+    else:
+        assert prediction_lines[0] < min(rendering_lines)
 
     select_call = calls_named(scope, "select")[0]
-    assert keyword_constant(select_call, "n_components") is None
     component_keyword = next(
         keyword
         for keyword in select_call.keywords
         if keyword.arg == "n_components"
     )
     assert isinstance(component_keyword.value, ast.Name)
-    assert component_keyword.value.id == "CHOSEN_N_COMPONENTS"
+    assert component_keyword.value.id in {"CHOSEN_N_COMPONENTS", "chosen_n_components"}
 
     refit_call = calls_named(scope, "refit")[0]
     assert _keyword_path(refit_call, "selection") == "selection"
@@ -281,7 +291,7 @@ def test_synthetic_selection_evidence_precedes_refit_and_rendering(
 
 
 @pytest.mark.parametrize("relative_path", _SELECTION_DRIVEN_REAL_DATA_WORKFLOWS)
-def test_real_data_selection_evidence_precedes_refit_and_rendering(
+def test_real_data_selection_review_precedes_refit(
     relative_path: str,
 ) -> None:
     path = _repository_root() / relative_path
@@ -291,6 +301,7 @@ def test_real_data_selection_evidence_precedes_refit_and_rendering(
     select_lines = call_lines(scope, {"select"})
     profile_lines = call_lines(scope, {"predictor_rank_profile"})
     report_lines = call_lines(scope, {"oof_report"})
+    diagnostic_lines = call_lines(scope, _SELECTION_EVIDENCE_ANALYSIS_CALLS)
     refit_lines = call_lines(scope, {"refit"})
     fitted_analysis_lines = call_lines(scope, _FITTED_MODEL_ANALYSIS_CALLS)
     rendering_names = _RENDERING_METHODS | _rendering_function_names(tree)
@@ -299,12 +310,25 @@ def test_real_data_selection_evidence_precedes_refit_and_rendering(
     assert len(select_lines) == 1
     assert len(profile_lines) == 1
     assert len(report_lines) == 1
+    assert len(diagnostic_lines) == 1
     assert len(refit_lines) == 1
     assert fitted_analysis_lines
     assert rendering_lines
-    assert select_lines[0] < profile_lines[0] < report_lines[0] < refit_lines[0]
-    assert refit_lines[0] < min(fitted_analysis_lines)
-    assert max(fitted_analysis_lines) < min(rendering_lines)
+    assert (
+        select_lines[0]
+        < profile_lines[0]
+        < report_lines[0]
+        < diagnostic_lines[0]
+        < refit_lines[0]
+        < min(fitted_analysis_lines)
+    )
+
+    if relative_path.startswith("tools/"):
+        assert min(rendering_lines) < select_lines[0]
+        assert any(profile_lines[0] < line < refit_lines[0] for line in rendering_lines)
+        assert max(fitted_analysis_lines) < max(rendering_lines)
+    else:
+        assert max(fitted_analysis_lines) < min(rendering_lines)
 
     report_call = calls_named(scope, "oof_report")[0]
     refit_call = calls_named(scope, "refit")[0]
@@ -316,6 +340,43 @@ def test_real_data_selection_evidence_precedes_refit_and_rendering(
         not (isinstance(node, ast.Attribute) and node.attr == "selection_")
         for node in ast.walk(scope)
     ), path
+
+
+@pytest.mark.parametrize(
+    ("relative_path", "first_stage", "selection_stage", "review_stage"),
+    [
+        (
+            "examples/02_synthetic_path_selection.py",
+            "inspect-synthetic-component-path",
+            "choose-synthetic-selection",
+            "inspect-synthetic-selected-evidence",
+        ),
+        (
+            "examples/05_pulp_real_data.py",
+            "inspect-pulp-component-path",
+            "choose-pulp-selection",
+            "inspect-pulp-selected-evidence",
+        ),
+    ],
+)
+def test_manual_tutorial_sources_separate_path_selection_and_review(
+    relative_path: str,
+    first_stage: str,
+    selection_stage: str,
+    review_stage: str,
+) -> None:
+    text = (_repository_root() / relative_path).read_text(encoding="utf-8")
+
+    first = text.index(f"# --8<-- [start:{first_stage}]")
+    selection = text.index(f"# --8<-- [start:{selection_stage}]")
+    selection_end = text.index(f"# --8<-- [end:{selection_stage}]")
+    review = text.index(f"# --8<-- [start:{review_stage}]")
+    chosen = text.index("CHOSEN_N_COMPONENTS")
+    select_call = text.index("selection = search.select")
+
+    assert first < selection < review
+    assert selection < chosen < selection_end
+    assert selection < select_call < selection_end
 
 
 @pytest.mark.parametrize(

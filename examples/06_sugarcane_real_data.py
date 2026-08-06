@@ -311,29 +311,29 @@ def main() -> None:
     selection = search.select(n_components=CHOSEN_N_COMPONENTS)
     rank_profile = search.predictor_rank_profile(selection.n_components)
 
-    # Qualify that same selection through the materialized validation splits.
+    # Inspect the same selection through the materialized validation splits.
     report = search.oof_report(
         X,
         Y,
         selection=selection,
     )
     oof_predictions = report.oof_predictions
+    diagnostics = prediction_diagnostics(
+        Y,
+        oof_predictions,
+        prediction_kind="selection-conditioned OOF predictions",
+    )
 
-    # Refit the exact qualified selection on all development observations.
+    # Refit the accepted selection on all development observations.
     model = search.refit(
         X,
         Y,
         selection=selection,
     )
 
-    # Calculate fitted-model and prediction inspection results.
+    # Calculate fitted-model inspection results.
     factors = pipls_display_factors(model.decomposition_)
     structure = latent_structure(model)
-    diagnostics = prediction_diagnostics(
-        Y,
-        oof_predictions,
-        prediction_kind="selection-conditioned OOF predictions",
-    )
 
     # Render the final reports from completed public result objects.
     _plot_component_path(path, ANALYSIS_DIR / "component_path.pdf")
