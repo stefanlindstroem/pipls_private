@@ -142,36 +142,20 @@ def _materialize_cv_splits(
     )
 
 
-def _splits_are_leave_one_out(
-    splits: tuple[CVSplit, ...],
-    *,
-    n_samples: int,
-) -> bool:
-    """Return whether splits form an ordered leave-one-out partition."""
-
-    if len(splits) != n_samples or any(validation.size != 1 for _, validation in splits):
-        return False
-    counts = np.zeros(n_samples, dtype=np.intp)
-    for _, validation in splits:
-        counts[validation] += 1
-    return bool(np.all(counts == 1))
-
-
-def _validate_singleton_fold_scoring(
+def _validate_singleton_validation_scoring(
     scoring: object,
     splits: tuple[CVSplit, ...],
 ) -> None:
-    """Reject ordinary R2 scoring when any validation fold is a singleton."""
+    """Reject ordinary R2 scoring for singleton validation sets."""
 
     if not any(validation.size == 1 for _, validation in splits):
         return
     score_func = getattr(scoring, "_score_func", None)
     if scoring is None or scoring == "r2" or score_func is r2_score:
         raise ValueError(
-            "R2 scoring is undefined for singleton validation folds. Use "
-            "pipls.metrics.neg_response_standardized_mse or another "
-            "singleton-safe scorer, and compute pooled OOF R2 only as a "
-            "secondary diagnostic."
+            "R2 scoring is undefined when a validation split contains fewer "
+            "than two observations. Use a scorer defined for singleton "
+            "validation sets."
         )
 
 

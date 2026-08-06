@@ -148,6 +148,10 @@ Coverage representation is exact:
 Pooled OOF R2 is computed only over covered observations and is `None` when fewer than two covered
 rows make it undefined. The report does not rescore candidates or fit a full-data model.
 
+Foldwise $R^2$ scoring is rejected when any validation split contains fewer than two observations.
+This is a protocol-neutral scorer-domain check; it does not identify or attach provenance for the
+validation protocol that produced the singleton split.
+
 ## Immutable public results
 
 Public result records defensively copy arrays, make them read-only, normalize accepted NumPy

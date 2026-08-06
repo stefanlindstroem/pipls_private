@@ -9,7 +9,6 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ._result_validation import (
-    _boolean,
     _finite_float,
     _read_only_float_array,
     _read_only_int_array,
@@ -26,14 +25,12 @@ IntArray = NDArray[np.intp]
 
 def _validated_oof_fields(
     *,
-    is_leave_one_out: object,
     oof_predictions: object,
     oof_prediction_counts: object,
     pooled_oof_r2: object,
-) -> tuple[bool, FloatArray, IntArray, float | None]:
+) -> tuple[FloatArray, IntArray, float | None]:
     """Normalize common immutable OOF report fields."""
 
-    leave_one_out = _boolean(is_leave_one_out, name="is_leave_one_out")
     pooled = (
         None
         if pooled_oof_r2 is None
@@ -79,7 +76,7 @@ def _validated_oof_fields(
         if np.any(~np.isnan(predictions[uncovered, :])):
             raise ValueError("Uncovered OOF predictions must be NaN.")
 
-    return leave_one_out, predictions, counts, pooled
+    return predictions, counts, pooled
 
 
 @dataclass(frozen=True)
@@ -90,8 +87,6 @@ class PiPLSOOFReport:
     ----------
     selection : PiPLSSelection
         Exact immutable selection evaluated by the report.
-    is_leave_one_out : bool
-        Whether the materialized splitter is leave-one-out.
     oof_predictions : ndarray
         Ordered OOF predictions. One-dimensional responses produce shape
         ``(n_samples,)``; multi-output responses produce
@@ -111,7 +106,6 @@ class PiPLSOOFReport:
     """
 
     selection: PiPLSSelection
-    is_leave_one_out: bool
     oof_predictions: FloatArray
     oof_prediction_counts: IntArray
     pooled_oof_r2: float | None = None
@@ -119,13 +113,11 @@ class PiPLSOOFReport:
     def __post_init__(self) -> None:
         if not isinstance(self.selection, PiPLSSelection):
             raise TypeError("selection must be a PiPLSSelection.")
-        leave_one_out, predictions, counts, pooled = _validated_oof_fields(
-            is_leave_one_out=self.is_leave_one_out,
+        predictions, counts, pooled = _validated_oof_fields(
             oof_predictions=self.oof_predictions,
             oof_prediction_counts=self.oof_prediction_counts,
             pooled_oof_r2=self.pooled_oof_r2,
         )
-        object.__setattr__(self, "is_leave_one_out", leave_one_out)
         object.__setattr__(self, "oof_predictions", predictions)
         object.__setattr__(self, "oof_prediction_counts", counts)
         object.__setattr__(self, "pooled_oof_r2", pooled)
@@ -137,7 +129,6 @@ class PiPLSOOFReport:
             type(self),
             (
                 self.selection,
-                self.is_leave_one_out,
                 self.oof_predictions,
                 self.oof_prediction_counts,
                 self.pooled_oof_r2,

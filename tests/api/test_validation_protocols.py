@@ -10,7 +10,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.metrics import r2_score
 from sklearn.model_selection import (
     GroupKFold,
-    LeaveOneOut,
+    KFold,
     PredefinedSplit,
     RepeatedKFold,
     TimeSeriesSplit,
@@ -36,9 +36,9 @@ def _fixed() -> PiPLSRegression:
     )
 
 
-def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() -> None:
+def test_ordered_oof_predictions_match_manual_fold_fits() -> None:
     X, Y = _data(12)
-    splitter = LeaveOneOut()
+    splitter = KFold(n_splits=3, shuffle=False)
     search = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
@@ -59,7 +59,6 @@ def test_path_leave_one_out_predictions_are_ordered_and_selection_conditioned() 
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
     assert report.selection.n_components == selection.n_components
     assert report.selection.predictor_rank == selection.predictor_rank
-    assert report.is_leave_one_out
     assert report.has_complete_oof_coverage
     best_index = np.flatnonzero(
         (search.cv_results_["n_components"] == selection.n_components)
@@ -163,12 +162,17 @@ def test_groups_participate_in_path_metadata_routing() -> None:
 @pytest.mark.parametrize("scoring", [None, "r2"])
 def test_singleton_validation_rejects_foldwise_r2(scoring: object) -> None:
     X, Y = _data(10)
+    indices = np.arange(X.shape[0], dtype=np.intp)
+    splits = [
+        (np.delete(indices, validation), np.asarray([validation], dtype=np.intp))
+        for validation in indices
+    ]
     estimator = PiPLSSearchCV(
         estimator=_fixed(),
         n_components_values=[1],
         predictor_rank_values=[2],
         max_predictor_rank=2,
-        cv=LeaveOneOut(),
+        cv=splits,
         scoring=scoring,
     )
 

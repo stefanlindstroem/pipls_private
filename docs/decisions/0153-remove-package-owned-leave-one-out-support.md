@@ -2,11 +2,11 @@
 
 ## Status
 
-Accepted. Implementation is planned in five patches. Patch 1 establishes the removal boundary and
-synchronizes maintainer contracts without changing runtime behavior, examples, or served user
-documentation. Until the later patches are applied, the current `PiPLSOOFReport.is_leave_one_out`
-field, detector, dedicated example, and associated documentation remain present only as transitional
-implementation state.
+Accepted. Implementation is planned in five patches. Patches 1 and 2 are implemented. Patch 2
+removed `PiPLSOOFReport.is_leave_one_out` and private split-structure recognition, retained generic
+OOF reporting, and made singleton-validation scorer safety protocol-neutral. The dedicated example,
+its support documentation, example numbering, and historical decision consolidation remain for
+Patches 3--5.
 
 ## Context
 

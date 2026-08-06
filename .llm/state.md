@@ -195,11 +195,11 @@ step. Same-search OOF results are descriptive selection-conditioned evidence rat
 independent qualification. Tutorials 2 and 3 retain separate unselected and selected path
 artifacts.
 
-Decision 0153 is accepted and active. The package-owned leave-one-out detector,
-`PiPLSOOFReport.is_leave_one_out`, dedicated Example 03, support documentation, and associated tests
-will be removed in five patches while generic splitter interoperability and `oof_report()` remain.
-Patch 1 changes decisions and maintainer contracts only, so those transitional surfaces still exist
-in the current source until the later implementation patches.
+Decision 0153 is accepted and active. Patches 1 and 2 are implemented. The runtime no longer
+detects leave-one-out split structure, and `PiPLSOOFReport` no longer exposes
+`is_leave_one_out`. Generic splitter interoperability, ordered OOF reporting, and protocol-neutral
+singleton-validation scorer safety remain. Patch 3 will delete the dedicated example and test and
+renumber the remaining catalogue.
 
 ## Authority and drift handling
 

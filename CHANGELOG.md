@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Remove package-owned leave-one-out provenance from the generic OOF result: delete private
+  split-structure recognition and `PiPLSOOFReport.is_leave_one_out` without an alias, while
+  preserving ordered predictions, counts, partial coverage, pooled OOF $R^2$, splitter
+  interoperability, and protocol-neutral rejection of foldwise $R^2$ on singleton validation sets.
 - Refine the manual tutorial workflow around an explicit review step. Tutorials 2 and 3 now show
   the unselected component path before the component count is chosen, combine setting that count
   with creating the immutable selection, review the selected path and conditional rank or OOF

@@ -137,6 +137,7 @@ def test_derived_result_properties_are_not_stored_state() -> None:
         "mean_test_score",
         "cv_mse_mean",
         "has_complete_oof_coverage",
+        "is_leave_one_out",
     }
     assert derived_report_fields.isdisjoint(
         field.name for field in fields(PiPLSOOFReport)
@@ -489,7 +490,6 @@ def test_oof_report_normalizes_and_freezes_arrays() -> None:
     selection = _validation_result()
     report = PiPLSOOFReport(
         selection=selection,
-        is_leave_one_out=np.bool_(False),
         oof_predictions=np.array([[1.0, 2.0], [np.nan, np.nan], [3.0, 4.0]]),
         oof_prediction_counts=np.array([1, 0, 2], dtype=np.int64),
         pooled_oof_r2=np.float32(0.25),
@@ -497,7 +497,6 @@ def test_oof_report_normalizes_and_freezes_arrays() -> None:
 
     assert report.selection == selection
     assert type(report.has_complete_oof_coverage) is bool
-    assert type(report.is_leave_one_out) is bool
     assert not report.oof_predictions.flags.writeable
     assert not report.oof_prediction_counts.flags.writeable
     assert not report.has_complete_oof_coverage
@@ -516,17 +515,13 @@ def test_oof_report_requires_selection() -> None:
     with pytest.raises(TypeError, match="selection must be a PiPLSSelection"):
         PiPLSOOFReport(
             selection=object(),  # type: ignore[arg-type]
-            is_leave_one_out=False,
             oof_predictions=[1.0, 2.0],  # type: ignore[arg-type]
             oof_prediction_counts=[1, 1],  # type: ignore[arg-type]
         )
 
 
 def test_oof_report_enforces_oof_coverage_representation() -> None:
-    kwargs = {
-        "selection": _validation_result(),
-        "is_leave_one_out": False,
-    }
+    kwargs = {"selection": _validation_result()}
     with pytest.raises(TypeError):
         PiPLSOOFReport(**kwargs)
     with pytest.raises(ValueError, match="oof_predictions are required"):
@@ -563,10 +558,7 @@ def test_oof_report_enforces_oof_coverage_representation() -> None:
 
 @pytest.mark.parametrize(
     ("field", "value", "message"),
-    [
-        ("is_leave_one_out", 1, "must be boolean"),
-        ("pooled_oof_r2", np.inf, "finite real"),
-    ],
+    [("pooled_oof_r2", np.inf, "finite real")],
 )
 def test_oof_report_rejects_invalid_scalar_fields(
     field: str,
@@ -575,7 +567,6 @@ def test_oof_report_rejects_invalid_scalar_fields(
 ) -> None:
     kwargs = {
         "selection": _validation_result(),
-        "is_leave_one_out": False,
         "oof_predictions": [1.0, 2.0],
         "oof_prediction_counts": [1, 1],
         "pooled_oof_r2": 0.2,

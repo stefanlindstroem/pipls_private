@@ -38,10 +38,9 @@ from ._model_selection import (
     _rank_test_scores,
     _search_predictor_ranks,
     _select_tolerant_predictor_rank,
-    _splits_are_leave_one_out,
     _tied_score_mask,
     _validate_positive_int,
-    _validate_singleton_fold_scoring,
+    _validate_singleton_validation_scoring,
 )
 from ._sklearn_compat import _validate_estimator_data
 from .component_path import (
@@ -405,7 +404,7 @@ class PiPLSSearchCV(
         materialized = _materialize_cv_splits(self.cv, X_array, y_array, groups=groups)
         self._cv_splits_ = _read_only_cv_splits(materialized.splits)
         self._n_samples_fit_ = int(X_array.shape[0])
-        _validate_singleton_fold_scoring(self.scoring, self._cv_splits_)
+        _validate_singleton_validation_scoring(self.scoring, self._cv_splits_)
         self.n_splits_ = len(self._cv_splits_)
         fold_feature_limit, fold_numerical_rank_limit = _fold_predictor_limits(
             template=template,
@@ -815,10 +814,9 @@ class PiPLSSearchCV(
         )
         return PiPLSOOFReport(
             selection=compatible,
-            is_leave_one_out=values[0],
-            oof_predictions=values[1],
-            oof_prediction_counts=values[2],
-            pooled_oof_r2=values[3],
+            oof_predictions=values[0],
+            oof_prediction_counts=values[1],
+            pooled_oof_r2=values[2],
         )
 
     def _validate_selection_compatibility(
@@ -863,7 +861,7 @@ class PiPLSSearchCV(
         y: ArrayLike,
         *,
         selection: PiPLSSelection,
-    ) -> tuple[bool, FloatArray, IntArray, float | None]:
+    ) -> tuple[FloatArray, IntArray, float | None]:
         """Compute common ordered OOF report values without mutation."""
 
         check_is_fitted(self, attributes=["_cv_splits_", "_n_samples_fit_"])
@@ -918,10 +916,6 @@ class PiPLSSearchCV(
         )
         predictions = oof_predictions[:, 0] if y_array.ndim == 1 else oof_predictions
         return (
-            _splits_are_leave_one_out(
-                self._cv_splits_,
-                n_samples=self._n_samples_fit_,
-            ),
             predictions,
             counts,
             _pooled_oof_r2(y_indexable, predictions, counts),
