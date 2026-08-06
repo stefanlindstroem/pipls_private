@@ -216,7 +216,8 @@ def test_served_tutorials_have_one_vertical_workflow_flowchart() -> None:
                 "fit the search",
                 "inspect the component path",
                 "choose a component count and create one selection",
-                "inspect the selected path, conditional predictor-rank profile, and OOF predictions",
+                "inspect the selected path, conditional predictor-rank "
+                "profile, and OOF predictions",
                 "refit the same selection",
                 "inspect the fitted model",
                 "render the reports",
