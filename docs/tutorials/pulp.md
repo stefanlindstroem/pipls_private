@@ -19,12 +19,10 @@ config:
 flowchart TD
     load["Load Pulp data"]
     search["Fit search"]
-    subgraph "Selection"
-      path["Inspect component path"]
-      select["Choose component count and create selection"]
-      review["Inspect selected path, conditional rank profile, and OOF predictions"]
-      decide{"Satisfied?"}
-    end
+    path["Inspect component path"]
+    select["Choose component count and create selection"]
+    review["Inspect selected path, conditional rank profile, and OOF predictions"]
+    decide{"Satisfied?"}
     refit["Refit the same selection"]
     analyze["Inspect the fitted model"]
     render["Render reports"]

@@ -2,10 +2,11 @@
 
 ## Status
 
-Accepted. Patch 1 of the seven-patch cleanup sequence is complete. This decision establishes the
-behavioral-testing boundary and authorizes later test deletion, maintenance-tool simplification,
-caller-owned rendering refactors, and retirement of superseded implementation decisions. Runtime
-code, tests, examples, and served documentation are unchanged in Patch 1.
+Accepted. Patches 1 and 2 of the seven-patch cleanup sequence are complete. Patch 1 established
+the behavioral-testing boundary. Patch 2 removed repository-prose, documentation-literal,
+decision-text, workflow-text, configuration-literal, and compatibility-policy policing, while
+retaining focused executable coverage for the GitHub Pages configuration tool. Runtime code,
+examples, and served documentation are unchanged.
 
 ## Context
 
@@ -118,7 +119,7 @@ product-boundary decisions remain current.
 1. Establish this decision and synchronize the testing, development, current-state, strategy, and
    decision registries without deleting tests or changing runtime behavior -- complete.
 2. Remove documentation, repository-text, decision-prose, workflow-text, and configuration-literal
-   policing; retain only executable maintenance-tool behavior where justified.
+   policing; retain only executable maintenance-tool behavior where justified -- complete.
 3. Remove example-source, AST workflow, snippet-marker, plotting-literal, and generated-SVG-text
    policing; rewrite renderer tests around manifests, declared artifacts, and parseable outputs.
 4. Consolidate duplicated distribution and documentation maintenance support, replace embedded

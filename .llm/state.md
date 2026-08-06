@@ -202,8 +202,10 @@ and the retirement map use this completed boundary.
 
 Decision 0154 is accepted. A seven-patch cleanup is replacing tests that police repository prose or
 source structure with behavioral, machine-readable artifact, executable-tool, and installed-
-distribution coverage. Patch 1 establishes the policy only; the current tests and runtime remain
-unchanged until their assigned cleanup patches.
+distribution coverage. Patches 1 and 2 are complete. Pure documentation, decision, repository,
+workflow, configuration-literal, and compatibility-policy test modules are removed; the retained
+GitHub Pages configuration check executes the tool and parses its generated YAML. Runtime behavior
+is unchanged.
 
 ## Authority and drift handling
 

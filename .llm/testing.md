@@ -6,8 +6,10 @@ Tests protect durable numerical, API, data, serialization, artifact, tool, and i
 behavior. They do not serve as a second copy of source structure, documentation prose, or completed
 migration history.
 
-Decision 0154 governs the active cleanup. Existing source-content tests are transitional until their
-assigned removal patches; do not add new tests of that kind.
+Decision 0154 governs the active cleanup. Repository-prose, documentation-literal, decision-text,
+workflow-text, configuration-literal, and compatibility-policy policing was removed in Patch 2.
+Remaining example-source, AST, snippet-marker, plotting-literal, and SVG-text tests are transitional
+until Patch 3; do not add new tests of either kind.
 
 ## Behavioral boundary
 
