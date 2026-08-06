@@ -73,7 +73,7 @@ recommend `PiPLSSearchCV`.
 The implemented public surface additionally uses the explicit `n_components_values="all"`
 sentinel, conventional random-state forms, a public callable default scorer, and one canonical
 `decomposition_` location for Pi-PLS-specific fitted output. Later pre-release cleanup is summarized
-in [history.md](history.md) and canonicalized by Decision 0145.
+in [history.md](history.md); the fixed-estimator/search boundary remains canonical here.
 
 ## Consequences
 

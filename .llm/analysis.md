@@ -177,9 +177,9 @@ does not.
 
 ## Computational-performance documentation boundary
 
-Decision 0150 owns one central served reference page for training cost. It must distinguish changes
-to validation evidence, candidate coverage or model policy, numerical approximation, parallel wall
-time, and repeated OOF work. It may describe candidate-fit scaling and current execution boundaries,
+The central computational-performance guide owns the served reference for training cost. It must
+distinguish changes to validation evidence, candidate coverage or model policy, numerical
+approximation, parallel wall time, and repeated OOF work. It may describe candidate-fit scaling and current execution boundaries,
 but it must not publish machine-independent speed claims or imply that narrower validation or search
 policies are statistically equivalent.
 

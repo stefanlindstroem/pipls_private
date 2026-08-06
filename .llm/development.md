@@ -138,13 +138,13 @@
   explicitly freezes a narrow fixture.
 - Design files and command outputs for both humans and machines. When results are naturally tabular,
   prefer flat UTF-8 CSV with explicit self-explanatory columns over nested serialization.
-- Numbered examples migrated under Phase F4 operate directly on immutable path and inspection results
-  in memory. They must not write generated CSV files as analytical or plotting intermediates.
+- Numbered examples operate directly on immutable path and inspection results in memory. They must
+  not write generated CSV files as analytical or plotting intermediates.
 - Preserve `cv_mse_std` as descriptive population split dispersion. Maintained CV-MSE figures
   use it directly for symmetric $\pm 1$ SD bars. No standard-error result or selection rule is
   public. Selection lookup must not fit, refit, or mutate search state. Decision 0140 assigns that
   ownership to `search.select(...)`, and maintained examples, tutorial snippets, and living API
-  pages use that operation. Under Decisions 0151--0152, Example 06 shows the exact minimum row,
+  pages use that operation. Under Decisions 0143 and 0152, Example 06 shows the exact minimum row,
   horizontal
   10% relative-tolerance threshold, and recommended pre-refit selection, then passes that same
   object to OOF reporting and final fitting. Keep generated pages and cross-links synchronized with
@@ -153,7 +153,7 @@
   observe executable behavior, public results, or machine-readable outputs rather than prescribed
   source literals, local call order, documentation wording, diagram labels, or plotting style.
   Strict documentation, complete examples, and installed distributions are owned by their dedicated
-  Make targets under Decision 0154.
+  Make targets under Decision 0147.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.
 - Numerical changes update `.llm/numerical_contracts.md` and include deterministic boundary tests.

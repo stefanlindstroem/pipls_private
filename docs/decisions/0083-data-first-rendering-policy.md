@@ -24,15 +24,17 @@ numerical operation. Annotated biplots use Matplotlib arrows and text artists. T
 placement is heuristic and is not part of the Pi-PLS numerical contract.
 
 Matplotlib and `adjustText` remain optional dependencies under the `examples`, `docs`, and `dev`
-extras. The runtime package imports neither package. No example support helper may hide chart
-construction or read serialized analytical results for plotting.
+extras. The runtime package imports neither package. Plotting helpers may be local to the example
+or renderer that owns a figure, but no shared example framework or installed plotting layer may
+hide the numerical inputs or report composition.
 
 ## Consequences
 
 - `pipls.inspection` is the public numerical analysis surface.
 - Users may render results with Matplotlib, another graphics library, or no graphics system.
 - Tutorials expose the result fields used for each maintained chart.
-- Structural tests protect module absence, optional dependency boundaries, direct rendering,
-  biplot-coordinate use, and runtime imports without graphics dependencies.
-- Exact visual styling, automatically adjusted label positions, and incidental artist counts are
-  not compatibility contracts.
+- Behavioral tests protect runtime imports without graphics dependencies, absence of a package-
+  owned plotting module, successful renderer execution, semantic manifests, and parseable
+  generated artifacts.
+- Exact visual styling, source arrangement, automatically adjusted label positions, and
+  incidental artist counts are not compatibility contracts.

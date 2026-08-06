@@ -4,8 +4,8 @@
 
 Accepted and implemented. Decision 0146 refines the Tobacco component-count rule and replaces
 standard-error presentation with split-SD presentation. Decision 0148 adds the separate predictor-
-rank tolerance demonstration. Decision 0151 refines the workflow so the profile and final refit
-consume one selection created before fitting the final model.
+rank tolerance demonstration. The profile and final refit consume one selection created before
+fitting the final model.
 
 ## Context
 

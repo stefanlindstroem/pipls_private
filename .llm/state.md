@@ -163,54 +163,25 @@ and are learned within each training fold during search.
 
 ## Current maintenance status
 
-Decision 0147 is implemented. Decision records, maintainer context, structural tests, snapshot
-policy, and dataset-module ownership are in their normalized current form.
+The decision lifecycle is normalized under Decision 0147. Current decisions describe durable
+scientific, numerical, API, data, documentation, compatibility, and repository contracts; completed
+migrations and cleanup sequences are summarized in `docs/decisions/history.md` and mapped in
+`docs/decisions/retirements.md`.
 
-Decision 0148 is implemented. Predictor-rank tolerances, conditioned component-path selection,
-immutable rank evidence, and the separate Tobacco predictor-rank and component-count demonstrations
-are part of the current package contract.
+Predictor-rank coverage uses the public values `"adaptive"` and `"exhaustive"` under Decision 0007.
+The served computational-performance guide documents fit counts, validation repetitions, rank
+coverage, SVD choices, parallelism, OOF reuse, and work inspection.
 
-Decision 0149 is implemented. The runtime API, maintained examples, public documentation,
-retained decisions, tests, and distribution checks use `search_method="adaptive"` and
-`search_method="exhaustive"`; the former values are rejected without aliases.
+Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
+`refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection
+provenance. Decision 0152 owns the manual selection-review presentation used by Tutorials 2 and 3.
+The package has no dedicated leave-one-out mode, detector, provenance field, example, or support
+promise; compatible user-supplied splitters remain ordinary interoperability.
 
-Decision 0150 is implemented. The served computational-performance guide documents candidate-fit
-scaling, validation repetitions, adaptive and exhaustive rank coverage, fixed and restricted
-paths, randomized predictor SVD, parallel execution, OOF reuse, and work inspection. Public guides
-route to it, and source-distribution documentation validation protects its shipped and rendered
-forms.
-
-Decision 0151 is implemented. `refit(selection=...)` shares exact compatibility validation with
-`oof_report(selection=...)`; evidence-retaining examples and guides pass one pre-refit selection
-through search inspection, optional OOF inspection, and final fitting. Every served tutorial has
-one source-level Mermaid flowchart with equivalent prose, and strict local, inherited Pages-overlay,
-and source-distribution checks protect diagram rendering. The former presentation increment from
-Decision 0139 is superseded.
-
-Decision 0152 is implemented. Manual component-count tutorials first inspect an unselected path,
-then choose the component count and create one selection, then review the selected path and
-conditional rank or OOF evidence. Their diagrams contain one possible return to the selection
-step. Same-search OOF results are descriptive selection-conditioned evidence rather than
-independent qualification. Tutorials 2 and 3 retain separate unselected and selected path
-artifacts.
-
-Decision 0153 is implemented. Package-owned protocol detection, provenance, examples, support
-claims, and dedicated tests are removed. The maintained example catalogue is contiguous from 01
-through 06. Generic splitter interoperability, ordered OOF reporting, partial and repeated coverage,
-pooled OOF $R^2$, and protocol-neutral singleton-validation scorer safety remain. Current decisions
-and the retirement map use this completed boundary.
-
-Decision 0154 is accepted. A seven-patch cleanup is replacing tests that police repository prose or
-source structure with behavioral, machine-readable artifact, executable-tool, and installed-
-distribution coverage. Patches 1--6 are complete. Pure documentation, decision, repository,
-workflow, configuration-literal, compatibility-policy, example-source, AST-workflow, snippet-
-marker, plotting-literal, SVG-text, and historical-name tombstone tests are removed. Artifact
-validation shares private subprocess, virtual-environment, archive, and artifact helpers; installed
-and source-distribution checks execute checked-in behavior; public-result tests assert current fields
-rather than removed aliases; and overlapping selection, OOF, pickle, and search-nonmutation tests are
-consolidated. The Pulp example and tutorial renderer now delegate figure construction and manifest
-writing to caller-local helpers while preserving analytical order and byte-identical tutorial
-artifacts. Runtime behavior and the installed package surface are unchanged.
+Tests now protect behavior and machine-readable outputs rather than repository prose or source
+arrangement. Distribution and documentation validation share private maintenance helpers, and the
+Pulp example and tutorial renderer use caller-local plotting functions. Runtime behavior and the
+installed package surface are unchanged.
 
 ## Authority and drift handling
 

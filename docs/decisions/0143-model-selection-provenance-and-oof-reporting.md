@@ -3,9 +3,8 @@
 ## Status
 
 Accepted and implemented. Decisions 0146 and 0148 refine component-count and conditional
-predictor-rank provenance. Decision 0151 further lets `refit()` consume an existing compatible
-selection and refines the evidence-to-review-to-refit workflow order. Decision 0153 removes
-protocol-specific classification from the report while preserving this generic OOF contract.
+predictor-rank provenance. This decision is the canonical contract for exact selection handoff,
+generic OOF reporting, and protocol-neutral report contents.
 
 ## Context
 
@@ -33,10 +32,10 @@ The value is the exact immutable `PiPLSSelection` used to configure the full-dat
 attached to the returned outer object only after fitting succeeds. A `PiPLSRegression` fitted
 directly has no `selection_` attribute because no search-owned selection occurred.
 
-`refit()` returns only the fitted estimator. It can resolve a rule or component count directly or,
-under Decision 0151, consume an existing exactly compatible `PiPLSSelection`. In the latter case the
-exact supplied immutable object becomes `model.selection_`. The method does not retain a selected
-fitted model on the search object and does not return a wrapper or tuple.
+`refit()` returns only the fitted estimator. It can resolve a rule or component count directly or
+consume an existing exactly compatible `PiPLSSelection`. In the latter case the exact supplied
+immutable object becomes `model.selection_`. The method does not retain a selected fitted model on
+the search object and does not return a wrapper or tuple.
 
 ### Selection results retain policy provenance
 
@@ -93,7 +92,9 @@ retain supplied matrices, or mutate the search.
 
 An OOF report based on a search-owned selection is a selection-conditioned diagnostic. It is not
 nested cross-validation or an external-test estimate. The report carries no classifier for the
-validation protocol represented by the stored splits.
+validation protocol represented by the stored splits, and the package provides no dedicated
+leave-one-out mode or provenance field. Users may still supply any compatible splitter or explicit
+split iterable intentionally.
 
 ### Workflow order
 

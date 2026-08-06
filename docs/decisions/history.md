@@ -44,13 +44,13 @@ Current canonical records: [0015](0015-dataset-and-synthetic-api.md),
 ## Examples and documentation
 
 The example series evolved through several numbering, ownership, and tutorial arrangements. The
-maintained outcome is a self-contained seven-example route led by an automatic Pulp fit, followed by
-inspect-decide-refit mechanics and selection-conditioned validation and interpretation. Served
+maintained outcome is a self-contained six-example route led by an automatic Pulp fit, followed by
+manual selection review, path comparison, and complete real-data interpretation workflows. Served
 documentation is self-contained, separates tutorials, guides, and generated reference, and keeps
 maintainer decisions outside the user site.
 
 Current canonical records: [0065](0065-documentation-layer-consolidation.md),
-[0139](0139-three-stage-user-onboarding.md), and the product and workflow boundaries in
+[0152](0152-selection-review-feedback-workflow.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
 [0045](0045-pls-family-analysis-boundary.md), and
 [0142](0142-package-owned-reference-datasets.md).
@@ -67,8 +67,7 @@ Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0061](0061-example-owned-report-composition.md),
 [0083](0083-data-first-rendering-policy.md), [0094](0094-inspection-result-safety.md),
 [0110](0110-response-anchored-display-factors.md),
-[0124](0124-mathematical-typography-and-subscripts.md),
-[0127](0127-artifact-based-rendering-validation.md), and
+[0124](0124-mathematical-typography-and-subscripts.md), and
 [0141](0141-spectral-predictor-rank-profile-figures.md).
 
 ## Packaging and release engineering
@@ -94,10 +93,28 @@ helpers. Those intermediate records are historical because no compatibility peri
 version `0.0.0`. The current names and export boundaries are defined by the mathematical terminology,
 result invariants, focused modules, and final implementation-surface decision.
 
-Current canonical records: [0093](0093-public-result-invariants.md),
+Current canonical records: [0039](0039-fixed-estimator-path-search-boundary.md),
+[0093](0093-public-result-invariants.md),
 [0120](0120-companion-manuscript-theory-alignment.md),
-[0121](0121-canonical-pipls-terminology.md),
-[0145](0145-final-implementation-surface-cleanup.md), and the current API decisions listed above.
+[0121](0121-canonical-pipls-terminology.md), and the current API decisions listed above.
+
+## Completed workflow, terminology, and cleanup sequences
+
+Several late pre-release records described bounded migrations rather than independent durable
+contracts. The three-stage onboarding sequence was completed and refined into the current
+selection-review workflow. The search-policy rename settled on `"adaptive"` and `"exhaustive"`, the
+computational-performance guide became ordinary served documentation, exact selection handoff was
+folded into the generic provenance and OOF contract, package-owned leave-one-out support was removed,
+and the behavioral test-suite cleanup replaced source and prose policing with executable boundaries.
+
+Current canonical records: [0007](0007-predictor-rank-search-policies.md),
+[0065](0065-documentation-layer-consolidation.md),
+[0083](0083-data-first-rendering-policy.md),
+[0143](0143-model-selection-provenance-and-oof-reporting.md),
+[0147](0147-decision-lifecycle-and-maintainer-context.md), and
+[0152](0152-selection-review-feedback-workflow.md). The served
+[computational-performance guide](../computational_performance.md) records the current user-facing
+performance guidance.
 
 ## Retired experiments and one-off cleanups
 

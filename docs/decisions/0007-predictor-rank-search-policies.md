@@ -26,7 +26,8 @@ irreversibly discard the region containing the global minimum.
 one rank candidate per component count. They do not require a candidate-coverage choice. Decision
 0148 refines final retained-rank selection: after either optimized coverage policy finishes candidate
 evaluation, separate public relative and absolute tolerances retain the smallest qualifying
-evaluated rank. Decision 0149 establishes the public values above without compatibility aliases.
+evaluated rank. The public values are `"adaptive"` and `"exhaustive"`; no aliases are retained
+for earlier pre-release spellings.
 
 ## Adaptive-search contract
 

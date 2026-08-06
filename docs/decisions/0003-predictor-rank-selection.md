@@ -39,6 +39,5 @@ rule-derived bound even when an explicit integer rank is used.
 
 ## Refinement
 
-Decision 0007 defines exhaustive and adaptive candidate coverage. Decision 0149 establishes the
-implemented public values `"exhaustive"` and `"adaptive"`, with cached evaluations and explicit
-diagnostics.
+Decision 0007 defines exhaustive and adaptive candidate coverage, the implemented public values
+`"exhaustive"` and `"adaptive"`, cached evaluations, and explicit diagnostics.

@@ -10,8 +10,8 @@ not independent qualification or validation.
 
 ## Context
 
-Decision 0151 established one immutable selection as the handoff to OOF reporting and final
-refitting. Its first tutorial diagrams compressed all search evidence into one inspection step and
+Decision 0143 establishes one immutable selection as the handoff to OOF reporting and final
+refitting. The first tutorial diagrams compressed all search evidence into one inspection step and
 used the phrase "qualify the selection" for optional OOF reporting.
 
 That presentation hides two distinct questions in manual component-count workflows:
@@ -105,10 +105,10 @@ search result already exists. This is consistent with data-first rendering: nume
 remain explicit and rendering remains caller-owned. It does not add package plotting APIs or hide
 selection inside a rendering helper.
 
-### Refine earlier workflow decisions
+### Refine the current workflow decisions
 
-This decision refines the pedagogical ordering and terminology in Decisions 0139 and 0151. Their
-remaining contracts are unchanged:
+This decision refines the pedagogical ordering and terminology in Decisions 0137 and 0143 and the
+documentation ownership in Decision 0065. Their remaining contracts are unchanged:
 
 - search fitting creates evidence rather than a final model;
 - one immutable selection is passed to every selection-conditioned operation;
@@ -124,29 +124,16 @@ creating the selection in one node, combine retrieval and plotting within inspec
 include a dashed return edge from selected-evidence review to selection.
 
 The Pulp, Sugarcane, and Tobacco workflows calculate selection-conditioned OOF diagnostics before
-final refitting. Fitted-model inspection remains after refitting. Public catalogues, maintainer
-records, and the changelog use the same terminology. Decision 0153 subsequently removes the
-dedicated protocol-specific validation example and renumbers the complete real-data examples to
-04--06 without changing this review sequence.
+final refitting. Fitted-model inspection remains after refitting. Public catalogues, maintainer records, and the changelog use the same terminology. The maintained
+example catalogue is contiguous from 01 through 06; no dedicated protocol-specific validation
+example remains.
 
 ## Validation obligations
 
-The implemented workflow must verify that:
-
-- manual tutorial examples retrieve the component path before defining their chosen component count;
-- the chosen value and `search.select(...)` occur in one checked source stage;
-- predictor-rank-profile and OOF inspection follow selection and precede final refitting;
-- the same named selection is passed to OOF reporting and final refitting;
-- fitted-model inspection follows final refitting;
-- each affected Mermaid diagram contains one feedback edge from selected-evidence review to
-  selection;
-- the initial path artifact contains no selected marker and the selected path artifact does;
-- generated manifests include both path artifacts;
-- selected pairs, CV-MSE values, OOF predictions, fitted predictions, and model results are
-  numerically unchanged;
-- active workflow prose does not describe same-search OOF reporting as qualification or independent
-  validation;
-- no generated Mermaid asset is committed.
+The complete examples and strict documentation build must execute the workflow shown above.
+Behavior-preserving changes must preserve selected pairs, CV-MSE values, OOF predictions, fitted
+predictions, model results, and semantic renderer manifests. Presentation details are reviewed
+through regenerated artifacts rather than source-literal tests.
 
 ## Consequences
 

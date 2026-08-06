@@ -57,6 +57,10 @@
   variability only.
 ### Repository
 
+- Complete the behavioral test-suite cleanup by consolidating durable testing, rendering,
+  selection-handoff, and search-policy outcomes into current canonical decisions; retire eight
+  completed migration and cleanup records; and return active maintainer state to current-policy
+  wording without changing runtime behavior.
 - Split the large Pulp example and tutorial renderer into focused caller-local plotting and
   manifest helpers. Preserve the analytical sequence, generated tutorial bytes, numerical results,
   and the package boundary with no plotting utilities added to `pipls`.

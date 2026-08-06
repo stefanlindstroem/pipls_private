@@ -6,13 +6,8 @@ Tests protect durable numerical, API, data, serialization, artifact, tool, and i
 behavior. They do not serve as a second copy of source structure, documentation prose, or completed
 migration history.
 
-Decision 0154 governs the active cleanup. Repository-prose, documentation-literal, decision-text,
-workflow-text, configuration-literal, and compatibility-policy policing was removed in Patch 2.
-Example-source, AST-workflow, snippet-marker, plotting-literal, and generated-SVG-text policing was
-removed in Patch 3. Patch 4 consolidated artifact validation around executable tools. Patch 5
-removed historical-name tombstones, retained positive current export and dataclass-field contracts,
-consolidated overlapping selection/refit/OOF state tests, and reduced coupling to incidental
-exception wording.
+Decision 0147 governs the behavior-focused validation boundary and the ownership of completed
+integration checks.
 
 ## Behavioral boundary
 

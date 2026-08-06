@@ -2,9 +2,9 @@
 
 ## Status
 
-Accepted and implemented. All seven patches are complete. The active `.llm` layer describes current
-contracts without patch-progress narration, `history.md` summarizes completed eras, the retirement
-map covers 102 removed records, and the maintained tree contains 45 current numbered decisions.
+Accepted and implemented. The active `.llm` layer describes current contracts without patch-
+progress narration, `history.md` summarizes completed eras, the retirement map covers removed
+records, and the maintained tree contains 44 current numbered decisions.
 
 ## Context
 
@@ -113,6 +113,19 @@ Git history is sufficient. In particular:
 - `testing.md` records current validation obligations;
 - `analysis.md` records current architectural and interpretation reasoning;
 - `public_api.md` and `numerical_contracts.md` describe only the implemented surface.
+
+
+### Keep validation behavior-focused
+
+Repository tests protect executable behavior and machine-readable outputs rather than prescribed
+source or documentation wording. Strict documentation, complete examples, source-distribution
+documentation, and installed-artifact checks belong to their dedicated Make targets. Pytest may
+parse artifacts created during a test, but it does not freeze prose, local helper names, AST call
+order, plotting style, Mermaid labels, workflow files, or removed pre-release spellings.
+
+Private maintenance helpers may consolidate subprocess, virtual-environment, archive, and artifact
+mechanics under `tools/`. Large caller-owned renderers may use local helpers. Neither practice adds
+installed package surface.
 
 ### Preserve behavior during documentation cleanup
 

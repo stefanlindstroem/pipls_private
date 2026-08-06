@@ -49,12 +49,12 @@ tolerances are search-constructor controls because they determine `component_pat
 tolerances remain post-search `select()` and `refit()` controls. Exact numerical ties and adaptive
 candidate coverage remain separate from substantive parsimony tolerances.
 
-Decision 0149 is implemented. `search_method="adaptive"` is the default predictor-rank coverage
-policy and `search_method="exhaustive"` requests complete admissible-rank coverage. The parameter
-name and `search_is_exhaustive_` fitted diagnostic remain unchanged, and the former values have no
+`search_method="adaptive"` is the default predictor-rank coverage policy and
+`search_method="exhaustive"` requests complete admissible-rank coverage. The parameter name and
+`search_is_exhaustive_` fitted diagnostic remain unchanged, and former pre-release values have no
 compatibility aliases.
 
-Decision 0151 implements `refit(selection=...)` as the exact-selection handoff for analytical
+Decision 0143 implements `refit(selection=...)` as the exact-selection handoff for analytical
 workflows. Rule-based and component-count refitting remain the compact route. Existing selections
 use one compatibility definition across OOF reporting and final refitting.
 
@@ -82,24 +82,10 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decisions 0148--0153 are implemented. Package-owned protocol detection, provenance, examples,
-support claims, and dedicated tests are removed. Generic splitter interoperability, ordered OOF
-reporting, and protocol-neutral singleton-validation scorer safety remain, and the maintained
-example catalogue is contiguous from 01 through 06.
-
-Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patches 1--6 are
-complete: the behavioral boundary is established; repository, documentation, example-source, and
-rendering-source policing is removed; duplicated artifact tooling is consolidated; stale runtime
-tombstones and overlapping selection/refit tests are removed; and the largest Pulp rendering
-workflows now delegate to caller-local helpers. Distribution checks use one checked-in installed
-smoke test and shared private subprocess, virtual-environment, archive, and artifact helpers. Current
-public fields and parameter surfaces are tested positively rather than through removed aliases. The
-final patch retires superseded implementation decisions and closes the cleanup. Runtime behavior is
-unchanged.
+No accepted implementation sequence is active. Current maintenance should address explicit owner
+requests in bounded patches while preserving the implemented numerical and product boundaries.
 
 ## Deferred work
-
-Decision 0139 Patch 3 is superseded by Decision 0151 and is no longer paused work.
 
 Future block-aware standardization remains intentionally undesigned. Do not reserve public names,
 constructor parameters, or hidden abstractions before a dedicated owner-led design phase.

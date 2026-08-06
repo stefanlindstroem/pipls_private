@@ -41,23 +41,15 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0121: canonical Pi-PLS terminology](0121-canonical-pipls-terminology.md)
 - [0123: manuscript synthetic-data guide](0123-companion-manuscript-synthetic-data-guide.md)
 - [0124: mathematical typography](0124-mathematical-typography-and-subscripts.md)
-- [0127: artifact-based rendering validation](0127-artifact-based-rendering-validation.md)
 - [0137: post-fit inspect-decide-refit lifecycle](0137-post-fit-inspect-decide-refit-lifecycle.md)
-- [0139: three-stage user onboarding](0139-three-stage-user-onboarding.md)
 - [0140: search-owned path selection](0140-search-owned-path-selection.md)
 - [0141: spectral predictor-rank profiles](0141-spectral-predictor-rank-profile-figures.md)
 - [0142: package-owned reference datasets](0142-package-owned-reference-datasets.md)
 - [0143: selection provenance and OOF](0143-model-selection-provenance-and-oof-reporting.md)
-- [0145: final implementation-surface cleanup](0145-final-implementation-surface-cleanup.md)
 - [0146: CV-MSE tolerance selection and split-SD reporting](0146-cv-mse-tolerance-selection.md)
 - [0147: decision lifecycle](0147-decision-lifecycle-and-maintainer-context.md)
 - [0148: predictor-rank tolerance selection](0148-predictor-rank-tolerance-selection.md)
-- [0149: predictor-rank search terminology](0149-predictor-rank-search-terminology.md)
-- [0150: computational-performance guidance](0150-computational-performance-guidance.md)
-- [0151: selection-driven refit workflow](0151-selection-driven-refit-workflow.md)
 - [0152: selection-review feedback workflow](0152-selection-review-feedback-workflow.md)
-- [0153: remove package-owned leave-one-out support](0153-remove-package-owned-leave-one-out-support.md)
-- [0154: behavioral test-suite cleanup](0154-behavioral-test-suite-cleanup.md)
 
 ## Historical navigation
 
