@@ -9,8 +9,9 @@ migration history.
 Decision 0154 governs the active cleanup. Repository-prose, documentation-literal, decision-text,
 workflow-text, configuration-literal, and compatibility-policy policing was removed in Patch 2.
 Example-source, AST-workflow, snippet-marker, plotting-literal, and generated-SVG-text policing was
-removed in Patch 3. Renderer coverage now executes the tools and inspects semantic manifests,
-declared artifacts, and parseable SVG output.
+removed in Patch 3. Patch 4 consolidated artifact-validation mechanics in a private tools module,
+moved the installed-package smoke test into a checked-in script, and reduced source-distribution
+documentation checks to strict builds, semantic manifests, declared artifacts, and parseable output.
 
 ## Behavioral boundary
 

@@ -202,10 +202,13 @@ and the retirement map use this completed boundary.
 
 Decision 0154 is accepted. A seven-patch cleanup is replacing tests that police repository prose or
 source structure with behavioral, machine-readable artifact, executable-tool, and installed-
-distribution coverage. Patches 1--3 are complete. Pure documentation, decision, repository,
+distribution coverage. Patches 1--4 are complete. Pure documentation, decision, repository,
 workflow, configuration-literal, compatibility-policy, example-source, AST-workflow, snippet-
-marker, plotting-literal, and SVG-text tests are removed. Renderer tests execute the tools, parse
-semantic manifests, and validate declared SVG artifacts. Runtime behavior is unchanged.
+marker, plotting-literal, and SVG-text tests are removed. Artifact validation now shares private
+subprocess, virtual-environment, archive, and artifact helpers; the installed smoke test is a
+checked-in script; and source-distribution documentation validation checks strict builds, semantic
+manifests, declared artifacts, and parseable output rather than fixed inventories. Runtime behavior
+is unchanged.
 
 ## Authority and drift handling
 

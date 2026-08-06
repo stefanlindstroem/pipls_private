@@ -15,6 +15,7 @@ selected evidence is unsatisfactory, return to the selection step before refitti
 ---
 config:
   htmlLabels: false
+  theme: neutral
 ---
 flowchart TD
     load["Load Pulp data"]
@@ -27,11 +28,10 @@ flowchart TD
     analyze["Inspect the fitted model"]
     render["Render reports"]
 
-    load --> search --> path --> select --> review --> decide -->|Yes| refit --> analyze --> render
-    decide -->|No| select
-    style render fill:#777,stroke:#000,color:#fff
-    linkStyle 5 stroke:#181,color:black;
-    linkStyle 8 stroke:#a11,color:black;
+    load --> search --> path --> select --> review --> decide -->|"`**Yes**`"| refit --> analyze --> render
+    decide -->|"`**No**`"| select
+    linkStyle 5 stroke:#292,color:black;
+    linkStyle 8 stroke:#b22,color:black;
 ```
 
 ## Setup

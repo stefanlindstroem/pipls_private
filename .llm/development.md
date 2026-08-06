@@ -122,12 +122,11 @@
   maintained example analyses into Markdown. Use `make docs-dist`
   when changing documentation packaging or the source-distribution documentation boundary; it
   performs a clean install plus strict base and inherited Pages-overlay builds from the unpacked
-  sdist, including rendered Mermaid-container checks, and therefore remains outside the ordinary
-  fast test target. Use
-  `make dist-check` for packaging, dependency, public-module, or included-data changes; it builds
-  once and checks separate clean wheel and sdist installations outside the checkout. The sdist
-  check also installs the `examples` extra, runs example 01 from the extracted source tree, and
-  verifies that its repository-owned output directory is present and writable.
+  sdist, then validates generated manifests, declared artifacts, and parseable SVG output. It
+  therefore remains outside the ordinary fast test target. Use `make dist-check` for packaging,
+  dependency, or included-data changes; it builds once and checks separate clean wheel and sdist
+  installations outside the checkout. The sdist check also installs the `examples` extra, runs
+  example 01 from the extracted source tree, and verifies its final PDF output.
 - The dedicated documentation workflow runs the strict checkout and source-distribution builds on
   pushes and pull requests. Pushes to `master` additionally derive the default GitHub Pages and
   repository URLs from the Actions context, rebuild the site with those canonical values, and

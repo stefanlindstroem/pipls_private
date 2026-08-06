@@ -2,12 +2,14 @@
 
 ## Status
 
-Accepted. Patches 1--3 of the seven-patch cleanup sequence are complete. Patch 1 established the
+Accepted. Patches 1--4 of the seven-patch cleanup sequence are complete. Patch 1 established the
 behavioral-testing boundary. Patch 2 removed repository-prose, documentation-literal,
 decision-text, workflow-text, configuration-literal, and compatibility-policy policing. Patch 3
 removed example-source, AST-workflow, snippet-marker, plotting-literal, and generated-SVG-text
-policing while retaining behavioral renderer, artifact, and runtime rendering-boundary coverage.
-Runtime code, examples, and served documentation are unchanged.
+policing. Patch 4 consolidated artifact-tool support, replaced embedded smoke-test source with a
+checked-in script, and reduced source-distribution documentation validation to executable build,
+manifest, artifact, and installed-package outcomes. Runtime code, examples, and served
+documentation are unchanged.
 
 ## Context
 
@@ -126,7 +128,7 @@ product-boundary decisions remain current.
    complete.
 4. Consolidate duplicated distribution and documentation maintenance support, replace embedded
    installed-smoke-test source with a checked-in script, and simplify source-distribution docs
-   validation to executable outcomes.
+   validation to executable outcomes -- complete.
 5. Remove stale tombstone and duplicate runtime tests, consolidate result and search coverage by
    ownership, and reduce exception-message coupling where wording is not public.
 6. Refactor the largest caller-owned Pulp example and tutorial renderer into small local plotting

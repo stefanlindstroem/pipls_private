@@ -1,70 +1,22 @@
-"""Build the documentation from a clean installation of the source distribution."""
+"""Build the documentation from a clean source-distribution installation."""
 
 from __future__ import annotations
 
 import hashlib
-import html
 import json
-import math
-import os
-import re
 import shutil
-import subprocess
 import sys
-import tarfile
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-QUICK_START_FIGURES = ("observed_vs_fitted.svg",)
-SYNTHETIC_TUTORIAL_FIGURES = (
-    "component_path.svg",
-    "selected_component_path.svg",
-    "predictor_rank_profile.svg",
-    "observed_vs_predicted.svg",
+from _artifact_support import (
+    clean_subprocess_environment,
+    run,
+    safe_extract_sdist,
+    single_artifact,
+    venv_python,
 )
-PULP_TUTORIAL_FIGURES = (
-    "component_path.svg",
-    "selected_component_path.svg",
-    "predictor_rank_profile.svg",
-    "biplot.svg",
-    "predictor_directions.svg",
-    "weighted_response_directions.svg",
-    "observed_vs_predicted.svg",
-    "residuals_vs_predicted.svg",
-    "standardized_rmse.svg",
-)
-
-
-TUTORIAL_WORKFLOWS = {
-    "quick_start": (
-        "Load Pulp data",
-        "Search candidate models",
-        "Select by rule and refit",
-        "Inspect fitted values",
-    ),
-    "synthetic": (
-        "Generate training and test data",
-        "Fit search",
-        "Inspect component path",
-        "Choose component count and create selection",
-        "Inspect selected path and conditional rank profile",
-        "Refit the same selection",
-        "Predict external test data",
-        "revise if dissatisfied",
-    ),
-    "pulp": (
-        "Load Pulp data",
-        "Fit search",
-        "Inspect component path",
-        "Choose component count and create selection",
-        "Inspect selected path, conditional rank profile, and OOF predictions",
-        "Refit the same selection",
-        "Inspect the fitted model",
-        "Render reports",
-        "revise if dissatisfied",
-    ),
-}
 
 
 def _sha256(path: Path) -> str:
@@ -75,89 +27,38 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _run(command: list[str], *, cwd: Path | None = None) -> None:
-    print("+", " ".join(command), flush=True)
-    subprocess.run(command, cwd=cwd, check=True)
+def _validate_generated_manifests(generated_root: Path) -> None:
+    manifests = sorted(generated_root.rglob("manifest.json"))
+    if not manifests:
+        raise RuntimeError("Documentation build did not generate figure manifests.")
+
+    for manifest_path in manifests:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        figures = manifest.get("figures")
+        if not isinstance(figures, list) or not figures:
+            raise RuntimeError(f"Invalid figure manifest: {manifest_path}")
+
+        filenames = [record.get("filename") for record in figures]
+        if len(filenames) != len(set(filenames)):
+            raise RuntimeError(f"Duplicate figure filenames in {manifest_path}")
+
+        for record in figures:
+            filename = record.get("filename")
+            expected_hash = record.get("sha256")
+            if not isinstance(filename, str) or not isinstance(expected_hash, str):
+                raise RuntimeError(f"Invalid figure record in {manifest_path}")
+            figure = manifest_path.parent / filename
+            if not figure.is_file():
+                raise RuntimeError(f"Missing manifest-declared figure: {figure}")
+            ET.parse(figure)
+            if _sha256(figure) != expected_hash:
+                raise RuntimeError(f"Figure hash disagrees with manifest: {figure}")
 
 
-def _validate_workflow_diagrams(site: Path) -> None:
-    for tutorial, labels in TUTORIAL_WORKFLOWS.items():
-        page = site / "tutorials" / tutorial / "index.html"
-        rendered = html.unescape(page.read_text(encoding="utf-8"))
-        classes = re.findall(r'class="([^"]*)"', rendered)
-        mermaid_containers = sum("mermaid" in value.split() for value in classes)
-        if mermaid_containers != 1:
-            raise RuntimeError(
-                f"Rendered {tutorial} tutorial must contain one Mermaid container."
-            )
-        if "flowchart TD" not in rendered:
-            raise RuntimeError(
-                f"Rendered {tutorial} tutorial must retain a vertical flowchart."
-            )
-        missing = [label for label in labels if label not in rendered]
-        if missing:
-            raise RuntimeError(
-                f"Rendered {tutorial} workflow is missing labels: {missing}."
-            )
-
-
-def _safe_extract(archive: tarfile.TarFile, destination: Path) -> Path:
-    members = archive.getmembers()
-    if not members:
-        raise RuntimeError("The source-distribution archive is empty.")
-
-    roots = {Path(member.name).parts[0] for member in members if Path(member.name).parts}
-    if len(roots) != 1:
-        raise RuntimeError("The source distribution must contain one top-level directory.")
-
-    resolved_destination = destination.resolve()
-    for member in members:
-        member_path = Path(member.name)
-        if member_path.is_absolute() or ".." in member_path.parts:
-            raise RuntimeError(f"Unsafe archive member: {member.name}")
-        if member.issym() or member.islnk():
-            raise RuntimeError(f"Archive links are not supported: {member.name}")
-        target = (destination / member_path).resolve()
-        if not target.is_relative_to(resolved_destination):
-            raise RuntimeError(f"Archive member escapes extraction directory: {member.name}")
-
-    if sys.version_info >= (3, 12):
-        archive.extractall(destination, filter="data")
-    else:
-        archive.extractall(destination)
-    return destination / roots.pop()
-
-
-def _venv_python(venv: Path) -> Path:
-    if os.name == "nt":
-        return venv / "Scripts" / "python.exe"
-    return venv / "bin" / "python"
-
-
-def _validate_figure_manifest(
-    generated_dir: Path,
-    expected_figures: tuple[str, ...],
-    *,
-    tutorial_name: str,
-) -> dict[str, object]:
-    manifest_path = generated_dir / "manifest.json"
-    if not manifest_path.is_file():
-        raise RuntimeError(f"Documentation build did not generate the {tutorial_name} manifest.")
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    declared = tuple(item["filename"] for item in manifest.get("figures", []))
-    if declared != expected_figures:
-        raise RuntimeError(
-            f"{tutorial_name} manifest does not declare the expected figures: {declared!r}."
-        )
-    figure_records = {item["filename"]: item for item in manifest["figures"]}
-    for filename in expected_figures:
-        figure_path = generated_dir / filename
-        if not figure_path.is_file():
-            raise RuntimeError(f"Missing generated {tutorial_name} figure: {filename}")
-        ET.parse(figure_path)
-        if figure_records[filename]["sha256"] != _sha256(figure_path):
-            raise RuntimeError(f"Generated {tutorial_name} figure hash disagrees: {filename}")
-    return manifest
+def _validate_site(source: Path) -> None:
+    if not (source / "site" / "index.html").is_file():
+        raise RuntimeError("Documentation build did not create site/index.html.")
+    _validate_generated_manifests(source / "docs" / "assets" / "generated")
 
 
 def main() -> None:
@@ -165,16 +66,15 @@ def main() -> None:
     make = shutil.which("make")
     if make is None:
         raise RuntimeError("The documentation distribution check requires make.")
+    environment_variables = clean_subprocess_environment()
 
     with tempfile.TemporaryDirectory(prefix="pipls-docs-dist-") as temporary:
         workspace = Path(temporary)
+        environment_variables["PIP_CACHE_DIR"] = str(workspace / "pip-cache")
         artifacts = workspace / "artifacts"
-        extracted = workspace / "extracted"
-        environment = workspace / "venv"
         artifacts.mkdir()
-        extracted.mkdir()
 
-        _run(
+        run(
             [
                 sys.executable,
                 "-m",
@@ -185,49 +85,22 @@ def main() -> None:
                 str(artifacts),
             ],
             cwd=repository,
+            env=environment_variables,
         )
-        archives = sorted(artifacts.glob("*.tar.gz"))
-        if len(archives) != 1:
-            raise RuntimeError(f"Expected one source distribution, found {len(archives)}.")
+        source_distribution = single_artifact(
+            artifacts,
+            "*.tar.gz",
+            "source distribution",
+        )
+        source = safe_extract_sdist(source_distribution, workspace / "extracted")
 
-        with tarfile.open(archives[0], mode="r:gz") as archive:
-            source = _safe_extract(archive, extracted)
-
-        required = [
-            source / "CITATION.cff",
-            source / "LICENSE",
-            source / "Makefile",
-            source / "mkdocs.yml",
-            source / "docs" / "citation.md",
-            source / "docs" / "computational_performance.md",
-            source / "docs" / "index.md",
-            source / "docs" / "tutorials" / "quick_start.md",
-            source / "docs" / "tutorials" / "synthetic.md",
-            source / "docs" / "tutorials" / "pulp.md",
-            source / "docs" / "api" / "index.md",
-            source / "docs" / "troubleshooting.md",
-            source / "docs" / "javascripts" / "mathjax.js",
-            source / "tools" / "configure_pages_docs.py",
-            source / "tools" / "render_quick_start_tutorial.py",
-            source / "tools" / "render_synthetic_tutorial.py",
-            source / "tools" / "render_pulp_tutorial.py",
-            source / "examples" / "01_pulp_quick_start.py",
-            source / "examples" / "02_synthetic_path_selection.py",
-            source / "examples" / "04_pulp_real_data.py",
-            *(
-                source / "src" / "pipls" / "_data" / dataset_id / filename
-                for dataset_id in ("pulp", "sugarcane", "tobacco")
-                for filename in ("X.csv", "Y.csv", "metadata.json", "README.md", "LICENSE.txt")
-            ),
-            source / "src" / "pipls" / "__init__.py",
-        ]
-        missing = [path.relative_to(source).as_posix() for path in required if not path.is_file()]
-        if missing:
-            raise RuntimeError(f"Source distribution is missing documentation inputs: {missing}")
-
-        _run([sys.executable, "-m", "venv", str(environment)])
-        python = _venv_python(environment)
-        _run(
+        environment = workspace / "venv"
+        run(
+            [sys.executable, "-m", "venv", str(environment)],
+            env=environment_variables,
+        )
+        python = venv_python(environment)
+        run(
             [
                 str(python),
                 "-m",
@@ -241,146 +114,18 @@ def main() -> None:
                 "--timeout",
                 "60",
                 f"{source}[docs]",
-            ]
+            ],
+            env=environment_variables,
         )
-        _run([make, "docs", f"PYTHON={python}"], cwd=source)
-
-        quick_start_dir = source / "docs" / "assets" / "generated" / "quick_start"
-        quick_start_manifest = _validate_figure_manifest(
-            quick_start_dir,
-            QUICK_START_FIGURES,
-            tutorial_name="quick-start tutorial",
+        run(
+            [make, "docs", f"PYTHON={python}"],
+            cwd=source,
+            env=environment_variables,
         )
-        quick_start_analysis = quick_start_manifest.get("analysis", {})
-        if quick_start_manifest.get("dataset") != {"id": "pulp", "version": "1"}:
-            raise RuntimeError("Quick-start tutorial dataset identity changed unexpectedly.")
-        if quick_start_analysis.get("selected_n_components") != 3:
-            raise RuntimeError("Quick-start tutorial component selection changed unexpectedly.")
-        if quick_start_analysis.get("selected_predictor_rank") != 10:
-            raise RuntimeError(
-                "Quick-start tutorial predictor-rank selection changed unexpectedly."
-            )
-        if quick_start_analysis.get("prediction_kind") != "fitted values":
-            raise RuntimeError("Quick-start tutorial must report fitted-value provenance.")
-        if not math.isfinite(
-            float(quick_start_analysis.get("mean_standardized_rmse", math.nan))
-        ):
-            raise RuntimeError("Quick-start tutorial standardized RMSE must be finite.")
-
-        synthetic_dir = source / "docs" / "assets" / "generated" / "synthetic"
-        synthetic_manifest = _validate_figure_manifest(
-            synthetic_dir,
-            SYNTHETIC_TUTORIAL_FIGURES,
-            tutorial_name="synthetic tutorial",
-        )
-        synthetic_analysis = synthetic_manifest.get("analysis", {})
-        if synthetic_analysis.get("chosen_n_components") != 2:
-            raise RuntimeError("Synthetic tutorial component selection changed unexpectedly.")
-        if synthetic_analysis.get("chosen_predictor_rank") != 4:
-            raise RuntimeError("Synthetic tutorial predictor-rank selection changed unexpectedly.")
-        if not math.isfinite(float(synthetic_analysis.get("external_test_r2", math.nan))):
-            raise RuntimeError("Synthetic tutorial external-test R2 must be finite.")
-
-        pulp_dir = source / "docs" / "assets" / "generated" / "pulp"
-        pulp_manifest = _validate_figure_manifest(
-            pulp_dir,
-            PULP_TUTORIAL_FIGURES,
-            tutorial_name="Pulp tutorial",
-        )
-        pulp_resources = source / "src" / "pipls" / "_data" / "pulp"
-        pulp_metadata = json.loads(
-            (pulp_resources / "metadata.json").read_text(encoding="utf-8")
-        )
-        manifest_dataset = pulp_manifest.get("dataset", {})
-        expected_dataset = {
-            "id": pulp_metadata["dataset"]["id"],
-            "version": pulp_metadata["dataset"]["version"],
-            "source_doi": pulp_metadata["source"]["doi"],
-            "license": pulp_metadata["license"]["identifier"],
-            "resource_sha256": pulp_metadata["integrity"]["resource_sha256"],
-            "array_sha256": pulp_metadata["integrity"]["array_sha256"],
-        }
-        if manifest_dataset != expected_dataset:
-            raise RuntimeError("Generated Pulp tutorial dataset identity disagrees.")
-        pulp_analysis = pulp_manifest.get("analysis", {})
-        expected_cv = {
-            "splitter": "RepeatedKFold",
-            "n_splits": 5,
-            "n_repeats": 10,
-            "random_state": 0,
-            "materialized_splits": 50,
-        }
-        if pulp_analysis.get("cross_validation") != expected_cv:
-            raise RuntimeError("Generated Pulp tutorial CV protocol changed unexpectedly.")
-        if pulp_analysis.get("oof_predictions_per_observation") != 10:
-            raise RuntimeError(
-                "Generated Pulp tutorial must average ten OOF predictions per row."
-            )
-        for filename in ("X.csv", "Y.csv"):
-            expected_hash = expected_dataset["resource_sha256"][filename]
-            if expected_hash != _sha256(pulp_resources / filename):
-                raise RuntimeError(f"Packaged Pulp resource hash disagrees: {filename}")
-
-        rendered = [
-            source / "site" / "index.html",
-            source / "site" / "tutorials" / "quick_start" / "index.html",
-            source / "site" / "tutorials" / "synthetic" / "index.html",
-            source / "site" / "tutorials" / "pulp" / "index.html",
-            source / "site" / "api" / "regression" / "index.html",
-            source / "site" / "computational_performance" / "index.html",
-            source / "site" / "troubleshooting" / "index.html",
-            source / "site" / "api" / "inspection" / "index.html",
-            source
-            / "site"
-            / "assets"
-            / "generated"
-            / "quick_start"
-            / "observed_vs_fitted.svg",
-            source / "site" / "assets" / "generated" / "synthetic" / "component_path.svg",
-            source
-            / "site"
-            / "assets"
-            / "generated"
-            / "synthetic"
-            / "selected_component_path.svg",
-            source
-            / "site"
-            / "assets"
-            / "generated"
-            / "synthetic"
-            / "observed_vs_predicted.svg",
-            source / "site" / "assets" / "generated" / "pulp" / "component_path.svg",
-            source
-            / "site"
-            / "assets"
-            / "generated"
-            / "pulp"
-            / "selected_component_path.svg",
-            source
-            / "site"
-            / "assets"
-            / "generated"
-            / "pulp"
-            / "weighted_response_directions.svg",
-            source
-            / "site"
-            / "assets"
-            / "generated"
-            / "pulp"
-            / "residuals_vs_predicted.svg",
-            source / "site" / "assets" / "generated" / "pulp" / "standardized_rmse.svg",
-        ]
-        missing_rendered = [
-            path.relative_to(source).as_posix() for path in rendered if not path.is_file()
-        ]
-        if missing_rendered:
-            raise RuntimeError(
-                f"Documentation build did not create expected pages: {missing_rendered}"
-            )
-        _validate_workflow_diagrams(source / "site")
+        _validate_site(source)
 
         pages_config = source / ".mkdocs-pages.yml"
-        _run(
+        run(
             [
                 str(python),
                 str(source / "tools" / "configure_pages_docs.py"),
@@ -392,8 +137,9 @@ def main() -> None:
                 str(pages_config),
             ],
             cwd=source,
+            env=environment_variables,
         )
-        _run(
+        run(
             [
                 str(python),
                 "-m",
@@ -404,8 +150,9 @@ def main() -> None:
                 str(pages_config),
             ],
             cwd=source,
+            env=environment_variables,
         )
-        _validate_workflow_diagrams(source / "site")
+        _validate_site(source)
 
     print("Source-distribution documentation build passed.")
 

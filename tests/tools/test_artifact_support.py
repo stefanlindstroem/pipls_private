@@ -1,0 +1,70 @@
+from __future__ import annotations
+
+import io
+import tarfile
+from pathlib import Path
+
+import pytest
+
+from tools._artifact_support import (
+    clean_subprocess_environment,
+    safe_extract_sdist,
+    single_artifact,
+)
+
+
+def _write_tar(archive_path: Path, members: dict[str, bytes]) -> None:
+    with tarfile.open(archive_path, mode="w:gz") as archive:
+        for name, content in members.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(content)
+            archive.addfile(info, io.BytesIO(content))
+
+
+def test_clean_subprocess_environment_removes_python_overrides(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PYTHONHOME", "/tmp/python-home")
+    monkeypatch.setenv("PYTHONPATH", "/tmp/python-path")
+
+    environment = clean_subprocess_environment()
+
+    assert "PYTHONHOME" not in environment
+    assert "PYTHONPATH" not in environment
+    assert environment["OMP_NUM_THREADS"] == "1"
+    assert environment["OPENBLAS_NUM_THREADS"] == "1"
+
+
+def test_single_artifact_requires_exactly_one_match(tmp_path: Path) -> None:
+    artifact = tmp_path / "pipls-0.0.0.tar.gz"
+    artifact.touch()
+
+    assert single_artifact(tmp_path, "*.tar.gz", "source distribution") == artifact
+
+    (tmp_path / "pipls-0.0.1.tar.gz").touch()
+    with pytest.raises(RuntimeError, match="Expected one source distribution"):
+        single_artifact(tmp_path, "*.tar.gz", "source distribution")
+
+
+def test_safe_extract_sdist_returns_the_single_root(tmp_path: Path) -> None:
+    artifact = tmp_path / "pipls.tar.gz"
+    _write_tar(
+        artifact,
+        {
+            "pipls-0.0.0/README.md": b"Pi-PLS\n",
+            "pipls-0.0.0/src/pipls/__init__.py": b"",
+        },
+    )
+
+    source = safe_extract_sdist(artifact, tmp_path / "extracted")
+
+    assert source == tmp_path / "extracted" / "pipls-0.0.0"
+    assert (source / "README.md").read_bytes() == b"Pi-PLS\n"
+
+
+def test_safe_extract_sdist_rejects_path_traversal(tmp_path: Path) -> None:
+    artifact = tmp_path / "pipls.tar.gz"
+    _write_tar(artifact, {"pipls-0.0.0/../../escaped.txt": b"bad"})
+
+    with pytest.raises(RuntimeError, match="Unsafe source-distribution member"):
+        safe_extract_sdist(artifact, tmp_path / "extracted")

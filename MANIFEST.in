@@ -2,8 +2,10 @@ prune .llm
 include CITATION.cff
 include Makefile
 include mkdocs.yml
+include tools/_artifact_support.py
 include tools/check_sdist_docs.py
 include tools/check_distributions.py
+include tools/installed_smoke_test.py
 include tools/configure_pages_docs.py
 include tools/render_quick_start_tutorial.py
 include tools/render_synthetic_tutorial.py
