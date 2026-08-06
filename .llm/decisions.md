@@ -56,17 +56,27 @@ This registry lists only numbered decisions that still define current behavior o
 | `0150-computational-performance-guidance.md` | computational-performance guidance | central reference page, explicit cost categories, fold-local preprocessing, reproducible examples, and current implementation semantics |
 | `0151-selection-driven-refit-workflow.md` | selection-driven refit workflow | pass one compatible immutable selection through OOF reporting and final refitting; reorder analytical examples and add source-level tutorial flowcharts |
 | `0152-selection-review-feedback-workflow.md` | selection-review feedback workflow | inspect the unselected path before selecting, review conditional evidence with one feedback edge, and reserve qualification or validation for independent assessment |
+| `0153-remove-package-owned-leave-one-out-support.md` | remove package-owned leave-one-out support | retain generic splitter interoperability and OOF reporting while removing the detector, provenance field, dedicated example, support claims, and tests in five patches |
 
 ## Current canonical clusters
 
 - **Mathematics and numerical construction:** 0001--0004, 0007--0009, 0014, 0025, 0032, 0092,
   0120--0121, and 0146--0149.
 - **Estimator, search, and result ownership:** 0039, 0066, 0093, 0102, 0137, 0140, 0143,
-  0145--0149, and 0151--0152.
+  0145--0149, and 0151--0153.
 - **Datasets and product scope:** 0015, 0024--0025, 0041, 0119, 0123, and 0142.
 - **Inspection and rendering:** 0042, 0045, 0061, 0083, 0094, 0110, 0124, 0127, and 0141.
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
-  0147, 0150, and 0151--0152.
+  0147, 0150, and 0151--0153.
+
+## Accepted Decision 0153 contract
+
+- Remove package-owned leave-one-out detection, provenance, examples, documentation, and tests.
+- Retain generic scikit-learn-compatible splitters, explicit split iterables, and protocol-neutral
+  OOF reporting.
+- Keep singleton-validation scorer safety without leave-one-out-specific wording or imports.
+- Do not add a compatibility alias, deprecation scaffold, replacement helper, or dedicated mode.
+- Implement the removal in five patches; Patch 1 changes decisions and maintainer contracts only.
 
 ## Implemented Decision 0152 contract
 

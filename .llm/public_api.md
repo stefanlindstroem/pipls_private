@@ -208,6 +208,12 @@ There is no standard-error property or selection rule.
 Selection metrics are accessed through `report.selection`; they are not duplicated on the report.
 Rows without validation coverage have zero counts and NaN predictions.
 
+Decision 0153 removes `is_leave_one_out` in Patch 2 without an alias or deprecation scaffold. The
+field remains transitional current behavior in Patch 1. Generic OOF predictions, counts, coverage,
+and pooled OOF R2 remain public and protocol-neutral. `cv` continues to accept compatible splitters
+and explicit split iterables, but the package will not identify, document, or guarantee
+leave-one-out as a dedicated mode.
+
 ## Metrics
 
 `pipls.metrics` exports `response_standardized_mse` and

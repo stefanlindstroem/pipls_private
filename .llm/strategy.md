@@ -82,9 +82,11 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decisions 0148--0152 are implemented. The current repository has no active public-API or tutorial
-migration increment. New work should begin with an owner decision when it changes scientific scope,
-public behavior, or maintained workflow structure.
+Decisions 0148--0152 are implemented. Decision 0153 is accepted and active as a five-patch removal
+of package-owned leave-one-out support. Preserve generic splitter interoperability and protocol-
+neutral OOF reporting while removing the detector and public provenance field, the dedicated
+example, support documentation, and leave-one-out-specific tests. Patch 1 changes only decisions and
+maintainer contracts; subsequent patches must follow the sequence in Decision 0153.
 
 ## Deferred work
 

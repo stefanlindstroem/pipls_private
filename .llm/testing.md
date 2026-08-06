@@ -44,6 +44,11 @@ They must not become a second copy of living prose or preserve removed migration
 - pooled OOF R2 over covered rows only;
 - no candidate rescoring, search mutation, retained input data, or implicit full-data fit.
 
+Decision 0153 removes leave-one-out provenance and dedicated protocol tests in later patches. Patch 1
+retains the current tests while establishing that generic OOF ordering, averaging, counts, partial
+coverage, pooled OOF R2, and protocol-neutral singleton-validation scorer safety are the durable
+contracts. Later tests must not import `LeaveOneOut` solely to establish package support.
+
 ### Immutable public results and inspection
 
 - defensive copies, read-only arrays, shape/scalar validation, direct construction, and pickle

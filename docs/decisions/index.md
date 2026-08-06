@@ -56,6 +56,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0150: computational-performance guidance](0150-computational-performance-guidance.md)
 - [0151: selection-driven refit workflow](0151-selection-driven-refit-workflow.md)
 - [0152: selection-review feedback workflow](0152-selection-review-feedback-workflow.md)
+- [0153: remove package-owned leave-one-out support](0153-remove-package-owned-leave-one-out-support.md)
 
 ## Historical navigation
 
