@@ -14,11 +14,7 @@ If the selected evidence is unsatisfactory, return to the selection step before 
 ```mermaid
 ---
 config:
-  flowchart:
-    diagramPadding: 4
-    padding: 6
-    nodeSpacing: 28
-    rankSpacing: 34
+  htmlLabels: false
 ---
 flowchart TD
     data["Generate training and test data"]
@@ -30,7 +26,7 @@ flowchart TD
     predict["Predict external test data"]
 
     data --> search --> path --> select --> review --> refit --> predict
-    review -. revise if dissatisfied .-> select
+    review -. "revise" .-> select
 ```
 
 The tutorial deliberately stops after one prediction plot. Scores, loadings, Pi-PLS factorization

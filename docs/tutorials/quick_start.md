@@ -10,11 +10,7 @@ observations, and then inspect fitted values.
 ```mermaid
 ---
 config:
-  flowchart:
-    diagramPadding: 4
-    padding: 6
-    nodeSpacing: 28
-    rankSpacing: 34
+  htmlLabels: false
 ---
 flowchart TD
     load["Load Pulp data"]

@@ -11,7 +11,7 @@ include tools/render_quick_start_tutorial.py
 include tools/render_synthetic_tutorial.py
 include tools/render_pulp_tutorial.py
 include constraints/minimum.txt
-recursive-include docs *.md *.js *.css
+recursive-include docs *.md *.js *.mjs *.css
 recursive-include src/pipls/_data/pulp *.csv *.json *.md *.txt
 recursive-include src/pipls/_data/sugarcane *.csv *.json *.md *.txt
 recursive-include src/pipls/_data/tobacco *.csv *.json *.md *.txt

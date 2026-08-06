@@ -15,12 +15,6 @@ selected evidence is unsatisfactory, return to the selection step before refitti
 ---
 config:
   htmlLabels: false
-  theme: neutral
-  flowchart:
-    diagramPadding: 4
-    padding: 6
-    nodeSpacing: 28
-    rankSpacing: 34
 ---
 flowchart TD
     load["Load Pulp data"]
@@ -28,15 +22,12 @@ flowchart TD
     path["Inspect component path"]
     select["Choose component count and create selection"]
     review["Inspect selected path, conditional rank profile, and OOF predictions"]
-    decide{"Satisfied?"}
     refit["Refit the same selection"]
     analyze["Inspect the fitted model"]
     render["Render reports"]
 
-    load --> search --> path --> select --> review --> decide -->|"`**Yes**`"| refit --> analyze --> render
-    decide -->|"`**No**`"| select
-    linkStyle 5 stroke:#292,color:black;
-    linkStyle 8 stroke:#b22,color:black;
+    load --> search --> path --> select --> review --> refit --> analyze --> render
+    review -. "revise" .-> select
 ```
 
 ## Setup
