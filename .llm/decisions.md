@@ -79,9 +79,10 @@ This registry lists only numbered decisions that still define current behavior o
   executable maintenance tools covered at their owning boundaries.
 - Simplify duplicated maintenance tooling and large caller-owned renderers without adding product
   surface.
-- The seven-patch cleanup is active; Patches 1--5 establish policy, remove repository and source
-  policing, consolidate artifact tools, and replace historical-name and duplicate state tests with
-  positive current API and behavioral coverage without changing runtime behavior.
+- The seven-patch cleanup is active; Patches 1--6 establish policy, remove repository and source
+  policing, consolidate artifact tools, replace historical-name and duplicate state tests with
+  positive current API coverage, and split the largest Pulp rendering workflows into caller-local
+  helpers without changing numerical or installed behavior.
 
 ## Implemented Decision 0153 contract
 

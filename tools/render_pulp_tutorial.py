@@ -33,13 +33,17 @@ from pipls.component_path import (  # noqa: E402
     PiPLSPredictorRankProfile,
     PiPLSSelection,
 )
-from pipls.datasets import load_pulp  # noqa: E402
+from pipls.datasets import PiPLSDataset, load_pulp  # noqa: E402
 from pipls.inspection import (  # noqa: E402
+    LatentStructure,
+    PiPLSDisplayFactors,
+    PredictionDiagnostics,
     biplot_coordinates,
     latent_structure,
     pipls_display_factors,
     prediction_diagnostics,
 )
+from pipls.validation import PiPLSOOFReport  # noqa: E402
 
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 DETAILED_RESPONSE_COUNT = 3
@@ -66,10 +70,7 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _figure(
-    *,
-    figsize: tuple[float, float],
-) -> tuple[Figure, Axes]:
+def _figure(*, figsize: tuple[float, float]) -> tuple[Figure, Axes]:
     return plt.subplots(figsize=figsize, layout="constrained")
 
 
@@ -112,9 +113,7 @@ def _render_component_path(
     axis.set_xlabel("Number of components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_xticks(component_path.n_components)
-    upper = float(
-        np.max(component_path.cv_mse_mean + component_path.cv_mse_std)
-    )
+    upper = float(np.max(component_path.cv_mse_mean + component_path.cv_mse_std))
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
     _save_svg(figure, output_path)
@@ -156,68 +155,14 @@ def _render_predictor_rank_profile(
     _save_svg(figure, output_path)
 
 
-def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
-    """Generate the representative Pulp tutorial figures and return the manifest path."""
-
-    output_dir = output_dir.resolve()
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
-    output_dir.mkdir(parents=True)
-
-    data = load_pulp()
-    X, Y = data.X, data.Y
-    predictor_names = data.feature_names
-    response_names = data.target_names
-
-    search = PiPLSSearchCV(cv=CV).fit(X, Y)
-    component_path = search.component_path_
-    _render_component_path(
-        component_path,
-        selected=None,
-        title=r"Pulp $\Pi$-PLS component path before selection",
-        output_path=output_dir / "component_path.svg",
-    )
-
-    chosen_n_components = 3
-    selection = search.select(n_components=chosen_n_components)
-    rank_profile = search.predictor_rank_profile(selection.n_components)
-    report = search.oof_report(
-        X,
-        Y,
-        selection=selection,
-    )
-    oof_predictions = report.oof_predictions
-    if not np.all(report.oof_prediction_counts == 10):
-        raise RuntimeError(
-            "Repeated Pulp CV must produce ten OOF predictions per observation."
-        )
-    diagnostics = prediction_diagnostics(
-        Y,
-        oof_predictions,
-        prediction_kind=PREDICTION_KIND,
-    )
-    _render_component_path(
-        component_path,
-        selected=selection,
-        title=r"Pulp $\Pi$-PLS selected component path",
-        output_path=output_dir / "selected_component_path.svg",
-    )
-    _render_predictor_rank_profile(
-        rank_profile,
-        output_path=output_dir / "predictor_rank_profile.svg",
-    )
-
-    model = search.refit(X, Y, selection=selection)
-    factors = pipls_display_factors(
-        model.decomposition_,
-        response_index=response_names.index("TI"),
-        response_sign="positive",
-    )
-    structure = latent_structure(model)
-    display_components = tuple(range(selection.n_components))
-
+def _render_biplot(
+    structure: LatentStructure,
+    *,
+    predictor_names: tuple[str, ...],
+    output_path: Path,
+) -> None:
     # --8<-- [start:render-pulp-biplot]
-    figure, axis = plt.subplots(figsize=(9.0, 7.0), layout="constrained")
+    figure, axis = _figure(figsize=(9.0, 7.0))
     biplot = biplot_coordinates(structure, components=(0, 1))
     sample_xy = biplot.sample_coordinates
     predictor_xy = biplot.predictor_coordinates
@@ -268,14 +213,22 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         arrowprops={"arrowstyle": "-", "linewidth": 0.6},
     )
     # --8<-- [end:render-pulp-biplot]
-    _save_svg(figure, output_dir / "biplot.svg")
+    _save_svg(figure, output_path)
 
+
+def _render_predictor_directions(
+    factors: PiPLSDisplayFactors,
+    *,
+    predictor_names: tuple[str, ...],
+    n_components: int,
+    output_path: Path,
+) -> None:
     # --8<-- [start:render-pulp-predictor-directions]
-    figure, axis = plt.subplots(figsize=(10.0, 5.4), layout="constrained")
+    figure, axis = _figure(figsize=(10.0, 5.4))
     predictor_positions = np.arange(len(predictor_names))
-    predictor_width = 0.8 / selection.n_components
-    for series, component in enumerate(display_components):
-        offset = (series - (selection.n_components - 1) / 2.0) * predictor_width
+    predictor_width = 0.8 / n_components
+    for series, component in enumerate(range(n_components)):
+        offset = (series - (n_components - 1) / 2.0) * predictor_width
         axis.bar(
             predictor_positions + offset,
             factors.predictor_directions[:, component],
@@ -292,14 +245,22 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     for label in axis.get_xticklabels():
         label.set_horizontalalignment("right")
     # --8<-- [end:render-pulp-predictor-directions]
-    _save_svg(figure, output_dir / "predictor_directions.svg")
+    _save_svg(figure, output_path)
 
+
+def _render_weighted_response_directions(
+    factors: PiPLSDisplayFactors,
+    *,
+    response_names: tuple[str, ...],
+    n_components: int,
+    output_path: Path,
+) -> None:
     # --8<-- [start:render-pulp-weighted-response-directions]
-    figure, axis = plt.subplots(figsize=(8.2, 5.4), layout="constrained")
+    figure, axis = _figure(figsize=(8.2, 5.4))
     response_positions = np.arange(len(response_names))
-    response_width = 0.8 / selection.n_components
-    for series, component in enumerate(display_components):
-        offset = (series - (selection.n_components - 1) / 2.0) * response_width
+    response_width = 0.8 / n_components
+    for series, component in enumerate(range(n_components)):
+        offset = (series - (n_components - 1) / 2.0) * response_width
         axis.bar(
             response_positions + offset,
             factors.weighted_response_directions[:, component],
@@ -316,13 +277,20 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     for label in axis.get_xticklabels():
         label.set_horizontalalignment("right")
     # --8<-- [end:render-pulp-weighted-response-directions]
-    _save_svg(figure, output_dir / "weighted_response_directions.svg")
+    _save_svg(figure, output_path)
 
+
+def _render_observed_vs_predicted(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: tuple[str, ...],
+    response_indices: tuple[int, ...],
+    output_path: Path,
+) -> None:
     # --8<-- [start:render-pulp-observed-vs-predicted]
-    figure, axis = plt.subplots(figsize=(6.4, 5.0), layout="constrained")
-    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
-    detailed_array = np.array(detailed_response_indices, dtype=np.int64)
-    for response in detailed_response_indices:
+    figure, axis = _figure(figsize=(6.4, 5.0))
+    detailed_array = np.array(response_indices, dtype=np.int64)
+    for response in response_indices:
         axis.scatter(
             diagnostics.observed_standardized[:, response],
             diagnostics.predicted_standardized[:, response],
@@ -344,17 +312,23 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.set_ylim(limits)
     axis.set_xlabel("Observed response (standardized)")
     axis.set_ylabel("Predicted response (standardized)")
-    axis.set_title(
-        rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}"
-    )
+    axis.set_title(rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}")
     axis.legend(title="Response")
     # --8<-- [end:render-pulp-observed-vs-predicted]
-    _save_svg(figure, output_dir / "observed_vs_predicted.svg")
+    _save_svg(figure, output_path)
 
+
+def _render_residuals_vs_predicted(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: tuple[str, ...],
+    response_indices: tuple[int, ...],
+    output_path: Path,
+) -> None:
     # --8<-- [start:render-pulp-residuals-vs-predicted]
-    figure, axis = plt.subplots(figsize=(6.4, 5.0), layout="constrained")
-    detailed_array = np.array(detailed_response_indices, dtype=np.int64)
-    for response in detailed_response_indices:
+    figure, axis = _figure(figsize=(6.4, 5.0))
+    detailed_array = np.array(response_indices, dtype=np.int64)
+    for response in response_indices:
         axis.scatter(
             diagnostics.predicted_standardized[:, response],
             diagnostics.residual_standardized[:, response],
@@ -380,35 +354,48 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     axis.axhline(0.0, linewidth=1.0, linestyle="--", color="0.35")
     axis.set_xlabel("Predicted response (standardized)")
     axis.set_ylabel("Standardized residual")
-    axis.set_title(
-        rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}"
-    )
+    axis.set_title(rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}")
     axis.legend(title="Response")
     # --8<-- [end:render-pulp-residuals-vs-predicted]
-    _save_svg(figure, output_dir / "residuals_vs_predicted.svg")
+    _save_svg(figure, output_path)
 
+
+def _render_standardized_rmse(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: tuple[str, ...],
+    output_path: Path,
+) -> None:
     # --8<-- [start:render-pulp-standardized-rmse]
-    figure, axis = plt.subplots(figsize=(7.4, 5.0), layout="constrained")
+    figure, axis = _figure(figsize=(7.4, 5.0))
     positions = np.arange(len(response_names))
     axis.bar(positions, diagnostics.standardized_rmse)
     axis.set_xticks(positions)
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
     axis.set_ylabel("Standardized RMSE")
-    axis.set_title(
-        rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}"
-    )
+    axis.set_title(rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}")
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
         label.set_horizontalalignment("right")
     # --8<-- [end:render-pulp-standardized-rmse]
-    _save_svg(figure, output_dir / "standardized_rmse.svg")
+    _save_svg(figure, output_path)
 
+
+def _write_manifest(
+    output_dir: Path,
+    *,
+    data: PiPLSDataset,
+    search: PiPLSSearchCV,
+    selection: PiPLSSelection,
+    rank_profile: PiPLSPredictorRankProfile,
+    report: PiPLSOOFReport,
+    diagnostics: PredictionDiagnostics,
+    displayed_components: tuple[int, ...],
+    detailed_response_indices: tuple[int, ...],
+) -> Path:
     figures = [
-        {
-            "filename": filename,
-            "sha256": _sha256(output_dir / filename),
-        }
+        {"filename": filename, "sha256": _sha256(output_dir / filename)}
         for filename in FIGURE_FILENAMES
     ]
     manifest = {
@@ -428,13 +415,12 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
             "predictor_rank_at_upper_boundary": bool(
                 selection.predictor_rank == int(rank_profile.predictor_rank[-1])
             ),
-            "displayed_components": [component + 1 for component in display_components],
-            "factor_sign_anchor": {
-                "response": "TI",
-                "sign": "positive",
-            },
+            "displayed_components": [
+                component + 1 for component in displayed_components
+            ],
+            "factor_sign_anchor": {"response": "TI", "sign": "positive"},
             "detailed_responses": [
-                response_names[index] for index in detailed_response_indices
+                data.target_names[index] for index in detailed_response_indices
             ],
             "prediction_kind": diagnostics.prediction_kind,
             "cross_validation": {
@@ -456,6 +442,109 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         encoding="utf-8",
     )
     return manifest_path
+
+
+def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
+    """Generate the representative Pulp tutorial figures and return the manifest path."""
+
+    output_dir = output_dir.resolve()
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
+    output_dir.mkdir(parents=True)
+
+    data = load_pulp()
+    X, Y = data.X, data.Y
+    predictor_names = data.feature_names
+    response_names = data.target_names
+
+    search = PiPLSSearchCV(cv=CV).fit(X, Y)
+    component_path = search.component_path_
+    _render_component_path(
+        component_path,
+        selected=None,
+        title=r"Pulp $\Pi$-PLS component path before selection",
+        output_path=output_dir / "component_path.svg",
+    )
+
+    selection = search.select(n_components=3)
+    rank_profile = search.predictor_rank_profile(selection.n_components)
+    report = search.oof_report(X, Y, selection=selection)
+    if not np.all(report.oof_prediction_counts == 10):
+        raise RuntimeError(
+            "Repeated Pulp CV must produce ten OOF predictions per observation."
+        )
+    diagnostics = prediction_diagnostics(
+        Y,
+        report.oof_predictions,
+        prediction_kind=PREDICTION_KIND,
+    )
+    _render_component_path(
+        component_path,
+        selected=selection,
+        title=r"Pulp $\Pi$-PLS selected component path",
+        output_path=output_dir / "selected_component_path.svg",
+    )
+    _render_predictor_rank_profile(
+        rank_profile,
+        output_path=output_dir / "predictor_rank_profile.svg",
+    )
+
+    model = search.refit(X, Y, selection=selection)
+    factors = pipls_display_factors(
+        model.decomposition_,
+        response_index=response_names.index("TI"),
+        response_sign="positive",
+    )
+    structure = latent_structure(model)
+    displayed_components = tuple(range(selection.n_components))
+    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
+
+    _render_biplot(
+        structure,
+        predictor_names=predictor_names,
+        output_path=output_dir / "biplot.svg",
+    )
+    _render_predictor_directions(
+        factors,
+        predictor_names=predictor_names,
+        n_components=selection.n_components,
+        output_path=output_dir / "predictor_directions.svg",
+    )
+    _render_weighted_response_directions(
+        factors,
+        response_names=response_names,
+        n_components=selection.n_components,
+        output_path=output_dir / "weighted_response_directions.svg",
+    )
+    _render_observed_vs_predicted(
+        diagnostics,
+        response_names=response_names,
+        response_indices=detailed_response_indices,
+        output_path=output_dir / "observed_vs_predicted.svg",
+    )
+    _render_residuals_vs_predicted(
+        diagnostics,
+        response_names=response_names,
+        response_indices=detailed_response_indices,
+        output_path=output_dir / "residuals_vs_predicted.svg",
+    )
+    _render_standardized_rmse(
+        diagnostics,
+        response_names=response_names,
+        output_path=output_dir / "standardized_rmse.svg",
+    )
+
+    return _write_manifest(
+        output_dir,
+        data=data,
+        search=search,
+        selection=selection,
+        rank_profile=rank_profile,
+        report=report,
+        diagnostics=diagnostics,
+        displayed_components=displayed_components,
+        detailed_response_indices=detailed_response_indices,
+    )
 
 
 def _parse_args() -> argparse.Namespace:

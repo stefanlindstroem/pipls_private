@@ -133,7 +133,8 @@ product-boundary decisions remain current.
 5. Remove stale tombstone and duplicate runtime tests, consolidate result and search coverage by
    ownership, and reduce exception-message coupling where wording is not public -- complete.
 6. Refactor the largest caller-owned Pulp example and tutorial renderer into small local plotting
-   functions without changing analytical order, numerical results, or the package surface.
+   functions without changing analytical order, numerical results, or the package surface --
+   complete.
 7. Consolidate durable outcomes, retire superseded implementation decisions under Decision 0147,
    shorten maintainer state, and run the complete validation matrix.
 

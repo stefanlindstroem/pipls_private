@@ -57,6 +57,9 @@
   variability only.
 ### Repository
 
+- Split the large Pulp example and tutorial renderer into focused caller-local plotting and
+  manifest helpers. Preserve the analytical sequence, generated tutorial bytes, numerical results,
+  and the package boundary with no plotting utilities added to `pipls`.
 - Remove historical pre-release tombstone assertions and duplicate search-state tests. Keep current
   public export and result-field surfaces, invalid-value behavior, selection/refit/OOF identity,
   pickle behavior, failed-fit cleanup, and search nonmutation covered directly.

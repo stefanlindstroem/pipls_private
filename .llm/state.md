@@ -202,13 +202,15 @@ and the retirement map use this completed boundary.
 
 Decision 0154 is accepted. A seven-patch cleanup is replacing tests that police repository prose or
 source structure with behavioral, machine-readable artifact, executable-tool, and installed-
-distribution coverage. Patches 1--5 are complete. Pure documentation, decision, repository,
+distribution coverage. Patches 1--6 are complete. Pure documentation, decision, repository,
 workflow, configuration-literal, compatibility-policy, example-source, AST-workflow, snippet-
 marker, plotting-literal, SVG-text, and historical-name tombstone tests are removed. Artifact
 validation shares private subprocess, virtual-environment, archive, and artifact helpers; installed
 and source-distribution checks execute checked-in behavior; public-result tests assert current fields
 rather than removed aliases; and overlapping selection, OOF, pickle, and search-nonmutation tests are
-consolidated. Runtime behavior is unchanged.
+consolidated. The Pulp example and tutorial renderer now delegate figure construction and manifest
+writing to caller-local helpers while preserving analytical order and byte-identical tutorial
+artifacts. Runtime behavior and the installed package surface are unchanged.
 
 ## Authority and drift handling
 

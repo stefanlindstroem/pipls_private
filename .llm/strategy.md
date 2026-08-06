@@ -87,14 +87,15 @@ support claims, and dedicated tests are removed. Generic splitter interoperabili
 reporting, and protocol-neutral singleton-validation scorer safety remain, and the maintained
 example catalogue is contiguous from 01 through 06.
 
-Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patches 1--5 are
+Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patches 1--6 are
 complete: the behavioral boundary is established; repository, documentation, example-source, and
-rendering-source policing is removed; duplicated artifact tooling is consolidated; and stale runtime
-tombstones and overlapping selection/refit tests are removed. Distribution checks use one checked-in
-installed smoke test and shared private subprocess, virtual-environment, archive, and artifact
-helpers. Current public fields and parameter surfaces are tested positively rather than through
-removed aliases. Later patches refactor large caller-owned rendering blocks and retire superseded
-implementation decisions. Runtime behavior is unchanged.
+rendering-source policing is removed; duplicated artifact tooling is consolidated; stale runtime
+tombstones and overlapping selection/refit tests are removed; and the largest Pulp rendering
+workflows now delegate to caller-local helpers. Distribution checks use one checked-in installed
+smoke test and shared private subprocess, virtual-environment, archive, and artifact helpers. Current
+public fields and parameter surfaces are tested positively rather than through removed aliases. The
+final patch retires superseded implementation decisions and closes the cleanup. Runtime behavior is
+unchanged.
 
 ## Deferred work
 
