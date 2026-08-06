@@ -8,10 +8,6 @@ The workflow is to load the Pulp data, search the candidate models, select by ru
 observations, and then inspect fitted values.
 
 ```mermaid
----
-config:
-  htmlLabels: false
----
 flowchart TD
     load["Load Pulp data"]
     search["Search candidate models"]

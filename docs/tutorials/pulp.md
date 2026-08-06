@@ -12,10 +12,6 @@ OOF predictions, refit the same selection, inspect the fitted model, and render 
 selected evidence is unsatisfactory, return to the selection step before refitting.
 
 ```mermaid
----
-config:
-  htmlLabels: false
----
 flowchart TD
     load["Load Pulp data"]
     search["Fit search"]

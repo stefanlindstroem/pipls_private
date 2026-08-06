@@ -12,10 +12,6 @@ conditional predictor-rank profile, refit the same selection, and predict the ex
 If the selected evidence is unsatisfactory, return to the selection step before refitting.
 
 ```mermaid
----
-config:
-  htmlLabels: false
----
 flowchart TD
     data["Generate training and test data"]
     search["Fit search"]

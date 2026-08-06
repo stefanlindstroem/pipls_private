@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Replace the ineffective Mermaid polling script with a custom Mermaid ES module that appends edge-label rules to Material for MkDocs' injected `themeCSS`.
+- Centralize Mermaid flowchart geometry, host spacing, node palettes, and edge-label styling in one custom ES module while using SVG labels consistently.
 - Reuse local component-path plotting helpers in the synthetic and Pulp examples, keep all
   plotting code caller-owned, and use an orange diamond consistently for selected rows across
   numbered examples and tutorial renderers.

@@ -2,13 +2,39 @@ import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.mi
 
 const PIPLS_MERMAID_HOST_CSS = `
 .md-typeset div.mermaid {
+  --pipls-mermaid-node-fill: #4051b5;
+  --pipls-mermaid-node-stroke: #000044;
+  --pipls-mermaid-node-stroke-width: 0;
+  --pipls-mermaid-node-text: #ffffff;
+  --pipls-mermaid-node-font-size: small;
+  --pipls-mermaid-node-line-height: 1.15;
+  --pipls-mermaid-node-radius: 0.5ex;
+
+  --pipls-mermaid-edge-label-bg: #e7e7e7;
+  --pipls-mermaid-edge-label-fg: #3b2d00;
+  --pipls-mermaid-edge-label-font-size: small;
+  --pipls-mermaid-edge-label-line-height: 1;
+  --pipls-mermaid-edge-label-radius: 0.5ex;
+
   box-sizing: border-box;
-
-  /* Space outside the entire chart */
-  margin: 0 0 0 40px;
-
-  /* Space between the host boundary and the SVG */
+  margin-inline-start: 40px;
   padding: 0;
+}
+
+[data-md-color-scheme="slate"] .md-typeset div.mermaid {
+  --pipls-mermaid-node-fill: #2b3038;
+  --pipls-mermaid-node-stroke: #9aa4b2;
+  --pipls-mermaid-node-stroke-width: 1.25px;
+  --pipls-mermaid-node-text: #f5f7fa;
+
+  --pipls-mermaid-edge-label-bg: #5a4514;
+  --pipls-mermaid-edge-label-fg: #fff1bd;
+}
+
+@media screen and (max-width: 44.984375em) {
+  .md-typeset div.mermaid {
+    margin-inline-start: 0;
+  }
 }
 `;
 
@@ -27,34 +53,8 @@ function installPiplsMermaidHostCss() {
 
 installPiplsMermaidHostCss();
 
-const EDGE_LABEL_PALETTES = {
-  default: {
-    background: "#e7e7e7",
-    foreground: "#3b2d00",
-  },
-  slate: {
-    background: "#5a4514",
-    foreground: "#fff1bd",
-  },
-};
-
-const NODE_PALETTES = {
-  default: {
-    fill: "#4051b5",
-    stroke: "#000044",
-    text: "#ffffff",
-    strokeWidth: "0px",
-  },
-  slate: {
-    fill: "#2b3038",
-    stroke: "#9aa4b2",
-    text: "#f5f7fa",
-    strokeWidth: "1.25px",
-  },
-};
-
 const PIPLS_MERMAID_THEME_CSS = `
-/* Standard Mermaid flowchart node shapes */
+/* Standard Mermaid flowchart node shapes. */
 .node rect,
 .node polygon,
 .node circle,
@@ -65,91 +65,44 @@ const PIPLS_MERMAID_THEME_CSS = `
   stroke-width: var(--pipls-mermaid-node-stroke-width) !important;
 }
 
-/* Rounded corners for rectangular nodes */
+/* Rounded corners for rectangular nodes. */
 .node rect {
-  rx: 0.5ex !important;
-  ry: 0.5ex !important;
+  rx: var(--pipls-mermaid-node-radius) !important;
+  ry: var(--pipls-mermaid-node-radius) !important;
 }
 
-/* Node text rendered as HTML */
+/* SVG-rendered node labels. */
 .nodeLabel,
-.nodeLabel p,
-.nodeLabel span,
-.node foreignObject {
-  color: var(--pipls-mermaid-node-text) !important;
-  font-size: small !important;
-  line-height: 1.15 !important;
-}
-
-/* Node text rendered as SVG */
+.nodeLabel text,
+.nodeLabel tspan,
 .node text,
 .node tspan {
   color: var(--pipls-mermaid-node-text) !important;
   fill: var(--pipls-mermaid-node-text) !important;
-  font-size: small !important;
+  font-size: var(--pipls-mermaid-node-font-size) !important;
+  line-height: var(--pipls-mermaid-node-line-height) !important;
 }
 
-/* Keep HTML node labels compact */
-.nodeLabel p,
-.nodeLabel span {
-  margin: 0 !important;
-  background: transparent !important;
-}
-
-/* The outer Mermaid edge label is only a container */
-.edgeLabel {
-  background: transparent !important;
-  color: var(--pipls-mermaid-edge-label-fg) !important;
-}
-
-/* HTML-rendered edge-label box */
-.edgeLabel > p {
-  display: inline-flex !important;
-  align-items: center !important;
-  box-sizing: border-box !important;
-
-  margin: 0 !important;
-  padding: 0.5ex 0.5ex !important;
-
-  background-color: var(--pipls-mermaid-edge-label-bg) !important;
-  color: var(--pipls-mermaid-edge-label-fg) !important;
-
-  font-size: small !important;
-  line-height: 1 !important;
-  border-radius: 0.5ex !important;
-}
-
-/* Do not let nested inline elements create a second box */
-.edgeLabel > p span {
-  margin: 0 !important;
-  padding: 0 !important;
-  background: transparent !important;
-  color: inherit !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-}
-
-/* SVG-rendered edge labels */
+/* SVG-rendered edge labels. */
+.edgeLabel,
 .edgeLabel .label,
 .edgeLabel .label text,
 .edgeLabel .label tspan,
 .edgeLabel text,
-.edgeLabel tspan,
-.flowchart-label .text-outer-tspan {
+.edgeLabel tspan {
   color: var(--pipls-mermaid-edge-label-fg) !important;
   fill: var(--pipls-mermaid-edge-label-fg) !important;
-  font-size: small !important;
-  line-height: 1 !important;
+  font-size: var(--pipls-mermaid-edge-label-font-size) !important;
+  line-height: var(--pipls-mermaid-edge-label-line-height) !important;
 }
 
-/* SVG-backed edge-label background */
+/* SVG-backed edge-label background. */
 .edgeLabel .labelBkg,
-.edgeLabel rect,
-.labelBkg {
+.edgeLabel rect {
   fill: var(--pipls-mermaid-edge-label-bg) !important;
   opacity: 1 !important;
-  rx: 0.5ex;
-  ry: 0.5ex;
+  rx: var(--pipls-mermaid-edge-label-radius) !important;
+  ry: var(--pipls-mermaid-edge-label-radius) !important;
 }
 `;
 
@@ -160,41 +113,6 @@ const PIPLS_FLOWCHART_CONFIG = {
   rankSpacing: 24,
 };
 
-function applyMermaidPalette() {
-  const scheme = document.body?.getAttribute("data-md-color-scheme");
-  const paletteName = scheme === "slate" ? "slate" : "default";
-
-  const edgeLabelPalette = EDGE_LABEL_PALETTES[paletteName];
-  const nodePalette = NODE_PALETTES[paletteName];
-  const root = document.documentElement;
-
-  root.style.setProperty(
-    "--pipls-mermaid-edge-label-bg",
-    edgeLabelPalette.background,
-  );
-  root.style.setProperty(
-    "--pipls-mermaid-edge-label-fg",
-    edgeLabelPalette.foreground,
-  );
-
-  root.style.setProperty("--pipls-mermaid-node-fill", nodePalette.fill);
-  root.style.setProperty("--pipls-mermaid-node-stroke", nodePalette.stroke);
-  root.style.setProperty("--pipls-mermaid-node-text", nodePalette.text);
-  root.style.setProperty(
-    "--pipls-mermaid-node-stroke-width",
-    nodePalette.strokeWidth,
-  );
-}
-
-applyMermaidPalette();
-
-if (document.body) {
-  new MutationObserver(applyMermaidPalette).observe(document.body, {
-    attributes: true,
-    attributeFilter: ["data-md-color-scheme"],
-  });
-}
-
 const initializeMermaid = mermaid.initialize.bind(mermaid);
 
 mermaid.initialize = (configuration = {}) => {
@@ -202,6 +120,7 @@ mermaid.initialize = (configuration = {}) => {
 
   return initializeMermaid({
     ...configuration,
+    htmlLabels: false,
     flowchart: {
       ...(configuration.flowchart ?? {}),
       ...PIPLS_FLOWCHART_CONFIG,
@@ -213,4 +132,3 @@ ${PIPLS_MERMAID_THEME_CSS}`,
 
 /* Material for MkDocs uses this instance when mounting Mermaid blocks. */
 window.mermaid = mermaid;
-
