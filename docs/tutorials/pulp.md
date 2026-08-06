@@ -12,19 +12,28 @@ OOF predictions, refit the same selection, inspect the fitted model, and render 
 selected evidence is unsatisfactory, return to the selection step before refitting.
 
 ```mermaid
+---
+config:
+  htmlLabels: false
+---
 flowchart TD
     load["Load Pulp data"]
     search["Fit search"]
-    path["Inspect component path"]
-    select["Choose component count and create selection"]
-    review["Inspect selected path, conditional rank profile, and OOF predictions"]
+    subgraph "Selection"
+      path["Inspect component path"]
+      select["Choose component count and create selection"]
+      review["Inspect selected path, conditional rank profile, and OOF predictions"]
+      decide{"Satisfied?"}
+    end
     refit["Refit the same selection"]
     analyze["Inspect the fitted model"]
     render["Render reports"]
 
-    load --> search --> path --> select --> review --> refit --> analyze --> render
-    review -. revise if dissatisfied .-> select
+    load --> search --> path --> select --> review --> decide -->|Yes| refit --> analyze --> render
+    decide -->|No| select
     style render fill:#777,stroke:#000,color:#fff
+    linkStyle 5 stroke:#181,color:black;
+    linkStyle 8 stroke:#a11,color:black;
 ```
 
 ## Setup
