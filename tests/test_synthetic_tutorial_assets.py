@@ -4,20 +4,12 @@ import hashlib
 import json
 import math
 import os
-import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-try:
-    import tomllib
-except ModuleNotFoundError:  # pragma: no cover - Python 3.10
-    import tomli as tomllib
-
 import pytest
-
-from tests._mkdocs import load_mkdocs_config
 
 FIGURE_FILENAMES = (
     "component_path.svg",
@@ -102,85 +94,3 @@ def test_synthetic_tutorial_renderer_writes_declared_parseable_svgs(
         figure_path = generated_synthetic_assets / item["filename"]
         ET.parse(figure_path)
         assert item["sha256"] == _sha256(figure_path)
-
-    initial_path = (generated_synthetic_assets / "component_path.svg").read_text(
-        encoding="utf-8"
-    )
-    selected_path = (
-        generated_synthetic_assets / "selected_component_path.svg"
-    ).read_text(encoding="utf-8")
-    assert "Chosen:" not in initial_path
-    assert "Chosen:" in selected_path
-
-
-def test_documentation_targets_own_generated_synthetic_assets() -> None:
-    repository = _repository_root()
-    makefile = (repository / "Makefile").read_text(encoding="utf-8")
-    manifest = (repository / "MANIFEST.in").read_text(encoding="utf-8")
-    sdist_checker = (repository / "tools" / "check_sdist_docs.py").read_text(
-        encoding="utf-8"
-    )
-    with (repository / "pyproject.toml").open("rb") as stream:
-        pyproject = tomllib.load(stream)
-
-    assert "tools/render_synthetic_tutorial.py" in makefile
-    assert makefile.index("tools/render_synthetic_tutorial.py") < makefile.index(
-        "tools/render_pulp_tutorial.py"
-    )
-    assert "include tools/render_synthetic_tutorial.py" in manifest
-    assert "render_synthetic_tutorial.py" in sdist_checker
-    assert 'source / "docs" / "tutorials" / "synthetic.md"' in sdist_checker
-    assert 'source / "examples" / "02_synthetic_path_selection.py"' in sdist_checker
-    assert 'source / "site" / "tutorials" / "synthetic" / "index.html"' in sdist_checker
-    assert "SYNTHETIC_TUTORIAL_FIGURES" in sdist_checker
-    assert "matplotlib>=3.8" in pyproject["project"]["optional-dependencies"]["docs"]
-
-
-def test_synthetic_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
-    repository = _repository_root()
-    tutorial = (repository / "docs" / "tutorials" / "synthetic.md").read_text(
-        encoding="utf-8"
-    )
-    example = (
-        repository / "examples" / "02_synthetic_path_selection.py"
-    ).read_text(encoding="utf-8")
-    mkdocs = load_mkdocs_config(repository / "mkdocs.yml")
-
-    tutorials = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
-    assert [next(iter(item.values())) for item in tutorials] == [
-        "tutorials/quick_start.md",
-        "tutorials/synthetic.md",
-        "tutorials/pulp.md",
-    ]
-
-    snippet_sections = {
-        "import-synthetic-kfold",
-        "define-synthetic-cv",
-        "define-synthetic-component-path-plotter",
-        "generate-synthetic-data",
-        "fit-synthetic-search",
-        "inspect-synthetic-component-path",
-        "choose-synthetic-selection",
-        "inspect-synthetic-selected-evidence",
-        "refit-synthetic-model",
-        "evaluate-synthetic-predictions",
-        "plot-synthetic-component-path",
-        "plot-synthetic-selected-component-path",
-        "plot-synthetic-rank-profile",
-        "plot-synthetic-predictions",
-    }
-    for section in snippet_sections:
-        assert f"examples/02_synthetic_path_selection.py:{section}" in tutorial
-        assert f"# --8<-- [start:{section}]" in example
-        assert f"# --8<-- [end:{section}]" in example
-
-    for filename in FIGURE_FILENAMES:
-        assert f"../assets/generated/synthetic/{filename}" in tutorial
-
-    linked_targets = re.findall(r"\]\(([^)#]+)(?:#[^)]+)?\)", tutorial)
-    assert {
-        "pulp.md",
-        "../api/path.md",
-        "../api/regression.md",
-        "../path_analysis.md",
-    } <= set(linked_targets)

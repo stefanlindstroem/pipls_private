@@ -2,11 +2,12 @@
 
 ## Status
 
-Accepted. Patches 1 and 2 of the seven-patch cleanup sequence are complete. Patch 1 established
-the behavioral-testing boundary. Patch 2 removed repository-prose, documentation-literal,
-decision-text, workflow-text, configuration-literal, and compatibility-policy policing, while
-retaining focused executable coverage for the GitHub Pages configuration tool. Runtime code,
-examples, and served documentation are unchanged.
+Accepted. Patches 1--3 of the seven-patch cleanup sequence are complete. Patch 1 established the
+behavioral-testing boundary. Patch 2 removed repository-prose, documentation-literal,
+decision-text, workflow-text, configuration-literal, and compatibility-policy policing. Patch 3
+removed example-source, AST-workflow, snippet-marker, plotting-literal, and generated-SVG-text
+policing while retaining behavioral renderer, artifact, and runtime rendering-boundary coverage.
+Runtime code, examples, and served documentation are unchanged.
 
 ## Context
 
@@ -121,7 +122,8 @@ product-boundary decisions remain current.
 2. Remove documentation, repository-text, decision-prose, workflow-text, and configuration-literal
    policing; retain only executable maintenance-tool behavior where justified -- complete.
 3. Remove example-source, AST workflow, snippet-marker, plotting-literal, and generated-SVG-text
-   policing; rewrite renderer tests around manifests, declared artifacts, and parseable outputs.
+   policing; rewrite renderer tests around manifests, declared artifacts, and parseable outputs --
+   complete.
 4. Consolidate duplicated distribution and documentation maintenance support, replace embedded
    installed-smoke-test source with a checked-in script, and simplify source-distribution docs
    validation to executable outcomes.

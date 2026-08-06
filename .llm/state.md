@@ -202,10 +202,10 @@ and the retirement map use this completed boundary.
 
 Decision 0154 is accepted. A seven-patch cleanup is replacing tests that police repository prose or
 source structure with behavioral, machine-readable artifact, executable-tool, and installed-
-distribution coverage. Patches 1 and 2 are complete. Pure documentation, decision, repository,
-workflow, configuration-literal, and compatibility-policy test modules are removed; the retained
-GitHub Pages configuration check executes the tool and parses its generated YAML. Runtime behavior
-is unchanged.
+distribution coverage. Patches 1--3 are complete. Pure documentation, decision, repository,
+workflow, configuration-literal, compatibility-policy, example-source, AST-workflow, snippet-
+marker, plotting-literal, and SVG-text tests are removed. Renderer tests execute the tools, parse
+semantic manifests, and validate declared SVG artifacts. Runtime behavior is unchanged.
 
 ## Authority and drift handling
 

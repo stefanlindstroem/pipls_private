@@ -34,21 +34,6 @@ def _canonical_array_hash(array: np.ndarray) -> str:
     return hashlib.sha256(canonical.tobytes(order="C")).hexdigest()
 
 
-def _collect_named_strings(value: object, name: str) -> set[str]:
-    if isinstance(value, dict):
-        collected: set[str] = set()
-        for key, child in value.items():
-            if key == name and isinstance(child, str) and child.strip():
-                collected.add(child.strip())
-            collected.update(_collect_named_strings(child, name))
-        return collected
-    if isinstance(value, list):
-        collected: set[str] = set()
-        for child in value:
-            collected.update(_collect_named_strings(child, name))
-        return collected
-    return set()
-
 
 def test_reference_dataset_resource_directories_are_complete() -> None:
     root = _repository_root()
@@ -104,23 +89,3 @@ def test_reference_dataset_matrices_have_one_active_location() -> None:
             f"src/pipls/_data/{dataset_id}/X.csv",
             f"src/pipls/_data/{dataset_id}/Y.csv",
         ]
-
-
-def test_public_dataset_guide_documents_sources_and_raw_resources() -> None:
-    guide = (_repository_root() / "docs" / "datasets.md").read_text(encoding="utf-8")
-
-    for dataset_id in _DATASET_LOADERS:
-        metadata = _metadata(dataset_id)
-        source = metadata["source"]
-        dois = _collect_named_strings(source, "doi")
-        urls = _collect_named_strings(source, "url")
-        assert dois, dataset_id
-
-        for doi in dois:
-            url = f"https://doi.org/{doi}"
-            assert url in urls, (dataset_id, doi)
-            assert f"]({url})" in guide, (dataset_id, doi)
-
-        for name in sorted(_RESOURCE_FILES):
-            assert f"src/pipls/_data/{dataset_id}/{name}" in guide
-        assert f"pipls/_data/{dataset_id}/" in guide

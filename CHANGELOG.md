@@ -57,6 +57,7 @@
   variability only.
 ### Repository
 
+- Remove example-source, AST-workflow, snippet-marker, plotting-literal, and generated-SVG-text policing from pytest. Keep behavioral renderer execution, semantic manifest checks, parseable artifact validation, runtime import boundaries, dataset-resource integrity, and complete example and documentation execution under their dedicated targets.
 - Use `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)` in the complete Pulp
   workflow and Tutorial 3. Materialize 50 validation splits, average ten OOF predictions per
   observation, record the repeated-CV protocol in the tutorial manifest, update deterministic

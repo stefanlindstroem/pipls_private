@@ -30,35 +30,3 @@ def test_synthetic_example_explains_selection_and_output(
     assert "Selected fixed model: n_components=2, predictor_rank=4" in output
     assert re.search(r"External-test R\^2: -?\d+\.\d{3}", output)
     assert "Wrote PDF figures to" in output
-
-
-def test_synthetic_example_owns_the_short_selection_workflow() -> None:
-    source = (
-        _repository_root() / "examples" / "02_synthetic_path_selection.py"
-    ).read_text(encoding="utf-8")
-
-    assert "make_pipls_train_test(" in source
-    assert "KFold(n_splits=5, shuffle=True, random_state=0)" in source
-    assert "PiPLSSearchCV(cv=CV).fit(train.X, train.Y)" in source
-    assert "path = search.component_path_" in source
-    assert "selection = search.select(n_components=CHOSEN_N_COMPONENTS)" in source
-    assert "search.predictor_rank_profile(selection.n_components)" in source
-    assert "model = search.refit(" in source
-    assert "selection=selection" in source
-    assert "selection = model.selection_" not in source
-    assert "model = PiPLSRegression(" not in source
-    assert "model.predict(test.X)" in source
-    assert 'prediction_kind="external test predictions"' in source
-    assert "diagnostics.observed_standardized" in source
-    assert "diagnostics.predicted_standardized" in source
-    assert "axis.scatter(" in source
-    assert "axis.plot(limits, limits" in source
-    for filename in (
-        "component_path.pdf",
-        "selected_component_path.pdf",
-        "predictor_rank_profile.pdf",
-        "observed_vs_predicted.pdf",
-    ):
-        assert filename in source
-    assert ".to_csv(" not in source
-    assert "pandas" not in source

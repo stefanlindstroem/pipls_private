@@ -87,13 +87,13 @@ support claims, and dedicated tests are removed. Generic splitter interoperabili
 reporting, and protocol-neutral singleton-validation scorer safety remain, and the maintained
 example catalogue is contiguous from 01 through 06.
 
-Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patches 1 and 2 are
-complete: the behavioral boundary is established, and repository-prose, documentation-literal,
-decision-text, workflow-text, configuration-literal, and compatibility-policy policing has been
-removed. A focused subprocess test now covers the GitHub Pages configuration tool through its
-generated YAML. Later patches remove example-source and rendering-literal policing, simplify
-duplicated maintenance tooling, consolidate stale runtime coverage, refactor large caller-owned
-rendering blocks, and retire superseded implementation decisions. Runtime behavior is unchanged.
+Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patches 1--3 are
+complete: the behavioral boundary is established, repository and documentation text policing is
+removed, and example-source, AST-workflow, snippet-marker, plotting-literal, and SVG-text tests are
+removed. Focused tests now execute maintenance and rendering tools and inspect their generated YAML,
+manifests, and parseable artifacts. Later patches simplify duplicated maintenance tooling,
+consolidate stale runtime coverage, refactor large caller-owned rendering blocks, and retire
+superseded implementation decisions. Runtime behavior is unchanged.
 
 ## Deferred work
 

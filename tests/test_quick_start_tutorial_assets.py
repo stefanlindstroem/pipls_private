@@ -11,8 +11,6 @@ from pathlib import Path
 
 import pytest
 
-from tests._mkdocs import load_mkdocs_config
-
 FIGURE_FILENAMES = ("observed_vs_fitted.svg",)
 
 
@@ -82,70 +80,3 @@ def test_quick_start_renderer_writes_one_parseable_fitted_value_svg(
     figure_path = generated_quick_start_assets / FIGURE_FILENAMES[0]
     ET.parse(figure_path)
     assert figures[0]["sha256"] == _sha256(figure_path)
-
-
-def test_quick_start_tutorial_owns_snippets_asset_and_navigation() -> None:
-    repository = _repository_root()
-    tutorial = (repository / "docs" / "tutorials" / "quick_start.md").read_text(
-        encoding="utf-8"
-    )
-    example = (repository / "examples" / "01_pulp_quick_start.py").read_text(
-        encoding="utf-8"
-    )
-    mkdocs = load_mkdocs_config(repository / "mkdocs.yml")
-
-    tutorials = next(item["Tutorials"] for item in mkdocs["nav"] if "Tutorials" in item)
-    assert [next(iter(item.values())) for item in tutorials] == [
-        "tutorials/quick_start.md",
-        "tutorials/synthetic.md",
-        "tutorials/pulp.md",
-    ]
-
-    for section in (
-        "load-pulp-data",
-        "fit-selected-pulp-model",
-        "plot-standardized-fitted-values",
-    ):
-        assert f"examples/01_pulp_quick_start.py:{section}" in tutorial
-        assert f"# --8<-- [start:{section}]" in example
-        assert f"# --8<-- [end:{section}]" in example
-
-    assert "../assets/generated/quick_start/observed_vs_fitted.svg" in tutorial
-    assert "fitted values" in tutorial
-    assert "calibration fit" in tutorial
-    assert "not an out-of-fold" in tutorial
-    assert "selection-conditioned OOF diagnostics" in tutorial
-    assert "model.selection_" in tutorial
-    assert "search.oof_report" in tutorial
-
-    evidence_section = tutorial.split("## Retain the search when evidence matters", 1)[1]
-    evidence_section = evidence_section.split("## Reproduce this tutorial", 1)[0]
-    assert 'selection = search.select(rule="minimum_cv_mse")' in evidence_section
-    assert "selection = model.selection_" not in evidence_section
-    assert "selection=selection" in evidence_section
-    assert evidence_section.index("selection = search.select") < evidence_section.index(
-        "search.oof_report"
-    )
-    assert evidence_section.index("search.oof_report") < evidence_section.index(
-        "search.refit"
-    )
-
-
-def test_documentation_targets_own_generated_quick_start_assets() -> None:
-    repository = _repository_root()
-    makefile = (repository / "Makefile").read_text(encoding="utf-8")
-    manifest = (repository / "MANIFEST.in").read_text(encoding="utf-8")
-    sdist_checker = (repository / "tools" / "check_sdist_docs.py").read_text(
-        encoding="utf-8"
-    )
-
-    assert "tools/render_quick_start_tutorial.py" in makefile
-    assert makefile.index("tools/render_quick_start_tutorial.py") < makefile.index(
-        "tools/render_synthetic_tutorial.py"
-    )
-    assert "include tools/render_quick_start_tutorial.py" in manifest
-    assert "render_quick_start_tutorial.py" in sdist_checker
-    assert 'source / "docs" / "tutorials" / "quick_start.md"' in sdist_checker
-    assert 'source / "examples" / "01_pulp_quick_start.py"' in sdist_checker
-    assert 'source / "site" / "tutorials" / "quick_start" / "index.html"' in sdist_checker
-    assert "QUICK_START_FIGURES" in sdist_checker
