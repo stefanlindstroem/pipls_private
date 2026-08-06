@@ -26,19 +26,6 @@ flowchart TD
     review -. revise if dissatisfied .-> select
 ```
 
-## What this tutorial covers
-
-You will:
-
-1. load the Pulp predictors and responses;
-2. search the admissible path and inspect it before fixing a component count;
-3. choose the component count and create one immutable selection;
-4. inspect the selected path, conditional predictor-rank profile, and OOF predictions;
-5. revise the selection if that evidence is unsatisfactory;
-6. refit the accepted selection on all development observations;
-7. compute immutable latent-structure and factorization results;
-8. render and interpret representative standard PLS-family and Pi-PLS-specific plots.
-
 ## Setup
 
 Install the example dependencies before running the analysis from a source checkout:

@@ -25,18 +25,6 @@ flowchart TD
     review -. revise if dissatisfied .-> select
 ```
 
-## What this tutorial covers
-
-You will:
-
-1. generate independent training and test observations;
-2. evaluate the component and predictor-rank search;
-3. inspect the component path before fixing a component count;
-4. choose the component count and create one manual selection;
-5. inspect the selected path and conditional predictor-rank profile;
-6. refit the exact selected pair on all training observations;
-7. predict the independent test responses and render the numerical results.
-
 The tutorial deliberately stops after one prediction plot. Scores, loadings, Pi-PLS factorization
 plots, and selection-conditioned OOF diagnostics are introduced in the
 [complete Pulp tutorial](pulp.md).
