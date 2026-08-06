@@ -192,6 +192,7 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
 
     example_sections = {
         "pulp-tutorial-setup",
+        "define-pulp-component-path-plotter",
         "load-pulp-data",
         "inspect-pulp-component-path",
         "choose-pulp-selection",

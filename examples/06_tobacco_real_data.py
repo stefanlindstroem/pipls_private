@@ -59,6 +59,7 @@ def _plot_component_path(
         [minimum.n_components],
         [minimum.cv_mse_mean],
         marker="X",
+        color="0.35",
         s=70,
         label=(
             "Conditioned-path minimum: "
@@ -80,6 +81,7 @@ def _plot_component_path(
         [selected.n_components],
         [selected.cv_mse_mean],
         marker="D",
+        color="tab:orange",
         s=70,
         label=(
             f"{100.0 * component_relative_tolerance:.0f}% "
@@ -128,6 +130,7 @@ def _plot_predictor_rank_profile(
         [reference.predictor_rank],
         [reference.cv_mse_mean],
         marker="X",
+        color="0.35",
         s=70,
         label=f"Exact conditional minimum: rank {reference.predictor_rank}",
         zorder=3,
@@ -146,6 +149,7 @@ def _plot_predictor_rank_profile(
         [selected.predictor_rank],
         [selected.cv_mse_mean],
         marker="D",
+        color="tab:orange",
         s=70,
         label=(
             f"{100.0 * predictor_rank_relative_tolerance:.0f}% "

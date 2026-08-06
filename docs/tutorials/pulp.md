@@ -24,6 +24,7 @@ flowchart TD
 
     load --> search --> path --> select --> review --> refit --> analyze --> render
     review -. revise if dissatisfied .-> select
+    style render fill:#777,stroke:#000,color:#fff
 ```
 
 ## Setup
@@ -95,7 +96,12 @@ model.
 Repeated CV makes this complete analysis approximately ten times as expensive as the former single
 five-fold partition. The quick start remains deliberately lighter.
 
-Render the path before fixing a component count:
+Define a local component-path plotter once, then render the path before fixing a component
+count:
+
+```python
+--8<-- "examples/04_pulp_real_data.py:define-pulp-component-path-plotter"
+```
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:plot-pulp-component-path"
@@ -123,16 +129,16 @@ analysis, inspect the first path figure, set the value, and rerun from this sele
 
 ## Inspect the selected path and conditional rank profile
 
-Retrieve the path again for its selected presentation and the predictor-rank evidence conditional
-on the chosen component count:
+Retrieve the predictor-rank evidence conditional on the chosen component count. The same `path`
+object is reused for the selected presentation:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:inspect-pulp-selected-evidence"
 ```
 
 The selected path is numerically identical to the first path; the second presentation adds the
-chosen-row marker. The profile exposes the evaluated predictor ranks at the selected component
-count.
+orange chosen-row marker. The profile exposes the evaluated predictor ranks at the selected
+component count.
 
 ### Selected component path
 
@@ -142,8 +148,9 @@ count.
 
 ![Pulp selected component path](../assets/generated/pulp/selected_component_path.svg)
 
-The diamond marks the selected three-component row. Its stored predictor rank is 9, the rank with
-the lowest evaluated mean CV-MSE at three components across the 50 seeded repeated-CV splits.
+The orange diamond marks the selected three-component row. Its stored predictor rank is 9, the
+rank with the lowest evaluated mean CV-MSE at three components across the 50 seeded repeated-CV
+splits.
 
 ### Conditional predictor-rank profile
 
@@ -153,7 +160,8 @@ the lowest evaluated mean CV-MSE at three components across the 50 seeded repeat
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
-For these 46 rows, 14 predictors, and repeated five-fold CV, the support rule gives
+The orange diamond marks the selected predictor rank. For these 46 rows, 14 predictors, and
+repeated five-fold CV, the support rule gives
 $r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The ten seeded repetitions select the
 interior rank 9. Ranks 9 and 10 have mean CV-MSE values of approximately 0.258 and 0.274, with
 population split SDs of approximately 0.097 and 0.100. Their mean difference is small relative

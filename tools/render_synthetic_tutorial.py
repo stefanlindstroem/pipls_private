@@ -78,6 +78,7 @@ def _render_component_path(
             [selected.n_components],
             [selected.cv_mse_mean],
             marker="D",
+            color="tab:orange",
             s=70,
             label=f"Chosen: {selected.n_components} components",
             zorder=3,
@@ -124,10 +125,9 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
 
     chosen_n_components = 2
     selection = search.select(n_components=chosen_n_components)
-    selected_path = search.component_path_
     rank_profile = search.predictor_rank_profile(selection.n_components)
     _render_component_path(
-        selected_path,
+        path,
         selected=selection,
         title=r"Synthetic $\Pi$-PLS selected component path",
         output_path=output_dir / "selected_component_path.svg",
@@ -145,6 +145,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         [rank_profile.selection.predictor_rank],
         [rank_profile.selection.cv_mse_mean],
         marker="D",
+        color="tab:orange",
         s=70,
         label=f"CV-MSE minimum: rank {rank_profile.selection.predictor_rank}",
         zorder=3,

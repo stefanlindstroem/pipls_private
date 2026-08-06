@@ -102,6 +102,7 @@ def _render_component_path(
             [selected.n_components],
             [selected.cv_mse_mean],
             marker="D",
+            color="tab:orange",
             s=70,
             label=f"Chosen: {selected.n_components} components",
             zorder=3,
@@ -136,6 +137,7 @@ def _render_predictor_rank_profile(
         [profile.selection.predictor_rank],
         [profile.selection.cv_mse_mean],
         marker="D",
+        color="tab:orange",
         s=70,
         label=f"CV-MSE minimum: rank {profile.selection.predictor_rank}",
         zorder=3,
@@ -178,7 +180,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
 
     chosen_n_components = 3
     selection = search.select(n_components=chosen_n_components)
-    selected_component_path = search.component_path_
     rank_profile = search.predictor_rank_profile(selection.n_components)
     report = search.oof_report(
         X,
@@ -196,7 +197,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         prediction_kind=PREDICTION_KIND,
     )
     _render_component_path(
-        selected_component_path,
+        component_path,
         selected=selection,
         title=r"Pulp $\Pi$-PLS selected component path",
         output_path=output_dir / "selected_component_path.svg",

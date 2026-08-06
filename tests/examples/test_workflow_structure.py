@@ -566,3 +566,32 @@ def test_example_support_is_numerical_only() -> None:
         tree = parse_module(path)
         assert import_roots(tree).isdisjoint(_RENDERING_PACKAGES), path
         assert call_names(tree).isdisjoint(prohibited_calls), path
+
+
+@pytest.mark.parametrize(
+    "relative_path",
+    [
+        "examples/02_synthetic_path_selection.py",
+        "examples/04_pulp_real_data.py",
+    ],
+)
+def test_repeated_component_path_plotting_uses_one_local_helper(
+    relative_path: str,
+) -> None:
+    path = _repository_root() / relative_path
+    tree = parse_module(path)
+    functions = top_level_functions(tree)
+    scope = _workflow_scope(tree)
+
+    assert "_plot_component_path" in functions
+    plot_calls = calls_named(scope, "_plot_component_path")
+    assert len(plot_calls) == 2
+    assert keyword_constant(plot_calls[0], "selection") is None
+    assert _keyword_path(plot_calls[1], "selection") == "selection"
+
+    component_path_reads = [
+        node
+        for node in ast.walk(scope)
+        if isinstance(node, ast.Attribute) and node.attr == "component_path_"
+    ]
+    assert len(component_path_reads) == 1

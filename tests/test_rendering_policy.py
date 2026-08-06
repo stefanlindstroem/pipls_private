@@ -15,7 +15,13 @@ except ModuleNotFoundError:  # pragma: no cover - Python 3.10
 
 import pipls
 import pipls.inspection as inspection
-from tests._source_contracts import call_name, dotted_name, import_roots, parse_module
+from tests._source_contracts import (
+    call_name,
+    dotted_name,
+    import_roots,
+    keyword_constant,
+    parse_module,
+)
 
 _RENDERING_PACKAGES = {"matplotlib", "adjustText"}
 _RENDERING_METHODS = {
@@ -173,3 +179,43 @@ def test_maintained_cv_mse_error_bars_use_split_standard_deviation() -> None:
             attribute = dotted_name(yerr)
             assert attribute is not None, path
             assert attribute.endswith(".cv_mse_std"), (path, attribute)
+
+
+def test_selection_diamond_markers_are_orange() -> None:
+    root = _repository_root()
+    paths = [
+        *_numbered_examples(),
+        *sorted((root / "tools").glob("render_*_tutorial.py")),
+    ]
+    diamond_count = 0
+
+    for path in paths:
+        tree = parse_module(path)
+        diamond_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and call_name(node) == "scatter"
+            and keyword_constant(node, "marker") == "D"
+        ]
+        diamond_count += len(diamond_calls)
+        for call in diamond_calls:
+            assert keyword_constant(call, "color") == "tab:orange", path
+
+    assert diamond_count > 0
+
+
+def test_tobacco_reference_markers_are_neutral() -> None:
+    path = _repository_root() / "examples" / "06_tobacco_real_data.py"
+    tree = parse_module(path)
+    reference_calls = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and call_name(node) == "scatter"
+        and keyword_constant(node, "marker") == "X"
+    ]
+
+    assert len(reference_calls) == 2
+    for call in reference_calls:
+        assert keyword_constant(call, "color") == "0.35"

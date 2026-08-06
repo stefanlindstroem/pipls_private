@@ -10,6 +10,7 @@ from matplotlib.patches import FancyArrowPatch
 from sklearn.model_selection import RepeatedKFold
 
 from pipls import PiPLSSearchCV
+from pipls.component_path import PiPLSComponentPath, PiPLSSelection
 from pipls.datasets import load_pulp
 from pipls.inspection import (
     biplot_coordinates,
@@ -22,6 +23,50 @@ ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis
 DETAILED_RESPONSE_COUNT = 3
 CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 # --8<-- [end:pulp-tutorial-setup]
+
+# --8<-- [start:define-pulp-component-path-plotter]
+def _plot_component_path(
+    path: PiPLSComponentPath,
+    *,
+    selection: PiPLSSelection | None,
+    title: str,
+    output_path: Path,
+) -> None:
+    figure, axis = plt.subplots(
+        figsize=(7.4, 4.8),
+        layout="constrained",
+    )
+    axis.errorbar(
+        path.n_components,
+        path.cv_mse_mean,
+        yerr=path.cv_mse_std,
+        fmt="o-",
+        capsize=4,
+    )
+    if selection is not None:
+        axis.scatter(
+            [selection.n_components],
+            [selection.cv_mse_mean],
+            marker="D",
+            color="tab:orange",
+            s=70,
+            label=f"Chosen: {selection.n_components} components",
+            zorder=3,
+        )
+        axis.legend()
+    axis.set_xlabel("Number of components")
+    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
+    axis.set_title(title)
+    axis.set_xticks(path.n_components)
+    upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
+    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
+    axis.grid(axis="y", alpha=0.25)
+    figure.savefig(output_path)
+    plt.close(figure)
+
+
+# --8<-- [end:define-pulp-component-path-plotter]
+
 
 # --8<-- [start:load-pulp-data]
 data = load_pulp()
@@ -41,7 +86,6 @@ selection = search.select(n_components=CHOSEN_N_COMPONENTS)
 # --8<-- [end:choose-pulp-selection]
 
 # --8<-- [start:inspect-pulp-selected-evidence]
-selected_path = search.component_path_
 rank_profile = search.predictor_rank_profile(selection.n_components)
 # --8<-- [end:inspect-pulp-selected-evidence]
 
@@ -80,58 +124,21 @@ structure = latent_structure(model)
 # --8<-- [end:pulp-fitted-model-inspection-results]
 
 # --8<-- [start:plot-pulp-component-path]
-figure, axis = plt.subplots(
-    figsize=(7.4, 4.8),
-    layout="constrained",
+_plot_component_path(
+    path,
+    selection=None,
+    title=r"Pulp $\Pi$-PLS component path before selection",
+    output_path=ANALYSIS_DIR / "component_path.pdf",
 )
-axis.errorbar(
-    path.n_components,
-    path.cv_mse_mean,
-    yerr=path.cv_mse_std,
-    fmt="o-",
-    capsize=4,
-)
-axis.set_xlabel("Number of components")
-axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
-axis.set_title(r"Pulp $\Pi$-PLS component path before selection")
-axis.set_xticks(path.n_components)
-upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
-axis.set_ylim(0.0, max(1.0, 1.05 * upper))
-axis.grid(axis="y", alpha=0.25)
-figure.savefig(ANALYSIS_DIR / "component_path.pdf")
-plt.close(figure)
 # --8<-- [end:plot-pulp-component-path]
 
 # --8<-- [start:plot-pulp-selected-component-path]
-figure, axis = plt.subplots(
-    figsize=(7.4, 4.8),
-    layout="constrained",
+_plot_component_path(
+    path,
+    selection=selection,
+    title=r"Pulp $\Pi$-PLS selected component path",
+    output_path=ANALYSIS_DIR / "selected_component_path.pdf",
 )
-axis.errorbar(
-    selected_path.n_components,
-    selected_path.cv_mse_mean,
-    yerr=selected_path.cv_mse_std,
-    fmt="o-",
-    capsize=4,
-)
-axis.scatter(
-    [selection.n_components],
-    [selection.cv_mse_mean],
-    marker="D",
-    s=70,
-    label=f"Chosen: {selection.n_components} components",
-    zorder=3,
-)
-axis.set_xlabel("Number of components")
-axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
-axis.set_title(r"Pulp $\Pi$-PLS selected component path")
-axis.set_xticks(selected_path.n_components)
-upper = float(np.max(selected_path.cv_mse_mean + selected_path.cv_mse_std))
-axis.set_ylim(0.0, max(1.0, 1.05 * upper))
-axis.grid(axis="y", alpha=0.25)
-axis.legend()
-figure.savefig(ANALYSIS_DIR / "selected_component_path.pdf")
-plt.close(figure)
 # --8<-- [end:plot-pulp-selected-component-path]
 
 # --8<-- [start:plot-pulp-rank-profile]
@@ -151,6 +158,7 @@ axis.scatter(
     [rank_profile.selection.predictor_rank],
     [rank_profile.selection.cv_mse_mean],
     marker="D",
+    color="tab:orange",
     s=70,
     label=f"CV-MSE minimum: rank {rank_profile.selection.predictor_rank}",
     zorder=3,

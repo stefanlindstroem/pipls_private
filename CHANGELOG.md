@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Reuse local component-path plotting helpers in the synthetic and Pulp examples, keep all
+  plotting code caller-owned, and use an orange diamond consistently for selected rows across
+  numbered examples and tutorial renderers.
 - Remove leave-one-out-specific public and maintainer guidance. Keep one concise non-support boundary
   in the path-analysis guide while preserving generic splitter interoperability, ordered OOF
   reporting, pooled OOF $R^2$, and protocol-neutral singleton-validation scorer safety.

@@ -8,7 +8,11 @@ from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
 from pipls import PiPLSSearchCV
-from pipls.component_path import PiPLSComponentPath, PiPLSPredictorRankProfile
+from pipls.component_path import (
+    PiPLSComponentPath,
+    PiPLSPredictorRankProfile,
+    PiPLSSelection,
+)
 from pipls.datasets import load_sugarcane
 from pipls.inspection import (
     LatentStructure,
@@ -24,7 +28,11 @@ CHOSEN_N_COMPONENTS = 2
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 
-def _plot_component_path(path: PiPLSComponentPath, output_path: Path) -> None:
+def _plot_component_path(
+    path: PiPLSComponentPath,
+    selection: PiPLSSelection,
+    output_path: Path,
+) -> None:
     figure, axis = plt.subplots(
         figsize=(7.0, 4.5),
         layout="constrained",
@@ -36,6 +44,15 @@ def _plot_component_path(path: PiPLSComponentPath, output_path: Path) -> None:
         fmt="o-",
         capsize=4,
     )
+    axis.scatter(
+        [selection.n_components],
+        [selection.cv_mse_mean],
+        marker="D",
+        color="tab:orange",
+        s=70,
+        label=f"Chosen: {selection.n_components} components",
+        zorder=3,
+    )
     axis.set_xlabel("Number of components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_title(r"Sugarcane $\Pi$-PLS component path")
@@ -43,6 +60,7 @@ def _plot_component_path(path: PiPLSComponentPath, output_path: Path) -> None:
     upper = float(np.max(path.cv_mse_mean + path.cv_mse_std))
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))
     axis.grid(axis="y", alpha=0.25)
+    axis.legend()
     figure.savefig(output_path)
     plt.close(figure)
 
@@ -66,6 +84,7 @@ def _plot_predictor_rank_profile(
         [profile.selection.predictor_rank],
         [profile.selection.cv_mse_mean],
         marker="D",
+        color="tab:orange",
         s=70,
         label=f"CV-MSE minimum: rank {profile.selection.predictor_rank}",
         zorder=3,
@@ -336,7 +355,11 @@ def main() -> None:
     structure = latent_structure(model)
 
     # Render the final reports from completed public result objects.
-    _plot_component_path(path, ANALYSIS_DIR / "component_path.pdf")
+    _plot_component_path(
+        path,
+        selection,
+        ANALYSIS_DIR / "component_path.pdf",
+    )
     _plot_predictor_rank_profile(
         rank_profile,
         ANALYSIS_DIR / "predictor_rank_profile.pdf",

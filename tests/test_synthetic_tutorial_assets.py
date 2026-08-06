@@ -156,6 +156,7 @@ def test_synthetic_tutorial_uses_checked_snippets_assets_and_public_links() -> N
     snippet_sections = {
         "import-synthetic-kfold",
         "define-synthetic-cv",
+        "define-synthetic-component-path-plotter",
         "generate-synthetic-data",
         "fit-synthetic-search",
         "inspect-synthetic-component-path",

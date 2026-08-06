@@ -90,7 +90,11 @@ Retrieve the component path without creating a selection:
 --8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-component-path"
 ```
 
-Render that unconditional path first:
+Define a local component-path plotter once, then render the unconditional path:
+
+```python
+--8<-- "examples/02_synthetic_path_selection.py:define-synthetic-component-path-plotter"
+```
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-component-path"
@@ -120,8 +124,8 @@ stage.
 
 ## Inspect the selected evidence
 
-Retrieve the path again for its selected presentation and the predictor-rank profile conditional on
-the chosen component count:
+Retrieve the predictor-rank profile conditional on the chosen component count. The same `path`
+object is reused for the selected presentation:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-selected-evidence"
@@ -139,8 +143,8 @@ evidence is accepted.
 
 ![Synthetic selected component path](../assets/generated/synthetic/selected_component_path.svg)
 
-The path is unchanged; the diamond now identifies the selected two-component row. Showing the path
-again makes the recorded decision explicit without implying that path evaluation was repeated.
+The path is unchanged; the orange diamond identifies the selected two-component row. Showing the
+path again makes the recorded decision explicit without implying that path evaluation was repeated.
 
 ### Conditional predictor-rank profile
 
@@ -150,7 +154,8 @@ again makes the recorded decision explicit without implying that path evaluation
 
 ![Synthetic predictor-rank profile](../assets/generated/synthetic/predictor_rank_profile.svg)
 
-At two components, the lowest evaluated mean CV-MSE occurs at predictor rank four. In this
+The orange diamond marks the selected predictor rank. At two components, the lowest evaluated
+mean CV-MSE occurs at predictor rank four. In this
 controlled example, that matches the two shared and two predictor-specific directions in the
 predictor block. This agreement is informative but not a general selection guarantee.
 
