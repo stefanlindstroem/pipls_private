@@ -17,7 +17,6 @@ def test_fit_exposes_expected_fixed_rank_attributes() -> None:
     model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
 
     assert model.predictor_rank == 4
-    assert not hasattr(model, "predictor_rank_")
     assert model.max_predictor_rank_ == min(X.shape[1], X.shape[0] - 1)
     assert model.decomposition_.predictor_directions.shape == (8, 2)
     assert model.decomposition_.dilation.shape == (2,)
@@ -110,21 +109,13 @@ def test_fixed_rank_pair_is_required_and_keyword_only() -> None:
     }
 
 
-def test_fit_creates_no_selection_attributes() -> None:
+def test_fixed_fit_creates_no_search_state() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=2, predictor_rank=4).fit(X, Y)
 
-    for name in (
-        "best_params_",
-        "best_score_",
-        "cv_results_",
-        "oof_report_",
-        "oof_predictions_",
-        "selection_",
-        "predictor_rank_values_",
-        "predictor_rank_search_history_",
-    ):
-        assert not hasattr(model, name)
+    assert not hasattr(model, "selection_")
+    assert not hasattr(model, "cv_results_")
+    assert not hasattr(model, "oof_report_")
 
 
 def test_small_auto_svd_uses_full_solver_and_reports_exact_rank() -> None:

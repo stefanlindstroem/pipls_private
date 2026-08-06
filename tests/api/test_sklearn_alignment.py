@@ -65,9 +65,6 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
         "neg_response_standardized_mse"
     )
     assert signature.parameters["search_method"].default == "adaptive"
-    assert "refit" not in signature.parameters
-    assert "selection_rule" not in signature.parameters
-    assert "return_oof_predictions" not in signature.parameters
     assert "0x" not in str(signature)
     path = PiPLSSearchCV()
     cloned = clone(path)
@@ -127,7 +124,7 @@ def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
     }
 
 
-def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
+def test_search_constructor_has_exact_parameter_surface() -> None:
     assert set(PiPLSSearchCV().get_params(deep=False)) == {
         "cv",
         "estimator",
@@ -143,17 +140,22 @@ def test_path_constructor_has_no_redundant_pipeline_prefix_parameter() -> None:
     }
 
 
-def test_removed_constructor_selection_controls_are_not_accepted() -> None:
-    with pytest.raises(TypeError, match="selection_rule"):
-        PiPLSSearchCV(selection_rule="best_score")  # type: ignore[call-arg]
-    with pytest.raises(TypeError, match="return_oof_predictions"):
-        PiPLSSearchCV(return_oof_predictions=True)  # type: ignore[call-arg]
+def test_search_owns_selection_without_estimator_delegation() -> None:
+    search = PiPLSSearchCV()
 
-
-def test_path_output_configuration_belongs_to_estimator_template() -> None:
-    path = PiPLSSearchCV()
-
-    assert not hasattr(path, "set_output")
+    assert callable(search.select)
+    assert callable(search.refit)
+    assert callable(search.oof_report)
+    for method_name in (
+        "predict",
+        "transform",
+        "fit_transform",
+        "inverse_transform",
+        "score",
+        "get_feature_names_out",
+        "set_output",
+    ):
+        assert not hasattr(search, method_name)
     assert hasattr(_fixed_estimator(), "set_output")
 
 
@@ -170,7 +172,6 @@ def test_fixed_estimator_interoperates_with_grid_search_for_explicit_pairs() -> 
 
     assert isinstance(search.best_estimator_, PiPLSRegression)
     assert search.best_estimator_.predictor_rank in (2, 3)
-    assert not hasattr(search.best_estimator_, "cv_results_")
 
 
 def test_pls_style_method_signatures_include_copy_controls() -> None:
@@ -338,7 +339,6 @@ def test_refit_returns_pipeline_without_flattening_coefficients() -> None:
     assert model.selection_ == search.select(n_components=2)
     assert not hasattr(model.named_steps["regression"], "selection_")
     assert not hasattr(search, "coef_")
-    assert not hasattr(search, "selected_estimator_")
 
 
 def test_minimum_cv_mse_tolerance_refit_preserves_pipeline_composition() -> None:

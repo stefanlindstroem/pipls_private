@@ -87,15 +87,14 @@ support claims, and dedicated tests are removed. Generic splitter interoperabili
 reporting, and protocol-neutral singleton-validation scorer safety remain, and the maintained
 example catalogue is contiguous from 01 through 06.
 
-Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patches 1--4 are
-complete: the behavioral boundary is established, repository and documentation text policing is
-removed, example-source and rendering-source tests are removed, and duplicated artifact tooling is
-consolidated. Distribution checks now use one checked-in installed smoke test and shared private
-subprocess, virtual-environment, archive, and artifact helpers. Source-distribution documentation
-checks execute strict builds and validate semantic manifests and parseable declared artifacts rather
-than fixed source, page, workflow-label, or numerical inventories. Later patches consolidate stale
-runtime coverage, refactor large caller-owned rendering blocks, and retire superseded implementation
-decisions. Runtime behavior is unchanged.
+Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patches 1--5 are
+complete: the behavioral boundary is established; repository, documentation, example-source, and
+rendering-source policing is removed; duplicated artifact tooling is consolidated; and stale runtime
+tombstones and overlapping selection/refit tests are removed. Distribution checks use one checked-in
+installed smoke test and shared private subprocess, virtual-environment, archive, and artifact
+helpers. Current public fields and parameter surfaces are tested positively rather than through
+removed aliases. Later patches refactor large caller-owned rendering blocks and retire superseded
+implementation decisions. Runtime behavior is unchanged.
 
 ## Deferred work
 

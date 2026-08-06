@@ -76,66 +76,78 @@ def test_primary_modules_declare_exact_exports(
     assert {name for name in namespace if name != "__builtins__"} == {expected_name}
 
 
-def test_result_records_are_public_only_from_focused_modules() -> None:
-    removed_top_level_names = (
-        "PiPLSComponentPath",
-        "PiPLSPredictorRankEvidence",
-        "PiPLSSelection",
-        "PiPLSPredictorRankProfile",
-        "PiPLSDecomposition",
-        "PiPLSOOFReport",
-    )
-
-    assert set(pipls.__all__) == {
+def test_top_level_exports_are_exact() -> None:
+    assert pipls.__all__ == [
         "PiPLSRegression",
         "PiPLSSearchCV",
         "PredictorRankSupportWarning",
         "__version__",
+    ]
+
+
+def test_public_result_dataclasses_have_current_fields() -> None:
+    expected = {
+        PiPLSSelection: (
+            "n_components",
+            "predictor_rank",
+            "predictor_rank_policy",
+            "mean_test_score",
+            "cv_mse_mean",
+            "cv_mse_std",
+            "n_splits",
+            "rule",
+            "reference_minimum",
+            "relative_tolerance",
+            "absolute_tolerance",
+            "predictor_rank_evidence",
+        ),
+        PiPLSPredictorRankProfile: (
+            "n_components",
+            "predictor_rank",
+            "mean_test_score",
+            "cv_mse_mean",
+            "cv_mse_std",
+            "predictor_rank_policy",
+            "n_splits",
+            "predictor_rank_evidence",
+        ),
+        PiPLSPredictorRankEvidence: (
+            "reference_predictor_rank",
+            "reference_mean_test_score",
+            "reference_cv_mse_mean",
+            "reference_cv_mse_std",
+            "relative_tolerance",
+            "absolute_tolerance",
+        ),
+        PiPLSComponentPath: (
+            "n_components",
+            "predictor_rank",
+            "predictor_rank_policy",
+            "mean_test_score",
+            "cv_mse_mean",
+            "cv_mse_std",
+            "n_splits",
+            "predictor_rank_evidence",
+        ),
+        PiPLSDecomposition: (
+            "predictor_directions",
+            "dilation",
+            "response_directions",
+            "predictor_numerical_rank",
+            "predictor_numerical_rank_is_exact",
+            "rank_tolerance",
+            "predictor_svd_solver",
+        ),
+        PiPLSOOFReport: (
+            "selection",
+            "oof_predictions",
+            "oof_prediction_counts",
+            "pooled_oof_r2",
+        ),
     }
-    assert all(not hasattr(pipls, name) for name in removed_top_level_names)
 
-
-def test_selection_terminology_has_no_pre_release_aliases() -> None:
-    profile = PiPLSPredictorRankProfile(
-        n_components=1,
-        predictor_rank=np.array([1]),
-        mean_test_score=np.array([-0.5]),
-        cv_mse_mean=np.array([0.5]),
-        cv_mse_std=np.array([0.1]),
-        predictor_rank_policy="optimized",
-        n_splits=3,
-    )
-
-    assert not hasattr(pipls, "PiPLSComponentResult")
-    assert not hasattr(profile, "selected_result")
-    assert isinstance(profile.selection, PiPLSSelection)
-
-
-
-def test_derived_result_properties_are_not_stored_state() -> None:
-    for result_type in (
-        PiPLSSelection,
-        PiPLSPredictorRankProfile,
-        PiPLSPredictorRankEvidence,
-        PiPLSComponentPath,
-    ):
-        assert "cv_mse_standard_error" not in {field.name for field in fields(result_type)}
-
-    assert "cv_mse_threshold" not in {
-        field.name for field in fields(PiPLSSelection)
-    }
-    assert "score_threshold" not in {
-        field.name for field in fields(PiPLSPredictorRankEvidence)
-    }
-    assert "selection" not in {
-        field.name for field in fields(PiPLSPredictorRankProfile)
-    }
-    assert {field.name for field in fields(PiPLSOOFReport)} == {
-        "selection",
-        "oof_predictions",
-        "oof_prediction_counts",
-        "pooled_oof_r2",
-    }
+    for result_type, field_names in expected.items():
+        assert tuple(field.name for field in fields(result_type)) == field_names
 
 
 def test_selection_validates_and_normalizes_python_scalars() -> None:
@@ -146,8 +158,6 @@ def test_selection_validates_and_normalizes_python_scalars() -> None:
     assert type(result.mean_test_score) is float
     assert type(result.cv_mse_mean) is float
     assert type(result.cv_mse_std) is float
-    assert not hasattr(result, "cv_mse_fold_sd")
-    assert not hasattr(result, "cv_mse_standard_error")
     assert type(result.n_splits) is int
     assert result.rule is None
     assert result.reference_minimum is None
@@ -155,7 +165,6 @@ def test_selection_validates_and_normalizes_python_scalars() -> None:
     assert result.absolute_tolerance is None
     assert result.predictor_rank_evidence is None
     assert result.cv_mse_threshold is None
-    assert not hasattr(result, "one_standard_error_threshold")
     with pytest.raises(FrozenInstanceError):
         result.n_components = 1  # type: ignore[misc]
 
@@ -175,7 +184,6 @@ def test_selection_validates_and_normalizes_python_scalars() -> None:
         ("cv_mse_std", np.nan, "finite real"),
         ("n_splits", 0, "positive integer"),
         ("rule", "unknown", "must be one of"),
-        ("rule", "one_standard_error", "must be one of"),
     ],
 )
 def test_selection_rejects_invalid_fields(
@@ -226,7 +234,6 @@ def test_selection_records_tolerance_provenance() -> None:
     assert selection.relative_tolerance == pytest.approx(0.10)
     assert np.isposinf(selection.absolute_tolerance)
     assert selection.cv_mse_threshold == pytest.approx(0.44)
-    assert not hasattr(selection, "one_standard_error_threshold")
 
     restored = pickle.loads(pickle.dumps(selection))
     assert restored == selection
@@ -353,8 +360,7 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
         PiPLSComponentPath(**{**path_kwargs, "cv_mse_mean": [0.5, -0.1]})
     with pytest.raises(ValueError, match="contain integers"):
         PiPLSComponentPath(**{**path_kwargs, "n_components": [1.0, 2.0]})
-    one_split_path = PiPLSComponentPath(**{**path_kwargs, "n_splits": 1})
-    assert not hasattr(one_split_path, "cv_mse_standard_error")
+    PiPLSComponentPath(**{**path_kwargs, "n_splits": 1})
 
     profile_kwargs = {
         "n_components": 2,
@@ -371,18 +377,6 @@ def test_path_records_reject_nonfinite_scores_and_noninteger_index_arrays() -> N
         )
     with pytest.raises(ValueError, match="nonnegative"):
         PiPLSPredictorRankProfile(**{**profile_kwargs, "cv_mse_mean": [0.5, -0.1]})
-
-
-def test_decomposition_uses_mathematical_direction_field_names() -> None:
-    assert tuple(field.name for field in fields(PiPLSDecomposition)) == (
-        "predictor_directions",
-        "dilation",
-        "response_directions",
-        "predictor_numerical_rank",
-        "predictor_numerical_rank_is_exact",
-        "rank_tolerance",
-        "predictor_svd_solver",
-    )
 
 
 def test_decomposition_makes_defensive_read_only_copies_and_revalidates_pickle() -> None:

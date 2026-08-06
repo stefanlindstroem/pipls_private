@@ -41,7 +41,18 @@ def test_n_components_rejects_more_components_than_response_columns() -> None:
 
 @pytest.mark.parametrize(
     "value",
-    [0, -1, True, np.bool_(True), 2.0, np.float64(2.0), "2", "max", "optimal", "auto", None],
+    [
+        0,
+        -1,
+        True,
+        np.bool_(True),
+        2.0,
+        np.float64(2.0),
+        "2",
+        "max",
+        "invalid",
+        None,
+    ],
 )
 def test_predictor_rank_rejects_nonpositive_noninteger_and_mode_values(value: object) -> None:
     X, Y = _data()
@@ -53,7 +64,6 @@ def test_predictor_rank_accepts_numpy_integer() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=2, predictor_rank=np.int64(3)).fit(X, Y)
     assert model.predictor_rank == 3
-    assert not hasattr(model, "predictor_rank_")
 
 
 def test_predictor_rank_rejects_rank_above_matrix_dimensions() -> None:
@@ -142,7 +152,6 @@ def test_numpy_boolean_parameters_are_accepted() -> None:
         copy=np.bool_(False),
     ).fit(X, Y)
     assert model.predictor_rank == 2
-    assert not hasattr(model, "predictor_rank_")
 
 
 @pytest.mark.parametrize("value", [1, None, [], np.asarray(["full"])])

@@ -10,7 +10,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import pipls
 import pipls.datasets
 from pipls.datasets import PiPLSDataset, load_pulp
 
@@ -58,7 +57,6 @@ def test_load_pulp_has_linnerud_style_return_contract() -> None:
     assert signature.parameters["return_X_y"].kind is inspect.Parameter.KEYWORD_ONLY
     assert signature.parameters["return_X_y"].default is False
     assert "load_pulp" in pipls.datasets.__all__
-    assert not hasattr(pipls, "load_pulp")
 
     with pytest.raises(TypeError, match="return_X_y must be a boolean"):
         load_pulp(return_X_y=1)  # type: ignore[arg-type]

@@ -61,8 +61,6 @@ def test_component_path_makes_aligned_read_only_defensive_copies() -> None:
     assert path.mean_test_score.dtype == np.dtype(np.float64)
     assert path.cv_mse_mean.dtype == np.dtype(np.float64)
     assert path.cv_mse_std.dtype == np.dtype(np.float64)
-    assert not hasattr(path, "cv_mse_fold_sd")
-    assert not hasattr(path, "cv_mse_standard_error")
     assert all(not array.flags.writeable for array in arrays)
     assert path.predictor_rank_policy == "fixed"
     assert path.n_splits == 4
@@ -96,8 +94,7 @@ def test_component_path_requires_aligned_ascending_valid_values() -> None:
         PiPLSComponentPath(**{**kwargs, "n_components": [2, 1]})
     with pytest.raises(ValueError, match="must be one of"):
         PiPLSComponentPath(**{**kwargs, "predictor_rank_policy": "unknown"})
-    one_split_path = PiPLSComponentPath(**{**kwargs, "n_splits": 1})
-    assert not hasattr(one_split_path, "cv_mse_standard_error")
+    PiPLSComponentPath(**{**kwargs, "n_splits": 1})
 
 
 def test_component_path_is_pickleable_with_read_only_arrays() -> None:
@@ -112,7 +109,6 @@ def test_component_path_is_pickleable_with_read_only_arrays() -> None:
     np.testing.assert_allclose(restored.mean_test_score, np.array([-0.8, -0.5, -0.45]))
     np.testing.assert_allclose(restored.cv_mse_mean, np.array([0.8, 0.5, 0.45]))
     np.testing.assert_allclose(restored.cv_mse_std, np.array([0.1, 0.08, 0.07]))
-    assert not hasattr(restored, "cv_mse_standard_error")
 
 
 def _predictor_rank_profile() -> PiPLSPredictorRankProfile:
@@ -162,8 +158,6 @@ def test_predictor_rank_profile_makes_read_only_defensive_copies() -> None:
     assert type(profile.n_splits) is int
     np.testing.assert_array_equal(profile.predictor_rank, np.array([2, 3]))
     np.testing.assert_allclose(profile.cv_mse_mean, np.array([0.6, 0.4]))
-    assert not hasattr(profile, "cv_mse_fold_sd")
-    assert not hasattr(profile, "cv_mse_standard_error")
     assert profile.selection.predictor_rank == 3
 
     with pytest.raises(ValueError, match="read-only"):
@@ -186,14 +180,13 @@ def test_predictor_rank_profile_validates_alignment_and_shared_values() -> None:
 
     with pytest.raises(ValueError, match="same length"):
         PiPLSPredictorRankProfile(**{**kwargs, "cv_mse_mean": [0.6, 0.5]})
-    one_split_profile = PiPLSPredictorRankProfile(
+    PiPLSPredictorRankProfile(
         **{
             **kwargs,
             "cv_mse_std": [0.10, 0.09, 0.0],
             "n_splits": 1,
         }
     )
-    assert not hasattr(one_split_profile, "cv_mse_standard_error")
     with pytest.raises(ValueError, match="strictly ascending"):
         PiPLSPredictorRankProfile(**{**kwargs, "predictor_rank": [2, 4, 3]})
     with pytest.raises(ValueError, match="smaller than n_components"):
@@ -236,7 +229,6 @@ def test_predictor_rank_profile_is_pickleable_with_read_only_arrays() -> None:
     assert not restored.predictor_rank.flags.writeable
     assert restored.predictor_rank_policy == "optimized"
     assert restored.selection.predictor_rank == 4
-    assert not hasattr(restored, "cv_mse_standard_error")
 
 
 def test_predictor_rank_evidence_is_immutable_validated_and_pickleable() -> None:

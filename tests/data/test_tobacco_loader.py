@@ -9,7 +9,6 @@ from importlib import resources
 import numpy as np
 import pytest
 
-import pipls
 import pipls.datasets
 from pipls.datasets import PiPLSDataset, load_tobacco
 
@@ -52,7 +51,6 @@ def test_load_tobacco_has_named_loader_return_contract() -> None:
     assert signature.parameters["return_X_y"].kind is inspect.Parameter.KEYWORD_ONLY
     assert signature.parameters["return_X_y"].default is False
     assert "load_tobacco" in pipls.datasets.__all__
-    assert not hasattr(pipls, "load_tobacco")
 
     with pytest.raises(TypeError, match="return_X_y must be a boolean"):
         load_tobacco(return_X_y=1)  # type: ignore[arg-type]

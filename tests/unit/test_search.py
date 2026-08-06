@@ -142,17 +142,6 @@ def test_search_method_default_and_parameter_surface_use_current_values() -> Non
     assert "search_method='exhaustive'" in repr(search)
 
 
-@pytest.mark.parametrize("retired_value", ["auto", "optimal"])
-def test_retired_search_method_values_are_rejected(retired_value: str) -> None:
-    X, Y = _data()
-
-    with pytest.raises(
-        ValueError,
-        match='search_method must be \"adaptive\" or \"exhaustive\"',
-    ):
-        PiPLSSearchCV(search_method=retired_value).fit(X, Y)  # type: ignore[arg-type]
-
-
 @pytest.mark.parametrize("predictor_rank_values", ([2], "max"))
 def test_one_candidate_rank_policies_reject_exhaustive_search(
     predictor_rank_values: object,
@@ -416,13 +405,11 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     assert selected == search.predictor_rank_profile(2).selection
     assert selected.rule is None
     assert selected.reference_minimum is None
-    assert not hasattr(selected, "one_standard_error_threshold")
 
     best = search.select(rule="best_score")
     best_row = search.select(n_components=best.n_components)
     assert best.rule == "best_score"
     assert best.reference_minimum is None
-    assert not hasattr(best, "one_standard_error_threshold")
     assert best.n_components == best_row.n_components
     assert best.predictor_rank == best_row.predictor_rank
     assert best.cv_mse_mean == best_row.cv_mse_mean
@@ -442,8 +429,6 @@ def test_post_fit_select_returns_immutable_stored_results_without_mutation() -> 
     )
     assert np.isposinf(minimum.absolute_tolerance)
     assert minimum.cv_mse_threshold is not None
-    assert not hasattr(minimum, "one_standard_error_threshold")
-    assert not hasattr(minimum, "cv_mse_standard_error")
 
     with pytest.raises(FrozenInstanceError):
         selected.n_components = 99  # type: ignore[misc]
@@ -465,20 +450,15 @@ def test_post_fit_select_validates_selection_input_and_fitted_state() -> None:
         predictor_rank_values=[1, 2],
         cv=3,
     ).fit(X, Y)
-    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+    with pytest.raises(ValueError):
         search.select()
-    with pytest.raises(ValueError, match="Exactly one of rule and n_components"):
+    with pytest.raises(ValueError):
         search.select(rule="best_score", n_components=1)
-    with pytest.raises(ValueError, match="rule must be"):
-        search.select(rule="smallest")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="rule must be"):
-        search.select(rule="one_standard_error")  # type: ignore[arg-type]
-    with pytest.raises(
-        ValueError,
-        match=r"n_components=3 was not evaluated.*\[1, 2\]",
-    ):
+    with pytest.raises(ValueError):
+        search.select(rule="invalid")  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
         search.select(n_components=3)
-    with pytest.raises(ValueError, match="must be an integer"):
+    with pytest.raises(ValueError):
         search.select(n_components=2.0)  # type: ignore[arg-type]
 
 
@@ -743,7 +723,6 @@ def test_minimum_cv_mse_selection_supports_one_validation_split() -> None:
 
     assert selected.n_components == 1
     assert selected.cv_mse_std == 0.0
-    assert not hasattr(search.component_path_, "cv_mse_standard_error")
 
 def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     X, Y = _data()
@@ -762,8 +741,6 @@ def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     assert hasattr(model, "coef_")
     assert model.predict(X).shape == Y.shape
     assert model.selection_ == search.select(rule="best_score")
-    assert not hasattr(search, "selected_estimator_")
-    assert not hasattr(search, "selected_pipls_")
 
 
 def test_post_fit_refit_supports_manual_component_selection() -> None:
@@ -892,7 +869,7 @@ def test_best_score_and_minimum_cv_mse_rules_can_select_different_models() -> No
     assert best_model.n_components != minimum_model.n_components
 
 
-def test_post_fit_operations_create_no_selected_search_state() -> None:
+def test_refit_and_oof_report_share_selection_without_mutating_search() -> None:
     X, Y = _selection_data()
     search = PiPLSSearchCV(
         n_components_values=[1, 2, 3],
@@ -901,51 +878,24 @@ def test_post_fit_operations_create_no_selected_search_state() -> None:
         cv=4,
         n_jobs=1,
     ).fit(X, Y)
-
-    expected = search.select(
-        rule="minimum_cv_mse",
-        relative_tolerance=0.10,
-    )
-    model = search.refit(X, Y, selection=expected)
-    report = search.oof_report(X, Y, selection=expected)
-
-    assert report.selection is expected
-    assert report.selection.rule == "minimum_cv_mse"
-    assert report.selection.reference_minimum is not None
-    assert report.selection.cv_mse_threshold is not None
-    assert model.n_components == expected.n_components
-    assert model.predictor_rank == expected.predictor_rank
-    assert model.selection_ is expected
-    assert model.selection_ is report.selection
-    for name in ("selected_params_", "oof_report_"):
-        assert not hasattr(search, name)
-
-
-def test_refit_and_oof_report_preserve_custom_tolerance_provenance() -> None:
-    X, Y = _selection_data()
-    search = PiPLSSearchCV(
-        n_components_values=[1, 2, 3],
-        predictor_rank_values=[1, 2, 3, 4],
-        search_method="exhaustive",
-        cv=4,
-        n_jobs=1,
-    ).fit(X, Y)
-
     before = pickle.dumps(search)
-    expected = search.select(
+    selection = search.select(
         rule="minimum_cv_mse",
         relative_tolerance=0.10,
         absolute_tolerance=0.05,
     )
-    model = search.refit(X, Y, selection=expected)
-    report = search.oof_report(X, Y, selection=expected)
 
-    assert model.selection_ is expected
-    assert report.selection is expected
-    assert report.selection.relative_tolerance == pytest.approx(0.10)
-    assert report.selection.absolute_tolerance == pytest.approx(0.05)
-    restored = pickle.loads(pickle.dumps(model))
-    assert restored.selection_ == expected
+    model = search.refit(X, Y, selection=selection)
+    report = search.oof_report(X, Y, selection=selection)
+
+    assert model.selection_ is selection
+    assert report.selection is selection
+    assert model.n_components == selection.n_components
+    assert model.predictor_rank == selection.predictor_rank
+    assert selection.reference_minimum is not None
+    assert selection.relative_tolerance == pytest.approx(0.10)
+    assert selection.absolute_tolerance == pytest.approx(0.05)
+    assert selection.cv_mse_threshold is not None
     assert pickle.dumps(search) == before
 
 
@@ -1032,17 +982,15 @@ def test_post_fit_refit_requires_exactly_one_selection_input() -> None:
         cv=3,
     ).fit(X, Y)
     selection = search.select(n_components=1)
-    selector_message = "Exactly one of selection, rule, and n_components"
-
-    with pytest.raises(ValueError, match=selector_message):
+    with pytest.raises(ValueError):
         search.refit(X, Y)
-    with pytest.raises(ValueError, match=selector_message):
+    with pytest.raises(ValueError):
         search.refit(X, Y, rule="best_score", n_components=1)
-    with pytest.raises(ValueError, match=selector_message):
+    with pytest.raises(ValueError):
         search.refit(X, Y, selection=selection, rule="best_score")
-    with pytest.raises(ValueError, match=selector_message):
+    with pytest.raises(ValueError):
         search.refit(X, Y, selection=selection, n_components=1)
-    with pytest.raises(ValueError, match=selector_message):
+    with pytest.raises(ValueError):
         search.refit(
             X,
             Y,
@@ -1050,33 +998,25 @@ def test_post_fit_refit_requires_exactly_one_selection_input() -> None:
             rule="best_score",
             n_components=1,
         )
-    with pytest.raises(TypeError, match="selection must be a PiPLSSelection"):
+    with pytest.raises(TypeError):
         search.refit(X, Y, selection=object())  # type: ignore[arg-type]
-    with pytest.raises(
-        ValueError,
-        match="relative_tolerance is supported only",
-    ):
+    with pytest.raises(ValueError):
         search.refit(
             X,
             Y,
             selection=selection,
             relative_tolerance=0.0,
         )
-    with pytest.raises(
-        ValueError,
-        match="absolute_tolerance is supported only",
-    ):
+    with pytest.raises(ValueError):
         search.refit(
             X,
             Y,
             selection=selection,
             absolute_tolerance=0.0,
         )
-    with pytest.raises(ValueError, match="rule must be"):
-        search.refit(X, Y, rule="smallest")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="rule must be"):
-        search.refit(X, Y, rule="one_standard_error")  # type: ignore[arg-type]
-    with pytest.raises(ValueError, match="was not evaluated"):
+    with pytest.raises(ValueError):
+        search.refit(X, Y, rule="invalid")  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
         search.refit(X, Y, n_components=3)
 
 
@@ -1097,22 +1037,6 @@ def test_post_fit_refit_requires_a_fitted_search() -> None:
         search.refit(X, Y, rule="best_score")
     with pytest.raises(NotFittedError):
         search.refit(X, Y, selection=selection)
-
-
-def test_post_fit_refit_does_not_mutate_search_state() -> None:
-    X, Y = _data()
-    search = PiPLSSearchCV(
-        n_components_values=[1, 2],
-        predictor_rank_values=[1, 2, 3],
-        cv=3,
-    ).fit(X, Y)
-    selection = search.select(n_components=1)
-    before = pickle.dumps(search)
-
-    model = search.refit(X, Y, selection=selection)
-
-    assert model.selection_ is selection
-    assert pickle.dumps(search) == before
 
 
 def test_refitted_model_selection_is_pickle_stable_and_not_cloned() -> None:
@@ -1177,40 +1101,6 @@ def test_failed_post_fit_refit_leaves_search_state_unchanged() -> None:
         search.refit(X[:-1], Y, selection=selection)
 
     assert pickle.dumps(search) == before
-
-
-def test_search_exposes_evidence_and_refit_but_no_model_delegation() -> None:
-    X, Y = _data()
-    search = PiPLSSearchCV(
-        n_components_values=[1],
-        predictor_rank_values=[1, 2],
-        cv=3,
-    )
-
-    for method_name in (
-        "predict",
-        "transform",
-        "fit_transform",
-        "inverse_transform",
-        "score",
-        "get_feature_names_out",
-        "set_output",
-    ):
-        assert not hasattr(search, method_name)
-
-    search.fit(X, Y)
-    assert hasattr(search, "refit")
-    assert hasattr(search, "oof_report")
-    for method_name in (
-        "predict",
-        "transform",
-        "fit_transform",
-        "inverse_transform",
-        "score",
-        "get_feature_names_out",
-        "set_output",
-    ):
-        assert not hasattr(search, method_name)
 
 
 def test_pipeline_is_cloned_inside_each_fold_and_prefix_is_inferred() -> None:
@@ -1433,7 +1323,6 @@ def test_path_suppresses_direct_fit_support_warning_through_oof_and_post_fit_ref
     assert model.selection_.predictor_rank == 4
     assert isinstance(model, PiPLSRegression)
     assert model.predictor_rank == 4
-    assert not hasattr(model, "predictor_rank_")
     np.testing.assert_array_equal(report.oof_prediction_counts, np.ones(X.shape[0]))
 
 
@@ -1617,7 +1506,6 @@ def test_cv_mse_summaries_use_equal_weight_for_every_materialized_split(
 
     if expected_n_splits == 1:
         assert path.cv_mse_std[0] == 0.0
-    assert not hasattr(path, "cv_mse_standard_error")
 
 
 def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> None:
@@ -1635,7 +1523,6 @@ def test_predictor_rank_profile_is_sorted_and_consistent_with_cv_results() -> No
     assert isinstance(profile, PiPLSPredictorRankProfile)
     assert profile.n_components == 2
     assert profile.n_splits == 3
-    assert not hasattr(profile, "cv_mse_standard_error")
     np.testing.assert_array_equal(profile.predictor_rank, np.array([2, 3, 4]))
     assert all(
         not array.flags.writeable

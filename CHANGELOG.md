@@ -57,6 +57,9 @@
   variability only.
 ### Repository
 
+- Remove historical pre-release tombstone assertions and duplicate search-state tests. Keep current
+  public export and result-field surfaces, invalid-value behavior, selection/refit/OOF identity,
+  pickle behavior, failed-fit cleanup, and search nonmutation covered directly.
 - Consolidate wheel, source-distribution, and documentation validation around shared private
   artifact helpers. Replace the embedded installed-package smoke-test string with a checked-in
   script, and validate source-distribution documentation through strict builds, semantic figure

@@ -76,7 +76,6 @@ def test_pulp_path_selects_the_documented_fixed_pair(pulp_result: SimpleNamespac
     assert result.model.predictor_rank == 9
     assert result.model.selection_ is result.selected
     assert result.report.selection is result.selected
-    assert not hasattr(result.model, "predictor_rank_")
 
 
 def test_pulp_rank_profile_exposes_the_interior_selection(

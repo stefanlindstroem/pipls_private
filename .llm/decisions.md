@@ -79,10 +79,9 @@ This registry lists only numbered decisions that still define current behavior o
   executable maintenance tools covered at their owning boundaries.
 - Simplify duplicated maintenance tooling and large caller-owned renderers without adding product
   surface.
-- The seven-patch cleanup is active; Patches 1--3 establish policy and remove repository-prose,
-  documentation-literal, decision-text, workflow-text, configuration-literal, compatibility-policy,
-  example-source, AST-workflow, snippet-marker, plotting-literal, and generated-SVG-text policing
-  without changing runtime behavior.
+- The seven-patch cleanup is active; Patches 1--5 establish policy, remove repository and source
+  policing, consolidate artifact tools, and replace historical-name and duplicate state tests with
+  positive current API and behavioral coverage without changing runtime behavior.
 
 ## Implemented Decision 0153 contract
 
