@@ -213,7 +213,7 @@ def main() -> None:
             source / "tools" / "render_pulp_tutorial.py",
             source / "examples" / "01_pulp_quick_start.py",
             source / "examples" / "02_synthetic_path_selection.py",
-            source / "examples" / "05_pulp_real_data.py",
+            source / "examples" / "04_pulp_real_data.py",
             *(
                 source / "src" / "pipls" / "_data" / dataset_id / filename
                 for dataset_id in ("pulp", "sugarcane", "tobacco")

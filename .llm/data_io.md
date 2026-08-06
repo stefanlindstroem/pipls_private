@@ -134,7 +134,7 @@ Do not introduce merely for examples:
 Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize intermediate
 analysis results. Every numbered real-data workflow keeps paths, selected rows, predictor-rank
 profiles, validation reports, and inspection results in memory, creates figures directly, and
-writes only final PDF outputs. Example 04 compares immutable Pi-PLS and ordinary-PLS paths; Pulp,
+writes only final PDF outputs. Example 03 compares immutable Pi-PLS and ordinary-PLS paths; Pulp,
 Sugarcane, and Tobacco expose the conditional predictor-rank profile at their selected component
 count. Tobacco uses search-owned minimum-CV-MSE selection with a 10% relative tolerance and passes the returned count into
 `predictor_rank_profile()`.

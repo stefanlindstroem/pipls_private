@@ -147,7 +147,7 @@ def test_documentation_targets_own_generated_pulp_assets() -> None:
     assert "adjustText>=1.4,<2" in docs_dependencies
     assert "render_pulp_tutorial.py" in sdist_checker
     assert 'source / "docs" / "tutorials" / "pulp.md"' in sdist_checker
-    assert 'source / "examples" / "05_pulp_real_data.py"' in sdist_checker
+    assert 'source / "examples" / "04_pulp_real_data.py"' in sdist_checker
     assert 'source / "site" / "tutorials" / "pulp" / "index.html"' in sdist_checker
     assert "PULP_TUTORIAL_FIGURES" in sdist_checker
     assert '"splitter": "RepeatedKFold"' in sdist_checker
@@ -163,7 +163,7 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
     tutorial = (repository / "docs" / "tutorials" / "pulp.md").read_text(
         encoding="utf-8"
     )
-    example = (repository / "examples" / "05_pulp_real_data.py").read_text(
+    example = (repository / "examples" / "04_pulp_real_data.py").read_text(
         encoding="utf-8"
     )
     renderer = (repository / "tools" / "render_pulp_tutorial.py").read_text(
@@ -205,7 +205,7 @@ def test_pulp_tutorial_uses_checked_snippets_assets_and_public_links() -> None:
         "pulp-fitted-model-inspection-results",
     }
     for section in example_sections:
-        assert f"examples/05_pulp_real_data.py:{section}" in tutorial
+        assert f"examples/04_pulp_real_data.py:{section}" in tutorial
         assert f"# --8<-- [start:{section}]" in example
         assert f"# --8<-- [end:{section}]" in example
 

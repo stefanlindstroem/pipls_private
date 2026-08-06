@@ -20,7 +20,7 @@ duplicate it as a literal or reconstruct candidate rows from `cv_results_`.
 
 ## Decision
 
-Examples 06 and 07 use the public composition:
+Examples 05 and 06 use the public composition:
 
 ```python
 selection = search.select(...)

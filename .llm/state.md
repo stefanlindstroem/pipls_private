@@ -112,13 +112,12 @@ The maintained numbered examples are user tasks:
 
 1. compact Pulp automatic fit and fitted-value diagnostic;
 2. synthetic inspect-decide-refit workflow with external-test prediction;
-3. focused leave-one-out validation;
-4. Pi-PLS versus ordinary-PLS component-path comparison;
-5. complete repeated-CV Pulp analysis;
-6. complete Sugarcane analysis;
-7. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
+3. Pi-PLS versus ordinary-PLS component-path comparison;
+4. complete repeated-CV Pulp analysis;
+5. complete Sugarcane analysis;
+6. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
 
-Example 05 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 06 and 07 use
+Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 05 and 06 use
 `KFold(n_splits=5, shuffle=True, random_state=0)`. Complete real-data examples are exercised by
 `make examples`, not duplicated in the default test suite.
 
@@ -195,11 +194,11 @@ step. Same-search OOF results are descriptive selection-conditioned evidence rat
 independent qualification. Tutorials 2 and 3 retain separate unselected and selected path
 artifacts.
 
-Decision 0153 is accepted and active. Patches 1 and 2 are implemented. The runtime no longer
-detects leave-one-out split structure, and `PiPLSOOFReport` no longer exposes
-`is_leave_one_out`. Generic splitter interoperability, ordered OOF reporting, and protocol-neutral
-singleton-validation scorer safety remain. Patch 3 will delete the dedicated example and test and
-renumber the remaining catalogue.
+Decision 0153 is accepted and active. Patches 1--3 are implemented. The runtime no longer
+detects leave-one-out split structure, `PiPLSOOFReport` no longer exposes `is_leave_one_out`, and
+the dedicated example and test are removed. The maintained example catalogue is contiguous from
+01 through 06. Generic splitter interoperability, ordered OOF reporting, and protocol-neutral
+singleton-validation scorer safety remain. Patch 4 removes the remaining support documentation.
 
 ## Authority and drift handling
 

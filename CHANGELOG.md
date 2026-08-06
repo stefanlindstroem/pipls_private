@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove the dedicated leave-one-out example and executable test, renumber the remaining numbered
+  examples from 01 through 06, and update tutorial snippets, distribution checks, catalogues,
+  decisions, and structural tests without changing their numerical workflows.
 - Remove package-owned leave-one-out provenance from the generic OOF result: delete private
   split-structure recognition and `PiPLSOOFReport.is_leave_one_out` without an alias, while
   preserving ordered predictions, counts, partial coverage, pooled OOF $R^2$, splitter

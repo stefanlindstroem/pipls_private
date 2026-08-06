@@ -102,7 +102,7 @@ contains paper-reproduction placeholders or promises to implement manuscript wor
 The former synthetic benchmark sequence was retired after serving its development-validation
 purpose. Package-owned Pulp, Sugarcane, and Tobacco are user-run examples rather than default-test
 jobs. Every maintained consumer uses the installed loaders, and the package resources are the sole
-active matrix copies. Example 04 keeps the Pi-PLS and
+active matrix copies. Example 03 keeps the Pi-PLS and
 standard PLS (NIPALS) comparison paths in memory
 and writes only the overlaid final PDFs. Sugarcane keeps its Pi-PLS path, selection-conditioned OOF
 predictions, and inspection results in memory and writes only final PDF figures. Pulp follows the

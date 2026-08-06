@@ -2,11 +2,11 @@
 
 ## Status
 
-Accepted. Implementation is planned in five patches. Patches 1 and 2 are implemented. Patch 2
-removed `PiPLSOOFReport.is_leave_one_out` and private split-structure recognition, retained generic
-OOF reporting, and made singleton-validation scorer safety protocol-neutral. The dedicated example,
-its support documentation, example numbering, and historical decision consolidation remain for
-Patches 3--5.
+Accepted. Implementation is planned in five patches. Patches 1--3 are implemented. The public
+leave-one-out provenance field and private detector are removed, singleton-validation scorer safety
+is protocol-neutral, the dedicated example and test are deleted, and the maintained examples are
+renumbered contiguously. Support documentation and historical decision consolidation remain for
+Patches 4 and 5.
 
 ## Context
 

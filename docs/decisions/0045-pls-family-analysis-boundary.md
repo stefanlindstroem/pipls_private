@@ -26,7 +26,7 @@ The repository distinguishes three analysis roles.
 
 ### Comparative component-path diagnostics
 
-`examples/04_pls_path_comparison.py` compares Pi-PLS and ordinary PLS component paths for Pulp,
+`examples/03_pls_path_comparison.py` compares Pi-PLS and ordinary PLS component paths for Pulp,
 Sugarcane, and Tobacco using the same validation partitions and response-standardized CV-MSE
 summary. Ordinary `PLSRegression` is permitted in that focused comparison because it answers a
 model-comparison question; it does not create the model interpreted by the subsequent dataset

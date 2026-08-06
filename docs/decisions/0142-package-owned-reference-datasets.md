@@ -135,7 +135,7 @@ layer is introduced.
 - Pulp, Sugarcane, and Tobacco can be loaded from a clean installed package through one consistent
   named-loader vocabulary.
 - Their canonical CSV matrices remain directly usable outside Python and are documented as such.
-- Examples 04, 06, and 07 can stop depending on repository-relative paths and pandas for fixed
+- Examples 03, 05, and 06 can stop depending on repository-relative paths and pandas for fixed
   dataset ingestion.
 - Package distributions grow because the spectral matrices travel with the base installation.
 - Resource hashes, canonical-array hashes, installed-distribution loading, and single-copy location

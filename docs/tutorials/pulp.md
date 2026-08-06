@@ -52,7 +52,7 @@ Matplotlib, and `adjustText`, then defines the output location, diagnostic-respo
 validation splitter:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:pulp-tutorial-setup"
+--8<-- "examples/04_pulp_real_data.py:pulp-tutorial-setup"
 ```
 
 The component count is intentionally absent from this setup block. It is introduced only after the
@@ -86,7 +86,7 @@ at that component count. The distinction is summarized in
 The named loader returns immutable matrices together with scientific predictor and response labels:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:load-pulp-data"
+--8<-- "examples/04_pulp_real_data.py:load-pulp-data"
 ```
 
 The resulting arrays have shapes `(46, 14)` and `(46, 8)`. The same loader works from a source
@@ -97,7 +97,7 @@ checkout, wheel, or source distribution and applies no preprocessing.
 Fit the search and retrieve the conditioned component path without creating a selection:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:inspect-pulp-component-path"
+--8<-- "examples/04_pulp_real_data.py:inspect-pulp-component-path"
 ```
 
 The search evaluates admissible paired-mode counts and conditionally retains one predictor rank at
@@ -111,7 +111,7 @@ five-fold partition. The quick start remains deliberately lighter.
 Render the path before fixing a component count:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:plot-pulp-component-path"
+--8<-- "examples/04_pulp_real_data.py:plot-pulp-component-path"
 ```
 
 ![Pulp component path before selection](../assets/generated/pulp/component_path.svg)
@@ -127,7 +127,7 @@ the component-count decision.
 After inspecting the path, record the chosen count and create the corresponding immutable row:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:choose-pulp-selection"
+--8<-- "examples/04_pulp_real_data.py:choose-pulp-selection"
 ```
 
 Setting `CHOSEN_N_COMPONENTS=3` and calling `search.select(...)` are one conceptual operation. The
@@ -140,7 +140,7 @@ Retrieve the path again for its selected presentation and the predictor-rank evi
 on the chosen component count:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:inspect-pulp-selected-evidence"
+--8<-- "examples/04_pulp_real_data.py:inspect-pulp-selected-evidence"
 ```
 
 The selected path is numerically identical to the first path; the second presentation adds the
@@ -150,7 +150,7 @@ count.
 ### Selected component path
 
 ```python
---8<-- "examples/05_pulp_real_data.py:plot-pulp-selected-component-path"
+--8<-- "examples/04_pulp_real_data.py:plot-pulp-selected-component-path"
 ```
 
 ![Pulp selected component path](../assets/generated/pulp/selected_component_path.svg)
@@ -161,7 +161,7 @@ the lowest evaluated mean CV-MSE at three components across the 50 seeded repeat
 ### Conditional predictor-rank profile
 
 ```python
---8<-- "examples/05_pulp_real_data.py:plot-pulp-rank-profile"
+--8<-- "examples/04_pulp_real_data.py:plot-pulp-rank-profile"
 ```
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
@@ -188,7 +188,7 @@ The OOF report consumes the exact selection already inspected above rather than 
 component count again:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:pulp-oof-predictions"
+--8<-- "examples/04_pulp_real_data.py:pulp-oof-predictions"
 ```
 
 `oof_report()` reuses the exact 50 seeded splits materialized during path evaluation and recomputes
@@ -201,7 +201,7 @@ appropriate protocol when the sampling design carries experimental structure.
 Convert those predictions to an immutable diagnostic result before refitting:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:pulp-oof-inspection-results"
+--8<-- "examples/04_pulp_real_data.py:pulp-oof-inspection-results"
 ```
 
 !!! important "Validation scope"
@@ -268,7 +268,7 @@ After the selection evidence has been examined, fit the exact same selection on 
 observations:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:fit-pulp-model"
+--8<-- "examples/04_pulp_real_data.py:fit-pulp-model"
 ```
 
 `refit(selection=selection)` does not repeat the component-count decision. It validates the supplied
@@ -283,7 +283,7 @@ The fitted estimator is converted to numerical result objects before the fitted-
 rendered:
 
 ```python
---8<-- "examples/05_pulp_real_data.py:pulp-fitted-model-inspection-results"
+--8<-- "examples/04_pulp_real_data.py:pulp-fitted-model-inspection-results"
 ```
 
 | Result | Question answered |
@@ -378,12 +378,12 @@ four-panel Pi-PLS factorization figure. See [Dilation](../model_inspection.md#di
 
 ## Reproduce this tutorial
 
-The analysis and selection snippets are maintained in `examples/05_pulp_real_data.py`. The repeated
+The analysis and selection snippets are maintained in `examples/04_pulp_real_data.py`. The repeated
 search is the deliberately expensive tutorial workflow; run the complete example from the repository
 root:
 
 ```bash
-python examples/05_pulp_real_data.py
+python examples/04_pulp_real_data.py
 ```
 
 Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.

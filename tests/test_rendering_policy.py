@@ -112,7 +112,7 @@ def test_tutorial_examples_render_named_result_arrays_directly() -> None:
     synthetic = (root / "examples" / "02_synthetic_path_selection.py").read_text(
         encoding="utf-8"
     )
-    pulp = (root / "examples" / "05_pulp_real_data.py").read_text(encoding="utf-8")
+    pulp = (root / "examples" / "04_pulp_real_data.py").read_text(encoding="utf-8")
 
     for field in (
         "path.n_components",
@@ -142,10 +142,10 @@ def test_maintained_cv_mse_error_bars_use_split_standard_deviation() -> None:
     root = _repository_root()
     relative_paths = (
         "examples/02_synthetic_path_selection.py",
-        "examples/04_pls_path_comparison.py",
-        "examples/05_pulp_real_data.py",
-        "examples/06_sugarcane_real_data.py",
-        "examples/07_tobacco_real_data.py",
+        "examples/03_pls_path_comparison.py",
+        "examples/04_pulp_real_data.py",
+        "examples/05_sugarcane_real_data.py",
+        "examples/06_tobacco_real_data.py",
         "tools/render_synthetic_tutorial.py",
         "tools/render_pulp_tutorial.py",
     )

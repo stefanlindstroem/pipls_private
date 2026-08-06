@@ -52,9 +52,9 @@ _SYNTHETIC_SELECTION_WORKFLOWS = (
     "tools/render_synthetic_tutorial.py",
 )
 _SELECTION_DRIVEN_REAL_DATA_WORKFLOWS = (
-    "examples/05_pulp_real_data.py",
-    "examples/06_sugarcane_real_data.py",
-    "examples/07_tobacco_real_data.py",
+    "examples/04_pulp_real_data.py",
+    "examples/05_sugarcane_real_data.py",
+    "examples/06_tobacco_real_data.py",
     "tools/render_pulp_tutorial.py",
 )
 
@@ -113,22 +113,22 @@ def _keyword_path(call: ast.Call, keyword_name: str) -> str | None:
             {"n_splits": 5, "shuffle": True, "random_state": 0},
         ),
         (
-            "examples/04_pls_path_comparison.py",
+            "examples/03_pls_path_comparison.py",
             "KFold",
             {"n_splits": 5, "shuffle": True, "random_state": 0},
         ),
         (
-            "examples/05_pulp_real_data.py",
+            "examples/04_pulp_real_data.py",
             "RepeatedKFold",
             {"n_splits": 5, "n_repeats": 10, "random_state": 0},
         ),
         (
-            "examples/06_sugarcane_real_data.py",
+            "examples/05_sugarcane_real_data.py",
             "KFold",
             {"n_splits": 5, "shuffle": True, "random_state": 0},
         ),
         (
-            "examples/07_tobacco_real_data.py",
+            "examples/06_tobacco_real_data.py",
             "KFold",
             {"n_splits": 5, "shuffle": True, "random_state": 0},
         ),
@@ -160,22 +160,6 @@ def test_randomized_cv_is_explicitly_seeded(
         } == expected
 
 
-def test_leave_one_out_example_uses_exhaustive_validation() -> None:
-    tree = parse_module(
-        _repository_root() / "examples" / "03_leave_one_out_validation.py"
-    )
-    calls = call_names(tree)
-
-    assert "LeaveOneOut" in calls
-    assert {"KFold", "RepeatedKFold", "refit"}.isdisjoint(calls)
-    select_calls = calls_named(tree, "select")
-    assert len(select_calls) == 1
-    assert keyword_constant(select_calls[0], "rule") == "best_score"
-
-    report_calls = calls_named(tree, "oof_report")
-    assert len(report_calls) == 1
-    assert _keyword_path(report_calls[0], "selection") is not None
-
 
 def test_examples_import_only_public_pipls_modules_and_names() -> None:
     for path in _maintained_python_files():
@@ -190,8 +174,8 @@ def test_examples_import_only_public_pipls_modules_and_names() -> None:
             "load_pulp",
             (
                 "examples/01_pulp_quick_start.py",
-                "examples/04_pls_path_comparison.py",
-                "examples/05_pulp_real_data.py",
+                "examples/03_pls_path_comparison.py",
+                "examples/04_pulp_real_data.py",
                 "tools/render_pulp_tutorial.py",
                 "tools/render_quick_start_tutorial.py",
             ),
@@ -199,15 +183,15 @@ def test_examples_import_only_public_pipls_modules_and_names() -> None:
         (
             "load_sugarcane",
             (
-                "examples/04_pls_path_comparison.py",
-                "examples/06_sugarcane_real_data.py",
+                "examples/03_pls_path_comparison.py",
+                "examples/05_sugarcane_real_data.py",
             ),
         ),
         (
             "load_tobacco",
             (
-                "examples/04_pls_path_comparison.py",
-                "examples/07_tobacco_real_data.py",
+                "examples/03_pls_path_comparison.py",
+                "examples/06_tobacco_real_data.py",
             ),
         ),
     ],
@@ -234,12 +218,12 @@ def test_ordinary_pls_is_confined_to_the_comparison_support() -> None:
     }
 
     assert users == {"_support/pls_component_path.py"}
-    comparison_calls = call_names(parse_module(examples / "04_pls_path_comparison.py"))
+    comparison_calls = call_names(parse_module(examples / "03_pls_path_comparison.py"))
     assert "evaluate_pls_component_path" in comparison_calls
     for filename in (
-        "05_pulp_real_data.py",
-        "06_sugarcane_real_data.py",
-        "07_tobacco_real_data.py",
+        "04_pulp_real_data.py",
+        "05_sugarcane_real_data.py",
+        "06_tobacco_real_data.py",
     ):
         assert "evaluate_pls_component_path" not in call_names(
             parse_module(examples / filename)
@@ -352,7 +336,7 @@ def test_real_data_selection_review_precedes_refit(
             "inspect-synthetic-selected-evidence",
         ),
         (
-            "examples/05_pulp_real_data.py",
+            "examples/04_pulp_real_data.py",
             "inspect-pulp-component-path",
             "choose-pulp-selection",
             "inspect-pulp-selected-evidence",
@@ -382,8 +366,8 @@ def test_manual_tutorial_sources_separate_path_selection_and_review(
 @pytest.mark.parametrize(
     "relative_path",
     [
-        "examples/06_sugarcane_real_data.py",
-        "examples/07_tobacco_real_data.py",
+        "examples/05_sugarcane_real_data.py",
+        "examples/06_tobacco_real_data.py",
     ],
 )
 def test_complete_examples_separate_analysis_from_rendering(
@@ -404,10 +388,10 @@ def test_complete_examples_separate_analysis_from_rendering(
 @pytest.mark.parametrize(
     ("relative_path", "extra_analysis_calls"),
     [
-        ("examples/05_pulp_real_data.py", set()),
-        ("examples/06_sugarcane_real_data.py", {"predictor_rank_profile"}),
+        ("examples/04_pulp_real_data.py", set()),
+        ("examples/05_sugarcane_real_data.py", {"predictor_rank_profile"}),
         (
-            "examples/07_tobacco_real_data.py",
+            "examples/06_tobacco_real_data.py",
             {"observation_diagnostics", "predictor_rank_profile"},
         ),
     ],
@@ -432,8 +416,8 @@ def test_real_data_examples_use_public_selection_and_inspection(
 @pytest.mark.parametrize(
     "relative_path",
     [
-        "examples/05_pulp_real_data.py",
-        "examples/06_sugarcane_real_data.py",
+        "examples/04_pulp_real_data.py",
+        "examples/05_sugarcane_real_data.py",
     ],
 )
 def test_manual_real_data_workflows_select_the_declared_component_count(
@@ -452,25 +436,18 @@ def test_manual_real_data_workflows_select_the_declared_component_count(
     assert component_keyword.value.id == "CHOSEN_N_COMPONENTS"
 
 
-@pytest.mark.parametrize(
-    "relative_path",
-    [
-        "examples/03_leave_one_out_validation.py",
-        "examples/04_pls_path_comparison.py",
-    ],
-)
-def test_validation_and_comparison_routes_do_not_refit_a_final_model(
-    relative_path: str,
-) -> None:
-    calls = call_names(parse_module(_repository_root() / relative_path))
+def test_comparison_route_does_not_refit_a_final_model() -> None:
+    calls = call_names(
+        parse_module(_repository_root() / "examples" / "03_pls_path_comparison.py")
+    )
     assert "refit" not in calls
 
 
 @pytest.mark.parametrize(
     "relative_path",
     [
-        "examples/06_sugarcane_real_data.py",
-        "examples/07_tobacco_real_data.py",
+        "examples/05_sugarcane_real_data.py",
+        "examples/06_tobacco_real_data.py",
     ],
 )
 def test_spectral_examples_request_rank_profile_at_a_selected_component_count(
@@ -486,7 +463,7 @@ def test_spectral_examples_request_rank_profile_at_a_selected_component_count(
 
 
 def test_tobacco_keeps_two_explicit_tolerance_decisions_and_paginated_reports() -> None:
-    tree = parse_module(_repository_root() / "examples" / "07_tobacco_real_data.py")
+    tree = parse_module(_repository_root() / "examples" / "06_tobacco_real_data.py")
 
     constants = {
         target.id: node.value.value
@@ -566,12 +543,8 @@ def test_numbered_examples_keep_rendering_caller_owned() -> None:
         imports = import_roots(tree)
         calls = call_names(tree)
 
-        if path.name == "03_leave_one_out_validation.py":
-            assert imports.isdisjoint(_RENDERING_PACKAGES)
-            assert calls.isdisjoint(_RENDERING_METHODS)
-        else:
-            assert "matplotlib" in imports, path
-            assert {"savefig", "subplots"} <= calls, path
+        assert "matplotlib" in imports, path
+        assert {"savefig", "subplots"} <= calls, path
 
         assert all(not name.startswith("plot_") for name in calls), path
 

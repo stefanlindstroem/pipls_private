@@ -447,7 +447,6 @@ def test_make_examples_runs_every_numbered_example() -> None:
             (
                 "pulp_quick_start",
                 "synthetic_path_selection",
-                "leave_one_out_validation",
                 "pls_path_comparison",
                 "pulp_real_data",
                 "sugarcane_real_data",

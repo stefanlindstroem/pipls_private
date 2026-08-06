@@ -194,7 +194,7 @@ The completed sequence must verify that:
 - incompatible types and provenance fail before model fitting and do not mutate the search;
 - rule-based and manual component-count refitting remain compatible;
 - Examples 02 and 05--07 create one selection before OOF reporting and final refitting;
-- Examples 03 and 04 retain their no-final-model roles;
+- Example 03 retains its no-final-model comparison role;
 - selected pairs, predictions, OOF results, and generated numerical artifacts remain unchanged;
 - every served tutorial contains one vertical Mermaid flowchart and equivalent prose;
 - local, Pages-overlay, and isolated source-distribution documentation builds render the diagrams

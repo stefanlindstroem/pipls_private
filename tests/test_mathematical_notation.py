@@ -15,9 +15,9 @@ def _dilation_notation_text() -> str:
         *(root / "docs").rglob("*.md"),
         root / "src" / "pipls" / "decomposition.py",
         root / "src" / "pipls" / "inspection.py",
-        root / "examples" / "05_pulp_real_data.py",
-        root / "examples" / "06_sugarcane_real_data.py",
-        root / "examples" / "07_tobacco_real_data.py",
+        root / "examples" / "04_pulp_real_data.py",
+        root / "examples" / "05_sugarcane_real_data.py",
+        root / "examples" / "06_tobacco_real_data.py",
         root / "tools" / "render_pulp_tutorial.py",
     ]
     return "\n".join(path.read_text(encoding="utf-8") for path in paths)

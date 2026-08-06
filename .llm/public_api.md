@@ -267,7 +267,7 @@ package exposes no plotting module, Matplotlib artist result, or public `plot_*`
 
 ## Example and rendering boundary
 
-Examples 05--07 fit Pi-PLS paths, create one immutable selection, optionally compute a matching
+Examples 04--06 fit Pi-PLS paths, create one immutable selection, optionally compute a matching
 OOF report, refit that same selection, inspect the fitted model, and render final PDFs directly with
 Matplotlib. Pulp uses 50 repeated five-fold splits and averages ten OOF predictions per
 observation. Sugarcane and Tobacco use seeded shuffled five-fold CV. Tobacco demonstrates a

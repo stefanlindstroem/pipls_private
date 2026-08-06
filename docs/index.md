@@ -14,7 +14,7 @@ predictive model by attaining a given cross-validated mean squared error (CV-MSE
 latent modes.
 
 Across a wide range of synthetic settings and real-world datasets examined during
-development, Pi-PLS typically yields lower CV-MSE than ordinary PLS at a given number of paired latent modes (*cf*. example 04). This is not a general performance claim: no method is universally better.
+development, Pi-PLS typically yields lower CV-MSE than ordinary PLS at a given number of paired latent modes (*cf*. example 03). This is not a general performance claim: no method is universally better.
 
 ## Quick start with Pulp
 

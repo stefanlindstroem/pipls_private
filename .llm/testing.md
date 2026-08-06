@@ -78,7 +78,7 @@ example-level test remains only until Patch 3 deletes and renumbers the example 
   caller-owned rendering;
 - caller-owned Matplotlib rendering from immutable arrays;
 - no private runtime imports or duplicate workflow implementations;
-- quick-start and small leave-one-out executable behavior;
+- quick-start executable behavior and numbered-example structural contracts;
 - focused module-scoped Pulp numerical coverage where justified;
 - maintained tutorial snippets, semantic manifests, asset names, parseable SVGs, and stable links;
 - strict MkDocs build, generated API ownership, local links/anchors, source-distribution docs, and

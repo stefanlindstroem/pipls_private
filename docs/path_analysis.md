@@ -203,10 +203,8 @@ validation folds because response scales are estimated from each training fold.
 Mean foldwise $R^2$ is rejected when validation folds contain one sample. The explicit report's
 `pooled_oof_r2` may report $R^2$ from pooled LOO predictions; it is not mean foldwise $R^2$.
 
-The [focused small-sample example](examples.md#leave-one-out-validation) uses twelve deterministic
-observations, a compact explicit candidate grid, the singleton-safe default scorer, and ordered OOF
-predictions. Its OOF report is selection-conditioned because the same LOO path selects the rank
-pair and supplies the pooled diagnostic.
+Users who intentionally choose singleton validation folds must apply these scoring and
+interpretation distinctions directly in their own validation protocol.
 
 ## Split variation and tolerance selection
 

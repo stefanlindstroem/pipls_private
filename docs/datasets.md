@@ -299,7 +299,7 @@ The accompanying data paper is:
 The Mendeley collection is licensed CC BY 4.0. The package adaptation matches the public LabSpec
 and response tables by `Sample`, removes three rows whose total-sugar response is missing, and
 applies no imputation or spectral preprocessing. `load_sugarcane()` returns the immutable labeled
-package dataset or its read-only matrices. `examples/06_sugarcane_real_data.py` obtains the matrices,
+package dataset or its read-only matrices. `examples/05_sugarcane_real_data.py` obtains the matrices,
 wavelength labels, and response names from that result, evaluates the default path-evaluating
 `PiPLSSearchCV()`, plots
 `component_path_` in memory, and fits a separate fixed model after a visible user component choice.
@@ -332,7 +332,7 @@ and chemistry tables one-to-one by sample ID, orders rows by that identifier, an
 source metadata columns from the model matrices. All samples and chemical responses are retained.
 No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
 preprocessing is applied. `load_tobacco()` returns the immutable labeled package dataset or its
-read-only matrices. `examples/07_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
+read-only matrices. `examples/06_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
 labels, and source-order response names from that result, evaluates a Pi-PLS component path with
 adaptive predictor-rank scanning and full predictor SVD, and selects the smallest component row
 within a 10% relative tolerance of the minimum mean CV-MSE. Analysis then obtains the exact
@@ -340,4 +340,4 @@ reference minimum, resolved tolerance, threshold, and conditional predictor-rank
 selection, evaluates the same object through `search.oof_report()`, refits it on all observations,
 calculates raw observation diagnostics, and writes six final PDFs.
 Prediction diagnostics and coefficients are
-paginated in source response order. The separate ordinary-PLS comparison remains in example 04.
+paginated in source response order. The separate ordinary-PLS comparison remains in example 03.

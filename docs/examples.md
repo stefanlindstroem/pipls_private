@@ -13,16 +13,15 @@ the maintained scripts.
 |---|---|---|
 | `01_pulp_quick_start.py` | Apply an automatic selection rule, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Inspect the unselected path, create one manual selection, review the selected path and rank profile, then refit and evaluate independent test predictions | Four PDF figures and printed external-test $R^2$ |
-| `03_leave_one_out_validation.py` | Select one path row without fitting a final model, then evaluate it with leave-one-out OOF reporting | Printed selected rank pair and immutable OOF summary |
-| `04_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths without fitting a final model | One comparison PDF for each reference dataset |
-| `05_pulp_real_data.py` | Inspect the unselected path, create and review one manual Pulp selection with OOF evidence, refit it, and interpret the fitted model | Seven PDF figures |
-| `06_sugarcane_real_data.py` | Run the complete selection-driven wavelength-aware Sugarcane workflow | Six PDF figures |
-| `07_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow | Six PDFs, including threshold-annotated rank and component profiles |
+| `03_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths without fitting a final model | One comparison PDF for each reference dataset |
+| `04_pulp_real_data.py` | Inspect the unselected path, create and review one manual Pulp selection with OOF evidence, refit it, and interpret the fitted model | Seven PDF figures |
+| `05_sugarcane_real_data.py` | Run the complete selection-driven wavelength-aware Sugarcane workflow | Six PDF figures |
+| `06_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow | Six PDFs, including threshold-annotated rank and component profiles |
 
 The [path-selection reference](api/path.md) documents both the compact automatic route used by
 example 01 and the explicit selection handoff used by the analytical examples. The
 [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02 workflow directly.
-The comparison in example 04 is optional and is not part of routine Pi-PLS fitting.
+The comparison in example 03 is optional and is not part of routine Pi-PLS fitting.
 
 ## Run one example
 
@@ -47,30 +46,18 @@ workflows and may take substantially longer than the package test suite.
 ## Cross-validation partitions
 
 Example 01 intentionally uses the scikit-learn-compatible default `cv=5` to keep the opening
-workflow to one automatic search/refit expression. Examples 02, 04, 06, and 07 use one explicit
+workflow to one automatic search/refit expression. Examples 02, 03, 05, and 06 use one explicit
 shuffled five-fold partition. The complete Pulp workflow instead uses
 `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`: 50 materialized splits and ten OOF
 predictions per observation. This deliberate stability analysis costs approximately ten times one
 five-fold partition; the quick start remains lighter. The complete Pulp, Sugarcane, and Tobacco
 workflows create one selection before OOF reporting and pass that same object to final refitting.
-Example 03 deliberately fits no final model: it uses `search.select(rule="best_score")` and passes
-that selection to `oof_report()`. Its `LeaveOneOut` splitter is exhaustive, so shuffling is not
-defined. Grouped, temporal, or otherwise structured data require an application-specific splitter
-instead. The
+The comparison workflow fits no final model. Grouped, temporal, or otherwise structured data
+require an application-specific splitter. The
 [computational-performance
 guide](computational_performance.md#develop-with-a-smaller-validation-protocol)
 explains how to use a lighter seeded protocol during development and restore the final declared
 validation effort for reported results.
-
-## Leave-one-out validation
-
-`examples/03_leave_one_out_validation.py` represents a small calibration study with twelve costly
-observations. It evaluates a compact explicit Pi-PLS path with `LeaveOneOut`, requests one ordered
-OOF prediction per observation, and reports the immutable validation summary. The displayed pooled
-OOF $R^2$ is calculated across all held-out predictions; it is not mean foldwise $R^2$, which is
-undefined for singleton validation folds. See the
-[leave-one-out interpretation](path_analysis.md#leave-one-out-interpretation) for the associated
-scoring and selection decisions.
 
 ## Complete real-data analyses
 
@@ -79,14 +66,14 @@ adaptation for each real-data integration. The three complete analyses evaluate 
 component path, create one immutable selection, inspect its selected evidence and optional OOF
 report, and then fit that exact row on all observations:
 
-- `examples/05_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
+- `examples/04_pulp_real_data.py`: the direct tutorial workflow for named scalar predictors and
   responses. It first presents the unselected component path, creates the declared manual
   selection, reviews the selected path, conditional predictor-rank profile, and
   selection-conditioned OOF predictions, refits the same selection, calculates immutable
   fitted-model results, and then renders seven figures;
-- `examples/06_sugarcane_real_data.py`: the direct reference workflow with the same ordering,
+- `examples/05_sugarcane_real_data.py`: the direct reference workflow with the same ordering,
   wavelength-aware inspection, and six final PDF figures;
-- `examples/07_tobacco_real_data.py`: a complete spectral workflow with two explicit parsimony
+- `examples/06_tobacco_real_data.py`: a complete spectral workflow with two explicit parsimony
   decisions. For every component count, the search retains the smallest evaluated predictor rank
   within 10% of the exact conditional optimum. The workflow then selects the smallest
   component-count row within 10% of the minimum on that conditioned path, inspects that selection,
@@ -147,6 +134,6 @@ predictor-based orientation. The example layer owns Matplotlib chart constructio
 coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Pi-PLS factor
 panels use the same direct array-to-Matplotlib boundary.
 
-The Pulp tutorial extracts its checked snippets directly from `examples/05_pulp_real_data.py`.
+The Pulp tutorial extracts its checked snippets directly from `examples/04_pulp_real_data.py`.
 The sole module under `examples/_support/` evaluates the nontrivial fold-local ordinary-PLS path for
-example 04. It is not required for ordinary estimator use.
+example 03. It is not required for ordinary estimator use.

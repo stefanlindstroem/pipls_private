@@ -99,7 +99,7 @@ factorization names retain the `pipls` marker.
 
 Numbered real-data examples apply shared fitted-model interpretation only to their selected Pi-PLS
 model. Ordinary PLS is fitted in the dedicated path-comparison example, not as a second final model
-in examples 05--07.
+in examples 04--06.
 
 ## Balanced biplot coordinates
 
@@ -161,13 +161,12 @@ and direct ownership but must not freeze final adjusted label coordinates.
 
 - Example 01: fitted-value prediction diagnostic only; no OOF claim.
 - Example 02: selection evidence, selection-driven fixed refit, and external-test prediction.
-- Example 03: selection-only leave-one-out report with ordered OOF predictions.
-- Example 04: Pi-PLS and ordinary-PLS path comparison only.
-- Example 05: repeated-CV Pulp selection, matching OOF report, selection-driven refit, and
+- Example 03: Pi-PLS and ordinary-PLS path comparison only.
+- Example 04: repeated-CV Pulp selection, matching OOF report, selection-driven refit, and
   representative interpretation.
-- Example 06: Sugarcane selection, OOF report, selection-driven refit, spectral interpretation, and
+- Example 05: Sugarcane selection, OOF report, selection-driven refit, spectral interpretation, and
   rank profile.
-- Example 07: Tobacco with separately labeled 10% predictor-rank and component-count tolerance
+- Example 06: Tobacco with separately labeled 10% predictor-rank and component-count tolerance
   decisions, OOF report, selection-driven refit, full-SVD spectral analysis, rank profile, raw
   observation diagnostics, and source-order response pagination.
 

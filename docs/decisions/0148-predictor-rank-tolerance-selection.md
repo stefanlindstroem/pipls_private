@@ -231,7 +231,7 @@ parsimony decisions.
 
 ### Demonstrate both decisions in the Tobacco workflow
 
-Example 07 defines separately named constants:
+Example 06 defines separately named constants:
 
 ```python
 PREDICTOR_RANK_RELATIVE_TOLERANCE = 0.10

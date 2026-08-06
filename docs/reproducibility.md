@@ -69,7 +69,7 @@ make docs-serve
 The synthetic tutorial figures are generated from the same deterministic calculation shown in
 example 02. Its manifest records the generator configuration, selected rank pair, external-test
 provenance, filenames, and SVG hashes. The Pulp figures are generated from the same public
-`load_pulp()` dataset used by example 05; their manifest records dataset identity, version, source
+`load_pulp()` dataset used by example 04; their manifest records dataset identity, version, source
 DOI, license, package-resource and canonical-array hashes, evaluated ranks, boundary status, and
 display subsets. Every SVG contains one chart. Generated directories are ignored by Git and
 removed by `make clean`.
