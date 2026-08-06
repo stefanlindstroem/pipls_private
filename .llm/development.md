@@ -150,7 +150,11 @@
   10% relative-tolerance threshold, and recommended pre-refit selection, then passes that same
   object to OOF reporting and final fitting. Keep generated pages and cross-links synchronized with
   the implemented stage.
-- Every behavioral change requires focused tests at the most public relevant boundary.
+- Every behavioral change requires focused tests at the most public relevant boundary. Tests must
+  observe executable behavior, public results, or machine-readable outputs rather than prescribed
+  source literals, local call order, documentation wording, diagram labels, or plotting style.
+  Strict documentation, complete examples, and installed distributions are owned by their dedicated
+  Make targets under Decision 0154.
 - Mathematical changes update `.llm/mathematics.md`, `.llm/theory.md`, and user-facing theory
   documentation when applicable.
 - Numerical changes update `.llm/numerical_contracts.md` and include deterministic boundary tests.

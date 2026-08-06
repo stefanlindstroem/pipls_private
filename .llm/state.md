@@ -200,6 +200,11 @@ through 06. Generic splitter interoperability, ordered OOF reporting, partial an
 pooled OOF $R^2$, and protocol-neutral singleton-validation scorer safety remain. Current decisions
 and the retirement map use this completed boundary.
 
+Decision 0154 is accepted. A seven-patch cleanup is replacing tests that police repository prose or
+source structure with behavioral, machine-readable artifact, executable-tool, and installed-
+distribution coverage. Patch 1 establishes the policy only; the current tests and runtime remain
+unchanged until their assigned cleanup patches.
+
 ## Authority and drift handling
 
 When sources disagree, use this order:

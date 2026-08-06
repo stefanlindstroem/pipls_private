@@ -85,7 +85,13 @@ release validation. Paper reproduction and publication-only analyses remain down
 Decisions 0148--0153 are implemented. Package-owned protocol detection, provenance, examples,
 support claims, and dedicated tests are removed. Generic splitter interoperability, ordered OOF
 reporting, and protocol-neutral singleton-validation scorer safety remain, and the maintained
-example catalogue is contiguous from 01 through 06. No implementation patch sequence is active.
+example catalogue is contiguous from 01 through 06.
+
+Decision 0154 is accepted and its seven-patch cleanup sequence is active. Patch 1 establishes the
+behavioral-testing boundary. Later patches remove source and prose policing, simplify duplicated
+maintenance tooling, consolidate stale runtime coverage, refactor large caller-owned rendering
+blocks, and retire superseded implementation decisions. Runtime behavior is unchanged at this
+stage.
 
 ## Deferred work
 

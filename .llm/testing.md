@@ -2,123 +2,139 @@
 
 ## Purpose
 
-Tests protect durable numerical, API, repository, documentation, data, and distribution contracts.
-They must not become a second copy of living prose or preserve removed migration scaffolding.
+Tests protect durable numerical, API, data, serialization, artifact, tool, and installed-package
+behavior. They do not serve as a second copy of source structure, documentation prose, or completed
+migration history.
 
-## What tests should protect
+Decision 0154 governs the active cleanup. Existing source-content tests are transitional until their
+assigned removal patches; do not add new tests of that kind.
+
+## Behavioral boundary
+
+A pytest assertion must observe one of these boundaries:
+
+- a public or intentionally tested private callable result;
+- estimator state, exceptions, warnings, cloning, pipelines, output containers, or serialization;
+- numerical arrays, selections, reports, diagnostics, or deterministic generated data;
+- a machine-readable artifact created during the test;
+- a built or installed wheel or source distribution;
+- an executable maintenance tool and the output it produces.
+
+Do not open repository source, Markdown, YAML, Makefiles, manifests, workflows, or decision records
+merely to search for expected literals. Do not use AST inspection to prescribe local call order,
+assignments, imports, helper names, snippet markers, or plotting construction.
+
+## Durable coverage
 
 ### Numerical core and estimator
 
+Protect:
+
 - fixed-model equations, dimensions, rank admissibility, and finite outputs;
-- centering/scaling learned inside each fit and each training fold;
-- full/randomized/auto predictor-SVD consistency within stated tolerances;
-- deterministic behavior for fixed seeds and stable subspace comparisons under sign or basis
-  ambiguity;
+- centering and scaling learned inside each fit and each training fold;
+- full, randomized, and automatic predictor-SVD consistency within accepted tolerances;
+- deterministic seeded behavior and subspace comparisons under sign or basis ambiguity;
 - transactional fitted state after failed fits;
-- copy/read-only/overlapping-input safety;
-- PLS-style methods, feature names, output containers, cloning, and pickling;
-- exact public warning type and suppression boundary.
+- copy, read-only, and overlapping-input safety;
+- PLS-style methods, feature names, output containers, cloning, pipelines, and pickling;
+- public warning types and their suppression boundary.
 
-### Search and selection
+### Search, selection, and OOF reporting
 
-- materialized split reuse and fold-local feasibility;
-- exhaustive and adaptive candidate behavior, private numerical score ties, tolerance-independent
-  candidate coverage, and pipeline support;
-- stable `cv_results_`, conditioned component path, exact and retained rank-profile selections, and
-  immutable predictor-rank evidence;
-- equal-split CV-MSE means and `ddof=0` SD, including repeated CV, one split, and unequal validation
-  lengths;
-- conditioned-path `best_score`, manual component selection, and dual-tolerance `minimum_cv_mse`
-  behavior;
-- independent predictor-rank and component-count tolerance defaults, simultaneous caps, exact
-  boundary inclusion, positive, negative, and zero score references, invalid arguments, provenance,
-  search non-mutation, refit, pipelines, and pickle behavior;
-- absence of retired standard-error properties and rules.
+Protect:
 
-### OOF reporting
-
-- exact compatibility with the supplied selection and fitted search;
-- reuse of every stored split without rematerialization;
-- ordered predictions, repeated-prediction averaging, counts, and partial coverage;
-- pooled OOF R2 over covered rows only;
+- materialized split reuse, fold-local feasibility, and pipeline support;
+- adaptive and exhaustive candidate behavior and tolerance-independent candidate coverage;
+- stable `cv_results_`, conditioned component paths, immutable rank profiles, and rank evidence;
+- equal-split CV-MSE means and population SD for ordinary and repeated validation;
+- manual, `best_score`, and dual-tolerance `minimum_cv_mse` selection;
+- exact tolerance boundaries, provenance, non-mutation, refitting, and pickle behavior;
+- exact selection compatibility shared by `oof_report()` and `refit()`;
+- ordered OOF predictions, repeated-prediction averaging, counts, partial coverage, and pooled
+  metrics;
 - protocol-neutral scorer safety for realized validation-set sizes;
-- no candidate rescoring, search mutation, retained input data, or implicit full-data fit.
+- absence of candidate rescoring, retained input data, or implicit final fitting in OOF reporting.
 
-Generic OOF ordering, averaging, counts, partial coverage, pooled OOF R2, and singleton-validation
-scorer safety are the durable contracts. API tests use ordinary $K$-fold or explicit split
-iterables and do not establish protocol-specific package support.
+### Public results and inspection
 
-### Immutable public results and inspection
+Protect:
 
-- defensive copies, read-only arrays, shape/scalar validation, direct construction, and pickle
+- defensive copies, read-only arrays, shape and scalar validation, direct construction, and pickle
   revalidation;
-- finite derived decomposition, path, OOF, and inspection arrays;
-- display-factor regression-map preservation;
-- balanced biplot reconstruction preservation;
-- observation-diagnostic equations;
-- prediction provenance, residual orientation, standardization, and RMSE;
-- absence of public plotting helpers and private construction state.
+- finite decomposition, path, OOF, and inspection arrays;
+- regression-map and balanced-biplot reconstruction preservation;
+- observation and prediction diagnostic equations and provenance;
+- current positive public exports and result fields.
+
+Do not retain one negative tombstone test for every removed pre-release attribute or value. Use a
+generic invalid-value test where accepting arbitrary invalid input remains a current behavior.
 
 ### Datasets and synthetic generation
 
-- immutable `PiPLSDataset`, recursively frozen metadata, names, sample identity, and truth records;
-- exact Pulp, Sugarcane, and Tobacco resource bytes, shapes, names, hashes, provenance, and
-  licenses;
-- fresh loader outputs, read-only `(X, Y)` returns, and no network/pandas dependency;
+Protect:
+
+- immutable datasets, recursively frozen metadata, names, sample identity, and truth records;
+- exact package-resource bytes, shapes, names, hashes, provenance, and licenses where byte identity
+  is the accepted data contract;
+- fresh loader outputs and no network or pandas dependency;
 - deterministic synthetic arrays and truth for fixed seeds;
 - one active package-resource matrix pair per named reference dataset;
-- clean wheel and source-distribution inclusion and loading.
+- loading from clean installed distributions.
 
-### Examples, rendering, and documentation
+### Rendering and generated artifacts
 
-- public imports, visible data preparation, seeded CV, route-specific
-  unselected-path/selection/review/refit order, feedback-aware tutorial structure, and
-  caller-owned rendering;
-- caller-owned Matplotlib rendering from immutable arrays;
-- no private runtime imports or duplicate workflow implementations;
-- quick-start executable behavior and numbered-example structural contracts;
-- focused module-scoped Pulp numerical coverage where justified;
-- maintained tutorial snippets, semantic manifests, asset names, parseable SVGs, and stable links;
-- strict MkDocs build, generated API ownership, local links/anchors, source-distribution docs, and
-  Pages workflow boundaries;
-- computational-performance examples with valid public constructor keywords, current search and
-  solver values, seeded randomized operations, one-candidate policy clarity, and distinction
-  between fit counts and wall time;
-- final generated examples through `make examples`, not ordinary `make check`.
+Renderer tests may execute a renderer in a temporary directory and inspect its returned manifest and
+created files. Protect:
 
-### Repository and release policy
+- finite and internally consistent manifest values;
+- existence of every declared artifact;
+- parseable generated SVG or other machine-readable output;
+- deterministic semantic results across repeated rendering;
+- the runtime package remaining importable without optional rendering dependencies;
+- absence of a package-owned plotting module.
 
-- required tracked files and UTF-8 Markdown structure;
-- public-module `__all__` boundaries;
-- package metadata, supported Python/dependency ranges, citation, authorship, and licenses;
-- clean wheel and source-distribution smoke tests;
-- clean root-relative snapshot and patch helper behavior;
-- current-decision index integrity, historical-summary anchors, exhaustive retirement mapping, and
-  active-reference integrity under Decision 0147.
+Do not assert exact SVG labels, colour codes, element order, marker literals, Matplotlib calls, local
+helper names, or artist coordinates.
 
-## What tests should not freeze
+### Documentation, examples, tools, and distributions
+
+Use the owning executable targets:
+
+```bash
+make docs
+make docs-dist
+make examples
+make dist-check
+```
+
+These targets own strict documentation builds, source-distribution documentation, complete numbered
+example execution, and clean installed-artifact behavior. Pytest may invoke a focused maintenance
+tool and parse its generated output, but it must not validate these targets by reading Makefile,
+workflow, manifest, or helper-script text.
+
+Snapshot tests execute the snapshot tool and inspect the resulting archive. They may verify clean-
+tree requirements, excluded generated files, and root-relative archive contents without asserting
+the implementation text of the helper.
+
+## What tests must not freeze
 
 Do not pin:
 
-- exact explanatory prose, line counts, heading wording beyond stable navigation contracts, or
-  roadmap status paragraphs;
-- local variable names, incidental assignment patterns, or helper names when executable behavior
-  already protects the contract;
-- Matplotlib styles, artist coordinates, optional label-adjustment positions, or page aesthetics;
+- explanatory prose, heading wording, diagram labels, or roadmap status;
+- local variable names, assignment order, imports, helper names, or snippet markers;
+- example call order when executable results protect the intended behavior;
+- plotting colours, marker choices, styles, label placement, or page aesthetics;
 - implementation-local arrays and aliases that are not public results;
-- one tombstone assertion for every removed pre-release name;
-- a fixed final number of decision records;
+- historical spellings and removed pre-release names;
+- the number of tests, files, decisions, headings, or source lines;
 - performance or scientific claims not explicitly accepted by the owner.
-
-When source-structure testing is necessary, prefer reusable AST predicates and parameterization over
-large repeated source-text checks.
 
 ## Test layers
 
 ### Focused tests
 
-Run the smallest relevant modules during implementation. A focused command is evidence for rapid
-iteration, not a substitute for complete validation.
+Run the smallest relevant behavioral modules during implementation. Focused tests support rapid
+iteration but do not replace complete validation.
 
 ### Complete package checks
 
@@ -128,139 +144,34 @@ The authoritative local target is:
 make check
 ```
 
-It should cover formatting/linting, typing, unit/API/repository tests, and any configured package
-checks. Also run `python -m compileall` and `git diff --check` when producing a patch.
-Documentation,
-distribution, or example changes require their dedicated targets.
+It covers formatting, linting, typing, behavioral pytest coverage, and configured package checks.
+Also run `python -m compileall` and `git diff --check` when producing a patch.
 
-### Application and documentation checks
+### Application, documentation, and distribution checks
 
-Use as applicable:
-
-```bash
-make docs
-make docs-figures
-make dist-check
-make examples
-```
-
-Complete Pulp, Sugarcane, and Tobacco workflows are application validation and may be expensive.
-Do not silently duplicate them inside ordinary pytest.
+Run the dedicated targets when their owned behavior changes. Complete Pulp, Sugarcane, and Tobacco
+workflows are application validation and must not be silently duplicated inside ordinary pytest.
 
 ### Independent patch validation
 
 Before delivery, apply the generated patch to a fresh extraction of the same snapshot, compare every
-changed file byte-for-byte with the working tree, and rerun all applicable checks. Verify the
-published SHA-256 checksum.
+changed file byte-for-byte with the working tree, rerun applicable checks, and verify the published
+SHA-256 checksum.
 
-If one monolithic pytest process is unreliable in the execution environment, run a complete set of
-nonoverlapping test groups and report the grouping honestly. Never describe a timeout or unavailable
-tool as a pass.
+Never describe a timeout, unavailable dependency, or unrun command as a pass.
 
 ## Numerical comparison policy
 
 Numerical changes require explicit tolerances and boundary cases. Behavior-preserving refactors
-require direct before/after comparisons of the affected arrays, selections, predictions, reports,
-resource bytes, or generator outputs. Do not rely only on aggregate test success.
+require direct before-and-after comparison of affected arrays, selections, predictions, reports,
+resource bytes, or manifest values. Aggregate test success alone is insufficient.
 
 For repeated or nearly repeated singular values, compare identifiable quantities rather than raw
-basis columns. For deterministic assets, prefer semantic manifests and parsed structure over only a
-binary hash; retain hashes when byte identity itself is the contract.
-
-## Documentation test policy
-
-When a test reads Markdown or metadata, ask whether it protects a stable machine contract. Prefer:
-
-- parsable configuration;
-- executable snippets;
-- generic local-link and anchor resolution;
-- required navigation destinations;
-- public object availability;
-- source-distribution buildability.
-
-Avoid exact prose assertions. Historical decisions and changelog entries may retain terminology
-that is intentionally absent from the active API.
-
-## Predictor-rank tolerance obligations
-
-Tests verify that:
-
-- private exact-score comparison remains distinct from public tolerance qualification;
-- changing only predictor-rank tolerances does not change evaluated candidates, split scores,
-  candidate summaries, `rank_test_score`, or adaptive/exhaustive diagnostics;
-- `"adaptive"` selects only among evaluated ranks and `"exhaustive"` selects among all admissible
-  ranks, with byte-identical evidence under the Decision 0149 mapping from the former values;
-- fixed and maximum policies reject nondefault tolerances and expose no inapplicable evidence;
-- optimized path rows, selections, profiles, component references, OOF reports, clones, pipelines,
-  and pickles retain complete validated predictor-rank provenance;
-- Tobacco applies and labels separate 10% predictor-rank and component-count tolerances.
-
-## Predictor-rank search terminology obligations
-
-Tests verify that:
-
-- `"adaptive"` is the constructor default and preserves deterministic coarse-to-fine coverage;
-- `"exhaustive"` evaluates every admissible predictor-rank candidate;
-- the former pre-release values are rejected without aliases;
-- cloning, parameter surfaces, repr, pipelines, and pickles contain only the current values;
-- `search_is_exhaustive_` remains an achieved-coverage diagnostic and can be true after an adaptive
-  request;
-- maximum and one-element fixed-rank policies accept the default and reject nondefault exhaustive
-  coverage;
-- multi-rank explicit sequences retain adaptive and exhaustive choices;
-- current source, examples, public guides, and retained decisions use the final terminology while
-  unrelated `svd_solver="auto"` uses remain intact.
-
-## Selection-driven refit and tutorial-workflow obligations
-
-Tests must verify that:
-
-- exactly one of `selection`, `rule`, and `n_components` configures `refit()`;
-- `refit(selection=...)` and `oof_report(selection=...)` share one exact compatibility contract;
-- nondefault component-count tolerances are rejected when a selection is supplied;
-- compatible direct-estimator and terminal-pipeline refits attach the exact supplied immutable
-  selection only after successful fitting;
-- invalid types, incompatible provenance, and failed fits do not mutate the search or leave partial
-  selection state;
-- rule-based and manual component-count refitting remain supported;
-- manual evidence-retaining examples inspect an unselected component path before defining the
-  chosen component count, create one selection, then inspect the selected path, conditional rank,
-  and OOF evidence before final refitting, while comparison-only examples do not acquire
-  unnecessary final models;
-- affected tutorial diagrams contain one feedback edge from selected-evidence review to selection,
-  initial path artifacts omit a selected marker, and selected path artifacts contain it;
-- before/after selected pairs, OOF arrays, fitted predictions, and generated numerical results are
-  unchanged;
-- each served tutorial has one vertical Mermaid flowchart, equivalent prose, and strict local,
-  Pages-overlay, and source-distribution rendering without committed diagram assets;
-- active public workflow guides describe analytical routes with a pre-refit `search.select()`
-  handoff, do not recover the working selection from `model.selection_`, and do not call same-search
-  OOF reporting independent qualification or validation.
-
-## Computational-performance documentation obligations
-
-Tests should protect the guide as a stable documentation contract rather than freeze its prose.
-Verify its Reference navigation position, section structure, current public parameter names, seeded
-randomized examples, omission of `search_method` for one-candidate rank policies, fold-local
-preprocessing boundary, and distinction between candidate-fit counts and wall-clock timing. Final
-distribution checks must include the served page.
-
-## Decision lifecycle and repository-hygiene obligations
-
-Tests must verify:
-
-- every shipped numbered decision is indexed;
-- every retained current decision, history link, and retirement replacement resolves;
-- retirement maps are nonconflicting and retired numbers are never reused;
-- active maintainer and decision records do not reference retired records;
-- no test pins the retained decision count or copies deleted decisions into tombstone fixtures;
-- `history.md` summarizes outcomes rather than reproducing retired files;
-- ignored untracked caches and generated files remain absent from snapshots, while equivalent
-  deliberately tracked artifacts cause snapshot creation to fail clearly;
-- the public `pipls.datasets` façade, module identity, resources, deterministic generators,
-  immutability, pickling, and installed-distribution behavior remain stable across internal splits.
+basis columns. Prefer semantic manifests and parsed artifact structure; retain hashes only when byte
+identity itself is the contract.
 
 ## Review rule
 
-A durable behavioral or machine-readable contract justifies a test. A statement that merely repeats
-today's implementation or prose should remain review guidance, not an assertion.
+A durable behavioral or machine-readable contract justifies a test. A statement that repeats the
+current implementation, presentation, prose, or migration history belongs in review guidance, not
+in an assertion.

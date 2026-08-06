@@ -57,17 +57,30 @@ This registry lists only numbered decisions that still define current behavior o
 | `0151-selection-driven-refit-workflow.md` | selection-driven refit workflow | pass one compatible immutable selection through OOF reporting and final refitting; reorder analytical examples and add source-level tutorial flowcharts |
 | `0152-selection-review-feedback-workflow.md` | selection-review feedback workflow | inspect the unselected path before selecting, review conditional evidence with one feedback edge, and reserve qualification or validation for independent assessment |
 | `0153-remove-package-owned-leave-one-out-support.md` | remove package-owned leave-one-out support | retain generic splitter interoperability and OOF reporting while removing the detector, provenance field, dedicated example, support claims, and tests in five patches |
+| `0154-behavioral-test-suite-cleanup.md` | behavioral test-suite cleanup | replace source and prose policing with behavioral, artifact, executable-tool, and installed-distribution coverage; simplify maintenance tooling and retire superseded implementation records |
 
 ## Current canonical clusters
 
 - **Mathematics and numerical construction:** 0001--0004, 0007--0009, 0014, 0025, 0032, 0092,
   0120--0121, and 0146--0149.
 - **Estimator, search, and result ownership:** 0039, 0066, 0093, 0102, 0137, 0140, 0143,
-  0145--0149, and 0151--0153.
+  0145--0149, and 0151--0154.
 - **Datasets and product scope:** 0015, 0024--0025, 0041, 0119, 0123, and 0142.
 - **Inspection and rendering:** 0042, 0045, 0061, 0083, 0094, 0110, 0124, 0127, and 0141.
 - **Documentation, compatibility, and repository policy:** 0054, 0065, 0091, 0103, 0117, 0139,
-  0147, 0150, and 0151--0153.
+  0147, 0150, and 0151--0154.
+
+## Accepted Decision 0154 contract
+
+- Pytest protects behavior and machine-readable outputs, not prescribed repository prose or source
+  structure.
+- Remove literal, AST workflow, snippet-marker, plotting-style, Mermaid-label, and tombstone tests.
+- Keep semantic renderer artifacts, dataset bytes, installed distributions, snapshot outputs, and
+  executable maintenance tools covered at their owning boundaries.
+- Simplify duplicated maintenance tooling and large caller-owned renderers without adding product
+  surface.
+- The seven-patch cleanup is active; Patch 1 establishes policy and changes no runtime or test
+  behavior.
 
 ## Implemented Decision 0153 contract
 
