@@ -1,50 +1,11 @@
-:root {
-  --pipls-flowchart-edge-label-bg: #fff0bd;
-  --pipls-flowchart-edge-label-fg: #3b2d00;
-  --pipls-flowchart-edge-label-padding-block: 0.08rem;
-  --pipls-flowchart-edge-label-padding-inline: 0.32rem;
-  --pipls-flowchart-edge-label-radius: 0.18rem;
-  --pipls-flowchart-label-line-height: 1.15;
+.md-typeset .mermaid {
+  --md-mermaid-label-bg-color: #0ff0bd;
+  --md-mermaid-label-fg-color: #fb2d00;
 }
 
-[data-md-color-scheme="slate"] {
-  --pipls-flowchart-edge-label-bg: #5a4514;
-  --pipls-flowchart-edge-label-fg: #fff1bd;
+[data-md-color-scheme="slate"] .md-typeset .mermaid {
+  --md-mermaid-label-bg-color: #5a4514;
+  --md-mermaid-label-fg-color: #fff1bd;
 }
 
-/* Keep Mermaid flowchart labels compact without changing diagram semantics. */
-.md-typeset .mermaid .nodeLabel,
-.md-typeset .mermaid .nodeLabel p,
-.md-typeset .mermaid .edgeLabel,
-.md-typeset .mermaid .edgeLabel p {
-  line-height: var(--pipls-flowchart-label-line-height) !important;
-}
 
-.md-typeset .mermaid .nodeLabel p,
-.md-typeset .mermaid .edgeLabel p {
-  margin: 0 !important;
-}
-
-/* Cover both HTML-label and SVG-text Mermaid renderings. */
-.md-typeset .mermaid .edgeLabel,
-.md-typeset .mermaid .edgeLabel p {
-  color: var(--pipls-flowchart-edge-label-fg) !important;
-  background-color: var(--pipls-flowchart-edge-label-bg) !important;
-}
-
-.md-typeset .mermaid .edgeLabel p {
-  padding: var(--pipls-flowchart-edge-label-padding-block)
-    var(--pipls-flowchart-edge-label-padding-inline) !important;
-  border-radius: var(--pipls-flowchart-edge-label-radius);
-}
-
-.md-typeset .mermaid .edgeLabel rect,
-.md-typeset .mermaid .edgeLabel .labelBkg {
-  fill: var(--pipls-flowchart-edge-label-bg) !important;
-  opacity: 1 !important;
-}
-
-.md-typeset .mermaid .edgeLabel text,
-.md-typeset .mermaid .edgeLabel tspan {
-  fill: var(--pipls-flowchart-edge-label-fg) !important;
-}
