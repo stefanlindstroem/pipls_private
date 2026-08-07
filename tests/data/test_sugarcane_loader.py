@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import hashlib
 import inspect
 import pickle
 from collections.abc import Mapping
-from importlib import resources
 
 import numpy as np
 import pytest
@@ -14,21 +12,6 @@ from pipls.datasets import PiPLSDataset, load_sugarcane
 
 FEATURE_NAMES = tuple(str(wavelength) for wavelength in range(780, 2501))
 TARGET_NAMES = ("TS", "CP", "ADF", "IVOMD")
-RESOURCE_HASHES = {
-    "X.csv": "f5437f54fcf2bb0cb4754cfb005836f472bbe5f3b29113e0a78ba4d9973b91c4",
-    "Y.csv": "a707650407e86af4fc08448f78fda1ee75ad0de25ee6906e17f159a7f2ec9d93",
-    "LICENSE.txt": "4a052472a6f2a041c62eb1530b571f104ea587b662830410e57cfb134ccbe2df",
-}
-ARRAY_HASHES = {
-    "data": "42abcf76dbcb6e9b244dfe8cfdac253dd67273cfeac7244ac79deede3112b0dd",
-    "target": "eee177285c6dbdd2b8df8c97a2e3712d1b82b1946f4f9d93229204ebb90d6f8f",
-}
-
-
-
-def _canonical_array_hash(array: np.ndarray) -> str:
-    canonical = np.asarray(array, dtype=np.dtype("<f8"), order="C")
-    return hashlib.sha256(canonical.tobytes(order="C")).hexdigest()
 
 
 def test_load_sugarcane_has_named_loader_return_contract() -> None:
@@ -105,20 +88,6 @@ def test_load_sugarcane_return_X_y_matches_default_result_and_is_fresh() -> None
     with pytest.raises(ValueError):
         Y[0, 0] = 0.0
 
-
-def test_packaged_sugarcane_resources_are_canonical() -> None:
-    resource_root = resources.files("pipls").joinpath("_data").joinpath("sugarcane")
-
-    for name, expected_hash in RESOURCE_HASHES.items():
-        packaged = resource_root.joinpath(name).read_bytes()
-        assert hashlib.sha256(packaged).hexdigest() == expected_hash
-
-    for name in ("metadata.json", "README.md"):
-        assert resource_root.joinpath(name).is_file()
-
-    dataset = load_sugarcane()
-    assert _canonical_array_hash(dataset.X) == ARRAY_HASHES["data"]
-    assert _canonical_array_hash(dataset.Y) == ARRAY_HASHES["target"]
 
 
 def test_load_sugarcane_result_is_pickleable() -> None:

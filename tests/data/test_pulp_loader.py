@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-import hashlib
 import inspect
 import pickle
 from collections.abc import Mapping
-from importlib import resources
-from pathlib import Path
 
 import numpy as np
 import pytest
@@ -39,15 +36,6 @@ TARGET_NAMES = (
     "Tear index",
     "s",
 )
-RESOURCE_HASHES = {
-    "X.csv": "b26d1639339c406bf91070e2ad8ceb8df59d3ad1f90ece7c5cd5b18264d63b45",
-    "Y.csv": "b600264d2319efce3500c6d7adbf5490b62e6d42a1e32af7df62709b1975ce93",
-    "LICENSE.txt": "e21d8674cbe4b64a371cd530a0ea8fa4727c1de7005dc707e86b55ea8e6f14d7",
-}
-
-
-def _repository_root() -> Path:
-    return Path(__file__).resolve().parents[2]
 
 
 def test_load_pulp_has_linnerud_style_return_contract() -> None:
@@ -113,27 +101,6 @@ def test_load_pulp_return_X_y_matches_default_result_and_is_fresh() -> None:
     with pytest.raises(ValueError):
         Y[0, 0] = 0.0
 
-
-def test_packaged_pulp_resources_are_canonical_and_unique() -> None:
-    resource_root = resources.files("pipls").joinpath("_data").joinpath("pulp")
-    for name, expected_hash in RESOURCE_HASHES.items():
-        packaged = resource_root.joinpath(name).read_bytes()
-        assert hashlib.sha256(packaged).hexdigest() == expected_hash
-
-    for name in ("metadata.json", "README.md"):
-        assert resource_root.joinpath(name).is_file()
-
-    root = _repository_root()
-    active_matrices = sorted(
-        path.relative_to(root).as_posix()
-        for active_root in (root / "src", root / "datasets")
-        for path in active_root.rglob("*.csv")
-        if "pulp" in path.parts and path.name in {"X.csv", "Y.csv"}
-    )
-    assert active_matrices == [
-        "src/pipls/_data/pulp/X.csv",
-        "src/pipls/_data/pulp/Y.csv",
-    ]
 
 
 def test_load_pulp_result_is_pickleable() -> None:

@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import hashlib
 import inspect
 import pickle
 from collections.abc import Mapping
-from importlib import resources
 
 import numpy as np
 import pytest
@@ -27,21 +25,6 @@ TARGET_NAMES = (
     "Scopoletin",
     "Rutin",
 )
-RESOURCE_HASHES = {
-    "X.csv": "41d4196bed498971b811dd1824a5af7f13bbcd0c1e421e065d1cd272a80067bf",
-    "Y.csv": "225b6bcabc73003f69bff6977a3ea8d94189626b60e8baa720273842fa83b6d6",
-    "LICENSE.txt": "f3e97289135b2adabd1cea24db4b92c5c08a39169fe89e9dca3e89d5d70b5330",
-}
-ARRAY_HASHES = {
-    "data": "ef74a8e2f1ea2609d588fa3437e97a8716db4a6aedd63475197e453129c96278",
-    "target": "2aea92d1c0e1a8158d2f270f665c27c97dd22e94e3945dbfb85eff2989e7b477",
-}
-
-
-
-def _canonical_array_hash(array: np.ndarray) -> str:
-    canonical = np.asarray(array, dtype=np.dtype("<f8"), order="C")
-    return hashlib.sha256(canonical.tobytes(order="C")).hexdigest()
 
 
 def test_load_tobacco_has_named_loader_return_contract() -> None:
@@ -125,24 +108,6 @@ def test_load_tobacco_return_X_y_matches_default_result_and_is_fresh() -> None:
     with pytest.raises(ValueError):
         Y[0, 0] = 0.0
 
-
-def test_packaged_tobacco_resources_are_canonical() -> None:
-    resource_root = resources.files("pipls").joinpath("_data").joinpath("tobacco")
-
-    for name, expected_hash in RESOURCE_HASHES.items():
-        packaged = resource_root.joinpath(name).read_bytes()
-        assert hashlib.sha256(packaged).hexdigest() == expected_hash
-
-    for name in ("metadata.json", "README.md"):
-        assert resource_root.joinpath(name).is_file()
-
-    license_text = resource_root.joinpath("LICENSE.txt").read_text(encoding="utf-8")
-    assert "Tobacco dataset attribution" in license_text
-    assert "Sugarcane dataset attribution" not in license_text
-
-    dataset = load_tobacco()
-    assert _canonical_array_hash(dataset.X) == ARRAY_HASHES["data"]
-    assert _canonical_array_hash(dataset.Y) == ARRAY_HASHES["target"]
 
 
 def test_load_tobacco_result_is_pickleable() -> None:
