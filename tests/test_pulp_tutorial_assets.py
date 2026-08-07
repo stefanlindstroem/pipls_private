@@ -9,7 +9,10 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+import numpy as np
 import pytest
+
+from pipls.datasets import load_pulp
 
 FIGURE_FILENAMES = (
     "component_path.svg",
@@ -21,6 +24,9 @@ FIGURE_FILENAMES = (
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
+    "final_fit_observed_vs_predicted.svg",
+    "final_fit_r2.svg",
+    "final_fit_residual_distribution.svg",
 )
 
 
@@ -78,7 +84,7 @@ def test_pulp_tutorial_renderer_records_repeated_cv_and_valid_figures(
         (generated_pulp_assets / "manifest.json").read_text(encoding="utf-8")
     )
 
-    assert manifest["schema_version"] == 1
+    assert manifest["schema_version"] == 2
     assert manifest["dataset"]["id"] == "pulp"
     assert manifest["dataset"]["version"] == "1"
     analysis = manifest["analysis"]
@@ -96,6 +102,24 @@ def test_pulp_tutorial_renderer_records_repeated_cv_and_valid_figures(
     assert analysis["prediction_kind"] == (
         "selection-conditioned OOF predictions"
     )
+
+    final_fit = manifest["final_fit"]
+    assert final_fit["prediction_kind"] == "fitted values"
+    response_r2 = final_fit["response_r2"]
+    assert [item["response"] for item in response_r2] == list(
+        load_pulp().target_names
+    )
+    r2_values = [item["value"] for item in response_r2]
+    assert len(r2_values) == 8
+    assert all(np.isfinite(value) for value in r2_values)
+    assert all(value <= 1.0 for value in r2_values)
+
+    pooled = final_fit["pooled_standardized_residuals"]
+    assert pooled["count"] == 46 * 8
+    assert np.isfinite(pooled["mean"])
+    assert abs(pooled["mean"]) < 1e-12
+    assert np.isfinite(pooled["sample_sd"])
+    assert pooled["sample_sd"] > 0.0
 
     figures = manifest["figures"]
     assert tuple(item["filename"] for item in figures) == FIGURE_FILENAMES

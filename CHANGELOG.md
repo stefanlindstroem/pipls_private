@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Extend the generated Pulp tutorial artifacts with three final-fit diagnostic SVGs and
+  machine-readable fitted R² and pooled standardized-residual summaries.
 - Add caller-owned final-fit diagnostic figures to the Pulp example: standardized observed
   versus fitted responses, response-wise fitted R², and a pooled standardized-residual histogram
   with a matched normal reference.

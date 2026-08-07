@@ -59,6 +59,9 @@ FIGURE_FILENAMES = (
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
     "standardized_rmse.svg",
+    "final_fit_observed_vs_predicted.svg",
+    "final_fit_r2.svg",
+    "final_fit_residual_distribution.svg",
 )
 
 
@@ -382,6 +385,100 @@ def _render_standardized_rmse(
     _save_svg(figure, output_path)
 
 
+def _render_final_fit_observed_vs_predicted(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: tuple[str, ...],
+    output_path: Path,
+) -> None:
+    figure, axis = _figure(figsize=(6.2, 6.2))
+    for response, response_name in enumerate(response_names):
+        axis.scatter(
+            diagnostics.observed_standardized[:, response],
+            diagnostics.predicted_standardized[:, response],
+            label=response_name,
+            alpha=0.7,
+        )
+
+    limits_source = np.concatenate(
+        [
+            diagnostics.observed_standardized.ravel(),
+            diagnostics.predicted_standardized.ravel(),
+        ]
+    )
+    lower = float(limits_source.min())
+    upper = float(limits_source.max())
+    margin = 0.05 * (upper - lower) if upper > lower else 1.0
+    limits = (lower - margin, upper + margin)
+    axis.plot(limits, limits, linewidth=1.0, linestyle="--", color="0.35")
+    axis.set_xlim(limits)
+    axis.set_ylim(limits)
+    axis.set_aspect("equal", adjustable="box")
+    axis.set_xlabel("Observed response (standardized)")
+    axis.set_ylabel("Fitted response (standardized)")
+    axis.set_title(r"Final $\Pi$-PLS fit: observed versus fitted")
+    axis.legend(title="Response", fontsize="small", ncols=2)
+    axis.grid(alpha=0.2)
+    _save_svg(figure, output_path)
+
+
+def _render_final_fit_r2(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: tuple[str, ...],
+    output_path: Path,
+) -> None:
+    positions = np.arange(len(response_names))
+    figure, axis = _figure(figsize=(8.2, 4.8))
+    axis.bar(positions, diagnostics.response_r2)
+    axis.axhline(0.0, linewidth=0.8, color="0.35")
+    axis.set_xticks(positions)
+    axis.set_xticklabels(response_names, rotation=45, ha="right")
+    axis.set_xlabel("Response")
+    axis.set_ylabel(r"Fitted $R^2$")
+    axis.set_title(r"Final $\Pi$-PLS fit: response-wise $R^2$")
+    lower = min(0.0, float(np.min(diagnostics.response_r2)))
+    margin = 0.05 * max(1.0, 1.0 - lower)
+    axis.set_ylim(lower - margin, 1.0 + margin)
+    axis.grid(axis="y", alpha=0.2)
+    _save_svg(figure, output_path)
+
+
+def _render_final_fit_residual_distribution(
+    diagnostics: PredictionDiagnostics,
+    *,
+    output_path: Path,
+) -> None:
+    residuals = diagnostics.residual_standardized.ravel()
+    residual_mean = float(np.mean(residuals))
+    residual_std = float(np.std(residuals, ddof=1))
+
+    figure, axis = _figure(figsize=(7.0, 4.8))
+    axis.hist(
+        residuals,
+        bins=18,
+        density=True,
+        alpha=0.65,
+        label="Standardized residuals",
+    )
+    if residual_std > 0.0:
+        x_values = np.linspace(float(residuals.min()), float(residuals.max()), 300)
+        normal_density = np.exp(
+            -0.5 * ((x_values - residual_mean) / residual_std) ** 2
+        ) / (residual_std * np.sqrt(2.0 * np.pi))
+        axis.plot(
+            x_values,
+            normal_density,
+            linewidth=1.5,
+            label="Matched normal density",
+        )
+    axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.35")
+    axis.set_xlabel("Standardized residual")
+    axis.set_ylabel("Density")
+    axis.set_title(r"Final $\Pi$-PLS fit: residual distribution")
+    axis.legend()
+    _save_svg(figure, output_path)
+
 def _write_manifest(
     output_dir: Path,
     *,
@@ -390,7 +487,8 @@ def _write_manifest(
     selection: PiPLSSelection,
     rank_profile: PiPLSPredictorRankProfile,
     report: PiPLSOOFReport,
-    diagnostics: PredictionDiagnostics,
+    oof_diagnostics: PredictionDiagnostics,
+    fitted_diagnostics: PredictionDiagnostics,
     displayed_components: tuple[int, ...],
     detailed_response_indices: tuple[int, ...],
 ) -> Path:
@@ -399,7 +497,7 @@ def _write_manifest(
         for filename in FIGURE_FILENAMES
     ]
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "dataset": {
             "id": data.metadata["dataset"]["id"],
             "version": data.metadata["dataset"]["version"],
@@ -422,7 +520,7 @@ def _write_manifest(
             "detailed_responses": [
                 data.target_names[index] for index in detailed_response_indices
             ],
-            "prediction_kind": diagnostics.prediction_kind,
+            "prediction_kind": oof_diagnostics.prediction_kind,
             "cross_validation": {
                 "splitter": type(CV).__name__,
                 "n_splits": 5,
@@ -433,6 +531,22 @@ def _write_manifest(
             "oof_predictions_per_observation": int(
                 report.oof_prediction_counts[0]
             ),
+        },
+        "final_fit": {
+            "prediction_kind": fitted_diagnostics.prediction_kind,
+            "response_r2": [
+                {"response": name, "value": float(value)}
+                for name, value in zip(
+                    data.target_names, fitted_diagnostics.response_r2, strict=True
+                )
+            ],
+            "pooled_standardized_residuals": {
+                "count": int(fitted_diagnostics.residual_standardized.size),
+                "mean": float(np.mean(fitted_diagnostics.residual_standardized)),
+                "sample_sd": float(
+                    np.std(fitted_diagnostics.residual_standardized, ddof=1)
+                ),
+            },
         },
         "figures": figures,
     }
@@ -473,7 +587,7 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         raise RuntimeError(
             "Repeated Pulp CV must produce ten OOF predictions per observation."
         )
-    diagnostics = prediction_diagnostics(
+    oof_diagnostics = prediction_diagnostics(
         Y,
         report.oof_predictions,
         prediction_kind=PREDICTION_KIND,
@@ -490,6 +604,11 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     )
 
     model = search.refit(X, Y, selection=selection)
+    fitted_diagnostics = prediction_diagnostics(
+        Y,
+        model.predict(X),
+        prediction_kind="fitted values",
+    )
     factors = pipls_display_factors(
         model.decomposition_,
         response_index=response_names.index("TI"),
@@ -517,21 +636,35 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         output_path=output_dir / "weighted_response_directions.svg",
     )
     _render_observed_vs_predicted(
-        diagnostics,
+        oof_diagnostics,
         response_names=response_names,
         response_indices=detailed_response_indices,
         output_path=output_dir / "observed_vs_predicted.svg",
     )
     _render_residuals_vs_predicted(
-        diagnostics,
+        oof_diagnostics,
         response_names=response_names,
         response_indices=detailed_response_indices,
         output_path=output_dir / "residuals_vs_predicted.svg",
     )
     _render_standardized_rmse(
-        diagnostics,
+        oof_diagnostics,
         response_names=response_names,
         output_path=output_dir / "standardized_rmse.svg",
+    )
+    _render_final_fit_observed_vs_predicted(
+        fitted_diagnostics,
+        response_names=response_names,
+        output_path=output_dir / "final_fit_observed_vs_predicted.svg",
+    )
+    _render_final_fit_r2(
+        fitted_diagnostics,
+        response_names=response_names,
+        output_path=output_dir / "final_fit_r2.svg",
+    )
+    _render_final_fit_residual_distribution(
+        fitted_diagnostics,
+        output_path=output_dir / "final_fit_residual_distribution.svg",
     )
 
     return _write_manifest(
@@ -541,7 +674,8 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         selection=selection,
         rank_profile=rank_profile,
         report=report,
-        diagnostics=diagnostics,
+        oof_diagnostics=oof_diagnostics,
+        fitted_diagnostics=fitted_diagnostics,
         displayed_components=displayed_components,
         detailed_response_indices=detailed_response_indices,
     )
