@@ -370,6 +370,73 @@ four-panel Pi-PLS factorization figure. See [Dilation](../model_inspection.md#di
 [Response directions](../model_inspection.md#response-directions), and
 [Weighted response directions](../model_inspection.md#weighted-response-directions).
 
+## Inspect the final fitted model
+
+The selection-conditioned OOF section above asks how the accepted selection behaves under the
+stored validation splits. After refitting, a different question is useful: how closely does the
+single final model fitted to all 46 development observations represent those same observations?
+Compute prediction diagnostics from the fitted values while preserving that provenance explicitly:
+
+```python
+--8<-- "examples/04_pulp_real_data.py:pulp-final-fit-diagnostics"
+```
+
+!!! important "Training-fit scope"
+    These figures describe the model fitted to the same 46 observations shown in the plots. They
+    are **not** estimates of out-of-sample predictive performance. Use the selection-conditioned
+    OOF section for same-search diagnostic evidence, and use nested cross-validation or an external
+    test set when independent post-selection performance is required.
+
+### Standardized observed versus fitted responses
+
+Each response is centered and scaled by its observed sample standard deviation, so all eight Pulp
+responses can share one coordinate system. The identity line represents exact agreement between
+standardized observed and fitted values.
+
+![Pulp final-fit standardized observed versus fitted responses](../assets/generated/pulp/final_fit_observed_vs_predicted.svg)
+
+The common scale makes relative scatter around the identity line comparable across responses even
+though their original physical units differ. This is a fitted-model representation diagnostic;
+points close to the identity line do not by themselves establish external predictive accuracy.
+See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
+
+### Response-wise fitted $R^2$
+
+The coefficient of determination is calculated separately for each response from the final fitted
+values:
+
+\begin{equation}
+R_j^2 = 1 -
+\frac{\sum_i (y_{ij}-\hat y_{ij})^2}
+     {\sum_i (y_{ij}-\bar y_j)^2}.
+\end{equation}
+
+![Pulp final-fit response-wise R²](../assets/generated/pulp/final_fit_r2.svg)
+
+For this selected model, the fitted $R^2$ values are approximately 0.81--0.96 across the eight
+responses. These values summarize training fit only; they should not be compared directly with an
+independent-test or nested-CV performance estimate as if the provenance were the same. See
+[Response-wise coefficient of determination](../model_inspection.md#response-r2).
+
+### Standardized residual distribution
+
+Pooling response-standardized residuals gives one compact view of the shape of the final-fit
+residual distribution. The histogram uses a fixed binning, and the overlaid normal density is
+matched to the pooled residual mean and sample standard deviation.
+
+![Pulp final-fit standardized residual distribution](../assets/generated/pulp/final_fit_residual_distribution.svg)
+
+The reference curve is descriptive rather than a normality test. Pooling also compresses
+response-specific structure into one distribution, so response-level residual plots remain the
+appropriate follow-up when a particular response needs closer diagnosis.
+
+The complete numbered example writes the same three diagnostics as caller-owned PDFs at the end of
+its report:
+
+```python
+--8<-- "examples/04_pulp_real_data.py:plot-pulp-final-fit-diagnostics"
+```
+
 ## Reproduce this tutorial
 
 The analysis and selection snippets are maintained in `examples/04_pulp_real_data.py`. The repeated
@@ -381,8 +448,8 @@ python examples/04_pulp_real_data.py
 ```
 
 Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.
-`make docs-figures` regenerates the nine representative single-chart SVGs displayed here, while
-the numbered example writes seven caller-owned PDFs with additional score, loading, factorization,
+`make docs-figures` regenerates the twelve representative single-chart SVGs displayed here, while
+the numbered example writes ten caller-owned PDFs with additional score, loading, factorization,
 and coefficient views. Both routes calculate directly from in-memory results and write no
 analytical CSV intermediates. See
 [Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the

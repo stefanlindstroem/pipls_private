@@ -67,7 +67,9 @@ Same-search OOF reporting is inspection rather than independent qualification.
 
 Pi-PLS-specific factorization inspection and shared PLS-family diagnostics are pure numerical
 operations. Examples and users render the returned arrays directly. OOF diagnostics describe the
-chosen selection under the search protocol and are not outer-validation estimates.
+chosen selection under the search protocol and are not outer-validation estimates. Fitted-value
+diagnostics describe the refitted model on its training observations and remain explicitly
+separate from predictive validation evidence.
 
 ### Data
 

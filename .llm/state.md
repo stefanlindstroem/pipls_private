@@ -125,7 +125,9 @@ Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examp
 
 `pipls.inspection` returns validated immutable NumPy results for Pi-PLS factor displays, shared
 PLS-family latent structure, balanced biplot coordinates, observation diagnostics, and explicit-
-provenance prediction diagnostics.
+provenance prediction diagnostics. The complete Pulp workflow keeps selection-conditioned OOF
+prediction diagnostics separate from descriptive diagnostics of the final model fitted to all
+development observations.
 
 The runtime package contains no plotting module. Examples and users compose Matplotlib artists,
 labels, layouts, saving, and optional `adjustText` placement directly from immutable numerical

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Complete the Pulp final-fit diagnostic workflow in Tutorial 3 with standardized observed-versus-
+  fitted, response-wise fitted R², and pooled standardized-residual interpretation, explicitly
+  separated from selection-conditioned OOF evidence.
 - Extend the generated Pulp tutorial artifacts with three final-fit diagnostic SVGs and
   machine-readable fitted R² and pooled standardized-residual summaries.
 - Add caller-owned final-fit diagnostic figures to the Pulp example: standardized observed

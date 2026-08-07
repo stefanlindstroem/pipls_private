@@ -215,7 +215,9 @@ helpers do not change as part of this decision.
   interpretation.
 - Full-data decomposition, score, loading, and coefficient plots are described as fitted-model
   views and do not imply predictive validation.
-- Prediction provenance is part of every prediction-diagnostic result and artifact.
+- Prediction provenance is part of every prediction-diagnostic result and artifact; complete
+  workflows keep selection-conditioned OOF diagnostics distinct from fitted-value diagnostics of
+  the final model trained on all development observations.
 - Pi-PLS-specific $P$, $D$, and $Q$ interpretation is supported without conflating rotations with
   ordinary PLS loadings.
 - Low-dimensional scalar and high-dimensional spectral examples can share one numerical
