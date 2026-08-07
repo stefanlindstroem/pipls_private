@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add caller-owned final-fit diagnostic figures to the Pulp example: standardized observed
+  versus fitted responses, response-wise fitted R², and a pooled standardized-residual histogram
+  with a matched normal reference.
 - Add response-wise coefficient of determination to immutable prediction diagnostics while
   preserving explicit prediction provenance and finite-result validation.
 - Centralize Mermaid flowchart geometry, host spacing, node palettes, and edge-label styling in one custom ES module while using SVG labels consistently.

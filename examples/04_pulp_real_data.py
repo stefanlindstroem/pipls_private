@@ -413,6 +413,104 @@ def _plot_prediction_diagnostics(
     plt.close(figure)
 
 
+def _plot_final_fit_observed_vs_predicted(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: tuple[str, ...],
+    output_path: Path,
+) -> None:
+    figure, axis = plt.subplots(figsize=(6.2, 6.2), layout="constrained")
+    for response, response_name in enumerate(response_names):
+        axis.scatter(
+            diagnostics.observed_standardized[:, response],
+            diagnostics.predicted_standardized[:, response],
+            label=response_name,
+            alpha=0.7,
+        )
+
+    limits_source = np.concatenate(
+        [
+            diagnostics.observed_standardized.ravel(),
+            diagnostics.predicted_standardized.ravel(),
+        ]
+    )
+    lower = float(limits_source.min())
+    upper = float(limits_source.max())
+    margin = 0.05 * (upper - lower) if upper > lower else 1.0
+    limits = (lower - margin, upper + margin)
+    axis.plot(limits, limits, linewidth=1.0, linestyle="--", color="0.35")
+    axis.set_xlim(limits)
+    axis.set_ylim(limits)
+    axis.set_aspect("equal", adjustable="box")
+    axis.set_xlabel("Observed response (standardized)")
+    axis.set_ylabel("Fitted response (standardized)")
+    axis.set_title(r"Final $\Pi$-PLS fit: observed versus fitted")
+    axis.legend(title="Response", fontsize="small", ncols=2)
+    axis.grid(alpha=0.2)
+    figure.savefig(output_path)
+    plt.close(figure)
+
+
+def _plot_final_fit_r2(
+    diagnostics: PredictionDiagnostics,
+    *,
+    response_names: tuple[str, ...],
+    output_path: Path,
+) -> None:
+    positions = np.arange(len(response_names))
+    figure, axis = plt.subplots(figsize=(8.2, 4.8), layout="constrained")
+    axis.bar(positions, diagnostics.response_r2)
+    axis.axhline(0.0, linewidth=0.8, color="0.35")
+    axis.set_xticks(positions)
+    axis.set_xticklabels(response_names, rotation=45, ha="right")
+    axis.set_xlabel("Response")
+    axis.set_ylabel(r"Fitted $R^2$")
+    axis.set_title(r"Final $\Pi$-PLS fit: response-wise $R^2$")
+    lower = min(0.0, float(np.min(diagnostics.response_r2)))
+    margin = 0.05 * max(1.0, 1.0 - lower)
+    axis.set_ylim(lower - margin, 1.0 + margin)
+    axis.grid(axis="y", alpha=0.2)
+    figure.savefig(output_path)
+    plt.close(figure)
+
+
+def _plot_final_fit_residual_distribution(
+    diagnostics: PredictionDiagnostics,
+    *,
+    output_path: Path,
+) -> None:
+    residuals = diagnostics.residual_standardized.ravel()
+    residual_mean = float(np.mean(residuals))
+    residual_std = float(np.std(residuals, ddof=1))
+
+    figure, axis = plt.subplots(figsize=(7.0, 4.8), layout="constrained")
+    axis.hist(
+        residuals,
+        bins=18,
+        density=True,
+        alpha=0.65,
+        label="Standardized residuals",
+    )
+    if residual_std > 0.0:
+        x_values = np.linspace(float(residuals.min()), float(residuals.max()), 300)
+        normal_density = np.exp(
+            -0.5 * ((x_values - residual_mean) / residual_std) ** 2
+        ) / (residual_std * np.sqrt(2.0 * np.pi))
+        axis.plot(
+            x_values,
+            normal_density,
+            linewidth=1.5,
+            label="Matched normal density",
+        )
+    axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.35")
+    axis.set_xlabel("Standardized residual")
+    axis.set_ylabel("Density")
+    axis.set_title(r"Final $\Pi$-PLS fit: residual distribution")
+    axis.legend()
+    figure.savefig(output_path)
+    plt.close(figure)
+
+
 def _plot_coefficients(
     structure: LatentStructure,
     *,
@@ -478,7 +576,7 @@ oof_predictions = report.oof_predictions
 # --8<-- [end:pulp-oof-predictions]
 
 # --8<-- [start:pulp-oof-inspection-results]
-diagnostics = prediction_diagnostics(
+oof_diagnostics = prediction_diagnostics(
     Y,
     oof_predictions,
     prediction_kind="selection-conditioned OOF predictions",
@@ -492,6 +590,15 @@ model = search.refit(
     selection=selection,
 )
 # --8<-- [end:fit-pulp-model]
+
+# --8<-- [start:pulp-final-fit-diagnostics]
+fitted_predictions = model.predict(X)
+fitted_diagnostics = prediction_diagnostics(
+    Y,
+    fitted_predictions,
+    prediction_kind="fitted values",
+)
+# --8<-- [end:pulp-final-fit-diagnostics]
 
 # --8<-- [start:pulp-fitted-model-inspection-results]
 factors = pipls_display_factors(
@@ -544,7 +651,7 @@ _plot_latent_structure(
 
 # --8<-- [start:plot-pulp-prediction-diagnostics]
 _plot_prediction_diagnostics(
-    diagnostics,
+    oof_diagnostics,
     response_names=response_names,
     output_path=ANALYSIS_DIR / "prediction_diagnostics.pdf",
 )
@@ -556,6 +663,23 @@ _plot_coefficients(
     response_names=response_names,
     output_path=ANALYSIS_DIR / "coefficients.pdf",
 )
+
+# --8<-- [start:plot-pulp-final-fit-diagnostics]
+_plot_final_fit_observed_vs_predicted(
+    fitted_diagnostics,
+    response_names=response_names,
+    output_path=ANALYSIS_DIR / "final_fit_observed_vs_predicted.pdf",
+)
+_plot_final_fit_r2(
+    fitted_diagnostics,
+    response_names=response_names,
+    output_path=ANALYSIS_DIR / "final_fit_r2.pdf",
+)
+_plot_final_fit_residual_distribution(
+    fitted_diagnostics,
+    output_path=ANALYSIS_DIR / "final_fit_residual_distribution.pdf",
+)
+# --8<-- [end:plot-pulp-final-fit-diagnostics]
 
 print(f"X shape: {X.shape}; Y shape: {Y.shape}")
 print(

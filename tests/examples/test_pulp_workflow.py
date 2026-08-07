@@ -39,10 +39,16 @@ def pulp_result() -> SimpleNamespace:
         response_sign="positive",
     )
     structure = latent_structure(model)
-    diagnostics = prediction_diagnostics(
+    oof_diagnostics = prediction_diagnostics(
         Y,
         oof_predictions,
         prediction_kind="selection-conditioned OOF predictions",
+    )
+    fitted_predictions = model.predict(X)
+    fitted_diagnostics = prediction_diagnostics(
+        Y,
+        fitted_predictions,
+        prediction_kind="fitted values",
     )
     return SimpleNamespace(
         data=data,
@@ -57,7 +63,9 @@ def pulp_result() -> SimpleNamespace:
         oof_predictions=oof_predictions,
         factors=factors,
         structure=structure,
-        diagnostics=diagnostics,
+        oof_diagnostics=oof_diagnostics,
+        fitted_predictions=fitted_predictions,
+        fitted_diagnostics=fitted_diagnostics,
     )
 
 
@@ -117,11 +125,11 @@ def test_pulp_oof_and_inspection_results_are_aligned(pulp_result: SimpleNamespac
     )
     assert result.oof_predictions.shape == result.Y.shape
     assert np.all(np.isfinite(result.oof_predictions))
-    assert result.diagnostics.prediction_kind == "selection-conditioned OOF predictions"
+    assert result.oof_diagnostics.prediction_kind == "selection-conditioned OOF predictions"
     ti_response_index = result.data.target_names.index("TI")
     assert np.all(result.factors.response_directions[ti_response_index] > 0.0)
     assert np.all(result.factors.weighted_response_directions[ti_response_index] > 0.0)
-    assert result.diagnostics.observed.shape == result.Y.shape
+    assert result.oof_diagnostics.observed.shape == result.Y.shape
     assert result.factors.n_components == result.selected.n_components
     assert result.structure.x_scores.shape[0] == len(result.X)
     assert result.structure.x_loadings.shape[0] == result.X.shape[1]
@@ -134,3 +142,27 @@ def test_pulp_selection_requires_an_evaluated_component_count(
 ) -> None:
     with pytest.raises(ValueError, match="was not evaluated"):
         pulp_result.search.select(n_components=99)
+
+
+def test_pulp_final_fit_diagnostics_are_response_wise_and_descriptive(
+    pulp_result: SimpleNamespace,
+) -> None:
+    result = pulp_result
+
+    diagnostics = result.fitted_diagnostics
+    assert diagnostics.prediction_kind == "fitted values"
+    np.testing.assert_allclose(diagnostics.predicted, result.fitted_predictions)
+    assert diagnostics.predicted.shape == result.Y.shape
+    assert diagnostics.response_r2.shape == (result.Y.shape[1],)
+    assert np.all(np.isfinite(diagnostics.response_r2))
+
+    residual = result.Y - result.fitted_predictions
+    residual_sum_squares = np.sum(residual * residual, axis=0)
+    centered = result.Y - np.mean(result.Y, axis=0)
+    total_sum_squares = np.sum(centered * centered, axis=0)
+    expected_r2 = 1.0 - residual_sum_squares / total_sum_squares
+    np.testing.assert_allclose(diagnostics.response_r2, expected_r2)
+
+    pooled_residuals = diagnostics.residual_standardized.ravel()
+    assert np.all(np.isfinite(pooled_residuals))
+    assert float(np.std(pooled_residuals, ddof=1)) > 0.0
