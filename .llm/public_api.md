@@ -33,7 +33,7 @@ where `y` may be one- or two-dimensional.
 
 The fixed estimator fits one explicit pair. Required keyword-only parameters are
 `n_components` and `predictor_rank`; neither has a default, `None`, or automatic sentinel. Optional
-parameters are `scale`, `copy`, `svd_solver`, and `random_state`.
+parameters are `scale`, `scale_x`, `scale_y`, `copy`, `svd_solver`, and `random_state`.
 
 Validation rules:
 
@@ -42,6 +42,8 @@ Validation rules:
 - `predictor_rank <= min(n_features, n_samples - 1)` after centering and no greater than the
   verified numerical rank;
 - `scale` and `copy` are booleans;
+- `scale_x` and `scale_y` are booleans or `None`; `None` inherits `scale` for the corresponding
+  block;
 - `svd_solver` is `"full"`, `"randomized"`, or `"auto"`;
 - `random_state` accepts `None`, a valid integer seed, or NumPy `RandomState`.
 
@@ -54,6 +56,10 @@ The estimator provides PLS-style `fit`, `predict`, `transform`, `fit_transform`,
 `inverse_transform`, and scalar R2 `score`. It supports feature names and inherited scikit-learn
 `set_output()` behavior. Standard fitted scores, loadings, rotations, coefficients, intercept, and
 means/scales remain available.
+
+Every fit centers both blocks. `scale` remains the backward-compatible default for both predictor
+and response scaling. Non-`None` `scale_x` and `scale_y` values override that policy independently,
+allowing a pipeline transformer to own predictor scaling while Pi-PLS retains response scaling.
 
 `decomposition_` is an immutable `PiPLSDecomposition` containing:
 
@@ -287,7 +293,7 @@ The package does not expose:
 - a final estimator from `search.fit()`;
 - general weighted fitting or metadata routing;
 - generic dataset download/registry APIs;
-- block-aware scaling;
+- a package-owned block-aware scaling class or block-definition API;
 - public plotting or report-composition helpers;
 - adaptive-search execution history as result state;
 - private scorer/preprocessing state needed only internally;

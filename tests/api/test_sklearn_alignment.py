@@ -120,6 +120,8 @@ def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
         "predictor_rank",
         "random_state",
         "scale",
+        "scale_x",
+        "scale_y",
         "svd_solver",
     }
 
@@ -339,6 +341,38 @@ def test_refit_returns_pipeline_without_flattening_coefficients() -> None:
     assert model.selection_ == search.select(n_components=2)
     assert not hasattr(model.named_steps["regression"], "selection_")
     assert not hasattr(search, "coef_")
+
+
+def test_pipeline_can_preserve_external_predictor_scaling_and_scale_responses() -> None:
+    X, Y = _data()
+    pipeline = Pipeline(
+        [
+            ("scale", StandardScaler()),
+            (
+                "regression",
+                PiPLSRegression(
+                    n_components=2,
+                    predictor_rank=3,
+                    scale_x=False,
+                    scale_y=True,
+                    svd_solver="full",
+                ),
+            ),
+        ]
+    )
+    search = PiPLSSearchCV(
+        estimator=pipeline,
+        n_components_values=[2],
+        predictor_rank_values=[3],
+        max_predictor_rank=3,
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+    model = search.refit(X, Y, n_components=2)
+    regression = model.named_steps["regression"]
+
+    np.testing.assert_allclose(regression.x_scale_, 1.0)
+    np.testing.assert_allclose(regression.y_scale_, np.std(Y, axis=0, ddof=1))
 
 
 def test_minimum_cv_mse_tolerance_refit_preserves_pipeline_composition() -> None:

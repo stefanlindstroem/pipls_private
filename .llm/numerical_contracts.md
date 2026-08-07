@@ -14,10 +14,12 @@
 
 ## Estimator preprocessing and finite behavior
 
-Every fixed fit learns predictor and response means from its own training observations. With
-`scale=True`, safe sample standard deviations use `ddof=1`; with `scale=False`, both blocks are
-still centered and unit scales are stored. Search candidates learn these quantities independently
-inside each training fold, and `refit()` learns them again from the supplied full training data.
+Every fixed fit learns predictor and response means from its own training observations. Both blocks
+are always centered. `scale` supplies the backward-compatible scaling default for both blocks;
+non-`None` `scale_x` and `scale_y` values override predictor and response scaling independently.
+Enabled scaling uses safe sample standard deviations with `ddof=1`; disabled scaling stores a unit
+scale vector for that block. Search candidates learn these quantities independently inside each
+training fold, and `refit()` learns them again from the supplied full training data.
 
 Public fits are transactional. A failed fit removes old and partial fitted state. A failed search
 refit leaves the fitted search unchanged because refitting operates on a fresh clone.

@@ -365,7 +365,9 @@ $$
 \boldsymbol\mu_{\mathrm{Y}}-\boldsymbol\mu_{\mathrm{X}}\mathbf{B}.
 $$
 
-When `scale=False`, the scale vectors are ones and the same expressions reduce to centering only.
+Each scale vector is learned or set to ones independently. `scale` supplies the default for both
+blocks, while non-`None` `scale_x` and `scale_y` values override predictor and response scaling.
+If scaling is disabled for one block, the corresponding expression reduces to centering only.
 
 ## Interpretation of the two ranks
 

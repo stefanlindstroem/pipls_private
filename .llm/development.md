@@ -72,9 +72,10 @@
   obtainable raw data and exposes analysis-relevant choices that users should follow.
 - Do not add paper-figure, manuscript-table, publication-grid, or paper-only comparator workflows
   to this repository. Downstream reproduction repositories should pin tagged `pipls` releases.
-- Do not introduce provisional block-aware scaling classes, public names, constructor parameters,
-  or internal abstractions until the owner starts a dedicated future design phase. This restriction
-  does not defer or weaken the existing `PiPLSRegression` centering/scaling contract.
+- Keep block-aware scaling classes, block labels, block norms, and block-method semantics outside
+  `pipls`. The fixed estimator exposes only the independent `scale_x` and `scale_y` overrides needed
+  to compose an external predictor transformer with the supported pipeline boundary. Do not add
+  further block-specific abstractions without a new owner decision.
 
 ## Tests and documentation
 

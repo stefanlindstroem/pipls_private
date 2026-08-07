@@ -47,8 +47,28 @@ workflows, the pre-existing selection is the handoff to OOF reporting and refitt
 ## Preprocessing and fit safety
 
 Every fit centers predictors and responses using statistics learned from that fit's training data.
-With `scale=True`, centered columns are divided by sample standard deviations with `ddof=1`;
-constant columns use scale 1. With `scale=False`, centering remains active without division.
+`scale` remains the backward-compatible default for both blocks: with `scale=True`, centered
+predictor and response columns are divided by sample standard deviations with `ddof=1`; with
+`scale=False`, both blocks remain only centered. Constant columns use scale 1.
+
+Predictor and response scaling can be overridden independently with `scale_x` and `scale_y`.
+Each defaults to `None`, which inherits `scale`. For example, an estimator placed after an external
+predictor-scaling transformer can preserve those transformed predictor units while retaining
+ordinary response standardization:
+
+```python
+model = PiPLSRegression(
+    n_components=2,
+    predictor_rank=4,
+    scale_x=False,
+    scale_y=True,
+)
+```
+
+Centering remains active for both blocks under every combination. This separation is useful for
+scikit-learn pipelines that learn predictor preprocessing inside each training fold: the upstream
+transformer owns predictor scaling, while the terminal Pi-PLS estimator can still standardize the
+responses. Explicit `scale_x` or `scale_y` values take precedence over `scale`.
 
 Ordinary means and standard deviations are retained for ordinary data. Range-safe fallbacks are
 used only when finite values would otherwise overflow or when a nonconstant scale would underflow

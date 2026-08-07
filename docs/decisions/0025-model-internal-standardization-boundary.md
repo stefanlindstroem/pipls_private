@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted while clarifying the package-product roadmap after Decision 0024.
+Accepted while clarifying the package-product roadmap after Decision 0024. Decision 0153 refines
+the public scaling controls while preserving this leakage-safe fitting boundary.
 
 ## Context
 
@@ -24,9 +25,11 @@ once to the complete dataset before cross-validation.
 - Treat centering and optional scaling as current, integral `PiPLSRegression` behavior, not as a
   deferred preprocessing feature.
 - Every estimator fit learns `x_mean_` and `y_mean_` from the observations supplied to that fit.
-- With `scale=True`, every fit also learns safe `x_scale_` and `y_scale_` vectors from those
-  observations using the accepted sample-standard-deviation convention. With `scale=False`,
-  centering remains active and the scale vectors are ones.
+- Scaling policy is resolved independently for predictors and responses. `scale` supplies the
+  backward-compatible default for both blocks; non-`None` `scale_x` and `scale_y` values override
+  the corresponding block. Every enabled block learns its safe scale vector from the observations
+  supplied to that fit using the accepted sample-standard-deviation convention. A disabled block
+  remains centered and stores a unit scale vector.
 - During internal rank or path selection, clone and fit the complete estimator inside each training
   fold. Validation observations must not influence centering or scaling statistics.
 - After selection, refit the chosen estimator on the complete training set supplied to `fit()`,
@@ -35,18 +38,20 @@ once to the complete dataset before cross-validation.
   units.
 - Keep the fixed numerical core independent from preprocessing: it continues to receive centered or
   centered-and-scaled matrices from the estimator layer.
-- Defer only the public API, naming, placement, and block semantics of future block-aware
-  standardization. It may eventually be estimator-owned or represented in a supported model
-  pipeline; that design is not decided. In either case, the complete candidate must fit it within
-  each training fold and the final full-training refit.
+- Defer the public API, naming, and block semantics of future block-aware standardization itself.
+  Predictor-side learned preprocessing may be represented in a supported model pipeline, with
+  terminal `PiPLSRegression(scale_x=False, scale_y=...)` preventing estimator-side predictor
+  standardization from replacing the upstream transform. In every case, the complete candidate
+  must fit learned preprocessing within each training fold and the final full-training refit.
 - Reject workflows that fit learned scaling once to the complete dataset before cross-validation;
   that is leakage and is not an accepted package pattern.
 
 ## Consequences
 
-- Existing runtime behavior remains unchanged.
+- Existing `scale=True` and `scale=False` runtime behavior remains unchanged when neither block
+  override is supplied.
 - Documentation and future development must distinguish current estimator standardization from
-  deferred block-aware variants.
+  external block-aware variants.
 - The package may later extend model standardization without changing the leakage-safe ownership
   boundary.
 - No block-scaling class, parameter, composition rule, or implementation schedule is created by

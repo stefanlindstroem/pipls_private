@@ -89,8 +89,10 @@ requests in bounded patches while preserving the implemented numerical and produ
 
 ## Deferred work
 
-Future block-aware standardization remains intentionally undesigned. Do not reserve public names,
-constructor parameters, or hidden abstractions before a dedicated owner-led design phase.
+The block-aware transformer itself remains outside this repository. `PiPLSRegression` now exposes
+only the independent `scale_x` and `scale_y` controls needed for supported pipeline composition.
+Do not reserve additional block-specific public names or hidden abstractions without a dedicated
+owner decision.
 
 ## Maintenance protocol
 

@@ -151,7 +151,8 @@ archives of a clean committed tree.
 
 Do not add without a new owner decision:
 
-- block-aware scaling or preprocessing semantics;
+- package-owned block-aware scaling classes, block definitions, or block-method semantics beyond
+  the implemented independent `scale_x` and `scale_y` controls;
 - automatic outer validation or unbiased-performance claims;
 - weighted fitting or general-purpose metadata routing;
 - arbitrary nested meta-estimator support;
@@ -160,8 +161,9 @@ Do not add without a new owner decision:
 - publication-only analyses in this repository;
 - compatibility aliases for removed pre-release APIs.
 
-Current centering and optional scaling are not deferred: they are integral to every estimator fit
-and are learned within each training fold during search.
+Current centering and optional scaling are not deferred: both blocks are always centered, while
+`scale_x` and `scale_y` may override the backward-compatible `scale` policy independently. Learned
+estimator or pipeline scaling remains fold-local during search.
 
 ## Current maintenance status
 

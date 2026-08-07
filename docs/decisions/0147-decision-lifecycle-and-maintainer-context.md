@@ -4,7 +4,7 @@
 
 Accepted and implemented. The active `.llm` layer describes current contracts without patch-
 progress narration, `history.md` summarizes completed eras, the retirement map covers removed
-records, and the maintained tree contains 44 current numbered decisions.
+records, and the maintained tree contains 45 current numbered decisions after Decision 0153.
 
 ## Context
 

@@ -357,10 +357,13 @@ SVD.
 
 ## Package realization
 
-`PiPLSRegression` learns predictor and response means and, when `scale=True`, sample-standard-
-deviation scales from the training data. It applies the fixed construction above in the resulting
-centered or centered-and-scaled coordinates, then transforms the regression map back to original
-units for `coef_`, `intercept_`, and `predict()`.
+`PiPLSRegression` learns predictor and response means from the training data. Predictor and
+response scaling are controlled independently after centering. The backward-compatible `scale`
+parameter supplies the default for both blocks, while non-`None` `scale_x` and `scale_y` values
+override predictor and response scaling respectively. Enabled scaling uses training-sample standard
+deviations. The estimator applies the fixed construction above in the resulting centered or
+centered-and-scaled coordinates, then transforms the regression map back to original units for
+`coef_`, `intercept_`, and `predict()`.
 
 A fitted estimator exposes the Pi-PLS-specific factorization in `decomposition_`:
 

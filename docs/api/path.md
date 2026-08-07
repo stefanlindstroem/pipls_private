@@ -102,7 +102,8 @@ model = search.refit(
 
 The pair `(1, 1)` is only a valid construction seed. The search replaces `n_components` and
 `predictor_rank` for fold-rank preflight and candidate fitting; cloning preserves other template
-settings such as `scale`, `copy`, `svd_solver`, and `random_state`. With `estimator=None`, the search
+settings such as `scale`, `scale_x`, `scale_y`, `copy`, `svd_solver`, and `random_state`. With
+`estimator=None`, the search
 creates the same seed pair using the ordinary `PiPLSRegression` defaults. A pipeline is configured
 in the same way through its terminal `PiPLSRegression` step; see
 [Pipelines and fold-local preprocessing](../path_analysis.md#pipelines-and-fold-local-preprocessing).
@@ -246,7 +247,9 @@ standard deviation learned from the estimator's training responses. The positive
 an error; the negative function follows the scikit-learn convention that larger scorer values are
 better. `PiPLSSearchCV` uses the stable string
 `"neg_response_standardized_mse"` by default and resolves it to the public negative
-scorer callable.
+scorer callable. This scoring normalization is independent of the fitted model's `scale_y` policy;
+changing response scaling inside `PiPLSRegression` does not disable fold-local response
+standardization in this loss.
 
 ::: pipls.metrics.response_standardized_mse
     options:

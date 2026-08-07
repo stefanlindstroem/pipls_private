@@ -52,8 +52,19 @@ class PiPLSRegression(
         centering, it
         must not exceed ``min(n_features, n_samples - 1)``.
     scale : bool, default=True
-        If true, center and divide predictor and response columns by their
-        training-sample standard deviations. If false, center without scaling.
+        Backward-compatible default for predictor and response scaling. If true,
+        centered predictor and response columns are divided by their
+        training-sample standard deviations. If false, both blocks remain only
+        centered. ``scale_x`` and ``scale_y`` override this value independently
+        when they are not ``None``.
+    scale_x : bool or None, default=None
+        Predictor-scaling override. ``None`` inherits ``scale``. If true,
+        centered predictor columns are divided by their training-sample standard
+        deviations; if false, predictors remain only centered.
+    scale_y : bool or None, default=None
+        Response-scaling override. ``None`` inherits ``scale``. If true,
+        centered response columns are divided by their training-sample standard
+        deviations; if false, responses remain only centered.
     copy : bool, default=True
         Whether fitting may copy the supplied arrays before preprocessing.
     svd_solver : {"auto", "full", "randomized"}, default="auto"
@@ -90,11 +101,11 @@ class PiPLSRegression(
     y_mean_ : ndarray of shape (n_targets_,)
         Response means learned from the training data.
     x_scale_ : ndarray of shape (n_features_in_,)
-        Predictor scales learned from the training data, or ones when
-        ``scale=False``. Constant columns receive scale one.
+        Predictor scales learned from the training data, or ones when effective
+        predictor scaling is disabled. Constant columns receive scale one.
     y_scale_ : ndarray of shape (n_targets_,)
-        Response scales learned from the training data, or ones when
-        ``scale=False``. Constant columns receive scale one.
+        Response scales learned from the training data, or ones when effective
+        response scaling is disabled. Constant columns receive scale one.
     x_rotations_ : ndarray of shape (n_features_in_, n_components)
         Predictor directions.
     y_rotations_ : ndarray of shape (n_targets_, n_components)
@@ -122,12 +133,16 @@ class PiPLSRegression(
         n_components: int,
         predictor_rank: int,
         scale: bool = True,
+        scale_x: bool | None = None,
+        scale_y: bool | None = None,
         copy: bool = True,
         svd_solver: SVDSolver = "auto",
         random_state: int | np.random.RandomState | None = 0,
     ) -> None:
         self.n_components = n_components
         self.scale = scale
+        self.scale_x = scale_x
+        self.scale_y = scale_y
         self.copy = copy
         self.predictor_rank = predictor_rank
         self.svd_solver = svd_solver
@@ -477,16 +492,23 @@ class PiPLSRegression(
         _require_finite_output(X, operation="Predictor centering")
         _require_finite_output(y, operation="Response centering")
 
-        if self.scale:
+        scale_x = self.scale if self.scale_x is None else self.scale_x
+        scale_y = self.scale if self.scale_y is None else self.scale_y
+
+        if scale_x:
             self.x_scale_ = _safe_sample_scale(X)
-            self.y_scale_ = _safe_sample_scale(y)
             with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
                 X /= self.x_scale_
-                y /= self.y_scale_
             _require_finite_output(X, operation="Predictor scaling")
-            _require_finite_output(y, operation="Response scaling")
         else:
             self.x_scale_ = np.ones(X.shape[1], dtype=np.float64)
+
+        if scale_y:
+            self.y_scale_ = _safe_sample_scale(y)
+            with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+                y /= self.y_scale_
+            _require_finite_output(y, operation="Response scaling")
+        else:
             self.y_scale_ = np.ones(y.shape[1], dtype=np.float64)
 
         X_cs = X
@@ -539,6 +561,8 @@ class PiPLSRegression(
             )
         if not isinstance(self.scale, (bool, np.bool_)):
             raise ValueError(f"scale must be boolean; got {self.scale!r}.")
+        _validate_optional_boolean(self.scale_x, name="scale_x")
+        _validate_optional_boolean(self.scale_y, name="scale_y")
         if not isinstance(self.copy, (bool, np.bool_)):
             raise ValueError(f"copy must be boolean; got {self.copy!r}.")
         if not isinstance(self.svd_solver, str) or self.svd_solver not in (
@@ -566,7 +590,8 @@ def _check_core_product_range(X: FloatArray, y: FloatArray) -> None:
     log_bound = np.log(x_max) + np.log(y_max) + np.log(X.shape[0])
     if log_bound >= np.log(np.finfo(np.float64).max):
         raise FloatingPointError(
-            "Pi-PLS cross-products may overflow; use scale=True or rescale the input data."
+            "Pi-PLS cross-products may overflow; enable predictor and/or response scaling, "
+            "or rescale the input data."
         )
 
 
@@ -590,3 +615,8 @@ def _validate_positive_int(value: object, *, name: str) -> None:
         raise ValueError(f"{name} must be a positive integer; got {value!r}.")
     if int(value) < 1:
         raise ValueError(f"{name} must be a positive integer; got {value!r}.")
+
+
+def _validate_optional_boolean(value: object, *, name: str) -> None:
+    if value is not None and not isinstance(value, (bool, np.bool_)):
+        raise ValueError(f"{name} must be boolean or None; got {value!r}.")

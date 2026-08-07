@@ -58,15 +58,16 @@ comparative studies, including synthetic recovery, nuisance sensitivity, solver 
 runtime, and memory studies, belong in downstream research or reproduction repositories unless a
 future package contract requires a focused regression test.
 
-## Current model standardization and deferred block-aware variants
+## Current model standardization and external block-aware variants
 
-Model-internal centering and scaling are current, required estimator behavior; they are not deferred
-product scope. `PiPLSRegression` mirrors the preprocessing contract of scikit-learn's
-`PLSRegression`:
+Model-internal centering and scaling are current estimator behavior; they are not deferred product
+scope. `PiPLSRegression` keeps `scale` as the backward-compatible policy for both blocks and also
+permits independent predictor and response overrides:
 
 - every fit centers `X` and `Y` using statistics estimated from the data supplied to that fit;
-- `scale=True` additionally divides both blocks by safe training-sample standard deviations;
-- `scale=False` retains centering and uses unit scale vectors;
+- `scale_x=None` and `scale_y=None` inherit `scale`;
+- an enabled block is divided by safe training-sample standard deviations after centering;
+- a disabled block remains centered and uses a unit scale vector;
 - every cross-validation candidate is a fresh estimator fit on one training fold, so validation
   observations never influence fold means or scales;
 - after model selection, the chosen model is refitted and standardized on the complete training set
@@ -77,22 +78,26 @@ The fixed numerical core remains independent from preprocessing because it recei
 centered or centered-and-scaled matrices from the estimator layer. This separation does not make
 standardization optional or external to model fitting.
 
-Future development may add block-aware variants of model standardization. Their eventual public
-placement—inside the estimator or as part of a supported model pipeline—is not designed yet. Only
-the future API and block semantics are deferred. Regardless of placement, the complete model must
-fit the scaling statistics inside each training fold and again during the final full-training
-refit. They must not be fitted once to the complete dataset before cross-validation.
+Block-aware predictor standardization belongs outside `PiPLSRegression`, for example in a dedicated
+transformer repository composed through the supported scikit-learn pipeline boundary. The terminal
+Pi-PLS estimator can use `scale_x=False` so upstream predictor scaling is preserved while choosing
+response scaling independently with `scale_y`. Block definitions, block norms, and block-scaling
+methods remain outside this repository. Any learned transformer must be fitted inside each training
+fold and again during the final full-training refit, never once on the complete dataset before
+cross-validation.
 
-Until the project owner starts a dedicated design phase:
+For block-aware work in `pipls`:
 
-- no provisional public names, classes, constructor parameters, or block semantics are reserved;
-- documentation must not imply that current centering/scaling is deferred;
-- implementation work must not anticipate a future block-scaling API through hidden abstractions;
-- ordinary model fitting and validation continue to use the implemented estimator-internal
-  standardization contract.
+- `scale_x` and `scale_y` are the complete estimator-side composition controls currently accepted;
+- no block-aware class, block definition, scaling method, or hidden block abstraction belongs in
+  this repository without a separate owner decision;
+- documentation must distinguish estimator scaling controls from the external transformer's block
+  semantics;
+- ordinary model fitting and validation continue to use the implemented fold-local standardization
+  boundary.
 
-A future block-aware standardization design requires a separate owner decision, explicit contracts,
-and its own small reviewable increments.
+The external block-aware transformer design requires its own explicit contracts and reviewable
+increments in the downstream repository.
 
 ## Current transition state
 
@@ -110,6 +115,6 @@ same in-memory boundary through `load_pulp()` and adds separate unselected and s
 component-path figures plus a conditional predictor-rank-profile figure.
 Tobacco is also direct while preserving full-SVD spectral analysis, response pagination, and
 observation diagnostics. Every analytical model-producing workflow creates one visible selection
-before optional OOF inspection and final fixed-model fitting. None of this includes a block-aware
-standardization API design; future block-aware variants remain deferred for months or until the
-project owner explicitly starts a separate phase.
+before optional OOF inspection and final fixed-model fitting. The package now provides only the
+independent predictor/response scaling controls needed for external block-aware pipeline
+composition; block-aware transformer design itself remains downstream.

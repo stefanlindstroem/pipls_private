@@ -50,6 +50,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0147: decision lifecycle](0147-decision-lifecycle-and-maintainer-context.md)
 - [0148: predictor-rank tolerance selection](0148-predictor-rank-tolerance-selection.md)
 - [0152: selection-review feedback workflow](0152-selection-review-feedback-workflow.md)
+- [0153: independent predictor and response scaling controls](0153-independent-block-scaling-controls.md)
 
 ## Historical navigation
 

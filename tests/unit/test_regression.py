@@ -56,6 +56,63 @@ def test_scale_false_still_centers() -> None:
     np.testing.assert_allclose(np.mean(model.x_scores_, axis=0), 0.0, atol=1e-12)
 
 
+@pytest.mark.parametrize(
+    ("scale_x", "scale_y", "expect_x_scaling", "expect_y_scaling"),
+    [
+        (False, False, False, False),
+        (False, True, False, True),
+        (True, False, True, False),
+        (True, True, True, True),
+    ],
+)
+def test_predictor_and_response_scaling_can_be_controlled_independently(
+    scale_x: bool,
+    scale_y: bool,
+    expect_x_scaling: bool,
+    expect_y_scaling: bool,
+) -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        scale=False,
+        scale_x=scale_x,
+        scale_y=scale_y,
+    ).fit(X, Y)
+
+    expected_x_scale = np.std(X, axis=0, ddof=1) if expect_x_scaling else np.ones(X.shape[1])
+    expected_y_scale = np.std(Y, axis=0, ddof=1) if expect_y_scaling else np.ones(Y.shape[1])
+    np.testing.assert_allclose(model.x_scale_, expected_x_scale)
+    np.testing.assert_allclose(model.y_scale_, expected_y_scale)
+
+
+@pytest.mark.parametrize("legacy_scale", [False, True])
+def test_independent_scaling_overrides_preserve_legacy_scale_behavior(
+    legacy_scale: bool,
+) -> None:
+    X, Y = _data()
+    legacy = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        scale=legacy_scale,
+        svd_solver="full",
+    ).fit(X, Y)
+    overridden = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        scale=not legacy_scale,
+        scale_x=legacy_scale,
+        scale_y=legacy_scale,
+        svd_solver="full",
+    ).fit(X, Y)
+
+    np.testing.assert_allclose(overridden.x_scale_, legacy.x_scale_)
+    np.testing.assert_allclose(overridden.y_scale_, legacy.y_scale_)
+    np.testing.assert_allclose(overridden.coef_, legacy.coef_)
+    np.testing.assert_allclose(overridden.intercept_, legacy.intercept_)
+    np.testing.assert_allclose(overridden.predict(X), legacy.predict(X))
+
+
 def test_one_dimensional_response_round_trips_as_one_dimensional() -> None:
     X, Y = _data()
     model = PiPLSRegression(n_components=1, predictor_rank=3).fit(X, Y[:, 0])
@@ -105,6 +162,8 @@ def test_fixed_rank_pair_is_required_and_keyword_only() -> None:
         "predictor_rank",
         "random_state",
         "scale",
+        "scale_x",
+        "scale_y",
         "svd_solver",
     }
 

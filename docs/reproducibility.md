@@ -95,11 +95,13 @@ default integer `0` is reproducible. `None` uses NumPy's global random state and
 only when repeatability is not required. The synthetic generators retain their separate explicit
 integer-seed contract.
 
-Centering and optional scaling are integral to `PiPLSRegression.fit`. `PiPLSSearchCV` clones fixed
-estimators inside every training fold, so each candidate learns statistics only from that fold.
-A subsequent `search.refit(X, Y, ...)` call fits one selected rank pair on the complete supplied
-training set, so centering and scaling are learned again from that full data. Learned scaling must
-not be fitted globally before CV.
+Centering and optional scaling are integral to `PiPLSRegression.fit`. The `scale` parameter remains
+the default policy for both blocks, while `scale_x` and `scale_y` can override predictor and response
+scaling independently. `PiPLSSearchCV` clones the complete fixed estimator or supported pipeline
+inside every training fold, so each candidate learns statistics only from that fold. A subsequent
+`search.refit(X, Y, ...)` call fits one selected rank pair on the complete supplied training set, so
+centering and any enabled estimator or pipeline scaling are learned again from that full data.
+Learned scaling must not be fitted globally before CV.
 
 
 Maintained examples that use one ordinary five-fold regression partition specify

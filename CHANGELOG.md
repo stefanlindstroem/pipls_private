@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add independent `scale_x` and `scale_y` overrides to `PiPLSRegression`. The existing `scale`
+  parameter remains the backward-compatible default for both blocks, while predictor and response
+  scaling can now be controlled separately without disabling centering.
 - Clarify the computational-performance guide for the fixed maximum predictor-rank policy,
   including the sample-support ceiling and the manuscript-style
   `samples_per_predictor_rank=10.0` and `5.0` configurations.

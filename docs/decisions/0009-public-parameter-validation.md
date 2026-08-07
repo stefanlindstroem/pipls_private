@@ -1,6 +1,6 @@
 # Decision 0009: public parameter validation and statistical-support warning
 
-Status: accepted and refined by Decision 0039. Fixed-estimator validation now covers only
+Status: accepted and refined by Decisions 0039 and 0153. Fixed-estimator validation now covers only
 explicit ranks and warns at $n/r_\pi<3$; rank-bound validation remains in `PiPLSSearchCV`.
 
 ## Context
@@ -25,7 +25,8 @@ materialization, or numerical decomposition.
 - `random_state` accepts an integer in the unsigned 32-bit seed interval $[0, 2^{32}-1]$,
   a NumPy `RandomState`, or `None`, under the current public API. The integer default `0` is
   reproducible; `None` follows NumPy's global random state.
-- `scale` and `copy` accept only Python or NumPy booleans.
+- `scale` and `copy` accept only Python or NumPy booleans. `scale_x` and `scale_y` accept Python or
+  NumPy booleans or `None`, where `None` inherits the value of `scale`.
 - Invalid scalar `scoring`, `svd_solver`, and rank-mode values fail with package-level `ValueError`
   messages rather than incidental errors from dependencies.
 

@@ -143,12 +143,41 @@ def test_boolean_parameters_reject_nonboolean_values(parameter: str, value: obje
         ).fit(X, Y)
 
 
+@pytest.mark.parametrize("parameter", ["scale_x", "scale_y"])
+@pytest.mark.parametrize("value", [0, 1, 1.0, "true", []])
+def test_optional_boolean_parameters_reject_nonboolean_values(
+    parameter: str,
+    value: object,
+) -> None:
+    X, Y = _data()
+    kwargs = {parameter: value}
+    with pytest.raises(ValueError, match=f"{parameter} must be boolean or None"):
+        PiPLSRegression(
+            n_components=1,
+            predictor_rank=2,
+            **kwargs,  # type: ignore[arg-type]
+        ).fit(X, Y)
+
+
+@pytest.mark.parametrize("parameter", ["scale_x", "scale_y"])
+def test_optional_boolean_parameters_accept_none(parameter: str) -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=1,
+        predictor_rank=2,
+        **{parameter: None},  # type: ignore[arg-type]
+    ).fit(X, Y)
+    assert model.predictor_rank == 2
+
+
 def test_numpy_boolean_parameters_are_accepted() -> None:
     X, Y = _data()
     model = PiPLSRegression(
         n_components=1,
         predictor_rank=2,
         scale=np.bool_(True),
+        scale_x=np.bool_(False),
+        scale_y=np.bool_(True),
         copy=np.bool_(False),
     ).fit(X, Y)
     assert model.predictor_rank == 2
