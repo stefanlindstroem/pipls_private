@@ -111,7 +111,7 @@ from the evaluated candidates, but they do not reduce adaptive or exhaustive sea
 ## Use fixed or restricted predictor-rank policies when justified
 
 When the scientific model already specifies the predictor-rank policy, avoid scanning ranks that
-will not be considered.
+will not be considered. This can reduce training computational cost significantly.
 
 Use the largest supported predictor rank across the component path:
 
@@ -143,7 +143,7 @@ where $c$ is `samples_per_predictor_rank`, $n$ is the number of observations sup
 and the other terms enforce fold-wise predictor dimensions and verified numerical rank. When those
 feasibility limits are inactive, this is the practical $r_\pi=\min(p,\lceil n/c\rceil)$ rule.
 
-For the EPV-inspired policy used in the manuscript experiments, set $c$ explicitly:
+For the events-per-variable (EPV) heuristic policy, set $c$ explicitly:
 
 ```python
 # Conservative default used for most real-data analyses.
