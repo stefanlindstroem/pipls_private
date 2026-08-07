@@ -113,14 +113,61 @@ from the evaluated candidates, but they do not reduce adaptive or exhaustive sea
 When the scientific model already specifies the predictor-rank policy, avoid scanning ranks that
 will not be considered.
 
-Use the largest feasible rank for each component count:
+Use the largest supported predictor rank across the component path:
 
 ```python
 search = PiPLSSearchCV(
+    n_components_values="all",
     predictor_rank_values="max",
+    samples_per_predictor_rank=10.0,
     cv=development_cv,
 ).fit(X, Y)
 ```
+
+Here `predictor_rank_values="max"` does not search over predictor ranks. It fixes the retained
+predictor rank at the resolved support ceiling and evaluates the requested component counts at that
+rank. With the default rule-based ceiling, the resolved value is
+
+\begin{equation}
+r_{\pi,\mathrm{max}}
+=
+\min\left[
+    p_{\mathrm{min}},
+    n_{\mathrm{train,min}}-1,
+    r_{\mathrm{num,min}},
+    \left\lceil\frac{n}{c}\right\rceil
+\right],
+\end{equation}
+
+where $c$ is `samples_per_predictor_rank`, $n$ is the number of observations supplied to `fit()`,
+and the other terms enforce fold-wise predictor dimensions and verified numerical rank. When those
+feasibility limits are inactive, this is the practical $r_\pi=\min(p,\lceil n/c\rceil)$ rule.
+
+For the EPV-inspired policy used in the manuscript experiments, set $c$ explicitly:
+
+```python
+# Conservative default used for most real-data analyses.
+search = PiPLSSearchCV(
+    n_components_values="all",
+    predictor_rank_values="max",
+    samples_per_predictor_rank=10.0,
+    cv=final_cv,
+).fit(X, Y)
+
+# More permissive small-sample variant.
+small_sample_search = PiPLSSearchCV(
+    n_components_values="all",
+    predictor_rank_values="max",
+    samples_per_predictor_rank=5.0,
+    cv=final_cv,
+).fit(X, Y)
+```
+
+Lowering $c$ permits a larger supported predictor subspace; increasing $c$ makes the rank ceiling
+more conservative. With `n_components_values="all"`, the component path then runs from one through
+the largest feasible paired-mode count at that fixed maximum predictor rank. This is different from
+the default conditional predictor-rank search, which evaluates or selects predictor ranks separately
+for each component count.
 
 Use one declared fixed rank:
 
