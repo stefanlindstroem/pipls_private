@@ -16,7 +16,7 @@ the maintained scripts.
 | `03_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths without fitting a final model | One comparison PDF for each reference dataset |
 | `04_pulp_real_data.py` | Inspect the unselected path, create and review one manual Pulp selection with OOF evidence, refit it, and interpret the fitted model | Seven PDF figures |
 | `05_sugarcane_real_data.py` | Run the complete selection-driven wavelength-aware Sugarcane workflow | Six PDF figures |
-| `06_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow | Six PDFs, including threshold-annotated rank and component profiles |
+| `06_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow with automated selection | Six PDFs, including threshold-annotated rank and component profiles |
 
 The [path-selection reference](api/path.md) documents both the compact automatic route used by
 example 01 and the explicit selection handoff used by the analytical examples. The
