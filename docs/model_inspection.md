@@ -80,9 +80,9 @@ confidence regions, or variable importance.
 
 `prediction_diagnostics()` receives observed and predicted responses explicitly.
 `PredictionDiagnostics` accepts those independent arrays and the required provenance label, then
-derives the residuals, response centers and scales, response-standardized arrays, and response-wise
-standardized RMSE once. Display standardization uses the supplied observed responses and does not
-alter predictions in original units.
+derives the residuals, response centers and scales, response-standardized arrays, response-wise
+standardized RMSE, and response-wise coefficient of determination once. Display standardization
+uses the supplied observed responses and does not alter predictions in original units.
 
 Selection-conditioned OOF predictions are descriptive post-selection diagnostics, not an
 independent estimate of future performance.
@@ -107,7 +107,7 @@ outlier labels, or contribution diagnostics.
 | What is each response mode after dilation? | `factors.weighted_response_directions` | Compare columns of $\mathbf{Q}\mathbf{D}$ across responses |
 | What is the original-unit linear map? | `structure.coefficients` | Plot one coefficient row per response, respecting variable units |
 | Which observations are distant or poorly reconstructed? | `observations.score_distance`, `observations.x_reconstruction_residual` | Scatter the two raw diagnostics |
-| How well do predictions agree with observations? | `PredictionDiagnostics` arrays | Use observed/predicted, residual, and response-wise RMSE views with provenance shown |
+| How well do predictions agree with observations? | `PredictionDiagnostics` arrays | Use observed/predicted, residual, response-wise RMSE, and response-wise $R^2$ views with provenance shown |
 
 ### Scores { #scores }
 
@@ -181,6 +181,18 @@ uncertainty tests.
 `standardized_rmse` compares response-wise error with each displayed response's observed spread.
 Lower values mean smaller relative error. These values are not generally equal to the mean
 fold-local standardized loss used during path selection.
+
+### Response-wise coefficient of determination { #response-r2 }
+
+`response_r2` is calculated independently for each response from the supplied predictions:
+
+\[
+R_j^2 = 1 - \frac{\sum_i (y_{ij} - \hat y_{ij})^2}{\sum_i (y_{ij} - \bar y_j)^2}.
+\]
+
+The interpretation follows `prediction_kind`. For fitted values it is a descriptive training-fit
+quantity; for OOF or external-test predictions it describes those supplied predictions. It is not
+by itself evidence of unbiased post-selection performance.
 
 ### Observation diagnostics { #observation-diagnostics }
 

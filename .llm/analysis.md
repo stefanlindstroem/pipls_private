@@ -127,14 +127,15 @@ outlier classification, or automatic exclusion.
 
 ## Prediction diagnostics
 
-`prediction_diagnostics(observed, predicted, kind=...)` accepts one- or two-dimensional responses
+`prediction_diagnostics(observed, predicted, prediction_kind=...)` accepts one- or two-dimensional responses
 and normalizes them to a two-dimensional numerical result. It derives:
 
 - residuals `observed - predicted`;
 - observed-response centers;
 - safe observed-response sample scales with `ddof=1`;
 - standardized observed values, predictions, and residuals;
-- response-wise standardized RMSE.
+- response-wise standardized RMSE;
+- response-wise coefficient of determination for the supplied prediction provenance.
 
 The result stores only independent observed values, predicted values, and provenance as constructor
 inputs; derived arrays are recomputed and validated. Constant response columns and ambiguous

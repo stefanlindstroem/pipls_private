@@ -132,6 +132,7 @@ def test_prediction_diagnostics_derive_dependent_fields() -> None:
         [[0.5], [-0.5], [0.0]],
     )
     np.testing.assert_allclose(diagnostics.standardized_rmse, [np.sqrt(1.0 / 6.0)])
+    np.testing.assert_allclose(diagnostics.response_r2, [0.75])
 
 
 def test_prediction_diagnostics_reject_derived_constructor_arguments() -> None:

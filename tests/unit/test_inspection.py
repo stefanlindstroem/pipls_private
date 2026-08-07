@@ -238,10 +238,15 @@ def test_prediction_diagnostics_standardize_from_observed_responses() -> None:
         diagnostics.residual_standardized,
         expected_residual / expected_scale,
     )
-    np.testing.assert_allclose(
-        diagnostics.standardized_rmse,
-        np.sqrt(np.mean(np.square(expected_residual / expected_scale), axis=0)),
+    expected_standardized_rmse = np.sqrt(
+        np.mean(np.square(expected_residual / expected_scale), axis=0)
     )
+    expected_r2 = 1.0 - np.sum(np.square(expected_residual), axis=0) / np.sum(
+        np.square(observed - expected_center),
+        axis=0,
+    )
+    np.testing.assert_allclose(diagnostics.standardized_rmse, expected_standardized_rmse)
+    np.testing.assert_allclose(diagnostics.response_r2, expected_r2)
     assert diagnostics.prediction_kind == "external test predictions"
     assert diagnostics.observed.shape == (3, 2)
     assert not hasattr(diagnostics, "n_samples")
@@ -259,6 +264,7 @@ def test_prediction_diagnostics_normalize_vector_inputs_to_two_dimensions() -> N
     assert diagnostics.predicted.shape == (3, 1)
     assert diagnostics.response_centers.shape == (1,)
     assert diagnostics.standardized_rmse.shape == (1,)
+    assert diagnostics.response_r2.shape == (1,)
 
 
 def test_prediction_diagnostics_are_defensive_read_only_copies() -> None:
@@ -281,6 +287,7 @@ def test_prediction_diagnostics_are_defensive_read_only_copies() -> None:
         diagnostics.response_centers,
         diagnostics.response_scales,
         diagnostics.standardized_rmse,
+        diagnostics.response_r2,
     ):
         assert not values.flags.writeable
 
@@ -335,7 +342,9 @@ def test_prediction_diagnostics_handles_representable_extreme_values() -> None:
     assert np.all(np.isfinite(diagnostics.response_centers))
     assert np.all(np.isfinite(diagnostics.response_scales))
     assert np.all(np.isfinite(diagnostics.standardized_rmse))
+    assert np.all(np.isfinite(diagnostics.response_r2))
     np.testing.assert_allclose(diagnostics.response_scales, [np.sqrt(2.0) * 1.0e307])
+    np.testing.assert_allclose(diagnostics.response_r2, [0.0], atol=1e-15)
 
 
 def test_prediction_diagnostics_rejects_unrepresentable_residuals() -> None:
@@ -346,6 +355,15 @@ def test_prediction_diagnostics_rejects_unrepresentable_residuals() -> None:
         prediction_diagnostics(
             observed,
             predicted,
+            prediction_kind="external test predictions",
+        )
+
+
+def test_prediction_diagnostics_rejects_unrepresentable_response_r2() -> None:
+    with pytest.raises(ValueError, match="response_r2 cannot be represented"):
+        prediction_diagnostics(
+            np.array([-1.0, 1.0]),
+            np.array([1.0e308, -1.0e308]),
             prediction_kind="external test predictions",
         )
 

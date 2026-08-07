@@ -394,6 +394,8 @@ class PredictionDiagnostics:
         responses.
     standardized_rmse : ndarray of shape (n_targets,)
         Response-wise root mean squared standardized residual.
+    response_r2 : ndarray of shape (n_targets,)
+        Response-wise coefficient of determination for the supplied predictions.
     prediction_kind : PredictionKind
         Explicit provenance of the supplied predictions.
     """
@@ -408,6 +410,7 @@ class PredictionDiagnostics:
     response_centers: FloatArray = field(init=False)
     response_scales: FloatArray = field(init=False)
     standardized_rmse: FloatArray = field(init=False)
+    response_r2: FloatArray = field(init=False)
 
     def __post_init__(self) -> None:
         observed = _read_only_float_array(self.observed, name="observed", ndim=2)
@@ -469,6 +472,10 @@ class PredictionDiagnostics:
             residual_standardized,
             name="standardized_rmse",
         )
+        response_r2 = _safe_response_r2(
+            standardized_rmse,
+            n_samples=observed.shape[0],
+        )
 
         for values in (
             residual,
@@ -478,6 +485,7 @@ class PredictionDiagnostics:
             response_centers,
             response_scales,
             standardized_rmse,
+            response_r2,
         ):
             values.setflags(write=False)
 
@@ -491,6 +499,7 @@ class PredictionDiagnostics:
         object.__setattr__(self, "response_centers", response_centers)
         object.__setattr__(self, "response_scales", response_scales)
         object.__setattr__(self, "standardized_rmse", standardized_rmse)
+        object.__setattr__(self, "response_r2", response_r2)
 
     def __reduce__(self) -> tuple[type[PredictionDiagnostics], tuple[object, ...]]:
         """Reconstruct through validation so unpickled arrays remain read-only."""
@@ -841,8 +850,8 @@ def prediction_diagnostics(
     Returns
     -------
     PredictionDiagnostics
-        Read-only response matrices, standardization statistics, and response-wise
-        standardized RMSE.
+        Read-only response matrices, standardization statistics, response-wise
+        standardized RMSE, and response-wise coefficient of determination.
     """
 
     observed = _response_matrix(y_true, name="y_true")
@@ -1041,3 +1050,21 @@ def _safe_column_rmse(values: FloatArray, *, name: str) -> FloatArray:
             name=name,
         )
     return _finite_derived_array(rmse, name=name)
+
+
+def _safe_response_r2(standardized_rmse: FloatArray, *, n_samples: int) -> FloatArray:
+    factor = float(n_samples) / float(n_samples - 1)
+    limit = np.sqrt(np.finfo(np.float64).max / factor)
+    if np.any(standardized_rmse > limit):
+        raise ValueError("response_r2 cannot be represented as finite float64 values.")
+    squared_rmse = _finite_product(
+        standardized_rmse,
+        standardized_rmse,
+        name="squared standardized_rmse for response_r2",
+    )
+    scaled_error = _finite_product(
+        squared_rmse,
+        factor,
+        name="scaled error for response_r2",
+    )
+    return _finite_difference(1.0, scaled_error, name="response_r2")

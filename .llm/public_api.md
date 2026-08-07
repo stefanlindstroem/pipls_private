@@ -260,7 +260,8 @@ and derived `QD` while preserving the regression map.
 `latent_structure()`, `biplot_coordinates()`, and `observation_diagnostics()` accept compatible
 fitted PLS-family models through public fitted operations. `prediction_diagnostics()` accepts
 observed and predicted responses explicitly and requires a `PredictionKind` provenance label.
-Residuals are `observed - predicted`.
+Residuals are `observed - predicted`; the immutable result also derives response-wise standardized
+RMSE and response-wise $R^2$ for those supplied predictions.
 
 Inspection results are defensive, read-only, finite, directly validated, and pickle-safe. The
 package exposes no plotting module, Matplotlib artist result, or public `plot_*` helper.

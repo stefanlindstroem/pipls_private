@@ -120,9 +120,20 @@ e^{(z)}_{ij}=z_{ij}-\hat z_{ij},
 where $s_j$ is the sample standard deviation calculated with `ddof=1`. Constant response columns
 are rejected because their standardized diagnostics are undefined.
 
-The first supported prediction display contains standardized observed-versus-predicted values,
-standardized residuals versus standardized predictions, and response-wise standardized RMSE. A
-pooled residual histogram and fitted normal density are not part of the initial contract.
+Prediction diagnostics also include the response-wise coefficient of determination
+
+\begin{equation}
+R_j^2 = 1 -
+\frac{\sum_i (y_{ij}-\hat y_{ij})^2}
+     {\sum_i (y_{ij}-\bar y_j)^2}.
+\end{equation}
+
+The provenance label governs its interpretation: fitted-value $R^2$ is descriptive training-fit
+evidence, while OOF or external-test $R^2$ describes those supplied predictions. Prediction
+displays may include standardized observed-versus-predicted values, standardized residuals,
+response-wise standardized RMSE, response-wise $R^2$, and a caller-owned pooled standardized
+residual histogram with a matched normal reference. Such a histogram is descriptive rather than a
+formal normality test.
 
 Real-data examples may calculate fixed-parameter out-of-fold predictions after the user has chosen
 component counts from the same observations. Such results are labeled

@@ -24,13 +24,15 @@ quantities.
    fields. Nonnegative or positive quantities retain those constraints.
 2. `PiPLSDisplayFactors` validates that `weighted_response_directions` equals
    `response_directions * dilation`. `PredictionDiagnostics` validates its residual,
-   standardization, center, scale, RMSE, and provenance relationships. Weighted response
-   directions and prediction-diagnostic dependent arrays are derived from independent inputs while
+   standardization, center, scale, RMSE, response-wise $R^2$, and provenance relationships.
+   Weighted response directions and prediction-diagnostic dependent arrays are derived from
+   independent inputs while
    retaining the same finite-value boundary.
 3. Pickle reconstruction passes through the same validating constructors.
 4. Biplot norms use max-scaled Euclidean calculations, and the balancing factor is formed as a
    quotient of square roots rather than by first forming a potentially overflowing norm ratio.
-5. Prediction centers, sample scales, and standardized RMSE use scaled calculations. Residual,
+5. Prediction centers, sample scales, standardized RMSE, and response-wise $R^2$ use scaled
+   calculations. Residual,
    centering, standardization, and factor products are checked immediately for finite float64
    representability.
 6. Observation score covariance is formed after one common finite scaling of the centered training
