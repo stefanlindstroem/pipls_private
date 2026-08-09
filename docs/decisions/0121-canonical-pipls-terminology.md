@@ -20,6 +20,11 @@ vocabulary is propagated across the broader documentation and docstring surface.
 
 ## Decision
 
+Use the mathematical spelling $\Pi$-PLS for the method name. In plain-text contexts that do not
+render mathematics, use the Unicode spelling `Π-PLS`. The installable Python package remains
+`pipls`, and established public Python identifiers such as `PiPLSRegression` and `PiPLSSearchCV`
+retain their ASCII spelling. Bibliographic titles are quoted as published rather than rewritten.
+
 Use the following canonical terms:
 
 | Object or public name | Canonical term or meaning |

@@ -1,16 +1,16 @@
-# Pi-PLS
+# $\Pi$-PLS
 
-`pipls` is a Python package for Pi-PLS, a PLS-family method for multivariate regression.
-Pi-PLS represents the predictive relation through paired latent modes. Each mode combines one
+`pipls` is the Python package for $\Pi$-PLS, a PLS-family method for multivariate regression.
+$\Pi$-PLS represents the predictive relation through paired latent modes. Each mode combines one
 orthonormal predictor direction, one orthonormal response direction, and one nonnegative dilation.
 Public `n_components` counts those paired modes; `predictor_rank` controls the dimension of the
 retained predictor subspace from which they are estimated.
 
-Pi-PLS is intended for problems with several responses where the predictor block may contain
+$\Pi$-PLS is intended for problems with several responses where the predictor block may contain
 structured variation that is not equally useful for prediction. Its two rank controls let users
 examine the predictor subspace and the paired predictive relation separately. This does not make
-Pi-PLS preferable for every regression problem; ordinary PLS and other multivariate methods remain
-appropriate alternatives whose suitability depends on the data and validation design.
+$\Pi$-PLS preferable for every regression problem; ordinary PLS and other multivariate methods
+remain appropriate alternatives whose suitability depends on the data and validation design.
 
 For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
 selects a predictor rank conditionally for each count. Evidence-retaining workflows inspect the

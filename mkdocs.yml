@@ -1,5 +1,5 @@
-site_name: Pi-PLS
-site_description: Pi-PLS multivariate regression for Python
+site_name: Π-PLS
+site_description: Π-PLS multivariate regression for Python
 copyright: Copyright © 2026 Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström
 strict: true
 

@@ -1,20 +1,46 @@
-# Pi-PLS documentation
+# $\Pi$-PLS documentation
 
-Pi-PLS is a multivariate linear-regression method that represents the predictive relation through
-paired latent modes. Each mode contains one orthonormal predictor direction, one orthonormal response
-direction, and one nonnegative dilation.
+`pipls` is a Python package for $\Pi$-PLS, a PLS-family method for multivariate linear regression.
+For routine modeling, $\Pi$-PLS can be used much like ordinary PLS: choose a component count, fit
+and predict, inspect latent scores and loadings, examine regression coefficients, and assess
+observed-versus-predicted values and residuals. The package exposes those familiar PLS-family
+analysis quantities together with the additional $\Pi$-PLS-specific paired-direction
+factorization.
 
-## When Pi-PLS may be useful
+## Why use $\Pi$-PLS?
 
-Although Pi-PLS and ordinary PLS have similar names and belong to the same broad family of
-latent-variable regression methods, their theoretical foundations differ. Pi-PLS diagonalizes its
-latent regression map into paired predictor and response directions, giving each retained paired
-mode a direct one-to-one predictor-response interpretation. It can also provide a more parsimonious
-predictive model by attaining a given cross-validated mean squared error (CV-MSE) with fewer paired
-latent modes.
+In the problems examined in the [companion paper](citation.md#companion-paper), $\Pi$-PLS is
+reported to be comparably robust to ordinary PLS while matching or improving its predictive
+performance; in some settings, the predictive improvement is substantial. These are empirical
+results for the studied problems rather than a guarantee that one method will be better for every
+dataset.
 
-Across a wide range of synthetic settings and real-world datasets examined during
-development, Pi-PLS typically yields lower CV-MSE than ordinary PLS at a given number of paired latent modes (*cf*. example 03). This is not a general performance claim: no method is universally better.
+The method differs from ordinary PLS in how it constructs the latent regression map. $\Pi$-PLS
+represents that map through paired latent modes. Each retained mode contains one orthonormal
+predictor direction, one orthonormal response direction, and one nonnegative dilation. This
+structure adds method-specific interpretation without replacing the standard PLS-family analysis
+workflow.
+
+## Leakage-safe modeling and validation
+
+The package provides one consistent workflow for fitting, model selection, prediction diagnostics,
+and final refitting. Learned centering, scaling, and supported pipeline preprocessing are fitted
+inside each cross-validation training fold rather than on the complete dataset before validation.
+This keeps candidate evaluation fold-local and avoids preprocessing leakage across validation
+boundaries.
+
+The workflow also keeps different kinds of predictive evidence distinct:
+
+- cross-validation is used to compare and select candidate models;
+- selection-conditioned out-of-fold predictions can be inspected without refitting the folds;
+- final refitting learns the selected model from the complete training data;
+- nested cross-validation or an independent test set is used when an independent estimate of
+  post-selection predictive performance is required.
+
+These distinctions are carried explicitly by the search and inspection APIs so that training,
+selection, diagnostic validation, and independent testing are not silently conflated. This follows
+standard statistical practice for separating model development from independent performance
+assessment.
 
 ## Quick start with Pulp
 
@@ -42,9 +68,9 @@ the complete selection contract in a small deterministic problem: inspect the un
 path, choose a paired-mode count and create one selection, inspect the selected path and conditional
 predictor rank, refit that exact row, and predict an independent test set.
 
-Continue with [Pulp: a complete Pi-PLS workflow](tutorials/pulp.md) for real-data loading,
+Continue with [Pulp: a complete $\Pi$-PLS workflow](tutorials/pulp.md) for real-data loading,
 selection-conditioned OOF inspection before final refitting, immutable inspection results, and
-representative interpretation of standard PLS-family and Pi-PLS-specific plots.
+representative interpretation of standard PLS-family and $\Pi$-PLS-specific plots.
 
 ## Programming reference
 
