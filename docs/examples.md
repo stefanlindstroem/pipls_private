@@ -1,6 +1,6 @@
 # Examples
 
-The numbered examples are executable workflows organized by programming task. Start with the
+The numbered examples are executable workflows organized by modeling purpose. Start with the
 package-owned [Pulp quick start](tutorials/quick_start.md), continue with the
 [synthetic tutorial](tutorials/synthetic.md) for component-path inspection and independent-test
 prediction, then use the
@@ -9,14 +9,14 @@ the maintained scripts.
 
 ## Choose an example
 
-| Script | Programming task | Main output |
+| Script | Workflow focus | Main output |
 |---|---|---|
-| `01_pulp_quick_start.py` | Apply an automatic selection rule, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
-| `02_synthetic_path_selection.py` | Inspect the unselected path, create one manual selection, review the selected path and rank profile, then refit and evaluate independent test predictions | Four PDF figures and printed external-test $R^2$ |
-| `03_pls_path_comparison.py` | Compare matched Π-PLS and ordinary PLS component paths without fitting a final model | One comparison PDF for each reference dataset |
-| `04_pulp_real_data.py` | Inspect the unselected path, create and review one manual Pulp selection with OOF evidence, refit it, and interpret the fitted model | Seven PDF figures |
-| `05_sugarcane_real_data.py` | Run the complete selection-driven wavelength-aware Sugarcane workflow | Six PDF figures |
-| `06_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow with automated selection | Six PDFs, including threshold-annotated rank and component profiles |
+| `01_pulp_quick_start.py` | Short automatic workflow on Pulp: select by a CV rule, refit, and inspect fitted predictions | Selected model summary and `pulp_quick_start.pdf` |
+| `02_synthetic_path_selection.py` | Learn manual component selection on synthetic train/test data, including path and optional predictor-rank inspection | Four PDF figures and printed external-test $R^2$ |
+| `03_pls_path_comparison.py` | Compare matched Π-PLS and ordinary PLS CV component paths without choosing a final model | One comparison PDF for each reference dataset |
+| `04_pulp_real_data.py` | Full manual-selection workflow on Pulp: choose $h$ explicitly, review selection-conditioned OOF evidence, refit, and interpret the model | Seven PDF figures |
+| `05_sugarcane_real_data.py` | Manual-selection spectral workflow on Sugarcane with wavelength-aware model inspection | Six PDF figures |
+| `06_tobacco_real_data.py` | Full automated-selection spectral workflow on Tobacco using separate relative-tolerance rules for $r_\pi$ and $h$ | Six PDFs, including threshold-annotated rank and component profiles |
 
 The [path-selection reference](api/path.md) documents both the compact automatic route used by
 example 01 and the explicit selection handoff used by the analytical examples. The
