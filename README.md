@@ -1,5 +1,8 @@
 # Π-PLS
 
+[![Tests](https://github.com/stefanlindstroem/pipls/actions/workflows/tests.yml/badge.svg)](https://github.com/stefanlindstroem/pipls/actions/workflows/tests.yml)
+[![Documentation](https://github.com/stefanlindstroem/pipls/actions/workflows/documentation.yml/badge.svg)](https://github.com/stefanlindstroem/pipls/actions/workflows/documentation.yml)
+
 `pipls` is the Python package for Π-PLS, a PLS-family method for multivariate regression.
 For routine modeling, use it much like ordinary PLS: treat `n_components` as the main model-
 complexity parameter, evaluate prediction error across component counts, select a count, fit, and
@@ -23,9 +26,8 @@ pass the same object to final refitting. Compact workflows may instead apply a n
 through `search.refit(X, Y, rule=...)`. The fitted model records the exact row as `selection_`, while
 the search retains the complete path and split evidence.
 
-The rendered documentation is the primary user guide. On GitHub, open the latest
-[`github-pages` deployment](../../deployments/github-pages). The source links below remain useful
-in a local checkout.
+The [rendered documentation](https://stefanlindstroem.github.io/pipls/) is the primary user guide.
+The source links below remain useful in a local checkout.
 
 Start with:
 
@@ -219,7 +221,7 @@ Install the `examples` extra before running them.
 
 ## Documentation
 
-- [Rendered documentation](../../deployments/github-pages)
+- [Rendered documentation](https://stefanlindstroem.github.io/pipls/)
 - Source documentation:
   - [Tutorial 1: Pulp quick start](docs/tutorials/quick_start.md)
   - [Tutorial 2: synthetic path inspection](docs/tutorials/synthetic.md)

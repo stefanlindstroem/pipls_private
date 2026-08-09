@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 - 2026-08-09
+
 - Add independent `scale_x` and `scale_y` overrides to `PiPLSRegression`. The existing `scale`
   parameter remains the backward-compatible default for both blocks, while predictor and response
   scaling can now be controlled separately without disabling centering.

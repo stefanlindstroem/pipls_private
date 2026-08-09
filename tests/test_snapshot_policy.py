@@ -165,7 +165,7 @@ def test_snapshot_refuses_dirty_worktrees(tmp_path: Path, state: str) -> None:
         "coverage.xml",
         "htmlcov/index.html",
         "build/lib/pipls.py",
-        "dist/pipls-0.0.0.whl",
+        "dist/pipls-0.1.0.whl",
         "src/pipls.egg-info/PKG-INFO",
         "docs/_build/index.html",
         "docs/assets/generated/tutorial.svg",

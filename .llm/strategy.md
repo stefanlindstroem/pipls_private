@@ -25,7 +25,7 @@ validation evidence.
 - Keep user data preparation visible; package-owned loaders are named reference conveniences, not a
   mandatory ingestion framework.
 - Keep rendering caller-owned and numerical inspection package-owned.
-- Avoid compatibility aliases during the unreleased pre-1.0 phase unless the owner explicitly
+- Avoid compatibility aliases during the pre-1.0 phase unless the owner explicitly
   requests one.
 - Use tests for durable behavior and machine contracts, not as a second copy of living prose.
 - Keep patches small enough to review independently and do not combine future phases.

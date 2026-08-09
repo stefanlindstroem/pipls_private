@@ -147,6 +147,36 @@ datasets without verified redistribution and adaptation terms.
 - `constraints/`: the maintainer-only minimum-dependency environment;
 - `.llm/`: tracked maintenance contracts for LLM-assisted development.
 
+## Release checklist
+
+Before tagging a release, start from a clean worktree and verify the release metadata, examples,
+documentation, and built distributions together:
+
+```bash
+git status
+make check
+make examples
+make docs
+make docs-dist
+make dist-check
+```
+
+The release version must agree in `pyproject.toml`, `src/pipls/__init__.py`, `CITATION.cff`, the
+software citation in `docs/citation.md`, and the dated release heading in `CHANGELOG.md`. The
+release-metadata tests enforce these repository-facing identities.
+
+Push the release commit before tagging it and confirm that the GitHub Actions workflows pass and
+the GitHub Pages site renders correctly. Then create and push an annotated tag matching the package
+version, for example:
+
+```bash
+git tag -a v0.1.0 -m "pipls 0.1.0"
+git push origin v0.1.0
+```
+
+Create the corresponding GitHub Release from that tag. Publishing to a package index is a separate
+release action and is not performed by the repository workflows.
+
 ## LLM-assisted maintenance
 
 Read [`.llm/README.md`](.llm/README.md), [`.llm/state.md`](.llm/state.md), and the relevant

@@ -36,7 +36,7 @@ def test_clean_subprocess_environment_removes_python_overrides(
 
 
 def test_single_artifact_requires_exactly_one_match(tmp_path: Path) -> None:
-    artifact = tmp_path / "pipls-0.0.0.tar.gz"
+    artifact = tmp_path / "pipls-1.2.3.tar.gz"
     artifact.touch()
 
     assert single_artifact(tmp_path, "*.tar.gz", "source distribution") == artifact
@@ -51,20 +51,20 @@ def test_safe_extract_sdist_returns_the_single_root(tmp_path: Path) -> None:
     _write_tar(
         artifact,
         {
-            "pipls-0.0.0/README.md": b"Pi-PLS\n",
-            "pipls-0.0.0/src/pipls/__init__.py": b"",
+            "pipls-1.2.3/README.md": b"Pi-PLS\n",
+            "pipls-1.2.3/src/pipls/__init__.py": b"",
         },
     )
 
     source = safe_extract_sdist(artifact, tmp_path / "extracted")
 
-    assert source == tmp_path / "extracted" / "pipls-0.0.0"
+    assert source == tmp_path / "extracted" / "pipls-1.2.3"
     assert (source / "README.md").read_bytes() == b"Pi-PLS\n"
 
 
 def test_safe_extract_sdist_rejects_path_traversal(tmp_path: Path) -> None:
     artifact = tmp_path / "pipls.tar.gz"
-    _write_tar(artifact, {"pipls-0.0.0/../../escaped.txt": b"bad"})
+    _write_tar(artifact, {"pipls-1.2.3/../../escaped.txt": b"bad"})
 
     with pytest.raises(RuntimeError, match="Unsafe source-distribution member"):
         safe_extract_sdist(artifact, tmp_path / "extracted")

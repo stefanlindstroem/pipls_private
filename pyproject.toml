@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pipls"
-version = "0.0.0"
+version = "0.1.0"
 description = "Π-PLS multivariate regression"
+keywords = ["partial least squares", "PLS", "multivariate regression", "chemometrics"]
 readme = "README.md"
 requires-python = ">=3.10"
 license = "BSD-3-Clause"
@@ -16,6 +17,9 @@ authors = [
   {name = "Stefan B. Lindström"},
 ]
 classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.10",
@@ -23,12 +27,21 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering",
+  "Typing :: Typed",
 ]
 dependencies = [
   "numpy>=1.26,<3",
   "scikit-learn>=1.4,<2",
   "joblib>=1.2,<2",
 ]
+
+[project.urls]
+Homepage = "https://stefanlindstroem.github.io/pipls/"
+Documentation = "https://stefanlindstroem.github.io/pipls/"
+Source = "https://github.com/stefanlindstroem/pipls"
+Issues = "https://github.com/stefanlindstroem/pipls/issues"
+Changelog = "https://github.com/stefanlindstroem/pipls/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
