@@ -46,7 +46,7 @@ make dist-check
 It builds the wheel and source distribution once in a temporary directory, creates a separate clean
 virtual environment for each artifact, and installs each exact artifact path while running outside
 the repository checkout. Both environments execute the same smoke test: public package and
-submodule imports, installed version-metadata agreement, a representative fixed Pi-PLS fit and
+submodule imports, installed version-metadata agreement, a representative fixed Π-PLS fit and
 prediction, and an explicit check that imports resolve from the temporary installation rather than
 `src/`. Matplotlib and `adjustText` remain optional example dependencies and are not imported by
 the runtime package.

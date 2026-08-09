@@ -1,6 +1,6 @@
-# Pulp: a complete Pi-PLS workflow
+# Pulp: a complete Π-PLS workflow
 
-This tutorial applies [Inspect a manually selected Pi-PLS model with synthetic data](synthetic.md)
+This tutorial applies [Inspect a manually selected Π-PLS model with synthetic data](synthetic.md)
 to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`,
 `predictor_rank_profile()`, and fixed-model fitting are already familiar. The focus is what changes
 with real data: an interior predictor-rank result, selection-conditioned out-of-fold (OOF)
@@ -283,7 +283,7 @@ rendered:
 | Result | Question answered |
 |---|---|
 | `LatentStructure` | How are samples and variables represented by the fitted PLS-family model? |
-| `PiPLSDisplayFactors` | What are the Pi-PLS-specific $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors? |
+| `PiPLSDisplayFactors` | What are the Π-PLS-specific $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors? |
 
 The Pulp workflow uses `response_names.index("TI")` as the response sign anchor and requests a
 positive orientation. The resulting TI entry is nonnegative for every displayed component, and the
@@ -325,7 +325,7 @@ chosen biplot scaling, not regression coefficients or formal variable importance
 See [Score-loading biplot](../model_inspection.md#score-loading-biplot) and
 [`biplot_coordinates()`](../api/inspection.md#pipls.inspection.biplot_coordinates).
 
-### Pi-PLS-specific factorization
+### Π-PLS-specific factorization
 
 #### Predictor directions $\mathbf{P}$
 
@@ -366,7 +366,7 @@ response direction with the dilation of its paired latent mode and shows orienta
 rather than $\mathbf{Q}$ alone.
 
 The complete example includes separate $\mathbf{D}$ and $\mathbf{Q}$ plots in the same
-four-panel Pi-PLS factorization figure. See [Dilation](../model_inspection.md#dilation),
+four-panel Π-PLS factorization figure. See [Dilation](../model_inspection.md#dilation),
 [Response directions](../model_inspection.md#response-directions), and
 [Weighted response directions](../model_inspection.md#weighted-response-directions).
 

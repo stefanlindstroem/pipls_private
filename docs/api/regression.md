@@ -1,4 +1,4 @@
-# Fixed Pi-PLS regression
+# Fixed Π-PLS regression
 
 Use `PiPLSRegression` when `n_components` and `predictor_rank` are already fixed. Here
 `n_components` is the number of paired latent modes $h$, while `predictor_rank` is the retained
@@ -67,7 +67,7 @@ model = PiPLSRegression(
 
 Centering remains active for both blocks under every combination. This separation is useful for
 scikit-learn pipelines that learn predictor preprocessing inside each training fold: the upstream
-transformer owns predictor scaling, while the terminal Pi-PLS estimator can still standardize the
+transformer owns predictor scaling, while the terminal Π-PLS estimator can still standardize the
 responses. Explicit `scale_x` or `scale_y` values take precedence over `scale`.
 
 Ordinary means and standard deviations are retained for ordinary data. Range-safe fallbacks are
@@ -97,7 +97,7 @@ standard path search uses its more conservative default support ceiling.
 ## Fitted results
 
 Standard PLS-family fitted attributes include scores, loadings, rotations, coefficients, and
-intercepts. The frozen, read-only `decomposition_` result groups the Pi-PLS factorization and
+intercepts. The frozen, read-only `decomposition_` result groups the Π-PLS factorization and
 numerical-rank diagnostics. The exact attribute shapes and conditional method behavior are
 documented below.
 
@@ -113,7 +113,7 @@ documented below.
         - get_feature_names_out
         - set_output
 
-## Pi-PLS decomposition
+## Π-PLS decomposition
 
 `PiPLSRegression.decomposition_` is normally obtained from a fitted estimator. Directly
 constructed instances apply the same shape, finite-value, scalar, and read-only-array validation.

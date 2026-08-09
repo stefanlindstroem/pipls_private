@@ -199,6 +199,6 @@ capabilities.
 
 For general synthetic examples with configurable strengths, distributions, orthonormal loading
 directions, and independent train/test blocks, continue to use the
-[first synthetic tutorial](tutorials/synthetic.md). For the fixed Pi-PLS construction, see the
+[first synthetic tutorial](tutorials/synthetic.md). For the fixed Π-PLS construction, see the
 [theory overview](theory.md); for software and generated-documentation controls, see
 [reproducibility](reproducibility.md).

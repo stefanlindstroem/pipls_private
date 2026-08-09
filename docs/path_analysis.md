@@ -197,7 +197,7 @@ post-selection estimate is required.
 
 ## Validation-protocol boundary
 
-Pi-PLS does not provide a dedicated leave-one-out mode, provenance flag, example, or compatibility
+Π-PLS does not provide a dedicated leave-one-out mode, provenance flag, example, or compatibility
 guarantee. Users may still intentionally supply any splitter or explicit split iterable accepted by
 the generic `cv` interface, including protocols with singleton validation folds, but they own the
 protocol choice and interpretation.
@@ -290,7 +290,7 @@ only to `rule="minimum_cv_mse"`; a supplied selection has already resolved those
 
 `refit()` validates an existing selection against the fitted search or resolves one from the compact
 rule/count arguments. It then clones the configured direct estimator or pipeline, replaces the
-terminal Pi-PLS rank pair, fits the clone, attaches the exact immutable row as `model.selection_`,
+terminal Π-PLS rank pair, fits the clone, attaches the exact immutable row as `model.selection_`,
 and returns the model.
 It does not mutate the search, store the supplied matrices, or attach the model to search state.
 Prediction, transformation, scoring, inverse transformation, and feature-name behavior belong to

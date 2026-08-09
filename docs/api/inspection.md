@@ -7,11 +7,11 @@ Direct construction and pickle reconstruction nevertheless validate the same fin
 relationship, and read-only invariants. Finite inputs either produce finite float64 inspection
 quantities or raise a clear `ValueError` when a requested derived value is not representable.
 
-The Pi-PLS factorization helper is method-specific. Its $\mathbf{P}$ and $\mathbf{Q}$ arrays
+The Π-PLS factorization helper is method-specific. Its $\mathbf{P}$ and $\mathbf{Q}$ arrays
 are orthonormal predictor and response directions, its entries $D_k=D_{kk}$ are dilations, and
 $(P_{:k},D_k,Q_{:k})$ defines paired latent mode $k$. The latent-structure, biplot, observation,
 and prediction helpers use PLS-family quantities and can therefore be applied to a compatible fitted
-Pi-PLS or ordinary PLS estimator. For interpretation, scientific limitations, and relationships
+Π-PLS or ordinary PLS estimator. For interpretation, scientific limitations, and relationships
 between these quantities, begin with [Model inspection concepts](../model_inspection.md).
 
 ## Result objects and labels
@@ -65,7 +65,7 @@ between these quantities, begin with [Model inspection concepts](../model_inspec
     options:
       members: false
 
-## Pi-PLS factorization display
+## Π-PLS factorization display
 
 ::: pipls.inspection.pipls_display_factors
     options:

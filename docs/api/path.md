@@ -1,4 +1,4 @@
-# Pi-PLS path selection
+# Π-PLS path selection
 
 Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
 `n_components` counts paired latent modes $h$; `predictor_rank` is the retained predictor-subspace

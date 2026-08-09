@@ -1,21 +1,21 @@
-# $\Pi$-PLS documentation
+# Π-PLS documentation
 
-`pipls` is a Python package for $\Pi$-PLS, a PLS-family method for multivariate linear regression.
-For routine modeling, $\Pi$-PLS can be used much like ordinary PLS: choose a component count, fit
+`pipls` is a Python package for Π-PLS, a PLS-family method for multivariate linear regression.
+For routine modeling, Π-PLS can be used much like ordinary PLS: choose a component count, fit
 and predict, inspect latent scores and loadings, examine regression coefficients, and assess
 observed-versus-predicted values and residuals. The package exposes those familiar PLS-family
-analysis quantities together with the additional $\Pi$-PLS-specific paired-direction
+analysis quantities together with the additional Π-PLS-specific paired-direction
 factorization.
 
-## Why use $\Pi$-PLS?
+## Why use Π-PLS?
 
-In the problems examined in the [companion paper](citation.md#companion-paper), $\Pi$-PLS is
+In the problems examined in the [companion paper](citation.md#companion-paper), Π-PLS is
 reported to be comparably robust to ordinary PLS while matching or improving its predictive
 performance; in some settings, the predictive improvement is substantial. These are empirical
 results for the studied problems rather than a guarantee that one method will be better for every
 dataset.
 
-The method differs from ordinary PLS in how it constructs the latent regression map. $\Pi$-PLS
+The method differs from ordinary PLS in how it constructs the latent regression map. Π-PLS
 represents that map through paired latent modes. Each retained mode contains one orthonormal
 predictor direction, one orthonormal response direction, and one nonnegative dilation. This
 structure adds method-specific interpretation without replacing the standard PLS-family analysis
@@ -68,9 +68,9 @@ the complete selection contract in a small deterministic problem: inspect the un
 path, choose a paired-mode count and create one selection, inspect the selected path and conditional
 predictor rank, refit that exact row, and predict an independent test set.
 
-Continue with [Pulp: a complete $\Pi$-PLS workflow](tutorials/pulp.md) for real-data loading,
+Continue with [Pulp: a complete Π-PLS workflow](tutorials/pulp.md) for real-data loading,
 selection-conditioned OOF inspection before final refitting, immutable inspection results, and
-representative interpretation of standard PLS-family and $\Pi$-PLS-specific plots.
+representative interpretation of standard PLS-family and Π-PLS-specific plots.
 
 ## Programming reference
 

@@ -1,6 +1,6 @@
 # Quick start with Pulp
 
-This tutorial fits a selected Pi-PLS model to the package-owned Pulp dataset and produces one
+This tutorial fits a selected Π-PLS model to the package-owned Pulp dataset and produces one
 observed-versus-fitted plot. It is the shortest installed-package route from data to a usable final
 model.
 

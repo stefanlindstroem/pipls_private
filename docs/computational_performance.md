@@ -1,6 +1,6 @@
 # Computational performance
 
-Pi-PLS path training repeats fixed-rank estimator fits over a cross-validation protocol. Runtime is
+Π-PLS path training repeats fixed-rank estimator fits over a cross-validation protocol. Runtime is
 therefore governed by more than the dimensions of `X` and `Y`: the number of validation splits, the
 number of evaluated `(n_components, predictor_rank)` pairs, the retained ranks, preprocessing, the
 predictor SVD policy, and parallel execution all matter.
@@ -27,7 +27,7 @@ fold-local estimator fits. Each fit includes the complete estimator or pipeline,
 optional scaling, and any pipeline preprocessing are learned again from that training fold.
 
 Before evaluating candidates, `PiPLSSearchCV` also checks predictor-rank feasibility separately on
-each training split. A useful accounting approximation for the Pi-PLS fits performed by
+each training split. A useful accounting approximation for the Π-PLS fits performed by
 `search.fit()` is therefore
 
 \begin{equation}

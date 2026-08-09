@@ -13,7 +13,7 @@ the maintained scripts.
 |---|---|---|
 | `01_pulp_quick_start.py` | Apply an automatic selection rule, refit, and plot standardized fitted values for package-owned Pulp data | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Inspect the unselected path, create one manual selection, review the selected path and rank profile, then refit and evaluate independent test predictions | Four PDF figures and printed external-test $R^2$ |
-| `03_pls_path_comparison.py` | Compare matched Pi-PLS and ordinary PLS component paths without fitting a final model | One comparison PDF for each reference dataset |
+| `03_pls_path_comparison.py` | Compare matched Π-PLS and ordinary PLS component paths without fitting a final model | One comparison PDF for each reference dataset |
 | `04_pulp_real_data.py` | Inspect the unselected path, create and review one manual Pulp selection with OOF evidence, refit it, and interpret the fitted model | Seven PDF figures |
 | `05_sugarcane_real_data.py` | Run the complete selection-driven wavelength-aware Sugarcane workflow | Six PDF figures |
 | `06_tobacco_real_data.py` | Apply separate 10% predictor-rank and component-count tolerances in a complete Tobacco spectral workflow with automated selection | Six PDFs, including threshold-annotated rank and component profiles |
@@ -21,7 +21,7 @@ the maintained scripts.
 The [path-selection reference](api/path.md) documents both the compact automatic route used by
 example 01 and the explicit selection handoff used by the analytical examples. The
 [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02 workflow directly.
-The comparison in example 03 is optional and is not part of routine Pi-PLS fitting.
+The comparison in example 03 is optional and is not part of routine Π-PLS fitting.
 
 ## Run one example
 
@@ -62,7 +62,7 @@ validation effort for reported results.
 ## Complete real-data analyses
 
 The [dataset documentation](datasets.md) gives the original source, DOI, license, and repository
-adaptation for each real-data integration. The three complete analyses evaluate one Pi-PLS
+adaptation for each real-data integration. The three complete analyses evaluate one Π-PLS
 component path, create one immutable selection, inspect its selected evidence and optional OOF
 report, and then fit that exact row on all observations:
 
@@ -131,7 +131,7 @@ their named `pipls.datasets` loaders. Every figure is constructed directly from
 selections, and immutable inspection results. The Pulp factor view anchors every component to a
 positive tensile-index (`TI`) response entry; Sugarcane and Tobacco retain the default
 predictor-based orientation. The example layer owns Matplotlib chart construction, physical
-coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Pi-PLS factor
+coordinates, subplot layouts, legends, figure-level titles, PDF output, and closing. Π-PLS factor
 panels use the same direct array-to-Matplotlib boundary.
 
 The Pulp tutorial extracts its checked snippets directly from `examples/04_pulp_real_data.py`.

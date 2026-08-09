@@ -13,7 +13,7 @@ call signatures follow the scikit-learn convention `fit(X, y)`: `y` may be eithe
 response or a two-dimensional multivariate response matrix. Names such as `y_pred`, `y_scores_`,
 and `y_loadings_` follow the same programming convention and do not imply a scalar response.
 
-For Pi-PLS, public `n_components` counts paired latent modes $h$, and `predictor_rank` is the
+For Π-PLS, public `n_components` counts paired latent modes $h$, and `predictor_rank` is the
 retained predictor-subspace dimension $r_\pi$. The factor arrays $\mathbf{P}$ and
 $\mathbf{Q}$ are orthonormal
 predictor and response directions; they are distinct from reconstruction loadings.
@@ -57,7 +57,7 @@ the runtime API.
 
 ## Rendering boundary
 
-The API ends at immutable numerical results. Pi-PLS provides no plotting submodule. Maintained
+The API ends at immutable numerical results. Π-PLS provides no plotting submodule. Maintained
 examples pass result arrays to ordinary Matplotlib calls. `biplot_coordinates()` is retained because
 coordinate balancing is numerical; optional `adjustText` placement operates on the resulting text
 artists.

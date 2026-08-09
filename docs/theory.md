@@ -1,6 +1,6 @@
-# Pi-PLS theory overview
+# Π-PLS theory overview
 
-Pi-PLS is a multivariate linear-regression method with two explicit rank controls. It first retains
+Π-PLS is a multivariate linear-regression method with two explicit rank controls. It first retains
 a rank-controlled predictor subspace, then constructs a response subspace from cross-covariance,
 and finally diagonalizes the reduced regression map into paired predictor-response modes.
 
@@ -20,7 +20,7 @@ They also do not imply that every package default or practical workflow reproduc
 the manuscript.
 
 The Pulp source paper documents the provenance and scientific context of the Pulp dataset; it is not
-the theoretical reference for Pi-PLS. Pulp provenance and analysis are covered in the
+the theoretical reference for Π-PLS. Pulp provenance and analysis are covered in the
 [reference-dataset guide](datasets.md) and [Pulp tutorial](tutorials/pulp.md). Citation metadata for
 the software and companion manuscript is maintained on the [citation page](citation.md).
 
@@ -35,7 +35,7 @@ $\mathbf{B}\in\mathbb{R}^{p\times q}$ such that
 \mathbf{Y}=\mathbf{X}\mathbf{B}+\mathbf{E}.
 \end{equation}
 
-Pi-PLS separates two structural choices:
+Π-PLS separates two structural choices:
 
 - the predictor rank $r_\pi$, which controls the dimension of the retained predictor subspace;
 - the component count $h$, which controls the number of paired predictor-response modes.
@@ -54,7 +54,7 @@ rank of the preprocessed predictor matrix.
 
 ## Canonical terminology
 
-The package uses the following terms for the fixed Pi-PLS construction:
+The package uses the following terms for the fixed Π-PLS construction:
 
 | Object or public name | Canonical meaning |
 |---|---|
@@ -76,7 +76,7 @@ $\mathbf{Q}$. `PiPLSDecomposition` exposes these arrays as `predictor_directions
 projectors onto the final direction spans are $\mathbf{P}\mathbf{P}^{\mathsf T}$ and
 $\mathbf{Q}\mathbf{Q}^{\mathsf T}$.
 
-The Pi-PLS directions are also distinct from `x_loadings_` and `y_loadings_`, which are
+The Π-PLS directions are also distinct from `x_loadings_` and `y_loadings_`, which are
 least-squares reconstruction loadings for the centered or centered-and-scaled training blocks.
 For response-side factor displays, the package stores response-by-mode weighted directions
 $\mathbf{Q}\mathbf{D}$, where column $k$ is $D_kQ_{:k}$. The manuscript's mode-by-response
@@ -86,7 +86,7 @@ orientation is the transpose:
 \mathbf{D}\mathbf{Q}^{\mathsf T}=(\mathbf{Q}\mathbf{D})^{\mathsf T}.
 \end{equation}
 
-The API word “component” is retained because it is familiar in regression software. In Pi-PLS,
+The API word “component” is retained because it is familiar in regression software. In Π-PLS,
 `n_components` counts paired latent modes, not predictor-SVD directions and not synthetic latent
 components. Likewise, `predictor_rank` is a retained observed-subspace dimension; “predictor signal
 rank” is reserved for synthetic settings where the noiseless generating rank is known.
@@ -141,7 +141,7 @@ Within the retained predictor representation, form
 \boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{Z}^{\mathsf T}\mathbf{Y}\in\mathbb{R}^{r_\pi\times q}.
 \end{equation}
 
-For a prescribed $h$, Pi-PLS selects an orthonormal response basis
+For a prescribed $h$, Π-PLS selects an orthonormal response basis
 $\mathbf{C}\in\mathbb{R}^{q\times h}$ by solving
 
 \begin{equation}
@@ -250,7 +250,7 @@ and the reduced regression relation becomes
 
 The predictor score vector $\mathbf{X}P_{:k}$ is coupled only to the response score
 vector $\mathbf{Y}Q_{:k}$, with dilation $D_k$. This is the one-to-one, mode-wise interpretation
-central to Pi-PLS. Orthogonal rotation by $\mathbf{N}$ preserves the Frobenius norm of the
+central to Π-PLS. Orthogonal rotation by $\mathbf{N}$ preserves the Frobenius norm of the
 residual and orthogonally transforms its covariance; it preserves covariance
 eigenvalues but does not generally leave the covariance matrix itself unchanged.
 
@@ -273,7 +273,7 @@ For new centered predictors $\mathbf{X}_{\mathrm{new}}$,
 ## Why the method is panoramic
 
 Standard deflation-based PLS algorithms construct successive components while removing previously
-modelled predictor variation. Pi-PLS instead fixes one rank-controlled predictor representation
+modelled predictor variation. Π-PLS instead fixes one rank-controlled predictor representation
 $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ and derives all $h$ coupled modes from that undeflated retained
 space through closed-form matrix decompositions. The retained predictor space therefore remains
 available as a whole during the covariance and regression stages; in this sense, the view is
@@ -323,33 +323,33 @@ response-side direction, then
 \widehat{\mathbf{Y}}=\mathbf{Z}\mathbf{W}\mathbf{C}^{\mathsf T}
 \end{equation}
 
-coincides with the multivariate OLS fitted response. In that limit, Pi-PLS is an orthogonal latent
+coincides with the multivariate OLS fitted response. In that limit, Π-PLS is an orthogonal latent
 reparameterization of the same fitted map.
 
 ### Reduced-rank regression
 
-Both Pi-PLS and reduced-rank regression produce low-rank coefficient structures. Reduced-rank
+Both Π-PLS and reduced-rank regression produce low-rank coefficient structures. Reduced-rank
 regression obtains the best rank-$h$ approximation of the OLS fit under its least-squares
-criterion. Pi-PLS first fixes a rank-controlled predictor representation, selects a response
+criterion. Π-PLS first fixes a rank-controlled predictor representation, selects a response
 subspace by cross-covariance, and then diagonalizes the reduced least-squares map into one-to-one
 paired modes.
 
 ### Canonical correlation analysis
 
 CCA also constructs paired predictor and response variates with a diagonal association structure,
-but classical CCA maximizes normalized correlation after within-block whitening. Pi-PLS instead
+but classical CCA maximizes normalized correlation after within-block whitening. Π-PLS instead
 uses an unwhitened cross-covariance criterion inside the retained predictor representation and then
 estimates a predictive least-squares map. Its diagonal relation is analogous to CCA structurally,
 not identical to the CCA objective.
 
 ### PLS and PLS-SVD
 
-PLS and Pi-PLS both use predictor-response covariance. Standard multicomponent PLS is commonly
-constructed through iterative extraction and deflation. Pi-PLS uses a fixed retained predictor
+PLS and Π-PLS both use predictor-response covariance. Standard multicomponent PLS is commonly
+constructed through iterative extraction and deflation. Π-PLS uses a fixed retained predictor
 space followed by SVD and least squares.
 
 PLS-SVD derives predictor and response directions directly from a cross-covariance operator.
-Pi-PLS first determines $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ from predictor singular structure and
+Π-PLS first determines $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ from predictor singular structure and
 uses $\mathbf{Z}^{\mathsf T}\mathbf{Y}$ to select only the response subspace. The final
 $\mathbf{P}$ and $\mathbf{Q}$ arise after the least-squares map $\mathbf{W}$ is
 estimated and diagonalized; they are not both obtained directly from the first cross-covariance
@@ -365,7 +365,7 @@ deviations. The estimator applies the fixed construction above in the resulting 
 centered-and-scaled coordinates, then transforms the regression map back to original units for
 `coef_`, `intercept_`, and `predict()`.
 
-A fitted estimator exposes the Pi-PLS-specific factorization in `decomposition_`:
+A fitted estimator exposes the Π-PLS-specific factorization in `decomposition_`:
 
 - `predictor_directions`: $\mathbf{P}$;
 - `dilation`: $(D_1,\ldots,D_h)$;

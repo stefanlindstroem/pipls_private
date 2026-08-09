@@ -203,7 +203,7 @@ block is unchanged when only `n_test` changes.
 ## Real-data boundary
 
 Real-data reading remains user-owned in general. Examples and reproduction scripts show how `X` and
-`Y` are formed using ordinary NumPy, pandas, or domain-specific code. Pi-PLS provides no public
+`Y` are formed using ordinary NumPy, pandas, or domain-specific code. Π-PLS provides no public
 registry, generic loader, downloader, preparation-only script, or required metadata sidecar.
 
 Pulp, Sugarcane, and Tobacco are explicit package-owned reference datasets. They are bundled with
@@ -333,7 +333,7 @@ source metadata columns from the model matrices. All samples and chemical respon
 No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
 preprocessing is applied. `load_tobacco()` returns the immutable labeled package dataset or its
 read-only matrices. `examples/06_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
-labels, and source-order response names from that result, evaluates a Pi-PLS component path with
+labels, and source-order response names from that result, evaluates a Π-PLS component path with
 adaptive predictor-rank scanning and full predictor SVD, and selects the smallest component row
 within a 10% relative tolerance of the minimum mean CV-MSE. Analysis then obtains the exact
 reference minimum, resolved tolerance, threshold, and conditional predictor-rank profile from that

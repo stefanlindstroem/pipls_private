@@ -1,4 +1,4 @@
-# Inspect and refit a manually selected Pi-PLS model
+# Inspect and refit a manually selected Π-PLS model
 
 This tutorial continues the workflow introduced in the [Pulp quick start](quick_start.md), but uses
 deterministic synthetic training and test data so that the latent structure is known and prediction
@@ -6,7 +6,7 @@ assessment remains independent of model selection. It retains the fitted search 
 the validation evidence before choosing a component count, creates one explicit selection, and
 passes that same immutable selection to the final full-data refit.
 
-For ordinary programming use, Pi-PLS behaves like a one-parameter component search: as in PLS,
+For ordinary programming use, Π-PLS behaves like a one-parameter component search: as in PLS,
 the main complexity parameter is `n_components`, denoted by $h$. A **component path** is the
 sequence of cross-validated prediction errors obtained as $h$ is varied. The search resolves the
 predictor rank $r_\pi$ internally for each $h$, so the component path remains a one-dimensional
@@ -31,7 +31,7 @@ flowchart TD
     review -. "revise" .-> select
 ```
 
-The tutorial deliberately stops after one prediction plot. Scores, loadings, Pi-PLS factorization
+The tutorial deliberately stops after one prediction plot. Scores, loadings, Π-PLS factorization
 plots, and selection-conditioned OOF diagnostics are introduced in the
 [complete Pulp tutorial](pulp.md).
 
@@ -75,7 +75,7 @@ Fit the component search just as you would fit a PLS component search:
 ```
 
 The programming-level decision is how many paired latent modes to retain, so `n_components` is the
-quantity displayed on the component path. Under the hood, Pi-PLS also has a predictor-rank
+quantity displayed on the component path. Under the hood, Π-PLS also has a predictor-rank
 parameter $r_\pi$. `PiPLSSearchCV` searches that rank conditionally for each $h$ and stores one
 resolved rank on each component-path row. Most users therefore do not need to treat $r_\pi$ as a
 second tuning parameter.
@@ -159,7 +159,7 @@ path again makes the recorded decision explicit without implying that path evalu
 ### Optional: inspect the conditional predictor-rank profile
 
 Most users can make the model-complexity decision from the component path alone. Advanced users
-can additionally inspect the second Pi-PLS parameter, $r_\pi$, because predictor rank is exposed
+can additionally inspect the second Π-PLS parameter, $r_\pi$, because predictor rank is exposed
 rather than hidden inside the estimator:
 
 ```python
@@ -256,7 +256,7 @@ final refitting must refer to exactly the same row.
 ## Continue with real data
 
 The [complete Pulp tutorial](pulp.md) adds selection-conditioned OOF predictions, immutable
-inspection objects, standard PLS-family plots, and Pi-PLS-specific factorization plots.
+inspection objects, standard PLS-family plots, and Π-PLS-specific factorization plots.
 
 For exact signatures and advanced behavior, see:
 

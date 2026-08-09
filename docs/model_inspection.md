@@ -1,7 +1,7 @@
 # Model inspection concepts
 
 `pipls.inspection` computes immutable numerical results from fitted models or explicit predictions.
-Pi-PLS-specific inspection covers $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and
+Π-PLS-specific inspection covers $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and
 $\mathbf{Q}\mathbf{D}$; scores, loadings, coefficients, biplots,
 observation diagnostics, and prediction diagnostics use estimator-neutral PLS-family objects.
 Maintained examples render these arrays directly, but rendering is not part of the numerical API.
@@ -15,7 +15,7 @@ signatures.
 
 ## Numerical results
 
-### Pi-PLS display factors
+### Π-PLS display factors
 
 A fitted `PiPLSRegression` stores the centered and scaled regression map as
 
@@ -101,9 +101,9 @@ outlier labels, or contribution diagnostics.
 | Where are samples in the latent plane? | `structure.x_scores` | Scatter two components; proximity means similar displayed score coordinates |
 | How do predictors reconstruct scores? | `structure.x_loadings` | Plot or group selected loading columns; these are not regression coefficients |
 | How do responses enter the latent representation? | `structure.y_loadings` | Compare selected loading columns across named responses |
-| What are the Pi-PLS predictor directions? | `factors.predictor_directions` | Plot columns of $\mathbf{P}$ against names or a physical predictor coordinate |
+| What are the Π-PLS predictor directions? | `factors.predictor_directions` | Plot columns of $\mathbf{P}$ against names or a physical predictor coordinate |
 | How strong is each paired latent mode? | `factors.dilation` | Compare the nonnegative dilations $D_k=D_{kk}$ |
-| What are the Pi-PLS response directions? | `factors.response_directions` | Compare columns of $\mathbf{Q}$ across responses |
+| What are the Π-PLS response directions? | `factors.response_directions` | Compare columns of $\mathbf{Q}$ across responses |
 | What is each response mode after dilation? | `factors.weighted_response_directions` | Compare columns of $\mathbf{Q}\mathbf{D}$ across responses |
 | What is the original-unit linear map? | `structure.coefficients` | Plot one coefficient row per response, respecting variable units |
 | Which observations are distant or poorly reconstructed? | `observations.score_distance`, `observations.x_reconstruction_residual` | Scatter the two raw diagnostics |
@@ -204,7 +204,7 @@ threshold is implied.
 
 The caller owns chart composition, scientific coordinates, labels, legends, layout, saving, and
 closing. Predictor and response names may come from ordinary Python sequences or data-frame column
-labels. For spectral plots, retain the physical coordinate in its existing order; Pi-PLS does not
+labels. For spectral plots, retain the physical coordinate in its existing order; Π-PLS does not
 smooth, interpolate, or reorder it.
 
 ## Interpretation boundary

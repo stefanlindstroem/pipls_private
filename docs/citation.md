@@ -26,7 +26,7 @@ datasets. Each reference dataset retains its own attribution and license notice;
 Until a release DOI is available, cite the software using the authors, package name, version, and
 license:
 
-> Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). `pipls`: Pi-PLS multivariate
+> Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). `pipls`: Π-PLS multivariate
 > regression for Python, version 0.0.0. BSD-3-Clause.
 
 The repository-root `CITATION.cff` provides the same software metadata in machine-readable form.

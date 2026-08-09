@@ -1,4 +1,4 @@
-# Decision 0121: canonical Pi-PLS terminology
+# Decision 0121: canonical Π-PLS terminology
 
 ## Status
 
@@ -6,13 +6,13 @@ Accepted and implemented.
 
 ## Context
 
-The companion manuscript gives the fixed Pi-PLS construction correctly, but its terminology for
+The companion manuscript gives the fixed Π-PLS construction correctly, but its terminology for
 $P$ and $Q$ varies by section. Section 3.3 calls them latent basis matrices, Algorithm 1 calls them
 loadings, the Corn discussion calls $P$ a projection matrix, and application prose also uses weight
 factors. The manuscript writes diagonal entries as $D_k$ in places and uses “component” for several
 different latent objects.
 
-The package already makes useful distinctions. Its Pi-PLS factorization exposes $P$ and $Q$
+The package already makes useful distinctions. Its Π-PLS factorization exposes $P$ and $Q$
 separately from `x_loadings_` and `y_loadings_`, which are least-squares reconstruction loadings.
 It also exposes response-by-mode weighted directions $QD$, whereas the manuscript often presents
 the transposed mode-by-response form $DQ^{\mathsf T}$. Canonical terminology is needed before
@@ -20,10 +20,11 @@ vocabulary is propagated across the broader documentation and docstring surface.
 
 ## Decision
 
-Use the mathematical spelling $\Pi$-PLS for the method name. In plain-text contexts that do not
-render mathematics, use the Unicode spelling `Π-PLS`. The installable Python package remains
-`pipls`, and established public Python identifiers such as `PiPLSRegression` and `PiPLSSearchCV`
-retain their ASCII spelling. Bibliographic titles are quoted as published rather than rewritten.
+Use the Unicode spelling `Π-PLS` for the method name in headings, prose, labels, and other
+user-facing text. Reserve mathematical notation such as $\Pi$ for mathematical objects rather than
+for typesetting the method name. The installable Python package remains `pipls`, and established
+public Python identifiers such as `PiPLSRegression` and `PiPLSSearchCV` retain their ASCII spelling.
+Bibliographic titles are quoted as published rather than rewritten.
 
 Use the following canonical terms:
 
@@ -60,7 +61,7 @@ manuscript's mode-by-response orientation is its transpose:
 DQ^{\mathsf T}=(QD)^{\mathsf T}.
 \]
 
-The public API retains the familiar word `n_components`, but for Pi-PLS it counts paired latent
+The public API retains the familiar word `n_components`, but for Π-PLS it counts paired latent
 modes. It does not count predictor-SVD basis vectors or synthetic latent components. The public
 name `predictor_rank` denotes the dimension of the retained observed predictor subspace. Reserve
 “predictor signal rank” for synthetic truth where the noiseless generating rank is known.
@@ -83,7 +84,7 @@ source docstrings belongs to the next documentation-only increment.
 
 ## Consequences
 
-- The package has one precise vocabulary for the fixed Pi-PLS objects and public rank names.
+- The package has one precise vocabulary for the fixed Π-PLS objects and public rank names.
 - Predictor and response directions remain clearly distinct from reconstruction loadings.
 - Public Python identifiers remain unchanged.
 - Manuscript terminology improvements are explicit rather than silently weakened in package prose.
