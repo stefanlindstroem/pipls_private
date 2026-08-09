@@ -1,13 +1,19 @@
 # Inspect and refit a manually selected Pi-PLS model
 
-This tutorial expands the [Pulp quick start](quick_start.md) by retaining the fitted search object,
-inspecting its component path before choosing a component count, creating one explicit selection,
-and passing that same immutable selection to the final full-data refit. Deterministic synthetic
-training and test data make the latent structure known and keep prediction assessment independent
-of model selection. For Pi-PLS, `n_components` is the number of paired latent modes.
+This tutorial continues the workflow introduced in the [Pulp quick start](quick_start.md), but uses
+deterministic synthetic training and test data so that the latent structure is known and prediction
+assessment remains independent of model selection. It retains the fitted search object, inspects
+the validation evidence before choosing a component count, creates one explicit selection, and
+passes that same immutable selection to the final full-data refit.
+
+For ordinary programming use, Pi-PLS behaves like a one-parameter component search: as in PLS,
+the main complexity parameter is `n_components`, denoted by $h$. A **component path** is the
+sequence of cross-validated prediction errors obtained as $h$ is varied. The search resolves the
+predictor rank $r_\pi$ internally for each $h$, so the component path remains a one-dimensional
+curve against component count.
 
 The workflow is to generate independent training and test data, fit the search, inspect the
-component path, choose a component count and create one selection, inspect the selected path and
+component path, choose a component count and create one selection, optionally inspect the
 conditional predictor-rank profile, refit the same selection, and predict the external test data.
 If the selected evidence is unsatisfactory, return to the selection step before refitting.
 
@@ -17,7 +23,7 @@ flowchart TD
     search["Fit search"]
     path["Inspect component path"]
     select["Choose component count and create selection"]
-    review["Inspect selected path and conditional rank profile"]
+    review["Inspect selected path; optionally inspect rank profile"]
     refit["Refit the same selection"]
     predict["Predict external test data"]
 
@@ -62,29 +68,32 @@ example, but cross-validation is not required to recover them exactly in a finit
 
 ## Fit the search
 
-The search evaluates admissible pairs of paired-mode count $h$ (`n_components`) and retained
-predictor-subspace dimension $r_\pi$ (`predictor_rank`):
+Fit the component search just as you would fit a PLS component search:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:fit-synthetic-search"
 ```
 
-For each paired-mode count, the component path retains the evaluated predictor rank with the
-smallest mean response-standardized CV-MSE:
+The programming-level decision is how many paired latent modes to retain, so `n_components` is the
+quantity displayed on the component path. Under the hood, Pi-PLS also has a predictor-rank
+parameter $r_\pi$. `PiPLSSearchCV` searches that rank conditionally for each $h$ and stores one
+resolved rank on each component-path row. Most users therefore do not need to treat $r_\pi$ as a
+second tuning parameter.
 
-\begin{equation}
-r_\pi^*(h)
-=
-\operatorname*{arg\,min}_{r_\pi}
-\operatorname{CV\text{-}MSE}(h,r_\pi).
-\end{equation}
+With the default scorer, larger scores are equivalent to smaller mean response-standardized
+CV-MSE. The search first identifies the exact predictor-rank optimum for each $h$ and then retains
+the smallest evaluated rank satisfying the configured predictor-rank tolerance. The default
+relative tolerance is at machine scale, so the retained rank normally coincides with the exact
+CV-MSE optimum unless a lower rank is numerically indistinguishable.
 
 At this stage the search owns validation evidence. It has not selected a component count or fitted
 a final model on all training observations.
 
 ## Inspect the component path { #retrieve-selection-evidence }
 
-Retrieve the component path without creating a selection:
+The component path is the PLS-like view of model complexity: one row for each evaluated $h$, with
+the conditionally resolved predictor rank already incorporated. Retrieve it without creating a
+selection:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-component-path"
@@ -124,15 +133,16 @@ stage.
 
 ## Inspect the selected evidence
 
-Retrieve the predictor-rank profile conditional on the chosen component count. The same `path`
-object is reused for the selected presentation:
+The selected component-path row can be reviewed without fitting a final model. For advanced
+inspection, also retrieve the predictor-rank profile conditional on the chosen component count.
+The same `path` object is reused for the selected presentation:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:inspect-synthetic-selected-evidence"
 ```
 
-`selection` is the complete immutable row $[h,r_\pi^*(h)]$. These search-owned results can be
-inspected without fitting a final model. The selection will be passed unchanged to `refit()` if the
+`selection` is the complete immutable row $[h,r_\pi(h)]$, where $r_\pi(h)$ is the predictor rank
+already resolved by the fitted search. The selection will be passed unchanged to `refit()` if the
 evidence is accepted.
 
 ### Selected component path
@@ -146,7 +156,11 @@ evidence is accepted.
 The path is unchanged; the orange diamond identifies the selected two-component row. Showing the
 path again makes the recorded decision explicit without implying that path evaluation was repeated.
 
-### Conditional predictor-rank profile
+### Optional: inspect the conditional predictor-rank profile
+
+Most users can make the model-complexity decision from the component path alone. Advanced users
+can additionally inspect the second Pi-PLS parameter, $r_\pi$, because predictor rank is exposed
+rather than hidden inside the estimator:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-rank-profile"
@@ -154,14 +168,23 @@ path again makes the recorded decision explicit without implying that path evalu
 
 ![Synthetic predictor-rank profile](../assets/generated/synthetic/predictor_rank_profile.svg)
 
-The orange diamond marks the selected predictor rank. At two components, the lowest evaluated
-mean CV-MSE occurs at predictor rank four. In this
-controlled example, that matches the two shared and two predictor-specific directions in the
-predictor block. This agreement is informative but not a general selection guarantee.
+The profile shows the predictor ranks actually evaluated at the chosen $h$. With the default
+scorer, `reference_selection` identifies the exact minimum-CV-MSE rank, while `selection`
+identifies the smallest rank admitted by the fitted predictor-rank tolerance. With the default
+machine-scale tolerance these are normally the same. Here both select predictor rank four, which
+matches the two shared and two predictor-specific directions in the predictor block. This
+agreement is informative but not a general selection guarantee.
 
-The selected path and rank profile are still model-selection evidence. If they make the chosen
-component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection. This is a
-return within the selection process, not independent post-selection validation.
+Advanced analyses can control predictor rank through the search configuration, for example by
+restricting or fixing `predictor_rank_values`, or can fit an exact
+`PiPLSRegression(n_components=h, predictor_rank=r_pi)` pair directly. The latter is an explicit
+fixed-model fit rather than a new row selected from an already fitted search. See
+[Path-selection details](../path_analysis.md#predictor-rank-policies) for the available policies
+and tolerances.
+
+The selected path and optional rank profile are still model-selection evidence. If they make the
+chosen component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection.
+This is a return within the selection process, not independent post-selection validation.
 
 ## Refit the selected pair
 
@@ -214,8 +237,9 @@ path = search.component_path_
 # Inspect path before assigning chosen_n_components.
 selection = search.select(n_components=chosen_n_components)
 selected_path = search.component_path_
+# Optionally, for advanced inspection:
 rank_profile = search.predictor_rank_profile(selection.n_components)
-# Inspect selected_path and rank_profile; revise selection if needed.
+# Inspect the selected evidence; revise selection if needed.
 
 model = search.refit(
     X_train,

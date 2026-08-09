@@ -142,7 +142,7 @@ axis.scatter(
     marker="D",
     color="tab:orange",
     s=70,
-    label=f"CV-MSE minimum: rank {rank_profile.selection.predictor_rank}",
+    label=f"Selected rank: {rank_profile.selection.predictor_rank}",
     zorder=3,
 )
 axis.set_xlabel("Predictor rank")
