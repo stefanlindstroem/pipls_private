@@ -1,15 +1,23 @@
 # Pulp: a complete Π-PLS workflow
 
 This tutorial applies [Inspect a manually selected Π-PLS model with synthetic data](synthetic.md)
-to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`,
-`predictor_rank_profile()`, and fixed-model fitting are already familiar. The focus is what changes
-with real data: an interior predictor-rank result, selection-conditioned out-of-fold (OOF)
-predictions, and interpretation of an accepted model.
+to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`, and fixed-model
+fitting are already familiar. The focus is what changes with real data: an interior predictor-rank
+result, selection-conditioned out-of-fold (OOF) predictions, and interpretation of an accepted
+model.
+
+For ordinary programming use, Π-PLS can be approached like PLS: the main model-complexity
+parameter is the paired-mode count $h$ (`n_components`). A **component path** is the
+one-dimensional sequence of cross-validated prediction errors obtained as $h$ is varied. For each
+$h$, the search resolves the retained predictor rank $r_\pi$ internally, so users do not normally
+need to tune a second parameter. Advanced users can inspect or constrain $r_\pi$ when the scientific
+question or available sample support makes that useful.
 
 The workflow is to load the Pulp data, fit the search, inspect the component path, choose a component
-count and create one selection, inspect the selected path, conditional predictor-rank profile, and
-OOF predictions, refit the same selection, inspect the fitted model, and render the reports. If the
-selected evidence is unsatisfactory, return to the selection step before refitting.
+count and create one selection, inspect the selected path and OOF predictions, optionally inspect the
+conditional predictor-rank profile, refit the same selection, inspect the fitted model, and render
+the reports. If the selected evidence is unsatisfactory, return to the selection step before
+refitting.
 
 ```mermaid
 flowchart TD
@@ -17,7 +25,7 @@ flowchart TD
     search["Fit search"]
     path["Inspect component path"]
     select["Choose component count and create selection"]
-    review["Inspect selected path, conditional rank profile, and OOF predictions"]
+    review["Inspect selected path and OOF predictions; optionally inspect rank profile"]
     refit["Refit the same selection"]
     analyze["Inspect the fitted model"]
     render["Render reports"]
@@ -64,8 +72,9 @@ arithmetic, length-weighted, and length-length-weighted means. The response labe
 energy absorption), `TSI` (tensile stiffness index), `Tear index`, and `s` (light-scattering
 coefficient).
 
-The accepted analysis uses three paired latent modes and the predictor rank selected conditionally
-at that component count. The distinction is summarized in
+The final accepted analysis below uses three paired latent modes. Its predictor rank is resolved
+conditionally by the search at that component count rather than chosen as a routine second tuning
+parameter. The distinction is summarized in
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 ## Load the data
@@ -79,7 +88,7 @@ The named loader returns immutable matrices together with scientific predictor a
 The resulting arrays have shapes `(46, 14)` and `(46, 8)`. The same loader works from a source
 checkout, wheel, or source distribution and applies no preprocessing.
 
-## Inspect the component path { #retrieve-selection-evidence }
+## Fit the search and inspect the component path { #retrieve-selection-evidence }
 
 Fit the search and retrieve the conditioned component path without creating a selection:
 
@@ -87,8 +96,12 @@ Fit the search and retrieve the conditioned component path without creating a se
 --8<-- "examples/04_pulp_real_data.py:inspect-pulp-component-path"
 ```
 
-The search evaluates admissible paired-mode counts and conditionally retains one predictor rank at
-each count. It uses ten repeated five-fold partitions, so every candidate is evaluated on 50
+The search evaluates admissible paired-mode counts $h$ and conditionally retains one predictor
+rank $r_\pi$ at each count. The resulting `component_path_` is therefore the PLS-like,
+one-parameter view: cross-validated prediction error versus `n_components`, with the internal
+predictor-rank choice already incorporated into each row.
+
+This analysis uses ten repeated five-fold partitions, so every evaluated candidate is assessed on 50
 materialized validation splits. These search-owned results can be inspected without fitting a final
 model.
 
@@ -126,10 +139,19 @@ Setting `CHOSEN_N_COMPONENTS=3` and calling `search.select(...)` are one concept
 static example records the resulting choice so the analysis is reproducible. In an interactive
 analysis, inspect the first path figure, set the value, and rerun from this selection stage.
 
-## Inspect the selected path and conditional rank profile
+Manual selection is not the only supported component-count rule.
+`search.select(rule="best_score")` returns the conditioned path row with the best configured
+score, while `search.select(rule="minimum_cv_mse")` returns the smallest component count within
+the supplied relative and absolute tolerances of the exact path minimum. With the default scorer,
+maximizing the configured score is equivalent to minimizing mean response-standardized CV-MSE.
+This tutorial uses manual selection because the purpose is to inspect the path before fixing $h$;
+the named rules operate on the same one-dimensional conditioned path and do not require the user to
+select $r_\pi$ separately.
 
-Retrieve the predictor-rank evidence conditional on the chosen component count. The same `path`
-object is reused for the selected presentation:
+## Inspect the selected path and optional conditional rank profile
+
+Retrieve the predictor-rank evidence conditional on the chosen component count. This is optional
+advanced inspection; the same `path` object is reused for the selected presentation:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:inspect-pulp-selected-evidence"
@@ -147,11 +169,11 @@ component count.
 
 ![Pulp selected component path](../assets/generated/pulp/selected_component_path.svg)
 
-The orange diamond marks the selected three-component row. Its stored predictor rank is 9, the
-rank with the lowest evaluated mean CV-MSE at three components across the 50 seeded repeated-CV
-splits.
+The orange diamond marks the selected three-component row. Its stored predictor rank is 9. With
+the default scorer and the default machine-scale predictor-rank tolerance, the exact reference
+optimum and the retained predictor rank coincide at 9 for this analysis.
 
-### Conditional predictor-rank profile
+### Optional: conditional predictor-rank profile
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:plot-pulp-rank-profile"
@@ -159,22 +181,37 @@ splits.
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
-The orange diamond marks the selected predictor rank. For these 46 rows, 14 predictors, and
-repeated five-fold CV, the support rule gives
-$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The ten seeded repetitions select the
-interior rank 9. Ranks 9 and 10 have mean CV-MSE values of approximately 0.258 and 0.274, with
-population split SDs of approximately 0.097 and 0.100. Their mean difference is small relative
-to the displayed split-to-split variability.
+Most users can stop at the component path. Advanced users can inspect this profile because
+Π-PLS exposes the second parameter $r_\pi$ rather than hiding it inside the implementation. With
+the default scorer, `profile.reference_selection` identifies the exact minimum-CV-MSE predictor
+rank at the chosen $h$, whereas `profile.selection` identifies the smallest evaluated rank admitted
+by the configured predictor-rank tolerance. The default relative tolerance is at machine scale, so
+these normally coincide; both are rank 9 in this analysis.
 
-The profile supports rank 9 for this selection, but it does not establish a distinct scientific
-advantage over nearby retained dimensions. The fixed model still contains three paired latent
-modes; predictor rank 9 is the retained predictor-subspace dimension used to estimate those modes.
-The 50-split protocol is a final stability choice rather than a recommended development default; a
-single seeded five-fold partition is much cheaper while the workflow is being assembled. See
-[Computational
+For these 46 rows, 14 predictors, and repeated five-fold CV, the default statistical-support rule
+with `samples_per_predictor_rank=5` gives
+$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The support parameter is configurable. For
+example, `samples_per_predictor_rank=10` would replace the last term by $\lceil46/10\rceil=5$,
+giving a more conservative scan that requires roughly twice as many supplied observations per
+retained predictor-rank unit under this heuristic. The dimensional and foldwise numerical-rank caps
+still apply.
+
+Ranks 9 and 10 have mean CV-MSE values of approximately 0.258 and 0.274, with population split SDs
+of approximately 0.097 and 0.100. Their mean difference is small relative to the displayed
+split-to-split variability. The profile supports rank 9 for this selection, but it does not
+establish a distinct scientific advantage over nearby retained dimensions. The fixed model still
+contains three paired latent modes; predictor rank 9 is the retained predictor-subspace dimension
+used to estimate those modes.
+
+Advanced analyses can also control predictor rank directly: `predictor_rank_values` can restrict or
+fix the ranks considered by `PiPLSSearchCV`, and an exact
+`PiPLSRegression(n_components=h, predictor_rank=r_pi)` pair can be fitted when both ranks are chosen
+deliberately. The 50-split protocol is a final stability choice rather than a recommended
+development default; a single seeded five-fold partition is much cheaper while the workflow is
+being assembled. See [Computational
 performance](../computational_performance.md#develop-with-a-smaller-validation-protocol)
 for that development-to-final distinction and [Path-selection details](../path_analysis.md) for
-other bounds and policies.
+selection rules, predictor-rank policies, tolerances, and bounds.
 
 ## Inspect selection-conditioned OOF behavior
 
@@ -342,10 +379,11 @@ fibrillation or length descriptors, the second emphasizes length descriptors, an
 strongly associated with `Fines B`. Only relative within-component patterns should be interpreted;
 the displayed orientation is fixed by the TI entries in the paired response directions.
 
-The columns of $\mathbf{P}$ are orthonormal predictor directions paired with orthonormal response
-directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. They are distinct from ordinary X
-loadings. The figure shows all three selected paired latent modes; predictor rank 9 does not create
-nine plotted modes. See
+The columns of $\mathbf{P}$ are orthonormal predictor directions, and the corresponding columns of
+$\mathbf{Q}$ are orthonormal response directions. The diagonal matrix $\mathbf{D}$ pairs and
+scales these directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. The predictor directions
+are distinct from ordinary X loadings. The figure shows all three selected paired latent modes;
+predictor rank 9 does not create nine plotted modes. See
 [Predictor directions](../model_inspection.md#predictor-directions) and
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
 

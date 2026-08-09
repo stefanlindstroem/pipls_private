@@ -94,13 +94,13 @@ def _plot_predictor_rank_profile(
         marker="D",
         color="tab:orange",
         s=70,
-        label=f"CV-MSE minimum: rank {profile.selection.predictor_rank}",
+        label=f"Selected rank: {profile.selection.predictor_rank}",
         zorder=3,
     )
     axis.set_xlabel("Predictor rank")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_title(
-        rf"Pulp $\Pi$-PLS predictor-rank profile at "
+        "Pulp Π-PLS predictor-rank profile at "
         f"{profile.n_components} components"
     )
     axis.set_xticks(profile.predictor_rank)

@@ -141,11 +141,11 @@ def _render_predictor_rank_profile(
         marker="D",
         color="tab:orange",
         s=70,
-        label=f"CV-MSE minimum: rank {profile.selection.predictor_rank}",
+        label=f"Selected rank: {profile.selection.predictor_rank}",
         zorder=3,
     )
     axis.set_title(
-        rf"Pulp $\Pi$-PLS predictor-rank profile at "
+        "Pulp Π-PLS predictor-rank profile at "
         f"{profile.n_components} components"
     )
     axis.set_xlabel("Predictor rank")

@@ -136,10 +136,11 @@ loadings describe the standardized fitted representation rather than original-un
 
 ### Predictor directions $\mathbf{P}$ { #predictor-directions }
 
-Use columns of `factors.predictor_directions`. They are orthonormal predictor directions paired with
-orthonormal response directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. They are
-distinct from X loadings because they belong to the regression factorization rather than score
-reconstruction.
+Use columns of `factors.predictor_directions`. They are orthonormal predictor directions. The
+corresponding columns of $\mathbf{Q}$ are orthonormal response directions, and $\mathbf{D}$ pairs
+and scales the two sets of directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. Predictor
+directions are distinct from X loadings because they belong to the regression factorization rather
+than score reconstruction.
 
 Theory: [Diagonal latent coupling](theory.md#diagonal-latent-coupling).
 
