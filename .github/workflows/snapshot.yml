@@ -20,4 +20,6 @@ jobs:
           ! tar -tzf /tmp/pipls-snapshot.tar.gz |
           grep -E '^examples/results/.+[^/]$' |
           grep -vE '(^|/)\.gitkeep$'
-      - run: tar -xOf /tmp/pipls-snapshot.tar.gz .llm/SNAPSHOT_INFO | grep -Fx 'dirty: false'
+      - run: |
+          tar -xOf /tmp/pipls-snapshot.tar.gz .llm/SNAPSHOT_INFO |
+            grep -Fx 'dirty: false'
