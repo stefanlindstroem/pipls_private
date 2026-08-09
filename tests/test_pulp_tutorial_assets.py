@@ -102,6 +102,7 @@ def test_pulp_tutorial_renderer_records_repeated_cv_and_valid_figures(
     assert analysis["prediction_kind"] == (
         "selection-conditioned OOF predictions"
     )
+    assert analysis["detailed_responses"] == list(load_pulp().target_names)
 
     final_fit = manifest["final_fit"]
     assert final_fit["prediction_kind"] == "fitted values"

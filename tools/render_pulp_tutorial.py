@@ -46,7 +46,6 @@ from pipls.inspection import (  # noqa: E402
 from pipls.validation import PiPLSOOFReport  # noqa: E402
 
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
-DETAILED_RESPONSE_COUNT = 3
 CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
@@ -287,23 +286,21 @@ def _render_observed_vs_predicted(
     diagnostics: PredictionDiagnostics,
     *,
     response_names: tuple[str, ...],
-    response_indices: tuple[int, ...],
     output_path: Path,
 ) -> None:
     # --8<-- [start:render-pulp-observed-vs-predicted]
     figure, axis = _figure(figsize=(6.4, 5.0))
-    detailed_array = np.array(response_indices, dtype=np.int64)
-    for response in response_indices:
+    for response, response_name in enumerate(response_names):
         axis.scatter(
             diagnostics.observed_standardized[:, response],
             diagnostics.predicted_standardized[:, response],
-            label=response_names[response],
+            label=response_name,
             alpha=0.75,
         )
     values = np.concatenate(
         [
-            diagnostics.observed_standardized[:, detailed_array].ravel(),
-            diagnostics.predicted_standardized[:, detailed_array].ravel(),
+            diagnostics.observed_standardized.ravel(),
+            diagnostics.predicted_standardized.ravel(),
         ]
     )
     lower = float(values.min())
@@ -316,7 +313,7 @@ def _render_observed_vs_predicted(
     axis.set_xlabel("Observed response (standardized)")
     axis.set_ylabel("Predicted response (standardized)")
     axis.set_title(rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}")
-    axis.legend(title="Response")
+    axis.legend(title="Response", fontsize="small", ncols=2)
     # --8<-- [end:render-pulp-observed-vs-predicted]
     _save_svg(figure, output_path)
 
@@ -325,21 +322,19 @@ def _render_residuals_vs_predicted(
     diagnostics: PredictionDiagnostics,
     *,
     response_names: tuple[str, ...],
-    response_indices: tuple[int, ...],
     output_path: Path,
 ) -> None:
     # --8<-- [start:render-pulp-residuals-vs-predicted]
     figure, axis = _figure(figsize=(6.4, 5.0))
-    detailed_array = np.array(response_indices, dtype=np.int64)
-    for response in response_indices:
+    for response, response_name in enumerate(response_names):
         axis.scatter(
             diagnostics.predicted_standardized[:, response],
             diagnostics.residual_standardized[:, response],
-            label=response_names[response],
+            label=response_name,
             alpha=0.75,
         )
-    predicted = diagnostics.predicted_standardized[:, detailed_array]
-    residual = diagnostics.residual_standardized[:, detailed_array]
+    predicted = diagnostics.predicted_standardized
+    residual = diagnostics.residual_standardized
     predicted_span = float(predicted.max() - predicted.min())
     residual_span = float(residual.max() - residual.min())
     axis.set_xlim(
@@ -358,7 +353,7 @@ def _render_residuals_vs_predicted(
     axis.set_xlabel("Predicted response (standardized)")
     axis.set_ylabel("Standardized residual")
     axis.set_title(rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}")
-    axis.legend(title="Response")
+    axis.legend(title="Response", fontsize="small", ncols=2)
     # --8<-- [end:render-pulp-residuals-vs-predicted]
     _save_svg(figure, output_path)
 
@@ -490,7 +485,6 @@ def _write_manifest(
     oof_diagnostics: PredictionDiagnostics,
     fitted_diagnostics: PredictionDiagnostics,
     displayed_components: tuple[int, ...],
-    detailed_response_indices: tuple[int, ...],
 ) -> Path:
     figures = [
         {"filename": filename, "sha256": _sha256(output_dir / filename)}
@@ -517,9 +511,7 @@ def _write_manifest(
                 component + 1 for component in displayed_components
             ],
             "factor_sign_anchor": {"response": "TI", "sign": "positive"},
-            "detailed_responses": [
-                data.target_names[index] for index in detailed_response_indices
-            ],
+            "detailed_responses": list(data.target_names),
             "prediction_kind": oof_diagnostics.prediction_kind,
             "cross_validation": {
                 "splitter": type(CV).__name__,
@@ -616,7 +608,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     )
     structure = latent_structure(model)
     displayed_components = tuple(range(selection.n_components))
-    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
 
     _render_biplot(
         structure,
@@ -638,13 +629,11 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     _render_observed_vs_predicted(
         oof_diagnostics,
         response_names=response_names,
-        response_indices=detailed_response_indices,
         output_path=output_dir / "observed_vs_predicted.svg",
     )
     _render_residuals_vs_predicted(
         oof_diagnostics,
         response_names=response_names,
-        response_indices=detailed_response_indices,
         output_path=output_dir / "residuals_vs_predicted.svg",
     )
     _render_standardized_rmse(
@@ -677,7 +666,6 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         oof_diagnostics=oof_diagnostics,
         fitted_diagnostics=fitted_diagnostics,
         displayed_components=displayed_components,
-        detailed_response_indices=detailed_response_indices,
     )
 
 

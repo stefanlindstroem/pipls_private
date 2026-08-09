@@ -27,7 +27,6 @@ from pipls.inspection import (
 )
 
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "pulp_post_analysis"
-DETAILED_RESPONSE_COUNT = 3
 CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 # --8<-- [end:pulp-tutorial-setup]
 
@@ -329,26 +328,24 @@ def _plot_prediction_diagnostics(
         figsize=(14.0, 4.6),
         layout="constrained",
     )
-    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
-    detailed_array = np.array(detailed_response_indices, dtype=np.int64)
-    for response in detailed_response_indices:
+    for response, response_name in enumerate(response_names):
         axes[0].scatter(
             diagnostics.observed_standardized[:, response],
             diagnostics.predicted_standardized[:, response],
-            label=response_names[response],
+            label=response_name,
             alpha=0.75,
         )
         axes[1].scatter(
             diagnostics.predicted_standardized[:, response],
             diagnostics.residual_standardized[:, response],
-            label=response_names[response],
+            label=response_name,
             alpha=0.75,
         )
 
     identity_values = np.concatenate(
         [
-            diagnostics.observed_standardized[:, detailed_array].ravel(),
-            diagnostics.predicted_standardized[:, detailed_array].ravel(),
+            diagnostics.observed_standardized.ravel(),
+            diagnostics.predicted_standardized.ravel(),
         ]
     )
     identity_lower = float(identity_values.min())
@@ -374,8 +371,8 @@ def _plot_prediction_diagnostics(
     axes[0].set_xlabel("Observed response (standardized)")
     axes[0].set_ylabel("Predicted response (standardized)")
 
-    predicted = diagnostics.predicted_standardized[:, detailed_array]
-    residual = diagnostics.residual_standardized[:, detailed_array]
+    predicted = diagnostics.predicted_standardized
+    residual = diagnostics.residual_standardized
     predicted_span = float(predicted.max() - predicted.min())
     residual_span = float(residual.max() - residual.min())
     axes[1].set_xlim(
@@ -518,14 +515,12 @@ def _plot_coefficients(
     response_names: tuple[str, ...],
     output_path: Path,
 ) -> None:
-    detailed_response_indices = tuple(range(DETAILED_RESPONSE_COUNT))
+    response_indices = tuple(range(len(response_names)))
     predictor_positions = np.arange(len(predictor_names))
-    response_width = 0.8 / len(detailed_response_indices)
+    response_width = 0.8 / len(response_indices)
     figure, axis = plt.subplots(figsize=(10.0, 5.4), layout="constrained")
-    for series, response in enumerate(detailed_response_indices):
-        offset = (
-            series - (len(detailed_response_indices) - 1) / 2
-        ) * response_width
+    for series, response in enumerate(response_indices):
+        offset = (series - (len(response_indices) - 1) / 2) * response_width
         axis.bar(
             predictor_positions + offset,
             structure.coefficients[response],

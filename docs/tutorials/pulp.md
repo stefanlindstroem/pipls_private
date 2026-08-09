@@ -243,9 +243,9 @@ Convert those predictions to an immutable diagnostic result before refitting:
     estimate of post-selection performance. See
     [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
 
-The pointwise figures show the first three response columns (`CSF`, `Density`, and `TI`) solely for
-visibility. The summary retains all responses. All charts use named arrays from
-`PredictionDiagnostics` directly.
+The pointwise figures show all eight response columns. This makes the displays denser, but preserves
+the full multivariate response structure instead of selecting a visually convenient subset. All
+charts use named arrays from `PredictionDiagnostics` directly.
 
 ### Observed versus predicted
 
@@ -255,8 +255,8 @@ visibility. The summary retains all responses. All charts use named arrays from
 
 ![Pulp observed versus predicted](../assets/generated/pulp/observed_vs_predicted.svg)
 
-`CSF` lies more tightly around the identity line than `Density` and `TI`; all three displays remain
-selection-conditioned rather than independent-test results.
+The response series differ in how tightly they follow the identity line. The figure shows all eight
+responses, and every series remains selection-conditioned rather than an independent-test result.
 
 See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
 
@@ -268,9 +268,8 @@ See [Observed versus predicted](../model_inspection.md#observed-versus-predicted
 
 ![Pulp residual versus predicted](../assets/generated/pulp/residuals_vs_predicted.svg)
 
-No dominant global curvature is apparent in the displayed responses, although `TI` has the largest
-residual excursions. The zero line is descriptive; it does not establish a formal variance model or
-calibration claim.
+No dominant global curvature is apparent across the displayed responses. The zero line is
+descriptive; it does not establish a formal variance model or calibration claim.
 
 See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted).
 
