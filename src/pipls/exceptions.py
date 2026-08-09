@@ -1,4 +1,4 @@
-"""Public warning categories for Pi-PLS."""
+"""Public warning categories for Π-PLS."""
 
 __all__ = ["PredictorRankSupportWarning"]
 

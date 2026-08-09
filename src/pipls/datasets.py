@@ -1,4 +1,4 @@
-"""Packaged data, validated containers, and deterministic Pi-PLS generators."""
+"""Packaged data, validated containers, and deterministic Π-PLS generators."""
 
 from __future__ import annotations
 

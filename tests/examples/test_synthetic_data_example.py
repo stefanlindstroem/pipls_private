@@ -23,7 +23,7 @@ def test_synthetic_example_explains_selection_and_output(
     )
     output = capsys.readouterr().out
 
-    assert "Synthetic Pi-PLS path-selection example" in output
+    assert "Synthetic Π-PLS path-selection example" in output
     assert "Training data: X(120, 8), Y(120, 3)" in output
     assert "Independent test data: X(60, 8), Y(60, 3)" in output
     assert "2 shared directions and 2 predictor-specific directions" in output

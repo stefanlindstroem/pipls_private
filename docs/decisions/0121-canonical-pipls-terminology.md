@@ -78,9 +78,9 @@ Recommended manuscript edits are:
 - state explicitly that $DQ^{\mathsf T}$ and package-facing $QD$ are transposed orientations of the
   same weighted response directions.
 
-This patch records and applies the terminology only in canonical theory and maintainer contracts.
-Broad propagation through README material, generated API prose, tutorials, examples, and public
-source docstrings belongs to the next documentation-only increment.
+The terminology is propagated through README material, generated API prose, tutorials, examples,
+and public source docstrings. Bibliographic titles remain quoted as published, and historical
+change records need not be rewritten solely to modernize spelling.
 
 ## Consequences
 

@@ -1,11 +1,12 @@
 # Examples
 
-Pi-PLS predicts through paired latent modes, each containing one predictor direction, one response
-direction, and one dilation. Applied workflows normally scan `n_components`, the number of paired
-latent modes, by cross-validation and inspect CV-MSE against that count. The resulting table or
-curve is called the component path. A clear elbow or plateau can motivate a component count; when
-no clear elbow is present, explicit relative tolerances provide a transparent parsimony policy.
-Example 06 demonstrates separate 10% predictor-rank and component-count tolerances. See the
+For ordinary use, Π-PLS follows the familiar PLS component-selection workflow: scan
+`n_components` by cross-validation and inspect prediction error against that count. The resulting
+table or curve is the component path. Π-PLS resolves its retained predictor rank conditionally for
+each component count, so most workflows can treat `n_components` as the main complexity parameter.
+A clear elbow or plateau can motivate a component count; when no clear elbow is present, explicit
+relative tolerances provide a transparent parsimony policy. Example 06 demonstrates separate 10%
+predictor-rank and component-count tolerances. See the
 [component-path discussion](../docs/path_analysis.md#search-owned-selection-rules) and the
 [served example catalogue](../docs/examples.md#tobacco-two-relative-tolerance-decisions). For the
 mathematical construction, see `docs/theory.md`.
@@ -46,7 +47,7 @@ seed makes these analyses reproducible while preventing row order from defining 
 
 ## Explicit comparison
 
-- `03_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Pi-PLS-versus-PLS
+- `03_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Π-PLS-versus-PLS
   component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model, and the
   workflow fits no final model.
 
@@ -65,7 +66,7 @@ Grouped and temporal validation require application-specific sampling semantics 
   manual selection, inspects its conditional predictor-rank evidence, computes an OOF report, refits
   that selection, and writes six wavelength-aware final PDF figures without generated analytical
   CSV files.
-- `06_tobacco_real_data.py`: adaptive Pi-PLS predictor-rank scanning with explicit full predictor
+- `06_tobacco_real_data.py`: adaptive Π-PLS predictor-rank scanning with explicit full predictor
   SVD and two separately named 10% relative tolerances. The search constructor applies the
   predictor-rank tolerance independently at each component count; `search.select()` then applies the
   component-count tolerance to the conditioned path. The workflow obtains exact and retained rank
@@ -115,7 +116,7 @@ not carry labels can supply equivalent coordinates and names from a schema, labo
 system, or other domain metadata. The package inspection API does not invent scientific variable
 names.
 
-Example 03 keeps the Pi-PLS and ordinary PLS paths in memory and creates the three overlaid
+Example 03 keeps the Π-PLS and ordinary PLS paths in memory and creates the three overlaid
 comparison figures directly. Sugarcane demonstrates the complete manual-analysis workflow:
 
 1. `PiPLSSearchCV(cv=CV).fit(X, Y)` evaluates the path.

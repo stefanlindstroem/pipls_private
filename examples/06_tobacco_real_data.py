@@ -1,4 +1,4 @@
-"""Fit and inspect a Tobacco Pi-PLS model directly in memory."""
+"""Fit and inspect a Tobacco Π-PLS model directly in memory."""
 
 from pathlib import Path
 
@@ -564,7 +564,7 @@ def main() -> None:
         f"CV-MSE threshold={component_cv_mse_threshold:.6g}"
     )
     print(
-        "Final Pi-PLS model: "
+        "Final Π-PLS model: "
         f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
     )
     print(f"Wrote PDF figures to {ANALYSIS_DIR}")

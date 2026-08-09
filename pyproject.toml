@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pipls"
 version = "0.0.0"
-description = "Pi-PLS multivariate regression"
+description = "Π-PLS multivariate regression"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "BSD-3-Clause"

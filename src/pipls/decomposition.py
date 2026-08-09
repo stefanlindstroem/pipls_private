@@ -1,4 +1,4 @@
-"""Public immutable representation of a fitted Pi-PLS factorization."""
+"""Public immutable representation of a fitted Π-PLS factorization."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ _ALLOWED_RESOLVED_SVD_SOLVERS = frozenset({"full", "randomized"})
 
 @dataclass(frozen=True)
 class PiPLSDecomposition:
-    r"""Interpretable Pi-PLS factorization and numerical diagnostics.
+    r"""Interpretable Π-PLS factorization and numerical diagnostics.
 
     Instances are returned through :attr:`pipls.PiPLSRegression.decomposition_`.
     Direct construction validates the same shape, scalar, and immutability

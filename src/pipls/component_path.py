@@ -1,4 +1,4 @@
-"""Immutable concise results for a fitted Pi-PLS component path."""
+"""Immutable concise results for a fitted Π-PLS component path."""
 
 from __future__ import annotations
 
@@ -195,7 +195,7 @@ class PiPLSPredictorRankEvidence:
 
 @dataclass(frozen=True)
 class PiPLSSelection:
-    """Immutable Pi-PLS selection for one evaluated rank pair.
+    """Immutable Π-PLS selection for one evaluated rank pair.
 
     Attributes
     ----------

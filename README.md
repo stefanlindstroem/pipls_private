@@ -1,20 +1,24 @@
 # Π-PLS
 
 `pipls` is the Python package for Π-PLS, a PLS-family method for multivariate regression.
-Π-PLS represents the predictive relation through paired latent modes. Each mode combines one
-orthonormal predictor direction, one orthonormal response direction, and one nonnegative dilation.
-Public `n_components` counts those paired modes; `predictor_rank` controls the dimension of the
-retained predictor subspace from which they are estimated.
+For routine modeling, use it much like ordinary PLS: treat `n_components` as the main model-
+complexity parameter, evaluate prediction error across component counts, select a count, fit, and
+predict. The resulting cross-validated error table or curve is the **component path**.
 
-Π-PLS is intended for problems with several responses where the predictor block may contain
-structured variation that is not equally useful for prediction. Its two rank controls let users
-examine the predictor subspace and the paired predictive relation separately. This does not make
-Π-PLS preferable for every regression problem; ordinary PLS and other multivariate methods
-remain appropriate alternatives whose suitability depends on the data and validation design.
+Under the hood, Π-PLS also resolves a retained predictor-subspace dimension, `predictor_rank`, for
+each component count. Most workflows do not need to tune that quantity separately. Advanced users
+can inspect, restrict, or fix it when statistical support or scientific interpretation motivates
+more direct control.
 
-For routine model selection, `PiPLSSearchCV` evaluates component counts by cross-validation and
-selects a predictor rank conditionally for each count. Evidence-retaining workflows inspect the
-component path, create one immutable selection, inspect its conditional rank and OOF evidence, and
+Π-PLS represents the predictive relation through paired latent modes. Each retained mode combines
+one orthonormal predictor direction, one orthonormal response direction, and one nonnegative
+dilation. The predictor rank controls the subspace from which those paired modes are estimated.
+Ordinary PLS and other multivariate methods remain appropriate alternatives; model choice should be
+based on the data and the validation design.
+
+For routine model selection, `PiPLSSearchCV` evaluates the component path by cross-validation and
+resolves one predictor rank conditionally for each count. Evidence-retaining workflows inspect the
+path, create one immutable selection, optionally inspect its conditional rank and OOF evidence, and
 pass the same object to final refitting. Compact workflows may instead apply a named rule directly
 through `search.refit(X, Y, rule=...)`. The fitted model records the exact row as `selection_`, while
 the search retains the complete path and split evidence.
@@ -79,9 +83,9 @@ values in one figure. These are fitted values from the final full-data model, no
 predictions. When OOF diagnostics are required, retain the search, create the selection explicitly,
 and pass that same object to both `oof_report()` and `refit()` as shown below.
 
-## Fit one known model
+## Fit one exact model
 
-When both ranks are known, fit the fixed estimator directly:
+When an advanced workflow has chosen both $h$ and $r_\pi$, fit that exact pair directly:
 
 ```python
 from pipls import PiPLSRegression

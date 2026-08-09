@@ -272,7 +272,7 @@ class ObservationDiagnostics:
 
 @dataclass(frozen=True)
 class PiPLSDisplayFactors:
-    r"""Immutable display-oriented copy of a Pi-PLS factorization.
+    r"""Immutable display-oriented copy of a Π-PLS factorization.
 
     The predictor and response direction columns use one chosen deterministic
     display sign per paired latent mode. Applying the same sign to both sides
@@ -363,7 +363,7 @@ class PiPLSDisplayFactors:
 
     @property
     def n_components(self) -> int:
-        """Number of retained Pi-PLS paired latent modes."""
+        """Number of retained Π-PLS paired latent modes."""
 
         return int(self.dilation.shape[0])
 
@@ -757,7 +757,7 @@ def pipls_display_factors(
     response_index: int | None = None,
     response_sign: Literal["positive", "negative"] = "positive",
 ) -> PiPLSDisplayFactors:
-    r"""Return copied Pi-PLS factors with deterministic display signs.
+    r"""Return copied Π-PLS factors with deterministic display signs.
 
     By default, the first largest-magnitude entry of each predictor direction is
     made nonnegative. When ``response_index`` is supplied, each component is
@@ -770,7 +770,7 @@ def pipls_display_factors(
     Parameters
     ----------
     decomposition : pipls.decomposition.PiPLSDecomposition
-        Public fitted Pi-PLS decomposition.
+        Public fitted Π-PLS decomposition.
     response_index : int or None, default=None
         Zero-based response row used to orient every component. ``None`` uses the
         default predictor-based convention.

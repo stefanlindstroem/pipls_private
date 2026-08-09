@@ -1,4 +1,4 @@
-"""Pi-PLS multivariate regression."""
+"""Π-PLS multivariate regression."""
 
 from .exceptions import PredictorRankSupportWarning
 from .regression import PiPLSRegression

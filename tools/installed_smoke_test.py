@@ -1,4 +1,4 @@
-"""Smoke-test a clean installation of Pi-PLS outside the repository checkout."""
+"""Smoke-test a clean installation of Π-PLS outside the repository checkout."""
 
 from __future__ import annotations
 

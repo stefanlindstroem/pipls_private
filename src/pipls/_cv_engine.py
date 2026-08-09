@@ -24,7 +24,7 @@ WarningCategory = type[Warning]
 
 @dataclass(frozen=True)
 class _PiPLSCandidate:
-    """One admissible Pi-PLS hyperparameter pair."""
+    """One admissible Π-PLS hyperparameter pair."""
 
     n_components: int
     predictor_rank: int
@@ -38,7 +38,7 @@ class _PiPLSCandidate:
 
 @dataclass(frozen=True)
 class _PiPLSCandidateResult:
-    """Fold-level results for one Pi-PLS candidate."""
+    """Fold-level results for one Π-PLS candidate."""
 
     split_scores: FloatArray
     split_response_standardized_mse: FloatArray

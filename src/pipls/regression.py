@@ -1,4 +1,4 @@
-"""Public fixed-parameter Pi-PLS regression estimator."""
+"""Public fixed-parameter Π-PLS regression estimator."""
 
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ class PiPLSRegression(
     MultiOutputMixin,  # type: ignore[misc]
     BaseEstimator,  # type: ignore[misc]
 ):
-    r"""Pi-PLS regression for one fixed pair $(h, r_\pi)$.
+    r"""Π-PLS regression for one fixed pair $(h, r_\pi)$.
 
     Parameters
     ----------
@@ -90,7 +90,7 @@ class PiPLSRegression(
         Algebraic upper bound ``min(n_features_in_, n_samples - 1)`` for the
         fitted data.
     decomposition_ : PiPLSDecomposition
-        Immutable Pi-PLS predictor directions, dilations, response directions,
+        Immutable Π-PLS predictor directions, dilations, response directions,
         and numerical diagnostics.
     coef_ : ndarray of shape (n_targets_, n_features_in_)
         Regression coefficients in original predictor and response units.
@@ -149,7 +149,7 @@ class PiPLSRegression(
         self.random_state = random_state
 
     def fit(self, X: ArrayLike, y: ArrayLike) -> PiPLSRegression:
-        """Fit one fixed Pi-PLS model.
+        """Fit one fixed Π-PLS model.
 
         Parameters
         ----------

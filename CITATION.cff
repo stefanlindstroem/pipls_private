@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite the software and the companion manuscript."
-title: "pipls: Pi-PLS multivariate regression for Python"
+title: "pipls: Π-PLS multivariate regression for Python"
 type: software
 version: "0.0.0"
 license: BSD-3-Clause

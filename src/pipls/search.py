@@ -1,4 +1,4 @@
-"""Pipeline-aware cross-validated Pi-PLS model selection."""
+"""Pipeline-aware cross-validated Π-PLS model selection."""
 
 from __future__ import annotations
 
@@ -221,7 +221,7 @@ class PiPLSSearchCV(
     MetaEstimatorMixin,  # type: ignore[misc]
     BaseEstimator,  # type: ignore[misc]
 ):
-    r"""Cross-validated search over the admissible Pi-PLS rank path.
+    r"""Cross-validated search over the admissible Π-PLS rank path.
 
     Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
     independently inside each training fold. Selection inspection, final
@@ -235,7 +235,7 @@ class PiPLSSearchCV(
     Parameters
     ----------
     estimator : PiPLSRegression, sklearn.pipeline.Pipeline or None, default=None
-        Direct Pi-PLS estimator or pipeline whose final step is
+        Direct Π-PLS estimator or pipeline whose final step is
         :class:`pipls.PiPLSRegression`. Path preflight and candidate evaluation
         replace only ``n_components`` and ``predictor_rank``; settings such as
         ``scale``, ``copy``, ``svd_solver``, and ``random_state`` are retained
@@ -342,7 +342,7 @@ class PiPLSSearchCV(
         *,
         groups: ArrayLike | None = None,
     ) -> PiPLSSearchCV:
-        """Evaluate the admissible Pi-PLS rank path.
+        """Evaluate the admissible Π-PLS rank path.
 
         Parameters
         ----------
@@ -593,7 +593,7 @@ class PiPLSSearchCV(
         relative_tolerance: float | None = None,
         absolute_tolerance: float = np.inf,
     ) -> PiPLSSelection:
-        """Return one immutable Pi-PLS selection.
+        """Return one immutable Π-PLS selection.
 
         Exactly one of ``rule`` and ``n_components`` must be supplied. A named
         rule selects one stored component-path row; a component count retrieves
@@ -1111,7 +1111,7 @@ def _validate_supported_estimator(estimator: Any) -> None:
 
 
 def _resolve_pipls_param_prefix(template: Any) -> str:
-    """Return the unique supported Pi-PLS parameter prefix."""
+    """Return the unique supported Π-PLS parameter prefix."""
 
     _validate_supported_estimator(template)
     if isinstance(template, PiPLSRegression):
@@ -1191,7 +1191,7 @@ def _prepare_fold_pipls_inputs(
     X: ArrayLike,
     y: ArrayLike,
 ) -> tuple[PiPLSRegression, Any]:
-    """Fit fold-local preprocessing and return its final Pi-PLS template and X."""
+    """Fit fold-local preprocessing and return its final Π-PLS template and X."""
 
     if isinstance(template, PiPLSRegression):
         return clone(template), X

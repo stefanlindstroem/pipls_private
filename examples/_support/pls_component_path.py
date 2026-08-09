@@ -1,4 +1,4 @@
-"""Evaluate a standard PLS component path for comparison with Pi-PLS."""
+"""Evaluate a standard PLS component path for comparison with Π-PLS."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Theory-faithful fixed-parameter Pi-PLS numerical core.
+"""Theory-faithful fixed-parameter Π-PLS numerical core.
 
 This private module operates on predictor and response matrices that have already
 been centered and, when requested by a caller, scaled. It contains no estimator,
@@ -51,7 +51,7 @@ class _PredictorRankInfeasibleError(ValueError):
 
 @dataclass(frozen=True)
 class PiPLSCoreResult:
-    """Result of the fixed-parameter Pi-PLS construction.
+    """Result of the fixed-parameter Π-PLS construction.
 
     Attributes
     ----------
@@ -108,7 +108,7 @@ def fit_pipls_core(
     svd_solver: SVDSolver = "full",
     random_state: int | np.random.RandomState | None = 0,
 ) -> PiPLSCoreResult:
-    r"""Fit the fixed-parameter Pi-PLS core to preprocessed matrices.
+    r"""Fit the fixed-parameter Π-PLS core to preprocessed matrices.
 
     Parameters
     ----------

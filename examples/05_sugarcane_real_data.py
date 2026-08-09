@@ -1,4 +1,4 @@
-"""Fit and inspect a Sugarcane Pi-PLS model directly in memory."""
+"""Fit and inspect a Sugarcane Π-PLS model directly in memory."""
 
 from pathlib import Path
 
@@ -392,7 +392,7 @@ def main() -> None:
 
     print(f"X shape: {X.shape}; Y shape: {Y.shape}")
     print(
-        "Selected Pi-PLS: "
+        "Selected Π-PLS: "
         f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
     )
     print(

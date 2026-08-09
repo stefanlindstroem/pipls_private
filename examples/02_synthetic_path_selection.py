@@ -1,4 +1,4 @@
-"""Inspect a component path, select one pair, and fit synthetic Pi-PLS."""
+"""Inspect a component path, select one pair, and fit synthetic Π-PLS."""
 
 from pathlib import Path
 
@@ -190,7 +190,7 @@ figure.savefig(ANALYSIS_DIR / "observed_vs_predicted.pdf")
 plt.close(figure)
 # --8<-- [end:plot-synthetic-predictions]
 
-print("Synthetic Pi-PLS path-selection example")
+print("Synthetic Π-PLS path-selection example")
 print(f"Training data: X{train.X.shape}, Y{train.Y.shape}")
 print(f"Independent test data: X{test.X.shape}, Y{test.Y.shape}")
 print(

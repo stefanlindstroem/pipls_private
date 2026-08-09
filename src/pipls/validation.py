@@ -1,4 +1,4 @@
-"""Structured out-of-fold reporting for public Pi-PLS estimators."""
+"""Structured out-of-fold reporting for public Π-PLS estimators."""
 
 from __future__ import annotations
 
@@ -81,7 +81,7 @@ def _validated_oof_fields(
 
 @dataclass(frozen=True)
 class PiPLSOOFReport:
-    """Immutable OOF diagnostics for one existing Pi-PLS selection.
+    """Immutable OOF diagnostics for one existing Π-PLS selection.
 
     Parameters
     ----------

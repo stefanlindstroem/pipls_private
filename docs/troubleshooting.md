@@ -3,12 +3,11 @@
 This page collects common public-API problems. It focuses on actions a programming user can take
 without relying on private implementation details.
 
-## I do not know the two ranks
+## Do I need to choose `predictor_rank`?
 
-Use `PiPLSSearchCV` rather than guessing both values. The search object evaluates admissible
-`(n_components, predictor_rank)` pairs, where `n_components` counts paired latent modes and
-`predictor_rank` is the retained predictor-subspace dimension. It retains one conditionally selected
-predictor rank for each paired-mode count and exposes the concise result through `component_path_`.
+Usually not. For ordinary use, treat `n_components` as the model-complexity parameter, as you would
+in PLS. `PiPLSSearchCV` evaluates the component path and resolves one predictor rank conditionally
+for every evaluated component count.
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
@@ -16,8 +15,10 @@ path = search.component_path_
 model = search.refit(X, Y, n_components=2)
 ```
 
-Inspect `path` before choosing the component count. The returned model already uses the
-conditionally selected predictor rank stored for that row. Continue with the
+Inspect `path` before choosing the component count. The returned model already uses the retained
+predictor rank stored for that row. Advanced users can inspect
+`search.predictor_rank_profile(h)` or constrain the predictor-rank search when statistical support
+or scientific interpretation motivates direct control. Continue with the
 [synthetic tutorial](tutorials/synthetic.md) or the [path-selection reference](api/path.md).
 
 ## I need to change scaling or the SVD solver during search

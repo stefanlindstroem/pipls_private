@@ -1,4 +1,4 @@
-"""Compare Pi-PLS and ordinary PLS component paths on the reference datasets."""
+"""Compare Π-PLS and ordinary PLS component paths on the reference datasets."""
 
 from pathlib import Path
 
@@ -39,7 +39,7 @@ for dataset, (X, Y), search in (
         cv=CV,
     )
     if not np.array_equal(pipls_path.n_components, pls_path.n_components):
-        raise RuntimeError("Pi-PLS and PLS paths must contain the same component counts.")
+        raise RuntimeError("Π-PLS and PLS paths must contain the same component counts.")
 
     figure, axis = plt.subplots(
         figsize=(8.0, 5.0),

@@ -1,4 +1,4 @@
-"""Deterministic synthetic data generators for Pi-PLS."""
+"""Deterministic synthetic data generators for Π-PLS."""
 
 from __future__ import annotations
 
@@ -234,7 +234,7 @@ def make_pipls_regression(
     noise: NoiseSpec = 0.1,
     random_state: int = 0,
 ) -> PiPLSDataset:
-    r"""Generate one deterministic Pi-PLS latent-structure dataset.
+    r"""Generate one deterministic Π-PLS latent-structure dataset.
 
     Shared latent scores affect both ``X`` and ``Y``. Predictor-specific scores
     affect only ``X`` and response-specific scores affect only ``Y``.

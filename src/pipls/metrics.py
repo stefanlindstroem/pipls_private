@@ -1,4 +1,4 @@
-"""Scoring utilities for Pi-PLS model selection."""
+"""Scoring utilities for Π-PLS model selection."""
 
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def response_standardized_mse(
     Parameters
     ----------
     estimator : estimator
-        Fitted Pi-PLS estimator, or pipeline ending in one. The scorer uses
+        Fitted Π-PLS estimator, or pipeline ending in one. The scorer uses
         private response-scale state learned during fitting.
     X : array-like of shape (n_samples, n_features)
         Predictor observations to score.
@@ -67,7 +67,7 @@ def neg_response_standardized_mse(
     Parameters
     ----------
     estimator : estimator
-        Fitted Pi-PLS estimator or compatible pipeline.
+        Fitted Π-PLS estimator or compatible pipeline.
     X : array-like of shape (n_samples, n_features)
         Predictor observations to score.
     y : array-like of shape (n_samples,) or (n_samples, n_targets)

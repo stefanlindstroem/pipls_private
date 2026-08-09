@@ -1,4 +1,4 @@
-"""Fit Pi-PLS on the package-owned Pulp data and plot fitted responses."""
+"""Fit Π-PLS on the package-owned Pulp data and plot fitted responses."""
 
 from pathlib import Path
 
