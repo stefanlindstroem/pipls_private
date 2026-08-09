@@ -43,17 +43,15 @@ python -m pip install ".[examples]"
 ```
 
 The example imports the estimators, repeated cross-validation, numerical inspection functions,
-Matplotlib, and `adjustText`, then defines the output location, diagnostic-response limit, and
-validation splitter:
+Matplotlib, and `adjustText`, then defines the output location and validation splitter:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:pulp-tutorial-setup"
 ```
 
 The component count is intentionally absent from this setup block. It is introduced only after the
-component path has been inspected. The first three response columns are shown only in pointwise
-diagnostic figures to keep the demonstration legible; the RMSE summary still includes all eight
-responses.
+component path has been inspected. The pointwise diagnostic figures and RMSE summary include all
+eight response columns.
 
 ## The data and modeling question
 
@@ -487,8 +485,7 @@ python examples/04_pulp_real_data.py
 Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.
 `make docs-figures` regenerates the twelve representative single-chart SVGs displayed here, while
 the numbered example writes ten caller-owned PDFs with additional score, loading, factorization,
-and coefficient views. Both routes calculate directly from in-memory results and write no
-analytical CSV intermediates. See
+and coefficient views. Both routes calculate their figures directly from in-memory results. See
 [Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the
 strict documentation-build and source-distribution checks.
 

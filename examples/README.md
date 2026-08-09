@@ -60,12 +60,10 @@ Grouped and temporal validation require application-specific sampling semantics 
   first inspects the unselected component path, creates the declared three-component selection,
   inspects its selected path, rank evidence, and selection-conditioned OOF predictions, refits the
   exact same selection, orients the displayed factors so the tensile-index response is positive,
-  and writes seven final PDF figures
-  directly from in-memory results.
+  and writes ten final PDF figures directly from in-memory results.
 - `05_sugarcane_real_data.py`: the direct reference workflow. It evaluates the path, creates one
   manual selection, inspects its conditional predictor-rank evidence, computes an OOF report, refits
-  that selection, and writes six wavelength-aware final PDF figures without generated analytical
-  CSV files.
+  that selection, and writes six wavelength-aware final PDF figures.
 - `06_tobacco_real_data.py`: adaptive Π-PLS predictor-rank scanning with explicit full predictor
   SVD and two separately named 10% relative tolerances. The search constructor applies the
   predictor-rank tolerance independently at each component count; `search.select()` then applies the
@@ -83,7 +81,8 @@ results, and only then compose figures. Tobacco replaces the manual component-co
 two explicit 10% relative-tolerance decisions described above. Sugarcane and Tobacco each write
 `component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
 `latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Pulp writes those
-six figures plus `selected_component_path.pdf`. For Tobacco,
+six figures plus `selected_component_path.pdf`, `final_fit_observed_vs_predicted.pdf`,
+`final_fit_r2.pdf`, and `final_fit_residual_distribution.pdf`. For Tobacco,
 `prediction_diagnostics.pdf` and `coefficients.pdf` each contain three source-order response pages.
 `make examples` runs every numbered example in filename order, including the slower real-data
 workflows. It remains separate from `make check`.
@@ -140,8 +139,8 @@ component-path figures; the same object is then passed to OOF reporting and fina
 Tobacco owns its full-SVD configuration, response pagination, and multipage PDF output visibly.
 
 Full-data factor, score, loading, and coefficient figures are interpretive. Prediction and residual
-figures retain explicit provenance. Numbered examples never serialize analytical results for later
-plotting and do not read repository CSV files. Sugarcane derives its strictly increasing wavelength
+figures retain explicit provenance. Numbered examples render their figures directly from in-memory
+analysis results. Sugarcane derives its strictly increasing wavelength
 coordinate from `data.feature_names`. Tobacco derives its decreasing wavenumber coordinate and all
 thirteen source-order response names from the same immutable dataset result. Generated files under
 `examples/results/` are ignored by Git.

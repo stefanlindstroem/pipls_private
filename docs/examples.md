@@ -14,7 +14,7 @@ the maintained scripts.
 | `01_pulp_quick_start.py` | Short automatic workflow on Pulp: select by a CV rule, refit, and inspect fitted predictions | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Learn manual component selection on synthetic train/test data, including path and optional predictor-rank inspection | Four PDF figures and printed external-test $R^2$ |
 | `03_pls_path_comparison.py` | Compare matched Π-PLS and ordinary PLS CV component paths without choosing a final model | One comparison PDF for each reference dataset |
-| `04_pulp_real_data.py` | Full manual-selection workflow on Pulp: choose $h$ explicitly, review selection-conditioned OOF evidence, refit, and interpret the model | Seven PDF figures |
+| `04_pulp_real_data.py` | Full manual-selection workflow on Pulp: choose $h$ explicitly, review selection-conditioned OOF evidence, refit, and interpret the model | Ten PDF figures |
 | `05_sugarcane_real_data.py` | Manual-selection spectral workflow on Sugarcane with wavelength-aware model inspection | Six PDF figures |
 | `06_tobacco_real_data.py` | Full automated-selection spectral workflow on Tobacco using separate relative-tolerance rules for $r_\pi$ and $h$ | Six PDFs, including threshold-annotated rank and component profiles |
 
@@ -70,7 +70,7 @@ report, and then fit that exact row on all observations:
   responses. It first presents the unselected component path, creates the declared manual
   selection, reviews the selected path, conditional predictor-rank profile, and
   selection-conditioned OOF predictions, refits the same selection, calculates immutable
-  fitted-model results, and then renders seven figures;
+  fitted-model results, and then renders ten figures;
 - `examples/05_sugarcane_real_data.py`: the direct reference workflow with the same ordering,
   wavelength-aware inspection, and six final PDF figures;
 - `examples/06_tobacco_real_data.py`: a complete spectral workflow with two explicit parsimony
@@ -124,9 +124,11 @@ selection object, and the [component-path API reference](api/path.md) gives the 
 
 Sugarcane and Tobacco each write six final PDF figures, including
 `predictor_rank_profile.pdf`. Pulp writes those six figures plus
-`selected_component_path.pdf`. Tobacco retains three-page prediction-diagnostic and coefficient
-PDFs. No numbered example writes a generated CSV file: Pulp, Sugarcane, and Tobacco are supplied by
-their named `pipls.datasets` loaders. Every figure is constructed directly from
+`selected_component_path.pdf` and the three final-fit diagnostics
+`final_fit_observed_vs_predicted.pdf`, `final_fit_r2.pdf`, and
+`final_fit_residual_distribution.pdf`. Tobacco retains three-page prediction-diagnostic and
+coefficient PDFs. Pulp, Sugarcane, and Tobacco are supplied by their named `pipls.datasets`
+loaders. Every figure is constructed directly from
 `component_path_`, conditional predictor-rank profiles, explicit OOF reports for retained
 selections, and immutable inspection results. The Pulp factor view anchors every component to a
 positive tensile-index (`TI`) response entry; Sugarcane and Tobacco retain the default

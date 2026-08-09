@@ -390,9 +390,9 @@ CV-MSE. Its search policies and the practical real-data workflows documented els
 redefined by this theory page and need not duplicate the manuscript’s experimental choices.
 
 The package offers two synthetic-data purposes. `make_pipls_latent_geometry()` implements the
-companion manuscript’s Gaussian latent data-generating model directly. The older
-`make_pipls_regression()` and `make_pipls_train_test()` functions remain broader configurable
-package generators. See the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
+companion manuscript’s Gaussian latent data-generating model directly.
+`make_pipls_regression()` and `make_pipls_train_test()` provide broader configurable package
+generators. See the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
 for the exact distribution and reproducibility boundary, and the
 [dataset and generator guide](datasets.md) for the broader package distinction.
 
