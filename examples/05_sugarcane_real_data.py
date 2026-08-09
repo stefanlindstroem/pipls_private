@@ -237,6 +237,7 @@ def _plot_prediction_diagnostics(
     axes[2].set_xticklabels(response_names)
     axes[2].set_xlabel("Response")
     axes[2].set_ylabel("Standardized RMSE")
+    axes[2].set_ylim(0.0, 1.0)
     axes[0].legend()
     axes[1].legend()
     figure.suptitle(

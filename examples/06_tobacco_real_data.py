@@ -314,6 +314,7 @@ def _write_prediction_diagnostics_report(
             )
             axes[2].set_xlabel("Response")
             axes[2].set_ylabel("Standardized RMSE")
+            axes[2].set_ylim(0.0, 1.0)
             if len(responses) > 1:
                 axes[0].legend()
                 axes[1].legend()

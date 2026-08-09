@@ -372,6 +372,7 @@ def _render_standardized_rmse(
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
     axis.set_ylabel("Standardized RMSE")
+    axis.set_ylim(0.0, 1.0)
     axis.set_title(rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}")
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
@@ -432,9 +433,7 @@ def _render_final_fit_r2(
     axis.set_xlabel("Response")
     axis.set_ylabel(r"Fitted $R^2$")
     axis.set_title(r"Final $\Pi$-PLS fit: response-wise $R^2$")
-    lower = min(0.0, float(np.min(diagnostics.response_r2)))
-    margin = 0.05 * max(1.0, 1.0 - lower)
-    axis.set_ylim(lower - margin, 1.0 + margin)
+    axis.set_ylim(0.0, 1.0)
     axis.grid(axis="y", alpha=0.2)
     _save_svg(figure, output_path)
 
