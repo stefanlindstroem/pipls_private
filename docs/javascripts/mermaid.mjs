@@ -6,7 +6,7 @@ const PIPLS_MERMAID_HOST_CSS = `
   --pipls-mermaid-node-stroke: #000044;
   --pipls-mermaid-node-stroke-width: 0;
   --pipls-mermaid-node-text: #ffffff;
-  --pipls-mermaid-node-font-size: small;
+  --pipls-mermaid-node-font-size: medium;
   --pipls-mermaid-node-line-height: 1.15;
   --pipls-mermaid-node-radius: 0.5ex;
 
