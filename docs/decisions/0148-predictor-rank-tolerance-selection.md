@@ -2,10 +2,11 @@
 
 ## Status
 
-Accepted and implemented. All five patches are complete. The public constructor controls,
-hierarchical conditioned path, immutable predictor-rank evidence, conditioned-path selection
-rules, separate 10% Tobacco predictor-rank and component-count demonstration, and final migration,
-distribution, link, and repository audits are complete.
+Accepted and implemented for hierarchical predictor-rank tolerance selection. Decision 0154
+supersedes only the former `"max"`/`"maximum"` fixed-policy clauses by introducing explicit EPV
+and full-domain automatic search; implementation of that accepted migration is pending. The
+constructor tolerance controls, immutable optimized-rank evidence, conditioned-path selection
+rules, and completed validation remain current.
 
 ## Context
 

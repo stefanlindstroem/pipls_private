@@ -1,7 +1,9 @@
 # Decision 0009: public parameter validation and statistical-support warning
 
-Status: accepted and refined by Decisions 0039 and 0153. Fixed-estimator validation now covers only
-explicit ranks and warns at $n/r_\pi<3$; rank-bound validation remains in `PiPLSSearchCV`.
+Status: accepted and refined by Decisions 0039, 0153, and 0154. Fixed-estimator validation now
+covers only explicit ranks and warns at $n/r_\pi<3$. Decision 0154 moves the low-$c$ search
+warning to the explicit EPV policy and removes the `max_predictor_rank="rule"` sentinel; that
+runtime migration is pending.
 
 ## Context
 

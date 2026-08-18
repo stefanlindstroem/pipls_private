@@ -1,7 +1,9 @@
 # Decision: 0007-predictor-rank-search-policies
 
 Status: accepted and implemented in `PiPLSSearchCV`; Decision 0039 removes these search modes from
-`PiPLSRegression`.
+`PiPLSRegression`. Decision 0154 keeps both coverage algorithms but makes exhaustive coverage the
+accepted default and removes the separate `predictor_rank_values="max"` policy; implementation is
+pending.
 
 ## Context
 

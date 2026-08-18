@@ -3,7 +3,9 @@
 ## Status
 
 Accepted and implemented for `PiPLSSearchCV`. This decision refines the rank-bound policy in
-Decision 0003; fixed `PiPLSRegression` no longer derives a rank ceiling.
+Decision 0003; fixed `PiPLSRegression` no longer derives a rank ceiling. Decision 0154 preserves
+the full-sample convention only for the explicit EPV policy and removes it from the general search
+ceiling; implementation of that accepted change is pending.
 
 ## Context
 

@@ -51,13 +51,15 @@ This registry lists only numbered decisions that still define current behavior o
 | `0148-predictor-rank-tolerance-selection.md` | predictor-rank tolerance selection | constructor tolerances, immutable rank evidence, conditioned component rules, and separate 10% Tobacco predictor-rank and component-count demonstration |
 | `0152-selection-review-feedback-workflow.md` | selection-review feedback workflow | inspect the unselected path before selecting, review conditional evidence with one feedback edge, and reserve qualification or validation for independent assessment |
 | `0153-independent-block-scaling-controls.md` | independent predictor and response scaling controls | retain `scale` as the compatibility default while allowing fold-local pipeline predictor scaling and Pi-PLS response scaling to be controlled independently |
+| `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | accepted migration to exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
 
 ## Implemented clarifications
 
 - `PiPLSRegression` fits one explicit pair; `PiPLSSearchCV` owns path evaluation, selection, OOF
   reporting, and explicit final refitting.
-- Predictor-rank search uses `"adaptive"` and `"exhaustive"`; earlier pre-release values have no
-  aliases.
+- Predictor-rank search currently implements `"adaptive"` and `"exhaustive"`; Decision 0154
+  accepts a staged migration to exhaustive full-feasible automatic coverage plus an explicit
+  `"epv"` fixed-rank policy. The runtime migration is pending.
 - The only named component-count rules are `best_score` and tolerance-based `minimum_cv_mse`;
   `cv_mse_std` is descriptive population split SD.
 - OOF reporting and final refitting may consume the same compatible immutable selection. OOF reports

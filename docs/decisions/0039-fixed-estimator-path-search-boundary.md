@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted and fully implemented.
+Accepted and fully implemented for estimator/search ownership. Decision 0154 supersedes only the
+search support ceiling and default coverage policy recorded here; that migration is pending.
 
 ## Context
 

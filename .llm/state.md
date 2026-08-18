@@ -172,7 +172,12 @@ scientific, numerical, API, data, documentation, compatibility, and repository c
 migrations and cleanup sequences are summarized in `docs/decisions/history.md` and mapped in
 `docs/decisions/retirements.md`.
 
-Predictor-rank coverage uses the public values `"adaptive"` and `"exhaustive"` under Decision 0007.
+The implemented runtime still uses the pre-Decision-0154 predictor-rank contract: `"adaptive"` is
+the default coverage policy, the ordinary search ceiling contains the samples-per-rank support
+term, and the fixed `"max"` policy remains present. Decision 0154 is accepted but not yet
+implemented. Its staged migration will make exhaustive full-feasible coverage the default, add
+explicit `"epv"`, remove `"max"`/`"rule"`, and confine `samples_per_predictor_rank` to EPV. User
+documentation must continue to describe the implemented boundary until the behavioral patch lands.
 The served computational-performance guide documents fit counts, validation repetitions, rank
 coverage, SVD choices, parallelism, OOF reuse, and work inspection.
 

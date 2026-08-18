@@ -49,10 +49,11 @@ tolerances are search-constructor controls because they determine `component_pat
 tolerances remain post-search `select()` and `refit()` controls. Exact numerical ties and adaptive
 candidate coverage remain separate from substantive parsimony tolerances.
 
-`search_method="adaptive"` is the default predictor-rank coverage policy and
-`search_method="exhaustive"` requests complete admissible-rank coverage. The parameter name and
-`search_is_exhaustive_` fitted diagnostic remain unchanged, and former pre-release values have no
-compatibility aliases.
+The implemented runtime still has `search_method="adaptive"` as the default predictor-rank
+coverage policy and `search_method="exhaustive"` as the complete-coverage option. Decision 0154
+accepts exhaustive coverage as the new default over the full hard-feasible domain; the public
+behavior changes only in Patch 3. The parameter name and `search_is_exhaustive_` fitted diagnostic
+remain part of the target surface.
 
 Decision 0143 implements `refit(selection=...)` as the exact-selection handoff for analytical
 workflows. Rule-based and component-count refitting remain the compact route. Existing selections
@@ -84,8 +85,21 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-No accepted implementation sequence is active. Current maintenance should address explicit owner
-requests in bounded patches while preserving the implemented numerical and product boundaries.
+Decision 0154 authorizes the active seven-patch predictor-rank migration. The accepted target is
+full-feasible automatic rank optimization with exhaustive coverage by default, an explicit EPV
+fixed-rank policy, and no pre-release `"max"`/`"rule"` shortcut. Implementation remains staged so
+that each boundary is independently reviewable:
+
+1. record Decision 0154 and synchronize the maintainer roadmap;
+2. separate hard-feasibility and EPV helper calculations without changing runtime behavior;
+3. change the public search defaults, policy vocabulary, and rank-domain semantics;
+4. add focused behavioral regression coverage for the new scientific/API contract;
+5. update maintained examples and regenerate tutorial evidence from execution;
+6. rewrite user and maintainer documentation around rank domain, coverage, and EPV;
+7. complete release, installed-package, distribution, and stale-contract audits.
+
+Until Patch 3 lands, source and user guides remain on the implemented pre-migration API. Patch 2
+must therefore be behavior-preserving.
 
 ## Deferred work
 

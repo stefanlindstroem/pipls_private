@@ -1,7 +1,8 @@
 # Decision: 0003-predictor-rank-selection
 
 Status: historical selection design. Decision 0039 supersedes the `PiPLSRegression` search
-modes; the rank ceiling and adaptive/exhaustive policies remain implemented in `PiPLSSearchCV`.
+modes. Decision 0154 supersedes the general $n/c$ search ceiling and assigns that heuristic
+only to the explicit EPV policy; implementation of that accepted change is pending.
 
 For total supplied sample count $n$, smallest training-set size $n_{\mathrm{train,min}}$,
 predictor count $p$, and positive numeric `samples_per_predictor_rank` value $c$, the shared

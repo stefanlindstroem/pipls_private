@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted.
+Accepted. Decision 0154 preserves fold numerical-rank preflight but removes the $n/c$ term from
+the general search ceiling and confines it to EPV; implementation of that accepted change is
+pending.
 
 ## Context
 
