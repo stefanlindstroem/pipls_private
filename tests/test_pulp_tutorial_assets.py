@@ -90,7 +90,7 @@ def test_pulp_tutorial_renderer_records_repeated_cv_and_valid_figures(
     analysis = manifest["analysis"]
     assert analysis["chosen_n_components"] == 3
     assert analysis["chosen_predictor_rank"] == 9
-    assert analysis["evaluated_predictor_ranks"] == list(range(3, 11))
+    assert analysis["evaluated_predictor_ranks"] == list(range(3, 15))
     assert analysis["cross_validation"] == {
         "splitter": "RepeatedKFold",
         "n_splits": 5,

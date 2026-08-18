@@ -49,7 +49,7 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert regression.predictor_rank == 3
     assert not hasattr(regression, "cv")
     assert not hasattr(regression, "samples_per_predictor_rank")
-    assert search.samples_per_predictor_rank == 5.0
+    assert search.samples_per_predictor_rank == 10.0
     assert search.cv == 5
     assert search.n_components_values == "all"
     assert search.scoring == "neg_response_standardized_mse"
@@ -64,7 +64,7 @@ def test_path_defaults_have_stable_signature_and_repr() -> None:
     assert signature.parameters["scoring"].default == (
         "neg_response_standardized_mse"
     )
-    assert signature.parameters["search_method"].default == "adaptive"
+    assert signature.parameters["search_method"].default == "exhaustive"
     assert "0x" not in str(signature)
     path = PiPLSSearchCV()
     cloned = clone(path)

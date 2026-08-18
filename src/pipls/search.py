@@ -66,7 +66,7 @@ Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
 Scoring = str | Scorer | None
 SearchMethod = Literal["adaptive", "exhaustive"]
 ComponentValues = Sequence[int] | Literal["all"]
-PredictorRankValues = Sequence[int] | Literal["max"] | None
+PredictorRankValues = Sequence[int] | Literal["epv"] | None
 _DEFAULT_SCORING_NAME = "neg_response_standardized_mse"
 _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK = 5.0
 _CONTROLLED_FIT_WARNING_CATEGORIES = (PredictorRankSupportWarning,)
@@ -229,9 +229,8 @@ class PiPLSSearchCV(
     full-data fitting, and selection-conditioned out-of-fold reporting are
     explicit post-fit :meth:`select`, :meth:`refit`,
     and :meth:`oof_report` operations. The default
-    ``search_method="adaptive"`` applies
-    a deterministic logarithmic coarse-to-fine predictor-rank search separately
-    for each paired-mode count.
+    ``search_method="exhaustive"`` evaluates the complete hard-feasible
+    predictor-rank domain for each paired-mode count.
 
     Parameters
     ----------
@@ -245,31 +244,33 @@ class PiPLSSearchCV(
         the ordinary :class:`pipls.PiPLSRegression` defaults for other settings.
     n_components_values : sequence of int or "all", default="all"
         Positive paired latent-mode counts to evaluate. ``"all"`` uses every value
-        from
-        one through ``min(n_targets_, max_predictor_rank_)``.
-    predictor_rank_values : sequence of int, "max" or None, default=None
-        Admissible predictor ranks. ``None`` makes every rank from one through
-        ``max_predictor_rank_`` available; ``search_method`` determines which
-        are evaluated. A one-element sequence fixes one rank, a longer sequence
-        defines an explicit set, and ``"max"`` uses ``max_predictor_rank_`` for
-        every paired-mode count.
+        from one through the smaller of ``n_targets_`` and the largest predictor
+        rank available under ``predictor_rank_values``.
+    predictor_rank_values : sequence of int, "epv" or None, default=None
+        Predictor-rank policy. ``None`` makes every rank from one through
+        ``max_predictor_rank_`` available for optimization; ``search_method``
+        determines candidate coverage. A one-element sequence fixes one rank, a
+        longer sequence defines an explicit optimization domain, and ``"epv"``
+        fixes one rank using the events-per-variable-inspired rule controlled by
+        ``samples_per_predictor_rank``.
     predictor_rank_relative_tolerance : float or None, default=None
         Configured-score relative tolerance for conditional predictor-rank
         selection. ``None`` resolves to ``sqrt(machine epsilon)``.
     predictor_rank_absolute_tolerance : float, default=inf
         Configured-score absolute tolerance for conditional predictor-rank
         selection. Positive infinity disables the absolute cap.
-    max_predictor_rank : int or "rule", default="rule"
-        ``"rule"`` applies the total-sample support rule together with
-        dimensional and verified numerical-rank caps from every training fold.
-        A positive integer imposes an additional upper bound but bypasses only
-        the support rule.
-    search_method : {"adaptive", "exhaustive"}, default="adaptive"
+    max_predictor_rank : int or None, default=None
+        Optional positive user-imposed upper restriction. ``None`` leaves the
+        predictor-rank domain limited only by fold-dimensional and verified
+        numerical-rank feasibility.
+    search_method : {"adaptive", "exhaustive"}, default="exhaustive"
         ``"exhaustive"`` evaluates every admissible pair. ``"adaptive"`` uses
-        the deterministic adaptive search and may skip pairs.
-    samples_per_predictor_rank : float, default=5
-        Positive support parameter $c$ for ``max_predictor_rank="rule"``. Values
-        below five issue :class:`pipls.PredictorRankSupportWarning`.
+        the deterministic adaptive search and may skip pairs when multiple ranks
+        are available.
+    samples_per_predictor_rank : float, default=10
+        Positive EPV parameter $c$, used only when
+        ``predictor_rank_values="epv"``. Values below five issue
+        :class:`pipls.PredictorRankSupportWarning`.
     cv : int, splitter, iterable or None, default=5
         Cross-validation specification. ``None`` requests the standard five-fold
         regression split.
@@ -292,8 +293,8 @@ class PiPLSSearchCV(
     n_splits_ : int
         Number of materialized cross-validation splits.
     max_predictor_rank_ : int
-        Effective predictor-rank upper bound after support, dimensional, and
-        verified fold-numerical-rank constraints.
+        Effective predictor-rank upper bound after fold-dimensional, verified
+        numerical-rank, and optional explicit user constraints.
     search_is_exhaustive_ : bool
         Whether every admissible pair was evaluated.
     scorer_ : callable
@@ -317,9 +318,9 @@ class PiPLSSearchCV(
         predictor_rank_values: PredictorRankValues = None,
         predictor_rank_relative_tolerance: float | None = None,
         predictor_rank_absolute_tolerance: float = np.inf,
-        max_predictor_rank: int | Literal["rule"] = "rule",
-        search_method: SearchMethod = "adaptive",
-        samples_per_predictor_rank: float = 5.0,
+        max_predictor_rank: int | None = None,
+        search_method: SearchMethod = "exhaustive",
+        samples_per_predictor_rank: float = 10.0,
         cv: object = 5,
         scoring: Scoring = _DEFAULT_SCORING_NAME,
         n_jobs: int | None = None,
@@ -418,29 +419,13 @@ class PiPLSSearchCV(
             n_samples=int(X_array.shape[0]),
             n_train_min=materialized.n_train_min,
         )
-        if self.max_predictor_rank == "rule":
-            epv_limit = _epv_predictor_rank(
-                n_features=fold_feature_limit,
-                n_samples=int(X_array.shape[0]),
-                samples_per_predictor_rank=self.samples_per_predictor_rank,
-            )
-            self.max_predictor_rank_ = min(
-                dimensional_limit,
-                epv_limit,
-                fold_numerical_rank_limit,
-            )
-        else:
-            self.max_predictor_rank_ = min(
-                int(self.max_predictor_rank),
-                dimensional_limit,
-                fold_numerical_rank_limit,
-            )
-
-        h_limit = min(self.n_targets_, self.max_predictor_rank_)
-        component_values = _validated_component_values(
-            self.n_components_values,
-            upper=h_limit,
+        hard_limit = min(dimensional_limit, fold_numerical_rank_limit)
+        self.max_predictor_rank_ = (
+            hard_limit
+            if self.max_predictor_rank is None
+            else min(int(self.max_predictor_rank), hard_limit)
         )
+
         predictor_rank_policy = _predictor_rank_policy(self.predictor_rank_values)
         (
             predictor_rank_relative_tolerance,
@@ -450,9 +435,15 @@ class PiPLSSearchCV(
             relative_tolerance=self.predictor_rank_relative_tolerance,
             absolute_tolerance=self.predictor_rank_absolute_tolerance,
         )
-        if isinstance(self.predictor_rank_values, str):
+        if predictor_rank_policy == "epv":
+            epv_rank = _epv_predictor_rank(
+                n_features=fold_feature_limit,
+                n_samples=int(X_array.shape[0]),
+                samples_per_predictor_rank=self.samples_per_predictor_rank,
+            )
             predictor_rank_values = np.asarray(
-                [self.max_predictor_rank_], dtype=np.intp
+                [min(epv_rank, self.max_predictor_rank_)],
+                dtype=np.intp,
             )
         else:
             predictor_rank_values = _validated_integer_values(
@@ -461,6 +452,12 @@ class PiPLSSearchCV(
                 lower=1,
                 upper=self.max_predictor_rank_,
             )
+
+        h_limit = min(self.n_targets_, int(np.max(predictor_rank_values)))
+        component_values = _validated_component_values(
+            self.n_components_values,
+            upper=h_limit,
+        )
         admissible = tuple(
             (int(h), int(r))
             for h in component_values
@@ -1052,31 +1049,33 @@ class PiPLSSearchCV(
         return tags
 
     def _validate_constructor_parameters(self, template: Any) -> Scorer:
+        _validate_component_values(self.n_components_values)
+        _validate_predictor_rank_values(self.predictor_rank_values)
+        predictor_rank_policy = _predictor_rank_policy(self.predictor_rank_values)
         samples_per_rank = _as_positive_float(
             self.samples_per_predictor_rank,
             name="samples_per_predictor_rank",
         )
+        if predictor_rank_policy != "epv" and samples_per_rank != 10.0:
+            raise ValueError(
+                "Nondefault samples_per_predictor_rank requires "
+                'predictor_rank_values="epv".'
+            )
         if (
-            self.max_predictor_rank == "rule"
+            predictor_rank_policy == "epv"
             and samples_per_rank < _MIN_TRUSTED_SAMPLES_PER_PREDICTOR_RANK
         ):
             warnings.warn(
                 f"samples_per_predictor_rank={samples_per_rank:g} is below 5. "
-                "This permits fewer than five supplied samples per retained predictor-rank "
-                "direction, so the resulting rank bound may not have sufficient statistical "
-                "support to be trusted without external validation.",
+                "The EPV policy then permits fewer than five supplied samples per "
+                "retained predictor-rank direction, so the selected rank may not have "
+                "sufficient statistical support to be trusted without external validation.",
                 PredictorRankSupportWarning,
                 stacklevel=3,
             )
-        if self.max_predictor_rank != "rule":
+        if self.max_predictor_rank is not None:
             _validate_positive_int(self.max_predictor_rank, name="max_predictor_rank")
-        _validate_component_values(self.n_components_values)
-        _validate_predictor_rank_values(self.predictor_rank_values)
-        predictor_rank_policy = _predictor_rank_policy(self.predictor_rank_values)
-        _validate_search_method(
-            self.search_method,
-            predictor_rank_policy=predictor_rank_policy,
-        )
+        _validate_search_method(self.search_method)
         _resolved_predictor_rank_tolerances(
             predictor_rank_policy=predictor_rank_policy,
             relative_tolerance=self.predictor_rank_relative_tolerance,
@@ -1453,11 +1452,11 @@ def _validate_component_values(values: object) -> None:
 
 
 def _validate_predictor_rank_values(values: object) -> None:
-    if values is None or (isinstance(values, str) and values == "max"):
+    if values is None or (isinstance(values, str) and values == "epv"):
         return
     if isinstance(values, (str, bytes)):
         raise ValueError(
-            'predictor_rank_values must be None, "max", or a sequence of positive integers.'
+            'predictor_rank_values must be None, "epv", or a sequence of positive integers.'
         )
     _validate_integer_sequence(values, name="predictor_rank_values")
 
@@ -1473,27 +1472,18 @@ def _validate_integer_sequence(values: object, *, name: str) -> None:
         _validate_positive_int(value, name=name)
 
 
-def _validate_search_method(
-    value: object,
-    *,
-    predictor_rank_policy: PredictorRankPolicy,
-) -> None:
-    """Validate predictor-rank candidate coverage for one rank policy."""
+def _validate_search_method(value: object) -> None:
+    """Validate predictor-rank candidate coverage policy."""
 
     if not isinstance(value, str) or value not in ("adaptive", "exhaustive"):
         raise ValueError('search_method must be "adaptive" or "exhaustive".')
-    if predictor_rank_policy != "optimized" and value == "exhaustive":
-        raise ValueError(
-            'search_method="exhaustive" requires an optimized '
-            "predictor-rank policy."
-        )
 
 
 def _predictor_rank_policy(values: PredictorRankValues) -> PredictorRankPolicy:
     """Describe how predictor rank is supplied for the component path."""
 
     if isinstance(values, str):
-        return "maximum"
+        return "epv"
     if values is None:
         return "optimized"
     return "fixed" if len(values) == 1 else "optimized"

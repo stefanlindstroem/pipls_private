@@ -49,11 +49,10 @@ tolerances are search-constructor controls because they determine `component_pat
 tolerances remain post-search `select()` and `refit()` controls. Exact numerical ties and adaptive
 candidate coverage remain separate from substantive parsimony tolerances.
 
-The implemented runtime still has `search_method="adaptive"` as the default predictor-rank
-coverage policy and `search_method="exhaustive"` as the complete-coverage option. Decision 0154
-accepts exhaustive coverage as the new default over the full hard-feasible domain; the public
-behavior changes only in Patch 3. The parameter name and `search_is_exhaustive_` fitted diagnostic
-remain part of the target surface.
+The implemented runtime now has `search_method="exhaustive"` as the default predictor-rank
+coverage policy over the full hard-feasible domain. `search_method="adaptive"` remains an explicit
+computational approximation, and `search_is_exhaustive_` continues to report whether the complete
+candidate set was actually evaluated. Decision 0154 owns this boundary.
 
 Decision 0143 implements `refit(selection=...)` as the exact-selection handoff for analytical
 workflows. Rule-based and component-count refitting remain the compact route. Existing selections
@@ -98,9 +97,10 @@ that each boundary is independently reviewable:
 6. rewrite user and maintainer documentation around rank domain, coverage, and EPV;
 7. complete release, installed-package, distribution, and stale-contract audits.
 
-Patches 1 and 2 are complete: the decision is recorded and the private hard-feasibility and EPV
-calculations are separated while the search still recombines them to reproduce the pre-migration
-runtime. Until Patch 3 lands, source and user guides remain on the implemented pre-migration API.
+Patches 1 through 3 are complete: the decision is recorded, hard-feasibility and EPV calculations
+are separated, and the public search runtime now implements the new defaults, policy vocabulary,
+and rank-domain semantics. Patch 4 adds focused regression coverage before examples, generated
+evidence, and broader documentation are migrated in Patches 5 and 6.
 
 ## Deferred work
 

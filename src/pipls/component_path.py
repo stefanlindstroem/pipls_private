@@ -33,9 +33,9 @@ __all__ = [
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 SelectionRule = Literal["best_score", "minimum_cv_mse"]
-PredictorRankPolicy = Literal["optimized", "fixed", "maximum"]
+PredictorRankPolicy = Literal["optimized", "fixed", "epv"]
 _ALLOWED_SELECTION_RULES = frozenset({"best_score", "minimum_cv_mse"})
-_ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "maximum"})
+_ALLOWED_PREDICTOR_RANK_POLICIES = frozenset({"optimized", "fixed", "epv"})
 
 
 def _optional_relative_tolerance(value: object) -> float | None:
@@ -203,7 +203,7 @@ class PiPLSSelection:
         Evaluated number of paired latent modes.
     predictor_rank : int
         Predictor rank selected conditionally for ``n_components``.
-    predictor_rank_policy : {"optimized", "fixed", "maximum"}
+    predictor_rank_policy : {"optimized", "fixed", "epv"}
         Interpretation of the predictor-rank specification used by the path.
     mean_test_score : float
         Mean configured test score for the selected candidate.
@@ -465,7 +465,7 @@ class PiPLSPredictorRankProfile:
     cv_mse_std : ndarray of shape (n_evaluated_ranks,)
         Population standard deviation of response-standardized MSE across
         validation splits.
-    predictor_rank_policy : {"optimized", "fixed", "maximum"}
+    predictor_rank_policy : {"optimized", "fixed", "epv"}
         Predictor-rank policy shared by every evaluated candidate.
     n_splits : int
         Number of cross-validation splits.
@@ -666,7 +666,7 @@ class PiPLSComponentPath:
         Evaluated paired-mode counts in strictly ascending order.
     predictor_rank : ndarray of shape (n_component_values,)
         Conditionally selected predictor rank for each paired-mode count.
-    predictor_rank_policy : {"optimized", "fixed", "maximum"}
+    predictor_rank_policy : {"optimized", "fixed", "epv"}
         Predictor-rank policy shared by every path row.
     mean_test_score : ndarray of shape (n_component_values,)
         Mean configured test score for each selected candidate.

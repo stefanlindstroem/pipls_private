@@ -99,24 +99,23 @@ def _search_with_component_path(path: PiPLSComponentPath) -> PiPLSSearchCV:
     return search
 
 
-def test_default_adaptive_path_can_achieve_exhaustive_coverage() -> None:
+def test_default_exhaustive_path_covers_the_full_hard_feasible_domain() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
-        samples_per_predictor_rank=8,
         cv=3,
         n_jobs=1,
     ).fit(X, Y)
 
-    assert search.max_predictor_rank_ == 5
+    assert search.max_predictor_rank_ == 8
     assert search.search_is_exhaustive_
-    assert search.cv_results_["n_components"].size == 12
+    assert search.cv_results_["n_components"].size == 21
     np.testing.assert_array_equal(
         search.component_path_.n_components,
         np.array([1, 2, 3]),
     )
     np.testing.assert_array_equal(
         search.predictor_rank_profile(1).predictor_rank,
-        np.array([1, 2, 3, 4, 5]),
+        np.arange(1, 9),
     )
     evaluated_pairs = set(
         zip(
@@ -125,42 +124,27 @@ def test_default_adaptive_path_can_achieve_exhaustive_coverage() -> None:
             strict=True,
         )
     )
-    assert (2, 1) not in evaluated_pairs
-    assert (3, 1) not in evaluated_pairs
-    assert (3, 2) not in evaluated_pairs
+    assert evaluated_pairs == {
+        (h, r)
+        for h in range(1, 4)
+        for r in range(h, 9)
+    }
 
 
 def test_search_method_default_and_parameter_surface_use_current_values() -> None:
     search = PiPLSSearchCV()
 
-    assert search.search_method == "adaptive"
-    assert search.get_params(deep=False)["search_method"] == "adaptive"
-    assert clone(search).search_method == "adaptive"
-    search.set_params(search_method="exhaustive")
     assert search.search_method == "exhaustive"
-    assert pickle.loads(pickle.dumps(search)).search_method == "exhaustive"
-    assert "search_method='exhaustive'" in repr(search)
+    assert search.get_params(deep=False)["search_method"] == "exhaustive"
+    assert clone(search).search_method == "exhaustive"
+    search.set_params(search_method="adaptive")
+    assert search.search_method == "adaptive"
+    assert pickle.loads(pickle.dumps(search)).search_method == "adaptive"
+    assert "search_method='adaptive'" in repr(search)
 
 
-@pytest.mark.parametrize("predictor_rank_values", ([2], "max"))
-def test_one_candidate_rank_policies_reject_exhaustive_search(
-    predictor_rank_values: object,
-) -> None:
-    X, Y = _data()
-
-    with pytest.raises(
-        ValueError,
-        match='search_method="exhaustive" requires an optimized predictor-rank policy',
-    ):
-        PiPLSSearchCV(
-            predictor_rank_values=predictor_rank_values,  # type: ignore[arg-type]
-            search_method="exhaustive",
-            cv=3,
-        ).fit(X, Y)
-
-
-@pytest.mark.parametrize("predictor_rank_values", ([2], "max"))
-def test_one_candidate_rank_policies_accept_default_adaptive_search(
+@pytest.mark.parametrize("predictor_rank_values", ([2], "epv"))
+def test_one_candidate_rank_policies_accept_default_exhaustive_search(
     predictor_rank_values: object,
 ) -> None:
     X, Y = _data()
@@ -171,7 +155,7 @@ def test_one_candidate_rank_policies_accept_default_adaptive_search(
         n_jobs=1,
     ).fit(X, Y)
 
-    assert search.search_method == "adaptive"
+    assert search.search_method == "exhaustive"
     assert search.search_is_exhaustive_
 
 
@@ -1157,7 +1141,6 @@ def test_adaptive_path_skips_candidates_with_constant_scorer() -> None:
         predictor_rank_values=list(range(1, 13)),
         max_predictor_rank=12,
         search_method="adaptive",
-        samples_per_predictor_rank=5,
         cv=4,
         scoring=constant_scorer,
         n_jobs=1,
@@ -1248,13 +1231,11 @@ def test_global_tie_breaking_prefers_lower_components_then_rank() -> None:
     assert not np.allclose(profile.cv_mse_mean, -profile.mean_test_score)
 
 
-def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
+def test_explicit_max_predictor_rank_restricts_the_full_domain() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
         n_components_values=[1],
-        predictor_rank_values=[1, 2, 3],
         max_predictor_rank=3,
-        samples_per_predictor_rank=100,
         cv=3,
     ).fit(X, Y)
 
@@ -1266,13 +1247,26 @@ def test_explicit_max_predictor_rank_bypasses_rule_bound() -> None:
     )
 
 
-def test_low_samples_per_predictor_rank_warns() -> None:
+def test_low_samples_per_predictor_rank_warns_for_epv() -> None:
     X, Y = _data()
     with pytest.warns(PredictorRankSupportWarning, match="statistical support"):
         PiPLSSearchCV(
             n_components_values=[1],
-            predictor_rank_values=[1],
+            predictor_rank_values="epv",
             samples_per_predictor_rank=4,
+            cv=3,
+        ).fit(X, Y)
+
+
+def test_nondefault_samples_per_predictor_rank_requires_epv() -> None:
+    X, Y = _data()
+    with pytest.raises(
+        ValueError,
+        match='predictor_rank_values="epv"',
+    ):
+        PiPLSSearchCV(
+            n_components_values=[1],
+            samples_per_predictor_rank=5,
             cv=3,
         ).fit(X, Y)
 
@@ -1377,11 +1371,13 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
     [
         ("search_method", "unsupported", "search_method"),
         ("max_predictor_rank", 0, "max_predictor_rank"),
+        ("max_predictor_rank", "rule", "max_predictor_rank"),
         ("n_components_values", [], "must not be empty"),
         ("n_components_values", None, 'must be "all"'),
         ("n_components_values", "everything", 'must be "all"'),
         ("scoring", "not_a_scorer", "Unknown scoring"),
         ("predictor_rank_values", [1.0], "positive integer"),
+        ("predictor_rank_values", "max", "must be None"),
         ("predictor_rank_values", "maximum", "must be None"),
         ("n_jobs", 0, "must not be zero"),
     ],
@@ -1570,7 +1566,7 @@ def test_predictor_rank_profile_requires_fitted_evaluated_component_count() -> N
     [
         (None, "optimized"),
         ([3], "fixed"),
-        ("max", "maximum"),
+        ("epv", "epv"),
         ([2, 3, 4], "optimized"),
     ],
 )
@@ -1596,24 +1592,24 @@ def test_component_path_records_predictor_rank_policy(
             search.component_path_.predictor_rank,
             np.array([3, 3]),
         )
-    if expected_policy == "maximum":
+    if expected_policy == "epv":
         np.testing.assert_array_equal(
             search.component_path_.predictor_rank,
-            np.full(2, search.max_predictor_rank_),
+            np.full(2, 4),
         )
 
     profile = search.predictor_rank_profile(2)
     assert profile.selection.predictor_rank == search.select(
         n_components=2
     ).predictor_rank
-    if expected_policy in {"fixed", "maximum"}:
+    if expected_policy in {"fixed", "epv"}:
         assert profile.predictor_rank.size == 1
 
 
 def test_fixed_predictor_rank_must_support_every_component_count() -> None:
     X, Y = _data()
 
-    with pytest.raises(ValueError, match="Every n_components value"):
+    with pytest.raises(ValueError, match=r"n_components_values values must lie in \[1, 2\]"):
         PiPLSSearchCV(
             n_components_values=[1, 2, 3],
             predictor_rank_values=[2],
@@ -1844,7 +1840,7 @@ def test_predictor_rank_tolerance_does_not_change_adaptive_candidate_coverage() 
     assert exact.search_is_exhaustive_ == tolerant.search_is_exhaustive_
 
 
-@pytest.mark.parametrize("predictor_rank_values", ([3], "max"))
+@pytest.mark.parametrize("predictor_rank_values", ([3], "epv"))
 @pytest.mark.parametrize(
     "tolerance_kwargs",
     (

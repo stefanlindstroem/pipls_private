@@ -93,7 +93,7 @@ def test_pulp_rank_profile_exposes_the_interior_selection(
 
     profile = result.rank_profile
     assert isinstance(profile, PiPLSPredictorRankProfile)
-    np.testing.assert_array_equal(profile.predictor_rank, np.arange(3, 11))
+    np.testing.assert_array_equal(profile.predictor_rank, np.arange(3, 15))
     assert profile.selection == result.selected
     assert profile.selection.predictor_rank == 9
     selected_index = int(np.flatnonzero(profile.predictor_rank == 9)[0])
