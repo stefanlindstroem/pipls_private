@@ -97,10 +97,11 @@ that each boundary is independently reviewable:
 6. rewrite user and maintainer documentation around rank domain, coverage, and EPV;
 7. complete release, installed-package, distribution, and stale-contract audits.
 
-Patches 1 through 3 are complete: the decision is recorded, hard-feasibility and EPV calculations
-are separated, and the public search runtime now implements the new defaults, policy vocabulary,
-and rank-domain semantics. Patch 4 adds focused regression coverage before examples, generated
-evidence, and broader documentation are migrated in Patches 5 and 6.
+Patches 1 through 4 are complete: the decision is recorded, hard-feasibility and EPV calculations
+are separated, the public search runtime implements the new defaults, policy vocabulary, and
+rank-domain semantics, and focused regression coverage protects the resulting scientific/API
+contract. Patch 5 updates maintained examples and regenerates tutorial evidence before the broader
+documentation migration in Patch 6.
 
 ## Deferred work
 

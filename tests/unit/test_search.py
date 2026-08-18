@@ -86,6 +86,18 @@ def _selection_data() -> tuple[np.ndarray, np.ndarray]:
     return X, Y
 
 
+def _low_variance_response_data() -> tuple[np.ndarray, np.ndarray]:
+    """Return data whose predictive direction enters late in the X-SVD path."""
+
+    rng = np.random.default_rng(4)
+    n_samples = 60
+    n_features = 20
+    feature_scales = np.geomspace(5.0, 0.2, n_features)
+    X = rng.normal(size=(n_samples, n_features)) * feature_scales
+    Y = 3.0 * X[:, [14]] + 0.01 * rng.normal(size=(n_samples, 1))
+    return X, Y
+
+
 def _search_with_component_path(path: PiPLSComponentPath) -> PiPLSSearchCV:
     """Return minimal fitted-state evidence for exact selection tests."""
 
@@ -129,6 +141,129 @@ def test_default_exhaustive_path_covers_the_full_hard_feasible_domain() -> None:
         for h in range(1, 4)
         for r in range(h, 9)
     }
+
+
+def test_full_domain_reference_optimum_can_lie_above_epv_rank() -> None:
+    X, Y = _low_variance_response_data()
+    estimator = PiPLSRegression(n_components=1, predictor_rank=1, scale=False)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", PredictorRankSupportWarning)
+        search = PiPLSSearchCV(
+            estimator=estimator,
+            n_components_values=[1],
+            cv=5,
+            n_jobs=1,
+        ).fit(X, Y)
+
+    profile = search.predictor_rank_profile(1)
+    evidence = profile.selection.predictor_rank_evidence
+
+    assert search.max_predictor_rank_ == X.shape[1]
+    np.testing.assert_array_equal(profile.predictor_rank, np.arange(1, X.shape[1] + 1))
+    assert isinstance(evidence, PiPLSPredictorRankEvidence)
+    assert evidence.reference_predictor_rank == X.shape[1]
+    assert profile.selection.predictor_rank == X.shape[1]
+    assert evidence.reference_predictor_rank > int(np.ceil(X.shape[0] / 5.0))
+
+
+def test_epv_uses_full_sample_count_and_limits_component_domain() -> None:
+    X, _ = _data()
+    rng = np.random.default_rng(20260818)
+    Y = X @ rng.normal(size=(X.shape[1], 6))
+
+    search = PiPLSSearchCV(
+        predictor_rank_values="epv",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    assert search.max_predictor_rank_ == X.shape[1]
+    np.testing.assert_array_equal(search.component_path_.n_components, np.arange(1, 5))
+    np.testing.assert_array_equal(search.component_path_.predictor_rank, np.full(4, 4))
+    assert search.component_path_.predictor_rank_policy == "epv"
+    assert search.component_path_.predictor_rank_evidence is None
+    np.testing.assert_array_equal(search.predictor_rank_profile(4).predictor_rank, [4])
+
+
+def test_epv_c_one_warns_once_and_reaches_hard_ceiling() -> None:
+    X, Y = _data()
+
+    with pytest.warns(PredictorRankSupportWarning, match="below 5") as caught:
+        search = PiPLSSearchCV(
+            predictor_rank_values="epv",
+            samples_per_predictor_rank=1.0,
+            cv=3,
+            n_jobs=1,
+        ).fit(X, Y)
+
+    assert len(caught) == 1
+    assert search.max_predictor_rank_ == X.shape[1]
+    np.testing.assert_array_equal(
+        search.component_path_.predictor_rank,
+        np.full(Y.shape[1], X.shape[1]),
+    )
+    assert search.search_is_exhaustive_
+
+
+def test_epv_is_clipped_by_verified_fold_numerical_rank() -> None:
+    X, Y = _rank_two_data()
+
+    with pytest.warns(PredictorRankSupportWarning):
+        search = PiPLSSearchCV(
+            predictor_rank_values="epv",
+            samples_per_predictor_rank=1.0,
+            cv=3,
+            n_jobs=1,
+        ).fit(X, Y)
+
+    assert search.max_predictor_rank_ == 2
+    np.testing.assert_array_equal(search.component_path_.n_components, [1, 2])
+    np.testing.assert_array_equal(search.component_path_.predictor_rank, [2, 2])
+
+
+def test_explicit_predictor_rank_sequence_defines_exact_exhaustive_domain() -> None:
+    X, Y = _data()
+    search = PiPLSSearchCV(
+        n_components_values=[1, 2, 3],
+        predictor_rank_values=[2, 4, 6],
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    np.testing.assert_array_equal(search.predictor_rank_profile(1).predictor_rank, [2, 4, 6])
+    np.testing.assert_array_equal(search.predictor_rank_profile(2).predictor_rank, [2, 4, 6])
+    np.testing.assert_array_equal(search.predictor_rank_profile(3).predictor_rank, [4, 6])
+    assert search.search_is_exhaustive_
+
+
+def test_adaptive_default_domain_reaches_the_hard_ceiling_without_exhausting_it() -> None:
+    rng = np.random.default_rng(20260818)
+    X = rng.normal(size=(80, 20))
+    Y = rng.normal(size=(80, 1))
+
+    def constant_scorer(
+        estimator: object,
+        X_validation: object,
+        y_validation: object,
+    ) -> float:
+        del estimator, X_validation, y_validation
+        return 1.0
+
+    search = PiPLSSearchCV(
+        n_components_values=[1],
+        search_method="adaptive",
+        scoring=constant_scorer,
+        cv=4,
+        n_jobs=1,
+    ).fit(X, Y)
+    ranks = search.predictor_rank_profile(1).predictor_rank
+
+    assert search.max_predictor_rank_ == X.shape[1]
+    assert ranks[0] == 1
+    assert ranks[-1] == X.shape[1]
+    assert ranks.size < X.shape[1]
+    assert not search.search_is_exhaustive_
 
 
 def test_search_method_default_and_parameter_surface_use_current_values() -> None:

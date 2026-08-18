@@ -178,8 +178,10 @@ that domain uncapped by statistical heuristics, and `predictor_rank_values="epv"
 fixed-rank EPV policy. The pre-release `"max"` predictor-rank policy and `"rule"` maximum-rank
 sentinel are removed, and nondefault `samples_per_predictor_rank` values are valid only for EPV.
 The private hard-feasibility and EPV calculations remain separate. Focused Decision-0154 regression
-coverage is the next patch; maintained examples, generated tutorial evidence, and the broader user
-and maintainer documentation are intentionally updated in later migration patches.
+coverage now protects full-domain reference optima above EPV ranks, EPV component-domain resolution,
+$c=1$ warning behavior, numerical-rank clipping, explicit rank domains, and adaptive full-domain
+endpoints. Maintained examples, generated tutorial evidence, and the broader user and maintainer
+documentation are intentionally updated in later migration patches.
 The served computational-performance guide documents fit counts, validation repetitions, rank
 coverage, SVD choices, parallelism, OOF reuse, and work inspection.
 
