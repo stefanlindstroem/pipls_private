@@ -43,28 +43,26 @@ class _PredictorRankScoreSelection:
     score_threshold: float
 
 
-def _max_predictor_rank(
+def _hard_predictor_rank_limit(
     *,
     n_features: int,
     n_samples: int,
     n_train_min: int,
-    samples_per_predictor_rank: float,
 ) -> int:
-    r"""Return the full-sample-supported, fold-feasible predictor-rank bound.
+    r"""Return the fold-dimensional predictor-rank feasibility bound.
 
     The bound is
 
     \begin{equation}
     \min\left(
     p,
-    n_{\mathrm{train,min}}-1,
-    \left\lceil n/c \right\rceil
+    n_{\mathrm{train,min}}-1
     \right),
     \end{equation}
 
-    where ``p`` is ``n_features``, ``n`` is ``n_samples``, and ``c`` is
-    ``samples_per_predictor_rank``. The smallest training-fold size remains a
-    hard feasibility cap, but it does not define the statistical-support term.
+    where ``p`` is ``n_features`` and ``n_train_min`` is the smallest
+    materialized training-fold size. Verified fold numerical rank is applied
+    separately by the search preflight.
     """
 
     _validate_positive_int(n_features, name="n_features")
@@ -80,15 +78,41 @@ def _max_predictor_rank(
             "n_train_min must be at least 2 because PiPLSRegression centers each "
             f"training fold; got {n_train_min}."
         )
+    return min(n_features, n_train_min - 1)
+
+
+def _epv_predictor_rank(
+    *,
+    n_features: int,
+    n_samples: int,
+    samples_per_predictor_rank: float,
+) -> int:
+    r"""Return the nominal events-per-variable-inspired predictor rank.
+
+    The nominal rule is
+
+    \begin{equation}
+    \min\left(
+    p,
+    \left\lceil n/c \right\rceil
+    \right),
+    \end{equation}
+
+    where ``p`` is ``n_features``, ``n`` is ``n_samples``, and ``c`` is
+    ``samples_per_predictor_rank``. Fold-dimensional and numerical-rank
+    feasibility are intentionally not part of this helper.
+    """
+
+    _validate_positive_int(n_features, name="n_features")
+    _validate_positive_int(n_samples, name="n_samples")
     samples_per_rank = _as_positive_float(
         samples_per_predictor_rank,
         name="samples_per_predictor_rank",
     )
-    algebraic_limit = min(n_features, n_train_min - 1)
-    if samples_per_rank <= n_samples / algebraic_limit:
-        return algebraic_limit
+    if samples_per_rank <= n_samples / n_features:
+        return n_features
     rule_limit = math.ceil(n_samples / samples_per_rank)
-    return min(algebraic_limit, rule_limit)
+    return min(n_features, rule_limit)
 
 
 def _materialize_cv_splits(

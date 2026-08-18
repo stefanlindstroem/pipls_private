@@ -174,10 +174,13 @@ migrations and cleanup sequences are summarized in `docs/decisions/history.md` a
 
 The implemented runtime still uses the pre-Decision-0154 predictor-rank contract: `"adaptive"` is
 the default coverage policy, the ordinary search ceiling contains the samples-per-rank support
-term, and the fixed `"max"` policy remains present. Decision 0154 is accepted but not yet
-implemented. Its staged migration will make exhaustive full-feasible coverage the default, add
-explicit `"epv"`, remove `"max"`/`"rule"`, and confine `samples_per_predictor_rank` to EPV. User
-documentation must continue to describe the implemented boundary until the behavioral patch lands.
+term, and the fixed `"max"` policy remains present. The private model-selection layer now separates
+the fold-dimensional hard-feasibility calculation from the nominal EPV calculation, while search
+recombines those helpers to preserve the existing runtime boundary. Decision 0154 is therefore
+partially implemented at the private-helper level only. The next behavioral patch will make
+exhaustive full-feasible coverage the default, add explicit `"epv"`, remove `"max"`/`"rule"`, and
+confine `samples_per_predictor_rank` to EPV. User documentation must continue to describe the
+implemented boundary until that behavioral patch lands.
 The served computational-performance guide documents fit counts, validation repetitions, rank
 coverage, SVD choices, parallelism, OOF reuse, and work inspection.
 

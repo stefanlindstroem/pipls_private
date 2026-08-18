@@ -98,8 +98,9 @@ that each boundary is independently reviewable:
 6. rewrite user and maintainer documentation around rank domain, coverage, and EPV;
 7. complete release, installed-package, distribution, and stale-contract audits.
 
-Until Patch 3 lands, source and user guides remain on the implemented pre-migration API. Patch 2
-must therefore be behavior-preserving.
+Patches 1 and 2 are complete: the decision is recorded and the private hard-feasibility and EPV
+calculations are separated while the search still recombines them to reproduce the pre-migration
+runtime. Until Patch 3 lands, source and user guides remain on the implemented pre-migration API.
 
 ## Deferred work
 

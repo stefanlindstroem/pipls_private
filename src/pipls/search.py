@@ -32,8 +32,9 @@ from ._cv_engine import (
 from ._model_selection import (
     CVSplit,
     _as_positive_float,
+    _epv_predictor_rank,
+    _hard_predictor_rank_limit,
     _materialize_cv_splits,
-    _max_predictor_rank,
     _pooled_oof_r2,
     _rank_test_scores,
     _search_predictor_ranks,
@@ -412,22 +413,26 @@ class PiPLSSearchCV(
             y=y_indexable,
             splits=self._cv_splits_,
         )
-        algebraic_limit = min(fold_feature_limit, materialized.n_train_min - 1)
+        dimensional_limit = _hard_predictor_rank_limit(
+            n_features=fold_feature_limit,
+            n_samples=int(X_array.shape[0]),
+            n_train_min=materialized.n_train_min,
+        )
         if self.max_predictor_rank == "rule":
-            support_limit = _max_predictor_rank(
+            epv_limit = _epv_predictor_rank(
                 n_features=fold_feature_limit,
                 n_samples=int(X_array.shape[0]),
-                n_train_min=materialized.n_train_min,
                 samples_per_predictor_rank=self.samples_per_predictor_rank,
             )
             self.max_predictor_rank_ = min(
-                support_limit,
+                dimensional_limit,
+                epv_limit,
                 fold_numerical_rank_limit,
             )
         else:
             self.max_predictor_rank_ = min(
                 int(self.max_predictor_rank),
-                algebraic_limit,
+                dimensional_limit,
                 fold_numerical_rank_limit,
             )
 

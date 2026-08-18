@@ -8,9 +8,10 @@ from sklearn.model_selection import KFold
 
 from pipls._model_selection import (
     _adaptive_refinement_interval,
+    _epv_predictor_rank,
+    _hard_predictor_rank_limit,
     _logarithmic_predictor_rank_values,
     _materialize_cv_splits,
-    _max_predictor_rank,
     _rank_test_scores,
     _score_tolerance_threshold,
     _select_minimum_loss_predictor_rank,
@@ -25,61 +26,47 @@ def test_model_selection_algorithms_are_private() -> None:
     assert importlib.util.find_spec("pipls._model_selection") is not None
 
 
-def test_max_predictor_rank_uses_ceiling_rule() -> None:
+def test_hard_predictor_rank_limit_uses_centered_training_fold_cap() -> None:
     assert (
-        _max_predictor_rank(
+        _hard_predictor_rank_limit(
             n_features=100,
             n_samples=51,
             n_train_min=51,
-            samples_per_predictor_rank=10,
         )
-        == 6
+        == 50
     )
 
 
-def test_max_predictor_rank_respects_feature_and_training_caps() -> None:
+def test_hard_predictor_rank_limit_respects_feature_cap() -> None:
     assert (
-        _max_predictor_rank(
+        _hard_predictor_rank_limit(
             n_features=3,
             n_samples=100,
             n_train_min=100,
-            samples_per_predictor_rank=10,
-        )
-        == 3
-    )
-    assert (
-        _max_predictor_rank(
-            n_features=100,
-            n_samples=100,
-            n_train_min=4,
-            samples_per_predictor_rank=0.1,
         )
         == 3
     )
 
 
-def test_support_term_uses_total_samples_while_fold_size_caps_feasibility() -> None:
-    complete_data_bound = _max_predictor_rank(
+def test_hard_predictor_rank_limit_respects_smallest_training_fold() -> None:
+    complete_data_bound = _hard_predictor_rank_limit(
         n_features=30,
         n_samples=50,
         n_train_min=50,
-        samples_per_predictor_rank=10,
     )
-    fold_bound = _max_predictor_rank(
+    fold_bound = _hard_predictor_rank_limit(
         n_features=30,
         n_samples=50,
         n_train_min=39,
-        samples_per_predictor_rank=10,
     )
-    feasibility_capped = _max_predictor_rank(
+    feasibility_capped = _hard_predictor_rank_limit(
         n_features=30,
         n_samples=50,
         n_train_min=4,
-        samples_per_predictor_rank=10,
     )
 
-    assert complete_data_bound == 5
-    assert fold_bound == 5
+    assert complete_data_bound == 30
+    assert fold_bound == 30
     assert feasibility_capped == 3
 
 
@@ -89,42 +76,112 @@ def test_support_term_uses_total_samples_while_fold_size_caps_feasibility() -> N
         ("n_features", 0),
         ("n_samples", 0),
         ("n_train_min", 0),
+        ("n_features", True),
+        ("n_samples", False),
+        ("n_train_min", True),
+    ],
+)
+def test_hard_predictor_rank_limit_rejects_invalid_inputs(
+    argument: str,
+    value: object,
+) -> None:
+    kwargs: dict[str, object] = {
+        "n_features": 10,
+        "n_samples": 20,
+        "n_train_min": 20,
+    }
+    kwargs[argument] = value
+
+    with pytest.raises(ValueError, match=argument):
+        _hard_predictor_rank_limit(**kwargs)  # type: ignore[arg-type]
+
+
+def test_hard_predictor_rank_limit_rejects_training_fold_larger_than_full_data() -> None:
+    with pytest.raises(ValueError, match="n_train_min must not exceed n_samples"):
+        _hard_predictor_rank_limit(
+            n_features=10,
+            n_samples=19,
+            n_train_min=20,
+        )
+
+
+def test_hard_predictor_rank_limit_rejects_singleton_training_folds() -> None:
+    with pytest.raises(ValueError, match="at least 2"):
+        _hard_predictor_rank_limit(
+            n_features=10,
+            n_samples=20,
+            n_train_min=1,
+        )
+
+
+@pytest.mark.parametrize(
+    ("samples_per_predictor_rank", "expected"),
+    [
+        (10.0, 6),
+        (5.0, 11),
+        (1.0, 51),
+        (7.5, 7),
+    ],
+)
+def test_epv_predictor_rank_uses_full_sample_ceiling_rule(
+    samples_per_predictor_rank: float,
+    expected: int,
+) -> None:
+    assert (
+        _epv_predictor_rank(
+            n_features=100,
+            n_samples=51,
+            samples_per_predictor_rank=samples_per_predictor_rank,
+        )
+        == expected
+    )
+
+
+def test_epv_predictor_rank_respects_feature_cap() -> None:
+    assert (
+        _epv_predictor_rank(
+            n_features=3,
+            n_samples=100,
+            samples_per_predictor_rank=10,
+        )
+        == 3
+    )
+
+
+def test_epv_predictor_rank_handles_tiny_positive_support_parameter() -> None:
+    assert (
+        _epv_predictor_rank(
+            n_features=100,
+            n_samples=51,
+            samples_per_predictor_rank=np.nextafter(0.0, 1.0),
+        )
+        == 100
+    )
+
+
+@pytest.mark.parametrize(
+    ("argument", "value"),
+    [
+        ("n_features", 0),
+        ("n_samples", 0),
         ("samples_per_predictor_rank", 0.0),
         ("samples_per_predictor_rank", np.inf),
         ("samples_per_predictor_rank", True),
     ],
 )
-def test_max_predictor_rank_rejects_invalid_inputs(argument: str, value: object) -> None:
+def test_epv_predictor_rank_rejects_invalid_inputs(
+    argument: str,
+    value: object,
+) -> None:
     kwargs: dict[str, object] = {
         "n_features": 10,
         "n_samples": 20,
-        "n_train_min": 20,
         "samples_per_predictor_rank": 10,
     }
     kwargs[argument] = value
 
     with pytest.raises(ValueError, match=argument):
-        _max_predictor_rank(**kwargs)  # type: ignore[arg-type]
-
-
-def test_max_predictor_rank_rejects_training_fold_larger_than_full_data() -> None:
-    with pytest.raises(ValueError, match="n_train_min must not exceed n_samples"):
-        _max_predictor_rank(
-            n_features=10,
-            n_samples=19,
-            n_train_min=20,
-            samples_per_predictor_rank=5,
-        )
-
-
-def test_max_predictor_rank_rejects_singleton_training_folds() -> None:
-    with pytest.raises(ValueError, match="at least 2"):
-        _max_predictor_rank(
-            n_features=10,
-            n_samples=20,
-            n_train_min=1,
-            samples_per_predictor_rank=5,
-        )
+        _epv_predictor_rank(**kwargs)  # type: ignore[arg-type]
 
 
 def test_materialize_cv_splits_reuses_one_concrete_split_set() -> None:
