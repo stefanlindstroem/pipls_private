@@ -13,9 +13,15 @@ from pipls.datasets import load_pulp, load_sugarcane, load_tobacco
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
+# Keep exact coverage for Pulp and request adaptive coverage explicitly for the
+# higher-dimensional spectral datasets.
 for dataset, (X, Y), search in (
     ("pulp", load_pulp(return_X_y=True), PiPLSSearchCV(cv=CV)),
-    ("sugarcane", load_sugarcane(return_X_y=True), PiPLSSearchCV(cv=CV)),
+    (
+        "sugarcane",
+        load_sugarcane(return_X_y=True),
+        PiPLSSearchCV(search_method="adaptive", cv=CV),
+    ),
     (
         "tobacco",
         load_tobacco(return_X_y=True),
@@ -25,6 +31,7 @@ for dataset, (X, Y), search in (
                 predictor_rank=1,
                 svd_solver="full",
             ),
+            search_method="adaptive",
             n_jobs=1,
             cv=CV,
         ),

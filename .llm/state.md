@@ -57,7 +57,7 @@ The implemented named rules are:
 For optimized predictor-rank policies, `PiPLSSearchCV` applies separate constructor-level relative
 and absolute configured-score tolerances at every component count. Adaptive refinement and
 `rank_test_score` retain private numerical tie semantics. Optimized path rows, selections, and
-profiles carry immutable `PiPLSPredictorRankEvidence`; fixed and maximum policies carry none.
+profiles carry immutable `PiPLSPredictorRankEvidence`; fixed and EPV policies carry none.
 
 Manual selection uses an evaluated `n_components` value and the predictor rank already selected
 conditionally for that row. A successful refit attaches the exact immutable row as
@@ -180,8 +180,10 @@ sentinel are removed, and nondefault `samples_per_predictor_rank` values are val
 The private hard-feasibility and EPV calculations remain separate. Focused Decision-0154 regression
 coverage now protects full-domain reference optima above EPV ranks, EPV component-domain resolution,
 $c=1$ warning behavior, numerical-rank clipping, explicit rank domains, and adaptive full-domain
-endpoints. Maintained examples, generated tutorial evidence, and the broader user and maintainer
-documentation are intentionally updated in later migration patches.
+endpoints. Maintained high-dimensional examples now request adaptive coverage explicitly, while
+Pulp and the synthetic entry workflows retain the exhaustive default. Generated tutorial manifests
+record the active search method, exhaustive-coverage status, and effective maximum predictor rank.
+The broader user and maintainer documentation is updated in the remaining migration patches.
 The served computational-performance guide documents fit counts, validation repetitions, rank
 coverage, SVD choices, parallelism, OOF reuse, and work inspection.
 

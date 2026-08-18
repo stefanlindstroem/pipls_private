@@ -218,6 +218,9 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         "analysis": {
             "chosen_n_components": selection.n_components,
             "chosen_predictor_rank": selection.predictor_rank,
+            "search_method": search.search_method,
+            "search_is_exhaustive": search.search_is_exhaustive_,
+            "max_predictor_rank": search.max_predictor_rank_,
             "evaluated_component_counts": path.n_components.tolist(),
             "evaluated_predictor_ranks": rank_profile.predictor_rank.tolist(),
             "prediction_kind": diagnostics.prediction_kind,

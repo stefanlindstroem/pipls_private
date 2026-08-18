@@ -66,6 +66,9 @@ def test_quick_start_renderer_writes_one_parseable_fitted_value_svg(
     assert manifest["dataset"] == {"id": "pulp", "version": "1"}
     assert manifest["analysis"]["selected_n_components"] == 3
     assert manifest["analysis"]["selected_predictor_rank"] == 10
+    assert manifest["analysis"]["search_method"] == "exhaustive"
+    assert manifest["analysis"]["search_is_exhaustive"] is True
+    assert manifest["analysis"]["max_predictor_rank"] == 14
     assert manifest["analysis"]["prediction_kind"] == "fitted values"
     mean_standardized_rmse = manifest["analysis"]["mean_standardized_rmse"]
     assert math.isfinite(mean_standardized_rmse)

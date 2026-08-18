@@ -325,8 +325,9 @@ def main() -> None:
     wavelengths = np.asarray(data.feature_names, dtype=np.float64)
     response_names = list(data.target_names)
 
-    # Inspect the search evidence and create one exact selection.
-    search = PiPLSSearchCV(cv=CV).fit(X, Y)
+    # Use adaptive candidate coverage for this high-dimensional spectral search.
+    # The admissible rank domain itself remains the complete hard-feasible domain.
+    search = PiPLSSearchCV(search_method="adaptive", cv=CV).fit(X, Y)
     path = search.component_path_
     selection = search.select(n_components=CHOSEN_N_COMPONENTS)
     rank_profile = search.predictor_rank_profile(selection.n_components)

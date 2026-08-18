@@ -79,6 +79,9 @@ def test_synthetic_tutorial_renderer_writes_declared_parseable_svgs(
     }
     assert manifest["analysis"]["chosen_n_components"] == 2
     assert manifest["analysis"]["chosen_predictor_rank"] == 4
+    assert manifest["analysis"]["search_method"] == "exhaustive"
+    assert manifest["analysis"]["search_is_exhaustive"] is True
+    assert manifest["analysis"]["max_predictor_rank"] == 8
     assert manifest["analysis"]["evaluated_component_counts"] == [1, 2, 3]
     assert manifest["analysis"]["evaluated_predictor_ranks"] == list(range(2, 9))
     assert manifest["analysis"]["prediction_kind"] == "external test predictions"

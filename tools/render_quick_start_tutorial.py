@@ -57,7 +57,8 @@ def render_quick_start_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) ->
 
     data = load_pulp()
     X, Y = data.X, data.Y
-    model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="minimum_cv_mse")
+    search = PiPLSSearchCV().fit(X, Y)
+    model = search.refit(X, Y, rule="minimum_cv_mse")
     diagnostics = prediction_diagnostics(
         Y,
         model.predict(X),
@@ -95,6 +96,9 @@ def render_quick_start_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) ->
         "analysis": {
             "selected_n_components": model.n_components,
             "selected_predictor_rank": model.predictor_rank,
+            "search_method": search.search_method,
+            "search_is_exhaustive": search.search_is_exhaustive_,
+            "max_predictor_rank": search.max_predictor_rank_,
             "prediction_kind": diagnostics.prediction_kind,
             "mean_standardized_rmse": mean_standardized_rmse,
         },

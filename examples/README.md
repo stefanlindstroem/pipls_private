@@ -48,8 +48,9 @@ seed makes these analyses reproducible while preventing row order from defining 
 ## Explicit comparison
 
 - `03_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco Π-PLS-versus-PLS
-  component-path CV-MSE comparisons. Ordinary PLS appears here as a reference model, and the
-  workflow fits no final model.
+  component-path CV-MSE comparisons. Pulp uses the exact exhaustive default; the higher-dimensional
+  Sugarcane and Tobacco searches request adaptive predictor-rank coverage explicitly. Ordinary PLS
+  appears here as a reference model, and the workflow fits no final model.
 
 Grouped and temporal validation require application-specific sampling semantics and remain in
 `docs/path_analysis.md`.
@@ -61,9 +62,10 @@ Grouped and temporal validation require application-specific sampling semantics 
   inspects its selected path, rank evidence, and selection-conditioned OOF predictions, refits the
   exact same selection, orients the displayed factors so the tensile-index response is positive,
   and writes ten final PDF figures directly from in-memory results.
-- `05_sugarcane_real_data.py`: the direct reference workflow. It evaluates the path, creates one
-  manual selection, inspects its conditional predictor-rank evidence, computes an OOF report, refits
-  that selection, and writes six wavelength-aware final PDF figures.
+- `05_sugarcane_real_data.py`: the direct reference workflow. It requests adaptive predictor-rank
+  coverage for the high-dimensional spectral search, creates one manual selection, inspects its
+  conditional predictor-rank evidence, computes an OOF report, refits that selection, and writes six
+  wavelength-aware final PDF figures.
 - `06_tobacco_real_data.py`: adaptive Π-PLS predictor-rank scanning with explicit full predictor
   SVD and two separately named 10% relative tolerances. The search constructor applies the
   predictor-rank tolerance independently at each component count; `search.select()` then applies the
@@ -118,7 +120,8 @@ names.
 Example 03 keeps the Π-PLS and ordinary PLS paths in memory and creates the three overlaid
 comparison figures directly. Sugarcane demonstrates the complete manual-analysis workflow:
 
-1. `PiPLSSearchCV(cv=CV).fit(X, Y)` evaluates the path.
+1. `PiPLSSearchCV(search_method="adaptive", cv=CV).fit(X, Y)` evaluates the path with
+   adaptive predictor-rank coverage to reduce candidate work for this high-dimensional dataset.
 2. `component_path_` provides the unconditional evidence used to choose a component count.
 3. `selection = search.select(n_components=CHOSEN_N_COMPONENTS)` records that choice as one complete
    immutable row without fitting.

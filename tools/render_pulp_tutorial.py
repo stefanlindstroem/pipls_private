@@ -502,6 +502,9 @@ def _write_manifest(
         "analysis": {
             "chosen_n_components": selection.n_components,
             "chosen_predictor_rank": selection.predictor_rank,
+            "search_method": search.search_method,
+            "search_is_exhaustive": search.search_is_exhaustive_,
+            "max_predictor_rank": search.max_predictor_rank_,
             "evaluated_predictor_ranks": rank_profile.predictor_rank.tolist(),
             "predictor_rank_at_upper_boundary": bool(
                 selection.predictor_rank == int(rank_profile.predictor_rank[-1])
