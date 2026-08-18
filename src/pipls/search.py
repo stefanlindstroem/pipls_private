@@ -426,7 +426,8 @@ class PiPLSSearchCV(
             else min(int(self.max_predictor_rank), hard_limit)
         )
 
-        predictor_rank_policy = _predictor_rank_policy(self.predictor_rank_values)
+        predictor_rank_setting = self.predictor_rank_values
+        predictor_rank_policy = _predictor_rank_policy(predictor_rank_setting)
         (
             predictor_rank_relative_tolerance,
             predictor_rank_absolute_tolerance,
@@ -435,7 +436,7 @@ class PiPLSSearchCV(
             relative_tolerance=self.predictor_rank_relative_tolerance,
             absolute_tolerance=self.predictor_rank_absolute_tolerance,
         )
-        if predictor_rank_policy == "epv":
+        if isinstance(predictor_rank_setting, str):
             epv_rank = _epv_predictor_rank(
                 n_features=fold_feature_limit,
                 n_samples=int(X_array.shape[0]),
@@ -447,7 +448,7 @@ class PiPLSSearchCV(
             )
         else:
             predictor_rank_values = _validated_integer_values(
-                self.predictor_rank_values,
+                predictor_rank_setting,
                 name="predictor_rank_values",
                 lower=1,
                 upper=self.max_predictor_rank_,
