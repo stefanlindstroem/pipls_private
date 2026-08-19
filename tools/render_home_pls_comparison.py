@@ -190,6 +190,16 @@ def render_home_pls_comparison_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> 
             output_path=output_dir / FIGURE_FILENAMES[case],
         )
 
+    case_records = {
+        case: _case_manifest(
+            case,
+            data_by_case[case],
+            evaluations[case],
+            output_path=output_dir / FIGURE_FILENAMES[case],
+        )
+        for case in CASES
+    }
+    
     manifest = {
         "schema_version": 1,
         "comparison": {
@@ -205,15 +215,11 @@ def render_home_pls_comparison_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> 
             "pls_label": PLS_LABEL,
             "shared_y_max": y_max,
         },
-        "cases": {
-            case: _case_manifest(
-                case,
-                data_by_case[case],
-                evaluations[case],
-                output_path=output_dir / FIGURE_FILENAMES[case],
-            )
+        "cases": case_records,
+        "figures": [
+            case_records[case]["figure"]
             for case in CASES
-        },
+        ],
     }
     manifest_path = output_dir / "manifest.json"
     manifest_path.write_text(
