@@ -127,11 +127,12 @@ PLS reaches 0.9373 at 8 components.
 Decision 0158 is the active three-patch documentation-presentation migration. Patch 0158A is
 complete: Example 03 now consumes a shared example-support evaluator that owns the maintained
 materialized folds, case-specific Pi-PLS search settings, requested response-subspace fitting, and
-ordinary-PLS path evaluation. The helper supports the full two-policy Example-03 comparison and a
-cross-covariance-only call for documentation rendering. Patch 0158B is next and will generate
-simplified Pulp and Tobacco Home assets containing only publication-default Pi-PLS and ordinary
-PLS. Patch 0158C will place those figures side by side under `Why use Π-PLS?`, state the bounded
-shared-component parsimony interpretation, link to Example 03, and close the decision.
+ordinary-PLS path evaluation. Patch 0158B is also complete: the dedicated Home renderer requests
+only publication-default Pi-PLS plus ordinary PLS for Pulp and Tobacco, writes two concise SVGs
+with a common y-axis limit and semantic provenance manifest under `docs/assets/generated/home/`,
+and is wired into `docs-figures` and the sdist. Patch 0158C is next and will place those figures side
+by side under `Why use Π-PLS?`, state the bounded shared-component parsimony interpretation, link to
+Example 03, update documentation reproducibility records, and close the decision.
 
 ## Deferred work
 

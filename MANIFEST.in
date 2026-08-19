@@ -10,6 +10,7 @@ include tools/configure_pages_docs.py
 include tools/render_quick_start_tutorial.py
 include tools/render_synthetic_tutorial.py
 include tools/render_pulp_tutorial.py
+include tools/render_home_pls_comparison.py
 include constraints/minimum.txt
 recursive-include docs *.md *.js *.mjs *.css
 recursive-include src/pipls/_data/pulp *.csv *.json *.md *.txt

@@ -58,9 +58,14 @@ contract needed by the future Home-page renderer.
 
 ### 0158B — simplified generated Home assets
 
-Pending. Add a documentation renderer that evaluates only the publication-default Pi-PLS path and
-ordinary PLS for Pulp and Tobacco and writes two concise generated SVG assets plus reproducibility
-metadata.
+Implemented in this patch. `tools/render_home_pls_comparison.py` evaluates only the
+publication-default Pi-PLS path and ordinary PLS for Pulp and Tobacco through the shared 0158A
+helper. It writes `pulp_component_parsimony.svg`, `tobacco_component_parsimony.svg`, and a semantic
+manifest under `docs/assets/generated/home/`. The two figures share one y-axis limit and use only
+the concise labels `Π-PLS` and `PLS`, with `Nr of components` on the x-axis. The manifest records
+dataset identity/version, the seeded five-fold protocol, response-subspace policy, case-specific
+search configuration, component and predictor-rank paths, CV-MSE summaries, and SVG hashes. The
+renderer is part of `docs-figures` and the source distribution.
 
 ### 0158C — Home-page placement and closure
 

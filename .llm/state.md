@@ -143,9 +143,12 @@ Decision 0158 is active. Patch 0158A factors the matched numerical evaluation be
 into `examples/_support/pls_family_path_comparison.py`: one helper now owns the seeded materialized
 five-fold protocol, case-specific Pi-PLS search configuration, requested response-subspace paths,
 component-domain checks, and ordinary-PLS path. Example 03 requests both response policies through
-that helper, while the planned Home renderer can request only `"cross_covariance"` without
-duplicating folds or search settings. Patch 0158B will generate simplified Pulp and Tobacco Home
-assets; 0158C will place them side by side under `Why use Π-PLS?` and close the decision.
+that helper. Patch 0158B adds `tools/render_home_pls_comparison.py`, which requests only
+`"cross_covariance"` for Pulp and Tobacco and writes simplified `Π-PLS` versus `PLS` SVGs plus a
+semantic manifest under `docs/assets/generated/home/`; it is now part of `docs-figures` and the
+source distribution. Patch 0158C remains to place the two figures side by side under
+`Why use Π-PLS?`, state the bounded shared-component parsimony interpretation, update documentation
+reproducibility records, and close the decision.
 
 ## Inspection and rendering boundary
 

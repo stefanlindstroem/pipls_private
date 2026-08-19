@@ -55,10 +55,11 @@ docs-serve: docs-figures ## Preview documentation at http://127.0.0.1:8000/.
 	@printf 'Documentation preview: http://127.0.0.1:8000/ (stop with Ctrl+C)\n'
 	$(PYTHON) -m mkdocs serve --dev-addr=127.0.0.1:8000
 
-docs-figures: ## Generate tutorial figures.
+docs-figures: ## Generate documentation figures.
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_quick_start_tutorial.py
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_synthetic_tutorial.py
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_pulp_tutorial.py
+	$(EXAMPLE_ENV) $(PYTHON) tools/render_home_pls_comparison.py
 
 docs-dist: ## Verify documentation from an extracted source distribution.
 	$(PYTHON) tools/check_sdist_docs.py
