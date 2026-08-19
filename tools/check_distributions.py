@@ -134,7 +134,6 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory(prefix="pipls-dist-check-") as temporary:
         workspace = Path(temporary)
-        environment_variables["PIP_CACHE_DIR"] = str(workspace / "pip-cache")
         artifacts = workspace / "artifacts"
         artifacts.mkdir()
 

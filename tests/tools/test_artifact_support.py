@@ -26,6 +26,7 @@ def test_clean_subprocess_environment_removes_python_overrides(
 ) -> None:
     monkeypatch.setenv("PYTHONHOME", "/tmp/python-home")
     monkeypatch.setenv("PYTHONPATH", "/tmp/python-path")
+    monkeypatch.setenv("PIP_CACHE_DIR", "/tmp/pip-cache")
 
     environment = clean_subprocess_environment()
 
@@ -33,6 +34,7 @@ def test_clean_subprocess_environment_removes_python_overrides(
     assert "PYTHONPATH" not in environment
     assert environment["OMP_NUM_THREADS"] == "1"
     assert environment["OPENBLAS_NUM_THREADS"] == "1"
+    assert environment["PIP_CACHE_DIR"] == "/tmp/pip-cache"
 
 
 def test_single_artifact_requires_exactly_one_match(tmp_path: Path) -> None:

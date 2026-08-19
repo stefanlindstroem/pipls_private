@@ -245,7 +245,10 @@ and reconciles active maintainer/example inventory wording only; it introduces n
 Patch 6B strengthens clean-artifact qualification: the installed-package smoke test exercises both
 response-subspace policies and verifies least-squares policy propagation through search/refit, while
 the extracted source distribution executes both Examples 01 and 07 and verifies their PDF outputs.
-No package runtime behavior changes in 6B.
+No package runtime behavior changes in 6B. Patch 6B1 keeps the clean virtual-environment isolation
+boundary while allowing artifact qualification to reuse pip's normal download cache, including any
+caller-supplied `PIP_CACHE_DIR`, instead of forcing a new empty cache for every `docs-dist` or
+`dist-check` run. Step 6C remains the final repository audit and Decision-0155 closure.
 
 ## Authority and drift handling
 

@@ -183,11 +183,12 @@ computational-performance trade-offs, troubleshooting, and top-level discoverabi
 adds the maintained matched-split Pulp comparison and labels its output as model-development CV
 evidence rather than independent validation.
 
-Step 6 is split into three reviewable patches:
+Step 6 is split into three reviewable patches plus one maintenance hotfix:
 
 - 6A: add release notes and reconcile stale active-contract/example-inventory wording -- complete;
 - 6B: qualify both response-subspace policies in clean installed artifacts and execute Example 07
   from the source distribution -- complete;
+- 6B1: reuse the normal pip download cache during clean artifact qualification -- complete;
 - 6C: perform the final repository audit and close Decision 0155 -- next.
 
 Patch 6A records the implemented feature under `Unreleased`, updates the current decision registry,
@@ -196,7 +197,9 @@ correct when written remain historical rather than being rewritten. No runtime b
 6A. Patch 6B extends clean wheel/source-distribution smoke qualification to both response-subspace
 policies, verifies least-squares policy propagation through installed search/refit, and executes both
 Examples 01 and 07 from the extracted source distribution. No package runtime behavior changes in
-6B.
+6B. Patch 6B1 preserves the clean virtual environments but stops replacing `PIP_CACHE_DIR` with a
+fresh temporary directory on every qualification run, so repeated `docs-dist` and `dist-check`
+commands can reuse pip's normal download cache without weakening installation isolation.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator
