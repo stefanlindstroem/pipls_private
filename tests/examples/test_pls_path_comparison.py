@@ -143,6 +143,58 @@ def test_synthetic_stress_case_is_fixed_and_deterministic(
     np.testing.assert_array_equal(first.truth.y_signal, second.truth.y_signal)
 
 
+def test_synthetic_stress_comparison_uses_exhaustive_matched_paths(
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    written_paths: list[Path] = []
+
+    def _capture_savefig(
+        self: Figure,
+        path: str | Path,
+        *args: object,
+        **kwargs: object,
+    ) -> None:
+        del self, args, kwargs
+        written_paths.append(Path(path))
+
+    monkeypatch.setattr(Figure, "savefig", _capture_savefig)
+    module = _load_comparison_module(monkeypatch)
+    result = module.run_dataset(module.SYNTHETIC_STRESS_CASE)
+    output = capsys.readouterr().out
+
+    cross_search = result.cross_covariance_search
+    least_squares_search = result.least_squares_search
+    splits = result.cv_splits
+
+    assert cross_search.cv is least_squares_search.cv is splits
+    assert cross_search.search_method == least_squares_search.search_method == "exhaustive"
+    assert cross_search.search_is_exhaustive_
+    assert least_squares_search.search_is_exhaustive_
+    assert cross_search.n_splits_ == least_squares_search.n_splits_ == 5
+    assert result.pls_path.n_splits == 5
+
+    cross_path = cross_search.component_path_
+    least_squares_path = least_squares_search.component_path_
+    expected_components = np.arange(1, 11, dtype=np.intp)
+    np.testing.assert_array_equal(cross_path.n_components, expected_components)
+    np.testing.assert_array_equal(least_squares_path.n_components, expected_components)
+    np.testing.assert_array_equal(result.pls_path.n_components, expected_components)
+    assert np.isfinite(cross_path.cv_mse_mean).all()
+    assert np.isfinite(least_squares_path.cv_mse_mean).all()
+    assert np.isfinite(result.pls_path.cv_mse_mean).all()
+
+    assert "Synthetic stress case: X shape=(25, 40), Y shape=(25, 10)" in output
+    assert (
+        "latent dimensions: shared=5, predictor-specific=15, response-specific=0" in output
+    )
+    assert "noise SD: X=0.3, Y=0.3" in output
+    assert "fold training size: 20; centered predictor rank cannot exceed 19" in output
+    assert "shared validation protocol: 5 materialized folds" in output
+    assert written_paths == [result.output_path]
+    assert result.output_path.name == "synthetic_stress_component_path_comparison.pdf"
+
+
 def test_dataset_search_templates_keep_matched_configuration(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -152,7 +204,7 @@ def test_dataset_search_templates_keep_matched_configuration(
         (np.array([1, 2], dtype=np.intp), np.array([0], dtype=np.intp)),
     ]
 
-    for dataset in module.DATASET_NAMES:
+    for dataset in module.COMPARISON_CASES:
         cross_search = module._make_search(
             dataset,
             response_subspace="cross_covariance",
@@ -173,7 +225,7 @@ def test_dataset_search_templates_keep_matched_configuration(
         assert least_squares_search.estimator.response_subspace == "least_squares"
         assert cross_search.estimator.svd_solver == least_squares_search.estimator.svd_solver
 
-        if dataset == "pulp":
+        if dataset in ("pulp", module.SYNTHETIC_STRESS_CASE):
             assert cross_search.search_method == "exhaustive"
         else:
             assert cross_search.search_method == "adaptive"

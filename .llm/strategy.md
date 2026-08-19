@@ -116,9 +116,10 @@ into Example 03 for Pulp, Sugarcane, and Tobacco and retired the separate Exampl
 records. Example 03 is now the sole maintained PLS-family comparison.
 
 Decision 0157 is the active exploratory comparison migration. Patch 0157A fixes and regression-tests
-the deterministic near-saturated synthetic design before any comparative result is used; Patch
-0157B will integrate it as a fourth Example-03 case using matched folds and exhaustive predictor-rank
-coverage; Patch 0157C will update user/maintainer documentation, record the observed fixed-realization
+the deterministic near-saturated synthetic design before any comparative result is used. Patch
+0157B integrates it as the fourth Example-03 case using one shared materialized five-fold protocol,
+exhaustive predictor-rank coverage for both Pi-PLS policies, and the full 1--10 component domain.
+Patch 0157C remains to update user/maintainer documentation, record the observed fixed-realization
 behavior without a general superiority claim, and close the decision.
 
 ## Deferred work

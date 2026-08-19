@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; Patch 0157A fixes and tests the synthetic design. Patches 0157B and 0157C remain.
+Accepted; Patches 0157A and 0157B are implemented. Patch 0157C remains.
 
 ## Context
 
@@ -51,10 +51,12 @@ patch does not add a new plotted case yet.
 
 ### 0157B — integrate the stress case into Example 03
 
-Run the cross-covariance Pi-PLS path, least-squares Pi-PLS path, and ordinary-PLS path on one shared
-materialized five-fold protocol. Use exhaustive predictor-rank search for both Pi-PLS policies and
-write one additional PDF under `examples/results/pls_path_comparison/`. Tests must not assert a
-performance ordering between methods.
+Implemented. Example 03 now runs the cross-covariance Pi-PLS path, least-squares Pi-PLS path, and
+ordinary-PLS path on one shared materialized five-fold protocol for the fixed synthetic case. Both
+Pi-PLS policies use exhaustive predictor-rank search. The additional figure is written to
+`examples/results/pls_path_comparison/synthetic_stress_component_path_comparison.pdf`. Focused
+regression coverage checks matched folds, exhaustive coverage, the complete 1--10 component domain,
+finite CV-MSE paths, and the expected artifact path without asserting a performance ordering.
 
 ### 0157C — document the exploratory case and close the decision
 

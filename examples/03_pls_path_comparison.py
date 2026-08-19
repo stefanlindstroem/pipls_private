@@ -1,4 +1,4 @@
-"""Compare Π-PLS response policies and ordinary PLS on the reference datasets."""
+"""Compare Π-PLS response policies and ordinary PLS on four matched-CV cases."""
 
 from __future__ import annotations
 
@@ -24,7 +24,9 @@ from pipls.datasets import (
 )
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
-DATASET_NAMES = ("pulp", "sugarcane", "tobacco")
+REFERENCE_DATASET_NAMES = ("pulp", "sugarcane", "tobacco")
+SYNTHETIC_STRESS_CASE = "synthetic_stress"
+COMPARISON_CASES = (*REFERENCE_DATASET_NAMES, SYNTHETIC_STRESS_CASE)
 ResponseSubspace = Literal["cross_covariance", "least_squares"]
 CVSplit = tuple[NDArray[np.intp], NDArray[np.intp]]
 
@@ -81,7 +83,10 @@ def _load_dataset(dataset: str) -> tuple[np.ndarray, np.ndarray]:
         return load_sugarcane(return_X_y=True)
     if dataset == "tobacco":
         return load_tobacco(return_X_y=True)
-    raise ValueError(f"Unknown reference dataset: {dataset!r}.")
+    if dataset == SYNTHETIC_STRESS_CASE:
+        generated = _make_synthetic_stress_case()
+        return generated.X, generated.Y
+    raise ValueError(f"Unknown comparison case: {dataset!r}.")
 
 
 def _make_search(
@@ -98,6 +103,12 @@ def _make_search(
     )
     if dataset == "pulp":
         return PiPLSSearchCV(estimator=estimator, cv=cv_splits)
+    if dataset == SYNTHETIC_STRESS_CASE:
+        return PiPLSSearchCV(
+            estimator=estimator,
+            search_method="exhaustive",
+            cv=cv_splits,
+        )
     if dataset == "sugarcane":
         return PiPLSSearchCV(
             estimator=estimator,
@@ -111,7 +122,34 @@ def _make_search(
             n_jobs=1,
             cv=cv_splits,
         )
-    raise ValueError(f"Unknown reference dataset: {dataset!r}.")
+    raise ValueError(f"Unknown comparison case: {dataset!r}.")
+
+
+def _case_title(dataset: str) -> str:
+    if dataset == SYNTHETIC_STRESS_CASE:
+        return "Synthetic stress-case PLS-family component-path comparison"
+    return f"{dataset.capitalize()} PLS-family component-path comparison"
+
+
+def _print_case_context(dataset: str, *, X: np.ndarray, Y: np.ndarray) -> None:
+    if dataset != SYNTHETIC_STRESS_CASE:
+        print(f"{dataset.capitalize()}: X shape={X.shape}, Y shape={Y.shape}")
+        return
+
+    spec = SYNTHETIC_STRESS_SPEC
+    fold_training_size = spec.n_samples - (spec.n_samples // 5)
+    centered_rank_limit = fold_training_size - 1
+    print(f"Synthetic stress case: X shape={X.shape}, Y shape={Y.shape}")
+    print(
+        "  latent dimensions: "
+        f"shared={spec.n_shared}, predictor-specific={spec.n_predictor_specific}, "
+        f"response-specific={spec.n_response_specific}"
+    )
+    print(f"  noise SD: X={spec.noise}, Y={spec.noise}")
+    print(
+        f"  fold training size: {fold_training_size}; centered predictor rank cannot exceed "
+        f"{centered_rank_limit}"
+    )
 
 
 def run_dataset(dataset: str) -> DatasetComparison:
@@ -145,8 +183,7 @@ def run_dataset(dataset: str) -> DatasetComparison:
         least_squares_path.n_components,
     ):
         raise RuntimeError(
-            "The two Π-PLS response-subspace paths must contain the same "
-            "component counts."
+            "The two Π-PLS response-subspace paths must contain the same component counts."
         )
 
     pls_path = evaluate_pls_component_path(
@@ -190,7 +227,7 @@ def run_dataset(dataset: str) -> DatasetComparison:
         float(np.max(least_squares_path.cv_mse_mean + least_squares_path.cv_mse_std)),
         float(np.max(pls_path.cv_mse_mean + pls_path.cv_mse_std)),
     )
-    axis.set_title(f"{dataset.capitalize()} PLS-family component-path comparison")
+    axis.set_title(_case_title(dataset))
     axis.set_xlabel("Nr of components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_xticks(cross_covariance_path.n_components)
@@ -203,7 +240,7 @@ def run_dataset(dataset: str) -> DatasetComparison:
     figure.savefig(output_path)
     plt.close(figure)
 
-    print(f"{dataset.capitalize()}: X shape={X.shape}, Y shape={Y.shape}")
+    _print_case_context(dataset, X=X, Y=Y)
     print(f"  shared validation protocol: {len(cv_splits)} materialized folds")
     print(
         "  cross_covariance (peer-reviewed default) predictor ranks: "
@@ -230,16 +267,16 @@ def run_dataset(dataset: str) -> DatasetComparison:
 
 
 def main(argv: Sequence[str] | None = None) -> dict[str, DatasetComparison]:
-    """Run one requested dataset or the complete three-dataset comparison."""
+    """Run one requested comparison case or all three datasets plus the synthetic case."""
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--dataset",
-        choices=DATASET_NAMES,
-        help="Run only one reference dataset; the default runs all three.",
+        choices=COMPARISON_CASES,
+        help="Run only one comparison case; the default runs all four.",
     )
     args = parser.parse_args(argv)
-    datasets = DATASET_NAMES if args.dataset is None else (args.dataset,)
+    datasets = COMPARISON_CASES if args.dataset is None else (args.dataset,)
     results = {dataset: run_dataset(dataset) for dataset in datasets}
     print(f"Wrote results to {RESULTS_DIR}")
     return results
