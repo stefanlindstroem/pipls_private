@@ -66,13 +66,16 @@ make docs
 make docs-serve
 ```
 
-The synthetic tutorial figures are generated from the same deterministic calculation shown in
-example 02. Its manifest records the generator configuration, selected rank pair, external-test
-provenance, filenames, and SVG hashes. The Pulp figures are generated from the same public
-`load_pulp()` dataset used by example 04; their manifest records dataset identity, version, source
-DOI, license, package-resource and canonical-array hashes, evaluated ranks, boundary status, and
-display subsets. Every SVG contains one chart. Generated directories are ignored by Git and
-removed by `make clean`.
+The quick-start, synthetic-tutorial, Pulp-tutorial, and Home comparison figures are generated from
+maintained repository calculations rather than committed image binaries. The synthetic tutorial
+manifest records the generator configuration, selected rank pair, external-test provenance,
+filenames, and SVG hashes. The Pulp tutorial manifest records dataset identity, version, source DOI,
+license, package-resource and canonical-array hashes, evaluated ranks, boundary status, and display
+subsets. The Home comparison manifest records the Pulp and Tobacco dataset identities and versions,
+the publication-default cross-covariance response-subspace policy, the seeded five-fold validation
+protocol, case-specific predictor-rank search settings, component and predictor-rank paths, both
+CV-MSE summaries, and the two SVG hashes. Every generated SVG contains one chart. Generated
+directories are ignored by Git and removed by `make clean`.
 
 The preview is served at `http://127.0.0.1:8000/` and updates as documentation files change. Stop it
 with `Ctrl+C`. The stronger distribution check is:
@@ -84,9 +87,10 @@ make docs-dist
 It builds a source distribution, unpacks it, creates a clean virtual environment, installs the
 unpacked package with its documentation extra, and runs the same strict site build. This verifies
 that `mkdocs.yml`, the Makefile, Markdown sources, JavaScript assets, generated-reference inputs,
-package source, synthetic and Pulp tutorial examples, Pulp data, and both renderers are shipped
-together. The clean build regenerates and parses the declared SVG assets. Generated tutorial assets and `site/` output
-are temporary and are not part of the source distribution.
+package source, documentation renderers, their required example-support code, and the Pulp and
+Tobacco data needed by the Home comparison are shipped together. The clean build regenerates and
+parses the declared SVG assets. Generated documentation assets and `site/` output are temporary and
+are not part of the source distribution.
 
 ## Model-fitting reproducibility
 

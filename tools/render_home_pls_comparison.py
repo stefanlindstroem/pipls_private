@@ -100,7 +100,7 @@ def _render_case(
     pipls_path = evaluation.pipls_searches["cross_covariance"].component_path_
     pls_path = evaluation.pls_path
 
-    figure, axis = plt.subplots(figsize=(5.8, 4.6), layout="constrained")
+    figure, axis = plt.subplots(figsize=(4.0, 4.0), layout="constrained")
     axis.errorbar(
         pipls_path.n_components,
         pipls_path.cv_mse_mean,

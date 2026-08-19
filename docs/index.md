@@ -15,6 +15,20 @@ performance; in some settings, the predictive improvement is substantial. These 
 results for the studied problems rather than a guarantee that one method will be better for every
 dataset.
 
+**Fewer shared components can be sufficient.** On both Pulp and Tobacco datasets, Π-PLS reaches a low
+cross-validated prediction-error region with fewer shared components than ordinary PLS.
+
+<div class="grid" markdown>
+
+![Pulp component-path comparison between Π-PLS and ordinary PLS](assets/generated/home/pulp_component_parsimony.svg)
+
+![Tobacco component-path comparison between Π-PLS and ordinary PLS](assets/generated/home/tobacco_component_parsimony.svg)
+
+</div>
+
+Both panels use the same seeded five-fold validation splits for Π-PLS and ordinary PLS, and the
+error bars show the split-to-split standard deviation. 
+
 The method differs from ordinary PLS in how it constructs the latent regression map. Π-PLS
 represents that map through paired latent modes. Each retained mode contains one orthonormal
 predictor direction, one orthonormal response direction, and one nonnegative dilation. This

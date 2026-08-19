@@ -50,15 +50,18 @@ maintained outcome is a self-contained six-example route led by an automatic Pul
 manual selection review, one unified PLS-family path comparison, and complete real-data
 interpretation workflows. The unified comparison overlays the publication-default and least-squares
 Pi-PLS response policies with ordinary PLS on matched folds for all three reference datasets plus
-one fixed near-saturated synthetic stress case. Served documentation is self-contained, separates
-tutorials, guides, and generated reference, and
-keeps maintainer decisions outside the user site.
+one fixed near-saturated synthetic stress case. The Home page derives a simplified Pulp/Tobacco
+view from that same numerical protocol to illustrate possible parsimony in shared component count
+without exposing the optional least-squares policy in the introductory motivation. Served
+documentation is self-contained, separates tutorials, guides, and generated reference, and keeps
+maintainer decisions outside the user site.
 
 Current canonical records: [0065](0065-documentation-layer-consolidation.md),
 [0152](0152-selection-review-feedback-workflow.md),
 [0155](0155-response-subspace-selection-policies.md),
 [0156](0156-unified-pls-family-path-comparison.md),
-[0157](0157-near-saturated-synthetic-pls-comparison.md), and the product and workflow boundaries in
+[0157](0157-near-saturated-synthetic-pls-comparison.md),
+[0158](0158-home-page-parsimony-comparison.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
 [0045](0045-pls-family-analysis-boundary.md), and
 [0142](0142-package-owned-reference-datasets.md).

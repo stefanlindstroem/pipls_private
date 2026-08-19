@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation in progress.
+Accepted, implemented, and closed.
 
 ## Context
 
@@ -69,9 +69,14 @@ renderer is part of `docs-figures` and the source distribution.
 
 ### 0158C — Home-page placement and closure
 
-Pending. Place the Pulp and Tobacco figures side by side under `Why use Π-PLS?`, state the bounded
-shared-component parsimony interpretation, link to Example 03 for the complete comparison, update
-documentation reproducibility records, and close this decision.
+Implemented. The Home page now places the Pulp and Tobacco comparison figures side by side under
+`Why use Π-PLS?`. The accompanying prose states the bounded claim that the displayed real-data
+examples can reach their useful low-error region with fewer shared components than ordinary PLS,
+identifies the displayed Π-PLS curve as the publication-default cross-covariance construction, and
+explicitly distinguishes shared component count $h$ from the additional predictor-rank parameter
+$r_\pi$. The Home page links to Example 03 for both response-subspace policies and the complete
+matched-validation context. Documentation reproducibility records now include the Home renderer,
+its semantic manifest, and its Pulp/Tobacco data dependencies. Decision 0158 is closed.
 
 ## Relationship to earlier decisions
 
@@ -86,6 +91,8 @@ documentation reproducibility records, and close this decision.
 
 - Home gets a concise real-data motivation figure without duplicating the full Example-03 story.
 - The numerical comparison protocol has one maintained implementation shared by Example 03 and the
-  future Home renderer.
+  Home renderer.
 - The Home figures cannot silently drift to different folds or case-specific search settings.
 - Documentation-build cost avoids the unnecessary least-squares searches for the Home assets.
+- The parsimony statement is explicitly limited to shared component count $h$ and is not presented
+  as a universal performance or total-model-complexity guarantee.

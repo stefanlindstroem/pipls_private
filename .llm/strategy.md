@@ -124,15 +124,13 @@ without a general superiority claim. In that fixed realization, both Pi-PLS poli
 minimum mean CV-MSE at 5 components (0.9036 cross-covariance; 0.9022 least squares), while ordinary
 PLS reaches 0.9373 at 8 components.
 
-Decision 0158 is the active three-patch documentation-presentation migration. Patch 0158A is
-complete: Example 03 now consumes a shared example-support evaluator that owns the maintained
-materialized folds, case-specific Pi-PLS search settings, requested response-subspace fitting, and
-ordinary-PLS path evaluation. Patch 0158B is also complete: the dedicated Home renderer requests
-only publication-default Pi-PLS plus ordinary PLS for Pulp and Tobacco, writes two concise SVGs
-with a common y-axis limit and semantic provenance manifest under `docs/assets/generated/home/`,
-and is wired into `docs-figures` and the sdist. Patch 0158C is next and will place those figures side
-by side under `Why use Π-PLS?`, state the bounded shared-component parsimony interpretation, link to
-Example 03, update documentation reproducibility records, and close the decision.
+Decision 0158 is complete and closed. Patch 0158A established the shared Example-03 numerical
+evaluator; 0158B added the dedicated Home renderer for publication-default Pi-PLS versus ordinary
+PLS on Pulp and Tobacco; and 0158C places those generated figures side by side under
+`Why use Π-PLS?`, records their documentation-reproducibility contract, and limits the stated
+parsimony interpretation to shared component count $h$. The full three-way technical comparison
+remains Example 03. Future changes to this Home comparison require a new owner decision rather than
+extending Decision 0158.
 
 ## Deferred work
 

@@ -139,16 +139,15 @@ Source-distribution qualification executes only the bounded Pulp branch of Examp
 examples` owns complete four-case execution. The former Example 07 and its dedicated PDF remain
 retired.
 
-Decision 0158 is active. Patch 0158A factors the matched numerical evaluation behind Example 03
-into `examples/_support/pls_family_path_comparison.py`: one helper now owns the seeded materialized
-five-fold protocol, case-specific Pi-PLS search configuration, requested response-subspace paths,
-component-domain checks, and ordinary-PLS path. Example 03 requests both response policies through
-that helper. Patch 0158B adds `tools/render_home_pls_comparison.py`, which requests only
-`"cross_covariance"` for Pulp and Tobacco and writes simplified `Π-PLS` versus `PLS` SVGs plus a
-semantic manifest under `docs/assets/generated/home/`; it is now part of `docs-figures` and the
-source distribution. Patch 0158C remains to place the two figures side by side under
-`Why use Π-PLS?`, state the bounded shared-component parsimony interpretation, update documentation
-reproducibility records, and close the decision.
+Decision 0158 is implemented and closed. Example 03 and the dedicated Home renderer share
+`examples/_support/pls_family_path_comparison.py`, so the simplified Pulp/Tobacco Home figures use
+the same seeded materialized five-fold protocol and case-specific Pi-PLS search settings as the
+maintained comparison. The Home renderer requests only the publication-default
+`"cross_covariance"` policy plus ordinary PLS, writes concise `Π-PLS` versus `PLS` SVGs and a
+semantic manifest under `docs/assets/generated/home/`, and is part of `docs-figures` and the source
+distribution. The two figures are placed side by side under `Why use Π-PLS?`; the accompanying text
+limits the parsimony interpretation to shared component count $h$, notes that Pi-PLS also selects
+$r_\pi$, and links to Example 03 for the complete matched-validation comparison.
 
 ## Inspection and rendering boundary
 
