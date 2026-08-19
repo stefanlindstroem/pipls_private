@@ -155,12 +155,14 @@ Step 4 is active with three reviewable patches:
 - 4A: add independent mathematical reference coverage, RRR equivalence, least-squares training
   optimality, limiting-case identities, and shared core invariants -- complete;
 - 4B: harden public scaling, serialization, configuration changes, and scikit-learn interoperability
-  for the least-squares policy -- next;
-- 4C: synchronize internal mathematics/testing contracts and close Step 4.
+  for the least-squares policy -- complete;
+- 4C: synchronize internal mathematics/testing contracts and close Step 4 -- next.
 
 Patch 4A uses an independent Choice-C Gram/eigen calculation only in regression-test code; the
-runtime continues to use the numerically preferred exact QR/SVD construction from Step 2. The
-broader public/API regression work remains isolated in Patch 4B before theory/API documentation and
+runtime continues to use the numerically preferred exact QR/SVD construction from Step 2. Patch 4B
+adds public regression coverage for all scaling combinations, estimator/search serialization,
+`set_params()` refitting, and external `GridSearchCV` while leaving runtime behavior unchanged.
+Patch 4C will synchronize internal scientific/testing contracts before theory/API documentation and
 the programming-user comparison example land in Step 5.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit

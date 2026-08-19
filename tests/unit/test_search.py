@@ -1988,6 +1988,43 @@ def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
         search.oof_report(X, Y[:, :1], selection=compatible)
 
 
+
+def test_least_squares_search_pickle_round_trip_preserves_template_and_refit() -> None:
+    X, Y = _data()
+    template = PiPLSRegression(
+        n_components=1,
+        predictor_rank=1,
+        response_subspace="least_squares",
+        svd_solver="full",
+    )
+    search = PiPLSSearchCV(
+        estimator=template,
+        n_components_values=[1, 2],
+        predictor_rank_values=[1, 2, 3],
+        search_method="exhaustive",
+        cv=3,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    restored = pickle.loads(pickle.dumps(search))
+    assert isinstance(restored.estimator, PiPLSRegression)
+    assert restored.estimator.response_subspace == "least_squares"
+
+    selection = restored.select(n_components=2)
+    model = restored.refit(X, Y, selection=selection)
+    fresh = PiPLSRegression(
+        n_components=selection.n_components,
+        predictor_rank=selection.predictor_rank,
+        response_subspace="least_squares",
+        svd_solver="full",
+    ).fit(X, Y)
+
+    assert model.response_subspace == "least_squares"
+    np.testing.assert_array_equal(model.coef_, fresh.coef_)
+    np.testing.assert_array_equal(model.intercept_, fresh.intercept_)
+    np.testing.assert_array_equal(model.predict(X), fresh.predict(X))
+
+
 def test_predictor_rank_relative_tolerance_conditions_the_component_path() -> None:
     X, Y = _data()
     score_by_rank = {1: 0.91, 2: 1.0, 3: 0.95}

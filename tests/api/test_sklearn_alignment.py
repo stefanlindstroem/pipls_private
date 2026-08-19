@@ -178,6 +178,26 @@ def test_fixed_estimator_interoperates_with_grid_search_for_explicit_pairs() -> 
     assert search.best_estimator_.predictor_rank in (2, 3)
 
 
+
+def test_grid_search_preserves_least_squares_response_subspace_configuration() -> None:
+    X, Y = _data()
+    template = _fixed_estimator().set_params(response_subspace="least_squares")
+    search = GridSearchCV(
+        template,
+        param_grid=[
+            {"n_components": [1], "predictor_rank": [2]},
+            {"n_components": [2], "predictor_rank": [3]},
+        ],
+        cv=3,
+    ).fit(X, Y)
+
+    assert template.response_subspace == "least_squares"
+    assert not hasattr(template, "coef_")
+    assert isinstance(search.best_estimator_, PiPLSRegression)
+    assert search.best_estimator_.response_subspace == "least_squares"
+    assert search.best_estimator_.predictor_rank in (2, 3)
+
+
 def test_pls_style_method_signatures_include_copy_controls() -> None:
     assert tuple(inspect.signature(PiPLSRegression.predict).parameters) == (
         "self",

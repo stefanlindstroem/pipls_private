@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import pytest
 from sklearn.base import clone
@@ -256,6 +258,98 @@ def test_invalid_response_subspace_is_rejected_without_fitted_state(value: objec
     assert not hasattr(model, "coef_")
     assert not hasattr(model, "decomposition_")
 
+
+@pytest.mark.parametrize(
+    ("scale_x", "scale_y"),
+    [
+        (False, False),
+        (False, True),
+        (True, False),
+        (True, True),
+    ],
+)
+def test_least_squares_response_subspace_supports_all_scaling_combinations(
+    scale_x: bool,
+    scale_y: bool,
+) -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        response_subspace="least_squares",
+        scale=False,
+        scale_x=scale_x,
+        scale_y=scale_y,
+        svd_solver="full",
+    ).fit(X, Y)
+
+    expected_x_scale = (
+        np.std(X, axis=0, ddof=1) if scale_x else np.ones(X.shape[1])
+    )
+    expected_y_scale = (
+        np.std(Y, axis=0, ddof=1) if scale_y else np.ones(Y.shape[1])
+    )
+    np.testing.assert_allclose(model.x_scale_, expected_x_scale)
+    np.testing.assert_allclose(model.y_scale_, expected_y_scale)
+    expected_coef_matrix = (
+        model.decomposition_.standardized_regression_map
+        * model.y_scale_[None, :]
+        / model.x_scale_[:, None]
+    )
+    np.testing.assert_allclose(model.coef_.T, expected_coef_matrix)
+    assert np.all(np.isfinite(model.predict(X)))
+    assert np.all(np.isfinite(model.x_scores_))
+    assert np.all(np.isfinite(model.y_scores_))
+
+
+def test_fitted_least_squares_estimator_pickle_round_trip() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        response_subspace="least_squares",
+        scale_x=True,
+        scale_y=False,
+        svd_solver="full",
+    ).fit(X, Y)
+
+    restored = pickle.loads(pickle.dumps(model))
+
+    assert restored.response_subspace == "least_squares"
+    np.testing.assert_array_equal(restored.coef_, model.coef_)
+    np.testing.assert_array_equal(restored.intercept_, model.intercept_)
+    np.testing.assert_array_equal(restored.predict(X), model.predict(X))
+    np.testing.assert_array_equal(
+        restored.decomposition_.standardized_regression_map,
+        model.decomposition_.standardized_regression_map,
+    )
+
+
+def test_set_params_response_subspace_refit_matches_fresh_estimator() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        response_subspace="cross_covariance",
+        svd_solver="full",
+    ).fit(X, Y)
+
+    model.set_params(response_subspace="least_squares").fit(X, Y)
+    fresh = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        response_subspace="least_squares",
+        svd_solver="full",
+    ).fit(X, Y)
+
+    assert model.response_subspace == "least_squares"
+    np.testing.assert_array_equal(model.coef_, fresh.coef_)
+    np.testing.assert_array_equal(model.intercept_, fresh.intercept_)
+    np.testing.assert_array_equal(model.predict(X), fresh.predict(X))
+    np.testing.assert_array_equal(
+        model.decomposition_.standardized_regression_map,
+        fresh.decomposition_.standardized_regression_map,
+    )
 
 def test_fixed_fit_creates_no_search_state() -> None:
     X, Y = _data()
