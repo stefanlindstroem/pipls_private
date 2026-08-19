@@ -229,16 +229,16 @@ Pi-PLS evidence or claim that it is uniformly superior in predictive performance
 
 ## Relationship to earlier decisions
 
-This decision extends, but does not yet modify the implemented contracts recorded by earlier
-current decisions. Patch 1B will reconcile the narrow clauses that otherwise read as exclusive once
-the extension is implemented:
+This decision extends, but does not yet modify the implemented runtime contracts recorded by
+earlier current decisions. The following reconciliations make their scope explicit before the
+extension is implemented:
 
 - Decision 0120 continues to define the companion-manuscript cross-covariance construction and its
   publication scope; Decision 0155 adds a software-only alternative without changing what the
   manuscript contains.
 - Decision 0008 continues to allow randomized decomposition only for the predictor basis. Its
-  response-side exact-factorization wording will be generalized to cover both response-subspace
-  policies.
+  exact response-side factorization contract applies to whichever response-subspace construction is
+  active.
 - Decision 0039 continues to separate fixed-estimator fitting from search ownership. The
   response-subspace policy belongs to the fixed estimator and is propagated, not optimized, by
   search.
@@ -257,9 +257,9 @@ This decision is the first patch of Step 1 in a six-step migration:
 5. document the theory and API and add a programming-user comparison example;
 6. complete the release, stale-contract, installed-artifact, and distribution audit.
 
-Step 1 is itself split into reviewable patches 1A--1D. This patch records Decision 0155 and indexes
-it. Later Step-1 patches reconcile existing decisions, open the active maintainer roadmap, and audit
-consistency before runtime implementation begins.
+Step 1 is itself split into reviewable patches 1A--1D. Patch 1A recorded Decision 0155 and indexed
+it; Patch 1B reconciles the affected earlier decisions. Later Step-1 patches open the active
+maintainer roadmap and audit consistency before runtime implementation begins.
 
 ## Consequences
 

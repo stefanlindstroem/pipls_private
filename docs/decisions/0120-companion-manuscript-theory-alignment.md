@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted and implemented.
+Accepted and implemented for companion-manuscript theory alignment. Decision 0155 leaves this
+publication contract intact while authorizing a software-only least-squares response-subspace
+extension.
 
 ## Context
 
@@ -62,6 +64,17 @@ cited in dataset and tutorial documentation, not as the theory reference.
 
 This decision changes documentation contracts only. It does not change package source behavior,
 defaults, examples, benchmarks, model selection, validation, or real-data workflows.
+
+## Relationship to Decision 0155
+
+The response-subspace optimization in item 5 remains the canonical construction documented by the
+peer-reviewed companion manuscript and remains the package default. Decision 0155 authorizes an
+additional least-squares-driven response-subspace policy as a software extension; it does not alter
+what the companion manuscript defines or retrospectively place that extension in the publication.
+
+When the Decision-0155 implementation lands, theory documentation may present the software-only
+alternative alongside this canonical derivation, but it must label the publication boundary
+explicitly. Manuscript-reproduction workflows continue to use the cross-covariance construction.
 
 ## Consequences
 

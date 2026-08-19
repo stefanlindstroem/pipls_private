@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted and implemented.
+Accepted and implemented. Decision 0155 preserves the predictor-only randomized-SVD boundary
+and generalizes the exact response-side factorization contract when its software extension is
+implemented.
 
 ## Context
 
@@ -43,6 +45,17 @@ The resolved solver and numerical-rank diagnostics are canonical fields of `deco
 `predictor_svd_solver`, `x_rank`, `x_rank_is_exact`, and `rank_tolerance`. Under full SVD, `x_rank`
 is the complete numerical rank. Under randomized truncated SVD, it is only the verified number of
 retained singular values above the tolerance and `x_rank_is_exact` is false.
+
+## Relationship to Decision 0155
+
+The statement above that the SVD of `Z.T @ Y` remains exact describes the currently implemented
+cross-covariance response-subspace route. Decision 0155 does not broaden `svd_solver`: only the
+predictor decomposition that constructs the retained predictor basis may be randomized.
+
+When the least-squares response-subspace extension is implemented, its small response-side
+orthogonal factorization must likewise remain exact, as must the final SVD of `W`. Thus the durable
+contract is that response-subspace selection and final latent coupling are exact under either
+response-subspace policy; randomized SVD remains a predictor-side performance option only.
 
 ## Consequences
 
