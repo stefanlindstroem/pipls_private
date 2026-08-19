@@ -191,20 +191,24 @@ seven-patch Decision-0154 migration is complete: release notes record the breaki
 change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
 default together with the explicit EPV policy.
 
-Decision 0155 is accepted and opens the next staged migration: an optional least-squares-driven
-response-subspace policy will be added as a software extension while the peer-reviewed
-cross-covariance construction remains the default. Runtime implementation has not started in Step
-1. The current fixed estimator still has no `response_subspace` parameter and still constructs the
-response basis only from the dominant right-singular subspace of the retained predictor-response
+Decision 0155 is accepted and Step 1 of its staged migration is complete. The planned
+least-squares-driven response-subspace policy remains a software extension, while the peer-reviewed
+cross-covariance construction remains the default. Runtime implementation has not started. The
+current fixed estimator still has no `response_subspace` parameter and still constructs the response
+basis only from the dominant right-singular subspace of the retained predictor-response
 cross-covariance. Active `.llm` mathematical, numerical, and public-API contracts therefore continue
 to describe only that implemented cross-covariance path until the core and public-API patches land.
 
-Step 1 is decision and maintainer-contract work only. Patches 1A and 1B recorded Decision 0155 and
-reconciled its relationship to Decisions 0120, 0008, and 0039. Patch 1C opens the six-step roadmap in
-maintainer state and strategy; Patch 1D will perform a repository-wide consistency audit before any
-runtime change. The compatibility invariant for the later implementation is that omitting the new
-parameter, or explicitly selecting `response_subspace="cross_covariance"`, must reproduce the
-pre-Decision-0155 fixed-estimator numerical path subject only to ordinary floating-point behavior.
+Patches 1A--1C recorded Decision 0155, reconciled Decisions 0120, 0008, and 0039, and opened the
+six-step roadmap. Patch 1D completed a repository-wide audit. The audit found no premature runtime
+signature, test expectation, programming example, or user-facing claim for `response_subspace`; the
+remaining unconditional cross-covariance descriptions belong either to the implemented runtime or
+to peer-reviewed/canonical theory and are intentionally unchanged at this stage. Step 2 is now the
+active increment: implement both response-subspace constructions in the fixed numerical core without
+yet widening the public estimator surface. The compatibility invariant for the later implementation
+is that omitting the new parameter, or explicitly selecting
+`response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155 fixed-estimator
+numerical path subject only to ordinary floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

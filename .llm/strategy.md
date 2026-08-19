@@ -106,14 +106,20 @@ Step 1 is split into four reviewable patches:
 
 - 1A: record and index Decision 0155 -- complete;
 - 1B: reconcile Decisions 0120, 0008, and 0039 with the accepted extension -- complete;
-- 1C: open the active maintainer roadmap while leaving implemented contracts untouched -- current
-  patch;
-- 1D: audit repository-wide consistency and close Step 1 before runtime implementation begins.
+- 1C: open the active maintainer roadmap while leaving implemented contracts untouched -- complete;
+- 1D: audit repository-wide consistency and close Step 1 before runtime implementation begins --
+  complete.
 
-During Step 1, `.llm/public_api.md`, `.llm/mathematics.md`, `.llm/theory.md`, and
-`.llm/numerical_contracts.md` continue to describe the implemented cross-covariance-only runtime.
-They must not be changed to claim support for `response_subspace` before the corresponding source
-and test contracts land.
+The Step-1 audit confirmed that `.llm/public_api.md`, `.llm/mathematics.md`, `.llm/theory.md`,
+`.llm/numerical_contracts.md`, source, tests, examples, and user-facing theory still describe only
+the implemented cross-covariance runtime. No premature `response_subspace` public signature, test
+expectation, or programming example is present. Those implemented-contract descriptions remain
+unchanged until the corresponding source and test contracts land.
+
+Step 2 is now active. It should add the two response-subspace constructions to the fixed numerical
+core only, preserving the current cross-covariance computation as the compatibility reference and
+keeping the least-squares response-side factorization exact. The public estimator parameter and
+search propagation remain Step 3 work.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

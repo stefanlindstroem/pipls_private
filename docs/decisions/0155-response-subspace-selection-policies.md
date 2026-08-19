@@ -2,10 +2,10 @@
 
 ## Status
 
-Accepted; implementation pending. The peer-reviewed cross-covariance construction remains the
-package default. This decision authorizes one additional least-squares-driven response-subspace
-policy as a software extension; it does not claim that the extension is part of the companion
-publication.
+Accepted; Step 1 is complete and runtime implementation is pending. The peer-reviewed
+cross-covariance construction remains the package default. This decision authorizes one additional
+least-squares-driven response-subspace policy as a software extension; it does not claim that the
+extension is part of the companion publication.
 
 ## Context
 
@@ -257,9 +257,12 @@ This decision is the first patch of Step 1 in a six-step migration:
 5. document the theory and API and add a programming-user comparison example;
 6. complete the release, stale-contract, installed-artifact, and distribution audit.
 
-Step 1 is itself split into reviewable patches 1A--1D. Patch 1A recorded Decision 0155 and indexed
-it; Patch 1B reconciles the affected earlier decisions. Later Step-1 patches open the active
-maintainer roadmap and audit consistency before runtime implementation begins.
+Step 1 is itself split into reviewable patches 1A--1D and is complete. Patch 1A recorded Decision
+0155 and indexed it; Patch 1B reconciled the affected earlier decisions; Patch 1C opened the active
+maintainer roadmap; and Patch 1D audited repository-wide consistency before runtime implementation.
+The audit confirmed that source, tests, examples, user-facing theory, and active implemented-contract
+files still describe only the current cross-covariance runtime and do not prematurely expose
+`response_subspace`. Step 2 is therefore the next implementation increment.
 
 ## Consequences
 
