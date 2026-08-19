@@ -128,7 +128,7 @@ def run_dataset(dataset: str) -> DatasetComparison:
         yerr=cross_covariance_path.cv_mse_std,
         fmt="o-",
         capsize=4,
-        label=r"$\Pi$-PLS (cross-covariance; publication default)",
+        label=r"$\Pi$-PLS (cross-covariance)",
     )
     axis.errorbar(
         least_squares_path.n_components,
@@ -136,7 +136,7 @@ def run_dataset(dataset: str) -> DatasetComparison:
         yerr=least_squares_path.cv_mse_std,
         fmt="^--",
         capsize=4,
-        label=r"$\Pi$-PLS (least squares; software extension)",
+        label=r"$\Pi$-PLS (least squares)",
     )
     axis.errorbar(
         pls_path.n_components,
@@ -152,7 +152,7 @@ def run_dataset(dataset: str) -> DatasetComparison:
         float(np.max(pls_path.cv_mse_mean + pls_path.cv_mse_std)),
     )
     axis.set_title(f"{dataset.capitalize()} PLS-family component-path comparison")
-    axis.set_xlabel("Number of response components")
+    axis.set_xlabel("Nr of components")
     axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
     axis.set_xticks(cross_covariance_path.n_components)
     axis.set_ylim(0.0, max(1.0, 1.05 * upper))

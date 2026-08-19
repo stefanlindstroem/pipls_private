@@ -34,6 +34,8 @@ def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     written_paths: list[Path] = []
+    xlabels: list[str] = []
+    legend_labels: list[list[str]] = []
 
     def _capture_savefig(
         self: Figure,
@@ -41,8 +43,13 @@ def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
         *args: object,
         **kwargs: object,
     ) -> None:
-        del self, args, kwargs
+        del args, kwargs
         written_paths.append(Path(path))
+        axis = self.axes[0]
+        xlabels.append(axis.get_xlabel())
+        legend = axis.get_legend()
+        assert legend is not None
+        legend_labels.append([text.get_text() for text in legend.get_texts()])
 
     monkeypatch.setattr(Figure, "savefig", _capture_savefig)
     module = _load_comparison_module(monkeypatch)
@@ -88,6 +95,14 @@ def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
     )
     assert "model-development evidence, not independent post-selection validation" in output
     assert written_paths == [result.output_path]
+    assert xlabels == ["Nr of components"]
+    assert legend_labels == [
+        [
+            r"$\Pi$-PLS (cross-covariance)",
+            r"$\Pi$-PLS (least squares)",
+            "PLS (NIPALS)",
+        ]
+    ]
     assert result.output_path.name == "pulp_component_path_comparison.pdf"
 
 
