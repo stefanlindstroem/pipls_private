@@ -33,7 +33,10 @@ where `y` may be one- or two-dimensional.
 
 The fixed estimator fits one explicit pair. Required keyword-only parameters are
 `n_components` and `predictor_rank`; neither has a default, `None`, or automatic sentinel. Optional
-parameters are `scale`, `scale_x`, `scale_y`, `copy`, `svd_solver`, and `random_state`.
+parameters are `response_subspace`, `scale`, `scale_x`, `scale_y`, `copy`, `svd_solver`, and
+`random_state`. `response_subspace="cross_covariance"` is the default peer-reviewed construction;
+`response_subspace="least_squares"` is the RRR-inspired software extension from Decision 0155 and
+is not part of the peer-reviewed companion publication.
 
 Validation rules:
 
@@ -41,6 +44,8 @@ Validation rules:
 - `n_components <= predictor_rank`;
 - `predictor_rank <= min(n_features, n_samples - 1)` after centering and no greater than the
   verified numerical rank;
+- `response_subspace` is exactly `"cross_covariance"` or `"least_squares"`; abbreviations such as
+  `"xcov"` and `"lstsq"`, and the exploratory `"var"` mode, are invalid;
 - `scale` and `copy` are booleans;
 - `scale_x` and `scale_y` are booleans or `None`; `None` inherits `scale` for the corresponding
   block;
@@ -55,7 +60,8 @@ warning category.
 The estimator provides PLS-style `fit`, `predict`, `transform`, `fit_transform`,
 `inverse_transform`, and scalar R2 `score`. It supports feature names and inherited scikit-learn
 `set_output()` behavior. Standard fitted scores, loadings, rotations, coefficients, intercept, and
-means/scales remain available.
+means/scales remain available. `response_subspace` is constructor configuration rather than fitted
+selection provenance; there is no separate `response_subspace_` attribute.
 
 Every fit centers both blocks. `scale` remains the backward-compatible default for both predictor
 and response scaling. Non-`None` `scale_x` and `scale_y` values override that policy independently,
@@ -77,7 +83,10 @@ has no selection provenance.
 
 The search owns cross-validated path evaluation. It accepts a direct `PiPLSRegression`, a
 scikit-learn pipeline with one terminal Pi-PLS step, or `None` for the default template. Arbitrary
-nested meta-estimators are unsupported.
+nested meta-estimators are unsupported. Search changes only `n_components` and `predictor_rank`; it
+preserves fixed-estimator configuration such as `response_subspace` through candidate fitting, OOF
+fitting, and refitting. `response_subspace` is not a third search dimension. The default search
+template therefore continues to use `"cross_covariance"`.
 
 Important defaults and controls:
 

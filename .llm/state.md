@@ -191,35 +191,29 @@ seven-patch Decision-0154 migration is complete: release notes record the breaki
 change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
 default together with the explicit EPV policy.
 
-Decision 0155 is accepted; Steps 1 and 2 and Patches 3A--3B of Step 3 are complete. The
-least-squares-driven response-subspace policy remains a software extension, while the peer-reviewed
-cross-covariance construction remains the default. The private core now supports exactly
-`"cross_covariance"` and `"least_squares"`: the former uses exact SVD of `Z.T @ Y`, while the latter
-uses exact reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`. The least-squares helper contains
-an explicit source comment that the construction is not part of the peer-reviewed companion
-publication. `svd_solver` still governs only the predictor decomposition; core tests now cover the
-least-squares route with full and seeded randomized predictor SVD and with `p >> n`.
+Decision 0155 is accepted; Steps 1--3 are complete. The least-squares-driven response-subspace
+policy remains a software extension, while the peer-reviewed cross-covariance construction remains
+the default. The private core supports exactly `"cross_covariance"` and `"least_squares"`: the former
+uses exact SVD of `Z.T @ Y`, while the latter uses exact reduced QR of `Z` followed by exact SVD of
+`Q_Z.T @ Y`. The least-squares helper contains an explicit source comment that the construction is
+not part of the peer-reviewed companion publication. `svd_solver` still governs only the predictor
+decomposition; core tests cover the least-squares route with full and seeded randomized predictor
+SVD and with `p >> n`.
 
-Patches 1A--1D established Decision 0155 and its publication/API boundary. Patches 2A--2C isolated
-the published response-basis calculation, added the Choice-C least-squares primitive, and added the
-private two-value core dispatch. Patch 2D hardened the numerical integration and recorded the
-implemented private-core contract without introducing a second rank threshold or Gram-matrix
-pseudoinverse. Patch 3A now exposes `response_subspace` on `PiPLSRegression` with default
-`"cross_covariance"` and alternative `"least_squares"`, validates exactly that two-value vocabulary,
-and forwards the setting to the private core. The estimator docstring identifies the least-squares
-construction as a software extension outside the peer-reviewed companion publication. Fixed-fit
-tests protect cloning, constructor parameters, public fit/transform/predict surfaces, invalid-value
-cleanup, and exact numerical identity between omitted and explicit cross-covariance settings. Patch
-3B confirms that direct candidate evaluation, explicit refit, selection-conditioned OOF reporting,
-and pipeline templates preserve `response_subspace="least_squares"` while search continues to
-overwrite only `n_components` and `predictor_rank`. The ordinary search template still refits with
-`response_subspace="cross_covariance"`.
+Patches 1A--1D established Decision 0155 and its publication/API boundary. Patches 2A--2D isolated
+the published response-basis calculation, added and hardened the Choice-C least-squares primitive,
+and recorded the implemented private-core numerical contract. Patches 3A--3C expose
+`response_subspace` on `PiPLSRegression`, validate exactly the two public values, propagate the fixed
+setting through direct search, pipelines, OOF fitting, and refitting, and synchronize the implemented
+public contract. Search still changes only `n_components` and `predictor_rank`; its ordinary template
+continues to use `response_subspace="cross_covariance"`. No `response_subspace_` fitted provenance
+attribute is introduced.
 
-Step 3 remains active. Patch 3C will synchronize the implemented public contract and close the step.
-The compatibility invariant remains
-that omitting the new parameter, or explicitly selecting `response_subspace="cross_covariance"`,
-must reproduce the pre-Decision-0155 fixed-estimator numerical path subject only to ordinary
-floating-point behavior.
+Step 4 is now active: add the broader mathematical, numerical, and API regression coverage for both
+response-subspace policies, including RRR equivalence and least-squares optimality claims. The
+compatibility invariant remains that omitting the new parameter, or explicitly selecting
+`response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155 fixed-estimator
+numerical path subject only to ordinary floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

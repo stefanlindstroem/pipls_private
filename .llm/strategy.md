@@ -136,19 +136,23 @@ map and `P`/`D`/`Q` diagonalization. Patch 2D adds full/seeded-randomized predic
 the least-squares route, protects the `p >> n` regime, and records that response-side QR/SVD remains
 exact and introduces no independent rank threshold.
 
-Step 3 is active with three patches:
+Step 3 is complete with three patches:
 
-- 3A (complete): expose and validate `response_subspace` on `PiPLSRegression`, preserve
+- 3A: expose and validate `response_subspace` on `PiPLSRegression`, preserve
   `"cross_covariance"` as the default, and forward the setting to the private core;
-- 3B (complete): certify direct-search, pipeline, OOF, and refit propagation without adding a third
-  search dimension;
-- 3C (next): synchronize the implemented public contract and close Step 3.
+- 3B: certify direct-search, pipeline, OOF, and refit propagation without adding a third search
+  dimension;
+- 3C: synchronize the implemented public contract and close Step 3.
 
-Patch 3B confirms the existing estimator-template boundary without requiring search-runtime
-changes. Direct candidate evaluation, explicit refit, selection-conditioned OOF reporting, and
-pipeline templates all retain `response_subspace="least_squares"` while search continues to
-overwrite only `n_components` and `predictor_rank`. The ordinary `PiPLSSearchCV()` template still
-refits with `response_subspace="cross_covariance"`.
+The existing estimator-template boundary required no search-runtime changes. Direct candidate
+evaluation, explicit refit, selection-conditioned OOF reporting, and pipeline templates retain
+`response_subspace="least_squares"` while search continues to overwrite only `n_components` and
+`predictor_rank`. The ordinary `PiPLSSearchCV()` template still refits with
+`response_subspace="cross_covariance"`.
+
+Step 4 is active. It will add the broader mathematical, numerical, and API regression coverage for
+both policies before theory/API documentation and the programming-user comparison example land in
+Step 5.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

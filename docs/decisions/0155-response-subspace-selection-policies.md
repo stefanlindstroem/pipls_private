@@ -229,9 +229,8 @@ Pi-PLS evidence or claim that it is uniformly superior in predictive performance
 
 ## Relationship to earlier decisions
 
-This decision extends, but does not yet modify the implemented runtime contracts recorded by
-earlier current decisions. The following reconciliations make their scope explicit before the
-extension is implemented:
+This decision extends the implemented runtime contracts recorded by earlier current decisions.
+The following reconciliations define their continuing scope:
 
 - Decision 0120 continues to define the companion-manuscript cross-covariance construction and its
   publication scope; Decision 0155 adds a software-only alternative without changing what the
@@ -243,8 +242,10 @@ extension is implemented:
   response-subspace policy belongs to the fixed estimator and is propagated, not optimized, by
   search.
 
-Until the implementation patches land, active runtime and user-facing documentation continue to
-describe only the currently implemented cross-covariance construction.
+The fixed estimator now implements both response-subspace policies, and search propagates the
+configured policy without optimizing it. User-facing theory and broader API guidance remain to be
+updated in Step 5; publication-aligned material continues to describe the cross-covariance
+construction as the peer-reviewed method.
 
 ## Planned implementation sequence
 
@@ -263,8 +264,10 @@ maintainer roadmap; and Patch 1D audited repository-wide consistency before runt
 Step 2 is split into patches 2A--2D and is also complete: the core isolates the published
 cross-covariance response basis, implements the exact least-squares/Choice-C basis, dispatches
 between exactly the two accepted private policies, and protects both the randomized-predictor and
-`p >> n` numerical regimes. The public estimator still does not expose `response_subspace`; Step 3
-is therefore the next implementation increment.
+`p >> n` numerical regimes. Step 3 is complete in patches 3A--3C: `PiPLSRegression` now exposes
+`response_subspace` with `"cross_covariance"` as the default, search/OOF/refit/pipeline paths preserve
+the configured policy without searching it, and the implemented public contract is synchronized.
+Step 4 is the next implementation increment.
 
 ## Consequences
 
