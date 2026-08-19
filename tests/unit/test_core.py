@@ -286,6 +286,61 @@ def test_randomized_predictor_svd_is_reproducible_and_close_to_full() -> None:
     )
 
 
+def test_least_squares_randomized_predictor_svd_is_reproducible_and_close_to_full() -> None:
+    rng = np.random.default_rng(20260824)
+    left, _ = np.linalg.qr(rng.normal(size=(96, 14)))
+    right, _ = np.linalg.qr(rng.normal(size=(72, 14)))
+    singular_values = np.array(
+        [40.0, 31.0, 25.0, 20.0, 16.0, 12.0, 9.0, 6.0, 4.0, 2.5, 1.5, 0.8, 0.4, 0.2]
+    )
+    X = left @ np.diag(singular_values) @ right.T
+    Y = X @ rng.normal(size=(72, 4)) + 0.01 * rng.normal(size=(96, 4))
+
+    full = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=7,
+        n_components=3,
+        response_subspace="least_squares",
+        svd_solver="full",
+    )
+    first = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=7,
+        n_components=3,
+        response_subspace="least_squares",
+        svd_solver="randomized",
+        random_state=23,
+    )
+    second = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=7,
+        n_components=3,
+        response_subspace="least_squares",
+        svd_solver="randomized",
+        random_state=23,
+    )
+
+    assert full.predictor_svd_solver == "full"
+    assert first.predictor_svd_solver == "randomized"
+    z_singular_values = np.linalg.svd(X @ first.Pi, compute_uv=False)
+    assert np.count_nonzero(z_singular_values > first.rank_tolerance) == 7
+    np.testing.assert_allclose(first.Pi, second.Pi)
+    np.testing.assert_allclose(first.C @ first.C.T, second.C @ second.C.T)
+    np.testing.assert_allclose(
+        first.standardized_regression_map,
+        second.standardized_regression_map,
+    )
+    np.testing.assert_allclose(
+        first.standardized_regression_map,
+        full.standardized_regression_map,
+        rtol=1e-6,
+        atol=1e-8,
+    )
+
+
 def test_randomized_predictor_svd_accepts_none_and_random_state() -> None:
     rng = np.random.default_rng(91)
     X = _center(rng.normal(size=(20, 8)))

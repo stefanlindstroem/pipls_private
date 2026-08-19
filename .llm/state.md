@@ -191,31 +191,25 @@ seven-patch Decision-0154 migration is complete: release notes record the breaki
 change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
 default together with the explicit EPV policy.
 
-Decision 0155 is accepted and Step 1 of its staged migration is complete. The planned
+Decision 0155 is accepted and Steps 1 and 2 of its staged migration are complete. The
 least-squares-driven response-subspace policy remains a software extension, while the peer-reviewed
-cross-covariance construction remains the default. Steps 2A and 2B have now isolated the existing
-published response-basis calculation and added an unused private least-squares response-basis
-primitive based on exact reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`. The new helper
-contains an explicit source comment that the least-squares/RRR-inspired construction is not part of
-the peer-reviewed companion publication. The `fit_pipls_core()` signature is still unchanged, and
-the current fixed estimator still has no `response_subspace` parameter and still reaches only the
-cross-covariance construction. Active `.llm` mathematical, numerical, and public-API contracts
-therefore continue to describe only that implemented public path until the remaining core and
-public-API patches land.
+cross-covariance construction remains the default. The private core now supports exactly
+`"cross_covariance"` and `"least_squares"`: the former uses exact SVD of `Z.T @ Y`, while the latter
+uses exact reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`. The least-squares helper contains
+an explicit source comment that the construction is not part of the peer-reviewed companion
+publication. `svd_solver` still governs only the predictor decomposition; core tests now cover the
+least-squares route with full and seeded randomized predictor SVD and with `p >> n`.
 
-Patches 1A--1C recorded Decision 0155, reconciled Decisions 0120, 0008, and 0039, and opened the
-six-step roadmap. Patch 1D completed the repository-wide audit. Step 2A is the first core increment:
-it extracts the existing cross-covariance response-basis SVD into one private helper and adds a direct
-regression check against the previous expression. Step 2B adds the isolated exact least-squares
-response-basis primitive and checks its projector against the Choice-C least-squares matrix on a
-well-conditioned problem. Step 2C now adds the private `fit_pipls_core()` two-value dispatch with
-`response_subspace="cross_covariance"` as the default and `"least_squares"` as the alternative.
-Unit coverage verifies default/explicit cross-covariance identity, a complete least-squares
-factorization, and rejection of unsupported values. `PiPLSRegression` still does not expose this
-setting, so public behavior remains cross-covariance-only until Step 3. Step 2D is next. The
-compatibility invariant for the later implementation remains that omitting the new parameter, or
-explicitly selecting `response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155
-fixed-estimator numerical path subject only to ordinary floating-point behavior.
+Patches 1A--1D established Decision 0155 and its publication/API boundary. Patches 2A--2C isolated
+the published response-basis calculation, added the Choice-C least-squares primitive, and added the
+private two-value core dispatch. Patch 2D hardens the numerical integration and records the
+implemented private-core contract without introducing a second rank threshold or Gram-matrix
+pseudoinverse. `PiPLSRegression` still has no public `response_subspace` parameter, so ordinary
+public fitting remains cross-covariance-only. Step 3 is now the active increment: expose the fixed
+estimator setting and preserve it through search, OOF fitting, and refitting. The compatibility
+invariant remains that omitting the new parameter, or explicitly selecting
+`response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155 fixed-estimator
+numerical path subject only to ordinary floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

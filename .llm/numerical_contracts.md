@@ -12,6 +12,29 @@
   Compare projectors, principal angles, singular values, regression maps, or predictions.
 - Invalid dimensions are errors and are never silently clamped.
 
+## Private response-subspace factorization
+
+The fixed numerical core now supports two exact response-subspace constructions under Decision
+0155. The public estimator does not expose the selector until Step 3; its current call path therefore
+continues to use the default cross-covariance construction.
+
+For `response_subspace="cross_covariance"`, the core forms `Z.T @ Y` and obtains the response basis
+from its exact thin NumPy SVD. This is the peer-reviewed companion-publication construction and the
+pre-Decision-0155 numerical compatibility reference.
+
+For `response_subspace="least_squares"`, the core obtains an orthonormal basis of `col(Z)` by exact
+reduced NumPy QR, projects the responses as `Q_Z.T @ Y`, and obtains the response basis from an exact
+thin NumPy SVD of that projected response matrix. The implementation does not form
+`Z.T @ Z`, does not invert or pseudoinvert a Gram matrix, and introduces no independent numerical-rank
+tolerance. This least-squares/RRR-inspired construction is a software extension and is not part of
+the peer-reviewed companion publication.
+
+`svd_solver` governs only the predictor decomposition used to construct $\mathbf{\Pi}$. Selecting
+`svd_solver="randomized"` may therefore randomize the predictor basis, but it does not replace QR or
+either response-side SVD with randomized routines. The retained predictor-rank verification remains
+the single rank-feasibility contract for `Z`; the response-subspace helpers do not add a second rank
+threshold.
+
 ## Estimator preprocessing and finite behavior
 
 Every fixed fit learns predictor and response means from its own training observations. Both blocks

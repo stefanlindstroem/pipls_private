@@ -257,12 +257,14 @@ This decision is the first patch of Step 1 in a six-step migration:
 5. document the theory and API and add a programming-user comparison example;
 6. complete the release, stale-contract, installed-artifact, and distribution audit.
 
-Step 1 is itself split into reviewable patches 1A--1D and is complete. Patch 1A recorded Decision
-0155 and indexed it; Patch 1B reconciled the affected earlier decisions; Patch 1C opened the active
+Step 1 is split into reviewable patches 1A--1D and is complete. Patch 1A recorded Decision 0155
+and indexed it; Patch 1B reconciled the affected earlier decisions; Patch 1C opened the active
 maintainer roadmap; and Patch 1D audited repository-wide consistency before runtime implementation.
-The audit confirmed that source, tests, examples, user-facing theory, and active implemented-contract
-files still describe only the current cross-covariance runtime and do not prematurely expose
-`response_subspace`. Step 2 is therefore the next implementation increment.
+Step 2 is split into patches 2A--2D and is also complete: the core isolates the published
+cross-covariance response basis, implements the exact least-squares/Choice-C basis, dispatches
+between exactly the two accepted private policies, and protects both the randomized-predictor and
+`p >> n` numerical regimes. The public estimator still does not expose `response_subspace`; Step 3
+is therefore the next implementation increment.
 
 ## Consequences
 

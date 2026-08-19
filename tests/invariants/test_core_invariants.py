@@ -38,3 +38,23 @@ def test_core_supports_p_much_greater_than_n() -> None:
     assert result.x_rank == 6
     assert result.P.shape == (50, 3)
     assert np.all(np.isfinite(result.standardized_regression_map))
+
+
+def test_least_squares_core_supports_p_much_greater_than_n() -> None:
+    rng = np.random.default_rng(20260825)
+    X = _center(rng.normal(size=(9, 80)))
+    Y = _center(rng.normal(size=(9, 4)))
+
+    result = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=5,
+        n_components=3,
+        response_subspace="least_squares",
+    )
+
+    assert result.x_rank == 8
+    assert result.P.shape == (80, 3)
+    assert result.C.shape == (4, 3)
+    assert_allclose(result.C.T @ result.C, np.eye(3), atol=1e-12, rtol=1e-12)
+    assert np.all(np.isfinite(result.standardized_regression_map))

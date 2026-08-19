@@ -116,7 +116,7 @@ the implemented cross-covariance runtime. No premature `response_subspace` publi
 expectation, or programming example is present. Those implemented-contract descriptions remain
 unchanged until the corresponding source and test contracts land.
 
-Step 2 is now active. It is split into four reviewable patches:
+Step 2 is complete. It is split into four reviewable patches:
 
 - 2A: isolate the current cross-covariance response-basis routine without changing numerics --
   complete;
@@ -124,7 +124,7 @@ Step 2 is now active. It is split into four reviewable patches:
 - 2C: add the two-value private core dispatch while preserving cross-covariance as the default --
   complete;
 - 2D: harden numerical integration, synchronize implemented numerical contracts, and close Step 2 --
-  next.
+  complete.
 
 Patch 2A changes only source organization around the already implemented response-basis SVD.
 Patch 2B adds a private least-squares/RRR-inspired response-basis helper implemented by exact
@@ -132,8 +132,13 @@ reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`; a projector test verifie
 Choice C on a well-conditioned problem. Patch 2C adds the private `fit_pipls_core()` dispatch with
 exactly `"cross_covariance"` and `"least_squares"`; default and explicit cross-covariance fits are
 covered for numerical identity, and the least-squares route uses the same downstream least-squares
-map and `P`/`D`/`Q` diagonalization. The public estimator surface remains unchanged, so the public
-estimator parameter and search propagation remain Step 3 work.
+map and `P`/`D`/`Q` diagonalization. Patch 2D adds full/seeded-randomized predictor-SVD coverage for
+the least-squares route, protects the `p >> n` regime, and records that response-side QR/SVD remains
+exact and introduces no independent rank threshold.
+
+Step 3 is now active. It will expose `response_subspace` on `PiPLSRegression` and ensure that search,
+OOF candidate fits, and refitting preserve the fixed-estimator setting without turning it into a
+third search dimension.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator
