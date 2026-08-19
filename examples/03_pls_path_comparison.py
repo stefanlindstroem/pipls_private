@@ -41,7 +41,7 @@ class SyntheticStressSpec:
     n_shared: int = 5
     n_predictor_specific: int = 15
     n_response_specific: int = 0
-    noise: float = 0.3
+    noise: float = 0.2
     random_state: int = 0
 
 
