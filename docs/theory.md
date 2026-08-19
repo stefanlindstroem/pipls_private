@@ -141,7 +141,7 @@ Substituting the decomposition into the regression relation gives
 This step is response-independent. Any predictive direction removed by the choice of $r_\pi$ cannot
 be recovered later by increasing $h$.
 
-## 2. Response-subspace selection
+## 2. Response-subspace selection {#response-subspace-selection}
 
 After fixing the retained predictor representation $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$, the
 package supports two criteria for selecting an $h$-dimensional orthonormal response basis
