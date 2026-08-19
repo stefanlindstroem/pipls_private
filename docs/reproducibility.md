@@ -103,6 +103,13 @@ inside every training fold, so each candidate learns statistics only from that f
 centering and any enabled estimator or pipeline scaling are learned again from that full data.
 Learned scaling must not be fitted globally before CV.
 
+Record `response_subspace` as part of every model-fitting protocol. The package default
+`"cross_covariance"` is the response-subspace construction used in the peer-reviewed companion
+publication; `"least_squares"` is a software extension outside that publication. `PiPLSSearchCV`
+clones this setting unchanged and does not search over it automatically. When comparing the two
+policies, materialize one validation protocol and reuse the same split indices for both searches so
+that differences are not confounded with resampling variation. Record the policy together with
+scaling, SVD configuration, rank-search policy, component-selection rule, and random seeds.
 
 Maintained examples that use one ordinary five-fold regression partition specify
 `KFold(n_splits=5, shuffle=True, random_state=0)` rather than relying on the package default. The

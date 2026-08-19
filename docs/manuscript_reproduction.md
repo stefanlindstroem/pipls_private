@@ -172,23 +172,38 @@ additive noise, the observed leading singular directions also need not separate 
 exactly.
 
 A fixed model can be evaluated at these known dimensions when reproducing that synthetic protocol.
-The manuscript's real-data workflow is different: it fixes $r_\pi$ with the EPV-inspired rule
-$r_\pi=\min[p,\lceil n/c\rceil]$ and then selects $h$ by cross-validation. In this package that
-protocol must be requested explicitly, for example:
+For manuscript-aligned Π-PLS fitting, the response-subspace construction is also fixed:
+`response_subspace="cross_covariance"`. This is both the package default and the construction used
+in the peer-reviewed companion publication. The alternative `"least_squares"` policy is a software
+extension and must not be used when claiming reproduction of the publication's response-subspace
+construction.
+
+The manuscript's real-data workflow is different from the synthetic oracle-rank protocol: it fixes
+$r_\pi$ with the EPV-inspired rule $r_\pi=\min[p,\lceil n/c\rceil]$ and then selects $h$ by
+cross-validation. In this package that complete model configuration can be requested explicitly:
 
 ```python
-from pipls import PiPLSSearchCV
+from pipls import PiPLSRegression, PiPLSSearchCV
+
+publication_template = PiPLSRegression(
+    n_components=1,
+    predictor_rank=1,
+    response_subspace="cross_covariance",
+)
 
 search = PiPLSSearchCV(
+    estimator=publication_template,
     predictor_rank_values="epv",
     samples_per_predictor_rank=10.0,
     cv=cv,
 ).fit(X, Y)
 ```
 
-Use the value of $c$ declared by the reproduction protocol; the manuscript describes $c=10$ as its
-ordinary EPV choice and $c=5$ as a more permissive small-sample choice. The package default is not
-that manuscript heuristic: ordinary `PiPLSSearchCV()` optimizes $r_\pi$ over the complete
+The pair `(1, 1)` is only a valid search-template seed; `PiPLSSearchCV` replaces it with the
+evaluated component count and EPV-fixed predictor rank while preserving `response_subspace`. Use the
+value of $c$ declared by the reproduction protocol; the manuscript describes $c=10$ as its ordinary
+EPV choice and $c=5$ as a more permissive small-sample choice. The package default rank policy is
+not that manuscript heuristic: ordinary `PiPLSSearchCV()` optimizes $r_\pi$ over the complete
 fold-feasible domain with exhaustive coverage.
 
 Any claim of complete manuscript-result reproduction must additionally match the manuscript's

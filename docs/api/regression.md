@@ -44,6 +44,38 @@ through `fit()` has no `selection_` because no search selection occurred. In evi
 workflows, the pre-existing selection is the handoff to OOF reporting and refitting;
 `model.selection_` confirms the provenance of the successful final fit.
 
+## Response-subspace selection
+
+`response_subspace` controls how the intermediate orthonormal response basis $\mathbf{C}$ is
+selected before the shared least-squares coupling and final diagonalization. Exactly two values are
+supported:
+
+- `"cross_covariance"` maximizes retained predictor-response cross-covariance. This is the
+  peer-reviewed Π-PLS construction and the package default.
+- `"least_squares"` chooses the response subspace that minimizes the rank-$h$ training
+  least-squares residual after the predictor subspace has been fixed. It is an
+  RRR-inspired software extension and is **not part of the peer-reviewed companion publication**.
+
+For a fixed pair $(h,r_\pi)$, request the software extension directly:
+
+```python
+model = PiPLSRegression(
+    n_components=3,
+    predictor_rank=9,
+    response_subspace="least_squares",
+).fit(X_train, Y_train)
+```
+
+Both policies use the same downstream least-squares estimate of the reduced coupling, followed by
+the same diagonalization into predictor directions $\mathbf{P}$, dilation $\mathbf{D}$, and response
+directions $\mathbf{Q}$. Thus `response_subspace` selects the intermediate basis $\mathbf{C}$; the
+public fitted response directions remain $\mathbf{Q}$. See
+[Response-subspace selection](../theory.md#response-subspace-selection) for the mathematical
+criteria and their RRR relationship.
+
+When manuscript alignment matters, use the default `"cross_covariance"` explicitly in recorded
+configuration. See [Companion-manuscript synthetic data](../manuscript_reproduction.md).
+
 ## Preprocessing and fit safety
 
 Every fit centers predictors and responses using statistics learned from that fit's training data.

@@ -89,6 +89,7 @@ from pipls import PiPLSRegression, PiPLSSearchCV
 template = PiPLSRegression(
     n_components=1,
     predictor_rank=1,
+    response_subspace="least_squares",
     scale=True,
     svd_solver="full",
     random_state=0,
@@ -104,14 +105,24 @@ model = search.refit(
 
 The pair `(1, 1)` is only a valid construction seed. The search replaces `n_components` and
 `predictor_rank` for fold-rank preflight and candidate fitting; cloning preserves other template
-settings such as `scale`, `scale_x`, `scale_y`, `copy`, `svd_solver`, and `random_state`. With
-`estimator=None`, the search
-creates the same seed pair using the ordinary `PiPLSRegression` defaults. A pipeline is configured
-in the same way through its terminal `PiPLSRegression` step; see
+settings such as `response_subspace`, `scale`, `scale_x`, `scale_y`, `copy`, `svd_solver`, and
+`random_state`. `response_subspace` is therefore fixed estimator configuration, not a third search
+dimension. To compare `"cross_covariance"` and `"least_squares"`, run two searches with otherwise
+matched configuration and, where possible, the same materialized validation splits.
+
+The example above deliberately shows the `"least_squares"` software extension. The package default
+remains `"cross_covariance"`, which is the response-subspace construction in the peer-reviewed
+companion publication. With `estimator=None`, the search creates the seed pair using those ordinary
+`PiPLSRegression` defaults. A pipeline is configured in the same way through its terminal
+`PiPLSRegression` step; see
 [Pipelines and fold-local preprocessing](../path_analysis.md#pipelines-and-fold-local-preprocessing).
 
-`svd_solver` controls only the initial predictor-matrix SVD. The response cross-product and latent
-coupling SVDs remain exact. Inspect the solver actually used on the returned model:
+`svd_solver` controls only the initial predictor-matrix SVD. With
+`response_subspace="cross_covariance"`, the response basis uses an exact SVD of
+$\mathbf{Z}^{\mathsf T}\mathbf{Y}$. With `response_subspace="least_squares"`, it uses an exact
+reduced QR factorization of $\mathbf{Z}$ followed by an exact SVD of
+$\mathbf{Q}_{Z}^{\mathsf T}\mathbf{Y}$. The final coupling SVD remains exact under both policies.
+Inspect the predictor solver actually used on the returned model:
 
 ```python
 search = PiPLSSearchCV(estimator=template).fit(X, Y)

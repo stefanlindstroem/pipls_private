@@ -89,7 +89,7 @@ representative interpretation of standard PLS-family and Π-PLS-specific plots.
 
 ## Scientific background
 
-- [Theory](theory.md): the implemented matrix construction and rank interpretation.
+- [Theory](theory.md): the implemented matrix construction, response-subspace policies, and rank interpretation.
 - [Companion-manuscript synthetic data](manuscript_reproduction.md): generate the exact Gaussian
   latent distribution and distinguish distribution, seeded-dataset, and full-study reproduction.
 

@@ -171,13 +171,17 @@ Step 5 is active with three reviewable patches:
 - 5A: rewrite the user-facing theory and establish the publication/software-extension boundary --
   complete;
 - 5B: update API, workflow, reproducibility, performance, and manuscript-reproduction documentation
-  -- next;
-- 5C: add the programming-user response-subspace comparison example and close Step 5.
+  -- complete;
+- 5C: add the programming-user response-subspace comparison example and close Step 5 -- next.
 
 Patch 5A documents both response-subspace objectives, the exact QR/SVD realization of the
 least-squares criterion, its RRR interpretation, the singular-value-weighting distinction between
 the policies, their shared downstream least-squares/diagonalization stages, and the limiting cases
-where their fitted maps coincide. User-facing API/workflow propagation remains assigned to 5B.
+where their fitted maps coincide. Patch 5B propagates the implemented policy through the
+fixed-regression and path-selection references, reproducibility and manuscript-alignment guidance,
+computational-performance trade-offs, troubleshooting, and top-level discoverability. It keeps the
+least-squares route visibly outside the peer-reviewed companion publication and leaves the
+executable comparison workflow to 5C.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

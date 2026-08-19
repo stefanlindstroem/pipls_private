@@ -21,10 +21,10 @@ predictor rank stored for that row. Advanced users can inspect
 or scientific interpretation motivates direct control. Continue with the
 [synthetic tutorial](tutorials/synthetic.md) or the [path-selection reference](api/path.md).
 
-## I need to change scaling or the SVD solver during search
+## I need to change scaling, response-subspace selection, or the SVD solver during search
 
-`PiPLSSearchCV` has no separate `scale` or `svd_solver` parameter. Configure these settings on the
-`PiPLSRegression` template supplied to the search:
+`PiPLSSearchCV` has no separate `scale`, `response_subspace`, or `svd_solver` parameter. Configure
+these settings on the `PiPLSRegression` template supplied to the search:
 
 ```python
 from pipls import PiPLSRegression, PiPLSSearchCV
@@ -32,6 +32,7 @@ from pipls import PiPLSRegression, PiPLSSearchCV
 template = PiPLSRegression(
     n_components=1,
     predictor_rank=1,
+    response_subspace="least_squares",
     scale=True,
     svd_solver="full",
     random_state=0,
@@ -40,8 +41,23 @@ search = PiPLSSearchCV(estimator=template).fit(X, Y)
 ```
 
 The search replaces only `n_components` and `predictor_rank`; it retains the other template
-settings while cloning candidates. With `estimator=None`, the ordinary `PiPLSRegression` defaults
-are used. See [Configure the candidate estimator](api/path.md#configure-the-candidate-estimator).
+settings while cloning candidates. The example above therefore keeps `"least_squares"` fixed for
+every candidate. With `estimator=None`, the ordinary `PiPLSRegression` defaults are used, including
+`response_subspace="cross_covariance"`. See
+[Configure the candidate estimator](api/path.md#configure-the-candidate-estimator).
+
+## I want least-squares response-subspace selection during search
+
+Supply a `PiPLSRegression` template with `response_subspace="least_squares"`, as in the preceding
+example. The search does not compare response-subspace policies automatically. If the scientific
+question is whether `"least_squares"` or `"cross_covariance"` predicts better for a dataset, run two
+searches with otherwise matched configuration and the same materialized validation splits. The
+least-squares route is a software extension outside the peer-reviewed companion publication; use
+`"cross_covariance"` for manuscript-aligned fitting.
+
+See [Response-subspace selection](theory.md#response-subspace-selection) for the mathematical
+difference and [Computational performance](computational_performance.md#treat-response-subspace-policy-as-a-model-choice)
+for comparison guidance.
 
 ## A component count or predictor rank was not evaluated
 

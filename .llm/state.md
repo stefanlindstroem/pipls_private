@@ -218,10 +218,11 @@ response-policy propagation. The internal mathematical and testing contracts now
 implemented response-subspace policies and the corrected full-domain predictor-rank search boundary.
 Step 5 is active. Patch 5A rewrites the user-facing theory to describe both response-subspace
 criteria, their shared downstream factorization, the RRR interpretation of the least-squares route,
-and the explicit publication/software-extension boundary. Patch 5B will update the broader API,
-workflow, reproducibility, performance, and manuscript-reproduction guidance; Patch 5C will add the
-programming-user comparison example and close Step 5. The compatibility invariant remains that
-omitting the new parameter, or explicitly selecting
+and the explicit publication/software-extension boundary. Patch 5B now propagates that implemented
+policy through the fixed-regression and path-selection references, reproducibility and
+manuscript-alignment guidance, computational-performance trade-offs, troubleshooting, and
+top-level discoverability. Patch 5C will add the programming-user comparison example and close
+Step 5. The compatibility invariant remains that omitting the new parameter, or explicitly selecting
 `response_subspace="cross_covariance"`, reproduces the pre-Decision-0155 fixed-estimator numerical
 path subject only to ordinary floating-point behavior.
 

@@ -33,6 +33,14 @@ explicitly with `predictor_rank_values="epv"`. Its default $c=10$ is controlled 
 available when the user intends to restrict the rank domain. Use `search_method="adaptive"`
 explicitly when reduced candidate coverage is an acceptable computational approximation.
 
+Programming users can also choose how the intermediate response subspace is constructed.
+`response_subspace="cross_covariance"` is the package default and the construction used in the
+peer-reviewed companion publication. `response_subspace="least_squares"` is an optional
+least-squares/RRR-inspired software extension; configure it on `PiPLSRegression` or on the estimator
+template supplied to `PiPLSSearchCV`. The search does not treat this choice as an additional search
+dimension. See the [theory](docs/theory.md#response-subspace-selection) and
+[fixed-regression reference](docs/api/regression.md#response-subspace-selection).
+
 The [rendered documentation](https://stefanlindstroem.github.io/pipls/) is the primary user guide.
 The source links below remain useful in a local checkout.
 

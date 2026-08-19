@@ -244,8 +244,11 @@ search = PiPLSSearchCV(
 ).fit(X, Y)
 ```
 
-Only the predictor SVD is randomized. The response-side and latent coupling decompositions remain
-exact. An integer `random_state` makes the randomized route reproducible.
+Only the predictor SVD is randomized. Response-subspace construction remains exact under either
+policy: `"cross_covariance"` uses an exact SVD of $\mathbf{Z}^{\mathsf T}\mathbf{Y}$, while
+`"least_squares"` uses exact reduced QR of $\mathbf{Z}$ followed by an exact SVD of
+$\mathbf{Q}_{Z}^{\mathsf T}\mathbf{Y}$. The final coupling SVD also remains exact. An integer
+`random_state` makes the randomized predictor route reproducible.
 
 Randomized SVD is an approximate numerical route, not a universal acceleration. It is most useful
 when the requested predictor rank is small compared with both predictor-matrix dimensions. Near
@@ -269,6 +272,48 @@ This combination is useful only when the resulting EPV rank remains sufficiently
 dimensions for randomized SVD to be advantageous. If the intended analysis instead optimizes
 predictor rank, retain `predictor_rank_values=None` and use adaptive coverage or an explicit rank
 range to control search cost.
+
+## Treat response-subspace policy as a model choice
+
+`response_subspace` is not a search-cost shortcut and `PiPLSSearchCV` does not optimize it
+automatically. The default `"cross_covariance"` route forms
+$\mathbf{Z}^{\mathsf T}\mathbf{Y}$ and computes its exact response-side SVD. The optional
+`"least_squares"` route instead computes an exact reduced QR factorization of $\mathbf{Z}$ and an
+exact SVD of $\mathbf{Q}_{Z}^{\mathsf T}\mathbf{Y}$ before using the same downstream coupling
+and diagonalization. Its extra QR work means it should not be described as a general computational
+acceleration.
+
+The least-squares criterion is optimal for the rank-$h$ training least-squares problem after the
+predictor subspace has been fixed, and it can be useful for some datasets. Whether that translates
+into lower validation or test error is problem-dependent. Compare the policies through two separate
+searches using the same materialized CV splits and otherwise matched configuration:
+
+```python
+from pipls import PiPLSRegression, PiPLSSearchCV
+
+shared_search = dict(cv=splits, search_method="adaptive")
+
+cross_covariance = PiPLSSearchCV(
+    estimator=PiPLSRegression(
+        n_components=1,
+        predictor_rank=1,
+        response_subspace="cross_covariance",
+    ),
+    **shared_search,
+).fit(X, Y)
+
+least_squares = PiPLSSearchCV(
+    estimator=PiPLSRegression(
+        n_components=1,
+        predictor_rank=1,
+        response_subspace="least_squares",
+    ),
+    **shared_search,
+).fit(X, Y)
+```
+
+Here `splits` is the same materialized split sequence for both searches. The least-squares policy
+is a software extension and is not part of the peer-reviewed companion publication.
 
 ## Use parallelism deliberately
 
@@ -370,5 +415,6 @@ narrowed policy is itself the intended analysis.
 | Integer `max_predictor_rank` | Truncates the admissible rank domain | User-declared search/model domain |
 | Restricted `n_components_values` | Fewer component candidates | Evaluated component path |
 | `svd_solver="randomized"` | Potentially cheaper suitable predictor decompositions | Approximate predictor-SVD route |
+| `response_subspace="least_squares"` | Adds exact QR plus an exact response-side SVD | Response-subspace model policy; compare validation evidence separately |
 | Larger `n_jobs` | May reduce wall time | Execution and memory use; no intended statistical change |
 | Reuse one `oof_report()` | Avoids repeated selected-pair fold fits | No change to the fitted search or report |
