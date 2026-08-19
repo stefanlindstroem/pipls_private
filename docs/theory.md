@@ -1,8 +1,11 @@
 # Π-PLS theory overview
 
 Π-PLS is a multivariate linear-regression method with two explicit rank controls. It first retains
-a rank-controlled predictor subspace, then constructs a response subspace from cross-covariance,
-and finally diagonalizes the reduced regression map into paired predictor-response modes.
+a rank-controlled predictor subspace, then constructs a response subspace under a configured
+selection criterion, and finally diagonalizes the reduced regression map into paired
+predictor-response modes. The package default uses the cross-covariance construction from the
+peer-reviewed companion publication; programming users may instead request a least-squares-driven
+response-subspace construction.
 
 ## Scientific source and package scope
 
@@ -12,12 +15,17 @@ The scientific source for the construction summarized on this page is the compan
 > (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model.”
 > Manuscript under revision at *Computers & Chemical Engineering*, CACE-D-26-00847.
 
-The manuscript states the fixed mathematical core for centered predictor and response matrices.
-The package implements that core and adds ordinary software facilities around it, including optional
-scaling, numerical-rank checks, configurable SVD solvers, cross-validated search, immutable result
-records, and prediction diagnostics. Those package capabilities do not change the equations below.
-They also do not imply that every package default or practical workflow reproduces a choice made in
-the manuscript.
+The manuscript states the fixed mathematical core for centered predictor and response matrices,
+including the cross-covariance response-subspace construction. The package implements that
+peer-reviewed construction as its default and adds ordinary software facilities around it, including
+optional scaling, numerical-rank checks, configurable predictor SVD solvers, cross-validated search,
+immutable result records, and prediction diagnostics. The package also provides one
+least-squares/RRR-inspired response-subspace construction for programming users. That alternative is
+a software extension and is not part of the peer-reviewed companion publication.
+
+The publication/software boundary matters when interpreting results: manuscript-aligned analyses use
+the cross-covariance response-subspace construction, while analyses using the least-squares option
+should identify that model choice explicitly.
 
 The Pulp source paper documents the provenance and scientific context of the Pulp dataset; it is not
 the theoretical reference for Π-PLS. Pulp provenance and analysis are covered in the
@@ -133,19 +141,28 @@ Substituting the decomposition into the regression relation gives
 This step is response-independent. Any predictive direction removed by the choice of $r_\pi$ cannot
 be recovered later by increasing $h$.
 
-## 2. Covariance-driven response projection
+## 2. Response-subspace selection
 
-Within the retained predictor representation, form
+After fixing the retained predictor representation $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$, the
+package supports two criteria for selecting an $h$-dimensional orthonormal response basis
+$\mathbf{C}\in\mathbb{R}^{q\times h}$. Both choices feed the same later least-squares coupling
+and diagonalization. They differ only in how the intermediate response subspace is chosen.
+
+### 2.1 Cross-covariance selection
+
+The peer-reviewed companion publication uses the cross-covariance construction, which is also the
+package default (`response_subspace="cross_covariance"`). Define
 
 \begin{equation}
 \boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{Z}^{\mathsf T}\mathbf{Y}\in\mathbb{R}^{r_\pi\times q}.
 \end{equation}
 
-For a prescribed $h$, Π-PLS selects an orthonormal response basis
-$\mathbf{C}\in\mathbb{R}^{q\times h}$ by solving
+For prescribed $h$, the response basis is chosen by
 
 \begin{equation}
-\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
+\mathbf{C}_{\mathrm{cov}}
+=
+\arg\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
 \left\|\boldsymbol{\Sigma}_{\mathrm{ZY}}\mathbf{C}\right\|_{\mathrm{F}}^2.
 \end{equation}
 
@@ -165,22 +182,130 @@ Because
 this is an orthonormal trace-maximization problem. If
 
 \begin{equation}
-\boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}\mathbf{S}\mathbf{V}^{\mathsf T},
+\boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}_{\mathrm{cov}}\mathbf{S}_{\mathrm{cov}}\mathbf{V}_{\mathrm{cov}}^{\mathsf T},
 \end{equation}
 
 then the leading $h$ right singular vectors span an optimum:
 
 \begin{equation}
-\mathbf{C}=\mathbf{V}_{(:,1:h)}.
+\mathbf{C}_{\mathrm{cov}}=\mathbf{V}_{\mathrm{cov}(:,1:h)}.
 \end{equation}
 
-Thus $\mathbf{C}$ selects the response subspace with the largest retained squared cross-covariance
-with $\mathbf{Z}$. The maximizing subspace is the meaningful object; individual basis vectors are
-not unique when the relevant singular values are repeated.
+Thus the default policy selects the response subspace with the largest retained squared
+cross-covariance with $\mathbf{Z}$. The maximizing subspace is the meaningful object; individual
+basis vectors are not unique when relevant singular values are repeated.
 
-## 3. Least squares in the reduced coordinates
+### 2.2 Least-squares selection
 
-Project the response matrix onto the selected response subspace and fit
+The alternative `response_subspace="least_squares"` chooses the response subspace jointly with a
+rank-$h$ reduced regression map by solving
+
+\begin{equation}
+(\mathbf{C}_{\mathrm{LS}},\mathbf{W}_{\mathrm{LS}})
+=
+\arg\min_{\substack{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h\\
+\mathbf{W}\in\mathbb{R}^{r_\pi\times h}}}
+\left\|\mathbf{Y}-\mathbf{Z}\mathbf{W}\mathbf{C}^{\mathsf T}\right\|_{\mathrm{F}}^2.
+\end{equation}
+
+For fixed $\mathbf{C}$, the minimizing map is
+
+\begin{equation}
+\mathbf{W}=\mathbf{Z}^{+}\mathbf{Y}\mathbf{C}.
+\end{equation}
+
+Let
+
+\begin{equation}
+\mathbf{P}_{\mathbf{Z}}=\mathbf{Z}\mathbf{Z}^{+}
+\end{equation}
+
+be the orthogonal projector onto the retained predictor-score column space. Eliminating
+$\mathbf{W}$ gives the equivalent response-subspace problem
+
+\begin{equation}
+\mathbf{C}_{\mathrm{LS}}
+=
+\arg\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
+\operatorname{tr}\!\left(
+\mathbf{C}^{\mathsf T}
+\mathbf{Y}^{\mathsf T}
+\mathbf{P}_{\mathbf{Z}}
+\mathbf{Y}
+\mathbf{C}
+\right).
+\end{equation}
+
+This is the rank-$h$ reduced-rank-regression response subspace for regression of $\mathbf{Y}$ on
+the fixed retained predictor coordinates $\mathbf{Z}$. Consequently, for the same fixed
+$(h,r_\pi)$, the least-squares policy minimizes the training Frobenius residual over admissible
+rank-$h$ maps. That property does not imply lower cross-validated or external prediction error.
+
+The package evaluates this criterion without forming normal equations. With a reduced QR
+factorization
+
+\begin{equation}
+\mathbf{Z}=\mathbf{Q}_{\mathbf{Z}}\mathbf{R}_{\mathbf{Z}},
+\qquad
+\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Q}_{\mathbf{Z}}=\mathbf{I}_{r_\pi},
+\end{equation}
+
+we have
+
+\begin{equation}
+\mathbf{P}_{\mathbf{Z}}
+=
+\mathbf{Q}_{\mathbf{Z}}\mathbf{Q}_{\mathbf{Z}}^{\mathsf T},
+\end{equation}
+
+and therefore
+
+\begin{equation}
+\mathbf{Y}^{\mathsf T}\mathbf{P}_{\mathbf{Z}}\mathbf{Y}
+=
+(\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y})^{\mathsf T}
+(\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}).
+\end{equation}
+
+The columns of $\mathbf{C}_{\mathrm{LS}}$ are thus the leading right singular directions of
+$\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}$. The response-side QR/SVD route remains exact;
+the configurable `svd_solver` applies only to construction of the predictor basis $\mathbf{\Pi}$.
+
+> **Software-extension boundary.** The least-squares response-subspace construction is implemented
+> for programming users but is not part of the peer-reviewed companion publication.
+> Manuscript-aligned analyses use `response_subspace="cross_covariance"`.
+
+The two criteria can differ substantially because they weight the retained predictor directions
+differently. Since the SVD-based retained scores can be written as
+
+\begin{equation}
+\mathbf{Z}=\mathbf{U}_{r}\mathbf{S}_{r},
+\end{equation}
+
+the cross-covariance criterion depends on the eigenspace of
+
+\begin{equation}
+\mathbf{Y}^{\mathsf T}
+\mathbf{U}_{r}\mathbf{S}_{r}^{2}\mathbf{U}_{r}^{\mathsf T}
+\mathbf{Y},
+\end{equation}
+
+whereas the least-squares criterion depends on
+
+\begin{equation}
+\mathbf{Y}^{\mathsf T}
+\mathbf{U}_{r}\mathbf{U}_{r}^{\mathsf T}
+\mathbf{Y}.
+\end{equation}
+
+The cross-covariance construction therefore retains weighting by predictor singular-value
+magnitude, while the least-squares construction depends on the retained predictor column space.
+When $q=1$, the two policies give the same fitted regression map. They also give the same fitted map
+when $h=q\leq r_\pi$, because the complete response space is retained.
+
+## 3. Least-squares coupling in the selected response subspace
+
+Under either response-subspace policy, project the response matrix onto the selected basis and fit
 
 \begin{equation}
 \mathbf{Y}\mathbf{C}=\mathbf{Z}\mathbf{W}+\mathbf{E}'',
@@ -189,8 +314,12 @@ Project the response matrix onto the selected response subspace and fit
 where $\mathbf{W}\in\mathbb{R}^{r_\pi\times h}$. The minimum-norm least-squares solution is
 
 \begin{equation}
-\mathbf{W}=\mathbf{Z}^+\mathbf{Y}\mathbf{C}.
+\mathbf{W}=\mathbf{Z}^{+}\mathbf{Y}\mathbf{C}.
 \end{equation}
+
+Thus the phrase “least-squares response-subspace selection” refers specifically to the criterion
+used to choose $\mathbf{C}$; estimation of $\mathbf{W}$ by least squares is common to both
+policies.
 
 Before diagonalization, the regression map in the centered coordinates is
 
@@ -276,7 +405,7 @@ Standard deflation-based PLS algorithms construct successive components while re
 modelled predictor variation. Π-PLS instead fixes one rank-controlled predictor representation
 $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ and derives all $h$ coupled modes from that undeflated retained
 space through closed-form matrix decompositions. The retained predictor space therefore remains
-available as a whole during the covariance and regression stages; in this sense, the view is
+available as a whole during response-subspace selection and regression; in this sense, the view is
 panoramic.
 
 ## Interpretation of $r_\pi$ and $h$ {#interpretation-of-the-ranks}
@@ -330,30 +459,37 @@ reparameterization of the same fitted map.
 
 Both Π-PLS and reduced-rank regression produce low-rank coefficient structures. Reduced-rank
 regression obtains the best rank-$h$ approximation of the OLS fit under its least-squares
-criterion. Π-PLS first fixes a rank-controlled predictor representation, selects a response
-subspace by cross-covariance, and then diagonalizes the reduced least-squares map into one-to-one
-paired modes.
+criterion. With `response_subspace="least_squares"`, Π-PLS applies exactly that reduced-rank
+principle after first fixing the retained predictor representation $\mathbf{Z}$, and then
+diagonalizes the resulting reduced map into one-to-one paired modes. With the default
+`"cross_covariance"` policy, the response subspace is instead selected by the peer-reviewed
+cross-covariance criterion before the common least-squares coupling and diagonalization stages.
 
 ### Canonical correlation analysis
 
 CCA also constructs paired predictor and response variates with a diagonal association structure,
-but classical CCA maximizes normalized correlation after within-block whitening. Π-PLS instead
-uses an unwhitened cross-covariance criterion inside the retained predictor representation and then
-estimates a predictive least-squares map. Its diagonal relation is analogous to CCA structurally,
-not identical to the CCA objective.
+but classical CCA maximizes normalized correlation after within-block whitening. The default
+Π-PLS response policy instead uses an unwhitened cross-covariance criterion inside the retained
+predictor representation, while the optional least-squares policy uses the fitted-response
+least-squares criterion described above. Both policies then form the same diagonal paired-mode
+representation. The structural analogy to CCA therefore concerns the final paired relation, not an
+identity of objectives.
 
 ### PLS and PLS-SVD
 
-PLS and Π-PLS both use predictor-response covariance. Standard multicomponent PLS is commonly
-constructed through iterative extraction and deflation. Π-PLS uses a fixed retained predictor
-space followed by SVD and least squares.
+Standard multicomponent PLS is commonly constructed through iterative covariance-guided extraction
+and deflation. Π-PLS instead fixes one retained predictor space and then selects a response
+subspace before fitting and diagonalizing the reduced least-squares map. Under the publication
+default, response-subspace selection is itself cross-covariance-driven; under the optional
+least-squares policy, it is RRR-inspired.
 
-PLS-SVD derives predictor and response directions directly from a cross-covariance operator.
-Π-PLS first determines $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ from predictor singular structure and
-uses $\mathbf{Z}^{\mathsf T}\mathbf{Y}$ to select only the response subspace. The final
-$\mathbf{P}$ and $\mathbf{Q}$ arise after the least-squares map $\mathbf{W}$ is
-estimated and diagonalized; they are not both obtained directly from the first cross-covariance
-SVD.
+PLS-SVD derives predictor and response directions directly from a cross-covariance operator. Under
+the default Π-PLS policy, $\mathbf{Z}^{\mathsf T}\mathbf{Y}$ selects only the intermediate response
+subspace after $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ has already been determined from predictor
+singular structure. Under the least-squares policy, that intermediate subspace is instead selected
+from the predictable response variation in $\operatorname{col}(\mathbf{Z})$. In both cases, the
+final $\mathbf{P}$ and $\mathbf{Q}$ arise only after the common least-squares map $\mathbf{W}$ is
+estimated and diagonalized.
 
 ## Package realization
 
@@ -361,9 +497,10 @@ SVD.
 response scaling are controlled independently after centering. The backward-compatible `scale`
 parameter supplies the default for both blocks, while non-`None` `scale_x` and `scale_y` values
 override predictor and response scaling respectively. Enabled scaling uses training-sample standard
-deviations. The estimator applies the fixed construction above in the resulting centered or
-centered-and-scaled coordinates, then transforms the regression map back to original units for
-`coef_`, `intercept_`, and `predict()`.
+deviations. `response_subspace` selects either the publication-default `"cross_covariance"`
+response basis or the software-extension `"least_squares"` basis. The estimator applies the
+corresponding fixed construction above in the resulting centered or centered-and-scaled coordinates,
+then transforms the regression map back to original units for `coef_`, `intercept_`, and `predict()`.
 
 A fitted estimator exposes the Π-PLS-specific factorization in `decomposition_`:
 
@@ -384,9 +521,12 @@ basis columns.
 
 ## Selection, validation, and synthetic-data boundaries
 
-The equations above define one fixed $(h,r_\pi)$ model. `PiPLSSearchCV` is a package-level facility
-for evaluating admissible fixed models under fold-local preprocessing and response-standardized
-CV-MSE. Its search policies and the practical real-data workflows documented elsewhere are not
+The equations above define one fixed $(h,r_\pi)$ model under one configured response-subspace
+policy. `PiPLSSearchCV` is a package-level facility for evaluating admissible fixed models under
+fold-local preprocessing and response-standardized CV-MSE. It searches component count and
+predictor rank; it does not automatically compare response-subspace policies. A controlled
+programming-user comparison therefore uses two estimator templates with the same materialized CV
+splits. Its search policies and the practical real-data workflows documented elsewhere are not
 redefined by this theory page and need not duplicate the manuscript’s experimental choices.
 
 The package offers two synthetic-data purposes. `make_pipls_latent_geometry()` implements the

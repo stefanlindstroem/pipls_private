@@ -216,8 +216,12 @@ invariants. Public coverage includes every predictor/response scaling combinatio
 and fitted-search pickle round trips, `set_params()` refitting, external `GridSearchCV`, and fixed
 response-policy propagation. The internal mathematical and testing contracts now describe both
 implemented response-subspace policies and the corrected full-domain predictor-rank search boundary.
-Step 5 is active: user-facing theory/API documentation and a programming-user comparison example are
-next. The compatibility invariant remains that omitting the new parameter, or explicitly selecting
+Step 5 is active. Patch 5A rewrites the user-facing theory to describe both response-subspace
+criteria, their shared downstream factorization, the RRR interpretation of the least-squares route,
+and the explicit publication/software-extension boundary. Patch 5B will update the broader API,
+workflow, reproducibility, performance, and manuscript-reproduction guidance; Patch 5C will add the
+programming-user comparison example and close Step 5. The compatibility invariant remains that
+omitting the new parameter, or explicitly selecting
 `response_subspace="cross_covariance"`, reproduces the pre-Decision-0155 fixed-estimator numerical
 path subject only to ordinary floating-point behavior.
 
