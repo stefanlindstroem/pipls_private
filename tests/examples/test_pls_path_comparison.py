@@ -106,6 +106,43 @@ def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
     assert result.output_path.name == "pulp_component_path_comparison.pdf"
 
 
+def test_synthetic_stress_case_is_fixed_and_deterministic(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_comparison_module(monkeypatch)
+    spec = module.SYNTHETIC_STRESS_SPEC
+
+    assert spec.n_samples == 25
+    assert spec.n_features == 40
+    assert spec.n_targets == 10
+    assert spec.n_shared == 5
+    assert spec.n_predictor_specific == 15
+    assert spec.n_response_specific == 0
+    assert spec.noise == 0.3
+    assert spec.random_state == 0
+
+    first = module._make_synthetic_stress_case()
+    second = module._make_synthetic_stress_case()
+
+    assert first.X.shape == (25, 40)
+    assert first.Y.shape == (25, 10)
+    assert first.metadata["latent_dimensions"]["shared"] == 5
+    assert first.metadata["latent_dimensions"]["predictor_specific"] == 15
+    assert first.metadata["latent_dimensions"]["response_specific"] == 0
+    assert first.metadata["noise"]["X"] == 0.3
+    assert first.metadata["noise"]["Y"] == 0.3
+    assert first.metadata["random_state"] == 0
+    assert first.truth is not None
+    assert first.truth.n_shared == 5
+    assert first.truth.n_predictor_specific == 15
+    assert first.truth.n_response_specific == 0
+
+    np.testing.assert_array_equal(first.X, second.X)
+    np.testing.assert_array_equal(first.Y, second.Y)
+    np.testing.assert_array_equal(first.truth.x_signal, second.truth.x_signal)
+    np.testing.assert_array_equal(first.truth.y_signal, second.truth.y_signal)
+
+
 def test_dataset_search_templates_keep_matched_configuration(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

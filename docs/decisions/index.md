@@ -54,6 +54,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0154: full-domain predictor-rank selection and explicit EPV policy](0154-full-domain-predictor-rank-selection.md)
 - [0155: response-subspace selection policies](0155-response-subspace-selection-policies.md)
 - [0156: unified PLS-family path comparison](0156-unified-pls-family-path-comparison.md)
+- [0157: near-saturated synthetic PLS-family stress case](0157-near-saturated-synthetic-pls-comparison.md)
 
 ## Historical navigation
 

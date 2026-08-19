@@ -115,8 +115,11 @@ into Example 03 for Pulp, Sugarcane, and Tobacco and retired the separate Exampl
 0156C consolidated documentation, source-distribution qualification, release notes, and maintainer
 records. Example 03 is now the sole maintained PLS-family comparison.
 
-There is no active numbered migration after Decision 0156. New scientific, numerical, API, or
-release-engineering work should begin with the relevant owner decision and a fresh bounded plan.
+Decision 0157 is the active exploratory comparison migration. Patch 0157A fixes and regression-tests
+the deterministic near-saturated synthetic design before any comparative result is used; Patch
+0157B will integrate it as a fourth Example-03 case using matched folds and exhaustive predictor-rank
+coverage; Patch 0157C will update user/maintainer documentation, record the observed fixed-realization
+behavior without a general superiority claim, and close the decision.
 
 ## Deferred work
 

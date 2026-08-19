@@ -130,6 +130,13 @@ PLS path for Pulp, Sugarcane, and Tobacco on one materialized five-fold protocol
 former Example 07 and its dedicated PDF are retired. Source-distribution qualification executes the
 bounded Pulp branch of Example 03; `make examples` owns complete three-dataset execution.
 
+Decision 0157 is active. Patch 0157A fixes a deterministic near-saturated synthetic stress design
+for later integration into Example 03: 25 observations, 40 predictors, 10 responses, 5 shared
+latent directions, 15 predictor-specific directions, no response-specific directions, common noise
+SD 0.3, and `random_state=0`. The design is fixed before comparative results are inspected. Patch
+0157B will add the fourth comparison case; Patch 0157C will document the observed fixed-realization
+behavior and close the decision.
+
 ## Inspection and rendering boundary
 
 `pipls.inspection` returns validated immutable NumPy results for Pi-PLS factor displays, shared

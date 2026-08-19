@@ -15,12 +15,51 @@ from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
 from pipls import PiPLSRegression, PiPLSSearchCV
-from pipls.datasets import load_pulp, load_sugarcane, load_tobacco
+from pipls.datasets import (
+    PiPLSDataset,
+    load_pulp,
+    load_sugarcane,
+    load_tobacco,
+    make_pipls_regression,
+)
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
 DATASET_NAMES = ("pulp", "sugarcane", "tobacco")
 ResponseSubspace = Literal["cross_covariance", "least_squares"]
 CVSplit = tuple[NDArray[np.intp], NDArray[np.intp]]
+
+
+@dataclass(frozen=True)
+class SyntheticStressSpec:
+    """Fixed geometry for the near-saturated synthetic comparison case."""
+
+    n_samples: int = 25
+    n_features: int = 40
+    n_targets: int = 10
+    n_shared: int = 5
+    n_predictor_specific: int = 15
+    n_response_specific: int = 0
+    noise: float = 0.3
+    random_state: int = 0
+
+
+SYNTHETIC_STRESS_SPEC = SyntheticStressSpec()
+
+
+def _make_synthetic_stress_case() -> PiPLSDataset:
+    """Generate the fixed Decision-0157 near-saturated stress case."""
+
+    spec = SYNTHETIC_STRESS_SPEC
+    return make_pipls_regression(
+        n_samples=spec.n_samples,
+        n_features=spec.n_features,
+        n_targets=spec.n_targets,
+        n_shared=spec.n_shared,
+        n_predictor_specific=spec.n_predictor_specific,
+        n_response_specific=spec.n_response_specific,
+        noise=spec.noise,
+        random_state=spec.random_state,
+    )
 
 
 @dataclass(frozen=True)
