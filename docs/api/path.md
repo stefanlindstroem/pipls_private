@@ -109,6 +109,8 @@ settings such as `response_subspace`, `scale`, `scale_x`, `scale_y`, `copy`, `sv
 `random_state`. `response_subspace` is therefore fixed estimator configuration, not a third search
 dimension. To compare `"cross_covariance"` and `"least_squares"`, run two searches with otherwise
 matched configuration and, where possible, the same materialized validation splits.
+See [Example 07](../examples.md#compare-response-subspace-policies) for an executable
+matched-split comparison.
 
 The example above deliberately shows the `"least_squares"` software extension. The package default
 remains `"cross_covariance"`, which is the response-subspace construction in the peer-reviewed

@@ -166,22 +166,23 @@ Patch 4C records both response-subspace objectives, their shared downstream fact
 and limiting-case identities, durable regression coverage, and the Decision-0154 full-domain rank
 boundary in the authoritative internal contracts.
 
-Step 5 is active with three reviewable patches:
+Step 5 is complete in three reviewable patches:
 
 - 5A: rewrite the user-facing theory and establish the publication/software-extension boundary --
   complete;
 - 5B: update API, workflow, reproducibility, performance, and manuscript-reproduction documentation
   -- complete;
-- 5C: add the programming-user response-subspace comparison example and close Step 5 -- next.
+- 5C: add the programming-user response-subspace comparison example and close Step 5 -- complete.
 
 Patch 5A documents both response-subspace objectives, the exact QR/SVD realization of the
 least-squares criterion, its RRR interpretation, the singular-value-weighting distinction between
 the policies, their shared downstream least-squares/diagonalization stages, and the limiting cases
 where their fitted maps coincide. Patch 5B propagates the implemented policy through the
 fixed-regression and path-selection references, reproducibility and manuscript-alignment guidance,
-computational-performance trade-offs, troubleshooting, and top-level discoverability. It keeps the
-least-squares route visibly outside the peer-reviewed companion publication and leaves the
-executable comparison workflow to 5C.
+computational-performance trade-offs, troubleshooting, and top-level discoverability. Patch 5C
+adds the maintained matched-split Pulp comparison and labels its output as model-development CV
+evidence rather than independent validation. Step 6 is now active for the final stale-contract,
+release-note, installed-artifact, documentation, and distribution audit.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

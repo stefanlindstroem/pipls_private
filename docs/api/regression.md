@@ -72,6 +72,8 @@ directions $\mathbf{Q}$. Thus `response_subspace` selects the intermediate basis
 public fitted response directions remain $\mathbf{Q}$. See
 [Response-subspace selection](../theory.md#response-subspace-selection) for the mathematical
 criteria and their RRR relationship.
+A complete matched-CV programming example is available in
+[Example 07](../examples.md#compare-response-subspace-policies).
 
 When manuscript alignment matters, use the default `"cross_covariance"` explicitly in recorded
 configuration. See [Companion-manuscript synthetic data](../manuscript_reproduction.md).

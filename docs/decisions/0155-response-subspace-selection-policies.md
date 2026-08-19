@@ -2,10 +2,10 @@
 
 ## Status
 
-Accepted; Step 1 is complete and runtime implementation is pending. The peer-reviewed
-cross-covariance construction remains the package default. This decision authorizes one additional
-least-squares-driven response-subspace policy as a software extension; it does not claim that the
-extension is part of the companion publication.
+Accepted and implemented through Step 5. The peer-reviewed cross-covariance construction remains
+the package default. The least-squares-driven response-subspace policy is implemented as a
+software extension; it is not part of the companion publication. Step 6 remains for the final
+release and distribution audit.
 
 ## Context
 
@@ -18,8 +18,8 @@ The fixed Pi-PLS construction first forms the retained predictor coordinates
 and then chooses an $h$-dimensional orthonormal response basis
 $\mathbf{C}\in\mathbb{R}^{q\times h}$. The peer-reviewed companion publication defines this basis
 from the dominant right-singular subspace of $\mathbf{Z}^{\mathsf T}\mathbf{Y}$, equivalently by
-maximizing retained predictor-response cross-covariance. The package currently implements only
-that construction.
+maximizing retained predictor-response cross-covariance. The package implements that construction
+as the default and also provides the software extension defined below.
 
 A second construction is useful for programming users. Instead of choosing $\mathbf{C}$ by the
 cross-covariance criterion, one may choose the response subspace that minimizes the rank-$h$
@@ -35,7 +35,7 @@ map, preprocessing semantics, and model-selection contracts can remain common.
 
 ### Expose one response-subspace parameter on the fixed estimator
 
-`PiPLSRegression` will expose
+`PiPLSRegression` exposes
 
 ```python
 response_subspace="cross_covariance"
@@ -176,7 +176,7 @@ $\mathbf{S}_{\mathrm{ZY}}^{\mathsf T}(\mathbf{Z}^{\mathsf T}\mathbf{Z})^{+}
 cutoff. That route squares the condition number and would introduce a numerical-rank convention
 separate from the package's predictor-rank policy.
 
-Instead, the implementation will obtain an orthonormal basis $\mathbf{U}_{\mathbf{Z}}$ for
+Instead, the implementation obtains an orthonormal basis $\mathbf{U}_{\mathbf{Z}}$ for
 $\operatorname{col}(\mathbf{Z})$ through a stable exact orthogonal factorization, such as reduced QR
 or an equivalent exact SVD. Since
 
@@ -209,7 +209,7 @@ candidate dimension of `PiPLSSearchCV`.
 
 `PiPLSSearchCV` continues to search only component count $h$ and predictor rank $r_\pi$ and must
 preserve the configured response-subspace policy when cloning its estimator template for candidate
-fits, OOF prediction, and final refitting. The package will not automatically compare
+fits, OOF prediction, and final refitting. The package does not automatically compare
 `"cross_covariance"` and `"least_squares"` within one search object.
 
 A programming user who wants to compare the two policies should perform two searches using two
@@ -243,9 +243,11 @@ The following reconciliations define their continuing scope:
   search.
 
 The fixed estimator now implements both response-subspace policies, and search propagates the
-configured policy without optimizing it. User-facing theory and broader API guidance remain to be
-updated in Step 5; publication-aligned material continues to describe the cross-covariance
-construction as the peer-reviewed method.
+configured policy without optimizing it. User-facing theory and API guidance document both
+policies, while publication-aligned material continues to identify the cross-covariance
+construction as the peer-reviewed method. The maintained programming example compares the
+policies with two searches on the same materialized CV splits and labels the resulting CV-MSE as
+model-development evidence.
 
 ## Planned implementation sequence
 
@@ -270,7 +272,9 @@ the configured policy without searching it, and the implemented public contract 
 Step 4 is complete in patches 4A--4C: the repository now protects an independent Choice-C
 reference, direct RRR equivalence, least-squares training optimality, limiting-case identities,
 shared factorization invariants, scaling/serialization/interoperability behavior, and synchronized
-internal mathematics/testing contracts. Step 5 is the next implementation increment.
+internal mathematics/testing contracts. Step 5 is complete in patches 5A--5C: user-facing
+theory, API/workflow guidance, manuscript-alignment guidance, and the matched-split programming
+comparison are maintained. Step 6 is the final release and distribution audit.
 
 ## Consequences
 
