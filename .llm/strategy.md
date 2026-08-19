@@ -136,9 +136,13 @@ map and `P`/`D`/`Q` diagonalization. Patch 2D adds full/seeded-randomized predic
 the least-squares route, protects the `p >> n` regime, and records that response-side QR/SVD remains
 exact and introduces no independent rank threshold.
 
-Step 3 is now active. It will expose `response_subspace` on `PiPLSRegression` and ensure that search,
-OOF candidate fits, and refitting preserve the fixed-estimator setting without turning it into a
-third search dimension.
+Step 3 is active with three patches:
+
+- 3A (complete): expose and validate `response_subspace` on `PiPLSRegression`, preserve
+  `"cross_covariance"` as the default, and forward the setting to the private core;
+- 3B (next): certify direct-search, pipeline, OOF, and refit propagation without adding a third search
+  dimension;
+- 3C: synchronize the implemented public contract and close Step 3.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

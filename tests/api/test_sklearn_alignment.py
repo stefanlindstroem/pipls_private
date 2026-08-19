@@ -113,12 +113,14 @@ def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
         parameter = signature.parameters[name]
         assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
         assert parameter.default is inspect.Parameter.empty
+    assert signature.parameters["response_subspace"].default == "cross_covariance"
 
     assert set(_fixed_estimator().get_params()) == {
         "copy",
         "n_components",
         "predictor_rank",
         "random_state",
+        "response_subspace",
         "scale",
         "scale_x",
         "scale_y",

@@ -202,14 +202,21 @@ least-squares route with full and seeded randomized predictor SVD and with `p >>
 
 Patches 1A--1D established Decision 0155 and its publication/API boundary. Patches 2A--2C isolated
 the published response-basis calculation, added the Choice-C least-squares primitive, and added the
-private two-value core dispatch. Patch 2D hardens the numerical integration and records the
+private two-value core dispatch. Patch 2D hardened the numerical integration and recorded the
 implemented private-core contract without introducing a second rank threshold or Gram-matrix
-pseudoinverse. `PiPLSRegression` still has no public `response_subspace` parameter, so ordinary
-public fitting remains cross-covariance-only. Step 3 is now the active increment: expose the fixed
-estimator setting and preserve it through search, OOF fitting, and refitting. The compatibility
-invariant remains that omitting the new parameter, or explicitly selecting
-`response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155 fixed-estimator
-numerical path subject only to ordinary floating-point behavior.
+pseudoinverse. Patch 3A now exposes `response_subspace` on `PiPLSRegression` with default
+`"cross_covariance"` and alternative `"least_squares"`, validates exactly that two-value vocabulary,
+and forwards the setting to the private core. The estimator docstring identifies the least-squares
+construction as a software extension outside the peer-reviewed companion publication. Fixed-fit
+tests protect cloning, constructor parameters, public fit/transform/predict surfaces, invalid-value
+cleanup, and exact numerical identity between omitted and explicit cross-covariance settings.
+
+Step 3 remains active. Patch 3B must certify that direct search, pipelines, OOF candidate fitting, and
+refitting preserve the fixed-estimator setting without turning it into a third search dimension;
+Patch 3C will then synchronize the implemented public contract. The compatibility invariant remains
+that omitting the new parameter, or explicitly selecting `response_subspace="cross_covariance"`,
+must reproduce the pre-Decision-0155 fixed-estimator numerical path subject only to ordinary
+floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

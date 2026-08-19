@@ -18,8 +18,10 @@ from sklearn.metrics import r2_score
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ._core import (
+    ResponseSubspace,
     SVDSolver,
     _validate_random_state,
+    _validate_response_subspace,
     fit_pipls_core,
 )
 from ._sklearn_compat import _validate_estimator_data
@@ -51,6 +53,12 @@ class PiPLSRegression(
         Required retained predictor-subspace dimension $r_\pi$. After
         centering, it
         must not exceed ``min(n_features, n_samples - 1)``.
+    response_subspace : {"cross_covariance", "least_squares"}, default="cross_covariance"
+        Response-subspace construction used to obtain the intermediate response
+        basis $\mathbf{C}$. ``"cross_covariance"`` is the peer-reviewed Π-PLS
+        construction and remains the package default. ``"least_squares"`` is a
+        least-squares/RRR-inspired software extension that is not part of the
+        peer-reviewed companion publication.
     scale : bool, default=True
         Backward-compatible default for predictor and response scaling. If true,
         centered predictor and response columns are divided by their
@@ -132,6 +140,7 @@ class PiPLSRegression(
         *,
         n_components: int,
         predictor_rank: int,
+        response_subspace: ResponseSubspace = "cross_covariance",
         scale: bool = True,
         scale_x: bool | None = None,
         scale_y: bool | None = None,
@@ -145,6 +154,7 @@ class PiPLSRegression(
         self.scale_y = scale_y
         self.copy = copy
         self.predictor_rank = predictor_rank
+        self.response_subspace = response_subspace
         self.svd_solver = svd_solver
         self.random_state = random_state
 
@@ -520,6 +530,7 @@ class PiPLSRegression(
                 y_cs,
                 predictor_rank=predictor_rank,
                 n_components=self.n_components,
+                response_subspace=self.response_subspace,
                 svd_solver=self.svd_solver,
                 random_state=self.random_state,
             )
@@ -553,6 +564,7 @@ class PiPLSRegression(
     def _validate_constructor_parameters(self) -> None:
         _validate_positive_int(self.n_components, name="n_components")
         _validate_positive_int(self.predictor_rank, name="predictor_rank")
+        _validate_response_subspace(self.response_subspace)
         if self.n_components > self.predictor_rank:
             raise ValueError(
                 "n_components must satisfy n_components <= predictor_rank; "

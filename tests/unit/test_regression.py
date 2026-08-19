@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from sklearn.base import clone
 
 from pipls import PiPLSRegression
 
@@ -161,11 +162,99 @@ def test_fixed_rank_pair_is_required_and_keyword_only() -> None:
         "n_components",
         "predictor_rank",
         "random_state",
+        "response_subspace",
         "scale",
         "scale_x",
         "scale_y",
         "svd_solver",
     }
+
+
+def test_response_subspace_default_and_clone_contract() -> None:
+    model = PiPLSRegression(n_components=2, predictor_rank=4)
+
+    assert model.response_subspace == "cross_covariance"
+    assert model.get_params()["response_subspace"] == "cross_covariance"
+    cloned = clone(
+        PiPLSRegression(
+            n_components=2,
+            predictor_rank=4,
+            response_subspace="least_squares",
+        )
+    )
+    assert cloned.response_subspace == "least_squares"
+    assert not hasattr(cloned, "coef_")
+
+
+def test_explicit_cross_covariance_matches_default_fit_exactly() -> None:
+    X, Y = _data()
+    default = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        svd_solver="full",
+    ).fit(X, Y)
+    explicit = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        response_subspace="cross_covariance",
+        svd_solver="full",
+    ).fit(X, Y)
+
+    np.testing.assert_array_equal(
+        explicit.decomposition_.predictor_directions,
+        default.decomposition_.predictor_directions,
+    )
+    np.testing.assert_array_equal(
+        explicit.decomposition_.dilation,
+        default.decomposition_.dilation,
+    )
+    np.testing.assert_array_equal(
+        explicit.decomposition_.response_directions,
+        default.decomposition_.response_directions,
+    )
+    np.testing.assert_array_equal(explicit.coef_, default.coef_)
+    np.testing.assert_array_equal(explicit.intercept_, default.intercept_)
+    np.testing.assert_array_equal(explicit.predict(X), default.predict(X))
+
+
+def test_least_squares_response_subspace_supports_public_fit_surfaces() -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        response_subspace="least_squares",
+        svd_solver="full",
+    ).fit(X, Y)
+
+    prediction = model.predict(X)
+    x_scores, y_scores = model.transform(X, Y)
+    assert model.response_subspace == "least_squares"
+    assert model.decomposition_.predictor_directions.shape == (X.shape[1], 2)
+    assert model.decomposition_.response_directions.shape == (Y.shape[1], 2)
+    assert prediction.shape == Y.shape
+    assert x_scores.shape == (X.shape[0], 2)
+    assert y_scores.shape == (X.shape[0], 2)
+    assert np.all(np.isfinite(prediction))
+    assert np.all(np.isfinite(model.coef_))
+
+
+@pytest.mark.parametrize("value", ["xcov", "lstsq", "var", 1, None])
+def test_invalid_response_subspace_is_rejected_without_fitted_state(value: object) -> None:
+    X, Y = _data()
+    model = PiPLSRegression(
+        n_components=2,
+        predictor_rank=4,
+        response_subspace=value,  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(
+        ValueError,
+        match='response_subspace must be "cross_covariance" or "least_squares"',
+    ):
+        model.fit(X, Y)
+
+    assert not hasattr(model, "coef_")
+    assert not hasattr(model, "decomposition_")
 
 
 def test_fixed_fit_creates_no_search_state() -> None:
