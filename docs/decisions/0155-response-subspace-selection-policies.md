@@ -2,10 +2,10 @@
 
 ## Status
 
-Accepted and implemented through Step 5. The peer-reviewed cross-covariance construction remains
-the package default. The least-squares-driven response-subspace policy is implemented as a
-software extension; it is not part of the companion publication. Step 6 remains for the final
-release and distribution audit.
+Accepted, implemented, and closed. The peer-reviewed cross-covariance construction remains the
+package default. The least-squares-driven response-subspace policy is implemented as a software
+extension; it is not part of the companion publication. The six-step implementation and final
+release/distribution audit are complete.
 
 ## Context
 
@@ -249,9 +249,9 @@ construction as the peer-reviewed method. The maintained programming example com
 policies with two searches on the same materialized CV splits and labels the resulting CV-MSE as
 model-development evidence.
 
-## Planned implementation sequence
+## Implementation sequence
 
-This decision is the first patch of Step 1 in a six-step migration:
+This decision was implemented through a six-step migration:
 
 1. establish the decision and maintainer contract;
 2. implement the fixed numerical core for both response-subspace policies;
@@ -274,7 +274,11 @@ reference, direct RRR equivalence, least-squares training optimality, limiting-c
 shared factorization invariants, scaling/serialization/interoperability behavior, and synchronized
 internal mathematics/testing contracts. Step 5 is complete in patches 5A--5C: user-facing
 theory, API/workflow guidance, manuscript-alignment guidance, and the matched-split programming
-comparison are maintained. Step 6 is the final release and distribution audit.
+comparison are maintained. Step 6 completed the changelog/stale-contract audit, strengthened
+clean installed-artifact qualification for both policies, exercised Example 07 from the source
+distribution, and completed the final repository audit. Documentation-from-sdist qualification
+builds from the extracted source tree with an explicit artifact `PYTHONPATH`; clean installation
+isolation remains owned by the wheel/sdist distribution check.
 
 ## Consequences
 

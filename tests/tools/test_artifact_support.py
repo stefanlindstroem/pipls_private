@@ -10,6 +10,7 @@ from tools._artifact_support import (
     clean_subprocess_environment,
     safe_extract_sdist,
     single_artifact,
+    source_distribution_environment,
 )
 
 
@@ -35,6 +36,19 @@ def test_clean_subprocess_environment_removes_python_overrides(
     assert environment["OMP_NUM_THREADS"] == "1"
     assert environment["OPENBLAS_NUM_THREADS"] == "1"
     assert environment["PIP_CACHE_DIR"] == "/tmp/pip-cache"
+
+
+def test_source_distribution_environment_uses_extracted_source(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("PYTHONPATH", "/tmp/development-checkout")
+    source = tmp_path / "pipls-1.2.3"
+
+    environment = source_distribution_environment(source)
+
+    assert environment["PYTHONPATH"] == str(source / "src")
+    assert environment["PYTHONPATH"] != "/tmp/development-checkout"
 
 
 def test_single_artifact_requires_exactly_one_match(tmp_path: Path) -> None:

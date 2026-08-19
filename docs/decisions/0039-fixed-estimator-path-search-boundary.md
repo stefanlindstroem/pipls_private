@@ -5,7 +5,7 @@
 Accepted and fully implemented for estimator/search ownership. Decision 0154 supersedes only the
 search support ceiling and default coverage policy recorded here; that migration is implemented.
 Decision 0155 preserves this ownership boundary and assigns response-subspace policy to the fixed
-estimator when that extension is implemented.
+estimator.
 
 ## Context
 
@@ -52,9 +52,9 @@ meta-estimators when users supply explicit valid parameter pairs. The repository
 ## Relationship to Decision 0155
 
 Decision 0155 adds a fixed-estimator response-subspace configuration without adding a model-selection
-dimension. Once implemented, `PiPLSRegression` owns `response_subspace`, while `PiPLSSearchCV`
-preserves that setting when cloning the estimator template for candidate evaluation, OOF work, and
-final refitting. Search continues to optimize only component count $h$ and predictor rank $r_\pi$.
+dimension. `PiPLSRegression` owns `response_subspace`, while `PiPLSSearchCV` preserves that setting
+when cloning the estimator template for candidate evaluation, OOF work, and final refitting. Search
+continues to optimize only component count $h$ and predictor rank $r_\pi$.
 
 Automatic comparison of the cross-covariance and least-squares response-subspace policies is
 therefore outside `PiPLSSearchCV`. A controlled comparison uses separate estimator templates and,
@@ -92,10 +92,12 @@ in [history.md](history.md); the fixed-estimator/search boundary remains canonic
 ## Consequences
 
 - The fixed estimator resembles scikit-learn's direct regression estimators.
-- The standard Pi-PLS selection path remains bounded, adaptive, and package-owned.
+- The standard Pi-PLS selection path remains package-owned; Decision 0154 makes exhaustive
+  full-feasible coverage the default and retains adaptive coverage as an explicit option.
 - Ordinary path analysis uses one CV layer; nested CV occurs only when a user deliberately places a
   selection procedure inside an external assessment procedure.
-- The $c=5$ path ceiling and the $c=3$ direct-fit warning have distinct purposes.
+- The explicit EPV policy and the $c=3$ direct-fit support warning have distinct purposes; the
+  default search domain has no statistical $n/c$ ceiling under Decision 0154.
 - Decision 0032's full-sample support convention remains in force.
 - Earlier constructor-owned and shared-engine selection arrangements are superseded by this
   implemented boundary.

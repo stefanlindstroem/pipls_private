@@ -72,9 +72,9 @@ peer-reviewed companion manuscript and remains the package default. Decision 015
 additional least-squares-driven response-subspace policy as a software extension; it does not alter
 what the companion manuscript defines or retrospectively place that extension in the publication.
 
-When the Decision-0155 implementation lands, theory documentation may present the software-only
-alternative alongside this canonical derivation, but it must label the publication boundary
-explicitly. Manuscript-reproduction workflows continue to use the cross-covariance construction.
+Theory documentation now presents the software-only alternative alongside this canonical
+derivation and labels the publication boundary explicitly. Manuscript-reproduction workflows
+continue to use the cross-covariance construction.
 
 ## Consequences
 

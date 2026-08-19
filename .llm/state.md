@@ -194,43 +194,23 @@ seven-patch Decision-0154 migration is complete: release notes record the breaki
 change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
 default together with the explicit EPV policy.
 
-Decision 0155 is accepted; Steps 1--5 are complete. The least-squares-driven response-subspace
-policy remains a software extension, while the peer-reviewed cross-covariance construction remains
-the default. The private core supports exactly `"cross_covariance"` and `"least_squares"`: the former
-uses exact SVD of `Z.T @ Y`, while the latter uses exact reduced QR of `Z` followed by exact SVD of
-`Q_Z.T @ Y`. The least-squares helper contains an explicit source comment that the construction is
-not part of the peer-reviewed companion publication. `svd_solver` still governs only the predictor
-decomposition.
+Decision 0155 is implemented and closed. `PiPLSRegression.response_subspace` accepts exactly
+`"cross_covariance"` and `"least_squares"`; the peer-reviewed cross-covariance construction remains
+the default, while the least-squares/RRR-inspired policy is a software extension outside the
+companion publication. The core keeps response-side algebra exact: cross-covariance uses exact SVD
+of `Z.T @ Y`, least-squares uses exact reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`, and
+the final SVD of `W` is exact under both policies. `svd_solver` continues to govern only the
+predictor decomposition.
 
-Patches 1A--1D established Decision 0155 and its publication/API boundary. Patches 2A--2D isolated
-the published response-basis calculation, added and hardened the Choice-C least-squares primitive,
-and recorded the implemented private-core numerical contract. Patches 3A--3C expose
-`response_subspace` on `PiPLSRegression`, validate exactly the two public values, propagate the fixed
-setting through direct search, pipelines, OOF fitting, and refitting, and synchronize the implemented
-public contract. Search still changes only `n_components` and `predictor_rank`; its ordinary template
-continues to use `response_subspace="cross_covariance"`. No `response_subspace_` fitted provenance
-attribute is introduced.
-
-Patches 4A--4C now protect and record the stronger scientific and interoperability contract. Tests
-cover an independently constructed frozen Choice-C reference, direct reduced-rank-regression
-equivalence in the retained predictor coordinates, least-squares training-residual optimality, the
-$q=1$ and full-response-subspace equivalence cases, and shared orthogonality/diagonalization
-invariants. Public coverage includes every predictor/response scaling combination, fitted-estimator
-and fitted-search pickle round trips, `set_params()` refitting, external `GridSearchCV`, and fixed
-response-policy propagation. The internal mathematical and testing contracts now describe both
-implemented response-subspace policies and the corrected full-domain predictor-rank search boundary.
-Step 5 is complete. Patch 5A rewrites the user-facing theory to describe both response-subspace
-criteria, their shared downstream factorization, the RRR interpretation of the least-squares route,
-and the explicit publication/software-extension boundary. Patch 5B propagates that implemented
-policy through the fixed-regression and path-selection references, reproducibility and
-manuscript-alignment guidance, computational-performance trade-offs, troubleshooting, and
-top-level discoverability. Patch 5C adds the maintained Pulp comparison using two searches on the
-same materialized five-fold splits, reports model-development CV-MSE evidence without claiming
-general superiority, and closes the user-documentation/example step. Step 6 is now active for the
-stale-contract, changelog, installed-artifact, distribution, and final release audit. The
-compatibility invariant remains that omitting the new parameter, or explicitly selecting
-`response_subspace="cross_covariance"`, reproduces the pre-Decision-0155 fixed-estimator numerical
-path subject only to ordinary floating-point behavior.
+`response_subspace` is fixed-estimator configuration, not a third `PiPLSSearchCV` search dimension.
+Candidate evaluation, OOF work, pipelines, serialization, external `GridSearchCV`, and final
+refitting preserve the estimator-template policy while package search changes only `n_components`
+and `predictor_rank`. The ordinary search template remains cross-covariance, and no
+`response_subspace_` fitted provenance attribute is introduced. Maintained theory, API,
+reproducibility, performance, troubleshooting, manuscript-alignment, and Example-07 material keep
+the publication/software-extension boundary explicit. The compatibility invariant is that omitting
+the parameter, or explicitly selecting `response_subspace="cross_covariance"`, preserves the
+pre-Decision-0155 fixed-estimator numerical path subject only to ordinary floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection
@@ -238,17 +218,19 @@ provenance. Decision 0152 owns the manual selection-review presentation used by 
 The package has no dedicated leave-one-out mode, detector, provenance field, example, or support
 promise; compatible user-supplied splitters remain ordinary interoperability.
 
-Tests now protect behavior and machine-readable outputs rather than repository prose or source
+Tests protect behavior and machine-readable outputs rather than repository prose or source
 arrangement. Distribution and documentation validation share private maintenance helpers, and the
-Pulp example and tutorial renderer use caller-local plotting functions. Patch 6A adds release notes
-and reconciles active maintainer/example inventory wording only; it introduces no runtime behavior.
-Patch 6B strengthens clean-artifact qualification: the installed-package smoke test exercises both
-response-subspace policies and verifies least-squares policy propagation through search/refit, while
-the extracted source distribution executes both Examples 01 and 07 and verifies their PDF outputs.
-No package runtime behavior changes in 6B. Patch 6B1 keeps the clean virtual-environment isolation
-boundary while allowing artifact qualification to reuse pip's normal download cache, including any
-caller-supplied `PIP_CACHE_DIR`, instead of forcing a new empty cache for every `docs-dist` or
-`dist-check` run. Step 6C remains the final repository audit and Decision-0155 closure.
+Pulp example and tutorial renderer use caller-local plotting functions. Clean wheel and
+source-distribution qualification exercises both response-subspace policies, verifies least-squares
+search/refit propagation, and runs Examples 01 and 07 from the extracted sdist.
+
+`docs-dist` separately verifies that documentation can be built from the extracted source
+distribution. It uses the invoking maintained documentation environment but forces `PYTHONPATH` to
+the extracted artifact's `src` tree, so package code and documentation content cannot fall back to
+the development checkout. Clean installation isolation remains the responsibility of `dist-check`;
+`docs-dist` therefore does not reinstall the scientific and documentation dependency stack into a
+second temporary virtual environment. Artifact installation checks reuse pip's normal cache,
+including a caller-supplied `PIP_CACHE_DIR`.
 
 ## Authority and drift handling
 

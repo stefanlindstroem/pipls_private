@@ -1,4 +1,4 @@
-"""Build the documentation from a clean source-distribution installation."""
+"""Build and validate documentation from an extracted source distribution."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ from _artifact_support import (
     run,
     safe_extract_sdist,
     single_artifact,
-    venv_python,
+    source_distribution_environment,
 )
 
 
@@ -93,33 +93,12 @@ def main() -> None:
         )
         source = safe_extract_sdist(source_distribution, workspace / "extracted")
 
-        environment = workspace / "venv"
-        run(
-            [sys.executable, "-m", "venv", str(environment)],
-            env=environment_variables,
-        )
-        python = venv_python(environment)
-        run(
-            [
-                str(python),
-                "-m",
-                "pip",
-                "install",
-                "--disable-pip-version-check",
-                "--quiet",
-                "--no-input",
-                "--retries",
-                "5",
-                "--timeout",
-                "60",
-                f"{source}[docs]",
-            ],
-            env=environment_variables,
-        )
+        documentation_environment = source_distribution_environment(source)
+        python = Path(sys.executable)
         run(
             [make, "docs", f"PYTHON={python}"],
             cwd=source,
-            env=environment_variables,
+            env=documentation_environment,
         )
         _validate_site(source)
 
@@ -136,7 +115,7 @@ def main() -> None:
                 str(pages_config),
             ],
             cwd=source,
-            env=environment_variables,
+            env=documentation_environment,
         )
         run(
             [
@@ -149,11 +128,11 @@ def main() -> None:
                 str(pages_config),
             ],
             cwd=source,
-            env=environment_variables,
+            env=documentation_environment,
         )
         _validate_site(source)
 
-    print("Source-distribution documentation build passed.")
+    print("Extracted-source-distribution documentation build passed.")
 
 
 if __name__ == "__main__":

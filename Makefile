@@ -60,7 +60,7 @@ docs-figures: ## Generate tutorial figures.
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_synthetic_tutorial.py
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_pulp_tutorial.py
 
-docs-dist: ## Verify documentation from a clean source distribution.
+docs-dist: ## Verify documentation from an extracted source distribution.
 	$(PYTHON) tools/check_sdist_docs.py
 
 ##@ Distribution and maintenance

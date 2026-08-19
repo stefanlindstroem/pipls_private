@@ -3,8 +3,8 @@
 ## Status
 
 Accepted and implemented. Decision 0155 preserves the predictor-only randomized-SVD boundary
-and generalizes the exact response-side factorization contract when its software extension is
-implemented.
+and generalizes the exact response-side factorization contract across both implemented
+response-subspace policies.
 
 ## Context
 
@@ -22,9 +22,11 @@ svd_solver="auto"       # "full", "randomized", or "auto"
 random_state=0
 ```
 
-Only the first SVD of the centered/scaled predictor matrix may be randomized. The SVDs of
-`Z.T @ Y` and `W` remain exact because they are normally much smaller and define the response
-subspace and final Pi-PLS coupling.
+Only the first SVD of the centered/scaled predictor matrix may be randomized. Response-side
+orthogonal factorizations and the final SVD of `W` remain exact because they are normally much
+smaller and define the response subspace and final Pi-PLS coupling. The cross-covariance policy
+uses exact SVD of `Z.T @ Y`; the least-squares policy uses exact reduced QR of `Z` followed by
+exact SVD of `Q_Z.T @ Y`.
 
 The automatic solver uses randomized SVD exactly when all three conditions hold:
 
@@ -48,14 +50,12 @@ retained singular values above the tolerance and `x_rank_is_exact` is false.
 
 ## Relationship to Decision 0155
 
-The statement above that the SVD of `Z.T @ Y` remains exact describes the currently implemented
-cross-covariance response-subspace route. Decision 0155 does not broaden `svd_solver`: only the
-predictor decomposition that constructs the retained predictor basis may be randomized.
-
-When the least-squares response-subspace extension is implemented, its small response-side
-orthogonal factorization must likewise remain exact, as must the final SVD of `W`. Thus the durable
-contract is that response-subspace selection and final latent coupling are exact under either
-response-subspace policy; randomized SVD remains a predictor-side performance option only.
+Decision 0155 does not broaden `svd_solver`: only the predictor decomposition that constructs the
+retained predictor basis may be randomized. The cross-covariance route therefore keeps exact SVD
+of `Z.T @ Y`, while the least-squares route keeps exact reduced QR of `Z` and exact SVD of
+`Q_Z.T @ Y`; the final SVD of `W` is exact under both policies. The durable contract is that
+response-subspace selection and final latent coupling are exact, while randomized SVD remains a
+predictor-side performance option only.
 
 ## Consequences
 

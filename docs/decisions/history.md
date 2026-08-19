@@ -22,8 +22,10 @@ Current canonical records: [0001](0001-core-definition.md),
 [0092](0092-fold-numerical-rank-feasibility.md), [0102](0102-path-search-defaults.md),
 [0137](0137-post-fit-inspect-decide-refit-lifecycle.md),
 [0140](0140-search-owned-path-selection.md),
-[0143](0143-model-selection-provenance-and-oof-reporting.md), and
-[0146](0146-cv-mse-tolerance-selection.md).
+[0143](0143-model-selection-provenance-and-oof-reporting.md),
+[0146](0146-cv-mse-tolerance-selection.md),
+[0154](0154-full-domain-predictor-rank-selection.md), and
+[0155](0155-response-subspace-selection-policies.md).
 
 ## Datasets and product boundary
 
@@ -44,13 +46,14 @@ Current canonical records: [0015](0015-dataset-and-synthetic-api.md),
 ## Examples and documentation
 
 The example series evolved through several numbering, ownership, and tutorial arrangements. The
-maintained outcome is a self-contained six-example route led by an automatic Pulp fit, followed by
-manual selection review, path comparison, and complete real-data interpretation workflows. Served
-documentation is self-contained, separates tutorials, guides, and generated reference, and keeps
-maintainer decisions outside the user site.
+maintained outcome is a self-contained seven-example route led by an automatic Pulp fit, followed
+by manual selection review, path comparison, complete real-data interpretation workflows, and a
+matched-split response-subspace comparison. Served documentation is self-contained, separates
+tutorials, guides, and generated reference, and keeps maintainer decisions outside the user site.
 
 Current canonical records: [0065](0065-documentation-layer-consolidation.md),
-[0152](0152-selection-review-feedback-workflow.md), and the product and workflow boundaries in
+[0152](0152-selection-review-feedback-workflow.md),
+[0155](0155-response-subspace-selection-policies.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
 [0045](0045-pls-family-analysis-boundary.md), and
 [0142](0142-package-owned-reference-datasets.md).

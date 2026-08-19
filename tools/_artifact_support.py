@@ -37,6 +37,13 @@ def clean_subprocess_environment() -> dict[str, str]:
     return environment
 
 
+def source_distribution_environment(source: Path) -> dict[str, str]:
+    """Return a clean environment that imports from an extracted sdist."""
+    environment = clean_subprocess_environment()
+    environment["PYTHONPATH"] = str(source / "src")
+    return environment
+
+
 def venv_python(environment: Path) -> Path:
     """Return the Python executable inside a virtual environment."""
     if os.name == "nt":

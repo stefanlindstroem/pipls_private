@@ -87,125 +87,31 @@ release validation. Paper reproduction and publication-only analyses remain down
 Decision 0154's seven-patch predictor-rank migration is complete and closed. Future changes to
 predictor-rank selection require a new owner decision rather than extending that sequence.
 
-Decision 0155 opens an active six-step migration for response-subspace selection. The scientific and
-API target is to retain the peer-reviewed cross-covariance construction as the default and add one
-explicit least-squares/RRR-inspired software extension. The response-subspace policy belongs to the
-fixed estimator and is propagated by search; it is not a third search dimension.
+Decision 0155's six-step response-subspace migration is complete and closed. The durable public
+contract keeps the peer-reviewed `"cross_covariance"` construction as the default and exposes one
+explicit `"least_squares"` RRR-inspired software extension outside the companion publication.
+`response_subspace` belongs to the fixed estimator and is propagated by search; it is not a third
+search dimension. Future changes to the response-subspace policy require a new owner decision
+rather than extending the completed Decision-0155 sequence.
 
-The six implementation steps are:
+The numerical contract is exact on the response side under both policies. Cross-covariance uses
+exact SVD of `Z.T @ Y`; least-squares uses exact reduced QR of `Z` followed by exact SVD of
+`Q_Z.T @ Y`; final `W` diagonalization is exact. Randomized SVD remains predictor-side only.
+Regression coverage protects the independent Choice-C/RRR reference, training-residual optimality,
+limiting cases, scaling, serialization, scikit-learn interoperability, fixed-policy propagation,
+and numerical compatibility of the default/explicit cross-covariance path.
 
-1. establish Decision 0155 and the maintainer contract;
-2. implement both response-subspace policies in the fixed numerical core;
-3. expose `response_subspace` on `PiPLSRegression` and preserve it through search, OOF work, and
-   refitting;
-4. add mathematical, numerical, and API regression coverage for both policies;
-5. document the theory and API and add a programming-user comparison example;
-6. complete the stale-contract, release, installed-artifact, and distribution audit.
+The completed release audit records the feature under `Unreleased`, keeps Example 07 in the
+maintained catalogue, qualifies both policies in clean wheel/sdist installations, and executes the
+matched-split comparison from the source distribution. `dist-check` owns clean installation
+isolation. `docs-dist` validates documentation from the extracted sdist using the maintained
+documentation environment with `PYTHONPATH` forced to the extracted artifact's `src` tree; this
+avoids redundantly reinstalling the full scientific/documentation stack while still preventing
+package imports from falling back to the development checkout. Pip's normal download cache remains
+available to artifact-installation checks.
 
-Step 1 is split into four reviewable patches:
-
-- 1A: record and index Decision 0155 -- complete;
-- 1B: reconcile Decisions 0120, 0008, and 0039 with the accepted extension -- complete;
-- 1C: open the active maintainer roadmap while leaving implemented contracts untouched -- complete;
-- 1D: audit repository-wide consistency and close Step 1 before runtime implementation begins --
-  complete.
-
-The Step-1 audit confirmed that `.llm/public_api.md`, `.llm/mathematics.md`, `.llm/theory.md`,
-`.llm/numerical_contracts.md`, source, tests, examples, and user-facing theory still describe only
-the implemented cross-covariance runtime. No premature `response_subspace` public signature, test
-expectation, or programming example is present. Those implemented-contract descriptions remain
-unchanged until the corresponding source and test contracts land.
-
-Step 2 is complete. It is split into four reviewable patches:
-
-- 2A: isolate the current cross-covariance response-basis routine without changing numerics --
-  complete;
-- 2B: implement the isolated exact least-squares response-basis routine -- complete;
-- 2C: add the two-value private core dispatch while preserving cross-covariance as the default --
-  complete;
-- 2D: harden numerical integration, synchronize implemented numerical contracts, and close Step 2 --
-  complete.
-
-Patch 2A changes only source organization around the already implemented response-basis SVD.
-Patch 2B adds a private least-squares/RRR-inspired response-basis helper implemented by exact
-reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`; a projector test verifies equivalence to
-Choice C on a well-conditioned problem. Patch 2C adds the private `fit_pipls_core()` dispatch with
-exactly `"cross_covariance"` and `"least_squares"`; default and explicit cross-covariance fits are
-covered for numerical identity, and the least-squares route uses the same downstream least-squares
-map and `P`/`D`/`Q` diagonalization. Patch 2D adds full/seeded-randomized predictor-SVD coverage for
-the least-squares route, protects the `p >> n` regime, and records that response-side QR/SVD remains
-exact and introduces no independent rank threshold.
-
-Step 3 is complete with three patches:
-
-- 3A: expose and validate `response_subspace` on `PiPLSRegression`, preserve
-  `"cross_covariance"` as the default, and forward the setting to the private core;
-- 3B: certify direct-search, pipeline, OOF, and refit propagation without adding a third search
-  dimension;
-- 3C: synchronize the implemented public contract and close Step 3.
-
-The existing estimator-template boundary required no search-runtime changes. Direct candidate
-evaluation, explicit refit, selection-conditioned OOF reporting, and pipeline templates retain
-`response_subspace="least_squares"` while search continues to overwrite only `n_components` and
-`predictor_rank`. The ordinary `PiPLSSearchCV()` template still refits with
-`response_subspace="cross_covariance"`.
-
-Step 4 is complete with three reviewable patches:
-
-- 4A: add independent mathematical reference coverage, RRR equivalence, least-squares training
-  optimality, limiting-case identities, and shared core invariants -- complete;
-- 4B: harden public scaling, serialization, configuration changes, and scikit-learn interoperability
-  for the least-squares policy -- complete;
-- 4C: synchronize internal mathematics/testing contracts and close Step 4 -- complete.
-
-Patch 4A uses an independent Choice-C Gram/eigen calculation only in regression-test code; the
-runtime continues to use the numerically preferred exact QR/SVD construction from Step 2. Patch 4B
-adds public regression coverage for all scaling combinations, estimator/search serialization,
-`set_params()` refitting, and external `GridSearchCV` while leaving runtime behavior unchanged.
-Patch 4C records both response-subspace objectives, their shared downstream factorization, the RRR
-and limiting-case identities, durable regression coverage, and the Decision-0154 full-domain rank
-boundary in the authoritative internal contracts.
-
-Step 5 is complete in three reviewable patches:
-
-- 5A: rewrite the user-facing theory and establish the publication/software-extension boundary --
-  complete;
-- 5B: update API, workflow, reproducibility, performance, and manuscript-reproduction documentation
-  -- complete;
-- 5C: add the programming-user response-subspace comparison example and close Step 5 -- complete.
-
-Patch 5A documents both response-subspace objectives, the exact QR/SVD realization of the
-least-squares criterion, its RRR interpretation, the singular-value-weighting distinction between
-the policies, their shared downstream least-squares/diagonalization stages, and the limiting cases
-where their fitted maps coincide. Patch 5B propagates the implemented policy through the
-fixed-regression and path-selection references, reproducibility and manuscript-alignment guidance,
-computational-performance trade-offs, troubleshooting, and top-level discoverability. Patch 5C
-adds the maintained matched-split Pulp comparison and labels its output as model-development CV
-evidence rather than independent validation.
-
-Step 6 is split into three reviewable patches plus one maintenance hotfix:
-
-- 6A: add release notes and reconcile stale active-contract/example-inventory wording -- complete;
-- 6B: qualify both response-subspace policies in clean installed artifacts and execute Example 07
-  from the source distribution -- complete;
-- 6B1: reuse the normal pip download cache during clean artifact qualification -- complete;
-- 6C: perform the final repository audit and close Decision 0155 -- next.
-
-Patch 6A records the implemented feature under `Unreleased`, updates the current decision registry,
-and synchronizes the maintained example inventory after Example 07. Historical records that were
-correct when written remain historical rather than being rewritten. No runtime behavior changes in
-6A. Patch 6B extends clean wheel/source-distribution smoke qualification to both response-subspace
-policies, verifies least-squares policy propagation through installed search/refit, and executes both
-Examples 01 and 07 from the extracted source distribution. No package runtime behavior changes in
-6B. Patch 6B1 preserves the clean virtual environments but stops replacing `PIP_CACHE_DIR` with a
-fresh temporary directory on every qualification run, so repeated `docs-dist` and `dist-check`
-commands can reuse pip's normal download cache without weakening installation isolation.
-
-The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
-`response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator
-numerics, subject only to ordinary floating-point behavior. The least-squares route must remain
-visibly outside the peer-reviewed companion publication throughout source, theory documentation,
-and manuscript-reproduction guidance.
+There is no active numbered migration after Decision 0155. New scientific, numerical, API, or
+release-engineering work should begin with the relevant owner decision and a fresh bounded plan.
 
 ## Deferred work
 
