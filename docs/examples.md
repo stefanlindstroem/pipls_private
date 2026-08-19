@@ -13,7 +13,7 @@ the maintained scripts.
 |---|---|---|
 | `01_pulp_quick_start.py` | Short automatic workflow on Pulp: select by a CV rule, refit, and inspect fitted predictions | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Learn manual component selection on synthetic train/test data, including path and optional predictor-rank inspection | Four PDF figures and printed external-test $R^2$ |
-| `03_pls_path_comparison.py` | Compare both Π-PLS response-subspace policies with ordinary PLS on matched CV splits for all three reference datasets, without choosing a final model | One three-way comparison PDF for each reference dataset |
+| `03_pls_path_comparison.py` | Compare both Π-PLS response-subspace policies with ordinary PLS on matched CV splits for three reference datasets plus one deterministic near-saturated synthetic stress case, without choosing a final model | Four three-way comparison PDFs |
 | `04_pulp_real_data.py` | Full manual-selection workflow on Pulp: choose $h$ explicitly, review selection-conditioned OOF evidence, refit, and interpret the model | Ten PDF figures |
 | `05_sugarcane_real_data.py` | Manual-selection spectral workflow on Sugarcane with wavelength-aware model inspection | Six PDF figures |
 | `06_tobacco_real_data.py` | Full automated-selection spectral workflow on Tobacco using separate relative-tolerance rules for $r_\pi$ and $h$ | Six PDFs, including threshold-annotated rank and component profiles |
@@ -22,7 +22,7 @@ The [path-selection reference](api/path.md) documents both the compact automatic
 example 01 and the explicit selection handoff used by the analytical examples. The
 [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02 workflow directly.
 The comparison in example 03 is optional and is not part of routine Π-PLS fitting. For each
-reference dataset it materializes one shuffled five-fold protocol and reuses those exact splits for
+comparison case it materializes one shuffled five-fold protocol and reuses those exact splits for
 separate `"cross_covariance"` and `"least_squares"` Π-PLS searches plus the ordinary-PLS path.
 `response_subspace` remains fixed estimator configuration rather than a third search dimension.
 The cross-covariance policy is the peer-reviewed package default; least squares is the RRR-inspired
@@ -30,7 +30,8 @@ software extension and is not part of the peer-reviewed companion publication. T
 CV-MSE paths are model-development evidence, not independent post-selection validation.
 
 Examples 01, 02, and the Pulp branch of example 03 use the package's exhaustive predictor-rank
-default. The high-dimensional Sugarcane and Tobacco branches of example 03 and complete examples
+default; the synthetic stress branch requests exhaustive coverage explicitly. The high-dimensional
+Sugarcane and Tobacco branches of example 03 and complete examples
 05 and 06 request `search_method="adaptive"` explicitly to control candidate cost over the new
 full hard-feasible rank domain. That choice changes candidate coverage, not the admissible rank
 endpoints; `search_is_exhaustive_` records whether the adaptive run happened to cover all pairs.
@@ -38,11 +39,22 @@ endpoints; `search_is_exhaustive_` records whether the adaptive run happened to 
 ## Compare response-subspace policies {#compare-response-subspace-policies}
 
 `examples/03_pls_path_comparison.py` is the maintained programming-user comparison. For Pulp,
-Sugarcane, and Tobacco it materializes one shuffled five-fold protocol, fits one `PiPLSSearchCV`
-with `response_subspace="cross_covariance"` and one with `response_subspace="least_squares"`, and
-evaluates ordinary PLS on those same folds. The three conditioned component paths are overlaid in
-one dataset-specific figure. No final model is fitted because the purpose is to compare
-model-development evidence under matched validation partitions.
+Sugarcane, Tobacco, and one deterministic synthetic stress case it materializes one shuffled
+five-fold protocol, fits one `PiPLSSearchCV` with `response_subspace="cross_covariance"` and one
+with `response_subspace="least_squares"`, and evaluates ordinary PLS on those same folds. The
+three conditioned component paths are overlaid in one case-specific figure. No final model is
+fitted because the purpose is to compare model-development evidence under matched validation
+partitions.
+
+The synthetic case has 25 observations, 40 predictors, 10 responses, 5 shared latent directions,
+15 predictor-specific directions, no response-specific directions, and Gaussian predictor and
+response noise with standard deviation 0.3. Five-fold training sets contain 20 observations, so
+centered predictor rank is at most 19 while the declared systematic predictor signal has 20 latent
+directions. In this fixed `random_state=0` realization, both Π-PLS response policies attain their
+minimum mean CV-MSE at 5 components: 0.9036 for cross-covariance and 0.9022 for least squares.
+Ordinary PLS reaches 0.9373 at 8 components. The two Π-PLS curves remain close and alternate in
+which one is lower, so this one stress realization does not establish a general performance
+ordering.
 
 The example does not claim that either response policy or ordinary PLS is generally superior. The
 appropriate model is data-dependent. For the mathematical distinction between the two Π-PLS
@@ -57,7 +69,8 @@ python -m pip install ".[examples]"
 python examples/01_pulp_quick_start.py
 ```
 
-Generated files are written below `examples/results/`.
+Generated files are written below `examples/results/`. Run only the fixed stress case with
+`python examples/03_pls_path_comparison.py --dataset synthetic_stress`.
 
 ## Run all examples
 
@@ -72,8 +85,8 @@ workflows and may take substantially longer than the package test suite.
 
 Example 01 intentionally uses the scikit-learn-compatible default `cv=5` to keep the opening
 workflow to one automatic search/refit expression. Examples 02, 03, 05, and 06 use one explicit
-shuffled five-fold partition. Example 03 materializes that partition once per dataset and reuses
-the same splits for both response-subspace policies and ordinary PLS. The complete Pulp workflow
+shuffled five-fold partition. Example 03 materializes that partition once per comparison case and
+reuses the same splits for both response-subspace policies and ordinary PLS. The complete Pulp workflow
 instead uses
 `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`: 50 materialized splits and ten OOF
 predictions per observation. This deliberate stability analysis costs approximately ten times one

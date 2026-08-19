@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; Patches 0157A and 0157B are implemented. Patch 0157C remains.
+Accepted, implemented, and closed.
 
 ## Context
 
@@ -18,7 +18,7 @@ policy is generally superior.
 
 ## Decision
 
-Example 03 will gain one deterministic synthetic stress case generated with
+Example 03 includes one deterministic synthetic stress case generated with
 `make_pipls_regression()` using the following fixed configuration:
 
 - 25 observations;
@@ -45,9 +45,9 @@ close to the sample count.
 
 ### 0157A — fixed design and deterministic regression coverage
 
-Add an example-local immutable specification and helper that generate the exact case above. Tests
-protect dimensions, latent declarations, noise levels, seed, and deterministic reproduction. This
-patch does not add a new plotted case yet.
+Implemented. An example-local immutable specification and helper generate the exact case above.
+Tests protect dimensions, latent declarations, noise levels, seed, and deterministic reproduction.
+The design was fixed before comparative results were inspected.
 
 ### 0157B — integrate the stress case into Example 03
 
@@ -60,8 +60,24 @@ finite CV-MSE paths, and the expected artifact path without asserting a performa
 
 ### 0157C — document the exploratory case and close the decision
 
-Update the maintained example catalogue and user documentation, retain bounded source-distribution
-qualification, record the observed fixed-realization behavior factually, and close Decision 0157.
+Implemented. The maintained example catalogue and user documentation now include the fourth case,
+while source-distribution qualification remains bounded to the Pulp branch of Example 03. The
+observed fixed-realization behavior is recorded below and Decision 0157 is closed.
+
+## Observed fixed-realization behavior
+
+The fixed `random_state=0` realization does not show a broad degradation of the least-squares
+response-subspace policy. The mean response-standardized CV-MSE minima are:
+
+- cross-covariance Pi-PLS: 0.9036 at 5 components;
+- least-squares Pi-PLS: 0.9022 at 5 components;
+- ordinary PLS: 0.9373 at 8 components.
+
+Across the 1--10 component path, the two Pi-PLS curves remain close and alternate in which policy
+has the lower mean CV-MSE. At 10 components their mean CV-MSE values coincide in this run, consistent with the fitted-map
+limiting case when the component count reaches the 10-dimensional response space. These values are exploratory
+model-development evidence from one predeclared realization; they neither establish equivalence nor
+support a general superiority claim for either response policy.
 
 ## Relationship to earlier decisions
 
@@ -76,5 +92,7 @@ qualification, record the observed fixed-realization behavior factually, and clo
 
 - The exploratory geometry is reproducible and reviewable before its comparative result is known.
 - No public runtime API changes are required.
-- The eventual fourth Example-03 case will increase `make examples` cost modestly but does not need
-  to expand clean source-distribution qualification beyond its bounded Pulp branch.
+- The fourth Example-03 case increases `make examples` cost modestly but does not expand clean
+  source-distribution qualification beyond its bounded Pulp branch.
+- The predeclared stress hypothesis was useful even though this realization did not show the
+  expected broad least-squares deterioration; retaining the result avoids post-hoc seed selection.

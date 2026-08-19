@@ -112,32 +112,32 @@ The maintained numbered examples are user tasks:
 
 1. compact Pulp automatic fit and fitted-value diagnostic;
 2. synthetic inspect-decide-refit workflow with external-test prediction;
-3. matched-fold PLS-family component-path comparison across Pulp, Sugarcane, and Tobacco, covering
-   both Pi-PLS response-subspace policies and ordinary PLS without final refitting;
+3. matched-fold PLS-family component-path comparison across Pulp, Sugarcane, Tobacco, and one
+   deterministic near-saturated synthetic stress case, covering both Pi-PLS response-subspace
+   policies and ordinary PLS without final refitting;
 4. complete repeated-CV Pulp analysis;
 5. complete Sugarcane analysis;
 6. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
 
 Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 03, 05, and 06
 use `KFold(n_splits=5, shuffle=True, random_state=0)`. Example 03 materializes those folds once per
-dataset and reuses the exact same split object for the cross-covariance Pi-PLS search, least-squares
-Pi-PLS search, and ordinary-PLS path. Complete real-data examples are exercised by `make examples`,
-not duplicated in the default test suite.
+comparison case and reuses the exact same split object for the cross-covariance Pi-PLS search,
+least-squares Pi-PLS search, and ordinary-PLS path. Complete real-data examples are exercised by
+`make examples`, not duplicated in the default test suite.
 
-Decision 0156 is implemented and closed. Example 03 is now the sole maintained PLS-family
+Decisions 0156 and 0157 are implemented and closed. Example 03 is the sole maintained PLS-family
 comparison and overlays the cross-covariance Pi-PLS path, least-squares Pi-PLS path, and ordinary
-PLS path for Pulp, Sugarcane, and Tobacco on one materialized five-fold protocol per dataset. The
-former Example 07 and its dedicated PDF are retired. Source-distribution qualification executes the
-bounded Pulp branch of Example 03; `make examples` owns complete three-dataset execution.
-
-Decision 0157 is active. Patch 0157A fixes a deterministic near-saturated synthetic stress design:
-25 observations, 40 predictors, 10 responses, 5 shared latent directions, 15 predictor-specific
-directions, no response-specific directions, common noise SD 0.3, and `random_state=0`. Patch 0157B
-adds that fixed design as the fourth Example-03 comparison case. It reuses one materialized
-five-fold protocol across cross-covariance Pi-PLS, least-squares Pi-PLS, and ordinary PLS; both
-Pi-PLS policies use exhaustive predictor-rank coverage and the component paths run from 1 through
-10 components.
-Patch 0157C remains to document the observed fixed-realization behavior and close the decision.
+PLS path for Pulp, Sugarcane, Tobacco, and one deterministic near-saturated synthetic stress case.
+Every case uses one materialized five-fold protocol shared across all three methods. The synthetic
+case fixes 25 observations, 40 predictors, 10 responses, 5 shared directions, 15 predictor-specific
+directions, no response-specific directions, common noise SD 0.3, and `random_state=0`; both Pi-PLS
+policies use exhaustive predictor-rank coverage over components 1 through 10. In this fixed
+realization, the minimum mean CV-MSE occurs at 5 components for both Pi-PLS policies (0.9036
+cross-covariance; 0.9022 least squares), while ordinary PLS reaches 0.9373 at 8 components. This is
+exploratory model-development evidence and does not establish a general performance ordering.
+Source-distribution qualification executes only the bounded Pulp branch of Example 03; `make
+examples` owns complete four-case execution. The former Example 07 and its dedicated PDF remain
+retired.
 
 ## Inspection and rendering boundary
 
@@ -222,7 +222,7 @@ Candidate evaluation, OOF work, pipelines, serialization, external `GridSearchCV
 refitting preserve the estimator-template policy while package search changes only `n_components`
 and `predictor_rank`. The ordinary search template remains cross-covariance, and no
 `response_subspace_` fitted provenance attribute is introduced. Maintained theory, API,
-reproducibility, performance, troubleshooting, manuscript-alignment, and Example-07 material keep
+reproducibility, performance, troubleshooting, manuscript-alignment, and Example-03 material keep
 the publication/software-extension boundary explicit. The compatibility invariant is that omitting
 the parameter, or explicitly selecting `response_subspace="cross_covariance"`, preserves the
 pre-Decision-0155 fixed-estimator numerical path subject only to ordinary floating-point behavior.
@@ -237,7 +237,8 @@ Tests protect behavior and machine-readable outputs rather than repository prose
 arrangement. Distribution and documentation validation share private maintenance helpers, and the
 Pulp example and tutorial renderer use caller-local plotting functions. Clean wheel and
 source-distribution qualification exercises both response-subspace policies, verifies least-squares
-search/refit propagation, and runs Examples 01 and 07 from the extracted sdist.
+search/refit propagation, and runs Example 01 plus the bounded Pulp branch of Example 03 from the
+extracted sdist.
 
 `docs-dist` separately verifies that documentation can be built from the extracted source
 distribution. It uses the invoking maintained documentation environment but forces `PYTHONPATH` to

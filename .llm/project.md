@@ -46,9 +46,9 @@ The maintained numbered examples are:
 
 1. Pulp automatic fit and fitted-value diagnostic;
 2. synthetic inspect-decide-refit workflow with external-test prediction;
-3. matched-fold PLS-family component-path comparison across Pulp, Sugarcane, and Tobacco, covering
-   the peer-reviewed cross-covariance Pi-PLS policy, the least-squares software extension, and
-   ordinary PLS without final refitting;
+3. matched-fold PLS-family component-path comparison across Pulp, Sugarcane, Tobacco, and one
+   deterministic near-saturated synthetic stress case, covering the peer-reviewed cross-covariance
+   Pi-PLS policy, the least-squares software extension, and ordinary PLS without final refitting;
 4. repeated-CV Pulp analysis;
 5. Sugarcane analysis;
 6. Tobacco analysis with separate 10% predictor-rank and component-count tolerances.

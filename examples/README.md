@@ -47,14 +47,16 @@ seed makes these analyses reproducible while preventing row order from defining 
 
 ## Explicit comparison
 
-- `03_pls_path_comparison.py`: the explicit Pulp, Sugarcane, and Tobacco PLS-family component-path
-  comparison. For each dataset it materializes one shuffled five-fold protocol and reuses those
-  exact splits for separate Π-PLS searches with `response_subspace="cross_covariance"` and
-  `response_subspace="least_squares"`, plus ordinary PLS. Pulp uses the exhaustive predictor-rank
-  default; the higher-dimensional Sugarcane and Tobacco searches request adaptive coverage
-  explicitly. Cross-covariance is the peer-reviewed Π-PLS default, whereas least squares is an
-  RRR-inspired software extension outside the peer-reviewed publication. The workflow fits no
-  final model.
+- `03_pls_path_comparison.py`: the explicit PLS-family component-path comparison for Pulp,
+  Sugarcane, Tobacco, and one deterministic near-saturated synthetic stress case. Each case
+  materializes one shuffled five-fold protocol and reuses those exact splits for separate Π-PLS
+  searches with `response_subspace="cross_covariance"` and `response_subspace="least_squares"`,
+  plus ordinary PLS. Pulp and the synthetic case use exhaustive predictor-rank coverage; the
+  higher-dimensional Sugarcane and Tobacco searches request adaptive coverage explicitly.
+  Cross-covariance is the peer-reviewed Π-PLS default, whereas least squares is an RRR-inspired
+  software extension outside the peer-reviewed publication. The workflow fits no final model.
+  Run only the exploratory synthetic branch with
+  `python examples/03_pls_path_comparison.py --dataset synthetic_stress`.
 
 Grouped and temporal validation require application-specific sampling semantics and remain in
 `docs/path_analysis.md`.
@@ -91,7 +93,7 @@ six figures plus `selected_component_path.pdf`, `final_fit_observed_vs_predicted
 `final_fit_r2.pdf`, and `final_fit_residual_distribution.pdf`. For Tobacco,
 `prediction_diagnostics.pdf` and `coefficients.pdf` each contain three source-order response pages.
 `make examples` runs every numbered example in filename order, including the slower real-data
-workflows and the three-way PLS-family comparison. It remains separate from `make check`.
+workflows and the four-case three-way PLS-family comparison. It remains separate from `make check`.
 
 ## Example support module
 
@@ -100,9 +102,9 @@ The Π-PLS-versus-PLS comparison workflow imports one implementation helper from
 
 - `pls_component_path.py`: immutable ordinary-PLS path evaluation for example 03.
 
-Example 03 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, and Tobacco import no
-comparison helper. Reusable numerical inspection belongs in `pipls.inspection`; every maintained
-figure is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot uses
+Example 03 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, Tobacco, and the
+synthetic stress case import no comparison helper. Reusable numerical inspection belongs in
+`pipls.inspection`; every maintained figure is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot uses
 optional `adjustText` only to reposition its Matplotlib text labels.
 
 ## Real-data workflow contract

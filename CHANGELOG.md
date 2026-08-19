@@ -25,7 +25,9 @@
 - Document both response-subspace criteria, their reproducibility and manuscript-alignment
   boundary, and computational trade-offs. Unify the maintained PLS-family comparison so both
   response-subspace policies and ordinary PLS are evaluated on identical materialized folds for
-  Pulp, Sugarcane, and Tobacco without claiming general superiority.
+  Pulp, Sugarcane, Tobacco, and one fixed near-saturated synthetic stress case without claiming
+  general superiority. The synthetic case fixes 25 observations, 40 predictors, 10 responses,
+  5 shared and 15 predictor-specific latent directions, and noise SD 0.3 before comparison.
 
 ## 0.1.0 - 2026-08-09
 

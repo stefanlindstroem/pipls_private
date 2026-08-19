@@ -54,7 +54,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | implemented exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
 | `0155-response-subspace-selection-policies.md` | response-subspace selection policies | closed implementation: cross-covariance default plus an explicit least-squares/RRR-inspired software extension outside the peer-reviewed publication |
 | `0156-unified-pls-family-path-comparison.md` | unified PLS-family path comparison | consolidate both Pi-PLS response policies and ordinary PLS into Example 03 on shared materialized folds for all three reference datasets |
-| `0157-near-saturated-synthetic-pls-comparison.md` | near-saturated synthetic PLS-family stress case | fixed deterministic 25-by-40, 10-response exploratory design now integrated into Example 03 with matched folds and exhaustive Pi-PLS rank coverage |
+| `0157-near-saturated-synthetic-pls-comparison.md` | near-saturated synthetic PLS-family stress case | closed exploratory extension of Example 03 with a fixed deterministic 25-by-40, 10-response design, matched folds, and exhaustive Pi-PLS rank coverage |
 
 ## Implemented clarifications
 
