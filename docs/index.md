@@ -42,7 +42,7 @@ selection, diagnostic validation, and independent testing are not silently confl
 standard statistical practice for separating model development from independent performance
 assessment.
 
-## Quick start with Pulp
+## Quick start with Pulp dataset
 
 The installed package contains the multivariate Pulp dataset:
 
