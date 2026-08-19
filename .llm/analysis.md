@@ -191,8 +191,10 @@ probe per split. Full-data refitting adds one fit and each OOF report adds one s
 split. These counts are not presented as wall-clock formulas.
 
 All advice preserves fold-local learned preprocessing. Shuffled validation and randomized predictor
-SVD examples use explicit integer seeds. Fixed and maximum-rank examples omit `search_method`;
-`"adaptive"` and `"exhaustive"` are used only when predictor-rank coverage is an actual choice.
+SVD examples use explicit integer seeds. Fixed and EPV rank policies expose one predictor rank per
+compatible component count; `"adaptive"` is used explicitly only when reduced coverage of a
+multi-rank domain is an intended computational approximation. Ordinary automatic search is
+exhaustive.
 
 ## Artifact and testing contract
 

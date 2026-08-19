@@ -32,8 +32,9 @@ responses.
 ## Search, select, and refit
 
 The complete automatic workflow is one chained expression. `fit()` evaluates the cross-validated
-path, and `refit(rule="minimum_cv_mse")` selects the smallest component count within the default
-machine-scale tolerance of the minimum mean CV-MSE and fits that fixed model on all observations:
+path using exhaustive coverage of the complete fold-feasible predictor-rank domain by default, and
+`refit(rule="minimum_cv_mse")` selects the smallest component count within the default machine-scale
+tolerance of the minimum mean CV-MSE and fits that fixed model on all observations:
 
 ```python
 --8<-- "examples/01_pulp_quick_start.py:fit-selected-pulp-model"

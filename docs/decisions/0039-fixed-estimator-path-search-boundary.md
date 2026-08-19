@@ -3,7 +3,7 @@
 ## Status
 
 Accepted and fully implemented for estimator/search ownership. Decision 0154 supersedes only the
-search support ceiling and default coverage policy recorded here; that migration is pending.
+search support ceiling and default coverage policy recorded here; that migration is implemented.
 
 ## Context
 
@@ -34,9 +34,9 @@ standard selection procedure.
 
 - It will evaluate the admissible triangular surface
   $1 \leq h \leq r_\pi \leq r_{\pi,\max}$.
-- Its default statistical-support ceiling will continue to use
-  `samples_per_predictor_rank=5` and the total number of observations supplied to `fit()`.
-- Centered training-fold dimensions will remain hard feasibility caps.
+- Its ordinary automatic rank domain is bounded only by hard fold feasibility and any explicit
+  integer `max_predictor_rank`; `samples_per_predictor_rank` belongs only to the explicit EPV policy.
+- Centered training-fold dimensions and verified numerical rank remain hard feasibility caps.
 - It will fit fixed-rank `PiPLSRegression` clones for candidate evaluation and will conditionally
   select one numeric predictor rank for every component count.
 - It will suppress only the expected `StatisticalSupportWarning` from its controlled internal

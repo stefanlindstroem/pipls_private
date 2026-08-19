@@ -2,15 +2,15 @@
 
 Status: accepted and implemented in `PiPLSSearchCV`; Decision 0039 removes these search modes from
 `PiPLSRegression`. Decision 0154 keeps both coverage algorithms but makes exhaustive coverage the
-accepted default and removes the separate `predictor_rank_values="max"` policy; implementation is
-pending.
+accepted default and removes the separate `predictor_rank_values="max"` policy; that migration is
+implemented.
 
 ## Context
 
 For fixed `n_components`, exhaustive evaluation of every admissible predictor rank can be
-prohibitively expensive when the fold-safe upper bound is large. The public API therefore needs
-both an exhaustive reference mode and a scalable default mode without conflating candidate-coverage
-approximation with numerical SVD approximation.
+prohibitively expensive when the fold-safe upper bound is large. The public API therefore retains
+both an exhaustive reference/default mode and a scalable opt-in adaptive mode without conflating
+candidate-coverage approximation with numerical SVD approximation.
 
 The CV objective is discrete and may be noisy or non-unimodal. Strict bisection, ternary search,
 or golden-section search would assume more structure than the objective guarantees and could
@@ -24,12 +24,13 @@ irreversibly discard the region containing the global minimum.
 - `"adaptive"`: use deterministic logarithmic coarse-to-fine coverage and accept that the
   evaluated candidate set may be a subset of the exhaustive set.
 
-`predictor_rank_values="max"` and one-element explicit sequences are separate fixed policies with
-one rank candidate per component count. They do not require a candidate-coverage choice. Decision
-0148 refines final retained-rank selection: after either optimized coverage policy finishes candidate
-evaluation, separate public relative and absolute tolerances retain the smallest qualifying
-evaluated rank. The public values are `"adaptive"` and `"exhaustive"`; no aliases are retained
-for earlier pre-release spellings.
+`predictor_rank_values="epv"` and one-element explicit sequences are separate fixed policies with
+one rank candidate per compatible component count. They are exhaustively covered when
+`search_method` is left at its default. Decision 0148 refines final retained-rank selection: after
+either optimized coverage policy finishes candidate evaluation, separate public relative and
+absolute tolerances retain the smallest qualifying evaluated rank. The public coverage values are
+`"adaptive"` and `"exhaustive"`; exhaustive is the default and no aliases are retained for earlier
+pre-release spellings.
 
 ## Adaptive-search contract
 

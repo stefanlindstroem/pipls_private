@@ -23,6 +23,12 @@ example 01 and the explicit selection handoff used by the analytical examples. T
 [synthetic tutorial](tutorials/synthetic.md) extracts the maintained example 02 workflow directly.
 The comparison in example 03 is optional and is not part of routine Π-PLS fitting.
 
+Examples 01, 02, and the Pulp branch of example 03 use the package's exhaustive predictor-rank
+default. The high-dimensional Sugarcane and Tobacco branches of example 03 and complete examples
+05 and 06 request `search_method="adaptive"` explicitly to control candidate cost over the new
+full hard-feasible rank domain. That choice changes candidate coverage, not the admissible rank
+endpoints; `search_is_exhaustive_` records whether the adaptive run happened to cover all pairs.
+
 ## Run one example
 
 Install the example dependencies and execute a script from the repository root:

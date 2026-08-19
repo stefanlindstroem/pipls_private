@@ -8,7 +8,7 @@ This index lists current numbered decisions only. Completed intermediate records
 
 - [0001: fixed Pi-PLS construction](0001-core-definition.md)
 - [0002: centering and scaling](0002-preprocessing-semantics.md)
-- [0003: rank bound and conditional selection](0003-predictor-rank-selection.md)
+- [0003: historical rank-bound design and conditional selection](0003-predictor-rank-selection.md)
 - [0004: selection loss](0004-response-standardized-mse.md)
 - [0007: exhaustive versus adaptive search](0007-predictor-rank-search-policies.md)
 - [0008: scalable predictor decomposition](0008-predictor-svd-policy.md)
@@ -17,7 +17,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0015: dataset and synthetic boundary](0015-dataset-and-synthetic-api.md)
 - [0024: package versus publication ownership](0024-package-product-repository-boundary.md)
 - [0025: current versus future scaling](0025-model-internal-standardization-boundary.md)
-- [0032: rank-support sample-count convention](0032-full-sample-rank-support.md)
+- [0032: EPV sample-count convention](0032-full-sample-rank-support.md)
 - [0039: estimator versus selection ownership](0039-fixed-estimator-path-search-boundary.md)
 - [0041: legacy dataset licensing and roadmap](0041-legacy-dataset-licensing-roadmap.md)
 - [0042: fitted-model analysis architecture](0042-model-inspection-and-post-analysis.md)

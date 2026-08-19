@@ -3,7 +3,7 @@
 Status: accepted and refined by Decisions 0039, 0153, and 0154. Fixed-estimator validation now
 covers only explicit ranks and warns at $n/r_\pi<3$. Decision 0154 moves the low-$c$ search
 warning to the explicit EPV policy and removes the `max_predictor_rank="rule"` sentinel; that
-runtime migration is pending.
+runtime migration is implemented.
 
 ## Context
 
@@ -32,11 +32,11 @@ materialization, or numerical decomposition.
 - Invalid scalar `scoring`, `svd_solver`, and rank-mode values fail with package-level `ValueError`
   messages rather than incidental errors from dependencies.
 
-When `samples_per_predictor_rank < 5` is used with `max_predictor_rank="rule"`, one public
+When `samples_per_predictor_rank < 5` is used with `predictor_rank_values="epv"`, one public
 `PredictorRankSupportWarning` is emitted per top-level search fit. The warning states that the
-resulting rank bound may not have sufficient statistical support to be trusted without external
-validation. Explicit integer `max_predictor_rank` values bypass the support rule and therefore do
-not use $c$.
+resulting EPV-fixed rank may not have sufficient statistical support to be trusted without external
+validation. Outside EPV, `samples_per_predictor_rank` does not define candidate ranks; a nondefault
+value is rejected so it cannot be mistaken for an automatic-search bound.
 
 The rank-bound calculation saturates safely at the algebraic limit for extremely small positive
 $c$, avoiding floating-point overflow.

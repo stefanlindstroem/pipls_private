@@ -2,9 +2,8 @@
 
 ## Status
 
-Accepted. Decision 0154 preserves fold numerical-rank preflight but removes the $n/c$ term from
-the general search ceiling and confines it to EPV; implementation of that accepted change is
-pending.
+Accepted and implemented. Decision 0154 preserves fold numerical-rank preflight, removes the
+$n/c$ term from the general search ceiling, and confines it to the explicit EPV policy.
 
 ## Context
 
@@ -30,16 +29,16 @@ across the materialized training folds.
 3. The private core reports rank infeasibility through a private `ValueError` subclass carrying the
    requested rank, verified rank, exactness flag, and tolerance. The public fixed-estimator failure
    remains a `ValueError` with the existing numerical-rank message.
-4. Let $r_{\mathrm{num,min}}$ be the minimum verified rank across folds. Under the default support
-   rule,
+4. Let $r_{\mathrm{num,min}}$ be the minimum verified rank across folds. The hard search ceiling is
 
    \begin{equation}
-   r_{\pi,\max}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
-   r_{\mathrm{num,min}},\left\lceil\frac{n}{c}\right\rceil\right].
+   r_{\pi,\mathrm{hard}}=\min\left[p_{\min},n_{\mathrm{train,min}}-1,
+   r_{\mathrm{num,min}}\right].
    \end{equation}
 
-   An integer `max_predictor_rank` remains an upper bound and is capped by the same dimensional and
-   numerical limits, but bypasses only the support term.
+   An integer `max_predictor_rank` is an additional user upper bound. The explicit EPV policy first
+   computes its full-sample nominal $\min[p,\lceil n/c\rceil]$ rank and then clips it by this hard
+   ceiling and any user maximum.
 5. Validate explicit component and predictor-rank sequences against this resolved ceiling before
    scoring any candidate. Do not add failed or nonfinite candidate rows to `cv_results_`.
 6. If any fold has no positive verified predictor rank, fail clearly and transactionally.
@@ -54,8 +53,9 @@ conservative path ceiling.
 ## Consequences
 
 Default and explicit path searches now treat rank-deficient predictors as an ordinary bounded
-search case. `max_predictor_rank_` records the effective support, dimensional, and fold-numerical
-ceiling, and `n_components_values="all"` resolves only component counts supported by that ceiling.
+search case. `max_predictor_rank_` records the effective hard/user ceiling, and
+`n_components_values="all"` resolves only component counts supported by the active predictor-rank
+policy.
 
 The preflight adds one terminal rank probe per training fold and one fold-local preprocessing fit
 for pipelines. Candidate evaluation, OOF generation, and refit behavior are otherwise unchanged.

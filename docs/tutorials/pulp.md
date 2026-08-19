@@ -186,13 +186,17 @@ rank at the chosen $h$, whereas `profile.selection` identifies the smallest eval
 by the configured predictor-rank tolerance. The default relative tolerance is at machine scale, so
 these normally coincide; both are rank 9 in this analysis.
 
-For these 46 rows, 14 predictors, and repeated five-fold CV, the default statistical-support rule
-with `samples_per_predictor_rank=5` gives
-$r_{\pi,\mathrm{max}}=\min[14,35,\lceil46/5\rceil]=10$. The support parameter is configurable. For
-example, `samples_per_predictor_rank=10` would replace the last term by $\lceil46/10\rceil=5$,
-giving a more conservative scan that requires roughly twice as many supplied observations per
-retained predictor-rank unit under this heuristic. The dimensional and foldwise numerical-rank caps
-still apply.
+For these 46 rows and 14 predictors, the default search is exhaustive over the complete
+fold-feasible predictor-rank domain. The effective hard ceiling is 14, so at the selected
+$h=3$ the profile evaluates every rank from 3 through 14. No EPV-style $n/c$ term limits this
+automatic scan.
+
+The manuscript-style EPV rule remains available as a distinct fixed-rank policy. For the same full
+sample count, `predictor_rank_values="epv"` with the default
+`samples_per_predictor_rank=10` gives the nominal rank
+$\min[14,\lceil46/10\rceil]=5$, while the more permissive $c=5$ choice gives rank 10. Those
+settings define a different predictor-rank policy; they do not alter the domain of the default
+automatic search.
 
 Ranks 9 and 10 have mean CV-MSE values of approximately 0.258 and 0.274, with population split SDs
 of approximately 0.097 and 0.100. Their mean difference is small relative to the displayed
@@ -202,9 +206,9 @@ contains three paired latent modes; predictor rank 9 is the retained predictor-s
 used to estimate those modes.
 
 Advanced analyses can also control predictor rank directly: `predictor_rank_values` can restrict or
-fix the ranks considered by `PiPLSSearchCV`, and an exact
-`PiPLSRegression(n_components=h, predictor_rank=r_pi)` pair can be fitted when both ranks are chosen
-deliberately. The 50-split protocol is a final stability choice rather than a recommended
+fix the ranks considered by `PiPLSSearchCV`, `predictor_rank_values="epv"` requests the explicit
+EPV policy, and an exact `PiPLSRegression(n_components=h, predictor_rank=r_pi)` pair can be fitted
+when both ranks are chosen deliberately. The 50-split protocol is a final stability choice rather than a recommended
 development default; a single seeded five-fold partition is much cheaper while the workflow is
 being assembled. See [Computational
 performance](../computational_performance.md#develop-with-a-smaller-validation-protocol)

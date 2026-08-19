@@ -8,45 +8,55 @@ when the defaults are not enough. Exact signatures and fitted attributes are in 
 ## Search bounds
 
 For paired-mode count $h$ (`n_components`) and retained predictor-subspace dimension $r_\pi$
-(`predictor_rank`), the admissible pairs are
+(`predictor_rank`), the ordinary automatic search domain is triangular. The predictor-rank ceiling
+is determined first from fold-local feasibility and an optional explicit user cap; component counts
+are then resolved from the ranks actually available under the chosen predictor-rank policy.
+
+### Hard predictor-rank ceiling
+
+Let $p_{\mathrm{min}}$ be the minimum predictor count after fold-local pipeline preprocessing,
+$n_{\mathrm{train,min}}$ the smallest materialized training-fold size, and
+$r_{\mathrm{num,min}}$ the minimum verified predictor numerical rank after terminal-estimator
+centering and optional scaling. The hard ceiling is
 
 \begin{equation}
-\mathcal{G}=\{(h,r_\pi):1\le h\le h_{\mathrm{max}},\ h\le r_\pi\le r_{\pi,\mathrm{max}}\}.
+r_{\pi,\mathrm{hard}}
+=
+\min\left[p_{\mathrm{min}},n_{\mathrm{train,min}}-1,r_{\mathrm{num,min}}\right].
 \end{equation}
 
-### Resolved ceilings
-
-The default upper predictor rank is
+These are feasibility constraints, not statistical-support heuristics. With
+`max_predictor_rank=None`, the effective automatic-search ceiling is
+$r_{\pi,\mathrm{max}}=r_{\pi,\mathrm{hard}}$. An explicit positive integer
+`max_predictor_rank=k` imposes the additional user restriction
 
 \begin{equation}
-r_{\pi,\mathrm{max}}=\min\left[p_{\mathrm{min}},n_{\mathrm{train,min}}-1,
-r_{\mathrm{num,min}},
-\left\lceil\frac{n}{c}\right\rceil\right].
+r_{\pi,\mathrm{max}}
+=
+\min\left[r_{\pi,\mathrm{hard}},k\right].
 \end{equation}
 
-Here $n$ is the total number of observations supplied to `fit()`, $p_{\mathrm{min}}$ is the minimum
-predictor count after fold-local pipeline preprocessing, $r_{\mathrm{num,min}}$ is the minimum
-verified predictor rank after terminal-estimator centering and optional scaling, and $c$ is `samples_per_predictor_rank`. The search object fits
-pipeline preprocessing separately inside each fold before this rank preflight. An integer
-`max_predictor_rank` bypasses the statistical support rule but remains capped by fold dimensions and
-numerical rank.
+The events-per-variable parameter `samples_per_predictor_rank` does not enter this general ceiling.
+It is used only by the explicit EPV policy described below.
 
-If the response matrix has $q$ columns, the resolved component ceiling is
+With `predictor_rank_values=None`, the admissible ranks for a component count $h$ are
 
 \begin{equation}
-h_{\mathrm{max}}=\min(q,r_{\pi,\mathrm{max}}).
+\mathcal{R}_h
+=
+\{h,h+1,\ldots,r_{\pi,\mathrm{max}}\}.
 \end{equation}
 
-This ceiling enforces $h\le q$ and guarantees that at least one predictor rank can satisfy
-$h\le r_\pi$ before an explicit predictor-rank set is applied. Explicit component or predictor-rank
-values above the corresponding resolved ceiling are rejected before candidate evaluation. If an
-explicit predictor-rank set leaves a requested component count without any rank satisfying
-$h\le r_\pi$, the request is rejected rather than silently dropping that component count.
+If the response matrix has $q$ columns, the default `n_components_values="all"` resolves after the
+predictor-rank policy and evaluates every $h$ from one through the smaller of $q$ and the largest
+rank available under that policy. Explicit component or predictor-rank values outside the resolved
+feasible domain are rejected before candidate evaluation. If an explicit predictor-rank sequence
+leaves a requested component count without any rank satisfying $h\le r_\pi$, the request is
+rejected rather than silently dropping that component count.
 
 ### Component-count requests
 
-The default `n_components_values="all"` evaluates every paired-mode count from 1 through
-$h_{\mathrm{max}}$. An explicit integer sequence requests a subset:
+An explicit integer sequence requests a subset of the available paired-mode counts:
 
 ```python
 search = PiPLSSearchCV(
@@ -58,16 +68,49 @@ Every requested value must have at least one admissible predictor rank.
 
 ## Predictor-rank policies
 
-With `predictor_rank_values=None`, predictor rank is selected independently for every component
-count. A one-element sequence fixes one rank across the path, a longer sequence defines the
-admissible set, and `predictor_rank_values="max"` uses $r_{\pi,\mathrm{max}}$ directly.
+`predictor_rank_values` controls the rank domain or fixed-rank policy; `search_method` separately
+controls how a multi-rank domain is covered. The supported cases are:
 
-`search_method="exhaustive"` evaluates every admissible pair. `search_method="adaptive"` performs a
-deterministic adaptive coarse-to-fine search independently for each component count and may leave
-admissible ranks unevaluated. After fitting, `search_is_exhaustive_` states whether every
-admissible pair was evaluated. Adaptive refinement and `rank_test_score` continue to use private
-numerical tie handling around the exact configured-score optimum. Final conditional rank retention
-then applies the separate public predictor-rank tolerances.
+- `None`: optimize predictor rank over every integer from one through
+  `max_predictor_rank_`, subject to $r_\pi\ge h$ for each component count;
+- a one-element integer sequence: fix that rank across all compatible component counts;
+- a longer integer sequence: optimize over exactly those supplied ranks after feasibility checks;
+- `"epv"`: fix one rank using the events-per-variable-inspired rule.
+
+For EPV, the nominal rank is computed from the full number of observations supplied to `fit()`:
+
+\begin{equation}
+r_{\pi,\mathrm{epv,nominal}}
+=
+\min\left[p,\left\lceil\frac{n}{c}\right\rceil\right],
+\end{equation}
+
+where $c$ is `samples_per_predictor_rank`. The effective EPV rank is then clipped only by the hard
+ceiling and any explicit integer `max_predictor_rank`:
+
+\begin{equation}
+r_{\pi,\mathrm{epv}}
+=
+\min\left[r_{\pi,\mathrm{epv,nominal}},r_{\pi,\mathrm{max}}\right].
+\end{equation}
+
+The EPV default is $c=10$. A more permissive $c=5$ is also supported. Values below 5 are legal but
+emit `PredictorRankSupportWarning`; for example, `predictor_rank_values="epv"` with
+`samples_per_predictor_rank=1` deliberately pushes the nominal EPV rank to $\min(p,n)$ before
+fold-local feasibility clipping. A nondefault `samples_per_predictor_rank` is invalid outside the
+EPV policy so it cannot be mistaken for a hidden automatic-search bound.
+
+`search_method="exhaustive"` is the default. It evaluates every admissible pair in a multi-rank
+domain and therefore gives the complete configured-score reference optimum over that declared
+domain. `search_method="adaptive"` is an explicit computational approximation: it uses the same
+admissible endpoints but may leave interior ranks unevaluated. After fitting,
+`search_is_exhaustive_` states whether every admissible pair was actually evaluated. Fixed and EPV
+policies have one rank per compatible component count, so their candidate coverage is exhaustive
+even when `search_method` is left at its default.
+
+Adaptive refinement and `rank_test_score` continue to use private numerical tie handling around the
+exact configured-score optimum among evaluated candidates. Final conditional rank retention then
+applies the separate public predictor-rank tolerances.
 
 For optimized policies, configure those tolerances on the search constructor:
 
@@ -79,9 +122,10 @@ search = PiPLSSearchCV(
 ```
 
 For each component count, the smallest evaluated rank satisfying both configured-score caps is
-retained. Fixed and maximum policies accept only the default tolerances and have no predictor-rank
-evidence. `search_method="adaptive"` selects among evaluated ranks; `"exhaustive"` selects among all
-admissible ranks.
+retained. Fixed and EPV policies accept only the default predictor-rank tolerances and have no
+`PiPLSPredictorRankEvidence`. Under exhaustive coverage the reference optimum is taken over the
+complete admissible rank domain; under adaptive coverage it is necessarily limited to the ranks
+that were evaluated.
 
 ## Scoring and conditioned path selection { #scoring-and-conditioned-path-selection }
 

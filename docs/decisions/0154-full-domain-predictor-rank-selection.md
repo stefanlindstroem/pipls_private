@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for implementation. This decision changes the predictor-rank search contract but does not
+Accepted and implemented. This decision changes the predictor-rank search contract but does not
 change the fixed Pi-PLS numerical construction. The implementation is staged so that the accepted
 contract, runtime behavior, tests, examples, and public documentation can be reviewed separately.
 
@@ -205,9 +205,9 @@ The accepted migration is intentionally staged:
 6. rewrite user and maintainer documentation around domain restriction, coverage strategy, and EPV;
 7. complete the stale-contract, installed-package, distribution, and release audit.
 
-Until the behavioral patch is merged, source and user documentation continue to describe the
-implemented pre-migration API. This decision and the active `.llm` roadmap are the authoritative
-statement of the accepted target.
+The runtime, focused regression coverage, maintained examples, generated tutorial evidence, and
+broader user and maintainer documentation now implement this contract. The final migration patch is
+reserved for the release, installed-package, distribution, and stale-contract audit.
 
 ## Consequences
 

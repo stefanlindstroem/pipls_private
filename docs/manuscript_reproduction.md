@@ -172,6 +172,25 @@ additive noise, the observed leading singular directions also need not separate 
 exactly.
 
 A fixed model can be evaluated at these known dimensions when reproducing that synthetic protocol.
+The manuscript's real-data workflow is different: it fixes $r_\pi$ with the EPV-inspired rule
+$r_\pi=\min[p,\lceil n/c\rceil]$ and then selects $h$ by cross-validation. In this package that
+protocol must be requested explicitly, for example:
+
+```python
+from pipls import PiPLSSearchCV
+
+search = PiPLSSearchCV(
+    predictor_rank_values="epv",
+    samples_per_predictor_rank=10.0,
+    cv=cv,
+).fit(X, Y)
+```
+
+Use the value of $c$ declared by the reproduction protocol; the manuscript describes $c=10$ as its
+ordinary EPV choice and $c=5$ as a more permissive small-sample choice. The package default is not
+that manuscript heuristic: ordinary `PiPLSSearchCV()` optimizes $r_\pi$ over the complete
+fold-feasible domain with exhaustive coverage.
+
 Any claim of complete manuscript-result reproduction must additionally match the manuscript's
 preprocessing, validation, comparator, repetition, aggregation, and reporting settings.
 

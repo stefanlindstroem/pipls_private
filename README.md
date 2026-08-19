@@ -26,6 +26,13 @@ pass the same object to final refitting. Compact workflows may instead apply a n
 through `search.refit(X, Y, rule=...)`. The fitted model records the exact row as `selection_`, while
 the search retains the complete path and split evidence.
 
+By default, predictor rank is optimized over the complete fold-feasible integer domain and candidate
+coverage is exhaustive. The EPV-inspired rule is not a hidden bound on that search: request it
+explicitly with `predictor_rank_values="epv"`. Its default $c=10$ is controlled by
+`samples_per_predictor_rank`; explicit rank sequences and an integer `max_predictor_rank` remain
+available when the user intends to restrict the rank domain. Use `search_method="adaptive"`
+explicitly when reduced candidate coverage is an acceptable computational approximation.
+
 The [rendered documentation](https://stefanlindstroem.github.io/pipls/) is the primary user guide.
 The source links below remain useful in a local checkout.
 

@@ -68,10 +68,10 @@ print(n_pairs, n_splits, n_pairs * n_splits)
 ```
 
 During development, use one seeded shuffled partition or fewer repetitions. Then decide whether
-adaptive rather than exhaustive rank coverage, a fixed or maximum predictor-rank policy, a
-restricted rank or component set, or randomized predictor SVD is justified by the analysis. Use
-`n_jobs` only after measuring memory and wall time on the actual matrices, and retain one
-`oof_report()` result rather than recomputing it for each output.
+explicit adaptive rather than default exhaustive rank coverage, an EPV or fixed predictor-rank
+policy, a restricted rank or component set, or randomized predictor SVD is justified by the
+analysis. Use `n_jobs` only after measuring memory and wall time on the actual matrices, and retain
+one `oof_report()` result rather than recomputing it for each output.
 
 Fewer repetitions and narrower candidate policies change the evidence or model-selection question;
 randomized SVD changes the numerical route. The complete ordering, examples, cost accounting, and
@@ -80,9 +80,10 @@ trade-off table are in [Computational performance](computational_performance.md)
 ## The path search has no admissible candidate
 
 Reduce the requested component count or predictor-rank range, provide more observations, remove
-redundant predictors, or review `max_predictor_rank` and `samples_per_predictor_rank`. Grouped,
-temporal, and other specialized splitters can reduce the smallest training-fold size or the minimum
-verified fold rank and therefore the feasible path.
+redundant predictors, or review an explicit integer `max_predictor_rank`. If
+`predictor_rank_values="epv"` is active, also review `samples_per_predictor_rank`, because it defines
+the nominal fixed EPV rank. Grouped, temporal, and other specialized splitters can reduce the
+smallest training-fold size or the minimum verified fold rank and therefore the feasible path.
 
 The [cross-validation protocols](path_analysis.md#cross-validation-protocols-and-metadata)
 section explains splitter-dependent feasibility and metadata such as `groups`.

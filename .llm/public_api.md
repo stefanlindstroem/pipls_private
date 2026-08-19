@@ -81,12 +81,15 @@ nested meta-estimators are unsupported.
 
 Important defaults and controls:
 
-- `n_components_values="all"` scans every admissible component count;
-- `predictor_rank_values=None` uses conditional rank search;
-- `search_method="adaptive"` is the default deterministic adaptive rank search;
-- `search_method="exhaustive"` evaluates every admissible predictor rank;
-- the former pre-release values are rejected without aliases, and the parameter name is unchanged;
-- `samples_per_predictor_rank=5` and `cv=5` define the ordinary support/search defaults;
+- `n_components_values="all"` scans every component count compatible with the active predictor-rank policy;
+- `predictor_rank_values=None` optimizes predictor rank over the complete hard-feasible integer domain;
+- `search_method="exhaustive"` is the default and evaluates every admissible predictor rank;
+- `search_method="adaptive"` is an explicit deterministic approximation over the same rank domain;
+- `predictor_rank_values="epv"` fixes one rank from the EPV-inspired rule;
+- a one-element sequence fixes one rank and a longer sequence defines an explicit optimization domain;
+- `max_predictor_rank=None` imposes no user cap; a positive integer adds an explicit upper restriction;
+- `samples_per_predictor_rank=10.0` is used only by EPV; a nondefault value is invalid outside EPV;
+- `cv=5` remains the ordinary validation default;
 - `scoring="neg_response_standardized_mse"` resolves to the package scorer;
 - standard scorer names, callables, and `None` remain accepted.
 
@@ -99,9 +102,10 @@ predictor_rank_absolute_tolerance=np.inf
 
 They are separate from `select()` and `refit()` tolerances. `None` resolves to the square root of
 float64 machine epsilon; positive-infinity absolute tolerance disables that cap. Nondefault values
-are invalid for fixed and maximum predictor-rank policies. Decision 0149 applies the same principle
-to nondefault `search_method="exhaustive"`: maximum-rank and one-element fixed-rank policies retain
-the default method but reject the inapplicable nondefault method.
+are invalid for fixed and EPV predictor-rank policies because those policies perform no conditional
+predictor-rank optimization. Fixed and EPV policies are compatible with the constructor-default
+`search_method="exhaustive"` and report exhaustive coverage because each compatible component count
+has only one rank candidate.
 
 `fit()` materializes one validation split set, evaluates candidate clones, and stores immutable
 candidate/path evidence. It does not retain the training matrices or fit a final model.
@@ -188,7 +192,7 @@ smallest evaluated tolerance-qualified rank and carries `predictor_rank_evidence
 
 Immutable `PiPLSPredictorRankEvidence` contains the exact-reference rank and score,
 reference CV-MSE mean and SD, resolved predictor-rank tolerances, and derived `score_threshold`.
-Optimized path rows and selections carry this evidence; fixed and maximum policies carry `None`.
+Optimized path rows and selections carry this evidence; fixed and EPV policies carry `None`.
 
 `PiPLSSelection` contains one evaluated pair, predictor-rank policy, configured score, CV-MSE mean,
 CV-MSE split SD, split count, and optional rule provenance. A `minimum_cv_mse` result additionally

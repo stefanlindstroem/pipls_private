@@ -4,7 +4,7 @@
 
 Accepted and implemented for hierarchical predictor-rank tolerance selection. Decision 0154
 supersedes only the former `"max"`/`"maximum"` fixed-policy clauses by introducing explicit EPV
-and full-domain automatic search; implementation of that accepted migration is pending. The
+and full-domain automatic search; that accepted migration is implemented. The
 constructor tolerance controls, immutable optimized-rank evidence, conditioned-path selection
 rules, and completed validation remain current.
 
@@ -135,7 +135,7 @@ The arguments are not added to `PiPLSRegression`, `select()`, or `refit()`. They
 search evidence and therefore participate in scikit-learn cloning, `get_params()`, `set_params()`,
 repr, and pickle behavior.
 
-Nondefault predictor-rank tolerances are rejected when `predictor_rank_values="max"` or a
+Nondefault predictor-rank tolerances are rejected when `predictor_rank_values="epv"` or a
 one-element fixed rank sequence makes predictor-rank optimization inapplicable. Defaults remain
 accepted for those policies and produce no tolerance provenance. `predictor_rank_values=None` and
 multi-rank explicit sequences use the optimized policy and apply the tolerances.
@@ -186,7 +186,7 @@ path.predictor_rank_evidence
 ```
 
 For an optimized `PiPLSComponentPath`, `predictor_rank_evidence` is an immutable sequence aligned
-one-for-one with path rows. For fixed and maximum policies it is `None`. Every optimized path row,
+one-for-one with path rows. For fixed and EPV policies it is `None`. Every optimized path row,
 including a row used as the component-count `reference_minimum`, retains its own predictor-rank
 evidence.
 

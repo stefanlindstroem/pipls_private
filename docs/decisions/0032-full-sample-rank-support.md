@@ -5,7 +5,7 @@
 Accepted and implemented for `PiPLSSearchCV`. This decision refines the rank-bound policy in
 Decision 0003; fixed `PiPLSRegression` no longer derives a rank ceiling. Decision 0154 preserves
 the full-sample convention only for the explicit EPV policy and removes it from the general search
-ceiling; implementation of that accepted change is pending.
+ceiling; that accepted change is implemented.
 
 ## Context
 
@@ -20,41 +20,33 @@ parameters outside the training folds.
 
 ## Decision
 
-Let $n$ be the total number of observations supplied to `fit()`, let
-$n_{\mathrm{train,min}}$ be the smallest materialized cross-validation training-fold size, let
-$p_{\min}$ be the smallest predictor dimension reaching the Pi-PLS estimator across those folds,
-and let $c=\texttt{samples\_per\_predictor\_rank}$. The rule-derived upper rank is
+Let $n$ be the total number of observations supplied to `fit()`, let $p$ be the predictor dimension
+used by the EPV policy, and let $c=\texttt{samples\_per\_predictor\_rank}$. The nominal EPV rank is
 
 \begin{equation}
-r_{\pi,\max}
+r_{\pi,\mathrm{epv,nominal}}
 =
-\min\left[
-p_{\min},
-n_{\mathrm{train,min}}-1,
-\left\lceil\frac{n}{c}\right\rceil
-\right].
+\min\left[p,\left\lceil\frac{n}{c}\right\rceil\right].
 \end{equation}
 
-The term $\lceil n/c\rceil$ defines statistical support for the final full-data model. The terms
-$p_{\min}$ and $n_{\mathrm{train,min}}-1$ are hard feasibility caps for every candidate training
-fold. The subtraction by one reflects model-internal centering, which limits the rank of a centered
-training matrix with $n_{\mathrm{train,min}}$ rows to at most
-$n_{\mathrm{train,min}}-1$.
+The term $\lceil n/c\rceil$ defines the explicit statistical-support heuristic for the final
+full-data model. It does not bound ordinary automatic or exhaustive search. Fold-local predictor
+dimensions, centered training-fold size, and verified numerical rank remain hard feasibility caps
+and may clip the effective EPV rank.
 
 `PiPLSSearchCV` materializes one split set and reuses it for every candidate under both
 `search_method="adaptive"` and `search_method="exhaustive"`. Centering, scaling, decomposition,
 fitting, and scoring remain training-fold local.
 
-The ordinary defaults remain `samples_per_predictor_rank=5` and `cv=5`. Values below 5 remain
-legal with `max_predictor_rank="rule"` but emit `PredictorRankSupportWarning`.
+The EPV default is `samples_per_predictor_rank=10.0`; $c=5$ remains a more permissive choice.
+Values below 5 remain legal only under the explicit EPV policy and emit
+`PredictorRankSupportWarning`. Outside EPV, a nondefault `samples_per_predictor_rank` is invalid.
 
 ## Consequences
 
-- The heuristic candidate range describes the model that will be refitted on all supplied data.
-- Changing the CV splitter does not change the support term, although unusually small training
-  folds can still reduce the range through the feasibility cap.
-- For the 46-row, 14-predictor Pulp data with five-fold CV, the default bound is
-  $\min[14,35,\lceil46/5\rceil]=10$.
+- The EPV heuristic describes the fixed predictor rank intended for the final full-data model.
+- Changing the CV splitter does not change the nominal $n/c$ term, although fold feasibility may
+  still clip the effective EPV rank.
+- For 46 observations and 14 predictors, the nominal EPV ranks are 5 for $c=10$ and 10 for $c=5$.
 - No global centering, scaling, response statistics, or latent structure is learned before CV.
-- Explicit integer ranks and explicit path maxima continue to bypass the samples-per-rank term but
-  remain subject to fold feasibility and numerical-rank validation.
+- Ordinary automatic search no longer uses the samples-per-rank term.

@@ -183,9 +183,11 @@ $c=1$ warning behavior, numerical-rank clipping, explicit rank domains, and adap
 endpoints. Maintained high-dimensional examples now request adaptive coverage explicitly, while
 Pulp and the synthetic entry workflows retain the exhaustive default. Generated tutorial manifests
 record the active search method, exhaustive-coverage status, and effective maximum predictor rank.
-The broader user and maintainer documentation is updated in the remaining migration patches.
-The served computational-performance guide documents fit counts, validation repetitions, rank
-coverage, SVD choices, parallelism, OOF reuse, and work inspection.
+The broader user and maintainer documentation now distinguishes hard feasibility, explicit rank
+domain restrictions, candidate coverage, and the EPV policy. The served computational-performance
+guide documents the exhaustive default cost, adaptive coverage, EPV/fixed-rank alternatives, fit
+counts, validation repetitions, SVD choices, parallelism, OOF reuse, and work inspection. Patch 7
+owns the final release, installed-package, distribution, and stale-contract audit.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection
@@ -195,8 +197,8 @@ promise; compatible user-supplied splitters remain ordinary interoperability.
 
 Tests now protect behavior and machine-readable outputs rather than repository prose or source
 arrangement. Distribution and documentation validation share private maintenance helpers, and the
-Pulp example and tutorial renderer use caller-local plotting functions. Runtime behavior and the
-installed package surface are unchanged.
+Pulp example and tutorial renderer use caller-local plotting functions. This documentation increment
+adds no further runtime behavior beyond the Decision-0154 search contract already implemented.
 
 ## Authority and drift handling
 

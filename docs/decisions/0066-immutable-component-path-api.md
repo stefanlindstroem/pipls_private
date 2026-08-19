@@ -35,7 +35,7 @@ n_splits
 ```
 
 Decision 0148 adds an immutable `predictor_rank_evidence` sequence aligned with optimized path rows;
-fixed and maximum policies use `None`. Each row contains the predictor rank selected conditionally
+fixed and EPV policies use `None`. Each row contains the predictor rank selected conditionally
 for that component count under the accepted configured-score tolerance rule. Component counts are
 unique and strictly increasing. `cv_mse_std` is population SD across the materialized validation
 splits.

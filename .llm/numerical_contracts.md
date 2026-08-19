@@ -40,28 +40,43 @@ training fold. With:
 - `p_min`: minimum transformed feature count;
 - `n_train_min`: minimum materialized training-fold size;
 - `r_num_min`: minimum verified fold numerical rank;
-- `n`: total observations supplied to `fit()`;
-- `c = samples_per_predictor_rank`;
 
-the rule-derived ceiling is:
+the hard predictor-rank ceiling is
 
 ```text
-min(p_min, n_train_min - 1, r_num_min, ceil(n / c))
+min(p_min, n_train_min - 1, r_num_min)
 ```
 
-`c` is positive and finite; the ceiling operation is normative. Candidate pairs satisfy
-`1 <= n_components <= min(n_targets, predictor_rank)` and are fixed-model clones. Fold-local
-preprocessing, scoring, and warning suppression must not leak validation data.
+An explicit positive integer `max_predictor_rank` adds a user restriction by taking the minimum with
+that hard ceiling. `max_predictor_rank=None` adds no statistical or heuristic cap.
 
-Adaptive rank search is deterministic for fixed inputs and configuration. Decision 0149 names the
-two coverage values `search_method="adaptive"` and `search_method="exhaustive"` without changing
-either algorithm. The fitted `search_is_exhaustive_` diagnostic continues to report achieved
-coverage, so an adaptive request may
-still report exhaustive coverage on a sufficiently small or fully refined candidate interval.
-Private numerical tie behavior uses dedicated numerical tie tolerances and deterministic
+With `predictor_rank_values=None`, the ordinary rank domain contains every integer from one through
+that effective ceiling, subject to `n_components <= predictor_rank`. The constructor default
+`search_method="exhaustive"` evaluates every admissible pair. `search_method="adaptive"` uses the
+same domain but may evaluate only a deterministic subset; `search_is_exhaustive_` reports achieved
+coverage. Private numerical tie behavior uses dedicated numerical tie tolerances and deterministic
 smaller-rank ordering.
 
-Decision 0148 preserves that private comparison for exact-reference identification,
+The EPV policy is separate from hard feasibility. With total sample count `n` and positive finite
+`c = samples_per_predictor_rank`, its nominal fixed rank is
+
+```text
+min(p, ceil(n / c))
+```
+
+and the effective EPV rank is the minimum of that nominal value and the effective hard/user
+ceiling. The ceiling operation and use of the full supplied `n` are normative.
+`samples_per_predictor_rank=10.0` is the EPV default; values below 5 remain legal and emit
+`PredictorRankSupportWarning`. A nondefault `samples_per_predictor_rank` is invalid outside
+`predictor_rank_values="epv"`. EPV and one-rank explicit sequences perform no predictor-rank
+optimization and carry no predictor-rank tolerance evidence.
+
+Candidate pairs satisfy `1 <= n_components <= min(n_targets, predictor_rank)` and are fixed-model
+clones. Fold-local preprocessing, scoring, and warning suppression must not leak validation data.
+The component-count domain is resolved after the active predictor-rank policy so
+`n_components_values="all"` cannot request a component count above a fixed or EPV rank.
+
+Decision 0148 preserves private score comparison for exact-reference identification,
 `rank_test_score`, and adaptive refinement. Its accepted final retained-rank rule uses separate
 public tolerances. For fixed component count $h$ and exact reference score $S_{h,\max}$, evaluated
 rank $r$ qualifies when both
@@ -85,8 +100,10 @@ S_{h,\max}
 \delta_{\mathrm{abs},r}.
 \end{equation}
 
-The smallest evaluated qualifying rank is retained. Adaptive candidate coverage remains determined
-by the exact score optimum and must not depend on these public tolerances.
+The smallest evaluated qualifying rank is retained. Under exhaustive coverage the reference is over
+the complete declared admissible rank domain; under adaptive coverage it is over the ranks actually
+evaluated. Adaptive candidate coverage remains determined by the exact score optimum and must not
+depend on these public tolerances.
 
 ## Response-standardized MSE
 

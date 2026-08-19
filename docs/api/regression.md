@@ -87,8 +87,9 @@ full rank. See
 [Computational performance](../computational_performance.md#use-randomized-predictor-svd-for-large-problems).
 
 A direct fixed fit emits `PredictorRankSupportWarning` when $n/r_\pi<3$. The warning is diagnostic and
-does not alter the requested rank. Algebraically or numerically infeasible ranks remain errors. The
-standard path search uses its more conservative default support ceiling.
+does not alter the requested rank. Algebraically or numerically infeasible ranks remain errors.
+`PiPLSSearchCV` does not impose an EPV support ceiling on ordinary automatic search; EPV is an
+explicit fixed-rank policy requested with `predictor_rank_values="epv"`.
 
 ::: pipls.PredictorRankSupportWarning
     options:

@@ -8,8 +8,10 @@ and pass that exact selection to final refitting.
 
 Every candidate is a cloned `PiPLSRegression` or supported pipeline ending in one. Learned
 preprocessing is fitted independently inside each training fold. Before candidate evaluation, the
-search object caps the path by the minimum predictor rank verified across those transformed folds.
-`PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Explicit post-search
+search object resolves the hard predictor-rank ceiling from fold-local dimensions and verified
+numerical rank. The ordinary default then evaluates every admissible rank exhaustively; an explicit
+integer `max_predictor_rank`, an explicit rank sequence, or `predictor_rank_values="epv"` can define
+a narrower rank policy. `PiPLSSearchCV()` is a path evaluator rather than a fitted prediction model. Explicit post-search
 `search.select(...)` returns one immutable stored component-path row without fitting.
 `search.refit(X, Y, selection=...)` validates an existing selection, clones the configured
 estimator or pipeline, fits that clone, attaches the exact supplied object as `model.selection_`,
@@ -179,7 +181,7 @@ matches `search.select(n_components=h)`.
 
 `PiPLSPredictorRankEvidence` stores the exact reference rank, its configured score and CV-MSE
 summary, and the resolved relative and absolute tolerances. `score_threshold` is derived in
-configured-score units. Fixed and maximum predictor-rank policies have no such evidence.
+configured-score units. Fixed and EPV predictor-rank policies have no such evidence.
 
 The Tobacco example uses this evidence to present a scorer-specific CV-MSE threshold while keeping
 the API scorer-neutral:

@@ -8,7 +8,7 @@ This registry lists only numbered decisions that still define current behavior o
 |---|---|---|
 | `0001-core-definition.md` | fixed Pi-PLS construction | SVD/least-squares core with explicit `(h, r_pi)` admissibility |
 | `0002-preprocessing-semantics.md` | centering and scaling | preprocessing remains outside the fixed numerical core |
-| `0003-predictor-rank-selection.md` | rank bound and conditional selection | ceiling rule, materialized splits, deterministic low-rank ties; sample-count convention refined by 0032 |
+| `0003-predictor-rank-selection.md` | historical rank-bound design and conditional selection | materialized split reuse and deterministic low-rank ties remain; Decision 0154 supersedes the general $n/c$ ceiling |
 | `0004-response-standardized-mse.md` | selection loss | fold-local response scales and uniform response weighting |
 | `0007-predictor-rank-search-policies.md` | exhaustive versus adaptive search | deterministic adaptive and exhaustive algorithms with public `"adaptive"` and `"exhaustive"` values |
 | `0008-predictor-svd-policy.md` | scalable predictor decomposition | independent `full`, `randomized`, and `auto` solver policy |
@@ -17,7 +17,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional immutable datasets plus local seeded latent-structure generation |
 | `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction and separate block-scaling products stay downstream |
 | `0025-model-internal-standardization-boundary.md` | current versus external scaling | estimator centering/scaling is current and fold-local; external learned scaling must remain inside the same CV boundary |
-| `0032-full-sample-rank-support.md` | rank-support sample-count convention | full supplied $n$ defines support; centered training folds impose feasibility caps |
+| `0032-full-sample-rank-support.md` | EPV sample-count convention | full supplied $n$ defines the explicit EPV heuristic; centered training folds impose feasibility caps |
 | `0039-fixed-estimator-path-search-boundary.md` | estimator versus selection ownership | implemented split: fixed `PiPLSRegression`, triangular selection in `PiPLSSearchCV` |
 | `0041-legacy-dataset-licensing-roadmap.md` | legacy dataset licensing and roadmap | retain the three licensed datasets; exclude Corn, legacy Steel, SARCOS, and FRED-MD |
 | `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; reusable inspection, plotting, and all three real-data integrations |
@@ -51,15 +51,15 @@ This registry lists only numbered decisions that still define current behavior o
 | `0148-predictor-rank-tolerance-selection.md` | predictor-rank tolerance selection | constructor tolerances, immutable rank evidence, conditioned component rules, and separate 10% Tobacco predictor-rank and component-count demonstration |
 | `0152-selection-review-feedback-workflow.md` | selection-review feedback workflow | inspect the unselected path before selecting, review conditional evidence with one feedback edge, and reserve qualification or validation for independent assessment |
 | `0153-independent-block-scaling-controls.md` | independent predictor and response scaling controls | retain `scale` as the compatibility default while allowing fold-local pipeline predictor scaling and Pi-PLS response scaling to be controlled independently |
-| `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | accepted migration to exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
+| `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | implemented exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
 
 ## Implemented clarifications
 
 - `PiPLSRegression` fits one explicit pair; `PiPLSSearchCV` owns path evaluation, selection, OOF
   reporting, and explicit final refitting.
-- Predictor-rank search currently implements `"adaptive"` and `"exhaustive"`; Decision 0154
-  accepts a staged migration to exhaustive full-feasible automatic coverage plus an explicit
-  `"epv"` fixed-rank policy. The runtime migration is pending.
+- Predictor-rank search implements exhaustive full-feasible automatic coverage by default, with
+  `"adaptive"` as an explicit reduced-coverage option and `"epv"` as the fixed-rank
+  events-per-variable-inspired policy under Decision 0154.
 - The only named component-count rules are `best_score` and tolerance-based `minimum_cv_mse`;
   `cv_mse_std` is descriptive population split SD.
 - OOF reporting and final refitting may consume the same compatible immutable selection. OOF reports

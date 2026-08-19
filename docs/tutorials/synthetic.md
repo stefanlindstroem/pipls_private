@@ -77,8 +77,9 @@ Fit the component search just as you would fit a PLS component search:
 The programming-level decision is how many paired latent modes to retain, so `n_components` is the
 quantity displayed on the component path. Under the hood, Π-PLS also has a predictor-rank
 parameter $r_\pi$. `PiPLSSearchCV` searches that rank conditionally for each $h$ and stores one
-resolved rank on each component-path row. Most users therefore do not need to treat $r_\pi$ as a
-second tuning parameter.
+resolved rank on each component-path row. The default rank search is exhaustive over every
+fold-feasible integer rank; no EPV-style $n/c$ heuristic truncates this automatic domain. Most
+users therefore do not need to treat $r_\pi$ as a second tuning parameter.
 
 With the default scorer, larger scores are equivalent to smaller mean response-standardized
 CV-MSE. The search first identifies the exact predictor-rank optimum for each $h$ and then retains
