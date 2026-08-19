@@ -205,9 +205,11 @@ The accepted migration is intentionally staged:
 6. rewrite user and maintainer documentation around domain restriction, coverage strategy, and EPV;
 7. complete the stale-contract, installed-package, distribution, and release audit.
 
-The runtime, focused regression coverage, maintained examples, generated tutorial evidence, and
-broader user and maintainer documentation now implement this contract. The final migration patch is
-reserved for the release, installed-package, distribution, and stale-contract audit.
+The seven-patch migration is complete. Runtime behavior, focused regression coverage, maintained
+examples, generated tutorial evidence, user and maintainer documentation, release notes, and clean
+installed-artifact smoke tests now implement and verify this contract. The final audit also confirms
+that active guidance contains no remaining `"max"`/`"rule"` rank-policy shortcut or hidden EPV
+ceiling; historical changelog and decision text may retain those retired spellings as history.
 
 ## Consequences
 

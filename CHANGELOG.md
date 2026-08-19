@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Change `PiPLSSearchCV` to optimize predictor rank over the complete hard-feasible domain by
+  default, with exhaustive candidate coverage and no implicit events-per-variable ceiling.
+  `max_predictor_rank=None` now means that no user rank cap is imposed.
+- Add `predictor_rank_values="epv"` as the explicit manuscript-style fixed-rank policy, using
+  `samples_per_predictor_rank=10.0` by default. Retain the low-support warning for $c<5$, including
+  the deliberately permissive $c=1$ endpoint, and remove the pre-release `"max"`, `"maximum"`,
+  and `max_predictor_rank="rule"` rank-policy spellings without compatibility aliases.
+- Update maintained examples, generated tutorial evidence, user documentation, API guidance, and
+  maintainer contracts for the separation between rank-domain restriction, exhaustive/adaptive
+  coverage, and EPV selection. High-dimensional maintained examples request adaptive coverage
+  explicitly where exhaustive coverage would be unnecessarily expensive.
+- Strengthen clean wheel and source-distribution smoke testing to verify the installed exhaustive
+  full-domain default and explicit EPV predictor-rank policy in addition to fitting and refitting.
+
 ## 0.1.0 - 2026-08-09
 
 - Add independent `scale_x` and `scale_y` overrides to `PiPLSRegression`. The existing `scale`

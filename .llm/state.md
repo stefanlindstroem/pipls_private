@@ -186,8 +186,10 @@ record the active search method, exhaustive-coverage status, and effective maxim
 The broader user and maintainer documentation now distinguishes hard feasibility, explicit rank
 domain restrictions, candidate coverage, and the EPV policy. The served computational-performance
 guide documents the exhaustive default cost, adaptive coverage, EPV/fixed-rank alternatives, fit
-counts, validation repetitions, SVD choices, parallelism, OOF reuse, and work inspection. Patch 7
-owns the final release, installed-package, distribution, and stale-contract audit.
+counts, validation repetitions, SVD choices, parallelism, OOF reuse, and work inspection. The
+seven-patch Decision-0154 migration is complete: release notes record the breaking pre-1.0 search
+change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
+default together with the explicit EPV policy.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

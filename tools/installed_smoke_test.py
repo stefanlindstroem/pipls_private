@@ -40,17 +40,42 @@ def main() -> None:
     if prediction.shape != (2, 2) or not np.isfinite(prediction).all():
         raise AssertionError("Installed fixed-estimator prediction failed.")
 
+    search_defaults = PiPLSSearchCV()
+    if search_defaults.search_method != "exhaustive":
+        raise AssertionError("Installed search does not use exhaustive coverage by default.")
+    if search_defaults.predictor_rank_values is not None:
+        raise AssertionError("Installed search does not optimize predictor rank by default.")
+    if search_defaults.max_predictor_rank is not None:
+        raise AssertionError("Installed search unexpectedly imposes a default rank cap.")
+    if search_defaults.samples_per_predictor_rank != 10.0:
+        raise AssertionError("Installed EPV default does not use c=10.")
+
     search = PiPLSSearchCV(
         n_components_values=(1,),
-        predictor_rank_values=(1, 2),
-        search_method="exhaustive",
         cv=2,
         n_jobs=1,
     ).fit(X, Y)
+    if search.max_predictor_rank_ != 4 or not search.search_is_exhaustive_:
+        raise AssertionError("Installed search did not resolve the full hard-feasible rank domain.")
+    evaluated_ranks = set(search.cv_results_["predictor_rank"].tolist())
+    if evaluated_ranks != {1, 2, 3, 4}:
+        raise AssertionError(
+            f"Installed exhaustive search evaluated unexpected ranks: {sorted(evaluated_ranks)}"
+        )
     selection = search.select(n_components=1)
     refitted = search.refit(X, Y, selection=selection)
     if not np.isfinite(refitted.predict(X[:2])).all():
         raise AssertionError("Installed search and refit workflow failed.")
+
+    epv_search = PiPLSSearchCV(
+        n_components_values=(1,),
+        predictor_rank_values="epv",
+        cv=2,
+        n_jobs=1,
+    ).fit(X, Y)
+    epv_selection = epv_search.select(n_components=1)
+    if epv_selection.predictor_rank != 2 or epv_selection.predictor_rank_policy != "epv":
+        raise AssertionError("Installed EPV policy did not resolve the expected fixed rank.")
 
     expected_shapes = {
         "pulp": ((46, 14), (46, 8)),

@@ -84,25 +84,12 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0154 authorizes the active seven-patch predictor-rank migration. The accepted target is
-full-feasible automatic rank optimization with exhaustive coverage by default, an explicit EPV
-fixed-rank policy, and no pre-release `"max"`/`"rule"` shortcut. Implementation remains staged so
-that each boundary is independently reviewable:
-
-1. record Decision 0154 and synchronize the maintainer roadmap;
-2. separate hard-feasibility and EPV helper calculations without changing runtime behavior;
-3. change the public search defaults, policy vocabulary, and rank-domain semantics;
-4. add focused behavioral regression coverage for the new scientific/API contract;
-5. update maintained examples and regenerate tutorial evidence from execution;
-6. rewrite user and maintainer documentation around rank domain, coverage, and EPV;
-7. complete release, installed-package, distribution, and stale-contract audits.
-
-Patches 1 through 6 are complete: the decision is recorded, hard-feasibility and EPV calculations
-are separated, the public search runtime implements the new defaults, focused regression coverage
-protects the resulting scientific/API contract, high-dimensional maintained examples request
-adaptive coverage explicitly, generated tutorial evidence records the new coverage semantics, and
-the broader user and maintainer documentation distinguishes rank domain, coverage, and EPV. Patch 7
-completes the release, installed-package, distribution, and stale-contract audits.
+No staged migration is active. Decision 0154's seven-patch predictor-rank migration is complete:
+full-feasible automatic rank optimization uses exhaustive coverage by default, EPV is an explicit
+fixed-rank policy, the pre-release `"max"`/`"rule"` shortcuts are absent from the active API, and
+high-dimensional maintained examples request adaptive coverage explicitly where appropriate. The
+release notes and clean installed-artifact smoke test cover the completed transition. Future changes
+to predictor-rank selection require a new owner decision rather than extending this closed sequence.
 
 ## Deferred work
 
