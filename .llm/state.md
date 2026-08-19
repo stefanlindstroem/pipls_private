@@ -112,17 +112,23 @@ The maintained numbered examples are user tasks:
 
 1. compact Pulp automatic fit and fitted-value diagnostic;
 2. synthetic inspect-decide-refit workflow with external-test prediction;
-3. Pi-PLS versus ordinary-PLS component-path comparison;
+3. matched-fold PLS-family component-path comparison across Pulp, Sugarcane, and Tobacco, covering
+   both Pi-PLS response-subspace policies and ordinary PLS without final refitting;
 4. complete repeated-CV Pulp analysis;
 5. complete Sugarcane analysis;
-6. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances;
-7. matched-split Pulp comparison of the peer-reviewed cross-covariance and optional least-squares
-   response-subspace policies, without final refitting.
+6. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
 
-Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 05, 06, and 07
-use `KFold(n_splits=5, shuffle=True, random_state=0)`; Example 07 materializes those folds once and
-reuses them for both response-subspace policies. Complete real-data examples are exercised by
-`make examples`, not duplicated in the default test suite.
+Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 03, 05, and 06
+use `KFold(n_splits=5, shuffle=True, random_state=0)`. Example 03 materializes those folds once per
+dataset and reuses the exact same split object for the cross-covariance Pi-PLS search, least-squares
+Pi-PLS search, and ordinary-PLS path. Complete real-data examples are exercised by `make examples`,
+not duplicated in the default test suite.
+
+Decision 0156 is implemented and closed. Example 03 is now the sole maintained PLS-family
+comparison and overlays the cross-covariance Pi-PLS path, least-squares Pi-PLS path, and ordinary
+PLS path for Pulp, Sugarcane, and Tobacco on one materialized five-fold protocol per dataset. The
+former Example 07 and its dedicated PDF are retired. Source-distribution qualification executes the
+bounded Pulp branch of Example 03; `make examples` owns complete three-dataset execution.
 
 ## Inspection and rendering boundary
 

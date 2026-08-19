@@ -23,8 +23,9 @@
   Pi-PLS search dimension. Add independent Choice-C/RRR regression coverage and limiting-case
   checks for the least-squares policy.
 - Document both response-subspace criteria, their reproducibility and manuscript-alignment
-  boundary, and computational trade-offs. Add a matched-split Pulp programming example that
-  compares model-development CV evidence without claiming general superiority.
+  boundary, and computational trade-offs. Unify the maintained PLS-family comparison so both
+  response-subspace policies and ordinary PLS are evaluated on identical materialized folds for
+  Pulp, Sugarcane, and Tobacco without claiming general superiority.
 
 ## 0.1.0 - 2026-08-09
 

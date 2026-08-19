@@ -53,6 +53,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0153-independent-block-scaling-controls.md` | independent predictor and response scaling controls | retain `scale` as the compatibility default while allowing fold-local pipeline predictor scaling and Pi-PLS response scaling to be controlled independently |
 | `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | implemented exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
 | `0155-response-subspace-selection-policies.md` | response-subspace selection policies | closed implementation: cross-covariance default plus an explicit least-squares/RRR-inspired software extension outside the peer-reviewed publication |
+| `0156-unified-pls-family-path-comparison.md` | unified PLS-family path comparison | consolidate both Pi-PLS response policies and ordinary PLS into Example 03 on shared materialized folds for all three reference datasets |
 
 ## Implemented clarifications
 

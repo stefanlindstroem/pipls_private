@@ -46,12 +46,12 @@ The maintained numbered examples are:
 
 1. Pulp automatic fit and fitted-value diagnostic;
 2. synthetic inspect-decide-refit workflow with external-test prediction;
-3. Pi-PLS versus ordinary-PLS component-path comparison;
+3. matched-fold PLS-family component-path comparison across Pulp, Sugarcane, and Tobacco, covering
+   the peer-reviewed cross-covariance Pi-PLS policy, the least-squares software extension, and
+   ordinary PLS without final refitting;
 4. repeated-CV Pulp analysis;
 5. Sugarcane analysis;
-6. Tobacco analysis with separate 10% predictor-rank and component-count tolerances;
-7. matched-split Pulp comparison of the peer-reviewed cross-covariance and optional least-squares
-   response-subspace policies, without final refitting.
+6. Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
 
 `make examples` owns complete application validation. The default test suite does not duplicate the
 full real-data workflows.

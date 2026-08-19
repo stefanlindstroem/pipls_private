@@ -101,16 +101,21 @@ Regression coverage protects the independent Choice-C/RRR reference, training-re
 limiting cases, scaling, serialization, scikit-learn interoperability, fixed-policy propagation,
 and numerical compatibility of the default/explicit cross-covariance path.
 
-The completed release audit records the feature under `Unreleased`, keeps Example 07 in the
-maintained catalogue, qualifies both policies in clean wheel/sdist installations, and executes the
-matched-split comparison from the source distribution. `dist-check` owns clean installation
-isolation. `docs-dist` validates documentation from the extracted sdist using the maintained
-documentation environment with `PYTHONPATH` forced to the extracted artifact's `src` tree; this
-avoids redundantly reinstalling the full scientific/documentation stack while still preventing
-package imports from falling back to the development checkout. Pip's normal download cache remains
-available to artifact-installation checks.
+The completed release audit records the feature under `Unreleased`, qualifies both policies in
+clean wheel/sdist installations, and keeps clean installation isolation in `dist-check`. `docs-dist`
+validates documentation from the extracted sdist using the maintained documentation environment
+with `PYTHONPATH` forced to the extracted artifact's `src` tree; this avoids redundantly reinstalling
+the full scientific/documentation stack while still preventing package imports from falling back to
+the development checkout. Pip's normal download cache remains available to artifact-installation
+checks.
 
-There is no active numbered migration after Decision 0155. New scientific, numerical, API, or
+Decision 0156 subsequently unified the comparison presentation. Patch 0156A established reusable
+materialized-fold support and the comparison contract; 0156B moved both Pi-PLS response policies
+into Example 03 for Pulp, Sugarcane, and Tobacco and retired the separate Example 07 workflow;
+0156C consolidated documentation, source-distribution qualification, release notes, and maintainer
+records. Example 03 is now the sole maintained PLS-family comparison.
+
+There is no active numbered migration after Decision 0156. New scientific, numerical, API, or
 release-engineering work should begin with the relevant owner decision and a fresh bounded plan.
 
 ## Deferred work

@@ -59,12 +59,19 @@ def _check_source_distribution_examples(
     example_environment = environment_variables.copy()
     example_environment["MPLBACKEND"] = "Agg"
     examples = (
-        ("01_pulp_quick_start.py", "pulp_quick_start.pdf"),
-        ("07_response_subspace_comparison.py", "response_subspace_comparison.pdf"),
+        (
+            ("01_pulp_quick_start.py",),
+            Path("pulp_quick_start.pdf"),
+        ),
+        (
+            ("03_pls_path_comparison.py", "--dataset", "pulp"),
+            Path("pls_path_comparison") / "pulp_component_path_comparison.pdf",
+        ),
     )
-    for script_name, output_name in examples:
+    for command, output_name in examples:
+        script_name, *arguments = command
         run(
-            [str(python), str(source / "examples" / script_name)],
+            [str(python), str(source / "examples" / script_name), *arguments],
             cwd=source,
             env=example_environment,
         )
@@ -72,7 +79,7 @@ def _check_source_distribution_examples(
         if not output.is_file():
             raise RuntimeError(
                 "Source-distribution example "
-                f"{script_name} did not create {output_name}."
+                f"{' '.join(command)} did not create {output_name}."
             )
 
 

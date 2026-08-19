@@ -46,14 +46,17 @@ Current canonical records: [0015](0015-dataset-and-synthetic-api.md),
 ## Examples and documentation
 
 The example series evolved through several numbering, ownership, and tutorial arrangements. The
-maintained outcome is a self-contained seven-example route led by an automatic Pulp fit, followed
-by manual selection review, path comparison, complete real-data interpretation workflows, and a
-matched-split response-subspace comparison. Served documentation is self-contained, separates
-tutorials, guides, and generated reference, and keeps maintainer decisions outside the user site.
+maintained outcome is a self-contained six-example route led by an automatic Pulp fit, followed by
+manual selection review, one unified PLS-family path comparison, and complete real-data
+interpretation workflows. The unified comparison overlays the publication-default and least-squares
+Pi-PLS response policies with ordinary PLS on matched folds for all three reference datasets.
+Served documentation is self-contained, separates tutorials, guides, and generated reference, and
+keeps maintainer decisions outside the user site.
 
 Current canonical records: [0065](0065-documentation-layer-consolidation.md),
 [0152](0152-selection-review-feedback-workflow.md),
-[0155](0155-response-subspace-selection-policies.md), and the product and workflow boundaries in
+[0155](0155-response-subspace-selection-policies.md),
+[0156](0156-unified-pls-family-path-comparison.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
 [0045](0045-pls-family-analysis-boundary.md), and
 [0142](0142-package-owned-reference-datasets.md).

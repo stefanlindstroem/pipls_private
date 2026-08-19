@@ -126,8 +126,10 @@ include a dashed return edge from selected-evidence review to selection.
 The Pulp, Sugarcane, and Tobacco workflows calculate selection-conditioned OOF diagnostics before
 final refitting. Fitted-model inspection remains after refitting. Public catalogues, maintainer
 records, and the changelog use the same terminology. The maintained example catalogue was
-contiguous from 01 through 06 when this workflow decision landed. Decision 0155 later added Example
-07 as a response-subspace comparison; no dedicated protocol-specific validation example remains.
+contiguous from 01 through 06 when this workflow decision landed. Decision 0155 later added a
+separate Example 07 for response-subspace comparison; Decision 0156 subsequently consolidated that
+evidence into the existing Example 03 and returned the active catalogue to 01 through 06. No
+dedicated protocol-specific validation example remains.
 
 ## Validation obligations
 

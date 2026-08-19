@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import numpy as np
@@ -12,6 +13,8 @@ from sklearn.model_selection import KFold
 ALGORITHM = "NIPALS"
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
+CVSplit = tuple[ArrayLike, ArrayLike]
+CVSpec = KFold | Sequence[CVSplit]
 
 
 @dataclass(frozen=True)
@@ -85,13 +88,15 @@ def evaluate_pls_component_path(
     Y: ArrayLike,
     *,
     max_n_components: int,
-    cv: KFold,
+    cv: CVSpec,
 ) -> PLSComponentPath:
     """Return fold-local response-standardized CV-MSE for standard PLS.
 
     One maximum-component ``PLSRegression`` fit is evaluated per fold. NIPALS
     extracts components sequentially, so truncating the fitted rotations and
     response loadings gives the same nested path without repeated earlier fits.
+    ``cv`` may be a ``KFold`` splitter or a reusable materialized sequence of
+    ``(train, validation)`` index pairs.
     """
 
     X_array = np.asarray(X, dtype=np.float64)
@@ -114,9 +119,10 @@ def evaluate_pls_component_path(
             f"{max_n_components} > {algebraic_max}."
         )
 
-    n_splits = cv.get_n_splits(X_array, Y_array)
+    splits = _materialize_cv_splits(cv, X_array, Y_array)
+    n_splits = len(splits)
     split_mse = np.empty((max_n_components, n_splits), dtype=np.float64)
-    for split_index, (train, validation) in enumerate(cv.split(X_array, Y_array)):
+    for split_index, (train, validation) in enumerate(splits):
         X_train = X_array[train]
         Y_train = Y_array[train]
         X_validation = X_array[validation]
@@ -153,6 +159,41 @@ def evaluate_pls_component_path(
         algorithm=ALGORITHM,
         n_splits=n_splits,
     )
+
+
+def _materialize_cv_splits(
+    cv: CVSpec,
+    X: FloatArray,
+    Y: FloatArray,
+) -> tuple[tuple[IntArray, IntArray], ...]:
+    if isinstance(cv, KFold):
+        raw_splits = cv.split(X, Y)
+    else:
+        raw_splits = iter(cv)
+
+    splits: list[tuple[IntArray, IntArray]] = []
+    n_samples = X.shape[0]
+    for split_index, (train, validation) in enumerate(raw_splits):
+        train_array = np.asarray(train, dtype=np.intp)
+        validation_array = np.asarray(validation, dtype=np.intp)
+        if train_array.ndim != 1 or validation_array.ndim != 1:
+            raise ValueError(
+                f"CV split {split_index} indices must be one-dimensional."
+            )
+        if train_array.size == 0 or validation_array.size == 0:
+            raise ValueError(f"CV split {split_index} must have nonempty partitions.")
+        if (
+            np.any(train_array < 0)
+            or np.any(train_array >= n_samples)
+            or np.any(validation_array < 0)
+            or np.any(validation_array >= n_samples)
+        ):
+            raise ValueError(f"CV split {split_index} contains an out-of-range index.")
+        splits.append((train_array, validation_array))
+
+    if not splits:
+        raise ValueError("cv must provide at least one validation split.")
+    return tuple(splits)
 
 
 def _read_only_int_array(value: ArrayLike, *, name: str) -> IntArray:

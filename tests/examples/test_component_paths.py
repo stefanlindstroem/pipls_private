@@ -66,6 +66,35 @@ def test_standard_pls_path_is_deterministic_and_immutable() -> None:
     assert not first.cv_mse_std.flags.writeable
 
 
+def test_standard_pls_path_accepts_materialized_shared_splits() -> None:
+    rng = np.random.default_rng(1730)
+    X = pd.DataFrame(rng.normal(size=(30, 6)))
+    Y = pd.DataFrame(rng.normal(size=(30, 3)))
+
+    splitter = KFold(n_splits=5, shuffle=True, random_state=0)
+    splits = list(splitter.split(X, Y))
+    from_splitter = PLS_PATH.evaluate_pls_component_path(
+        X, Y, max_n_components=3, cv=splitter
+    )
+    from_materialized = PLS_PATH.evaluate_pls_component_path(
+        X, Y, max_n_components=3, cv=splits
+    )
+
+    np.testing.assert_array_equal(
+        from_materialized.n_components,
+        from_splitter.n_components,
+    )
+    np.testing.assert_allclose(
+        from_materialized.cv_mse_mean,
+        from_splitter.cv_mse_mean,
+    )
+    np.testing.assert_allclose(
+        from_materialized.cv_mse_std,
+        from_splitter.cv_mse_std,
+    )
+    assert from_materialized.n_splits == len(splits) == 5
+
+
 def test_standard_pls_path_defensively_copies_and_pickles() -> None:
     components = np.array([1, 2, 3])
     means = np.array([0.9, 0.6, 0.55])

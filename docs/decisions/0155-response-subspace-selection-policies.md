@@ -275,10 +275,19 @@ shared factorization invariants, scaling/serialization/interoperability behavior
 internal mathematics/testing contracts. Step 5 is complete in patches 5A--5C: user-facing
 theory, API/workflow guidance, manuscript-alignment guidance, and the matched-split programming
 comparison are maintained. Step 6 completed the changelog/stale-contract audit, strengthened
-clean installed-artifact qualification for both policies, exercised Example 07 from the source
-distribution, and completed the final repository audit. Documentation-from-sdist qualification
+clean installed-artifact qualification for both policies, exercised the then-current dedicated
+response-subspace comparison from the source distribution, and completed the final repository
+audit. Documentation-from-sdist qualification
 builds from the extracted source tree with an explicit artifact `PYTHONPATH`; clean installation
 isolation remains owned by the wheel/sdist distribution check.
+
+## Subsequent refinement
+
+Decision 0156 later consolidated the dedicated Pulp-only response-subspace comparison into Example
+03. The scientific and API contracts of this decision are unchanged: the two policies remain
+separate fixed-estimator configurations, and the least-squares policy remains outside the
+peer-reviewed publication. The maintained comparison now presents both policies alongside ordinary
+PLS on matched folds for Pulp, Sugarcane, and Tobacco.
 
 ## Consequences
 
