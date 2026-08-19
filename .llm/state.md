@@ -207,9 +207,12 @@ Patches 1A--1C recorded Decision 0155, reconciled Decisions 0120, 0008, and 0039
 six-step roadmap. Patch 1D completed the repository-wide audit. Step 2A is the first core increment:
 it extracts the existing cross-covariance response-basis SVD into one private helper and adds a direct
 regression check against the previous expression. Step 2B adds the isolated exact least-squares
-response-basis primitive without yet making it selectable from `fit_pipls_core()`; its unit test
-checks the resulting projector against the Choice-C least-squares matrix on a
-well-conditioned problem. Step 2C is next and will add the private two-value dispatch. The
+response-basis primitive and checks its projector against the Choice-C least-squares matrix on a
+well-conditioned problem. Step 2C now adds the private `fit_pipls_core()` two-value dispatch with
+`response_subspace="cross_covariance"` as the default and `"least_squares"` as the alternative.
+Unit coverage verifies default/explicit cross-covariance identity, a complete least-squares
+factorization, and rejection of unsupported values. `PiPLSRegression` still does not expose this
+setting, so public behavior remains cross-covariance-only until Step 3. Step 2D is next. The
 compatibility invariant for the later implementation remains that omitting the new parameter, or
 explicitly selecting `response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155
 fixed-estimator numerical path subject only to ordinary floating-point behavior.

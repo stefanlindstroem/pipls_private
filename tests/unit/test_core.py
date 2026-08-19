@@ -62,6 +62,73 @@ def test_least_squares_response_basis_matches_choice_c_subspace() -> None:
     )
 
 
+def test_core_response_subspace_default_matches_explicit_cross_covariance() -> None:
+    rng = np.random.default_rng(20260821)
+    X = _center(rng.normal(size=(22, 8)))
+    Y = _center(rng.normal(size=(22, 5)))
+
+    default = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=3,
+    )
+    explicit = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=3,
+        response_subspace="cross_covariance",
+    )
+
+    for name in ("Pi", "C", "W", "P", "D", "Q"):
+        np.testing.assert_array_equal(
+            getattr(default, name),
+            getattr(explicit, name),
+        )
+    np.testing.assert_array_equal(
+        default.standardized_regression_map,
+        explicit.standardized_regression_map,
+    )
+
+
+def test_core_least_squares_response_subspace_completes_factorization() -> None:
+    rng = np.random.default_rng(20260822)
+    X = _center(rng.normal(size=(28, 9)))
+    Y = _center(rng.normal(size=(28, 5)))
+
+    result = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=3,
+        response_subspace="least_squares",
+    )
+
+    assert result.C.shape == (5, 3)
+    assert_allclose(result.C.T @ result.C, np.eye(3), atol=1e-12, rtol=1e-12)
+    direct_fitted = (X @ result.Pi) @ result.W @ result.C.T
+    factored_fitted = X @ result.standardized_regression_map
+    assert_allclose(factored_fitted, direct_fitted, atol=2e-12, rtol=1e-12)
+
+
+def test_core_rejects_invalid_response_subspace() -> None:
+    rng = np.random.default_rng(20260823)
+    X = _center(rng.normal(size=(12, 5)))
+    Y = _center(rng.normal(size=(12, 3)))
+
+    with pytest.raises(
+        ValueError,
+        match='response_subspace must be "cross_covariance" or "least_squares"',
+    ):
+        fit_pipls_core(
+            X,
+            Y,
+            predictor_rank=4,
+            n_components=2,
+            response_subspace="lstsq",  # type: ignore[arg-type]
+        )
+
 def test_core_shapes_and_regression_map() -> None:
     rng = np.random.default_rng(12)
     X = _center(rng.normal(size=(15, 7)))

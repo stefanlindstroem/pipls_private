@@ -17,6 +17,7 @@ from sklearn.utils.extmath import randomized_svd
 FloatArray = NDArray[np.float64]
 SVDSolver = Literal["full", "randomized", "auto"]
 ResolvedSVDSolver = Literal["full", "randomized"]
+ResponseSubspace = Literal["cross_covariance", "least_squares"]
 _AUTO_RANDOMIZED_MIN_DIMENSION = 500
 _AUTO_RANDOMIZED_MIN_ENTRIES = 1_000_000
 _AUTO_RANDOMIZED_MAX_RANK_FRACTION = 0.2
@@ -135,6 +136,7 @@ def fit_pipls_core(
     *,
     predictor_rank: int,
     n_components: int,
+    response_subspace: ResponseSubspace = "cross_covariance",
     svd_solver: SVDSolver = "full",
     random_state: int | np.random.RandomState | None = 0,
 ) -> PiPLSCoreResult:
@@ -150,6 +152,10 @@ def fit_pipls_core(
         Retained predictor-subspace dimension $r_\pi$.
     n_components:
         Number of paired latent modes $h$.
+    response_subspace:
+        Private response-basis construction policy. ``"cross_covariance"``
+        uses the peer-reviewed construction; ``"least_squares"`` uses the
+        least-squares/RRR-inspired software extension from Decision 0155.
     svd_solver:
         Predictor decomposition policy. ``"full"`` uses NumPy's exact thin SVD,
         ``"randomized"`` uses scikit-learn's randomized truncated SVD, and
@@ -188,6 +194,7 @@ def fit_pipls_core(
 
     r_pi = _as_positive_int(predictor_rank, name="predictor_rank")
     h = _as_positive_int(n_components, name="n_components")
+    resolved_response_subspace = _validate_response_subspace(response_subspace)
 
     algebraic_limit = min(n_samples, n_features)
     if r_pi > algebraic_limit:
@@ -237,11 +244,18 @@ def fit_pipls_core(
     Pi = np.asarray(x_vt[:r_pi, :].T, dtype=np.float64)
     Z = X_array @ Pi
 
-    C = _cross_covariance_response_basis(
-        Z,
-        Y_array,
-        n_components=h,
-    )
+    if resolved_response_subspace == "cross_covariance":
+        C = _cross_covariance_response_basis(
+            Z,
+            Y_array,
+            n_components=h,
+        )
+    else:
+        C = _least_squares_response_basis(
+            Z,
+            Y_array,
+            n_components=h,
+        )
 
     Y_C = Y_array @ C
     W_raw, _, _, _ = np.linalg.lstsq(Z, Y_C, rcond=None)
@@ -291,6 +305,20 @@ def _resolve_predictor_svd_solver(
         and predictor_rank <= _AUTO_RANDOMIZED_MAX_RANK_FRACTION * min_dimension
     )
     return "randomized" if use_randomized else "full"
+
+
+def _validate_response_subspace(response_subspace: object) -> ResponseSubspace:
+    """Validate and narrow the private response-subspace policy."""
+
+    if not isinstance(response_subspace, str) or response_subspace not in (
+        "cross_covariance",
+        "least_squares",
+    ):
+        raise ValueError(
+            'response_subspace must be "cross_covariance" or "least_squares"; '
+            f"got {response_subspace!r}."
+        )
+    return cast(ResponseSubspace, response_subspace)
 
 
 def _validate_random_state(
