@@ -52,6 +52,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0152-selection-review-feedback-workflow.md` | selection-review feedback workflow | inspect the unselected path before selecting, review conditional evidence with one feedback edge, and reserve qualification or validation for independent assessment |
 | `0153-independent-block-scaling-controls.md` | independent predictor and response scaling controls | retain `scale` as the compatibility default while allowing fold-local pipeline predictor scaling and Pi-PLS response scaling to be controlled independently |
 | `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | implemented exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
+| `0155-response-subspace-selection-policies.md` | response-subspace selection policies | accepted cross-covariance default plus a planned least-squares/RRR-inspired software extension outside the peer-reviewed publication |
 
 ## Implemented clarifications
 
