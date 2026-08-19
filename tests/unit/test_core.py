@@ -31,6 +31,37 @@ def test_cross_covariance_response_basis_matches_direct_svd() -> None:
     np.testing.assert_array_equal(actual, expected)
 
 
+def test_least_squares_response_basis_matches_choice_c_subspace() -> None:
+    from pipls._core import _least_squares_response_basis
+
+    rng = np.random.default_rng(20260820)
+    Z = _center(rng.normal(size=(24, 6)))
+    Y = _center(rng.normal(size=(24, 5)))
+
+    actual = _least_squares_response_basis(
+        Z,
+        Y,
+        n_components=3,
+    )
+
+    cross_product = Z.T @ Y
+    gram = Z.T @ Z
+    choice_c = cross_product.T @ np.linalg.solve(gram, cross_product)
+    choice_c = 0.5 * (choice_c + choice_c.T)
+    _, eigenvectors = np.linalg.eigh(choice_c)
+    expected = eigenvectors[:, -3:]
+
+    assert actual.shape == (5, 3)
+    assert np.all(np.isfinite(actual))
+    assert_allclose(actual.T @ actual, np.eye(3), atol=1e-12, rtol=1e-12)
+    assert_allclose(
+        actual @ actual.T,
+        expected @ expected.T,
+        atol=1e-12,
+        rtol=1e-12,
+    )
+
+
 def test_core_shapes_and_regression_map() -> None:
     rng = np.random.default_rng(12)
     X = _center(rng.normal(size=(15, 7)))

@@ -120,13 +120,16 @@ Step 2 is now active. It is split into four reviewable patches:
 
 - 2A: isolate the current cross-covariance response-basis routine without changing numerics --
   complete;
-- 2B: implement the isolated exact least-squares response-basis routine -- next;
-- 2C: add the two-value private core dispatch while preserving cross-covariance as the default;
+- 2B: implement the isolated exact least-squares response-basis routine -- complete;
+- 2C: add the two-value private core dispatch while preserving cross-covariance as the default --
+  next;
 - 2D: harden numerical integration, synchronize implemented numerical contracts, and close Step 2.
 
-Patch 2A changes only source organization around the already implemented response-basis SVD. The
-`fit_pipls_core()` signature and public estimator surface remain unchanged. The public estimator
-parameter and search propagation remain Step 3 work.
+Patch 2A changes only source organization around the already implemented response-basis SVD.
+Patch 2B adds an unused private least-squares/RRR-inspired response-basis helper implemented by
+exact reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`; a projector test verifies equivalence
+to Choice C on a well-conditioned problem. The `fit_pipls_core()` signature and public estimator
+surface remain unchanged. The public estimator parameter and search propagation remain Step 3 work.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

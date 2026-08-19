@@ -193,18 +193,23 @@ default together with the explicit EPV policy.
 
 Decision 0155 is accepted and Step 1 of its staged migration is complete. The planned
 least-squares-driven response-subspace policy remains a software extension, while the peer-reviewed
-cross-covariance construction remains the default. Step 2A has now isolated the existing published
-response-basis calculation in a private `_cross_covariance_response_basis()` helper without changing
-the `fit_pipls_core()` signature or public estimator behavior. The current fixed estimator still has
-no `response_subspace` parameter and still reaches only the cross-covariance construction. Active
-`.llm` mathematical, numerical, and public-API contracts therefore continue to describe only that
-implemented public path until the remaining core and public-API patches land.
+cross-covariance construction remains the default. Steps 2A and 2B have now isolated the existing
+published response-basis calculation and added an unused private least-squares response-basis
+primitive based on exact reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`. The new helper
+contains an explicit source comment that the least-squares/RRR-inspired construction is not part of
+the peer-reviewed companion publication. The `fit_pipls_core()` signature is still unchanged, and
+the current fixed estimator still has no `response_subspace` parameter and still reaches only the
+cross-covariance construction. Active `.llm` mathematical, numerical, and public-API contracts
+therefore continue to describe only that implemented public path until the remaining core and
+public-API patches land.
 
 Patches 1A--1C recorded Decision 0155, reconciled Decisions 0120, 0008, and 0039, and opened the
 six-step roadmap. Patch 1D completed the repository-wide audit. Step 2A is the first core increment:
 it extracts the existing cross-covariance response-basis SVD into one private helper and adds a direct
-regression check against the previous expression. Step 2B is next and will add the isolated exact
-least-squares response-basis primitive without yet making it selectable from `fit_pipls_core()`. The
+regression check against the previous expression. Step 2B adds the isolated exact least-squares
+response-basis primitive without yet making it selectable from `fit_pipls_core()`; its unit test
+checks the resulting projector against the Choice-C least-squares matrix on a
+well-conditioned problem. Step 2C is next and will add the private two-value dispatch. The
 compatibility invariant for the later implementation remains that omitting the new parameter, or
 explicitly selecting `response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155
 fixed-estimator numerical path subject only to ordinary floating-point behavior.

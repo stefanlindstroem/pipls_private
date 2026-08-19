@@ -113,6 +113,22 @@ def _cross_covariance_response_basis(
     return np.asarray(cross_vt[:n_components, :].T, dtype=np.float64)
 
 
+def _least_squares_response_basis(
+    Z: FloatArray,
+    Y: FloatArray,
+    *,
+    n_components: int,
+) -> FloatArray:
+    """Return the least-squares/RRR-inspired response basis."""
+
+    # Software extension: this least-squares/RRR-inspired response-subspace
+    # construction is not part of the peer-reviewed companion publication.
+    Z_basis, _ = np.linalg.qr(Z, mode="reduced")
+    projected_response = Z_basis.T @ Y
+    _, _, response_vt = np.linalg.svd(projected_response, full_matrices=False)
+    return np.asarray(response_vt[:n_components, :].T, dtype=np.float64)
+
+
 def fit_pipls_core(
     X: ArrayLike,
     Y: ArrayLike,
