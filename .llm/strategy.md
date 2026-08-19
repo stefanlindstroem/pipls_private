@@ -84,12 +84,42 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-No staged migration is active. Decision 0154's seven-patch predictor-rank migration is complete:
-full-feasible automatic rank optimization uses exhaustive coverage by default, EPV is an explicit
-fixed-rank policy, the pre-release `"max"`/`"rule"` shortcuts are absent from the active API, and
-high-dimensional maintained examples request adaptive coverage explicitly where appropriate. The
-release notes and clean installed-artifact smoke test cover the completed transition. Future changes
-to predictor-rank selection require a new owner decision rather than extending this closed sequence.
+Decision 0154's seven-patch predictor-rank migration is complete and closed. Future changes to
+predictor-rank selection require a new owner decision rather than extending that sequence.
+
+Decision 0155 opens an active six-step migration for response-subspace selection. The scientific and
+API target is to retain the peer-reviewed cross-covariance construction as the default and add one
+explicit least-squares/RRR-inspired software extension. The response-subspace policy belongs to the
+fixed estimator and is propagated by search; it is not a third search dimension.
+
+The six implementation steps are:
+
+1. establish Decision 0155 and the maintainer contract;
+2. implement both response-subspace policies in the fixed numerical core;
+3. expose `response_subspace` on `PiPLSRegression` and preserve it through search, OOF work, and
+   refitting;
+4. add mathematical, numerical, and API regression coverage for both policies;
+5. document the theory and API and add a programming-user comparison example;
+6. complete the stale-contract, release, installed-artifact, and distribution audit.
+
+Step 1 is split into four reviewable patches:
+
+- 1A: record and index Decision 0155 -- complete;
+- 1B: reconcile Decisions 0120, 0008, and 0039 with the accepted extension -- complete;
+- 1C: open the active maintainer roadmap while leaving implemented contracts untouched -- current
+  patch;
+- 1D: audit repository-wide consistency and close Step 1 before runtime implementation begins.
+
+During Step 1, `.llm/public_api.md`, `.llm/mathematics.md`, `.llm/theory.md`, and
+`.llm/numerical_contracts.md` continue to describe the implemented cross-covariance-only runtime.
+They must not be changed to claim support for `response_subspace` before the corresponding source
+and test contracts land.
+
+The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
+`response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator
+numerics, subject only to ordinary floating-point behavior. The least-squares route must remain
+visibly outside the peer-reviewed companion publication throughout source, theory documentation,
+and manuscript-reproduction guidance.
 
 ## Deferred work
 
