@@ -242,6 +242,10 @@ Tests now protect behavior and machine-readable outputs rather than repository p
 arrangement. Distribution and documentation validation share private maintenance helpers, and the
 Pulp example and tutorial renderer use caller-local plotting functions. Patch 6A adds release notes
 and reconciles active maintainer/example inventory wording only; it introduces no runtime behavior.
+Patch 6B strengthens clean-artifact qualification: the installed-package smoke test exercises both
+response-subspace policies and verifies least-squares policy propagation through search/refit, while
+the extracted source distribution executes both Examples 01 and 07 and verifies their PDF outputs.
+No package runtime behavior changes in 6B.
 
 ## Authority and drift handling
 

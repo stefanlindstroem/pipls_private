@@ -36,9 +36,29 @@ def main() -> None:
     Y = np.column_stack((X[:, 0] + X[:, 1], X[:, 2] - X[:, 3]))
 
     model = PiPLSRegression(n_components=1, predictor_rank=2).fit(X, Y)
+    if model.response_subspace != "cross_covariance":
+        raise AssertionError(
+            "Installed fixed estimator does not use cross-covariance response "
+            "selection by default."
+        )
     prediction = model.predict(X[:2])
     if prediction.shape != (2, 2) or not np.isfinite(prediction).all():
         raise AssertionError("Installed fixed-estimator prediction failed.")
+
+    least_squares_model = PiPLSRegression(
+        n_components=1,
+        predictor_rank=2,
+        response_subspace="least_squares",
+    ).fit(X, Y)
+    least_squares_prediction = least_squares_model.predict(X[:2])
+    if (
+        least_squares_model.response_subspace != "least_squares"
+        or least_squares_prediction.shape != (2, 2)
+        or not np.isfinite(least_squares_prediction).all()
+    ):
+        raise AssertionError(
+            "Installed least-squares response-subspace estimator failed."
+        )
 
     search_defaults = PiPLSSearchCV()
     if search_defaults.search_method != "exhaustive":
@@ -76,6 +96,32 @@ def main() -> None:
     epv_selection = epv_search.select(n_components=1)
     if epv_selection.predictor_rank != 2 or epv_selection.predictor_rank_policy != "epv":
         raise AssertionError("Installed EPV policy did not resolve the expected fixed rank.")
+
+    least_squares_search = PiPLSSearchCV(
+        estimator=PiPLSRegression(
+            n_components=1,
+            predictor_rank=2,
+            response_subspace="least_squares",
+        ),
+        n_components_values=(1,),
+        predictor_rank_values=(2,),
+        cv=2,
+        n_jobs=1,
+    ).fit(X, Y)
+    least_squares_selection = least_squares_search.select(n_components=1)
+    least_squares_refit = least_squares_search.refit(
+        X,
+        Y,
+        selection=least_squares_selection,
+    )
+    if least_squares_refit.response_subspace != "least_squares":
+        raise AssertionError(
+            "Installed search did not preserve least-squares response selection."
+        )
+    if not np.isfinite(least_squares_refit.predict(X[:2])).all():
+        raise AssertionError(
+            "Installed least-squares search and refit workflow failed."
+        )
 
     expected_shapes = {
         "pulp": ((46, 14), (46, 8)),

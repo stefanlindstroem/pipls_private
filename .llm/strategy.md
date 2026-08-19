@@ -187,13 +187,16 @@ Step 6 is split into three reviewable patches:
 
 - 6A: add release notes and reconcile stale active-contract/example-inventory wording -- complete;
 - 6B: qualify both response-subspace policies in clean installed artifacts and execute Example 07
-  from the source distribution -- next;
-- 6C: perform the final repository audit and close Decision 0155 -- pending.
+  from the source distribution -- complete;
+- 6C: perform the final repository audit and close Decision 0155 -- next.
 
 Patch 6A records the implemented feature under `Unreleased`, updates the current decision registry,
 and synchronizes the maintained example inventory after Example 07. Historical records that were
 correct when written remain historical rather than being rewritten. No runtime behavior changes in
-6A.
+6A. Patch 6B extends clean wheel/source-distribution smoke qualification to both response-subspace
+policies, verifies least-squares policy propagation through installed search/refit, and executes both
+Examples 01 and 07 from the extracted source distribution. No package runtime behavior changes in
+6B.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

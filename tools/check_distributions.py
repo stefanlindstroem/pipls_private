@@ -29,7 +29,7 @@ def _assert_development_archive_excluded(artifact: Path) -> None:
         )
 
 
-def _check_source_distribution_example(
+def _check_source_distribution_examples(
     *,
     artifact: Path,
     workspace: Path,
@@ -58,16 +58,22 @@ def _check_source_distribution_example(
     )
     example_environment = environment_variables.copy()
     example_environment["MPLBACKEND"] = "Agg"
-    run(
-        [str(python), str(source / "examples" / "01_pulp_quick_start.py")],
-        cwd=source,
-        env=example_environment,
+    examples = (
+        ("01_pulp_quick_start.py", "pulp_quick_start.pdf"),
+        ("07_response_subspace_comparison.py", "response_subspace_comparison.pdf"),
     )
-    output = source / "examples" / "results" / "pulp_quick_start.pdf"
-    if not output.is_file():
-        raise RuntimeError(
-            "The source-distribution quick-start example did not create its PDF."
+    for script_name, output_name in examples:
+        run(
+            [str(python), str(source / "examples" / script_name)],
+            cwd=source,
+            env=example_environment,
         )
+        output = source / "examples" / "results" / output_name
+        if not output.is_file():
+            raise RuntimeError(
+                "Source-distribution example "
+                f"{script_name} did not create {output_name}."
+            )
 
 
 def _check_installation(
@@ -114,7 +120,7 @@ def _check_installation(
         env=environment_variables,
     )
     if check_source_example:
-        _check_source_distribution_example(
+        _check_source_distribution_examples(
             artifact=artifact,
             workspace=workspace,
             python=python,
