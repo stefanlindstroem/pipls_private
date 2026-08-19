@@ -106,6 +106,33 @@ def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
     assert result.output_path.name == "pulp_component_path_comparison.pdf"
 
 
+def test_shared_evaluator_can_run_publication_default_only(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_comparison_module(monkeypatch)
+    X, Y = module._load_dataset("pulp")
+
+    evaluation = module.evaluate_pls_family_paths(
+        "pulp",
+        X,
+        Y,
+        response_subspaces=("cross_covariance",),
+    )
+
+    assert tuple(evaluation.pipls_searches) == ("cross_covariance",)
+    search = evaluation.pipls_searches["cross_covariance"]
+    assert search.cv is evaluation.cv_splits
+    assert search.n_splits_ == evaluation.pls_path.n_splits == 5
+    assert search.estimator.response_subspace == "cross_covariance"
+    assert search.search_method == "exhaustive"
+    np.testing.assert_array_equal(
+        search.component_path_.n_components,
+        evaluation.pls_path.n_components,
+    )
+    assert np.isfinite(search.component_path_.cv_mse_mean).all()
+    assert np.isfinite(evaluation.pls_path.cv_mse_mean).all()
+
+
 def test_synthetic_stress_case_is_fixed_and_deterministic(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -199,18 +226,20 @@ def test_dataset_search_templates_keep_matched_configuration(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     module = _load_comparison_module(monkeypatch)
+    from _support.pls_family_path_comparison import make_pipls_search
+
     splits = [
         (np.array([0, 1], dtype=np.intp), np.array([2], dtype=np.intp)),
         (np.array([1, 2], dtype=np.intp), np.array([0], dtype=np.intp)),
     ]
 
     for dataset in module.COMPARISON_CASES:
-        cross_search = module._make_search(
+        cross_search = make_pipls_search(
             dataset,
             response_subspace="cross_covariance",
             cv_splits=splits,
         )
-        least_squares_search = module._make_search(
+        least_squares_search = make_pipls_search(
             dataset,
             response_subspace="least_squares",
             cv_splits=splits,

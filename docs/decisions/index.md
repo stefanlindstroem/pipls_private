@@ -55,6 +55,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0155: response-subspace selection policies](0155-response-subspace-selection-policies.md)
 - [0156: unified PLS-family path comparison](0156-unified-pls-family-path-comparison.md)
 - [0157: near-saturated synthetic PLS-family stress case](0157-near-saturated-synthetic-pls-comparison.md)
+- [0158: Home-page parsimony comparison](0158-home-page-parsimony-comparison.md)
 
 ## Historical navigation
 

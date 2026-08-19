@@ -139,6 +139,14 @@ Source-distribution qualification executes only the bounded Pulp branch of Examp
 examples` owns complete four-case execution. The former Example 07 and its dedicated PDF remain
 retired.
 
+Decision 0158 is active. Patch 0158A factors the matched numerical evaluation behind Example 03
+into `examples/_support/pls_family_path_comparison.py`: one helper now owns the seeded materialized
+five-fold protocol, case-specific Pi-PLS search configuration, requested response-subspace paths,
+component-domain checks, and ordinary-PLS path. Example 03 requests both response policies through
+that helper, while the planned Home renderer can request only `"cross_covariance"` without
+duplicating folds or search settings. Patch 0158B will generate simplified Pulp and Tobacco Home
+assets; 0158C will place them side by side under `Why use Π-PLS?` and close the decision.
+
 ## Inspection and rendering boundary
 
 `pipls.inspection` returns validated immutable NumPy results for Pi-PLS factor displays, shared

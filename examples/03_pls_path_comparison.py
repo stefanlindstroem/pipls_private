@@ -6,15 +6,18 @@ import argparse
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
-from _support.pls_component_path import PLSComponentPath, evaluate_pls_component_path
-from numpy.typing import NDArray
-from sklearn.model_selection import KFold
+from _support.pls_component_path import PLSComponentPath
+from _support.pls_family_path_comparison import (
+    COMPARISON_CASES,
+    SYNTHETIC_STRESS_CASE,
+    CVSplit,
+    evaluate_pls_family_paths,
+)
 
-from pipls import PiPLSRegression, PiPLSSearchCV
+from pipls import PiPLSSearchCV
 from pipls.datasets import (
     PiPLSDataset,
     load_pulp,
@@ -24,11 +27,6 @@ from pipls.datasets import (
 )
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
-REFERENCE_DATASET_NAMES = ("pulp", "sugarcane", "tobacco")
-SYNTHETIC_STRESS_CASE = "synthetic_stress"
-COMPARISON_CASES = (*REFERENCE_DATASET_NAMES, SYNTHETIC_STRESS_CASE)
-ResponseSubspace = Literal["cross_covariance", "least_squares"]
-CVSplit = tuple[NDArray[np.intp], NDArray[np.intp]]
 
 
 @dataclass(frozen=True)
@@ -41,7 +39,7 @@ class SyntheticStressSpec:
     n_shared: int = 5
     n_predictor_specific: int = 15
     n_response_specific: int = 0
-    noise: float = 0.2
+    noise: float = 0.3
     random_state: int = 0
 
 
@@ -89,42 +87,6 @@ def _load_dataset(dataset: str) -> tuple[np.ndarray, np.ndarray]:
     raise ValueError(f"Unknown comparison case: {dataset!r}.")
 
 
-def _make_search(
-    dataset: str,
-    *,
-    response_subspace: ResponseSubspace,
-    cv_splits: list[CVSplit],
-) -> PiPLSSearchCV:
-    estimator = PiPLSRegression(
-        n_components=1,
-        predictor_rank=1,
-        response_subspace=response_subspace,
-        svd_solver="full" if dataset == "tobacco" else "auto",
-    )
-    if dataset == "pulp":
-        return PiPLSSearchCV(estimator=estimator, cv=cv_splits)
-    if dataset == SYNTHETIC_STRESS_CASE:
-        return PiPLSSearchCV(
-            estimator=estimator,
-            search_method="exhaustive",
-            cv=cv_splits,
-        )
-    if dataset == "sugarcane":
-        return PiPLSSearchCV(
-            estimator=estimator,
-            search_method="adaptive",
-            cv=cv_splits,
-        )
-    if dataset == "tobacco":
-        return PiPLSSearchCV(
-            estimator=estimator,
-            search_method="adaptive",
-            n_jobs=1,
-            cv=cv_splits,
-        )
-    raise ValueError(f"Unknown comparison case: {dataset!r}.")
-
-
 def _case_title(dataset: str) -> str:
     if dataset == SYNTHETIC_STRESS_CASE:
         return "Synthetic stress-case PLS-family component-path comparison"
@@ -156,46 +118,18 @@ def run_dataset(dataset: str) -> DatasetComparison:
     """Run one three-way matched-CV comparison and write its PDF figure."""
 
     X, Y = _load_dataset(dataset)
-    cv_splits = [
-        (np.asarray(train, dtype=np.intp), np.asarray(validation, dtype=np.intp))
-        for train, validation in KFold(
-            n_splits=5,
-            shuffle=True,
-            random_state=0,
-        ).split(X, Y)
-    ]
-
-    cross_covariance_search = _make_search(
+    evaluation = evaluate_pls_family_paths(
         dataset,
-        response_subspace="cross_covariance",
-        cv_splits=cv_splits,
-    ).fit(X, Y)
-    least_squares_search = _make_search(
-        dataset,
-        response_subspace="least_squares",
-        cv_splits=cv_splits,
-    ).fit(X, Y)
-
-    cross_covariance_path = cross_covariance_search.component_path_
-    least_squares_path = least_squares_search.component_path_
-    if not np.array_equal(
-        cross_covariance_path.n_components,
-        least_squares_path.n_components,
-    ):
-        raise RuntimeError(
-            "The two Π-PLS response-subspace paths must contain the same component counts."
-        )
-
-    pls_path = evaluate_pls_component_path(
         X,
         Y,
-        max_n_components=int(cross_covariance_path.n_components[-1]),
-        cv=cv_splits,
+        response_subspaces=("cross_covariance", "least_squares"),
     )
-    if not np.array_equal(cross_covariance_path.n_components, pls_path.n_components):
-        raise RuntimeError(
-            "Π-PLS and ordinary PLS paths must contain the same component counts."
-        )
+    cv_splits = evaluation.cv_splits
+    cross_covariance_search = evaluation.pipls_searches["cross_covariance"]
+    least_squares_search = evaluation.pipls_searches["least_squares"]
+    cross_covariance_path = cross_covariance_search.component_path_
+    least_squares_path = least_squares_search.component_path_
+    pls_path = evaluation.pls_path
 
     figure, axis = plt.subplots(figsize=(8.4, 5.2), layout="constrained")
     axis.errorbar(

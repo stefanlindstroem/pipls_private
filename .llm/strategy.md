@@ -122,7 +122,16 @@ predictor-rank coverage for both Pi-PLS policies, and the full 1--10 component d
 synchronized the user and maintainer documentation and recorded the fixed-realization result
 without a general superiority claim. In that fixed realization, both Pi-PLS policies reach their
 minimum mean CV-MSE at 5 components (0.9036 cross-covariance; 0.9022 least squares), while ordinary
-PLS reaches 0.9373 at 8 components. There is no active numbered migration after Decision 0157.
+PLS reaches 0.9373 at 8 components.
+
+Decision 0158 is the active three-patch documentation-presentation migration. Patch 0158A is
+complete: Example 03 now consumes a shared example-support evaluator that owns the maintained
+materialized folds, case-specific Pi-PLS search settings, requested response-subspace fitting, and
+ordinary-PLS path evaluation. The helper supports the full two-policy Example-03 comparison and a
+cross-covariance-only call for documentation rendering. Patch 0158B is next and will generate
+simplified Pulp and Tobacco Home assets containing only publication-default Pi-PLS and ordinary
+PLS. Patch 0158C will place those figures side by side under `Why use Π-PLS?`, state the bounded
+shared-component parsimony interpretation, link to Example 03, and close the decision.
 
 ## Deferred work
 
