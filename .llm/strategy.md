@@ -150,9 +150,18 @@ evaluation, explicit refit, selection-conditioned OOF reporting, and pipeline te
 `predictor_rank`. The ordinary `PiPLSSearchCV()` template still refits with
 `response_subspace="cross_covariance"`.
 
-Step 4 is active. It will add the broader mathematical, numerical, and API regression coverage for
-both policies before theory/API documentation and the programming-user comparison example land in
-Step 5.
+Step 4 is active with three reviewable patches:
+
+- 4A: add independent mathematical reference coverage, RRR equivalence, least-squares training
+  optimality, limiting-case identities, and shared core invariants -- complete;
+- 4B: harden public scaling, serialization, configuration changes, and scikit-learn interoperability
+  for the least-squares policy -- next;
+- 4C: synchronize internal mathematics/testing contracts and close Step 4.
+
+Patch 4A uses an independent Choice-C Gram/eigen calculation only in regression-test code; the
+runtime continues to use the numerically preferred exact QR/SVD construction from Step 2. The
+broader public/API regression work remains isolated in Patch 4B before theory/API documentation and
+the programming-user comparison example land in Step 5.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose
 
 from pipls._core import fit_pipls_core
@@ -10,12 +11,21 @@ def _center(array: np.ndarray) -> np.ndarray:
     return array - array.mean(axis=0, keepdims=True)
 
 
-def test_core_orthogonality_dilation_and_factorization() -> None:
+@pytest.mark.parametrize("response_subspace", ["cross_covariance", "least_squares"])
+def test_core_orthogonality_dilation_and_factorization(
+    response_subspace: str,
+) -> None:
     rng = np.random.default_rng(45)
     X = _center(rng.normal(size=(20, 9)))
     Y = _center(rng.normal(size=(20, 5)))
 
-    result = fit_pipls_core(X, Y, predictor_rank=6, n_components=4)
+    result = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=4,
+        response_subspace=response_subspace,  # type: ignore[arg-type]
+    )
 
     assert_allclose(result.P.T @ result.P, np.eye(4), atol=1e-12)
     assert_allclose(result.Q.T @ result.Q, np.eye(4), atol=1e-12)

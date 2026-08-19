@@ -209,11 +209,15 @@ public contract. Search still changes only `n_components` and `predictor_rank`; 
 continues to use `response_subspace="cross_covariance"`. No `response_subspace_` fitted provenance
 attribute is introduced.
 
-Step 4 is now active: add the broader mathematical, numerical, and API regression coverage for both
-response-subspace policies, including RRR equivalence and least-squares optimality claims. The
-compatibility invariant remains that omitting the new parameter, or explicitly selecting
-`response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155 fixed-estimator
-numerical path subject only to ordinary floating-point behavior.
+Step 4 is active. Patch 4A is complete: the test suite now protects an independently constructed
+frozen Choice-C reference, direct reduced-rank-regression equivalence in the retained predictor
+coordinates, the least-squares training-residual optimum relative to the cross-covariance policy,
+the $q=1$ and full-response-subspace equivalence cases, and the shared orthogonality/diagonalization
+invariants under both policies. Patch 4B is next and will harden public scaling, serialization,
+configuration changes, and scikit-learn interoperability. The compatibility invariant remains that
+omitting the new parameter, or explicitly selecting `response_subspace="cross_covariance"`, must
+reproduce the pre-Decision-0155 fixed-estimator numerical path subject only to ordinary
+floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

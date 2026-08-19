@@ -112,6 +112,132 @@ def test_core_least_squares_response_subspace_completes_factorization() -> None:
     assert_allclose(factored_fitted, direct_fitted, atol=2e-12, rtol=1e-12)
 
 
+def test_least_squares_response_subspace_matches_reduced_rank_regression_fit() -> None:
+    rng = np.random.default_rng(20260826)
+    X = _center(rng.normal(size=(30, 9)))
+    Y = _center(rng.normal(size=(30, 5)))
+    h = 3
+
+    result = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=6,
+        n_components=h,
+        response_subspace="least_squares",
+    )
+
+    Z = X @ result.Pi
+    unrestricted_coefficients = np.linalg.lstsq(Z, Y, rcond=None)[0]
+    unrestricted_fitted = Z @ unrestricted_coefficients
+    left, singular_values, right_t = np.linalg.svd(
+        unrestricted_fitted,
+        full_matrices=False,
+    )
+    expected_rrr_fitted = (
+        left[:, :h] * singular_values[:h]
+    ) @ right_t[:h, :]
+    actual_fitted = X @ result.standardized_regression_map
+
+    assert_allclose(actual_fitted, expected_rrr_fitted, atol=3e-12, rtol=2e-12)
+
+
+def test_least_squares_response_subspace_minimizes_training_residual() -> None:
+    rng = np.random.default_rng(20260715)
+    X = _center(rng.normal(size=(8, 5)))
+    Y = _center(rng.normal(size=(8, 3)))
+
+    covariance = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=3,
+        n_components=1,
+        response_subspace="cross_covariance",
+    )
+    least_squares = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=3,
+        n_components=1,
+        response_subspace="least_squares",
+    )
+
+    covariance_error = np.linalg.norm(
+        Y - X @ covariance.standardized_regression_map,
+        ord="fro",
+    ) ** 2
+    least_squares_error = np.linalg.norm(
+        Y - X @ least_squares.standardized_regression_map,
+        ord="fro",
+    ) ** 2
+
+    assert least_squares_error <= covariance_error + 1e-12
+    assert covariance_error - least_squares_error > 1e-8
+
+
+def test_response_subspace_policies_are_equivalent_for_one_response() -> None:
+    rng = np.random.default_rng(20260827)
+    X = _center(rng.normal(size=(24, 8)))
+    Y = _center(rng.normal(size=(24, 1)))
+
+    covariance = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=5,
+        n_components=1,
+        response_subspace="cross_covariance",
+    )
+    least_squares = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=5,
+        n_components=1,
+        response_subspace="least_squares",
+    )
+
+    assert_allclose(
+        least_squares.standardized_regression_map,
+        covariance.standardized_regression_map,
+        atol=2e-12,
+        rtol=1e-12,
+    )
+
+
+def test_response_subspace_policies_match_with_full_response_subspace() -> None:
+    rng = np.random.default_rng(20260828)
+    X = _center(rng.normal(size=(25, 7)))
+    Y = _center(rng.normal(size=(25, 3)))
+
+    covariance = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=5,
+        n_components=3,
+        response_subspace="cross_covariance",
+    )
+    least_squares = fit_pipls_core(
+        X,
+        Y,
+        predictor_rank=5,
+        n_components=3,
+        response_subspace="least_squares",
+    )
+    Z = X @ covariance.Pi
+    expected_map = covariance.Pi @ np.linalg.lstsq(Z, Y, rcond=None)[0]
+
+    assert_allclose(
+        covariance.standardized_regression_map,
+        expected_map,
+        atol=3e-12,
+        rtol=2e-12,
+    )
+    assert_allclose(
+        least_squares.standardized_regression_map,
+        expected_map,
+        atol=3e-12,
+        rtol=2e-12,
+    )
+
+
 def test_core_rejects_invalid_response_subspace() -> None:
     rng = np.random.default_rng(20260823)
     X = _center(rng.normal(size=(12, 5)))
