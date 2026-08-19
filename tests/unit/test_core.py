@@ -11,6 +11,26 @@ def _center(array: np.ndarray) -> np.ndarray:
     return array - array.mean(axis=0, keepdims=True)
 
 
+def test_cross_covariance_response_basis_matches_direct_svd() -> None:
+    from pipls._core import _cross_covariance_response_basis
+
+    rng = np.random.default_rng(20260819)
+    Z = _center(rng.normal(size=(18, 6)))
+    Y = _center(rng.normal(size=(18, 4)))
+
+    cross_product = Z.T @ Y
+    _, _, cross_vt = np.linalg.svd(cross_product, full_matrices=False)
+    expected = np.asarray(cross_vt[:3, :].T, dtype=np.float64)
+
+    actual = _cross_covariance_response_basis(
+        Z,
+        Y,
+        n_components=3,
+    )
+
+    np.testing.assert_array_equal(actual, expected)
+
+
 def test_core_shapes_and_regression_map() -> None:
     rng = np.random.default_rng(12)
     X = _center(rng.normal(size=(15, 7)))

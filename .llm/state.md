@@ -193,22 +193,21 @@ default together with the explicit EPV policy.
 
 Decision 0155 is accepted and Step 1 of its staged migration is complete. The planned
 least-squares-driven response-subspace policy remains a software extension, while the peer-reviewed
-cross-covariance construction remains the default. Runtime implementation has not started. The
-current fixed estimator still has no `response_subspace` parameter and still constructs the response
-basis only from the dominant right-singular subspace of the retained predictor-response
-cross-covariance. Active `.llm` mathematical, numerical, and public-API contracts therefore continue
-to describe only that implemented cross-covariance path until the core and public-API patches land.
+cross-covariance construction remains the default. Step 2A has now isolated the existing published
+response-basis calculation in a private `_cross_covariance_response_basis()` helper without changing
+the `fit_pipls_core()` signature or public estimator behavior. The current fixed estimator still has
+no `response_subspace` parameter and still reaches only the cross-covariance construction. Active
+`.llm` mathematical, numerical, and public-API contracts therefore continue to describe only that
+implemented public path until the remaining core and public-API patches land.
 
 Patches 1A--1C recorded Decision 0155, reconciled Decisions 0120, 0008, and 0039, and opened the
-six-step roadmap. Patch 1D completed a repository-wide audit. The audit found no premature runtime
-signature, test expectation, programming example, or user-facing claim for `response_subspace`; the
-remaining unconditional cross-covariance descriptions belong either to the implemented runtime or
-to peer-reviewed/canonical theory and are intentionally unchanged at this stage. Step 2 is now the
-active increment: implement both response-subspace constructions in the fixed numerical core without
-yet widening the public estimator surface. The compatibility invariant for the later implementation
-is that omitting the new parameter, or explicitly selecting
-`response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155 fixed-estimator
-numerical path subject only to ordinary floating-point behavior.
+six-step roadmap. Patch 1D completed the repository-wide audit. Step 2A is the first core increment:
+it extracts the existing cross-covariance response-basis SVD into one private helper and adds a direct
+regression check against the previous expression. Step 2B is next and will add the isolated exact
+least-squares response-basis primitive without yet making it selectable from `fit_pipls_core()`. The
+compatibility invariant for the later implementation remains that omitting the new parameter, or
+explicitly selecting `response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155
+fixed-estimator numerical path subject only to ordinary floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

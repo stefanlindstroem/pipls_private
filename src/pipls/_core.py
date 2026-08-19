@@ -99,6 +99,20 @@ class PiPLSCoreResult:
         standardized_regression_map: FloatArray = self.P @ self.D @ self.Q.T
         return standardized_regression_map
 
+
+def _cross_covariance_response_basis(
+    Z: FloatArray,
+    Y: FloatArray,
+    *,
+    n_components: int,
+) -> FloatArray:
+    """Return the published cross-covariance-driven response basis."""
+
+    cross_product = Z.T @ Y
+    _, _, cross_vt = np.linalg.svd(cross_product, full_matrices=False)
+    return np.asarray(cross_vt[:n_components, :].T, dtype=np.float64)
+
+
 def fit_pipls_core(
     X: ArrayLike,
     Y: ArrayLike,
@@ -207,9 +221,11 @@ def fit_pipls_core(
     Pi = np.asarray(x_vt[:r_pi, :].T, dtype=np.float64)
     Z = X_array @ Pi
 
-    cross_product = Z.T @ Y_array
-    _, _, cross_vt = np.linalg.svd(cross_product, full_matrices=False)
-    C = np.asarray(cross_vt[:h, :].T, dtype=np.float64)
+    C = _cross_covariance_response_basis(
+        Z,
+        Y_array,
+        n_components=h,
+    )
 
     Y_C = Y_array @ C
     W_raw, _, _, _ = np.linalg.lstsq(Z, Y_C, rcond=None)
