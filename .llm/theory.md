@@ -7,11 +7,13 @@ It summarizes the mathematical construction, interpretation, limiting cases, ran
 implementation consequences of the method so that the project owner does not need to attach the
 manuscript for routine implementation work.
 
-The scientific source for this summary is the project owner's companion manuscript, “Panoramic
-Partial Least Squares (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate
-regression model,” under revision at *Computers & Chemical Engineering* as CACE-D-26-00847. This
-file is a repository-maintained explanation, not a replacement for the manuscript. The authority
-hierarchy for implementation work is:
+The companion manuscript, “Panoramic Partial Least Squares (Pi-PLS): Transparent, parsimonious,
+and more interpretable multivariate regression model,” under revision at *Computers & Chemical
+Engineering* as CACE-D-26-00847, is the scientific source for the canonical cross-covariance
+construction summarized here. Decision 0155 additionally defines the implemented least-squares/
+RRR-inspired response-subspace policy as a software extension that is not part of the peer-reviewed
+publication. This file is a repository-maintained explanation of the implemented scientific
+contract, not a replacement for the manuscript. The authority hierarchy for implementation work is:
 
 1. explicit scientific decisions from the project owner;
 2. accepted decision records under `docs/decisions/`;
@@ -58,14 +60,16 @@ Pi-PLS combines ideas familiar from several multivariate methods:
 
 - Like truncated-SVD regression, it first restricts estimation to a rank-controlled predictor
   subspace.
-- Like PLS and PLS-SVD, it uses predictor-response cross-covariance to identify response-relevant
-  latent directions.
-- Like reduced-rank regression, it represents the coefficient matrix through a low-rank
+- In its default peer-reviewed response-subspace policy, like PLS and PLS-SVD, it uses
+  predictor-response cross-covariance to identify response-relevant latent directions.
+- Its optional least-squares response-subspace policy applies the reduced-rank-regression principle
+  after the predictor subspace has been fixed.
+- Like reduced-rank regression, both policies represent the coefficient matrix through a low-rank
   factorization.
 - Unlike iterative deflation-based PLS algorithms, the fixed-parameter Pi-PLS construction is a
-  sequence of SVD and least-squares operations with an explicit closed form.
+  sequence of orthogonal factorizations and least-squares operations with an explicit closed form.
 - Unlike PLS-SVD, Pi-PLS first preserves a chosen rank-controlled predictor subspace and only then
-  identifies response directions from cross-covariance within that subspace.
+  selects the response subspace under the configured criterion.
 
 The defining interpretive feature is a diagonal one-to-one coupling between orthogonal predictor
 and response modes.
@@ -80,7 +84,7 @@ and response modes.
 | $h$ | scalar | number of coupled latent modes |
 | $\mathbf{\Pi}$ | $(p,r_\pi)$ | orthonormal retained predictor basis |
 | $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ | $(n,r_\pi)$ | predictor scores in the retained subspace |
-| $\mathbf{C}$ | $(q,h)$ | orthonormal response basis selected by cross-covariance |
+| $\mathbf{C}$ | $(q,h)$ | orthonormal response basis selected by the configured response-subspace policy |
 | $\mathbf{W}$ | $(r_\pi,h)$ | least-squares map from $\mathbf{Z}$ to $\mathbf{Y}\mathbf{C}$ |
 | $\mathbf{M}$ | $(r_\pi,h)$ | left singular vectors of $\mathbf{W}$ |
 | $\mathbf{D}$ | $(h,h)$ | nonnegative diagonal dilation matrix |
@@ -171,17 +175,23 @@ subspace and is treated as truncation residual. Thus, $r_\pi$ determines which p
 remains available to all later stages. Any predictive direction removed here cannot be recovered
 by increasing $h$.
 
-## Step 2: select the response subspace by cross-covariance
+## Step 2: select the response subspace
 
-Within the retained predictor space, form the predictor-response cross-product matrix
+The package implements two response-subspace policies. Both produce an orthonormal basis
+$\mathbf{C}\in\mathbb{R}^{q\times h}$ and then share the same latent least-squares and
+final-diagonalization stages.
+
+### Cross-covariance policy
+
+The default `"cross_covariance"` policy is the construction in the peer-reviewed companion
+publication. Within the retained predictor space, form
 
 $$
 \boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{Z}^{\mathsf T}\mathbf{Y}
 \in\mathbb{R}^{r_\pi\times q}.
 $$
 
-Pi-PLS seeks an orthonormal response basis
-$\mathbf{C}\in\mathbb{R}^{q\times h}$ that maximizes retained squared cross-covariance:
+The response basis maximizes retained squared cross-covariance:
 
 $$
 \max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
@@ -197,13 +207,59 @@ $$
 then one optimum is
 
 $$
-\mathbf{C}=\mathbf{V}_{(:,1:h)}.
+\mathbf{C}_{\mathrm{cov}}=\mathbf{V}_{(:,1:h)}.
 $$
 
-Therefore, $\mathbf{C}$ spans the $h$ response directions most strongly coupled, in the
-cross-covariance sense, to the retained predictor representation. The basis vectors themselves
-are not unique when the relevant singular values are repeated, but the maximizing subspace is the
-meaningful object.
+Thus $\mathbf{C}_{\mathrm{cov}}$ spans the $h$ response directions most strongly coupled, in the
+cross-covariance sense, to the retained predictor representation.
+
+### Least-squares policy
+
+The optional `"least_squares"` policy is an RRR-inspired software extension and is **not part of
+the peer-reviewed companion publication**. It chooses the response subspace and reduced map jointly:
+
+$$
+(\mathbf{C}_{\mathrm{LS}},\mathbf{W}_{\mathrm{LS}})
+=
+\arg\min_{\substack{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h\\
+\mathbf{W}\in\mathbb{R}^{r_\pi\times h}}}
+\left\|\mathbf{Y}-\mathbf{Z}\mathbf{W}\mathbf{C}^{\mathsf T}\right\|_{\mathrm{F}}^2.
+$$
+
+For fixed $\mathbf{C}$, the minimizing map is
+
+$$
+\mathbf{W}=\mathbf{Z}^{+}\mathbf{Y}\mathbf{C}.
+$$
+
+With the projector $\mathbf{P}_{\mathbf{Z}}=\mathbf{Z}\mathbf{Z}^{+}$, eliminating
+$\mathbf{W}$ gives
+
+$$
+\mathbf{C}_{\mathrm{LS}}
+=
+\arg\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
+\operatorname{tr}\left[
+\mathbf{C}^{\mathsf T}\mathbf{Y}^{\mathsf T}
+\mathbf{P}_{\mathbf{Z}}\mathbf{Y}\mathbf{C}
+\right].
+$$
+
+Equivalently, the least-squares response subspace is the dominant eigenspace of
+$\mathbf{Y}^{\mathsf T}\mathbf{P}_{\mathbf{Z}}\mathbf{Y}$. It is therefore the rank-$h$
+reduced-rank-regression response subspace for regression of $\mathbf{Y}$ on the fixed retained
+predictor coordinates $\mathbf{Z}$. The implementation obtains it by exact reduced QR of
+$\mathbf{Z}$ followed by exact SVD of $\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}$; it does
+not form normal equations or introduce a separate pseudoinverse cutoff.
+
+For the same fixed $(h,r_\pi)$, the least-squares policy cannot have larger training residual norm
+than the cross-covariance policy, apart from numerical tolerance. This is a training-objective
+statement, not a claim of uniformly lower cross-validated or external prediction error.
+
+For $q=1$, both policies produce the same fitted regression map. They also agree when the complete
+response space is retained with $h=q\le r_\pi$. In general, basis vectors are not unique when the
+relevant singular or eigenvalues are repeated; the selected subspace and fitted map are the
+meaningful objects.
 
 ## Step 3: regress in the reduced latent coordinates
 
@@ -303,8 +359,9 @@ cross-coupling terms between distinct latent modes in these coordinates.
 
 Unlike standard deflation-based PLS algorithms, Pi-PLS fixes one rank-controlled predictor
 representation $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ and derives all $h$ coupled modes from that
-undeflated retained space. The full retained predictor subspace remains available during the
-cross-covariance and latent least-squares stages; in this sense, the method is panoramic.
+undeflated retained space. The full retained predictor subspace remains available during
+response-subspace selection and the latent least-squares stage; in this sense, the method is
+panoramic.
 
 ## Regression-map identities and prediction
 
@@ -378,7 +435,8 @@ used. It is a regularization and subspace-retention parameter.
 
 - If $r_\pi$ is too small, predictive directions may be irreversibly removed.
 - Once all predictive directions are retained, additional predictor directions may have little
-  effect because the response-subspace step can assign them negligible cross-covariance weight.
+  effect because response-subspace selection and the reduced regression can give them negligible
+  contribution to the fitted map.
 - This creates an important asymmetry: under-specification can destroy signal, whereas moderate
   over-specification may mainly increase computation or variance.
 
@@ -430,29 +488,35 @@ orthogonal latent-coordinate representation of the same fitted map rather than a
 
 ### Relation to reduced-rank regression
 
-Both methods produce low-rank coefficient structures. Pi-PLS differs by explicitly selecting a
-rank-controlled predictor subspace first, selecting response directions through
-$\mathbf{Z}^{\mathsf T}\mathbf{Y}$, and then rotating the latent regression into a diagonal
-one-to-one coupling.
+Both methods produce low-rank coefficient structures. Under the default cross-covariance policy,
+Pi-PLS first selects a rank-controlled predictor subspace and then chooses response directions from
+$\mathbf{Z}^{\mathsf T}\mathbf{Y}$ before rotating the latent regression into a diagonal one-to-one
+coupling. Under `"least_squares"`, the response-subspace step is exactly the rank-$h$ reduced-rank-
+regression solution for $\mathbf{Y}$ on the fixed retained coordinates $\mathbf{Z}$; Pi-PLS then
+applies the same final diagonal pairing $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$ used by the default
+construction.
 
 ### Relation to CCA
 
 CCA also constructs paired predictor and response variates with a diagonal association structure,
-but classical CCA maximizes normalized correlation after within-block whitening. Pi-PLS uses an
-unwhitened cross-covariance criterion within the retained predictor representation and then
-estimates a predictive least-squares map. The diagonal relation is structurally analogous to CCA,
-not identical to its objective.
+but classical CCA maximizes normalized correlation after within-block whitening. The peer-reviewed
+Pi-PLS policy uses an unwhitened cross-covariance criterion within the retained predictor
+representation and then estimates a predictive least-squares map. The optional software extension
+instead selects the response subspace by a least-squares/RRR criterion. In either case, the final
+diagonal relation is structurally analogous to CCA, not identical to its objective.
 
 ### Relation to PLS and PLS-SVD
 
-PLS and Pi-PLS both exploit predictor-response covariance. Classical PLS is usually constructed
-through iterative component extraction and deflation. Pi-PLS instead uses a closed sequence of
-SVD and least-squares operations.
+PLS and the default Pi-PLS response policy both exploit predictor-response covariance. Classical
+PLS is usually constructed through iterative component extraction and deflation. Pi-PLS instead
+uses a closed sequence of orthogonal factorizations and least-squares operations.
 
 PLS-SVD derives both sides directly from a cross-covariance operator. Pi-PLS first fixes the
-retained predictor subspace from the singular structure of $\mathbf{X}$, then derives response
-directions from cross-covariance with that retained subspace. Pi-PLS can therefore preserve
-predictor variation not aligned with the leading raw cross-covariance modes.
+retained predictor subspace from the singular structure of $\mathbf{X}$ and then selects the
+response subspace under the configured criterion. Under the peer-reviewed default this criterion is
+cross-covariance with the retained subspace; under the software extension it is the retained-space
+least-squares/RRR criterion. The predictor truncation can therefore preserve variation not aligned
+with the leading raw cross-covariance modes.
 
 ## Identifiability and invariance
 
@@ -501,41 +565,56 @@ predictor-response coupling. It reports that under-specification causes irrevers
 moderate over-specification often lies on a broad predictive plateau. It also discusses
 sample-size heuristics and exhaustive CV as practical selection approaches.
 
-The repository API uses the full-sample-supported, fold-feasible upper bound
+The repository API separates hard predictor-rank feasibility from optional rank policies. For
+internal CV, the hard/default upper bound is
 
 \begin{equation}
-r_{\pi,\mathrm{max}}
+r_{\pi,\mathrm{hard}}
 =
 \min\left(
  p_{\mathrm{min}},
  n_{\mathrm{train,min}}-1,
- r_{\mathrm{num,min}},
+ r_{\mathrm{num,min}}
+\right),
+\end{equation}
+
+where $p_{\mathrm{min}}$ is the minimum predictor count after fold-local pipeline preprocessing,
+$n_{\mathrm{train,min}}$ is the smallest materialized training-fold size, and
+$r_{\mathrm{num,min}}$ is the minimum predictor rank verified after terminal-estimator centering
+and optional scaling. With `max_predictor_rank=None`, automatic search uses the complete
+hard-feasible domain; an explicit integer maximum only restricts that domain further.
+
+The EPV-inspired policy is explicit rather than a general search ceiling. With
+`predictor_rank_values="epv"`, the nominal full-sample rank is
+
+\begin{equation}
+r_{\pi,\mathrm{epv}}
+=
+\min\left(
+ p,
  \left\lceil
  \frac{n}
  {\texttt{samples\_per\_predictor\_rank}}
  \right\rceil
-\right).
+\right),
 \end{equation}
 
-This bound is an API and regularization policy, not a theorem of Pi-PLS. The total supplied sample
-count $n$ defines statistical support for the final model, which is refitted on all supplied rows.
-For internal CV, $p_{\mathrm{min}}$ is the minimum predictor count after fold-local pipeline
-preprocessing,
-$n_{\mathrm{train,min}}$ is the smallest materialized training-fold size, and
-$r_{\mathrm{num,min}}$ is the minimum predictor rank verified after terminal-estimator centering
-and optional scaling. These are hard feasibility caps. Using the public sample count in the support
-term does not fit any quantity from $X$ or $Y$ outside the training folds.
+and that fixed rank is clipped only by hard feasibility and any explicit integer maximum. The
+samples-per-rank quantity does not cap ordinary automatic or exhaustive search.
 
-The fixed estimator accepts one explicit integer $r_\pi$. Rule-derived ceilings and adaptive or
-exhaustive rank search belong to `PiPLSSearchCV`, which evaluates fixed-estimator clones on the
-admissible triangular surface.
+The fixed estimator accepts one explicit integer $r_\pi$. Full-domain exhaustive search, adaptive
+candidate coverage, explicit rank sequences, and EPV belong to `PiPLSSearchCV`, which evaluates
+fixed-estimator clones on the admissible triangular surface.
 
 Adaptive search reports every evaluated rank and does not guarantee the exhaustive optimum for
 an arbitrary non-unimodal CV curve. Search approximation and linear-algebra approximation are
 separate. The implemented `svd_solver` policy permits randomized approximation only for the first
-predictor-matrix SVD; the response-subspace and coupling SVDs remain exact. Automatic solver
-selection is conservative and depends on matrix dimensions and retained-rank fraction, while
-explicit `"full"` remains the reference path.
+predictor-matrix SVD; response-side factorizations and the coupling SVD remain exact. Automatic
+solver selection is conservative and depends on matrix dimensions and retained-rank fraction, while
+explicit `"full"` remains the reference path. Response-subspace selection remains exact under
+both policies: cross-covariance uses exact SVD of $\mathbf{Z}^{\mathsf T}\mathbf{Y}$, while the
+least-squares policy uses exact reduced QR of $\mathbf{Z}$ followed by exact SVD of
+$\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}$.
 
 ## Cross-validation consequences
 
@@ -545,8 +624,8 @@ Any CV-based selection of $r_\pi$ or $h$ must obey the following theoretical sep
 2. derive predictor and response subspaces only from the training fold;
 3. predict the validation fold using that fold-trained model;
 4. reuse the same materialized split set for every candidate being compared;
-5. derive the samples-per-rank support term from total supplied $n$, then cap candidates by every
-   centered training fold's feasible dimensions;
+5. define the ordinary automatic rank domain only from fold-local hard feasibility and any
+   explicit integer user cap; apply the full-sample $n/c$ rule only when the EPV policy is requested;
 6. refit the selected fixed-parameter model once on all data supplied to `fit()`.
 
 Response-standardized MSE is used so response columns with different physical scales contribute

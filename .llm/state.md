@@ -191,14 +191,13 @@ seven-patch Decision-0154 migration is complete: release notes record the breaki
 change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
 default together with the explicit EPV policy.
 
-Decision 0155 is accepted; Steps 1--3 are complete. The least-squares-driven response-subspace
+Decision 0155 is accepted; Steps 1--4 are complete. The least-squares-driven response-subspace
 policy remains a software extension, while the peer-reviewed cross-covariance construction remains
 the default. The private core supports exactly `"cross_covariance"` and `"least_squares"`: the former
 uses exact SVD of `Z.T @ Y`, while the latter uses exact reduced QR of `Z` followed by exact SVD of
 `Q_Z.T @ Y`. The least-squares helper contains an explicit source comment that the construction is
 not part of the peer-reviewed companion publication. `svd_solver` still governs only the predictor
-decomposition; core tests cover the least-squares route with full and seeded randomized predictor
-SVD and with `p >> n`.
+decomposition.
 
 Patches 1A--1D established Decision 0155 and its publication/API boundary. Patches 2A--2D isolated
 the published response-basis calculation, added and hardened the Choice-C least-squares primitive,
@@ -209,18 +208,18 @@ public contract. Search still changes only `n_components` and `predictor_rank`; 
 continues to use `response_subspace="cross_covariance"`. No `response_subspace_` fitted provenance
 attribute is introduced.
 
-Step 4 is active. Patches 4A and 4B are complete. Patch 4A protects an independently constructed
-frozen Choice-C reference, direct reduced-rank-regression equivalence in the retained predictor
-coordinates, the least-squares training-residual optimum relative to the cross-covariance policy,
-the $q=1$ and full-response-subspace equivalence cases, and the shared orthogonality/diagonalization
-invariants under both policies. Patch 4B now protects the least-squares public estimator across all
-four predictor/response scaling combinations, fitted-estimator pickle round trips, `set_params()`
-policy changes followed by refitting, fitted-search pickle round trips and refits, and external
-`GridSearchCV` use while the response-subspace policy remains fixed configuration. Patch 4C is next
-and will synchronize the internal mathematics/testing contracts and close Step 4. The compatibility
-invariant remains that omitting the new parameter, or explicitly selecting
-`response_subspace="cross_covariance"`, must reproduce the pre-Decision-0155 fixed-estimator
-numerical path subject only to ordinary floating-point behavior.
+Patches 4A--4C now protect and record the stronger scientific and interoperability contract. Tests
+cover an independently constructed frozen Choice-C reference, direct reduced-rank-regression
+equivalence in the retained predictor coordinates, least-squares training-residual optimality, the
+$q=1$ and full-response-subspace equivalence cases, and shared orthogonality/diagonalization
+invariants. Public coverage includes every predictor/response scaling combination, fitted-estimator
+and fitted-search pickle round trips, `set_params()` refitting, external `GridSearchCV`, and fixed
+response-policy propagation. The internal mathematical and testing contracts now describe both
+implemented response-subspace policies and the corrected full-domain predictor-rank search boundary.
+Step 5 is active: user-facing theory/API documentation and a programming-user comparison example are
+next. The compatibility invariant remains that omitting the new parameter, or explicitly selecting
+`response_subspace="cross_covariance"`, reproduces the pre-Decision-0155 fixed-estimator numerical
+path subject only to ordinary floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection

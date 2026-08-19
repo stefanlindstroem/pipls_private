@@ -24,7 +24,7 @@ italic, for example $D_k$, $D_{kk}$, $P_{:k}$, $s_i$, $r_\pi$, and $\mathbf{I}_p
 | $\mathbf{Y}_{\mathrm{cs}}$ | $(n,q)$ | centered, optionally scaled responses |
 | $\mathbf{\Pi}$ | $(p,r_\pi)$ | retained predictor basis from the leading right singular vectors of $\mathbf{X}_{\mathrm{cs}}$ |
 | $\mathbf{Z}$ | $(n,r_\pi)$ | retained predictor scores, $\mathbf{Z}=\mathbf{X}_{\mathrm{cs}}\mathbf{\Pi}$ |
-| $\mathbf{C}$ | $(q,h)$ | response basis maximizing retained squared cross-covariance |
+| $\mathbf{C}$ | $(q,h)$ | orthonormal response basis selected by the configured response-subspace policy |
 | $\mathbf{W}$ | $(r_\pi,h)$ | least-squares map from $\mathbf{Z}$ to $\mathbf{Y}_{\mathrm{cs}}\mathbf{C}$ |
 | $\mathbf{M}$ | $(r_\pi,h)$ | left singular vectors of $\mathbf{W}$ |
 | $\mathbf{D}$ | $(h,h)$ | nonnegative diagonal dilation matrix |
@@ -107,7 +107,13 @@ Set
 \mathbf{Z}=\mathbf{X}_{\mathrm{cs}}\mathbf{\Pi}.
 \end{equation}
 
-The response basis solves
+The configured `response_subspace` policy selects an orthonormal response basis satisfying
+
+\begin{equation}
+\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h.
+\end{equation}
+
+For the default peer-reviewed policy, `"cross_covariance"`, the response basis solves
 
 \begin{equation}
 \max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
@@ -117,11 +123,38 @@ The response basis solves
 \end{equation}
 
 One optimum is formed by the leading $h$ right singular vectors of
-$\mathbf{Z}^{\mathsf T}\mathbf{Y}_{\mathrm{cs}}$. Thus
+$\mathbf{Z}^{\mathsf T}\mathbf{Y}_{\mathrm{cs}}$.
+
+For the software-only `"least_squares"` policy, which is not part of the peer-reviewed companion
+publication, choose $\mathbf{C}$ and $\mathbf{W}$ jointly by
 
 \begin{equation}
-\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h.
+(\mathbf{C}_{\mathrm{LS}},\mathbf{W}_{\mathrm{LS}})
+=
+\arg\min_{\substack{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h\\
+\mathbf{W}\in\mathbb{R}^{r_\pi\times h}}}
+\left\|
+\mathbf{Y}_{\mathrm{cs}}-\mathbf{Z}\mathbf{W}\mathbf{C}^{\mathsf T}
+\right\|_{\mathrm{F}}^2.
 \end{equation}
+
+With $\mathbf{P}_{\mathbf{Z}}=\mathbf{Z}\mathbf{Z}^{+}$, eliminating $\mathbf{W}$ gives
+
+\begin{equation}
+\mathbf{C}_{\mathrm{LS}}
+=
+\arg\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
+\operatorname{tr}\left[
+\mathbf{C}^{\mathsf T}\mathbf{Y}_{\mathrm{cs}}^{\mathsf T}
+\mathbf{P}_{\mathbf{Z}}\mathbf{Y}_{\mathrm{cs}}\mathbf{C}
+\right].
+\end{equation}
+
+This is the rank-$h$ reduced-rank-regression response subspace for regression of
+$\mathbf{Y}_{\mathrm{cs}}$ on the retained predictor coordinates $\mathbf{Z}$. For fixed
+$(h,r_\pi)$, its training residual cannot exceed that of the cross-covariance policy, apart from
+numerical tolerance. The two policies have the same fitted regression map when $q=1$ and when the
+complete response space is retained with $h=q\le r_\pi$.
 
 Solve
 
@@ -201,19 +234,41 @@ regression maps, or predictions rather than raw basis columns.
 ## Path-selection boundary
 
 For path selection, let $r_{\mathrm{num,min}}$ be the minimum predictor rank verified after
-fold-local pipeline preprocessing and terminal-estimator centering/scaling. The default path ceiling
-is
+fold-local pipeline preprocessing and terminal-estimator centering/scaling. The hard/default path
+ceiling is
 
 \begin{equation}
-r_{\pi,\mathrm{max}}
+r_{\pi,\mathrm{hard}}
 =
 \min\left[
  p_{\mathrm{min}},
  n_{\mathrm{train,min}}-1,
- r_{\mathrm{num,min}},
- \left\lceil\frac{n}{c}\right\rceil
+ r_{\mathrm{num,min}}
 \right].
 \end{equation}
 
-This path policy is a package contract around the fixed model. It is not part of the mathematical
-definition above and is not changed by companion-manuscript theory alignment.
+With `max_predictor_rank=None`, automatic search uses this complete hard-feasible domain. For an
+explicit integer $r_{\mathrm{user}}$, the effective search ceiling is
+
+\begin{equation}
+r_{\pi,\mathrm{max}}
+=
+\min\left[r_{\pi,\mathrm{hard}},r_{\mathrm{user}}\right].
+\end{equation}
+
+Otherwise $r_{\pi,\mathrm{max}}=r_{\pi,\mathrm{hard}}$.
+
+The EPV-inspired policy is separate. For `predictor_rank_values="epv"`, its nominal full-sample
+rank is
+
+\begin{equation}
+r_{\pi,\mathrm{epv}}
+=
+\min\left[p,\left\lceil\frac{n}{c}\right\rceil\right],
+\end{equation}
+
+and the evaluated fixed rank is clipped only by $r_{\pi,\mathrm{max}}$. The samples-per-rank
+quantity $c$ does not restrict ordinary automatic or exhaustive search.
+
+These search policies are package contracts around the fixed model rather than part of the
+mathematical definition above.

@@ -37,7 +37,16 @@ Protect:
 - transactional fitted state after failed fits;
 - copy, read-only, and overlapping-input safety;
 - PLS-style methods, feature names, output containers, cloning, pipelines, and pickling;
-- public warning types and their suppression boundary.
+- public warning types and their suppression boundary;
+- response-subspace default compatibility and exact two-value validation;
+- independent least-squares/Choice-C numerical reference behavior and reduced-rank-regression
+  equivalence in the retained predictor coordinates;
+- least-squares training-residual optimality for fixed $(h,r_\pi)$, together with the $q=1$ and
+  full-response-subspace equivalence cases;
+- shared orthogonality, ordered dilation, and regression-map factorization invariants under both
+  response-subspace policies;
+- least-squares behavior under all supported predictor/response scaling combinations, estimator
+  pickling, `set_params()` refitting, and external scikit-learn parameter search.
 
 ### Search, selection, and OOF reporting
 
@@ -53,7 +62,10 @@ Protect:
 - ordered OOF predictions, repeated-prediction averaging, counts, partial coverage, and pooled
   metrics;
 - protocol-neutral scorer safety for realized validation-set sizes;
-- absence of candidate rescoring, retained input data, or implicit final fitting in OOF reporting.
+- absence of candidate rescoring, retained input data, or implicit final fitting in OOF reporting;
+- preservation of fixed estimator `response_subspace` configuration through candidate fitting,
+  pipelines, OOF reporting, search pickling, and final refitting without adding a third search
+  dimension.
 
 ### Public results and inspection
 

@@ -150,20 +150,24 @@ evaluation, explicit refit, selection-conditioned OOF reporting, and pipeline te
 `predictor_rank`. The ordinary `PiPLSSearchCV()` template still refits with
 `response_subspace="cross_covariance"`.
 
-Step 4 is active with three reviewable patches:
+Step 4 is complete with three reviewable patches:
 
 - 4A: add independent mathematical reference coverage, RRR equivalence, least-squares training
   optimality, limiting-case identities, and shared core invariants -- complete;
 - 4B: harden public scaling, serialization, configuration changes, and scikit-learn interoperability
   for the least-squares policy -- complete;
-- 4C: synchronize internal mathematics/testing contracts and close Step 4 -- next.
+- 4C: synchronize internal mathematics/testing contracts and close Step 4 -- complete.
 
 Patch 4A uses an independent Choice-C Gram/eigen calculation only in regression-test code; the
 runtime continues to use the numerically preferred exact QR/SVD construction from Step 2. Patch 4B
 adds public regression coverage for all scaling combinations, estimator/search serialization,
 `set_params()` refitting, and external `GridSearchCV` while leaving runtime behavior unchanged.
-Patch 4C will synchronize internal scientific/testing contracts before theory/API documentation and
-the programming-user comparison example land in Step 5.
+Patch 4C records both response-subspace objectives, their shared downstream factorization, the RRR
+and limiting-case identities, durable regression coverage, and the Decision-0154 full-domain rank
+boundary in the authoritative internal contracts.
+
+Step 5 is active. It will update user-facing theory and API documentation and add the explicit
+programming-user comparison example while preserving the peer-reviewed/software-extension boundary.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

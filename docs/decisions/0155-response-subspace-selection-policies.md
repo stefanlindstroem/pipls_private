@@ -267,7 +267,10 @@ between exactly the two accepted private policies, and protects both the randomi
 `p >> n` numerical regimes. Step 3 is complete in patches 3A--3C: `PiPLSRegression` now exposes
 `response_subspace` with `"cross_covariance"` as the default, search/OOF/refit/pipeline paths preserve
 the configured policy without searching it, and the implemented public contract is synchronized.
-Step 4 is the next implementation increment.
+Step 4 is complete in patches 4A--4C: the repository now protects an independent Choice-C
+reference, direct RRR equivalence, least-squares training optimality, limiting-case identities,
+shared factorization invariants, scaling/serialization/interoperability behavior, and synchronized
+internal mathematics/testing contracts. Step 5 is the next implementation increment.
 
 ## Consequences
 
