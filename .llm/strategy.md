@@ -140,9 +140,15 @@ Step 3 is active with three patches:
 
 - 3A (complete): expose and validate `response_subspace` on `PiPLSRegression`, preserve
   `"cross_covariance"` as the default, and forward the setting to the private core;
-- 3B (next): certify direct-search, pipeline, OOF, and refit propagation without adding a third search
-  dimension;
-- 3C: synchronize the implemented public contract and close Step 3.
+- 3B (complete): certify direct-search, pipeline, OOF, and refit propagation without adding a third
+  search dimension;
+- 3C (next): synchronize the implemented public contract and close Step 3.
+
+Patch 3B confirms the existing estimator-template boundary without requiring search-runtime
+changes. Direct candidate evaluation, explicit refit, selection-conditioned OOF reporting, and
+pipeline templates all retain `response_subspace="least_squares"` while search continues to
+overwrite only `n_components` and `predictor_rank`. The ordinary `PiPLSSearchCV()` template still
+refits with `response_subspace="cross_covariance"`.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

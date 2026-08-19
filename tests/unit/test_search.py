@@ -843,6 +843,155 @@ def test_minimum_cv_mse_selection_supports_one_validation_split() -> None:
     assert selected.n_components == 1
     assert selected.cv_mse_std == 0.0
 
+
+def test_least_squares_template_propagates_through_search_and_refit() -> None:
+    X, Y = _data(18)
+    splits = [
+        (np.arange(0, 12), np.arange(12, 18)),
+        (np.arange(6, 18), np.arange(0, 6)),
+    ]
+    template = PiPLSRegression(
+        n_components=2,
+        predictor_rank=3,
+        response_subspace="least_squares",
+    )
+    search = PiPLSSearchCV(
+        estimator=template,
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=splits,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    for split_index, (train, validation) in enumerate(splits):
+        manual = clone(template).set_params(
+            n_components=1,
+            predictor_rank=2,
+        ).fit(X[train], Y[train])
+        prediction = manual.predict(X[validation])
+        response_scale = np.std(Y[train], axis=0, ddof=1)
+        expected_mse = np.mean(
+            ((Y[validation] - prediction) / response_scale[None, :]) ** 2
+        )
+        assert search.cv_results_[
+            f"split{split_index}_response_standardized_mse"
+        ][0] == pytest.approx(expected_mse)
+
+    selection = search.select(n_components=1)
+    model = search.refit(X, Y, selection=selection)
+    independent = clone(template).set_params(
+        n_components=selection.n_components,
+        predictor_rank=selection.predictor_rank,
+    ).fit(X, Y)
+
+    assert template.response_subspace == "least_squares"
+    assert template.n_components == 2
+    assert template.predictor_rank == 3
+    assert not hasattr(template, "coef_")
+    assert isinstance(model, PiPLSRegression)
+    assert model.response_subspace == "least_squares"
+    assert clone(model).response_subspace == "least_squares"
+    np.testing.assert_allclose(model.coef_, independent.coef_)
+    np.testing.assert_allclose(model.intercept_, independent.intercept_)
+    np.testing.assert_allclose(model.predict(X), independent.predict(X))
+
+
+def test_least_squares_template_propagates_through_oof_reporting() -> None:
+    X, Y = _data(18)
+    splits = [
+        (np.arange(0, 12), np.arange(12, 18)),
+        (np.arange(6, 18), np.arange(0, 6)),
+    ]
+    template = PiPLSRegression(
+        n_components=1,
+        predictor_rank=2,
+        response_subspace="least_squares",
+    )
+    search = PiPLSSearchCV(
+        estimator=template,
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=splits,
+        n_jobs=1,
+    ).fit(X, Y)
+    selection = search.select(n_components=1)
+    report = search.oof_report(X, Y, selection=selection)
+
+    expected_sum = np.zeros_like(Y, dtype=np.float64)
+    expected_counts = np.zeros(X.shape[0], dtype=np.intp)
+    for train, validation in splits:
+        manual = clone(template).fit(X[train], Y[train])
+        expected_sum[validation] += manual.predict(X[validation])
+        expected_counts[validation] += 1
+    expected = np.full_like(Y, np.nan, dtype=np.float64)
+    covered = expected_counts > 0
+    expected[covered] = expected_sum[covered] / expected_counts[covered, None]
+
+    np.testing.assert_array_equal(report.oof_prediction_counts, expected_counts)
+    np.testing.assert_allclose(report.oof_predictions, expected, equal_nan=True)
+    assert template.response_subspace == "least_squares"
+    assert not hasattr(template, "coef_")
+
+
+def test_least_squares_pipeline_template_propagates_through_search_and_refit() -> None:
+    X, Y = _data(18)
+    splits = [
+        (np.arange(0, 12), np.arange(12, 18)),
+        (np.arange(6, 18), np.arange(0, 6)),
+    ]
+    pipeline = Pipeline(
+        [
+            ("scale", StandardScaler()),
+            (
+                "regression",
+                PiPLSRegression(
+                    n_components=2,
+                    predictor_rank=3,
+                    response_subspace="least_squares",
+                    scale=False,
+                ),
+            ),
+        ]
+    )
+    search = PiPLSSearchCV(
+        estimator=pipeline,
+        n_components_values=[1],
+        predictor_rank_values=[2],
+        max_predictor_rank=2,
+        cv=splits,
+        n_jobs=1,
+    ).fit(X, Y)
+
+    manual = clone(pipeline).set_params(
+        regression__n_components=1,
+        regression__predictor_rank=2,
+    ).fit(X[:12], Y[:12])
+    prediction = manual.predict(X[12:18])
+    response_scale = np.std(Y[:12], axis=0, ddof=1)
+    expected_mse = np.mean(
+        ((Y[12:18] - prediction) / response_scale[None, :]) ** 2
+    )
+    assert search.cv_results_[
+        "split0_response_standardized_mse"
+    ][0] == pytest.approx(expected_mse)
+
+    selection = search.select(n_components=1)
+    model = search.refit(X, Y, selection=selection)
+    independent = clone(pipeline).set_params(
+        regression__n_components=selection.n_components,
+        regression__predictor_rank=selection.predictor_rank,
+    ).fit(X, Y)
+
+    assert isinstance(model, Pipeline)
+    assert model is not pipeline
+    assert pipeline.named_steps["regression"].response_subspace == "least_squares"
+    assert not hasattr(pipeline.named_steps["regression"], "coef_")
+    assert model.named_steps["regression"].response_subspace == "least_squares"
+    np.testing.assert_allclose(model.predict(X), independent.predict(X))
+
+
 def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
@@ -855,6 +1004,7 @@ def test_post_fit_refit_returns_fitted_direct_model_for_best_score() -> None:
     model = search.refit(X, Y, rule="best_score")
 
     assert isinstance(model, PiPLSRegression)
+    assert model.response_subspace == "cross_covariance"
     assert model.n_components == model.selection_.n_components
     assert model.predictor_rank == model.selection_.predictor_rank
     assert hasattr(model, "coef_")

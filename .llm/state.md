@@ -191,7 +191,7 @@ seven-patch Decision-0154 migration is complete: release notes record the breaki
 change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
 default together with the explicit EPV policy.
 
-Decision 0155 is accepted and Steps 1 and 2 of its staged migration are complete. The
+Decision 0155 is accepted; Steps 1 and 2 and Patches 3A--3B of Step 3 are complete. The
 least-squares-driven response-subspace policy remains a software extension, while the peer-reviewed
 cross-covariance construction remains the default. The private core now supports exactly
 `"cross_covariance"` and `"least_squares"`: the former uses exact SVD of `Z.T @ Y`, while the latter
@@ -209,11 +209,14 @@ pseudoinverse. Patch 3A now exposes `response_subspace` on `PiPLSRegression` wit
 and forwards the setting to the private core. The estimator docstring identifies the least-squares
 construction as a software extension outside the peer-reviewed companion publication. Fixed-fit
 tests protect cloning, constructor parameters, public fit/transform/predict surfaces, invalid-value
-cleanup, and exact numerical identity between omitted and explicit cross-covariance settings.
+cleanup, and exact numerical identity between omitted and explicit cross-covariance settings. Patch
+3B confirms that direct candidate evaluation, explicit refit, selection-conditioned OOF reporting,
+and pipeline templates preserve `response_subspace="least_squares"` while search continues to
+overwrite only `n_components` and `predictor_rank`. The ordinary search template still refits with
+`response_subspace="cross_covariance"`.
 
-Step 3 remains active. Patch 3B must certify that direct search, pipelines, OOF candidate fitting, and
-refitting preserve the fixed-estimator setting without turning it into a third search dimension;
-Patch 3C will then synchronize the implemented public contract. The compatibility invariant remains
+Step 3 remains active. Patch 3C will synchronize the implemented public contract and close the step.
+The compatibility invariant remains
 that omitting the new parameter, or explicitly selecting `response_subspace="cross_covariance"`,
 must reproduce the pre-Decision-0155 fixed-estimator numerical path subject only to ordinary
 floating-point behavior.
