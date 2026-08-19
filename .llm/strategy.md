@@ -181,8 +181,19 @@ where their fitted maps coincide. Patch 5B propagates the implemented policy thr
 fixed-regression and path-selection references, reproducibility and manuscript-alignment guidance,
 computational-performance trade-offs, troubleshooting, and top-level discoverability. Patch 5C
 adds the maintained matched-split Pulp comparison and labels its output as model-development CV
-evidence rather than independent validation. Step 6 is now active for the final stale-contract,
-release-note, installed-artifact, documentation, and distribution audit.
+evidence rather than independent validation.
+
+Step 6 is split into three reviewable patches:
+
+- 6A: add release notes and reconcile stale active-contract/example-inventory wording -- complete;
+- 6B: qualify both response-subspace policies in clean installed artifacts and execute Example 07
+  from the source distribution -- next;
+- 6C: perform the final repository audit and close Decision 0155 -- pending.
+
+Patch 6A records the implemented feature under `Unreleased`, updates the current decision registry,
+and synchronizes the maintained example inventory after Example 07. Historical records that were
+correct when written remain historical rather than being rewritten. No runtime behavior changes in
+6A.
 
 The numerical compatibility invariant for Steps 2--6 is that the existing path and an explicit
 `response_subspace="cross_covariance"` path reproduce the pre-Decision-0155 fixed-estimator

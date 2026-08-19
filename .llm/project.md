@@ -49,7 +49,9 @@ The maintained numbered examples are:
 3. Pi-PLS versus ordinary-PLS component-path comparison;
 4. repeated-CV Pulp analysis;
 5. Sugarcane analysis;
-6. Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
+6. Tobacco analysis with separate 10% predictor-rank and component-count tolerances;
+7. matched-split Pulp comparison of the peer-reviewed cross-covariance and optional least-squares
+   response-subspace policies, without final refitting.
 
 `make examples` owns complete application validation. The default test suite does not duplicate the
 full real-data workflows.

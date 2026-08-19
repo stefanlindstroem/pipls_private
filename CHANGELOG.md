@@ -15,6 +15,16 @@
   explicitly where exhaustive coverage would be unnecessarily expensive.
 - Strengthen clean wheel and source-distribution smoke testing to verify the installed exhaustive
   full-domain default and explicit EPV predictor-rank policy in addition to fitting and refitting.
+- Add `PiPLSRegression(response_subspace=...)` with `"cross_covariance"` as the unchanged
+  peer-reviewed default and `"least_squares"` as an RRR-inspired software extension that is not
+  part of the peer-reviewed companion publication.
+- Preserve fixed response-subspace configuration through `PiPLSSearchCV`, pipelines, OOF work,
+  refitting, serialization, and scikit-learn model-selection workflows without adding a third
+  Pi-PLS search dimension. Add independent Choice-C/RRR regression coverage and limiting-case
+  checks for the least-squares policy.
+- Document both response-subspace criteria, their reproducibility and manuscript-alignment
+  boundary, and computational trade-offs. Add a matched-split Pulp programming example that
+  compares model-development CV evidence without claiming general superiority.
 
 ## 0.1.0 - 2026-08-09
 

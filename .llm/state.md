@@ -115,10 +115,13 @@ The maintained numbered examples are user tasks:
 3. Pi-PLS versus ordinary-PLS component-path comparison;
 4. complete repeated-CV Pulp analysis;
 5. complete Sugarcane analysis;
-6. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
+6. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances;
+7. matched-split Pulp comparison of the peer-reviewed cross-covariance and optional least-squares
+   response-subspace policies, without final refitting.
 
-Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 05 and 06 use
-`KFold(n_splits=5, shuffle=True, random_state=0)`. Complete real-data examples are exercised by
+Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 05, 06, and 07
+use `KFold(n_splits=5, shuffle=True, random_state=0)`; Example 07 materializes those folds once and
+reuses them for both response-subspace policies. Complete real-data examples are exercised by
 `make examples`, not duplicated in the default test suite.
 
 ## Inspection and rendering boundary
@@ -191,7 +194,7 @@ seven-patch Decision-0154 migration is complete: release notes record the breaki
 change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
 default together with the explicit EPV policy.
 
-Decision 0155 is accepted; Steps 1--4 are complete. The least-squares-driven response-subspace
+Decision 0155 is accepted; Steps 1--5 are complete. The least-squares-driven response-subspace
 policy remains a software extension, while the peer-reviewed cross-covariance construction remains
 the default. The private core supports exactly `"cross_covariance"` and `"least_squares"`: the former
 uses exact SVD of `Z.T @ Y`, while the latter uses exact reduced QR of `Z` followed by exact SVD of
@@ -237,8 +240,8 @@ promise; compatible user-supplied splitters remain ordinary interoperability.
 
 Tests now protect behavior and machine-readable outputs rather than repository prose or source
 arrangement. Distribution and documentation validation share private maintenance helpers, and the
-Pulp example and tutorial renderer use caller-local plotting functions. This documentation increment
-adds no further runtime behavior beyond the Decision-0154 search contract already implemented.
+Pulp example and tutorial renderer use caller-local plotting functions. Patch 6A adds release notes
+and reconciles active maintainer/example inventory wording only; it introduces no runtime behavior.
 
 ## Authority and drift handling
 
