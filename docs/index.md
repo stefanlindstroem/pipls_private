@@ -1,6 +1,6 @@
 # Π-PLS documentation
 
-`pipls` is a Python package for Π-PLS, a PLS-family method for multivariate linear regression.
+`pipls` is a Python package for the multivariate linear regression model Π-PLS.
 For routine modeling, Π-PLS can be used much like ordinary PLS: choose a component count, fit
 and predict, inspect latent scores and loadings, examine regression coefficients, and assess
 observed-versus-predicted values and residuals. The package exposes those familiar PLS-family
@@ -11,28 +11,23 @@ factorization.
 
 In the problems examined in the [companion paper](citation.md#companion-paper), Π-PLS is
 reported to be comparably robust to ordinary PLS while matching or improving its predictive
-performance; in some settings, the predictive improvement is substantial. These are empirical
-results for the studied problems rather than a guarantee that one method will be better for every
-dataset.
+performance; the predictive improvement is substantial in some settings. These are empirical
+results which may not hold for every dataset.
 
-**Fewer shared components can be sufficient.** On both Pulp and Tobacco datasets, Π-PLS reaches a low
-cross-validated prediction-error region with fewer shared components than ordinary PLS.
+**Fewer shared components can be sufficient.** For many datasets, including the Pulp and Tobacco datasets available through this package, Π-PLS reaches a low
+cross-validated prediction-error region with fewer shared components than ordinary PLS, as seen in the following figure:
 
 <div class="grid" markdown>
-
 ![Pulp component-path comparison between Π-PLS and ordinary PLS](assets/generated/home/pulp_component_parsimony.svg)
 
 ![Tobacco component-path comparison between Π-PLS and ordinary PLS](assets/generated/home/tobacco_component_parsimony.svg)
-
 </div>
 
-Both panels use the same seeded five-fold validation splits for Π-PLS and ordinary PLS, and the
-error bars show the split-to-split standard deviation. 
+Both panels use the same seeded five-fold validation splits for Π-PLS and ordinary PLS, and the error bars show the split-to-split standard deviation. 
 
-The method differs from ordinary PLS in how it constructs the latent regression map. Π-PLS
+**Π-PLS gives a one-to-one relation between predictor and response directions.** The Π-PLS method differs from ordinary PLS in how it constructs the latent regression map. Π-PLS
 represents that map through paired latent modes. Each retained mode contains one orthonormal
-predictor direction, one orthonormal response direction, and one nonnegative dilation. This
-structure adds method-specific interpretation without replacing the standard PLS-family analysis
+predictor direction, one orthonormal response direction, and one nonnegative dilation. This structure adds method-specific interpretation without replacing the standard PLS-family analysis
 workflow.
 
 ## Leakage-safe modeling and validation
@@ -58,7 +53,7 @@ assessment.
 
 ## Quick start with Pulp dataset
 
-The installed package contains the multivariate Pulp dataset:
+The installed package contains the multivariate Pulp dataset, for which a Π-PLS multivariate regeression model is cretad in one line of code:
 
 ```python
 from pipls import PiPLSSearchCV
@@ -69,11 +64,8 @@ model = PiPLSSearchCV().fit(X, Y).refit(X, Y, rule="minimum_cv_mse")
 Y_fitted = model.predict(X)
 ```
 
-The first numbered example standardizes the eight response variables and combines all observed and
-fitted values in one plot. This is a compact calibration-fit demonstration: `Y_fitted` comes from
-the same observations used to fit the final model. Use a
-[`oof_report()`](api/path.md#out-of-fold-report) for
-selection-conditioned out-of-fold validation when the fitted search is retained.
+This is a compact calibration-fit demonstration: `Y_fitted` comes from
+the same observations used to fit the final model. Study the complete [quick start tutorial](tutorials/quick_start.md) with prediction diagnostics.
 
 ## Choose a tutorial
 
@@ -83,8 +75,8 @@ path, choose a paired-mode count and create one selection, inspect the selected 
 predictor rank, refit that exact row, and predict an independent test set.
 
 Continue with [Pulp: a complete Π-PLS workflow](tutorials/pulp.md) for real-data loading,
-selection-conditioned OOF inspection before final refitting, immutable inspection results, and
-representative interpretation of standard PLS-family and Π-PLS-specific plots.
+selection-conditioned out-of-fold (OOF) inspection before final refitting, immutable inspection results, and
+representative interpretation of standard PLS-family plots and Π-PLS-specific plots.
 
 ## Programming reference
 

@@ -40,9 +40,8 @@ tolerance of the minimum mean CV-MSE and fits that fixed model on all observatio
 --8<-- "examples/01_pulp_quick_start.py:fit-selected-pulp-model"
 ```
 
-The returned object is an ordinary fitted `PiPLSRegression`. It owns prediction and fitted-model
-inspection; the temporary search object is discarded because this workflow does not inspect the
-selection evidence.
+The returned object is a fitted `PiPLSRegression`. It owns prediction and fitted-model
+inspection.
 
 ## Plot all responses on one scale
 
