@@ -2,7 +2,9 @@
 
 Use `PiPLSSearchCV` to evaluate admissible `(n_components, predictor_rank)` pairs by cross-validation.
 `n_components` counts paired latent modes $h$; `predictor_rank` is the retained predictor-subspace
-dimension $r_\pi$. The [synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence)
+dimension $r_\pi$; their distinct roles are summarized under
+[Interpretation of the two rank controls](../theory.md#interpretation-of-the-ranks). The
+[synthetic tutorial](../tutorials/synthetic.md#retrieve-selection-evidence)
 shows the ordinary manual workflow: inspect the search evidence, create one immutable selection,
 and pass that exact selection to final refitting.
 
@@ -107,14 +109,16 @@ The pair `(1, 1)` is only a valid construction seed. The search replaces `n_comp
 `predictor_rank` for fold-rank preflight and candidate fitting; cloning preserves other template
 settings such as `response_subspace`, `scale`, `scale_x`, `scale_y`, `copy`, `svd_solver`, and
 `random_state`. `response_subspace` is therefore fixed estimator configuration, not a third search
-dimension. To compare `"cross_covariance"` and `"least_squares"`, run two searches with otherwise
-matched configuration and, where possible, the same materialized validation splits.
-See [Example 03](../examples.md#compare-response-subspace-policies) for an executable
-matched-split comparison.
+dimension. See [Response-subspace selection](../theory.md#response-subspace-selection) for the two
+mathematical criteria. To compare `"cross_covariance"` and `"least_squares"`, run two searches with
+otherwise matched configuration and, where possible, the same materialized validation splits. See
+[Example 03](../examples.md#compare-response-subspace-policies) for an executable matched-split
+comparison.
 
 The example above deliberately shows the `"least_squares"` software extension. The package default
-remains `"cross_covariance"`, which is the response-subspace construction in the peer-reviewed
-companion publication. With `estimator=None`, the search creates the seed pair using those ordinary
+remains `"cross_covariance"`, which is the response-subspace construction in the
+[peer-reviewed companion publication](../citation.md#companion-paper). With `estimator=None`, the
+search creates the seed pair using those ordinary
 `PiPLSRegression` defaults. A pipeline is configured in the same way through its terminal
 `PiPLSRegression` step; see
 [Pipelines and fold-local preprocessing](../path_analysis.md#pipelines-and-fold-local-preprocessing).

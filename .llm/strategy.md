@@ -136,10 +136,12 @@ Decision 0159 is accepted and active. Patch 0159A records a semantic cross-refer
 and stabilizes canonical anchors for reference datasets, the companion publication, and high-value
 theory concepts. Patch 0159B implements the reference-dataset pass across the served documentation:
 dataset-name links lead to the Pulp, Sugarcane, or Tobacco detail section while tutorial, workflow,
-loader, heading, code, figure-alt, and immediate-repeat semantics are preserved. 0159C will link
-publication and concept-specific theory references, and 0159D will audit remaining navigation, add
-regression protection, run strict documentation qualification, and close the decision. Do not turn
-this into a mechanical every-occurrence link rule.
+loader, heading, code, figure-alt, and immediate-repeat semantics are preserved. Patch 0159C links
+substantive companion-publication references to the canonical citation section and routes rank,
+response-subspace, predictor-projection, paired-mode, and factorization terminology to specific
+theory anchors. 0159D will audit remaining navigation, add regression protection, run strict
+documentation qualification, and close the decision. Do not turn this into a mechanical
+every-occurrence link rule.
 
 ## Deferred work
 

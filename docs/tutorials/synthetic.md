@@ -10,7 +10,8 @@ For ordinary programming use, Π-PLS behaves like a one-parameter component sear
 the main complexity parameter is `n_components`, denoted by $h$. A **component path** is the
 sequence of cross-validated prediction errors obtained as $h$ is varied. The search resolves the
 predictor rank $r_\pi$ internally for each $h$, so the component path remains a one-dimensional
-curve against component count.
+curve against component count. The distinction between the two controls is summarized under
+[Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 The workflow is to generate independent training and test data, fit the search, inspect the
 component path, choose a component count and create one selection, optionally inspect the

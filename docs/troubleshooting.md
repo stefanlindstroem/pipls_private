@@ -7,7 +7,9 @@ without relying on private implementation details.
 
 Usually not. For ordinary use, treat `n_components` as the model-complexity parameter, as you would
 in PLS. `PiPLSSearchCV` evaluates the component path and resolves one predictor rank conditionally
-for every evaluated component count.
+for every evaluated component count. See
+[Interpretation of the two rank controls](theory.md#interpretation-of-the-ranks) for why $h$ and
+$r_\pi$ play different roles.
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
@@ -52,8 +54,9 @@ Supply a `PiPLSRegression` template with `response_subspace="least_squares"`, as
 example. The search does not compare response-subspace policies automatically. If the scientific
 question is whether `"least_squares"` or `"cross_covariance"` predicts better for a dataset, run two
 searches with otherwise matched configuration and the same materialized validation splits. The
-least-squares route is a software extension outside the peer-reviewed companion publication; use
-`"cross_covariance"` for manuscript-aligned fitting.
+least-squares route is a software extension outside the
+[peer-reviewed companion publication](citation.md#companion-paper); use `"cross_covariance"` for
+manuscript-aligned fitting.
 
 See [Response-subspace selection](theory.md#response-subspace-selection) for the mathematical
 difference and [Computational performance](computational_performance.md#treat-response-subspace-policy-as-a-model-choice)

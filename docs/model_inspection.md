@@ -23,6 +23,7 @@ A fitted `PiPLSRegression` stores the centered and scaled regression map as
 \mathbf{B}_{\mathrm{cs}}=\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}.
 \end{equation}
 
+This is the method's [diagonal latent coupling](theory.md#diagonal-latent-coupling).
 `pipls_display_factors()` returns defensive read-only copies and applies one deterministic display
 sign per paired latent mode. The same sign is applied to the paired columns of $\mathbf{P}$
 and $\mathbf{Q}$, so the regression map is unchanged. By default, the first largest-magnitude

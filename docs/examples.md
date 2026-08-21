@@ -25,8 +25,9 @@ The comparison in example 03 is optional and is not part of routine Π-PLS fitti
 comparison case it materializes one shuffled five-fold protocol and reuses those exact splits for
 separate `"cross_covariance"` and `"least_squares"` Π-PLS searches plus the ordinary-PLS path.
 `response_subspace` remains fixed estimator configuration rather than a third search dimension.
-The cross-covariance policy is the peer-reviewed package default; least squares is the RRR-inspired
-software extension and is not part of the peer-reviewed companion publication. The resulting
+The cross-covariance policy is the package default from the
+[peer-reviewed companion publication](citation.md#companion-paper); least squares is the
+RRR-inspired software extension and is not part of that publication. The resulting
 CV-MSE paths are model-development evidence, not independent post-selection validation.
 
 Examples 01, 02, and the [Pulp](datasets.md#pulp-real-data-integration) branch of example 03 use

@@ -74,9 +74,10 @@ license, package-resource and canonical-array hashes, evaluated ranks, boundary 
 subsets. The Home comparison manifest records the
 [Pulp](datasets.md#pulp-real-data-integration) and
 [Tobacco](datasets.md#tobacco-spectral-integration) dataset identities and versions,
-the publication-default cross-covariance response-subspace policy, the seeded five-fold validation
-protocol, case-specific predictor-rank search settings, component and predictor-rank paths, both
-CV-MSE summaries, and the two SVG hashes. Every generated SVG contains one chart. Generated
+the
+[publication-default cross-covariance response-subspace policy](theory.md#response-subspace-selection),
+the seeded five-fold validation protocol, case-specific predictor-rank search settings, component
+and predictor-rank paths, both CV-MSE summaries, and the two SVG hashes. Every generated SVG contains one chart. Generated
 directories are ignored by Git and removed by `make clean`.
 
 The preview is served at `http://127.0.0.1:8000/` and updates as documentation files change. Stop it
@@ -112,8 +113,9 @@ centering and any enabled estimator or pipeline scaling are learned again from t
 Learned scaling must not be fitted globally before CV.
 
 Record `response_subspace` as part of every model-fitting protocol. The package default
-`"cross_covariance"` is the response-subspace construction used in the peer-reviewed companion
-publication; `"least_squares"` is a software extension outside that publication. `PiPLSSearchCV`
+[`"cross_covariance"` response-subspace construction](theory.md#response-subspace-selection) is the
+construction used in the [peer-reviewed companion publication](citation.md#companion-paper);
+`"least_squares"` is a software extension outside that publication. `PiPLSSearchCV`
 clones this setting unchanged and does not search over it automatically. When comparing the two
 policies, materialize one validation protocol and reuse the same split indices for both searches so
 that differences are not confounded with resampling variation. Record the policy together with

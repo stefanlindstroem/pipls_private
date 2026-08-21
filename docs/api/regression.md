@@ -2,9 +2,10 @@
 
 Use `PiPLSRegression` when `n_components` and `predictor_rank` are already fixed. Here
 `n_components` is the number of paired latent modes $h$, while `predictor_rank` is the retained
-predictor-subspace dimension $r_\pi$. Both are required keyword-only constructor arguments because
-the estimator fits exactly one explicit pair and does not perform cross-validation or parameter
-selection.
+predictor-subspace dimension $r_\pi$. Their distinct roles are summarized under
+[Interpretation of the two rank controls](../theory.md#interpretation-of-the-ranks). Both are
+required keyword-only constructor arguments because the estimator fits exactly one explicit pair
+and does not perform cross-validation or parameter selection.
 
 ```python
 from pipls import PiPLSRegression
@@ -51,10 +52,11 @@ selected before the shared least-squares coupling and final diagonalization. Exa
 supported:
 
 - `"cross_covariance"` maximizes retained predictor-response cross-covariance. This is the
-  peer-reviewed Π-PLS construction and the package default.
+  construction in the [peer-reviewed companion publication](../citation.md#companion-paper) and the
+  package default.
 - `"least_squares"` chooses the response subspace that minimizes the rank-$h$ training
-  least-squares residual after the predictor subspace has been fixed. It is an
-  RRR-inspired software extension and is **not part of the peer-reviewed companion publication**.
+  least-squares residual after the predictor subspace has been fixed. It is an RRR-inspired
+  software extension and is **not part of that publication**.
 
 For a fixed pair $(h,r_\pi)$, request the software extension directly:
 
@@ -67,9 +69,10 @@ model = PiPLSRegression(
 ```
 
 Both policies use the same downstream least-squares estimate of the reduced coupling, followed by
-the same diagonalization into predictor directions $\mathbf{P}$, dilation $\mathbf{D}$, and response
-directions $\mathbf{Q}$. Thus `response_subspace` selects the intermediate basis $\mathbf{C}$; the
-public fitted response directions remain $\mathbf{Q}$. See
+the same [diagonal latent coupling](../theory.md#diagonal-latent-coupling) into predictor directions
+$\mathbf{P}$, dilation $\mathbf{D}$, and response directions $\mathbf{Q}$. Thus `response_subspace`
+selects the intermediate basis $\mathbf{C}$; the public fitted response directions remain
+$\mathbf{Q}$. See
 [Response-subspace selection](../theory.md#response-subspace-selection) for the mathematical
 criteria and their RRR relationship.
 A complete matched-CV programming example is available in

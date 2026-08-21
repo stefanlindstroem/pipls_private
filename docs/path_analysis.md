@@ -8,7 +8,9 @@ when the defaults are not enough. Exact signatures and fitted attributes are in 
 ## Search bounds
 
 For paired-mode count $h$ (`n_components`) and retained predictor-subspace dimension $r_\pi$
-(`predictor_rank`), the ordinary automatic search domain is triangular. The predictor-rank ceiling
+(`predictor_rank`), the ordinary automatic search domain is triangular. See
+[Interpretation of the two rank controls](theory.md#interpretation-of-the-ranks) for their distinct
+modeling roles. The predictor-rank ceiling
 is determined first from fold-local feasibility and an optional explicit user cap; component counts
 are then resolved from the ranks actually available under the chosen predictor-rank policy.
 

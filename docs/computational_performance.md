@@ -225,7 +225,8 @@ shortcut.
 ## Use randomized predictor SVD for large problems
 
 For sufficiently large predictor matrices, an explicit randomized predictor SVD can reduce the cost
-when the retained predictor rank is well below the matrix dimensions:
+when the retained predictor rank is well below the matrix dimensions. The affected construction is
+the [rank-controlled predictor projection](theory.md#rank-controlled-predictor-projection):
 
 ```python
 from pipls import PiPLSRegression, PiPLSSearchCV
@@ -276,7 +277,9 @@ range to control search cost.
 ## Treat response-subspace policy as a model choice
 
 `response_subspace` is not a search-cost shortcut and `PiPLSSearchCV` does not optimize it
-automatically. The default `"cross_covariance"` route forms
+automatically. The two criteria are defined under
+[Response-subspace selection](theory.md#response-subspace-selection). The default
+`"cross_covariance"` route forms
 $\mathbf{Z}^{\mathsf T}\mathbf{Y}$ and computes its exact response-side SVD. The optional
 `"least_squares"` route instead computes an exact reduced QR factorization of $\mathbf{Z}$ and an
 exact SVD of $\mathbf{Q}_{Z}^{\mathsf T}\mathbf{Y}$ before using the same downstream coupling
@@ -313,7 +316,8 @@ least_squares = PiPLSSearchCV(
 ```
 
 Here `splits` is the same materialized split sequence for both searches. The least-squares policy
-is a software extension and is not part of the peer-reviewed companion publication.
+is a software extension and is not part of the
+[peer-reviewed companion publication](citation.md#companion-paper).
 
 ## Use parallelism deliberately
 

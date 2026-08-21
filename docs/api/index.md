@@ -14,9 +14,11 @@ response or a two-dimensional multivariate response matrix. Names such as `y_pre
 and `y_loadings_` follow the same programming convention and do not imply a scalar response.
 
 For Π-PLS, public `n_components` counts paired latent modes $h$, and `predictor_rank` is the
-retained predictor-subspace dimension $r_\pi$. The factor arrays $\mathbf{P}$ and
-$\mathbf{Q}$ are orthonormal
-predictor and response directions; they are distinct from reconstruction loadings.
+retained predictor-subspace dimension $r_\pi$. See
+[Interpretation of the two rank controls](../theory.md#interpretation-of-the-ranks) for their
+separate roles. The factor arrays $\mathbf{P}$ and $\mathbf{Q}$ are orthonormal predictor and
+response directions; the [canonical terminology](../theory.md#canonical-terminology) distinguishes
+them from reconstruction loadings.
 
 ## Start with the estimators
 

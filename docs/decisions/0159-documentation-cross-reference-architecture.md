@@ -105,9 +105,13 @@ semantic or a nearby dataset link already supplies the route.
 
 ### 0159C — publication and theory cross-references
 
-Link substantive companion-publication references to the canonical citation section and connect
-mathematical terminology and method comparisons to the most specific maintained theory sections.
-Avoid generic theory-page links when a stable concept-specific anchor is available.
+Implemented. Substantive references to the companion paper, manuscript, and peer-reviewed
+publication now lead to the canonical companion-paper citation section. Programming, performance,
+inspection, path-analysis, reproducibility, troubleshooting, tutorial, and Home documentation link
+high-value mathematical concepts to the most specific maintained theory anchors, including the two
+rank controls, rank-controlled predictor projection, response-subspace selection, canonical
+terminology, and diagonal latent coupling. The theory page links outward to publication identity but
+does not add self-links to its own subsections.
 
 ### 0159D — final navigation audit and regression protection
 

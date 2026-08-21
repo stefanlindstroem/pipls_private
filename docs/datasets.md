@@ -115,7 +115,7 @@ they are not stored as redundant zero loading arrays.
 ## Companion-manuscript latent geometry
 
 Use `make_pipls_latent_geometry()` when the data-generating distribution must match the Gaussian
-latent geometry in the companion manuscript:
+latent geometry in the [companion manuscript](citation.md#companion-paper):
 
 ```python
 from pipls.datasets import make_pipls_latent_geometry
@@ -156,7 +156,7 @@ Every latent-score entry and loading entry is an independent standard-normal dra
 are independent Gaussian draws with standard deviations `noise[0]` and `noise[1]`. The function
 applies no centering, score standardization, loading orthonormalization, latent-strength scaling, or
 observed-variable scaling. This is the synthetic model described in the
-[companion manuscript](citation.md); it is separate from the more configurable package
+[companion manuscript](citation.md#companion-paper); it is separate from the more configurable package
 generator above.
 
 `synthetic.truth` is a read-only `PiPLSLatentGeometryTruth`. Its loading matrices retain the

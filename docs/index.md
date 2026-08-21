@@ -29,9 +29,10 @@ PLS, as seen in the following figure:
 Both panels use the same seeded five-fold validation splits for Π-PLS and ordinary PLS, and the error bars show the split-to-split standard deviation. 
 
 **Π-PLS gives a one-to-one relation between predictor and response directions.** The Π-PLS method differs from ordinary PLS in how it constructs the latent regression map. Π-PLS
-represents that map through paired latent modes. Each retained mode contains one orthonormal
-predictor direction, one orthonormal response direction, and one nonnegative dilation. This structure adds method-specific interpretation without replacing the standard PLS-family analysis
-workflow.
+represents that map through [paired latent modes](theory.md#diagonal-latent-coupling). Each retained
+mode contains one orthonormal predictor direction, one orthonormal response direction, and one
+nonnegative dilation. This structure adds method-specific interpretation without replacing the
+standard PLS-family analysis workflow.
 
 ## Leakage-safe modeling and validation
 
@@ -107,4 +108,4 @@ representative interpretation of standard PLS-family plots and Π-PLS-specific p
 ## Project information
 
 - [Authors, license, and citation](citation.md): copyright holders, commercial-use terms,
-  dataset-license scope, and the companion paper.
+  dataset-license scope, and the [companion paper](citation.md#companion-paper).

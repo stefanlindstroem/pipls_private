@@ -154,9 +154,11 @@ cross-referencing and explicit canonical anchors for the three reference-dataset
 the companion-paper citation section, and frequently referenced theory concepts. Patch 0159B adds
 semantic Pulp, Sugarcane, and Tobacco links across the served documentation, including direct
 same-page dataset-guide navigation, while preserving tutorial, workflow, loader, heading, code, and
-figure-alt semantics. Patch 0159C will add publication and concept-specific theory links; 0159D will
-complete the navigation audit, add regression protection, and close the decision. The policy favors
-one meaningful destination per reference over mechanical link density.
+figure-alt semantics. Patch 0159C adds canonical companion-publication links and concept-specific
+theory links across Home, API, performance, inspection, path-analysis, reproducibility,
+troubleshooting, synthetic-data, and example guidance. Patch 0159D will complete the navigation
+audit, add regression protection, and close the decision. The policy favors one meaningful
+destination per reference over mechanical link density.
 
 ## Inspection and rendering boundary
 

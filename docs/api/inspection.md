@@ -9,7 +9,8 @@ quantities or raise a clear `ValueError` when a requested derived value is not r
 
 The Π-PLS factorization helper is method-specific. Its $\mathbf{P}$ and $\mathbf{Q}$ arrays
 are orthonormal predictor and response directions, its entries $D_k=D_{kk}$ are dilations, and
-$(P_{:k},D_k,Q_{:k})$ defines paired latent mode $k$. The latent-structure, biplot, observation,
+$(P_{:k},D_k,Q_{:k})$ defines [paired latent mode $k$](../theory.md#diagonal-latent-coupling). The
+latent-structure, biplot, observation,
 and prediction helpers use PLS-family quantities and can therefore be applied to a compatible fitted
 Π-PLS or ordinary PLS estimator. For interpretation, scientific limitations, and relationships
 between these quantities, begin with [Model inspection concepts](../model_inspection.md).

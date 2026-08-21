@@ -1,7 +1,8 @@
 # Companion-manuscript synthetic data
 
-This guide shows how to generate the Gaussian latent-space model used in the companion manuscript.
-It covers the manuscript's **data-generating distribution** and the information needed to recreate
+This guide shows how to generate the Gaussian latent-space model used in the
+[companion manuscript](citation.md#companion-paper). It covers the manuscript's
+**data-generating distribution** and the information needed to recreate
 one **seeded synthetic dataset**. It does not reproduce the manuscript's complete tables, figures,
 resampling study, comparator implementations, or reporting pipeline.
 
@@ -11,7 +12,7 @@ The scientific reference is:
 > (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model.”
 > Manuscript under revision at *Computers & Chemical Engineering*, CACE-D-26-00847.
 
-See [authors, license, and citation](citation.md) for the maintained citation metadata.
+See [authors, license, and citation](citation.md#companion-paper) for the maintained citation metadata.
 
 ## Three reproducibility levels
 
@@ -172,15 +173,18 @@ additive noise, the observed leading singular directions also need not separate 
 exactly.
 
 A fixed model can be evaluated at these known dimensions when reproducing that synthetic protocol.
-For manuscript-aligned Π-PLS fitting, the response-subspace construction is also fixed:
+For manuscript-aligned Π-PLS fitting, the
+[response-subspace construction](theory.md#response-subspace-selection) is also fixed:
 `response_subspace="cross_covariance"`. This is both the package default and the construction used
-in the peer-reviewed companion publication. The alternative `"least_squares"` policy is a software
-extension and must not be used when claiming reproduction of the publication's response-subspace
-construction.
+in the [peer-reviewed companion publication](citation.md#companion-paper). The alternative
+`"least_squares"` policy is a software extension and must not be used when claiming reproduction of
+the publication's response-subspace construction.
 
 The manuscript's real-data workflow is different from the synthetic oracle-rank protocol: it fixes
 $r_\pi$ with the EPV-inspired rule $r_\pi=\min[p,\lceil n/c\rceil]$ and then selects $h$ by
-cross-validation. In this package that complete model configuration can be requested explicitly:
+cross-validation. The separate roles of these two controls are summarized under
+[Interpretation of the ranks](theory.md#interpretation-of-the-ranks). In this package that complete
+model configuration can be requested explicitly:
 
 ```python
 from pipls import PiPLSRegression, PiPLSSearchCV

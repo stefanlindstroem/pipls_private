@@ -4,12 +4,13 @@
 a rank-controlled predictor subspace, then constructs a response subspace under a configured
 selection criterion, and finally diagonalizes the reduced regression map into paired
 predictor-response modes. The package default uses the cross-covariance construction from the
-peer-reviewed companion publication; programming users may instead request a least-squares-driven
-response-subspace construction.
+[peer-reviewed companion publication](citation.md#companion-paper); programming users may instead
+request a least-squares-driven response-subspace construction.
 
 ## Scientific source and package scope
 
-The scientific source for the construction summarized on this page is the companion manuscript:
+The scientific source for the construction summarized on this page is the
+[companion manuscript](citation.md#companion-paper):
 
 > Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström, “Panoramic Partial Least Squares
 > (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model.”
@@ -21,7 +22,8 @@ peer-reviewed construction as its default and adds ordinary software facilities 
 optional scaling, numerical-rank checks, configurable predictor SVD solvers, cross-validated search,
 immutable result records, and prediction diagnostics. The package also provides one
 least-squares/RRR-inspired response-subspace construction for programming users. That alternative is
-a software extension and is not part of the peer-reviewed companion publication.
+a software extension and is not part of the
+[peer-reviewed companion publication](citation.md#companion-paper).
 
 The publication/software boundary matters when interpreting results: manuscript-aligned analyses use
 the cross-covariance response-subspace construction, while analyses using the least-squares option
@@ -31,7 +33,8 @@ The Pulp source paper documents the provenance and scientific context of the
 [Pulp dataset](datasets.md#pulp-real-data-integration); it is not the theoretical reference for
 Π-PLS. Pulp provenance and analysis are covered in the
 [reference-dataset guide](datasets.md) and [Pulp tutorial](tutorials/pulp.md). Citation metadata for
-the software and companion manuscript is maintained on the [citation page](citation.md).
+the software and companion manuscript is maintained under the
+[companion-paper citation](citation.md#companion-paper).
 
 ## Problem setting and two rank controls {#problem-setting-and-two-rank-controls}
 
@@ -151,8 +154,8 @@ and diagonalization. They differ only in how the intermediate response subspace 
 
 ### 2.1 Cross-covariance selection
 
-The peer-reviewed companion publication uses the cross-covariance construction, which is also the
-package default (`response_subspace="cross_covariance"`). Define
+The [peer-reviewed companion publication](citation.md#companion-paper) uses the cross-covariance
+construction, which is also the package default (`response_subspace="cross_covariance"`). Define
 
 \begin{equation}
 \boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{Z}^{\mathsf T}\mathbf{Y}\in\mathbb{R}^{r_\pi\times q}.
@@ -273,7 +276,8 @@ $\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}$. The response-side QR/SVD route 
 the configurable `svd_solver` applies only to construction of the predictor basis $\mathbf{\Pi}$.
 
 > **Software-extension boundary.** The least-squares response-subspace construction is implemented
-> for programming users but is not part of the peer-reviewed companion publication.
+> for programming users but is not part of the
+> [peer-reviewed companion publication](citation.md#companion-paper).
 > Manuscript-aligned analyses use `response_subspace="cross_covariance"`.
 
 The two criteria can differ substantially because they weight the retained predictor directions
@@ -463,8 +467,9 @@ regression obtains the best rank-$h$ approximation of the OLS fit under its leas
 criterion. With `response_subspace="least_squares"`, Π-PLS applies exactly that reduced-rank
 principle after first fixing the retained predictor representation $\mathbf{Z}$, and then
 diagonalizes the resulting reduced map into one-to-one paired modes. With the default
-`"cross_covariance"` policy, the response subspace is instead selected by the peer-reviewed
-cross-covariance criterion before the common least-squares coupling and diagonalization stages.
+`"cross_covariance"` policy, the response subspace is instead selected by the
+[peer-reviewed cross-covariance criterion](citation.md#companion-paper) before the common
+least-squares coupling and diagonalization stages.
 
 ### Canonical correlation analysis {#canonical-correlation-analysis}
 
@@ -531,7 +536,7 @@ splits. Its search policies and the practical real-data workflows documented els
 redefined by this theory page and need not duplicate the manuscript’s experimental choices.
 
 The package offers two synthetic-data purposes. `make_pipls_latent_geometry()` implements the
-companion manuscript’s Gaussian latent data-generating model directly.
+[companion manuscript’s](citation.md#companion-paper) Gaussian latent data-generating model directly.
 `make_pipls_regression()` and `make_pipls_train_test()` provide broader configurable package
 generators. See the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
 for the exact distribution and reproducibility boundary, and the
