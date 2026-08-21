@@ -133,12 +133,13 @@ remains Example 03. Future changes to this Home comparison require a new owner d
 extending Decision 0158.
 
 Decision 0159 is accepted and active. Patch 0159A records a semantic cross-reference architecture
-and stabilizes canonical anchors for reference datasets, the companion publication, and
-high-value theory concepts. 0159B will link dataset references, 0159C will link publication and
-concept-specific theory references, and 0159D will audit remaining navigation, add regression
-protection, run strict documentation qualification, and close the decision. Do not turn this into a
-mechanical every-occurrence link rule; preserve the semantic destination of tutorial, API, dataset,
-publication, and theory references.
+and stabilizes canonical anchors for reference datasets, the companion publication, and high-value
+theory concepts. Patch 0159B implements the reference-dataset pass across the served documentation:
+dataset-name links lead to the Pulp, Sugarcane, or Tobacco detail section while tutorial, workflow,
+loader, heading, code, figure-alt, and immediate-repeat semantics are preserved. 0159C will link
+publication and concept-specific theory references, and 0159D will audit remaining navigation, add
+regression protection, run strict documentation qualification, and close the decision. Do not turn
+this into a mechanical every-occurrence link rule.
 
 ## Deferred work
 

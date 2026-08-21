@@ -14,8 +14,11 @@ reported to be comparably robust to ordinary PLS while matching or improving its
 performance; the predictive improvement is substantial in some settings. These are empirical
 results which may not hold for every dataset.
 
-**Fewer shared components can be sufficient.** For many datasets, including the Pulp and Tobacco datasets available through this package, Π-PLS reaches a low
-cross-validated prediction-error region with fewer shared components than ordinary PLS, as seen in the following figure:
+**Fewer shared components can be sufficient.** For many datasets, including the
+[Pulp](datasets.md#pulp-real-data-integration) and
+[Tobacco](datasets.md#tobacco-spectral-integration) datasets available through this package, Π-PLS
+reaches a low cross-validated prediction-error region with fewer shared components than ordinary
+PLS, as seen in the following figure:
 
 <div class="grid" markdown>
 ![Pulp component-path comparison between Π-PLS and ordinary PLS](assets/generated/home/pulp_component_parsimony.svg)
@@ -53,7 +56,9 @@ assessment.
 
 ## Quick start with Pulp dataset
 
-The installed package contains the multivariate Pulp dataset, for which a Π-PLS multivariate regeression model is cretad in one line of code:
+The installed package contains the multivariate
+[Pulp dataset](datasets.md#pulp-real-data-integration), for which a Π-PLS multivariate regeression
+model is cretad in one line of code:
 
 ```python
 from pipls import PiPLSSearchCV

@@ -1,7 +1,9 @@
 # Dataset interface and synthetic generator
 
-The optional dataset interface provides a structured in-memory boundary for packaged Pulp,
-Sugarcane, and Tobacco datasets, package-owned synthetic data, and experiments. Real-data users may
+The optional dataset interface provides a structured in-memory boundary for packaged
+[Pulp](#pulp-real-data-integration), [Sugarcane](#sugarcane-spectral-integration), and
+[Tobacco](#tobacco-spectral-integration) datasets, package-owned synthetic data, and experiments.
+Real-data users may
 pass ordinary arrays or
 data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
 Pulp, Sugarcane, and Tobacco have installed named loaders backed by canonical package resources.
@@ -206,8 +208,9 @@ Real-data reading remains user-owned in general. Examples and reproduction scrip
 `Y` are formed using ordinary NumPy, pandas, or domain-specific code. Π-PLS provides no public
 registry, generic loader, downloader, preparation-only script, or required metadata sidecar.
 
-Pulp, Sugarcane, and Tobacco are explicit package-owned reference datasets. They are bundled with
-the installed distribution and available without network access:
+[Pulp](#pulp-real-data-integration), [Sugarcane](#sugarcane-spectral-integration), and
+[Tobacco](#tobacco-spectral-integration) are explicit package-owned reference datasets. They are
+bundled with the installed distribution and available without network access:
 
 ```python
 from pipls.datasets import load_pulp, load_sugarcane, load_tobacco

@@ -71,7 +71,9 @@ maintained repository calculations rather than committed image binaries. The syn
 manifest records the generator configuration, selected rank pair, external-test provenance,
 filenames, and SVG hashes. The Pulp tutorial manifest records dataset identity, version, source DOI,
 license, package-resource and canonical-array hashes, evaluated ranks, boundary status, and display
-subsets. The Home comparison manifest records the Pulp and Tobacco dataset identities and versions,
+subsets. The Home comparison manifest records the
+[Pulp](datasets.md#pulp-real-data-integration) and
+[Tobacco](datasets.md#tobacco-spectral-integration) dataset identities and versions,
 the publication-default cross-covariance response-subspace policy, the seeded five-fold validation
 protocol, case-specific predictor-rank search settings, component and predictor-rank paths, both
 CV-MSE summaries, and the two SVG hashes. Every generated SVG contains one chart. Generated
@@ -87,8 +89,10 @@ make docs-dist
 It builds a source distribution, unpacks it, creates a clean virtual environment, installs the
 unpacked package with its documentation extra, and runs the same strict site build. This verifies
 that `mkdocs.yml`, the Makefile, Markdown sources, JavaScript assets, generated-reference inputs,
-package source, documentation renderers, their required example-support code, and the Pulp and
-Tobacco data needed by the Home comparison are shipped together. The clean build regenerates and
+package source, documentation renderers, their required example-support code, and the
+[Pulp](datasets.md#pulp-real-data-integration) and
+[Tobacco](datasets.md#tobacco-spectral-integration) data needed by the Home comparison are shipped
+together. The clean build regenerates and
 parses the declared SVG assets. Generated documentation assets and `site/` output are temporary and
 are not part of the source distribution.
 
@@ -135,7 +139,9 @@ package test suite protects maintained numerical and API contracts directly.
 
 ## Reference datasets
 
-Pulp, Sugarcane, and Tobacco are canonical package resources under
+[Pulp](datasets.md#pulp-real-data-integration),
+[Sugarcane](datasets.md#sugarcane-spectral-integration), and
+[Tobacco](datasets.md#tobacco-spectral-integration) are canonical package resources under
 `src/pipls/_data/<dataset>/`. Each directory contains `X.csv`, `Y.csv`, `metadata.json`,
 `README.md`, and `LICENSE.txt`; the same resources are included in wheels and source distributions.
 The named loaders return these exact matrices without learned preprocessing.

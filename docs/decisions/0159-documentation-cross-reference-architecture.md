@@ -93,9 +93,15 @@ pass is performed yet.
 
 ### 0159B — reference-dataset cross-references
 
-Link substantive references to Pulp, Sugarcane, and Tobacco across the served documentation to the
-corresponding dataset-detail sections. Preserve distinct tutorial, example, and API navigation when
-those are the actual subject of the link.
+Implemented. Substantive references to Pulp, Sugarcane, and Tobacco across the served documentation
+now link to the corresponding dataset-detail sections when the dataset itself is the navigation
+subject. The pass covers Home, the example catalogue and comparison guide, API overview and dataset
+reference, path-selection guidance, reproducibility, theory context, the Quick Start, the complete
+Pulp tutorial, and same-page navigation in the dataset guide.
+
+Tutorial names, workflow references, loader symbols, headings, code, figure alt text, and immediate
+repetitions are not mechanically redirected to the dataset guide when another destination is more
+semantic or a nearby dataset link already supplies the route.
 
 ### 0159C — publication and theory cross-references
 

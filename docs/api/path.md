@@ -196,7 +196,8 @@ matches `search.select(n_components=h)`.
 summary, and the resolved relative and absolute tolerances. `score_threshold` is derived in
 configured-score units. Fixed and EPV predictor-rank policies have no such evidence.
 
-The Tobacco example uses this evidence to present a scorer-specific CV-MSE threshold while keeping
+The [Tobacco](../datasets.md#tobacco-spectral-integration) example uses this evidence to present a
+scorer-specific CV-MSE threshold while keeping
 the API scorer-neutral:
 
 ```python

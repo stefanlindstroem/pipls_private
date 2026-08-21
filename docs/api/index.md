@@ -49,7 +49,10 @@ minimum-CV-MSE rule accepts simultaneous relative and absolute tolerances and re
 selection provenance. Rule scope and scorer qualification are described under
 [search-owned selection rules](../path_analysis.md#search-owned-selection-rules).
 
-Pulp, Sugarcane, and Tobacco are available as named package-owned datasets through
+[Pulp](../datasets.md#pulp-real-data-integration),
+[Sugarcane](../datasets.md#sugarcane-spectral-integration), and
+[Tobacco](../datasets.md#tobacco-spectral-integration) are available as named package-owned
+datasets through
 [`load_pulp()`](datasets.md#pipls.datasets.load_pulp),
 [`load_sugarcane()`](datasets.md#pipls.datasets.load_sugarcane), and
 [`load_tobacco()`](datasets.md#pipls.datasets.load_tobacco). No generic dataset registry is part of

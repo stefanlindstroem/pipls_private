@@ -151,10 +151,12 @@ $r_\pi$, and links to Example 03 for the complete matched-validation comparison.
 
 Decision 0159 is accepted and active. Patch 0159A establishes semantic documentation
 cross-referencing and explicit canonical anchors for the three reference-dataset detail sections,
-the companion-paper citation section, and frequently referenced theory concepts. Patches 0159B and
-0159C will add dataset, publication, and concept-specific theory links across the served
-documentation; 0159D will complete the navigation audit, add regression protection, and close the
-decision. The policy favors one meaningful destination per reference over mechanical link density.
+the companion-paper citation section, and frequently referenced theory concepts. Patch 0159B adds
+semantic Pulp, Sugarcane, and Tobacco links across the served documentation, including direct
+same-page dataset-guide navigation, while preserving tutorial, workflow, loader, heading, code, and
+figure-alt semantics. Patch 0159C will add publication and concept-specific theory links; 0159D will
+complete the navigation audit, add regression protection, and close the decision. The policy favors
+one meaningful destination per reference over mechanical link density.
 
 ## Inspection and rendering boundary
 

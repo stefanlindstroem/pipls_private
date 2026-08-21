@@ -13,7 +13,8 @@ $h$, the search resolves the retained predictor rank $r_\pi$ internally, so user
 need to tune a second parameter. Advanced users can inspect or constrain $r_\pi$ when the scientific
 question or available sample support makes that useful.
 
-The workflow is to load the Pulp data, fit the search, inspect the component path, choose a component
+The workflow is to load the [Pulp data](../datasets.md#pulp-real-data-integration), fit the search,
+inspect the component path, choose a component
 count and create one selection, inspect the selected path and OOF predictions, optionally inspect the
 conditional predictor-rank profile, refit the same selection, inspect the fitted model, and render
 the reports. If the selected evidence is unsatisfactory, return to the selection step before

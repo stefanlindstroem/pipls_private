@@ -6,8 +6,10 @@ experiments; ordinary arrays and data frames passed directly to `fit(X, Y)` rema
 real-data interface. Synthetic truth stores only loading blocks that contribute to the generated
 predictor or response signal.
 
-Pulp, Sugarcane, and Tobacco are available through the named package-owned loaders below. The
-[dataset guide](../datasets.md) records provenance and preparation, and the
+[Pulp](../datasets.md#pulp-real-data-integration),
+[Sugarcane](../datasets.md#sugarcane-spectral-integration), and
+[Tobacco](../datasets.md#tobacco-spectral-integration) are available through the named package-owned
+loaders below. The [dataset guide](../datasets.md) records provenance and preparation, and the
 [maintained examples](../examples.md#complete-real-data-analyses) show their analysis workflows.
 Every maintained reference-data workflow uses the corresponding loader. The package-resource
 directories are the sole active matrix locations; no generic registry or download layer is

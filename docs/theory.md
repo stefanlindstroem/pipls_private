@@ -27,8 +27,9 @@ The publication/software boundary matters when interpreting results: manuscript-
 the cross-covariance response-subspace construction, while analyses using the least-squares option
 should identify that model choice explicitly.
 
-The Pulp source paper documents the provenance and scientific context of the Pulp dataset; it is not
-the theoretical reference for Π-PLS. Pulp provenance and analysis are covered in the
+The Pulp source paper documents the provenance and scientific context of the
+[Pulp dataset](datasets.md#pulp-real-data-integration); it is not the theoretical reference for
+Π-PLS. Pulp provenance and analysis are covered in the
 [reference-dataset guide](datasets.md) and [Pulp tutorial](tutorials/pulp.md). Citation metadata for
 the software and companion manuscript is maintained on the [citation page](citation.md).
 

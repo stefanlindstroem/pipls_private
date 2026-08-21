@@ -11,12 +11,12 @@ the maintained scripts.
 
 | Script | Workflow focus | Main output |
 |---|---|---|
-| `01_pulp_quick_start.py` | Short automatic workflow on Pulp: select by a CV rule, refit, and inspect fitted predictions | Selected model summary and `pulp_quick_start.pdf` |
+| `01_pulp_quick_start.py` | Short automatic workflow on [Pulp](datasets.md#pulp-real-data-integration): select by a CV rule, refit, and inspect fitted predictions | Selected model summary and `pulp_quick_start.pdf` |
 | `02_synthetic_path_selection.py` | Learn manual component selection on synthetic train/test data, including path and optional predictor-rank inspection | Four PDF figures and printed external-test $R^2$ |
 | `03_pls_path_comparison.py` | Compare both Π-PLS response-subspace policies with ordinary PLS on matched CV splits for three reference datasets plus one deterministic near-saturated synthetic stress case, without choosing a final model | Four three-way comparison PDFs |
-| `04_pulp_real_data.py` | Full manual-selection workflow on Pulp: choose $h$ explicitly, review selection-conditioned OOF evidence, refit, and interpret the model | Ten PDF figures |
-| `05_sugarcane_real_data.py` | Manual-selection spectral workflow on Sugarcane with wavelength-aware model inspection | Six PDF figures |
-| `06_tobacco_real_data.py` | Full automated-selection spectral workflow on Tobacco using separate relative-tolerance rules for $r_\pi$ and $h$ | Six PDFs, including threshold-annotated rank and component profiles |
+| `04_pulp_real_data.py` | Full manual-selection workflow on [Pulp](datasets.md#pulp-real-data-integration): choose $h$ explicitly, review selection-conditioned OOF evidence, refit, and interpret the model | Ten PDF figures |
+| `05_sugarcane_real_data.py` | Manual-selection spectral workflow on [Sugarcane](datasets.md#sugarcane-spectral-integration) with wavelength-aware model inspection | Six PDF figures |
+| `06_tobacco_real_data.py` | Full automated-selection spectral workflow on [Tobacco](datasets.md#tobacco-spectral-integration) using separate relative-tolerance rules for $r_\pi$ and $h$ | Six PDFs, including threshold-annotated rank and component profiles |
 
 The [path-selection reference](api/path.md) documents both the compact automatic route used by
 example 01 and the explicit selection handoff used by the analytical examples. The
@@ -29,17 +29,21 @@ The cross-covariance policy is the peer-reviewed package default; least squares 
 software extension and is not part of the peer-reviewed companion publication. The resulting
 CV-MSE paths are model-development evidence, not independent post-selection validation.
 
-Examples 01, 02, and the Pulp branch of example 03 use the package's exhaustive predictor-rank
-default; the synthetic stress branch requests exhaustive coverage explicitly. The high-dimensional
-Sugarcane and Tobacco branches of example 03 and complete examples
+Examples 01, 02, and the [Pulp](datasets.md#pulp-real-data-integration) branch of example 03 use
+the package's exhaustive predictor-rank default; the synthetic stress branch requests exhaustive
+coverage explicitly. The high-dimensional [Sugarcane](datasets.md#sugarcane-spectral-integration)
+and [Tobacco](datasets.md#tobacco-spectral-integration) branches of example 03 and complete examples
 05 and 06 request `search_method="adaptive"` explicitly to control candidate cost over the new
 full hard-feasible rank domain. That choice changes candidate coverage, not the admissible rank
 endpoints; `search_is_exhaustive_` records whether the adaptive run happened to cover all pairs.
 
 ## Compare response-subspace policies {#compare-response-subspace-policies}
 
-`examples/03_pls_path_comparison.py` is the maintained programming-user comparison. For Pulp,
-Sugarcane, Tobacco, and one deterministic synthetic stress case it materializes one shuffled
+`examples/03_pls_path_comparison.py` is the maintained programming-user comparison. For
+[Pulp](datasets.md#pulp-real-data-integration),
+[Sugarcane](datasets.md#sugarcane-spectral-integration),
+[Tobacco](datasets.md#tobacco-spectral-integration), and one deterministic synthetic stress case it
+materializes one shuffled
 five-fold protocol, fits one `PiPLSSearchCV` with `response_subspace="cross_covariance"` and one
 with `response_subspace="least_squares"`, and evaluates ordinary PLS on those same folds. The
 three conditioned component paths are overlaid in one case-specific figure. No final model is
@@ -168,7 +172,9 @@ Sugarcane and Tobacco each write six final PDF figures, including
 `selected_component_path.pdf` and the three final-fit diagnostics
 `final_fit_observed_vs_predicted.pdf`, `final_fit_r2.pdf`, and
 `final_fit_residual_distribution.pdf`. Tobacco retains three-page prediction-diagnostic and
-coefficient PDFs. Pulp, Sugarcane, and Tobacco are supplied by their named `pipls.datasets`
+coefficient PDFs. [Pulp](datasets.md#pulp-real-data-integration),
+[Sugarcane](datasets.md#sugarcane-spectral-integration), and
+[Tobacco](datasets.md#tobacco-spectral-integration) are supplied by their named `pipls.datasets`
 loaders. Every figure is constructed directly from
 `component_path_`, conditional predictor-rank profiles, explicit OOF reports for retained
 selections, and immutable inspection results. The Pulp factor view anchors every component to a

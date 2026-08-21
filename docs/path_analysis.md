@@ -293,7 +293,8 @@ model-producing workflows create one selection and pass that same object to OOF 
 refitting. After a successful fit, `model.selection_` confirms the fitted model's exact provenance.
 `component_path_` remains the aligned numerical curve.
 
-The Tobacco workflow demonstrates the hierarchy with separate 10% relative tolerances. The search
+The [Tobacco](datasets.md#tobacco-spectral-integration) workflow demonstrates the hierarchy with
+separate 10% relative tolerances. The search
 constructor applies `predictor_rank_relative_tolerance=0.10` within every component count, and
 `search.select(rule="minimum_cv_mse", relative_tolerance=0.10)` then acts on the resulting
 conditioned component path. The predictor-rank profile shows its exact configured-score reference,
