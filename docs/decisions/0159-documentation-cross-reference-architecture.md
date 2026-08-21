@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation is in progress.
+Accepted, implemented, and closed.
 
 ## Context
 
@@ -115,9 +115,17 @@ does not add self-links to its own subsections.
 
 ### 0159D — final navigation audit and regression protection
 
-Review the served documentation for remaining isolated pages and missing high-value contextual
-links, add lightweight regression tests for the canonical cross-reference architecture, run strict
-documentation and source-distribution validation, and close Decision 0159.
+Implemented. The final audit connects the previously isolated compatibility page to distribution
+reproducibility, routes the computational-performance guide back to path-selection semantics, and
+connects the dataset guide to the generated dataset API reference. Lightweight regression tests now
+protect the explicit canonical anchors, representative page-level dataset/publication/theory routes,
+and the architectural requirement that every served Markdown page provide at least one contextual
+route to another served documentation page. The tests do not require every textual occurrence of a
+term to be linked.
+
+Strict documentation and source-distribution builds remain the authoritative link-resolution checks;
+pytest protects the intended semantic destinations so a future prose edit cannot silently remove the
+navigation architecture while leaving Markdown syntactically valid.
 
 ## Relationship to earlier decisions
 
@@ -139,3 +147,7 @@ documentation and source-distribution validation, and close Decision 0159.
 - Explicit anchors provide stable incoming-link contracts even if visible heading text is edited.
 - Cross-referencing remains readable because repeated nearby mentions and destination-page
   self-links are not required.
+- Canonical anchors and representative semantic routes are regression-tested without turning prose
+  wording into a mechanical link-density contract.
+- Every served Markdown page retains at least one contextual route to another documentation page;
+  Home remains the natural entry point and is not required to have an incoming link.

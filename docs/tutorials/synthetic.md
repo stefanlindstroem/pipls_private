@@ -2,9 +2,8 @@
 
 This tutorial continues the workflow introduced in the [Pulp quick start](quick_start.md), but uses
 deterministic synthetic training and test data so that the latent structure is known and prediction
-assessment remains independent of model selection. It retains the fitted search object, inspects
-the validation evidence before choosing a component count, creates one explicit selection, and
-passes that same immutable selection to the final full-data refit.
+assessment remains independent of model selection. It inspects
+the validation evidence before choosing a component count, creates one explicit selection, and passes it to the final full-data refit.
 
 For ordinary programming use, Π-PLS behaves like a one-parameter component search: as in PLS,
 the main complexity parameter is `n_components`, denoted by $h$. A **component path** is the
@@ -57,7 +56,7 @@ The generator creates two independent sample blocks from one latent model:
 --8<-- "examples/02_synthetic_path_selection.py:generate-synthetic-data"
 ```
 
-The generating structure contains:
+The details of the synthetic data generation is not important to learn Π-PLS regression analysis, but for the interested reader, the generating structure contains:
 
 - two shared directions that affect both predictors and responses;
 - two predictor-specific directions that affect only the predictors;

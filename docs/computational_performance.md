@@ -9,7 +9,8 @@ These controls are not interchangeable. Fewer validation repetitions change the 
 evidence. Narrower rank and component sets change the evaluated model-selection problem.
 Randomized predictor SVD changes the numerical route. `n_jobs` primarily changes execution, and
 reusing an existing OOF report avoids repeated work. Learned preprocessing must remain inside every
-fit and every training fold.
+fit and every training fold. For the statistical and selection semantics behind these controls, see
+[Path-selection details](path_analysis.md).
 
 ## A cost model for path training
 

@@ -22,4 +22,6 @@ joblib==1.2.*
 
 Continuous integration tests the minimum stack on Python 3.10, all supported Python versions with
 normal dependency resolution, and the latest admitted dependency versions on Python 3.14. Clean
-wheel and source-distribution installations are verified by `make dist-check`.
+wheel and source-distribution installations are verified by `make dist-check`. The
+[reproducibility guide](reproducibility.md#installed-distribution-reproducibility) describes that
+isolated artifact check and the separate documentation-distribution qualification.

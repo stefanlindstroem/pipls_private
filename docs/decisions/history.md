@@ -54,14 +54,18 @@ one fixed near-saturated synthetic stress case. The Home page derives a simplifi
 view from that same numerical protocol to illustrate possible parsimony in shared component count
 without exposing the optional least-squares policy in the introductory motivation. Served
 documentation is self-contained, separates tutorials, guides, and generated reference, and keeps
-maintainer decisions outside the user site.
+maintainer decisions outside the user site. Semantic cross-referencing now gives reference datasets,
+the companion publication, and high-value mathematical concepts stable destinations across those
+layers without mechanically linking every repeated occurrence.
 
 Current canonical records: [0065](0065-documentation-layer-consolidation.md),
 [0152](0152-selection-review-feedback-workflow.md),
 [0155](0155-response-subspace-selection-policies.md),
 [0156](0156-unified-pls-family-path-comparison.md),
 [0157](0157-near-saturated-synthetic-pls-comparison.md),
-[0158](0158-home-page-parsimony-comparison.md), and the product and workflow boundaries in
+[0158](0158-home-page-parsimony-comparison.md),
+[0159](0159-documentation-cross-reference-architecture.md), and the product and workflow
+boundaries in
 [0024](0024-package-product-repository-boundary.md),
 [0045](0045-pls-family-analysis-boundary.md), and
 [0142](0142-package-owned-reference-datasets.md).

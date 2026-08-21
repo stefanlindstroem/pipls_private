@@ -132,15 +132,16 @@ parsimony interpretation to shared component count $h$. The full three-way techn
 remains Example 03. Future changes to this Home comparison require a new owner decision rather than
 extending Decision 0158.
 
-Decision 0159 is accepted and active. Patch 0159A records a semantic cross-reference architecture
+Decision 0159 is complete and closed. Patch 0159A records a semantic cross-reference architecture
 and stabilizes canonical anchors for reference datasets, the companion publication, and high-value
 theory concepts. Patch 0159B implements the reference-dataset pass across the served documentation:
 dataset-name links lead to the Pulp, Sugarcane, or Tobacco detail section while tutorial, workflow,
 loader, heading, code, figure-alt, and immediate-repeat semantics are preserved. Patch 0159C links
 substantive companion-publication references to the canonical citation section and routes rank,
 response-subspace, predictor-projection, paired-mode, and factorization terminology to specific
-theory anchors. 0159D will audit remaining navigation, add regression protection, run strict
-documentation qualification, and close the decision. Do not turn this into a mechanical
+theory anchors. Patch 0159D completes the remaining contextual navigation and adds regression tests
+for canonical anchors, representative semantic routes, and non-isolated served pages. Future
+cross-reference changes should preserve semantic destinations and must not become a mechanical
 every-occurrence link rule.
 
 ## Deferred work

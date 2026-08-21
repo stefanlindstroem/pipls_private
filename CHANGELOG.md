@@ -28,6 +28,10 @@
   Pulp, Sugarcane, Tobacco, and one fixed near-saturated synthetic stress case without claiming
   general superiority. The synthetic case fixes 25 observations, 40 predictors, 10 responses,
   5 shared and 15 predictor-specific latent directions, and noise SD 0.3 before comparison.
+- Improve documentation navigation with stable semantic destinations for the three reference
+  datasets, the companion publication, and frequently used theory concepts. Cross-link the served
+  guides, tutorials, and API pages to those destinations and add regression coverage for the
+  canonical cross-reference architecture without requiring every repeated noun to be linked.
 
 ## 0.1.0 - 2026-08-09
 

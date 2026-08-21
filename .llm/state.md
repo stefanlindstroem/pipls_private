@@ -149,16 +149,18 @@ distribution. The two figures are placed side by side under `Why use Π-PLS?`; t
 limits the parsimony interpretation to shared component count $h$, notes that Pi-PLS also selects
 $r_\pi$, and links to Example 03 for the complete matched-validation comparison.
 
-Decision 0159 is accepted and active. Patch 0159A establishes semantic documentation
+Decision 0159 is implemented and closed. Patch 0159A establishes semantic documentation
 cross-referencing and explicit canonical anchors for the three reference-dataset detail sections,
 the companion-paper citation section, and frequently referenced theory concepts. Patch 0159B adds
 semantic Pulp, Sugarcane, and Tobacco links across the served documentation, including direct
 same-page dataset-guide navigation, while preserving tutorial, workflow, loader, heading, code, and
 figure-alt semantics. Patch 0159C adds canonical companion-publication links and concept-specific
 theory links across Home, API, performance, inspection, path-analysis, reproducibility,
-troubleshooting, synthetic-data, and example guidance. Patch 0159D will complete the navigation
-audit, add regression protection, and close the decision. The policy favors one meaningful
-destination per reference over mechanical link density.
+troubleshooting, synthetic-data, and example guidance. Patch 0159D completes the navigation audit,
+connects compatibility to reproducibility, performance guidance to path-selection semantics, and the
+dataset guide to the dataset API, and adds `tests/test_documentation_cross_references.py` to protect
+canonical anchors, representative semantic routes, and against isolated served pages. The policy
+favors one meaningful destination per reference over mechanical link density.
 
 ## Inspection and rendering boundary
 

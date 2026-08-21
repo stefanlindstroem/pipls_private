@@ -7,7 +7,8 @@ Real-data users may
 pass ordinary arrays or
 data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
 Pulp, Sugarcane, and Tobacco have installed named loaders backed by canonical package resources.
-Every maintained reference-data example uses those resources.
+Every maintained reference-data example uses those resources. Exact container, generator, and
+loader signatures are collected in the [dataset API reference](api/datasets.md).
 
 ## Validated dataset container
 
