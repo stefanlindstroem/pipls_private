@@ -56,6 +56,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0156-unified-pls-family-path-comparison.md` | unified PLS-family path comparison | consolidate both Pi-PLS response policies and ordinary PLS into Example 03 on shared materialized folds for all three reference datasets |
 | `0157-near-saturated-synthetic-pls-comparison.md` | near-saturated synthetic PLS-family stress case | closed exploratory extension of Example 03 with a fixed deterministic 25-by-40, 10-response design, matched folds, and exhaustive Pi-PLS rank coverage |
 | `0158-home-page-parsimony-comparison.md` | Home-page parsimony comparison | closed documentation contract: simplified Pulp/Tobacco Home figures share the Example-03 protocol, show publication-default Pi-PLS versus PLS, and bound the parsimony claim to shared component count |
+| `0159-documentation-cross-reference-architecture.md` | documentation cross-reference architecture | active four-patch documentation-navigation contract: stable dataset/publication/theory destinations followed by semantic cross-linking and regression protection |
 
 ## Implemented clarifications
 

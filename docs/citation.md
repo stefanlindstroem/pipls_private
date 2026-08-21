@@ -31,7 +31,7 @@ license:
 
 The repository-root `CITATION.cff` provides the same software metadata in machine-readable form.
 
-## Companion paper
+## Companion paper {#companion-paper}
 
 The companion paper is currently under revision:
 

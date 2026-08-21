@@ -257,7 +257,7 @@ environment they normally appear below the environment-specific
 `<site-packages>/pipls/_data/<dataset>/` directory. Each `X.csv` and `Y.csv` pair is exactly the
 matrix pair returned by its Python loader; loading applies no additional preprocessing.
 
-## Pulp real-data integration
+## Pulp real-data integration {#pulp-real-data-integration}
 
 The installed Pulp resources contain 46 rows, 14 fiber-property predictors, and eight responses
 adapted from the supplementary material for the following article:
@@ -276,7 +276,7 @@ public provenance, and immutable metadata together with the two model matrices. 
 ordinary-PLS comparison, complete Pulp example, and tutorial renderer all use this public loader.
 The installed resources are the sole active Pulp matrix representation.
 
-## Sugarcane spectral integration
+## Sugarcane spectral integration {#sugarcane-spectral-integration}
 
 The installed Sugarcane resources contain 57 samples, 1,721 LabSpec absorbance predictors spanning
 780 through 2500 nm, and four responses: total sugar, crude protein, acid detergent fiber, and in
@@ -309,7 +309,7 @@ immutable public results. The compact spectral-axis description in `metadata.jso
 repeating 1,721 equivalent per-wavelength descriptions while still defining every predictor column
 exactly.
 
-## Tobacco spectral integration
+## Tobacco spectral integration {#tobacco-spectral-integration}
 
 The installed Tobacco resources contain 347 samples, 1,557 raw FT-NIR absorbance predictors
 spanning approximately 10,001 through 4,000 `cm^-1`, and 13 chemical-component responses. The

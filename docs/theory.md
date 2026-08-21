@@ -32,7 +32,7 @@ the theoretical reference for Π-PLS. Pulp provenance and analysis are covered i
 [reference-dataset guide](datasets.md) and [Pulp tutorial](tutorials/pulp.md). Citation metadata for
 the software and companion manuscript is maintained on the [citation page](citation.md).
 
-## Problem setting and two rank controls
+## Problem setting and two rank controls {#problem-setting-and-two-rank-controls}
 
 Let $\mathbf{X}\in\mathbb{R}^{n\times p}$ contain column-centered predictors and let
 $\mathbf{Y}\in\mathbb{R}^{n\times q}$ contain column-centered responses. Multivariate linear
@@ -60,7 +60,7 @@ For a centered estimator fit, the effective sample-space bound becomes
 $r_\pi\leq\min(n-1,p)$. The implementation also requires $r_\pi$ not to exceed the verified numerical
 rank of the preprocessed predictor matrix.
 
-## Canonical terminology
+## Canonical terminology {#canonical-terminology}
 
 The package uses the following terms for the fixed Π-PLS construction:
 
@@ -99,7 +99,7 @@ The API word “component” is retained because it is familiar in regression so
 components. Likewise, `predictor_rank` is a retained observed-subspace dimension; “predictor signal
 rank” is reserved for synthetic settings where the noiseless generating rank is known.
 
-## 1. Rank-controlled predictor projection
+## 1. Rank-controlled predictor projection {#rank-controlled-predictor-projection}
 
 Take a singular value decomposition
 
@@ -399,7 +399,7 @@ For new centered predictors $\mathbf{X}_{\mathrm{new}}$,
 \widehat{\mathbf{Y}}_{\mathrm{new}}=\mathbf{X}_{\mathrm{new}}\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}.
 \end{equation}
 
-## Why the method is panoramic
+## Why the method is panoramic {#why-the-method-is-panoramic}
 
 Standard deflation-based PLS algorithms construct successive components while removing previously
 modelled predictor variation. Π-PLS instead fixes one rank-controlled predictor representation
@@ -441,9 +441,9 @@ This count concerns the fitted representation after the retained predictor basis
 does not treat the $ph$ entries of $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ as independently free
 parameters.
 
-## Relationships to established methods
+## Relationships to established methods {#relationships-to-established-methods}
 
-### Ordinary least squares
+### Ordinary least squares {#ordinary-least-squares}
 
 If predictor truncation preserves the estimable predictor row space and $h$ retains every estimable
 response-side direction, then
@@ -455,7 +455,7 @@ response-side direction, then
 coincides with the multivariate OLS fitted response. In that limit, Π-PLS is an orthogonal latent
 reparameterization of the same fitted map.
 
-### Reduced-rank regression
+### Reduced-rank regression {#reduced-rank-regression}
 
 Both Π-PLS and reduced-rank regression produce low-rank coefficient structures. Reduced-rank
 regression obtains the best rank-$h$ approximation of the OLS fit under its least-squares
@@ -465,7 +465,7 @@ diagonalizes the resulting reduced map into one-to-one paired modes. With the de
 `"cross_covariance"` policy, the response subspace is instead selected by the peer-reviewed
 cross-covariance criterion before the common least-squares coupling and diagonalization stages.
 
-### Canonical correlation analysis
+### Canonical correlation analysis {#canonical-correlation-analysis}
 
 CCA also constructs paired predictor and response variates with a diagonal association structure,
 but classical CCA maximizes normalized correlation after within-block whitening. The default
@@ -475,7 +475,7 @@ least-squares criterion described above. Both policies then form the same diagon
 representation. The structural analogy to CCA therefore concerns the final paired relation, not an
 identity of objectives.
 
-### PLS and PLS-SVD
+### PLS and PLS-SVD {#pls-and-pls-svd}
 
 Standard multicomponent PLS is commonly constructed through iterative covariance-guided extraction
 and deflation. Π-PLS instead fixes one retained predictor space and then selects a response
@@ -519,7 +519,7 @@ subspaces rather than unique ordered columns. Numerical validation should theref
 regression maps, predictions, projections, principal angles, or singular values rather than raw
 basis columns.
 
-## Selection, validation, and synthetic-data boundaries
+## Selection, validation, and synthetic-data boundaries {#selection-validation-and-synthetic-data-boundaries}
 
 The equations above define one fixed $(h,r_\pi)$ model under one configured response-subspace
 policy. `PiPLSSearchCV` is a package-level facility for evaluating admissible fixed models under

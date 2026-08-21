@@ -149,6 +149,13 @@ distribution. The two figures are placed side by side under `Why use Π-PLS?`; t
 limits the parsimony interpretation to shared component count $h$, notes that Pi-PLS also selects
 $r_\pi$, and links to Example 03 for the complete matched-validation comparison.
 
+Decision 0159 is accepted and active. Patch 0159A establishes semantic documentation
+cross-referencing and explicit canonical anchors for the three reference-dataset detail sections,
+the companion-paper citation section, and frequently referenced theory concepts. Patches 0159B and
+0159C will add dataset, publication, and concept-specific theory links across the served
+documentation; 0159D will complete the navigation audit, add regression protection, and close the
+decision. The policy favors one meaningful destination per reference over mechanical link density.
+
 ## Inspection and rendering boundary
 
 `pipls.inspection` returns validated immutable NumPy results for Pi-PLS factor displays, shared
