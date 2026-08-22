@@ -21,11 +21,17 @@ matplotlib.use("Agg")
 matplotlib.rcParams["svg.hashsalt"] = "pipls-pulp-tutorial"
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from adjustText import adjust_text  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
 from matplotlib.patches import FancyArrowPatch  # noqa: E402
 from sklearn.model_selection import RepeatedKFold  # noqa: E402
+
+try:  # noqa: E402
+    from adjustText import adjust_text  # noqa: E402
+except ModuleNotFoundError as exc:  # noqa: E402
+    if exc.name != "adjustText":
+        raise
+    adjust_text = None
 
 from pipls import PiPLSSearchCV  # noqa: E402
 from pipls.component_path import (  # noqa: E402
@@ -202,18 +208,19 @@ def _render_biplot(
     axis.set_aspect("equal", adjustable="datalim")
     axis.margins(0.1)
     axis.legend()
-    adjust_text(
-        labels,
-        x=sample_xy[:, 0],
-        y=sample_xy[:, 1],
-        target_x=predictor_xy[:, 0],
-        target_y=predictor_xy[:, 1],
-        ax=axis,
-        ensure_inside_axes=True,
-        prevent_crossings=False,
-        iter_lim=200,
-        arrowprops={"arrowstyle": "-", "linewidth": 0.6},
-    )
+    if adjust_text is not None:
+        adjust_text(
+            labels,
+            x=sample_xy[:, 0],
+            y=sample_xy[:, 1],
+            target_x=predictor_xy[:, 0],
+            target_y=predictor_xy[:, 1],
+            ax=axis,
+            ensure_inside_axes=True,
+            prevent_crossings=False,
+            iter_lim=200,
+            arrowprops={"arrowstyle": "-", "linewidth": 0.6},
+        )
     # --8<-- [end:render-pulp-biplot]
     _save_svg(figure, output_path)
 

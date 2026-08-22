@@ -57,6 +57,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0157: near-saturated synthetic PLS-family stress case](0157-near-saturated-synthetic-pls-comparison.md)
 - [0158: Home-page parsimony comparison](0158-home-page-parsimony-comparison.md)
 - [0159: documentation cross-reference architecture](0159-documentation-cross-reference-architecture.md)
+- [0160: graceful optional `adjustText` fallback](0160-graceful-adjusttext-fallback.md)
 
 ## Historical navigation
 

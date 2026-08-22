@@ -104,8 +104,9 @@ The Π-PLS-versus-PLS comparison workflow imports one implementation helper from
 
 Example 03 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, Tobacco, and the
 synthetic stress case import no comparison helper. Reusable numerical inspection belongs in
-`pipls.inspection`; every maintained figure is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot uses
-optional `adjustText` only to reposition its Matplotlib text labels.
+`pipls.inspection`; every maintained figure is rendered directly from immutable arrays with ordinary
+Matplotlib. The Pulp biplot uses optional `adjustText` only to reposition its Matplotlib text labels;
+without it, the same example remains executable and leaves those labels at their original endpoints.
 
 ## Real-data workflow contract
 

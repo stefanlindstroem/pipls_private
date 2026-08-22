@@ -51,3 +51,55 @@ assert pipls.PiPLSRegression is not None
         capture_output=True,
         text=True,
     )
+
+
+
+def test_pulp_example_runs_without_adjusttext(tmp_path: Path) -> None:
+    root = _repository_root()
+    example_path = tmp_path / "04_pulp_real_data.py"
+    example_path.write_text(
+        (root / "examples" / "04_pulp_real_data.py").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    (tmp_path / "results" / "pulp_post_analysis").mkdir(parents=True)
+    sitecustomize = tmp_path / "sitecustomize.py"
+    sitecustomize.write_text(
+        """import builtins
+
+_original_import = builtins.__import__
+
+
+def _guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
+    if name.split(\".\", 1)[0] == \"adjustText\":
+        raise ModuleNotFoundError(
+            \"blocked optional dependency: adjustText\",
+            name=\"adjustText\",
+        )
+    return _original_import(name, globals, locals, fromlist, level)
+
+
+builtins.__import__ = _guarded_import
+""",
+        encoding="utf-8",
+    )
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "PYTHONPATH": f"{tmp_path}{os.pathsep}{root / 'src'}",
+            "MPLBACKEND": "Agg",
+            "OMP_NUM_THREADS": "1",
+            "OPENBLAS_NUM_THREADS": "1",
+            "MKL_NUM_THREADS": "1",
+            "NUMEXPR_NUM_THREADS": "1",
+        }
+    )
+    completed = subprocess.run(
+        [sys.executable, str(example_path)],
+        cwd=tmp_path,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert "Selected Pi-PLS: n_components=3, predictor_rank=9" in completed.stdout
+    assert (tmp_path / "results" / "pulp_post_analysis" / "latent_structure.pdf").is_file()

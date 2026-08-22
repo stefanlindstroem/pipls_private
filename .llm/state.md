@@ -271,6 +271,13 @@ the development checkout. Clean installation isolation remains the responsibilit
 second temporary virtual environment. Artifact installation checks reuse pip's normal cache,
 including a caller-supplied `PIP_CACHE_DIR`.
 
+Decision 0160 is implemented and closed. `adjustText` remains installed by the maintained
+`examples`, `docs`, and `dev` extras but is no longer required for successful Pulp rendering.
+Example 04 and the Pulp tutorial renderer retain their original Matplotlib text positions when
+`adjustText` itself is unavailable, while unrelated import failures from an installed
+`adjustText` continue to propagate. The runtime package remains independent of both graphics
+dependencies.
+
 ## Authority and drift handling
 
 When sources disagree, use this order:

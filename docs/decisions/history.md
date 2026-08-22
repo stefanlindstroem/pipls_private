@@ -82,8 +82,9 @@ Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0061](0061-example-owned-report-composition.md),
 [0083](0083-data-first-rendering-policy.md), [0094](0094-inspection-result-safety.md),
 [0110](0110-response-anchored-display-factors.md),
-[0124](0124-mathematical-typography-and-subscripts.md), and
-[0141](0141-spectral-predictor-rank-profile-figures.md).
+[0124](0124-mathematical-typography-and-subscripts.md),
+[0141](0141-spectral-predictor-rank-profile-figures.md), and
+[0160](0160-graceful-adjusttext-fallback.md).
 
 ## Packaging and release engineering
 

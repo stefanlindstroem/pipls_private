@@ -57,6 +57,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0157-near-saturated-synthetic-pls-comparison.md` | near-saturated synthetic PLS-family stress case | closed exploratory extension of Example 03 with a fixed deterministic 25-by-40, 10-response design, matched folds, and exhaustive Pi-PLS rank coverage |
 | `0158-home-page-parsimony-comparison.md` | Home-page parsimony comparison | closed documentation contract: simplified Pulp/Tobacco Home figures share the Example-03 protocol, show publication-default Pi-PLS versus PLS, and bound the parsimony claim to shared component count |
 | `0159-documentation-cross-reference-architecture.md` | documentation cross-reference architecture | closed four-patch navigation contract: stable canonical anchors, semantic dataset/publication/theory links, final contextual-link audit, and regression protection are implemented without an every-occurrence link rule |
+| `0160-graceful-adjusttext-fallback.md` | graceful optional `adjustText` fallback | keep `adjustText` in maintained extras but make its absence non-fatal for Pulp example/tutorial rendering by retaining original Matplotlib label positions |
 
 ## Implemented clarifications
 

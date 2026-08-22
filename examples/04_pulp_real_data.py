@@ -5,9 +5,16 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from adjustText import adjust_text
 from matplotlib.patches import FancyArrowPatch
 from sklearn.model_selection import RepeatedKFold
+
+try:
+    from adjustText import adjust_text
+except ModuleNotFoundError as exc:
+    if exc.name != "adjustText":
+        raise
+    adjust_text = None
+
 
 from pipls import PiPLSSearchCV
 from pipls.component_path import (
@@ -260,18 +267,19 @@ def _plot_latent_structure(
     biplot_axis.set_aspect("equal", adjustable="datalim")
     biplot_axis.margins(0.1)
     biplot_axis.legend()
-    adjust_text(
-        predictor_labels,
-        x=sample_xy[:, 0],
-        y=sample_xy[:, 1],
-        target_x=predictor_xy[:, 0],
-        target_y=predictor_xy[:, 1],
-        ax=biplot_axis,
-        ensure_inside_axes=True,
-        prevent_crossings=False,
-        iter_lim=200,
-        arrowprops={"arrowstyle": "-", "linewidth": 0.6},
-    )
+    if adjust_text is not None:
+        adjust_text(
+            predictor_labels,
+            x=sample_xy[:, 0],
+            y=sample_xy[:, 1],
+            target_x=predictor_xy[:, 0],
+            target_y=predictor_xy[:, 1],
+            ax=biplot_axis,
+            ensure_inside_axes=True,
+            prevent_crossings=False,
+            iter_lim=200,
+            arrowprops={"arrowstyle": "-", "linewidth": 0.6},
+        )
     # --8<-- [end:plot-pulp-biplot]
 
     predictor_positions = np.arange(len(predictor_names))

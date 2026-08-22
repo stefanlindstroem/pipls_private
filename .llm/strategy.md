@@ -166,3 +166,10 @@ For each patch:
 
 When a tool such as Ruff, mypy, MkDocs, or an optional renderer dependency is unavailable, state
 that precisely and provide the authoritative local command. Do not claim an unrun check passed.
+
+Decision 0160 is implemented and closed. `adjustText` remains installed by the maintained
+`examples`, `docs`, and `dev` extras but is no longer required for successful Pulp rendering.
+Example 04 and the Pulp tutorial renderer retain their original Matplotlib text positions when
+`adjustText` itself is unavailable, while unrelated import failures from an installed
+`adjustText` continue to propagate. The runtime package remains independent of both graphics
+dependencies.

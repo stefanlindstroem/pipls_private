@@ -20,8 +20,9 @@ legends, layout, and output remain visible and caller-controlled.
 
 `biplot_coordinates()` remains package-owned because balancing score and loading coordinates is a
 numerical operation. Annotated biplots use Matplotlib arrows and text artists. The optional external
-`adjustText` package may reposition those labels after final axis configuration. Automatic label
-placement is heuristic and is not part of the Pi-PLS numerical contract.
+`adjustText` package may reposition those labels after final axis configuration. Maintained Pulp
+rendering workflows fall back to the original Matplotlib text positions when `adjustText` is not
+available. Automatic label placement is heuristic and is not part of the Pi-PLS numerical contract.
 
 Matplotlib and `adjustText` remain optional dependencies under the `examples`, `docs`, and `dev`
 extras. The runtime package imports neither package. Plotting helpers may be local to the example

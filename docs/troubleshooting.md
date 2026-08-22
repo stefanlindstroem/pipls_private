@@ -190,7 +190,7 @@ rule is more conservative. See
 `copy=True` when input preservation matters. Read-only arrays and overlapping predictor/response
 storage are copied internally when mutation would be unsafe.
 
-## An example cannot import Matplotlib or `adjustText`
+## An example cannot import Matplotlib
 
 Numerical estimators and inspection results do not require plotting dependencies. Install the
 example extra before running the maintained plotting workflows:
@@ -199,9 +199,9 @@ example extra before running the maintained plotting workflows:
 python -m pip install ".[examples]"
 ```
 
-The examples render immutable inspection arrays with ordinary Matplotlib. Annotated biplots also
-use `adjustText`; call `adjust_text()` only after the final axis labels, limits, aspect, and legend
-have been configured. Automatic label placement is heuristic and may need application-specific
-tuning for dense
-diagrams. It does not change `BiplotCoordinates`; inspect or export those arrays directly when a
-non-graphical workflow is preferable.
+The examples render immutable inspection arrays with ordinary Matplotlib. Annotated biplots use
+`adjustText` when it is available, but its absence is non-fatal: labels remain at their original
+Matplotlib text positions. When using `adjustText`, call `adjust_text()` only after the final axis
+labels, limits, aspect, and legend have been configured. Automatic label placement is heuristic and
+may need application-specific tuning for dense diagrams. It does not change `BiplotCoordinates`;
+inspect or export those arrays directly when a non-graphical workflow is preferable.

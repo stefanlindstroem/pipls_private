@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import importlib.util
 import json
 import os
 import subprocess
@@ -45,14 +44,27 @@ def generated_pulp_assets(tmp_path_factory: pytest.TempPathFactory) -> Path:
     repository = _repository_root()
     output_dir = tmp_path_factory.mktemp("pulp-tutorial-assets") / "pulp"
     environment = os.environ.copy()
-    python_path = str(repository / "src")
-    if importlib.util.find_spec("adjustText") is None:
-        stub_dir = tmp_path_factory.mktemp("pulp-adjusttext-stub")
-        (stub_dir / "adjustText.py").write_text(
-            "def adjust_text(texts, *args, **kwargs):\n    return texts\n",
-            encoding="utf-8",
+    blocked_dependency_dir = tmp_path_factory.mktemp("pulp-no-adjusttext")
+    (blocked_dependency_dir / "sitecustomize.py").write_text(
+        """import builtins
+
+_original_import = builtins.__import__
+
+
+def _guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
+    if name.split(".", 1)[0] == "adjustText":
+        raise ModuleNotFoundError(
+            "blocked optional dependency: adjustText",
+            name="adjustText",
         )
-        python_path = f"{stub_dir}{os.pathsep}{python_path}"
+    return _original_import(name, globals, locals, fromlist, level)
+
+
+builtins.__import__ = _guarded_import
+""",
+        encoding="utf-8",
+    )
+    python_path = f"{blocked_dependency_dir}{os.pathsep}{repository / 'src'}"
     environment.update(
         {
             "PYTHONPATH": python_path,
