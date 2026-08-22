@@ -47,12 +47,12 @@
       {"name": "W (arith)", "description": "Arithmetic mean of the measured particle width W."},
       {"name": "W (lw)", "description": "Length-weighted mean of the measured particle width W."},
       {"name": "W (llw)", "description": "Length-length-weighted mean of the measured particle width W."},
-      {"name": "C (arith)", "description": "Arithmetic mean of the source FiberLab C particle descriptor."},
-      {"name": "C (lw)", "description": "Length-weighted mean of the source FiberLab C particle descriptor."},
-      {"name": "C (llw)", "description": "Length-length-weighted mean of the source FiberLab C particle descriptor."},
-      {"name": "F (arith)", "description": "Arithmetic mean of the source FiberLab fibrillation descriptor F."},
-      {"name": "F (lw)", "description": "Length-weighted mean of the source FiberLab fibrillation descriptor F."},
-      {"name": "F (llw)", "description": "Length-length-weighted mean of the source FiberLab fibrillation descriptor F."}
+      {"name": "C (arith)", "description": "Arithmetic mean of the measured particle curl C."},
+      {"name": "C (lw)", "description": "Length-weighted mean of the measured particle curl C."},
+      {"name": "C (llw)", "description": "Length-length-weighted mean of the measured particle curl C."},
+      {"name": "F (arith)", "description": "Arithmetic mean of the measured fibrillation descriptor F."},
+      {"name": "F (lw)", "description": "Length-weighted mean of the measured fibrillation descriptor F."},
+      {"name": "F (llw)", "description": "Length-length-weighted mean of the measured fibrillation descriptor F."}
     ],
     "responses": [
       {"name": "CSF", "description": "Canadian Standard Freeness measurement."},

@@ -51,24 +51,18 @@ validation splitter:
 --8<-- "examples/04_pulp_real_data.py:pulp-tutorial-setup"
 ```
 
-The component count is intentionally absent from this setup block. It is introduced only after the
-component path has been inspected. The pointwise diagnostic figures and RMSE summary include all
-eight response columns.
-
 ## The data and modeling question
 
 The package-owned dataset contains 46 thermomechanical-pulp samples, 14 fiber-description
 predictors, and eight responses comprising Canadian Standard Freeness and seven handsheet
 properties. `load_pulp()` reads the installed resources without network access. The matrices are
-adapted from supplementary material associated with Lindström et al. (2025); all rows are preserved,
-and no imputation or learned preprocessing is applied before fitting. See the
+adapted from supplementary material associated with Lindström et al. (2025). See the
 [dataset description](../datasets.md#pulp-real-data-integration) and the [reference](#reference) for
 provenance.
 
-Predictor labels retain the source notation: `L` is contour length, `W` is width, `C` is the source
-FiberLab C descriptor, and `F` is fibrillation. The suffixes `arith`, `lw`, and `llw` denote
+Predictor labels retain the source notation: `L` is contour length, `W` is width, `C` is curl, and `F` is fibrillation. The suffixes `arith`, `lw`, and `llw` denote
 arithmetic, length-weighted, and length-length-weighted means. The response labels are `CSF`
-(Canadian Standard Freeness), `Density`, `TI` (tensile index), `Elongation`, `TEA` (tensile
+(Canadian Standard Freeness), `Density`, `TI` (tensile index), `Elongation` (strain at break), `TEA` (tensile
 energy absorption), `TSI` (tensile stiffness index), `Tear index`, and `s` (light-scattering
 coefficient).
 
@@ -105,9 +99,6 @@ This analysis uses ten repeated five-fold partitions, so every evaluated candida
 materialized validation splits. These search-owned results can be inspected without fitting a final
 model.
 
-Repeated CV makes this complete analysis approximately ten times as expensive as the former single
-five-fold partition. The quick start remains deliberately lighter.
-
 Define a local component-path plotter once, then render the path before fixing a component
 count:
 
@@ -124,29 +115,21 @@ count:
 The mean CV-MSE falls substantially through three components and is nearly flat thereafter. The
 bars show one population standard deviation across the materialized validation splits on either
 side of each mean. They describe split-to-split variability; they are not confidence intervals and
-do not enter selection. No row is marked in this first figure because it supplies the evidence for
-the component-count decision.
+do not enter selection.
 
 ## Choose the component count and create the selection
 
-After inspecting the path, record the chosen count and create the corresponding immutable row:
+After inspecting the path, identify the elbow point, record the corresponding count, and create the immutable selection:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:choose-pulp-selection"
 ```
 
-Setting `CHOSEN_N_COMPONENTS=3` and calling `search.select(...)` are one conceptual operation. The
-static example records the resulting choice so the analysis is reproducible. In an interactive
-analysis, inspect the first path figure, set the value, and rerun from this selection stage.
-
-Manual selection is not the only supported component-count rule.
-`search.select(rule="best_score")` returns the conditioned path row with the best configured
-score, while `search.select(rule="minimum_cv_mse")` returns the smallest component count within
+Manual selection is not the only supported component-count rule. The statement
+`search.select(rule="best_score")` would return the conditioned path row with the best configured
+score, while `search.select(rule="minimum_cv_mse")` would return the smallest component count within
 the supplied relative and absolute tolerances of the exact path minimum. With the default scorer,
 maximizing the configured score is equivalent to minimizing mean response-standardized CV-MSE.
-This tutorial uses manual selection because the purpose is to inspect the path before fixing $h$;
-the named rules operate on the same one-dimensional conditioned path and do not require the user to
-select $r_\pi$ separately.
 
 ## Inspect the selected path and optional conditional rank profile
 
@@ -169,9 +152,7 @@ component count.
 
 ![Pulp selected component path](../assets/generated/pulp/selected_component_path.svg)
 
-The orange diamond marks the selected three-component row. Its stored predictor rank is 9. With
-the default scorer and the default machine-scale predictor-rank tolerance, the exact reference
-optimum and the retained predictor rank coincide at 9 for this analysis.
+The orange diamond marks the three-component selection, which is also associated with a certain predictor rank which was selected internally.
 
 ### Optional: conditional predictor-rank profile
 
@@ -182,18 +163,16 @@ optimum and the retained predictor rank coincide at 9 for this analysis.
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
 Most users can stop at the component path. Advanced users can inspect this profile because
-Π-PLS exposes the second parameter $r_\pi$ rather than hiding it inside the implementation. With
+Π-PLS exposes the second parameter $r_\pi$. With
 the default scorer, `profile.reference_selection` identifies the exact minimum-CV-MSE predictor
 rank at the chosen $h$, whereas `profile.selection` identifies the smallest evaluated rank admitted
 by the configured predictor-rank tolerance. The default relative tolerance is at machine scale, so
 these normally coincide; both are rank 9 in this analysis.
 
 For these 46 rows and 14 predictors, the default search is exhaustive over the complete
-fold-feasible predictor-rank domain. The effective hard ceiling is 14, so at the selected
-$h=3$ the profile evaluates every rank from 3 through 14. No EPV-style $n/c$ term limits this
-automatic scan.
+fold-feasible predictor-rank domain, which is from 3 through 14 at the selected $h=3$.
 
-The manuscript-style EPV rule remains available as a distinct fixed-rank policy. For the same full
+The events-per-value (EPV) rule used in the companion article remains available as a distinct time-efficient, fixed-rank policy. For the same full
 sample count, `predictor_rank_values="epv"` with the default
 `samples_per_predictor_rank=10` gives the nominal rank
 $\min[14,\lceil46/10\rceil]=5$, while the more permissive $c=5$ choice gives rank 10. Those
