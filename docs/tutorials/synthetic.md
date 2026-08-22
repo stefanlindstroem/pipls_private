@@ -8,8 +8,7 @@ the validation evidence before choosing a component count, creates one explicit 
 For ordinary programming use, Π-PLS behaves like a one-parameter component search: as in PLS,
 the main complexity parameter is `n_components`, denoted by $h$. A **component path** is the
 sequence of cross-validated prediction errors obtained as $h$ is varied. The search resolves the
-predictor rank $r_\pi$ internally for each $h$, so the component path remains a one-dimensional
-curve against component count. The distinction between the two controls is summarized under
+predictor rank $r_\pi$ internally for each $h$. Details can be reviewed under
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 The workflow is to generate independent training and test data, fit the search, inspect the
@@ -75,17 +74,11 @@ Fit the component search just as you would fit a PLS component search:
 ```
 
 The programming-level decision is how many paired latent modes to retain, so `n_components` is the
-quantity displayed on the component path. Under the hood, Π-PLS also has a predictor-rank
-parameter $r_\pi$. `PiPLSSearchCV` searches that rank conditionally for each $h$ and stores one
-resolved rank on each component-path row. The default rank search is exhaustive over every
-fold-feasible integer rank. Most
-users therefore do not need to treat $r_\pi$ as a second tuning parameter.
-
-With the default scorer, larger scores are equivalent to smaller mean response-standardized
-CV-MSE. The search first identifies the exact predictor-rank optimum for each $h$ and then retains
-the smallest evaluated rank satisfying the configured predictor-rank tolerance. The default
-relative tolerance is at machine scale, so the retained rank normally coincides with the exact
-CV-MSE optimum unless a lower rank is numerically indistinguishable.
+quantity displayed on the component path. Under the hood, Π-PLS also investigates predictor rank
+$r_\pi$ conditionally for each $h$; that resolved rank is already incorporated into each
+component-path row. Most users can therefore treat the search as a one-dimensional component-count
+problem. We return to the predictor-rank search, with graphical support, under
+[Optional: inspect the conditional predictor-rank profile](#inspect-conditional-predictor-rank-profile).
 
 At this stage the search owns validation evidence. It has not selected a component count or fitted
 a final model on all training observations.
@@ -115,20 +108,17 @@ Define a local component-path plotter once, then render the unconditional path:
 The mean CV-MSE falls markedly from one to two components and changes little at three. The bars
 show one population standard deviation across the materialized validation splits on either side
 of each mean. They describe split-to-split variability; they are not confidence intervals and do
-not enter selection. No row is marked because the purpose of this first figure is to support the
-component-count decision.
+not enter selection.
 
 ## Choose the component count and create the selection
 
-After inspecting the path, record the chosen value and create the corresponding immutable search
-selection:
+Inspect the path and identify its elbow point. This which represents the simplest model that can be constructed significantly impairing predictive performance.   Record the number of components at that point and create the corresponding immutable search selection:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:choose-synthetic-selection"
 ```
 
-Setting `CHOSEN_N_COMPONENTS` and calling `search.select(...)` are one conceptual operation. The
-static script records the resulting choice so that the complete example is reproducible. In an
+The static script records the resulting choice so that the complete example is reproducible. In an
 interactive analysis, inspect the first path figure, set the value, and rerun from this selection
 stage.
 
@@ -154,14 +144,14 @@ evidence is accepted.
 
 ![Synthetic selected component path](../assets/generated/synthetic/selected_component_path.svg)
 
-The path is unchanged; the orange diamond identifies the selected two-component row. Showing the
-path again makes the recorded decision explicit without implying that path evaluation was repeated.
+The path is unchanged; the orange diamond identifies the selected two-component row without repeating the evaluation.
 
-### Optional: inspect the conditional predictor-rank profile
+### Optional: inspect the conditional predictor-rank profile { #inspect-conditional-predictor-rank-profile }
 
-Most users can make the model-complexity decision from the component path alone. Advanced users
-can additionally inspect the second Π-PLS parameter, $r_\pi$, because predictor rank is exposed
-rather than hidden inside the estimator:
+Most users can make the model-complexity decision from the component path alone. This is where the
+predictor-rank search mentioned earlier becomes visible. By default, `PiPLSSearchCV` evaluates every
+fold-feasible integer predictor rank conditionally at the chosen $h$. Advanced users can inspect
+those evaluations directly:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-rank-profile"
@@ -170,22 +160,18 @@ rather than hidden inside the estimator:
 ![Synthetic predictor-rank profile](../assets/generated/synthetic/predictor_rank_profile.svg)
 
 The profile shows the predictor ranks actually evaluated at the chosen $h$. With the default
-scorer, `reference_selection` identifies the exact minimum-CV-MSE rank, while `selection`
-identifies the smallest rank admitted by the fitted predictor-rank tolerance. With the default
-machine-scale tolerance these are normally the same. Here both select predictor rank four, which
+scorer, larger configured scores are equivalent to smaller mean response-standardized CV-MSE.
+`reference_selection` identifies the exact minimum-CV-MSE rank, while `selection` identifies the
+smallest rank admitted by the fitted predictor-rank tolerance. With the default machine-scale
+tolerance these are normally the same. Here both select predictor rank four, which
 matches the two shared and two predictor-specific directions in the predictor block. This
 agreement is informative but not a general selection guarantee.
 
-Advanced analyses can control predictor rank through the search configuration, for example by
-restricting or fixing `predictor_rank_values`, or can fit an exact
-`PiPLSRegression(n_components=h, predictor_rank=r_pi)` pair directly. The latter is an explicit
-fixed-model fit rather than a new row selected from an already fitted search. See
-[Path-selection details](../path_analysis.md#predictor-rank-policies) for the available policies
-and tolerances.
+Advanced analyses can control predictor rank through the search configuration. See
+[Path-selection details](../path_analysis.md#predictor-rank-policies) for the available policies and tolerances.
 
 The selected path and optional rank profile are still model-selection evidence. If they make the
 chosen component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection.
-This is a return within the selection process, not independent post-selection validation.
 
 ## Refit the selected pair
 
@@ -218,8 +204,7 @@ The completed diagnostic result is then rendered:
 
 ![Synthetic observed versus predicted responses](../assets/generated/synthetic/observed_vs_predicted.svg)
 
-The prediction plot uses the held-out test block, so it is not a fitted-data or
-selection-conditioned OOF display. `model.score(test.X, test.Y)` supplies the corresponding uniform
+The prediction plot uses the held-out test block. `model.score(test.X, test.Y)` supplies the corresponding uniform
 average of the response-wise coefficients of determination.
 
 ## Minimal reusable workflow

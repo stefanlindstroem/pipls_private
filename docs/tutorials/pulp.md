@@ -1,16 +1,16 @@
 # Pulp: a complete Π-PLS workflow
 
-This tutorial applies [Inspect a manually selected Π-PLS model with synthetic data](synthetic.md)
+This tutorial showcases a complete Π-PLS workflow applied 
 to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`, and fixed-model
-fitting are already familiar. The focus is what changes with real data: an interior predictor-rank
+fitting are already familiar from [Inspect a manually selected Π-PLS model with synthetic data](synthetic.md). The focus is what changes with real data: an interior predictor-rank
 result, selection-conditioned out-of-fold (OOF) predictions, and interpretation of an accepted
 model.
 
 For ordinary programming use, Π-PLS can be approached like PLS: the main model-complexity
 parameter is the paired-mode count $h$ (`n_components`). A **component path** is the
 one-dimensional sequence of cross-validated prediction errors obtained as $h$ is varied. For each
-$h$, the search resolves the retained predictor rank $r_\pi$ internally, so users do not normally
-need to tune a second parameter. Advanced users can inspect or constrain $r_\pi$ when the scientific
+$h$, the search also resolves the retained predictor rank $r_\pi$ internally, so users do not normally
+need to tune it as a second parameter. Advanced users can inspect or constrain $r_\pi$ when the scientific
 question or available sample support makes that useful.
 
 The workflow is to load the [Pulp data](../datasets.md#pulp-real-data-integration), fit the search,
