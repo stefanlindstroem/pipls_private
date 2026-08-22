@@ -173,18 +173,9 @@ For these 46 rows and 14 predictors, the default search is exhaustive over the c
 fold-feasible predictor-rank domain, which is from 3 through 14 at the selected $h=3$.
 
 The events-per-value (EPV) rule used in the companion article remains available as a distinct time-efficient, fixed-rank policy. For the same full
-sample count, `predictor_rank_values="epv"` with the default
-`samples_per_predictor_rank=10` gives the nominal rank
-$\min[14,\lceil46/10\rceil]=5$, while the more permissive $c=5$ choice gives rank 10. Those
-settings define a different predictor-rank policy; they do not alter the domain of the default
-automatic search.
-
-Ranks 9 and 10 have mean CV-MSE values of approximately 0.258 and 0.274, with population split SDs
-of approximately 0.097 and 0.100. Their mean difference is small relative to the displayed
-split-to-split variability. The profile supports rank 9 for this selection, but it does not
-establish a distinct scientific advantage over nearby retained dimensions. The fixed model still
-contains three paired latent modes; predictor rank 9 is the retained predictor-subspace dimension
-used to estimate those modes.
+sample count, `predictor_rank_values="epv"` with `samples_per_predictor_rank=5` gives the nominal rank
+$\min[14,\lceil46/5\rceil]=10$. Those
+settings define a different predictor-rank policy.
 
 Advanced analyses can also control predictor rank directly: `predictor_rank_values` can restrict or
 fix the ranks considered by `PiPLSSearchCV`, `predictor_rank_values="epv"` requests the explicit
@@ -205,12 +196,11 @@ component count again:
 --8<-- "examples/04_pulp_real_data.py:pulp-oof-predictions"
 ```
 
-`oof_report()` reuses the exact 50 seeded splits materialized during path evaluation and recomputes
-row-ordered predictions for `selection`. Each observation is held out once per repetition, so the
-report averages ten OOF predictions for every Pulp row and records a prediction count of ten. The
-fixed random seed makes the repeated partitions reproducible while avoiding fold assignments
-determined by row order. Replace the search splitter with a grouped, temporal, or otherwise
-appropriate protocol when the sampling design carries experimental structure.
+`oof_report()` reuses the same cross-validation splits that were used to evaluate the component path
+and recomputes OOF predictions for the selected model. Under the repeated cross-validation protocol used here,
+each observation is predicted once in each of the ten repetitions. The report therefore combines ten
+OOF predictions for each observation into a single averaged prediction and records a prediction count of ten.
+Because the folds are shuffled using a fixed random seed, the procedure is reproducible while remaining independent of the original observation order.
 
 Convert those predictions to an immutable diagnostic result before refitting:
 
@@ -219,16 +209,12 @@ Convert those predictions to an immutable diagnostic result before refitting:
 ```
 
 !!! important "Validation scope"
-    These are **selection-conditioned OOF predictions**. The selected rank pair is fitted on each
-    stored training fold, but the same observations were already used to inspect the selection path.
-    This report is additional evidence within model selection, not independent qualification of the
-    selected model. Nested cross-validation or an external test set is required for an independent
-    estimate of post-selection performance. See
-    [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
+    These are **selection-conditioned OOF predictions**: the selected model is refitted on each
+    stored training fold, but the same data were already used for model selection. The report is
+    therefore part of the model-selection evidence, not an independent estimate of post-selection
+    performance. Use nested cross-validation or an external test set for independent evaluation.
+    See [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
 
-The pointwise figures show all eight response columns. This makes the displays denser, but preserves
-the full multivariate response structure instead of selecting a visually convenient subset. All
-charts use named arrays from `PredictionDiagnostics` directly.
 
 ### Observed versus predicted
 
@@ -264,16 +250,12 @@ See [Residuals versus predicted](../model_inspection.md#residuals-versus-predict
 
 ![Pulp standardized RMSE](../assets/generated/pulp/standardized_rmse.svg)
 
-Response-wise RMSE is divided by the observed sample standard deviation. `CSF` has the lowest value
-(approximately 0.30), while `Tear index` has the highest (approximately 0.68). These values are not
-identical to the fold-local standardized losses used during path selection.
+Response-wise RMSE is divided by the observed sample standard deviation. Prediction accuracy varies across the eight responses: `s` has the lowest standardized RMSE in this analysis, while `Elongation` has the highest. These response-wise diagnostics are not identical to the fold-local standardized losses used during path selection.
 
 See [Standardized RMSE](../model_inspection.md#standardized-rmse).
 
 If the selected path, conditional rank profile, or OOF behavior is unsatisfactory, return to
-`CHOSEN_N_COMPONENTS`, create another selection, and inspect the resulting evidence. That feedback
-step remains part of model selection; it does not turn the same-search OOF report into an independent
-performance estimate.
+`CHOSEN_N_COMPONENTS`, create another selection, and inspect the resulting evidence.
 
 ## Refit the accepted selection
 
@@ -284,11 +266,10 @@ observations:
 --8<-- "examples/04_pulp_real_data.py:fit-pulp-model"
 ```
 
-`refit(selection=selection)` does not repeat the component-count decision. It validates the supplied
-selection against the fitted search, fits its fixed component and predictor ranks, and attaches the
+`refit(selection=selection)` fits its fixed component and predictor ranks, and attaches the
 exact immutable object as `model.selection_` after fitting succeeds. The returned
 [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression) supplies predictions and fitted-model
-inspection, while the search continues to own the cross-validation evidence.
+inspection.
 
 ## Compute immutable fitted-model results
 
