@@ -163,29 +163,16 @@ The orange diamond marks the three-component selection, which is also associated
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
 Most users can stop at the component path. Advanced users can inspect this profile because
-Π-PLS exposes the second parameter $r_\pi$. With
-the default scorer, `profile.reference_selection` identifies the exact minimum-CV-MSE predictor
-rank at the chosen $h$, whereas `profile.selection` identifies the smallest evaluated rank admitted
-by the configured predictor-rank tolerance. The default relative tolerance is at machine scale, so
-these normally coincide; both are rank 9 in this analysis.
+Π-PLS exposes the second parameter $r_\pi$. With the default scorer,
+`profile.reference_selection` identifies the exact minimum-CV-MSE predictor rank at the chosen
+$h$, whereas `profile.selection` identifies the smallest evaluated rank admitted by the configured
+predictor-rank tolerance. The default relative tolerance is at machine scale, so these normally
+coincide; both are rank 9 in this analysis.
 
-For these 46 rows and 14 predictors, the default search is exhaustive over the complete
-fold-feasible predictor-rank domain, which is from 3 through 14 at the selected $h=3$.
-
-The events-per-value (EPV) rule used in the companion article remains available as a distinct time-efficient, fixed-rank policy. For the same full
-sample count, `predictor_rank_values="epv"` with `samples_per_predictor_rank=5` gives the nominal rank
-$\min[14,\lceil46/5\rceil]=10$. Those
-settings define a different predictor-rank policy.
-
-Advanced analyses can also control predictor rank directly: `predictor_rank_values` can restrict or
-fix the ranks considered by `PiPLSSearchCV`, `predictor_rank_values="epv"` requests the explicit
-EPV policy, and an exact `PiPLSRegression(n_components=h, predictor_rank=r_pi)` pair can be fitted
-when both ranks are chosen deliberately. The 50-split protocol is a final stability choice rather than a recommended
-development default; a single seeded five-fold partition is much cheaper while the workflow is
-being assembled. See [Computational
-performance](../computational_performance.md#develop-with-a-smaller-validation-protocol)
-for that development-to-final distinction and [Path-selection details](../path_analysis.md) for
-selection rules, predictor-rank policies, tolerances, and bounds.
+For these 46 observations and 14 predictors, the default search is exhaustive over the complete
+fold-feasible predictor-rank domain, from 3 through 14 at the selected $h=3$. Alternative ways to
+restrict or fix predictor rank are advanced configuration choices and are documented separately in
+[Predictor-rank policies](../path_analysis.md#predictor-rank-policies).
 
 ## Inspect selection-conditioned OOF behavior
 
@@ -285,13 +272,14 @@ rendered:
 | `LatentStructure` | How are samples and variables represented by the fitted PLS-family model? |
 | `PiPLSDisplayFactors` | What are the Π-PLS-specific $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors? |
 
-The Pulp workflow uses `response_names.index("TI")` as the response sign anchor and requests a
-positive orientation. The resulting TI entry is nonnegative for every displayed component, and the
-same component sign is applied to the paired columns of $\mathbf{P}$ and $\mathbf{Q}$. This
-convention is useful here because tensile index is the principal controlled target. It only chooses
-how an equivalent factorization is displayed; it does not change predictions or assert that every
-physical effect on TI is positive. If an anchored entry were exactly zero, the helper would use its
-default predictor-based sign for that component.
+Each paired latent mode has an arbitrary overall sign: reversing the matching columns of
+$\mathbf{P}$ and $\mathbf{Q}$ leaves the fitted regression map unchanged. For interpretation, this
+sign indeterminacy is normally resolved by choosing a deterministic, canonical display orientation.
+Tensile index (`TI`) is commonly treated as a key handsheet quality property in pulp applications,
+so this tutorial uses
+`response_names.index("TI")` to orient the displayed components toward positive TI. The same
+orientation is applied to the paired predictor directions, giving the factor plots a consistent
+reference for interpretation.
 
 At this point all numerical analysis is complete. The remaining fitted-model code only renders
 completed public result objects. The full catalogue is in
@@ -299,10 +287,10 @@ completed public result objects. The full catalogue is in
 
 ## Interpret representative fitted-model plots
 
-Factor signs are arbitrary, so paired quantities may change sign together without changing
-predictions. This tutorial fixes that ambiguity with the TI-positive convention above. Interpret
-relative patterns and paired quantities rather than treating the chosen sign as a fitted scientific
-conclusion.
+With the display orientation fixed, the remaining figures provide two complementary views of
+the fitted model: the usual PLS-family latent structure and the Π-PLS-specific pairing of predictor
+and response directions. Read the figures comparatively, using relative patterns within and across
+paired components rather than treating individual plotted entries as standalone effects.
 
 ### Standard PLS-family latent structure
 
@@ -341,7 +329,7 @@ The grouped bars are constructed directly from `factors.predictor_directions`:
 The dominant entries differ by component: the first direction emphasizes `Shives` and selected
 fibrillation or length descriptors, the second emphasizes length descriptors, and the third is
 strongly associated with `Fines B`. Only relative within-component patterns should be interpreted;
-the displayed orientation is fixed by the TI entries in the paired response directions.
+the signs follow the TI-positive display convention defined above.
 
 The columns of $\mathbf{P}$ are orthonormal predictor directions, and the corresponding columns of
 $\mathbf{Q}$ are orthonormal response directions. The diagonal matrix $\mathbf{D}$ pairs and
