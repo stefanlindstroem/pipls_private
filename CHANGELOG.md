@@ -28,9 +28,10 @@
   Pulp, Sugarcane, Tobacco, and one fixed near-saturated synthetic stress case without claiming
   general superiority. The synthetic case fixes 25 observations, 40 predictors, 10 responses,
   5 shared and 15 predictor-specific latent directions, and noise SD 0.3 before comparison.
-- Make `adjustText` genuinely optional for maintained Pulp rendering: Example 04 and the Pulp
-  tutorial renderer now retain ordinary Matplotlib label positions when `adjustText` is unavailable,
-  while the `examples`, `docs`, and `dev` extras continue to install it for improved label layout.
+- Replace maintained Pulp biplot label placement with optional `textalloc`: predictor labels avoid
+  other predictor labels and exact predictor-arrow line segments, while sample-score points are not
+  obstacles. Preserve the plain-Matplotlib endpoint-label fallback and remove `adjustText` from the
+  active `examples`, `docs`, and `dev` dependency surface.
 - Improve documentation navigation with stable semantic destinations for the three reference
   datasets, the companion publication, and frequently used theory concepts. Cross-link the served
   guides, tutorials, and API pages to those destinations and add regression coverage for the

@@ -22,7 +22,7 @@ structure. `make examples` is the separate application-validation target and run
 example, including the complete real-data analyses. Randomized numerical paths and synthetic
 generators expose explicit random-state controls.
 
-The executable real-data examples require Matplotlib. The annotated Pulp biplot uses `adjustText`
+The executable real-data examples require Matplotlib. The annotated Pulp biplot uses `textalloc`
 when available and otherwise retains the original Matplotlib label positions. The package-owned
 loaders remove pandas from the numbered-example dependency set.
 Install the dedicated extra with:
@@ -49,8 +49,8 @@ virtual environment for each artifact, and installs each exact artifact path whi
 the repository checkout. Both environments execute the same smoke test: public package and
 submodule imports, installed version-metadata agreement, a representative fixed Π-PLS fit and
 prediction, and an explicit check that imports resolve from the temporary installation rather than
-`src/`. Matplotlib and `adjustText` remain optional example dependencies and are not imported by
-the runtime package.
+`src/`. Matplotlib and `textalloc` remain optional example dependencies and are not imported by the
+runtime package.
 
 The temporary environments and artifacts are removed after the check. This target validates
 installation behavior; `make check` remains the ordinary source-checkout test suite, and

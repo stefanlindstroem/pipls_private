@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted, implemented, and closed.
+Accepted, implemented, and closed. The allocator choice is superseded by Decision 0161; the
+graceful-fallback and runtime-dependency boundary remains in force.
 
 ## Context
 
@@ -40,3 +41,10 @@ optional-dependency fallback.
   the preferred maintained figure layout.
 - Regression coverage blocks `adjustText` during import of both Pulp rendering workflows and verifies
   that the fallback is selected without affecting the package-owned numerical boundary.
+
+
+## Supersession
+
+Decision 0161 replaces `adjustText` with optional `textalloc` for maintained Pulp label allocation.
+This record remains authoritative for the earlier decision that absence of an annotation-layout
+extra must not prevent the Pulp example or tutorial renderer from running.

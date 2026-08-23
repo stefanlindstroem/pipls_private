@@ -41,8 +41,8 @@
   belongs to `CONTRIBUTING.md` and maintainer workflows.
 - Keep rendering data-first: the package computes immutable numerical results, while maintained
   examples and tutorial renderers use ordinary Matplotlib directly. Retain
-  `biplot_coordinates()` as numerical preparation and use optional `adjustText` only after final
-  axis configuration. Private rendering functions may clarify a complete numbered example when
+  `biplot_coordinates()` as numerical preparation and use optional `textalloc` only for
+  example-owned label allocation after final axis configuration. Private rendering functions may clarify a complete numbered example when
   they remain in that same script, accept completed results explicitly, and perform no data loading,
   fitting, cross-validation, selection, or inspection calculation. Do not add public `plot_*`
   functions, a plotting submodule, or a shared support helper that hides chart construction.

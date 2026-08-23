@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted; implementation in progress.
+Accepted, implemented, and closed.
 
 ## Context
 
@@ -47,13 +47,14 @@ qualification gates before Patch 0161C removes `adjustText`.
 
 Patch 0161C removes `adjustText` from the active dependency and documentation surface, records
 Decision 0160 as superseded only with respect to the allocator choice while preserving its graceful
-fallback boundary, and closes this decision.
+fallback boundary, and closes this decision. Following qualification of the 0161B rendering,
+`textalloc` is the sole maintained annotation-layout extra.
 
 ## Consequences
 
 - No plotting dependency enters the `pipls` runtime package.
-- `textalloc` and `adjustText` temporarily coexist in the `examples`, `docs`, and `dev` extras while
-  the replacement is qualified; the Pulp workflows themselves now use only the `textalloc` helper.
+- `textalloc` is the sole annotation-layout dependency in the `examples`, `docs`, and `dev` extras;
+  `adjustText` is no longer part of the active dependency surface.
 - The helper has no sample-coordinate parameter, preventing accidental repulsion from the score
   cloud in the maintained annotation policy.
 - Predictor arrows are represented by their true line-segment geometry rather than sampled points.

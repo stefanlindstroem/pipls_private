@@ -64,5 +64,5 @@ the runtime API.
 
 The API ends at immutable numerical results. Π-PLS provides no plotting submodule. Maintained
 examples pass result arrays to ordinary Matplotlib calls. `biplot_coordinates()` is retained because
-coordinate balancing is numerical; optional `adjustText` placement operates on the resulting text
-artists.
+coordinate balancing is numerical; optional `textalloc` placement is example-owned rendering that
+operates on the resulting predictor endpoints and Matplotlib axes.

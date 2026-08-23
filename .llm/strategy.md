@@ -144,14 +144,13 @@ for canonical anchors, representative semantic routes, and non-isolated served p
 cross-reference changes should preserve semantic destinations and must not become a mechanical
 every-occurrence link rule.
 
-Decision 0161 is active. Patch 0161A introduces `textalloc>=1.2.4,<2` alongside `adjustText` in the
-maintained `examples`, `docs`, and `dev` extras and adds an example-local annotation helper. The
-helper gives `textalloc` only exact predictor-arrow line segments as geometric obstacles; other
-labels are allocator-owned obstacles, while sample-score points are intentionally excluded. The
-Patch 0161B migrates the Pulp example and tutorial renderer to the shared `textalloc` helper; the
-score cloud is not supplied as an obstacle, and fallback tests block `textalloc` while requiring both
-workflows to remain executable. Live visual and deterministic-render qualification with `textalloc`
-installed is required before Patch 0161C removes `adjustText` and closes the decision.
+Decision 0161 is implemented and closed. `textalloc>=1.2.4,<2` is the sole maintained
+annotation-layout extra in the `examples`, `docs`, and `dev` groups. Example 04 and the Pulp tutorial
+renderer share the example-local annotation helper, which gives `textalloc` only exact
+predictor-arrow line segments as geometric obstacles; other labels are allocator-owned obstacles,
+while sample-score points are intentionally excluded. Without `textalloc`, labels remain at their
+ordinary Matplotlib predictor endpoints. `adjustText` is no longer part of the active dependency or
+documentation surface.
 
 ## Deferred work
 
@@ -176,9 +175,7 @@ For each patch:
 When a tool such as Ruff, mypy, MkDocs, or an optional renderer dependency is unavailable, state
 that precisely and provide the authoritative local command. Do not claim an unrun check passed.
 
-Decision 0160 is implemented and closed. `adjustText` remains installed by the maintained
-`examples`, `docs`, and `dev` extras but is no longer required for successful Pulp rendering.
-Example 04 and the Pulp tutorial renderer retain their original Matplotlib text positions when
-`adjustText` itself is unavailable, while unrelated import failures from an installed
-`adjustText` continue to propagate. The runtime package remains independent of both graphics
-dependencies.
+Decision 0160 is implemented and closed but superseded by Decision 0161 only with respect to the
+annotation allocator. Its durable rule remains: absence of an optional annotation-layout dependency
+must not prevent maintained Pulp rendering, and the runtime package must remain independent of
+graphics dependencies.

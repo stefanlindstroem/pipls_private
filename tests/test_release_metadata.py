@@ -62,3 +62,14 @@ def test_release_urls_are_consistent_across_public_metadata() -> None:
     assert citation["repository-code"] == EXPECTED_REPOSITORY
     assert citation["url"] == EXPECTED_DOCUMENTATION
     assert EXPECTED_DOCUMENTATION in readme
+
+
+def test_annotation_layout_extra_is_textalloc_only() -> None:
+    project = _project_metadata()
+    optional = project["optional-dependencies"]
+    assert isinstance(optional, dict)
+
+    for group in ("dev", "examples", "docs"):
+        requirements = [str(requirement) for requirement in optional[group]]
+        assert any(requirement.startswith("textalloc>=") for requirement in requirements)
+        assert all(not requirement.lower().startswith("adjusttext") for requirement in requirements)

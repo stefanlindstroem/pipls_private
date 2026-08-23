@@ -295,8 +295,8 @@ constructor-level `predictor_rank_relative_tolerance=0.10` and a separate compon
 `relative_tolerance=0.10`; its figures and console output identify both exact references,
 thresholds, and retained choices.
 
-The example-local ordinary-PLS path helper is not package API. Optional Matplotlib and `adjustText`
-dependencies remain outside the runtime dependency set.
+The example-local ordinary-PLS path helper and annotation-layout helper are not package API.
+Optional Matplotlib and `textalloc` dependencies remain outside the runtime dependency set.
 
 ## Explicit public exclusions
 

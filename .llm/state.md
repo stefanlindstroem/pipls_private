@@ -171,7 +171,7 @@ prediction diagnostics separate from descriptive diagnostics of the final model 
 development observations.
 
 The runtime package contains no plotting module. Examples and users compose Matplotlib artists,
-labels, layouts, saving, and optional `adjustText` placement directly from immutable numerical
+labels, layouts, saving, and optional `textalloc` placement directly from immutable numerical
 results. Generated figures are artifacts, not package state.
 
 ## Documentation and distribution boundary
@@ -271,21 +271,18 @@ the development checkout. Clean installation isolation remains the responsibilit
 second temporary virtual environment. Artifact installation checks reuse pip's normal cache,
 including a caller-supplied `PIP_CACHE_DIR`.
 
-Decision 0160 is implemented and closed. `adjustText` remains installed by the maintained
-`examples`, `docs`, and `dev` extras but is no longer required for successful Pulp rendering.
-Example 04 and the Pulp tutorial renderer retain their original Matplotlib text positions when
-`adjustText` itself is unavailable, while unrelated import failures from an installed
-`adjustText` continue to propagate. The runtime package remains independent of both graphics
-dependencies.
+Decision 0160 is implemented and closed but superseded by Decision 0161 only with respect to the
+annotation allocator. Its durable rule remains: absence of an optional annotation-layout dependency
+must not prevent maintained Pulp rendering, and the runtime package must remain independent of
+graphics dependencies.
 
-Decision 0161 is active. Patch 0161A introduces `textalloc>=1.2.4,<2` alongside `adjustText` in the
-maintained `examples`, `docs`, and `dev` extras and adds an example-local annotation helper. The
-helper gives `textalloc` only exact predictor-arrow line segments as geometric obstacles; other
-labels are allocator-owned obstacles, while sample-score points are intentionally excluded. The
-Patch 0161B migrates the Pulp example and tutorial renderer to the shared `textalloc` helper; the
-score cloud is not supplied as an obstacle, and fallback tests block `textalloc` while requiring both
-workflows to remain executable. Live visual and deterministic-render qualification with `textalloc`
-installed is required before Patch 0161C removes `adjustText` and closes the decision.
+Decision 0161 is implemented and closed. `textalloc>=1.2.4,<2` is the sole maintained
+annotation-layout extra in the `examples`, `docs`, and `dev` groups. Example 04 and the Pulp tutorial
+renderer share the example-local annotation helper, which gives `textalloc` only exact
+predictor-arrow line segments as geometric obstacles; other labels are allocator-owned obstacles,
+while sample-score points are intentionally excluded. Without `textalloc`, labels remain at their
+ordinary Matplotlib predictor endpoints. `adjustText` is no longer part of the active dependency or
+documentation surface.
 
 ## Authority and drift handling
 

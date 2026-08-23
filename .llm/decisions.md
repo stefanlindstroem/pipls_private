@@ -57,8 +57,8 @@ This registry lists only numbered decisions that still define current behavior o
 | `0157-near-saturated-synthetic-pls-comparison.md` | near-saturated synthetic PLS-family stress case | closed exploratory extension of Example 03 with a fixed deterministic 25-by-40, 10-response design, matched folds, and exhaustive Pi-PLS rank coverage |
 | `0158-home-page-parsimony-comparison.md` | Home-page parsimony comparison | closed documentation contract: simplified Pulp/Tobacco Home figures share the Example-03 protocol, show publication-default Pi-PLS versus PLS, and bound the parsimony claim to shared component count |
 | `0159-documentation-cross-reference-architecture.md` | documentation cross-reference architecture | closed four-patch navigation contract: stable canonical anchors, semantic dataset/publication/theory links, final contextual-link audit, and regression protection are implemented without an every-occurrence link rule |
-| `0160-graceful-adjusttext-fallback.md` | graceful optional `adjustText` fallback | keep `adjustText` in maintained extras but make its absence non-fatal for Pulp example/tutorial rendering by retaining original Matplotlib label positions |
-| `0161-line-aware-text-allocation.md` | line-aware text allocation for annotated biplots | active migration from `adjustText` to `textalloc`; 0161B has moved the Pulp example/tutorial renderer to exact predictor-arrow line obstacles while retaining the plain-Matplotlib fallback, with final dependency cleanup deferred to 0161C |
+| `0160-graceful-adjusttext-fallback.md` | graceful optional `adjustText` fallback | historical allocator choice superseded by 0161; its non-fatal plain-Matplotlib fallback and runtime-dependency boundary remain authoritative |
+| `0161-line-aware-text-allocation.md` | line-aware text allocation for annotated biplots | closed migration: optional `textalloc` owns Pulp label allocation against other labels and exact predictor-arrow line obstacles; sample scores are excluded, fallback remains plain Matplotlib, and `adjustText` is removed from active dependencies |
 
 ## Implemented clarifications
 

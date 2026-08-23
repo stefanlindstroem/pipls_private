@@ -26,7 +26,7 @@ def test_runtime_imports_without_rendering_dependencies() -> None:
     script = r'''
 import builtins
 
-blocked = {"matplotlib", "adjustText", "textalloc"}
+blocked = {"matplotlib", "textalloc"}
 original_import = builtins.__import__
 
 

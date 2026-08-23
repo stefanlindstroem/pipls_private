@@ -16,7 +16,7 @@ which is a contributor workflow rather than the ordinary user route.
 
 Expose only three optional dependency groups:
 
-- `examples` owns pandas, Matplotlib, and optional `adjustText` for numbered examples;
+- `examples` owns pandas, Matplotlib, and optional `textalloc` for numbered examples;
 - `docs` owns source-distribution construction, tutorial rendering, and the strict MkDocs toolchain;
 - `dev` owns complete repository validation and therefore includes the example dependencies,
   PyYAML, Python-3.10 TOML support, pytest, mypy, Ruff, and artifact construction.

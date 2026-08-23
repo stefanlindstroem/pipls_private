@@ -199,9 +199,9 @@ example extra before running the maintained plotting workflows:
 python -m pip install ".[examples]"
 ```
 
-The examples render immutable inspection arrays with ordinary Matplotlib. Annotated biplots use
-`adjustText` when it is available, but its absence is non-fatal: labels remain at their original
-Matplotlib text positions. When using `adjustText`, call `adjust_text()` only after the final axis
-labels, limits, aspect, and legend have been configured. Automatic label placement is heuristic and
-may need application-specific tuning for dense diagrams. It does not change `BiplotCoordinates`;
+The examples render immutable inspection arrays with ordinary Matplotlib. The annotated Pulp biplot
+uses optional `textalloc` after the axis has been configured. When available, it places predictor
+labels while avoiding other predictor labels and the predictor-arrow shafts; sample-score points are
+not treated as obstacles. If `textalloc` is unavailable, labels remain at their original Matplotlib
+endpoint positions. Automatic label placement is heuristic and does not change `BiplotCoordinates`;
 inspect or export those arrays directly when a non-graphical workflow is preferable.

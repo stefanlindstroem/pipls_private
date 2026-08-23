@@ -28,8 +28,8 @@ operations. The supported named selection rules are `best_score` and tolerance-b
 `minimum_cv_mse`. Refitted models retain the exact immutable `selection_`.
 
 The package owns no plotting module. Maintained examples and tutorial renderers build Matplotlib
-figures directly from immutable numerical results. Optional `adjustText` may reposition annotated
-biplot labels but is not part of the numerical contract.
+figures directly from immutable numerical results. Optional `textalloc` may reposition annotated
+biplot labels while avoiding predictor-arrow shafts, but is not part of the numerical contract.
 
 ## Data and product assets
 

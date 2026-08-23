@@ -119,9 +119,9 @@ plane. The display is exploratory and does not establish groups, confidence regi
 
 Plot `BiplotCoordinates.sample_coordinates` and draw vectors from the origin to
 `predictor_coordinates`. Similar arrow directions indicate similar loading patterns in the displayed
-plane; they are not causal effects or automatic importance measures. Optional
-`adjustText.adjust_text()` may reposition predictor labels after limits, aspect, titles, and legends
-are final, but its placement is heuristic.
+plane; they are not causal effects or automatic importance measures. Optional `textalloc` may
+reposition predictor labels after limits, aspect, titles, and legends are final. The maintained Pulp biplot supplies the predictor-arrow shafts as line obstacles and lets the
+allocator avoid other predictor labels; placement remains a rendering heuristic.
 
 ### X loadings { #x-loadings }
 

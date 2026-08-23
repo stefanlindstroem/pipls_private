@@ -123,9 +123,10 @@ The two tutorial roles are fixed:
 
 Rendering follows one data-first rule: package code computes immutable numerical results, while
 numbered examples and tutorial renderers show ordinary Matplotlib construction directly. Keep
-`adjustText` optional and confined to annotated biplot label layout after final axis configuration.
-Maintained examples and documentation renderers must remain executable when `adjustText` is absent;
-in that case they retain the original Matplotlib text positions.
+`textalloc` optional and confined to annotated biplot label allocation after final axis configuration.
+Maintained examples and documentation renderers must remain executable when `textalloc` is absent;
+in that case they retain the original Matplotlib text positions. The shared annotation helper may own
+that optional label-allocation policy, but chart construction must remain in the example or renderer.
 Do not add a replacement plotting submodule or hide chart construction in `examples/_support/`.
 
 The served reference pages own exact API behavior and advanced alternatives. Avoid repeating those

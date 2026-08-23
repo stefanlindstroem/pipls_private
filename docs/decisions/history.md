@@ -75,7 +75,9 @@ boundaries in
 Inspection developed from package-owned plotters and report objects into validated immutable
 numerical results with caller-owned rendering. Intermediate atomic plotters and direct-rendering
 migration records are historical. The package owns coordinates, diagnostics, and orientation; users
-and examples own Matplotlib artists, panels, labels, layout, and file output.
+and examples own Matplotlib artists, panels, labels, layout, and file output. The maintained Pulp
+biplot uses optional line-aware `textalloc` placement with a plain-Matplotlib fallback; this
+supersedes the earlier `adjustText` allocator choice while preserving its non-fatal fallback rule.
 
 Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0045](0045-pls-family-analysis-boundary.md),
@@ -84,7 +86,7 @@ Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0110](0110-response-anchored-display-factors.md),
 [0124](0124-mathematical-typography-and-subscripts.md),
 [0141](0141-spectral-predictor-rank-profile-figures.md), and
-[0160](0160-graceful-adjusttext-fallback.md).
+[0161](0161-line-aware-text-allocation.md).
 
 ## Packaging and release engineering
 

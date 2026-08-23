@@ -55,7 +55,7 @@ independently held-out matrix supplied by the user.
 
 `pipls.inspection` owns pure numerical transformations and immutable records. It must not:
 
-- import Matplotlib or `adjustText`;
+- import Matplotlib or `textalloc`;
 - create or save figures;
 - choose components, responses, labels, colors, page layouts, or output paths;
 - read datasets or infer sample identity;
@@ -149,13 +149,15 @@ Examples and users render immutable arrays directly with Matplotlib. They own:
 - component/response choice;
 - physical coordinate axes such as wavelength or wavenumber;
 - labels, annotations, legends, styles, and panel layout;
-- optional `adjustText` placement;
+- optional `textalloc` placement;
 - saving and closing artifacts.
 
 The runtime package exposes no `pipls.plotting` module, no `plot_*` helpers, and no artist-bearing
-result records. Matplotlib and `adjustText` remain optional example/documentation dependencies.
+result records. Matplotlib and `textalloc` remain optional example/documentation dependencies.
 
-Annotated biplots call `adjust_text()` only after axis configuration. Tests may protect this order
+Annotated Pulp biplots allocate labels only after axis configuration. The maintained helper supplies
+predictor-arrow shafts as exact line obstacles, relies on the allocator for label-label avoidance,
+and intentionally excludes sample-score points. Tests may protect this order
 and direct ownership but must not freeze final adjusted label coordinates.
 
 ## Maintained workflow roles
