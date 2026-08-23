@@ -44,7 +44,7 @@ def generated_pulp_assets(tmp_path_factory: pytest.TempPathFactory) -> Path:
     repository = _repository_root()
     output_dir = tmp_path_factory.mktemp("pulp-tutorial-assets") / "pulp"
     environment = os.environ.copy()
-    blocked_dependency_dir = tmp_path_factory.mktemp("pulp-no-adjusttext")
+    blocked_dependency_dir = tmp_path_factory.mktemp("pulp-no-textalloc")
     (blocked_dependency_dir / "sitecustomize.py").write_text(
         """import builtins
 
@@ -52,10 +52,10 @@ _original_import = builtins.__import__
 
 
 def _guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
-    if name.split(".", 1)[0] == "adjustText":
+    if name.split(".", 1)[0] == "textalloc":
         raise ModuleNotFoundError(
-            "blocked optional dependency: adjustText",
-            name="adjustText",
+            "blocked optional dependency: textalloc",
+            name="textalloc",
         )
     return _original_import(name, globals, locals, fromlist, level)
 
@@ -64,7 +64,13 @@ builtins.__import__ = _guarded_import
 """,
         encoding="utf-8",
     )
-    python_path = f"{blocked_dependency_dir}{os.pathsep}{repository / 'src'}"
+    python_path = os.pathsep.join(
+        (
+            str(blocked_dependency_dir),
+            str(repository / "src"),
+            str(repository / "examples"),
+        )
+    )
     environment.update(
         {
             "PYTHONPATH": python_path,

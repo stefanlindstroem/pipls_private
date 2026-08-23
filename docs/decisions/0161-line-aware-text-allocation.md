@@ -39,8 +39,11 @@ Patch 0161A introduces `textalloc` alongside `adjustText` in the maintained extr
 example-local allocation helper that represents predictor arrows as actual line segments, and
 regression-tests the line-only obstacle contract. It does not change the rendered Pulp workflows.
 
-Patch 0161B migrates Example 04 and the Pulp tutorial renderer to that helper and qualifies the
-result visually and for deterministic documentation rendering.
+Patch 0161B migrates Example 04 and the Pulp tutorial renderer to that helper. Both workflows now
+pass only predictor endpoints and labels to the helper; sample-score coordinates remain outside the
+allocation interface. The maintained fallback tests block `textalloc` and require both workflows to
+remain executable. Visual acceptance and a live deterministic render with `textalloc` installed are
+qualification gates before Patch 0161C removes `adjustText`.
 
 Patch 0161C removes `adjustText` from the active dependency and documentation surface, records
 Decision 0160 as superseded only with respect to the allocator choice while preserving its graceful
@@ -50,7 +53,7 @@ fallback boundary, and closes this decision.
 
 - No plotting dependency enters the `pipls` runtime package.
 - `textalloc` and `adjustText` temporarily coexist in the `examples`, `docs`, and `dev` extras while
-  the replacement is qualified.
+  the replacement is qualified; the Pulp workflows themselves now use only the `textalloc` helper.
 - The helper has no sample-coordinate parameter, preventing accidental repulsion from the score
   cloud in the maintained annotation policy.
 - Predictor arrows are represented by their true line-segment geometry rather than sampled points.

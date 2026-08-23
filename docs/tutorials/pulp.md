@@ -44,8 +44,8 @@ python -m pip install ".[examples]"
 ```
 
 The example imports the estimators, repeated cross-validation, numerical inspection functions,
-Matplotlib, and uses `adjustText` when it is available, then defines the output location and
-validation splitter:
+Matplotlib, and the optional `textalloc`-backed annotation helper, then defines the output location
+and validation splitter:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:pulp-tutorial-setup"
@@ -297,9 +297,9 @@ paired components rather than treating individual plotted entries as standalone 
 #### Score-loading biplot
 
 `biplot_coordinates()` supplies balanced numerical coordinates. Matplotlib draws samples and
-predictor arrows. When [`adjustText`](https://adjusttext.readthedocs.io/) is available, it moves the
-labels after the axis has been configured; otherwise the labels remain at their original predictor
-endpoints:
+predictor arrows. When `textalloc` is available, it places predictor labels while avoiding other
+labels and the predictor-arrow shafts; sample scores are intentionally not treated as obstacles.
+Without `textalloc`, the labels remain at their original predictor endpoints:
 
 ```python
 --8<-- "tools/render_pulp_tutorial.py:render-pulp-biplot"

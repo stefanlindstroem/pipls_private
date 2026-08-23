@@ -26,7 +26,7 @@ def test_runtime_imports_without_rendering_dependencies() -> None:
     script = r'''
 import builtins
 
-blocked = {"matplotlib", "adjustText"}
+blocked = {"matplotlib", "adjustText", "textalloc"}
 original_import = builtins.__import__
 
 
@@ -54,7 +54,7 @@ assert pipls.PiPLSRegression is not None
 
 
 
-def test_pulp_example_runs_without_adjusttext(tmp_path: Path) -> None:
+def test_pulp_example_runs_without_textalloc(tmp_path: Path) -> None:
     root = _repository_root()
     example_path = tmp_path / "04_pulp_real_data.py"
     example_path.write_text(
@@ -62,6 +62,12 @@ def test_pulp_example_runs_without_adjusttext(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     (tmp_path / "results" / "pulp_post_analysis").mkdir(parents=True)
+    support_dir = tmp_path / "_support"
+    support_dir.mkdir()
+    (support_dir / "annotation_layout.py").write_text(
+        (root / "examples" / "_support" / "annotation_layout.py").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
     sitecustomize = tmp_path / "sitecustomize.py"
     sitecustomize.write_text(
         """import builtins
@@ -70,10 +76,10 @@ _original_import = builtins.__import__
 
 
 def _guarded_import(name, globals=None, locals=None, fromlist=(), level=0):
-    if name.split(\".\", 1)[0] == \"adjustText\":
+    if name.split(\".\", 1)[0] == \"textalloc\":
         raise ModuleNotFoundError(
-            \"blocked optional dependency: adjustText\",
-            name=\"adjustText\",
+            \"blocked optional dependency: textalloc\",
+            name=\"textalloc\",
         )
     return _original_import(name, globals, locals, fromlist, level)
 
@@ -103,3 +109,16 @@ builtins.__import__ = _guarded_import
     )
     assert "Selected Pi-PLS: n_components=3, predictor_rank=9" in completed.stdout
     assert (tmp_path / "results" / "pulp_post_analysis" / "latent_structure.pdf").is_file()
+
+
+def test_pulp_renderers_use_shared_textalloc_helper() -> None:
+    root = _repository_root()
+    for relative_path in (
+        "examples/04_pulp_real_data.py",
+        "tools/render_pulp_tutorial.py",
+    ):
+        source = (root / relative_path).read_text(encoding="utf-8")
+        assert "allocate_predictor_labels" in source
+        assert "adjust_text" not in source
+        assert "x_scatter" not in source
+        assert "y_scatter" not in source

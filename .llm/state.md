@@ -282,8 +282,10 @@ Decision 0161 is active. Patch 0161A introduces `textalloc>=1.2.4,<2` alongside 
 maintained `examples`, `docs`, and `dev` extras and adds an example-local annotation helper. The
 helper gives `textalloc` only exact predictor-arrow line segments as geometric obstacles; other
 labels are allocator-owned obstacles, while sample-score points are intentionally excluded. The
-Pulp example and tutorial renderer still use `adjustText` until Patch 0161B visually qualifies the
-replacement. Patch 0161C will remove the superseded allocator and close the decision.
+Patch 0161B migrates the Pulp example and tutorial renderer to the shared `textalloc` helper; the
+score cloud is not supplied as an obstacle, and fallback tests block `textalloc` while requiring both
+workflows to remain executable. Live visual and deterministic-render qualification with `textalloc`
+installed is required before Patch 0161C removes `adjustText` and closes the decision.
 
 ## Authority and drift handling
 

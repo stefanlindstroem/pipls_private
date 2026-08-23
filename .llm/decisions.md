@@ -58,7 +58,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0158-home-page-parsimony-comparison.md` | Home-page parsimony comparison | closed documentation contract: simplified Pulp/Tobacco Home figures share the Example-03 protocol, show publication-default Pi-PLS versus PLS, and bound the parsimony claim to shared component count |
 | `0159-documentation-cross-reference-architecture.md` | documentation cross-reference architecture | closed four-patch navigation contract: stable canonical anchors, semantic dataset/publication/theory links, final contextual-link audit, and regression protection are implemented without an every-occurrence link rule |
 | `0160-graceful-adjusttext-fallback.md` | graceful optional `adjustText` fallback | keep `adjustText` in maintained extras but make its absence non-fatal for Pulp example/tutorial rendering by retaining original Matplotlib label positions |
-| `0161-line-aware-text-allocation.md` | line-aware text allocation for annotated biplots | active three-patch migration from `adjustText` to `textalloc`, with predictor labels avoiding only other labels and exact predictor-arrow line segments while retaining the plain-Matplotlib fallback |
+| `0161-line-aware-text-allocation.md` | line-aware text allocation for annotated biplots | active migration from `adjustText` to `textalloc`; 0161B has moved the Pulp example/tutorial renderer to exact predictor-arrow line obstacles while retaining the plain-Matplotlib fallback, with final dependency cleanup deferred to 0161C |
 
 ## Implemented clarifications
 
