@@ -144,6 +144,13 @@ for canonical anchors, representative semantic routes, and non-isolated served p
 cross-reference changes should preserve semantic destinations and must not become a mechanical
 every-occurrence link rule.
 
+Decision 0161 is active. Patch 0161A introduces `textalloc>=1.2.4,<2` alongside `adjustText` in the
+maintained `examples`, `docs`, and `dev` extras and adds an example-local annotation helper. The
+helper gives `textalloc` only exact predictor-arrow line segments as geometric obstacles; other
+labels are allocator-owned obstacles, while sample-score points are intentionally excluded. The
+Pulp example and tutorial renderer still use `adjustText` until Patch 0161B visually qualifies the
+replacement. Patch 0161C will remove the superseded allocator and close the decision.
+
 ## Deferred work
 
 The block-aware transformer itself remains outside this repository. `PiPLSRegression` now exposes
