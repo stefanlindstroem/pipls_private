@@ -72,18 +72,12 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8--12 are complete:
-the decision registry is structurally checked, completed presentation/workflow records are retired,
-overlapping search-lifecycle records are consolidated, the active `.llm` handoff is compacted, and
-pytest no longer preserves prose, source arrangement, private implementation names, or removed
-pre-release spellings in place of durable behavior.
+Decision 0147 is complete. Decision-registry consolidation, active `.llm` compaction, stale-test
+pruning, and validation-ownership cleanup are finished. Ordinary pytest is behavior-focused;
+complete examples and tutorial rendering are owned by their dedicated Make targets and CI jobs.
 
-Patch 13 moves complete example/documentation execution to the dedicated validation targets and
-removes redundant ordinary-pytest execution. It must retain focused numerical/API regression tests
-and add or preserve CI ownership for complete examples as required by the accepted testing contract.
-
-Future scientific or public-API changes require their own owner decision rather than extending a
-completed migration sequence.
+There is no active repository-wide cleanup sequence. Future scientific, public-API, or maintenance
+changes require a bounded owner decision or task rather than extending Decision 0147.
 
 ## Deferred work
 

@@ -69,8 +69,9 @@ This registry lists only numbered decisions that still define current behavior o
   remains explicit.
 - Documentation cross-references are semantic and contextual. Strict documentation builds own link
   resolution; pytest does not pin prose-level link placement.
-- Tests protect behavior and machine-readable outputs. Complete documentation, examples, and
-  installed artifacts are validated by their dedicated Make targets.
+- Tests protect behavior and machine-readable outputs. Complete numbered examples run through
+  `make examples` in dedicated Python-3.12 CI; complete tutorial rendering and documentation run
+  through `make docs`; installed artifacts retain their dedicated validation targets.
 - Decision numbers are not reused for new records. The inherited 0153/0154 retirement-map
   collisions are frozen exceptions and `make decision-check` rejects any additional reuse.
 

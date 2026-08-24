@@ -123,21 +123,11 @@ def test_home_renderer_writes_simplified_matched_protocol_assets(
         ("pulp", ("cross_covariance",)),
         ("tobacco", ("cross_covariance",)),
     ]
-    assert module.X_LABEL == "Nr of components"
-    assert module.Y_LABEL == "Mean response-standardized CV-MSE (±1 SD)"
-    assert module.PIPLS_LABEL == r"$\Pi$-PLS"
-    assert module.PLS_LABEL == "PLS"
-
     assert manifest["schema_version"] == 1
-    assert manifest["comparison"] == {
-        "response_subspace": "cross_covariance",
-        "cv": {"n_splits": 5, "shuffle": True, "random_state": 0},
-        "x_label": "Nr of components",
-        "y_label": "Mean response-standardized CV-MSE (±1 SD)",
-        "pipls_label": "Π-PLS",
-        "pls_label": "PLS",
-        "shared_y_max": 1.0,
-    }
+    comparison = manifest["comparison"]
+    assert comparison["response_subspace"] == "cross_covariance"
+    assert comparison["cv"] == {"n_splits": 5, "shuffle": True, "random_state": 0}
+    assert math.isfinite(float(comparison["shared_y_max"]))
 
     assert set(manifest["cases"]) == {"pulp", "tobacco"}
     assert manifest["cases"]["pulp"]["dataset"] == {"id": "pulp", "version": "1"}

@@ -95,8 +95,9 @@ Protect:
 
 ### Rendering and generated artifacts
 
-Renderer tests may execute a renderer in a temporary directory and inspect its returned manifest and
-created files. Protect:
+Focused renderer tests may execute a renderer with bounded synthetic or mocked numerical inputs in a
+temporary directory and inspect its returned manifest and created files. Complete tutorial renderers
+belong to `make docs` and are not rerun by ordinary pytest. Protect at the focused layer:
 
 - finite and internally consistent manifest values;
 - existence of every declared artifact;
@@ -120,9 +121,11 @@ make dist-check
 ```
 
 These targets own strict documentation builds, source-distribution documentation, complete numbered
-example execution, and clean installed-artifact behavior. Pytest may invoke a focused maintenance
-tool and parse its generated output, but it must not validate these targets by reading Makefile,
-workflow, manifest, or helper-script text.
+example execution, and clean installed-artifact behavior. The CI test workflow runs `make examples`
+once on Python 3.12; the documentation workflow runs `make docs` and `make docs-dist`. Pytest may
+invoke a focused maintenance tool and parse its generated output, but it must not duplicate complete
+application/tutorial execution or validate these targets by reading Makefile, workflow, manifest, or
+helper-script text.
 
 Snapshot tests execute the snapshot tool and inspect the resulting archive. They may verify clean-
 tree requirements, excluded generated files, and root-relative archive contents without asserting

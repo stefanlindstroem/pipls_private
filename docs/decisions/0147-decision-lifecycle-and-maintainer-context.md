@@ -2,13 +2,11 @@
 
 ## Status
 
-Accepted and implemented through Patch 12. The original seven-patch consolidation is complete;
-Patches 8--13 are a bounded maintenance continuation for registry repair, further decision
-consolidation, and test-boundary cleanup. Patches 8--10 repaired the registry and retired completed
-presentation/migration records. Patch 11 consolidated overlapping search-lifecycle records and
-compacted the active `.llm` handoff. Patch 12 removes stale pytest assertions that pin prose,
-source arrangement, private implementation names, removed pre-release spellings, or removed
-shape-only result attributes rather than durable behavior. None of Patches 8--12 changes numerical
+Accepted and implemented. The original seven-patch consolidation and the bounded Patches 8--13
+maintenance continuation are complete. Patches 8--11 repaired and consolidated the decision
+registry and active maintainer handoff. Patch 12 removed stale implementation- and prose-policing
+assertions. Patch 13 moved complete application/tutorial execution to its dedicated Make targets
+and CI owners while retaining focused behavioral coverage. None of Patches 8--13 changes numerical
 or public-API behavior.
 
 ## Context
@@ -167,7 +165,7 @@ split internally.
 12. Remove stale pytest assertions that police prose, source arrangement, private names, or removed
     pre-release spellings instead of durable behavior -- complete.
 13. Move complete application/documentation validation to its owning targets and remove redundant
-    ordinary-pytest execution -- pending.
+    ordinary-pytest execution -- complete.
 
 ## Final audit outcome
 
@@ -178,9 +176,12 @@ private source helpers, or uncalled example-owned plotting and rendering functio
 configuration includes the private dataset implementation modules through ordinary package
 discovery while retaining the public `pipls.datasets` façade.
 
-The active maintainer layer now records current state and unresolved work only. The completed
-seven-patch sequence remains in this decision and Git history rather than in `state.md`,
-`strategy.md`, or `testing.md`.
+The active maintainer layer now records current state and unresolved work only. Complete numbered
+examples run once in dedicated Python-3.12 CI through `make examples`; complete tutorial rendering
+is owned by the documentation workflow through `make docs`. Ordinary pytest retains focused
+numerical, API, rendering-helper, artifact, and maintenance-tool contracts without rerunning those
+complete workflows. The completed consolidation sequence remains in this decision and Git history
+rather than in active roadmap prose.
 
 ## Validation
 

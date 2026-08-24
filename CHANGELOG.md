@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Complete the Decision-0147 maintenance sequence by moving full numbered-example and tutorial
+  execution out of ordinary pytest. Keep focused matched-fold, rendering-fallback, metric, and
+  semantic-manifest tests; run all numbered examples once in dedicated Python-3.12 CI and leave
+  complete tutorial rendering to the strict documentation workflow.
 - Remove stale pytest assertions that pin documentation cross-link placement, example console
   wording, rendering-helper source arrangement, retired pre-release rank-policy spellings, private
   dataset pickle-module names, and removed shape-only result attributes. Retain executable

@@ -156,24 +156,19 @@ Do not add without a new owner decision:
 - publication-only analyses in this repository;
 - compatibility aliases for removed pre-release APIs.
 
-## Active maintenance
+## Maintenance state
 
-Decision 0147 governs decision lifecycle and test-boundary cleanup. The maintained registry contains
-only current decisions; completed records are summarized in `docs/decisions/history.md` and mapped
-in `docs/decisions/retirements.md`. The inherited 0153/0154 retirement-map number collisions are
+Decision 0147 is complete. The maintained registry contains only current decisions; completed
+records are summarized in `docs/decisions/history.md` and mapped in
+`docs/decisions/retirements.md`. The inherited 0153/0154 retirement-map number collisions are
 frozen exceptions. `make decision-check` validates both current registries, local links, active
 decision references, retirement-map uniqueness, and additional number reuse.
 
-Patches 8--12 of the Decision-0147 maintenance continuation are complete. Pytest no longer pins
-documentation cross-link placement, example console wording, local rendering-helper source use,
-retired pre-release rank-policy spellings, private dataset pickle-module names, or removed
-shape-only result attributes. Patch 13 moves complete application/documentation execution to the
-dedicated validation targets and removes redundant ordinary-pytest execution. It is not authorized
-to change numerical or public-API behavior.
-
-Tests protect executable behavior and machine-readable outputs. Strict documentation, complete
-examples, source-distribution documentation, and installed artifacts are validated by their
-dedicated Make targets.
+Tests protect executable behavior and machine-readable outputs without duplicating complete
+application or tutorial workflows. `make examples` owns every numbered example and runs once in CI
+on Python 3.12. `make docs` owns complete tutorial rendering and strict site integration.
+Source-distribution documentation and installed artifacts remain owned by `make docs-dist` and
+`make dist-check`.
 
 ## Authority and drift handling
 

@@ -37,7 +37,7 @@ hide the numerical inputs or report composition.
 - Users may render results with Matplotlib, another graphics library, or no graphics system.
 - Tutorials expose the result fields used for each maintained chart.
 - Behavioral tests protect runtime imports without graphics dependencies, absence of a package-
-  owned plotting module, successful renderer execution, semantic manifests, and parseable
-  generated artifacts.
+  owned plotting module, and focused renderer semantics with bounded inputs. Complete tutorial
+  rendering and generated-artifact integration are owned by the strict documentation target.
 - Exact visual styling, source arrangement, automatically adjusted label positions, and
   incidental artist counts are not compatibility contracts.
