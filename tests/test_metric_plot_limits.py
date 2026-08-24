@@ -3,7 +3,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-_METRIC_ATTRIBUTES = {"response_r2", "standardized_rmse"}
+_METRIC_ATTRIBUTES = {"standardized_rmse"}
 
 
 def _repository_root() -> Path:
@@ -50,7 +50,7 @@ def _has_unit_ylim(function: ast.FunctionDef, receiver: str) -> bool:
     return False
 
 
-def test_rmse_and_r2_bar_plots_use_unit_interval() -> None:
+def test_standardized_rmse_bar_plots_use_unit_interval() -> None:
     root = _repository_root()
     violations: list[str] = []
     metric_bars = 0
@@ -72,5 +72,5 @@ def test_rmse_and_r2_bar_plots_use_unit_interval() -> None:
                         f"{path.relative_to(root)}:{candidate.lineno} ({function.name})"
                     )
 
-    assert metric_bars == 6
+    assert metric_bars == 4
     assert violations == []

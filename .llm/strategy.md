@@ -159,6 +159,15 @@ scores are excluded. Maintained predictor labels use 9-point text and `min_dista
 `max_distance=0.15`. The tutorial exposes only `biplot_coordinates()` plus one local plotting call,
 keeping helper implementation and optional-dependency mechanics out of the instructional flow.
 
+Decision 0163 is active. The visible scalar prediction diagnostic in the maintained real-data OOF
+workflows is migrating from response-wise standardized RMSE to response-wise selection-conditioned
+OOF R². The public `PredictionDiagnostics` surface and response-standardized model-selection loss do
+not change, and Quick Start retains its fitted-value standardized-RMSE summary. The maintained R²
+bar-plot limit contract is upper limit exactly 1.0 and lower limit never greater than 0.0; negative
+R² values must remain visible below zero. Patch 0163A owns the shared example-local y-limit helper
+and tests; 0163B migrates Pulp Tutorial 3 / Example 04, and 0163C migrates Sugarcane/Tobacco and
+closes the decision.
+
 ## Deferred work
 
 The block-aware transformer itself remains outside this repository. `PiPLSRegression` now exposes
