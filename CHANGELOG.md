@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add a standalone TikZ source and committed SVG for the synthetic-generator latent-role
+  schematic, together with an optional `make docs-static-figures` maintainer target. The ordinary
+  documentation build remains independent of a TeX installation.
 - Use four bounded joblib workers for the maintained Tobacco search and Tobacco PLS-family
   comparison, reducing wall time for the expensive spectral calculations without changing
   candidate domains, validation splits, or selection semantics.

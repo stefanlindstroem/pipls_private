@@ -118,7 +118,11 @@
   are added. Core generated pages use explicit public objects and source docstrings; do not
   expose private modules or inherited implementation machinery by broad module expansion. Never commit
   generated `site/` output or `docs/assets/generated/` tutorial assets. `make docs` and
-  `make docs-serve` regenerate the synthetic and Pulp assets through `make docs-figures`. Tutorial
+  `make docs-serve` regenerate the synthetic and Pulp assets through `make docs-figures`. Committed
+  standalone diagrams under `docs/assets/figures/` are maintained separately from those generated
+  tutorial assets: keep reproducible TeX sources under `tools/figures/`, regenerate them explicitly
+  with `make docs-static-figures`, and do not make ordinary documentation builds depend on TeX.
+  Tutorial
   code excerpts use checked `pymdownx.snippets` sections from repository source; do not copy the
   maintained example analyses into Markdown. Use `make docs-dist`
   when changing documentation packaging or the source-distribution documentation boundary; it
@@ -183,6 +187,8 @@
 - Run focused tests while developing, then `make check` before delivery.
 - Run `make docs-figures` for changes to either tutorial example, renderer, display subset, or plot
   behavior used by generated assets.
+- Run `make docs-static-figures` when changing a committed standalone TeX diagram or its rendering
+  contract, then review the resulting SVG diff.
 - Run `make docs` for changes to public guides, navigation, documentation configuration, public
   docstrings, or generated tutorial assets.
 - Run `make examples` for changes to numbered examples, example-generated final PDF

@@ -5,7 +5,7 @@ EXAMPLE_ENV := PYTHONPATH=src MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THRE
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install check decision-check test lint format typecheck clean examples docs docs-serve docs-figures docs-dist build dist-check snapshot
+.PHONY: help install check decision-check test lint format typecheck clean examples docs docs-serve docs-figures docs-static-figures docs-dist build dist-check snapshot
 
 ##@ Start here
 
@@ -63,6 +63,13 @@ docs-figures: ## Generate documentation figures.
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_synthetic_tutorial.py
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_pulp_tutorial.py
 	$(EXAMPLE_ENV) $(PYTHON) tools/render_home_pls_comparison.py
+
+docs-static-figures: ## Regenerate committed standalone documentation figures (requires TeX and pdftocairo).
+	@command -v latexmk >/dev/null 2>&1 || { echo "latexmk is required for docs-static-figures" >&2; exit 1; }
+	@command -v pdftocairo >/dev/null 2>&1 || { echo "pdftocairo is required for docs-static-figures" >&2; exit 1; }
+	mkdir -p build/docs-static-figures docs/assets/figures
+	latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build/docs-static-figures tools/figures/latent_geometry_generator.tex
+	pdftocairo -svg build/docs-static-figures/latent_geometry_generator.pdf docs/assets/figures/latent_geometry_generator.svg
 
 docs-dist: ## Verify documentation from an extracted source distribution.
 	$(PYTHON) tools/check_sdist_docs.py

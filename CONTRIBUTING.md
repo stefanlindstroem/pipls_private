@@ -56,10 +56,11 @@ Development
 
 Documentation and examples
   make examples      run every numbered example
-  make docs          build the strict MkDocs site and its tutorial figures
-  make docs-serve    generate figures and preview the site locally
-  make docs-figures  regenerate both tutorial figure sets only
-  make docs-dist     rebuild the site from a clean source distribution
+  make docs                 build the strict MkDocs site and its tutorial figures
+  make docs-serve           generate figures and preview the site locally
+  make docs-figures         regenerate tutorial figures only
+  make docs-static-figures  regenerate committed standalone TeX figures
+  make docs-dist            rebuild the site from a clean source distribution
 
 Distribution and maintenance
   make build         build the wheel and source distribution
@@ -79,8 +80,12 @@ Run `make examples` when changing executable example behavior, example artifacts
 application-facing workflow. It intentionally includes the slower real-data analyses.
 
 Run `make docs-figures` when changing tutorial workflows, tutorial rendering, or plotting behavior
-used by generated assets. Run `make docs` for public guides, navigation, docstrings, or tutorial
-assets. `make docs-serve` serves `http://127.0.0.1:8000/` until stopped with `Ctrl+C`.
+used by generated assets. Standalone documentation diagrams under `docs/assets/figures/` are
+committed assets with reproducible TeX sources under `tools/figures/`; regenerate them explicitly
+with `make docs-static-figures`, which requires `latexmk` and `pdftocairo`. Ordinary `make docs`
+consumes the committed SVG and therefore does not require a TeX installation. Run `make docs` for
+public guides, navigation, docstrings, or tutorial assets. `make docs-serve` serves
+`http://127.0.0.1:8000/` until stopped with `Ctrl+C`.
 
 Run `make docs-dist` when changing documentation packaging, documentation dependencies,
 `MANIFEST.in`, or the source-distribution documentation boundary.
@@ -138,8 +143,10 @@ contracts in tutorial prose.
 Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
 
 Do not commit generated result files without an explicit fixture decision. Generated example
-figures, tutorial assets, build artifacts, caches, and archive clutter are ignored. Do not add
-datasets without verified redistribution and adaptation terms.
+figures, tutorial assets, build artifacts, caches, and archive clutter are ignored. The committed
+standalone SVG diagrams under `docs/assets/figures/` are the narrow exception: keep their TeX
+sources under `tools/figures/` and regenerate them only through `make docs-static-figures`. Do not
+add datasets without verified redistribution and adaptation terms.
 
 ## Repository map
 
