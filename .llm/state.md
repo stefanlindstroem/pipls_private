@@ -284,13 +284,12 @@ while sample-score points are intentionally excluded. Without `textalloc`, label
 ordinary Matplotlib predictor endpoints. `adjustText` is no longer part of the active dependency or
 documentation surface.
 
-Decision 0162 is active. Patch 0162A replaces the label-only annotation helper with complete
-example-local Pulp biplot renderers: a simple Matplotlib path, a line-aware `textalloc` path, and one
-dispatcher used by Example 04 and the Pulp tutorial renderer. The `textalloc` obstacle set remains
-other predictor labels plus exact predictor-arrow shafts only; sample scores are excluded. Maintained
-predictor labels now use 9-point text and `min_distance=0.01125`, `max_distance=0.15`. Patch 0162B
-still needs to simplify the tutorial-visible snippet, regenerate and visually qualify the biplot,
-and close the decision.
+Decision 0162 is complete and closed. Example 04 and the Pulp tutorial renderer share complete
+example-local biplot helpers with a plain-Matplotlib path, a line-aware `textalloc` path, and one
+dispatcher. The allocator avoids other predictor labels and exact predictor-arrow shafts only; sample
+scores are excluded. Maintained predictor labels use 9-point text and `min_distance=0.01125`,
+`max_distance=0.15`. The tutorial exposes only `biplot_coordinates()` plus one local plotting call,
+keeping helper implementation and optional-dependency mechanics out of the instructional flow.
 
 ## Authority and drift handling
 

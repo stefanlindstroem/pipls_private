@@ -31,7 +31,9 @@
 - Replace maintained Pulp biplot label placement with optional `textalloc`: predictor labels avoid
   other predictor labels and exact predictor-arrow line segments, while sample-score points are not
   obstacles. Preserve the plain-Matplotlib endpoint-label fallback and remove `adjustText` from the
-  active `examples`, `docs`, and `dev` dependency surface.
+  active `examples`, `docs`, and `dev` dependency surface. Consolidate the maintained Pulp biplot
+  into one complete example-local helper so the tutorial shows only `biplot_coordinates()` plus one
+  plotting call; use 9-point predictor labels and a tighter 0.01125--0.15 placement envelope.
 - Improve documentation navigation with stable semantic destinations for the three reference
   datasets, the companion publication, and frequently used theory concepts. Cross-link the served
   guides, tutorials, and API pages to those destinations and add regression coverage for the

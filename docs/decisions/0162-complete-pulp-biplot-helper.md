@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted. Patch 0162A is implemented; Patch 0162B remains pending.
+Accepted, implemented, and closed.
 
 ## Context
 
@@ -40,9 +40,11 @@ Patch 0162A introduces the complete helper, migrates Example 04 and the Pulp tut
 it, and adds focused tests for the simple path, the line-aware `textalloc` path, the dispatcher, the
 font size, and the tighter placement envelope.
 
-Patch 0162B will simplify the tutorial presentation so only the biplot-coordinate computation and
-local helper call are shown, update the explanatory prose, regenerate and visually qualify the
-maintained biplot, and close this decision.
+Patch 0162B simplifies the tutorial presentation so only the biplot-coordinate computation and
+local helper call are shown. The helper implementation and optional-dependency branch remain hidden
+from the tutorial narrative, while the prose states the plain-Matplotlib fallback and line-aware
+`textalloc` behavior explicitly. This closes the two-patch refinement without changing the
+underlying biplot coordinates or collision policy.
 
 ## Consequences
 
@@ -55,3 +57,5 @@ maintained biplot, and close this decision.
   predictor-arrow shafts are avoided; sample scores are not obstacles.
 - The maintained predictor labels are one point larger and remain closer to their predictor
   endpoints than under the previous placement envelope.
+- Tutorial readers see the reusable `biplot_coordinates()` computation followed by one local
+  plotting call rather than the helper implementation or annotation-layout mechanics.

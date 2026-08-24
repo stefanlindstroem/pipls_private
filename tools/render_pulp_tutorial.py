@@ -164,8 +164,8 @@ def _render_biplot(
     predictor_names: tuple[str, ...],
     output_path: Path,
 ) -> None:
-    # --8<-- [start:render-pulp-biplot]
     figure, axis = _figure(figsize=(9.0, 7.0))
+    # --8<-- [start:render-pulp-biplot]
     biplot = biplot_coordinates(structure, components=(0, 1))
     plot_pulp_biplot(
         axis,

@@ -76,8 +76,10 @@ Inspection developed from package-owned plotters and report objects into validat
 numerical results with caller-owned rendering. Intermediate atomic plotters and direct-rendering
 migration records are historical. The package owns coordinates, diagnostics, and orientation; users
 and examples own Matplotlib artists, panels, labels, layout, and file output. The maintained Pulp
-biplot uses optional line-aware `textalloc` placement with a plain-Matplotlib fallback; this
-supersedes the earlier `adjustText` allocator choice while preserving its non-fatal fallback rule.
+biplot uses one complete example-local renderer with optional line-aware `textalloc` placement and a
+plain-Matplotlib fallback; tutorial readers see only the numerical biplot coordinates and one local
+plotting call. This supersedes the earlier label-only and `adjustText` arrangements while preserving
+the non-fatal fallback rule.
 
 Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0045](0045-pls-family-analysis-boundary.md),
@@ -85,8 +87,9 @@ Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0083](0083-data-first-rendering-policy.md), [0094](0094-inspection-result-safety.md),
 [0110](0110-response-anchored-display-factors.md),
 [0124](0124-mathematical-typography-and-subscripts.md),
-[0141](0141-spectral-predictor-rank-profile-figures.md), and
-[0161](0161-line-aware-text-allocation.md).
+[0141](0141-spectral-predictor-rank-profile-figures.md),
+[0161](0161-line-aware-text-allocation.md), and
+[0162](0162-complete-pulp-biplot-helper.md).
 
 ## Packaging and release engineering
 

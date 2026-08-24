@@ -59,7 +59,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0159-documentation-cross-reference-architecture.md` | documentation cross-reference architecture | closed four-patch navigation contract: stable canonical anchors, semantic dataset/publication/theory links, final contextual-link audit, and regression protection are implemented without an every-occurrence link rule |
 | `0160-graceful-adjusttext-fallback.md` | graceful optional `adjustText` fallback | historical allocator choice superseded by 0161; its non-fatal plain-Matplotlib fallback and runtime-dependency boundary remain authoritative |
 | `0161-line-aware-text-allocation.md` | line-aware text allocation for annotated biplots | closed migration: optional `textalloc` owns Pulp label allocation against other labels and exact predictor-arrow line obstacles; sample scores are excluded, fallback remains plain Matplotlib, and `adjustText` is removed from active dependencies |
-| `0162-complete-pulp-biplot-helper.md` | complete Pulp biplot helper | active two-patch refinement: complete simple/textalloc Pulp biplot renderers share one dispatcher; 0162A is implemented with 9-point labels and a 75% placement-distance envelope, while tutorial simplification and visual qualification remain in 0162B |
+| `0162-complete-pulp-biplot-helper.md` | complete Pulp biplot helper | closed two-patch refinement: complete simple/textalloc renderers share one dispatcher; the tutorial exposes only `biplot_coordinates()` plus the local plotting call, with 9-point labels and the 0.01125--0.15 placement envelope |
 
 ## Implemented clarifications
 

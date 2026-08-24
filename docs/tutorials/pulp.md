@@ -44,8 +44,8 @@ python -m pip install ".[examples]"
 ```
 
 The example imports the estimators, repeated cross-validation, numerical inspection functions,
-Matplotlib, and the optional `textalloc`-backed annotation helper, then defines the output location
-and validation splitter:
+Matplotlib, and a local biplot helper, then defines the output location and validation splitter. The
+helper handles optional `textalloc` use internally:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:pulp-tutorial-setup"
@@ -296,16 +296,19 @@ paired components rather than treating individual plotted entries as standalone 
 
 #### Score-loading biplot
 
-`biplot_coordinates()` supplies balanced numerical coordinates. Matplotlib draws samples and
-predictor arrows. When `textalloc` is available, it places predictor labels while avoiding other
-labels and the predictor-arrow shafts; sample scores are intentionally not treated as obstacles.
-Without `textalloc`, the labels remain at their original predictor endpoints:
+`biplot_coordinates()` supplies the balanced numerical coordinates, and one local plotting helper
+renders the score-loading biplot:
 
 ```python
 --8<-- "tools/render_pulp_tutorial.py:render-pulp-biplot"
 ```
 
 ![Pulp score-loading biplot](../assets/generated/pulp/biplot.svg)
+
+The helper is local to the example; the reusable Pi-PLS interface is `biplot_coordinates()`. It uses
+ordinary Matplotlib when `textalloc` is unavailable. When `textalloc` is installed, predictor labels
+are placed to avoid one another and the predictor-arrow shafts; sample scores are intentionally not
+treated as obstacles. The numerical biplot coordinates are identical in both cases.
 
 The three length descriptors point in closely similar directions in the displayed plane, while
 `Shives` contrasts with several C descriptors. These are loading-pattern relationships under the
