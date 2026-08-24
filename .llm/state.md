@@ -106,8 +106,10 @@ The maintained numbered examples are user tasks:
 3. matched-fold PLS-family component-path comparison of both Pi-PLS response policies and ordinary
    PLS across the three reference datasets plus one deterministic synthetic stress case;
 4. complete repeated-CV Pulp analysis;
-5. complete Sugarcane analysis;
-6. complete Tobacco analysis with separate predictor-rank and component-count tolerances.
+5. complete Sugarcane analysis with EPV-fixed predictor rank at
+   `samples_per_predictor_rank=5.0` and a separate component-count choice;
+6. complete Tobacco analysis with optimized predictor rank and separate 10% predictor-rank and
+   component-count tolerances.
 
 Example 03 materializes one split set per comparison case and reuses it across all compared models.
 Its paths are model-development evidence, not independent post-selection validation. Complete

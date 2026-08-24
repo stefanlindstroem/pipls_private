@@ -50,8 +50,10 @@ The maintained numbered examples are:
    deterministic near-saturated synthetic stress case, covering the peer-reviewed cross-covariance
    Pi-PLS policy, the least-squares software extension, and ordinary PLS without final refitting;
 4. repeated-CV Pulp analysis;
-5. Sugarcane analysis;
-6. Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
+5. Sugarcane analysis with EPV-fixed predictor rank at `samples_per_predictor_rank=5.0` and a
+   separate component-count choice;
+6. Tobacco analysis with optimized predictor rank and separate 10% predictor-rank and
+   component-count tolerances.
 
 `make examples` owns complete application validation. The default test suite does not duplicate the
 full real-data workflows.

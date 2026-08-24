@@ -132,12 +132,14 @@ Do not introduce merely for examples:
 ## Analysis artifact transparency
 
 Committed `X.csv` and `Y.csv` files are input assets, not a reason to serialize intermediate
-analysis results. Every numbered real-data workflow keeps paths, selected rows, predictor-rank
-profiles, validation reports, and inspection results in memory, creates figures directly, and
-writes only final PDF outputs. Example 03 compares immutable Pi-PLS and ordinary-PLS paths; Pulp,
-Sugarcane, and Tobacco expose the conditional predictor-rank profile at their selected component
-count. Tobacco uses search-owned minimum-CV-MSE selection with a 10% relative tolerance and passes the returned count into
-`predictor_rank_profile()`.
+analysis results. Every numbered real-data workflow keeps its paths, selected rows, validation
+reports, and inspection results in memory, creates figures directly, and writes only final PDF
+outputs. Example 03 compares immutable Pi-PLS and ordinary-PLS paths. Pulp and Tobacco expose a
+conditional predictor-rank profile at their selected component count because they optimize
+predictor rank. Sugarcane instead fixes predictor rank with the EPV policy at
+`samples_per_predictor_rank=5.0`, so it has no conditional predictor-rank optimization profile.
+Tobacco uses search-owned minimum-CV-MSE selection with a 10% relative tolerance and passes the
+returned count into `predictor_rank_profile()`.
 
 Generated PDFs are never committed or included in snapshots. Output-directory structure is
 preserved through `.gitkeep` files.
