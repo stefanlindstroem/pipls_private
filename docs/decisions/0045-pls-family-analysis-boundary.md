@@ -40,7 +40,7 @@ post-selection validation.
 
 Inspection of $P$, $D$, $Q$, $QD$, and the identity $PDQ^\mathsf{T}$ is specific to Pi-PLS. The
 numerical API therefore retains the explicit name `pipls_display_factors()`. Rendering is
-caller-owned under Decisions 0061 and 0083.
+caller-owned under Decision 0083.
 
 The terminology is predictor rotations or predictor directions for $P$, dilation values for $D$,
 and response rotations or dilation-weighted response directions for $Q$ and $QD$. These quantities

@@ -9,21 +9,21 @@ the active maintainer contracts.
 
 The earliest work established the fixed Pi-PLS construction, fold-local response-standardized loss,
 rank feasibility, exhaustive and adaptive predictor-rank search, and scikit-learn-compatible path
-evaluation. Intermediate path classes, shared-engine arrangements, default-support experiments, and
-API-polish passes were later replaced by the fixed-estimator/search boundary and explicit post-fit
-selection lifecycle.
+evaluation. Intermediate rank-bound rules, constructor-owned refitting, path lookup helpers, and
+search-default presentation records were later replaced by the fixed-estimator/search boundary and
+one explicit post-fit selection lifecycle. Materialized-split reuse and numerical low-rank ties are
+covered by the search-policy/tolerance decisions; stable scorer presentation is part of the
+response-standardized loss contract; and search-owned selection, OOF reporting, and refitting are
+canonical in Decision 0143.
 
 Current canonical records: [0001](0001-core-definition.md),
-[0002](0002-preprocessing-semantics.md), [0003](0003-predictor-rank-selection.md),
-[0004](0004-response-standardized-mse.md), [0007](0007-predictor-rank-search-policies.md),
-[0008](0008-predictor-svd-policy.md), [0009](0009-public-parameter-validation.md),
-[0014](0014-validation-metadata-scope.md), [0032](0032-full-sample-rank-support.md),
-[0039](0039-fixed-estimator-path-search-boundary.md),
-[0092](0092-fold-numerical-rank-feasibility.md), [0102](0102-path-search-defaults.md),
-[0137](0137-post-fit-inspect-decide-refit-lifecycle.md),
-[0140](0140-search-owned-path-selection.md),
+[0002](0002-preprocessing-semantics.md), [0004](0004-response-standardized-mse.md),
+[0007](0007-predictor-rank-search-policies.md), [0008](0008-predictor-svd-policy.md),
+[0009](0009-public-parameter-validation.md), [0014](0014-validation-metadata-scope.md),
+[0032](0032-full-sample-rank-support.md), [0039](0039-fixed-estimator-path-search-boundary.md),
+[0066](0066-immutable-component-path-api.md), [0092](0092-fold-numerical-rank-feasibility.md),
 [0143](0143-model-selection-provenance-and-oof-reporting.md),
-[0146](0146-cv-mse-tolerance-selection.md),
+[0146](0146-cv-mse-tolerance-selection.md), [0148](0148-predictor-rank-tolerance-selection.md),
 [0154](0154-full-domain-predictor-rank-selection.md), and
 [0155](0155-response-subspace-selection-policies.md).
 

@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented. Decisions 0140, 0145, 0146, and 0148 refine selection ownership, public
-names, component-count tolerance provenance, and conditional predictor-rank evidence.
+Accepted and implemented. Decisions 0143, 0146, and 0148 define search-owned selection,
+component-count tolerance provenance, and conditional predictor-rank evidence.
 
 ## Context
 

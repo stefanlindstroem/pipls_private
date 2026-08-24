@@ -12,7 +12,10 @@ from urllib.parse import unquote
 _DECISION_FILE_RE = re.compile(r"^(?P<number>\d{4})-[a-z0-9][a-z0-9-]*\.md$")
 _MARKDOWN_LINK_RE = re.compile(r"\[[^\]]*\]\((?P<target>[^)]+)\)")
 _RETIRED_ROW_RE = re.compile(r"^\|\s*`(?P<filename>\d{4}-[^`]+\.md)`\s*\|")
-_DECISION_REFERENCE_RE = re.compile(r"\bDecision\s+(?P<number>\d{4})\b")
+_DECISION_REFERENCE_RE = re.compile(
+    r"\bDecisions?\s+(?P<numbers>"
+    r"\d{4}(?:(?:\s*,\s*and\s+|\s*,\s*|\s+and\s+)\d{4})*)\b"
+)
 _LLM_REGISTRY_FILE_RE = re.compile(r"`(?P<filename>\d{4}-[a-z0-9][a-z0-9-]*\.md)`")
 
 # The maintained tree inherited these two collisions before registry normalization. Their exact
@@ -178,9 +181,9 @@ def check_registry(root: Path) -> list[str]:
     active_reference_paths = current_paths + sorted((root / ".llm").glob("*.md"))
     for path in active_reference_paths:
         for match in _DECISION_REFERENCE_RE.finditer(path.read_text(encoding="utf-8")):
-            number = match.group("number")
-            if number not in current_by_number:
-                errors.append(f"{path}: active reference to non-current Decision {number}")
+            for number in re.findall(r"\d{4}", match.group("numbers")):
+                if number not in current_by_number:
+                    errors.append(f"{path}: active reference to non-current Decision {number}")
 
     decision_markdown_paths = sorted(decision_dir.glob("*.md"))
     errors.extend(_check_local_markdown_links(decision_markdown_paths + [llm_registry_path]))

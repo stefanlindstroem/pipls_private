@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Consolidate four overlapping search-lifecycle decisions into the retained scoring, fixed-
+  estimator/search, immutable-path, tolerance, and selection-provenance contracts. Compact the
+  active `.llm` state/strategy handoff to current facts and pending work, retire stale decision
+  references, and extend `make decision-check` to recognize plural decision-reference lists.
 - Retire four older presentation/workflow decisions whose durable content is already canonical:
   example report composition is covered by the data-first rendering policy, manuscript synthetic-
   data reproducibility by the product/generator/theory boundary, spectral rank-profile semantics by

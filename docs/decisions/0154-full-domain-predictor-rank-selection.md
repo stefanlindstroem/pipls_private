@@ -160,19 +160,17 @@ rank candidates.
 
 For every component count $h$, `PiPLSSearchCV` continues to choose predictor rank before building
 `component_path_`. Component-count selection then acts only on that conditioned path. Decision 0148
-continues to define optimized predictor-rank tolerance selection, and Decisions 0140, 0143, 0146,
-and 0152 continue to govern component-path selection, exact selection handoff, CV-MSE tolerance
-selection, and manual review respectively.
+defines optimized predictor-rank tolerance selection, Decision 0146 defines component-count
+tolerances, and Decision 0143 owns selected-row lookup, exact selection handoff, OOF reporting, and
+final refitting.
 
 No part of this decision changes the Pi-PLS factorization, the fixed-estimator rank checks, fold-
 local preprocessing, configured scoring, OOF semantics, or final refit lifecycle.
 
 ## Relationship to earlier decisions
 
-This decision supersedes only the following clauses of earlier current decisions:
+This decision refines the following retained contracts:
 
-- Decision 0003: the $\lceil n/c\rceil$ term is no longer part of the general automatic or
-  exhaustive rank ceiling; it belongs only to the EPV policy.
 - Decision 0007: exhaustive rather than adaptive coverage becomes the default, and the former
   `predictor_rank_values="max"` fixed policy is removed. The adaptive and exhaustive algorithms
   otherwise remain in force.

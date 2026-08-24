@@ -3,8 +3,8 @@
 ## Purpose
 
 This file records current development principles, unresolved work, and review protocol. Completed
-implementation history belongs in numbered decisions and Git history. `.llm/state.md` contains the
-concise implemented-state handoff.
+implementation history belongs in numbered decisions, `docs/decisions/history.md`, and Git history.
+`.llm/state.md` contains the concise implemented-state handoff.
 
 ## Ownership
 
@@ -22,11 +22,9 @@ validation evidence.
   inspection over hidden state.
 - Keep public result objects immutable, validated, finite where required, and pickle-safe.
 - Use scikit-learn conventions where they do not obscure Pi-PLS-specific semantics.
-- Keep user data preparation visible; package-owned loaders are named reference conveniences, not a
-  mandatory ingestion framework.
+- Keep user data preparation visible; reference loaders are conveniences, not an ingestion layer.
 - Keep rendering caller-owned and numerical inspection package-owned.
-- Avoid compatibility aliases during the pre-1.0 phase unless the owner explicitly
-  requests one.
+- Avoid compatibility aliases during the pre-1.0 phase unless the owner explicitly requests one.
 - Use tests for durable behavior and machine contracts, not as a second copy of living prose.
 - Keep patches small enough to review independently and do not combine future phases.
 
@@ -34,49 +32,38 @@ validation evidence.
 
 ### Modeling
 
-`PiPLSRegression` fits one explicit rank pair. `PiPLSSearchCV` owns the triangular path, split
-materialization, candidate evaluation, selection lookup, explicit full-data refit, and selection-
-conditioned OOF reporting. Search fitting itself does not produce a final model.
+`PiPLSRegression` fits one explicit rank pair. `response_subspace` is fixed-estimator configuration:
+`"cross_covariance"` is the peer-reviewed default and `"least_squares"` is a software extension.
+`PiPLSSearchCV` preserves that template policy and searches only component count and predictor rank.
 
 ### Selection
 
-The final named rule vocabulary is `best_score` and tolerance-based `minimum_cv_mse`. Manual
-selection is by evaluated component count. CV-MSE path summaries use equal weighting per
-materialized split and population SD (`ddof=0`). There is no standard-error rule or result surface.
+`PiPLSSearchCV.fit()` owns split materialization and path evaluation but does not produce a final
+model. Exhaustive coverage of the full hard-feasible optimized predictor-rank domain is the default;
+adaptive coverage is an explicit approximation and EPV is an explicit fixed-rank policy.
 
-Decision 0148 adds a separate tolerance stage for conditional predictor-rank choice. Predictor-rank
-tolerances are search-constructor controls because they determine `component_path_`; component-count
-tolerances remain post-search `select()` and `refit()` controls. Exact numerical ties and adaptive
-candidate coverage remain separate from substantive parsimony tolerances.
+`search.select()` is the sole public selected-row lookup. The named component-count rules are
+`best_score` and tolerance-based `minimum_cv_mse`; manual selection is by evaluated component count.
+Predictor-rank tolerances are search-constructor controls because they determine the conditioned
+component path, while component-count tolerances are post-search selection controls. Exact numerical
+ties remain separate from substantive parsimony tolerances.
 
-The implemented runtime now has `search_method="exhaustive"` as the default predictor-rank
-coverage policy over the full hard-feasible domain. `search_method="adaptive"` remains an explicit
-computational approximation, and `search_is_exhaustive_` continues to report whether the complete
-candidate set was actually evaluated. Decision 0154 owns this boundary.
-
-Decision 0143 implements `refit(selection=...)` as the exact-selection handoff for analytical
-workflows. Rule-based and component-count refitting remain the compact route. Existing selections
-use one compatibility definition across OOF reporting and final refitting.
-
-Decision 0143 is the current owner of manual-selection handoff and OOF interpretation. Maintained
-tutorials may show an unselected path, one explicit `search.select(...)` decision, and review of the
-selected path and conditional evidence before refitting, but those diagram and artifact choices are
-presentation rather than independent policy. Same-search OOF reporting is selection-conditioned
-inspection rather than independent qualification or validation.
+Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
+`refit(selection=...)`. Same-search OOF evidence is selection-conditioned inspection rather than
+independent post-selection qualification or validation.
 
 ### Analysis
 
 Pi-PLS-specific factorization inspection and shared PLS-family diagnostics are pure numerical
-operations. Examples and users render the returned arrays directly. OOF diagnostics describe the
-chosen selection under the search protocol and are not outer-validation estimates. Fitted-value
-diagnostics describe the refitted model on its training observations and remain explicitly
-separate from predictive validation evidence.
+operations. Examples and users render returned arrays directly. OOF diagnostics describe the chosen
+selection under the search protocol; fitted-value diagnostics describe the refitted model on its
+training observations and remain explicitly separate.
 
 ### Data
 
 The package supports arbitrary user-provided arrays and three named immutable reference datasets.
 Package resources are ordinary language-neutral files with one active matrix copy each. A future
-dataset must have explicit redistribution and adaptation rights before inclusion.
+dataset requires explicit redistribution and adaptation rights before inclusion.
 
 ### Product scope
 
@@ -85,53 +72,27 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8--10 are
-complete: the registry checker protects decision lifecycle consistency, eight completed late
-presentation/migration decisions are retired, and four older presentation/workflow records have
-been consolidated into their canonical owners. Patch 11 consolidates overlapping
-search-lifecycle decisions and compacts `.llm`; Patch 12 removes stale implementation- and
-prose-policing pytest assertions; Patch 13 moves complete application/documentation execution to
-its owning validation targets and removes redundant ordinary-pytest runs. These patches must not
-change numerical or public API behavior.
+Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8--11 are complete:
+the decision registry is structurally checked, completed presentation/workflow records are retired,
+overlapping search-lifecycle records are consolidated, and the active `.llm` handoff is compacted.
 
-Decision 0154's seven-patch predictor-rank migration is complete and closed. Future changes to
-predictor-rank selection require a new owner decision rather than extending that sequence.
+Patch 12 removes pytest assertions that preserve documentation wording, local source arrangement,
+private implementation names, or removed pre-release spellings rather than durable behavior. It
+must preserve numerical, public-API, dataset, distribution, and rendering behavior.
 
-Decision 0155's six-step response-subspace migration is complete and closed. The durable public
-contract keeps the peer-reviewed `"cross_covariance"` construction as the default and exposes one
-explicit `"least_squares"` RRR-inspired software extension outside the companion publication.
-`response_subspace` belongs to the fixed estimator and is propagated by search; it is not a third
-search dimension. Future changes to the response-subspace policy require a new owner decision
-rather than extending the completed Decision-0155 sequence.
+Patch 13 moves complete example/documentation execution to the dedicated validation targets and
+removes redundant ordinary-pytest execution. It must retain focused numerical/API regression tests
+and add or preserve CI ownership for complete examples as required by the accepted testing contract.
 
-The numerical contract is exact on the response side under both policies. Cross-covariance uses
-exact SVD of `Z.T @ Y`; least-squares uses exact reduced QR of `Z` followed by exact SVD of
-`Q_Z.T @ Y`; final `W` diagonalization is exact. Randomized SVD remains predictor-side only.
-Regression coverage protects the independent Choice-C/RRR reference, training-residual optimality,
-limiting cases, scaling, serialization, scikit-learn interoperability, fixed-policy propagation,
-and numerical compatibility of the default/explicit cross-covariance path.
-
-The completed release audit records the feature under `Unreleased`, qualifies both policies in
-clean wheel/sdist installations, and keeps clean installation isolation in `dist-check`. `docs-dist`
-validates documentation from the extracted sdist using the maintained documentation environment
-with `PYTHONPATH` forced to the extracted artifact's `src` tree; this avoids redundantly reinstalling
-the full scientific/documentation stack while still preventing package imports from falling back to
-the development checkout. Pip's normal download cache remains available to artifact-installation
-checks.
-
-The maintained PLS-family comparison, documentation navigation, Pulp annotation fallback, and
-response-wise OOF $R^2$ presentation are implemented outcomes rather than open roadmap items.
-Example 03 owns matched-fold comparison of both Pi-PLS response policies and ordinary PLS;
-`textalloc` remains optional with a plain-Matplotlib Pulp fallback; and complete real-data OOF
-figures keep prediction provenance explicit. Further presentation changes require an appropriate
-current owner decision rather than reopening retired migration sequences.
+Future scientific or public-API changes require their own owner decision rather than extending a
+completed migration sequence.
 
 ## Deferred work
 
-The block-aware transformer itself remains outside this repository. `PiPLSRegression` now exposes
-only the independent `scale_x` and `scale_y` controls needed for supported pipeline composition.
-Do not reserve additional block-specific public names or hidden abstractions without a dedicated
-owner decision.
+The block-aware transformer itself remains outside this repository. `PiPLSRegression` exposes only
+the independent `scale_x` and `scale_y` controls needed for supported pipeline composition. Do not
+reserve additional block-specific public names or hidden abstractions without a dedicated owner
+decision.
 
 ## Maintenance protocol
 

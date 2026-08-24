@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted and implemented. Public result naming and selection ownership are refined by Decisions
-0140, 0145, 0146, and 0148.
+Accepted and implemented. Selection ownership and tolerance provenance are defined by Decisions
+0143, 0146, and 0148.
 
 ## Context
 

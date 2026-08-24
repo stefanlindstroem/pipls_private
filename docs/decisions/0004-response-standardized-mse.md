@@ -24,3 +24,8 @@ uniform weight. Candidate losses are the unweighted mean of split losses.
 `response_standardized_mse` returns the positive loss and `neg_response_standardized_mse` returns
 its negative for scikit-learn scorer maximization. Both follow the `(estimator, X, y)` scorer
 signature and use the estimator's training-derived `response_scale_for_scoring_`.
+
+`PiPLSSearchCV.scoring` defaults to the stable string `"neg_response_standardized_mse"`, which
+resolves internally to the public `pipls.metrics.neg_response_standardized_mse` callable. Ordinary
+scikit-learn scorer names, scorer callables, and `None` remain supported. The stable string is a
+configuration/presentation choice only; it does not change the fold-local loss defined above.

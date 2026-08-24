@@ -17,8 +17,8 @@
   fitted attributes, feature names, and scalar `score()` on fitted model estimators. Search objects
   own evidence and do not delegate fitted-model methods.
 - Keep constructor arguments unchanged unless an accepted decision explicitly changes the public
-  lifecycle. Decision 0137 removed constructor-time selection, refit, and OOF controls; do not add
-  aliases, ignored arguments, deprecation paths, or fallback state.
+  lifecycle. Decision 0143 keeps selection, refit, and OOF operations explicitly post-search; do
+  not add constructor-time aliases, ignored arguments, deprecation paths, or fallback state.
 - Keep the fixed numerical core independent from preprocessing, CV, datasets,
   and publication-specific workflows.
 - Reuse the shared private evaluation/search machinery rather than adding a second fold loop.
@@ -143,13 +143,12 @@
   not write generated CSV files as analytical or plotting intermediates.
 - Preserve `cv_mse_std` as descriptive population split dispersion. Maintained CV-MSE figures
   use it directly for symmetric $\pm 1$ SD bars. No standard-error result or selection rule is
-  public. Selection lookup must not fit, refit, or mutate search state. Decision 0140 assigns that
+  public. Selection lookup must not fit, refit, or mutate search state. Decision 0143 assigns that
   ownership to `search.select(...)`, and maintained examples, tutorial snippets, and living API
-  pages use that operation. Under Decisions 0143 and 0152, Example 06 shows the exact minimum row,
-  horizontal
-  10% relative-tolerance threshold, and recommended pre-refit selection, then passes that same
-  object to OOF reporting and final fitting. Keep generated pages and cross-links synchronized with
-  the implemented stage.
+  pages use that operation. Example 06 shows the exact minimum row, horizontal 10% relative-
+  tolerance threshold, and recommended pre-refit selection, then passes that same object to OOF
+  reporting and final fitting. Keep generated pages and cross-links synchronized with the
+  implemented stage.
 - Every behavioral change requires focused tests at the most public relevant boundary. Tests must
   observe executable behavior, public results, or machine-readable outputs rather than prescribed
   source literals, local call order, documentation wording, diagram labels, or plotting style.

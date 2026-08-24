@@ -2,12 +2,12 @@
 
 ## Purpose
 
-This is the fresh-chat handoff for the implemented repository. It records the current package
-boundary, accepted exclusions, active maintenance work, and authority order. Historical patch
-sequences belong in numbered decisions and Git history, not here.
+This is the fresh-chat handoff for the implemented repository. It records current package behavior,
+accepted exclusions, active maintenance work, and authority order. Completed migration narratives
+belong in numbered decisions, `docs/decisions/history.md`, and Git history.
 
-Read this file with `.llm/product_scope.md` before proposing work. Confirm every relevant claim
-against the affected source and tests in the uploaded snapshot.
+Read this file with `.llm/product_scope.md` before proposing work. Confirm relevant claims against
+the affected source and tests in the uploaded snapshot.
 
 ## Implemented package boundary
 
@@ -28,18 +28,25 @@ The top-level wildcard surface is intentionally narrow:
 from pipls import PiPLSRegression, PiPLSSearchCV, PredictorRankSupportWarning
 ```
 
-Result records and utility functions remain public from their focused modules. There is no
-compatibility alias for removed pre-release names.
+Result records and utility functions remain public from their focused modules. There are no
+compatibility aliases for removed pre-release names.
 
 ## Modeling and selection lifecycle
 
-`PiPLSRegression` owns fixed fitting only. It learns centering and optional scaling from the data
-supplied to each fit, validates the requested ranks, and exposes standard PLS-style fitted arrays
-plus `decomposition_`.
+`PiPLSRegression` owns fixed fitting only. It always centers both blocks and lets `scale_x` and
+`scale_y` override the backward-compatible `scale` policy independently. Its `response_subspace`
+parameter accepts exactly `"cross_covariance"` and `"least_squares"`; cross-covariance is the
+peer-reviewed default and least-squares is an RRR-inspired software extension outside the companion
+publication. Response-subspace choice is fixed-estimator configuration, not a search dimension.
 
-`PiPLSSearchCV.fit(X, y)` materializes one validation split set and evaluates fixed-model clones.
-It does not retain `X` or `y` and does not automatically fit a final full-data model. Post-search work
-is explicit:
+`PiPLSSearchCV.fit(X, y)` materializes one validation split set, evaluates fixed-model clones, and
+retains path evidence. It does not retain `X` or `y` and does not automatically fit a final
+full-data model. The ordinary optimized predictor-rank domain is bounded by hard fold feasibility
+and any explicit user cap. Exhaustive coverage is the default, adaptive coverage is an explicit
+computational approximation, and `predictor_rank_values="epv"` is the fixed events-per-variable
+policy using the full supplied sample count before fold-feasibility clipping.
+
+Post-search work is explicit:
 
 ```python
 search = PiPLSSearchCV(cv=cv).fit(X, y)
@@ -48,30 +55,19 @@ report = search.oof_report(X, y, selection=selection)
 model = search.refit(X, y, selection=selection)
 ```
 
-The implemented named rules are:
-
-- `best_score`: maximum configured-score row on the predictor-rank-conditioned component path;
-- `minimum_cv_mse`: smallest conditioned path row satisfying simultaneous relative and absolute
-  tolerances around the exact minimum CV-MSE row.
-
-For optimized predictor-rank policies, `PiPLSSearchCV` applies separate constructor-level relative
-and absolute configured-score tolerances at every component count. Adaptive refinement and
-`rank_test_score` retain private numerical tie semantics. Optimized path rows, selections, and
-profiles carry immutable `PiPLSPredictorRankEvidence`; fixed and EPV policies carry none.
-
-Manual selection uses an evaluated `n_components` value and the predictor rank already selected
-conditionally for that row. A successful refit attaches the exact immutable row as
-`model.selection_`; the fitted search is not mutated. `refit(selection=...)` validates one
-pre-existing selection with the same exact compatibility contract used by `oof_report()`, fits the
-selected pair, and attaches the exact supplied object after fitting succeeds. Rule-based and manual
-component-count refitting remain supported.
+`search.select()` is the sole public selected-row lookup and performs no fitting. The named rules are
+`best_score` and tolerance-based `minimum_cv_mse`; manual selection uses an evaluated component
+count and its already-conditioned predictor rank. Predictor-rank optimization applies separate
+constructor-level relative and absolute configured-score tolerances before component-count
+selection. A successful refit attaches the exact immutable selection as `model.selection_`.
 
 `oof_report()` accepts an existing compatible selection and reuses every split materialized by the
-search. Repeated validation predictions are averaged per observation and their counts are exposed.
-The report is selection-conditioned descriptive validation, not nested-CV or external-test
-performance.
+search. Repeated validation predictions are averaged per observation and prediction counts are
+retained. Same-search OOF evidence is selection-conditioned inspection, not independent
+post-selection validation; independent assessment requires outer resampling or untouched external
+data.
 
-## Current statistical reporting
+## Statistical reporting
 
 For each evaluated component-path row, validation MSE is summarized with equal weight per
 materialized split:
@@ -81,95 +77,77 @@ cv_mse_mean = mean(split_cv_mse)
 cv_mse_std  = std(split_cv_mse, ddof=0)
 ```
 
-`cv_mse_std` is descriptive split-to-split variability. Maintained plots use mean CV-MSE plus or
-minus one split SD. The package exposes no standard-error result and no standard-error selection
-rule.
+`cv_mse_std` is descriptive split-to-split variability. Maintained CV-MSE plots use mean plus or
+minus one split SD. The package exposes no standard-error result or standard-error selection rule.
 
 For `minimum_cv_mse`, `relative_tolerance=None` resolves to
 `sqrt(np.finfo(np.float64).eps)` and `absolute_tolerance=np.inf` disables the absolute cap. Both
-caps must hold. The selection retains the resolved tolerances, the exact unruled reference minimum,
-and the derived effective threshold.
+caps must hold. Predictor-rank tolerance selection uses the analogous configured-score contract and
+retains immutable evidence for optimized policies.
+
+The default search scorer is the stable string `"neg_response_standardized_mse"`, resolving to the
+public fold-local response-standardized MSE scorer. Complete real-data OOF scalar figures prefer
+response-wise selection-conditioned OOF $R^2$ while keeping standardized RMSE available
+numerically. Maintained response-wise $R^2$ bars cap at 1.0, do not place the lower limit above 0.0,
+preserve negative values, and show the zero reference.
 
 ## Data and example boundary
 
 Users may fit ordinary array-like `X` and `y` from any source. No generic registry, downloader,
-DataFrame requirement, or package-specific data-ingestion layer is required.
-
-Named reference datasets are available from `pipls.datasets`:
-
-```python
-load_pulp()
-load_sugarcane()
-load_tobacco()
-```
-
-Each loader reads one canonical package-resource `X.csv`/`Y.csv` pair plus metadata, README, and
-license files. The resources are usable directly outside Python. Corn, the legacy Citrination
-Steel table, SARCOS, and FRED-MD are intentionally excluded because the exact candidate materials
-do not have sufficiently clear redistribution rights.
+DataFrame requirement, or package-specific ingestion layer is required. Named reference datasets
+are available from `pipls.datasets` through `load_pulp()`, `load_sugarcane()`, and `load_tobacco()`;
+each loader reads one canonical language-neutral package-resource matrix pair plus metadata and
+licensing material.
 
 The maintained numbered examples are user tasks:
 
 1. compact Pulp automatic fit and fitted-value diagnostic;
 2. synthetic inspect-decide-refit workflow with external-test prediction;
-3. matched-fold PLS-family component-path comparison across Pulp, Sugarcane, Tobacco, and one
-   deterministic near-saturated synthetic stress case, covering both Pi-PLS response-subspace
-   policies and ordinary PLS without final refitting;
+3. matched-fold PLS-family component-path comparison of both Pi-PLS response policies and ordinary
+   PLS across the three reference datasets plus one deterministic synthetic stress case;
 4. complete repeated-CV Pulp analysis;
 5. complete Sugarcane analysis;
-6. complete Tobacco analysis with separate 10% predictor-rank and component-count tolerances.
+6. complete Tobacco analysis with separate predictor-rank and component-count tolerances.
 
-Example 04 uses `RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)`. Examples 03, 05, and 06
-use `KFold(n_splits=5, shuffle=True, random_state=0)`. Example 03 materializes those folds once per
-comparison case and reuses the exact same split object for the cross-covariance Pi-PLS search,
-least-squares Pi-PLS search, and ordinary-PLS path. Complete real-data examples are exercised by
-`make examples`, not duplicated in the default test suite.
-
-The maintained Example 03 is the sole PLS-family component-path comparison. For Pulp,
-Sugarcane, Tobacco, and one fixed deterministic near-saturated synthetic case, it evaluates the
-publication-default and least-squares Pi-PLS response policies plus ordinary PLS on one shared
-materialized five-fold protocol. Comparative paths are model-development evidence, not independent
-post-selection validation. Source-distribution qualification keeps the bounded Pulp branch while
-`make examples` owns complete execution.
-
-The Home motivation uses the same shared comparison evaluator for its Pulp/Tobacco
-publication-default Pi-PLS versus ordinary-PLS assets. Its claim is limited to shared component
-count $h$ and does not equate that count with total Pi-PLS model complexity. Served documentation
-uses contextual semantic routes to maintained dataset, publication, and theory destinations rather
-than mechanical every-occurrence linking.
+Example 03 materializes one split set per comparison case and reuses it across all compared models.
+Its paths are model-development evidence, not independent post-selection validation. Complete
+real-data examples belong to `make examples`, while source-distribution qualification uses bounded
+smoke branches where appropriate.
 
 ## Inspection and rendering boundary
 
 `pipls.inspection` returns validated immutable NumPy results for Pi-PLS factor displays, shared
-PLS-family latent structure, balanced biplot coordinates, observation diagnostics, and explicit-
-provenance prediction diagnostics. The complete Pulp workflow keeps selection-conditioned OOF
-prediction diagnostics separate from descriptive diagnostics of the final model fitted to all
-development observations.
+PLS-family latent structure, biplot coordinates, observation diagnostics, and explicit-provenance
+prediction diagnostics. OOF diagnostics remain separate from descriptive diagnostics of the final
+model fitted to all development observations.
 
-The runtime package contains no plotting module. Examples and users compose Matplotlib artists,
-labels, layouts, saving, and optional `textalloc` placement directly from immutable numerical
-results. Generated figures are artifacts, not package state.
+The runtime package contains no plotting module. Examples and users own Matplotlib artists, labels,
+layouts, saving, and optional annotation allocation. The maintained Pulp biplot may use optional
+`textalloc>=1.2.4,<2` line-aware placement and must remain executable through a plain-Matplotlib
+fallback when that dependency is absent. Exact visual tuning is not a numerical compatibility
+contract.
 
 ## Documentation and distribution boundary
 
-The repository is the long-lived software product, not a paper-reproduction environment. Paper-
-specific experiment grids, cached results, figure reproduction, and publication environments
-belong in downstream repositories that pin a released package version.
+The repository owns the installable software product, user documentation, examples, tests,
+packaging, and release validation. Paper-specific experiment grids, cached results, figure
+reproduction, and publication environments belong downstream and pin a released package version.
 
 The served site separates tutorials, programming reference, advanced scientific guidance, and
 project validation. Numbered decisions and `.llm` are maintainer records and are not served as user
-documentation.
+documentation. Semantic cross-references are maintained contextually; strict documentation builds
+own link resolution rather than pytest assertions about prose placement.
 
-Python 3.10--3.14 is supported within the dependency ranges declared in `pyproject.toml`. Clean
-wheel and source-distribution installations are validated. Package snapshots are root-relative
-archives of a clean committed tree.
+Python 3.10--3.14 is supported within the dependency ranges in `pyproject.toml`. Clean wheel and
+source-distribution installations are validated. `docs-dist` builds documentation from the
+extracted sdist with package imports forced to that artifact's `src` tree. Snapshots are
+root-relative archives of a clean committed tree.
 
 ## Explicit exclusions and deferred work
 
 Do not add without a new owner decision:
 
-- package-owned block-aware scaling classes, block definitions, or block-method semantics beyond
-  the implemented independent `scale_x` and `scale_y` controls;
+- package-owned block-aware scaling classes or block-method semantics beyond `scale_x`/`scale_y`;
 - automatic outer validation or unbiased-performance claims;
 - weighted fitting or general-purpose metadata routing;
 - arbitrary nested meta-estimator support;
@@ -178,93 +156,23 @@ Do not add without a new owner decision:
 - publication-only analyses in this repository;
 - compatibility aliases for removed pre-release APIs.
 
-Current centering and optional scaling are not deferred: both blocks are always centered, while
-`scale_x` and `scale_y` may override the backward-compatible `scale` policy independently. Learned
-estimator or pipeline scaling remains fold-local during search.
+## Active maintenance
 
-## Current maintenance status
+Decision 0147 governs decision lifecycle and test-boundary cleanup. The maintained registry contains
+only current decisions; completed records are summarized in `docs/decisions/history.md` and mapped
+in `docs/decisions/retirements.md`. The inherited 0153/0154 retirement-map number collisions are
+frozen exceptions. `make decision-check` validates both current registries, local links, active
+decision references, retirement-map uniqueness, and additional number reuse.
 
-The decision lifecycle is normalized under Decision 0147. Current decisions describe durable
-scientific, numerical, API, data, documentation, compatibility, and repository contracts; completed
-migrations and cleanup sequences are summarized in `docs/decisions/history.md` and mapped in
-`docs/decisions/retirements.md`.
-The registry has one explicit historical anomaly: retired filenames with numeric prefixes 0153 and
-0154 coexist with different current Decisions 0153 and 0154. Those exact pairs are frozen;
-`make decision-check` validates both registries, local decision links, active references, retirement
-map uniqueness, and rejects any additional number reuse.
+Patches 8--11 of the Decision-0147 maintenance continuation are complete. Patch 12 removes stale
+pytest assertions that police prose, source arrangement, private names, or removed pre-release
+spellings. Patch 13 moves complete application/documentation execution to the dedicated validation
+targets and removes redundant ordinary-pytest execution. Neither pending patch is authorized to
+change numerical or public-API behavior.
 
-
-Decision 0154 is now implemented in the search runtime. `PiPLSSearchCV` uses exhaustive coverage
-by default over the complete fold-feasible predictor-rank domain, `max_predictor_rank=None` leaves
-that domain uncapped by statistical heuristics, and `predictor_rank_values="epv"` is the explicit
-fixed-rank EPV policy. The pre-release `"max"` predictor-rank policy and `"rule"` maximum-rank
-sentinel are removed, and nondefault `samples_per_predictor_rank` values are valid only for EPV.
-The private hard-feasibility and EPV calculations remain separate. Focused Decision-0154 regression
-coverage now protects full-domain reference optima above EPV ranks, EPV component-domain resolution,
-$c=1$ warning behavior, numerical-rank clipping, explicit rank domains, and adaptive full-domain
-endpoints. Maintained high-dimensional examples now request adaptive coverage explicitly, while
-Pulp and the synthetic entry workflows retain the exhaustive default. Generated tutorial manifests
-record the active search method, exhaustive-coverage status, and effective maximum predictor rank.
-The broader user and maintainer documentation now distinguishes hard feasibility, explicit rank
-domain restrictions, candidate coverage, and the EPV policy. The served computational-performance
-guide documents the exhaustive default cost, adaptive coverage, EPV/fixed-rank alternatives, fit
-counts, validation repetitions, SVD choices, parallelism, OOF reuse, and work inspection. The
-seven-patch Decision-0154 migration is complete: release notes record the breaking pre-1.0 search
-change, and clean wheel/source-distribution smoke tests verify the installed full-domain exhaustive
-default together with the explicit EPV policy.
-
-Decision 0155 is implemented and closed. `PiPLSRegression.response_subspace` accepts exactly
-`"cross_covariance"` and `"least_squares"`; the peer-reviewed cross-covariance construction remains
-the default, while the least-squares/RRR-inspired policy is a software extension outside the
-companion publication. The core keeps response-side algebra exact: cross-covariance uses exact SVD
-of `Z.T @ Y`, least-squares uses exact reduced QR of `Z` followed by exact SVD of `Q_Z.T @ Y`, and
-the final SVD of `W` is exact under both policies. `svd_solver` continues to govern only the
-predictor decomposition.
-
-`response_subspace` is fixed-estimator configuration, not a third `PiPLSSearchCV` search dimension.
-Candidate evaluation, OOF work, pipelines, serialization, external `GridSearchCV`, and final
-refitting preserve the estimator-template policy while package search changes only `n_components`
-and `predictor_rank`. The ordinary search template remains cross-covariance, and no
-`response_subspace_` fitted provenance attribute is introduced. Maintained theory, API,
-reproducibility, performance, troubleshooting, manuscript-alignment, and Example-03 material keep
-the publication/software-extension boundary explicit. The compatibility invariant is that omitting
-the parameter, or explicitly selecting `response_subspace="cross_covariance"`, preserves the
-pre-Decision-0155 fixed-estimator numerical path subject only to ordinary floating-point behavior.
-
-Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
-`refit(selection=...)`, generic protocol-neutral OOF reporting, fitted-model selection provenance,
-and the interpretation boundary that same-search OOF evidence is selection-conditioned inspection
-rather than independent post-selection validation. Maintained manual-selection tutorials present
-that lifecycle without creating a separate workflow contract. The package has no dedicated
-leave-one-out mode, detector, provenance field, example, or support promise; compatible user-supplied
-splitters remain ordinary interoperability.
-
-Tests protect behavior and machine-readable outputs rather than repository prose or source
-arrangement. Distribution and documentation validation share private maintenance helpers, and the
-Pulp example and tutorial renderer use caller-local plotting functions. Clean wheel and
-source-distribution qualification exercises both response-subspace policies, verifies least-squares
-search/refit propagation, and runs Example 01 plus the bounded Pulp branch of Example 03 from the
-extracted sdist.
-
-`docs-dist` separately verifies that documentation can be built from the extracted source
-distribution. It uses the invoking maintained documentation environment but forces `PYTHONPATH` to
-the extracted artifact's `src` tree, so package code and documentation content cannot fall back to
-the development checkout. Clean installation isolation remains the responsibility of `dist-check`;
-`docs-dist` therefore does not reinstall the scientific and documentation dependency stack into a
-second temporary virtual environment. Artifact installation checks reuse pip's normal cache,
-including a caller-supplied `PIP_CACHE_DIR`.
-
-`textalloc>=1.2.4,<2` is the optional annotation-layout extra used by the maintained Pulp biplot.
-It may allocate predictor labels against other labels and exact predictor-arrow shafts; sample-score
-points are excluded from the obstacle set. If `textalloc` is absent, Pulp rendering remains
-executable through ordinary Matplotlib endpoint labels. Exact allocator tuning is presentation
-implementation rather than a numerical compatibility contract.
-
-Response-wise selection-conditioned OOF $R^2$ is the preferred visible scalar response diagnostic
-for Examples 04--06 and Tutorial 3. Standardized RMSE remains available numerically and the
-response-standardized model-selection loss is unchanged. Maintained response-wise $R^2$ bars cap at
-1.0, do not place the lower limit above 0.0, preserve negative values, and show the zero reference;
-OOF and fitted-value provenance remain explicit.
+Tests protect executable behavior and machine-readable outputs. Strict documentation, complete
+examples, source-distribution documentation, and installed artifacts are validated by their
+dedicated Make targets.
 
 ## Authority and drift handling
 
@@ -277,8 +185,8 @@ When sources disagree, use this order:
 4. source and tests as evidence of implemented behavior;
 5. this handoff and `.llm/strategy.md`.
 
-Do not silently choose between conflicting scientific or public-API contracts. Identify the exact
-conflict and resolve it in the same patch or obtain an owner decision.
+Do not silently choose between conflicting scientific or public-API contracts. Resolve the exact
+conflict in the same patch or obtain an owner decision.
 
 ## Fresh-chat checklist
 

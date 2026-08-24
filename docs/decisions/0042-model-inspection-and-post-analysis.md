@@ -3,7 +3,7 @@
 ## Status
 
 Accepted, with ordinary-PLS comparison ownership refined by Decision 0045 and rendering ownership
-refined by Decisions 0061 and 0083. The
+refined by Decision 0083. The
 separation of selection diagnostics, fitted-model interpretation, prediction diagnostics,
 immutable inspection results, optional plotting, explicit labels, physical axes, and canonical
 artifacts remains in force. The corrective API, numbered-example, artifact, and boundary-test
@@ -48,7 +48,7 @@ The repository distinguishes three analysis stages:
 
 Reusable numerical analysis belongs in the public `pipls.inspection` submodule. It contains pure
 NumPy computations and immutable result objects, with no pandas or Matplotlib dependency. Plotting
-and report composition are caller-owned under Decisions 0061 and 0083; the runtime package exposes
+and report composition are caller-owned under Decision 0083; the runtime package exposes
 no plotting submodule or public `plot_*` convenience functions.
 
 Dataset-specific orchestration, explicit data reading, variable-name acquisition, fixed model

@@ -20,6 +20,27 @@ creating a second splitter or an independent performance estimate.
 
 ## Decision
 
+### Search fitting produces evidence only
+
+`PiPLSSearchCV.fit(X, y)` materializes one validation split set, evaluates the admissible candidate
+path, and retains search evidence. It retains neither training matrices nor a final selected
+full-data estimator. Search evidence includes `cv_results_`, `component_path_`, `n_splits_`,
+`max_predictor_rank_`, `search_is_exhaustive_`, and `scorer_`.
+
+`PiPLSSearchCV.select()` is the sole public selected-row lookup. Exactly one of `rule` and
+`n_components` is supplied, the method performs no fitting or search mutation, and it returns an
+immutable `PiPLSSelection`. The named rules are:
+
+- `best_score`: the maximum configured-score row on the predictor-rank-conditioned component path,
+  with deterministic smaller-component and smaller-rank ordering for exact numerical ties;
+- `minimum_cv_mse`: the smallest conditioned row satisfying the relative and absolute CV-MSE
+  tolerances defined by Decision 0146.
+
+Manual component-count selection returns the stored conditioned row for that evaluated count with
+no named-rule provenance. `PiPLSComponentPath` remains aligned numerical evidence and exposes no
+public recommendation or selected-row lookup methods; conditional predictor-rank inspection remains
+a search operation through `predictor_rank_profile()`.
+
 ### Refitted models retain the exact selection
 
 Every estimator or terminal pipeline returned successfully by `PiPLSSearchCV.refit()` exposes:

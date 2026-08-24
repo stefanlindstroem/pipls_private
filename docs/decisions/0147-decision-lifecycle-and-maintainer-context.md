@@ -2,13 +2,13 @@
 
 ## Status
 
-Accepted and implemented through Patch 10. The original seven-patch consolidation is complete;
+Accepted and implemented through Patch 11. The original seven-patch consolidation is complete;
 Patches 8--13 are a bounded maintenance continuation for registry repair, further decision
-consolidation, and test-boundary cleanup. Patch 8 repaired the registry and added a structural
-checker. Patch 9 retired eight completed late presentation and migration records. Patch 10 retires
-four older presentation/workflow records after preserving their remaining durable contracts in the
-retained rendering, publication-boundary, predictor-rank, documentation, and OOF-provenance
-decisions. None of Patches 8--10 changes numerical or public-API behavior.
+consolidation, and test-boundary cleanup. Patches 8--10 repaired the registry and retired completed
+presentation/migration records. Patch 11 consolidates four overlapping search-lifecycle records
+into the retained scoring, estimator/search, immutable-path, tolerance, and selection-provenance
+contracts and compacts the active `.llm` handoff. None of Patches 8--11 changes numerical or
+public-API behavior.
 
 ## Context
 
@@ -157,12 +157,12 @@ split internally.
    decision implemented -- complete.
 8. Repair the maintained registry, document the inherited 0153/0154 number collisions, and add a
    structural registry checker -- complete.
-9. Retire completed Decisions 0156--0163 after folding only durable contracts into current
+9. Retire completed records 0156--0163 after folding only durable contracts into current
    canonical records and history -- complete with 47 current records.
 10. Retire older presentation/workflow records whose durable content is canonical elsewhere --
     complete with 43 current records.
 11. Consolidate overlapping search-lifecycle decisions and compact the active `.llm` layer around
-    current state and unresolved work -- pending.
+    current state and unresolved work -- complete with 39 current records.
 12. Remove stale pytest assertions that police prose, source arrangement, private names, or removed
     pre-release spellings instead of durable behavior -- pending.
 13. Move complete application/documentation validation to its owning targets and remove redundant
