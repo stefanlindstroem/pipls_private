@@ -5,6 +5,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from _support.metric_plotting import response_r2_ylim
 from _support.pulp_biplot import plot_pulp_biplot
 from sklearn.model_selection import RepeatedKFold
 
@@ -348,12 +349,13 @@ def _plot_prediction_diagnostics(
     axes[1].set_ylabel("Standardized residual")
 
     positions = np.arange(len(response_names))
-    axes[2].bar(positions, diagnostics.standardized_rmse)
+    axes[2].bar(positions, diagnostics.response_r2)
+    axes[2].axhline(0.0, linewidth=0.8, linestyle="--", color="0.35")
     axes[2].set_xticks(positions)
     axes[2].set_xticklabels(response_names)
     axes[2].set_xlabel("Response")
-    axes[2].set_ylabel("Standardized RMSE")
-    axes[2].set_ylim(0.0, 1.0)
+    axes[2].set_ylabel(r"Response-wise OOF $R^2$")
+    axes[2].set_ylim(*response_r2_ylim(diagnostics.response_r2))
     axes[0].legend(title="Response")
     axes[1].legend(title="Response")
     axes[2].tick_params(axis="x", labelrotation=45)
@@ -420,7 +422,7 @@ def _plot_final_fit_r2(
     axis.set_xlabel("Response")
     axis.set_ylabel(r"Fitted $R^2$")
     axis.set_title(r"Final $\Pi$-PLS fit: response-wise $R^2$")
-    axis.set_ylim(0.0, 1.0)
+    axis.set_ylim(*response_r2_ylim(diagnostics.response_r2))
     axis.grid(axis="y", alpha=0.2)
     figure.savefig(output_path)
     plt.close(figure)

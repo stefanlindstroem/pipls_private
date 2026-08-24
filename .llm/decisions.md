@@ -60,7 +60,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0160-graceful-adjusttext-fallback.md` | graceful optional `adjustText` fallback | historical allocator choice superseded by 0161; its non-fatal plain-Matplotlib fallback and runtime-dependency boundary remain authoritative |
 | `0161-line-aware-text-allocation.md` | line-aware text allocation for annotated biplots | closed migration: optional `textalloc` owns Pulp label allocation against other labels and exact predictor-arrow line obstacles; sample scores are excluded, fallback remains plain Matplotlib, and `adjustText` is removed from active dependencies |
 | `0162-complete-pulp-biplot-helper.md` | complete Pulp biplot helper | closed two-patch refinement: complete simple/textalloc renderers share one dispatcher; the tutorial exposes only `biplot_coordinates()` plus the local plotting call, with 9-point labels and the 0.01125--0.15 placement envelope |
-| `0163-oof-response-r2-diagnostics.md` | response-wise OOF R² diagnostics | active three-patch migration: Examples 04--06 and Tutorial 3 will show response-wise selection-conditioned OOF R²; standardized RMSE remains public, and every maintained R² bar plot must end at 1.0 with a lower limit no greater than 0.0 |
+| `0163-oof-response-r2-diagnostics.md` | response-wise OOF R² diagnostics | active migration: 0163A defined the axis contract and 0163B migrated Pulp Tutorial 3 / Example 04; 0163C remains for Sugarcane/Tobacco and closure, while standardized RMSE stays public |
 
 ## Implemented clarifications
 

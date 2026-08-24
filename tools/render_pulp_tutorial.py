@@ -23,6 +23,7 @@ matplotlib.use("Agg")
 matplotlib.rcParams["svg.hashsalt"] = "pipls-pulp-tutorial"
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
+from _support.metric_plotting import response_r2_ylim  # noqa: E402
 from _support.pulp_biplot import plot_pulp_biplot  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
@@ -58,7 +59,7 @@ FIGURE_FILENAMES = (
     "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
-    "standardized_rmse.svg",
+    "oof_response_r2.svg",
     "final_fit_observed_vs_predicted.svg",
     "final_fit_r2.svg",
     "final_fit_residual_distribution.svg",
@@ -317,26 +318,27 @@ def _render_residuals_vs_predicted(
     _save_svg(figure, output_path)
 
 
-def _render_standardized_rmse(
+def _render_oof_response_r2(
     diagnostics: PredictionDiagnostics,
     *,
     response_names: tuple[str, ...],
     output_path: Path,
 ) -> None:
-    # --8<-- [start:render-pulp-standardized-rmse]
+    # --8<-- [start:render-pulp-oof-response-r2]
     figure, axis = _figure(figsize=(7.4, 5.0))
     positions = np.arange(len(response_names))
-    axis.bar(positions, diagnostics.standardized_rmse)
+    axis.bar(positions, diagnostics.response_r2)
+    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.35")
     axis.set_xticks(positions)
     axis.set_xticklabels(response_names)
     axis.set_xlabel("Response")
-    axis.set_ylabel("Standardized RMSE")
-    axis.set_ylim(0.0, 1.0)
+    axis.set_ylabel(r"Response-wise OOF $R^2$")
+    axis.set_ylim(*response_r2_ylim(diagnostics.response_r2))
     axis.set_title(rf"Pulp $\Pi$-PLS — {diagnostics.prediction_kind}")
     axis.tick_params(axis="x", labelrotation=45)
     for label in axis.get_xticklabels():
         label.set_horizontalalignment("right")
-    # --8<-- [end:render-pulp-standardized-rmse]
+    # --8<-- [end:render-pulp-oof-response-r2]
     _save_svg(figure, output_path)
 
 
@@ -392,7 +394,7 @@ def _render_final_fit_r2(
     axis.set_xlabel("Response")
     axis.set_ylabel(r"Fitted $R^2$")
     axis.set_title(r"Final $\Pi$-PLS fit: response-wise $R^2$")
-    axis.set_ylim(0.0, 1.0)
+    axis.set_ylim(*response_r2_ylim(diagnostics.response_r2))
     axis.grid(axis="y", alpha=0.2)
     _save_svg(figure, output_path)
 
@@ -484,6 +486,12 @@ def _write_manifest(
             "oof_predictions_per_observation": int(
                 report.oof_prediction_counts[0]
             ),
+            "response_r2": [
+                {"response": name, "value": float(value)}
+                for name, value in zip(
+                    data.target_names, oof_diagnostics.response_r2, strict=True
+                )
+            ],
         },
         "final_fit": {
             "prediction_kind": fitted_diagnostics.prediction_kind,
@@ -597,10 +605,10 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
         response_names=response_names,
         output_path=output_dir / "residuals_vs_predicted.svg",
     )
-    _render_standardized_rmse(
+    _render_oof_response_r2(
         oof_diagnostics,
         response_names=response_names,
-        output_path=output_dir / "standardized_rmse.svg",
+        output_path=output_dir / "oof_response_r2.svg",
     )
     _render_final_fit_observed_vs_predicted(
         fitted_diagnostics,

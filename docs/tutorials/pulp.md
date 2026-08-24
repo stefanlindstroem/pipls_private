@@ -229,17 +229,21 @@ descriptive; it does not establish a formal variance model or calibration claim.
 
 See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted).
 
-### Standardized RMSE
+### Response-wise OOF $R^2$
 
 ```python
---8<-- "tools/render_pulp_tutorial.py:render-pulp-standardized-rmse"
+--8<-- "tools/render_pulp_tutorial.py:render-pulp-oof-response-r2"
 ```
 
-![Pulp standardized RMSE](../assets/generated/pulp/standardized_rmse.svg)
+![Pulp response-wise OOF R²](../assets/generated/pulp/oof_response_r2.svg)
 
-Response-wise RMSE is divided by the observed sample standard deviation. Prediction accuracy varies across the eight responses: `s` has the lowest standardized RMSE in this analysis, while `Elongation` has the highest. These response-wise diagnostics are not identical to the fold-local standardized losses used during path selection.
+Response-wise $R^2$ summarizes how closely the selection-conditioned OOF predictions reproduce
+each observed response. Values near 1 indicate strong agreement, $R^2=0$ corresponds to the
+observed-mean reference, and negative values indicate prediction poorer than that reference. The
+values are calculated from the averaged OOF predictions above; they are not averages of fold-wise
+$R^2$ values.
 
-See [Standardized RMSE](../model_inspection.md#standardized-rmse).
+See [Response-wise coefficient of determination](../model_inspection.md#response-r2).
 
 If the selected path, conditional rank profile, or OOF behavior is unsatisfactory, return to
 `CHOSEN_N_COMPONENTS`, create another selection, and inspect the resulting evidence.
@@ -365,8 +369,9 @@ four-panel Π-PLS factorization figure. See [Dilation](../model_inspection.md#di
 ## Inspect the final fitted model
 
 The selection-conditioned OOF section above asks how the accepted selection behaves under the
-stored validation splits. After refitting, a different question is useful: how closely does the
-single final model fitted to all 46 development observations represent those same observations?
+stored validation splits, including response-wise OOF $R^2$. After refitting, a different question
+is useful: how closely does the single final model fitted to all 46 development observations
+represent those same observations?
 Compute prediction diagnostics from the fitted values while preserving that provenance explicitly:
 
 ```python
@@ -406,8 +411,9 @@ R_j^2 = 1 -
 ![Pulp final-fit response-wise R²](../assets/generated/pulp/final_fit_r2.svg)
 
 For this selected model, the fitted $R^2$ values are approximately 0.81--0.96 across the eight
-responses. These values summarize training fit only; they should not be compared directly with an
-independent-test or nested-CV performance estimate as if the provenance were the same. See
+responses. Unlike the OOF $R^2$ values above, these are computed from predictions of the final model
+on the same observations used to fit it. They summarize training fit only and should not be
+interpreted as held-out predictive performance. See
 [Response-wise coefficient of determination](../model_inspection.md#response-r2).
 
 ### Standardized residual distribution

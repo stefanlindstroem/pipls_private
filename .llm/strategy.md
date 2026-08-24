@@ -165,8 +165,8 @@ OOF R². The public `PredictionDiagnostics` surface and response-standardized mo
 not change, and Quick Start retains its fitted-value standardized-RMSE summary. The maintained R²
 bar-plot limit contract is upper limit exactly 1.0 and lower limit never greater than 0.0; negative
 R² values must remain visible below zero. Patch 0163A owns the shared example-local y-limit helper
-and tests; 0163B migrates Pulp Tutorial 3 / Example 04, and 0163C migrates Sugarcane/Tobacco and
-closes the decision.
+and tests; 0163B has migrated Pulp Tutorial 3 / Example 04 and applies the same limit contract to
+Pulp final-fit R². Patch 0163C remains to migrate Sugarcane/Tobacco and close the decision.
 
 ## Deferred work
 

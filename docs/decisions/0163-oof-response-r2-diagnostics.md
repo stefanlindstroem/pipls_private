@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted; patch 0163A establishes the presentation and axis-limit contract. Patches 0163B--C remain
-active.
+Accepted; patches 0163A--B establish the presentation contract and migrate Pulp. Patch 0163C
+remains active.
 
 ## Context
 
@@ -56,8 +56,11 @@ old source-level test that treated standardized RMSE and R² as sharing one unit
 and adds focused helper tests. It does not change visible example output.
 
 Patch 0163B migrates Tutorial 3 and Example 04 from the visible OOF standardized-RMSE bar plot to
-response-wise OOF R², applies the shared R² y-limit helper to both OOF and final-fit Pulp R²
-plots, and keeps their prediction provenance explicit.
+response-wise OOF R², records the response-wise OOF values in the generated tutorial manifest,
+applies the shared R² y-limit helper to both OOF and final-fit Pulp R² plots, and keeps their
+prediction provenance explicit. The generated OOF scalar asset is renamed to
+`oof_response_r2.svg`; standardized RMSE remains available numerically through
+`PredictionDiagnostics`.
 
 Patch 0163C migrates the analogous Sugarcane and Tobacco OOF panels, synchronizes documentation and
 release notes, qualifies all maintained examples/documentation, and closes the decision.

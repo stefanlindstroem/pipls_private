@@ -72,5 +72,5 @@ def test_standardized_rmse_bar_plots_use_unit_interval() -> None:
                         f"{path.relative_to(root)}:{candidate.lineno} ({function.name})"
                     )
 
-    assert metric_bars == 4
+    assert metric_bars == 2
     assert violations == []

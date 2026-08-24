@@ -22,7 +22,7 @@ FIGURE_FILENAMES = (
     "weighted_response_directions.svg",
     "observed_vs_predicted.svg",
     "residuals_vs_predicted.svg",
-    "standardized_rmse.svg",
+    "oof_response_r2.svg",
     "final_fit_observed_vs_predicted.svg",
     "final_fit_r2.svg",
     "final_fit_residual_distribution.svg",
@@ -124,6 +124,14 @@ def test_pulp_tutorial_renderer_records_repeated_cv_and_valid_figures(
         "selection-conditioned OOF predictions"
     )
     assert analysis["detailed_responses"] == list(load_pulp().target_names)
+    oof_response_r2 = analysis["response_r2"]
+    assert [item["response"] for item in oof_response_r2] == list(
+        load_pulp().target_names
+    )
+    oof_r2_values = [item["value"] for item in oof_response_r2]
+    assert len(oof_r2_values) == 8
+    assert all(np.isfinite(value) for value in oof_r2_values)
+    assert all(value <= 1.0 for value in oof_r2_values)
 
     final_fit = manifest["final_fit"]
     assert final_fit["prediction_kind"] == "fitted values"

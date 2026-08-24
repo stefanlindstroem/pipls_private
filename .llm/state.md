@@ -296,9 +296,11 @@ preferred visible scalar response diagnostic for Examples 04--06 and Tutorial 3 
 `PredictionDiagnostics`, model-selection scoring, or Quick Start. The shared example-local
 `response_r2_ylim()` contract fixes every maintained R² bar plot at an upper limit of exactly 1.0;
 its lower limit is 0.0 for nonnegative displayed values and extends below any negative minimum with
-small downward padding. Patches 0163B--C will migrate Pulp first, then Sugarcane/Tobacco, while
-keeping standardized RMSE available as a numerical diagnostic and keeping OOF versus final-fit R²
-provenance explicit.
+small downward padding. Patch 0163B migrates Pulp Tutorial 3 and Example 04, renames the generated
+OOF scalar asset to `oof_response_r2.svg`, records response-wise OOF R² in the tutorial manifest,
+and applies the same axis contract to final-fit Pulp R². Patch 0163C remains for Sugarcane/Tobacco
+and closure. Standardized RMSE remains available as a numerical diagnostic, and OOF versus
+final-fit R² provenance remains explicit.
 
 ## Authority and drift handling
 

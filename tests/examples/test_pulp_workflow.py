@@ -144,6 +144,23 @@ def test_pulp_selection_requires_an_evaluated_component_count(
         pulp_result.search.select(n_components=99)
 
 
+def test_pulp_oof_response_r2_matches_the_assembled_oof_predictions(
+    pulp_result: SimpleNamespace,
+) -> None:
+    result = pulp_result
+    diagnostics = result.oof_diagnostics
+
+    assert diagnostics.response_r2.shape == (result.Y.shape[1],)
+    assert np.all(np.isfinite(diagnostics.response_r2))
+
+    residual = result.Y - result.oof_predictions
+    residual_sum_squares = np.sum(residual * residual, axis=0)
+    centered = result.Y - np.mean(result.Y, axis=0)
+    total_sum_squares = np.sum(centered * centered, axis=0)
+    expected_r2 = 1.0 - residual_sum_squares / total_sum_squares
+    np.testing.assert_allclose(diagnostics.response_r2, expected_r2)
+
+
 def test_pulp_final_fit_diagnostics_are_response_wise_and_descriptive(
     pulp_result: SimpleNamespace,
 ) -> None:

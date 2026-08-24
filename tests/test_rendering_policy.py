@@ -68,6 +68,12 @@ def test_pulp_example_runs_without_textalloc(tmp_path: Path) -> None:
         (root / "examples" / "_support" / "pulp_biplot.py").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
+    (support_dir / "metric_plotting.py").write_text(
+        (root / "examples" / "_support" / "metric_plotting.py").read_text(
+            encoding="utf-8"
+        ),
+        encoding="utf-8",
+    )
     sitecustomize = tmp_path / "sitecustomize.py"
     sitecustomize.write_text(
         """import builtins
