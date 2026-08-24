@@ -9,11 +9,7 @@ from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
 from pipls import PiPLSSearchCV
-from pipls.component_path import (
-    PiPLSComponentPath,
-    PiPLSPredictorRankProfile,
-    PiPLSSelection,
-)
+from pipls.component_path import PiPLSComponentPath, PiPLSSelection
 from pipls.datasets import load_sugarcane
 from pipls.inspection import (
     LatentStructure,
@@ -65,44 +61,6 @@ def _plot_component_path(
     figure.savefig(output_path)
     plt.close(figure)
 
-
-def _plot_predictor_rank_profile(
-    profile: PiPLSPredictorRankProfile,
-    output_path: Path,
-) -> None:
-    figure, axis = plt.subplots(
-        figsize=(7.0, 4.5),
-        layout="constrained",
-    )
-    axis.errorbar(
-        profile.predictor_rank,
-        profile.cv_mse_mean,
-        yerr=profile.cv_mse_std,
-        fmt="o-",
-        capsize=4,
-    )
-    axis.scatter(
-        [profile.selection.predictor_rank],
-        [profile.selection.cv_mse_mean],
-        marker="D",
-        color="tab:orange",
-        s=70,
-        label=f"CV-MSE minimum: rank {profile.selection.predictor_rank}",
-        zorder=3,
-    )
-    axis.set_xlabel("Predictor rank")
-    axis.set_ylabel("Mean response-standardized CV-MSE (±1 SD)")
-    axis.set_title(
-        rf"Sugarcane $\Pi$-PLS predictor-rank profile at "
-        f"{profile.n_components} components"
-    )
-    axis.set_xticks(profile.predictor_rank)
-    upper = float(np.max(profile.cv_mse_mean + profile.cv_mse_std))
-    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
-    axis.grid(axis="y", alpha=0.25)
-    axis.legend()
-    figure.savefig(output_path)
-    plt.close(figure)
 
 
 def _plot_pipls_factors(
@@ -327,12 +285,16 @@ def main() -> None:
     wavelengths = np.asarray(data.feature_names, dtype=np.float64)
     response_names = list(data.target_names)
 
-    # Use adaptive candidate coverage for this high-dimensional spectral search.
-    # The admissible rank domain itself remains the complete hard-feasible domain.
-    search = PiPLSSearchCV(search_method="adaptive", cv=CV).fit(X, Y)
+    # Use the more permissive EPV choice c=5 to regularize the spectral
+    # predictor subspace while retaining sufficient rank for this dataset.
+    # Predictor rank is fixed independently of the component-count choice.
+    search = PiPLSSearchCV(
+        predictor_rank_values="epv",
+        samples_per_predictor_rank=5.0,
+        cv=CV,
+    ).fit(X, Y)
     path = search.component_path_
     selection = search.select(n_components=CHOSEN_N_COMPONENTS)
-    rank_profile = search.predictor_rank_profile(selection.n_components)
 
     # Inspect the same selection through the materialized validation splits.
     report = search.oof_report(
@@ -363,10 +325,6 @@ def main() -> None:
         path,
         selection,
         ANALYSIS_DIR / "component_path.pdf",
-    )
-    _plot_predictor_rank_profile(
-        rank_profile,
-        ANALYSIS_DIR / "predictor_rank_profile.pdf",
     )
     _plot_pipls_factors(
         factors,
@@ -400,10 +358,9 @@ def main() -> None:
         f"n_components={model.n_components}, predictor_rank={selection.predictor_rank}"
     )
     print(
-        "Predictor-rank profile: "
-        f"evaluated {rank_profile.predictor_rank[0]} to "
-        f"{rank_profile.predictor_rank[-1]}; "
-        f"selected rank {rank_profile.selection.predictor_rank}"
+        "EPV-fixed predictor rank: "
+        f"r_pi={selection.predictor_rank} "
+        "(samples_per_predictor_rank=5.0)"
     )
     print(f"Wrote PDF figures to {ANALYSIS_DIR}")
 

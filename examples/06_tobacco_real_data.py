@@ -450,7 +450,9 @@ def main() -> None:
         for start in range(0, len(response_names), RESPONSES_PER_PAGE)
     )
 
-    # Apply separate 10% parsimony tolerances at the two selection levels.
+    # Optimize predictor rank, but use a 10% tolerance to prefer a smaller
+    # spectral subspace when its CV performance remains close to the conditional
+    # optimum. Component-count parsimony is applied separately below.
     search = PiPLSSearchCV(
         estimator=PiPLSRegression(
             n_components=1,

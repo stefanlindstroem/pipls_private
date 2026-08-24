@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Change the maintained Sugarcane workflow to use an explicit EPV-fixed predictor rank with
+  `samples_per_predictor_rank=5.0`, removing the now-inapplicable predictor-rank optimization
+  profile. Keep Tobacco on adaptive rank optimization with its existing 10% predictor-rank
+  tolerance, and document the contrasting regularization intent in the example code.
 - Rewrite the served Examples catalogue around the learning purpose of each numbered script,
   removing configuration inventories and fixed-result narration while retaining links to the
   tutorials, datasets, theory, and selection references that own those details.
