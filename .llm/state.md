@@ -212,6 +212,11 @@ The decision lifecycle is normalized under Decision 0147. Current decisions desc
 scientific, numerical, API, data, documentation, compatibility, and repository contracts; completed
 migrations and cleanup sequences are summarized in `docs/decisions/history.md` and mapped in
 `docs/decisions/retirements.md`.
+The registry has one explicit historical anomaly: retired filenames with numeric prefixes 0153 and
+0154 coexist with different current Decisions 0153 and 0154. Those exact pairs are frozen;
+`make decision-check` validates both registries, local decision links, active references, retirement
+map uniqueness, and rejects any additional number reuse.
+
 
 Decision 0154 is now implemented in the search runtime. `PiPLSSearchCV` uses exhaustive coverage
 by default over the complete fold-feasible predictor-rank domain, `max_predictor_rank=None` leaves

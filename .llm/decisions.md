@@ -78,6 +78,9 @@ This registry lists only numbered decisions that still define current behavior o
   are caller-owned.
 - Tests protect behavior and machine-readable outputs. Complete documentation, examples, and
   installed artifacts are validated by their dedicated Make targets.
+- Decision numbers are not reused for new records. The inherited 0153/0154 retirement-map
+  collisions are frozen exceptions and `make decision-check` rejects any additional reuse.
 
 When adding a decision, create the numbered file and index it in the same patch. Retirement requires
-an explicit mapping, active-reference cleanup, and the validation defined by Decision 0147.
+an explicit mapping, active-reference cleanup, `make decision-check`, and the validation defined by
+Decision 0147.

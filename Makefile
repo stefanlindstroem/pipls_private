@@ -5,7 +5,7 @@ EXAMPLE_ENV := PYTHONPATH=src MPLBACKEND=Agg OMP_NUM_THREADS=1 OPENBLAS_NUM_THRE
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install check test lint format typecheck clean examples docs docs-serve docs-figures docs-dist build dist-check snapshot
+.PHONY: help install check decision-check test lint format typecheck clean examples docs docs-serve docs-figures docs-dist build dist-check snapshot
 
 ##@ Start here
 
@@ -18,7 +18,10 @@ help: ## Show this command index.
 install: ## Install the editable package with development dependencies.
 	$(PYTHON) -m pip install -e ".[dev]"
 
-check: test lint typecheck ## Run tests, lint, and type checks.
+check: decision-check test lint typecheck ## Run registry, tests, lint, and type checks.
+
+decision-check: ## Validate the current decision registry and retirement map.
+	$(PYTHON) tools/check_decision_registry.py
 
 ##@ Development
 

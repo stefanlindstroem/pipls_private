@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Repair the maintained decision registry by documenting and freezing the inherited 0153/0154
+  numeric collisions, correcting the Patch-7 retirement heading, and adding `make decision-check`
+  to validate current indexes, local decision links, active references, retirement-map uniqueness,
+  and future decision-number reuse.
 - Make response-wise selection-conditioned OOF $R^2$ the preferred visible scalar prediction
   diagnostic in the maintained Pulp, Sugarcane, and Tobacco workflows. Draw the $R^2=0$
   reference explicitly and keep every maintained response-wise $R^2$ bar plot capped at exactly

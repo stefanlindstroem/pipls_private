@@ -42,11 +42,12 @@ make install
 make check
 ```
 
-`make check` runs tests, Ruff, and strict mypy checks. Use the grouped targets when working on a
-specific part of the repository:
+`make check` validates the decision registry, runs tests and Ruff, and performs strict mypy
+checks. Use the grouped targets when working on a specific part of the repository:
 
 ```text
 Development
+  make decision-check validate the decision registry and retirement map
   make test          run the test suite
   make lint          run Ruff checks
   make format        format Python files with Ruff

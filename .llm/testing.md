@@ -156,8 +156,8 @@ The authoritative local target is:
 make check
 ```
 
-It covers formatting, linting, typing, behavioral pytest coverage, and configured package checks.
-Also run `python -m compileall` and `git diff --check` when producing a patch.
+It covers decision-registry consistency, linting, typing, and behavioral pytest coverage. Also run
+`python -m compileall` and `git diff --check` when producing a patch.
 
 ### Application, documentation, and distribution checks
 

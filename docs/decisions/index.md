@@ -67,5 +67,6 @@ This index lists current numbered decisions only. Completed intermediate records
 - [Compact development history](history.md)
 - [Explicit retirement map](retirements.md)
 
-Decision numbers are never reused. Add or retire records only through the lifecycle defined by
-Decision 0147.
+New decision numbers are never reused. The two inherited 0153/0154 collisions are frozen and
+documented in the [retirement map](retirements.md#frozen-legacy-number-collisions). Add or retire
+records only through the lifecycle defined by Decision 0147.

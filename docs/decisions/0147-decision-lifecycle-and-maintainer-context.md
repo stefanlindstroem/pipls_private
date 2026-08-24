@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted and implemented. The active `.llm` layer describes current contracts without patch-
-progress narration, `history.md` summarizes completed eras, the retirement map covers removed
-records, and the maintained tree contains 45 current numbered decisions after Decision 0153.
+Accepted and implemented through Patch 8. The original seven-patch consolidation is complete;
+Patches 8--13 are a bounded maintenance continuation for registry repair, further decision
+consolidation, and test-boundary cleanup. Patch 8 repairs the registry and adds a structural
+checker without changing numerical, public-API, documentation-rendering, or example behavior.
 
 ## Context
 
@@ -45,7 +46,11 @@ to understand why the repository has its present shape. It does not reproduce de
 become a second patch log.
 
 **Retired decisions** are removed from the maintained tree and recovered from Git history when
-needed. Their decision numbers are never reused.
+needed. Their decision numbers are not reused. Patch 8 records two inherited exceptions, 0153 and
+0154,
+where the maintained retirement map already contains older filenames with the same numeric
+prefixes as current decisions. Those exact collisions are frozen historical anomalies; no new
+reuse is permitted.
 
 ### Retire by relevance, not age
 
@@ -147,6 +152,18 @@ split internally.
    preserving the public façade -- complete.
 7. Normalize links and indexes, complete stale-surface and repository-artifact audits, and mark this
    decision implemented -- complete.
+8. Repair the maintained registry, document the inherited 0153/0154 number collisions, and add a
+   structural registry checker -- complete.
+9. Retire completed Decisions 0156--0163 after folding only durable contracts into current
+   canonical records and history -- pending.
+10. Retire older presentation/workflow records whose durable content is canonical elsewhere --
+    pending.
+11. Consolidate overlapping search-lifecycle decisions and compact the active `.llm` layer around
+    current state and unresolved work -- pending.
+12. Remove stale pytest assertions that police prose, source arrangement, private names, or removed
+    pre-release spellings instead of durable behavior -- pending.
+13. Move complete application/documentation validation to its owning targets and remove redundant
+    ordinary-pytest execution -- pending.
 
 ## Final audit outcome
 
@@ -166,9 +183,11 @@ seven-patch sequence remains in this decision and Git history rather than in `st
 Every patch must pass `git diff --check`, Python compilation, Ruff, mypy, the complete pytest suite,
 and strict MkDocs validation where available.
 
-Decision-retirement patches must additionally verify that every shipped numbered decision is
-indexed, every index link resolves, every active decision reference resolves, retired numbers are
-not reused, and the retirement map covers every deleted record. Tests must not enforce a fixed
+Decision-retirement patches must additionally run `make decision-check`. The checker verifies that
+every shipped numbered decision appears once in both maintained registries, local decision links
+resolve, active decision references name current records, retirement-map filenames are unique, and
+no decision number is reused outside the frozen 0153/0154 legacy collisions. Retirement review must
+still confirm that the map covers every record deleted by the patch. Tests must not enforce a fixed
 number of decisions or preserve one tombstone assertion per retired record.
 
 The snapshot-hardening patch must demonstrate that untracked ignored caches remain excluded and

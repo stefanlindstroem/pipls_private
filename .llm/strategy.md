@@ -84,6 +84,15 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
+Decision 0147 has a bounded maintenance continuation through Patch 13. Patch 8 is complete: the
+0153/0154 legacy registry collisions are documented and frozen, and `make decision-check` now
+protects registry/index/link consistency without pinning a decision count. Patch 9 retires completed
+Decisions 0156--0163; Patch 10 retires older presentation/workflow records; Patch 11 consolidates
+overlapping search-lifecycle decisions and compacts `.llm`; Patch 12 removes stale implementation-
+and prose-policing pytest assertions; Patch 13 moves complete application/documentation execution
+to its owning validation targets and removes redundant ordinary-pytest runs. These patches must not
+change numerical or public API behavior.
+
 Decision 0154's seven-patch predictor-rank migration is complete and closed. Future changes to
 predictor-rank selection require a new owner decision rather than extending that sequence.
 

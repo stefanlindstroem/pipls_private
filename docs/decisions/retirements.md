@@ -2,8 +2,9 @@
 
 Decision 0147 permits a numbered record to leave the maintained tree when its durable outcome is
 captured by a current canonical decision or the compact historical summary. Git remains the
-authoritative archive, decision numbers are never reused, and this map records where maintainers
-should look for current policy or historical context.
+authoritative archive, decision numbers are not reused except for the two frozen legacy collisions
+documented below, and this map records where maintainers should look for current policy or historical
+context.
 
 To recover a retired record, locate its last revision with:
 
@@ -11,6 +12,19 @@ To recover a retired record, locate its last revision with:
 git log --all -- docs/decisions/<retired-filename>
 git show <revision>:docs/decisions/<retired-filename>
 ```
+
+## Frozen legacy number collisions
+
+Patch 8 found that the maintained registry already contains two numeric collisions: the retirement
+map preserves older filenames beginning with 0153 and 0154 while different current decisions use
+those same numbers. Renumbering accepted current decisions or deleting historical lookup entries
+would create more ambiguity, so these exact pairs are frozen as legacy exceptions. They do not
+permit any additional decision-number reuse.
+
+| Number | Current record | Retired historical record |
+|---|---|---|
+| 0153 | `0153-independent-block-scaling-controls.md` | `0153-remove-package-owned-leave-one-out-support.md` |
+| 0154 | `0154-full-domain-predictor-rank-selection.md` | `0154-behavioral-test-suite-cleanup.md` |
 
 ## Decision 0147 Patch 3
 
@@ -124,7 +138,7 @@ git show <revision>:docs/decisions/<retired-filename>
 | `0138-package-owned-pulp-dataset-loader.md` | [0142](0142-package-owned-reference-datasets.md), [history](history.md#datasets-and-product-boundary) | The Pulp-only transition was generalized and completed by Decision 0142. |
 | `0144-pre-release-public-surface-cleanup.md` | [0039](0039-fixed-estimator-path-search-boundary.md), [0093](0093-public-result-invariants.md), [history](history.md#pre-release-api-normalization) | The seven-patch pre-release cleanup was followed by the canonical final implementation-surface cleanup. |
 
-## Decision 0154 Patch 7
+## Decision 0147 Patch 7
 
 | Retired record | Current replacement or historical summary | Reason for retirement |
 |---|---|---|
