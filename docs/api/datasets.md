@@ -89,7 +89,7 @@ only to $\mathbf{X}$, shared directions contribute to both $\mathbf{X}$ and $\ma
 response-specific directions contribute only to $\mathbf{Y}$. Independent noise is then added to
 the two observed blocks.
 
-![Latent roles in the synthetic generators: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg)
+![Latent roles in the synthetic generators: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg){ style="width: 100%; height: auto;" }
 
 The dimensions of those three latent blocks are controlled by `n_predictor_specific`, `n_shared`,
 and `n_response_specific`; `noise` controls the additive predictor and response noise. The diagram

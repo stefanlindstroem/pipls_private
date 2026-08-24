@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Complete the latent-role schematic integration by displaying it at full documentation-column width
+  and validating that the committed SVG and standalone TeX source survive source-distribution builds.
 - Add the latent-role schematic to the Dataset API generator section and connect the three
   structural roles directly to `n_predictor_specific`, `n_shared`, and `n_response_specific`, with
   links to the manuscript-reproduction guide and synthetic tutorial.

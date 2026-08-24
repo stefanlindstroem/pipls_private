@@ -55,10 +55,21 @@ def _validate_generated_manifests(generated_root: Path) -> None:
                 raise RuntimeError(f"Figure hash disagrees with manifest: {figure}")
 
 
+def _validate_static_figures(source: Path) -> None:
+    svg = source / "docs" / "assets" / "figures" / "latent_geometry_generator.svg"
+    tex = source / "tools" / "figures" / "latent_geometry_generator.tex"
+    if not svg.is_file():
+        raise RuntimeError(f"Missing committed standalone documentation figure: {svg}")
+    if not tex.is_file():
+        raise RuntimeError(f"Missing standalone documentation figure source: {tex}")
+    ET.parse(svg)
+
+
 def _validate_site(source: Path) -> None:
     if not (source / "site" / "index.html").is_file():
         raise RuntimeError("Documentation build did not create site/index.html.")
     _validate_generated_manifests(source / "docs" / "assets" / "generated")
+    _validate_static_figures(source)
 
 
 def main() -> None:

@@ -122,6 +122,8 @@
   standalone diagrams under `docs/assets/figures/` are maintained separately from those generated
   tutorial assets: keep reproducible TeX sources under `tools/figures/`, regenerate them explicitly
   with `make docs-static-figures`, and do not make ordinary documentation builds depend on TeX.
+  `make docs-dist` verifies that each maintained standalone SVG and its TeX source survive the source-
+  distribution boundary; visual layout remains documentation presentation rather than a test contract.
   Tutorial
   code excerpts use checked `pymdownx.snippets` sections from repository source; do not copy the
   maintained example analyses into Markdown. Use `make docs-dist`
