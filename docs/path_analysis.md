@@ -295,14 +295,19 @@ model-producing workflows create one selection and pass that same object to OOF 
 refitting. After a successful fit, `model.selection_` confirms the fitted model's exact provenance.
 `component_path_` remains the aligned numerical curve.
 
-The [Tobacco](datasets.md#tobacco-spectral-integration) workflow demonstrates the hierarchy with
-separate 10% relative tolerances. The search
-constructor applies `predictor_rank_relative_tolerance=0.10` within every component count, and
-`search.select(rule="minimum_cv_mse", relative_tolerance=0.10)` then acts on the resulting
-conditioned component path. The predictor-rank profile shows its exact configured-score reference,
-converted CV-MSE threshold, and
-retained rank; the component path shows its own exact minimum, threshold, and retained component
-count. Predictor-rank profile error bars use the stored split SD.
+The two maintained spectral workflows illustrate different predictor-rank regularization choices.
+[Sugarcane](datasets.md#sugarcane-spectral-integration) fixes $r_\pi$ in advance with the explicit
+[EPV policy](computational_performance.md#epv-policy) using
+`samples_per_predictor_rank=5.0`; predictor-rank tolerances therefore do not apply. The component
+count remains a separate choice. [Tobacco](datasets.md#tobacco-spectral-integration) instead
+optimizes predictor rank and demonstrates the tolerance hierarchy with separate 10% relative
+tolerances. The search constructor applies `predictor_rank_relative_tolerance=0.10` within every
+component count, and `search.select(rule="minimum_cv_mse", relative_tolerance=0.10)` then acts on the
+resulting conditioned component path. The predictor-rank profile shows its exact configured-score
+reference, converted CV-MSE threshold, and retained rank; the component path shows its own exact
+minimum, threshold, and retained component count. Predictor-rank profile error bars use the stored
+split SD. For the conceptual distinction between predictor rank and component count, see
+[Interpretation of $r_\pi$ and $h$](theory.md#interpretation-of-the-ranks).
 
 ## Final-model refitting
 

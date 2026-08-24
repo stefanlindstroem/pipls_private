@@ -304,14 +304,15 @@ The Mendeley collection is licensed CC BY 4.0. The package adaptation matches th
 and response tables by `Sample`, removes three rows whose total-sugar response is missing, and
 applies no imputation or spectral preprocessing. `load_sugarcane()` returns the immutable labeled
 package dataset or its read-only matrices. `examples/05_sugarcane_real_data.py` obtains the matrices,
-wavelength labels, and response names from that result, evaluates the default path-evaluating
-`PiPLSSearchCV()`, plots
-`component_path_` in memory, and fits a separate fixed model after a visible user component choice.
-It obtains the conditional predictor-rank profile at the selected component count, evaluates
-that fitted selection through `search.oof_report()`, and writes six final PDF figures directly from
-immutable public results. The compact spectral-axis description in `metadata.json` avoids
-repeating 1,721 equivalent per-wavelength descriptions while still defining every predictor column
-exactly.
+wavelength labels, and response names from that result. The example deliberately fixes predictor
+rank with the [EPV policy](computational_performance.md#epv-policy) using
+`samples_per_predictor_rank=5.0`, providing additional regularization of the spectral predictor
+subspace before the component count is chosen separately. It then reviews selection-conditioned
+OOF evidence, refits the same selection, and writes five wavelength-aware PDF figures from immutable
+public results. The interpretation of the two complexity controls is discussed under
+[$r_\pi$ and $h$](theory.md#interpretation-of-the-ranks). The compact spectral-axis description in
+`metadata.json` avoids repeating 1,721 equivalent per-wavelength descriptions while still defining
+every predictor column exactly.
 
 ## Tobacco spectral integration {#tobacco-spectral-integration}
 
@@ -337,11 +338,11 @@ source metadata columns from the model matrices. All samples and chemical respon
 No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
 preprocessing is applied. `load_tobacco()` returns the immutable labeled package dataset or its
 read-only matrices. `examples/06_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
-labels, and source-order response names from that result, evaluates a Π-PLS component path with
-adaptive predictor-rank scanning and full predictor SVD, and selects the smallest component row
-within a 10% relative tolerance of the minimum mean CV-MSE. Analysis then obtains the exact
-reference minimum, resolved tolerance, threshold, and conditional predictor-rank profile from that
-selection, evaluates the same object through `search.oof_report()`, refits it on all observations,
-calculates raw observation diagnostics, and writes six final PDFs.
-Prediction diagnostics and coefficients are
-paginated in source response order. The separate ordinary-PLS comparison remains in example 03.
+labels, and source-order response names from that result. Unlike Sugarcane's fixed EPV rank, Tobacco
+optimizes predictor rank and uses a 10% relative tolerance to retain a smaller spectral subspace
+when its CV performance remains close to the conditional optimum. A separate 10% relative tolerance
+then selects component count. The workflow carries that selection through conditional rank evidence,
+selection-conditioned OOF review, and final refitting, and writes six final PDFs. See
+[search-owned selection rules](path_analysis.md#search-owned-selection-rules) for the two-stage
+selection semantics. Prediction diagnostics and coefficients are paginated in source response order.
+The separate ordinary-PLS comparison remains in example 03.

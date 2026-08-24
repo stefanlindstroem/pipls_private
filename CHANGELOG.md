@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Update the reader-facing spectral workflow guidance to contrast Sugarcane's fixed EPV
+  predictor-rank regularization at `samples_per_predictor_rank=5.0` with Tobacco's validation-driven
+  10% predictor-rank tolerance, linking both examples to the canonical rank-policy and $r_\pi$/$h$
+  interpretation references.
 - Change the maintained Sugarcane workflow to use an explicit EPV-fixed predictor rank with
   `samples_per_predictor_rank=5.0`, removing the now-inapplicable predictor-rank optimization
   profile. Keep Tobacco on adaptive rank optimization with its existing 10% predictor-rank

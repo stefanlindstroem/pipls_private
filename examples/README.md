@@ -68,10 +68,11 @@ Grouped and temporal validation require application-specific sampling semantics 
   inspects its selected path, rank evidence, and selection-conditioned OOF predictions, refits the
   exact same selection, orients the displayed factors so the tensile-index response is positive,
   and writes ten final PDF figures directly from in-memory results.
-- `05_sugarcane_real_data.py`: the direct reference workflow. It requests adaptive predictor-rank
-  coverage for the high-dimensional spectral search, creates one manual selection, inspects its
-  conditional predictor-rank evidence, computes an OOF report, refits that selection, and writes six
-  wavelength-aware final PDF figures.
+- `05_sugarcane_real_data.py`: the direct spectral reference workflow. It fixes predictor rank with
+  the EPV policy at `samples_per_predictor_rank=5.0` to regularize the retained wavelength subspace,
+  keeps component count as a separate manual choice, computes an OOF report, refits that selection,
+  and writes five wavelength-aware final PDF figures. See the
+  [EPV policy](../docs/computational_performance.md#epv-policy).
 - `06_tobacco_real_data.py`: adaptive Π-PLS predictor-rank scanning with explicit full predictor
   SVD and two separately named 10% relative tolerances. The search constructor applies the
   predictor-rank tolerance independently at each component count; `search.select()` then applies the
@@ -84,11 +85,12 @@ Grouped and temporal validation require application-specific sampling semantics 
 These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
 inspect the component path, create one immutable selection, inspect its selected path and optional
 OOF evidence, refit the same row on all observations, calculate immutable fitted-model inspection
-results, and only then compose figures. Tobacco replaces the manual component-count choice with the
-two explicit 10% relative-tolerance decisions described above. Sugarcane and Tobacco each write
-`component_path.pdf`, `predictor_rank_profile.pdf`, `pipls_factors.pdf`,
-`latent_structure.pdf`, `coefficients.pdf`, and `prediction_diagnostics.pdf`. Pulp writes those
-six figures plus `selected_component_path.pdf`, `final_fit_observed_vs_predicted.pdf`,
+results, and only then compose figures. Sugarcane fixes predictor rank through EPV before the manual
+component-count choice; Tobacco instead uses two explicit 10% relative-tolerance decisions.
+Sugarcane writes `component_path.pdf`, `pipls_factors.pdf`, `latent_structure.pdf`,
+`coefficients.pdf`, and `prediction_diagnostics.pdf`. Tobacco writes those five figures plus
+`predictor_rank_profile.pdf`. Pulp writes those six figure types plus
+`selected_component_path.pdf`, `final_fit_observed_vs_predicted.pdf`,
 `final_fit_r2.pdf`, and `final_fit_residual_distribution.pdf`. For Tobacco,
 `prediction_diagnostics.pdf` and `coefficients.pdf` each contain three source-order response pages.
 `make examples` runs every numbered example in filename order, including the slower real-data
@@ -128,21 +130,26 @@ system, or other domain metadata. The package inspection API does not invent sci
 names.
 
 Example 03 keeps both Π-PLS response-policy paths and the ordinary-PLS path in memory and creates
-the three overlaid comparison figures directly. Sugarcane demonstrates the complete manual-analysis workflow:
+the three overlaid comparison figures directly. Sugarcane demonstrates the complete manual-analysis
+workflow with an explicitly regularized predictor subspace:
 
-1. `PiPLSSearchCV(search_method="adaptive", cv=CV).fit(X, Y)` evaluates the path with
-   adaptive predictor-rank coverage to reduce candidate work for this high-dimensional dataset.
-2. `component_path_` provides the unconditional evidence used to choose a component count.
+1. `PiPLSSearchCV(predictor_rank_values="epv", samples_per_predictor_rank=5.0, cv=CV).fit(X, Y)`
+   fixes $r_\pi$ by the EPV policy while evaluating the component path.
+2. `component_path_` provides the evidence used to choose a component count separately from the
+   fixed predictor rank.
 3. `selection = search.select(n_components=CHOSEN_N_COMPONENTS)` records that choice as one complete
    immutable row without fitting.
-4. `predictor_rank_profile(selection.n_components)`, `oof_report(...)`, and
-   `prediction_diagnostics()` provide selection-conditioned evidence for reviewing that row, with
-   response-wise OOF $R^2$ as the visible scalar prediction diagnostic.
+4. `oof_report(...)` and `prediction_diagnostics()` provide selection-conditioned evidence for
+   reviewing that row, with response-wise OOF $R^2$ as the visible scalar prediction diagnostic.
 5. `search.refit(X, Y, selection=selection)` fits the accepted component-count and predictor-rank
    pair on all observations and records it as `model.selection_`.
 6. `pipls_display_factors()` and `latent_structure()` return immutable fitted-model results.
-7. The script renders the completed path, rank-profile, latent-structure, prediction-diagnostic, and
-   factor results with Matplotlib and saves the six final figures itself.
+7. The script renders the component path, latent structure, prediction diagnostics, factors, and
+   coefficients with Matplotlib and saves the five final figures itself.
+
+See the [EPV policy](../docs/computational_performance.md#epv-policy) and
+[Interpretation of $r_\pi$ and $h$](../docs/theory.md#interpretation-of-the-ranks) for why these are
+distinct complexity controls.
 
 Pulp is the canonical tutorial workflow. Example 04 follows the same ordering, with
 `oof_report()` averaging ten predictions per observation across the 50 stored splits before the

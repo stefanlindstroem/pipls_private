@@ -28,15 +28,19 @@ datasets and their provenance, see the [dataset guide](datasets.md).
    review and explicit selection to out-of-fold review, refitting, and model interpretation. The
    [Pulp tutorial](tutorials/pulp.md) is the guided version.
 
-5. **`05_sugarcane_real_data.py` — apply the manual workflow to spectral data.** Transfer the same
-   selection-and-refit logic to a high-dimensional predictor block with wavelength-aware inspection
-   on [Sugarcane](datasets.md#sugarcane-spectral-integration).
+5. **`05_sugarcane_real_data.py` — regularize a spectral predictor subspace explicitly.** Fix
+   $r_\pi$ with the EPV policy, then choose the component
+   count separately and interpret the retained wavelength directions on
+   [Sugarcane](datasets.md#sugarcane-spectral-integration). See the
+   [EPV policy](computational_performance.md#epv-policy) and the distinct roles of
+   [$r_\pi$ and $h$](theory.md#interpretation-of-the-ranks).
 
-6. **`06_tobacco_real_data.py` — make parsimony rules explicit.** Select predictor rank and component
-   count in two separate tolerance stages, then carry that selection through out-of-fold review and
-   refitting on [Tobacco](datasets.md#tobacco-spectral-integration). See
-   [search-owned selection rules](path_analysis.md#search-owned-selection-rules) for the exact rule
-   semantics.
+6. **`06_tobacco_real_data.py` — regularize spectral rank from validation evidence.** Optimize
+   $r_\pi$, but use a 10% relative tolerance to prefer a smaller retained predictor subspace when
+   its CV performance remains close to the conditional optimum. Apply component-count parsimony in
+   a separate tolerance stage, then carry the selection through out-of-fold review and refitting on
+   [Tobacco](datasets.md#tobacco-spectral-integration). See
+   [search-owned selection rules](path_analysis.md#search-owned-selection-rules).
 
 ## Compare response-subspace policies {#compare-response-subspace-policies}
 
