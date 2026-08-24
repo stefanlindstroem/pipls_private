@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add the latent-role schematic to the Dataset API generator section and connect the three
+  structural roles directly to `n_predictor_specific`, `n_shared`, and `n_response_specific`, with
+  links to the manuscript-reproduction guide and synthetic tutorial.
 - Add a standalone TikZ source and committed SVG for the synthetic-generator latent-role
   schematic, together with an optional `make docs-static-figures` maintainer target. The ordinary
   documentation build remains independent of a TeX installation.

@@ -84,9 +84,24 @@ inspect these records through `dataset.truth` rather than construct them directl
 
 ## Generators
 
-The [companion-manuscript synthetic-data guide](../manuscript_reproduction.md) shows how to use the
-exact Gaussian latent generator, inspect its truth matrices, and distinguish distribution-level
-from realization-level and complete-study reproduction.
+The synthetic generators distinguish three latent roles. Predictor-specific directions contribute
+only to $\mathbf{X}$, shared directions contribute to both $\mathbf{X}$ and $\mathbf{Y}$, and
+response-specific directions contribute only to $\mathbf{Y}$. Independent noise is then added to
+the two observed blocks.
+
+![Latent roles in the synthetic generators: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg)
+
+The dimensions of those three latent blocks are controlled by `n_predictor_specific`, `n_shared`,
+and `n_response_specific`; `noise` controls the additive predictor and response noise. The diagram
+shows these structural roles rather than every distributional option.
+
+`make_pipls_latent_geometry()` implements the exact Gaussian construction used by the companion
+manuscript. `make_pipls_regression()` and `make_pipls_train_test()` retain the same three latent
+roles while adding configurable strengths, score distributions, observed-variable scaling, and
+train/test generation. See the
+[companion-manuscript synthetic-data guide](../manuscript_reproduction.md) for the defining
+equations and reproduction boundary, and the [synthetic tutorial](../tutorials/synthetic.md) for a
+worked analysis using the configurable generator.
 
 ::: pipls.datasets.make_pipls_latent_geometry
     options:
