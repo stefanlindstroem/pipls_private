@@ -78,10 +78,12 @@ def make_pipls_search(
             cv=cv_splits,
         )
     if case == "tobacco":
+        # Keep Tobacco parallelism bounded because the high-dimensional spectral
+        # comparison is expensive and each worker also performs matrix operations.
         return PiPLSSearchCV(
             estimator=estimator,
             search_method="adaptive",
-            n_jobs=1,
+            n_jobs=4,
             cv=cv_splits,
         )
     raise ValueError(f"Unknown comparison case: {case!r}.")

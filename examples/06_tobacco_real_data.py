@@ -461,7 +461,9 @@ def main() -> None:
         ),
         predictor_rank_relative_tolerance=PREDICTOR_RANK_RELATIVE_TOLERANCE,
         search_method="adaptive",
-        n_jobs=1,
+        # Bound parallelism to four workers for this expensive high-dimensional search.
+        # n_jobs changes execution only; the candidate domain and CV splits are unchanged.
+        n_jobs=4,
         cv=CV,
     ).fit(X, Y)
     path = search.component_path_

@@ -60,7 +60,7 @@ def _fake_evaluation(case: str) -> SimpleNamespace:
         search_is_exhaustive = False
         max_rank = 346
         svd_solver = "full"
-        n_jobs = 1
+        n_jobs = 4
 
     pipls_path = SimpleNamespace(
         n_components=components,
@@ -148,7 +148,7 @@ def test_home_renderer_writes_simplified_matched_protocol_assets(
     assert tobacco_analysis["search_method"] == "adaptive"
     assert tobacco_analysis["search_is_exhaustive"] is False
     assert tobacco_analysis["svd_solver"] == "full"
-    assert tobacco_analysis["n_jobs"] == 1
+    assert tobacco_analysis["n_jobs"] == 4
 
     for case in ("pulp", "tobacco"):
         analysis = manifest["cases"][case]["analysis"]

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Use four bounded joblib workers for the maintained Tobacco search and Tobacco PLS-family
+  comparison, reducing wall time for the expensive spectral calculations without changing
+  candidate domains, validation splits, or selection semantics.
 - Update the reader-facing spectral workflow guidance to contrast Sugarcane's fixed EPV
   predictor-rank regularization at `samples_per_predictor_rank=5.0` with Tobacco's validation-driven
   10% predictor-rank tolerance, linking both examples to the canonical rank-policy and $r_\pi$/$h$
