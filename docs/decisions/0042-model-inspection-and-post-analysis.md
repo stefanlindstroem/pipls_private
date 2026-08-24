@@ -140,6 +140,15 @@ component counts from the same observations. Such results are labeled
 `selection-conditioned OOF predictions`; they are descriptive diagnostics, not unbiased nested-CV
 or external-test estimates.
 
+The maintained complete real-data workflows use response-wise selection-conditioned OOF $R^2$ as
+the preferred visible scalar prediction diagnostic while retaining standardized RMSE in the public
+numerical result. Response-wise OOF $R^2$ is calculated from the row-ordered OOF predictions after
+any repeated held-out predictions have been combined per observation; it is not an average of
+fold-wise $R^2$ values. Maintained response-wise $R^2$ bar plots place the upper limit at exactly
+1.0, never place the lower limit above 0.0, extend below negative values rather than clipping them,
+and show the zero reference. Fitted-value and OOF $R^2$ remain explicitly distinguished by
+prediction provenance.
+
 ### Shared PLS-family analysis contract
 
 Decision 0045 supersedes the restriction to a concrete ordinary `PLSRegression` model. The shared

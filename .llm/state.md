@@ -125,42 +125,18 @@ comparison case and reuses the exact same split object for the cross-covariance 
 least-squares Pi-PLS search, and ordinary-PLS path. Complete real-data examples are exercised by
 `make examples`, not duplicated in the default test suite.
 
-Decisions 0156 and 0157 are implemented and closed. Example 03 is the sole maintained PLS-family
-comparison and overlays the cross-covariance Pi-PLS path, least-squares Pi-PLS path, and ordinary
-PLS path for Pulp, Sugarcane, Tobacco, and one deterministic near-saturated synthetic stress case.
-Every case uses one materialized five-fold protocol shared across all three methods. The synthetic
-case fixes 25 observations, 40 predictors, 10 responses, 5 shared directions, 15 predictor-specific
-directions, no response-specific directions, common noise SD 0.3, and `random_state=0`; both Pi-PLS
-policies use exhaustive predictor-rank coverage over components 1 through 10. In this fixed
-realization, the minimum mean CV-MSE occurs at 5 components for both Pi-PLS policies (0.9036
-cross-covariance; 0.9022 least squares), while ordinary PLS reaches 0.9373 at 8 components. This is
-exploratory model-development evidence and does not establish a general performance ordering.
-Source-distribution qualification executes only the bounded Pulp branch of Example 03; `make
-examples` owns complete four-case execution. The former Example 07 and its dedicated PDF remain
-retired.
+The maintained Example 03 is the sole PLS-family component-path comparison. For Pulp,
+Sugarcane, Tobacco, and one fixed deterministic near-saturated synthetic case, it evaluates the
+publication-default and least-squares Pi-PLS response policies plus ordinary PLS on one shared
+materialized five-fold protocol. Comparative paths are model-development evidence, not independent
+post-selection validation. Source-distribution qualification keeps the bounded Pulp branch while
+`make examples` owns complete execution.
 
-Decision 0158 is implemented and closed. Example 03 and the dedicated Home renderer share
-`examples/_support/pls_family_path_comparison.py`, so the simplified Pulp/Tobacco Home figures use
-the same seeded materialized five-fold protocol and case-specific Pi-PLS search settings as the
-maintained comparison. The Home renderer requests only the publication-default
-`"cross_covariance"` policy plus ordinary PLS, writes concise `Π-PLS` versus `PLS` SVGs and a
-semantic manifest under `docs/assets/generated/home/`, and is part of `docs-figures` and the source
-distribution. The two figures are placed side by side under `Why use Π-PLS?`; the accompanying text
-limits the parsimony interpretation to shared component count $h$, notes that Pi-PLS also selects
-$r_\pi$, and links to Example 03 for the complete matched-validation comparison.
-
-Decision 0159 is implemented and closed. Patch 0159A establishes semantic documentation
-cross-referencing and explicit canonical anchors for the three reference-dataset detail sections,
-the companion-paper citation section, and frequently referenced theory concepts. Patch 0159B adds
-semantic Pulp, Sugarcane, and Tobacco links across the served documentation, including direct
-same-page dataset-guide navigation, while preserving tutorial, workflow, loader, heading, code, and
-figure-alt semantics. Patch 0159C adds canonical companion-publication links and concept-specific
-theory links across Home, API, performance, inspection, path-analysis, reproducibility,
-troubleshooting, synthetic-data, and example guidance. Patch 0159D completes the navigation audit,
-connects compatibility to reproducibility, performance guidance to path-selection semantics, and the
-dataset guide to the dataset API, and adds `tests/test_documentation_cross_references.py` to protect
-canonical anchors, representative semantic routes, and against isolated served pages. The policy
-favors one meaningful destination per reference over mechanical link density.
+The Home motivation uses the same shared comparison evaluator for its Pulp/Tobacco
+publication-default Pi-PLS versus ordinary-PLS assets. Its claim is limited to shared component
+count $h$ and does not equate that count with total Pi-PLS model complexity. Served documentation
+uses contextual semantic routes to maintained dataset, publication, and theory destinations rather
+than mechanical every-occurrence linking.
 
 ## Inspection and rendering boundary
 
@@ -276,34 +252,17 @@ the development checkout. Clean installation isolation remains the responsibilit
 second temporary virtual environment. Artifact installation checks reuse pip's normal cache,
 including a caller-supplied `PIP_CACHE_DIR`.
 
-Decision 0160 is implemented and closed but superseded by Decision 0161 only with respect to the
-annotation allocator. Its durable rule remains: absence of an optional annotation-layout dependency
-must not prevent maintained Pulp rendering, and the runtime package must remain independent of
-graphics dependencies.
+`textalloc>=1.2.4,<2` is the optional annotation-layout extra used by the maintained Pulp biplot.
+It may allocate predictor labels against other labels and exact predictor-arrow shafts; sample-score
+points are excluded from the obstacle set. If `textalloc` is absent, Pulp rendering remains
+executable through ordinary Matplotlib endpoint labels. Exact allocator tuning is presentation
+implementation rather than a numerical compatibility contract.
 
-Decision 0161 is implemented and closed. `textalloc>=1.2.4,<2` is the sole maintained
-annotation-layout extra in the `examples`, `docs`, and `dev` groups. Example 04 and the Pulp tutorial
-renderer share the example-local annotation helper, which gives `textalloc` only exact
-predictor-arrow line segments as geometric obstacles; other labels are allocator-owned obstacles,
-while sample-score points are intentionally excluded. Without `textalloc`, labels remain at their
-ordinary Matplotlib predictor endpoints. `adjustText` is no longer part of the active dependency or
-documentation surface.
-
-Decision 0162 is complete and closed. Example 04 and the Pulp tutorial renderer share complete
-example-local biplot helpers with a plain-Matplotlib path, a line-aware `textalloc` path, and one
-dispatcher. The allocator avoids other predictor labels and exact predictor-arrow shafts only; sample
-scores are excluded. Maintained predictor labels use 9-point text and `min_distance=0.01125`,
-`max_distance=0.15`. The tutorial exposes only `biplot_coordinates()` plus one local plotting call,
-keeping helper implementation and optional-dependency mechanics out of the instructional flow.
-
-Decision 0163 is implemented and closed. Response-wise selection-conditioned OOF R² is the
-preferred visible scalar response diagnostic for Examples 04--06 and Tutorial 3 without changing
-`PredictionDiagnostics`, model-selection scoring, or Quick Start. The shared example-local
-`response_r2_ylim()` contract fixes every maintained R² bar plot at an upper limit of exactly 1.0;
-its lower limit is 0.0 for nonnegative displayed values and extends below any negative minimum with
-small downward padding. The Pulp tutorial manifest records response-wise OOF R², and all maintained
-real-data OOF R² panels draw the zero reference explicitly. Standardized RMSE remains available as
-a numerical diagnostic, and OOF versus final-fit R² provenance remains explicit.
+Response-wise selection-conditioned OOF $R^2$ is the preferred visible scalar response diagnostic
+for Examples 04--06 and Tutorial 3. Standardized RMSE remains available numerically and the
+response-standardized model-selection loss is unchanged. Maintained response-wise $R^2$ bars cap at
+1.0, do not place the lower limit above 0.0, preserve negative values, and show the zero reference;
+OOF and fitted-value provenance remain explicit.
 
 ## Authority and drift handling
 

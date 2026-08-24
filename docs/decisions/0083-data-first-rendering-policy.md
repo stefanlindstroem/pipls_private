@@ -19,12 +19,12 @@ render named result arrays with ordinary Matplotlib so scientific coordinates, s
 legends, layout, and output remain visible and caller-controlled.
 
 `biplot_coordinates()` remains package-owned because balancing score and loading coordinates is a
-numerical operation. Annotated biplots use Matplotlib arrows and text artists. Under Decision 0161,
-the optional external `textalloc` package may reposition predictor labels after final axis
-configuration while treating predictor-arrow shafts and other predictor labels as obstacles.
-Maintained Pulp rendering workflows fall back to the original Matplotlib text positions when
-`textalloc` is not available. Automatic label placement is heuristic and is not part of the Pi-PLS
-numerical contract.
+numerical operation. Annotated biplots use Matplotlib arrows and text artists. The optional external
+`textalloc` package may reposition Pulp predictor labels after final axis configuration while
+treating predictor-arrow shafts and other predictor labels as obstacles; sample-score points are
+not allocator obstacles. Maintained Pulp rendering falls back to ordinary Matplotlib endpoint
+labels when `textalloc` is unavailable. Automatic label placement and its tuning are heuristic and
+are not part of the Pi-PLS numerical contract.
 
 Matplotlib and `textalloc` remain optional dependencies under the `examples`, `docs`, and `dev`
 extras. The runtime package imports neither package. Plotting helpers may be local to the example

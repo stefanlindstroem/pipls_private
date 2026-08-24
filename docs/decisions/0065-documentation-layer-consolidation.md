@@ -36,6 +36,14 @@ Repository-generated tutorial images appear only in their owning tutorials. Othe
 the tutorial or the general interpretation reference rather than embedding or retelling the worked
 analysis.
 
+Cross-references are semantic rather than mechanical. A substantive dataset reference should lead
+to the maintained dataset detail, a publication reference to the canonical citation section, and a
+mathematical concept to the most specific maintained theory section when that route helps the
+reader. Immediate repetitions, headings, code, figure alt text, and prose already on the canonical
+destination need not be linked. Strict documentation builds own link-resolution validation; pytest
+must not freeze particular prose-link placement or require every served page to satisfy an
+incidental hyperlink-count rule.
+
 The served site is a strict self-contained MkDocs build. Generated API pages cover the documented
 public modules and derive signatures and field documentation from audited docstrings. Numbered
 decisions and `.llm` are maintainer records and are excluded from served navigation and search.

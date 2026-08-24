@@ -53,14 +53,6 @@ This registry lists only numbered decisions that still define current behavior o
 | `0153-independent-block-scaling-controls.md` | independent predictor and response scaling controls | retain `scale` as the compatibility default while allowing fold-local pipeline predictor scaling and Pi-PLS response scaling to be controlled independently |
 | `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | implemented exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
 | `0155-response-subspace-selection-policies.md` | response-subspace selection policies | closed implementation: cross-covariance default plus an explicit least-squares/RRR-inspired software extension outside the peer-reviewed publication |
-| `0156-unified-pls-family-path-comparison.md` | unified PLS-family path comparison | consolidate both Pi-PLS response policies and ordinary PLS into Example 03 on shared materialized folds for all three reference datasets |
-| `0157-near-saturated-synthetic-pls-comparison.md` | near-saturated synthetic PLS-family stress case | closed exploratory extension of Example 03 with a fixed deterministic 25-by-40, 10-response design, matched folds, and exhaustive Pi-PLS rank coverage |
-| `0158-home-page-parsimony-comparison.md` | Home-page parsimony comparison | closed documentation contract: simplified Pulp/Tobacco Home figures share the Example-03 protocol, show publication-default Pi-PLS versus PLS, and bound the parsimony claim to shared component count |
-| `0159-documentation-cross-reference-architecture.md` | documentation cross-reference architecture | closed four-patch navigation contract: stable canonical anchors, semantic dataset/publication/theory links, final contextual-link audit, and regression protection are implemented without an every-occurrence link rule |
-| `0160-graceful-adjusttext-fallback.md` | graceful optional `adjustText` fallback | historical allocator choice superseded by 0161; its non-fatal plain-Matplotlib fallback and runtime-dependency boundary remain authoritative |
-| `0161-line-aware-text-allocation.md` | line-aware text allocation for annotated biplots | closed migration: optional `textalloc` owns Pulp label allocation against other labels and exact predictor-arrow line obstacles; sample scores are excluded, fallback remains plain Matplotlib, and `adjustText` is removed from active dependencies |
-| `0162-complete-pulp-biplot-helper.md` | complete Pulp biplot helper | closed two-patch refinement: complete simple/textalloc renderers share one dispatcher; the tutorial exposes only `biplot_coordinates()` plus the local plotting call, with 9-point labels and the 0.01125--0.15 placement envelope |
-| `0163-oof-response-r2-diagnostics.md` | response-wise OOF R² diagnostics | closed migration: Examples 04--06 and Tutorial 3 show response-wise selection-conditioned OOF R² with the shared negative-aware axis contract, while standardized RMSE remains public and Quick Start remains unchanged |
 
 ## Implemented clarifications
 
@@ -75,7 +67,16 @@ This registry lists only numbered decisions that still define current behavior o
   are selection-conditioned and protocol-neutral; there is no dedicated leave-one-out surface.
 - Pulp, Sugarcane, and Tobacco are the closed package-owned reference-dataset set.
 - Numerical inspection is package-owned; plotting, local rendering helpers, and report composition
-  are caller-owned.
+  are caller-owned. Maintained Pulp biplots may use optional line-aware `textalloc` placement but
+  must fall back to ordinary Matplotlib endpoint labels when it is unavailable.
+- Example 03 is the sole maintained PLS-family path comparison and evaluates both Pi-PLS response
+  policies and ordinary PLS on the same materialized folds. Comparative paths are model-development
+  evidence rather than independent post-selection validation.
+- Complete real-data OOF scalar figures prefer response-wise selection-conditioned OOF $R^2$;
+  standardized RMSE remains a public numerical diagnostic, and OOF versus fitted-value provenance
+  remains explicit.
+- Documentation cross-references are semantic and contextual. Strict documentation builds own link
+  resolution; pytest does not pin prose-level link placement.
 - Tests protect behavior and machine-readable outputs. Complete documentation, examples, and
   installed artifacts are validated by their dedicated Make targets.
 - Decision numbers are not reused for new records. The inherited 0153/0154 retirement-map

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Consolidate eight completed late-stage decision records into the current comparison,
+  documentation, rendering, optional-dependency, inspection, and OOF-provenance contracts. Keep
+  exact synthetic-case results, Home layout, cross-link rollout stages, allocator migration, and
+  text-placement tuning as historical implementation context rather than active policy.
 - Repair the maintained decision registry by documenting and freezing the inherited 0153/0154
   numeric collisions, correcting the Patch-7 retirement heading, and adding `make decision-check`
   to validate current indexes, local decision links, active references, retirement-map uniqueness,

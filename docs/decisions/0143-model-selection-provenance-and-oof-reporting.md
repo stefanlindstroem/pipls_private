@@ -87,8 +87,10 @@ report.has_complete_oof_coverage
 
 Repeated validation predictions for one observation are averaged. Their multiplicity is retained
 in `oof_prediction_counts`. Uncovered rows retain `NaN` predictions and zero counts, and pooled OOF
-$R^2$ uses covered rows only. The operation does not rescore candidates, fit a full-data model,
-retain supplied matrices, or mutate the search.
+$R^2$ uses covered rows only. Response-wise diagnostics derived from an OOF report operate on these
+row-ordered, per-observation predictions after repeated held-out predictions have been combined;
+they are not averages of fold-wise response diagnostics. The operation does not rescore candidates,
+fit a full-data model, retain supplied matrices, or mutate the search.
 
 An OOF report based on a search-owned selection is a selection-conditioned diagnostic. It is not
 nested cross-validation or an external-test estimate. The report carries no classifier for the

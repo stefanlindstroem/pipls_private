@@ -2,10 +2,12 @@
 
 ## Status
 
-Accepted and implemented through Patch 8. The original seven-patch consolidation is complete;
+Accepted and implemented through Patch 9. The original seven-patch consolidation is complete;
 Patches 8--13 are a bounded maintenance continuation for registry repair, further decision
-consolidation, and test-boundary cleanup. Patch 8 repairs the registry and adds a structural
-checker without changing numerical, public-API, documentation-rendering, or example behavior.
+consolidation, and test-boundary cleanup. Patch 8 repaired the registry and added a structural
+checker. Patch 9 retires eight completed presentation and migration records after folding their
+durable contracts into the retained comparison, documentation, rendering, dependency, inspection,
+and OOF-provenance decisions. Neither patch changes numerical or public-API behavior.
 
 ## Context
 
@@ -155,7 +157,7 @@ split internally.
 8. Repair the maintained registry, document the inherited 0153/0154 number collisions, and add a
    structural registry checker -- complete.
 9. Retire completed Decisions 0156--0163 after folding only durable contracts into current
-   canonical records and history -- pending.
+   canonical records and history -- complete with 47 current records.
 10. Retire older presentation/workflow records whose durable content is canonical elsewhere --
     pending.
 11. Consolidate overlapping search-lifecycle decisions and compact the active `.llm` layer around

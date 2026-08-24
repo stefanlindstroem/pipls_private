@@ -26,11 +26,15 @@ The repository distinguishes three analysis roles.
 
 ### Comparative component-path diagnostics
 
-`examples/03_pls_path_comparison.py` compares Pi-PLS and ordinary PLS component paths for Pulp,
-Sugarcane, Tobacco, and the deterministic Decision-0157 synthetic stress case using the same
-validation partitions and response-standardized CV-MSE summary. Ordinary `PLSRegression` is permitted in that focused comparison because it answers a
+`examples/03_pls_path_comparison.py` is the sole maintained PLS-family component-path comparison.
+For Pulp, Sugarcane, Tobacco, and one fixed deterministic synthetic stress case, it evaluates the
+publication-default and least-squares Pi-PLS response-subspace policies alongside ordinary PLS on
+exactly the same materialized validation partitions and response-standardized CV-MSE summary. The
+two Pi-PLS policies remain fixed-estimator alternatives rather than an additional search dimension.
+Ordinary `PLSRegression` is permitted in that focused comparison because it answers a
 model-comparison question; it does not create the model interpreted by the subsequent dataset
-analyses.
+analyses. Comparative CV-MSE paths are model-development evidence rather than independent
+post-selection validation.
 
 ### Pi-PLS-specific factorization inspection
 

@@ -283,11 +283,11 @@ isolation remains owned by the wheel/sdist distribution check.
 
 ## Subsequent refinement
 
-Decision 0156 later consolidated the dedicated Pulp-only response-subspace comparison into Example
-03. The scientific and API contracts of this decision are unchanged: the two policies remain
-separate fixed-estimator configurations, and the least-squares policy remains outside the
-peer-reviewed publication. The maintained comparison now presents both policies alongside ordinary
-PLS on matched folds for Pulp, Sugarcane, and Tobacco.
+The dedicated Pulp-only response-subspace comparison was later consolidated into Example 03. The
+scientific and API contracts of this decision are unchanged: the two policies remain separate
+fixed-estimator configurations, and the least-squares policy remains outside the peer-reviewed
+publication. The maintained comparison presents both policies alongside ordinary PLS on matched
+folds for Pulp, Sugarcane, and Tobacco.
 
 ## Consequences
 

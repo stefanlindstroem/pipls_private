@@ -58,14 +58,16 @@ maintainer decisions outside the user site. Semantic cross-referencing now gives
 the companion publication, and high-value mathematical concepts stable destinations across those
 layers without mechanically linking every repeated occurrence.
 
+The late comparison/navigation sequence that produced those outcomes is historical: the separate
+response-subspace example was folded into Example 03; one predeclared near-saturated synthetic case
+was retained despite not producing a broad policy ordering; the Home motivation was derived from
+the same matched-fold comparison; and a staged cross-linking pass established useful semantic
+routes. Exact case values, page layout, rollout stages, and link-placement details remain in Git
+rather than current policy.
+
 Current canonical records: [0065](0065-documentation-layer-consolidation.md),
 [0152](0152-selection-review-feedback-workflow.md),
-[0155](0155-response-subspace-selection-policies.md),
-[0156](0156-unified-pls-family-path-comparison.md),
-[0157](0157-near-saturated-synthetic-pls-comparison.md),
-[0158](0158-home-page-parsimony-comparison.md),
-[0159](0159-documentation-cross-reference-architecture.md), and the product and workflow
-boundaries in
+[0155](0155-response-subspace-selection-policies.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
 [0045](0045-pls-family-analysis-boundary.md), and
 [0142](0142-package-owned-reference-datasets.md).
@@ -81,15 +83,22 @@ plain-Matplotlib fallback; tutorial readers see only the numerical biplot coordi
 plotting call. This supersedes the earlier label-only and `adjustText` arrangements while preserving
 the non-fatal fallback rule.
 
+The final Pulp annotation sequence first made an external allocator optional, then replaced
+`adjustText` with line-aware `textalloc`, and finally consolidated the example-local biplot into one
+complete renderer with a plain-Matplotlib fallback. Exact font sizes, placement-distance tuning,
+and helper-refactoring steps are historical implementation details. A later presentation migration
+made response-wise selection-conditioned OOF $R^2$ the visible scalar diagnostic in the complete
+real-data workflows while keeping standardized RMSE available numerically and preserving explicit
+OOF versus fitted-value provenance.
+
 Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0045](0045-pls-family-analysis-boundary.md),
 [0061](0061-example-owned-report-composition.md),
 [0083](0083-data-first-rendering-policy.md), [0094](0094-inspection-result-safety.md),
+[0103](0103-installation-and-optional-dependency-boundary.md),
 [0110](0110-response-anchored-display-factors.md),
-[0124](0124-mathematical-typography-and-subscripts.md),
-[0141](0141-spectral-predictor-rank-profile-figures.md),
-[0161](0161-line-aware-text-allocation.md), and
-[0162](0162-complete-pulp-biplot-helper.md).
+[0124](0124-mathematical-typography-and-subscripts.md), and
+[0141](0141-spectral-predictor-rank-profile-figures.md).
 
 ## Packaging and release engineering
 

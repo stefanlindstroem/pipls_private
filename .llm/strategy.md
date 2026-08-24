@@ -84,13 +84,13 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0147 has a bounded maintenance continuation through Patch 13. Patch 8 is complete: the
-0153/0154 legacy registry collisions are documented and frozen, and `make decision-check` now
-protects registry/index/link consistency without pinning a decision count. Patch 9 retires completed
-Decisions 0156--0163; Patch 10 retires older presentation/workflow records; Patch 11 consolidates
-overlapping search-lifecycle decisions and compacts `.llm`; Patch 12 removes stale implementation-
-and prose-policing pytest assertions; Patch 13 moves complete application/documentation execution
-to its owning validation targets and removes redundant ordinary-pytest runs. These patches must not
+Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8 and 9 are
+complete: the registry checker protects decision lifecycle consistency, and eight completed late
+presentation/migration decisions have been retired after their durable contracts were consolidated.
+Patch 10 retires older presentation/workflow records; Patch 11 consolidates overlapping
+search-lifecycle decisions and compacts `.llm`; Patch 12 removes stale implementation- and
+prose-policing pytest assertions; Patch 13 moves complete application/documentation execution to
+its owning validation targets and removes redundant ordinary-pytest runs. These patches must not
 change numerical or public API behavior.
 
 Decision 0154's seven-patch predictor-rank migration is complete and closed. Future changes to
@@ -118,63 +118,12 @@ the full scientific/documentation stack while still preventing package imports f
 the development checkout. Pip's normal download cache remains available to artifact-installation
 checks.
 
-Decision 0156 subsequently unified the comparison presentation. Patch 0156A established reusable
-materialized-fold support and the comparison contract; 0156B moved both Pi-PLS response policies
-into Example 03 for Pulp, Sugarcane, and Tobacco and retired the separate Example 07 workflow;
-0156C consolidated documentation, source-distribution qualification, release notes, and maintainer
-records. Example 03 is now the sole maintained PLS-family comparison.
-
-Decision 0157 is complete and closed. Patch 0157A fixed and regression-tested the deterministic
-near-saturated synthetic design before comparative results were inspected; 0157B integrated it as
-the fourth Example-03 case using one shared materialized five-fold protocol, exhaustive
-predictor-rank coverage for both Pi-PLS policies, and the full 1--10 component domain; 0157C
-synchronized the user and maintainer documentation and recorded the fixed-realization result
-without a general superiority claim. In that fixed realization, both Pi-PLS policies reach their
-minimum mean CV-MSE at 5 components (0.9036 cross-covariance; 0.9022 least squares), while ordinary
-PLS reaches 0.9373 at 8 components.
-
-Decision 0158 is complete and closed. Patch 0158A established the shared Example-03 numerical
-evaluator; 0158B added the dedicated Home renderer for publication-default Pi-PLS versus ordinary
-PLS on Pulp and Tobacco; and 0158C places those generated figures side by side under
-`Why use Π-PLS?`, records their documentation-reproducibility contract, and limits the stated
-parsimony interpretation to shared component count $h$. The full three-way technical comparison
-remains Example 03. Future changes to this Home comparison require a new owner decision rather than
-extending Decision 0158.
-
-Decision 0159 is complete and closed. Patch 0159A records a semantic cross-reference architecture
-and stabilizes canonical anchors for reference datasets, the companion publication, and high-value
-theory concepts. Patch 0159B implements the reference-dataset pass across the served documentation:
-dataset-name links lead to the Pulp, Sugarcane, or Tobacco detail section while tutorial, workflow,
-loader, heading, code, figure-alt, and immediate-repeat semantics are preserved. Patch 0159C links
-substantive companion-publication references to the canonical citation section and routes rank,
-response-subspace, predictor-projection, paired-mode, and factorization terminology to specific
-theory anchors. Patch 0159D completes the remaining contextual navigation and adds regression tests
-for canonical anchors, representative semantic routes, and non-isolated served pages. Future
-cross-reference changes should preserve semantic destinations and must not become a mechanical
-every-occurrence link rule.
-
-Decision 0161 is implemented and closed. `textalloc>=1.2.4,<2` is the sole maintained
-annotation-layout extra in the `examples`, `docs`, and `dev` groups. Example 04 and the Pulp tutorial
-renderer share the example-local annotation helper, which gives `textalloc` only exact
-predictor-arrow line segments as geometric obstacles; other labels are allocator-owned obstacles,
-while sample-score points are intentionally excluded. Without `textalloc`, labels remain at their
-ordinary Matplotlib predictor endpoints. `adjustText` is no longer part of the active dependency or
-documentation surface.
-
-Decision 0162 is complete and closed. Example 04 and the Pulp tutorial renderer share complete
-example-local biplot helpers with a plain-Matplotlib path, a line-aware `textalloc` path, and one
-dispatcher. The allocator avoids other predictor labels and exact predictor-arrow shafts only; sample
-scores are excluded. Maintained predictor labels use 9-point text and `min_distance=0.01125`,
-`max_distance=0.15`. The tutorial exposes only `biplot_coordinates()` plus one local plotting call,
-keeping helper implementation and optional-dependency mechanics out of the instructional flow.
-
-Decision 0163 is implemented and closed. The visible scalar prediction diagnostic in the
-maintained real-data OOF workflows is response-wise selection-conditioned OOF R². The public
-`PredictionDiagnostics` surface and response-standardized model-selection loss do not change, and
-Quick Start retains its fitted-value standardized-RMSE summary. The maintained R² bar-plot limit
-contract is upper limit exactly 1.0 and lower limit never greater than 0.0; negative R² values remain
-visible below zero. Examples 04--06 and Tutorial 3 use the shared example-local y-limit helper, and
-Pulp final-fit R² follows the same axis contract while remaining explicitly distinct from OOF R².
+The maintained PLS-family comparison, documentation navigation, Pulp annotation fallback, and
+response-wise OOF $R^2$ presentation are implemented outcomes rather than open roadmap items.
+Example 03 owns matched-fold comparison of both Pi-PLS response policies and ordinary PLS;
+`textalloc` remains optional with a plain-Matplotlib Pulp fallback; and complete real-data OOF
+figures keep prediction provenance explicit. Further presentation changes require an appropriate
+current owner decision rather than reopening retired migration sequences.
 
 ## Deferred work
 
@@ -198,8 +147,3 @@ For each patch:
 
 When a tool such as Ruff, mypy, MkDocs, or an optional renderer dependency is unavailable, state
 that precisely and provide the authoritative local command. Do not claim an unrun check passed.
-
-Decision 0160 is implemented and closed but superseded by Decision 0161 only with respect to the
-annotation allocator. Its durable rule remains: absence of an optional annotation-layout dependency
-must not prevent maintained Pulp rendering, and the runtime package must remain independent of
-graphics dependencies.

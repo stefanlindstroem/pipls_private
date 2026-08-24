@@ -29,6 +29,12 @@ Public README and served-documentation commands use ordinary noneditable install
 checkout. Editable installation remains the contributor and CI workflow documented in
 `CONTRIBUTING.md`.
 
+Optional rendering helpers remain non-fatal when the optional package itself is absent. In
+particular, maintained Pulp biplot rendering must remain executable with Matplotlib alone and use
+its plain endpoint-label path when `textalloc` is unavailable. An unrelated import failure from an
+installed optional package must propagate rather than be disguised as dependency absence. No
+graphics dependency enters the runtime `pipls` import surface.
+
 ## Consequences
 
 The optional dependency surface now describes maintained executable workflows rather than possible
