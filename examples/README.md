@@ -8,7 +8,7 @@ A clear elbow or plateau can motivate a component count; when no clear elbow is 
 relative tolerances provide a transparent parsimony policy. Example 06 demonstrates separate 10%
 predictor-rank and component-count tolerances. See the
 [component-path discussion](../docs/path_analysis.md#search-owned-selection-rules) and the
-[served example catalogue](../docs/examples.md#tobacco-two-relative-tolerance-decisions). For the
+[served example catalogue](../docs/examples.md). For the
 mathematical construction, see `docs/theory.md`.
 
 The examples are arranged by user task rather than by implementation complexity. Each numbered
@@ -79,8 +79,7 @@ Grouped and temporal validation require application-specific sampling semantics 
   evidence, the component-path reference minimum, and a selection-conditioned OOF report before it
   refits the same selection and renders both thresholds, decreasing-wavenumber spectral displays,
   deterministic response pagination, and raw observation diagnostics through caller-owned PDFs.
-  See the [selection rules](../docs/path_analysis.md#search-owned-selection-rules) and the
-  [focused Tobacco explanation](../docs/examples.md#tobacco-two-relative-tolerance-decisions).
+  See the [selection rules](../docs/path_analysis.md#search-owned-selection-rules).
 
 These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
 inspect the component path, create one immutable selection, inspect its selected path and optional

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Rewrite the served Examples catalogue around the learning purpose of each numbered script,
+  removing configuration inventories and fixed-result narration while retaining links to the
+  tutorials, datasets, theory, and selection references that own those details.
 - Reduce the deterministic synthetic stress-case noise standard deviation from 0.3 to 0.2 in
   both predictor and response blocks, and refresh the documented matched-fold component-path
   minima for that fixed realization.
