@@ -273,7 +273,6 @@ def test_core_shapes_and_regression_map() -> None:
         result.standardized_regression_map,
         result.P @ result.D @ result.Q.T,
     )
-    assert not hasattr(result, "predict")
     prediction = X @ result.standardized_regression_map
     assert prediction.shape == Y.shape
     assert np.all(np.isfinite(prediction))

@@ -49,7 +49,6 @@ def test_n_components_rejects_more_components_than_response_columns() -> None:
         2.0,
         np.float64(2.0),
         "2",
-        "max",
         "invalid",
         None,
     ],

@@ -44,8 +44,6 @@ def test_dataset_normalizes_single_target_and_exposes_canonical_dimensions() -> 
 
     assert dataset.X.shape == (4, 3)
     assert dataset.Y.shape == (4, 1)
-    assert not hasattr(dataset, "data")
-    assert not hasattr(dataset, "target")
     assert dataset.n_samples == 4
     assert dataset.n_features == 3
     assert dataset.n_targets == 1
@@ -73,7 +71,6 @@ def test_dataset_copies_and_freezes_arrays_and_metadata() -> None:
 
     payload = pickle.dumps(dataset)
     assert b"pipls.datasets" in payload
-    assert b"pipls._dataset_types" not in payload
 
     restored = pickle.loads(payload)
     assert isinstance(restored, PiPLSDataset)
@@ -185,7 +182,6 @@ def test_manuscript_latent_geometry_truth_is_read_only_and_pickleable() -> None:
 
     payload = pickle.dumps(truth)
     assert b"pipls.datasets" in payload
-    assert b"pipls._dataset_types" not in payload
 
     restored = pickle.loads(payload)
     assert isinstance(restored, PiPLSLatentGeometryTruth)

@@ -1,1 +1,1 @@
-"""Test support package for repository-wide source contracts."""
+"""Repository-wide test support package."""

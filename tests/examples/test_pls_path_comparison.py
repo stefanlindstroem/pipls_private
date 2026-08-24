@@ -30,12 +30,9 @@ def _load_comparison_module(monkeypatch: pytest.MonkeyPatch) -> ModuleType:
 
 
 def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
-    capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     written_paths: list[Path] = []
-    xlabels: list[str] = []
-    legend_labels: list[list[str]] = []
 
     def _capture_savefig(
         self: Figure,
@@ -45,16 +42,10 @@ def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
     ) -> None:
         del args, kwargs
         written_paths.append(Path(path))
-        axis = self.axes[0]
-        xlabels.append(axis.get_xlabel())
-        legend = axis.get_legend()
-        assert legend is not None
-        legend_labels.append([text.get_text() for text in legend.get_texts()])
 
     monkeypatch.setattr(Figure, "savefig", _capture_savefig)
     module = _load_comparison_module(monkeypatch)
     result = module.run_dataset("pulp")
-    output = capsys.readouterr().out
 
     cross_search = result.cross_covariance_search
     least_squares_search = result.least_squares_search
@@ -86,24 +77,7 @@ def test_pulp_comparison_uses_one_protocol_for_all_three_paths(
     assert np.isfinite(least_squares_path.cv_mse_mean).all()
     assert np.isfinite(result.pls_path.cv_mse_mean).all()
 
-    assert "shared validation protocol: 5 materialized folds" in output
-    assert "cross_covariance (peer-reviewed default) predictor ranks" in output
-    assert (
-        "least_squares (software extension; not part of the peer-reviewed publication) "
-        "predictor ranks"
-        in output
-    )
-    assert "model-development evidence, not independent post-selection validation" in output
     assert written_paths == [result.output_path]
-    assert xlabels == ["Nr of components"]
-    assert legend_labels == [
-        [
-            r"$\Pi$-PLS (cross-covariance)",
-            r"$\Pi$-PLS (least squares)",
-            "PLS (NIPALS)",
-        ]
-    ]
-    assert result.output_path.name == "pulp_component_path_comparison.pdf"
 
 
 def test_shared_evaluator_can_run_publication_default_only(
@@ -171,7 +145,6 @@ def test_synthetic_stress_case_is_fixed_and_deterministic(
 
 
 def test_synthetic_stress_comparison_uses_exhaustive_matched_paths(
-    capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     written_paths: list[Path] = []
@@ -188,7 +161,6 @@ def test_synthetic_stress_comparison_uses_exhaustive_matched_paths(
     monkeypatch.setattr(Figure, "savefig", _capture_savefig)
     module = _load_comparison_module(monkeypatch)
     result = module.run_dataset(module.SYNTHETIC_STRESS_CASE)
-    output = capsys.readouterr().out
 
     cross_search = result.cross_covariance_search
     least_squares_search = result.least_squares_search
@@ -211,15 +183,7 @@ def test_synthetic_stress_comparison_uses_exhaustive_matched_paths(
     assert np.isfinite(least_squares_path.cv_mse_mean).all()
     assert np.isfinite(result.pls_path.cv_mse_mean).all()
 
-    assert "Synthetic stress case: X shape=(25, 40), Y shape=(25, 10)" in output
-    assert (
-        "latent dimensions: shared=5, predictor-specific=15, response-specific=0" in output
-    )
-    assert "noise SD: X=0.3, Y=0.3" in output
-    assert "fold training size: 20; centered predictor rank cannot exceed 19" in output
-    assert "shared validation protocol: 5 materialized folds" in output
     assert written_paths == [result.output_path]
-    assert result.output_path.name == "synthetic_stress_component_path_comparison.pdf"
 
 
 def test_dataset_search_templates_keep_matched_configuration(

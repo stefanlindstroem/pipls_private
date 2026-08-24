@@ -72,13 +72,11 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8--11 are complete:
+Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8--12 are complete:
 the decision registry is structurally checked, completed presentation/workflow records are retired,
-overlapping search-lifecycle records are consolidated, and the active `.llm` handoff is compacted.
-
-Patch 12 removes pytest assertions that preserve documentation wording, local source arrangement,
-private implementation names, or removed pre-release spellings rather than durable behavior. It
-must preserve numerical, public-API, dataset, distribution, and rendering behavior.
+overlapping search-lifecycle records are consolidated, the active `.llm` handoff is compacted, and
+pytest no longer preserves prose, source arrangement, private implementation names, or removed
+pre-release spellings in place of durable behavior.
 
 Patch 13 moves complete example/documentation execution to the dedicated validation targets and
 removes redundant ordinary-pytest execution. It must retain focused numerical/API regression tests

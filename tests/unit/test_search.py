@@ -435,34 +435,6 @@ def test_no_positive_fold_numerical_rank_fails_transactionally() -> None:
         "max_predictor_rank_",
         "cv_results_",
         "component_path_",
-        "best_index_",
-        "best_score_",
-        "best_n_components_",
-        "best_predictor_rank_",
-        "best_params_",
-    ):
-        assert not hasattr(search, name)
-
-
-def test_fit_exposes_no_global_best_attributes() -> None:
-    X, Y = _data()
-    search = PiPLSSearchCV(
-        n_components_values=[1, 2],
-        predictor_rank_values=[1, 2, 3],
-        search_method="exhaustive",
-        cv=3,
-        n_jobs=1,
-    ).fit(X, Y)
-
-    best = search.select(rule="best_score")
-    assert best.n_components in {1, 2}
-    assert best.predictor_rank in {1, 2, 3}
-    for name in (
-        "best_index_",
-        "best_score_",
-        "best_n_components_",
-        "best_predictor_rank_",
-        "best_params_",
     ):
         assert not hasattr(search, name)
 
@@ -1525,7 +1497,6 @@ def test_explicit_max_predictor_rank_restricts_the_full_domain() -> None:
     ).fit(X, Y)
 
     assert search.max_predictor_rank_ == 3
-    assert not hasattr(search, "cv_n_train_min_")
     np.testing.assert_array_equal(
         search.predictor_rank_profile(1).predictor_rank,
         np.array([1, 2, 3]),
@@ -1656,14 +1627,13 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
     [
         ("search_method", "unsupported", "search_method"),
         ("max_predictor_rank", 0, "max_predictor_rank"),
-        ("max_predictor_rank", "rule", "max_predictor_rank"),
+        ("max_predictor_rank", "unsupported", "max_predictor_rank"),
         ("n_components_values", [], "must not be empty"),
         ("n_components_values", None, 'must be "all"'),
         ("n_components_values", "everything", 'must be "all"'),
         ("scoring", "not_a_scorer", "Unknown scoring"),
         ("predictor_rank_values", [1.0], "positive integer"),
-        ("predictor_rank_values", "max", "must be None"),
-        ("predictor_rank_values", "maximum", "must be None"),
+        ("predictor_rank_values", "unsupported", "must be None"),
         ("n_jobs", 0, "must not be zero"),
     ],
 )

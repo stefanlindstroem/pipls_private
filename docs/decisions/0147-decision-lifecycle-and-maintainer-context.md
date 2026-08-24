@@ -2,13 +2,14 @@
 
 ## Status
 
-Accepted and implemented through Patch 11. The original seven-patch consolidation is complete;
+Accepted and implemented through Patch 12. The original seven-patch consolidation is complete;
 Patches 8--13 are a bounded maintenance continuation for registry repair, further decision
 consolidation, and test-boundary cleanup. Patches 8--10 repaired the registry and retired completed
-presentation/migration records. Patch 11 consolidates four overlapping search-lifecycle records
-into the retained scoring, estimator/search, immutable-path, tolerance, and selection-provenance
-contracts and compacts the active `.llm` handoff. None of Patches 8--11 changes numerical or
-public-API behavior.
+presentation/migration records. Patch 11 consolidated overlapping search-lifecycle records and
+compacted the active `.llm` handoff. Patch 12 removes stale pytest assertions that pin prose,
+source arrangement, private implementation names, removed pre-release spellings, or removed
+shape-only result attributes rather than durable behavior. None of Patches 8--12 changes numerical
+or public-API behavior.
 
 ## Context
 
@@ -164,7 +165,7 @@ split internally.
 11. Consolidate overlapping search-lifecycle decisions and compact the active `.llm` layer around
     current state and unresolved work -- complete with 39 current records.
 12. Remove stale pytest assertions that police prose, source arrangement, private names, or removed
-    pre-release spellings instead of durable behavior -- pending.
+    pre-release spellings instead of durable behavior -- complete.
 13. Move complete application/documentation validation to its owning targets and remove redundant
     ordinary-pytest execution -- pending.
 

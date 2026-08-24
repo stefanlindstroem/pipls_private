@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Remove stale pytest assertions that pin documentation cross-link placement, example console
+  wording, rendering-helper source arrangement, retired pre-release rank-policy spellings, private
+  dataset pickle-module names, and removed shape-only result attributes. Retain executable
+  numerical, API, dataset, serialization, rendering, tool, and machine-readable metadata coverage.
 - Consolidate four overlapping search-lifecycle decisions into the retained scoring, fixed-
   estimator/search, immutable-path, tolerance, and selection-provenance contracts. Compact the
   active `.llm` state/strategy handoff to current facts and pending work, retire stale decision

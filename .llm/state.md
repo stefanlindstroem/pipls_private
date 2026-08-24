@@ -164,11 +164,12 @@ in `docs/decisions/retirements.md`. The inherited 0153/0154 retirement-map numbe
 frozen exceptions. `make decision-check` validates both current registries, local links, active
 decision references, retirement-map uniqueness, and additional number reuse.
 
-Patches 8--11 of the Decision-0147 maintenance continuation are complete. Patch 12 removes stale
-pytest assertions that police prose, source arrangement, private names, or removed pre-release
-spellings. Patch 13 moves complete application/documentation execution to the dedicated validation
-targets and removes redundant ordinary-pytest execution. Neither pending patch is authorized to
-change numerical or public-API behavior.
+Patches 8--12 of the Decision-0147 maintenance continuation are complete. Pytest no longer pins
+documentation cross-link placement, example console wording, local rendering-helper source use,
+retired pre-release rank-policy spellings, private dataset pickle-module names, or removed
+shape-only result attributes. Patch 13 moves complete application/documentation execution to the
+dedicated validation targets and removes redundant ordinary-pytest execution. It is not authorized
+to change numerical or public-API behavior.
 
 Tests protect executable behavior and machine-readable outputs. Strict documentation, complete
 examples, source-distribution documentation, and installed artifacts are validated by their

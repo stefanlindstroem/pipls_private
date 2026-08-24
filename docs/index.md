@@ -1,6 +1,6 @@
 # Π-PLS documentation
 
-`pipls` is a Python package for the multivariate linear regression model Π-PLS.
+`pipls` is a Python package for the multivariate linear regression model panoramic partial least squares (Π-PLS), where Π stands for the Greek πανοραμικός (“panoramic”).
 For routine modeling, Π-PLS can be used much like ordinary PLS: choose a component count, fit
 and predict, inspect latent scores and loadings, examine regression coefficients, and assess
 observed-versus-predicted values and residuals. The package exposes those familiar PLS-family

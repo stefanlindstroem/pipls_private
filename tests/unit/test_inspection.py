@@ -81,8 +81,6 @@ def test_pipls_display_factors_use_first_largest_predictor_entry_for_sign() -> N
     assert factors.predictor_directions.shape == (3, 3)
     assert factors.response_directions.shape == (2, 3)
     assert factors.n_components == 3
-    assert not hasattr(factors, "n_features")
-    assert not hasattr(factors, "n_targets")
 
 
 def test_pipls_display_factors_can_anchor_signs_to_a_response() -> None:
@@ -249,8 +247,6 @@ def test_prediction_diagnostics_standardize_from_observed_responses() -> None:
     np.testing.assert_allclose(diagnostics.response_r2, expected_r2)
     assert diagnostics.prediction_kind == "external test predictions"
     assert diagnostics.observed.shape == (3, 2)
-    assert not hasattr(diagnostics, "n_samples")
-    assert not hasattr(diagnostics, "n_targets")
 
 
 def test_prediction_diagnostics_normalize_vector_inputs_to_two_dimensions() -> None:

@@ -105,7 +105,7 @@ builtins.__import__ = _guarded_import
             "NUMEXPR_NUM_THREADS": "1",
         }
     )
-    completed = subprocess.run(
+    subprocess.run(
         [sys.executable, str(example_path)],
         cwd=tmp_path,
         env=environment,
@@ -113,18 +113,4 @@ builtins.__import__ = _guarded_import
         capture_output=True,
         text=True,
     )
-    assert "Selected Pi-PLS: n_components=3, predictor_rank=9" in completed.stdout
     assert (tmp_path / "results" / "pulp_post_analysis" / "latent_structure.pdf").is_file()
-
-
-def test_pulp_renderers_use_shared_biplot_helper() -> None:
-    root = _repository_root()
-    for relative_path in (
-        "examples/04_pulp_real_data.py",
-        "tools/render_pulp_tutorial.py",
-    ):
-        source = (root / relative_path).read_text(encoding="utf-8")
-        assert "plot_pulp_biplot" in source
-        assert "adjust_text" not in source
-        assert "x_scatter" not in source
-        assert "y_scatter" not in source
