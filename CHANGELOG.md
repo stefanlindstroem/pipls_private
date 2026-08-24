@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Reduce the deterministic synthetic stress-case noise standard deviation from 0.3 to 0.2 in
+  both predictor and response blocks, and refresh the documented matched-fold component-path
+  minima for that fixed realization.
 - Complete the Decision-0147 maintenance sequence by moving full numbered-example and tutorial
   execution out of ordinary pytest. Keep focused matched-fold, rendering-fallback, metric, and
   semantic-manifest tests; run all numbered examples once in dedicated Python-3.12 CI and leave
@@ -58,7 +61,7 @@
   response-subspace policies and ordinary PLS are evaluated on identical materialized folds for
   Pulp, Sugarcane, Tobacco, and one fixed near-saturated synthetic stress case without claiming
   general superiority. The synthetic case fixes 25 observations, 40 predictors, 10 responses,
-  5 shared and 15 predictor-specific latent directions, and noise SD 0.3 before comparison.
+  5 shared and 15 predictor-specific latent directions, and noise SD 0.2 before comparison.
 - Replace maintained Pulp biplot label placement with optional `textalloc`: predictor labels avoid
   other predictor labels and exact predictor-arrow line segments, while sample-score points are not
   obstacles. Preserve the plain-Matplotlib endpoint-label fallback and remove `adjustText` from the

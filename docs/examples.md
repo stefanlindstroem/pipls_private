@@ -53,13 +53,14 @@ partitions.
 
 The synthetic case has 25 observations, 40 predictors, 10 responses, 5 shared latent directions,
 15 predictor-specific directions, no response-specific directions, and Gaussian predictor and
-response noise with standard deviation 0.3. Five-fold training sets contain 20 observations, so
+response noise with standard deviation 0.2. Five-fold training sets contain 20 observations, so
 centered predictor rank is at most 19 while the declared systematic predictor signal has 20 latent
 directions. In this fixed `random_state=0` realization, both Π-PLS response policies attain their
-minimum mean CV-MSE at 5 components: 0.9036 for cross-covariance and 0.9022 for least squares.
-Ordinary PLS reaches 0.9373 at 8 components. The two Π-PLS curves remain close and alternate in
-which one is lower, so this one stress realization does not establish a general performance
-ordering.
+minimum mean CV-MSE at 5 components: 0.6176 for cross-covariance and 0.6163 for least squares.
+Ordinary PLS reaches 0.6603 at 10 components. The two Π-PLS curves remain close;
+cross-covariance is lower at most component counts, while least squares is slightly lower at the
+shared five-component minimum. This one stress realization does not establish a general
+performance ordering.
 
 The example does not claim that either response policy or ordinary PLS is generally superior. The
 appropriate model is data-dependent. For the mathematical distinction between the two Π-PLS

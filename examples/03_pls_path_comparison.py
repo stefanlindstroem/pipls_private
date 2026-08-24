@@ -39,7 +39,7 @@ class SyntheticStressSpec:
     n_shared: int = 5
     n_predictor_specific: int = 15
     n_response_specific: int = 0
-    noise: float = 0.3
+    noise: float = 0.2
     random_state: int = 0
 
 
@@ -47,7 +47,7 @@ SYNTHETIC_STRESS_SPEC = SyntheticStressSpec()
 
 
 def _make_synthetic_stress_case() -> PiPLSDataset:
-    """Generate the fixed Decision-0157 near-saturated stress case."""
+    """Generate the fixed near-saturated synthetic stress case."""
 
     spec = SYNTHETIC_STRESS_SPEC
     return make_pipls_regression(
