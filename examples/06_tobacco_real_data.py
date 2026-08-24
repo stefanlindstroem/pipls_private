@@ -4,6 +4,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from _support.metric_plotting import response_r2_ylim
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.ticker import MaxNLocator
 from numpy.typing import NDArray
@@ -305,7 +306,9 @@ def _write_prediction_diagnostics_report(
             axes[1].set_xlabel("Predicted response (standardized)")
             axes[1].set_ylabel("Standardized residual")
             positions = np.arange(len(responses))
-            axes[2].bar(positions, diagnostics.standardized_rmse[response_array])
+            page_response_r2 = diagnostics.response_r2[response_array]
+            axes[2].bar(positions, page_response_r2)
+            axes[2].axhline(0.0, linewidth=0.8, linestyle="--", color="0.35")
             axes[2].set_xticks(positions)
             axes[2].set_xticklabels(
                 [response_names[index] for index in responses],
@@ -313,8 +316,8 @@ def _write_prediction_diagnostics_report(
                 ha="right",
             )
             axes[2].set_xlabel("Response")
-            axes[2].set_ylabel("Standardized RMSE")
-            axes[2].set_ylim(0.0, 1.0)
+            axes[2].set_ylabel(r"Response-wise OOF $R^2$")
+            axes[2].set_ylim(*response_r2_ylim(page_response_r2))
             if len(responses) > 1:
                 axes[0].legend()
                 axes[1].legend()

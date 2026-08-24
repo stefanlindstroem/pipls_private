@@ -4,6 +4,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from _support.metric_plotting import response_r2_ylim
 from numpy.typing import NDArray
 from sklearn.model_selection import KFold
 
@@ -232,12 +233,13 @@ def _plot_prediction_diagnostics(
     axes[1].set_ylabel("Standardized residual")
 
     positions = np.arange(len(response_names))
-    axes[2].bar(positions, diagnostics.standardized_rmse)
+    axes[2].bar(positions, diagnostics.response_r2)
+    axes[2].axhline(0.0, linewidth=0.8, linestyle="--", color="0.35")
     axes[2].set_xticks(positions)
     axes[2].set_xticklabels(response_names)
     axes[2].set_xlabel("Response")
-    axes[2].set_ylabel("Standardized RMSE")
-    axes[2].set_ylim(0.0, 1.0)
+    axes[2].set_ylabel(r"Response-wise OOF $R^2$")
+    axes[2].set_ylim(*response_r2_ylim(diagnostics.response_r2))
     axes[0].legend()
     axes[1].legend()
     figure.suptitle(

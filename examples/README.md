@@ -103,11 +103,13 @@ The Π-PLS-versus-PLS comparison workflow imports one implementation helper from
 - `pls_component_path.py`: immutable ordinary-PLS path evaluation for example 03.
 
 Example 03 owns the Matplotlib comparison figures directly. Pulp, Sugarcane, Tobacco, and the
-synthetic stress case import no comparison helper. Reusable numerical inspection belongs in
-`pipls.inspection`; every maintained figure is rendered directly from immutable arrays with ordinary
-Matplotlib. The Pulp biplot uses optional `textalloc` only for predictor-label placement: when available, it
-avoids other predictor labels and the predictor-arrow shafts. Without it, the same example remains
-executable and leaves those labels at their original endpoints.
+synthetic stress case import no comparison helper. Examples 04--06 share only the example-local
+`metric_plotting.py` y-limit contract for response-wise $R^2$ bars; their plot composition remains
+caller-owned. Reusable numerical inspection belongs in `pipls.inspection`; every maintained figure
+is rendered directly from immutable arrays with ordinary Matplotlib. The Pulp biplot uses optional
+`textalloc` only for predictor-label placement: when available, it avoids other predictor labels and
+the predictor-arrow shafts. Without it, the same example remains executable and leaves those labels
+at their original endpoints.
 
 ## Real-data workflow contract
 
@@ -135,7 +137,8 @@ the three overlaid comparison figures directly. Sugarcane demonstrates the compl
 3. `selection = search.select(n_components=CHOSEN_N_COMPONENTS)` records that choice as one complete
    immutable row without fitting.
 4. `predictor_rank_profile(selection.n_components)`, `oof_report(...)`, and
-   `prediction_diagnostics()` provide selection-conditioned evidence for reviewing that row.
+   `prediction_diagnostics()` provide selection-conditioned evidence for reviewing that row, with
+   response-wise OOF $R^2$ as the visible scalar prediction diagnostic.
 5. `search.refit(X, Y, selection=selection)` fits the accepted component-count and predictor-rank
    pair on all observations and records it as `model.selection_`.
 6. `pipls_display_factors()` and `latent_structure()` return immutable fitted-model results.

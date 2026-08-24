@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Make response-wise selection-conditioned OOF $R^2$ the preferred visible scalar prediction
+  diagnostic in the maintained Pulp, Sugarcane, and Tobacco workflows. Draw the $R^2=0$
+  reference explicitly and keep every maintained response-wise $R^2$ bar plot capped at exactly
+  1.0 while extending below zero when negative values occur. Standardized RMSE remains available
+  numerically, and Quick Start retains its fitted-value standardized-RMSE summary.
 - Change `PiPLSSearchCV` to optimize predictor rank over the complete hard-feasible domain by
   default, with exhaustive candidate coverage and no implicit events-per-variable ceiling.
   `max_predictor_rank=None` now means that no user rank cap is imposed.

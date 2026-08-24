@@ -2,8 +2,8 @@
 
 ## Status
 
-Accepted; patches 0163A--B establish the presentation contract and migrate Pulp. Patch 0163C
-remains active.
+Accepted, implemented, and closed. Patches 0163A--C establish the presentation contract and
+migrate all maintained real-data OOF scalar diagnostics.
 
 ## Context
 
@@ -63,7 +63,8 @@ prediction provenance explicit. The generated OOF scalar asset is renamed to
 `PredictionDiagnostics`.
 
 Patch 0163C migrates the analogous Sugarcane and Tobacco OOF panels, synchronizes documentation and
-release notes, qualifies all maintained examples/documentation, and closes the decision.
+release notes, removes the transitional source-level standardized-RMSE plot-limit test, qualifies all
+maintained examples/documentation, and closes the decision.
 
 ## Consequences
 

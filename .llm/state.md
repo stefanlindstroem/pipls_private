@@ -291,16 +291,14 @@ scores are excluded. Maintained predictor labels use 9-point text and `min_dista
 `max_distance=0.15`. The tutorial exposes only `biplot_coordinates()` plus one local plotting call,
 keeping helper implementation and optional-dependency mechanics out of the instructional flow.
 
-Decision 0163 is active. Patch 0163A establishes response-wise selection-conditioned OOF R² as the
+Decision 0163 is implemented and closed. Response-wise selection-conditioned OOF R² is the
 preferred visible scalar response diagnostic for Examples 04--06 and Tutorial 3 without changing
 `PredictionDiagnostics`, model-selection scoring, or Quick Start. The shared example-local
 `response_r2_ylim()` contract fixes every maintained R² bar plot at an upper limit of exactly 1.0;
 its lower limit is 0.0 for nonnegative displayed values and extends below any negative minimum with
-small downward padding. Patch 0163B migrates Pulp Tutorial 3 and Example 04, renames the generated
-OOF scalar asset to `oof_response_r2.svg`, records response-wise OOF R² in the tutorial manifest,
-and applies the same axis contract to final-fit Pulp R². Patch 0163C remains for Sugarcane/Tobacco
-and closure. Standardized RMSE remains available as a numerical diagnostic, and OOF versus
-final-fit R² provenance remains explicit.
+small downward padding. The Pulp tutorial manifest records response-wise OOF R², and all maintained
+real-data OOF R² panels draw the zero reference explicitly. Standardized RMSE remains available as
+a numerical diagnostic, and OOF versus final-fit R² provenance remains explicit.
 
 ## Authority and drift handling
 

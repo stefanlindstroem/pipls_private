@@ -187,9 +187,9 @@ fold-local standardized loss used during path selection.
 ### Response-wise coefficient of determination { #response-r2 }
 
 `response_r2` is calculated independently for each response from the supplied predictions. The
-maintained Pulp tutorial uses this quantity as the visible scalar OOF diagnostic because its
-zero and unit reference points are familiar, while standardized RMSE remains available as the
-response-scale-normalized error diagnostic.
+maintained Pulp, Sugarcane, and Tobacco workflows use this quantity as the visible scalar OOF
+diagnostic because its zero and unit reference points are familiar, while standardized RMSE remains
+available as the response-scale-normalized error diagnostic.
 
 \[
 R_j^2 = 1 - \frac{\sum_i (y_{ij} - \hat y_{ij})^2}{\sum_i (y_{ij} - \bar y_j)^2}.
