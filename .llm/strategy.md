@@ -152,6 +152,13 @@ while sample-score points are intentionally excluded. Without `textalloc`, label
 ordinary Matplotlib predictor endpoints. `adjustText` is no longer part of the active dependency or
 documentation surface.
 
+Decision 0162 is active. Patch 0162A replaces the label-only helper with complete example-local Pulp
+biplot renderers plus a dispatcher shared by Example 04 and the Pulp tutorial renderer. The simple
+path fixes labels at predictor endpoints; the preferred path uses `textalloc` against other labels
+and exact predictor-arrow shafts only. Maintained predictor labels are now 9 point, with the
+`textalloc` placement-distance envelope tightened to `0.01125`--`0.15`. Patch 0162B remains for
+tutorial simplification, regenerated-figure review, and closure.
+
 ## Deferred work
 
 The block-aware transformer itself remains outside this repository. `PiPLSRegression` now exposes

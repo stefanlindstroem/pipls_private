@@ -5,8 +5,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from _support.annotation_layout import allocate_predictor_labels
-from matplotlib.patches import FancyArrowPatch
+from _support.pulp_biplot import plot_pulp_biplot
 from sklearn.model_selection import RepeatedKFold
 
 from pipls import PiPLSSearchCV
@@ -224,38 +223,10 @@ def _plot_latent_structure(
 
     # --8<-- [start:plot-pulp-biplot]
     biplot = biplot_coordinates(structure, components=(0, 1))
-    sample_xy = biplot.sample_coordinates
-    predictor_xy = biplot.predictor_coordinates
-    biplot_axis = axes[0, 1]
-    biplot_axis.scatter(
-        sample_xy[:, 0],
-        sample_xy[:, 1],
-        alpha=0.75,
-        label="Samples",
-    )
-    for endpoint in predictor_xy:
-        biplot_axis.add_patch(
-            FancyArrowPatch(
-                (0.0, 0.0),
-                (float(endpoint[0]), float(endpoint[1])),
-                arrowstyle="->",
-                mutation_scale=10.0,
-                linewidth=1.0,
-            )
-        )
-    first, second = (int(value) for value in biplot.component_indices)
-    biplot_axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    biplot_axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    biplot_axis.set_xlabel(f"Balanced component {first + 1}")
-    biplot_axis.set_ylabel(f"Balanced component {second + 1}")
-    biplot_axis.set_aspect("equal", adjustable="datalim")
-    biplot_axis.margins(0.1)
-    biplot_axis.legend()
-    allocate_predictor_labels(
-        biplot_axis,
-        predictor_xy,
-        predictor_names,
-        textsize=8,
+    plot_pulp_biplot(
+        axes[0, 1],
+        biplot,
+        predictor_names=predictor_names,
     )
     # --8<-- [end:plot-pulp-biplot]
 

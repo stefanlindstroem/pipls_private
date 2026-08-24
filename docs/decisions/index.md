@@ -59,6 +59,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0159: documentation cross-reference architecture](0159-documentation-cross-reference-architecture.md)
 - [0160: graceful optional `adjustText` fallback](0160-graceful-adjusttext-fallback.md)
 - [0161: line-aware text allocation for annotated biplots](0161-line-aware-text-allocation.md)
+- [0162: complete Pulp biplot helper](0162-complete-pulp-biplot-helper.md)
 
 ## Historical navigation
 

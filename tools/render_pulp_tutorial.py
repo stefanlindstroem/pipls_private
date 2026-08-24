@@ -23,10 +23,9 @@ matplotlib.use("Agg")
 matplotlib.rcParams["svg.hashsalt"] = "pipls-pulp-tutorial"
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-from _support.annotation_layout import allocate_predictor_labels  # noqa: E402
+from _support.pulp_biplot import plot_pulp_biplot  # noqa: E402
 from matplotlib.axes import Axes  # noqa: E402
 from matplotlib.figure import Figure  # noqa: E402
-from matplotlib.patches import FancyArrowPatch  # noqa: E402
 from sklearn.model_selection import RepeatedKFold  # noqa: E402
 
 from pipls import PiPLSSearchCV  # noqa: E402
@@ -168,38 +167,11 @@ def _render_biplot(
     # --8<-- [start:render-pulp-biplot]
     figure, axis = _figure(figsize=(9.0, 7.0))
     biplot = biplot_coordinates(structure, components=(0, 1))
-    sample_xy = biplot.sample_coordinates
-    predictor_xy = biplot.predictor_coordinates
-    axis.scatter(
-        sample_xy[:, 0],
-        sample_xy[:, 1],
-        alpha=0.75,
-        label="Samples",
-    )
-    for endpoint in predictor_xy:
-        axis.add_patch(
-            FancyArrowPatch(
-                (0.0, 0.0),
-                (float(endpoint[0]), float(endpoint[1])),
-                arrowstyle="->",
-                mutation_scale=10.0,
-                linewidth=1.0,
-            )
-        )
-    first, second = (int(value) for value in biplot.component_indices)
-    axis.axhline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    axis.axvline(0.0, linewidth=0.8, linestyle="--", color="0.45")
-    axis.set_xlabel(f"Balanced component {first + 1}")
-    axis.set_ylabel(f"Balanced component {second + 1}")
-    axis.set_title(r"Pulp $\Pi$-PLS score-loading biplot")
-    axis.set_aspect("equal", adjustable="datalim")
-    axis.margins(0.1)
-    axis.legend()
-    allocate_predictor_labels(
+    plot_pulp_biplot(
         axis,
-        predictor_xy,
-        predictor_names,
-        textsize=8,
+        biplot,
+        predictor_names=predictor_names,
+        title=r"Pulp $\Pi$-PLS score-loading biplot",
     )
     # --8<-- [end:render-pulp-biplot]
     _save_svg(figure, output_path)

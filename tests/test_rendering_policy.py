@@ -64,8 +64,8 @@ def test_pulp_example_runs_without_textalloc(tmp_path: Path) -> None:
     (tmp_path / "results" / "pulp_post_analysis").mkdir(parents=True)
     support_dir = tmp_path / "_support"
     support_dir.mkdir()
-    (support_dir / "annotation_layout.py").write_text(
-        (root / "examples" / "_support" / "annotation_layout.py").read_text(encoding="utf-8"),
+    (support_dir / "pulp_biplot.py").write_text(
+        (root / "examples" / "_support" / "pulp_biplot.py").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
     sitecustomize = tmp_path / "sitecustomize.py"
@@ -111,14 +111,14 @@ builtins.__import__ = _guarded_import
     assert (tmp_path / "results" / "pulp_post_analysis" / "latent_structure.pdf").is_file()
 
 
-def test_pulp_renderers_use_shared_textalloc_helper() -> None:
+def test_pulp_renderers_use_shared_biplot_helper() -> None:
     root = _repository_root()
     for relative_path in (
         "examples/04_pulp_real_data.py",
         "tools/render_pulp_tutorial.py",
     ):
         source = (root / relative_path).read_text(encoding="utf-8")
-        assert "allocate_predictor_labels" in source
+        assert "plot_pulp_biplot" in source
         assert "adjust_text" not in source
         assert "x_scatter" not in source
         assert "y_scatter" not in source
