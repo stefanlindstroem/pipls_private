@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Retire four older presentation/workflow decisions whose durable content is already canonical:
+  example report composition is covered by the data-first rendering policy, manuscript synthetic-
+  data reproducibility by the product/generator/theory boundary, spectral rank-profile semantics by
+  the profile and tolerance decisions, and same-search OOF interpretation by the selection-
+  provenance contract. Keep exact tutorial ordering, figure grids, paired path artifacts, and
+  feedback-arrow presentation in history rather than active policy.
 - Consolidate eight completed late-stage decision records into the current comparison,
   documentation, rendering, optional-dependency, inspection, and OOF-provenance contracts. Keep
   exact synthetic-case results, Home layout, cross-link rollout stages, allocator migration, and

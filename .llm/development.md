@@ -52,10 +52,10 @@
 - Every numbered example must present a recognizable user task, explicit comparison, or focused
   comparison. It must explain its data and label its output without relying on publication context or
   earlier project history. Do not ship context-free API demonstrations as numbered examples.
-- Under Decision 0152, maintained manual-selection workflows inspect the unselected component
-  path, choose the component count and create one selection through `search.select(...)`, inspect
-  the selected path, conditional rank profile, and any selection-conditioned OOF report, then fit
-  the final full-data model through
+- Under the current selection/OOF contract in Decision 0143, maintained manual-selection workflows
+  inspect the unselected component path, choose the component count and create one selection through
+  `search.select(...)`, inspect the selected path, conditional rank profile, and any
+  selection-conditioned OOF report, then fit the final full-data model through
   `search.refit(..., selection=selection)`. Do not recover the working selection from the
   fitted model or manually transfer the selected predictor rank into a new estimator. Compact
   automatic workflows may continue to refit directly from a rule or component count.

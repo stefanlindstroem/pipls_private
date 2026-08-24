@@ -4,9 +4,9 @@
 from __future__ import annotations
 
 import argparse
+import re
 from collections import Counter
 from pathlib import Path
-import re
 from urllib.parse import unquote
 
 _DECISION_FILE_RE = re.compile(r"^(?P<number>\d{4})-[a-z0-9][a-z0-9-]*\.md$")

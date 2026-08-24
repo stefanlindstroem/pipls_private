@@ -232,10 +232,12 @@ the parameter, or explicitly selecting `response_subspace="cross_covariance"`, p
 pre-Decision-0155 fixed-estimator numerical path subject only to ordinary floating-point behavior.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
-`refit(selection=...)`, generic protocol-neutral OOF reporting, and fitted-model selection
-provenance. Decision 0152 owns the manual selection-review presentation used by Tutorials 2 and 3.
-The package has no dedicated leave-one-out mode, detector, provenance field, example, or support
-promise; compatible user-supplied splitters remain ordinary interoperability.
+`refit(selection=...)`, generic protocol-neutral OOF reporting, fitted-model selection provenance,
+and the interpretation boundary that same-search OOF evidence is selection-conditioned inspection
+rather than independent post-selection validation. Maintained manual-selection tutorials present
+that lifecycle without creating a separate workflow contract. The package has no dedicated
+leave-one-out mode, detector, provenance field, example, or support promise; compatible user-supplied
+splitters remain ordinary interoperability.
 
 Tests protect behavior and machine-readable outputs rather than repository prose or source
 arrangement. Distribution and documentation validation share private maintenance helpers, and the

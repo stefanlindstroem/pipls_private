@@ -58,10 +58,11 @@ Decision 0143 implements `refit(selection=...)` as the exact-selection handoff f
 workflows. Rule-based and component-count refitting remain the compact route. Existing selections
 use one compatibility definition across OOF reporting and final refitting.
 
-Decision 0152 refines manual tutorial presentation. Inspect the unselected component path before
-choosing a component count, treat setting that value and `search.select(...)` as one operation,
-then review the selected path and conditional evidence with one possible return to selection.
-Same-search OOF reporting is inspection rather than independent qualification.
+Decision 0143 is the current owner of manual-selection handoff and OOF interpretation. Maintained
+tutorials may show an unselected path, one explicit `search.select(...)` decision, and review of the
+selected path and conditional evidence before refitting, but those diagram and artifact choices are
+presentation rather than independent policy. Same-search OOF reporting is selection-conditioned
+inspection rather than independent qualification or validation.
 
 ### Analysis
 
@@ -84,10 +85,10 @@ release validation. Paper reproduction and publication-only analyses remain down
 
 ## Current roadmap
 
-Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8 and 9 are
-complete: the registry checker protects decision lifecycle consistency, and eight completed late
-presentation/migration decisions have been retired after their durable contracts were consolidated.
-Patch 10 retires older presentation/workflow records; Patch 11 consolidates overlapping
+Decision 0147 has a bounded maintenance continuation through Patch 13. Patches 8--10 are
+complete: the registry checker protects decision lifecycle consistency, eight completed late
+presentation/migration decisions are retired, and four older presentation/workflow records have
+been consolidated into their canonical owners. Patch 11 consolidates overlapping
 search-lifecycle decisions and compacts `.llm`; Patch 12 removes stale implementation- and
 prose-policing pytest assertions; Patch 13 moves complete application/documentation execution to
 its owning validation targets and removes redundant ordinary-pytest runs. These patches must not

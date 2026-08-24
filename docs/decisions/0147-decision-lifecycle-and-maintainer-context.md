@@ -2,12 +2,13 @@
 
 ## Status
 
-Accepted and implemented through Patch 9. The original seven-patch consolidation is complete;
+Accepted and implemented through Patch 10. The original seven-patch consolidation is complete;
 Patches 8--13 are a bounded maintenance continuation for registry repair, further decision
 consolidation, and test-boundary cleanup. Patch 8 repaired the registry and added a structural
-checker. Patch 9 retires eight completed presentation and migration records after folding their
-durable contracts into the retained comparison, documentation, rendering, dependency, inspection,
-and OOF-provenance decisions. Neither patch changes numerical or public-API behavior.
+checker. Patch 9 retired eight completed late presentation and migration records. Patch 10 retires
+four older presentation/workflow records after preserving their remaining durable contracts in the
+retained rendering, publication-boundary, predictor-rank, documentation, and OOF-provenance
+decisions. None of Patches 8--10 changes numerical or public-API behavior.
 
 ## Context
 
@@ -159,7 +160,7 @@ split internally.
 9. Retire completed Decisions 0156--0163 after folding only durable contracts into current
    canonical records and history -- complete with 47 current records.
 10. Retire older presentation/workflow records whose durable content is canonical elsewhere --
-    pending.
+    complete with 43 current records.
 11. Consolidate overlapping search-lifecycle decisions and compact the active `.llm` layer around
     current state and unresolved work -- pending.
 12. Remove stale pytest assertions that police prose, source arrangement, private names, or removed

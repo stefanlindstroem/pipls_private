@@ -40,7 +40,7 @@ Current canonical records: [0015](0015-dataset-and-synthetic-api.md),
 [0025](0025-model-internal-standardization-boundary.md),
 [0041](0041-legacy-dataset-licensing-roadmap.md),
 [0119](0119-manuscript-latent-geometry-generator.md),
-[0123](0123-companion-manuscript-synthetic-data-guide.md), and
+[0120](0120-companion-manuscript-theory-alignment.md), and
 [0142](0142-package-owned-reference-datasets.md).
 
 ## Examples and documentation
@@ -65,8 +65,15 @@ the same matched-fold comparison; and a staged cross-linking pass established us
 routes. Exact case values, page layout, rollout stages, and link-placement details remain in Git
 rather than current policy.
 
+The earlier companion-manuscript guide decision and the later manual selection-review decision are
+also historical implementation records. The served synthetic-data guide remains part of the user
+documentation, but its durable package-versus-publication boundary is owned by Decisions 0024,
+0119, and 0120. The exact tutorial diagram order, paired before/after component-path artifacts, and
+manual feedback arrow are presentation choices; exact selection handoff and the interpretation of
+same-search OOF evidence are owned by Decision 0143.
+
 Current canonical records: [0065](0065-documentation-layer-consolidation.md),
-[0152](0152-selection-review-feedback-workflow.md),
+[0143](0143-model-selection-provenance-and-oof-reporting.md),
 [0155](0155-response-subspace-selection-policies.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
 [0045](0045-pls-family-analysis-boundary.md), and
@@ -91,14 +98,21 @@ made response-wise selection-conditioned OOF $R^2$ the visible scalar diagnostic
 real-data workflows while keeping standardized RMSE available numerically and preserving explicit
 OOF versus fitted-value provenance.
 
+The former example-owned report-composition decision and spectral predictor-rank figure decision
+are historical presentation records. Direct figure/page composition is already part of the final
+data-first rendering policy, while the numerical rank-profile result, split-SD meaning, and the two
+sequential tolerance decisions are canonical in Decisions 0072, 0146, and 0148. Exact panel grids,
+page groupings, and example-local figure arrangements remain presentation details.
+
 Current canonical records: [0042](0042-model-inspection-and-post-analysis.md),
 [0045](0045-pls-family-analysis-boundary.md),
-[0061](0061-example-owned-report-composition.md),
+[0072](0072-conditional-predictor-rank-profile.md),
 [0083](0083-data-first-rendering-policy.md), [0094](0094-inspection-result-safety.md),
 [0103](0103-installation-and-optional-dependency-boundary.md),
 [0110](0110-response-anchored-display-factors.md),
-[0124](0124-mathematical-typography-and-subscripts.md), and
-[0141](0141-spectral-predictor-rank-profile-figures.md).
+[0124](0124-mathematical-typography-and-subscripts.md),
+[0146](0146-cv-mse-tolerance-selection.md), and
+[0148](0148-predictor-rank-tolerance-selection.md).
 
 ## Packaging and release engineering
 
@@ -140,9 +154,8 @@ and the behavioral test-suite cleanup replaced source and prose policing with ex
 Current canonical records: [0007](0007-predictor-rank-search-policies.md),
 [0065](0065-documentation-layer-consolidation.md),
 [0083](0083-data-first-rendering-policy.md),
-[0143](0143-model-selection-provenance-and-oof-reporting.md),
-[0147](0147-decision-lifecycle-and-maintainer-context.md), and
-[0152](0152-selection-review-feedback-workflow.md). The served
+[0143](0143-model-selection-provenance-and-oof-reporting.md), and
+[0147](0147-decision-lifecycle-and-maintainer-context.md). The served
 [computational-performance guide](../computational_performance.md) records the current user-facing
 performance guidance.
 

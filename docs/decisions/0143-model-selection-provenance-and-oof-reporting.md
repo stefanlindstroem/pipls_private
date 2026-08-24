@@ -93,10 +93,13 @@ they are not averages of fold-wise response diagnostics. The operation does not 
 fit a full-data model, retain supplied matrices, or mutate the search.
 
 An OOF report based on a search-owned selection is a selection-conditioned diagnostic. It is not
-nested cross-validation or an external-test estimate. The report carries no classifier for the
-validation protocol represented by the stored splits, and the package provides no dedicated
-leave-one-out mode or provenance field. Users may still supply any compatible splitter or explicit
-split iterable intentionally.
+nested cross-validation or an external-test estimate. Because the same search-owned splits both
+inform the retained selection and generate the report, maintained analysis may use the report for
+inspection or review but must not present it as independent post-selection qualification or
+validation. Independent post-selection assessment requires an outer resampling design or untouched
+external data. The report carries no classifier for the validation protocol represented by the
+stored splits, and the package provides no dedicated leave-one-out mode or provenance field. Users
+may still supply any compatible splitter or explicit split iterable intentionally.
 
 ### Workflow order
 
