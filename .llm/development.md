@@ -52,13 +52,16 @@
 - Every numbered example must present a recognizable user task, explicit comparison, or focused
   comparison. It must explain its data and label its output without relying on publication context or
   earlier project history. Do not ship context-free API demonstrations as numbered examples.
-- Under the current selection/OOF contract in Decision 0143, maintained manual-selection workflows
-  inspect the unselected component path, choose the component count and create one selection through
-  `search.select(...)`, inspect the selected path, conditional rank profile, and any
-  selection-conditioned OOF report, then fit the final full-data model through
-  `search.refit(..., selection=selection)`. Do not recover the working selection from the
-  fitted model or manually transfer the selected predictor rank into a new estimator. Compact
-  automatic workflows may continue to refit directly from a rule or component count.
+- Under Decisions 0143 and 0165, maintained manual-selection workflows inspect the component path,
+  choose the component count and create one selection through `search.select(...)`, and may inspect
+  the conditional rank profile when the retained predictor rank needs review. Selection is complete
+  before any selection-conditioned OOF report is inspected. OOF diagnostics may reveal that the
+  modeling strategy is inadequate, but the standard workflow does not retune $h$ or $r_\pi$ from
+  that same diagnostic view. Pass the accepted selection directly to both
+  `search.oof_report(..., selection=selection)` and `search.refit(..., selection=selection)` as
+  needed. Do not recover the working selection from the fitted model or manually transfer the
+  selected predictor rank into a new estimator. Compact automatic workflows may continue to refit
+  directly from a rule or component count.
 - For real-data examples, form `X` and `Y` visibly in the script. Package-owned Pulp, Sugarcane,
   and Tobacco use their named loaders; ordinary user data retain explicit user-owned reading. Do not
   introduce a registry, generic loader, metadata-driven runtime path, or helper that obscures data

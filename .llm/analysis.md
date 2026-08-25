@@ -47,9 +47,12 @@ are fitted, OOF, or external-test predictions through `PredictionKind`. Diagnost
 provenance from array shape or estimator state.
 
 OOF predictions come from `search.oof_report(..., selection=...)` and remain selection-conditioned.
-When the same fitted search informed the selection, those predictions support review of that
-selection but do not independently qualify or validate it. External-test predictions require an
-independently held-out matrix supplied by the user.
+Under Decision 0165, the maintained workflow completes ordinary model selection from the component
+path and, when useful, conditional predictor-rank evidence before OOF inspection. OOF predictions
+characterize that accepted selection but do not independently qualify or validate it. If they are
+used to retune the model, they have become additional selection evidence and performance assessment
+requires an appropriate outer design. External-test predictions require an independently held-out
+matrix supplied by the user.
 
 ## Package ownership
 

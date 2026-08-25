@@ -44,7 +44,8 @@ This registry lists only numbered decisions that still define current behavior o
 | `0153-independent-block-scaling-controls.md` | independent predictor and response scaling controls | retain `scale` as the compatibility default while allowing fold-local pipeline predictor scaling and Pi-PLS response scaling to be controlled independently |
 | `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | implemented exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
 | `0155-response-subspace-selection-policies.md` | response-subspace selection policies | closed implementation: cross-covariance default plus an explicit least-squares/RRR-inspired software extension outside the peer-reviewed publication |
-| `0164-lean-reference-architecture.md` | lean reference architecture | flat seven-page lookup reference; tutorials own workflows, domain pages own exact contracts, and synthetic generator explanation plus the maintained latent-role figure remain served |
+| `0164-lean-reference-architecture.md` | lean reference architecture | lean flat lookup reference; tutorials own workflows, domain pages own exact contracts, and synthetic generator explanation plus the maintained latent-role figure remain served |
+| `0165-selection-evidence-and-oof-diagnostic-boundary.md` | selection evidence and OOF diagnostic boundary | component path and optional conditional rank evidence complete the documented selection; same-search OOF reporting diagnoses that accepted selection and remains selection-conditioned |
 
 ## Implemented clarifications
 
@@ -55,8 +56,10 @@ This registry lists only numbered decisions that still define current behavior o
   events-per-variable-inspired policy under Decision 0154.
 - The only named component-count rules are `best_score` and tolerance-based `minimum_cv_mse`;
   `cv_mse_std` is descriptive population split SD.
-- OOF reporting and final refitting may consume the same compatible immutable selection. OOF reports
-  are selection-conditioned and protocol-neutral; there is no dedicated leave-one-out surface.
+- OOF reporting and final refitting may consume the same compatible immutable selection. Under
+  Decision 0165, maintained workflows complete ordinary selection from path and optional conditional
+  rank evidence before OOF inspection. OOF reports are selection-conditioned and protocol-neutral;
+  there is no dedicated leave-one-out surface.
 - Pulp, Sugarcane, and Tobacco are the closed package-owned reference-dataset set.
 - Numerical inspection is package-owned; plotting, local rendering helpers, and report composition
   are caller-owned. Maintained Pulp biplots may use optional line-aware `textalloc` placement but

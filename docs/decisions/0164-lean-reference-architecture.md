@@ -3,7 +3,9 @@
 ## Status
 
 Accepted. Patch 0164A records the architecture and supersedes the former 0065 documentation-layer
-record. Patches 0164B--0164F complete the served-page migration to the flat seven-page Reference.
+record. Patches 0164B--0164F complete the original served-page migration. Decision 0165 retains
+this lean-reference architecture but replaces the combined Selection and validation ownership and
+the resulting seven-page count with separate Path and selection and OOF diagnostics pages.
 
 ## Context
 
@@ -29,17 +31,11 @@ leaner.
 
 ## Decision
 
-### Use one flat seven-page Reference section
+### Use one flat Reference section
 
-The target Reference navigation is:
-
-1. **Overview**;
-2. **PiPLSRegression**;
-3. **PiPLSSearchCV**;
-4. **Selection and validation**;
-5. **Model inspection**;
-6. **Datasets and generators**;
-7. **Troubleshooting**.
+The original target Reference navigation used seven pages. Decision 0165 later refines that target
+by replacing the combined **Selection and validation** page with separate **Path and selection** and
+**OOF diagnostics** pages. All other page ownership in this decision remains current.
 
 There are no nested Reference navigation groups. In particular, Model inspection is one page rather
 than separate Concepts and API children.
@@ -62,11 +58,11 @@ lifecycle exposes. Generated `PiPLSSearchCV` documentation appears near the star
 summarize `fit()`, `select()`, `oof_report()`, and `refit()` but does not retell the tutorial
 workflow or duplicate detailed statistical selection rules.
 
-**Selection and validation** answers exactly how search evidence, scoring, conditional
-predictor-rank evidence, selection rules, OOF reporting, CV metadata, and refit provenance are
-defined. Immutable search-result records and public scoring utilities belong here. This page absorbs
-the durable contracts from the former path-selection-details material and the parts of
-computational-performance guidance that affect search semantics or interpretation.
+Decision 0165 now owns the boundary between **Path and selection** and **OOF diagnostics**. The
+former owns search evidence and the rules that retain one immutable selection; the latter owns the
+selection-conditioned diagnostics computed for that accepted selection. The original consolidation
+of durable path-selection-details and computational-accounting material remains valid, but its
+served destination is refined by Decision 0165.
 
 **Model inspection** answers what numerical quantities can be extracted from a fitted model and how
 they should be interpreted. Scientific definitions and generated inspection API documentation live
@@ -90,9 +86,10 @@ links to canonical contracts instead of reproducing them at length.
 ### Remove standalone reference chapters whose material has a clearer owner
 
 The target navigation has no standalone **Path-selection details** or **Computational performance**
-page. Durable path, selection, validation, and OOF contracts move to Selection and validation.
-Solver behavior remains with the estimator that exposes the solver; search-domain and parallelism
-cost consequences remain with `PiPLSSearchCV` or Selection and validation; symptom-oriented
+page. Their durable material remains consolidated into the lean Reference, with Decision 0165
+assigning search/selection contracts to Path and selection and OOF-specific contracts to OOF
+diagnostics. Solver behavior remains with the estimator that exposes the solver; search-domain and
+parallelism cost consequences remain with `PiPLSSearchCV` or Path and selection; symptom-oriented
 performance advice belongs in Troubleshooting. General optimization recommendations that merely
 repeat workflow choices need not remain in Reference.
 
@@ -128,8 +125,8 @@ prose placement or hyperlink counts.
 
 Reference becomes a flat lookup surface centered on public objects and exact domain contracts rather
 than a second tutorial sequence. The estimator pages can become substantially shorter without
-losing behavior, while selection/validation and inspection retain enough manual explanation for
-Pi-PLS-specific semantics.
+losing behavior, while the path/selection, OOF-diagnostic, and inspection domains retain enough
+manual explanation for Pi-PLS-specific semantics under the refinement in Decision 0165.
 
 Synthetic generation remains explainable rather than collapsing into signatures alone. The general
 latent-role explanation and maintained figure stay with Datasets and generators, while the

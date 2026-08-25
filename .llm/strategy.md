@@ -49,8 +49,11 @@ component path, while component-count tolerances are post-search selection contr
 ties remain separate from substantive parsimony tolerances.
 
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
-`refit(selection=...)`. Same-search OOF evidence is selection-conditioned inspection rather than
-independent post-selection qualification or validation.
+`refit(selection=...)`. Decision 0165 refines the maintained workflow: component-path evidence and,
+when useful, the conditional predictor-rank profile complete ordinary selection before OOF
+diagnostics are inspected. Same-search OOF evidence is selection-conditioned inspection rather than
+independent post-selection qualification or validation, and using it to retune the model makes it
+additional selection evidence that requires an appropriate outer assessment for performance claims.
 
 ### Analysis
 
@@ -76,15 +79,17 @@ Decision 0147 is complete. Decision-registry consolidation, active `.llm` compac
 pruning, and validation-ownership cleanup are finished. Ordinary pytest is behavior-focused;
 complete examples and tutorial rendering are owned by their dedicated Make targets and CI jobs.
 
-Decision 0164 is complete. Patches 0164A--0164F replaced the overgrown Reference with the flat
-seven-page lookup surface, consolidated selection/validation contracts, slimmed both estimator
-pages, merged inspection concepts and API, retained the synthetic-generator structural explanation
-and latent-role figure, and finished the overview, datasets/generators, Troubleshooting, and
-cross-reference audit. No runtime, numerical, public-API, dataset, or generator behavior changed.
+Decision 0164 is complete. Patches 0164A--0164F replaced the overgrown Reference with a lean flat
+lookup surface, slimmed both estimator pages, merged inspection concepts and API, retained the
+synthetic-generator structural explanation and latent-role figure, and finished the overview,
+datasets/generators, Troubleshooting, and cross-reference audit. No runtime, numerical, public-API,
+dataset, or generator behavior changed.
 
-There is no active repository-wide cleanup. Future scientific, public-API, documentation, or
-maintenance changes require a bounded owner decision or task rather than extending Decision 0147 or
-Decision 0164.
+Decision 0165 is active. Patch 0165A establishes that path evidence selects the model while OOF
+diagnostics characterize the accepted selection. Patch 0165B aligns the tutorials, Patch 0165C
+splits Selection and validation into Path and selection plus OOF diagnostics, and Patch 0165D is the
+closing terminology and cross-reference audit. This sequence changes documentation methodology and
+ownership only.
 
 ## Deferred work
 

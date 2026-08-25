@@ -45,6 +45,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0154: full-domain predictor-rank selection and explicit EPV policy](0154-full-domain-predictor-rank-selection.md)
 - [0155: response-subspace selection policies](0155-response-subspace-selection-policies.md)
 - [0164: lean reference architecture](0164-lean-reference-architecture.md)
+- [0165: selection evidence and OOF diagnostic boundary](0165-selection-evidence-and-oof-diagnostic-boundary.md)
 
 ## Historical navigation
 

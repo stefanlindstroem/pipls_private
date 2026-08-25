@@ -65,7 +65,9 @@ selection. A successful refit attaches the exact immutable selection as `model.s
 search. Repeated validation predictions are averaged per observation and prediction counts are
 retained. Same-search OOF evidence is selection-conditioned inspection, not independent
 post-selection validation; independent assessment requires outer resampling or untouched external
-data.
+data. Decision 0165 makes the maintained workflow boundary explicit: component-path evidence and,
+when useful, the conditional predictor-rank profile complete selection before OOF diagnostics are
+inspected. OOF results do not ordinarily feed back into $h$ or $r_\pi$ tuning.
 
 ## Statistical reporting
 
@@ -136,21 +138,21 @@ packaging, and release validation. Paper-specific experiment grids, cached resul
 reproduction, and publication environments belong downstream and pin a released package version.
 
 The served site separates tutorials, programming reference, scientific background, and project
-validation. Decision 0164 authorizes a lean flat Reference target with Overview, `PiPLSRegression`,
-`PiPLSSearchCV`, Selection and validation, Model inspection, Datasets and generators, and
-Troubleshooting. Tutorials own worked workflows; estimator pages prioritize generated API lookup;
-domain pages own exact selection, validation, inspection, and data/generator semantics. The
-Datasets and generators reference retains the general latent-role explanation and maintained
-`docs/assets/figures/latent_geometry_generator.svg` figure, while the companion-manuscript
-synthetic-data page retains publication-specific generation and reproduction guidance.
+validation. Decision 0164 owns the lean flat Reference, tutorial ownership, early generated API
+lookup, and the retained synthetic-generator explanation and
+`docs/assets/figures/latent_geometry_generator.svg` figure. Decision 0165 refines only the
+search-domain part of that architecture: the final target has separate Path and selection and OOF
+diagnostics pages so that selection evidence and selection-conditioned diagnosis have distinct
+owners. The companion-manuscript synthetic-data page retains publication-specific generation and
+reproduction guidance.
 
-Patches 0164B--0164F complete that migration: selection/validation owns search evidence and
-scoring records, estimator pages prioritize generated API lookup, Model inspection is one flat page,
-and the overview, datasets/generators, and Troubleshooting pages are compact lookup surfaces. The
-synthetic-generator latent-role explanation and maintained figure remain served. Numbered decisions
-and `.llm` are maintainer records and are not served as user documentation. Semantic
-cross-references are maintained contextually; strict documentation builds own link resolution
-rather than pytest assertions about prose placement.
+Patches 0164B--0164F completed the first lean-reference migration. Patch 0165A now establishes the
+selection/OOF boundary; Patches 0165B--0165D will align tutorials, split the combined Reference page,
+and audit terminology and cross-references. Until those served-page patches land, the current site
+continues to expose the combined Selection and validation page. Numbered decisions and `.llm` are
+maintainer records and are not served as user documentation. Semantic cross-references are
+maintained contextually; strict documentation builds own link resolution rather than pytest
+assertions about prose placement.
 
 Python 3.10--3.14 is supported within the dependency ranges in `pyproject.toml`. Clean wheel and
 source-distribution installations are validated. `docs-dist` builds documentation from the
@@ -172,9 +174,10 @@ Do not add without a new owner decision:
 
 ## Maintenance state
 
-Decisions 0147 and 0164 are complete. The served Reference now follows the flat seven-page
-architecture with lean object/domain lookup pages and no active repository-wide documentation
-migration. The maintained registry contains only current decisions; completed records are summarized in
+Decisions 0147 and 0164 are complete. Decision 0165 is the active bounded documentation-methodology
+migration. Patch 0165A establishes the target; 0165B--0165D remain to align tutorials, split the
+combined selection/validation page, and close the terminology/cross-reference audit. The maintained
+registry contains only current decisions; completed records are summarized in
 `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
 inherited 0153/0154 retirement-map number collisions are frozen exceptions. `make decision-check`
 validates both current registries, local links, active decision references, retirement-map

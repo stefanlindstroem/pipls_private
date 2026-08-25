@@ -71,11 +71,13 @@ rather than current policy.
 The earlier companion-manuscript guide decision and the later manual selection-review decision are
 also historical implementation records. The served synthetic-data guide remains part of the user
 documentation, but its durable package-versus-publication boundary is owned by Decisions 0024,
-0119, and 0120. The exact tutorial diagram order, paired before/after component-path artifacts, and
-manual feedback arrow are presentation choices; exact selection handoff and the interpretation of
-same-search OOF evidence are owned by Decision 0143.
+0119, and 0120. The exact tutorial diagram order and paired before/after component-path artifacts are presentation
+choices. The former manual feedback arrow from OOF diagnostics to ordinary model tuning is
+historical; Decision 0165 now owns the documented selection-versus-diagnosis boundary, while exact
+selection handoff and same-search OOF report semantics remain owned by Decision 0143.
 
 Current canonical records: [0164](0164-lean-reference-architecture.md),
+[0165](0165-selection-evidence-and-oof-diagnostic-boundary.md),
 [0143](0143-model-selection-provenance-and-oof-reporting.md),
 [0155](0155-response-subspace-selection-policies.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
