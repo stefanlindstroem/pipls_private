@@ -89,7 +89,8 @@ representative interpretation of standard PLS-family plots and Π-PLS-specific p
 - [Overview](api/index.md): public objects and canonical reference destinations.
 - [`PiPLSRegression`](api/regression.md): fixed-estimator parameters and fitted results.
 - [`PiPLSSearchCV`](api/path.md): search-estimator parameters and post-fit lifecycle.
-- [Selection and validation](selection_validation.md): search bounds, rank policies, scoring, CV, OOF, and selection contracts.
+- [Path and selection](path_selection.md): search bounds, rank policies, scoring, CV, path evidence, and selection rules.
+- [OOF diagnostics](oof_diagnostics.md): stored-split reuse, ordered OOF predictions, coverage, and selection-conditioned interpretation.
 - [Model inspection](model_inspection.md): numerical fitted-model quantities and interpretation.
 - [Datasets and generators](api/datasets.md): packaged data, synthetic generators, and truth records.
 - [Troubleshooting](troubleshooting.md): warnings, validation failures, lifecycle errors, and expensive searches.

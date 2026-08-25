@@ -543,5 +543,5 @@ for the exact distribution and reproducibility boundary, and the
 [dataset and generator guide](datasets.md) for the broader package distinction.
 
 The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#retrieve-selection-evidence)
-and [Selection and validation](selection_validation.md) define the package’s general selection and
-validation contracts.
+and [Path and selection](path_selection.md) define the package’s general path-construction,
+validation, and selection contracts.

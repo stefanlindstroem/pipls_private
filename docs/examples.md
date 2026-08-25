@@ -32,7 +32,7 @@ datasets and their provenance, see the [dataset guide](datasets.md).
    $r_\pi$ with the EPV policy, then choose the component
    count separately and interpret the retained wavelength directions on
    [Sugarcane](datasets.md#sugarcane-spectral-integration). See the
-   [EPV policy](selection_validation.md#epv-policy) and the distinct roles of
+   [EPV policy](path_selection.md#epv-policy) and the distinct roles of
    [$r_\pi$ and $h$](theory.md#interpretation-of-the-ranks).
 
 6. **`06_tobacco_real_data.py` — regularize spectral rank from validation evidence.** Optimize
@@ -40,7 +40,7 @@ datasets and their provenance, see the [dataset guide](datasets.md).
    its CV performance remains close to the conditional optimum. Apply component-count parsimony in
    a separate tolerance stage, then carry the selection through out-of-fold review and refitting on
    [Tobacco](datasets.md#tobacco-spectral-integration). See
-   [search-owned selection rules](selection_validation.md#search-owned-selection-rules).
+   [search-owned selection rules](path_selection.md#search-owned-selection-rules).
 
 ## Compare response-subspace policies {#compare-response-subspace-policies}
 
@@ -82,4 +82,5 @@ than package tests.
 The component paths and same-search out-of-fold reports used here are model-development evidence,
 not independent post-selection validation. Applications with grouped, temporal, or otherwise
 structured data should supply an appropriate splitter. See
-[Selection and validation](selection_validation.md) for the validation and selection contracts.
+[Path and selection](path_selection.md) for search and selection contracts and
+[OOF diagnostics](oof_diagnostics.md) for selection-conditioned OOF reporting.

@@ -16,8 +16,9 @@ state belong to the supplied `PiPLSRegression` estimator or terminal pipeline st
 only `n_components` and `predictor_rank` on cloned candidates. With `estimator=None`, ordinary
 `PiPLSRegression` defaults are used.
 
-Exact search-domain, predictor-rank-policy, scoring, validation, selection, OOF, provenance, and
-computational contracts are defined in [Selection and validation](../selection_validation.md).
+Exact search-domain, predictor-rank-policy, scoring, validation, selection, provenance, and
+computational contracts are defined in [Path and selection](../path_selection.md). Exact stored-split
+reuse and OOF-reporting contracts are defined in [OOF diagnostics](../oof_diagnostics.md).
 Worked model-selection procedures belong to the [tutorials](../tutorials/synthetic.md) and
 [examples](../examples.md).
 

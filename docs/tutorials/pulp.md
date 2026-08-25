@@ -174,7 +174,7 @@ coincide; both are rank 9 in this analysis.
 For these 46 observations and 14 predictors, the default search is exhaustive over the complete
 fold-feasible predictor-rank domain, from 3 through 14 at the selected $h=3$. Alternative ways to
 restrict or fix predictor rank are advanced configuration choices and are documented separately in
-[Predictor-rank policies](../selection_validation.md#predictor-rank-policies).
+[Predictor-rank policies](../path_selection.md#predictor-rank-policies).
 
 The selected path and optional conditional rank profile are the model-selection evidence used in
 this tutorial. If they make the chosen component count unsatisfactory, revise
@@ -210,7 +210,7 @@ Convert those predictions to an immutable diagnostic result before refitting:
     estimate of post-selection performance. If OOF diagnostics are instead used to compare and
     retune alternative selections, they become additional model-selection evidence. Use nested
     cross-validation or an untouched external test set for independent assessment after such
-    adaptivity. See [ordered out-of-fold predictions](../selection_validation.md#ordered-out-of-fold-predictions).
+    adaptivity. See [ordered out-of-fold predictions](../oof_diagnostics.md#ordered-out-of-fold-predictions).
 
 
 ### Observed versus predicted
@@ -470,8 +470,10 @@ strict documentation-build and source-distribution checks.
 
 - Use [Model inspection](../model_inspection.md) for inspection quantities, exact API contracts,
   and interpretation boundaries.
-- Use [Selection and validation](../selection_validation.md) for nondefault bounds, policies, pipelines,
-  scorer behavior, grouped or temporal splitters, OOF coverage, and automatic refitting.
+- Use [Path and selection](../path_selection.md) for nondefault bounds, policies, pipelines, scorer
+  behavior, grouped or temporal splitters, selection rules, and refitting contracts.
+- Use [OOF diagnostics](../oof_diagnostics.md) for stored-split reuse, OOF coverage, repeated-CV
+  averaging, and selection-conditioned interpretation.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
 - Use the [`PiPLSSearchCV` reference](../api/path.md#pipls.PiPLSSearchCV) for the search-estimator
   signature; [Model inspection](../model_inspection.md) embeds the inspection API beside each quantity.

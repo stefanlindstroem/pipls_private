@@ -152,10 +152,10 @@ to verify fitted-model provenance. Rule-based and component-count refitting rema
 compact workflows that do not need to retain an earlier selection.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
-predictor-rank plots. The [`PiPLSSearchCV` reference](docs/api/path.md) and
-[Selection and validation](docs/selection_validation.md) defines alternative rank policies,
-splitters, selection rules, OOF semantics, and the main computational consequences of candidate
-coverage and validation splits.
+predictor-rank plots. The [`PiPLSSearchCV` reference](docs/api/path.md), [Path and selection](docs/path_selection.md),
+and [OOF diagnostics](docs/oof_diagnostics.md) define alternative rank policies, splitters,
+selection rules, selection-conditioned OOF semantics, and the main computational consequences of
+candidate coverage and validation splits.
 
 When the complete protocol is known in advance, search and final fitting can remain compact. The
 same separate 10% relative tolerances used in the Tobacco analysis can be written as one automatic
@@ -241,7 +241,8 @@ Install the `examples` extra before running them.
   - [Tutorial 2: synthetic path inspection](docs/tutorials/synthetic.md)
   - [Tutorial 3: complete Pulp analysis](docs/tutorials/pulp.md)
   - [API overview](docs/api/index.md)
-  - [Selection and validation](docs/selection_validation.md)
+  - [Path and selection](docs/path_selection.md)
+  - [OOF diagnostics](docs/oof_diagnostics.md)
   - [Troubleshooting](docs/troubleshooting.md)
   - [Model inspection](docs/model_inspection.md)
   - [Reference datasets](docs/datasets.md)

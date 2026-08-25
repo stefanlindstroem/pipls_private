@@ -13,7 +13,7 @@ configuration is cloned into every candidate. With `estimator=None`, the ordinar
 The search does not compare response-subspace policies automatically. Use
 `response_subspace="cross_covariance"` for the companion-publication formulation; if you need the
 `"least_squares"` software extension, set it on the estimator template and keep it fixed across the
-search. See [Pipelines and fold-local preprocessing](selection_validation.md#pipelines-and-fold-local-preprocessing).
+search. See [Pipelines and fold-local preprocessing](path_selection.md#pipelines-and-fold-local-preprocessing).
 
 ## A component count or predictor rank was not evaluated
 
@@ -21,7 +21,7 @@ Inspect `search.component_path_.n_components` and, for one component count,
 `search.predictor_rank_profile(h).predictor_rank`. Candidate availability depends on fold-local
 sample counts and numerical ranks, configured bounds, and the predictor-rank policy. An explicit
 component request must have at least one admissible predictor rank. See
-[Search bounds](selection_validation.md#search-bounds).
+[Search bounds](path_selection.md#search-bounds).
 
 ## The path search is too slow or uses too much memory
 
@@ -32,7 +32,7 @@ materialized validation splits. Inspect `search.cv_results_["n_components"].size
 Restricting candidates or repetitions changes the statistical evidence; randomized SVD changes the
 numerical route. `n_jobs` changes execution only, but can increase memory use. Reuse one OOF report
 instead of recomputing it for each downstream output. See
-[Computational consequences](selection_validation.md#computational-consequences).
+[Computational consequences](path_selection.md#computational-consequences).
 
 ## The path search has no admissible candidate
 
@@ -40,7 +40,7 @@ Reduce the requested component count or predictor-rank range, provide more obser
 redundant predictors, or review an explicit `max_predictor_rank`. With
 `predictor_rank_values="epv"`, also review `samples_per_predictor_rank`. Specialized splitters can
 reduce the smallest training-fold size or verified fold rank. See
-[Cross-validation protocols and metadata](selection_validation.md#cross-validation-protocols-and-metadata).
+[Cross-validation protocols and metadata](path_selection.md#cross-validation-protocols-and-metadata).
 
 ## `predict()` is unavailable after path selection
 
@@ -58,13 +58,13 @@ conditional optimum, and a custom scorer need not have the same optimum as CV-MS
 
 Use `search.predictor_rank_profile(h)` for rank-level evidence and pass the same selection to
 `oof_report()` and `refit()` when both operations must describe one exact row. See
-[Scoring and conditioned-path selection](selection_validation.md#scoring-and-conditioned-path-selection).
+[Scoring and conditioned-path selection](path_selection.md#scoring-and-conditioned-path-selection).
 
 ## A grouped splitter reports missing metadata
 
 Pass `groups=` to `PiPLSSearchCV.fit(X, y, groups=...)`. Do not pass split metadata to
 `PiPLSRegression.fit()`, which performs no cross-validation. See
-[Cross-validation protocols and metadata](selection_validation.md#cross-validation-protocols-and-metadata).
+[Cross-validation protocols and metadata](path_selection.md#cross-validation-protocols-and-metadata).
 
 ## Fitting rejects the data or leaves the estimator unfitted
 

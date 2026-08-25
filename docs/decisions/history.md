@@ -162,8 +162,9 @@ Current canonical records: [0007](0007-predictor-rank-search-policies.md),
 [0083](0083-data-first-rendering-policy.md),
 [0143](0143-model-selection-provenance-and-oof-reporting.md), and
 [0147](0147-decision-lifecycle-and-maintainer-context.md). The served
-[Selection and validation](../selection_validation.md) page records the durable search, validation,
-and computational-accounting contracts; symptom-oriented performance guidance is in
+[Path and selection](../path_selection.md) page records the durable search, validation, selection,
+and computational-accounting contracts; [OOF diagnostics](../oof_diagnostics.md) records the
+selection-conditioned OOF contracts; symptom-oriented performance guidance is in
 [Troubleshooting](../troubleshooting.md).
 
 ## Retired experiments and one-off cleanups

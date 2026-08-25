@@ -22,7 +22,8 @@ nav:
       - Overview: api/index.md
       - PiPLSRegression: api/regression.md
       - PiPLSSearchCV: api/path.md
-      - Selection and validation: selection_validation.md
+      - Path and selection: path_selection.md
+      - OOF diagnostics: oof_diagnostics.md
       - Model inspection: model_inspection.md
       - Datasets and generators: api/datasets.md
       - Troubleshooting: troubleshooting.md

@@ -17,8 +17,10 @@ retained predictor-subspace dimension $r_\pi$. Their separate roles are defined 
 
 ## Results and supporting APIs
 
-- [Selection and validation](../selection_validation.md) defines component paths, predictor-rank
-  evidence, selections, OOF reports, scoring, CV metadata, and exact selection rules.
+- [Path and selection](../path_selection.md) defines component paths, predictor-rank evidence,
+  scoring, CV metadata, selections, and exact selection/refit rules.
+- [OOF diagnostics](../oof_diagnostics.md) defines stored-split reuse, ordered OOF predictions,
+  repeated-validation coverage, and the `PiPLSOOFReport` contract.
 - [Model inspection](../model_inspection.md) defines fitted latent quantities, Π-PLS display
   factors, biplot coordinates, and prediction and observation diagnostics.
 - [Datasets and generators](datasets.md) documents packaged datasets, immutable data/truth records,

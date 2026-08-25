@@ -146,11 +146,10 @@ diagnostics pages so that selection evidence and selection-conditioned diagnosis
 owners. The companion-manuscript synthetic-data page retains publication-specific generation and
 reproduction guidance.
 
-Patches 0164B--0164F completed the first lean-reference migration. Patches 0165A--0165B establish
-the selection/OOF boundary and align the maintained tutorials with it; Patches 0165C--0165D remain
-to split the combined Reference page and audit terminology and cross-references. Until 0165C lands,
-the current site continues to expose the combined Selection and validation page. Numbered decisions and `.llm` are
-maintainer records and are not served as user documentation. Semantic cross-references are
+Patches 0164B--0164F completed the first lean-reference migration. Patches 0165A--0165C establish
+the selection/OOF boundary, align the maintained tutorials, and split the Reference into Path and
+selection plus OOF diagnostics. Patch 0165D remains to audit terminology and cross-references.
+Numbered decisions and `.llm` are maintainer records and are not served as user documentation. Semantic cross-references are
 maintained contextually; strict documentation builds own link resolution rather than pytest
 assertions about prose placement.
 
@@ -175,8 +174,8 @@ Do not add without a new owner decision:
 ## Maintenance state
 
 Decisions 0147 and 0164 are complete. Decision 0165 is the active bounded documentation-methodology
-migration. Patches 0165A--0165B establish the target and align the tutorials; 0165C--0165D remain to
-split the combined selection/validation page and close the terminology/cross-reference audit. The maintained
+migration. Patches 0165A--0165C establish the target, align the tutorials, and split the Reference;
+0165D remains to close the terminology/cross-reference audit. The maintained
 registry contains only current decisions; completed records are summarized in
 `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
 inherited 0153/0154 retirement-map number collisions are frozen exceptions. `make decision-check`

@@ -169,7 +169,7 @@ matches the two shared and two predictor-specific directions in the predictor bl
 agreement is informative but not a general selection guarantee.
 
 Advanced analyses can control predictor rank through the search configuration. See
-[Selection and validation](../selection_validation.md#predictor-rank-policies) for the available policies and tolerances.
+[Path and selection](../path_selection.md#predictor-rank-policies) for the available policies and tolerances.
 
 The selected path and optional rank profile are the model-selection evidence in this workflow. If
 they make the chosen component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new
@@ -251,7 +251,7 @@ For exact signatures and advanced behavior, see:
 
 - [`PiPLSSearchCV`](../api/path.md#pipls.PiPLSSearchCV);
 - [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression);
-- [Selection and validation](../selection_validation.md).
+- [Path and selection](../path_selection.md).
 
 ## Reproduce this tutorial
 

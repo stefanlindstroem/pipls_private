@@ -2,9 +2,10 @@
 
 ## Status
 
-Accepted. Patch 0165A establishes the methodological and documentation boundary, and Patch 0165B
-aligns the maintained tutorials with it. Patches 0165C--0165D split the combined Reference page and
-complete the terminology and cross-reference audit. This decision refines Decisions 0143 and 0164
+Accepted. Patch 0165A establishes the methodological and documentation boundary, Patch 0165B
+aligns the maintained tutorials with it, and Patch 0165C splits the combined Reference page into
+Path and selection plus OOF diagnostics. Patch 0165D remains the closing terminology and
+cross-reference audit. This decision refines Decisions 0143 and 0164
 without changing their
 public-API, numerical, strict-build, or general documentation-ownership contracts.
 

@@ -44,7 +44,7 @@ the distinction between these directions and reconstruction loadings.
 A direct fixed fit emits `PredictorRankSupportWarning` when $n/r_\pi<3$. The warning is diagnostic:
 it does not alter the requested rank, while algebraically or numerically infeasible ranks remain
 errors. Search-time predictor-rank support policies are defined under
-[Predictor-rank policies](../selection_validation.md#predictor-rank-policies).
+[Predictor-rank policies](../path_selection.md#predictor-rank-policies).
 
 ::: pipls.PredictorRankSupportWarning
     options:

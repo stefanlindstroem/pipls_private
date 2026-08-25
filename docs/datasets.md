@@ -305,7 +305,7 @@ and response tables by `Sample`, removes three rows whose total-sugar response i
 applies no imputation or spectral preprocessing. `load_sugarcane()` returns the immutable labeled
 package dataset or its read-only matrices. `examples/05_sugarcane_real_data.py` obtains the matrices,
 wavelength labels, and response names from that result. The example deliberately fixes predictor
-rank with the [EPV policy](selection_validation.md#epv-policy) using
+rank with the [EPV policy](path_selection.md#epv-policy) using
 `samples_per_predictor_rank=5.0`, providing additional regularization of the spectral predictor
 subspace before the component count is chosen separately. It then reviews selection-conditioned
 OOF evidence, refits the same selection, and writes five wavelength-aware PDF figures from immutable
@@ -343,6 +343,6 @@ optimizes predictor rank and uses a 10% relative tolerance to retain a smaller s
 when its CV performance remains close to the conditional optimum. A separate 10% relative tolerance
 then selects component count. The workflow carries that selection through conditional rank evidence,
 selection-conditioned OOF review, and final refitting, and writes six final PDFs. See
-[search-owned selection rules](selection_validation.md#search-owned-selection-rules) for the two-stage
+[search-owned selection rules](path_selection.md#search-owned-selection-rules) for the two-stage
 selection semantics. Prediction diagnostics and coefficients are paginated in source response order.
 The separate ordinary-PLS comparison remains in example 03.
