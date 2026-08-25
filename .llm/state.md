@@ -63,7 +63,7 @@ selection. A successful refit attaches the exact immutable selection as `model.s
 
 `oof_report()` accepts an existing compatible selection and reuses every split materialized by the
 search. Repeated validation predictions are averaged per observation and prediction counts are
-retained. Same-search OOF evidence is selection-conditioned inspection, not independent
+retained. Same-search OOF diagnostics are selection-conditioned inspection, not independent
 post-selection validation; independent assessment requires outer resampling or untouched external
 data. Decision 0165 makes the maintained workflow boundary explicit: component-path evidence and,
 when useful, the conditional predictor-rank profile complete selection before OOF diagnostics are
@@ -146,9 +146,9 @@ diagnostics pages so that selection evidence and selection-conditioned diagnosis
 owners. The companion-manuscript synthetic-data page retains publication-specific generation and
 reproduction guidance.
 
-Patches 0164B--0164F completed the first lean-reference migration. Patches 0165A--0165C establish
-the selection/OOF boundary, align the maintained tutorials, and split the Reference into Path and
-selection plus OOF diagnostics. Patch 0165D remains to audit terminology and cross-references.
+Patches 0164B--0164F completed the first lean-reference migration. Patches 0165A--0165D establish
+the selection/OOF boundary, align the maintained tutorials, split the Reference into Path and
+selection plus OOF diagnostics, and complete the terminology and cross-reference audit.
 Numbered decisions and `.llm` are maintainer records and are not served as user documentation. Semantic cross-references are
 maintained contextually; strict documentation builds own link resolution rather than pytest
 assertions about prose placement.

@@ -21,8 +21,9 @@ based on the data and the validation design.
 
 For routine model selection, `PiPLSSearchCV` evaluates the component path by cross-validation and
 resolves one predictor rank conditionally for each count. Evidence-retaining workflows inspect the
-path, create one immutable selection, optionally inspect its conditional rank and OOF evidence, and
-pass the same object to final refitting. Compact workflows may instead apply a named rule directly
+path, create one immutable selection, optionally inspect its conditional rank evidence, diagnose
+the accepted selection with OOF predictions when useful, and pass the same object to final
+refitting. Compact workflows may instead apply a named rule directly
 through `search.refit(X, Y, rule=...)`. The fitted model records the exact row as `selection_`, while
 the search retains the complete path and split evidence.
 
@@ -179,9 +180,9 @@ Y_pred = model.predict(X_test)
 ```
 
 Retain the fitted search in a variable when component-path, predictor-rank-profile, candidate, or
-OOF evidence matters. In that route, inspect the component path first, create one selection, and
-review its conditional evidence before final fitting so every operation refers to the same stored
-row:
+OOF diagnostic provenance matters. In that route, inspect the component path first, create one
+selection, and review its conditional evidence before final fitting so every operation refers to
+the same stored row:
 
 ```python
 search = PiPLSSearchCV(search_method="adaptive").fit(X_train, Y_train)

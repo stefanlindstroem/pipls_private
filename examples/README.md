@@ -7,7 +7,7 @@ each component count, so most workflows can treat `n_components` as the main com
 A clear elbow or plateau can motivate a component count; when no clear elbow is present, explicit
 relative tolerances provide a transparent parsimony policy. Example 06 demonstrates separate 10%
 predictor-rank and component-count tolerances. See the
-[component-path discussion](../docs/selection_validation.md#search-owned-selection-rules) and the
+[component-path discussion](../docs/path_selection.md#search-owned-selection-rules) and the
 [served example catalogue](../docs/examples.md). For the
 mathematical construction, see `docs/theory.md`.
 
@@ -59,20 +59,21 @@ seed makes these analyses reproducible while preventing row order from defining 
   `python examples/03_pls_path_comparison.py --dataset synthetic_stress`.
 
 Grouped and temporal validation require application-specific sampling semantics and remain in
-`docs/selection_validation.md`.
+`docs/path_selection.md#cross-validation-protocols-and-metadata`.
 
 ## Complete Pi-PLS reference workflows
 
 - `04_pulp_real_data.py`: the direct canonical tutorial analysis. It evaluates the repeated-CV path,
   first inspects the unselected component path, creates the declared three-component selection,
-  inspects its selected path, rank evidence, and selection-conditioned OOF predictions, refits the
-  exact same selection, orients the displayed factors so the tensile-index response is positive,
+  inspects its selected path and rank evidence, diagnoses the accepted selection with
+  selection-conditioned OOF predictions, refits the exact same selection, orients the displayed
+  factors so the tensile-index response is positive,
   and writes ten final PDF figures directly from in-memory results.
 - `05_sugarcane_real_data.py`: the direct spectral reference workflow. It fixes predictor rank with
   the EPV policy at `samples_per_predictor_rank=5.0` to regularize the retained wavelength subspace,
   keeps component count as a separate manual choice, computes an OOF report, refits that selection,
   and writes five wavelength-aware final PDF figures. See the
-  [EPV policy](../docs/selection_validation.md#epv-policy).
+  [EPV policy](../docs/path_selection.md#epv-policy).
 - `06_tobacco_real_data.py`: adaptive Π-PLS predictor-rank scanning with explicit full predictor
   SVD and two separately named 10% relative tolerances. The search constructor applies the
   predictor-rank tolerance independently at each component count; `search.select()` then applies the
@@ -80,12 +81,13 @@ Grouped and temporal validation require application-specific sampling semantics 
   evidence, the component-path reference minimum, and a selection-conditioned OOF report before it
   refits the same selection and renders both thresholds, decreasing-wavenumber spectral displays,
   deterministic response pagination, and raw observation diagnostics through caller-owned PDFs.
-  See the [selection rules](../docs/selection_validation.md#search-owned-selection-rules).
+  See the [selection rules](../docs/path_selection.md#search-owned-selection-rules).
 
 These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
 inspect the component path, create one immutable selection, inspect its selected path and optional
-OOF evidence, refit the same row on all observations, calculate immutable fitted-model inspection
-results, and only then compose figures. Sugarcane fixes predictor rank through EPV before the manual
+conditional rank evidence, diagnose the accepted row with OOF predictions when useful, refit the
+same row on all observations, calculate immutable fitted-model inspection results, and only then
+compose figures. Sugarcane fixes predictor rank through EPV before the manual
 component-count choice; Tobacco instead uses two explicit 10% relative-tolerance decisions.
 Sugarcane writes `component_path.pdf`, `pipls_factors.pdf`, `latent_structure.pdf`,
 `coefficients.pdf`, and `prediction_diagnostics.pdf`. Tobacco writes those five figures plus
@@ -139,15 +141,16 @@ workflow with an explicitly regularized predictor subspace:
    fixed predictor rank.
 3. `selection = search.select(n_components=CHOSEN_N_COMPONENTS)` records that choice as one complete
    immutable row without fitting.
-4. `oof_report(...)` and `prediction_diagnostics()` provide selection-conditioned evidence for
-   reviewing that row, with response-wise OOF $R^2$ as the visible scalar prediction diagnostic.
+4. `oof_report(...)` and `prediction_diagnostics()` diagnose that accepted row with
+   selection-conditioned predictions, using response-wise OOF $R^2$ as the visible scalar
+   prediction diagnostic.
 5. `search.refit(X, Y, selection=selection)` fits the accepted component-count and predictor-rank
    pair on all observations and records it as `model.selection_`.
 6. `pipls_display_factors()` and `latent_structure()` return immutable fitted-model results.
 7. The script renders the component path, latent structure, prediction diagnostics, factors, and
    coefficients with Matplotlib and saves the five final figures itself.
 
-See the [EPV policy](../docs/selection_validation.md#epv-policy) and
+See the [EPV policy](../docs/path_selection.md#epv-policy) and
 [Interpretation of $r_\pi$ and $h$](../docs/theory.md#interpretation-of-the-ranks) for why these are
 distinct complexity controls.
 

@@ -307,10 +307,10 @@ package dataset or its read-only matrices. `examples/05_sugarcane_real_data.py` 
 wavelength labels, and response names from that result. The example deliberately fixes predictor
 rank with the [EPV policy](path_selection.md#epv-policy) using
 `samples_per_predictor_rank=5.0`, providing additional regularization of the spectral predictor
-subspace before the component count is chosen separately. It then reviews selection-conditioned
-OOF evidence, refits the same selection, and writes five wavelength-aware PDF figures from immutable
-public results. The interpretation of the two complexity controls is discussed under
-[$r_\pi$ and $h$](theory.md#interpretation-of-the-ranks). The compact spectral-axis description in
+subspace before the component count is chosen separately. It then diagnoses the accepted selection
+with selection-conditioned OOF predictions, refits that same selection, and writes five
+wavelength-aware PDF figures from immutable public results. The interpretation of the two complexity
+controls is discussed under [$r_\pi$ and $h$](theory.md#interpretation-of-the-ranks). The compact spectral-axis description in
 `metadata.json` avoids repeating 1,721 equivalent per-wavelength descriptions while still defining
 every predictor column exactly.
 

@@ -2,9 +2,9 @@
 
 ## Status
 
-Accepted. Patch 0165A establishes the methodological and documentation boundary, Patch 0165B
-aligns the maintained tutorials with it, and Patch 0165C splits the combined Reference page into
-Path and selection plus OOF diagnostics. Patch 0165D remains the closing terminology and
+Accepted and complete. Patch 0165A establishes the methodological and documentation boundary,
+Patch 0165B aligns the maintained tutorials with it, Patch 0165C splits the combined Reference page
+into Path and selection plus OOF diagnostics, and Patch 0165D completes the terminology and
 cross-reference audit. This decision refines Decisions 0143 and 0164
 without changing their
 public-API, numerical, strict-build, or general documentation-ownership contracts.
@@ -139,8 +139,8 @@ selection/diagnostic distinction.
 2. **0165B** -- align the tutorials with path/rank-profile selection followed by optional OOF
    diagnosis;
 3. **0165C** -- replace Selection and validation with Path and selection plus OOF diagnostics;
-4. **0165D** -- audit current served documentation, decisions, and maintainer context for stale
-   terminology and cross-references, then close the migration.
+4. **0165D** -- audit current served documentation, decisions, examples, and maintainer context
+   for stale terminology and cross-references, then close the migration.
 
 ## Consequences
 

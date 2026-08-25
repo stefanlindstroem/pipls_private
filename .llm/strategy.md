@@ -51,9 +51,9 @@ ties remain separate from substantive parsimony tolerances.
 Decision 0143 owns exact selection handoff across `oof_report(selection=...)` and
 `refit(selection=...)`. Decision 0165 refines the maintained workflow: component-path evidence and,
 when useful, the conditional predictor-rank profile complete ordinary selection before OOF
-diagnostics are inspected. Same-search OOF evidence is selection-conditioned inspection rather than
-independent post-selection qualification or validation, and using it to retune the model makes it
-additional selection evidence that requires an appropriate outer assessment for performance claims.
+diagnostics are inspected. Same-search OOF diagnostics are selection-conditioned inspection rather than
+independent post-selection qualification or validation, and using them to retune the model makes
+them additional selection evidence that requires an appropriate outer assessment for performance claims.
 
 ### Analysis
 
@@ -85,11 +85,11 @@ synthetic-generator structural explanation and latent-role figure, and finished 
 datasets/generators, Troubleshooting, and cross-reference audit. No runtime, numerical, public-API,
 dataset, or generator behavior changed.
 
-Decision 0165 is active. Patches 0165A--0165C establish that path evidence selects the model while
-OOF diagnostics characterize the accepted selection, align all three maintained tutorials with that
-workflow, and split the Reference into Path and selection plus OOF diagnostics. Patch 0165D is the
-closing terminology and cross-reference audit. This sequence
-changes documentation methodology and ownership only.
+Decision 0165 is complete. Patches 0165A--0165D establish that path evidence selects the model
+while OOF diagnostics characterize the accepted selection, align all three maintained tutorials
+with that workflow, split the Reference into Path and selection plus OOF diagnostics, and complete
+the terminology and cross-reference audit. This sequence changes documentation methodology and
+ownership only.
 
 ## Deferred work
 
