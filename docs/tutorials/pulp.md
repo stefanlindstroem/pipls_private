@@ -202,16 +202,6 @@ Convert those predictions to an immutable diagnostic result before refitting:
 --8<-- "examples/04_pulp_real_data.py:pulp-oof-inspection-results"
 ```
 
-!!! important "Validation scope"
-    These are **selection-conditioned OOF predictions**: the selected model is refitted on each
-    stored training fold, but the same development data and search protocol were already used to
-    choose the fixed selection. In this tutorial, the report diagnoses that accepted selection; it
-    is not part of the ordinary path/rank-profile selection procedure and is not an independent
-    estimate of post-selection performance. If OOF diagnostics are instead used to compare and
-    retune alternative selections, they become additional model-selection evidence. Use nested
-    cross-validation or an untouched external test set for independent assessment after such
-    adaptivity. See [ordered out-of-fold predictions](../oof_diagnostics.md#ordered-out-of-fold-predictions).
-
 
 ### Observed versus predicted
 
@@ -255,12 +245,6 @@ $R^2$ values.
 
 See [Response-wise coefficient of determination](../model_inspection.md#response-r2).
 
-These diagnostics can expose response-specific or aggregate weaknesses in the accepted selection.
-In the documented workflow they do not send the analysis back to `CHOSEN_N_COMPONENTS`. A
-substantively unacceptable result instead calls for reconsidering the modeling assumptions, search
-design, candidate domain, preprocessing, or validation strategy. If the OOF diagnostics are used to
-choose among alternative selections, use an appropriate outer assessment for subsequent performance
-claims.
 
 ## Refit the accepted selection
 
@@ -391,12 +375,6 @@ Compute prediction diagnostics from the fitted values while preserving that prov
 ```python
 --8<-- "examples/04_pulp_real_data.py:pulp-final-fit-diagnostics"
 ```
-
-!!! important "Training-fit scope"
-    These figures describe the model fitted to the same 46 observations shown in the plots. They
-    are **not** estimates of out-of-sample predictive performance. Use the selection-conditioned
-    OOF section for same-search diagnostic evidence, and use nested cross-validation or an external
-    test set when independent post-selection performance is required.
 
 ### Standardized observed versus fitted responses
 
