@@ -14,11 +14,11 @@ need to tune it as a second parameter. Advanced users can inspect or constrain $
 question or available sample support makes that useful.
 
 The workflow is to load the [Pulp data](../datasets.md#pulp-real-data-integration), fit the search,
-inspect the component path, choose a component
-count and create one selection, inspect the selected path and OOF predictions, optionally inspect the
-conditional predictor-rank profile, refit the same selection, inspect the fitted model, and render
-the reports. If the selected evidence is unsatisfactory, return to the selection step before
-refitting.
+inspect the component path, choose a component count and create one selection, inspect the selected
+path and optionally the conditional predictor-rank profile, accept that selection, inspect its
+selection-conditioned OOF diagnostics, refit the same selection, inspect the fitted model, and
+render the reports. If the path or conditional rank evidence is unsatisfactory, return to the
+selection step before proceeding to OOF diagnosis or refitting.
 
 ```mermaid
 flowchart TD
@@ -26,12 +26,14 @@ flowchart TD
     search["Fit search"]
     path["Inspect component path"]
     select["Choose component count and create selection"]
-    review["Inspect selected path and OOF predictions; optionally inspect rank profile"]
+    review["Inspect selected path; optionally inspect rank profile"]
+    accept["Accept selection"]
+    oof["Inspect selection-conditioned OOF diagnostics"]
     refit["Refit the same selection"]
     analyze["Inspect the fitted model"]
     render["Render reports"]
 
-    load --> search --> path --> select --> review --> refit --> analyze --> render
+    load --> search --> path --> select --> review --> accept --> oof --> refit --> analyze --> render
     review -. "revise" .-> select
 ```
 
@@ -174,6 +176,11 @@ fold-feasible predictor-rank domain, from 3 through 14 at the selected $h=3$. Al
 restrict or fix predictor rank are advanced configuration choices and are documented separately in
 [Predictor-rank policies](../selection_validation.md#predictor-rank-policies).
 
+The selected path and optional conditional rank profile are the model-selection evidence used in
+this tutorial. If they make the chosen component count unsatisfactory, revise
+`CHOSEN_N_COMPONENTS` and create a new selection here. Once the selection is accepted, keep it
+fixed through OOF diagnosis and final refitting.
+
 ## Inspect selection-conditioned OOF behavior
 
 The OOF report consumes the exact selection already inspected above rather than resolving the
@@ -197,10 +204,13 @@ Convert those predictions to an immutable diagnostic result before refitting:
 
 !!! important "Validation scope"
     These are **selection-conditioned OOF predictions**: the selected model is refitted on each
-    stored training fold, but the same data were already used for model selection. The report is
-    therefore part of the model-selection evidence, not an independent estimate of post-selection
-    performance. Use nested cross-validation or an external test set for independent evaluation.
-    See [ordered out-of-fold predictions](../selection_validation.md#ordered-out-of-fold-predictions).
+    stored training fold, but the same development data and search protocol were already used to
+    choose the fixed selection. In this tutorial, the report diagnoses that accepted selection; it
+    is not part of the ordinary path/rank-profile selection procedure and is not an independent
+    estimate of post-selection performance. If OOF diagnostics are instead used to compare and
+    retune alternative selections, they become additional model-selection evidence. Use nested
+    cross-validation or an untouched external test set for independent assessment after such
+    adaptivity. See [ordered out-of-fold predictions](../selection_validation.md#ordered-out-of-fold-predictions).
 
 
 ### Observed versus predicted
@@ -245,13 +255,17 @@ $R^2$ values.
 
 See [Response-wise coefficient of determination](../model_inspection.md#response-r2).
 
-If the selected path, conditional rank profile, or OOF behavior is unsatisfactory, return to
-`CHOSEN_N_COMPONENTS`, create another selection, and inspect the resulting evidence.
+These diagnostics can expose response-specific or aggregate weaknesses in the accepted selection.
+In the documented workflow they do not send the analysis back to `CHOSEN_N_COMPONENTS`. A
+substantively unacceptable result instead calls for reconsidering the modeling assumptions, search
+design, candidate domain, preprocessing, or validation strategy. If the OOF diagnostics are used to
+choose among alternative selections, use an appropriate outer assessment for subsequent performance
+claims.
 
 ## Refit the accepted selection
 
-After the selection evidence has been examined, fit the exact same selection on all 46 development
-observations:
+After the selection has been accepted and its optional OOF diagnostics inspected, fit the exact
+same selection on all 46 development observations:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:fit-pulp-model"

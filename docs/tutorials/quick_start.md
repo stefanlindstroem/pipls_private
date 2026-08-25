@@ -65,8 +65,9 @@ standardized fitted RMSE values.
 
 ## Retain the search when evidence matters
 
-Keep the fitted search in a variable when you want to inspect the component path, choose a component
-count manually, or request selection-conditioned OOF diagnostics:
+Keep the fitted search in a variable when you want to inspect the component path and selection
+evidence explicitly, choose a component count manually, or diagnose an accepted selection with
+selection-conditioned OOF predictions:
 
 ```python
 search = PiPLSSearchCV().fit(X, Y)
@@ -77,9 +78,11 @@ report = search.oof_report(X, Y, selection=selection)
 model = search.refit(X, Y, selection=selection)
 ```
 
-This longer route inspects and optionally qualifies one immutable row before fitting the final
-model. The same `selection` configures both OOF reporting and refitting, while `model.selection_`
-records that exact provenance after the full-data fit succeeds.
+The component path supplies the component-count evidence, and the optional rank profile exposes
+the conditional predictor-rank evidence. `selection` records the retained row. `oof_report()` then
+diagnoses that fixed row; it does not choose or modify the selection. The same `selection` configures
+both OOF reporting and refitting, while `model.selection_` records that exact provenance after the
+full-data fit succeeds.
 
 Continue with [Inspect and select with synthetic data](synthetic.md) for a manual component choice
 and independent-test prediction. The [complete Pulp analysis](pulp.md) adds selection-conditioned

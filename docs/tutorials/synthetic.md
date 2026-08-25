@@ -13,8 +13,9 @@ predictor rank $r_\pi$ internally for each $h$. Details can be reviewed under
 
 The workflow is to generate independent training and test data, fit the search, inspect the
 component path, choose a component count and create one selection, optionally inspect the
-conditional predictor-rank profile, refit the same selection, and predict the external test data.
-If the selected evidence is unsatisfactory, return to the selection step before refitting.
+conditional predictor-rank profile, accept the selection, refit that same selection, and predict the
+external test data. If the selected path or conditional rank evidence is unsatisfactory, return to
+the selection step before accepting it.
 
 ```mermaid
 flowchart TD
@@ -170,8 +171,10 @@ agreement is informative but not a general selection guarantee.
 Advanced analyses can control predictor rank through the search configuration. See
 [Selection and validation](../selection_validation.md#predictor-rank-policies) for the available policies and tolerances.
 
-The selected path and optional rank profile are still model-selection evidence. If they make the
-chosen component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection.
+The selected path and optional rank profile are the model-selection evidence in this workflow. If
+they make the chosen component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new
+selection. Once accepted, keep that immutable selection fixed for final refitting and for any later
+selection-conditioned OOF diagnosis.
 
 ## Refit the selected pair
 

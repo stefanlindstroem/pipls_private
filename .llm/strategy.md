@@ -85,11 +85,11 @@ synthetic-generator structural explanation and latent-role figure, and finished 
 datasets/generators, Troubleshooting, and cross-reference audit. No runtime, numerical, public-API,
 dataset, or generator behavior changed.
 
-Decision 0165 is active. Patch 0165A establishes that path evidence selects the model while OOF
-diagnostics characterize the accepted selection. Patch 0165B aligns the tutorials, Patch 0165C
-splits Selection and validation into Path and selection plus OOF diagnostics, and Patch 0165D is the
-closing terminology and cross-reference audit. This sequence changes documentation methodology and
-ownership only.
+Decision 0165 is active. Patches 0165A--0165B establish that path evidence selects the model while
+OOF diagnostics characterize the accepted selection, and align all three maintained tutorials with
+that workflow. Patch 0165C splits Selection and validation into Path and selection plus OOF
+diagnostics, and Patch 0165D is the closing terminology and cross-reference audit. This sequence
+changes documentation methodology and ownership only.
 
 ## Deferred work
 
