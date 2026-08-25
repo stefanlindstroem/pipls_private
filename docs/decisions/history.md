@@ -53,10 +53,13 @@ Pi-PLS response policies with ordinary PLS on matched folds for all three refere
 one fixed near-saturated synthetic stress case. The Home page derives a simplified Pulp/Tobacco
 view from that same numerical protocol to illustrate possible parsimony in shared component count
 without exposing the optional least-squares policy in the introductory motivation. Served
-documentation is self-contained, separates tutorials, guides, and generated reference, and keeps
-maintainer decisions outside the user site. Semantic cross-referencing now gives reference datasets,
-the companion publication, and high-value mathematical concepts stable destinations across those
-layers without mechanically linking every repeated occurrence.
+documentation is self-contained and keeps maintainer decisions outside the user site. The earlier
+tutorial/guide/reference ownership split eventually allowed the Reference section to accumulate
+workflow, performance, conceptual, and API material in the same navigation. Decision 0164
+supersedes that arrangement with a flat lookup-oriented Reference while preserving tutorial
+ownership and strict generated documentation. Semantic cross-referencing gives reference datasets,
+the companion publication, and high-value mathematical concepts stable destinations without
+mechanically linking every repeated occurrence.
 
 The late comparison/navigation sequence that produced those outcomes is historical: the separate
 response-subspace example was folded into Example 03; one predeclared near-saturated synthetic case
@@ -72,7 +75,7 @@ documentation, but its durable package-versus-publication boundary is owned by D
 manual feedback arrow are presentation choices; exact selection handoff and the interpretation of
 same-search OOF evidence are owned by Decision 0143.
 
-Current canonical records: [0065](0065-documentation-layer-consolidation.md),
+Current canonical records: [0164](0164-lean-reference-architecture.md),
 [0143](0143-model-selection-provenance-and-oof-reporting.md),
 [0155](0155-response-subspace-selection-policies.md), and the product and workflow boundaries in
 [0024](0024-package-product-repository-boundary.md),
@@ -123,7 +126,7 @@ Python and dependency ranges, isolated artifact validation, optional graphics de
 clean committed-tree snapshots.
 
 Current canonical records: [0054](0054-compatibility-policy.md),
-[0065](0065-documentation-layer-consolidation.md),
+[0164](0164-lean-reference-architecture.md),
 [0091](0091-clean-git-snapshots.md),
 [0103](0103-installation-and-optional-dependency-boundary.md),
 [0117](0117-commercial-license-authorship-and-citation.md), and
@@ -152,7 +155,7 @@ folded into the generic provenance and OOF contract, package-owned leave-one-out
 and the behavioral test-suite cleanup replaced source and prose policing with executable boundaries.
 
 Current canonical records: [0007](0007-predictor-rank-search-policies.md),
-[0065](0065-documentation-layer-consolidation.md),
+[0164](0164-lean-reference-architecture.md),
 [0083](0083-data-first-rendering-policy.md),
 [0143](0143-model-selection-provenance-and-oof-reporting.md), and
 [0147](0147-decision-lifecycle-and-maintainer-context.md). The served

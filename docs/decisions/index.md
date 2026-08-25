@@ -22,7 +22,6 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0042: fitted-model analysis architecture](0042-model-inspection-and-post-analysis.md)
 - [0045: comparison versus fitted-model analysis ownership](0045-pls-family-analysis-boundary.md)
 - [0054: supported interpreter and dependency ranges](0054-compatibility-policy.md)
-- [0065: tutorial, guide, and reference ownership](0065-documentation-layer-consolidation.md)
 - [0066: concise path-result API](0066-immutable-component-path-api.md)
 - [0072: conditional predictor-rank inspection](0072-conditional-predictor-rank-profile.md)
 - [0083: final data-first rendering policy](0083-data-first-rendering-policy.md)
@@ -45,6 +44,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0153: independent predictor and response scaling controls](0153-independent-block-scaling-controls.md)
 - [0154: full-domain predictor-rank selection and explicit EPV policy](0154-full-domain-predictor-rank-selection.md)
 - [0155: response-subspace selection policies](0155-response-subspace-selection-policies.md)
+- [0164: lean reference architecture](0164-lean-reference-architecture.md)
 
 ## Historical navigation
 

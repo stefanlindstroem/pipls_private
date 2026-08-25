@@ -76,8 +76,17 @@ Decision 0147 is complete. Decision-registry consolidation, active `.llm` compac
 pruning, and validation-ownership cleanup are finished. Ordinary pytest is behavior-focused;
 complete examples and tutorial rendering are owned by their dedicated Make targets and CI jobs.
 
-There is no active repository-wide cleanup sequence. Future scientific, public-API, or maintenance
-changes require a bounded owner decision or task rather than extending Decision 0147.
+Decision 0164 now owns one bounded documentation sequence that replaces the overgrown Reference
+with a flat seven-page lookup surface. Patch 0164A establishes the architecture; following patches
+consolidate selection/validation material, slim the two estimator pages, flatten Model inspection,
+and finish the overview, datasets/generators, troubleshooting, and cross-reference audit. The
+synthetic generator's structural explanation and maintained latent-role figure remain served
+documentation throughout the migration. No runtime, numerical, public-API, dataset, or generator
+behavior is in scope.
+
+Outside this bounded documentation sequence, there is no active repository-wide cleanup. Future
+scientific, public-API, or maintenance changes require a bounded owner decision or task rather than
+extending Decision 0147 or Decision 0164.
 
 ## Deferred work
 

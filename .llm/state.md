@@ -135,8 +135,18 @@ The repository owns the installable software product, user documentation, exampl
 packaging, and release validation. Paper-specific experiment grids, cached results, figure
 reproduction, and publication environments belong downstream and pin a released package version.
 
-The served site separates tutorials, programming reference, advanced scientific guidance, and
-project validation. Numbered decisions and `.llm` are maintainer records and are not served as user
+The served site separates tutorials, programming reference, scientific background, and project
+validation. Decision 0164 authorizes a lean flat Reference target with Overview, `PiPLSRegression`,
+`PiPLSSearchCV`, Selection and validation, Model inspection, Datasets and generators, and
+Troubleshooting. Tutorials own worked workflows; estimator pages prioritize generated API lookup;
+domain pages own exact selection, validation, inspection, and data/generator semantics. The
+Datasets and generators reference retains the general latent-role explanation and maintained
+`docs/assets/figures/latent_geometry_generator.svg` figure, while the companion-manuscript
+synthetic-data page retains publication-specific generation and reproduction guidance.
+
+Patch 0164A records that architecture only. Until the bounded page-migration patches land, the
+served navigation and living pages remain the implemented documentation surface and must continue
+to build strictly. Numbered decisions and `.llm` are maintainer records and are not served as user
 documentation. Semantic cross-references are maintained contextually; strict documentation builds
 own link resolution rather than pytest assertions about prose placement.
 
@@ -160,11 +170,13 @@ Do not add without a new owner decision:
 
 ## Maintenance state
 
-Decision 0147 is complete. The maintained registry contains only current decisions; completed
-records are summarized in `docs/decisions/history.md` and mapped in
-`docs/decisions/retirements.md`. The inherited 0153/0154 retirement-map number collisions are
-frozen exceptions. `make decision-check` validates both current registries, local links, active
-decision references, retirement-map uniqueness, and additional number reuse.
+Decision 0147 is complete. Decision 0164 is the active documentation-architecture increment; Patch
+0164A establishes ownership and later bounded patches migrate the served Reference without changing
+runtime behavior. The maintained registry contains only current decisions; completed records are
+summarized in `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
+inherited 0153/0154 retirement-map number collisions are frozen exceptions. `make decision-check`
+validates both current registries, local links, active decision references, retirement-map
+uniqueness, and additional number reuse.
 
 Tests protect executable behavior and machine-readable outputs without duplicating complete
 application or tutorial workflows. `make examples` owns every numbered example and runs once in CI

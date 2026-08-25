@@ -22,7 +22,6 @@ This registry lists only numbered decisions that still define current behavior o
 | `0042-model-inspection-and-post-analysis.md` | fitted-model analysis architecture | separate selection diagnostics, interpretation, and prediction diagnostics; reusable inspection, plotting, and all three real-data integrations |
 | `0045-pls-family-analysis-boundary.md` | comparison versus fitted-model analysis ownership | retain ordinary PLS for CV-MSE comparison; keep $P$, $D$, and $Q$ Pi-PLS-specific; make shared analysis estimator-neutral and apply it only to Pi-PLS in numbered examples |
 | `0054-compatibility-policy.md` | supported interpreter and dependency ranges | Python 3.10–3.14, guarded runtime dependency majors, explicit CI responsibilities, and clean wheel/sdist validation |
-| `0065-documentation-layer-consolidation.md` | tutorial, guide, and reference ownership | self-contained strict docs separate worked tutorials, task guides, scientific interpretation, and generated API reference |
 | `0066-immutable-component-path-api.md` | concise path-result API | frozen aligned path arrays and separate immutable search-owned scalar selections without path lookup methods |
 | `0072-conditional-predictor-rank-profile.md` | conditional predictor-rank inspection | derive one immutable sorted rank profile on demand from `cv_results_` without another fitted representation |
 | `0083-data-first-rendering-policy.md` | final data-first rendering policy | immutable results are the compatibility surface; rendering and local plot helpers remain caller-owned |
@@ -45,6 +44,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0153-independent-block-scaling-controls.md` | independent predictor and response scaling controls | retain `scale` as the compatibility default while allowing fold-local pipeline predictor scaling and Pi-PLS response scaling to be controlled independently |
 | `0154-full-domain-predictor-rank-selection.md` | full-domain predictor-rank selection and explicit EPV policy | implemented exhaustive full-feasible automatic coverage, explicit `"epv"`, and removal of the pre-release `"max"`/`"rule"` rank shortcuts |
 | `0155-response-subspace-selection-policies.md` | response-subspace selection policies | closed implementation: cross-covariance default plus an explicit least-squares/RRR-inspired software extension outside the peer-reviewed publication |
+| `0164-lean-reference-architecture.md` | lean reference architecture | flat seven-page lookup reference; tutorials own workflows, domain pages own exact contracts, and synthetic generator explanation plus the maintained latent-role figure remain served |
 
 ## Implemented clarifications
 
