@@ -19,16 +19,13 @@ nav:
       - 3. Complete Pulp analysis: tutorials/pulp.md
   - Examples: examples.md
   - Reference:
-      - API overview: api/index.md
-      - Fixed regression: api/regression.md
-      - Path selection: api/path.md
-      - Path-selection details: path_analysis.md
-      - Computational performance: computational_performance.md
+      - Overview: api/index.md
+      - PiPLSRegression: api/regression.md
+      - PiPLSSearchCV: api/path.md
+      - Selection and validation: selection_validation.md
+      - Model inspection: model_inspection.md
+      - Datasets and generators: api/datasets.md
       - Troubleshooting: troubleshooting.md
-      - Model inspection:
-          - Concepts: model_inspection.md
-          - API: api/inspection.md
-      - Dataset API and generators: api/datasets.md
   - Project validation:
       - Reference datasets: datasets.md
       - Reproducibility: reproducibility.md
@@ -40,6 +37,9 @@ nav:
 
 exclude_docs: |
   decisions/**
+
+not_in_nav: |
+  /api/inspection.md
 
 validation:
   omitted_files: warn

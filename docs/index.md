@@ -86,12 +86,13 @@ representative interpretation of standard PLS-family plots and Π-PLS-specific p
 
 ## Programming reference
 
-- [API overview](api/index.md): generated signatures and method contracts.
-- [Path selection](api/path.md): search parameters and immutable path results.
-- [Path-selection details](path_analysis.md): bounds, policies, splitters, OOF output, and refitting.
-- [Troubleshooting](troubleshooting.md): common fit, selection, scoring, and plotting problems.
-- [Model inspection](model_inspection.md): general interpretation of fitted quantities and plots.
-- [Examples](examples.md): maintained executable analyses and their outputs.
+- [Overview](api/index.md): public objects and canonical reference destinations.
+- [`PiPLSRegression`](api/regression.md): fixed-estimator parameters and fitted results.
+- [`PiPLSSearchCV`](api/path.md): search-estimator parameters and post-fit lifecycle.
+- [Selection and validation](selection_validation.md): search bounds, rank policies, scoring, CV, OOF, and selection contracts.
+- [Model inspection](model_inspection.md): interpretation of fitted quantities and plots.
+- [Datasets and generators](api/datasets.md): packaged data, synthetic generators, and truth records.
+- [Troubleshooting](troubleshooting.md): common fit, selection, scoring, and performance problems.
 
 ## Project validation
 

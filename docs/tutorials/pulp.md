@@ -172,7 +172,7 @@ coincide; both are rank 9 in this analysis.
 For these 46 observations and 14 predictors, the default search is exhaustive over the complete
 fold-feasible predictor-rank domain, from 3 through 14 at the selected $h=3$. Alternative ways to
 restrict or fix predictor rank are advanced configuration choices and are documented separately in
-[Predictor-rank policies](../path_analysis.md#predictor-rank-policies).
+[Predictor-rank policies](../selection_validation.md#predictor-rank-policies).
 
 ## Inspect selection-conditioned OOF behavior
 
@@ -200,7 +200,7 @@ Convert those predictions to an immutable diagnostic result before refitting:
     stored training fold, but the same data were already used for model selection. The report is
     therefore part of the model-selection evidence, not an independent estimate of post-selection
     performance. Use nested cross-validation or an external test set for independent evaluation.
-    See [ordered out-of-fold predictions](../path_analysis.md#ordered-out-of-fold-predictions).
+    See [ordered out-of-fold predictions](../selection_validation.md#ordered-out-of-fold-predictions).
 
 
 ### Observed versus predicted
@@ -456,7 +456,7 @@ strict documentation-build and source-distribution checks.
 
 - Use [Model inspection](../model_inspection.md) for the complete quantity catalogue and
   interpretation boundaries.
-- Use [Path-selection details](../path_analysis.md) for nondefault bounds, policies, pipelines,
+- Use [Selection and validation](../selection_validation.md) for nondefault bounds, policies, pipelines,
   scorer behavior, grouped or temporal splitters, OOF coverage, and automatic refitting.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
 - Use the [`PiPLSSearchCV` reference](../api/path.md#pipls.PiPLSSearchCV) and

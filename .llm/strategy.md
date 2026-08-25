@@ -76,10 +76,11 @@ Decision 0147 is complete. Decision-registry consolidation, active `.llm` compac
 pruning, and validation-ownership cleanup are finished. Ordinary pytest is behavior-focused;
 complete examples and tutorial rendering are owned by their dedicated Make targets and CI jobs.
 
-Decision 0164 now owns one bounded documentation sequence that replaces the overgrown Reference
-with a flat seven-page lookup surface. Patch 0164A establishes the architecture; following patches
-consolidate selection/validation material, slim the two estimator pages, flatten Model inspection,
-and finish the overview, datasets/generators, troubleshooting, and cross-reference audit. The
+Decision 0164 owns one bounded documentation sequence that replaces the overgrown Reference with
+a flat seven-page lookup surface. Patch 0164A established the architecture and Patch 0164B applies
+the flat navigation while consolidating selection/validation and durable performance contracts.
+Following patches slim the two estimator pages, merge Model inspection, and finish the overview,
+datasets/generators, troubleshooting, and cross-reference audit. The
 synthetic generator's structural explanation and maintained latent-role figure remain served
 documentation throughout the migration. No runtime, numerical, public-API, dataset, or generator
 behavior is in scope.

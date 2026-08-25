@@ -144,11 +144,13 @@ Datasets and generators reference retains the general latent-role explanation an
 `docs/assets/figures/latent_geometry_generator.svg` figure, while the companion-manuscript
 synthetic-data page retains publication-specific generation and reproduction guidance.
 
-Patch 0164A records that architecture only. Until the bounded page-migration patches land, the
-served navigation and living pages remain the implemented documentation surface and must continue
-to build strictly. Numbered decisions and `.llm` are maintainer records and are not served as user
-documentation. Semantic cross-references are maintained contextually; strict documentation builds
-own link resolution rather than pytest assertions about prose placement.
+Patch 0164B applies the flat seven-page Reference navigation and consolidates the former
+path-selection-details and computational-performance pages into the canonical Selection and
+validation page plus symptom-oriented Troubleshooting guidance. The estimator, inspection, and
+remaining overview/data pages are slimmed in later bounded patches. Numbered decisions and `.llm`
+are maintainer records and are not served as user documentation. Semantic cross-references are
+maintained contextually; strict documentation builds own link resolution rather than pytest
+assertions about prose placement.
 
 Python 3.10--3.14 is supported within the dependency ranges in `pyproject.toml`. Clean wheel and
 source-distribution installations are validated. `docs-dist` builds documentation from the
@@ -171,9 +173,10 @@ Do not add without a new owner decision:
 ## Maintenance state
 
 Decision 0147 is complete. Decision 0164 is the active documentation-architecture increment; Patch
-0164A establishes ownership and later bounded patches migrate the served Reference without changing
-runtime behavior. The maintained registry contains only current decisions; completed records are
-summarized in `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
+0164B establishes the flat served Reference and canonical selection/validation ownership, while
+later bounded patches slim the estimator, inspection, overview, data, and troubleshooting content
+without changing runtime behavior. The maintained registry contains only current decisions;
+completed records are summarized in `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
 inherited 0153/0154 retirement-map number collisions are frozen exceptions. `make decision-check`
 validates both current registries, local links, active decision references, retirement-map
 uniqueness, and additional number reuse.

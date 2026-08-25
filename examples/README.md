@@ -7,7 +7,7 @@ each component count, so most workflows can treat `n_components` as the main com
 A clear elbow or plateau can motivate a component count; when no clear elbow is present, explicit
 relative tolerances provide a transparent parsimony policy. Example 06 demonstrates separate 10%
 predictor-rank and component-count tolerances. See the
-[component-path discussion](../docs/path_analysis.md#search-owned-selection-rules) and the
+[component-path discussion](../docs/selection_validation.md#search-owned-selection-rules) and the
 [served example catalogue](../docs/examples.md). For the
 mathematical construction, see `docs/theory.md`.
 
@@ -59,7 +59,7 @@ seed makes these analyses reproducible while preventing row order from defining 
   `python examples/03_pls_path_comparison.py --dataset synthetic_stress`.
 
 Grouped and temporal validation require application-specific sampling semantics and remain in
-`docs/path_analysis.md`.
+`docs/selection_validation.md`.
 
 ## Complete Pi-PLS reference workflows
 
@@ -72,7 +72,7 @@ Grouped and temporal validation require application-specific sampling semantics 
   the EPV policy at `samples_per_predictor_rank=5.0` to regularize the retained wavelength subspace,
   keeps component count as a separate manual choice, computes an OOF report, refits that selection,
   and writes five wavelength-aware final PDF figures. See the
-  [EPV policy](../docs/computational_performance.md#epv-policy).
+  [EPV policy](../docs/selection_validation.md#epv-policy).
 - `06_tobacco_real_data.py`: adaptive Π-PLS predictor-rank scanning with explicit full predictor
   SVD and two separately named 10% relative tolerances. The search constructor applies the
   predictor-rank tolerance independently at each component count; `search.select()` then applies the
@@ -80,7 +80,7 @@ Grouped and temporal validation require application-specific sampling semantics 
   evidence, the component-path reference minimum, and a selection-conditioned OOF report before it
   refits the same selection and renders both thresholds, decreasing-wavenumber spectral displays,
   deterministic response pagination, and raw observation diagnostics through caller-owned PDFs.
-  See the [selection rules](../docs/path_analysis.md#search-owned-selection-rules).
+  See the [selection rules](../docs/selection_validation.md#search-owned-selection-rules).
 
 These are application analyses rather than introductory snippets. Pulp, Sugarcane, and Tobacco
 inspect the component path, create one immutable selection, inspect its selected path and optional
@@ -147,7 +147,7 @@ workflow with an explicitly regularized predictor subspace:
 7. The script renders the component path, latent structure, prediction diagnostics, factors, and
    coefficients with Matplotlib and saves the five final figures itself.
 
-See the [EPV policy](../docs/computational_performance.md#epv-policy) and
+See the [EPV policy](../docs/selection_validation.md#epv-policy) and
 [Interpretation of $r_\pi$ and $h$](../docs/theory.md#interpretation-of-the-ranks) for why these are
 distinct complexity controls.
 

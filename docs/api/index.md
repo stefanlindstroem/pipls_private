@@ -22,8 +22,9 @@ them from reconstruction loadings.
 
 ## Start with the estimators
 
-- [Fixed regression](regression.md)
-- [Path selection](path.md)
+- [`PiPLSRegression`](regression.md)
+- [`PiPLSSearchCV`](path.md)
+- [Selection and validation](../selection_validation.md)
 - [Troubleshooting](../troubleshooting.md)
 
 ## Which result object should I use?
@@ -49,7 +50,7 @@ them from reconstruction loadings.
 `best_score` and `minimum_cv_mse` rules without fitting or mutating the search. The
 minimum-CV-MSE rule accepts simultaneous relative and absolute tolerances and retains their complete
 selection provenance. Rule scope and scorer qualification are described under
-[search-owned selection rules](../path_analysis.md#search-owned-selection-rules).
+[search-owned selection rules](../selection_validation.md#search-owned-selection-rules).
 
 [Pulp](../datasets.md#pulp-real-data-integration),
 [Sugarcane](../datasets.md#sugarcane-spectral-integration), and

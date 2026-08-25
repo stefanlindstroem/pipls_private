@@ -25,9 +25,8 @@ delegate model methods or retain the returned estimator, report, or supplied tra
 
 For nondefault component requests, predictor-rank policies, rank ceilings, splitters, OOF reporting,
 tie-breaking, pipelines, and detailed result surfaces, see
-[Path-selection details](../path_analysis.md). For training-cost controls and their statistical or
-numerical trade-offs, see [Computational performance](../computational_performance.md). For
-candidate-feasibility, refit, scoring, or metadata problems, see
+[Selection and validation](../selection_validation.md). For candidate-feasibility, refit, scoring,
+metadata, or performance problems, see
 [Troubleshooting](../troubleshooting.md).
 
 `cv_results_` is the complete candidate-level record. Its parameter columns are the stable,
@@ -121,7 +120,7 @@ remains `"cross_covariance"`, which is the response-subspace construction in the
 search creates the seed pair using those ordinary
 `PiPLSRegression` defaults. A pipeline is configured in the same way through its terminal
 `PiPLSRegression` step; see
-[Pipelines and fold-local preprocessing](../path_analysis.md#pipelines-and-fold-local-preprocessing).
+[Pipelines and fold-local preprocessing](../selection_validation.md#pipelines-and-fold-local-preprocessing).
 
 `svd_solver` controls only the initial predictor-matrix SVD. With
 `response_subspace="cross_covariance"`, the response basis uses an exact SVD of
@@ -158,7 +157,7 @@ validation split count are stored once as path-wide scalars; row-aligned
 `predictor_rank_evidence` records the exact score optimum and resolved tolerances. Use
 `search.select(...)` when a
 complete scalar row is needed for annotation or reporting. See
-[Search-owned selection rules](../path_analysis.md#search-owned-selection-rules) for the rule
+[Search-owned selection rules](../selection_validation.md#search-owned-selection-rules) for the rule
 definitions and scope. Maintained plots use `cv_mse_std` directly as descriptive split-to-split variability. The path
 object provides no standard-error property and no public row-selection methods.
 
@@ -245,8 +244,7 @@ coverage. The supplied selection is validated exactly against the fitted
 search, preventing a report for an unrelated component-count or predictor-rank decision. The
 operation does not rescore candidates, perform a full-data fit, mutate the search, or retain the
 supplied matrices. Each repeated call performs the selected-pair fold fits again; retain and reuse
-one report when several tables or figures need the same diagnostics. See
-[Computational performance](../computational_performance.md#avoid-repeated-oof-computation).
+one report when several tables or figures need the same diagnostics. See the [OOF contract](../selection_validation.md#ordered-out-of-fold-predictions).
 
 The caller must provide the same observations in the same row order and with the same sample and
 response-column counts as the fitted search. Selection metrics remain on `report.selection`;

@@ -150,7 +150,8 @@ Current canonical records: [0039](0039-fixed-estimator-path-search-boundary.md),
 Several late pre-release records described bounded migrations rather than independent durable
 contracts. The three-stage onboarding sequence was completed and refined into the current
 selection-review workflow. The search-policy rename settled on `"adaptive"` and `"exhaustive"`, the
-computational-performance guide became ordinary served documentation, exact selection handoff was
+computational-performance guidance was later consolidated into the lean Reference, exact selection
+handoff was
 folded into the generic provenance and OOF contract, package-owned leave-one-out support was removed,
 and the behavioral test-suite cleanup replaced source and prose policing with executable boundaries.
 
@@ -159,8 +160,9 @@ Current canonical records: [0007](0007-predictor-rank-search-policies.md),
 [0083](0083-data-first-rendering-policy.md),
 [0143](0143-model-selection-provenance-and-oof-reporting.md), and
 [0147](0147-decision-lifecycle-and-maintainer-context.md). The served
-[computational-performance guide](../computational_performance.md) records the current user-facing
-performance guidance.
+[Selection and validation](../selection_validation.md) page records the durable search, validation,
+and computational-accounting contracts; symptom-oriented performance guidance is in
+[Troubleshooting](../troubleshooting.md).
 
 ## Retired experiments and one-off cleanups
 

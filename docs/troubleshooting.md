@@ -59,8 +59,8 @@ least-squares route is a software extension outside the
 manuscript-aligned fitting.
 
 See [Response-subspace selection](theory.md#response-subspace-selection) for the mathematical
-difference and [Computational performance](computational_performance.md#treat-response-subspace-policy-as-a-model-choice)
-for comparison guidance.
+difference and [Compare response-subspace policies](examples.md#compare-response-subspace-policies)
+for the maintained matched-split comparison.
 
 ## A component count or predictor rank was not evaluated
 
@@ -73,8 +73,8 @@ search.predictor_rank_profile(h).predictor_rank
 
 An explicit component request must have at least one admissible predictor rank. Candidate limits
 also depend on sample count, transformed training-fold dimensions, the minimum numerical rank
-verified across those folds, configured rank bounds, and the selected search policy. See
-[Path-selection details](path_analysis.md).
+verified across those folds, configured rank bounds, and the selected search policy. See the
+[search-domain contract](selection_validation.md#search-bounds).
 
 ## The path search is too slow or uses too much memory
 
@@ -93,8 +93,9 @@ analysis. Use `n_jobs` only after measuring memory and wall time on the actual m
 one `oof_report()` result rather than recomputing it for each output.
 
 Fewer repetitions and narrower candidate policies change the evidence or model-selection question;
-randomized SVD changes the numerical route. The complete ordering, examples, cost accounting, and
-trade-off table are in [Computational performance](computational_performance.md).
+randomized SVD changes the numerical route. The fit-count accounting and statistical consequences
+of these controls are summarized under
+[Computational consequences](selection_validation.md#computational-consequences).
 
 ## The path search has no admissible candidate
 
@@ -104,8 +105,8 @@ redundant predictors, or review an explicit integer `max_predictor_rank`. If
 the nominal fixed EPV rank. Grouped, temporal, and other specialized splitters can reduce the
 smallest training-fold size or the minimum verified fold rank and therefore the feasible path.
 
-The [cross-validation protocols](path_analysis.md#cross-validation-protocols-and-metadata)
-section explains splitter-dependent feasibility and metadata such as `groups`.
+The [cross-validation protocol](selection_validation.md#cross-validation-protocols-and-metadata)
+contract explains splitter-dependent feasibility and metadata such as `groups`.
 
 ## `predict()` is unavailable after path selection
 
@@ -143,7 +144,7 @@ exact conditional rank optimum with the tolerance-retained rank at one component
 same compatible selection to `oof_report()` and `refit()` when those operations must describe one
 exact row. The returned model records that row as `model.selection_`; it is not stored on the search.
 See
-[Scoring and conditioned path selection](path_analysis.md#scoring-and-conditioned-path-selection).
+[Candidate coverage and scoring](selection_validation.md#scoring-and-conditioned-path-selection).
 
 ## A grouped splitter reports missing metadata
 
@@ -155,7 +156,7 @@ search.fit(X, Y, groups=sample_groups)
 
 Do not pass split metadata to `PiPLSRegression.fit()`, which fits one fixed pair and performs no
 cross-validation. See
-[cross-validation protocols and metadata](path_analysis.md#cross-validation-protocols-and-metadata).
+[cross-validation protocols and metadata](selection_validation.md#cross-validation-protocols-and-metadata).
 
 ## Fitting rejects the data or leaves the estimator unfitted
 

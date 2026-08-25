@@ -153,10 +153,9 @@ compact workflows that do not need to retain an earlier selection.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
 predictor-rank plots. The [path-selection reference](docs/api/path.md) and
-[path-selection details](docs/path_analysis.md) cover alternative policies, splitters, and
-validation protocols. See [Computational performance](docs/computational_performance.md) for
-the cost of validation splits and candidate coverage, large-problem SVD choices, parallelism,
-and OOF-report reuse.
+[Selection and validation](docs/selection_validation.md) defines alternative rank policies,
+splitters, selection rules, OOF semantics, and the main computational consequences of candidate
+coverage and validation splits.
 
 When the complete protocol is known in advance, search and final fitting can remain compact. The
 same separate 10% relative tolerances used in the Tobacco analysis can be written as one automatic
@@ -242,8 +241,7 @@ Install the `examples` extra before running them.
   - [Tutorial 2: synthetic path inspection](docs/tutorials/synthetic.md)
   - [Tutorial 3: complete Pulp analysis](docs/tutorials/pulp.md)
   - [API overview](docs/api/index.md)
-  - [Path-selection details](docs/path_analysis.md)
-  - [Computational performance](docs/computational_performance.md)
+  - [Selection and validation](docs/selection_validation.md)
   - [Troubleshooting](docs/troubleshooting.md)
   - [Model inspection](docs/model_inspection.md)
   - [Reference datasets](docs/datasets.md)
