@@ -148,8 +148,10 @@ Patch 0164B applies the flat seven-page Reference navigation and consolidates th
 path-selection-details and computational-performance pages into the canonical Selection and
 validation page plus symptom-oriented Troubleshooting guidance. Patch 0164C reduces the
 `PiPLSRegression` page to generated estimator, decomposition, and warning reference with only
-concise estimator-specific orientation. `PiPLSSearchCV`, inspection, and the remaining
-overview/data pages are slimmed in later bounded patches. Numbered decisions and `.llm`
+concise estimator-specific orientation. Patch 0164D reduces `PiPLSSearchCV` to generated estimator
+reference plus a concise lifecycle/template boundary and moves generated search-result and scoring
+reference to Selection and validation. Inspection and the remaining overview/data pages are slimmed
+in later bounded patches. Numbered decisions and `.llm`
 are maintainer records and are not served as user documentation. Semantic cross-references are
 maintained contextually; strict documentation builds own link resolution rather than pytest
 assertions about prose placement.

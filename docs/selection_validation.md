@@ -217,3 +217,45 @@ These are not computationally neutral shortcuts.
 pairs are parallel tasks during search; OOF reporting parallelizes selected-pair fits across
 validation splits. More workers can increase peak memory. For symptoms and practical controls, see
 [Troubleshooting](troubleshooting.md#the-path-search-is-too-slow-or-uses-too-much-memory).
+
+## Result objects and scoring functions
+
+The search exposes immutable result records rather than mutable analysis state. Their fields are
+documented below from the public NumPy-style docstrings. `component_path_` contains the
+component-count path, `select()` returns one `PiPLSSelection`, `predictor_rank_profile()` exposes the
+evaluated ranks and conditional evidence for one component count, and `oof_report()` returns one
+`PiPLSOOFReport`.
+
+::: pipls.component_path.PiPLSComponentPath
+    options:
+      show_signature: false
+
+::: pipls.component_path.PiPLSSelection
+    options:
+      show_signature: false
+
+::: pipls.component_path.PiPLSPredictorRankProfile
+    options:
+      show_signature: false
+
+::: pipls.component_path.PiPLSPredictorRankEvidence
+    options:
+      show_signature: false
+
+::: pipls.validation.PiPLSOOFReport
+    options:
+      show_signature: false
+      members:
+        - has_complete_oof_coverage
+
+The positive public loss and its scikit-learn-oriented negative scorer use the same fold-local
+response-standardized MSE definition described under
+[Candidate coverage and scoring](#scoring-and-conditioned-path-selection).
+
+::: pipls.metrics.response_standardized_mse
+    options:
+      members: false
+
+::: pipls.metrics.neg_response_standardized_mse
+    options:
+      members: false

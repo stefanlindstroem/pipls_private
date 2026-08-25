@@ -31,11 +31,11 @@ them from reconstruction loadings.
 
 | Object | Obtained from | Main purpose |
 |---|---|---|
-| [`PiPLSComponentPath`](path.md#pipls.component_path.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
-| [`PiPLSPredictorRankEvidence`](path.md#pipls.component_path.PiPLSPredictorRankEvidence) | conditioned path rows and rank profiles | Reconstruct the exact rank reference and tolerance threshold |
-| [`PiPLSSelection`](path.md#pipls.component_path.PiPLSSelection) | `search.select(...)`, `model.selection_`, or an OOF report | Retrieve one evaluated fixed rank pair and its diagnostics |
-| [`PiPLSPredictorRankProfile`](path.md#pipls.component_path.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
-| [`PiPLSOOFReport`](path.md#pipls.validation.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |
+| [`PiPLSComponentPath`](../selection_validation.md#pipls.component_path.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
+| [`PiPLSPredictorRankEvidence`](../selection_validation.md#pipls.component_path.PiPLSPredictorRankEvidence) | conditioned path rows and rank profiles | Reconstruct the exact rank reference and tolerance threshold |
+| [`PiPLSSelection`](../selection_validation.md#pipls.component_path.PiPLSSelection) | `search.select(...)`, `model.selection_`, or an OOF report | Retrieve one evaluated fixed rank pair and its diagnostics |
+| [`PiPLSPredictorRankProfile`](../selection_validation.md#pipls.component_path.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
+| [`PiPLSOOFReport`](../selection_validation.md#pipls.validation.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |
 | [`PiPLSDecomposition`](regression.md#pipls.decomposition.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
 | [`LatentStructure`](inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, and coefficients for PLS-family inspection |
 | [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors |

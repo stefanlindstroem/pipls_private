@@ -21,7 +21,7 @@ Inspect `path` before choosing the component count. The returned model already u
 predictor rank stored for that row. Advanced users can inspect
 `search.predictor_rank_profile(h)` or constrain the predictor-rank search when statistical support
 or scientific interpretation motivates direct control. Continue with the
-[synthetic tutorial](tutorials/synthetic.md) or the [path-selection reference](api/path.md).
+[synthetic tutorial](tutorials/synthetic.md) or the [`PiPLSSearchCV` reference](api/path.md).
 
 ## I need to change scaling, response-subspace selection, or the SVD solver during search
 
@@ -46,7 +46,7 @@ The search replaces only `n_components` and `predictor_rank`; it retains the oth
 settings while cloning candidates. The example above therefore keeps `"least_squares"` fixed for
 every candidate. With `estimator=None`, the ordinary `PiPLSRegression` defaults are used, including
 `response_subspace="cross_covariance"`. See
-[Configure the candidate estimator](api/path.md#configure-the-candidate-estimator).
+[Pipelines and fold-local preprocessing](selection_validation.md#pipelines-and-fold-local-preprocessing).
 
 ## I want least-squares response-subspace selection during search
 
@@ -127,7 +127,7 @@ model = search.refit(X, Y, rule="minimum_cv_mse")
 The accepted rules are `"best_score"` and `"minimum_cv_mse"`. `minimum_cv_mse` additionally accepts
 `relative_tolerance` and `absolute_tolerance`; nondefault tolerances are rejected for `best_score`
 and for manual component-count selection. The search object retains the path evidence but does not delegate
-prediction or store the returned model. See the [path API](api/path.md).
+prediction or store the returned model. See the [`PiPLSSearchCV` reference](api/path.md).
 
 ## The CV-MSE minimum, best candidate, and selected model disagree
 

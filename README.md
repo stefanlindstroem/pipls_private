@@ -152,7 +152,7 @@ to verify fitted-model provenance. Rule-based and component-count refitting rema
 compact workflows that do not need to retain an earlier selection.
 
 The [synthetic tutorial](docs/tutorials/synthetic.md) shows the component-path and conditional
-predictor-rank plots. The [path-selection reference](docs/api/path.md) and
+predictor-rank plots. The [`PiPLSSearchCV` reference](docs/api/path.md) and
 [Selection and validation](docs/selection_validation.md) defines alternative rank policies,
 splitters, selection rules, OOF semantics, and the main computational consequences of candidate
 coverage and validation splits.
