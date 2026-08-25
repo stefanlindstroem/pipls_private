@@ -146,8 +146,10 @@ synthetic-data page retains publication-specific generation and reproduction gui
 
 Patch 0164B applies the flat seven-page Reference navigation and consolidates the former
 path-selection-details and computational-performance pages into the canonical Selection and
-validation page plus symptom-oriented Troubleshooting guidance. The estimator, inspection, and
-remaining overview/data pages are slimmed in later bounded patches. Numbered decisions and `.llm`
+validation page plus symptom-oriented Troubleshooting guidance. Patch 0164C reduces the
+`PiPLSRegression` page to generated estimator, decomposition, and warning reference with only
+concise estimator-specific orientation. `PiPLSSearchCV`, inspection, and the remaining
+overview/data pages are slimmed in later bounded patches. Numbered decisions and `.llm`
 are maintainer records and are not served as user documentation. Semantic cross-references are
 maintained contextually; strict documentation builds own link resolution rather than pytest
 assertions about prose placement.

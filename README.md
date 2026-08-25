@@ -39,7 +39,7 @@ peer-reviewed companion publication. `response_subspace="least_squares"` is an o
 least-squares/RRR-inspired software extension; configure it on `PiPLSRegression` or on the estimator
 template supplied to `PiPLSSearchCV`. The search does not treat this choice as an additional search
 dimension. See the [theory](docs/theory.md#response-subspace-selection) and
-[fixed-regression reference](docs/api/regression.md#response-subspace-selection).
+[`PiPLSRegression` reference](docs/api/regression.md#pipls.PiPLSRegression).
 
 The [rendered documentation](https://stefanlindstroem.github.io/pipls/) is the primary user guide.
 The source links below remain useful in a local checkout.
@@ -117,7 +117,7 @@ Y_pred = model.predict(X_test)
 
 This performs no parameter selection. The estimator learns centering and optional scaling from the
 training observations and follows the ordinary scikit-learn `fit()` and `predict()` pattern. See
-the [fixed-regression reference](docs/api/regression.md) for the complete contract.
+the [`PiPLSRegression` reference](docs/api/regression.md) for the complete contract.
 
 ## Select a model from the component path
 

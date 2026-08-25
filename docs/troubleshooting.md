@@ -165,8 +165,8 @@ infeasible ranks, and numerical results that cannot be represented as finite `fl
 failed fit is transactional: partial fitted state and any earlier fitted model are removed.
 
 Correct the data or parameters and call `fit()` again. The
-[fixed-regression reference](api/regression.md) documents preprocessing, fit safety, solver choices,
-and the statistical-support warning.
+[`PiPLSRegression` reference](api/regression.md#pipls.PiPLSRegression) documents estimator parameters
+and solver choices; this troubleshooting entry defines the transactional failure behavior.
 
 ## Inspection rejects an extreme derived quantity
 
@@ -183,7 +183,7 @@ support, while algebraically or numerically infeasible ranks remain errors.
 
 Use a lower predictor rank, provide more observations, or use `PiPLSSearchCV`, whose default support
 rule is more conservative. See
-[Solver and statistical support](api/regression.md#solver-and-statistical-support).
+[`PredictorRankSupportWarning`](api/regression.md#pipls.PredictorRankSupportWarning).
 
 ## `copy=False` changed an input array
 

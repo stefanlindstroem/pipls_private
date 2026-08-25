@@ -77,10 +77,11 @@ pruning, and validation-ownership cleanup are finished. Ordinary pytest is behav
 complete examples and tutorial rendering are owned by their dedicated Make targets and CI jobs.
 
 Decision 0164 owns one bounded documentation sequence that replaces the overgrown Reference with
-a flat seven-page lookup surface. Patch 0164A established the architecture and Patch 0164B applies
-the flat navigation while consolidating selection/validation and durable performance contracts.
-Following patches slim the two estimator pages, merge Model inspection, and finish the overview,
-datasets/generators, troubleshooting, and cross-reference audit. The
+a flat seven-page lookup surface. Patch 0164A established the architecture, Patch 0164B applies
+the flat navigation while consolidating selection/validation and durable performance contracts,
+and Patch 0164C slims the `PiPLSRegression` page around generated estimator, decomposition, and
+warning reference. Following patches slim `PiPLSSearchCV`, merge Model inspection, and finish the
+overview, datasets/generators, troubleshooting, and cross-reference audit. The
 synthetic generator's structural explanation and maintained latent-role figure remain served
 documentation throughout the migration. No runtime, numerical, public-API, dataset, or generator
 behavior is in scope.
