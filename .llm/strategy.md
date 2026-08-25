@@ -76,21 +76,15 @@ Decision 0147 is complete. Decision-registry consolidation, active `.llm` compac
 pruning, and validation-ownership cleanup are finished. Ordinary pytest is behavior-focused;
 complete examples and tutorial rendering are owned by their dedicated Make targets and CI jobs.
 
-Decision 0164 owns one bounded documentation sequence that replaces the overgrown Reference with
-a flat seven-page lookup surface. Patch 0164A established the architecture, Patch 0164B applies
-the flat navigation while consolidating selection/validation and durable performance contracts,
-Patch 0164C slims the `PiPLSRegression` page around generated estimator, decomposition, and
-warning reference, Patch 0164D slims `PiPLSSearchCV` while moving generated search-result and
-scoring reference to Selection and validation, and Patch 0164E merges inspection concepts and API
-into one Model inspection page. The final patch finishes the overview, datasets/generators,
-troubleshooting, and cross-reference audit. The
-synthetic generator's structural explanation and maintained latent-role figure remain served
-documentation throughout the migration. No runtime, numerical, public-API, dataset, or generator
-behavior is in scope.
+Decision 0164 is complete. Patches 0164A--0164F replaced the overgrown Reference with the flat
+seven-page lookup surface, consolidated selection/validation contracts, slimmed both estimator
+pages, merged inspection concepts and API, retained the synthetic-generator structural explanation
+and latent-role figure, and finished the overview, datasets/generators, Troubleshooting, and
+cross-reference audit. No runtime, numerical, public-API, dataset, or generator behavior changed.
 
-Outside this bounded documentation sequence, there is no active repository-wide cleanup. Future
-scientific, public-API, or maintenance changes require a bounded owner decision or task rather than
-extending Decision 0147 or Decision 0164.
+There is no active repository-wide cleanup. Future scientific, public-API, documentation, or
+maintenance changes require a bounded owner decision or task rather than extending Decision 0147 or
+Decision 0164.
 
 ## Deferred work
 

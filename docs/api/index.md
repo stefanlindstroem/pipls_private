@@ -1,69 +1,34 @@
 # API reference
 
-The generated reference documents supported public objects directly from their Python docstrings.
-Core estimators and the public warning are available from `pipls`; their defining modules expose
-only the corresponding public object. Returned result records, numerical inspection, dataset, and
-metric tools live in focused submodules. Rendering is caller-owned.
+Reference is for exact object, result, and behavior lookup. The
+[tutorials](../tutorials/quick_start.md) own worked modeling workflows; generated API sections on
+these pages come directly from the public NumPy-style docstrings.
 
-## Mathematical notation and Python names
+## Estimators
 
-Mathematical sections use $\mathbf{X}$ for the predictor matrix and $\mathbf{Y}$ for the
-response matrix. Python
-call signatures follow the scikit-learn convention `fit(X, y)`: `y` may be either a one-dimensional
-response or a two-dimensional multivariate response matrix. Names such as `y_pred`, `y_scores_`,
-and `y_loadings_` follow the same programming convention and do not imply a scalar response.
+- [`PiPLSRegression`](regression.md) fits one explicit $(h,r_\pi)$ pair and documents its fitted
+  decomposition and direct-fit support warning.
+- [`PiPLSSearchCV`](path.md) evaluates admissible component/rank candidates and exposes explicit
+  selection, OOF-reporting, and refitting operations.
 
-For Π-PLS, public `n_components` counts paired latent modes $h$, and `predictor_rank` is the
-retained predictor-subspace dimension $r_\pi$. See
-[Interpretation of the two rank controls](../theory.md#interpretation-of-the-ranks) for their
-separate roles. The factor arrays $\mathbf{P}$ and $\mathbf{Q}$ are orthonormal predictor and
-response directions; the [canonical terminology](../theory.md#canonical-terminology) distinguishes
-them from reconstruction loadings.
+For Π-PLS, `n_components` is the number of paired latent modes $h$, while `predictor_rank` is the
+retained predictor-subspace dimension $r_\pi$. Their separate roles are defined under
+[Interpretation of the two rank controls](../theory.md#interpretation-of-the-ranks).
 
-## Start with the estimators
+## Results and supporting APIs
 
-- [`PiPLSRegression`](regression.md)
-- [`PiPLSSearchCV`](path.md)
-- [Selection and validation](../selection_validation.md)
-- [Troubleshooting](../troubleshooting.md)
+- [Selection and validation](../selection_validation.md) defines component paths, predictor-rank
+  evidence, selections, OOF reports, scoring, CV metadata, and exact selection rules.
+- [Model inspection](../model_inspection.md) defines fitted latent quantities, Π-PLS display
+  factors, biplot coordinates, and prediction and observation diagnostics.
+- [Datasets and generators](datasets.md) documents packaged datasets, immutable data/truth records,
+  and synthetic generators.
+- [Troubleshooting](../troubleshooting.md) covers warnings, validation failures, lifecycle errors,
+  numerical failures, copying behavior, and unexpectedly expensive searches.
 
-## Which result object should I use?
+Mathematical sections use $\mathbf{X}$ and $\mathbf{Y}$. Python follows the scikit-learn convention
+`fit(X, y)`, where `y` may be either one-dimensional or a two-dimensional multivariate response
+matrix.
 
-| Object | Obtained from | Main purpose |
-|---|---|---|
-| [`PiPLSComponentPath`](../selection_validation.md#pipls.component_path.PiPLSComponentPath) | `search.component_path_` | Compare paired-mode counts through aligned numerical evidence |
-| [`PiPLSPredictorRankEvidence`](../selection_validation.md#pipls.component_path.PiPLSPredictorRankEvidence) | conditioned path rows and rank profiles | Reconstruct the exact rank reference and tolerance threshold |
-| [`PiPLSSelection`](../selection_validation.md#pipls.component_path.PiPLSSelection) | `search.select(...)`, `model.selection_`, or an OOF report | Retrieve one evaluated fixed rank pair and its diagnostics |
-| [`PiPLSPredictorRankProfile`](../selection_validation.md#pipls.component_path.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
-| [`PiPLSOOFReport`](../selection_validation.md#pipls.validation.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |
-| [`PiPLSDecomposition`](regression.md#pipls.decomposition.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
-| [`LatentStructure`](../model_inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, and coefficients for PLS-family inspection |
-| [`PiPLSDisplayFactors`](../model_inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors |
-| [`BiplotCoordinates`](../model_inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |
-| [`ObservationDiagnostics`](../model_inspection.md#pipls.inspection.ObservationDiagnostics) | `observation_diagnostics(model)` | Inspect score distance and X-reconstruction residuals |
-| [`PredictionDiagnostics`](../model_inspection.md#pipls.inspection.PredictionDiagnostics) | `prediction_diagnostics(Y, Y_pred, ...)` | Inspect predictions, residuals, and response-standardized errors |
-| [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | a named loader, dataset construction, or generator output | Carry validated arrays, labels, provenance, and metadata |
-| [`PiPLSRegressionTruth`](datasets.md#pipls.datasets.PiPLSRegressionTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
-| [`PiPLSLatentGeometryTruth`](datasets.md#pipls.datasets.PiPLSLatentGeometryTruth) | `make_pipls_latent_geometry(...).truth` | Inspect the manuscript-oriented Gaussian latent geometry |
-
-`PiPLSSearchCV.select()` returns complete stored component rows by component count or by the
-`best_score` and `minimum_cv_mse` rules without fitting or mutating the search. The
-minimum-CV-MSE rule accepts simultaneous relative and absolute tolerances and retains their complete
-selection provenance. Rule scope and scorer qualification are described under
-[search-owned selection rules](../selection_validation.md#search-owned-selection-rules).
-
-[Pulp](../datasets.md#pulp-real-data-integration),
-[Sugarcane](../datasets.md#sugarcane-spectral-integration), and
-[Tobacco](../datasets.md#tobacco-spectral-integration) are available as named package-owned
-datasets through
-[`load_pulp()`](datasets.md#pipls.datasets.load_pulp),
-[`load_sugarcane()`](datasets.md#pipls.datasets.load_sugarcane), and
-[`load_tobacco()`](datasets.md#pipls.datasets.load_tobacco). No generic dataset registry is part of
-the runtime API.
-
-## Rendering boundary
-
-The API ends at immutable numerical results. Π-PLS provides no plotting submodule. Maintained
-examples pass result arrays to ordinary Matplotlib calls. `biplot_coordinates()` is retained because
-coordinate balancing is numerical; optional `textalloc` placement is example-owned rendering that
-operates on the resulting predictor endpoints and Matplotlib axes.
+The runtime API returns numerical objects and contains no plotting submodule. Maintained examples
+render inspection results with ordinary Matplotlib.

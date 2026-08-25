@@ -144,18 +144,13 @@ Datasets and generators reference retains the general latent-role explanation an
 `docs/assets/figures/latent_geometry_generator.svg` figure, while the companion-manuscript
 synthetic-data page retains publication-specific generation and reproduction guidance.
 
-Patch 0164B applies the flat seven-page Reference navigation and consolidates the former
-path-selection-details and computational-performance pages into the canonical Selection and
-validation page plus symptom-oriented Troubleshooting guidance. Patch 0164C reduces the
-`PiPLSRegression` page to generated estimator, decomposition, and warning reference with only
-concise estimator-specific orientation. Patch 0164D reduces `PiPLSSearchCV` to generated estimator
-reference plus a concise lifecycle/template boundary and moves generated search-result and scoring
-reference to Selection and validation. Patch 0164E merges inspection concepts and generated API
-into the single flat Model inspection page. The remaining overview/data pages are slimmed in the
-final bounded patch. Numbered decisions and `.llm`
-are maintainer records and are not served as user documentation. Semantic cross-references are
-maintained contextually; strict documentation builds own link resolution rather than pytest
-assertions about prose placement.
+Patches 0164B--0164F complete that migration: selection/validation owns search evidence and
+scoring records, estimator pages prioritize generated API lookup, Model inspection is one flat page,
+and the overview, datasets/generators, and Troubleshooting pages are compact lookup surfaces. The
+synthetic-generator latent-role explanation and maintained figure remain served. Numbered decisions
+and `.llm` are maintainer records and are not served as user documentation. Semantic
+cross-references are maintained contextually; strict documentation builds own link resolution
+rather than pytest assertions about prose placement.
 
 Python 3.10--3.14 is supported within the dependency ranges in `pyproject.toml`. Clean wheel and
 source-distribution installations are validated. `docs-dist` builds documentation from the
@@ -177,11 +172,9 @@ Do not add without a new owner decision:
 
 ## Maintenance state
 
-Decision 0147 is complete. Decision 0164 is the active documentation-architecture increment;
-Patches 0164B--0164E establish the flat served Reference, canonical selection/validation ownership,
-slim estimator pages, and the merged Model inspection reference. The final bounded patch slims the
-overview, data, and troubleshooting content without changing runtime behavior. The maintained
-registry contains only current decisions; completed records are summarized in
+Decisions 0147 and 0164 are complete. The served Reference now follows the flat seven-page
+architecture with lean object/domain lookup pages and no active repository-wide documentation
+migration. The maintained registry contains only current decisions; completed records are summarized in
 `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
 inherited 0153/0154 retirement-map number collisions are frozen exceptions. `make decision-check`
 validates both current registries, local links, active decision references, retirement-map

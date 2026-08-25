@@ -90,9 +90,9 @@ representative interpretation of standard PLS-family plots and Π-PLS-specific p
 - [`PiPLSRegression`](api/regression.md): fixed-estimator parameters and fitted results.
 - [`PiPLSSearchCV`](api/path.md): search-estimator parameters and post-fit lifecycle.
 - [Selection and validation](selection_validation.md): search bounds, rank policies, scoring, CV, OOF, and selection contracts.
-- [Model inspection](model_inspection.md): interpretation of fitted quantities and plots.
+- [Model inspection](model_inspection.md): numerical fitted-model quantities and interpretation.
 - [Datasets and generators](api/datasets.md): packaged data, synthetic generators, and truth records.
-- [Troubleshooting](troubleshooting.md): common fit, selection, scoring, and performance problems.
+- [Troubleshooting](troubleshooting.md): warnings, validation failures, lifecycle errors, and expensive searches.
 
 ## Project validation
 

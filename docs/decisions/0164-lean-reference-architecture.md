@@ -2,9 +2,8 @@
 
 ## Status
 
-Accepted. Patch 0164A records the architecture and supersedes the former 0065 documentation-layer record. The served-page
-migration follows in bounded documentation patches; until each page is migrated, living user
-documentation continues to describe the implemented site rather than a partially applied target.
+Accepted. Patch 0164A records the architecture and supersedes the former 0065 documentation-layer
+record. Patches 0164B--0164F complete the served-page migration to the flat seven-page Reference.
 
 ## Context
 
