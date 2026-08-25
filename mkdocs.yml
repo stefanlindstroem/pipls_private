@@ -38,9 +38,6 @@ nav:
 exclude_docs: |
   decisions/**
 
-not_in_nav: |
-  /api/inspection.md
-
 validation:
   omitted_files: warn
   absolute_links: warn

@@ -37,11 +37,11 @@ them from reconstruction loadings.
 | [`PiPLSPredictorRankProfile`](../selection_validation.md#pipls.component_path.PiPLSPredictorRankProfile) | `search.predictor_rank_profile(h)` | Inspect all predictor ranks evaluated at one paired-mode count |
 | [`PiPLSOOFReport`](../selection_validation.md#pipls.validation.PiPLSOOFReport) | `search.oof_report(X, Y, selection=...)` | Inspect ordered OOF predictions and coverage for one existing selection |
 | [`PiPLSDecomposition`](regression.md#pipls.decomposition.PiPLSDecomposition) | `model.decomposition_` | Access predictor directions, dilation, response directions, and rank diagnostics |
-| [`LatentStructure`](inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, and coefficients for PLS-family inspection |
-| [`PiPLSDisplayFactors`](inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors |
-| [`BiplotCoordinates`](inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |
-| [`ObservationDiagnostics`](inspection.md#pipls.inspection.ObservationDiagnostics) | `observation_diagnostics(model)` | Inspect score distance and X-reconstruction residuals |
-| [`PredictionDiagnostics`](inspection.md#pipls.inspection.PredictionDiagnostics) | `prediction_diagnostics(Y, Y_pred, ...)` | Inspect predictions, residuals, and response-standardized errors |
+| [`LatentStructure`](../model_inspection.md#pipls.inspection.LatentStructure) | `latent_structure(model)` | Access scores, loadings, and coefficients for PLS-family inspection |
+| [`PiPLSDisplayFactors`](../model_inspection.md#pipls.inspection.PiPLSDisplayFactors) | `pipls_display_factors(model.decomposition_)` | Obtain display-oriented $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors |
+| [`BiplotCoordinates`](../model_inspection.md#pipls.inspection.BiplotCoordinates) | `biplot_coordinates(model)` | Construct balanced two-component score-loading coordinates |
+| [`ObservationDiagnostics`](../model_inspection.md#pipls.inspection.ObservationDiagnostics) | `observation_diagnostics(model)` | Inspect score distance and X-reconstruction residuals |
+| [`PredictionDiagnostics`](../model_inspection.md#pipls.inspection.PredictionDiagnostics) | `prediction_diagnostics(Y, Y_pred, ...)` | Inspect predictions, residuals, and response-standardized errors |
 | [`PiPLSDataset`](datasets.md#pipls.datasets.PiPLSDataset) | a named loader, dataset construction, or generator output | Carry validated arrays, labels, provenance, and metadata |
 | [`PiPLSRegressionTruth`](datasets.md#pipls.datasets.PiPLSRegressionTruth) | `synthetic.truth` | Inspect the known latent structure of generated data |
 | [`PiPLSLatentGeometryTruth`](datasets.md#pipls.datasets.PiPLSLatentGeometryTruth) | `make_pipls_latent_geometry(...).truth` | Inspect the manuscript-oriented Gaussian latent geometry |

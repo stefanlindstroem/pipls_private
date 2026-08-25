@@ -319,7 +319,7 @@ The three length descriptors point in closely similar directions in the displaye
 chosen biplot scaling, not regression coefficients or formal variable importance.
 
 See [Score-loading biplot](../model_inspection.md#score-loading-biplot) and
-[`biplot_coordinates()`](../api/inspection.md#pipls.inspection.biplot_coordinates).
+[`biplot_coordinates()`](../model_inspection.md#pipls.inspection.biplot_coordinates).
 
 ### Π-PLS-specific factorization
 
@@ -454,13 +454,13 @@ strict documentation-build and source-distribution checks.
 
 ## Next steps
 
-- Use [Model inspection](../model_inspection.md) for the complete quantity catalogue and
-  interpretation boundaries.
+- Use [Model inspection](../model_inspection.md) for inspection quantities, exact API contracts,
+  and interpretation boundaries.
 - Use [Selection and validation](../selection_validation.md) for nondefault bounds, policies, pipelines,
   scorer behavior, grouped or temporal splitters, OOF coverage, and automatic refitting.
 - Use [Examples](../examples.md) for Sugarcane, Tobacco, and the ordinary-PLS path comparison.
-- Use the [`PiPLSSearchCV` reference](../api/path.md#pipls.PiPLSSearchCV) and
-  [inspection API](../api/inspection.md) for exact signatures.
+- Use the [`PiPLSSearchCV` reference](../api/path.md#pipls.PiPLSSearchCV) for the search-estimator
+  signature; [Model inspection](../model_inspection.md) embeds the inspection API beside each quantity.
 
 ## Reference
 

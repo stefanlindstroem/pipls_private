@@ -150,8 +150,9 @@ validation page plus symptom-oriented Troubleshooting guidance. Patch 0164C redu
 `PiPLSRegression` page to generated estimator, decomposition, and warning reference with only
 concise estimator-specific orientation. Patch 0164D reduces `PiPLSSearchCV` to generated estimator
 reference plus a concise lifecycle/template boundary and moves generated search-result and scoring
-reference to Selection and validation. Inspection and the remaining overview/data pages are slimmed
-in later bounded patches. Numbered decisions and `.llm`
+reference to Selection and validation. Patch 0164E merges inspection concepts and generated API
+into the single flat Model inspection page. The remaining overview/data pages are slimmed in the
+final bounded patch. Numbered decisions and `.llm`
 are maintainer records and are not served as user documentation. Semantic cross-references are
 maintained contextually; strict documentation builds own link resolution rather than pytest
 assertions about prose placement.
@@ -176,11 +177,12 @@ Do not add without a new owner decision:
 
 ## Maintenance state
 
-Decision 0147 is complete. Decision 0164 is the active documentation-architecture increment; Patch
-0164B establishes the flat served Reference and canonical selection/validation ownership, while
-later bounded patches slim the estimator, inspection, overview, data, and troubleshooting content
-without changing runtime behavior. The maintained registry contains only current decisions;
-completed records are summarized in `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
+Decision 0147 is complete. Decision 0164 is the active documentation-architecture increment;
+Patches 0164B--0164E establish the flat served Reference, canonical selection/validation ownership,
+slim estimator pages, and the merged Model inspection reference. The final bounded patch slims the
+overview, data, and troubleshooting content without changing runtime behavior. The maintained
+registry contains only current decisions; completed records are summarized in
+`docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
 inherited 0153/0154 retirement-map number collisions are frozen exceptions. `make decision-check`
 validates both current registries, local links, active decision references, retirement-map
 uniqueness, and additional number reuse.
