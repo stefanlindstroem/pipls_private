@@ -130,7 +130,7 @@ seed.
 
 ## Synthetic validation
 
-`pipls.datasets` provides deterministic latent-structure generators with known shared,
+`pipls.datasets` provides a deterministic latent-structure generator with known shared,
 predictor-specific, and response-specific components. The separate
 [companion-manuscript synthetic-data guide](manuscript_reproduction.md) documents the exact
 Gaussian latent distribution and distinguishes reproducing that distribution from reproducing one

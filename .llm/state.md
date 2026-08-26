@@ -173,9 +173,7 @@ Do not add without a new owner decision:
 
 ## Maintenance state
 
-Decisions 0147 and 0164 are complete. Decision 0165 is the active bounded documentation-methodology
-migration. Patches 0165A--0165C establish the target, align the tutorials, and split the Reference;
-0165D remains to close the terminology/cross-reference audit. The maintained
+Decisions 0147, 0164, and 0165 are complete. The maintained
 registry contains only current decisions; completed records are summarized in
 `docs/decisions/history.md` and mapped in `docs/decisions/retirements.md`. The
 inherited 0153/0154 retirement-map number collisions are frozen exceptions. `make decision-check`

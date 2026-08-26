@@ -56,7 +56,7 @@ Generate one reproducible synthetic dataset and split its rows into training and
 --8<-- "examples/02_synthetic_path_selection.py:generate-synthetic-data"
 ```
 
-The details of the synthetic data generation is not important to learn Π-PLS regression analysis, but for the interested reader, the generating structure contains:
+The details of the synthetic data generation are not important for learning Π-PLS regression analysis, but the generating structure contains:
 
 - two shared directions that affect both predictors and responses;
 - two predictor-specific directions that affect only the predictors;
@@ -113,7 +113,7 @@ not enter selection.
 
 ## Choose the component count and create the selection
 
-Inspect the path and identify its elbow point. This which represents the simplest model that can be constructed significantly impairing predictive performance.   Record the number of components at that point and create the corresponding immutable search selection:
+Inspect the path and identify its elbow point. This represents the simplest model that can be constructed without significantly impairing predictive performance. Record the number of components at that point and create the corresponding immutable search selection:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:choose-synthetic-selection"
@@ -207,7 +207,7 @@ The completed diagnostic result is then rendered:
 
 ![Synthetic observed versus predicted responses](../assets/generated/synthetic/observed_vs_predicted.svg)
 
-The prediction plot uses the held-out test block. `model.score(test.X, test.Y)` supplies the corresponding uniform
+The prediction plot uses the held-out test block. `model.score(X_test, Y_test)` supplies the corresponding uniform
 average of the response-wise coefficients of determination.
 
 ## Minimal reusable workflow

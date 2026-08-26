@@ -76,7 +76,7 @@ full real-data workflows.
 - `src/pipls/datasets.py`: stable public dataset façade and `__all__`.
 - `src/pipls/_dataset_types.py`: immutable dataset and truth records plus shared validation.
 - `src/pipls/_dataset_resources.py`: packaged Pulp, Sugarcane, and Tobacco loading and integrity.
-- `src/pipls/_synthetic_data.py`: deterministic synthetic-data and configurable regression generators.
+- `src/pipls/_synthetic_data.py`: deterministic synthetic-data generator.
 - `src/pipls/exceptions.py`: package warning types.
 - `src/pipls/__init__.py`: deliberate top-level exports.
 

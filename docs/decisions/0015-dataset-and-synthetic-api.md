@@ -23,7 +23,6 @@ should contain no more generator machinery than those uses require.
 - `PiPLSDataset` is the common immutable, validation-controlled container. It stores `X`, `Y`,
   feature names, target names, sample identifiers, provenance, metadata, and optional synthetic
   truth.
-- `data` and `target` are scikit-learn-style aliases for `X` and `Y`.
 - `Y` is normalized to a two-dimensional array, including single-response datasets.
 - Required provenance keys are `source`, `license`, `citation`, and `version` when the optional
   container is used. They are not prerequisites for fitting plain user-supplied `X` and `Y`.
