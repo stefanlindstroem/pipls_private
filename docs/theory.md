@@ -537,8 +537,8 @@ redefined by this theory page and need not duplicate the manuscript’s experime
 
 The package offers two synthetic-data purposes. `make_synthetic_data()` implements the
 [companion manuscript’s](citation.md#companion-paper) Gaussian latent data-generating model directly.
-`make_pipls_regression()` and `make_pipls_train_test()` provide broader configurable package
-generators. See the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
+`make_pipls_regression()` provides a broader configurable package generator. See the
+[companion-manuscript synthetic-data guide](manuscript_reproduction.md)
 for the exact distribution and reproducibility boundary, and the
 [dataset and generator guide](datasets.md) for the broader package distinction.
 

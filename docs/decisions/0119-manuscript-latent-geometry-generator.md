@@ -6,10 +6,10 @@ Accepted and implemented.
 
 ## Context
 
-The package already provides `make_pipls_regression()` and `make_pipls_train_test()` as broad,
-configurable synthetic-data facilities. Those generators center and standardize latent score
-columns, use orthonormal loading directions, and support configurable strengths, distributions,
-and observed-variable scales. They are useful package capabilities, but they do not reproduce the
+The package already provides `make_pipls_regression()` as a broad, configurable synthetic-data
+facility. That generator centers and standardizes latent score columns, uses orthonormal loading
+directions, and supports configurable strengths, distributions, and observed-variable scales. It is
+a useful package capability, but it does not reproduce the
 Gaussian latent-space data-generating model used in the companion manuscript.
 
 The package must be capable of generating data from the manuscript model without changing its

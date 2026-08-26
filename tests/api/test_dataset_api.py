@@ -10,7 +10,6 @@ from pipls.datasets import (
     PiPLSDataset,
     SyntheticDataTruth,
     make_pipls_regression,
-    make_pipls_train_test,
     make_synthetic_data,
 )
 
@@ -23,7 +22,6 @@ _PUBLIC_DATASET_NAMES = [
     "load_tobacco",
     "make_synthetic_data",
     "make_pipls_regression",
-    "make_pipls_train_test",
 ]
 
 
@@ -36,7 +34,6 @@ def test_dataset_module_is_a_stable_public_facade() -> None:
 def test_dataset_api_is_exposed_from_pipls_datasets_namespace() -> None:
     assert inspect.signature(make_synthetic_data).parameters["random_state"].default == 0
     assert inspect.signature(make_pipls_regression).parameters["random_state"].default == 0
-    assert inspect.signature(make_pipls_train_test).parameters["random_state"].default == 0
 
     dataset = make_pipls_regression(
         n_samples=12,
@@ -89,15 +86,6 @@ def test_generator_rejects_sample_blocks_too_small_for_centered_latent_rank() ->
     with pytest.raises(ValueError, match="centered latent rank"):
         make_pipls_regression(
             n_samples=3,
-            n_features=5,
-            n_targets=4,
-            n_shared=2,
-            n_predictor_specific=1,
-        )
-    with pytest.raises(ValueError, match="n_test"):
-        make_pipls_train_test(
-            n_train=10,
-            n_test=3,
             n_features=5,
             n_targets=4,
             n_shared=2,

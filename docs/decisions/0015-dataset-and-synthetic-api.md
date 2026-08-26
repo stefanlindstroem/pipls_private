@@ -28,8 +28,6 @@ structure without changing NumPy's global random state.
   contents can be recursively frozen. Unsupported mutable or object values are rejected.
 - `make_pipls_regression` uses a local seeded `numpy.random.Generator` and returns one
   `PiPLSDataset`.
-- `make_pipls_train_test` returns two `PiPLSDataset` objects generated from one shared latent
-  loading model but independent sample scores and noise. It performs no fitted preprocessing.
 - `PiPLSSyntheticTruth` exposes read-only latent scores, loading blocks, signal/noise matrices,
   strengths, and scales. Predictor-side response-specific and response-side predictor-specific
   loading blocks are explicit zeros.
@@ -43,8 +41,8 @@ structure without changing NumPy's global random state.
 ## Consequences
 
 - Synthetic estimator tests can use one package-owned generator rather than ad hoc local formulas.
-- Train/test demonstrations can share a true model without fitting transformations across the
-  boundary.
+- Train/test demonstrations can generate one reproducible dataset and split rows explicitly without
+  fitting transformations across the boundary.
 - Real-data examples may use plain arrays or data frames and are not required to construct this
   container.
 - Dataset migrations must keep their reading and matrix-construction steps explicit rather than

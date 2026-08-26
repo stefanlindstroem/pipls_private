@@ -54,21 +54,18 @@ observed blocks.
 
 `n_predictor_specific`, `n_shared`, and `n_response_specific` set the three latent dimensions.
 `make_synthetic_data()` implements the Gaussian construction used by the companion
-manuscript. `make_pipls_regression()` and `make_pipls_train_test()` retain the same structural roles
-while allowing configurable strengths, score distributions, observed-variable scaling, and noise.
+manuscript. `make_pipls_regression()` retains the same structural roles while allowing configurable
+strengths, score distributions, observed-variable scaling, and noise.
 The [companion-manuscript synthetic-data](../manuscript_reproduction.md) page owns the defining
 publication equations and reproduction boundary; the
-[synthetic tutorial](../tutorials/synthetic.md) shows a worked configurable example.
+[synthetic tutorial](../tutorials/synthetic.md) shows a worked train/test analysis using an explicit
+row split.
 
 ::: pipls.datasets.make_synthetic_data
     options:
       members: false
 
 ::: pipls.datasets.make_pipls_regression
-    options:
-      members: false
-
-::: pipls.datasets.make_pipls_train_test
     options:
       members: false
 

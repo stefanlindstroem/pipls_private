@@ -88,8 +88,8 @@ publication-reproduction materials.
 
 The generator performs no latent-score centering or standardization, no loading
 orthonormalization, no strength rescaling, and no observed-variable rescaling. The broader
-`make_pipls_regression()` and `make_pipls_train_test()` APIs intentionally provide those additional
-package capabilities and are not substitutes when the manuscript distribution itself is required.
+`make_pipls_regression()` API intentionally provides those additional package capabilities and is not
+a substitute when the manuscript distribution itself is required.
 
 See the
 [`make_synthetic_data()` API](api/datasets.md#pipls.datasets.make_synthetic_data)

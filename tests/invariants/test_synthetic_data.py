@@ -6,7 +6,6 @@ from numpy.testing import assert_allclose
 from pipls.datasets import (
     SyntheticDataTruth,
     make_pipls_regression,
-    make_pipls_train_test,
     make_synthetic_data,
 )
 
@@ -59,38 +58,6 @@ def test_noise_free_signal_has_declared_predictor_and_response_ranks() -> None:
     assert_allclose(dataset.Y, truth.y_signal)
 
 
-def test_train_test_share_model_but_not_sample_realizations() -> None:
-    train, test = make_pipls_train_test(
-        n_train=30,
-        n_test=20,
-        n_features=7,
-        n_targets=4,
-        n_shared=2,
-        n_predictor_specific=2,
-        n_response_specific=1,
-        feature_scale=(1.0, 2.0, 1.0, 0.5, 1.5, 1.0, 0.8),
-        target_scale=(1.0, 2.0, 0.5, 1.5),
-        random_state=9,
-    )
-    train_truth = train.truth
-    test_truth = test.truth
-    assert train_truth is not None and test_truth is not None
-
-    assert train.metadata["split_role"] == "train"
-    assert test.metadata["split_role"] == "test"
-    assert_allclose(train_truth.x_shared_loadings, test_truth.x_shared_loadings)
-    assert_allclose(
-        train_truth.x_predictor_specific_loadings,
-        test_truth.x_predictor_specific_loadings,
-    )
-    assert_allclose(train_truth.y_shared_loadings, test_truth.y_shared_loadings)
-    assert_allclose(
-        train_truth.y_response_specific_loadings,
-        test_truth.y_response_specific_loadings,
-    )
-    assert not np.array_equal(train_truth.shared_scores[:20], test_truth.shared_scores)
-
-
 def test_generator_does_not_mutate_numpy_global_rng() -> None:
     np.random.seed(124)
     expected = np.random.random(5)
@@ -106,7 +73,6 @@ def test_generator_does_not_mutate_numpy_global_rng() -> None:
     observed = np.random.random(5)
 
     assert_allclose(observed, expected)
-
 
 
 def test_manuscript_latent_geometry_matches_both_generating_equations() -> None:

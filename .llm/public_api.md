@@ -250,7 +250,6 @@ load_sugarcane
 load_tobacco
 make_synthetic_data
 make_pipls_regression
-make_pipls_train_test
 ```
 
 `PiPLSDataset` uses canonical matrix attributes `X` and `Y`; metadata, names, sample identifiers,

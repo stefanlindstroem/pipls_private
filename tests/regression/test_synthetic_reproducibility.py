@@ -6,7 +6,6 @@ from numpy.testing import assert_array_equal
 from pipls.datasets import (
     SyntheticDataTruth,
     make_pipls_regression,
-    make_pipls_train_test,
     make_synthetic_data,
 )
 
@@ -41,24 +40,6 @@ def test_different_seed_changes_generated_values() -> None:
 
     assert not np.array_equal(first.X, second.X)
     assert not np.array_equal(first.Y, second.Y)
-
-
-def test_train_block_is_independent_of_requested_test_size() -> None:
-    common = {
-        "n_train": 24,
-        "n_features": 7,
-        "n_targets": 4,
-        "n_shared": 2,
-        "n_predictor_specific": 2,
-        "n_response_specific": 1,
-        "random_state": 88,
-    }
-    train_small, _ = make_pipls_train_test(**common, n_test=5)
-    train_large, _ = make_pipls_train_test(**common, n_test=50)
-
-    assert_array_equal(train_small.X, train_large.X)
-    assert_array_equal(train_small.Y, train_large.Y)
-
 
 
 def test_manuscript_generator_is_exactly_reproducible() -> None:

@@ -11,7 +11,6 @@ from ._dataset_types import (
 )
 from ._synthetic_data import (
     make_pipls_regression,
-    make_pipls_train_test,
     make_synthetic_data,
 )
 
@@ -24,7 +23,6 @@ __all__ = [
     "load_tobacco",
     "make_synthetic_data",
     "make_pipls_regression",
-    "make_pipls_train_test",
 ]
 
 
@@ -44,7 +42,6 @@ _preserve_public_module_identity(
     load_tobacco,
     make_synthetic_data,
     make_pipls_regression,
-    make_pipls_train_test,
     _FrozenMapping,
 )
 del _preserve_public_module_identity

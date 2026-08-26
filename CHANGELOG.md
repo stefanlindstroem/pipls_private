@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Remove the dedicated synthetic train/test generator from the public API. Maintained workflows now
+  generate one reproducible dataset and split rows explicitly, avoiding a separate train/test
+  generation contract while leaving the configurable single-dataset generator unchanged.
 - Simplify the maintained synthetic train/test workflow by generating one reproducible latent-geometry
   dataset with `make_synthetic_data()` and splitting its rows explicitly; remove the tutorial-only
   latent-strength configuration without yet removing the older train/test generator API.
