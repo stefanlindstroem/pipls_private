@@ -18,8 +18,8 @@ See [authors, license, and citation](citation.md#companion-paper) for the mainta
 
 Keep three distinct targets separate:
 
-1. **Data-generating distribution.** Match the equations, dimensions, independent Gaussian draws,
-   and noise standard deviations. `make_synthetic_data()` provides this capability.
+1. **Data-generating distribution.** Match the dimensions, Gaussian construction, and noise
+   standard deviations defined by the [`make_synthetic_data()` API](api/datasets.md#synthetic-generator).
 2. **One seeded dataset.** In addition, record the exact generator arguments, random seed, package
    version, and numerical environment. The same inputs then identify one deterministic realization.
 3. **Complete manuscript results.** Also reproduce the parameter grids, all random seeds, data
@@ -32,32 +32,10 @@ software repository as the orchestration environment for one paper.
 
 ## Generate the manuscript distribution
 
-The manuscript separates predictor-specific, shared, and response-specific latent variation.
-Upright subscripts identify fixed roles or blocks: $\mathrm{p}$ is predictor-specific,
-$\mathrm{s}$ is shared, $\mathrm{r}$ is response-specific, $\mathrm{sp}$ is shared-predictor,
-and $\mathrm{sr}$ is shared-response.
-
-\begin{equation}
-\mathbf{X}
-=
-\boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
-+
-\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
-+
-\boldsymbol{\varepsilon}_{\mathrm{X}},
-\qquad
-\mathbf{Y}
-=
-\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
-+
-\boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
-+
-\boldsymbol{\varepsilon}_{\mathrm{Y}}.
-\end{equation}
-
-Every entry of the three latent-score matrices and four loading matrices is sampled independently
-from $\mathcal{N}(0,1)$. Predictor and response noise entries are independent Gaussian draws with
-standard deviations $\sigma_{\mathrm{X}}$ and $\sigma_{\mathrm{Y}}$.
+The package generator implements the manuscript's predictor-specific, shared, and response-specific
+Gaussian latent construction. The [Datasets and generators API](api/datasets.md#synthetic-generator)
+is the canonical definition of its equation, latent roles, distributional assumptions, and
+non-transformation boundary.
 
 The following call uses a representative geometry discussed in the manuscript: 40 observations,
 80 predictors, 30 responses, four predictor-specific directions, four shared directions, one
@@ -82,12 +60,9 @@ The seed `0` is illustrative. It reproduces this package-generated realization; 
 interpreted as a seed used for a manuscript result unless that seed is separately recorded in the
 publication-reproduction materials.
 
-The generator performs no latent-score centering or standardization, no loading
-orthonormalization, no strength rescaling, and no observed-variable rescaling.
-
 See the
 [`make_synthetic_data()` API](api/datasets.md#pipls.datasets.make_synthetic_data)
-for its complete validation and return contract.
+for the complete validation and return contract.
 
 ## Generator boundary
 

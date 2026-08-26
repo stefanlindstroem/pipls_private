@@ -52,10 +52,15 @@ observed blocks.
 ![Latent roles in the synthetic generator: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg){ style="width: 100%; height: auto;" }
 
 `n_predictor_specific`, `n_shared`, and `n_response_specific` set the three latent dimensions.
-`make_synthetic_data()` uses independent standard-normal score and loading entries plus independent
-Gaussian predictor and response noise. The
-[companion-manuscript synthetic-data](../manuscript_reproduction.md) page owns the
-publication-reproduction boundary; the
+Every latent-score and loading entry is an independent standard-normal draw. Predictor and response
+noise entries are independent Gaussian draws with the requested standard deviations. The generator
+applies no centering, score standardization, loading orthonormalization, latent-strength scaling, or
+observed-variable scaling.
+
+`make_synthetic_data()` returns only the generated `X` and `Y` arrays. A fixed `random_state` and
+identical arguments reproduce the same arrays for a given package implementation; internal random
+draw order is not public API. The [companion-manuscript synthetic-data](../manuscript_reproduction.md)
+page owns publication-specific reproduction requirements, while the
 [synthetic tutorial](../tutorials/synthetic.md) shows a worked train/test analysis using an explicit
 row split.
 

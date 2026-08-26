@@ -42,8 +42,9 @@ The companion paper is currently under revision:
 
 The [theory overview](theory.md) summarizes the fixed mathematical construction from the
 companion manuscript and distinguishes it from package-level preprocessing, search, and validation
-capabilities. The [companion-manuscript synthetic-data guide](manuscript_reproduction.md) documents
-the exact Gaussian data-generating distribution and the boundary between a seeded dataset and
-complete publication-result reproduction.
+capabilities. The [Datasets and generators API](api/datasets.md#synthetic-generator) defines the
+Gaussian data-generating distribution, while the
+[companion-manuscript synthetic-data guide](manuscript_reproduction.md) defines the boundary between
+a seeded dataset and complete publication-result reproduction.
 
 The citation metadata should be updated when final publication details and a DOI become available.

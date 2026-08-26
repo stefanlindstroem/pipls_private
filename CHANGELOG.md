@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Tighten dataset documentation ownership: keep the synthetic equation and generator semantics in
+  the Dataset API, keep publication-specific reproducibility in the companion-manuscript guide, and
+  reduce the Reference datasets page to packaged-data loading, provenance, licensing, adaptation,
+  dimensions, and raw-resource access.
 - Simplify reference-dataset runtime infrastructure: make `PiPLSDataset` metadata a shallow-copied
   mapping rather than a recursively frozen object tree, drop its dedicated pickle contract, and
   leave resource/canonical-array hash verification to the dedicated resource tests instead of

@@ -29,15 +29,15 @@ docstrings, and normative `.llm` contracts:
 - display mathematics in public Markdown and generated Markdown docstrings uses the supported
   equation environment rather than reStructuredText math directives.
 
-Apply the convention to the configurable and companion-manuscript synthetic models, the public
-Pi-PLS theory, path-selection extrema, generated dataset API docstrings, and the corresponding
-normative guide-layer equations. Historical decision records are not rewritten solely for
-typographic modernization.
+Apply the convention to the public synthetic-generator model, the public Pi-PLS theory,
+path-selection extrema, generated dataset API docstrings, and the corresponding normative
+guide-layer equations. Historical decision records are not rewritten solely for typographic
+modernization.
 
 ## Consequences
 
-- The dataset API and companion-manuscript guide render their defining equations through the same
-  Markdown mathematics pipeline as the public theory page.
+- The dataset API renders the synthetic generator's defining equation through the same Markdown
+  mathematics pipeline as the public theory page.
 - Predictor/shared/response labels are visibly distinct from variable indices.
 - Complete matrices, indexed columns, scalar elements, and dimensional indices retain separate
   visual roles.

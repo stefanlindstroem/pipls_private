@@ -73,10 +73,10 @@ Concepts-versus-API distinction. Worked plotting procedures remain tutorial or e
 synthetic generator are available and what they return. This page retains enough explanation to
 understand how synthetic generation works, including the predictor-specific, shared, and
 response-specific latent roles and the maintained
-`docs/assets/figures/latent_geometry_generator.svg` figure. Defining equations may remain when they
-clarify generator semantics rather than repeat docstrings. The separate companion-manuscript
-synthetic-data page continues to own the publication-specific Gaussian construction, seeded-
-realization requirements, and manuscript-reproduction boundary.
+`docs/assets/figures/latent_geometry_generator.svg` figure. The defining equation lives here with
+the generator semantics rather than being repeated on general dataset or manuscript-reproduction
+pages. The separate companion-manuscript synthetic-data page owns seeded-realization requirements
+and the manuscript-reproduction boundary.
 
 **Troubleshooting** answers why a supported operation failed or behaved unexpectedly. It remains a
 compact task-oriented lookup page for warnings, validation failures, search/refit lifecycle errors,
@@ -128,9 +128,11 @@ than a second tutorial sequence. The estimator pages can become substantially sh
 losing behavior, while the path/selection, OOF-diagnostic, and inspection domains retain enough
 manual explanation for Pi-PLS-specific semantics under the refinement in Decision 0165.
 
-Synthetic generation remains explainable rather than collapsing into signatures alone. The general
-latent-role explanation and maintained figure stay with Datasets and generators, while the
-companion-manuscript page retains the more specialized publication model and reproduction scope.
+Synthetic generation remains explainable rather than collapsing into signatures alone. The
+latent-role explanation, defining equation, distributional assumptions, and maintained figure stay
+with Datasets and generators, while the companion-manuscript page retains only the specialized
+publication-reproduction scope. The Reference datasets page owns provenance, licensing, adaptation,
+and matrix facts for the packaged real datasets.
 
 The restructuring changes documentation ownership and navigation only. It does not change numerical
 behavior, estimator behavior, public API, dataset contents, generator behavior, or rendering
