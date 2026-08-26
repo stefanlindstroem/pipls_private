@@ -2,18 +2,14 @@ from __future__ import annotations
 
 import inspect
 
+import numpy as np
 import pytest
 
 import pipls.datasets as dataset_api
-from pipls.datasets import (
-    PiPLSDataset,
-    SyntheticDataTruth,
-    make_synthetic_data,
-)
+from pipls.datasets import make_synthetic_data
 
 _PUBLIC_DATASET_NAMES = [
     "PiPLSDataset",
-    "SyntheticDataTruth",
     "load_pulp",
     "load_sugarcane",
     "load_tobacco",
@@ -30,13 +26,14 @@ def test_dataset_module_is_a_stable_public_facade() -> None:
 def test_dataset_api_is_exposed_from_pipls_datasets_namespace() -> None:
     assert inspect.signature(make_synthetic_data).parameters["random_state"].default == 0
 
-    dataset = make_synthetic_data(
+    X, Y = make_synthetic_data(
         n_samples=12,
         n_features=5,
         n_targets=3,
         n_shared=1,
     )
-    assert isinstance(dataset, PiPLSDataset)
+    assert X.shape == (12, 5)
+    assert Y.shape == (12, 3)
 
 
 @pytest.mark.parametrize(
@@ -92,8 +89,8 @@ def test_synthetic_generator_rejects_latent_dimensions_larger_than_spaces() -> N
         )
 
 
-def test_synthetic_generator_is_public_and_returns_its_truth_record() -> None:
-    dataset = make_synthetic_data(
+def test_synthetic_generator_returns_float64_arrays() -> None:
+    X, Y = make_synthetic_data(
         n_samples=1,
         n_features=3,
         n_targets=2,
@@ -101,6 +98,7 @@ def test_synthetic_generator_is_public_and_returns_its_truth_record() -> None:
         random_state=4,
     )
 
-    assert isinstance(dataset, PiPLSDataset)
-    assert isinstance(dataset.truth, SyntheticDataTruth)
-    assert dataset.metadata["generator"] == "make_synthetic_data"
+    assert X.shape == (1, 3)
+    assert Y.shape == (1, 2)
+    assert X.dtype == np.float64
+    assert Y.dtype == np.float64

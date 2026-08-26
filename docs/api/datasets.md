@@ -1,7 +1,7 @@
 # Datasets and generators
 
-`pipls.datasets` provides three packaged real-data loaders, immutable dataset and truth records, and
-a deterministic synthetic generator. Ordinary arrays and data frames passed directly to `fit(X, y)`
+`pipls.datasets` provides three packaged real-data loaders, an immutable dataset record, and a
+deterministic synthetic generator. Ordinary arrays and data frames passed directly to `fit(X, y)`
 remain the normal interface for user data.
 
 ## Packaged datasets
@@ -63,7 +63,7 @@ row split.
     options:
       members: false
 
-## Containers and truth records
+## Dataset container
 
 ::: pipls.datasets.PiPLSDataset
     options:
@@ -71,14 +71,3 @@ row split.
         - n_samples
         - n_features
         - n_targets
-
-`SyntheticDataTruth` records the latent scores, loadings, signal, and noise used to generate a
-synthetic dataset. It is normally inspected through `dataset.truth`.
-
-::: pipls.datasets.SyntheticDataTruth
-    options:
-      show_signature: false
-      members:
-        - n_shared
-        - n_predictor_specific
-        - n_response_specific

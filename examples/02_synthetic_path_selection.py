@@ -61,7 +61,7 @@ def _plot_component_path(
 
 
 # --8<-- [start:generate-synthetic-data]
-data = make_synthetic_data(
+X, Y = make_synthetic_data(
     n_samples=180,
     n_features=8,
     n_targets=3,
@@ -71,8 +71,8 @@ data = make_synthetic_data(
     noise=(0.2, 0.25),
     random_state=0,
 )
-X_train, X_test = data.X[:120], data.X[120:]
-Y_train, Y_test = data.Y[:120], data.Y[120:]
+X_train, X_test = X[:120], X[120:]
+Y_train, Y_test = Y[:120], Y[120:]
 # --8<-- [end:generate-synthetic-data]
 
 # --8<-- [start:fit-synthetic-search]
@@ -162,7 +162,8 @@ plt.close(figure)
 
 # --8<-- [start:plot-synthetic-predictions]
 figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
-for response, name in enumerate(data.target_names):
+for response in range(Y.shape[1]):
+    name = f"y_{response:03d}"
     axis.scatter(
         diagnostics.observed_standardized[:, response],
         diagnostics.predicted_standardized[:, response],
@@ -193,11 +194,7 @@ plt.close(figure)
 print("Synthetic Π-PLS path-selection example")
 print(f"Training data: X{X_train.shape}, Y{Y_train.shape}")
 print(f"Independent test data: X{X_test.shape}, Y{Y_test.shape}")
-print(
-    "Known latent structure: "
-    f"{data.truth.n_shared} shared directions and "
-    f"{data.truth.n_predictor_specific} predictor-specific directions"
-)
+print("Known latent structure: 2 shared and 2 predictor-specific directions")
 print(
     "Selected fixed model: "
     f"n_components={selection.n_components}, "

@@ -19,7 +19,6 @@ from _support.pls_family_path_comparison import (
 
 from pipls import PiPLSSearchCV
 from pipls.datasets import (
-    PiPLSDataset,
     load_pulp,
     load_sugarcane,
     load_tobacco,
@@ -46,7 +45,7 @@ class SyntheticStressSpec:
 SYNTHETIC_STRESS_SPEC = SyntheticStressSpec()
 
 
-def _make_synthetic_stress_case() -> PiPLSDataset:
+def _make_synthetic_stress_case() -> tuple[np.ndarray, np.ndarray]:
     """Generate the fixed near-saturated synthetic stress case."""
 
     spec = SYNTHETIC_STRESS_SPEC
@@ -82,8 +81,7 @@ def _load_dataset(dataset: str) -> tuple[np.ndarray, np.ndarray]:
     if dataset == "tobacco":
         return load_tobacco(return_X_y=True)
     if dataset == SYNTHETIC_STRESS_CASE:
-        generated = _make_synthetic_stress_case()
-        return generated.X, generated.Y
+        return _make_synthetic_stress_case()
     raise ValueError(f"Unknown comparison case: {dataset!r}.")
 
 

@@ -2,8 +2,8 @@
 
 The optional dataset interface provides a structured in-memory boundary for packaged
 [Pulp](#pulp-real-data-integration), [Sugarcane](#sugarcane-spectral-integration), and
-[Tobacco](#tobacco-spectral-integration) datasets, package-owned synthetic data, and experiments.
-Real-data users may
+[Tobacco](#tobacco-spectral-integration) datasets and structured experiments. Synthetic data are
+generated separately as ordinary arrays. Real-data users may
 pass ordinary arrays or
 data frames directly to `fit(X, Y)`; no container or metadata file is required for model fitting.
 Pulp, Sugarcane, and Tobacco have installed named loaders backed by canonical package resources.
@@ -57,7 +57,7 @@ validation, examples, and the [companion manuscript](citation.md#companion-paper
 ```python
 from pipls.datasets import make_synthetic_data
 
-synthetic = make_synthetic_data(
+X, Y = make_synthetic_data(
     n_samples=40,
     n_features=80,
     n_targets=30,
@@ -95,35 +95,21 @@ applies no centering, score standardization, loading orthonormalization, latent-
 observed-variable scaling. This is the package's single synthetic-data model and is also the
 synthetic model described in the [companion manuscript](citation.md#companion-paper).
 
-`synthetic.truth` is a read-only `SyntheticDataTruth`. Its loading matrices retain the
-manuscript orientation, with latent dimensions on rows and observed variables on columns. The
-stored arrays therefore verify the equations directly:
-
-```python
-truth = synthetic.truth
-
-x_signal = (
-    truth.predictor_specific_scores @ truth.predictor_specific_loadings
-    + truth.shared_scores @ truth.shared_predictor_loadings
-)
-y_signal = (
-    truth.shared_scores @ truth.shared_response_loadings
-    + truth.response_specific_scores @ truth.response_specific_loadings
-)
-```
-
-A fixed `random_state` reproduces the package draw sequence exactly. Reproducing a particular
-manuscript table or figure additionally requires the parameter grid, random seeds, resampling
-protocol, and analysis settings used for that result.
+`make_synthetic_data()` returns only the generated `X` and `Y` arrays. The latent score and loading
+matrices are implementation details rather than public result objects. A fixed `random_state` makes
+the returned arrays deterministic for a given package implementation; the internal random-draw
+order is not part of the public API. Reproducing a particular manuscript table or figure additionally
+requires the parameter grid, random seeds, resampling protocol, and analysis settings used for that
+result.
 
 ## Train/test splitting
 
-Generate one synthetic dataset and split its rows using ordinary array operations:
+Generate one synthetic `X, Y` pair and split its rows using ordinary array operations:
 
 ```python
 from pipls.datasets import make_synthetic_data
 
-synthetic = make_synthetic_data(
+X, Y = make_synthetic_data(
     n_samples=200,
     n_features=40,
     n_targets=8,
@@ -133,8 +119,8 @@ synthetic = make_synthetic_data(
     random_state=0,
 )
 
-X_train, X_test = synthetic.X[:150], synthetic.X[150:]
-Y_train, Y_test = synthetic.Y[:150], synthetic.Y[150:]
+X_train, X_test = X[:150], X[150:]
+Y_train, Y_test = Y[:150], Y[150:]
 ```
 
 The rows share one generated loading geometry while their latent scores and noise are independent

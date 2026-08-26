@@ -85,11 +85,11 @@ generic invalid-value test where accepting arbitrary invalid input remains a cur
 
 Protect:
 
-- immutable datasets, recursively frozen metadata, names, sample identity, and truth records;
+- immutable datasets, recursively frozen metadata, names, and sample identity;
 - exact package-resource bytes, shapes, names, hashes, provenance, and licenses where byte identity
   is the accepted data contract;
 - fresh loader outputs and no network or pandas dependency;
-- deterministic synthetic arrays and truth for fixed seeds;
+- deterministic synthetic arrays for fixed seeds;
 - one active package-resource matrix pair per named reference dataset;
 - loading from clean installed distributions.
 

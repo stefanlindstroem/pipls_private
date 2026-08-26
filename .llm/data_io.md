@@ -152,8 +152,8 @@ grow into manuscript pipelines or complete comparison grids.
 
 ## Tutorial assets
 
-The synthetic tutorial uses `make_synthetic_data()` and splits one generated dataset into explicit
-training and test row blocks. Pulp tutorial renderers use
+The synthetic tutorial uses `make_synthetic_data()` and splits the generated `X` and `Y` arrays into
+explicit training and test row blocks. Pulp tutorial renderers use
 `load_pulp()` and record the packaged dataset identifier, provenance,
 resource hashes, canonical-array hashes, repeated-CV protocol, OOF prediction count, selected pair,
 evaluated predictor ranks, and generated-figure hashes in ignored manifests. Generated tutorial

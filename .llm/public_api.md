@@ -243,7 +243,6 @@ or terminal Pi-PLS pipeline step and average uniformly across observations and r
 
 ```python
 PiPLSDataset
-SyntheticDataTruth
 load_pulp
 load_sugarcane
 load_tobacco
@@ -251,12 +250,13 @@ make_synthetic_data
 ```
 
 `PiPLSDataset` uses canonical matrix attributes `X` and `Y`; metadata, names, sample identifiers,
-provenance, and optional truth records are immutable. Reference loaders return a fresh immutable
-object by default or fresh read-only `(X, Y)` arrays with `return_X_y=True`. They perform no hidden
-preprocessing and require no network access or pandas.
+and provenance are immutable. Reference loaders return a fresh immutable object by default or fresh
+read-only `(X, Y)` arrays with `return_X_y=True`. They perform no hidden preprocessing and require
+no network access or pandas.
 
-The synthetic generator is deterministic for a fixed validated seed and returns an immutable
-truth record. It is a package utility, not a benchmark or publication-result API.
+The synthetic generator returns `(X, Y)` arrays directly and is deterministic for a fixed validated
+seed and identical arguments. Its internal random-draw order is not public API. It is a package
+utility, not a benchmark or publication-result API.
 
 ## Inspection
 

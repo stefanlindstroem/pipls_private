@@ -31,31 +31,21 @@ entries. Predictor and response noise contain independent Gaussian entries with 
 standard deviations. The generator applies no score centering, score standardization, loading
 orthonormalization, latent-strength scaling, or observed-variable scaling.
 
-The draw order is public and deterministic for a fixed unsigned 32-bit `random_state`:
+A fixed validated unsigned 32-bit `random_state` and identical arguments reproduce the same `X` and
+`Y` arrays for a given package implementation. The internal random-draw order is not public API;
+exact realization-level reproduction across package versions therefore requires recording the
+package version as well as the seed and generator arguments.
 
-1. predictor-specific scores `Lambda_p`;
-2. shared scores `Lambda_s`;
-3. response-specific scores `Lambda_r`;
-4. predictor-specific loadings `L_p`;
-5. shared predictor loadings `L_sp`;
-6. shared response loadings `L_sr`;
-7. response-specific loadings `L_r`;
-8. predictor noise;
-9. response noise.
-
-The function returns an ordinary `PiPLSDataset` whose `truth` is the immutable
-`SyntheticDataTruth`. Loading matrices retain manuscript orientation: latent dimensions are rows and
-observed variables are columns. The truth record validates both signal equations and reconstructs
-through the same validation path after pickling.
+The function returns the generated `(X, Y)` arrays directly. Latent score, loading, signal, and
+noise matrices are implementation details rather than public result objects.
 
 No separate train/test generator, latent-strength controls, score-distribution controls,
 orthonormal-loading construction, or observed-variable scaling belong to the public synthetic-data
-surface. When train/test blocks are required, callers generate one dataset and split rows
-explicitly.
+surface. When train/test blocks are required, callers generate `X` and `Y` once and split rows explicitly.
 
 ## Consequences
 
-- The package has one synthetic model, one generator, and one truth record.
+- The package has one synthetic model and one generator.
 - The same generator supports focused package validation and the companion manuscript's synthetic
   distribution.
 - Synthetic support code remains small and clearly separate from the Pi-PLS estimator.

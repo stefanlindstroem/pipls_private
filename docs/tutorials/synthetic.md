@@ -50,7 +50,7 @@ sampling design rather than shuffling those structures.
 
 ## Generate and split synthetic data
 
-Generate one reproducible synthetic dataset and split its rows into training and test blocks:
+Generate one reproducible synthetic `X, Y` pair and split its rows into training and test blocks:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:generate-synthetic-data"

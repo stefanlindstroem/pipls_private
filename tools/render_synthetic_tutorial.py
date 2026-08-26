@@ -102,7 +102,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True)
 
-    data = make_synthetic_data(
+    X, Y = make_synthetic_data(
         n_samples=180,
         n_features=8,
         n_targets=3,
@@ -112,8 +112,8 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         noise=(0.2, 0.25),
         random_state=0,
     )
-    X_train, X_test = data.X[:120], data.X[120:]
-    Y_train, Y_test = data.Y[:120], data.Y[120:]
+    X_train, X_test = X[:120], X[120:]
+    Y_train, Y_test = Y[:120], Y[120:]
     search = PiPLSSearchCV(cv=CV).fit(X_train, Y_train)
     path = search.component_path_
     _render_component_path(
@@ -176,7 +176,8 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     )
 
     figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
-    for response, name in enumerate(data.target_names):
+    for response in range(Y.shape[1]):
+        name = f"y_{response:03d}"
         axis.scatter(
             diagnostics.observed_standardized[:, response],
             diagnostics.predicted_standardized[:, response],
@@ -207,12 +208,12 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         "generator": {
             "name": "make_synthetic_data",
             "random_state": 0,
-            "n_samples": data.n_samples,
-            "n_features": data.n_features,
-            "n_targets": data.n_targets,
-            "n_shared": data.truth.n_shared,
-            "n_predictor_specific": data.truth.n_predictor_specific,
-            "n_response_specific": data.truth.n_response_specific,
+            "n_samples": X.shape[0],
+            "n_features": X.shape[1],
+            "n_targets": Y.shape[1],
+            "n_shared": 2,
+            "n_predictor_specific": 2,
+            "n_response_specific": 1,
         },
         "split": {
             "n_train": X_train.shape[0],

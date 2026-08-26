@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import TypeAlias
 
 import numpy as np
+from numpy.typing import NDArray
 
-from ._dataset_types import PiPLSDataset, SyntheticDataTruth
-
+FloatArray: TypeAlias = NDArray[np.float64]
 NoiseSpec: TypeAlias = float | tuple[float, float]
 
 _UINT32_MAX = 2**32 - 1
@@ -24,7 +23,7 @@ def make_synthetic_data(
     n_response_specific: int = 0,
     noise: NoiseSpec = 0.0,
     random_state: int = 0,
-) -> PiPLSDataset:
+) -> tuple[FloatArray, FloatArray]:
     r"""Generate the Gaussian latent geometry used in the companion manuscript.
 
     The function implements the latent-geometry equation in the Synthetic
@@ -58,9 +57,10 @@ def make_synthetic_data(
 
     Returns
     -------
-    PiPLSDataset
-        Generated matrices, manuscript-oriented latent truth, metadata, and
-        provenance.
+    X : ndarray of shape (n_samples, n_features)
+        Generated predictor matrix.
+    Y : ndarray of shape (n_samples, n_targets)
+        Generated response matrix.
     """
 
     n_samples = _positive_integer(n_samples, name="n_samples")
@@ -110,51 +110,9 @@ def make_synthetic_data(
         shared_scores @ shared_response_loadings
         + response_specific_scores @ response_specific_loadings
     )
-    truth = SyntheticDataTruth(
-        predictor_specific_scores=predictor_specific_scores,
-        shared_scores=shared_scores,
-        response_specific_scores=response_specific_scores,
-        predictor_specific_loadings=predictor_specific_loadings,
-        shared_predictor_loadings=shared_predictor_loadings,
-        shared_response_loadings=shared_response_loadings,
-        response_specific_loadings=response_specific_loadings,
-        x_signal=x_signal,
-        y_signal=y_signal,
-        x_noise=x_noise,
-        y_noise=y_noise,
-    )
-    metadata: Mapping[str, object] = {
-        "schema_version": 1,
-        "generator": "make_synthetic_data",
-        "random_state": seed,
-        "latent_dimensions": {
-            "predictor_specific": n_predictor_specific,
-            "shared": n_shared,
-            "response_specific": n_response_specific,
-        },
-        "noise_standard_deviation": {"X": sigma_x, "Y": sigma_y},
-        "distribution": "independent standard normal scores and loadings",
-    }
-    provenance = {
-        "source": "generated:pipls.datasets.make_synthetic_data",
-        "license": "BSD-3-Clause",
-        "citation": (
-            "Agrawal, Vishal; Nilsson, Fritjof; Lindström, Stefan B. "
-            "Panoramic Partial Least Squares (Pi-PLS): Transparent, parsimonious, "
-            "and more interpretable multivariate regression model. Manuscript under revision."
-        ),
-        "version": "1",
-    }
-    return PiPLSDataset(
-        X=x_signal + x_noise,
-        Y=y_signal + y_noise,
-        feature_names=tuple(f"x_{index:03d}" for index in range(n_features)),
-        target_names=tuple(f"y_{index:03d}" for index in range(n_targets)),
-        sample_ids=tuple(f"sample_{index:04d}" for index in range(n_samples)),
-        provenance=provenance,
-        metadata=metadata,
-        truth=truth,
-    )
+    X = x_signal + x_noise
+    Y = y_signal + y_noise
+    return X, Y
 
 
 def _positive_integer(value: object, *, name: str, minimum: int = 1) -> int:

@@ -40,89 +40,12 @@ _REQUIRED_PROVENANCE_KEYS = ("source", "license", "citation", "version")
 
 
 @dataclass(frozen=True)
-class SyntheticDataTruth:
-    r"""Immutable latent geometry for one synthetic dataset.
-
-    This record stores the terms of the latent-geometry equation in the
-    Synthetic generator section of the dataset API reference. All score,
-    loading, signal, and noise arrays are defensive read-only ``float64``
-    copies. Loading matrices follow the companion-manuscript orientation, with
-    latent dimensions on rows and observed variables on columns.
-
-    Attributes
-    ----------
-    predictor_specific_scores : ndarray of shape (n_samples, n_predictor_specific)
-        Predictor-specific latent matrix $\boldsymbol{\Lambda}_{\mathrm{p}}$.
-    shared_scores : ndarray of shape (n_samples, n_shared)
-        Shared latent matrix $\boldsymbol{\Lambda}_{\mathrm{s}}$.
-    response_specific_scores : ndarray of shape (n_samples, n_response_specific)
-        Response-specific latent matrix $\boldsymbol{\Lambda}_{\mathrm{r}}$.
-    predictor_specific_loadings : ndarray of shape (n_predictor_specific, n_features)
-        Predictor-specific loading matrix $\mathbf{L}_{\mathrm{p}}$.
-    shared_predictor_loadings : ndarray of shape (n_shared, n_features)
-        Shared predictor loading matrix $\mathbf{L}_{\mathrm{sp}}$.
-    shared_response_loadings : ndarray of shape (n_shared, n_targets)
-        Shared response loading matrix $\mathbf{L}_{\mathrm{sr}}$.
-    response_specific_loadings : ndarray of shape (n_response_specific, n_targets)
-        Response-specific loading matrix $\mathbf{L}_{\mathrm{r}}$.
-    x_signal, x_noise : ndarray of shape (n_samples, n_features)
-        Noise-free predictor signal and additive noise.
-    y_signal, y_noise : ndarray of shape (n_samples, n_targets)
-        Noise-free response signal and additive noise.
-    """
-
-    predictor_specific_scores: FloatArray
-    shared_scores: FloatArray
-    response_specific_scores: FloatArray
-    predictor_specific_loadings: FloatArray
-    shared_predictor_loadings: FloatArray
-    shared_response_loadings: FloatArray
-    response_specific_loadings: FloatArray
-    x_signal: FloatArray
-    y_signal: FloatArray
-    x_noise: FloatArray
-    y_noise: FloatArray
-
-    def __post_init__(self) -> None:
-        for name in self.__dataclass_fields__:
-            value = _read_only_float_array(getattr(self, name), name=name)
-            if value.ndim != 2:
-                raise ValueError(f"{name} must be two-dimensional.")
-            object.__setattr__(self, name, value)
-        _validate_latent_geometry_truth(self)
-
-    @property
-    def n_shared(self) -> int:
-        r"""Number of shared latent directions $d_{\mathrm{s}}$."""
-
-        return int(self.shared_scores.shape[1])
-
-    @property
-    def n_predictor_specific(self) -> int:
-        r"""Number of predictor-specific latent directions $d_{\mathrm{p}}$."""
-
-        return int(self.predictor_specific_scores.shape[1])
-
-    @property
-    def n_response_specific(self) -> int:
-        r"""Number of response-specific latent directions $d_{\mathrm{r}}$."""
-
-        return int(self.response_specific_scores.shape[1])
-
-    def __reduce__(self) -> tuple[object, tuple[FloatArray, ...]]:
-        return (
-            type(self),
-            tuple(getattr(self, name) for name in self.__dataclass_fields__),
-        )
-
-
-@dataclass(frozen=True)
 class PiPLSDataset:
     r"""Immutable validated multivariate regression dataset.
 
     Plain arrays and data frames passed directly to ``fit(X, Y)`` remain the
     primary real-data interface. This container carries packaged reference
-    datasets, synthetic data, and structured experiment data.
+    datasets and structured experiment data.
 
     Parameters
     ----------
@@ -141,9 +64,6 @@ class PiPLSDataset:
     metadata : mapping of str to object, default={}
         Recursively frozen dataset metadata. NumPy metadata arrays must not use
         object dtype, because object-array elements can remain mutable.
-    truth : SyntheticDataTruth or None, default=None
-        Optional synthetic latent structure consistent with ``X`` and ``Y``.
-
     Attributes
     ----------
     X, Y : ndarray
@@ -152,8 +72,6 @@ class PiPLSDataset:
         Validated axis labels.
     provenance, metadata : mapping
         Immutable mappings.
-    truth : SyntheticDataTruth or None
-        Optional synthetic truth object.
     """
 
     X: FloatArray
@@ -163,7 +81,6 @@ class PiPLSDataset:
     sample_ids: Sequence[str]
     provenance: Mapping[str, str]
     metadata: Mapping[str, object] = field(default_factory=dict)
-    truth: SyntheticDataTruth | None = None
 
     def __post_init__(self) -> None:
         X = _validated_matrix(self.X, name="X", allow_vector=False)
@@ -190,18 +107,6 @@ class PiPLSDataset:
         )
         provenance = _validated_provenance(self.provenance)
         metadata = _freeze_mapping(self.metadata, name="metadata")
-
-        if self.truth is not None:
-            _validate_dataset_truth(
-                self.truth,
-                n_samples=X.shape[0],
-                n_features=X.shape[1],
-                n_targets=Y.shape[1],
-            )
-            if not np.allclose(X, self.truth.x_signal + self.truth.x_noise):
-                raise ValueError("X must equal truth.x_signal + truth.x_noise.")
-            if not np.allclose(Y, self.truth.y_signal + self.truth.y_noise):
-                raise ValueError("Y must equal truth.y_signal + truth.y_noise.")
 
         object.__setattr__(self, "X", X)
         object.__setattr__(self, "Y", Y)
@@ -242,7 +147,6 @@ class PiPLSDataset:
                 self.sample_ids,
                 self.provenance,
                 self.metadata,
-                self.truth,
             ),
         )
 
@@ -338,72 +242,3 @@ def _freeze_metadata_value(value: object, *, path: str) -> object:
         f"{path} has unsupported type {type(value).__name__}; use immutable scalars, "
         "sequences, mappings, or NumPy arrays."
     )
-
-
-def _validate_dataset_truth(
-    truth: SyntheticDataTruth,
-    *,
-    n_samples: int,
-    n_features: int,
-    n_targets: int,
-) -> None:
-    if not isinstance(truth, SyntheticDataTruth):
-        raise TypeError("truth must be SyntheticDataTruth.")
-    if truth.x_signal.shape != (n_samples, n_features):
-        raise ValueError(f"truth.x_signal must have shape {(n_samples, n_features)}.")
-    if truth.y_signal.shape != (n_samples, n_targets):
-        raise ValueError(f"truth.y_signal must have shape {(n_samples, n_targets)}.")
-
-
-def _validate_latent_geometry_truth(truth: SyntheticDataTruth) -> None:
-    n_samples = truth.shared_scores.shape[0]
-    if truth.predictor_specific_scores.shape[0] != n_samples:
-        raise ValueError("All latent score matrices must contain the same samples.")
-    if truth.response_specific_scores.shape[0] != n_samples:
-        raise ValueError("All latent score matrices must contain the same samples.")
-
-    n_features = truth.shared_predictor_loadings.shape[1]
-    n_targets = truth.shared_response_loadings.shape[1]
-    expected_shapes = {
-        "predictor_specific_loadings": (
-            truth.n_predictor_specific,
-            n_features,
-        ),
-        "shared_predictor_loadings": (truth.n_shared, n_features),
-        "shared_response_loadings": (truth.n_shared, n_targets),
-        "response_specific_loadings": (
-            truth.n_response_specific,
-            n_targets,
-        ),
-        "x_signal": (n_samples, n_features),
-        "x_noise": (n_samples, n_features),
-        "y_signal": (n_samples, n_targets),
-        "y_noise": (n_samples, n_targets),
-    }
-    for name, expected in expected_shapes.items():
-        if getattr(truth, name).shape != expected:
-            raise ValueError(f"{name} must have shape {expected}.")
-
-    expected_x_signal = (
-        truth.predictor_specific_scores @ truth.predictor_specific_loadings
-        + truth.shared_scores @ truth.shared_predictor_loadings
-    )
-    expected_y_signal = (
-        truth.shared_scores @ truth.shared_response_loadings
-        + truth.response_specific_scores @ truth.response_specific_loadings
-    )
-    if not np.allclose(truth.x_signal, expected_x_signal):
-        raise ValueError("x_signal must follow the manuscript latent-geometry equation.")
-    if not np.allclose(truth.y_signal, expected_y_signal):
-        raise ValueError("y_signal must follow the manuscript latent-geometry equation.")
-
-
-def _read_only_float_array(value: object, *, name: str) -> FloatArray:
-    raw = np.asarray(value)
-    if raw.dtype.kind not in "iuf":
-        raise TypeError(f"{name} must contain real numeric values.")
-    array = np.array(raw, dtype=np.float64, copy=True)
-    if not np.all(np.isfinite(array)):
-        raise ValueError(f"{name} must contain only finite values.")
-    array.setflags(write=False)
-    return array

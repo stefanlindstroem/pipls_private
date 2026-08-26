@@ -66,7 +66,7 @@ response-specific direction, and noise standard deviations of 0.5 in both blocks
 ```python
 from pipls.datasets import make_synthetic_data
 
-data = make_synthetic_data(
+X, Y = make_synthetic_data(
     n_samples=40,
     n_features=80,
     n_targets=30,
@@ -76,10 +76,6 @@ data = make_synthetic_data(
     noise=(0.5, 0.5),
     random_state=0,
 )
-
-X = data.X
-Y = data.Y
-truth = data.truth
 ```
 
 The seed `0` is illustrative. It reproduces this package-generated realization; it should not be
@@ -93,31 +89,12 @@ See the
 [`make_synthetic_data()` API](api/datasets.md#pipls.datasets.make_synthetic_data)
 for its complete validation and return contract.
 
-## Verify the stored latent geometry
+## Generator boundary
 
-`data.truth` exposes the manuscript matrices in manuscript orientation: latent dimensions are rows
-of the loading matrices and observed variables are columns. The stored arrays permit direct
-verification of both signal equations:
-
-```python
-import numpy as np
-
-np.testing.assert_allclose(
-    truth.x_signal,
-    truth.predictor_specific_scores @ truth.predictor_specific_loadings
-    + truth.shared_scores @ truth.shared_predictor_loadings,
-)
-np.testing.assert_allclose(
-    truth.y_signal,
-    truth.shared_scores @ truth.shared_response_loadings
-    + truth.response_specific_scores @ truth.response_specific_loadings,
-)
-np.testing.assert_allclose(X, truth.x_signal + truth.x_noise)
-np.testing.assert_allclose(Y, truth.y_signal + truth.y_noise)
-```
-
-All dataset and truth arrays are defensive read-only `float64` values. The dataset metadata records
-the generator name, random seed, latent dimensions, noise standard deviations, and distribution.
+The generator returns only the observed matrices `X` and `Y`. The latent score, loading, signal, and
+noise matrices are implementation details rather than public result objects. The generating
+dimensions are already explicit in the function arguments and are sufficient for the synthetic
+validation and reproduction protocols maintained by the package.
 
 ## Record one deterministic realization
 
@@ -130,18 +107,10 @@ least:
 - the integer `random_state`;
 - any serialization or numeric-output format used downstream.
 
-The generator uses a local NumPy `default_rng` and a fixed public draw order. Decision 0119 records
-that order so a fixed seed has an auditable meaning. The metadata can be inspected directly:
-
-```python
-print(data.metadata["generator"])
-print(data.metadata["random_state"])
-print(data.metadata["latent_dimensions"])
-print(data.metadata["noise_standard_deviation"])
-```
-
-Recording a seed without the dimensions, noise settings, package version, and numerical environment
-is insufficient for an exact realization-level claim.
+The generator uses a local NumPy `default_rng`. A fixed seed and identical arguments reproduce the
+same arrays for a given package implementation, while the internal random-draw order remains an
+implementation detail. Recording a seed without the dimensions, noise settings, package version,
+and numerical environment is insufficient for an exact realization-level claim.
 
 ## Known dimensions in the synthetic experiments
 
@@ -158,14 +127,14 @@ h=d_{\mathrm{s}}.
 With the representative call above, these values are:
 
 ```python
-d_p = truth.n_predictor_specific
-d_s = truth.n_shared
+d_p = 4
+d_s = 4
 
 predictor_rank = d_p + d_s
 n_components = d_s
 ```
 
-These are oracle dimensions available because the synthetic truth is known. They are not a
+These are oracle dimensions available because the generating dimensions are known. They are not a
 real-data rank-selection rule and do not alter the package's practical search workflow. Under
 additive noise, the observed leading singular directions also need not separate signal and noise
 exactly.

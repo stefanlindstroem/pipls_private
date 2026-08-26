@@ -2,10 +2,10 @@
 
 ## Unreleased
 
-- Simplify the synthetic-data surface to `make_synthetic_data()` and `SyntheticDataTruth`: migrate
-  maintained examples and validation coverage, use explicit row splitting for train/test analyses,
-  and remove the superseded train/test and configurable generators together with their
-  strength/distribution/scaling controls and private machinery.
+- Simplify synthetic-data support to one `make_synthetic_data()` utility returning `(X, Y)` directly:
+  migrate maintained examples and validation coverage, use explicit row splitting for train/test
+  analyses, remove the superseded generators and `SyntheticDataTruth`, and keep exact internal RNG
+  draw order outside the public contract.
 - Complete the latent-role schematic integration by displaying it at full documentation-column width
   and validating that the committed SVG and standalone TeX source survive source-distribution builds.
 - Add the latent-role schematic to the Dataset API generator section and connect the three
