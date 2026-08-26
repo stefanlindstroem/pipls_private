@@ -1,8 +1,8 @@
 # Inspect and refit a manually selected Π-PLS model
 
 This tutorial continues the workflow introduced in the [Pulp quick start](quick_start.md), but uses
-deterministic synthetic training and test data so that the latent structure is known and prediction
-assessment remains independent of model selection. It inspects
+deterministic synthetic data split into training and test rows so that the latent structure is known
+and prediction assessment remains independent of model selection. It inspects
 the validation evidence before choosing a component count, creates one explicit selection, and passes it to the final full-data refit.
 
 For ordinary programming use, Π-PLS behaves like a one-parameter component search: as in PLS,
@@ -11,15 +11,15 @@ sequence of cross-validated prediction errors obtained as $h$ is varied. The sea
 predictor rank $r_\pi$ internally for each $h$. Details can be reviewed under
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
-The workflow is to generate independent training and test data, fit the search, inspect the
-component path, choose a component count and create one selection, optionally inspect the
+The workflow is to generate synthetic data, split its rows into training and test blocks, fit the
+search, inspect the component path, choose a component count and create one selection, optionally inspect the
 conditional predictor-rank profile, accept the selection, refit that same selection, and predict the
 external test data. If the selected path or conditional rank evidence is unsatisfactory, return to
 the selection step before accepting it.
 
 ```mermaid
 flowchart TD
-    data["Generate training and test data"]
+    data["Generate and split synthetic data"]
     search["Fit search"]
     path["Inspect component path"]
     select["Choose component count and create selection"]
@@ -48,9 +48,9 @@ is shown explicitly because it determines every fold-level fit and every CV-MSE 
 For grouped, blocked, or ordered observations, replace `KFold` with a splitter that represents the
 sampling design rather than shuffling those structures.
 
-## Generate training and test data
+## Generate and split synthetic data
 
-The generator creates two independent sample blocks from one latent model:
+Generate one reproducible synthetic dataset and split its rows into training and test blocks:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:generate-synthetic-data"
@@ -164,9 +164,9 @@ The profile shows the predictor ranks actually evaluated at the chosen $h$. With
 scorer, larger configured scores are equivalent to smaller mean response-standardized CV-MSE.
 `reference_selection` identifies the exact minimum-CV-MSE rank, while `selection` identifies the
 smallest rank admitted by the fitted predictor-rank tolerance. With the default machine-scale
-tolerance these are normally the same. Here both select predictor rank four, which
-matches the two shared and two predictor-specific directions in the predictor block. This
-agreement is informative but not a general selection guarantee.
+tolerance these are normally the same. Here both select predictor rank five, one above the four
+structured predictor directions in the generating model. Cross-validation targets predictive
+performance in the finite noisy sample; it need not recover the generating rank exactly.
 
 Advanced analyses can control predictor rank through the search configuration. See
 [Path and selection](../path_selection.md#predictor-rank-policies) for the available policies and tolerances.
@@ -192,8 +192,8 @@ prediction and fitted-model inspection.
 
 ## Evaluate independent predictions
 
-Predictions are calculated for the independent test observations after the selected pair has been
-refitted on all training data:
+Predictions are calculated for the held-out test rows after the selected pair has been refitted on
+all training rows:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:evaluate-synthetic-predictions"

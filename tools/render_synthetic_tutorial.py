@@ -26,7 +26,7 @@ from sklearn.model_selection import KFold  # noqa: E402
 
 from pipls import PiPLSSearchCV  # noqa: E402
 from pipls.component_path import PiPLSComponentPath, PiPLSSelection  # noqa: E402
-from pipls.datasets import make_pipls_train_test  # noqa: E402
+from pipls.datasets import make_synthetic_data  # noqa: E402
 from pipls.inspection import prediction_diagnostics  # noqa: E402
 
 DEFAULT_OUTPUT_DIR = (
@@ -102,19 +102,19 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
         shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True)
 
-    train, test = make_pipls_train_test(
-        n_train=120,
-        n_test=60,
+    data = make_synthetic_data(
+        n_samples=180,
         n_features=8,
         n_targets=3,
         n_shared=2,
         n_predictor_specific=2,
         n_response_specific=1,
-        shared_strength=(2.5, 1.5),
         noise=(0.2, 0.25),
         random_state=0,
     )
-    search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
+    X_train, X_test = data.X[:120], data.X[120:]
+    Y_train, Y_test = data.Y[:120], data.Y[120:]
+    search = PiPLSSearchCV(cv=CV).fit(X_train, Y_train)
     path = search.component_path_
     _render_component_path(
         path,
@@ -164,19 +164,19 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     _save_svg(figure, output_dir / "predictor_rank_profile.svg")
 
     model = search.refit(
-        train.X,
-        train.Y,
+        X_train,
+        Y_train,
         selection=selection,
     )
-    predictions = model.predict(test.X)
+    predictions = model.predict(X_test)
     diagnostics = prediction_diagnostics(
-        test.Y,
+        Y_test,
         predictions,
         prediction_kind="external test predictions",
     )
 
     figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
-    for response, name in enumerate(test.target_names):
+    for response, name in enumerate(data.target_names):
         axis.scatter(
             diagnostics.observed_standardized[:, response],
             diagnostics.predicted_standardized[:, response],
@@ -205,15 +205,18 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
     manifest = {
         "schema_version": 1,
         "generator": {
-            "name": "make_pipls_train_test",
+            "name": "make_synthetic_data",
             "random_state": 0,
-            "n_train": train.n_samples,
-            "n_test": test.n_samples,
-            "n_features": train.n_features,
-            "n_targets": train.n_targets,
-            "n_shared": train.truth.n_shared,
-            "n_predictor_specific": train.truth.n_predictor_specific,
-            "n_response_specific": train.truth.n_response_specific,
+            "n_samples": data.n_samples,
+            "n_features": data.n_features,
+            "n_targets": data.n_targets,
+            "n_shared": data.truth.n_shared,
+            "n_predictor_specific": data.truth.n_predictor_specific,
+            "n_response_specific": data.truth.n_response_specific,
+        },
+        "split": {
+            "n_train": X_train.shape[0],
+            "n_test": X_test.shape[0],
         },
         "analysis": {
             "chosen_n_components": selection.n_components,
@@ -224,7 +227,7 @@ def render_synthetic_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> P
             "evaluated_component_counts": path.n_components.tolist(),
             "evaluated_predictor_ranks": rank_profile.predictor_rank.tolist(),
             "prediction_kind": diagnostics.prediction_kind,
-            "external_test_r2": model.score(test.X, test.Y),
+            "external_test_r2": model.score(X_test, Y_test),
         },
         "figures": [
             {"filename": filename, "sha256": _sha256(output_dir / filename)}

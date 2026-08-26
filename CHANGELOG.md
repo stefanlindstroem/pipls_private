@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Simplify the maintained synthetic train/test workflow by generating one reproducible latent-geometry
+  dataset with `make_synthetic_data()` and splitting its rows explicitly; remove the tutorial-only
+  latent-strength configuration without yet removing the older train/test generator API.
 - Complete the latent-role schematic integration by displaying it at full documentation-column width
   and validating that the committed SVG and standalone TeX source survive source-distribution builds.
 - Add the latent-role schematic to the Dataset API generator section and connect the three

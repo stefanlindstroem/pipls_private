@@ -181,14 +181,15 @@ A fixed `random_state` reproduces the package draw sequence exactly. Reproducing
 manuscript table or figure additionally requires the parameter grid, random seeds, resampling
 protocol, and analysis settings used for that result.
 
-## Leakage-free train/test generation
+## Train/test splitting
+
+Generate one synthetic dataset and split its rows using ordinary array operations:
 
 ```python
-from pipls.datasets import make_pipls_train_test
+from pipls.datasets import make_synthetic_data
 
-train, test = make_pipls_train_test(
-    n_train=150,
-    n_test=50,
+synthetic = make_synthetic_data(
+    n_samples=200,
     n_features=40,
     n_targets=8,
     n_shared=3,
@@ -196,12 +197,14 @@ train, test = make_pipls_train_test(
     n_response_specific=1,
     random_state=0,
 )
+
+X_train, X_test = synthetic.X[:150], synthetic.X[150:]
+Y_train, Y_test = synthetic.Y[:150], synthetic.Y[150:]
 ```
 
-Both blocks share one generated set of loadings, strengths, and observed-variable scales. Their
-latent scores and noise are independent draws. No centering, standardization, imputation, feature
-selection, or other fitted preprocessing is applied across the train/test boundary. The training
-block is unchanged when only `n_test` changes.
+The rows share one generated loading geometry while their latent scores and noise are independent
+draws. Splitting is an analysis operation rather than part of the synthetic-data model. No fitted
+preprocessing is learned across the boundary by this row split.
 
 ## Real-data boundary
 

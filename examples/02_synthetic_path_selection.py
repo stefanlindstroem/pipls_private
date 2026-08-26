@@ -11,7 +11,7 @@ from sklearn.model_selection import KFold
 # --8<-- [end:import-synthetic-kfold]
 from pipls import PiPLSSearchCV
 from pipls.component_path import PiPLSComponentPath, PiPLSSelection
-from pipls.datasets import make_pipls_train_test
+from pipls.datasets import make_synthetic_data
 from pipls.inspection import prediction_diagnostics
 
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "synthetic_tutorial"
@@ -61,22 +61,22 @@ def _plot_component_path(
 
 
 # --8<-- [start:generate-synthetic-data]
-train, test = make_pipls_train_test(
-    n_train=120,
-    n_test=60,
+data = make_synthetic_data(
+    n_samples=180,
     n_features=8,
     n_targets=3,
     n_shared=2,
     n_predictor_specific=2,
     n_response_specific=1,
-    shared_strength=(2.5, 1.5),
     noise=(0.2, 0.25),
     random_state=0,
 )
+X_train, X_test = data.X[:120], data.X[120:]
+Y_train, Y_test = data.Y[:120], data.Y[120:]
 # --8<-- [end:generate-synthetic-data]
 
 # --8<-- [start:fit-synthetic-search]
-search = PiPLSSearchCV(cv=CV).fit(train.X, train.Y)
+search = PiPLSSearchCV(cv=CV).fit(X_train, Y_train)
 # --8<-- [end:fit-synthetic-search]
 
 # --8<-- [start:inspect-synthetic-component-path]
@@ -94,16 +94,16 @@ rank_profile = search.predictor_rank_profile(selection.n_components)
 
 # --8<-- [start:refit-synthetic-model]
 model = search.refit(
-    train.X,
-    train.Y,
+    X_train,
+    Y_train,
     selection=selection,
 )
 # --8<-- [end:refit-synthetic-model]
 
 # --8<-- [start:evaluate-synthetic-predictions]
-test_predictions = model.predict(test.X)
+test_predictions = model.predict(X_test)
 diagnostics = prediction_diagnostics(
-    test.Y,
+    Y_test,
     test_predictions,
     prediction_kind="external test predictions",
 )
@@ -162,7 +162,7 @@ plt.close(figure)
 
 # --8<-- [start:plot-synthetic-predictions]
 figure, axis = plt.subplots(figsize=(6.2, 5.0), layout="constrained")
-for response, name in enumerate(test.target_names):
+for response, name in enumerate(data.target_names):
     axis.scatter(
         diagnostics.observed_standardized[:, response],
         diagnostics.predicted_standardized[:, response],
@@ -191,17 +191,17 @@ plt.close(figure)
 # --8<-- [end:plot-synthetic-predictions]
 
 print("Synthetic Π-PLS path-selection example")
-print(f"Training data: X{train.X.shape}, Y{train.Y.shape}")
-print(f"Independent test data: X{test.X.shape}, Y{test.Y.shape}")
+print(f"Training data: X{X_train.shape}, Y{Y_train.shape}")
+print(f"Independent test data: X{X_test.shape}, Y{Y_test.shape}")
 print(
     "Known latent structure: "
-    f"{train.truth.n_shared} shared directions and "
-    f"{train.truth.n_predictor_specific} predictor-specific directions"
+    f"{data.truth.n_shared} shared directions and "
+    f"{data.truth.n_predictor_specific} predictor-specific directions"
 )
 print(
     "Selected fixed model: "
     f"n_components={selection.n_components}, "
     f"predictor_rank={selection.predictor_rank}"
 )
-print(f"External-test R^2: {model.score(test.X, test.Y):.3f}")
+print(f"External-test R^2: {model.score(X_test, Y_test):.3f}")
 print(f"Wrote PDF figures to {ANALYSIS_DIR}")
