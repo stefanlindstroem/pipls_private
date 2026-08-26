@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import inspect
-import pickle
 from collections.abc import Mapping
 
 import numpy as np
@@ -39,7 +38,7 @@ def test_load_tobacco_has_named_loader_return_contract() -> None:
         load_tobacco(return_X_y=1)  # type: ignore[arg-type]
 
 
-def test_load_tobacco_returns_labeled_immutable_dataset() -> None:
+def test_load_tobacco_returns_labeled_dataset() -> None:
     dataset = load_tobacco()
     wavenumbers = np.asarray(dataset.feature_names, dtype=np.float64)
 
@@ -66,8 +65,8 @@ def test_load_tobacco_returns_labeled_immutable_dataset() -> None:
 
     assert isinstance(dataset.metadata, Mapping)
     assert dataset.metadata["schema_version"] == 1
-    assert dataset.metadata["feature_names"] == dataset.feature_names
-    assert dataset.metadata["target_names"] == TARGET_NAMES
+    assert dataset.metadata["feature_names"] == list(dataset.feature_names)
+    assert dataset.metadata["target_names"] == list(TARGET_NAMES)
     assert dataset.metadata["dimensions"] == {
         "n_samples": 347,
         "n_features": 1557,
@@ -83,8 +82,6 @@ def test_load_tobacco_returns_labeled_immutable_dataset() -> None:
     assert axis["unit"] == "cm^-1"
     assert axis["ordering"] == "decreasing"
     assert axis["step"] == pytest.approx(-3.856933436849431)
-    with pytest.raises(TypeError):
-        dataset.metadata["new"] = "value"  # type: ignore[index]
 
 
 def test_load_tobacco_return_X_y_matches_default_result_and_is_fresh() -> None:
@@ -106,18 +103,3 @@ def test_load_tobacco_return_X_y_matches_default_result_and_is_fresh() -> None:
         X[0, 0] = 0.0
     with pytest.raises(ValueError):
         Y[0, 0] = 0.0
-
-
-
-def test_load_tobacco_result_is_pickleable() -> None:
-    dataset = load_tobacco()
-    restored = pickle.loads(pickle.dumps(dataset))
-
-    assert isinstance(restored, PiPLSDataset)
-    np.testing.assert_array_equal(restored.X, dataset.X)
-    np.testing.assert_array_equal(restored.Y, dataset.Y)
-    assert restored.feature_names == dataset.feature_names
-    assert restored.target_names == dataset.target_names
-    assert restored.metadata == dataset.metadata
-    assert not restored.X.flags.writeable
-    assert not restored.Y.flags.writeable

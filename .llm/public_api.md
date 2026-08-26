@@ -249,10 +249,11 @@ load_tobacco
 make_synthetic_data
 ```
 
-`PiPLSDataset` uses canonical matrix attributes `X` and `Y`; feature names, target names, and
-metadata are immutable. Reference-dataset provenance is stored once inside metadata. Reference
-loaders return a fresh immutable object by default or fresh read-only `(X, Y)` arrays with
-`return_X_y=True`. They perform no hidden preprocessing and require
+`PiPLSDataset` uses canonical matrix attributes `X` and `Y`; those arrays are defensive,
+read-only `float64` copies, names are validated tuples, and the top-level metadata mapping is
+shallow-copied without recursively freezing its values. Reference-dataset provenance is stored once
+inside metadata. Reference loaders return a fresh dataset object by default or fresh read-only
+`(X, Y)` arrays with `return_X_y=True`. They perform no hidden preprocessing and require
 no network access or pandas.
 
 The synthetic generator returns `(X, Y)` arrays directly and is deterministic for a fixed validated

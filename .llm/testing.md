@@ -85,7 +85,8 @@ generic invalid-value test where accepting arbitrary invalid input remains a cur
 
 Protect:
 
-- immutable datasets, recursively frozen metadata, names, and sample identity;
+- dataset matrix validation, defensive read-only arrays, names, and shallow-copied top-level
+  metadata;
 - exact package-resource bytes, shapes, names, hashes, provenance, and licenses where byte identity
   is the accepted data contract;
 - fresh loader outputs and no network or pandas dependency;

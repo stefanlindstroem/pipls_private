@@ -24,18 +24,15 @@ sample = PiPLSDataset(
 )
 ```
 
-The container validates and then freezes its contents:
+The container validates the model-facing structure and copies its inputs:
 
 - `X` is a finite two-dimensional real numeric array;
 - `Y` is a finite one- or two-dimensional real numeric array and is stored as two-dimensional;
 - rows of `X` and `Y` must align exactly;
 - feature names and target names are non-empty, unique strings with matching lengths;
-- metadata values may be immutable scalars, sequences, mappings, or non-object NumPy arrays;
 - model arrays are copied, converted to `float64`, and made read-only;
-- metadata arrays are copied with their dtype preserved and made read-only;
-- object-dtype metadata arrays are rejected because their elements can retain mutable Python
-  objects; use nested sequences or mappings instead;
-- nested metadata mappings and sequences are frozen recursively.
+- the top-level metadata mapping is shallow-copied;
+- metadata values are retained as supplied rather than recursively copied, normalized, or frozen.
 
 The canonical matrix attributes are `X` and `Y`. The container also exposes `n_samples`,
 `n_features`, and `n_targets` as dataset-level dimensions.
@@ -137,8 +134,8 @@ tobacco = load_tobacco()
 X, Y = load_tobacco(return_X_y=True)
 ```
 
-The default result is an immutable `PiPLSDataset`; the direct return mode supplies the same read-only
-`float64` matrices. The loaders apply no imputation, centering, scaling, row filtering, or learned
+The default result is a `PiPLSDataset` with read-only model arrays; the direct return mode supplies
+the same read-only `float64` matrices. The loaders apply no imputation, centering, scaling, row filtering, or learned
 preprocessing.
 
 ## Using the raw files outside Python
@@ -190,7 +187,7 @@ The article identifies the refiner controls, internal state variables, pulp desc
 handsheet properties as supplementary data. The package-owned dataset selects the documented
 fiber-property and response columns from that public supplementary table.
 
-`load_pulp()` reads the installed package resources and returns labels and immutable metadata
+`load_pulp()` reads the installed package resources and returns labels and metadata
 together with the two model matrices. Public provenance is stored once under
 `dataset.metadata["provenance"]`. The quick start,
 ordinary-PLS comparison, complete Pulp example, and tutorial renderer all use this public loader.
@@ -218,8 +215,8 @@ The accompanying data paper is:
 
 The Mendeley collection is licensed CC BY 4.0. The package adaptation matches the public LabSpec
 and response tables by `Sample`, removes three rows whose total-sugar response is missing, and
-applies no imputation or spectral preprocessing. `load_sugarcane()` returns the immutable labeled
-package dataset or its read-only matrices. `examples/05_sugarcane_real_data.py` obtains the matrices,
+applies no imputation or spectral preprocessing. `load_sugarcane()` returns the labeled package
+dataset with read-only model arrays or those arrays directly. `examples/05_sugarcane_real_data.py` obtains the matrices,
 wavelength labels, and response names from that result. The example deliberately fixes predictor
 rank with the [EPV policy](path_selection.md#epv-policy) using
 `samples_per_predictor_rank=5.0`, providing additional regularization of the spectral predictor
@@ -252,8 +249,8 @@ The Mendeley collection is licensed CC BY 4.0. The package adaptation matches th
 and chemistry tables one-to-one by sample ID, orders rows by that identifier, and excludes only
 source metadata columns from the model matrices. All samples and chemical responses are retained.
 No imputation, smoothing, derivatives, scatter correction, centering, scaling, or other spectral
-preprocessing is applied. `load_tobacco()` returns the immutable labeled package dataset or its
-read-only matrices. `examples/06_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
+preprocessing is applied. `load_tobacco()` returns the labeled package dataset with read-only model
+arrays or those arrays directly. `examples/06_tobacco_real_data.py` obtains the matrices, decreasing wavenumber
 labels, and source-order response names from that result. Unlike Sugarcane's fixed EPV rank, Tobacco
 optimizes predictor rank and uses a 10% relative tolerance to retain a smaller spectral subspace
 when its CV performance remains close to the conditional optimum. A separate 10% relative tolerance

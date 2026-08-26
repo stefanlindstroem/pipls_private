@@ -1,17 +1,14 @@
-"""Packaged reference-dataset loading and integrity checks."""
+"""Packaged reference-dataset loading."""
 
 from __future__ import annotations
 
 import csv
-import hashlib
 import io
 import json
 from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import resources
 from typing import Literal, cast, overload
-
-import numpy as np
 
 from ._dataset_types import FloatArray, PiPLSDataset, _validated_matrix
 
@@ -61,8 +58,8 @@ def load_pulp(
     ----------
     return_X_y : bool, default=False
         If ``True``, return the read-only predictor and response arrays directly.
-        Otherwise return an immutable :class:`PiPLSDataset` with labels and
-        metadata.
+        Otherwise return a :class:`PiPLSDataset` with read-only arrays, labels,
+        and metadata.
 
     Returns
     -------
@@ -108,8 +105,8 @@ def load_sugarcane(
     ----------
     return_X_y : bool, default=False
         If ``True``, return the read-only predictor and response arrays directly.
-        Otherwise return an immutable :class:`PiPLSDataset` with labels and
-        metadata.
+        Otherwise return a :class:`PiPLSDataset` with read-only arrays, labels,
+        and metadata.
 
     Returns
     -------
@@ -155,8 +152,8 @@ def load_tobacco(
     ----------
     return_X_y : bool, default=False
         If ``True``, return the read-only predictor and response arrays directly.
-        Otherwise return an immutable :class:`PiPLSDataset` with labels and
-        metadata.
+        Otherwise return a :class:`PiPLSDataset` with read-only arrays, labels,
+        and metadata.
 
     Returns
     -------
@@ -187,21 +184,15 @@ def _load_packaged_dataset(
     feature_names = _metadata_string_tuple(config, metadata, "feature_names")
     target_names = _metadata_string_tuple(config, metadata, "target_names")
     dimensions = _metadata_mapping(config, metadata, "dimensions")
-    integrity = _metadata_mapping(config, metadata, "integrity")
-    resource_hashes = _metadata_mapping(config, integrity, "resource_sha256")
-    array_hashes = _metadata_mapping(config, integrity, "array_sha256")
-
     X = _load_dataset_csv(
         config,
         "X.csv",
         expected_names=feature_names,
-        expected_resource_hash=_metadata_string(config, resource_hashes, "X.csv"),
     )
     Y = _load_dataset_csv(
         config,
         "Y.csv",
         expected_names=target_names,
-        expected_resource_hash=_metadata_string(config, resource_hashes, "Y.csv"),
     )
 
     expected_shape = (
@@ -216,19 +207,6 @@ def _load_packaged_dataset(
         raise RuntimeError(
             f"Packaged {config.display_name} matrices do not match metadata dimensions."
         )
-
-    _verify_dataset_array_hash(
-        config,
-        X,
-        expected=_metadata_string(config, array_hashes, "data_float64_c_order"),
-        name="data",
-    )
-    _verify_dataset_array_hash(
-        config,
-        Y,
-        expected=_metadata_string(config, array_hashes, "target_float64_c_order"),
-        name="target",
-    )
 
     dataset = PiPLSDataset(
         X=X,
@@ -275,16 +253,8 @@ def _load_dataset_csv(
     name: str,
     *,
     expected_names: tuple[str, ...],
-    expected_resource_hash: str,
 ) -> FloatArray:
     raw = _dataset_resource_bytes(config, name)
-    digest = hashlib.sha256(raw).hexdigest()
-    if digest != expected_resource_hash:
-        message = (
-            f"Packaged {config.display_name} resource {name!r} "
-            "failed its integrity check."
-        )
-        raise RuntimeError(message)
 
     try:
         rows = csv.reader(io.StringIO(raw.decode("utf-8"), newline=""))
@@ -311,22 +281,6 @@ def _load_dataset_csv(
     return _validated_matrix(values, name=name, allow_vector=False)
 
 
-def _verify_dataset_array_hash(
-    config: _PackagedDatasetConfig,
-    array: FloatArray,
-    *,
-    expected: str,
-    name: str,
-) -> None:
-    canonical = np.asarray(array, dtype=np.dtype("<f8"), order="C")
-    digest = hashlib.sha256(canonical.tobytes(order="C")).hexdigest()
-    if digest != expected:
-        message = (
-            f"Packaged {config.display_name} {name} array failed its integrity check."
-        )
-        raise RuntimeError(message)
-
-
 def _metadata_mapping(
     config: _PackagedDatasetConfig,
     values: Mapping[str, object],
@@ -336,20 +290,6 @@ def _metadata_mapping(
     if not isinstance(value, Mapping):
         message = (
             f"Packaged {config.display_name} metadata field {key!r} must be an object."
-        )
-        raise RuntimeError(message)
-    return value
-
-
-def _metadata_string(
-    config: _PackagedDatasetConfig,
-    values: Mapping[str, object],
-    key: str,
-) -> str:
-    value = values.get(key)
-    if not isinstance(value, str) or not value:
-        message = (
-            f"Packaged {config.display_name} metadata field {key!r} must be a string."
         )
         raise RuntimeError(message)
     return value

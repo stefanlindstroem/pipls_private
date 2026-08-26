@@ -13,7 +13,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0008-predictor-svd-policy.md` | scalable predictor decomposition | independent `full`, `randomized`, and `auto` solver policy |
 | `0009-public-parameter-validation.md` | exposed controls | early validation and low-statistical-support warning |
 | `0014-validation-metadata-scope.md` | groups and weighting boundary | groups-only splitter metadata; no weighted fitting or general routing |
-| `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional immutable datasets plus local seeded latent-structure generation |
+| `0015-dataset-and-synthetic-api.md` | dataset and synthetic boundary | optional validated dataset records with read-only model arrays plus local seeded latent-structure generation |
 | `0024-package-product-repository-boundary.md` | package versus publication ownership | `pipls` owns the software product; paper reproduction and separate block-scaling products stay downstream |
 | `0025-model-internal-standardization-boundary.md` | current versus external scaling | estimator centering/scaling is current and fold-local; external learned scaling must remain inside the same CV boundary |
 | `0032-full-sample-rank-support.md` | EPV sample-count convention | full supplied $n$ defines the explicit EPV heuristic; centered training folds impose feasibility caps |
@@ -36,7 +36,7 @@ This registry lists only numbered decisions that still define current behavior o
 | `0120-companion-manuscript-theory-alignment.md` | companion-manuscript theory alignment | canonical projector/optimization/diagonal derivation, corrected fitted dimension, and explicit manuscript/package scope boundary |
 | `0121-canonical-pipls-terminology.md` | canonical Pi-PLS terminology | retained basis/projector, predictor and response directions, dilation, paired modes, score orientation, and public rank-name meanings |
 | `0124-mathematical-typography-and-subscripts.md` | mathematical typography and descriptive subscripts | bold complete matrices, upright descriptive subscripts, italic variable indices, and renderable generated equations |
-| `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named immutable loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
+| `0142-package-owned-reference-datasets.md` | package-owned reference datasets | extend the named loader and language-neutral package-resource contract from Pulp to Sugarcane and Tobacco without a registry or duplicate active matrices |
 | `0143-model-selection-provenance-and-oof-reporting.md` | model-selection provenance and OOF reporting | retain exact selection provenance, share compatible selections across OOF reporting and refitting, keep reports protocol-neutral, and treat same-search OOF diagnostics as selection-conditioned inspection rather than independent validation |
 | `0146-cv-mse-tolerance-selection.md` | CV-MSE tolerance selection and split-SD reporting | replace the 1-SE heuristic with dual-tolerance minimum-CV-MSE selection, descriptive split SD, a 10% Tobacco demonstration, and repeated Pulp validation |
 | `0147-decision-lifecycle-and-maintainer-context.md` | decision lifecycle and maintainer-context consolidation | distinguish current decisions, historical summaries, and retired records; keep tests behavior-focused and active maintainer context current |

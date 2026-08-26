@@ -56,8 +56,10 @@ distribution input.
 - SHA-256 hashes of the raw resources;
 - SHA-256 hashes of canonical little-endian C-order `float64` arrays.
 
-Runtime loading verifies the declared resource and array hashes. Public tests should protect the
-schema and numerical integrity, not freeze incidental narrative wording.
+Dedicated repository tests verify the declared resource and array hashes; distribution
+qualification separately verifies that all named loaders work from built artifacts. Runtime loading
+does not rehash the package resources on every call. Tests should protect schema and numerical
+integrity, not freeze incidental narrative wording.
 
 ## Human and language-neutral access
 

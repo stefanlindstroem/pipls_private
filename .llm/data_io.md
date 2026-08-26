@@ -53,8 +53,8 @@ tobacco = load_tobacco()
 X, Y = load_tobacco(return_X_y=True)
 ```
 
-Each loader returns the immutable `PiPLSDataset` or fresh read-only `float64` arrays from installed
-package resources. Loading performs no download, imputation, centering, scaling, row filtering,
+Each loader returns a `PiPLSDataset` with read-only model arrays or fresh read-only `float64`
+arrays from installed package resources. Loading performs no download, imputation, centering, scaling, row filtering,
 spectral preprocessing, or model fitting. There is no registry, `as_frame` mode, optional data
 extra, pandas/PyYAML runtime dependency, or generic loader protocol.
 
@@ -113,7 +113,7 @@ licensing and ownership decision and remains dataset-specific.
 - **Programming user:** reads and prepares arbitrary `X` and `Y` from their own source.
 - **Estimator API:** validates supplied model matrices and fits Pi-PLS.
 - **Package-owned reference integration:** provides one canonical language-neutral resource set,
-  named Python loading, public metadata, provenance, integrity checks, and licenses.
+  named Python loading, public metadata, provenance, qualified resource integrity, and licenses.
 - **Examples:** use the named loader for package-owned reference data and show all later analytical
   choices; examples for user-owned data continue to form `X` and `Y` visibly.
 

@@ -53,5 +53,5 @@ Extreme finite inputs succeed when the requested result is representable and fai
 is not. Public inspection records now have the same direct-construction, immutability, and pickle
 boundary as the core public results.
 
-The final pre-release hardening increment closes recursively frozen dataset metadata by rejecting
-object-dtype arrays.
+Dataset metadata policy is owned separately by Decision 0015 and is not part of this
+inspection-result contract.

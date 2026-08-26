@@ -1,44 +1,19 @@
-"""Immutable dataset containers and validation support."""
+"""Dataset containers and validation support."""
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Generic, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
 
 FloatArray = NDArray[np.float64]
 
-K = TypeVar("K")
-V = TypeVar("V")
-
-
-class _FrozenMapping(Mapping[K, V], Generic[K, V]):
-    """Small immutable and pickleable mapping used by public dataset objects."""
-
-    __slots__ = ("_data",)
-
-    def __init__(self, values: Mapping[K, V]) -> None:
-        self._data = dict(values)
-
-    def __getitem__(self, key: K) -> V:
-        return self._data[key]
-
-    def __iter__(self) -> Iterator[K]:
-        return iter(self._data)
-
-    def __len__(self) -> int:
-        return len(self._data)
-
-    def __reduce__(self) -> tuple[object, tuple[dict[K, V]]]:
-        return (_FrozenMapping, (self._data,))
-
 
 @dataclass(frozen=True)
 class PiPLSDataset:
-    r"""Immutable validated multivariate regression dataset.
+    r"""Validated multivariate regression dataset.
 
     Plain arrays and data frames passed directly to ``fit(X, Y)`` remain the
     primary real-data interface. This container carries packaged reference
@@ -55,8 +30,7 @@ class PiPLSDataset:
     target_names : sequence of str
         Unique nonempty response names.
     metadata : mapping of str to object, default={}
-        Recursively frozen dataset metadata. NumPy metadata arrays must not use
-        object dtype, because object-array elements can remain mutable.
+        Dataset metadata. The top-level mapping is shallow-copied.
     Attributes
     ----------
     X, Y : ndarray
@@ -64,7 +38,7 @@ class PiPLSDataset:
     feature_names, target_names : tuple of str
         Validated axis labels.
     metadata : mapping
-        Immutable metadata mapping.
+        Shallow-copied metadata mapping.
     """
 
     X: FloatArray
@@ -91,7 +65,9 @@ class PiPLSDataset:
             expected=Y.shape[1],
             name="target_names",
         )
-        metadata = _freeze_mapping(self.metadata, name="metadata")
+        if not isinstance(self.metadata, Mapping):
+            raise TypeError("metadata must be a mapping.")
+        metadata = dict(self.metadata)
 
         object.__setattr__(self, "X", X)
         object.__setattr__(self, "Y", Y)
@@ -116,20 +92,6 @@ class PiPLSDataset:
         """Number of response columns."""
 
         return int(self.Y.shape[1])
-
-    def __reduce__(self) -> tuple[object, tuple[object, ...]]:
-        """Reconstruct through validation when unpickling."""
-
-        return (
-            type(self),
-            (
-                self.X,
-                self.Y,
-                self.feature_names,
-                self.target_names,
-                self.metadata,
-            ),
-        )
 
 
 def _validated_matrix(
@@ -167,43 +129,3 @@ def _validated_names(
     if len(set(result)) != len(result):
         raise ValueError(f"{name} must contain unique values.")
     return result
-
-
-def _freeze_mapping(values: Mapping[str, object], *, name: str) -> Mapping[str, object]:
-    if not isinstance(values, Mapping):
-        raise TypeError(f"{name} must be a mapping.")
-    result: dict[str, object] = {}
-    for key, value in values.items():
-        if not isinstance(key, str) or not key.strip():
-            raise TypeError(f"{name} keys must be non-empty strings.")
-        result[key] = _freeze_metadata_value(value, path=f"{name}[{key!r}]")
-    return _FrozenMapping(result)
-
-
-def _freeze_metadata_value(value: object, *, path: str) -> object:
-    if value is None or isinstance(value, (str, bool, int, float)):
-        if isinstance(value, float) and not np.isfinite(value):
-            raise ValueError(f"{path} must be finite.")
-        return value
-    if isinstance(value, np.ndarray):
-        if value.dtype.hasobject:
-            raise TypeError(
-                f"{path} must not use an object-dtype NumPy array; "
-                "use nested sequences or mappings for heterogeneous metadata."
-            )
-        array = np.array(value, copy=True)
-        if array.dtype.kind in "fci" and not np.all(np.isfinite(array)):
-            raise ValueError(f"{path} must contain only finite values.")
-        array.setflags(write=False)
-        return array
-    if isinstance(value, Mapping):
-        return _freeze_mapping(value, name=path)
-    if isinstance(value, (list, tuple)):
-        return tuple(
-            _freeze_metadata_value(item, path=f"{path}[{index}]")
-            for index, item in enumerate(value)
-        )
-    raise TypeError(
-        f"{path} has unsupported type {type(value).__name__}; use immutable scalars, "
-        "sequences, mappings, or NumPy arrays."
-    )

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Simplify reference-dataset runtime infrastructure: make `PiPLSDataset` metadata a shallow-copied
+  mapping rather than a recursively frozen object tree, drop its dedicated pickle contract, and
+  leave resource/canonical-array hash verification to the dedicated resource tests instead of
+  rehashing package assets on every loader call.
 - Simplify `PiPLSDataset` to `X`, `Y`, feature names, target names, and metadata: remove generated
   sample identifiers and the duplicate top-level provenance field while retaining reference-dataset
   provenance once under `metadata["provenance"]`.

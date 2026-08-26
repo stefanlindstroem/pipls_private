@@ -7,7 +7,7 @@ Accepted; implemented.
 ## Context
 
 Pulp was the first named dataset distributed with Pi-PLS. The resulting
-`load_pulp()` workflow is useful in an installed package, preserves immutable labels and metadata,
+`load_pulp()` workflow is useful in an installed package, preserves labels and metadata,
 and avoids a repository-relative file dependency. Sugarcane and Tobacco now have the same relevant
 properties: they are licensed, curated reference analyses with fixed predictor and response
 matrices, documented scientific transformations, and maintained Pi-PLS examples.
@@ -54,7 +54,7 @@ def load_tobacco(
 
 All three loaders share one narrow contract:
 
-- the default result is the existing immutable `PiPLSDataset`;
+- the default result is a `PiPLSDataset` with fresh read-only `X` and `Y` arrays;
 - `return_X_y=True` returns fresh read-only `float64` predictor and response arrays;
 - loaders are exported from `pipls.datasets`, not from the top-level `pipls` namespace;
 - loading performs no network access, filtering, imputation, centering, scaling, spectral
@@ -113,8 +113,11 @@ each have one `X.csv`/`Y.csv` pair under `src/pipls/_data/<dataset>/`, accompani
 matrix copies are removed rather than retained as duplicate active data. The hidden historical Pulp
 archive remains excluded development history and is not an active data source.
 
-All three loaders share one private package-resource pipeline for CSV and JSON parsing, dimensional
-validation, raw-resource and canonical-array integrity checks, and metadata. Every maintained reference-data consumer uses its named loader. Wheels and source
+All three loaders share one private package-resource pipeline for CSV and JSON parsing, header and
+dimensional validation, and metadata. Dedicated repository tests verify resource and
+canonical-array integrity, while distribution qualification verifies installed loading; runtime
+loaders do not rehash package resources on every call. Every maintained reference-data consumer
+uses its named loader. Wheels and source
 distributions include all five files for each dataset, isolated installations load all three
 datasets, and tests protect one active matrix location.
 

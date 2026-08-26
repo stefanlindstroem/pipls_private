@@ -20,8 +20,9 @@ flowchart TD
 
 ## Load the data
 
-`load_pulp()` returns the predictor matrix, response matrix, labels, and metadata in one immutable
-dataset object. Public provenance is available under `dataset.metadata["provenance"]`:
+`load_pulp()` returns the predictor matrix, response matrix, labels, and metadata in one dataset
+object. Its predictor and response arrays are read-only. Public provenance is available under
+`dataset.metadata["provenance"]`:
 
 ```python
 --8<-- "examples/01_pulp_quick_start.py:load-pulp-data"

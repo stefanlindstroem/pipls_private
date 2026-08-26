@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import pickle
 from collections.abc import Mapping
 
 import numpy as np
@@ -15,7 +14,7 @@ def _dataset(**overrides: object) -> PiPLSDataset:
         "Y": np.arange(8, dtype=np.float64).reshape(4, 2),
         "feature_names": ("a", "b", "c"),
         "target_names": ("u", "v"),
-        "metadata": {"nested": {"values": [1, 2]}, "array": np.array([1.0, 2.0])},
+        "metadata": {"nested": {"values": [1, 2]}},
     }
     values.update(overrides)
     return PiPLSDataset(**values)  # type: ignore[arg-type]
@@ -34,33 +33,20 @@ def test_dataset_normalizes_single_target_and_exposes_canonical_dimensions() -> 
     assert dataset.n_targets == 1
 
 
-def test_dataset_copies_and_freezes_arrays_and_metadata() -> None:
+def test_dataset_copies_arrays_and_top_level_metadata() -> None:
     X = np.arange(12, dtype=np.float64).reshape(4, 3)
-    metadata_array = np.array([1.0, 2.0])
-    dataset = _dataset(X=X, metadata={"array": metadata_array, "items": [1, 2]})
+    metadata = {"instrument": "example"}
+    dataset = _dataset(X=X, metadata=metadata)
 
     X[0, 0] = -999.0
-    metadata_array[0] = -999.0
+    metadata["instrument"] = "changed"
+    metadata["new"] = 1
 
     assert dataset.X[0, 0] == 0.0
     assert not dataset.X.flags.writeable
     assert not dataset.Y.flags.writeable
     assert isinstance(dataset.metadata, Mapping)
-    frozen_array = dataset.metadata["array"]
-    assert isinstance(frozen_array, np.ndarray)
-    assert frozen_array[0] == 1.0
-    assert not frozen_array.flags.writeable
-    assert dataset.metadata["items"] == (1, 2)
-    with pytest.raises(TypeError):
-        dataset.metadata["new"] = 1  # type: ignore[index]
-
-    payload = pickle.dumps(dataset)
-    assert b"pipls.datasets" in payload
-
-    restored = pickle.loads(payload)
-    assert isinstance(restored, PiPLSDataset)
-    np.testing.assert_array_equal(restored.X, dataset.X)
-    assert restored.metadata["items"] == (1, 2)
+    assert dataset.metadata == {"instrument": "example"}
 
 
 @pytest.mark.parametrize(
@@ -73,7 +59,7 @@ def test_dataset_copies_and_freezes_arrays_and_metadata() -> None:
         ("feature_names", ("a", "b"), ValueError),
         ("feature_names", ("a", "a", "c"), ValueError),
         ("target_names", ("u", ""), TypeError),
-        ("metadata", {"bad": object()}, TypeError),
+        ("metadata", (), TypeError),
     ],
 )
 def test_dataset_rejects_invalid_public_inputs(
@@ -83,41 +69,3 @@ def test_dataset_rejects_invalid_public_inputs(
 ) -> None:
     with pytest.raises(error):
         _dataset(**{field: value})
-
-
-def test_dataset_accepts_and_freezes_non_object_metadata_arrays() -> None:
-    source_arrays = {
-        "booleans": np.array([True, False]),
-        "strings": np.array(["alpha", "beta"]),
-        "dates": np.array(["2026-01-01", "2026-01-02"], dtype="datetime64[D]"),
-    }
-    dataset = _dataset(metadata=source_arrays)
-
-    source_arrays["booleans"][0] = False
-    source_arrays["strings"][0] = "changed"
-    source_arrays["dates"][0] = np.datetime64("2030-01-01")
-
-    for name, expected in (
-        ("booleans", np.array([True, False])),
-        ("strings", np.array(["alpha", "beta"])),
-        ("dates", np.array(["2026-01-01", "2026-01-02"], dtype="datetime64[D]")),
-    ):
-        frozen = dataset.metadata[name]
-        assert isinstance(frozen, np.ndarray)
-        assert not frozen.flags.writeable
-        np.testing.assert_array_equal(frozen, expected)
-
-
-@pytest.mark.parametrize(
-    "metadata_array",
-    [
-        np.array([{"items": []}], dtype=object),
-        np.array([[1, 2], [3, 4]], dtype=object),
-        np.array([bytearray(b"mutable")], dtype=object),
-    ],
-)
-def test_dataset_rejects_object_dtype_metadata_arrays(
-    metadata_array: np.ndarray,
-) -> None:
-    with pytest.raises(TypeError, match="object-dtype NumPy array"):
-        _dataset(metadata={"nested": {"array": metadata_array}})

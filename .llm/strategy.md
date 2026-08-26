@@ -64,7 +64,8 @@ training observations and remain explicitly separate.
 
 ### Data
 
-The package supports arbitrary user-provided arrays and three named immutable reference datasets.
+The package supports arbitrary user-provided arrays and three named reference datasets with
+read-only model arrays.
 Package resources are ordinary language-neutral files with one active matrix copy each. A future
 dataset requires explicit redistribution and adaptation rights before inclusion.
 

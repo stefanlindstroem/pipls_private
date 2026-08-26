@@ -18,8 +18,8 @@ package contains:
 - `PiPLSSearchCV`, which evaluates the admissible triangular component/rank path;
 - immutable component-path, selection, predictor-rank-profile, decomposition, and OOF records;
 - public response-standardized MSE scorers;
-- immutable datasets, deterministic synthetic data, and package-owned Pulp, Sugarcane, and
-  Tobacco reference resources;
+- validated dataset containers with read-only model arrays, deterministic synthetic data, and
+  package-owned Pulp, Sugarcane, and Tobacco reference resources;
 - pure numerical fitted-model inspection under `pipls.inspection`.
 
 The top-level wildcard surface is intentionally narrow:

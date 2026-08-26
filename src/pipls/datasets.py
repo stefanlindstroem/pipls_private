@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ._dataset_resources import load_pulp, load_sugarcane, load_tobacco
-from ._dataset_types import PiPLSDataset, _FrozenMapping
+from ._dataset_types import PiPLSDataset
 from ._synthetic_data import make_synthetic_data
 
 __all__ = [
@@ -28,6 +28,5 @@ _preserve_public_module_identity(
     load_sugarcane,
     load_tobacco,
     make_synthetic_data,
-    _FrozenMapping,
 )
 del _preserve_public_module_identity

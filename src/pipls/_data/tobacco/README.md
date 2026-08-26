@@ -11,7 +11,7 @@ preprocessing.
   `cm^-1`, ordered from approximately 10,001 down to 4,000.
 - `Y.csv`: the same 347 rows and 13 chemical response columns in source order.
 - `metadata.json`: dimensions, ordered labels, public provenance, preparation, and integrity
-  hashes used by the loader.
+  hashes verified by package qualification tests.
 - `LICENSE.txt`: Tobacco-specific attribution and Creative Commons Attribution 4.0 notice.
 
 In a wheel, the files are stored under `pipls/_data/tobacco/`. In a source checkout or unpacked

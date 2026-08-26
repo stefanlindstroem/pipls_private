@@ -1,6 +1,6 @@
 # Datasets and generators
 
-`pipls.datasets` provides three packaged real-data loaders, an immutable dataset record, and a
+`pipls.datasets` provides three packaged real-data loaders, a validated dataset record, and a
 deterministic synthetic generator. Ordinary arrays and data frames passed directly to `fit(X, y)`
 remain the normal interface for user data.
 

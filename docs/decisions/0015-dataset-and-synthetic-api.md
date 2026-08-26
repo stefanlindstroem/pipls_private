@@ -20,14 +20,14 @@ should contain no more generator machinery than those uses require.
 
 - Public dataset functionality lives in `pipls.datasets`, following the scikit-learn convention of
   a dedicated dataset namespace rather than expanding the package root.
-- `PiPLSDataset` is the common immutable, validation-controlled container for packaged datasets and
-  structured experiments. It stores `X`, `Y`, feature names, target names, and metadata.
+- `PiPLSDataset` is the common validated container for packaged datasets and structured
+  experiments. It stores `X`, `Y`, feature names, target names, and metadata; `X` and `Y` are
+  defensive read-only `float64` copies.
 - `Y` is normalized to a two-dimensional array, including single-response datasets.
 - Reference-dataset provenance is retained once inside `metadata`; it is not duplicated as a
   separate container field and is not required for user-constructed datasets.
-- All model arrays and array-valued metadata are copied and made read-only. Metadata NumPy arrays
-  must have a non-object dtype; heterogeneous values use nested sequences or mappings so their
-  contents can be recursively frozen. Unsupported mutable or object values are rejected.
+- The top-level metadata mapping is shallow-copied. Metadata
+  values are documentary user/package data and are not recursively normalized, copied, or frozen.
 - `make_synthetic_data()` is the single public synthetic generator. It uses a local seeded
   `numpy.random.Generator` and returns the generated `(X, Y)` arrays directly.
 - Exact internal random-draw order is an implementation detail rather than public API. A fixed seed
