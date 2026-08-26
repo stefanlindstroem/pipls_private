@@ -117,29 +117,11 @@ class PiPLSRegressionTruth:
 class PiPLSLatentGeometryTruth:
     r"""Immutable manuscript latent geometry for one synthetic dataset.
 
-    This record follows the orientation of the companion manuscript directly:
-
-    \begin{equation}
-    \mathbf{X}
-    =
-    \boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
-    +
-    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
-    +
-    \boldsymbol{\varepsilon}_{\mathrm{X}},
-    \qquad
-    \mathbf{Y}
-    =
-    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
-    +
-    \boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
-    +
-    \boldsymbol{\varepsilon}_{\mathrm{Y}}.
-    \end{equation}
-
-    All score, loading, signal, and noise arrays are defensive read-only
-    ``float64`` copies. Loading matrices therefore have latent dimensions on
-    rows and observed variables on columns.
+    This record stores the terms of the latent-geometry equation in the
+    Synthetic generators section of the dataset API reference. All score,
+    loading, signal, and noise arrays are defensive read-only ``float64``
+    copies. Loading matrices follow the companion-manuscript orientation, with
+    latent dimensions on rows and observed variables on columns.
 
     Attributes
     ----------

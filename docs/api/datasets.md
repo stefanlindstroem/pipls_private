@@ -22,6 +22,56 @@ licensing, adaptation, and matrix-dimension details.
     options:
       members: false
 
+## Synthetic generators
+
+The generators distinguish three latent roles. For the companion-manuscript latent geometry, the
+corresponding data model is
+
+\begin{equation}
+\mathbf{X}
+=
+\boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
++
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
++
+\boldsymbol{\varepsilon}_{\mathrm{X}},
+\qquad
+\mathbf{Y}
+=
+\boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
++
+\boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
++
+\boldsymbol{\varepsilon}_{\mathrm{Y}}.
+\end{equation}
+
+The figure illustrates this equation: predictor-specific directions contribute only to
+$\mathbf{X}$, shared directions contribute to both $\mathbf{X}$ and $\mathbf{Y}$, and
+response-specific directions contribute only to $\mathbf{Y}$. Independent noise is added to the two
+observed blocks.
+
+![Latent roles in the synthetic generators: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg){ style="width: 100%; height: auto;" }
+
+`n_predictor_specific`, `n_shared`, and `n_response_specific` set the three latent dimensions.
+`make_pipls_latent_geometry()` implements the Gaussian construction used by the companion
+manuscript. `make_pipls_regression()` and `make_pipls_train_test()` retain the same structural roles
+while allowing configurable strengths, score distributions, observed-variable scaling, and noise.
+The [companion-manuscript synthetic-data](../manuscript_reproduction.md) page owns the defining
+publication equations and reproduction boundary; the
+[synthetic tutorial](../tutorials/synthetic.md) shows a worked configurable example.
+
+::: pipls.datasets.make_pipls_latent_geometry
+    options:
+      members: false
+
+::: pipls.datasets.make_pipls_regression
+    options:
+      members: false
+
+::: pipls.datasets.make_pipls_train_test
+    options:
+      members: false
+
 ## Containers and truth records
 
 ::: pipls.datasets.PiPLSDataset
@@ -49,32 +99,3 @@ describes the companion-manuscript generator. They are normally inspected throug
         - n_shared
         - n_predictor_specific
         - n_response_specific
-
-## Synthetic generators
-
-The generators distinguish three latent roles. Predictor-specific directions contribute only to
-$\mathbf{X}$, shared directions contribute to both $\mathbf{X}$ and $\mathbf{Y}$, and
-response-specific directions contribute only to $\mathbf{Y}$. Independent noise is added to the two
-observed blocks.
-
-![Latent roles in the synthetic generators: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg){ style="width: 100%; height: auto;" }
-
-`n_predictor_specific`, `n_shared`, and `n_response_specific` set the three latent dimensions.
-`make_pipls_latent_geometry()` implements the Gaussian construction used by the companion
-manuscript. `make_pipls_regression()` and `make_pipls_train_test()` retain the same structural roles
-while allowing configurable strengths, score distributions, observed-variable scaling, and noise.
-The [companion-manuscript synthetic-data](../manuscript_reproduction.md) page owns the defining
-publication equations and reproduction boundary; the
-[synthetic tutorial](../tutorials/synthetic.md) shows a worked configurable example.
-
-::: pipls.datasets.make_pipls_latent_geometry
-    options:
-      members: false
-
-::: pipls.datasets.make_pipls_regression
-    options:
-      members: false
-
-::: pipls.datasets.make_pipls_train_test
-    options:
-      members: false

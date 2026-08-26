@@ -63,28 +63,10 @@ def make_pipls_latent_geometry(
 ) -> PiPLSDataset:
     r"""Generate the Gaussian latent geometry used in the companion manuscript.
 
-    The function implements the manuscript data model directly:
-
-    \begin{equation}
-    \mathbf{X}
-    =
-    \boldsymbol{\Lambda}_{\mathrm{p}}\mathbf{L}_{\mathrm{p}}
-    +
-    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sp}}
-    +
-    \boldsymbol{\varepsilon}_{\mathrm{X}},
-    \qquad
-    \mathbf{Y}
-    =
-    \boldsymbol{\Lambda}_{\mathrm{s}}\mathbf{L}_{\mathrm{sr}}
-    +
-    \boldsymbol{\Lambda}_{\mathrm{r}}\mathbf{L}_{\mathrm{r}}
-    +
-    \boldsymbol{\varepsilon}_{\mathrm{Y}}.
-    \end{equation}
-
-    Every entry of the three latent-score matrices and four loading matrices is
-    drawn independently from $\mathcal{N}(0,1)$. Predictor and response
+    The function implements the latent-geometry equation in the Synthetic
+    generators section of the dataset API reference. Every entry of the three
+    latent-score matrices and four loading matrices is drawn independently
+    from $\mathcal{N}(0,1)$. Predictor and response
     noise entries are independent Gaussian draws with the requested standard
     deviations. No score centering, score standardization, loading
     orthonormalization, latent-strength scaling, or observed-variable scaling is

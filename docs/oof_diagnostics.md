@@ -14,24 +14,23 @@ For the search evidence and rules that create the selection, see
 fits that fixed pair once per stored training fold, and returns an immutable `PiPLSOOFReport`.
 
 The search materializes and stores defensive read-only copies of the exact validation indices used
-by `fit()`. Consequently, an iterable splitter is not consumed a second time and a stochastic
-splitter is not asked to generate a new partition for OOF reporting. The report therefore describes
+by `fit()`. The report describes
 the same validation protocol that produced the supplied selection.
 
 ## Ordered out-of-fold predictions { #ordered-out-of-fold-predictions }
 
-The report preserves input row order. Repeated validation predictions are averaged and their counts
-are retained; uncovered rows have count 0 and NaN predictions. `has_complete_oof_coverage` records
-whether every row received at least one validation prediction, and `pooled_oof_r2` uses only rows
+The report preserves path entry order. Repeated validation predictions are averaged and their counts
+are retained; uncovered entries have count 0 and NaN predictions. `has_complete_oof_coverage` records
+whether every entry received at least one validation prediction, and `pooled_oof_r2` uses only entries
 with OOF coverage.
 
 The supplied data must have the same sample count, predictor count, and response-column count as the
 fitted search. The search does not retain and compare the original values, so the caller is
-responsible for passing the same observations in the same row order.
+responsible for passing the same observations in the same entry order.
 
 ## Prediction diagnostics and interpretation { #oof-prediction-diagnostics }
 
-`pooled_oof_r2` is calculated over rows with OOF coverage. It is a pooled statistic over the
+`pooled_oof_r2` is calculated over path entries with OOF coverage. It is a pooled statistic over the
 selection-conditioned predictions, not mean foldwise $R^2$. Response-wise $R^2$, standardized RMSE,
 and residual diagnostics can be obtained by passing the covered observed and OOF-predicted responses
 to [`prediction_diagnostics()`](model_inspection.md#response-r2) with
