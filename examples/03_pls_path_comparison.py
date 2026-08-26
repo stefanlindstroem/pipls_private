@@ -23,7 +23,7 @@ from pipls.datasets import (
     load_pulp,
     load_sugarcane,
     load_tobacco,
-    make_pipls_regression,
+    make_synthetic_data,
 )
 
 RESULTS_DIR = Path(__file__).resolve().parent / "results" / "pls_path_comparison"
@@ -50,7 +50,7 @@ def _make_synthetic_stress_case() -> PiPLSDataset:
     """Generate the fixed near-saturated synthetic stress case."""
 
     spec = SYNTHETIC_STRESS_SPEC
-    return make_pipls_regression(
+    return make_synthetic_data(
         n_samples=spec.n_samples,
         n_features=spec.n_features,
         n_targets=spec.n_targets,

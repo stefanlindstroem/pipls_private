@@ -72,9 +72,8 @@ def make_synthetic_data(
     orthonormalization, latent-strength scaling, or observed-variable scaling is
     applied.
 
-    This manuscript-aligned generator is separate from
-    :func:`make_pipls_regression`, which remains the configurable package
-    generator used by existing examples and validation workflows.
+    This generator is separate from :func:`make_pipls_regression`, which
+    remains the configurable package generator.
 
     Parameters
     ----------

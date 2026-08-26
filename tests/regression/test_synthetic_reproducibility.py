@@ -5,55 +5,31 @@ from numpy.testing import assert_array_equal
 
 from pipls.datasets import (
     SyntheticDataTruth,
-    make_pipls_regression,
     make_synthetic_data,
 )
 
 PARAMETERS = {
-    "n_samples": 24,
-    "n_features": 7,
-    "n_targets": 4,
+    "n_samples": 17,
+    "n_features": 6,
+    "n_targets": 5,
     "n_shared": 2,
-    "n_predictor_specific": 2,
-    "n_response_specific": 1,
-    "shared_distribution": "uniform",
-    "predictor_specific_distribution": "normal",
-    "response_specific_distribution": "uniform",
-    "noise": (0.05, 0.1),
+    "n_predictor_specific": 1,
+    "n_response_specific": 2,
+    "noise": (0.15, 0.25),
 }
 
 
-def test_synthetic_generator_is_exactly_reproducible() -> None:
-    first = make_pipls_regression(**PARAMETERS, random_state=314)
-    second = make_pipls_regression(**PARAMETERS, random_state=np.int64(314))
-
-    assert_array_equal(first.X, second.X)
-    assert_array_equal(first.Y, second.Y)
-    assert first.feature_names == second.feature_names
-    assert first.target_names == second.target_names
-    assert first.sample_ids == second.sample_ids
-
-
 def test_different_seed_changes_generated_values() -> None:
-    first = make_pipls_regression(**PARAMETERS, random_state=314)
-    second = make_pipls_regression(**PARAMETERS, random_state=315)
+    first = make_synthetic_data(**PARAMETERS, random_state=314)
+    second = make_synthetic_data(**PARAMETERS, random_state=315)
 
     assert not np.array_equal(first.X, second.X)
     assert not np.array_equal(first.Y, second.Y)
 
 
-def test_manuscript_generator_is_exactly_reproducible() -> None:
-    parameters = {
-        "n_samples": 17,
-        "n_features": 6,
-        "n_targets": 5,
-        "n_shared": 2,
-        "n_predictor_specific": 1,
-        "n_response_specific": 2,
-        "noise": (0.15, 0.25),
-    }
-    first = make_synthetic_data(**parameters, random_state=271)
-    second = make_synthetic_data(**parameters, random_state=np.int64(271))
+def test_synthetic_generator_is_exactly_reproducible() -> None:
+    first = make_synthetic_data(**PARAMETERS, random_state=271)
+    second = make_synthetic_data(**PARAMETERS, random_state=np.int64(271))
 
     assert_array_equal(first.X, second.X)
     assert_array_equal(first.Y, second.Y)
@@ -65,7 +41,7 @@ def test_manuscript_generator_is_exactly_reproducible() -> None:
         assert_array_equal(getattr(first_truth, name), getattr(second_truth, name))
 
 
-def test_manuscript_generator_matches_documented_rng_draw_order() -> None:
+def test_synthetic_generator_matches_documented_rng_draw_order() -> None:
     n_samples = 7
     n_features = 5
     n_targets = 4

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Migrate the remaining maintained synthetic stress case and synthetic validation coverage to
+  `make_synthetic_data()`. Remove tests that exist only for configurable latent strengths, score
+  distributions, observed-variable scaling, centered-score rank restrictions, and the superseded
+  regression truth record while leaving that older public generator in place for final cleanup.
 - Remove the dedicated synthetic train/test generator from the public API. Maintained workflows now
   generate one reproducible dataset and split rows explicitly, avoiding a separate train/test
   generation contract while leaving the configurable single-dataset generator unchanged.
