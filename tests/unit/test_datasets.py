@@ -8,10 +8,10 @@ import pytest
 
 from pipls.datasets import (
     PiPLSDataset,
-    PiPLSLatentGeometryTruth,
     PiPLSRegressionTruth,
-    make_pipls_latent_geometry,
+    SyntheticDataTruth,
     make_pipls_regression,
+    make_synthetic_data,
 )
 
 PROVENANCE = {
@@ -161,7 +161,7 @@ def test_regression_truth_is_read_only() -> None:
 
 
 def test_manuscript_latent_geometry_truth_is_read_only_and_pickleable() -> None:
-    dataset = make_pipls_latent_geometry(
+    dataset = make_synthetic_data(
         n_samples=9,
         n_features=6,
         n_targets=5,
@@ -173,7 +173,7 @@ def test_manuscript_latent_geometry_truth_is_read_only_and_pickleable() -> None:
     )
     truth = dataset.truth
 
-    assert isinstance(truth, PiPLSLatentGeometryTruth)
+    assert isinstance(truth, SyntheticDataTruth)
     assert truth.n_shared == 2
     assert truth.n_predictor_specific == 1
     assert truth.n_response_specific == 2
@@ -184,14 +184,14 @@ def test_manuscript_latent_geometry_truth_is_read_only_and_pickleable() -> None:
     assert b"pipls.datasets" in payload
 
     restored = pickle.loads(payload)
-    assert isinstance(restored, PiPLSLatentGeometryTruth)
+    assert isinstance(restored, SyntheticDataTruth)
     for name in truth.__dataclass_fields__:
         np.testing.assert_array_equal(getattr(restored, name), getattr(truth, name))
         assert not getattr(restored, name).flags.writeable
 
 
 def test_manuscript_latent_geometry_truth_validates_equations() -> None:
-    dataset = make_pipls_latent_geometry(
+    dataset = make_synthetic_data(
         n_samples=8,
         n_features=5,
         n_targets=4,
@@ -201,10 +201,10 @@ def test_manuscript_latent_geometry_truth_validates_equations() -> None:
         random_state=3,
     )
     truth = dataset.truth
-    assert isinstance(truth, PiPLSLatentGeometryTruth)
+    assert isinstance(truth, SyntheticDataTruth)
 
     with pytest.raises(ValueError, match="x_signal"):
-        PiPLSLatentGeometryTruth(
+        SyntheticDataTruth(
             predictor_specific_scores=truth.predictor_specific_scores,
             shared_scores=truth.shared_scores,
             response_specific_scores=truth.response_specific_scores,

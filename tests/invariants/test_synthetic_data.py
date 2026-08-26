@@ -4,10 +4,10 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 from pipls.datasets import (
-    PiPLSLatentGeometryTruth,
-    make_pipls_latent_geometry,
+    SyntheticDataTruth,
     make_pipls_regression,
     make_pipls_train_test,
+    make_synthetic_data,
 )
 
 
@@ -110,7 +110,7 @@ def test_generator_does_not_mutate_numpy_global_rng() -> None:
 
 
 def test_manuscript_latent_geometry_matches_both_generating_equations() -> None:
-    dataset = make_pipls_latent_geometry(
+    dataset = make_synthetic_data(
         n_samples=40,
         n_features=8,
         n_targets=5,
@@ -121,7 +121,7 @@ def test_manuscript_latent_geometry_matches_both_generating_equations() -> None:
         random_state=42,
     )
     truth = dataset.truth
-    assert isinstance(truth, PiPLSLatentGeometryTruth)
+    assert isinstance(truth, SyntheticDataTruth)
 
     assert truth.predictor_specific_scores.shape == (40, 3)
     assert truth.shared_scores.shape == (40, 2)
@@ -145,7 +145,7 @@ def test_manuscript_latent_geometry_matches_both_generating_equations() -> None:
 
 
 def test_manuscript_latent_geometry_supports_structurally_absent_blocks() -> None:
-    dataset = make_pipls_latent_geometry(
+    dataset = make_synthetic_data(
         n_samples=6,
         n_features=4,
         n_targets=3,
@@ -156,7 +156,7 @@ def test_manuscript_latent_geometry_supports_structurally_absent_blocks() -> Non
         random_state=11,
     )
     truth = dataset.truth
-    assert isinstance(truth, PiPLSLatentGeometryTruth)
+    assert isinstance(truth, SyntheticDataTruth)
 
     assert truth.predictor_specific_scores.shape == (6, 0)
     assert truth.shared_scores.shape == (6, 0)
@@ -174,7 +174,7 @@ def test_manuscript_generator_does_not_mutate_numpy_global_rng() -> None:
     expected = np.random.random(5)
     np.random.seed(318)
 
-    make_pipls_latent_geometry(
+    make_synthetic_data(
         n_samples=10,
         n_features=4,
         n_targets=3,

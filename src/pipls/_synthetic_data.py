@@ -11,8 +11,8 @@ import numpy as np
 from ._dataset_types import (
     FloatArray,
     PiPLSDataset,
-    PiPLSLatentGeometryTruth,
     PiPLSRegressionTruth,
+    SyntheticDataTruth,
 )
 
 Distribution: TypeAlias = Literal["normal", "uniform"]
@@ -50,7 +50,7 @@ class _RegressionGeneratorConfig:
     random_state: int
 
 
-def make_pipls_latent_geometry(
+def make_synthetic_data(
     *,
     n_samples: int,
     n_features: int,
@@ -150,7 +150,7 @@ def make_pipls_latent_geometry(
         shared_scores @ shared_response_loadings
         + response_specific_scores @ response_specific_loadings
     )
-    truth = PiPLSLatentGeometryTruth(
+    truth = SyntheticDataTruth(
         predictor_specific_scores=predictor_specific_scores,
         shared_scores=shared_scores,
         response_specific_scores=response_specific_scores,
@@ -165,7 +165,7 @@ def make_pipls_latent_geometry(
     )
     metadata: Mapping[str, object] = {
         "schema_version": 1,
-        "generator": "make_pipls_latent_geometry",
+        "generator": "make_synthetic_data",
         "random_state": seed,
         "latent_dimensions": {
             "predictor_specific": n_predictor_specific,
@@ -176,7 +176,7 @@ def make_pipls_latent_geometry(
         "distribution": "independent standard normal scores and loadings",
     }
     provenance = {
-        "source": "generated:pipls.datasets.make_pipls_latent_geometry",
+        "source": "generated:pipls.datasets.make_synthetic_data",
         "license": "BSD-3-Clause",
         "citation": (
             "Agrawal, Vishal; Nilsson, Fritjof; Lindström, Stefan B. "

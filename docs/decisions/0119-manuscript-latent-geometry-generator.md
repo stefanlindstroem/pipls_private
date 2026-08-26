@@ -18,7 +18,7 @@ synthetic benchmark contracts.
 
 ## Decision
 
-Add a separate public function, `make_pipls_latent_geometry()`, implementing
+Add a separate public function, `make_synthetic_data()`, implementing
 
 \[
 X = \Lambda_p L_p + \Lambda_s L_{sp} + \varepsilon_X,
@@ -44,7 +44,7 @@ The draw order is public and deterministic for a fixed unsigned 32-bit `random_s
 9. response noise.
 
 Return an ordinary `PiPLSDataset` whose `truth` is a new immutable
-`PiPLSLatentGeometryTruth`. Loading matrices retain manuscript orientation: latent dimensions are
+`SyntheticDataTruth`. Loading matrices retain manuscript orientation: latent dimensions are
 rows and observed variables are columns. The truth record validates both signal equations and
 reconstructs through the same validation path after pickling.
 

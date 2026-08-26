@@ -19,7 +19,7 @@ See [authors, license, and citation](citation.md#companion-paper) for the mainta
 Keep three distinct targets separate:
 
 1. **Data-generating distribution.** Match the equations, dimensions, independent Gaussian draws,
-   and noise standard deviations. `make_pipls_latent_geometry()` provides this capability.
+   and noise standard deviations. `make_synthetic_data()` provides this capability.
 2. **One seeded dataset.** In addition, record the exact generator arguments, random seed, package
    version, and numerical environment. The same inputs then identify one deterministic realization.
 3. **Complete manuscript results.** Also reproduce the parameter grids, all random seeds, data
@@ -64,9 +64,9 @@ The following call uses a representative geometry discussed in the manuscript: 4
 response-specific direction, and noise standard deviations of 0.5 in both blocks.
 
 ```python
-from pipls.datasets import make_pipls_latent_geometry
+from pipls.datasets import make_synthetic_data
 
-data = make_pipls_latent_geometry(
+data = make_synthetic_data(
     n_samples=40,
     n_features=80,
     n_targets=30,
@@ -92,7 +92,7 @@ orthonormalization, no strength rescaling, and no observed-variable rescaling. T
 package capabilities and are not substitutes when the manuscript distribution itself is required.
 
 See the
-[`make_pipls_latent_geometry()` API](api/datasets.md#pipls.datasets.make_pipls_latent_geometry)
+[`make_synthetic_data()` API](api/datasets.md#pipls.datasets.make_synthetic_data)
 for its complete validation and return contract.
 
 ## Verify the stored latent geometry
@@ -128,7 +128,7 @@ least:
 
 - the `pipls` version or source commit;
 - the NumPy version;
-- every `make_pipls_latent_geometry()` argument;
+- every `make_synthetic_data()` argument;
 - the integer `random_state`;
 - any serialization or numeric-output format used downstream.
 

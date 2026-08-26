@@ -243,12 +243,12 @@ or terminal Pi-PLS pipeline step and average uniformly across observations and r
 
 ```python
 PiPLSDataset
-PiPLSLatentGeometryTruth
+SyntheticDataTruth
 PiPLSRegressionTruth
 load_pulp
 load_sugarcane
 load_tobacco
-make_pipls_latent_geometry
+make_synthetic_data
 make_pipls_regression
 make_pipls_train_test
 ```

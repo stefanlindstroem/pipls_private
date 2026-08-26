@@ -4,10 +4,10 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from pipls.datasets import (
-    PiPLSLatentGeometryTruth,
-    make_pipls_latent_geometry,
+    SyntheticDataTruth,
     make_pipls_regression,
     make_pipls_train_test,
+    make_synthetic_data,
 )
 
 PARAMETERS = {
@@ -71,15 +71,15 @@ def test_manuscript_generator_is_exactly_reproducible() -> None:
         "n_response_specific": 2,
         "noise": (0.15, 0.25),
     }
-    first = make_pipls_latent_geometry(**parameters, random_state=271)
-    second = make_pipls_latent_geometry(**parameters, random_state=np.int64(271))
+    first = make_synthetic_data(**parameters, random_state=271)
+    second = make_synthetic_data(**parameters, random_state=np.int64(271))
 
     assert_array_equal(first.X, second.X)
     assert_array_equal(first.Y, second.Y)
     first_truth = first.truth
     second_truth = second.truth
-    assert isinstance(first_truth, PiPLSLatentGeometryTruth)
-    assert isinstance(second_truth, PiPLSLatentGeometryTruth)
+    assert isinstance(first_truth, SyntheticDataTruth)
+    assert isinstance(second_truth, SyntheticDataTruth)
     for name in first_truth.__dataclass_fields__:
         assert_array_equal(getattr(first_truth, name), getattr(second_truth, name))
 
@@ -115,7 +115,7 @@ def test_manuscript_generator_matches_documented_rng_draw_order() -> None:
         "x_noise": sigma_x * rng.standard_normal((n_samples, n_features)),
         "y_noise": sigma_y * rng.standard_normal((n_samples, n_targets)),
     }
-    dataset = make_pipls_latent_geometry(
+    dataset = make_synthetic_data(
         n_samples=n_samples,
         n_features=n_features,
         n_targets=n_targets,
@@ -126,7 +126,7 @@ def test_manuscript_generator_matches_documented_rng_draw_order() -> None:
         random_state=seed,
     )
     truth = dataset.truth
-    assert isinstance(truth, PiPLSLatentGeometryTruth)
+    assert isinstance(truth, SyntheticDataTruth)
 
     for name, values in expected.items():
         assert_array_equal(getattr(truth, name), values)

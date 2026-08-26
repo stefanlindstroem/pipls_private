@@ -5,24 +5,24 @@ from __future__ import annotations
 from ._dataset_resources import load_pulp, load_sugarcane, load_tobacco
 from ._dataset_types import (
     PiPLSDataset,
-    PiPLSLatentGeometryTruth,
     PiPLSRegressionTruth,
+    SyntheticDataTruth,
     _FrozenMapping,
 )
 from ._synthetic_data import (
-    make_pipls_latent_geometry,
     make_pipls_regression,
     make_pipls_train_test,
+    make_synthetic_data,
 )
 
 __all__ = [
     "PiPLSDataset",
-    "PiPLSLatentGeometryTruth",
+    "SyntheticDataTruth",
     "PiPLSRegressionTruth",
     "load_pulp",
     "load_sugarcane",
     "load_tobacco",
-    "make_pipls_latent_geometry",
+    "make_synthetic_data",
     "make_pipls_regression",
     "make_pipls_train_test",
 ]
@@ -37,12 +37,12 @@ def _preserve_public_module_identity(*objects: object) -> None:
 
 _preserve_public_module_identity(
     PiPLSDataset,
-    PiPLSLatentGeometryTruth,
+    SyntheticDataTruth,
     PiPLSRegressionTruth,
     load_pulp,
     load_sugarcane,
     load_tobacco,
-    make_pipls_latent_geometry,
+    make_synthetic_data,
     make_pipls_regression,
     make_pipls_train_test,
     _FrozenMapping,

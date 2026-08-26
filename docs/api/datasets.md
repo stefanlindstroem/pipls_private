@@ -53,14 +53,14 @@ observed blocks.
 ![Latent roles in the synthetic generators: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg){ style="width: 100%; height: auto;" }
 
 `n_predictor_specific`, `n_shared`, and `n_response_specific` set the three latent dimensions.
-`make_pipls_latent_geometry()` implements the Gaussian construction used by the companion
+`make_synthetic_data()` implements the Gaussian construction used by the companion
 manuscript. `make_pipls_regression()` and `make_pipls_train_test()` retain the same structural roles
 while allowing configurable strengths, score distributions, observed-variable scaling, and noise.
 The [companion-manuscript synthetic-data](../manuscript_reproduction.md) page owns the defining
 publication equations and reproduction boundary; the
 [synthetic tutorial](../tutorials/synthetic.md) shows a worked configurable example.
 
-::: pipls.datasets.make_pipls_latent_geometry
+::: pipls.datasets.make_synthetic_data
     options:
       members: false
 
@@ -81,7 +81,7 @@ publication equations and reproduction boundary; the
         - n_features
         - n_targets
 
-`PiPLSRegressionTruth` describes the configurable generators, while `PiPLSLatentGeometryTruth`
+`PiPLSRegressionTruth` describes the configurable generators, while `SyntheticDataTruth`
 describes the companion-manuscript generator. They are normally inspected through `dataset.truth`.
 
 ::: pipls.datasets.PiPLSRegressionTruth
@@ -92,7 +92,7 @@ describes the companion-manuscript generator. They are normally inspected throug
         - n_predictor_specific
         - n_response_specific
 
-::: pipls.datasets.PiPLSLatentGeometryTruth
+::: pipls.datasets.SyntheticDataTruth
     options:
       show_signature: false
       members:

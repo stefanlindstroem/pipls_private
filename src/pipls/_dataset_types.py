@@ -114,7 +114,7 @@ class PiPLSRegressionTruth:
 
 
 @dataclass(frozen=True)
-class PiPLSLatentGeometryTruth:
+class SyntheticDataTruth:
     r"""Immutable manuscript latent geometry for one synthetic dataset.
 
     This record stores the terms of the latent-geometry equation in the
@@ -190,7 +190,7 @@ class PiPLSLatentGeometryTruth:
         )
 
 
-_SyntheticTruth: TypeAlias = PiPLSRegressionTruth | PiPLSLatentGeometryTruth
+_SyntheticTruth: TypeAlias = PiPLSRegressionTruth | SyntheticDataTruth
 
 
 @dataclass(frozen=True)
@@ -218,7 +218,7 @@ class PiPLSDataset:
     metadata : mapping of str to object, default={}
         Recursively frozen dataset metadata. NumPy metadata arrays must not use
         object dtype, because object-array elements can remain mutable.
-    truth : PiPLSRegressionTruth, PiPLSLatentGeometryTruth, or None, default=None
+    truth : PiPLSRegressionTruth, SyntheticDataTruth, or None, default=None
         Optional synthetic latent structure consistent with ``X`` and ``Y``.
 
     Attributes
@@ -229,7 +229,7 @@ class PiPLSDataset:
         Validated axis labels.
     provenance, metadata : mapping
         Immutable mappings.
-    truth : PiPLSRegressionTruth, PiPLSLatentGeometryTruth, or None
+    truth : PiPLSRegressionTruth, SyntheticDataTruth, or None
         Optional synthetic truth object.
     """
 
@@ -424,7 +424,7 @@ def _validate_dataset_truth(
     n_features: int,
     n_targets: int,
 ) -> None:
-    if isinstance(truth, PiPLSLatentGeometryTruth):
+    if isinstance(truth, SyntheticDataTruth):
         if truth.x_signal.shape != (n_samples, n_features):
             raise ValueError(
                 f"truth.x_signal must have shape {(n_samples, n_features)}."
@@ -436,7 +436,7 @@ def _validate_dataset_truth(
         return
     if not isinstance(truth, PiPLSRegressionTruth):
         raise TypeError(
-            "truth must be PiPLSRegressionTruth or PiPLSLatentGeometryTruth."
+            "truth must be PiPLSRegressionTruth or SyntheticDataTruth."
         )
 
     n_shared = truth.n_shared
@@ -474,7 +474,7 @@ def _validate_dataset_truth(
         raise ValueError("truth latent strengths must be positive.")
 
 
-def _validate_latent_geometry_truth(truth: PiPLSLatentGeometryTruth) -> None:
+def _validate_latent_geometry_truth(truth: SyntheticDataTruth) -> None:
     n_samples = truth.shared_scores.shape[0]
     if truth.predictor_specific_scores.shape[0] != n_samples:
         raise ValueError("All latent score matrices must contain the same samples.")

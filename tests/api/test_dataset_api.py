@@ -8,20 +8,20 @@ import pytest
 import pipls.datasets as dataset_api
 from pipls.datasets import (
     PiPLSDataset,
-    PiPLSLatentGeometryTruth,
-    make_pipls_latent_geometry,
+    SyntheticDataTruth,
     make_pipls_regression,
     make_pipls_train_test,
+    make_synthetic_data,
 )
 
 _PUBLIC_DATASET_NAMES = [
     "PiPLSDataset",
-    "PiPLSLatentGeometryTruth",
+    "SyntheticDataTruth",
     "PiPLSRegressionTruth",
     "load_pulp",
     "load_sugarcane",
     "load_tobacco",
-    "make_pipls_latent_geometry",
+    "make_synthetic_data",
     "make_pipls_regression",
     "make_pipls_train_test",
 ]
@@ -34,7 +34,7 @@ def test_dataset_module_is_a_stable_public_facade() -> None:
 
 
 def test_dataset_api_is_exposed_from_pipls_datasets_namespace() -> None:
-    assert inspect.signature(make_pipls_latent_geometry).parameters["random_state"].default == 0
+    assert inspect.signature(make_synthetic_data).parameters["random_state"].default == 0
     assert inspect.signature(make_pipls_regression).parameters["random_state"].default == 0
     assert inspect.signature(make_pipls_train_test).parameters["random_state"].default == 0
 
@@ -155,12 +155,12 @@ def test_manuscript_generator_rejects_invalid_public_controls(
     }
     values[parameter] = value
     with pytest.raises(error):
-        make_pipls_latent_geometry(**values)  # type: ignore[arg-type]
+        make_synthetic_data(**values)  # type: ignore[arg-type]
 
 
 def test_manuscript_generator_rejects_latent_dimensions_larger_than_spaces() -> None:
     with pytest.raises(ValueError, match="n_features"):
-        make_pipls_latent_geometry(
+        make_synthetic_data(
             n_samples=10,
             n_features=2,
             n_targets=5,
@@ -168,7 +168,7 @@ def test_manuscript_generator_rejects_latent_dimensions_larger_than_spaces() -> 
             n_predictor_specific=1,
         )
     with pytest.raises(ValueError, match="n_targets"):
-        make_pipls_latent_geometry(
+        make_synthetic_data(
             n_samples=10,
             n_features=5,
             n_targets=2,
@@ -178,7 +178,7 @@ def test_manuscript_generator_rejects_latent_dimensions_larger_than_spaces() -> 
 
 
 def test_manuscript_generator_is_public_and_returns_its_truth_record() -> None:
-    dataset = make_pipls_latent_geometry(
+    dataset = make_synthetic_data(
         n_samples=1,
         n_features=3,
         n_targets=2,
@@ -187,5 +187,5 @@ def test_manuscript_generator_is_public_and_returns_its_truth_record() -> None:
     )
 
     assert isinstance(dataset, PiPLSDataset)
-    assert isinstance(dataset.truth, PiPLSLatentGeometryTruth)
-    assert dataset.metadata["generator"] == "make_pipls_latent_geometry"
+    assert isinstance(dataset.truth, SyntheticDataTruth)
+    assert dataset.metadata["generator"] == "make_synthetic_data"

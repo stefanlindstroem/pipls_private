@@ -115,13 +115,13 @@ they are not stored as redundant zero loading arrays.
 
 ## Companion-manuscript latent geometry
 
-Use `make_pipls_latent_geometry()` when the data-generating distribution must match the Gaussian
+Use `make_synthetic_data()` when the data-generating distribution must match the Gaussian
 latent geometry in the [companion manuscript](citation.md#companion-paper):
 
 ```python
-from pipls.datasets import make_pipls_latent_geometry
+from pipls.datasets import make_synthetic_data
 
-synthetic = make_pipls_latent_geometry(
+synthetic = make_synthetic_data(
     n_samples=40,
     n_features=80,
     n_targets=30,
@@ -160,7 +160,7 @@ observed-variable scaling. This is the synthetic model described in the
 [companion manuscript](citation.md#companion-paper); it is separate from the more configurable package
 generator above.
 
-`synthetic.truth` is a read-only `PiPLSLatentGeometryTruth`. Its loading matrices retain the
+`synthetic.truth` is a read-only `SyntheticDataTruth`. Its loading matrices retain the
 manuscript orientation, with latent dimensions on rows and observed variables on columns. The
 stored arrays therefore verify the equations directly:
 

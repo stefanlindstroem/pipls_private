@@ -637,7 +637,7 @@ not from the validation fold or the complete dataset.
 Decision 0119 separates two public synthetic purposes. `make_pipls_regression()` and
 `make_pipls_train_test()` remain configurable package generators with standardized latent scores,
 orthonormal loading directions, strengths, distributions, and observed scales.
-`make_pipls_latent_geometry()` instead implements the companion manuscript model exactly:
+`make_synthetic_data()` instead implements the companion manuscript model exactly:
 
 \begin{equation}
 \mathbf{X}

@@ -535,7 +535,7 @@ programming-user comparison therefore uses two estimator templates with the same
 splits. Its search policies and the practical real-data workflows documented elsewhere are not
 redefined by this theory page and need not duplicate the manuscript’s experimental choices.
 
-The package offers two synthetic-data purposes. `make_pipls_latent_geometry()` implements the
+The package offers two synthetic-data purposes. `make_synthetic_data()` implements the
 [companion manuscript’s](citation.md#companion-paper) Gaussian latent data-generating model directly.
 `make_pipls_regression()` and `make_pipls_train_test()` provide broader configurable package
 generators. See the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
