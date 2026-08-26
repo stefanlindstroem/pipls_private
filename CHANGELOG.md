@@ -2,16 +2,10 @@
 
 ## Unreleased
 
-- Migrate the remaining maintained synthetic stress case and synthetic validation coverage to
-  `make_synthetic_data()`. Remove tests that exist only for configurable latent strengths, score
-  distributions, observed-variable scaling, centered-score rank restrictions, and the superseded
-  regression truth record while leaving that older public generator in place for final cleanup.
-- Remove the dedicated synthetic train/test generator from the public API. Maintained workflows now
-  generate one reproducible dataset and split rows explicitly, avoiding a separate train/test
-  generation contract while leaving the configurable single-dataset generator unchanged.
-- Simplify the maintained synthetic train/test workflow by generating one reproducible latent-geometry
-  dataset with `make_synthetic_data()` and splitting its rows explicitly; remove the tutorial-only
-  latent-strength configuration without yet removing the older train/test generator API.
+- Simplify the synthetic-data surface to `make_synthetic_data()` and `SyntheticDataTruth`: migrate
+  maintained examples and validation coverage, use explicit row splitting for train/test analyses,
+  and remove the superseded train/test and configurable generators together with their
+  strength/distribution/scaling controls and private machinery.
 - Complete the latent-role schematic integration by displaying it at full documentation-column width
   and validating that the committed SVG and standalone TeX source survive source-distribution builds.
 - Add the latent-role schematic to the Dataset API generator section and connect the three

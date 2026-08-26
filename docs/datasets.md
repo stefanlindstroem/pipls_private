@@ -49,74 +49,10 @@ The container validates and then freezes its contents:
 The canonical matrix attributes are `X` and `Y`. The container also exposes `n_samples`,
 `n_features`, and `n_targets` as dataset-level dimensions.
 
-## Deterministic latent-structure generator
+## Deterministic synthetic generator
 
-```python
-from pipls.datasets import make_pipls_regression
-
-synthetic = make_pipls_regression(
-    n_samples=200,
-    n_features=40,
-    n_targets=8,
-    n_shared=3,
-    n_predictor_specific=2,
-    n_response_specific=1,
-    shared_strength=(3.0, 2.0, 1.0),
-    predictor_specific_strength=(1.5, 0.8),
-    response_specific_strength=0.7,
-    shared_distribution="normal",
-    predictor_specific_distribution="uniform",
-    response_specific_distribution="normal",
-    feature_scale=1.0,
-    target_scale=1.0,
-    noise=(0.1, 0.2),
-    random_state=0,
-)
-```
-
-The generator uses a local `numpy.random.Generator`; it never changes NumPy's global random state.
-A scalar `noise` applies to both blocks, while `(x_noise, y_noise)` controls them separately.
-Strength and scale arguments accept either a scalar or one value per relevant latent direction or
-observed variable.
-Because latent score columns are centered, each generated sample block must contain more rows than
-the larger of the declared predictor and response latent ranks. Invalid degenerate dimensions are
-rejected rather than silently producing a lower-rank realization.
-
-The generative model is
-
-\begin{equation}
-\mathbf{X}
-=
-\mathbf{T}_{\mathrm{s}}\mathbf{A}_{\mathrm{s}}^{\mathsf T}
-+
-\mathbf{T}_{\mathrm{x}}\mathbf{A}_{\mathrm{x}}^{\mathsf T}
-+
-\mathbf{E}_{\mathrm{X}},
-\qquad
-\mathbf{Y}
-=
-\mathbf{T}_{\mathrm{s}}\mathbf{B}_{\mathrm{s}}^{\mathsf T}
-+
-\mathbf{T}_{\mathrm{y}}\mathbf{B}_{\mathrm{y}}^{\mathsf T}
-+
-\mathbf{E}_{\mathrm{Y}}.
-\end{equation}
-
-Here $\mathbf{T}_{\mathrm{s}}$ is shared, $\mathbf{T}_{\mathrm{x}}$ is predictor-specific, and
-$\mathbf{T}_{\mathrm{y}}$ is response-specific. The loading columns are orthonormal within
-each observed block. Latent score columns are centered and scaled
-to unit sample standard deviation after being drawn from the selected normal or uniform source
-distribution.
-
-`synthetic.truth` is a read-only `PiPLSRegressionTruth` containing latent scores, contributing
-loading blocks, signal matrices, noise matrices, strengths, and observed-variable scales. Effects
-that are structurally absent from one observed block are described by the declared latent ranks;
-they are not stored as redundant zero loading arrays.
-
-## Companion-manuscript latent geometry
-
-Use `make_synthetic_data()` when the data-generating distribution must match the Gaussian
-latent geometry in the [companion manuscript](citation.md#companion-paper):
+`make_synthetic_data()` provides the package-owned reproducible synthetic data used by tests,
+validation, examples, and the [companion manuscript](citation.md#companion-paper):
 
 ```python
 from pipls.datasets import make_synthetic_data
@@ -156,9 +92,8 @@ The generator implements
 Every latent-score entry and loading entry is an independent standard-normal draw. Noise entries
 are independent Gaussian draws with standard deviations `noise[0]` and `noise[1]`. The function
 applies no centering, score standardization, loading orthonormalization, latent-strength scaling, or
-observed-variable scaling. This is the synthetic model described in the
-[companion manuscript](citation.md#companion-paper); it is separate from the more configurable package
-generator above.
+observed-variable scaling. This is the package's single synthetic-data model and is also the
+synthetic model described in the [companion manuscript](citation.md#companion-paper).
 
 `synthetic.truth` is a read-only `SyntheticDataTruth`. Its loading matrices retain the
 manuscript orientation, with latent dimensions on rows and observed variables on columns. The

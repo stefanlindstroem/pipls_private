@@ -32,7 +32,7 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0103: optional dependencies](0103-installation-and-optional-dependency-boundary.md)
 - [0110: response-anchored Pi-PLS display factors](0110-response-anchored-display-factors.md)
 - [0117: license, authorship, and citation](0117-commercial-license-authorship-and-citation.md)
-- [0119: manuscript latent-geometry generator](0119-manuscript-latent-geometry-generator.md)
+- [0119: synthetic-data generator](0119-manuscript-latent-geometry-generator.md)
 - [0120: companion-manuscript theory alignment](0120-companion-manuscript-theory-alignment.md)
 - [0121: canonical Pi-PLS terminology](0121-canonical-pipls-terminology.md)
 - [0124: mathematical typography](0124-mathematical-typography-and-subscripts.md)

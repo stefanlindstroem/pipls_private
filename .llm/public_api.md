@@ -237,19 +237,17 @@ structure.
 `neg_response_standardized_mse`. They use response scales learned from the fitted Pi-PLS estimator
 or terminal Pi-PLS pipeline step and average uniformly across observations and response columns.
 
-## Datasets and synthetic generators
+## Datasets and synthetic generator
 
 `pipls.datasets` exports:
 
 ```python
 PiPLSDataset
 SyntheticDataTruth
-PiPLSRegressionTruth
 load_pulp
 load_sugarcane
 load_tobacco
 make_synthetic_data
-make_pipls_regression
 ```
 
 `PiPLSDataset` uses canonical matrix attributes `X` and `Y`; metadata, names, sample identifiers,
@@ -257,8 +255,8 @@ provenance, and optional truth records are immutable. Reference loaders return a
 object by default or fresh read-only `(X, Y)` arrays with `return_X_y=True`. They perform no hidden
 preprocessing and require no network access or pandas.
 
-The synthetic generators are deterministic for fixed validated seeds and return immutable truth
-records where applicable. They are package utilities, not benchmark or publication-result APIs.
+The synthetic generator is deterministic for a fixed validated seed and returns an immutable
+truth record. It is a package utility, not a benchmark or publication-result API.
 
 ## Inspection
 

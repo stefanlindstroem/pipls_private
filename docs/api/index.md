@@ -24,7 +24,7 @@ retained predictor-subspace dimension $r_\pi$. Their separate roles are defined 
 - [Model inspection](../model_inspection.md) defines fitted latent quantities, Π-PLS display
   factors, biplot coordinates, and prediction and observation diagnostics.
 - [Datasets and generators](datasets.md) documents packaged datasets, immutable data/truth records,
-  and synthetic generators.
+  and the synthetic generator.
 - [Troubleshooting](../troubleshooting.md) covers warnings, validation failures, lifecycle errors,
   numerical failures, copying behavior, and unexpectedly expensive searches.
 

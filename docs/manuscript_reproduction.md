@@ -87,9 +87,7 @@ interpreted as a seed used for a manuscript result unless that seed is separatel
 publication-reproduction materials.
 
 The generator performs no latent-score centering or standardization, no loading
-orthonormalization, no strength rescaling, and no observed-variable rescaling. The broader
-`make_pipls_regression()` API intentionally provides those additional package capabilities and is not
-a substitute when the manuscript distribution itself is required.
+orthonormalization, no strength rescaling, and no observed-variable rescaling.
 
 See the
 [`make_synthetic_data()` API](api/datasets.md#pipls.datasets.make_synthetic_data)
@@ -235,8 +233,7 @@ Nothing in this guide changes or replaces the package's practical real-data work
 reports, and the maintained Pulp, Sugarcane, and Tobacco examples remain independent package
 capabilities.
 
-For general synthetic examples with configurable strengths, distributions, orthonormal loading
-directions, and independent train/test blocks, continue to use the
+For a worked synthetic train/test analysis using an explicit row split, see the
 [first synthetic tutorial](tutorials/synthetic.md). For the fixed Π-PLS construction, see the
 [theory overview](theory.md); for software and generated-documentation controls, see
 [reproducibility](reproducibility.md).

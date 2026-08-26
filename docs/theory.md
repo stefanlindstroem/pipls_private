@@ -535,12 +535,11 @@ programming-user comparison therefore uses two estimator templates with the same
 splits. Its search policies and the practical real-data workflows documented elsewhere are not
 redefined by this theory page and need not duplicate the manuscript’s experimental choices.
 
-The package offers two synthetic-data purposes. `make_synthetic_data()` implements the
-[companion manuscript’s](citation.md#companion-paper) Gaussian latent data-generating model directly.
-`make_pipls_regression()` provides a broader configurable package generator. See the
-[companion-manuscript synthetic-data guide](manuscript_reproduction.md)
+`make_synthetic_data()` provides the package's deterministic synthetic-data utility and implements
+the [companion manuscript’s](citation.md#companion-paper) Gaussian latent data-generating model
+directly. See the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
 for the exact distribution and reproducibility boundary, and the
-[dataset and generator guide](datasets.md) for the broader package distinction.
+[dataset and generator guide](datasets.md) for the package data interface.
 
 The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#retrieve-selection-evidence)
 and [Path and selection](path_selection.md) define the package’s general path-construction,

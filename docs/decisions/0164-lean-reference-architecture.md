@@ -69,8 +69,8 @@ they should be interpreted. Scientific definitions and generated inspection API 
 on the same flat page, organized by maintained quantities or operations rather than by a
 Concepts-versus-API distinction. Worked plotting procedures remain tutorial or example material.
 
-**Datasets and generators** answers what packaged datasets, immutable data/truth records, and
-synthetic generators are available and what they return. This page retains enough explanation to
+**Datasets and generators** answers what packaged datasets, immutable data/truth records, and the
+synthetic generator are available and what they return. This page retains enough explanation to
 understand how synthetic generation works, including the predictor-specific, shared, and
 response-specific latent roles and the maintained
 `docs/assets/figures/latent_geometry_generator.svg` figure. Defining equations may remain when they

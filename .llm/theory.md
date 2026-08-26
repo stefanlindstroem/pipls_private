@@ -634,10 +634,8 @@ not from the validation fold or the complete dataset.
 
 ## Synthetic-data capability
 
-Decision 0119 separates two public synthetic purposes. `make_pipls_regression()` remains a
-configurable package generator with standardized latent scores, orthonormal loading directions,
-strengths, distributions, and observed scales.
-`make_synthetic_data()` instead implements the companion manuscript model exactly:
+Decision 0119 defines one public synthetic-data utility. `make_synthetic_data()` implements the
+companion manuscript model exactly:
 
 \begin{equation}
 \mathbf{X}

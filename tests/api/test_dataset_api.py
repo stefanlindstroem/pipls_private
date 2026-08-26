@@ -8,19 +8,16 @@ import pipls.datasets as dataset_api
 from pipls.datasets import (
     PiPLSDataset,
     SyntheticDataTruth,
-    make_pipls_regression,
     make_synthetic_data,
 )
 
 _PUBLIC_DATASET_NAMES = [
     "PiPLSDataset",
     "SyntheticDataTruth",
-    "PiPLSRegressionTruth",
     "load_pulp",
     "load_sugarcane",
     "load_tobacco",
     "make_synthetic_data",
-    "make_pipls_regression",
 ]
 
 
@@ -32,7 +29,6 @@ def test_dataset_module_is_a_stable_public_facade() -> None:
 
 def test_dataset_api_is_exposed_from_pipls_datasets_namespace() -> None:
     assert inspect.signature(make_synthetic_data).parameters["random_state"].default == 0
-    assert inspect.signature(make_pipls_regression).parameters["random_state"].default == 0
 
     dataset = make_synthetic_data(
         n_samples=12,

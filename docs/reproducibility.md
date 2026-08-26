@@ -102,7 +102,7 @@ are not part of the source distribution.
 
 `PiPLSRegression.random_state` accepts an integer seed, a NumPy `RandomState`, or `None`. The
 default integer `0` is reproducible. `None` uses NumPy's global random state and should be chosen
-only when repeatability is not required. The synthetic generators retain their separate explicit
+only when repeatability is not required. The synthetic generator retains its separate explicit
 integer-seed contract.
 
 Centering and optional scaling are integral to `PiPLSRegression.fit`. The `scale` parameter remains

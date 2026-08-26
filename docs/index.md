@@ -92,7 +92,7 @@ representative interpretation of standard PLS-family plots and Π-PLS-specific p
 - [Path and selection](path_selection.md): search bounds, rank policies, scoring, CV, path evidence, and selection rules.
 - [OOF diagnostics](oof_diagnostics.md): stored-split reuse, ordered OOF predictions, coverage, and selection-conditioned interpretation.
 - [Model inspection](model_inspection.md): numerical fitted-model quantities and interpretation.
-- [Datasets and generators](api/datasets.md): packaged data, synthetic generators, and truth records.
+- [Datasets and generators](api/datasets.md): packaged data, the synthetic generator, and its truth record.
 - [Troubleshooting](troubleshooting.md): warnings, validation failures, lifecycle errors, and expensive searches.
 
 ## Project validation

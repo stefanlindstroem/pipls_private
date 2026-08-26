@@ -2,15 +2,19 @@
 
 ## Status
 
-Accepted in Phase E1.
+Accepted in Phase E1; simplified to the single synthetic generator.
 
 ## Context
 
-The package needs one stable in-memory boundary before real datasets, registry loading, and paper
-reproduction are introduced. The boundary must preserve names, identifiers, provenance, and
+The package needs one stable in-memory boundary for packaged datasets, synthetic validation data,
+and structured experiments. The boundary must preserve names, identifiers, provenance, and
 synthetic truth without making preprocessing decisions or exposing mutable arrays. Synthetic
-studies also need deterministic shared, predictor-specific, and response-specific latent
-structure without changing NumPy's global random state.
+validation and examples also need deterministic predictor-specific, shared, and response-specific
+latent structure without changing NumPy's global random state.
+
+The synthetic facility is support infrastructure for testing, validation, examples, and
+reproducibility. It is not part of the Pi-PLS estimator or fitting algorithm, so the public surface
+should contain no more generator machinery than those uses require.
 
 ## Decision
 
@@ -26,23 +30,24 @@ structure without changing NumPy's global random state.
 - All model arrays and array-valued metadata are copied and made read-only. Metadata NumPy arrays
   must have a non-object dtype; heterogeneous values use nested sequences or mappings so their
   contents can be recursively frozen. Unsupported mutable or object values are rejected.
-- `make_pipls_regression` uses a local seeded `numpy.random.Generator` and returns one
-  `PiPLSDataset`.
-- `PiPLSSyntheticTruth` exposes read-only latent scores, loading blocks, signal/noise matrices,
-  strengths, and scales. Predictor-side response-specific and response-side predictor-specific
-  loading blocks are explicit zeros.
-- Active latent strengths and observed-variable scales must be positive and finite. Noise may be
-  zero but not negative. Zero latent ranks are valid negative-control configurations.
-- Each generated sample block must contain more rows than the larger declared centered latent rank;
-  degenerate blocks that cannot realize the requested rank are rejected.
+- `make_synthetic_data()` is the single public synthetic generator. It uses a local seeded
+  `numpy.random.Generator` and returns one `PiPLSDataset`.
+- `SyntheticDataTruth` is the single synthetic truth record. It exposes read-only latent scores,
+  loading matrices, signal matrices, and noise matrices for direct validation of the generated
+  construction.
+- The generator accepts predictor-specific, shared, and response-specific latent dimensions,
+  predictor/response noise levels, and one deterministic unsigned 32-bit seed. Zero latent ranks
+  and zero noise are valid.
+- Train/test partitioning is not generator API. Generate one reproducible dataset and split rows
+  explicitly when separate analysis blocks are needed.
 - Real dataset loading, implicit or explicit downloading, conversion, checksums, and registry
-  resolution are not part of E1.
+  resolution are not part of the synthetic generator contract.
 
 ## Consequences
 
-- Synthetic estimator tests can use one package-owned generator rather than ad hoc local formulas.
-- Train/test demonstrations can generate one reproducible dataset and split rows explicitly without
-  fitting transformations across the boundary.
+- Synthetic estimator tests and examples use one package-owned generator rather than parallel
+  synthetic frameworks.
+- Train/test demonstrations use ordinary row splitting without a separate generator abstraction.
 - Real-data examples may use plain arrays or data frames and are not required to construct this
   container.
 - Dataset migrations must keep their reading and matrix-construction steps explicit rather than

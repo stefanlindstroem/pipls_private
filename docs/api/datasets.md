@@ -1,7 +1,7 @@
 # Datasets and generators
 
 `pipls.datasets` provides three packaged real-data loaders, immutable dataset and truth records, and
-deterministic synthetic generators. Ordinary arrays and data frames passed directly to `fit(X, y)`
+a deterministic synthetic generator. Ordinary arrays and data frames passed directly to `fit(X, y)`
 remain the normal interface for user data.
 
 ## Packaged datasets
@@ -22,10 +22,9 @@ licensing, adaptation, and matrix-dimension details.
     options:
       members: false
 
-## Synthetic generators
+## Synthetic generator
 
-The generators distinguish three latent roles. For the companion-manuscript latent geometry, the
-corresponding data model is
+The generator distinguishes three latent roles. Its data model is
 
 \begin{equation}
 \mathbf{X}
@@ -50,22 +49,17 @@ $\mathbf{X}$, shared directions contribute to both $\mathbf{X}$ and $\mathbf{Y}$
 response-specific directions contribute only to $\mathbf{Y}$. Independent noise is added to the two
 observed blocks.
 
-![Latent roles in the synthetic generators: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg){ style="width: 100%; height: auto;" }
+![Latent roles in the synthetic generator: predictor-specific variation contributes only to X, shared variation contributes to both X and Y, and response-specific variation contributes only to Y.](../assets/figures/latent_geometry_generator.svg){ style="width: 100%; height: auto;" }
 
 `n_predictor_specific`, `n_shared`, and `n_response_specific` set the three latent dimensions.
-`make_synthetic_data()` implements the Gaussian construction used by the companion
-manuscript. `make_pipls_regression()` retains the same structural roles while allowing configurable
-strengths, score distributions, observed-variable scaling, and noise.
-The [companion-manuscript synthetic-data](../manuscript_reproduction.md) page owns the defining
-publication equations and reproduction boundary; the
+`make_synthetic_data()` uses independent standard-normal score and loading entries plus independent
+Gaussian predictor and response noise. The
+[companion-manuscript synthetic-data](../manuscript_reproduction.md) page owns the
+publication-reproduction boundary; the
 [synthetic tutorial](../tutorials/synthetic.md) shows a worked train/test analysis using an explicit
 row split.
 
 ::: pipls.datasets.make_synthetic_data
-    options:
-      members: false
-
-::: pipls.datasets.make_pipls_regression
     options:
       members: false
 
@@ -78,16 +72,8 @@ row split.
         - n_features
         - n_targets
 
-`PiPLSRegressionTruth` describes the configurable generators, while `SyntheticDataTruth`
-describes the companion-manuscript generator. They are normally inspected through `dataset.truth`.
-
-::: pipls.datasets.PiPLSRegressionTruth
-    options:
-      show_signature: false
-      members:
-        - n_shared
-        - n_predictor_specific
-        - n_response_specific
+`SyntheticDataTruth` records the latent scores, loadings, signal, and noise used to generate a
+synthetic dataset. It is normally inspected through `dataset.truth`.
 
 ::: pipls.datasets.SyntheticDataTruth
     options:
