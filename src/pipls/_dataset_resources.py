@@ -13,35 +13,26 @@ from typing import Literal, cast, overload
 
 import numpy as np
 
-from ._dataset_types import (
-    _REQUIRED_PROVENANCE_KEYS,
-    FloatArray,
-    PiPLSDataset,
-    _validated_matrix,
-)
+from ._dataset_types import FloatArray, PiPLSDataset, _validated_matrix
 
 
 @dataclass(frozen=True)
 class _PackagedDatasetConfig:
     dataset_id: str
     display_name: str
-    sample_id_width: int
 
 
 _PULP_DATASET = _PackagedDatasetConfig(
     dataset_id="pulp",
     display_name="Pulp",
-    sample_id_width=2,
 )
 _SUGARCANE_DATASET = _PackagedDatasetConfig(
     dataset_id="sugarcane",
     display_name="Sugarcane",
-    sample_id_width=2,
 )
 _TOBACCO_DATASET = _PackagedDatasetConfig(
     dataset_id="tobacco",
     display_name="Tobacco",
-    sample_id_width=3,
 )
 
 
@@ -70,8 +61,8 @@ def load_pulp(
     ----------
     return_X_y : bool, default=False
         If ``True``, return the read-only predictor and response arrays directly.
-        Otherwise return an immutable :class:`PiPLSDataset` with labels,
-        provenance, sample identifiers, and metadata.
+        Otherwise return an immutable :class:`PiPLSDataset` with labels and
+        metadata.
 
     Returns
     -------
@@ -117,8 +108,8 @@ def load_sugarcane(
     ----------
     return_X_y : bool, default=False
         If ``True``, return the read-only predictor and response arrays directly.
-        Otherwise return an immutable :class:`PiPLSDataset` with labels,
-        provenance, sample identifiers, and metadata.
+        Otherwise return an immutable :class:`PiPLSDataset` with labels and
+        metadata.
 
     Returns
     -------
@@ -164,8 +155,8 @@ def load_tobacco(
     ----------
     return_X_y : bool, default=False
         If ``True``, return the read-only predictor and response arrays directly.
-        Otherwise return an immutable :class:`PiPLSDataset` with labels,
-        provenance, sample identifiers, and metadata.
+        Otherwise return an immutable :class:`PiPLSDataset` with labels and
+        metadata.
 
     Returns
     -------
@@ -239,21 +230,11 @@ def _load_packaged_dataset(
         name="target",
     )
 
-    provenance_raw = _metadata_mapping(config, metadata, "provenance")
-    provenance = {
-        key: _metadata_string(config, provenance_raw, key)
-        for key in _REQUIRED_PROVENANCE_KEYS
-    }
     dataset = PiPLSDataset(
         X=X,
         Y=Y,
         feature_names=feature_names,
         target_names=target_names,
-        sample_ids=tuple(
-            f"{config.dataset_id}-{index:0{config.sample_id_width}d}"
-            for index in range(1, X.shape[0] + 1)
-        ),
-        provenance=provenance,
         metadata=metadata,
     )
     if return_X_y:

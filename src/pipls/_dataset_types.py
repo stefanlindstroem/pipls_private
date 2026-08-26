@@ -36,9 +36,6 @@ class _FrozenMapping(Mapping[K, V], Generic[K, V]):
         return (_FrozenMapping, (self._data,))
 
 
-_REQUIRED_PROVENANCE_KEYS = ("source", "license", "citation", "version")
-
-
 @dataclass(frozen=True)
 class PiPLSDataset:
     r"""Immutable validated multivariate regression dataset.
@@ -57,10 +54,6 @@ class PiPLSDataset:
         Unique nonempty predictor names.
     target_names : sequence of str
         Unique nonempty response names.
-    sample_ids : sequence of str
-        Unique nonempty sample identifiers.
-    provenance : mapping of str to str
-        Nonempty ``source``, ``license``, ``citation``, and ``version`` entries.
     metadata : mapping of str to object, default={}
         Recursively frozen dataset metadata. NumPy metadata arrays must not use
         object dtype, because object-array elements can remain mutable.
@@ -68,18 +61,16 @@ class PiPLSDataset:
     ----------
     X, Y : ndarray
         Read-only ``float64`` predictor and two-dimensional response matrices.
-    feature_names, target_names, sample_ids : tuple of str
+    feature_names, target_names : tuple of str
         Validated axis labels.
-    provenance, metadata : mapping
-        Immutable mappings.
+    metadata : mapping
+        Immutable metadata mapping.
     """
 
     X: FloatArray
     Y: FloatArray
     feature_names: Sequence[str]
     target_names: Sequence[str]
-    sample_ids: Sequence[str]
-    provenance: Mapping[str, str]
     metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -100,20 +91,12 @@ class PiPLSDataset:
             expected=Y.shape[1],
             name="target_names",
         )
-        sample_ids = _validated_names(
-            self.sample_ids,
-            expected=X.shape[0],
-            name="sample_ids",
-        )
-        provenance = _validated_provenance(self.provenance)
         metadata = _freeze_mapping(self.metadata, name="metadata")
 
         object.__setattr__(self, "X", X)
         object.__setattr__(self, "Y", Y)
         object.__setattr__(self, "feature_names", feature_names)
         object.__setattr__(self, "target_names", target_names)
-        object.__setattr__(self, "sample_ids", sample_ids)
-        object.__setattr__(self, "provenance", provenance)
         object.__setattr__(self, "metadata", metadata)
 
     @property
@@ -144,8 +127,6 @@ class PiPLSDataset:
                 self.Y,
                 self.feature_names,
                 self.target_names,
-                self.sample_ids,
-                self.provenance,
                 self.metadata,
             ),
         )
@@ -186,22 +167,6 @@ def _validated_names(
     if len(set(result)) != len(result):
         raise ValueError(f"{name} must contain unique values.")
     return result
-
-
-def _validated_provenance(values: Mapping[str, str]) -> Mapping[str, str]:
-    if not isinstance(values, Mapping):
-        raise TypeError("provenance must be a mapping.")
-    copied: dict[str, str] = {}
-    for key, value in values.items():
-        if not isinstance(key, str) or not key.strip():
-            raise TypeError("provenance keys must be non-empty strings.")
-        if not isinstance(value, str) or not value.strip():
-            raise TypeError("provenance values must be non-empty strings.")
-        copied[key] = value
-    missing = [key for key in _REQUIRED_PROVENANCE_KEYS if key not in copied]
-    if missing:
-        raise ValueError(f"provenance is missing required keys: {missing}.")
-    return _FrozenMapping(copied)
 
 
 def _freeze_mapping(values: Mapping[str, object], *, name: str) -> Mapping[str, object]:

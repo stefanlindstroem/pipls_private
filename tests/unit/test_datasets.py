@@ -8,13 +8,6 @@ import pytest
 
 from pipls.datasets import PiPLSDataset
 
-PROVENANCE = {
-    "source": "unit-test",
-    "license": "BSD-3-Clause",
-    "citation": "Synthetic unit-test data",
-    "version": "1",
-}
-
 
 def _dataset(**overrides: object) -> PiPLSDataset:
     values: dict[str, object] = {
@@ -22,8 +15,6 @@ def _dataset(**overrides: object) -> PiPLSDataset:
         "Y": np.arange(8, dtype=np.float64).reshape(4, 2),
         "feature_names": ("a", "b", "c"),
         "target_names": ("u", "v"),
-        "sample_ids": ("s0", "s1", "s2", "s3"),
-        "provenance": PROVENANCE,
         "metadata": {"nested": {"values": [1, 2]}, "array": np.array([1.0, 2.0])},
     }
     values.update(overrides)
@@ -82,8 +73,6 @@ def test_dataset_copies_and_freezes_arrays_and_metadata() -> None:
         ("feature_names", ("a", "b"), ValueError),
         ("feature_names", ("a", "a", "c"), ValueError),
         ("target_names", ("u", ""), TypeError),
-        ("sample_ids", ("s0", "s1", "s1", "s3"), ValueError),
-        ("provenance", {"source": "x"}, ValueError),
         ("metadata", {"bad": object()}, TypeError),
     ],
 )

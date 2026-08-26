@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Simplify `PiPLSDataset` to `X`, `Y`, feature names, target names, and metadata: remove generated
+  sample identifiers and the duplicate top-level provenance field while retaining reference-dataset
+  provenance once under `metadata["provenance"]`.
 - Simplify synthetic-data support to one `make_synthetic_data()` utility returning `(X, Y)` directly:
   migrate maintained examples and validation coverage, use explicit row splitting for train/test
   analyses, remove the superseded generators and `SyntheticDataTruth`, and keep exact internal RNG
@@ -300,7 +303,7 @@
   temporary repository copy, resource and canonical-array integrity checks, and clean wheel/source-
   distribution smoke coverage. Maintained consumers remain unchanged until the migration patch.
 - Generalize the private packaged-reference-dataset loader across resource access, metadata and CSV
-  parsing, dimensional validation, integrity checks, provenance, and stable sample identifiers,
+  parsing, dimensional validation, integrity checks, and metadata,
   while preserving the complete public `load_pulp()` contract and adding no new public loader.
 - Add conditional predictor-rank profile extraction and plotting to the complete Sugarcane and
   Tobacco workflows. Tobacco now demonstrates that the component count returned by the

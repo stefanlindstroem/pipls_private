@@ -36,18 +36,17 @@ def test_load_sugarcane_returns_labeled_immutable_dataset() -> None:
     assert dataset.Y.dtype == np.float64
     assert dataset.feature_names == FEATURE_NAMES
     assert dataset.target_names == TARGET_NAMES
-    assert dataset.sample_ids == tuple(
-        f"sugarcane-{index:02d}" for index in range(1, 58)
-    )
     assert not dataset.X.flags.writeable
     assert not dataset.Y.flags.writeable
     assert np.isfinite(dataset.X).all()
     assert np.isfinite(dataset.Y).all()
 
-    assert dataset.provenance["source"].endswith("10.17632/mjttsjfj2s.1")
-    assert dataset.provenance["license"] == "CC-BY-4.0"
-    assert "Chaix" in dataset.provenance["citation"]
-    assert dataset.provenance["version"] == "1"
+    provenance = dataset.metadata["provenance"]
+    assert isinstance(provenance, Mapping)
+    assert provenance["source"].endswith("10.17632/mjttsjfj2s.1")
+    assert provenance["license"] == "CC-BY-4.0"
+    assert "Chaix" in provenance["citation"]
+    assert provenance["version"] == "1"
 
     assert isinstance(dataset.metadata, Mapping)
     assert dataset.metadata["schema_version"] == 1
@@ -99,8 +98,6 @@ def test_load_sugarcane_result_is_pickleable() -> None:
     np.testing.assert_array_equal(restored.Y, dataset.Y)
     assert restored.feature_names == dataset.feature_names
     assert restored.target_names == dataset.target_names
-    assert restored.sample_ids == dataset.sample_ids
-    assert restored.provenance == dataset.provenance
     assert restored.metadata == dataset.metadata
     assert not restored.X.flags.writeable
     assert not restored.Y.flags.writeable

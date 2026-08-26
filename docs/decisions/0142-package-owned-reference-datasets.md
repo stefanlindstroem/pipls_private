@@ -7,7 +7,7 @@ Accepted; implemented.
 ## Context
 
 Pulp was the first named dataset distributed with Pi-PLS. The resulting
-`load_pulp()` workflow is useful in an installed package, preserves immutable labels and provenance,
+`load_pulp()` workflow is useful in an installed package, preserves immutable labels and metadata,
 and avoids a repository-relative file dependency. Sugarcane and Tobacco now have the same relevant
 properties: they are licensed, curated reference analyses with fixed predictor and response
 matrices, documented scientific transformations, and maintained Pi-PLS examples.
@@ -89,15 +89,9 @@ src/pipls/_data/
 
 Each `X.csv` and `Y.csv` pair is the exact analysis-facing matrix pair returned by its loader.
 Metadata records ordered labels, source-level transformations, row alignment, public provenance,
-licensing, raw-resource hashes, and canonical `float64` array hashes. The package-level sample
-identifiers are stable identifiers for the returned row order:
-
-- `pulp-01` through `pulp-46`;
-- `sugarcane-01` through `sugarcane-57`;
-- `tobacco-001` through `tobacco-347`.
-
-These are package identifiers, not assertions that the upstream sources use the same identifiers.
-Source sample numbers, exclusions, and row-alignment information remain documentary metadata.
+licensing, raw-resource hashes, and canonical `float64` array hashes. Source sample numbers,
+exclusions, and row-alignment information remain documentary metadata where they are available;
+the public dataset container does not manufacture package-level sample identifiers.
 
 The resource directories are intentionally language-neutral. Public dataset documentation must
 list the canonical paths and explain that the same CSV, JSON, README, and license files are
@@ -111,7 +105,7 @@ available:
 For reproducible non-Python use, documentation should recommend a tagged source release, source
 distribution, or wheel rather than a moving development branch or an environment-specific installed
 path. Each resource README states that the files may be used independently of Python and identifies
-the local matrix, metadata, provenance, and license resources.
+the local matrix, metadata, README, and license resources.
 
 There is one active matrix representation for each named dataset. Pulp, Sugarcane, and Tobacco
 each have one `X.csv`/`Y.csv` pair under `src/pipls/_data/<dataset>/`, accompanied by
@@ -120,8 +114,7 @@ matrix copies are removed rather than retained as duplicate active data. The hid
 archive remains excluded development history and is not an active data source.
 
 All three loaders share one private package-resource pipeline for CSV and JSON parsing, dimensional
-validation, raw-resource and canonical-array integrity checks, provenance, and stable sample
-identifiers. Every maintained reference-data consumer uses its named loader. Wheels and source
+validation, raw-resource and canonical-array integrity checks, and metadata. Every maintained reference-data consumer uses its named loader. Wheels and source
 distributions include all five files for each dataset, isolated installations load all three
 datasets, and tests protect one active matrix location.
 

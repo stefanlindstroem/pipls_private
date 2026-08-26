@@ -7,7 +7,7 @@ Accepted in Phase E1; simplified to the single synthetic generator.
 ## Context
 
 The package needs one stable in-memory boundary for packaged datasets and structured experiments.
-The boundary must preserve names, identifiers, and provenance without making preprocessing
+The boundary must preserve matrix labels and dataset metadata without making preprocessing
 decisions or exposing mutable arrays. Synthetic validation and examples separately need
 deterministic predictor-specific, shared, and response-specific latent structure without changing
 NumPy's global random state.
@@ -21,11 +21,10 @@ should contain no more generator machinery than those uses require.
 - Public dataset functionality lives in `pipls.datasets`, following the scikit-learn convention of
   a dedicated dataset namespace rather than expanding the package root.
 - `PiPLSDataset` is the common immutable, validation-controlled container for packaged datasets and
-  structured experiments. It stores `X`, `Y`, feature names, target names, sample identifiers,
-  provenance, and metadata.
+  structured experiments. It stores `X`, `Y`, feature names, target names, and metadata.
 - `Y` is normalized to a two-dimensional array, including single-response datasets.
-- Required provenance keys are `source`, `license`, `citation`, and `version` when the optional
-  container is used. They are not prerequisites for fitting plain user-supplied `X` and `Y`.
+- Reference-dataset provenance is retained once inside `metadata`; it is not duplicated as a
+  separate container field and is not required for user-constructed datasets.
 - All model arrays and array-valued metadata are copied and made read-only. Metadata NumPy arrays
   must have a non-object dtype; heterogeneous values use nested sequences or mappings so their
   contents can be recursively frozen. Unsupported mutable or object values are rejected.

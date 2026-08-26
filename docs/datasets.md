@@ -20,13 +20,6 @@ sample = PiPLSDataset(
     Y=Y,
     feature_names=("x_1", "x_2"),
     target_names=("y_1",),
-    sample_ids=("sample_1", "sample_2"),
-    provenance={
-        "source": "local-example",
-        "license": "BSD-3-Clause",
-        "citation": "Example data",
-        "version": "1",
-    },
     metadata={"instrument": "example"},
 )
 ```
@@ -36,9 +29,7 @@ The container validates and then freezes its contents:
 - `X` is a finite two-dimensional real numeric array;
 - `Y` is a finite one- or two-dimensional real numeric array and is stored as two-dimensional;
 - rows of `X` and `Y` must align exactly;
-- feature names, target names, and sample identifiers are non-empty, unique strings with matching
-  lengths;
-- provenance must contain non-empty `source`, `license`, `citation`, and `version` strings;
+- feature names and target names are non-empty, unique strings with matching lengths;
 - metadata values may be immutable scalars, sequences, mappings, or non-object NumPy arrays;
 - model arrays are copied, converted to `float64`, and made read-only;
 - metadata arrays are copied with their dtype preserved and made read-only;
@@ -199,8 +190,9 @@ The article identifies the refiner controls, internal state variables, pulp desc
 handsheet properties as supplementary data. The package-owned dataset selects the documented
 fiber-property and response columns from that public supplementary table.
 
-`load_pulp()` reads the installed package resources and returns labels, stable sample identifiers,
-public provenance, and immutable metadata together with the two model matrices. The quick start,
+`load_pulp()` reads the installed package resources and returns labels and immutable metadata
+together with the two model matrices. Public provenance is stored once under
+`dataset.metadata["provenance"]`. The quick start,
 ordinary-PLS comparison, complete Pulp example, and tutorial renderer all use this public loader.
 The installed resources are the sole active Pulp matrix representation.
 
