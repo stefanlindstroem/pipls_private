@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add the EPV policy as the second graphical path-selection case: reuse the Pulp feasible domain,
+  highlight the single default-EPV predictor rank and its compatible component counts, and color
+  only those evaluated pairs by their actual CV-MSE.
 - Rework the path-and-selection explanation around the exhaustive Pulp CV-MSE surface: show
   conditional predictor-rank tolerance as the reduction from the two-dimensional candidate domain
   to one rank per component count, then show component tolerance on the resulting path. Add

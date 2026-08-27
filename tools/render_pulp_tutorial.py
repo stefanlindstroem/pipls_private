@@ -52,10 +52,12 @@ CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 DOMAIN_PREDICTOR_RELATIVE_TOLERANCE = 0.15
 DOMAIN_COMPONENT_RELATIVE_TOLERANCE = 0.50
+EPV_SAMPLES_PER_PREDICTOR_RANK = 10.0
 FIGURE_FILENAMES = (
     "search_domain.svg",
     "conditioned_search_domain.svg",
     "conditioned_component_path.svg",
+    "epv_search_domain.svg",
     "component_path.svg",
     "selected_component_path.svg",
     "predictor_rank_profile.svg",
@@ -330,6 +332,94 @@ def _render_conditioned_component_path(
     axis.set_ylim(bottom=0.0)
     axis.grid(axis="y", alpha=0.25)
     axis.legend(fontsize="small")
+    _save_svg(figure, output_path)
+
+
+def _epv_rank(
+    data: PiPLSDataset,
+    search: PiPLSSearchCV,
+) -> int:
+    nominal = min(
+        data.X.shape[1],
+        int(np.ceil(data.X.shape[0] / EPV_SAMPLES_PER_PREDICTOR_RANK)),
+    )
+    return min(nominal, search.max_predictor_rank_)
+
+
+def _render_epv_search_domain(
+    search: PiPLSSearchCV,
+    data: PiPLSDataset,
+    *,
+    output_path: Path,
+) -> None:
+    component_values, rank_values, surface = _candidate_surface(search)
+    epv_rank = _epv_rank(data, search)
+    if epv_rank not in rank_values:
+        raise RuntimeError("Pulp EPV rank must lie in the exhaustive search domain.")
+
+    figure, axis = _figure(figsize=(7.6, 7.0))
+    admissible = np.isfinite(surface)
+    background = np.where(admissible, 0.84, 0.94)
+    axis.imshow(
+        background,
+        origin="lower",
+        aspect="auto",
+        interpolation="nearest",
+        extent=(
+            0.5,
+            float(component_values[-1]) + 0.5,
+            0.5,
+            float(rank_values[-1]) + 0.5,
+        ),
+        cmap="gray",
+        vmin=0.0,
+        vmax=1.0,
+    )
+
+    epv_surface = np.full_like(surface, np.nan)
+    epv_row = epv_rank - 1
+    compatible = component_values <= epv_rank
+    epv_surface[epv_row, compatible] = surface[epv_row, compatible]
+    image = axis.imshow(
+        np.ma.masked_invalid(epv_surface),
+        origin="lower",
+        aspect="auto",
+        interpolation="nearest",
+        extent=(
+            0.5,
+            float(component_values[-1]) + 0.5,
+            0.5,
+            float(rank_values[-1]) + 0.5,
+        ),
+        cmap="viridis",
+        vmin=float(np.nanmin(surface)),
+        vmax=float(np.nanmax(surface)),
+    )
+    axis.set_xticks(component_values)
+    axis.set_yticks(rank_values)
+    axis.set_xticks(
+        np.arange(1.5, float(component_values[-1]) + 0.5),
+        minor=True,
+    )
+    axis.set_yticks(
+        np.arange(1.5, float(rank_values[-1]) + 0.5),
+        minor=True,
+    )
+    axis.grid(which="minor", linewidth=0.5, color="white", alpha=0.65)
+    axis.tick_params(which="minor", bottom=False, left=False)
+    axis.set_xlabel(r"Paired-mode count $h$")
+    axis.set_ylabel(r"Predictor rank $r_\pi$")
+    axis.set_title(rf"Pulp EPV policy: fixed $r_\pi={epv_rank}$")
+    axis.text(
+        float(component_values[-1]) - 1.3,
+        2.1,
+        r"$r_\pi < h$" + "\nnot admissible",
+        ha="center",
+        va="center",
+        fontsize="small",
+    )
+    colorbar = figure.colorbar(image, ax=axis, shrink=0.86)
+    colorbar.set_label("Mean response-standardized CV-MSE")
     _save_svg(figure, output_path)
 
 
@@ -727,6 +817,8 @@ def _write_manifest(
                     DOMAIN_PREDICTOR_RELATIVE_TOLERANCE
                 ),
                 "component_relative_tolerance": DOMAIN_COMPONENT_RELATIVE_TOLERANCE,
+                "epv_samples_per_predictor_rank": EPV_SAMPLES_PER_PREDICTOR_RANK,
+                "epv_predictor_rank": _epv_rank(data, search),
             },
             "cross_validation": {
                 "splitter": type(CV).__name__,
@@ -798,6 +890,11 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     _render_conditioned_component_path(
         search,
         output_path=output_dir / "conditioned_component_path.svg",
+    )
+    _render_epv_search_domain(
+        search,
+        data,
+        output_path=output_dir / "epv_search_domain.svg",
     )
     component_path = search.component_path_
     _render_component_path(

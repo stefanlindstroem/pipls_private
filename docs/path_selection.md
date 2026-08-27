@@ -144,35 +144,48 @@ The labels above the path show the predictor rank already selected conditionally
 This ordering is central: predictor rank is resolved first at each $h$; component selection then
 acts on the resulting one-dimensional path and does not revisit the predictor-rank profiles.
 
-## Predictor-rank policies { #predictor-rank-policies }
+## Fixed predictor rank: EPV { #epv-policy }
 
-`predictor_rank_values` defines the rank domain or fixed-rank policy; `search_method` controls the
-coverage of a multi-rank domain.
-
-- `None` optimizes over every feasible integer rank, subject to $r_\pi\ge h$.
-- A one-element integer sequence fixes that rank for every compatible component count.
-- A longer integer sequence optimizes over exactly those supplied ranks after feasibility checks.
-- `"epv"` fixes one rank using the events-per-variable-inspired rule.
-
-### EPV policy { #epv-policy }
-
-For the EPV policy, the nominal rank is computed from the full number of observations supplied to
-`fit()`:
+The exhaustive case above optimizes predictor rank separately at every component count. The EPV
+policy instead fixes one predictor rank before the component path is evaluated. With
+`predictor_rank_values="epv"`, the nominal rank is
 
 \begin{equation}
 r_{\pi,\mathrm{epv,nominal}}
 =
-\min\left[p,\left\lceil\frac{n}{c}\right\rceil\right],
+\min\left(p,\left\lceil\frac{n}{c}\right\rceil\right),
 \end{equation}
 
-where $c$ is `samples_per_predictor_rank`. The effective EPV rank is clipped only by the hard
-feasibility ceiling and an explicit integer `max_predictor_rank`, if supplied. The default is
-$c=10$; $c=5$ is supported as a more permissive policy. Values below 5 are legal but emit
-`PredictorRankSupportWarning`. A nondefault `samples_per_predictor_rank` is invalid outside the EPV
-policy.
+where $n$ and $p$ are the full-data observation and predictor counts supplied to `fit()`, and $c$ is
+`samples_per_predictor_rank`. The effective EPV rank is
 
-EPV and one-element fixed-rank policies expose one rank per compatible component count and therefore
-have no conditional predictor-rank search or `PiPLSPredictorRankEvidence`.
+\begin{equation}
+r_{\pi,\mathrm{epv}}
+=
+\min(r_{\pi,\mathrm{epv,nominal}},r_{\pi,\mathrm{max}}).
+\end{equation}
+
+The default is $c=10$. For Pulp, $n=46$ and $p=14$, so the nominal rank is 5 and no feasibility
+clipping is needed. The search therefore evaluates only the five compatible pairs
+$(h,r_\pi)=(1,5),\ldots,(5,5)$. In the figure below, the full feasible domain is left neutral and
+only those EPV pairs are colored by their actual mean response-standardized CV-MSE under the same
+validation splits used in the exhaustive example.
+
+![Pulp EPV search domain](assets/generated/pulp/epv_search_domain.svg)
+
+There is no conditional predictor-rank selection in this case: $r_\pi$ is already fixed, and only
+the component path remains to be selected. The default $c=10$ may be changed with
+`samples_per_predictor_rank`; $c=5$ is a more permissive maintained setting. Values below 5 are
+legal but emit `PredictorRankSupportWarning`. A nondefault `samples_per_predictor_rank` is invalid
+outside the EPV policy.
+
+### Other predictor-rank policies { #predictor-rank-policies }
+
+A one-element explicit `predictor_rank_values` sequence also fixes one rank and therefore has no
+conditional predictor-rank selection. A longer explicit sequence restricts the predictor-rank
+domain and optimizes only over those supplied ranks, while `predictor_rank_values=None` uses the
+full feasible integer domain described above. `n_components_values` restricts the component counts
+and `max_predictor_rank` restricts the upper predictor-rank boundary.
 
 ## Scoring and adaptive coverage { #scoring-and-conditioned-path-selection }
 

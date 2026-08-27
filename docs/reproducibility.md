@@ -72,7 +72,7 @@ maintained repository calculations rather than committed image binaries. The syn
 manifest records the generator configuration, selected rank pair, external-test provenance,
 filenames, and SVG hashes. The Pulp tutorial manifest records dataset identity, version, source DOI,
 license, package-resource and canonical-array hashes, evaluated ranks, boundary status, display
-subsets, and the exhaustive search-domain SVG used by the path-and-selection guide. The Home
+subsets, and the exhaustive and EPV search-domain SVGs used by the path-and-selection guide. The Home
 comparison manifest records the
 [Pulp](datasets.md#pulp-real-data-integration) and
 [Tobacco](datasets.md#tobacco-spectral-integration) dataset identities and versions,
