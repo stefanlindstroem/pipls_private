@@ -16,7 +16,6 @@ This index lists current numbered decisions only. Completed intermediate records
 - [0015: dataset and synthetic boundary](0015-dataset-and-synthetic-api.md)
 - [0024: package versus publication ownership](0024-package-product-repository-boundary.md)
 - [0025: current versus future scaling](0025-model-internal-standardization-boundary.md)
-- [0032: EPV sample-count convention](0032-full-sample-rank-support.md)
 - [0039: estimator versus selection ownership](0039-fixed-estimator-path-search-boundary.md)
 - [0041: legacy dataset licensing and roadmap](0041-legacy-dataset-licensing-roadmap.md)
 - [0042: fitted-model analysis architecture](0042-model-inspection-and-post-analysis.md)

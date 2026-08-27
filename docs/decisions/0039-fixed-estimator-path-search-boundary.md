@@ -56,7 +56,7 @@ third search dimension.
 - Search fitting produces inspectable path evidence but no hidden selected estimator.
 - Ordinary path analysis uses one CV layer; unbiased post-selection assessment requires a separate
   outer resampling design or untouched external data.
-- Decision 0032's full-sample convention remains specific to EPV, while Decision 0154 defines the
-  default full-feasible search domain and exhaustive/adaptive coverage boundary.
+- Decision 0154 defines both the full-sample EPV convention and the default full-feasible search
+  domain with its exhaustive/adaptive coverage boundary.
 - Supported pipelines require no public parameter-prefix control because the terminal Pi-PLS step
   is unique and inferred.

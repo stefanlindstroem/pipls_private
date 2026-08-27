@@ -38,6 +38,3 @@ A successful snapshot is a faithful committed-tree handoff for one recorded comm
 generated tutorial figures, ignored results, and other ignored artifacts are excluded by
 construction. Contributors must commit or remove every nonignored change before running
 `make snapshot`; the helper no longer produces diagnostic dirty snapshots.
-
-The next pre-release hardening increment is fold-level numerical-rank feasibility in path
-selection.

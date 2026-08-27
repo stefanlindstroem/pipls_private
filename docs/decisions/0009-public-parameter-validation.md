@@ -8,10 +8,9 @@ runtime migration is implemented.
 ## Context
 
 `PiPLSRegression` exposes several integer or integer-like controls whose invalid values can
-otherwise fail inside NumPy, joblib, or scikit-learn with inconsistent messages. The rank-bound
-parameter $c$, exposed as `samples_per_predictor_rank`, also controls how much training-sample
-support is required for each retained predictor-rank direction. Decision 0032 specifies that this
-support term uses the total number of observations supplied to `fit()`.
+otherwise fail inside NumPy, joblib, or scikit-learn with inconsistent messages. The parameter $c$, exposed as `samples_per_predictor_rank`, controls the explicit
+EPV heuristic. Decision 0154 specifies that this policy uses the total number of observations supplied
+to `fit()`.
 
 ## Decision
 

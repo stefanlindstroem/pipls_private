@@ -103,8 +103,8 @@ r_{\pi,\mathrm{epv,nominal}}
 \end{equation}
 
 where $n$ is the full number of observations supplied to `fit()` and
-$c=\texttt{samples_per_predictor_rank}>0$. Using the full supplied $n$ preserves the sample-count
-convention established in Decision 0032 and matches the manuscript workflow for the final model.
+$c=\texttt{samples_per_predictor_rank}>0$. The full supplied $n$ defines the EPV sample-count
+convention and matches the manuscript workflow for the final model.
 
 The effective EPV rank is the nominal value clipped only by unavoidable search feasibility and any
 explicit user maximum:
@@ -176,8 +176,6 @@ This decision refines the following retained contracts:
   otherwise remain in force.
 - Decision 0009: `PredictorRankSupportWarning` is attached to EPV use with $c<5$, not to
   `max_predictor_rank="rule"`; the rule sentinel is removed.
-- Decision 0032: the full-sample $n/c$ convention remains normative only for EPV. Its fold-
-  dimensional feasibility reasoning remains in force for all policies.
 - Decision 0039: the fixed-estimator/search ownership boundary remains unchanged, but the standard
   search is no longer bounded by the $c=5$ support rule and adaptive coverage is no longer the
   default.

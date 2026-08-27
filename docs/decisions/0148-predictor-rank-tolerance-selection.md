@@ -2,11 +2,9 @@
 
 ## Status
 
-Accepted and implemented for hierarchical predictor-rank tolerance selection. The constructor
-tolerance controls, immutable optimized-rank evidence, conditioned-path selection rules, adaptive
-tolerance-boundary refinement, and completed validation are implemented. Decision 0154 supersedes
-only the former `"max"`/`"maximum"` fixed-policy clauses by introducing explicit EPV and full-domain
-automatic search; that migration is implemented.
+Accepted and implemented. The constructor tolerance controls, immutable optimized-rank evidence,
+conditioned-path selection rules, and adaptive tolerance-boundary refinement are current. Decision
+0154 owns the explicit EPV policy and full-domain automatic-search contract.
 
 ## Context
 
@@ -234,66 +232,6 @@ limiting case, the selected candidate can have CV-MSE up to
 
 relative to the global candidate minimum. This is the expected consequence of two sequential
 parsimony decisions.
-
-### Demonstrate both decisions in the Tobacco workflow
-
-Example 06 defines separately named constants:
-
-```python
-PREDICTOR_RANK_RELATIVE_TOLERANCE = 0.10
-COMPONENT_RELATIVE_TOLERANCE = 0.10
-```
-
-The search constructor receives the predictor-rank tolerance, while `refit()` receives the
-component-count tolerance. The predictor-rank profile and console output show both the exact
-conditional optimum and the smaller 10%-qualified retained rank. The component-path figure and
-console output separately show the exact conditioned-path minimum and the 10%-qualified component
-count.
-
-Because Tobacco uses the default scorer, the example may convert the generic configured-score
-threshold to a CV-MSE threshold by negation. That conversion remains example-level presentation and
-is not built into the scorer-neutral evidence record.
-
-## Patch sequence
-
-1. Establish this decision and synchronize the accepted target contracts in `.llm` -- complete.
-2. Separate exact numerical score comparison from substantive predictor-rank tolerance primitives,
-   without changing the public API or adaptive candidate coverage -- complete.
-3. Add the constructor parameters, hierarchical path behavior, immutable public evidence, and full
-   API/integration tests -- complete.
-4. Demonstrate separate 10% predictor-rank and component-count tolerances in the Tobacco workflow
-   and update user documentation and generated example artifacts -- complete.
-5. Complete migration wording, distribution and link audits, update the changelog, and mark this
-   decision implemented -- complete.
-
-## Validation
-
-Every patch must pass:
-
-```bash
-python3 -m ruff check src tests examples tools
-python3 -m mypy src
-make check
-make docs
-git diff --check
-```
-
-Patches affecting the public API must also run `make dist-check`. Patches affecting the Tobacco
-workflow must run `make examples` and record the exact reference and retained $r_{\pi}$ and $h$
-values.
-
-The numerical implementation must compare candidate evaluation before and after directly. Under
-exhaustive coverage, changing only predictor-rank tolerances must not change evaluated
-`(n_components, predictor_rank)` pairs or candidate-level results. Under adaptive coverage, tolerance
-may add tolerance-boundary evaluations. Common evaluated candidates must retain identical split and
-mean scores and CV-MSE values, cached candidates must not be refit, and `cv_results_`,
-`rank_test_score`, timing arrays, and `search_is_exhaustive_` must describe the completed coverage.
-
-Tests must cover positive, negative, and zero reference scores; individual and simultaneous caps;
-exact boundaries; invalid values; fixed, maximum, explicit, adaptive, and exhaustive policies;
-custom scorers; pipelines; cloning; parameter mutation; direct result construction; immutability;
-pickling; OOF compatibility; and the distinction between global candidate evidence and conditioned
-path selection.
 
 ## Consequences
 

@@ -59,5 +59,3 @@ policy.
 
 The preflight adds one terminal rank probe per training fold and one fold-local preprocessing fit
 for pipelines. Candidate evaluation, OOF generation, and refit behavior are otherwise unchanged.
-
-The next pre-release hardening increment is consistent tolerant score ranking.

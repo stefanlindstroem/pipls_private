@@ -2,9 +2,9 @@
 
 ## Status
 
-Accepted and implemented. All seven patches are complete. The active API uses tolerance-based
-minimum-CV-MSE selection and descriptive split SD, and the complete Pulp workflow and Tutorial 3 use
-ten repeated five-fold partitions.
+Accepted and implemented. The active API uses tolerance-based minimum-CV-MSE selection and
+descriptive split SD; the complete Pulp workflow and Tutorial 3 use ten repeated five-fold
+partitions.
 
 ## Context
 
@@ -156,9 +156,9 @@ component-count tolerances; it is not stored as independent state.
 Manual component-count selections and `rule="best_score"` selections do not carry tolerance
 provenance.
 
-### Remove the one-standard-error surface
+### Keep the one-standard-error surface retired
 
-After maintained consumers migrate, remove:
+The public and private one-standard-error surface is removed:
 
 ```text
 rule="one_standard_error"
@@ -167,25 +167,8 @@ one_standard_error_threshold
 _select_one_standard_error()
 ```
 
-No compatibility alias or deprecation period is required before the first release. Historical
-decisions and changelog entries may retain historically accurate wording.
-
-### Demonstrate substantive relative tolerance in Tobacco
-
-The Tobacco example becomes the maintained demonstration of deliberate parsimony:
-
-```python
-model = search.refit(
-    X,
-    Y,
-    rule="minimum_cv_mse",
-    relative_tolerance=0.10,
-)
-```
-
-Its component-path figure shows mean CV-MSE ± split SD, the exact minimum row, the 10% threshold,
-and the smallest qualifying component count. The example mentions the additional absolute cap in
-prose only; it does not demonstrate a second tolerance configuration.
+No compatibility alias is retained. Historical decisions and changelog entries may keep
+historically accurate wording.
 
 ### Use repeated CV in Tutorial 3 and its Pulp experiment
 
@@ -212,44 +195,6 @@ start and other maintained examples remain computationally lighter unless separa
 This transition changes inner path selection and descriptive reporting only. It does not introduce a
 nested-CV or repeated outer-evaluation class. Independent evaluation of the complete
 search-select-refit procedure remains a separate future design problem.
-
-## Patch sequence
-
-1. Establish this decision and synchronize the guide layer — complete.
-2. Rename `cv_mse_fold_sd` to `cv_mse_std` and lock equal-split mean and population-SD numerics,
-   temporarily retaining derived SE support as a migration bridge — complete.
-3. Add relative and absolute tolerance arguments, validation, threshold selection, and immutable
-   selection provenance — complete.
-4. Replace maintained SE error bars and wording with SD across validation splits — complete.
-5. Migrate maintained automatic workflows to `minimum_cv_mse`; use `relative_tolerance=0.10` in
-   Tobacco and machine-scale defaults elsewhere — complete.
-6. Use repeated five-fold CV with ten repetitions in the Pulp example, renderer, Tutorial 3, and
-   corresponding tests and manifests — complete.
-7. Remove the one-standard-error rule and all remaining active SE surface, synchronize public
-   documentation and guide material, and run complete stale-surface audits — complete.
-
-## Validation
-
-Every implementation patch must pass:
-
-```text
-git diff --check
-Ruff
-mypy
-complete pytest suite
-strict MkDocs build
-Python compilation
-```
-
-Patch 2 must protect exact split means and population SDs for ordinary, repeated, one-split, and
-unequal-length splitter protocols. Patch 3 must protect default resolution, zero and finite
-relative tolerance, finite and infinite absolute tolerance, both-conditions semantics, exact
-threshold inclusion, zero minimum MSE, invalid inputs, custom scorers, pipelines, pickling, and OOF
-selection compatibility. Patch 4 must execute affected renderers and verify SD labels and arrays.
-Patch 5 must protect Tobacco's exact minimum, 10% threshold, first qualifying row, and selection
-provenance. Patch 6 must protect 50 materialized splits, ten OOF predictions per Pulp observation,
-semantic manifests, generated figures, and deliberate runtime documentation. Patch 7 must verify
-that no active one-standard-error or standard-error selection surface remains.
 
 ## Consequences
 

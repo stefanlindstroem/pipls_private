@@ -23,8 +23,8 @@ wheel, source distribution, or source checkout. Their canonical locations and ac
 metadata, README, and license files therefore need an explicit language-neutral documentation
 contract.
 
-The package remains unreleased at version `0.0.0`. The transition can end with one active matrix
-copy per dataset and no compatibility aliases, generic registry, or duplicate repository layout.
+The maintained package keeps one active matrix copy per dataset and no compatibility aliases,
+generic registry, or duplicate repository layout.
 
 ## Decision
 
@@ -131,8 +131,8 @@ layer is introduced.
 - Pulp, Sugarcane, and Tobacco can be loaded from a clean installed package through one consistent
   named-loader vocabulary.
 - Their canonical CSV matrices remain directly usable outside Python and are documented as such.
-- Examples 03, 05, and 06 can stop depending on repository-relative paths and pandas for fixed
-  dataset ingestion.
+- Examples 03, 05, and 06 use the named package loaders rather than repository-relative paths or
+  pandas for fixed dataset ingestion.
 - Package distributions grow because the spectral matrices travel with the base installation.
 - Resource hashes, canonical-array hashes, installed-distribution loading, and single-copy location
   become durable tests for all three datasets.

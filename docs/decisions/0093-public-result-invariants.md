@@ -8,7 +8,7 @@ Accepted.
 
 The public fixed-estimator and path layers return five frozen result records:
 `PiPLSDecomposition`, `PiPLSSelection`, `PiPLSPredictorRankProfile`,
-`PiPLSComponentPath`, and `PiPLSValidationReport`. Estimator-produced instances were mostly
+`PiPLSComponentPath`, and `PiPLSOOFReport`. Estimator-produced instances were mostly
 well formed, but direct construction did not apply one consistent policy. Some records retained
 aliased writable arrays, some normalized values and others did not, and several accepted invalid
 scalar, score, or coverage states.
@@ -42,14 +42,10 @@ Apply one defensive validation contract to all five records.
 9. Keep constructor signatures suppressed in generated reference pages. The records remain
    returned-first interfaces, but direct construction is supported and validated.
 
-No compatibility layer is required because the package has not been released. Invalid states that
-were previously constructible are rejected immediately.
+Invalid states are rejected immediately rather than being retained as weaker alternate forms.
 
 ## Consequences
 
 Estimator and path outputs retain their existing values and field names, while public records have
 one predictable immutability and validation boundary. Tests can construct records directly without
 creating weaker states than the package itself returns.
-
-The next pre-release hardening increment applies the same policy to inspection results and hardens
-inspection calculations against nonfinite derived values.

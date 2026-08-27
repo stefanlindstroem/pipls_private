@@ -44,7 +44,6 @@ quantities.
 8. These safeguards do not add thresholds, probability limits, outlier labels, uncertainty claims,
    or rendering behavior.
 
-No compatibility layer is required because the package has not been released.
 
 ## Consequences
 
