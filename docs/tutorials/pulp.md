@@ -438,7 +438,8 @@ python examples/04_pulp_real_data.py
 ```
 
 Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.
-`make docs-figures` regenerates the twelve representative single-chart SVGs displayed here, while
+`make docs-figures` regenerates the twelve representative single-chart SVGs displayed here and the
+Pulp search-domain SVG used by the path-and-selection guide, while
 the numbered example writes ten caller-owned PDFs with additional score, loading, factorization,
 and coefficient views. Both routes calculate their figures directly from in-memory results. See
 [Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the

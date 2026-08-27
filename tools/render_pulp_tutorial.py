@@ -51,6 +51,7 @@ DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 FIGURE_FILENAMES = (
+    "search_domain.svg",
     "component_path.svg",
     "selected_component_path.svg",
     "predictor_rank_profile.svg",
@@ -85,6 +86,81 @@ def _save_svg(figure: Figure, path: Path) -> None:
         metadata={"Creator": "Pi-PLS repository", "Date": None},
     )
     plt.close(figure)
+
+
+def _candidate_surface(search: PiPLSSearchCV) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    n_components = np.asarray(search.cv_results_["n_components"], dtype=np.intp)
+    predictor_rank = np.asarray(search.cv_results_["predictor_rank"], dtype=np.intp)
+    cv_mse = np.asarray(
+        search.cv_results_["mean_response_standardized_mse"],
+        dtype=np.float64,
+    )
+
+    component_values = np.arange(1, int(np.max(n_components)) + 1, dtype=np.intp)
+    rank_values = np.arange(1, search.max_predictor_rank_ + 1, dtype=np.intp)
+    surface = np.full(
+        (rank_values.size, component_values.size),
+        np.nan,
+        dtype=np.float64,
+    )
+    for h_value, rank_value, mse_value in zip(
+        n_components,
+        predictor_rank,
+        cv_mse,
+        strict=True,
+    ):
+        surface[int(rank_value) - 1, int(h_value) - 1] = float(mse_value)
+    return component_values, rank_values, surface
+
+
+def _render_search_domain(
+    search: PiPLSSearchCV,
+    *,
+    output_path: Path,
+) -> None:
+    component_values, rank_values, surface = _candidate_surface(search)
+    figure, axis = _figure(figsize=(7.6, 7.0))
+    colormap = plt.get_cmap("viridis").copy()
+    colormap.set_bad("0.92")
+    image = axis.imshow(
+        np.ma.masked_invalid(surface),
+        origin="lower",
+        aspect="auto",
+        interpolation="nearest",
+        extent=(
+            0.5,
+            float(component_values[-1]) + 0.5,
+            0.5,
+            float(rank_values[-1]) + 0.5,
+        ),
+        cmap=colormap,
+    )
+    axis.set_xticks(component_values)
+    axis.set_yticks(rank_values)
+    axis.set_xticks(
+        np.arange(1.5, float(component_values[-1]) + 0.5),
+        minor=True,
+    )
+    axis.set_yticks(
+        np.arange(1.5, float(rank_values[-1]) + 0.5),
+        minor=True,
+    )
+    axis.grid(which="minor", linewidth=0.5, color="white", alpha=0.65)
+    axis.tick_params(which="minor", bottom=False, left=False)
+    axis.set_xlabel(r"Paired-mode count $h$")
+    axis.set_ylabel(r"Predictor rank $r_\pi$")
+    axis.set_title("Pulp exhaustive search domain")
+    axis.text(
+        float(component_values[-1]) - 1.3,
+        2.1,
+        r"$r_\pi < h$" + "\nnot admissible",
+        ha="center",
+        va="center",
+        fontsize="small",
+    )
+    colorbar = figure.colorbar(image, ax=axis, shrink=0.86)
+    colorbar.set_label("Mean response-standardized CV-MSE")
+    _save_svg(figure, output_path)
 
 
 def _render_component_path(
@@ -533,6 +609,12 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     response_names = data.target_names
 
     search = PiPLSSearchCV(cv=CV).fit(X, Y)
+    if not search.search_is_exhaustive_:
+        raise RuntimeError("The Pulp domain figure requires exhaustive search.")
+    _render_search_domain(
+        search,
+        output_path=output_dir / "search_domain.svg",
+    )
     component_path = search.component_path_
     _render_component_path(
         component_path,

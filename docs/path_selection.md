@@ -65,6 +65,13 @@ The domain $\mathcal{D}$ is triangular: increasing $h$ removes all predictor ran
 `n_components_values="all"` uses every feasible integer $h$. Explicit component or predictor-rank
 values restrict this domain after the same feasibility checks.
 
+The Pulp dataset gives a compact example. Its exhaustive search has $q=8$ and
+$r_{\pi,\mathrm{max}}=14$, giving 84 admissible pairs. Each colored cell below is one pair
+evaluated under the maintained 10-times repeated five-fold CV protocol; color gives its actual
+mean response-standardized CV-MSE. Gray cells violate $r_\pi\ge h$.
+
+![Pulp exhaustive search domain](assets/generated/pulp/search_domain.svg)
+
 These bounds describe feasibility. The EPV policy introduced below is instead a rule for choosing
 one predictor rank inside the feasible domain.
 
