@@ -187,33 +187,27 @@ domain and optimizes only over those supplied ranks, while `predictor_rank_value
 full feasible integer domain described above. `n_components_values` restricts the component counts
 and `max_predictor_rank` restricts the upper predictor-rank boundary.
 
-## Scoring and adaptive coverage { #scoring-and-conditioned-path-selection }
+## Adaptive search and scoring { #scoring-and-conditioned-path-selection }
 
-The exhaustive example above uses the default scorer, `"neg_response_standardized_mse"`, which
-resolves to `pipls.metrics.neg_response_standardized_mse`. Maximizing that score is equivalent to
-minimizing the response-standardized CV-MSE shown in the figures. Ordinary scikit-learn scorer
-names, scorer callables, and `scoring=None` are also accepted. With another scorer, the conditional
-predictor-rank optimum and tolerance are defined on the configured-score scale; CV-MSE remains a
-diagnostic and need not identify that optimum.
+The examples above use exhaustive coverage. When the predictor-rank domain is large,
+`search_method="adaptive"` can reduce the number of ranks evaluated at each $h$. The admissible
+domain and the conditional predictor-rank selection rule are unchanged; only candidate coverage
+changes.
 
-`search_method="adaptive"` uses the same admissible endpoints as exhaustive search but may leave
-interior predictor ranks unevaluated. It first refines around the exact evaluated score optimum. If
-the smallest qualifying evaluated rank and its immediately lower failing neighbor still bracket
-unevaluated ranks, it refines that tolerance boundary as well. Each refinement switches to
-exhaustive evaluation once at most five admissible ranks remain in the local interval. If a boundary
-evaluation changes the exact evaluated optimum, optimum refinement resumes before the tolerance
-boundary is finalized.
+For each $h$, adaptive search begins with a sparse deterministic set of predictor ranks and refines
+around the best evaluated score. If the lower boundary of the tolerance-qualified region lies
+between evaluated ranks, that interval is refined as well. Each local refinement becomes exhaustive
+once at most five admissible ranks remain. Ranks that are never evaluated have no associated CV
+score and make no contribution to selection.
 
-`search_is_exhaustive_` records whether every admissible pair was evaluated, and `cv_results_` is
-the complete record of the pairs that were actually evaluated. `PiPLSPredictorRankEvidence` stores
-the exact configured-score reference and resolved predictor-rank tolerances;
-`predictor_rank_profile(h).reference_selection` exposes that reference, while `.selection` exposes
-the retained tolerance-qualified rank. Under adaptive coverage these statements necessarily concern
-the evaluated candidates rather than unevaluated ranks.
+`cv_results_` records the candidates actually evaluated, and `search_is_exhaustive_` reports whether
+those candidates happened to cover the complete admissible domain. `predictor_rank_profile(h)` and
+its reference and retained selections likewise describe the evaluated ranks.
 
-`rank_test_score` uses minimum ranks with private `rtol=1e-12` and `atol=1e-15` comparisons; tied
-score groups are anchored to the leading score in each group rather than chained through adjacent
-values. Public parsimony tolerances do not change these candidate-level ranks.
+The figures use the default scorer, `"neg_response_standardized_mse"`; maximizing it is equivalent
+to minimizing the response-standardized CV-MSE shown above. Other scikit-learn scorer names,
+scorer callables, and `scoring=None` are also accepted. With another scorer, conditional
+predictor-rank selection is performed on that configured-score scale.
 
 ## Pipelines and fold-local preprocessing { #pipelines-and-fold-local-preprocessing }
 
@@ -329,7 +323,7 @@ exposes the evaluated ranks and conditional evidence for one component count.
 
 The positive public loss and its scikit-learn-oriented negative scorer use the same fold-local
 response-standardized MSE definition described under
-[Scoring and adaptive coverage](#scoring-and-conditioned-path-selection).
+[Adaptive search and scoring](#scoring-and-conditioned-path-selection).
 
 ::: pipls.metrics.response_standardized_mse
     options:
