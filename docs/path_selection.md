@@ -209,97 +209,75 @@ to minimizing the response-standardized CV-MSE shown above. Other scikit-learn s
 scorer callables, and `scoring=None` are also accepted. With another scorer, conditional
 predictor-rank selection is performed on that configured-score scale.
 
-## Pipelines and fold-local preprocessing { #pipelines-and-fold-local-preprocessing }
+## Reference details
 
-The supported search estimator is either a direct `PiPLSRegression` or a scikit-learn `Pipeline`
-whose final step is `PiPLSRegression`. The complete estimator is cloned and fitted inside every
-training fold. Learned preprocessing must therefore remain inside the estimator or pipeline rather
-than being fitted once on the complete dataset before search.
+The sections below collect search configuration, stored evidence, and refitting details. They use the
+same domain and selection rules defined above.
 
-The terminal Π-PLS estimator uses a valid construction seed pair such as `(1, 1)` because
-`PiPLSRegression` always represents one explicit fixed pair. `PiPLSSearchCV` replaces
-`n_components` and `predictor_rank` before feasibility checks, candidate fits, OOF fits, and final
-refitting. Other template settings, including scaling, response-subspace policy, `svd_solver`, and
-`random_state`, remain part of every candidate.
+### Pipelines and fold-local preprocessing { #pipelines-and-fold-local-preprocessing }
 
-## Cross-validation protocols and metadata { #cross-validation-protocols-and-metadata }
+The search estimator may be a direct `PiPLSRegression` or a scikit-learn `Pipeline` whose final
+step is `PiPLSRegression`. The complete estimator is cloned and fitted inside every training split,
+so learned preprocessing must remain inside the estimator or pipeline.
+
+For each candidate, `PiPLSSearchCV` replaces the terminal estimator's `n_components` and
+`predictor_rank`. Other estimator settings, including scaling, response-subspace policy,
+`svd_solver`, and `random_state`, are retained.
+
+### Cross-validation protocols and metadata { #cross-validation-protocols-and-metadata }
 
 `PiPLSSearchCV` accepts scikit-learn-compatible splitters and explicit split iterables, including
-grouped, repeated, predefined, temporal, and other protocols when their assumptions match the
-data. `groups` is an explicit `fit()` parameter and participates in scikit-learn metadata routing
-when routing is enabled and requested. Split metadata belongs to the search object;
-`PiPLSRegression.fit(X, y)` accepts none.
+grouped, repeated, predefined, and temporal protocols. `groups` is an explicit `fit()` parameter
+and participates in scikit-learn metadata routing when routing is enabled and requested.
 
-The exact split reuse required for OOF reporting is documented under
-[Selection and split provenance](oof_diagnostics.md#selection-and-split-provenance).
+Foldwise $R^2$ requires at least two validation observations per split.
 
-Π-PLS provides no dedicated leave-one-out mode or package-specific interpretation for singleton
-validation folds. Foldwise $R^2$ is rejected when a validation split contains fewer than two
-observations.
+### Split variation
 
-## Split variation
+`component_path_.cv_mse_std` is the population standard deviation of the split-specific
+response-standardized MSE values. Maintained path and predictor-rank-profile figures show symmetric
+$\pm 1$ SD bars. These bars describe split-to-split variation; they are not confidence intervals and
+do not enter selection.
 
-`component_path_.cv_mse_std` is the population standard deviation of the realized split-specific
-response-standardized MSE values. Maintained path and predictor-rank-profile figures use symmetric
-$\pm 1$ SD bars from this stored quantity. These bars describe split-to-split variation; they are not
-confidence intervals, do not enter selection, and are not standard errors.
+### Search-owned selection rules { #search-owned-selection-rules }
 
-## Search-owned selection rules { #search-owned-selection-rules }
+`PiPLSSearchCV.select()` returns one immutable stored component-path row without fitting or mutating
+the search. `rule="minimum_cv_mse"` applies the component-path tolerance described above;
+`rule="best_score"` instead selects the maximum configured-score row. A component count may also be
+selected directly. In every case, the predictor rank is the rank already retained conditionally at
+that $h$.
 
-`PiPLSSearchCV.select()` returns one complete immutable stored component-path row without fitting or
-mutating the search. `rule="minimum_cv_mse"` applies the component-path tolerance described above
-and stores the exact path minimum as `reference_minimum` together with the resolved tolerances and
-`cv_mse_threshold`.
-
-`rule="best_score"` instead chooses the maximum configured-score row on the conditioned component
-path. Direct lookup by component count and `best_score` carry no CV-MSE tolerance provenance. In all
-cases the predictor rank is the rank already retained conditionally for that component count;
-`select()` does not revisit the predictor-rank profile.
-
-## Final-model refitting and provenance { #final-model-refitting }
+### Final-model refitting and provenance { #final-model-refitting }
 
 `refit()` fits exactly one stored component-path row on the supplied full data. Exactly one of an
-existing `selection`, a named `rule`, or `n_components` is required. An existing selection is
-validated against the fitted search before fitting.
+existing `selection`, a named `rule`, or `n_components` is required. The search clones the configured
+estimator or pipeline, inserts the selected rank pair, fits the clone, and attaches the immutable
+selection as `model.selection_`.
 
-The search clones the configured estimator or pipeline, replaces the terminal Π-PLS rank pair, fits
-the clone, attaches the exact immutable selection as `model.selection_`, and returns the model. It
-does not mutate the search or attach the returned model to search state. Prediction,
-transformation, scoring, inverse transformation, and fitted-model inspection belong to the returned
-estimator.
+The returned estimator owns the fitted model. The search object retains the candidate and selection
+evidence and is not mutated by `refit()`.
 
-The search stores candidate evidence but no final fitted model.
+### Computational consequences { #computational-consequences }
 
-## Computational consequences { #computational-consequences }
-
-If $N_{\mathrm{split}}$ validation splits and $N_{\mathrm{pair}}$ candidate pairs are materialized,
-candidate evaluation performs
+If $N_{\mathrm{split}}$ validation splits and $N_{\mathrm{pair}}$ candidate pairs are evaluated, the
+candidate search performs
 
 \begin{equation}
-N_{\mathrm{candidate\ fit}}
-=
-N_{\mathrm{pair}}N_{\mathrm{split}}
+N_{\mathrm{candidate\ fit}}=N_{\mathrm{pair}}N_{\mathrm{split}}
 \end{equation}
 
-fold-local fits, in addition to fold-level predictor-rank feasibility probes. A final `refit()` adds
-one full-data fit. OOF-specific fitting cost is documented under
-[OOF computation](oof_diagnostics.md#oof-computation).
+fold-local fits, in addition to feasibility probes. A final `refit()` adds one full-data fit.
+Restricting the component or predictor-rank domain, using adaptive coverage, or changing the number
+of validation splits changes the search evidence rather than merely its execution cost.
 
-Narrowing the rank or component domain changes the model-selection problem. Adaptive coverage
-changes which interior ranks are evaluated. Fewer validation splits change the validation evidence.
-These are not computationally neutral shortcuts.
+`n_jobs` controls parallel execution of candidate pairs. More workers can reduce elapsed time but
+increase peak memory. See [Troubleshooting](troubleshooting.md#the-path-search-is-too-slow-or-uses-too-much-memory)
+for practical controls.
 
-`n_jobs` changes execution rather than the requested candidates or validation splits. Candidate
-pairs are parallel tasks during search. More workers can increase peak memory. For symptoms and
-practical controls, see
-[Troubleshooting](troubleshooting.md#the-path-search-is-too-slow-or-uses-too-much-memory).
+### Result objects and scoring functions
 
-## Result objects and scoring functions
-
-The search exposes immutable path and selection records rather than mutable analysis state. Their
-fields are documented below from the public NumPy-style docstrings. `component_path_` contains the
-component-count path, `select()` returns one `PiPLSSelection`, and `predictor_rank_profile()`
-exposes the evaluated ranks and conditional evidence for one component count.
+`component_path_`, `select()`, and `predictor_rank_profile()` expose immutable records of the path,
+retained selection, and conditional predictor-rank evidence.
 
 ::: pipls.component_path.PiPLSComponentPath
     options:
@@ -321,9 +299,8 @@ exposes the evaluated ranks and conditional evidence for one component count.
       show_signature: false
       members: false
 
-The positive public loss and its scikit-learn-oriented negative scorer use the same fold-local
-response-standardized MSE definition described under
-[Adaptive search and scoring](#scoring-and-conditioned-path-selection).
+The positive loss and its scikit-learn-oriented negative scorer use the same fold-local
+response-standardized MSE definition used in the exhaustive example.
 
 ::: pipls.metrics.response_standardized_mse
     options:
