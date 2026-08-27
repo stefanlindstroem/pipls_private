@@ -239,13 +239,15 @@ def _logarithmic_predictor_rank_values(
 
 def _adaptive_refinement_interval(
     predictor_ranks: ArrayLike,
-    mean_losses: ArrayLike,
+    mean_scores: ArrayLike,
 ) -> tuple[int, int]:
-    """Return the evaluated-neighbor interval around the current best rank."""
+    """Return the evaluated-neighbor interval around the exact score optimum."""
 
     ranks = np.asarray(predictor_ranks)
-    losses = np.asarray(mean_losses, dtype=np.float64)
-    selected_rank, _ = _select_minimum_loss_predictor_rank(ranks, losses)
+    scores = np.asarray(mean_scores, dtype=np.float64)
+    reference_score = float(np.max(scores))
+    reference_mask = _tied_score_mask(scores, reference_score)
+    selected_rank = int(np.min(ranks[reference_mask]))
     order = np.argsort(ranks)
     sorted_ranks = ranks[order]
     selected_index = int(np.flatnonzero(sorted_ranks == selected_rank)[0])
@@ -280,7 +282,7 @@ def _refine_adaptive_reference(
             return
 
         ranks, scores = evaluated_scores()
-        lower, upper = _adaptive_refinement_interval(ranks, -scores)
+        lower, upper = _adaptive_refinement_interval(ranks, scores)
         refined = allowed_ranks[(allowed_ranks >= lower) & (allowed_ranks <= upper)]
         if np.array_equal(refined, interval):
             evaluated_set = {int(rank) for rank in ranks}
@@ -591,35 +593,6 @@ def _rank_test_scores(
             group_reference = float(scores[index])
         ranks[index] = group_start + 1
     return ranks
-
-
-def _select_minimum_loss_predictor_rank(
-    predictor_ranks: ArrayLike,
-    mean_losses: ArrayLike,
-    *,
-    rtol: float = _NUMERICAL_TIE_RTOL,
-    atol: float = _NUMERICAL_TIE_ATOL,
-) -> tuple[int, float]:
-    """Select the smallest rank numerically tied with the exact minimum loss."""
-
-    ranks = np.asarray(predictor_ranks)
-    losses = np.asarray(mean_losses, dtype=np.float64)
-    if ranks.ndim != 1 or ranks.size == 0:
-        raise ValueError("predictor_ranks must be a nonempty one-dimensional array.")
-    if ranks.dtype.kind not in "iu" or np.any(ranks < 1):
-        raise ValueError("predictor_ranks must contain positive integers.")
-    if np.unique(ranks).size != ranks.size:
-        raise ValueError("predictor_ranks must not contain duplicates.")
-    if losses.ndim != 1 or losses.shape != ranks.shape:
-        raise ValueError("mean_losses must be one-dimensional with one value per predictor rank.")
-    if not np.all(np.isfinite(losses)):
-        raise ValueError("mean_losses must contain only finite values.")
-
-    minimum_loss = float(np.min(losses))
-    tied = _tied_score_mask(losses, minimum_loss, rtol=rtol, atol=atol)
-    selected_rank = int(np.min(ranks[tied]))
-    selected_index = int(np.flatnonzero(ranks == selected_rank)[0])
-    return selected_rank, float(losses[selected_index])
 
 
 def _as_index_array(index: ArrayLike, *, name: str, n_samples: int) -> IntArray:

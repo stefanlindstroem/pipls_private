@@ -16,7 +16,6 @@ from pipls._model_selection import (
     _rank_test_scores,
     _score_tolerance_threshold,
     _search_predictor_ranks,
-    _select_minimum_loss_predictor_rank,
     _select_tolerant_predictor_rank,
     _tied_score_mask,
     _tolerant_score_mask,
@@ -232,43 +231,6 @@ def test_materialize_cv_splits_rejects_invalid_splits(splits: object) -> None:
         _materialize_cv_splits(splits, X, y)
 
 
-def test_select_minimum_loss_predictor_rank_uses_low_rank_tie_breaking() -> None:
-    rank, loss = _select_minimum_loss_predictor_rank(
-        np.array([5, 2, 4], dtype=np.intp),
-        np.array([0.7, 0.5 + 5e-14, 0.5]),
-    )
-
-    assert rank == 2
-    assert loss == pytest.approx(0.5 + 5e-14)
-
-
-def test_select_minimum_loss_predictor_rank_prefers_strictly_lower_loss_outside_tolerance() -> None:
-    rank, loss = _select_minimum_loss_predictor_rank(
-        np.array([2, 3], dtype=np.intp),
-        np.array([0.5 + 1e-8, 0.5]),
-    )
-
-    assert rank == 3
-    assert loss == pytest.approx(0.5)
-
-
-@pytest.mark.parametrize(
-    ("ranks", "losses"),
-    [
-        ([], []),
-        ([1, 1], [0.2, 0.3]),
-        ([1, 2], [0.2]),
-        ([1, 2], [0.2, np.nan]),
-    ],
-)
-def test_select_minimum_loss_predictor_rank_rejects_invalid_surfaces(
-    ranks: list[int],
-    losses: list[float],
-) -> None:
-    with pytest.raises(ValueError):
-        _select_minimum_loss_predictor_rank(ranks, losses)
-
-
 def test_logarithmic_predictor_rank_values_are_deterministic_and_include_endpoints() -> None:
     values = _logarithmic_predictor_rank_values(lower=2, upper=100)
 
@@ -288,7 +250,7 @@ def test_logarithmic_predictor_rank_values_handle_small_intervals() -> None:
 def test_adaptive_refinement_interval_uses_neighbors_around_best_rank() -> None:
     interval = _adaptive_refinement_interval(
         np.array([2, 4, 8, 16, 32]),
-        np.array([5.0, 3.0, 1.0, 2.0, 4.0]),
+        np.array([-5.0, -3.0, -1.0, -2.0, -4.0]),
     )
 
     assert interval == (4, 16)
@@ -297,7 +259,7 @@ def test_adaptive_refinement_interval_uses_neighbors_around_best_rank() -> None:
 def test_adaptive_refinement_interval_respects_lower_rank_ties() -> None:
     interval = _adaptive_refinement_interval(
         np.array([2, 4, 8, 16]),
-        np.array([1.0, 1.0, 2.0, 3.0]),
+        np.array([3.0, 3.0, 2.0, 1.0]),
     )
 
     assert interval == (2, 4)
@@ -595,13 +557,13 @@ def test_select_tolerant_predictor_rank_rejects_invalid_surfaces(
 
 def test_adaptive_refinement_remains_anchored_to_the_exact_optimum() -> None:
     ranks = np.array([2, 4, 8, 16, 32], dtype=np.intp)
-    losses = np.array([1.09, 1.08, 1.07, 1.00, 1.05])
+    scores = -np.array([1.09, 1.08, 1.07, 1.00, 1.05])
     tolerant = _select_tolerant_predictor_rank(
         ranks,
-        -losses,
+        scores,
         relative_tolerance=0.10,
         absolute_tolerance=np.inf,
     )
 
     assert tolerant.selected_rank == 2
-    assert _adaptive_refinement_interval(ranks, losses) == (8, 32)
+    assert _adaptive_refinement_interval(ranks, scores) == (8, 32)
