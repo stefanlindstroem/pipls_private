@@ -1,72 +1,50 @@
 # Path and selection
 
-`PiPLSSearchCV` searches over pairs of paired-mode count $h$ (`n_components`) and retained
-predictor-subspace dimension $r_\pi$ (`predictor_rank`). This page explains how the feasible search
-domain is obtained, how candidates are scored, and how the two-dimensional search is reduced to one
-retained `PiPLSSelection`. For constructor signatures and fitted attributes, see
-[`PiPLSSearchCV`](api/path.md).
+This page defines the search evidence and selection contracts used by `PiPLSSearchCV`: which
+component/rank candidates are admissible, how cross-validation scores them, how the component path
+and conditional predictor-rank profile are formed, and how one immutable `PiPLSSelection` is
+retained and refitted. For constructor signatures and fitted attributes, see
+[`PiPLSSearchCV`](api/path.md). The tutorials own the worked selection workflows.
+
+Once a selection has been accepted, [`OOF diagnostics`](oof_diagnostics.md) defines how the stored
+validation splits are reused to diagnose that fixed selection. OOF diagnostics are not part of the
+ordinary path/rank-profile selection procedure.
 
 ## Search domain { #search-bounds }
 
-A `PiPLSRegression` fit uses one fixed pair $(h,r_\pi)$. During cross-validation, the same pair must
-be feasible in every training split used to evaluate it. The search domain is therefore the
-intersection of the splitwise feasible domains.
+For paired-mode count $h$ (`n_components`) and retained predictor-subspace dimension $r_\pi$
+(`predictor_rank`), the ordinary automatic search domain is triangular. Their different modeling
+roles are described under
+[Interpretation of the two rank controls](theory.md#interpretation-of-the-ranks).
 
-For training split $j$, let
-
-- $n_j$ be its number of training observations;
-- $p_j$ be its predictor count after any fold-local pipeline preprocessing; and
-- $r_j$ be its verified numerical predictor rank after terminal-estimator centering and optional
-  scaling.
-
-Define the corresponding minima across all training splits as
-
-\begin{equation}
-p'=\min_j p_j,
-\qquad
-n'=\min_j n_j,
-\qquad
-r'=\min_j r_j.
-\end{equation}
-
-A predictor rank used by the search must be feasible in every split. The hard predictor-rank ceiling
-is therefore
+Let $p_{\mathrm{min}}$ be the minimum predictor count after fold-local preprocessing,
+$n_{\mathrm{train,min}}$ the smallest materialized training-fold size, and
+$r_{\mathrm{num,min}}$ the minimum verified predictor numerical rank after terminal-estimator
+centering and optional scaling. The hard predictor-rank ceiling is
 
 \begin{equation}
 r_{\pi,\mathrm{hard}}
 =
-\min(p',n'-1,r').
+\min\left[p_{\mathrm{min}},n_{\mathrm{train,min}}-1,r_{\mathrm{num,min}}\right].
 \end{equation}
 
-The term $n'-1$ reflects the loss of one predictor dimension under centering. The verified rank
-$r'$ also captures any additional numerical rank loss after preprocessing, centering, and optional
-scaling.
-
-With `max_predictor_rank=None`, the search uses this hard ceiling. An explicit positive integer
-`max_predictor_rank=k` adds a user restriction,
+With `max_predictor_rank=None`, the automatic-search ceiling is this hard ceiling. An explicit
+positive integer `max_predictor_rank=k` adds the user restriction
 
 \begin{equation}
 r_{\pi,\mathrm{max}}
 =
-\min(r_{\pi,\mathrm{hard}},k).
+\min\left[r_{\pi,\mathrm{hard}},k\right].
 \end{equation}
 
-Let $q$ be the number of responses, which is common to all training splits. For the ordinary full
-rank domain, the admissible integer pairs are
+These limits are feasibility constraints. `samples_per_predictor_rank` does not enter the general
+ceiling; it applies only to the explicit EPV policy.
 
-\begin{equation}
-\mathcal{D}
-=
-\{(h,r_\pi)\in\mathbb{N}^2:1\le h\le \min(q,r_{\pi,\mathrm{max}}),\ h\le r_\pi\le r_{\pi,\mathrm{max}}\}.
-\end{equation}
-
-The domain $\mathcal{D}$ is triangular: increasing $h$ removes all predictor ranks below $h$.
-`predictor_rank_values=None` uses every feasible integer $r_\pi$ in this domain, and
-`n_components_values="all"` uses every feasible integer $h$. Explicit component or predictor-rank
-values restrict this domain after the same feasibility checks.
-
-These bounds describe feasibility. The EPV policy introduced below is instead a rule for choosing
-one predictor rank inside the feasible domain.
+With `predictor_rank_values=None`, the admissible ranks at component count $h$ are every integer
+from $h$ through $r_{\pi,\mathrm{max}}$. `n_components_values="all"` then evaluates component counts
+from one through the smaller of the response count and the largest rank available under the chosen
+predictor-rank policy. Explicit component or predictor-rank requests outside the resolved feasible
+domain are rejected rather than silently dropped.
 
 ## Predictor-rank policies { #predictor-rank-policies }
 
