@@ -36,7 +36,7 @@ datasets and their provenance, see the [dataset guide](datasets.md).
    [$r_\pi$ and $h$](theory.md#interpretation-of-the-ranks).
 
 6. **`06_tobacco_real_data.py` — regularize spectral rank from validation evidence.** Optimize
-   $r_\pi$, but use a 10% relative tolerance to prefer a smaller retained predictor subspace when
+   $r_\pi$, but use a 20% relative tolerance to prefer a smaller retained predictor subspace when
    its CV performance remains close to the conditional optimum. Apply component-count parsimony in
    a separate tolerance stage, then carry the selection through out-of-fold review and refitting on
    [Tobacco](datasets.md#tobacco-spectral-integration). See

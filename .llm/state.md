@@ -110,7 +110,7 @@ The maintained numbered examples are user tasks:
 4. complete repeated-CV Pulp analysis;
 5. complete Sugarcane analysis with EPV-fixed predictor rank at
    `samples_per_predictor_rank=5.0` and a separate component-count choice;
-6. complete Tobacco analysis with optimized predictor rank and separate 10% predictor-rank and
+6. complete Tobacco analysis with optimized predictor rank and separate 20% predictor-rank and
    component-count tolerances.
 
 Example 03 materializes one split set per comparison case and reuses it across all compared models.

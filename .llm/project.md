@@ -52,7 +52,7 @@ The maintained numbered examples are:
 4. repeated-CV Pulp analysis;
 5. Sugarcane analysis with EPV-fixed predictor rank at `samples_per_predictor_rank=5.0` and a
    separate component-count choice;
-6. Tobacco analysis with optimized predictor rank and separate 10% predictor-rank and
+6. Tobacco analysis with optimized predictor rank and separate 20% predictor-rank and
    component-count tolerances.
 
 `make examples` owns complete application validation. The default test suite does not duplicate the

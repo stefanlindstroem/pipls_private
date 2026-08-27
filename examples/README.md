@@ -5,7 +5,7 @@ For ordinary use, Π-PLS follows the familiar PLS component-selection workflow: 
 table or curve is the component path. Π-PLS resolves its retained predictor rank conditionally for
 each component count, so most workflows can treat `n_components` as the main complexity parameter.
 A clear elbow or plateau can motivate a component count; when no clear elbow is present, explicit
-relative tolerances provide a transparent parsimony policy. Example 06 demonstrates separate 10%
+relative tolerances provide a transparent parsimony policy. Example 06 demonstrates separate 20%
 predictor-rank and component-count tolerances. See the
 [component-path discussion](../docs/path_selection.md#search-owned-selection-rules) and the
 [served example catalogue](../docs/examples.md). For the
@@ -75,7 +75,7 @@ Grouped and temporal validation require application-specific sampling semantics 
   and writes five wavelength-aware final PDF figures. See the
   [EPV policy](../docs/path_selection.md#epv-policy).
 - `06_tobacco_real_data.py`: adaptive Π-PLS predictor-rank scanning with explicit full predictor
-  SVD and two separately named 10% relative tolerances. The search constructor applies the
+  SVD and two separately named 20% relative tolerances. The search constructor applies the
   predictor-rank tolerance independently at each component count; `search.select()` then applies the
   component-count tolerance to the conditioned path. The workflow obtains exact and retained rank
   evidence, the component-path reference minimum, and a selection-conditioned OOF report before it
@@ -88,7 +88,7 @@ inspect the component path, create one immutable selection, inspect its selected
 conditional rank evidence, diagnose the accepted row with OOF predictions when useful, refit the
 same row on all observations, calculate immutable fitted-model inspection results, and only then
 compose figures. Sugarcane fixes predictor rank through EPV before the manual
-component-count choice; Tobacco instead uses two explicit 10% relative-tolerance decisions.
+component-count choice; Tobacco instead uses two explicit 20% relative-tolerance decisions.
 Sugarcane writes `component_path.pdf`, `pipls_factors.pdf`, `latent_structure.pdf`,
 `coefficients.pdf`, and `prediction_diagnostics.pdf`. Tobacco writes those five figures plus
 `predictor_rank_profile.pdf`. Pulp writes those six figure types plus
@@ -157,7 +157,7 @@ distinct complexity controls.
 Pulp is the canonical tutorial workflow. Example 04 follows the same ordering, with
 `oof_report()` averaging ten predictions per observation across the 50 stored splits before the
 same selection is refitted. Tobacco applies `search.select(rule="minimum_cv_mse",
-relative_tolerance=0.10)` to the conditioned path. That selection supplies the exact reference
+relative_tolerance=0.20)` to the conditioned path. That selection supplies the exact reference
 minimum, resolved tolerance, threshold, and component count used by both the rank-profile and
 component-path figures; the same object is then passed to OOF reporting and final refitting.
 Tobacco owns its full-SVD configuration, response pagination, and multipage PDF output visibly.

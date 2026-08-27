@@ -31,8 +31,8 @@ from pipls.inspection import (
 ANALYSIS_DIR = Path(__file__).resolve().parent / "results" / "tobacco_post_analysis"
 DISPLAY_COMPONENT_COUNT = 4
 RESPONSES_PER_PAGE = 5
-PREDICTOR_RANK_RELATIVE_TOLERANCE = 0.10
-COMPONENT_RELATIVE_TOLERANCE = 0.10
+PREDICTOR_RANK_RELATIVE_TOLERANCE = 0.20
+COMPONENT_RELATIVE_TOLERANCE = 0.20
 CV = KFold(n_splits=5, shuffle=True, random_state=0)
 
 
@@ -165,11 +165,7 @@ def _plot_predictor_rank_profile(
         f"{profile.n_components} components"
     )
     axis.xaxis.set_major_locator(MaxNLocator(nbins=8, integer=True))
-    upper = max(
-        float(np.max(profile.cv_mse_mean + profile.cv_mse_std)),
-        float(cv_mse_threshold),
-    )
-    axis.set_ylim(0.0, max(1.0, 1.05 * upper))
+    axis.set_ylim(bottom=0.0)
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
     figure.savefig(output_path)
@@ -450,7 +446,7 @@ def main() -> None:
         for start in range(0, len(response_names), RESPONSES_PER_PAGE)
     )
 
-    # Optimize predictor rank, but use a 10% tolerance to prefer a smaller
+    # Optimize predictor rank, but use a 20% tolerance to prefer a smaller
     # spectral subspace when its CV performance remains close to the conditional
     # optimum. Component-count parsimony is applied separately below.
     search = PiPLSSearchCV(

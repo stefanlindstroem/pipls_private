@@ -38,7 +38,7 @@ permit any additional decision-number reuse.
 | `0035-tobacco-randomized-auto-path.md` | [0045](0045-pls-family-analysis-boundary.md), [0146](0146-cv-mse-tolerance-selection.md), [history](history.md#examples-and-documentation) | The maintained Tobacco workflow uses the current comparison boundary and tolerance-selection protocol. |
 | `0106-fold-based-cv-standard-error.md` | [0146](0146-cv-mse-tolerance-selection.md) | Split SD is descriptive only and the public standard-error surface was removed. |
 | `0107-component-path-recommendation-methods.md` | [0143](0143-model-selection-provenance-and-oof-reporting.md), [0146](0146-cv-mse-tolerance-selection.md) | Selection moved from path methods to search-owned tolerance rules. |
-| `0108-tobacco-one-standard-error-workflow.md` | [0146](0146-cv-mse-tolerance-selection.md) | Tobacco now uses minimum-CV-MSE selection with a 10% relative tolerance. |
+| `0108-tobacco-one-standard-error-workflow.md` | [0146](0146-cv-mse-tolerance-selection.md) | Tobacco now uses minimum-CV-MSE selection with an explicit relative tolerance. |
 | `0109-tobacco-one-standard-error-threshold-figure.md` | [0146](0146-cv-mse-tolerance-selection.md) | The figure now shows split SD and the relative-tolerance threshold. |
 | `0111-explicit-path-selection-rules.md` | [0143](0143-model-selection-provenance-and-oof-reporting.md), [0146](0146-cv-mse-tolerance-selection.md) | Selection and refitting are explicit post-fit operations with current tolerance provenance. |
 | `0116-composed-validation-report-result.md` | [0042](0042-model-inspection-and-post-analysis.md), [0143](0143-model-selection-provenance-and-oof-reporting.md) | The composed report was replaced by selection-conditioned OOF reporting plus separate inspection results. |

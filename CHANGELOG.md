@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Increase both explicit relative tolerances in the maintained Tobacco analysis from 10% to 20%,
+  and let the predictor-rank profile choose its upper y-axis limit from the plotted data instead of
+  forcing the scale to reach 1.0.
 - Refine adaptive predictor-rank tolerance selection at the lower-rank parsimony boundary. Exact-
   reference and tolerance-boundary refinement now share one private five-rank exhaustive switch;
   unresolved failing-to-qualifying rank gaps are bisected before the retained rank is finalized.

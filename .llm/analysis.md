@@ -173,7 +173,7 @@ and direct ownership but must not freeze final adjusted label coordinates.
 - Example 05: Sugarcane with an EPV-fixed predictor rank at `samples_per_predictor_rank=5.0`,
   separate manual component-count choice, OOF report, selection-driven refit, and spectral
   interpretation.
-- Example 06: Tobacco with optimized predictor rank and separately labeled 10% predictor-rank and
+- Example 06: Tobacco with optimized predictor rank and separately labeled 20% predictor-rank and
   component-count tolerance decisions, OOF report, selection-driven refit, full-SVD spectral
   analysis, rank profile, raw observation diagnostics, and source-order response pagination.
 

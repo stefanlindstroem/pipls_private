@@ -159,13 +159,13 @@ selection rules, selection-conditioned OOF semantics, and the main computational
 candidate coverage and validation splits.
 
 When the complete protocol is known in advance, search and final fitting can remain compact. The
-same separate 10% relative tolerances used in the Tobacco analysis can be written as one automatic
+same separate 20% relative tolerances used in the Tobacco analysis can be written as one automatic
 search-and-refit expression:
 
 ```python
 model = PiPLSSearchCV(
     search_method="adaptive",
-    predictor_rank_relative_tolerance=0.10,
+    predictor_rank_relative_tolerance=0.20,
 ).fit(
     X_train,
     Y_train,
@@ -173,7 +173,7 @@ model = PiPLSSearchCV(
     X_train,
     Y_train,
     rule="minimum_cv_mse",
-    relative_tolerance=0.10,
+    relative_tolerance=0.20,
 )
 
 Y_pred = model.predict(X_test)
