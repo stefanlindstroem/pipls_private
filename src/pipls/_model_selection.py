@@ -21,7 +21,7 @@ CVSplit = tuple[IntArray, IntArray]
 _NUMERICAL_TIE_RTOL = 1e-12
 _NUMERICAL_TIE_ATOL = 1e-15
 _ADAPTIVE_INITIAL_POINTS = 7
-_ADAPTIVE_EXHAUSTIVE_THRESHOLD = 10
+_ADAPTIVE_EXHAUSTIVE_THRESHOLD = 5
 
 
 @dataclass(frozen=True)
@@ -254,27 +254,17 @@ def _adaptive_refinement_interval(
     return int(sorted_ranks[lower_index]), int(sorted_ranks[upper_index])
 
 
-def _search_predictor_ranks(
+def _refine_adaptive_reference(
     *,
-    allowed_ranks: ArrayLike,
-    search_method: Literal["adaptive", "exhaustive"],
+    allowed_ranks: IntArray,
     evaluate: Callable[[IntArray], None],
     evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
 ) -> None:
-    """Evaluate predictor ranks according to one search policy."""
+    """Refine adaptive coverage around the exact evaluated score optimum."""
 
-    allowed = np.asarray(allowed_ranks)
-    if allowed.ndim != 1 or allowed.size == 0 or allowed.dtype.kind not in "iu":
-        raise ValueError("allowed_ranks must be a nonempty one-dimensional integer array.")
-    allowed = np.asarray(np.unique(allowed), dtype=np.intp)
-    if np.any(allowed < 1):
-        raise ValueError("allowed_ranks must contain positive integers.")
-    if search_method not in ("adaptive", "exhaustive"):
-        raise ValueError('search_method must be "adaptive" or "exhaustive".')
-
-    interval = allowed
+    interval = allowed_ranks
     while True:
-        if search_method == "exhaustive" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+        if interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
             proposed = interval
         else:
             logarithmic = _logarithmic_predictor_rank_values(
@@ -286,12 +276,12 @@ def _search_predictor_ranks(
 
         evaluate(proposed)
 
-        if search_method == "exhaustive" or interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
-            break
+        if interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+            return
 
         ranks, scores = evaluated_scores()
         lower, upper = _adaptive_refinement_interval(ranks, -scores)
-        refined = allowed[(allowed >= lower) & (allowed <= upper)]
+        refined = allowed_ranks[(allowed_ranks >= lower) & (allowed_ranks <= upper)]
         if np.array_equal(refined, interval):
             evaluated_set = {int(rank) for rank in ranks}
             remaining = np.asarray(
@@ -299,8 +289,130 @@ def _search_predictor_ranks(
                 dtype=np.intp,
             )
             evaluate(remaining)
-            break
+            return
         interval = refined
+
+
+def _adaptive_tolerance_interval(
+    *,
+    allowed_ranks: IntArray,
+    predictor_ranks: IntArray,
+    mean_scores: FloatArray,
+    relative_tolerance: float,
+    absolute_tolerance: float,
+) -> IntArray | None:
+    """Return an unresolved failing-to-qualifying adaptive tolerance bracket."""
+
+    selection = _select_tolerant_predictor_rank(
+        predictor_ranks,
+        mean_scores,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
+    )
+    sorted_ranks = np.sort(predictor_ranks)
+    selected_index = int(np.flatnonzero(sorted_ranks == selection.selected_rank)[0])
+    if selected_index == 0:
+        return None
+    lower = int(sorted_ranks[selected_index - 1])
+    interval = allowed_ranks[
+        (allowed_ranks >= lower) & (allowed_ranks <= selection.selected_rank)
+    ]
+    if interval.size <= 2:
+        return None
+    return np.asarray(interval, dtype=np.intp)
+
+
+def _refine_adaptive_tolerance_boundary(
+    *,
+    allowed_ranks: IntArray,
+    evaluate: Callable[[IntArray], None],
+    evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
+    relative_tolerance: float,
+    absolute_tolerance: float,
+) -> None:
+    """Refine adaptive coverage around the public tolerance crossing."""
+
+    while True:
+        ranks, scores = evaluated_scores()
+        selection = _select_tolerant_predictor_rank(
+            ranks,
+            scores,
+            relative_tolerance=relative_tolerance,
+            absolute_tolerance=absolute_tolerance,
+        )
+        interval = _adaptive_tolerance_interval(
+            allowed_ranks=allowed_ranks,
+            predictor_ranks=ranks,
+            mean_scores=scores,
+            relative_tolerance=relative_tolerance,
+            absolute_tolerance=absolute_tolerance,
+        )
+        if interval is None:
+            return
+
+        if interval.size <= _ADAPTIVE_EXHAUSTIVE_THRESHOLD:
+            proposed = interval
+        else:
+            proposed = np.asarray([interval[interval.size // 2]], dtype=np.intp)
+        evaluate(proposed)
+
+        updated_ranks, updated_scores = evaluated_scores()
+        updated_selection = _select_tolerant_predictor_rank(
+            updated_ranks,
+            updated_scores,
+            relative_tolerance=relative_tolerance,
+            absolute_tolerance=absolute_tolerance,
+        )
+        if updated_selection.reference_rank != selection.reference_rank:
+            _refine_adaptive_reference(
+                allowed_ranks=allowed_ranks,
+                evaluate=evaluate,
+                evaluated_scores=evaluated_scores,
+            )
+
+
+def _search_predictor_ranks(
+    *,
+    allowed_ranks: ArrayLike,
+    search_method: Literal["adaptive", "exhaustive"],
+    evaluate: Callable[[IntArray], None],
+    evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
+    relative_tolerance: float | None = None,
+    absolute_tolerance: float | None = None,
+) -> None:
+    """Evaluate predictor ranks according to one search policy."""
+
+    allowed = np.asarray(allowed_ranks)
+    if allowed.ndim != 1 or allowed.size == 0 or allowed.dtype.kind not in "iu":
+        raise ValueError("allowed_ranks must be a nonempty one-dimensional integer array.")
+    allowed = np.asarray(np.unique(allowed), dtype=np.intp)
+    if np.any(allowed < 1):
+        raise ValueError("allowed_ranks must contain positive integers.")
+    if search_method not in ("adaptive", "exhaustive"):
+        raise ValueError('search_method must be "adaptive" or "exhaustive".')
+    if (relative_tolerance is None) != (absolute_tolerance is None):
+        raise ValueError(
+            "relative_tolerance and absolute_tolerance must be supplied together."
+        )
+
+    if search_method == "exhaustive":
+        evaluate(allowed)
+        return
+
+    _refine_adaptive_reference(
+        allowed_ranks=allowed,
+        evaluate=evaluate,
+        evaluated_scores=evaluated_scores,
+    )
+    if relative_tolerance is None or absolute_tolerance is None:
+        return
+    _refine_adaptive_tolerance_boundary(
+        allowed_ranks=allowed,
+        evaluate=evaluate,
+        evaluated_scores=evaluated_scores,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
+    )
 
 
 def _tied_score_mask(

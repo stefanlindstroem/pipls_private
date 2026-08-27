@@ -7,6 +7,7 @@ import pytest
 from sklearn.model_selection import KFold
 
 from pipls._model_selection import (
+    _ADAPTIVE_EXHAUSTIVE_THRESHOLD,
     _adaptive_refinement_interval,
     _epv_predictor_rank,
     _hard_predictor_rank_limit,
@@ -14,6 +15,7 @@ from pipls._model_selection import (
     _materialize_cv_splits,
     _rank_test_scores,
     _score_tolerance_threshold,
+    _search_predictor_ranks,
     _select_minimum_loss_predictor_rank,
     _select_tolerant_predictor_rank,
     _tied_score_mask,
@@ -299,6 +301,100 @@ def test_adaptive_refinement_interval_respects_lower_rank_ties() -> None:
     )
 
     assert interval == (2, 4)
+
+
+def test_adaptive_exhaustive_threshold_is_five() -> None:
+    assert _ADAPTIVE_EXHAUSTIVE_THRESHOLD == 5
+
+
+def _run_adaptive_rank_surface(
+    score_by_rank: dict[int, float],
+    *,
+    relative_tolerance: float | None,
+    absolute_tolerance: float | None,
+) -> tuple[np.ndarray, np.ndarray]:
+    allowed = np.asarray(sorted(score_by_rank), dtype=np.intp)
+    evaluated: dict[int, float] = {}
+
+    def evaluate(ranks: np.ndarray) -> None:
+        for rank in ranks:
+            evaluated.setdefault(int(rank), score_by_rank[int(rank)])
+
+    def evaluated_scores() -> tuple[np.ndarray, np.ndarray]:
+        ranks = np.asarray(sorted(evaluated), dtype=np.intp)
+        scores = np.asarray([evaluated[int(rank)] for rank in ranks], dtype=np.float64)
+        return ranks, scores
+
+    _search_predictor_ranks(
+        allowed_ranks=allowed,
+        search_method="adaptive",
+        evaluate=evaluate,
+        evaluated_scores=evaluated_scores,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
+    )
+    return evaluated_scores()
+
+
+def test_adaptive_rank_search_refines_tolerance_boundary() -> None:
+    score_by_rank = {rank: rank / 50.0 for rank in range(1, 51)}
+
+    ranks, scores = _run_adaptive_rank_surface(
+        score_by_rank,
+        relative_tolerance=0.50,
+        absolute_tolerance=np.inf,
+    )
+    selection = _select_tolerant_predictor_rank(
+        ranks,
+        scores,
+        relative_tolerance=0.50,
+        absolute_tolerance=np.inf,
+    )
+
+    assert selection.reference_rank == 50
+    assert selection.selected_rank == 25
+    assert 24 in ranks
+    assert 25 in ranks
+    assert 15 not in ranks
+
+
+def test_zero_tolerance_does_not_extend_exact_reference_coverage() -> None:
+    score_by_rank = {rank: rank / 50.0 for rank in range(1, 51)}
+
+    exact_ranks, _ = _run_adaptive_rank_surface(
+        score_by_rank,
+        relative_tolerance=None,
+        absolute_tolerance=None,
+    )
+    tolerant_ranks, _ = _run_adaptive_rank_surface(
+        score_by_rank,
+        relative_tolerance=0.0,
+        absolute_tolerance=0.0,
+    )
+
+    np.testing.assert_array_equal(tolerant_ranks, exact_ranks)
+
+
+def test_tolerance_refinement_rechecks_a_changed_exact_reference() -> None:
+    score_by_rank = {rank: rank / 50.0 for rank in range(1, 51)}
+    score_by_rank[20] = 1.20
+
+    ranks, scores = _run_adaptive_rank_surface(
+        score_by_rank,
+        relative_tolerance=0.50,
+        absolute_tolerance=np.inf,
+    )
+    selection = _select_tolerant_predictor_rank(
+        ranks,
+        scores,
+        relative_tolerance=0.50,
+        absolute_tolerance=np.inf,
+    )
+
+    assert selection.reference_rank == 20
+    assert selection.selected_rank == 20
+    assert 19 in ranks
+    assert 21 in ranks
 
 
 def test_rank_test_scores_assigns_minimum_rank_to_ties() -> None:

@@ -521,6 +521,8 @@ class PiPLSSearchCV(
                     y=y_indexable,
                     splits=self._cv_splits_,
                     n_jobs=self.n_jobs,
+                    relative_tolerance=predictor_rank_relative_tolerance,
+                    absolute_tolerance=predictor_rank_absolute_tolerance,
                 )
 
         evaluated_pairs = tuple(sorted(cache))
@@ -1267,6 +1269,8 @@ def _adaptive_path_search(
     y: ArrayLike,
     splits: tuple[CVSplit, ...],
     n_jobs: int | None,
+    relative_tolerance: float | None,
+    absolute_tolerance: float | None,
 ) -> None:
     def evaluate(ranks: IntArray) -> None:
         _evaluate_path_batch(
@@ -1302,6 +1306,8 @@ def _adaptive_path_search(
         search_method="adaptive",
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
+        relative_tolerance=relative_tolerance,
+        absolute_tolerance=absolute_tolerance,
     )
 
 

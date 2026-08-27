@@ -2103,13 +2103,21 @@ def test_best_score_selects_from_the_conditioned_component_path() -> None:
     assert best.mean_test_score == pytest.approx(0.95)
 
 
-def test_predictor_rank_tolerance_does_not_change_adaptive_candidate_coverage() -> None:
-    X, Y = _data(n_samples=80)
+def test_predictor_rank_tolerance_refines_adaptive_candidate_coverage() -> None:
+    rng = np.random.default_rng(20260827)
+    X = rng.normal(size=(80, 30))
+    Y = rng.normal(size=(80, 1))
+
+    def scorer(estimator: object, X_validation: object, y_validation: object) -> float:
+        del X_validation, y_validation
+        return float(estimator.predictor_rank) / 30.0
+
     common = {
         "n_components_values": [1],
-        "predictor_rank_values": list(range(1, 9)),
-        "max_predictor_rank": 8,
+        "predictor_rank_values": list(range(1, 31)),
+        "max_predictor_rank": 30,
         "search_method": "adaptive",
+        "scoring": scorer,
         "cv": 3,
         "n_jobs": 1,
     }
@@ -2124,12 +2132,13 @@ def test_predictor_rank_tolerance_does_not_change_adaptive_candidate_coverage() 
         predictor_rank_absolute_tolerance=np.inf,
     ).fit(X, Y)
 
-    for name in ("n_components", "predictor_rank"):
-        np.testing.assert_array_equal(exact.cv_results_[name], tolerant.cv_results_[name])
-    for name in exact.cv_results_:
-        if name.startswith("split") and name.endswith("_test_score"):
-            np.testing.assert_allclose(exact.cv_results_[name], tolerant.cv_results_[name])
-    assert exact.search_is_exhaustive_ == tolerant.search_is_exhaustive_
+    exact_ranks = exact.predictor_rank_profile(1).predictor_rank
+    tolerant_profile = tolerant.predictor_rank_profile(1)
+    assert 15 not in exact_ranks
+    assert 15 in tolerant_profile.predictor_rank
+    assert tolerant_profile.reference_selection.predictor_rank == 30
+    assert tolerant_profile.selection.predictor_rank == 15
+    assert not tolerant.search_is_exhaustive_
 
 
 @pytest.mark.parametrize("predictor_rank_values", ([3], "epv"))
