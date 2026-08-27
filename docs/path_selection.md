@@ -103,6 +103,15 @@ domain; under adaptive coverage it is necessarily limited to evaluated ranks.
 `predictor_rank_profile(h).reference_selection` exposes the exact reference, while `.selection`
 exposes the retained tolerance-qualified rank.
 
+Adaptive coverage first refines around the exact evaluated reference. If the smallest qualifying
+evaluated rank and its immediately lower failing evaluated neighbor still bracket unevaluated
+admissible ranks, the search bisects that tolerance boundary and evaluates the remaining interval
+exhaustively once it contains at most five admissible ranks. Both adaptive refinement stages use
+this same private five-rank switch. If boundary evaluation changes the exact evaluated reference,
+reference refinement resumes before the tolerance boundary is resolved. Predictor-rank tolerance
+can therefore add evaluated candidates under adaptive coverage without making the search globally
+exhaustive.
+
 `cv_results_` remains the complete evaluated-candidate record. `rank_test_score` uses minimum ranks
 with private `rtol=1e-12` and `atol=1e-15` comparisons; tied score groups are anchored to the leading
 score in each group rather than chained through adjacent values. Public parsimony tolerances do not

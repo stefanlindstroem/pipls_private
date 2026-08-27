@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Refine adaptive predictor-rank tolerance selection at the lower-rank parsimony boundary. Exact-
+  reference and tolerance-boundary refinement now share one private five-rank exhaustive switch;
+  unresolved failing-to-qualifying rank gaps are bisected before the retained rank is finalized.
 - Tighten dataset documentation ownership: keep the synthetic equation, generator semantics, and
   companion-paper attribution in the Dataset API; remove the separate companion-manuscript
   synthetic-data page; and keep the Reference datasets page focused on packaged-data loading,

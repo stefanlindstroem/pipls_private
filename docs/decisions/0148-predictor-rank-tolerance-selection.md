@@ -2,11 +2,11 @@
 
 ## Status
 
-Accepted for hierarchical predictor-rank tolerance selection. The constructor tolerance controls,
-immutable optimized-rank evidence, conditioned-path selection rules, and completed validation are
-implemented. The revised adaptive tolerance-boundary refinement below is pending implementation.
-Decision 0154 supersedes only the former `"max"`/`"maximum"` fixed-policy clauses by introducing
-explicit EPV and full-domain automatic search; that migration is implemented.
+Accepted and implemented for hierarchical predictor-rank tolerance selection. The constructor
+tolerance controls, immutable optimized-rank evidence, conditioned-path selection rules, adaptive
+tolerance-boundary refinement, and completed validation are implemented. Decision 0154 supersedes
+only the former `"max"`/`"maximum"` fixed-policy clauses by introducing explicit EPV and full-domain
+automatic search; that migration is implemented.
 
 ## Context
 

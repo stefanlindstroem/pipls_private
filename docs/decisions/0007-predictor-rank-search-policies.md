@@ -1,10 +1,10 @@
 # Decision: 0007-predictor-rank-search-policies
 
-Status: accepted. Existing exhaustive coverage and exact-optimum adaptive refinement are implemented
-in `PiPLSSearchCV`; the revised five-rank exhaustive threshold and adaptive tolerance-boundary
-refinement below are pending implementation. Decision 0039 removes these search modes from
-`PiPLSRegression`. Decision 0154 keeps both coverage algorithms but makes exhaustive coverage the
-accepted default and removes the separate `predictor_rank_values="max"` policy.
+Status: accepted and implemented. Exhaustive coverage, exact-reference adaptive refinement, the
+shared five-rank exhaustive threshold, and adaptive tolerance-boundary refinement are implemented in
+`PiPLSSearchCV`. Decision 0039 removes these search modes from `PiPLSRegression`. Decision 0154 keeps
+both coverage algorithms but makes exhaustive coverage the accepted default and removes the separate
+`predictor_rank_values="max"` policy.
 
 ## Context
 
