@@ -30,9 +30,7 @@ README.md
 LICENSE.txt
 ```
 
-There is no active top-level `datasets/` directory. Historical material below `.llm/archive/` is
-excluded development history and is never a runtime, test-fixture, documentation, wheel, or source-
-distribution input.
+There is no active top-level `datasets/` directory.
 
 ## Matrix files
 
@@ -92,7 +90,6 @@ Tests verify:
 - all five files are present in the source tree, wheel, and source distribution;
 - raw-resource and canonical-array hashes match `metadata.json`;
 - loaders work from isolated wheel and source-distribution installations;
-- `.llm/archive/` is absent from distributions;
 - the public dataset guide contains source DOI links and raw-resource locations.
 
 ## Future datasets

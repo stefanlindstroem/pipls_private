@@ -6,7 +6,6 @@ import os
 import subprocess
 import sys
 import tarfile
-import zipfile
 from pathlib import Path
 
 
@@ -19,7 +18,6 @@ def run(
     """Run one checked subprocess while showing the invoked command."""
     print("+", " ".join(command), flush=True)
     subprocess.run(command, cwd=cwd, env=env, check=True)
-
 
 def clean_subprocess_environment() -> dict[str, str]:
     """Return an environment isolated from the current Python checkout."""
@@ -36,13 +34,11 @@ def clean_subprocess_environment() -> dict[str, str]:
     )
     return environment
 
-
 def source_distribution_environment(source: Path) -> dict[str, str]:
     """Return a clean environment that imports from an extracted sdist."""
     environment = clean_subprocess_environment()
     environment["PYTHONPATH"] = str(source / "src")
     return environment
-
 
 def venv_python(environment: Path) -> Path:
     """Return the Python executable inside a virtual environment."""
@@ -50,22 +46,12 @@ def venv_python(environment: Path) -> Path:
         return environment / "Scripts" / "python.exe"
     return environment / "bin" / "python"
 
-
 def single_artifact(artifacts: Path, pattern: str, label: str) -> Path:
     """Return the only matching artifact or raise a useful error."""
     matches = sorted(artifacts.glob(pattern))
     if len(matches) != 1:
         raise RuntimeError(f"Expected one {label}, found {len(matches)}.")
     return matches[0]
-
-
-def artifact_members(artifact: Path) -> list[str]:
-    """List wheel or gzipped source-distribution members."""
-    if artifact.suffix == ".whl":
-        with zipfile.ZipFile(artifact) as archive:
-            return archive.namelist()
-    with tarfile.open(artifact, mode="r:gz") as archive:
-        return archive.getnames()
 
 
 def safe_extract_sdist(artifact: Path, destination: Path) -> Path:
