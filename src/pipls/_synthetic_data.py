@@ -61,6 +61,14 @@ def make_synthetic_data(
         Generated predictor matrix.
     Y : ndarray of shape (n_samples, n_targets)
         Generated response matrix.
+
+    Notes
+    -----
+    The generator implements the synthetic data model described by Agrawal,
+    Nilsson, and Lindström (2026), *Panoramic Partial Least Squares (Pi-PLS):
+    Transparent, parsimonious, and more interpretable multivariate regression
+    model*, manuscript under revision at *Computers & Chemical Engineering*,
+    CACE-D-26-00847.
     """
 
     n_samples = _positive_integer(n_samples, name="n_samples")

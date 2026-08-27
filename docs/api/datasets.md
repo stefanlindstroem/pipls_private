@@ -59,10 +59,8 @@ observed-variable scaling.
 
 `make_synthetic_data()` returns only the generated `X` and `Y` arrays. A fixed `random_state` and
 identical arguments reproduce the same arrays for a given package implementation; internal random
-draw order is not public API. The [companion-manuscript synthetic-data](../manuscript_reproduction.md)
-page owns publication-specific reproduction requirements, while the
-[synthetic tutorial](../tutorials/synthetic.md) shows a worked train/test analysis using an explicit
-row split.
+draw order is not public API. The [synthetic tutorial](../tutorials/synthetic.md) shows a worked
+train/test analysis using an explicit row split.
 
 ::: pipls.datasets.make_synthetic_data
     options:

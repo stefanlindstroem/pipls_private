@@ -248,7 +248,6 @@ Install the `examples` extra before running them.
   - [Model inspection](docs/model_inspection.md)
   - [Reference datasets](docs/datasets.md)
   - [Theory](docs/theory.md)
-  - [Companion-manuscript synthetic data](docs/manuscript_reproduction.md)
 
 ## Authors, license, and citation
 

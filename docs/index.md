@@ -104,8 +104,6 @@ representative interpretation of standard PLS-family plots and Π-PLS-specific p
 ## Scientific background
 
 - [Theory](theory.md): the implemented matrix construction, response-subspace policies, and rank interpretation.
-- [Companion-manuscript synthetic data](manuscript_reproduction.md): distinguish distribution,
-  seeded-dataset, and full-study reproduction for the companion paper.
 
 ## Project information
 

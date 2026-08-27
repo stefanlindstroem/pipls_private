@@ -74,9 +74,9 @@ synthetic generator are available and what they return. This page retains enough
 understand how synthetic generation works, including the predictor-specific, shared, and
 response-specific latent roles and the maintained
 `docs/assets/figures/latent_geometry_generator.svg` figure. The defining equation lives here with
-the generator semantics rather than being repeated on general dataset or manuscript-reproduction
-pages. The separate companion-manuscript synthetic-data page owns seeded-realization requirements
-and the manuscript-reproduction boundary.
+the generator semantics rather than being repeated on general dataset pages. Publication-specific
+simulation grids, seeded studies, and result reproduction remain downstream rather than requiring
+a separate served documentation page.
 
 **Troubleshooting** answers why a supported operation failed or behaved unexpectedly. It remains a
 compact task-oriented lookup page for warnings, validation failures, search/refit lifecycle errors,

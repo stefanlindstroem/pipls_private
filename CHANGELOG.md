@@ -2,10 +2,10 @@
 
 ## Unreleased
 
-- Tighten dataset documentation ownership: keep the synthetic equation and generator semantics in
-  the Dataset API, keep publication-specific reproducibility in the companion-manuscript guide, and
-  reduce the Reference datasets page to packaged-data loading, provenance, licensing, adaptation,
-  dimensions, and raw-resource access.
+- Tighten dataset documentation ownership: keep the synthetic equation, generator semantics, and
+  companion-paper attribution in the Dataset API; remove the separate companion-manuscript
+  synthetic-data page; and keep the Reference datasets page focused on packaged-data loading,
+  provenance, licensing, adaptation, dimensions, and raw-resource access.
 - Simplify reference-dataset runtime infrastructure: make `PiPLSDataset` metadata a shallow-copied
   mapping rather than a recursively frozen object tree, drop its dedicated pickle contract, and
   leave resource/canonical-array hash verification to the dedicated resource tests instead of
@@ -21,7 +21,7 @@
   and validating that the committed SVG and standalone TeX source survive source-distribution builds.
 - Add the latent-role schematic to the Dataset API generator section and connect the three
   structural roles directly to `n_predictor_specific`, `n_shared`, and `n_response_specific`, with
-  links to the manuscript-reproduction guide and synthetic tutorial.
+  a link to the synthetic tutorial.
 - Add a standalone TikZ source and committed SVG for the synthetic-generator latent-role
   schematic, together with an optional `make docs-static-figures` maintainer target. The ordinary
   documentation build remains independent of a TeX installation.

@@ -133,9 +133,7 @@ seed.
 `pipls.datasets` provides a deterministic latent-structure generator with known shared,
 predictor-specific, and response-specific components. The
 [Datasets and generators API](api/datasets.md#synthetic-generator) defines the Gaussian latent
-distribution; the separate [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
-distinguishes reproducing that distribution from reproducing one seeded realization or a complete
-publication study.
+distribution and seeded generator contract.
 
 Scientific comparison studies, large simulation grids, paper-only comparators, and manuscript
 figure or table orchestration remain downstream assets that pin a released package version. The

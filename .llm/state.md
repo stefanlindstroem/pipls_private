@@ -143,8 +143,8 @@ lookup, and the retained synthetic-generator explanation and
 `docs/assets/figures/latent_geometry_generator.svg` figure. Decision 0165 refines only the
 search-domain part of that architecture: the final target has separate Path and selection and OOF
 diagnostics pages so that selection evidence and selection-conditioned diagnosis have distinct
-owners. The companion-manuscript synthetic-data page retains publication-specific generation and
-reproduction guidance.
+owners. The Dataset API owns the synthetic generator description; publication-specific simulation
+and reproduction material remains downstream rather than on a separate served page.
 
 Patches 0164B--0164F completed the first lean-reference migration. Patches 0165A--0165D establish
 the selection/OOF boundary, align the maintained tutorials, split the Reference into Path and

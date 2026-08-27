@@ -390,8 +390,7 @@ redefined by this theory page and need not duplicate the manuscript’s experime
 `make_synthetic_data()` provides the package's deterministic synthetic-data utility and implements
 the [companion manuscript’s](citation.md#companion-paper) Gaussian latent data-generating model
 directly. See [Datasets and generators](api/datasets.md#synthetic-generator) for the exact
-distribution and generator contract, the [companion-manuscript synthetic-data guide](manuscript_reproduction.md)
-for the publication-reproduction boundary, and [Reference datasets](datasets.md) for packaged data.
+distribution and generator contract, and [Reference datasets](datasets.md) for packaged data.
 
 The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#retrieve-selection-evidence)
 and [Path and selection](path_selection.md) define the package’s general path-construction,
