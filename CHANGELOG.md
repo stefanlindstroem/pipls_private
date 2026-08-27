@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Rework the path-and-selection explanation around the exhaustive Pulp CV-MSE surface: show
+  conditional predictor-rank tolerance as the reduction from the two-dimensional candidate domain
+  to one rank per component count, then show component tolerance on the resulting path. Add
+  deterministic explanatory overlays without rerunning candidate CV.
 - Increase both explicit relative tolerances in the maintained Tobacco analysis from 10% to 20%,
   and let the predictor-rank profile choose its upper y-axis limit from the plotted data instead of
   forcing the scale to reach 1.0.

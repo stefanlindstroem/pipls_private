@@ -72,8 +72,77 @@ mean response-standardized CV-MSE. Gray cells violate $r_\pi\ge h$.
 
 ![Pulp exhaustive search domain](assets/generated/pulp/search_domain.svg)
 
-These bounds describe feasibility. The EPV policy introduced below is instead a rule for choosing
-one predictor rank inside the feasible domain.
+These bounds describe feasibility. Selection begins only after the admissible pairs have been
+defined.
+
+## Exhaustive search and selection { #exhaustive-search-and-selection }
+
+With `predictor_rank_values=None` and `search_method="exhaustive"`, every pair in $\mathcal{D}$
+is evaluated. Under the default scorer, each cell in the Pulp figure therefore contains one mean
+response-standardized CV-MSE, denoted $M_{h,r_\pi}$ below. Lower values are better.
+
+### Conditional predictor-rank selection
+
+Predictor rank is selected separately at each component count. For fixed $h$, let
+
+\begin{equation}
+M_{h,\min}=\min_{r_\pi:(h,r_\pi)\in\mathcal{D}} M_{h,r_\pi}.
+\end{equation}
+
+A predictor rank qualifies when its mean CV-MSE satisfies both
+
+\begin{equation}
+M_{h,r_\pi} \le (1+\delta_{\pi,\mathrm{rel}})M_{h,\min},
+\qquad
+M_{h,r_\pi} \le M_{h,\min}+\delta_{\pi,\mathrm{abs}}.
+\end{equation}
+
+The smallest qualifying $r_\pi$ is retained. Thus the tolerance can trade a small increase in
+validation error for a smaller predictor subspace without changing which candidates were evaluated.
+`predictor_rank_relative_tolerance=None` resolves to `sqrt(np.finfo(np.float64).eps)`, while an
+infinite `predictor_rank_absolute_tolerance` disables the absolute cap.
+
+The next figure applies the same rule to the already evaluated Pulp surface. To make the mechanism
+visible, it uses a deliberately generous 15% relative predictor-rank tolerance and no absolute cap.
+Open circles mark the exact minimum at each $h$; diamonds mark the smallest qualifying rank. This
+illustrative tolerance does not require another exhaustive CV run because candidate evaluation is
+independent of the tolerance.
+
+![Pulp conditional predictor-rank selection](assets/generated/pulp/conditioned_search_domain.svg)
+
+Write the retained rank as $\hat r_\pi(h)$. The two-dimensional search has now been reduced to one
+retained pair $(h,\hat r_\pi(h))$ for each component count.
+
+### Component path and component selection
+
+The retained pairs form the component path. Define its mean CV-MSE at component count $h$ as
+$M_h=M_{h,\hat r_\pi(h)}$ and let
+
+\begin{equation}
+M_{\min}=\min_h M_h.
+\end{equation}
+
+For `rule="minimum_cv_mse"`, a component count qualifies when
+
+\begin{equation}
+M_h \le (1+\delta_{\mathrm{rel}})M_{\min},
+\qquad
+M_h \le M_{\min}+\delta_{\mathrm{abs}}.
+\end{equation}
+
+Because the path is ordered by increasing $h$, the first qualifying row is retained.
+`relative_tolerance=None` again resolves to `sqrt(np.finfo(np.float64).eps)`, and an infinite
+`absolute_tolerance` disables the absolute cap.
+
+For visibility, the Pulp component-path figure below continues the 15% predictor-rank illustration
+and then applies a deliberately generous 50% relative component tolerance. The exact path minimum
+is at $h=3$, while the smaller $h=2$ model falls inside that illustrative tolerance and is retained.
+The labels above the path show the predictor rank already selected conditionally at each $h$.
+
+![Pulp conditioned component-path selection](assets/generated/pulp/conditioned_component_path.svg)
+
+This ordering is central: predictor rank is resolved first at each $h$; component selection then
+acts on the resulting one-dimensional path and does not revisit the predictor-rank profiles.
 
 ## Predictor-rank policies { #predictor-rank-policies }
 
@@ -105,46 +174,33 @@ policy.
 EPV and one-element fixed-rank policies expose one rank per compatible component count and therefore
 have no conditional predictor-rank search or `PiPLSPredictorRankEvidence`.
 
-## Candidate coverage and scoring { #scoring-and-conditioned-path-selection }
+## Scoring and adaptive coverage { #scoring-and-conditioned-path-selection }
 
-`search_method="exhaustive"` evaluates every admissible pair in a multi-rank domain.
-`search_method="adaptive"` uses the same admissible endpoints but may leave interior ranks
-unevaluated. `search_is_exhaustive_` records whether every admissible pair was actually evaluated.
-Adaptive search makes no claim about ranks it did not evaluate.
+The exhaustive example above uses the default scorer, `"neg_response_standardized_mse"`, which
+resolves to `pipls.metrics.neg_response_standardized_mse`. Maximizing that score is equivalent to
+minimizing the response-standardized CV-MSE shown in the figures. Ordinary scikit-learn scorer
+names, scorer callables, and `scoring=None` are also accepted. With another scorer, the conditional
+predictor-rank optimum and tolerance are defined on the configured-score scale; CV-MSE remains a
+diagnostic and need not identify that optimum.
 
-Candidate evaluation uses the configured mean test score. The default scorer name is
-`"neg_response_standardized_mse"`, which resolves to
-`pipls.metrics.neg_response_standardized_mse`; maximizing it is equivalent to minimizing mean
-response-standardized CV-MSE. Ordinary scikit-learn scorer names, scorer callables, and
-`scoring=None` are also accepted. With another scorer, CV-MSE remains a diagnostic and need not
-identify the configured-score optimum.
+`search_method="adaptive"` uses the same admissible endpoints as exhaustive search but may leave
+interior predictor ranks unevaluated. It first refines around the exact evaluated score optimum. If
+the smallest qualifying evaluated rank and its immediately lower failing neighbor still bracket
+unevaluated ranks, it refines that tolerance boundary as well. Each refinement switches to
+exhaustive evaluation once at most five admissible ranks remain in the local interval. If a boundary
+evaluation changes the exact evaluated optimum, optimum refinement resumes before the tolerance
+boundary is finalized.
 
-For an optimized rank policy, let $S_{\mathrm{max}}$ be the maximum configured mean score at one component
-count. The smallest evaluated rank is retained when its score is no smaller than both
-$S_{\max}-\delta_{\mathrm{rel}}|S_{\max}|$ and $S_{\max}-\delta_{\mathrm{abs}}$ (up to the private
-numerical tie tolerance). `predictor_rank_relative_tolerance=None` resolves to
-`sqrt(np.finfo(np.float64).eps)`; positive-infinity `predictor_rank_absolute_tolerance` disables the
-absolute cap.
+`search_is_exhaustive_` records whether every admissible pair was evaluated, and `cv_results_` is
+the complete record of the pairs that were actually evaluated. `PiPLSPredictorRankEvidence` stores
+the exact configured-score reference and resolved predictor-rank tolerances;
+`predictor_rank_profile(h).reference_selection` exposes that reference, while `.selection` exposes
+the retained tolerance-qualified rank. Under adaptive coverage these statements necessarily concern
+the evaluated candidates rather than unevaluated ranks.
 
-`PiPLSPredictorRankEvidence` records the exact configured-score reference rank and the resolved
-tolerances. Under exhaustive coverage the reference is taken over the complete admissible rank
-domain; under adaptive coverage it is necessarily limited to evaluated ranks.
-`predictor_rank_profile(h).reference_selection` exposes the exact reference, while `.selection`
-exposes the retained tolerance-qualified rank.
-
-Adaptive coverage first refines around the exact evaluated reference. If the smallest qualifying
-evaluated rank and its immediately lower failing evaluated neighbor still bracket unevaluated
-admissible ranks, the search bisects that tolerance boundary and evaluates the remaining interval
-exhaustively once it contains at most five admissible ranks. Both adaptive refinement stages use
-this same private five-rank switch. If boundary evaluation changes the exact evaluated reference,
-reference refinement resumes before the tolerance boundary is resolved. Predictor-rank tolerance
-can therefore add evaluated candidates under adaptive coverage without making the search globally
-exhaustive.
-
-`cv_results_` remains the complete evaluated-candidate record. `rank_test_score` uses minimum ranks
-with private `rtol=1e-12` and `atol=1e-15` comparisons; tied score groups are anchored to the leading
-score in each group rather than chained through adjacent values. Public parsimony tolerances do not
-change these candidate-level ranks.
+`rank_test_score` uses minimum ranks with private `rtol=1e-12` and `atol=1e-15` comparisons; tied
+score groups are anchored to the leading score in each group rather than chained through adjacent
+values. Public parsimony tolerances do not change these candidate-level ranks.
 
 ## Pipelines and fold-local preprocessing { #pipelines-and-fold-local-preprocessing }
 
@@ -184,24 +240,14 @@ confidence intervals, do not enter selection, and are not standard errors.
 ## Search-owned selection rules { #search-owned-selection-rules }
 
 `PiPLSSearchCV.select()` returns one complete immutable stored component-path row without fitting or
-mutating the search.
+mutating the search. `rule="minimum_cv_mse"` applies the component-path tolerance described above
+and stores the exact path minimum as `reference_minimum` together with the resolved tolerances and
+`cv_mse_threshold`.
 
-For `rule="minimum_cv_mse"`, let $M_{\mathrm{min}}$ be the exact minimum stored mean CV-MSE. A row qualifies
-only when its mean is no larger than both $(1+\delta_{\mathrm{rel}})M_{\min}$ and
-$M_{\min}+\delta_{\mathrm{abs}}$. Because component counts are stored in ascending order, the first
-qualifying row is returned. `relative_tolerance=None` resolves to
-`sqrt(np.finfo(np.float64).eps)`; positive-infinity `absolute_tolerance` disables the absolute cap.
-The returned selection retains the exact unruled minimum as `reference_minimum`, the resolved
-tolerances, and the derived `cv_mse_threshold`.
-
-`rule="best_score"` chooses the maximum configured-score row on the predictor-rank-conditioned
-component path. Direct lookup by component count and `best_score` carry no CV-MSE tolerance
-provenance.
-
-The predictor rank in every selected row is the rank already retained conditionally for that
-component count under the configured scorer and constructor-level predictor-rank tolerances.
-`select()` does not revisit the predictor-rank profile. With a nondefault scorer, the retained
-predictor rank therefore need not minimize CV-MSE within its component-count profile.
+`rule="best_score"` instead chooses the maximum configured-score row on the conditioned component
+path. Direct lookup by component count and `best_score` carry no CV-MSE tolerance provenance. In all
+cases the predictor rank is the rank already retained conditionally for that component count;
+`select()` does not revisit the predictor-rank profile.
 
 ## Final-model refitting and provenance { #final-model-refitting }
 
@@ -270,7 +316,7 @@ exposes the evaluated ranks and conditional evidence for one component count.
 
 The positive public loss and its scikit-learn-oriented negative scorer use the same fold-local
 response-standardized MSE definition described under
-[Candidate coverage and scoring](#scoring-and-conditioned-path-selection).
+[Scoring and adaptive coverage](#scoring-and-conditioned-path-selection).
 
 ::: pipls.metrics.response_standardized_mse
     options:

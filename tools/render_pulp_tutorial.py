@@ -50,8 +50,12 @@ from pipls.validation import PiPLSOOFReport  # noqa: E402
 DEFAULT_OUTPUT_DIR = REPOSITORY_ROOT / "docs" / "assets" / "generated" / "pulp"
 CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
+DOMAIN_PREDICTOR_RELATIVE_TOLERANCE = 0.15
+DOMAIN_COMPONENT_RELATIVE_TOLERANCE = 0.50
 FIGURE_FILENAMES = (
     "search_domain.svg",
+    "conditioned_search_domain.svg",
+    "conditioned_component_path.svg",
     "component_path.svg",
     "selected_component_path.svg",
     "predictor_rank_profile.svg",
@@ -113,11 +117,11 @@ def _candidate_surface(search: PiPLSSearchCV) -> tuple[np.ndarray, np.ndarray, n
     return component_values, rank_values, surface
 
 
-def _render_search_domain(
+def _search_surface_figure(
     search: PiPLSSearchCV,
     *,
-    output_path: Path,
-) -> None:
+    title: str,
+) -> tuple[Figure, Axes, np.ndarray, np.ndarray, np.ndarray]:
     component_values, rank_values, surface = _candidate_surface(search)
     figure, axis = _figure(figsize=(7.6, 7.0))
     colormap = plt.get_cmap("viridis").copy()
@@ -149,7 +153,21 @@ def _render_search_domain(
     axis.tick_params(which="minor", bottom=False, left=False)
     axis.set_xlabel(r"Paired-mode count $h$")
     axis.set_ylabel(r"Predictor rank $r_\pi$")
-    axis.set_title("Pulp exhaustive search domain")
+    axis.set_title(title)
+    colorbar = figure.colorbar(image, ax=axis, shrink=0.86)
+    colorbar.set_label("Mean response-standardized CV-MSE")
+    return figure, axis, component_values, rank_values, surface
+
+
+def _render_search_domain(
+    search: PiPLSSearchCV,
+    *,
+    output_path: Path,
+) -> None:
+    figure, axis, component_values, _, _ = _search_surface_figure(
+        search,
+        title="Pulp exhaustive search domain",
+    )
     axis.text(
         float(component_values[-1]) - 1.3,
         2.1,
@@ -158,8 +176,160 @@ def _render_search_domain(
         va="center",
         fontsize="small",
     )
-    colorbar = figure.colorbar(image, ax=axis, shrink=0.86)
-    colorbar.set_label("Mean response-standardized CV-MSE")
+    _save_svg(figure, output_path)
+
+
+def _relative_tolerance_path(
+    search: PiPLSSearchCV,
+    *,
+    relative_tolerance: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    component_values, rank_values, surface = _candidate_surface(search)
+    exact_ranks = np.empty(component_values.size, dtype=np.intp)
+    selected_ranks = np.empty(component_values.size, dtype=np.intp)
+    selected_mse = np.empty(component_values.size, dtype=np.float64)
+
+    for column, _ in enumerate(component_values):
+        mse = surface[:, column]
+        admissible = np.flatnonzero(np.isfinite(mse))
+        admissible_mse = mse[admissible]
+        exact_offset = int(np.argmin(admissible_mse))
+        exact_index = int(admissible[exact_offset])
+        threshold = (1.0 + relative_tolerance) * float(mse[exact_index])
+        qualifying = admissible[mse[admissible] <= threshold]
+        selected_index = int(qualifying[0])
+        exact_ranks[column] = rank_values[exact_index]
+        selected_ranks[column] = rank_values[selected_index]
+        selected_mse[column] = mse[selected_index]
+
+    return component_values, exact_ranks, selected_ranks, selected_mse
+
+
+def _render_conditioned_search_domain(
+    search: PiPLSSearchCV,
+    *,
+    output_path: Path,
+) -> None:
+    figure, axis, component_values, _, _ = _search_surface_figure(
+        search,
+        title="Pulp exhaustive search: conditional rank selection",
+    )
+    (
+        _,
+        exact_ranks,
+        selected_ranks,
+        _,
+    ) = _relative_tolerance_path(
+        search,
+        relative_tolerance=DOMAIN_PREDICTOR_RELATIVE_TOLERANCE,
+    )
+    if np.array_equal(exact_ranks, selected_ranks):
+        raise RuntimeError("Illustrative predictor-rank tolerance must change the path.")
+
+    axis.plot(
+        component_values,
+        exact_ranks,
+        linestyle="none",
+        marker="o",
+        markerfacecolor="none",
+        markeredgecolor="white",
+        markeredgewidth=1.8,
+        markersize=8,
+        label="Exact minimum at fixed h",
+        zorder=3,
+    )
+    axis.plot(
+        component_values,
+        selected_ranks,
+        marker="D",
+        color="tab:orange",
+        linewidth=1.5,
+        markersize=6,
+        label=(
+            f"Smallest rank within "
+            f"{100.0 * DOMAIN_PREDICTOR_RELATIVE_TOLERANCE:.0f}%"
+        ),
+        zorder=4,
+    )
+    axis.legend(loc="lower right", fontsize="small")
+    _save_svg(figure, output_path)
+
+
+def _render_conditioned_component_path(
+    search: PiPLSSearchCV,
+    *,
+    output_path: Path,
+) -> None:
+    (
+        component_values,
+        _,
+        selected_ranks,
+        selected_mse,
+    ) = _relative_tolerance_path(
+        search,
+        relative_tolerance=DOMAIN_PREDICTOR_RELATIVE_TOLERANCE,
+    )
+    exact_index = int(np.argmin(selected_mse))
+    threshold = (
+        1.0 + DOMAIN_COMPONENT_RELATIVE_TOLERANCE
+    ) * float(selected_mse[exact_index])
+    selected_index = int(np.flatnonzero(selected_mse <= threshold)[0])
+    if selected_index == exact_index:
+        raise RuntimeError("Illustrative component tolerance must change the selection.")
+
+    figure, axis = _figure(figsize=(7.4, 4.8))
+    axis.plot(component_values, selected_mse, "o-", label="Conditioned component path")
+    axis.axhline(
+        threshold,
+        linewidth=1.0,
+        linestyle="--",
+        color="0.35",
+        label=(
+            f"{100.0 * DOMAIN_COMPONENT_RELATIVE_TOLERANCE:.0f}% "
+            "relative threshold"
+        ),
+    )
+    axis.scatter(
+        [component_values[exact_index]],
+        [selected_mse[exact_index]],
+        marker="o",
+        facecolors="none",
+        edgecolors="black",
+        linewidths=1.5,
+        s=80,
+        label="Exact path minimum",
+        zorder=3,
+    )
+    axis.scatter(
+        [component_values[selected_index]],
+        [selected_mse[selected_index]],
+        marker="D",
+        color="tab:orange",
+        s=70,
+        label=f"Selected h = {component_values[selected_index]}",
+        zorder=4,
+    )
+    for h_value, rank_value, mse_value in zip(
+        component_values,
+        selected_ranks,
+        selected_mse,
+        strict=True,
+    ):
+        axis.annotate(
+            rf"$r_\pi={int(rank_value)}$",
+            (h_value, mse_value),
+            xytext=(0, 7),
+            textcoords="offset points",
+            ha="center",
+            fontsize="x-small",
+        )
+    axis.set_title("Pulp conditioned component path")
+    axis.set_xlabel(r"Paired-mode count $h$")
+    axis.set_ylabel("Mean response-standardized CV-MSE")
+    axis.set_xticks(component_values)
+    axis.set_ylim(bottom=0.0)
+    axis.grid(axis="y", alpha=0.25)
+    axis.legend(fontsize="small")
     _save_svg(figure, output_path)
 
 
@@ -552,6 +722,12 @@ def _write_manifest(
             "factor_sign_anchor": {"response": "TI", "sign": "positive"},
             "detailed_responses": list(data.target_names),
             "prediction_kind": oof_diagnostics.prediction_kind,
+            "path_selection_explanation": {
+                "predictor_rank_relative_tolerance": (
+                    DOMAIN_PREDICTOR_RELATIVE_TOLERANCE
+                ),
+                "component_relative_tolerance": DOMAIN_COMPONENT_RELATIVE_TOLERANCE,
+            },
             "cross_validation": {
                 "splitter": type(CV).__name__,
                 "n_splits": 5,
@@ -614,6 +790,14 @@ def render_pulp_tutorial_assets(output_dir: Path = DEFAULT_OUTPUT_DIR) -> Path:
     _render_search_domain(
         search,
         output_path=output_dir / "search_domain.svg",
+    )
+    _render_conditioned_search_domain(
+        search,
+        output_path=output_dir / "conditioned_search_domain.svg",
+    )
+    _render_conditioned_component_path(
+        search,
+        output_path=output_dir / "conditioned_component_path.svg",
     )
     component_path = search.component_path_
     _render_component_path(
