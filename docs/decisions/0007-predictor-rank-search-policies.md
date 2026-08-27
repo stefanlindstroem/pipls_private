@@ -1,9 +1,10 @@
 # Decision: 0007-predictor-rank-search-policies
 
-Status: accepted and implemented in `PiPLSSearchCV`; Decision 0039 removes these search modes from
+Status: accepted. Existing exhaustive coverage and exact-optimum adaptive refinement are implemented
+in `PiPLSSearchCV`; the revised five-rank exhaustive threshold and adaptive tolerance-boundary
+refinement below are pending implementation. Decision 0039 removes these search modes from
 `PiPLSRegression`. Decision 0154 keeps both coverage algorithms but makes exhaustive coverage the
-accepted default and removes the separate `predictor_rank_values="max"` policy; that migration is
-implemented.
+accepted default and removes the separate `predictor_rank_values="max"` policy.
 
 ## Context
 
@@ -14,7 +15,8 @@ candidate-coverage approximation with numerical SVD approximation.
 
 The CV objective is discrete and may be noisy or non-unimodal. Strict bisection, ternary search,
 or golden-section search would assume more structure than the objective guarantees and could
-irreversibly discard the region containing the global minimum.
+irreversibly discard the region containing the global minimum. Decision 0148 therefore uses
+midpoint bisection only after exact-reference refinement, to narrow an observed tolerance bracket.
 
 ## Decision
 
@@ -26,11 +28,11 @@ irreversibly discard the region containing the global minimum.
 
 `predictor_rank_values="epv"` and one-element explicit sequences are separate fixed policies with
 one rank candidate per compatible component count. They are exhaustively covered when
-`search_method` is left at its default. Decision 0148 refines final retained-rank selection: after
-either optimized coverage policy finishes candidate evaluation, separate public relative and
-absolute tolerances retain the smallest qualifying evaluated rank. The public coverage values are
-`"adaptive"` and `"exhaustive"`; exhaustive is the default and no aliases are retained for earlier
-pre-release spellings.
+`search_method` is left at its default. Decision 0148 refines final retained-rank selection: exhaustive
+coverage retains the smallest qualifying admissible rank, while adaptive coverage additionally
+refines a tolerance boundary when needed before retaining the smallest qualifying evaluated rank.
+The public coverage values are `"adaptive"` and `"exhaustive"`; exhaustive is the default and no
+aliases are retained for earlier pre-release spellings.
 
 ## Adaptive-search contract
 
@@ -50,15 +52,21 @@ adaptive search must:
    numerical tie rule;
 6. refine the integer interval bounded by the neighboring evaluated ranks around that exact
    reference rank;
-7. switch to exhaustive evaluation when the remaining interval contains no more than a small
-   fixed implementation threshold, initially targeted at 10 ranks;
-8. after evaluation, apply Decision 0148 and retain the smallest evaluated rank satisfying both
-   public tolerance caps;
-9. expose diagnostics sufficient to reconstruct both candidate coverage and final retention.
+7. switch that refinement to exhaustive evaluation when its remaining admissible interval contains
+   no more than five ranks;
+8. apply Decision 0148 to identify the smallest evaluated qualifying rank and, when its immediately
+   lower evaluated neighbor fails while unevaluated admissible ranks remain between them, refine that
+   tolerance-boundary interval by deterministic midpoint bisection;
+9. use the same five-rank exhaustive-switch threshold for the tolerance-boundary refinement;
+10. if tolerance-boundary evaluation changes the exact evaluated reference rank, complete
+    exact-reference refinement around the new reference before resolving the tolerance boundary
+    again;
+11. expose diagnostics sufficient to reconstruct candidate coverage and final retention.
 
-The implementation uses private deterministic constants of seven logarithmic points and an
-exhaustive-switch threshold of 10 ranks. These are not public constructor parameters and should
-remain private until benchmark evidence demonstrates a stable need.
+The adaptive search uses private deterministic constants of seven logarithmic points and one shared
+exhaustive-switch threshold of five admissible ranks. The threshold governs both exact-reference and
+tolerance-boundary refinement. These are not public constructor parameters and should remain private
+until benchmark evidence demonstrates a stable need.
 
 ## Required diagnostics
 
@@ -67,7 +75,7 @@ At minimum, adaptive fitting should record:
 - the evaluated predictor ranks in deterministic order;
 - mean and per-split scores for evaluated ranks;
 - the number of admissible and evaluated candidates;
-- the final refinement interval;
+- the final refinement interval or intervals;
 - whether every admissible rank was evaluated;
 - the exact reference rank, tolerance-qualified retained rank, and standard score diagnostics.
 

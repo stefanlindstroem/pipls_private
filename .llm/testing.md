@@ -53,7 +53,8 @@ Protect:
 Protect:
 
 - materialized split reuse, fold-local feasibility, and pipeline support;
-- adaptive and exhaustive candidate behavior and tolerance-independent candidate coverage;
+- adaptive and exhaustive candidate behavior, exact-reference refinement, tolerance-boundary
+  refinement, and the shared five-rank exhaustive-switch threshold;
 - stable `cv_results_`, conditioned component paths, immutable rank profiles, and rank evidence;
 - equal-split CV-MSE means and population SD for ordinary and repeated validation;
 - manual, `best_score`, and dual-tolerance `minimum_cv_mse` selection;

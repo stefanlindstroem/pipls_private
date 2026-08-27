@@ -124,9 +124,15 @@ S_{h,\max}
 \end{equation}
 
 The smallest evaluated qualifying rank is retained. Under exhaustive coverage the reference is over
-the complete declared admissible rank domain; under adaptive coverage it is over the ranks actually
-evaluated. Adaptive candidate coverage remains determined by the exact score optimum and must not
-depend on these public tolerances.
+the complete declared admissible rank domain, so this is also the smallest admissible qualifying
+rank. Under adaptive coverage, first refine around the exact evaluated score optimum. If the smallest
+evaluated qualifying rank and its immediately lower failing evaluated neighbor bracket unevaluated
+admissible ranks, refine that tolerance boundary by deterministic midpoint bisection as a second
+adaptive phase. Both phases use one shared private exhaustive-switch threshold of five admissible
+ranks. If tolerance-boundary evaluation changes the exact evaluated reference rank, complete
+exact-reference refinement around the new reference before resolving the tolerance boundary again.
+Adaptive candidate coverage may
+therefore depend on the public predictor-rank tolerances.
 
 ## Response-standardized MSE
 

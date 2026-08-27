@@ -2,11 +2,11 @@
 
 ## Status
 
-Accepted and implemented for hierarchical predictor-rank tolerance selection. Decision 0154
-supersedes only the former `"max"`/`"maximum"` fixed-policy clauses by introducing explicit EPV
-and full-domain automatic search; that accepted migration is implemented. The
-constructor tolerance controls, immutable optimized-rank evidence, conditioned-path selection
-rules, and completed validation remain current.
+Accepted for hierarchical predictor-rank tolerance selection. The constructor tolerance controls,
+immutable optimized-rank evidence, conditioned-path selection rules, and completed validation are
+implemented. The revised adaptive tolerance-boundary refinement below is pending implementation.
+Decision 0154 supersedes only the former `"max"`/`"maximum"` fixed-policy clauses by introducing
+explicit EPV and full-domain automatic search; that migration is implemented.
 
 ## Context
 
@@ -140,7 +140,7 @@ one-element fixed rank sequence makes predictor-rank optimization inapplicable. 
 accepted for those policies and produce no tolerance provenance. `predictor_rank_values=None` and
 multi-rank explicit sequences use the optimized policy and apply the tolerances.
 
-### Keep candidate coverage independent of parsimony tolerance
+### Refine adaptive coverage at the parsimony boundary
 
 Private numerical tie handling remains separate from public parsimony tolerance. The existing
 private tie constants continue to govern:
@@ -150,15 +150,20 @@ private tie constants continue to govern:
 - deterministic low-rank ordering among exact numerical ties;
 - adaptive-search refinement around the exact evaluated optimum.
 
-`search_method="adaptive"` must not alter its evaluated candidate set when only predictor-rank
-tolerances change. It refines around the exact configured-score optimum and applies the public
-tolerances after candidate evaluation. The retained result is therefore the smallest **evaluated**
-qualifying rank. `search_method="exhaustive"` evaluates every admissible rank and therefore returns the
-smallest admissible qualifying rank.
+For `search_method="adaptive"`, first complete exact-reference refinement under Decision 0007.
+Then let $r_b$ be the smallest evaluated rank satisfying both public tolerance caps. If the
+immediately lower evaluated rank $r_a$ fails the tolerance and unevaluated admissible ranks remain in
+$(r_a,r_b)$, refine that interval by deterministic midpoint bisection toward the tolerance crossing.
+Use the same private five-rank exhaustive-switch threshold as exact-reference refinement, then retain
+the smallest evaluated qualifying rank. If new evaluations change the exact evaluated reference
+rank, complete exact-reference refinement around the new reference and resolve the tolerance bracket
+again.
 
-Candidate-level `cv_results_`, split scores, mean scores, CV-MSE summaries, timing results,
-`rank_test_score`, and `search_is_exhaustive_` remain descriptions of evaluated candidates and are
-not rewritten by tolerance selection.
+Adaptive candidate coverage may therefore depend on predictor-rank tolerance.
+`search_method="exhaustive"` evaluates every admissible rank and returns the smallest admissible
+qualifying rank directly. Candidate-level `cv_results_`, split scores, mean scores, CV-MSE summaries,
+timing results, `rank_test_score`, and `search_is_exhaustive_` remain descriptions of the candidates
+actually evaluated and are not rewritten by tolerance selection.
 
 ### Make predictor-rank provenance public and immutable
 
@@ -277,11 +282,12 @@ Patches affecting the public API must also run `make dist-check`. Patches affect
 workflow must run `make examples` and record the exact reference and retained $r_{\pi}$ and $h$
 values.
 
-The numerical implementation must compare candidate evaluation before and after directly. For
-identical data, splits, scorer, and search method, changing only predictor-rank tolerances must not
-change evaluated `(n_components, predictor_rank)` pairs, split scores, mean scores, CV-MSE arrays,
-`rank_test_score`, timing-array shape, or `search_is_exhaustive_`. Only conditional path retention
-and downstream selections may change.
+The numerical implementation must compare candidate evaluation before and after directly. Under
+exhaustive coverage, changing only predictor-rank tolerances must not change evaluated
+`(n_components, predictor_rank)` pairs or candidate-level results. Under adaptive coverage, tolerance
+may add tolerance-boundary evaluations. Common evaluated candidates must retain identical split and
+mean scores and CV-MSE values, cached candidates must not be refit, and `cv_results_`,
+`rank_test_score`, timing arrays, and `search_is_exhaustive_` must describe the completed coverage.
 
 Tests must cover positive, negative, and zero reference scores; individual and simultaneous caps;
 exact boundaries; invalid values; fixed, maximum, explicit, adaptive, and exhaustive policies;
@@ -293,6 +299,6 @@ path selection.
 
 Users can request a smaller retained predictor subspace under an explicit bounded validation-score
 allowance, independently of the later component-count choice. The path remains deterministic and
-fully inspectable, adaptive search coverage remains tolerance-independent, and custom scorers keep
-their native orientation and units. The additional provenance makes both stages of parsimony
+fully inspectable; adaptive coverage may add tolerance-boundary evaluations, while custom scorers
+keep their native orientation and units. The additional provenance makes both stages of parsimony
 reconstructable from public immutable results.

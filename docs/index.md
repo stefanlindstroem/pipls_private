@@ -84,28 +84,3 @@ Continue with [Pulp: a complete Π-PLS workflow](tutorials/pulp.md) for real-dat
 selection-conditioned out-of-fold (OOF) inspection before final refitting, immutable inspection results, and
 representative interpretation of standard PLS-family plots and Π-PLS-specific plots.
 
-## Programming reference
-
-- [Overview](api/index.md): public objects and canonical reference destinations.
-- [`PiPLSRegression`](api/regression.md): fixed-estimator parameters and fitted results.
-- [`PiPLSSearchCV`](api/path.md): search-estimator parameters and post-fit lifecycle.
-- [Path and selection](path_selection.md): search bounds, rank policies, scoring, CV, path evidence, and selection rules.
-- [OOF diagnostics](oof_diagnostics.md): stored-split reuse, ordered OOF predictions, coverage, and selection-conditioned interpretation.
-- [Model inspection](model_inspection.md): numerical fitted-model quantities and interpretation.
-- [Datasets and generators](api/datasets.md): packaged data, the dataset container, and the synthetic generator.
-- [Troubleshooting](troubleshooting.md): warnings, validation failures, lifecycle errors, and expensive searches.
-
-## Project validation
-
-- [Reference datasets](datasets.md): provenance, licensing, adaptation, and matrix dimensions.
-- [Reproducibility](reproducibility.md): software, data, and generated-documentation controls.
-- [Compatibility](compatibility.md): supported Python and dependency versions.
-
-## Scientific background
-
-- [Theory](theory.md): the implemented matrix construction, response-subspace policies, and rank interpretation.
-
-## Project information
-
-- [Authors, license, and citation](citation.md): copyright holders, commercial-use terms,
-  dataset-license scope, and the [companion paper](citation.md#companion-paper).

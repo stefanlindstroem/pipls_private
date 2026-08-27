@@ -24,23 +24,23 @@ default convention makes the first largest-magnitude predictor entry nonnegative
 response can instead anchor the orientation. These sign choices affect display only and do not
 change predictions or imply a positive or negative physical effect.
 
-### Predictor directions $\mathbf{P}$ { #predictor-directions }
+### Predictor directions { #predictor-directions }
 
-Columns of `predictor_directions` are orthonormal predictor directions in the regression
+Columns of `predictor_directions` are orthonormal predictor directions $\mathbf{P}$ in the regression
 factorization. They are not X loadings, which instead describe score reconstruction and are returned
 by `latent_structure()`.
 
-### Dilation $\mathbf{D}$ { #dilation }
+### Dilation { #dilation }
 
 Each nonnegative value $D_k=D_{kk}$ scales paired latent mode $k$ and should be interpreted together
 with the matching columns of $\mathbf{P}$ and $\mathbf{Q}$.
 
-### Response directions $\mathbf{Q}$ { #response-directions }
+### Response directions { #response-directions }
 
-Columns of `response_directions` are orthonormal response directions before dilation. Use explicit
+Columns of `response_directions` are orthonormal response directions $\mathbf{Q}$ before dilation. Use explicit
 response labels when comparing them.
 
-### Weighted response directions $\mathbf{Q}\mathbf{D}$ { #weighted-response-directions }
+### Weighted response directions { #weighted-response-directions }
 
 `weighted_response_directions` combines response-side orientation and mode strength; column $k$ is
 $D_kQ_{:k}$.

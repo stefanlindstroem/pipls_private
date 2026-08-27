@@ -229,7 +229,7 @@ descriptive; it does not establish a formal variance model or calibration claim.
 
 See [Residuals versus predicted](../model_inspection.md#residuals-versus-predicted).
 
-### Response-wise OOF $R^2$
+### Response-wise OOF *R*²
 
 ```python
 --8<-- "tools/render_pulp_tutorial.py:render-pulp-oof-response-r2"
@@ -321,7 +321,7 @@ See [Score-loading biplot](../model_inspection.md#score-loading-biplot) and
 
 ### Π-PLS-specific factorization
 
-#### Predictor directions $\mathbf{P}$
+#### Predictor directions
 
 The grouped bars are constructed directly from `factors.predictor_directions`:
 
@@ -344,7 +344,7 @@ predictor rank 9 does not create nine plotted modes. See
 [Predictor directions](../model_inspection.md#predictor-directions) and
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
 
-#### Weighted response directions $\mathbf{Q}\mathbf{D}$
+#### Weighted response directions
 
 The grouped bars are constructed directly from `factors.weighted_response_directions`:
 
@@ -389,7 +389,7 @@ though their original physical units differ. This is a fitted-model representati
 points close to the identity line do not by themselves establish external predictive accuracy.
 See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
 
-### Response-wise fitted $R^2$
+### Response-wise fitted *R*²
 
 The coefficient of determination is calculated separately for each response from the final fitted
 values:
