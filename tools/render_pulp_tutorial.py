@@ -52,7 +52,7 @@ CV = RepeatedKFold(n_splits=5, n_repeats=10, random_state=0)
 PREDICTION_KIND = "selection-conditioned OOF predictions"
 DOMAIN_PREDICTOR_RELATIVE_TOLERANCE = 0.15
 DOMAIN_COMPONENT_RELATIVE_TOLERANCE = 0.50
-EPV_SAMPLES_PER_PREDICTOR_RANK = 10.0
+EPV_SAMPLES_PER_PREDICTOR_RANK = 5.0
 FIGURE_FILENAMES = (
     "search_domain.svg",
     "conditioned_search_domain.svg",
@@ -125,7 +125,7 @@ def _search_surface_figure(
     title: str,
 ) -> tuple[Figure, Axes, np.ndarray, np.ndarray, np.ndarray]:
     component_values, rank_values, surface = _candidate_surface(search)
-    figure, axis = _figure(figsize=(7.6, 7.0))
+    figure, axis = _figure(figsize=(7.4, 5.0))
     colormap = plt.get_cmap("viridis").copy()
     colormap.set_bad("0.92")
     image = axis.imshow(
@@ -176,7 +176,6 @@ def _render_search_domain(
         r"$r_\pi < h$" + "\nnot admissible",
         ha="center",
         va="center",
-        fontsize="small",
     )
     _save_svg(figure, output_path)
 
@@ -233,10 +232,10 @@ def _render_conditioned_search_domain(
         exact_ranks,
         linestyle="none",
         marker="o",
-        markerfacecolor="none",
+        markerfacecolor="black",
         markeredgecolor="white",
         markeredgewidth=1.8,
-        markersize=8,
+        markersize=10,
         label="Exact minimum at fixed h",
         zorder=3,
     )
@@ -253,7 +252,7 @@ def _render_conditioned_search_domain(
         ),
         zorder=4,
     )
-    axis.legend(loc="lower right", fontsize="small")
+    axis.legend(loc="lower right", framealpha=0.0)
     _save_svg(figure, output_path)
 
 
@@ -320,10 +319,10 @@ def _render_conditioned_component_path(
         axis.annotate(
             rf"$r_\pi={int(rank_value)}$",
             (h_value, mse_value),
-            xytext=(0, 7),
+            xytext=(0, -7),
             textcoords="offset points",
             ha="center",
-            fontsize="x-small",
+            va="top",
         )
     axis.set_title("Pulp conditioned component path")
     axis.set_xlabel(r"Paired-mode count $h$")
@@ -331,7 +330,7 @@ def _render_conditioned_component_path(
     axis.set_xticks(component_values)
     axis.set_ylim(bottom=0.0)
     axis.grid(axis="y", alpha=0.25)
-    axis.legend(fontsize="small")
+    axis.legend()
     _save_svg(figure, output_path)
 
 
@@ -357,7 +356,7 @@ def _render_epv_search_domain(
     if epv_rank not in rank_values:
         raise RuntimeError("Pulp EPV rank must lie in the exhaustive search domain.")
 
-    figure, axis = _figure(figsize=(7.6, 7.0))
+    figure, axis = _figure(figsize=(7.4, 5.0))
     admissible = np.isfinite(surface)
     background = np.where(admissible, 0.84, 0.94)
     axis.imshow(
@@ -416,7 +415,6 @@ def _render_epv_search_domain(
         r"$r_\pi < h$" + "\nnot admissible",
         ha="center",
         va="center",
-        fontsize="small",
     )
     colorbar = figure.colorbar(image, ax=axis, shrink=0.86)
     colorbar.set_label("Mean response-standardized CV-MSE")

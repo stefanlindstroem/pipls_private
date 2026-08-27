@@ -12,18 +12,9 @@ A `PiPLSRegression` fit uses one fixed pair $(h,r_\pi)$. During cross-validation
 be feasible in every training split used to evaluate it. The search domain is therefore the
 intersection of the splitwise feasible domains.
 
-For training split $j$, let
-
-- $n_j$ be its number of training observations;
-- $p_j$ be its predictor count after any fold-local pipeline preprocessing; and
-- $r_j$ be its verified numerical predictor rank after terminal-estimator centering and optional
-  scaling.
-
-Define the corresponding minima across all training splits as
+For training split $j$, let $n_j$ be its number of training observations, and let $r_j$ be its verified numerical predictor rank after terminal-estimator centering and optional scaling. Define the corresponding minima across all training splits as
 
 \begin{equation}
-p'=\min_j p_j,
-\qquad
 n'=\min_j n_j,
 \qquad
 r'=\min_j r_j.
@@ -35,15 +26,15 @@ is therefore
 \begin{equation}
 r_{\pi,\mathrm{hard}}
 =
-\min(p',n'-1,r').
+\min(p,n'-1,r').
 \end{equation}
 
 The term $n'-1$ reflects the loss of one predictor dimension under centering. The verified rank
 $r'$ also captures any additional numerical rank loss after preprocessing, centering, and optional
 scaling.
 
-With `max_predictor_rank=None`, the search uses this hard ceiling. An explicit positive integer
-`max_predictor_rank=k` adds a user restriction,
+With `max_predictor_rank=None`, the search uses this hard ceiling $r_{\pi,\mathrm{max}} = r_{\pi,\mathrm{hard}}$. An explicit positive integer
+`max_predictor_rank=k` adds a user restriction
 
 \begin{equation}
 r_{\pi,\mathrm{max}}
@@ -111,12 +102,16 @@ independent of the tolerance.
 ![Pulp conditional predictor-rank selection](assets/generated/pulp/conditioned_search_domain.svg)
 
 Write the retained rank as $\hat r_\pi(h)$. The two-dimensional search has now been reduced to one
-retained pair $(h,\hat r_\pi(h))$ for each component count.
+retained pair $(h,\hat r_\pi(h))$ for each component count. 
 
 ### Component path and component selection
 
-The retained pairs form the component path. Define its mean CV-MSE at component count $h$ as
-$M_h=M_{h,\hat r_\pi(h)}$ and let
+The retained pairs $(h,\hat r_\pi(h))$ form the *component path*. Define its mean CV-MSE at component count $h$ as
+$M_h=M_{h,\hat r_\pi(h)}$.
+
+These CV-MSE values $M_h$ are used for manually selecting of the number of components $h$ in, *e.g.*, the [Complete Pulp Analysis](tutorials/pulp.md) tutorial.
+
+For automated component selection, let
 
 \begin{equation}
 M_{\min}=\min_h M_h.
@@ -146,38 +141,28 @@ acts on the resulting one-dimensional path and does not revisit the predictor-ra
 
 ## Fixed predictor rank: EPV { #epv-policy }
 
-The exhaustive case above optimizes predictor rank separately at every component count. The EPV
+The exhaustive case above optimizes predictor rank separately at every component count, which is computationally expensive. The EPV
 policy instead fixes one predictor rank before the component path is evaluated. With
-`predictor_rank_values="epv"`, the nominal rank is
-
-\begin{equation}
-r_{\pi,\mathrm{epv,nominal}}
-=
-\min\left(p,\left\lceil\frac{n}{c}\right\rceil\right),
-\end{equation}
-
-where $n$ and $p$ are the full-data observation and predictor counts supplied to `fit()`, and $c$ is
-`samples_per_predictor_rank`. The effective EPV rank is
+`predictor_rank_values="epv"`, the rank is
 
 \begin{equation}
 r_{\pi,\mathrm{epv}}
 =
-\min(r_{\pi,\mathrm{epv,nominal}},r_{\pi,\mathrm{max}}).
+\min\left(p,\left\lceil\frac{n}{c}\right\rceil,r_{\pi,\mathrm{max}}\right),
 \end{equation}
 
-The default is $c=10$. For Pulp, $n=46$ and $p=14$, so the nominal rank is 5 and no feasibility
-clipping is needed. The search therefore evaluates only the five compatible pairs
-$(h,r_\pi)=(1,5),\ldots,(5,5)$. In the figure below, the full feasible domain is left neutral and
+where $n$ and $p$ are the full-data observation and predictor counts supplied to `fit()` and $c$ is
+`samples_per_predictor_rank`.
+
+The default is $c=10$. However, the Pulp datset has only $n=46$ observations. In such cases, we use a more permissive $c=5$ by setting `samples_per_predictor_rank=5.0`. Then, the nominal rank becomes 10, and the search evaluates only the eight compatible pairs
+$(h,r_\pi)=(1,10),\ldots,(8,10)$. In the figure below, the full feasible domain is left neutral and
 only those EPV pairs are colored by their actual mean response-standardized CV-MSE under the same
 validation splits used in the exhaustive example.
 
 ![Pulp EPV search domain](assets/generated/pulp/epv_search_domain.svg)
 
 There is no conditional predictor-rank selection in this case: $r_\pi$ is already fixed, and only
-the component path remains to be selected. The default $c=10$ may be changed with
-`samples_per_predictor_rank`; $c=5$ is a more permissive maintained setting. Values below 5 are
-legal but emit `PredictorRankSupportWarning`. A nondefault `samples_per_predictor_rank` is invalid
-outside the EPV policy.
+the component path remains to be selected.
 
 ### Other predictor-rank policies { #predictor-rank-policies }
 
@@ -189,7 +174,7 @@ and `max_predictor_rank` restricts the upper predictor-rank boundary.
 
 ## Adaptive search and scoring { #scoring-and-conditioned-path-selection }
 
-The examples above use exhaustive coverage. When the predictor-rank domain is large,
+The examples above use exhaustive coverage across the set of specified predictor ranks. When the predictor-rank domain is large,
 `search_method="adaptive"` can reduce the number of ranks evaluated at each $h$. The admissible
 domain and the conditional predictor-rank selection rule are unchanged; only candidate coverage
 changes.
