@@ -222,18 +222,22 @@ exposes the evaluated ranks and conditional evidence for one component count.
 ::: pipls.component_path.PiPLSComponentPath
     options:
       show_signature: false
+      members: false
 
 ::: pipls.component_path.PiPLSSelection
     options:
       show_signature: false
+      members: false
 
 ::: pipls.component_path.PiPLSPredictorRankProfile
     options:
       show_signature: false
+      members: false
 
 ::: pipls.component_path.PiPLSPredictorRankEvidence
     options:
       show_signature: false
+      members: false
 
 The positive public loss and its scikit-learn-oriented negative scorer use the same fold-local
 response-standardized MSE definition described under
