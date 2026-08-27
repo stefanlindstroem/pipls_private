@@ -4,8 +4,7 @@
 a rank-controlled predictor subspace, then constructs a response subspace under a configured
 selection criterion, and finally diagonalizes the reduced regression map into paired
 predictor-response modes. The package default uses the cross-covariance construction from the
-[peer-reviewed companion publication](citation.md#companion-paper); programming users may instead
-request a least-squares-driven response-subspace construction.
+[peer-reviewed companion publication](citation.md#companion-paper).
 
 ## Scientific source and package scope
 
@@ -21,20 +20,12 @@ including the cross-covariance response-subspace construction. The package imple
 peer-reviewed construction as its default and adds ordinary software facilities around it, including
 optional scaling, numerical-rank checks, configurable predictor SVD solvers, cross-validated search,
 immutable result records, and prediction diagnostics. The package also provides one
-least-squares/RRR-inspired response-subspace construction for programming users. That alternative is
-a software extension and is not part of the
+least-squares/RRR-inspired response-subspace construction for programming users, which can show
+pareto dominance for some datasets. That alternative is a software extension and is not part of the
 [peer-reviewed companion publication](citation.md#companion-paper).
 
-The publication/software boundary matters when interpreting results: manuscript-aligned analyses use
-the cross-covariance response-subspace construction, while analyses using the least-squares option
-should identify that model choice explicitly.
-
-The Pulp source paper documents the provenance and scientific context of the
-[Pulp dataset](datasets.md#pulp-real-data-integration); it is not the theoretical reference for
-Π-PLS. Pulp provenance and analysis are covered in the
-[reference-dataset guide](datasets.md) and [Pulp tutorial](tutorials/pulp.md). Citation metadata for
-the software and companion manuscript is maintained under the
-[companion-paper citation](citation.md#companion-paper).
+Reference dataset loaders are provided for demonstration purposes. Provenance and analysis are
+covered in the [reference-dataset guide](datasets.md).
 
 ## Problem setting and two rank controls {#problem-setting-and-two-rank-controls}
 
@@ -81,27 +72,20 @@ The package uses the following terms for the fixed Π-PLS construction:
 | `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
 | `n_components` | number of paired latent modes $h$ |
 
-The word **direction** is the primary mathematical term for columns of $\mathbf{P}$ and
+The word *direction* is the mathematical term for columns of $\mathbf{P}$ and
 $\mathbf{Q}$. `PiPLSDecomposition` exposes these arrays as `predictor_directions` and
 `response_directions`. The estimator retains the standard PLS-style names `x_rotations_` and
-`y_rotations_`; none of these names makes $\mathbf{P}$ or $\mathbf{Q}$ a projection matrix. The
-projectors onto the final direction spans are $\mathbf{P}\mathbf{P}^{\mathsf T}$ and
-$\mathbf{Q}\mathbf{Q}^{\mathsf T}$.
+`y_rotations_`.
 
 The Π-PLS directions are also distinct from `x_loadings_` and `y_loadings_`, which are
 least-squares reconstruction loadings for the centered or centered-and-scaled training blocks.
 For response-side factor displays, the package stores response-by-mode weighted directions
-$\mathbf{Q}\mathbf{D}$, where column $k$ is $D_kQ_{:k}$. The manuscript's mode-by-response
-orientation is the transpose:
-
-\begin{equation}
-\mathbf{D}\mathbf{Q}^{\mathsf T}=(\mathbf{Q}\mathbf{D})^{\mathsf T}.
-\end{equation}
+$\mathbf{Q}\mathbf{D}$, where column $k$ is $D_kQ_{:k}$.
 
 The API word “component” is retained because it is familiar in regression software. In Π-PLS,
-`n_components` counts paired latent modes, not predictor-SVD directions and not synthetic latent
-components. Likewise, `predictor_rank` is a retained observed-subspace dimension; “predictor signal
-rank” is reserved for synthetic settings where the noiseless generating rank is known.
+`n_components` counts paired latent modes. Likewise, `predictor_rank` is a retained
+observed-subspace dimension; the term *predictor signal rank* is reserved for synthetic
+settings where the noiseless generating rank is known.
 
 ## 1. Rank-controlled predictor projection {#rank-controlled-predictor-projection}
 
@@ -126,24 +110,17 @@ predictor subspace, so
 \mathbf{X}=\mathbf{X}\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}+\mathbf{X}(\mathbf{I}_p-\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}).
 \end{equation}
 
-Define the retained predictor scores
-
-\begin{equation}
-\mathbf{Z}=\mathbf{X}\mathbf{\Pi}\in\mathbb{R}^{n\times r_\pi}.
-\end{equation}
-
-The first term, $\mathbf{Z}\mathbf{\Pi}^{\mathsf T}$, is the rank-$r_\pi$ predictor approximation.
-The second term is orthogonal to the retained subspace and contributes a truncation residual.
-Substituting the decomposition into the regression relation gives
+The first term, $\mathbf{X}\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T}$, is the rank-$r_\pi$ predictor
+approximation. The second term is orthogonal to the retained subspace and contributes a
+truncation residual. Substituting this decomposition into the regression relation gives
 
 \begin{equation}
 \mathbf{Y}=\mathbf{Z}\mathbf{\Pi}^{\mathsf T}\mathbf{B}+\mathbf{E}',
 \qquad
-\mathbf{E}'=\mathbf{E}+\mathbf{X}(\mathbf{I}_p-\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T})\mathbf{B}.
+\mathbf{E}'=\mathbf{E}+\mathbf{X}(\mathbf{I}_p-\mathbf{\Pi}\mathbf{\Pi}^{\mathsf T})\mathbf{B},
 \end{equation}
 
-This step is response-independent. Any predictive direction removed by the choice of $r_\pi$ cannot
-be recovered later by increasing $h$.
+where $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}\in\mathbb{R}^{n\times r_\pi}$ is the retained predictor scores.
 
 ## 2. Response-subspace selection {#response-subspace-selection}
 
@@ -167,32 +144,13 @@ For prescribed $h$, the response basis is chosen by
 \mathbf{C}_{\mathrm{cov}}
 =
 \arg\max_{\mathbf{C}^{\mathsf T}\mathbf{C}=\mathbf{I}_h}
-\left\|\boldsymbol{\Sigma}_{\mathrm{ZY}}\mathbf{C}\right\|_{\mathrm{F}}^2.
+\left\|\boldsymbol{\Sigma}_{\mathrm{ZY}}\mathbf{C}\right\|_{\mathrm{F}}^2,
 \end{equation}
 
-Because
+and its solution is obtained through an SVD as
 
 \begin{equation}
-\left\|\boldsymbol{\Sigma}_{\mathrm{ZY}}\mathbf{C}\right\|_{\mathrm{F}}^2
-=
-\operatorname{tr}\!\left(
-\mathbf{C}^{\mathsf T}
-\boldsymbol{\Sigma}_{\mathrm{ZY}}^{\mathsf T}
-\boldsymbol{\Sigma}_{\mathrm{ZY}}
-\mathbf{C}
-\right),
-\end{equation}
-
-this is an orthonormal trace-maximization problem. If
-
-\begin{equation}
-\boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}_{\mathrm{cov}}\mathbf{S}_{\mathrm{cov}}\mathbf{V}_{\mathrm{cov}}^{\mathsf T},
-\end{equation}
-
-then the leading $h$ right singular vectors span an optimum:
-
-\begin{equation}
-\mathbf{C}_{\mathrm{cov}}=\mathbf{V}_{\mathrm{cov}(:,1:h)}.
+\mathbf{C}_{\mathrm{cov}}=\mathbf{V}_{\mathrm{cov}(:,1:h)},\qquad \boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}_{\mathrm{cov}}\mathbf{S}_{\mathrm{cov}}\mathbf{V}_{\mathrm{cov}}^{\mathsf T}.
 \end{equation}
 
 Thus the default policy selects the response subspace with the largest retained squared
@@ -218,14 +176,8 @@ For fixed $\mathbf{C}$, the minimizing map is
 \mathbf{W}=\mathbf{Z}^{+}\mathbf{Y}\mathbf{C}.
 \end{equation}
 
-Let
-
-\begin{equation}
-\mathbf{P}_{\mathbf{Z}}=\mathbf{Z}\mathbf{Z}^{+}
-\end{equation}
-
-be the orthogonal projector onto the retained predictor-score column space. Eliminating
-$\mathbf{W}$ gives the equivalent response-subspace problem
+Let $\mathbf{P}_{\mathbf{Z}}=\mathbf{Z}\mathbf{Z}^{+}$ be the orthogonal projector onto the retained
+predictor-score column space. Eliminating $\mathbf{W}$ gives the equivalent response-subspace problem
 
 \begin{equation}
 \mathbf{C}_{\mathrm{LS}}
@@ -243,10 +195,9 @@ $\mathbf{W}$ gives the equivalent response-subspace problem
 This is the rank-$h$ reduced-rank-regression response subspace for regression of $\mathbf{Y}$ on
 the fixed retained predictor coordinates $\mathbf{Z}$. Consequently, for the same fixed
 $(h,r_\pi)$, the least-squares policy minimizes the training Frobenius residual over admissible
-rank-$h$ maps. That property does not imply lower cross-validated or external prediction error.
+rank-$h$ maps.
 
-The package evaluates this criterion without forming normal equations. With a reduced QR
-factorization
+With a reduced QR factorization
 
 \begin{equation}
 \mathbf{Z}=\mathbf{Q}_{\mathbf{Z}}\mathbf{R}_{\mathbf{Z}},
@@ -254,59 +205,23 @@ factorization
 \mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Q}_{\mathbf{Z}}=\mathbf{I}_{r_\pi},
 \end{equation}
 
-we have
-
-\begin{equation}
-\mathbf{P}_{\mathbf{Z}}
-=
-\mathbf{Q}_{\mathbf{Z}}\mathbf{Q}_{\mathbf{Z}}^{\mathsf T},
-\end{equation}
-
-and therefore
+we have $\mathbf{P}_{\mathbf{Z}} = \mathbf{Q}_{\mathbf{Z}}\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}$, and therefore
 
 \begin{equation}
 \mathbf{Y}^{\mathsf T}\mathbf{P}_{\mathbf{Z}}\mathbf{Y}
 =
 (\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y})^{\mathsf T}
-(\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}).
+(\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}),
 \end{equation}
 
 The columns of $\mathbf{C}_{\mathrm{LS}}$ are thus the leading right singular directions of
-$\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}$. The response-side QR/SVD route remains exact;
-the configurable `svd_solver` applies only to construction of the predictor basis $\mathbf{\Pi}$.
+$\mathbf{Q}_{\mathbf{Z}}^{\mathsf T}\mathbf{Y}$.
 
 > **Software-extension boundary.** The least-squares response-subspace construction is implemented
 > for programming users but is not part of the
 > [peer-reviewed companion publication](citation.md#companion-paper).
 > Manuscript-aligned analyses use `response_subspace="cross_covariance"`.
 
-The two criteria can differ substantially because they weight the retained predictor directions
-differently. Since the SVD-based retained scores can be written as
-
-\begin{equation}
-\mathbf{Z}=\mathbf{U}_{r}\mathbf{S}_{r},
-\end{equation}
-
-the cross-covariance criterion depends on the eigenspace of
-
-\begin{equation}
-\mathbf{Y}^{\mathsf T}
-\mathbf{U}_{r}\mathbf{S}_{r}^{2}\mathbf{U}_{r}^{\mathsf T}
-\mathbf{Y},
-\end{equation}
-
-whereas the least-squares criterion depends on
-
-\begin{equation}
-\mathbf{Y}^{\mathsf T}
-\mathbf{U}_{r}\mathbf{U}_{r}^{\mathsf T}
-\mathbf{Y}.
-\end{equation}
-
-The cross-covariance construction therefore retains weighting by predictor singular-value
-magnitude, while the least-squares construction depends on the retained predictor column space.
-When $q=1$, the two policies give the same fitted regression map. They also give the same fitted map
-when $h=q\leq r_\pi$, because the complete response space is retained.
 
 ## 3. Least-squares coupling in the selected response subspace
 
@@ -321,10 +236,6 @@ where $\mathbf{W}\in\mathbb{R}^{r_\pi\times h}$. The minimum-norm least-squares 
 \begin{equation}
 \mathbf{W}=\mathbf{Z}^{+}\mathbf{Y}\mathbf{C}.
 \end{equation}
-
-Thus the phrase “least-squares response-subspace selection” refers specifically to the criterion
-used to choose $\mathbf{C}$; estimation of $\mathbf{W}$ by least squares is common to both
-policies.
 
 Before diagonalization, the regression map in the centered coordinates is
 
@@ -363,17 +274,10 @@ Define
 \begin{equation}
 \mathbf{P}=\mathbf{\Pi}\mathbf{M}\in\mathbb{R}^{p\times h},
 \qquad
-\mathbf{Q}=\mathbf{C}\mathbf{N}\in\mathbb{R}^{q\times h}.
+\mathbf{Q}=\mathbf{C}\mathbf{N}\in\mathbb{R}^{q\times h},
 \end{equation}
 
-Then
-
-\begin{equation}
-\mathbf{P}^{\mathsf T}\mathbf{P}=\mathbf{I}_h,
-\qquad
-\mathbf{Q}^{\mathsf T}\mathbf{Q}=\mathbf{I}_h,
-\end{equation}
-
+where $\mathbf{P}^{\mathsf T}\mathbf{P}=\mathbf{I}_h$ and $\mathbf{Q}^{\mathsf T}\mathbf{Q}=\mathbf{I}_h$,
 and the reduced regression relation becomes
 
 \begin{equation}
@@ -384,9 +288,7 @@ and the reduced regression relation becomes
 
 The predictor score vector $\mathbf{X}P_{:k}$ is coupled only to the response score
 vector $\mathbf{Y}Q_{:k}$, with dilation $D_k$. This is the one-to-one, mode-wise interpretation
-central to Π-PLS. Orthogonal rotation by $\mathbf{N}$ preserves the Frobenius norm of the
-residual and orthogonally transforms its covariance; it preserves covariance
-eigenvalues but does not generally leave the covariance matrix itself unchanged.
+central to Π-PLS.
 
 The equivalent regression-map factorizations are
 
@@ -404,7 +306,7 @@ For new centered predictors $\mathbf{X}_{\mathrm{new}}$,
 \widehat{\mathbf{Y}}_{\mathrm{new}}=\mathbf{X}_{\mathrm{new}}\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}.
 \end{equation}
 
-## Why the method is panoramic {#why-the-method-is-panoramic}
+## Why the method is called panoramic {#why-the-method-is-panoramic}
 
 Standard deflation-based PLS algorithms construct successive components while removing previously
 modelled predictor variation. Π-PLS instead fixes one rank-controlled predictor representation
@@ -413,7 +315,7 @@ space through closed-form matrix decompositions. The retained predictor space th
 available as a whole during response-subspace selection and regression; in this sense, the view is
 panoramic.
 
-## Interpretation of $r_\pi$ and $h$ {#interpretation-of-the-ranks}
+## Ranks and fitted dimension {#interpretation-of-the-ranks}
 
 The two ranks control different forms of complexity.
 
@@ -426,13 +328,6 @@ The component count $h$ determines the rank and interpretive complexity of the d
 predictor-response coupling. Increasing $h$ adds paired modes, but it cannot recover predictor
 directions excluded by $r_\pi$ and cannot exceed the number of responses.
 
-The phrase “predictor signal rank” is appropriate for a synthetic data-generating model when its
-noiseless rank is known. For an observed noisy predictor matrix, $\mathbf{\Pi}$ is more accurately
-described as a retained predictor basis: leading observed singular directions are not guaranteed to
-separate signal from noise exactly.
-
-## Nominal fitted dimension
-
 After $\mathbf{\Pi}$ has been fixed, the fitted representation is described by $\mathbf{M}$,
 $\mathbf{D}$, and $\mathbf{Q}$. These contain $r_\pi h$, $h$, and $qh$ entries. The orthonormality
 constraints on $\mathbf{M}$ and $\mathbf{Q}$ each remove $h(h+1)/2$ degrees of freedom. The resulting
@@ -442,23 +337,18 @@ nominal fitted dimension is
 \boxed{(r_\pi+q-h)h}.
 \end{equation}
 
-This count concerns the fitted representation after the retained predictor basis has been fixed. It
-does not treat the $ph$ entries of $\mathbf{P}=\mathbf{\Pi}\mathbf{M}$ as independently free
-parameters.
 
 ## Relationships to established methods {#relationships-to-established-methods}
 
-### Ordinary least squares {#ordinary-least-squares}
+### Canonical correlation analysis {#canonical-correlation-analysis}
 
-If predictor truncation preserves the estimable predictor row space and $h$ retains every estimable
-response-side direction, then
-
-\begin{equation}
-\widehat{\mathbf{Y}}=\mathbf{Z}\mathbf{W}\mathbf{C}^{\mathsf T}
-\end{equation}
-
-coincides with the multivariate OLS fitted response. In that limit, Π-PLS is an orthogonal latent
-reparameterization of the same fitted map.
+Similarly to Π-PLS, CCA also constructs paired predictor and response variates with a diagonal
+association structure, but classical CCA maximizes normalized correlation after within-block whitening. The default
+Π-PLS response policy instead uses an unwhitened cross-covariance criterion inside the retained
+predictor representation, while the optional least-squares policy uses the fitted-response
+least-squares criterion described above. Both policies then form the same diagonal paired-mode
+representation. The structural analogy to CCA therefore concerns the final paired relation, not an
+identity of objectives.
 
 ### Reduced-rank regression {#reduced-rank-regression}
 
@@ -470,16 +360,6 @@ diagonalizes the resulting reduced map into one-to-one paired modes. With the de
 `"cross_covariance"` policy, the response subspace is instead selected by the
 [peer-reviewed cross-covariance criterion](citation.md#companion-paper) before the common
 least-squares coupling and diagonalization stages.
-
-### Canonical correlation analysis {#canonical-correlation-analysis}
-
-CCA also constructs paired predictor and response variates with a diagonal association structure,
-but classical CCA maximizes normalized correlation after within-block whitening. The default
-Π-PLS response policy instead uses an unwhitened cross-covariance criterion inside the retained
-predictor representation, while the optional least-squares policy uses the fitted-response
-least-squares criterion described above. Both policies then form the same diagonal paired-mode
-representation. The structural analogy to CCA therefore concerns the final paired relation, not an
-identity of objectives.
 
 ### PLS and PLS-SVD {#pls-and-pls-svd}
 
@@ -496,34 +376,6 @@ singular structure. Under the least-squares policy, that intermediate subspace i
 from the predictable response variation in $\operatorname{col}(\mathbf{Z})$. In both cases, the
 final $\mathbf{P}$ and $\mathbf{Q}$ arise only after the common least-squares map $\mathbf{W}$ is
 estimated and diagonalized.
-
-## Package realization
-
-`PiPLSRegression` learns predictor and response means from the training data. Predictor and
-response scaling are controlled independently after centering. The backward-compatible `scale`
-parameter supplies the default for both blocks, while non-`None` `scale_x` and `scale_y` values
-override predictor and response scaling respectively. Enabled scaling uses training-sample standard
-deviations. `response_subspace` selects either the publication-default `"cross_covariance"`
-response basis or the software-extension `"least_squares"` basis. The estimator applies the
-corresponding fixed construction above in the resulting centered or centered-and-scaled coordinates,
-then transforms the regression map back to original units for `coef_`, `intercept_`, and `predict()`.
-
-A fitted estimator exposes the Π-PLS-specific factorization in `decomposition_`:
-
-- `predictor_directions`: $\mathbf{P}$;
-- `dilation`: $(D_1,\ldots,D_h)$;
-- `response_directions`: $\mathbf{Q}$;
-- `standardized_regression_map`: $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$;
-- numerical-rank and resolved predictor-SVD diagnostics.
-
-The construction matrices $\mathbf{\Pi}$, $\mathbf{C}$, and $\mathbf{W}$ remain private.
-Conventional scores, reconstruction loadings, coefficients, and transformations are exposed
-separately from the $\mathbf{P}$, $\mathbf{D}$, and $\mathbf{Q}$ factorization.
-
-Singular-vector signs are arbitrary. Repeated or nearly repeated singular values identify invariant
-subspaces rather than unique ordered columns. Numerical validation should therefore compare
-regression maps, predictions, projections, principal angles, or singular values rather than raw
-basis columns.
 
 ## Selection, validation, and synthetic-data boundaries {#selection-validation-and-synthetic-data-boundaries}
 

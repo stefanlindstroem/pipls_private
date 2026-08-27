@@ -2,9 +2,8 @@
 
 This guide shows how to generate the Gaussian latent-space model used in the
 [companion manuscript](citation.md#companion-paper). It covers the manuscript's
-**data-generating distribution** and the information needed to recreate
-one **seeded synthetic dataset**. It does not reproduce the manuscript's complete tables, figures,
-resampling study, comparator implementations, or reporting pipeline.
+data-generating distribution and the information needed to recreate
+one seeded synthetic dataset. 
 
 The scientific reference is:
 
