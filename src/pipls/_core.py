@@ -196,43 +196,24 @@ def fit_pipls_core(
     h = _as_positive_int(n_components, name="n_components")
     resolved_response_subspace = _validate_response_subspace(response_subspace)
 
-    algebraic_limit = min(n_samples, n_features)
-    if r_pi > algebraic_limit:
-        raise ValueError(
-            "predictor_rank must satisfy predictor_rank <= min(n_samples, n_features); "
-            f"got predictor_rank={r_pi}, min(...)={algebraic_limit}."
-        )
     if h > min(r_pi, n_targets):
         raise ValueError(
             "n_components must satisfy n_components <= min(predictor_rank, n_targets); "
             f"got n_components={h}, predictor_rank={r_pi}, n_targets={n_targets}."
         )
 
-    resolved_solver = _resolve_predictor_svd_solver(
-        shape=(n_samples, n_features),
+    (
+        Pi,
+        x_rank,
+        x_rank_is_exact,
+        rank_tolerance,
+        predictor_svd_solver,
+    ) = _decompose_predictors(
+        X_array,
         predictor_rank=r_pi,
         svd_solver=svd_solver,
+        random_state=random_state,
     )
-    validated_random_state = _validate_random_state(random_state)
-
-    if resolved_solver == "full":
-        _, x_singular_values, x_vt = np.linalg.svd(X_array, full_matrices=False)
-        x_rank_is_exact = True
-    else:
-        _, x_singular_values, x_vt = randomized_svd(
-            X_array,
-            n_components=r_pi,
-            n_iter="auto",
-            random_state=validated_random_state,
-            flip_sign=True,
-        )
-        x_singular_values = np.asarray(x_singular_values, dtype=np.float64)
-        x_vt = np.asarray(x_vt, dtype=np.float64)
-        x_rank_is_exact = False
-
-    x_shape = (X_array.shape[0], X_array.shape[1])
-    rank_tolerance = _svd_rank_tolerance(x_shape, x_singular_values)
-    x_rank = int(np.count_nonzero(x_singular_values > rank_tolerance))
     if r_pi > x_rank:
         raise _PredictorRankInfeasibleError(
             requested_rank=r_pi,
@@ -241,7 +222,6 @@ def fit_pipls_core(
             tolerance=rank_tolerance,
         )
 
-    Pi = np.asarray(x_vt[:r_pi, :].T, dtype=np.float64)
     Z = X_array @ Pi
 
     if resolved_response_subspace == "cross_covariance":
@@ -280,7 +260,61 @@ def fit_pipls_core(
         x_rank=x_rank,
         x_rank_is_exact=x_rank_is_exact,
         rank_tolerance=rank_tolerance,
-        predictor_svd_solver=resolved_solver,
+        predictor_svd_solver=predictor_svd_solver,
+    )
+
+
+def _decompose_predictors(
+    X: ArrayLike,
+    *,
+    predictor_rank: int,
+    svd_solver: SVDSolver,
+    random_state: int | np.random.RandomState | None,
+) -> tuple[FloatArray, int, bool, float, ResolvedSVDSolver]:
+    """Return the retained predictor basis and verified rank evidence."""
+
+    X_array = _as_finite_matrix(X, name="X")
+    n_samples, n_features = X_array.shape
+    r_pi = _as_positive_int(predictor_rank, name="predictor_rank")
+    algebraic_limit = min(n_samples, n_features)
+    if r_pi > algebraic_limit:
+        raise ValueError(
+            "predictor_rank must satisfy predictor_rank <= min(n_samples, n_features); "
+            f"got predictor_rank={r_pi}, min(...)={algebraic_limit}."
+        )
+
+    resolved_solver = _resolve_predictor_svd_solver(
+        shape=(n_samples, n_features),
+        predictor_rank=r_pi,
+        svd_solver=svd_solver,
+    )
+    validated_random_state = _validate_random_state(random_state)
+    if resolved_solver == "full":
+        _, x_singular_values, x_vt = np.linalg.svd(X_array, full_matrices=False)
+        x_rank_is_exact = True
+    else:
+        _, x_singular_values, x_vt = randomized_svd(
+            X_array,
+            n_components=r_pi,
+            n_iter="auto",
+            random_state=validated_random_state,
+            flip_sign=True,
+        )
+        x_singular_values = np.asarray(x_singular_values, dtype=np.float64)
+        x_vt = np.asarray(x_vt, dtype=np.float64)
+        x_rank_is_exact = False
+
+    rank_tolerance = _svd_rank_tolerance(
+        (n_samples, n_features),
+        x_singular_values,
+    )
+    x_rank = int(np.count_nonzero(x_singular_values > rank_tolerance))
+    return (
+        np.asarray(x_vt[:r_pi, :].T, dtype=np.float64),
+        x_rank,
+        x_rank_is_exact,
+        rank_tolerance,
+        resolved_solver,
     )
 
 

@@ -15,7 +15,7 @@ from sklearn.base import clone
 from sklearn.utils import _safe_indexing
 
 from ._model_selection import CVSplit
-from .metrics import _response_standardized_mse, _training_response_scale
+from .metrics import _response_scale_for_scoring, _response_standardized_mse
 
 FloatArray = NDArray[np.float64]
 Scorer = Callable[[Any, ArrayLike, ArrayLike], float]
@@ -142,7 +142,7 @@ def _evaluate_candidate(
         mse = _response_standardized_mse(
             y_validation,
             prediction,
-            _training_response_scale(y_train),
+            _response_scale_for_scoring(estimator),
         )
         split_mse[split_index] = mse
 

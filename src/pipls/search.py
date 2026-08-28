@@ -21,7 +21,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils import _safe_indexing, indexable
 from sklearn.utils.validation import check_is_fitted
 
-from ._core import _PredictorRankInfeasibleError
 from ._cv_engine import (
     CandidateCache,
     _evaluate_candidate_batch,
@@ -55,7 +54,11 @@ from .component_path import (
 )
 from .exceptions import PredictorRankSupportWarning
 from .metrics import neg_response_standardized_mse
-from .regression import PiPLSRegression, _clear_fitted_state
+from .regression import (
+    PiPLSRegression,
+    _clear_fitted_state,
+    _verified_predictor_rank,
+)
 from .validation import PiPLSOOFReport
 
 __all__ = ["PiPLSSearchCV"]
@@ -225,7 +228,8 @@ class PiPLSSearchCV(
     r"""Cross-validated search over admissible Π-PLS component-count and predictor-rank pairs.
 
     Every candidate is a :class:`pipls.PiPLSRegression` clone with fixed
-    ``n_components`` and ``predictor_rank``, fitted independently inside each training fold. Selection inspection, final
+    ``n_components`` and ``predictor_rank``, fitted independently inside each
+    training fold. Selection inspection, final
     full-data fitting, and selection-conditioned out-of-fold reporting are
     explicit post-fit :meth:`select`, :meth:`refit`,
     and :meth:`oof_report` operations. The default
@@ -1147,48 +1151,44 @@ def _fold_predictor_limits(
 
     feature_counts: list[int] = []
     numerical_ranks: list[int] = []
-    global_random_state = np.random.get_state()
-    try:
-        for split_index, (train, _) in enumerate(splits):
-            X_train = _safe_indexing(X, train)
-            y_train = _safe_indexing(y, train)
-            final_estimator, X_transformed = _prepare_fold_pipls_inputs(
-                template=template,
-                X=X_train,
-                y=y_train,
+    preflight_random_state = np.random.RandomState()
+    preflight_random_state.set_state(np.random.get_state())
+    for split_index, (train, _) in enumerate(splits):
+        X_train = _safe_indexing(X, train)
+        y_train = _safe_indexing(y, train)
+        final_estimator, X_transformed = _prepare_fold_pipls_inputs(
+            template=template,
+            X=X_train,
+            y=y_train,
+        )
+        transformed_shape = np.shape(X_transformed)
+        if len(transformed_shape) != 2:
+            raise ValueError(
+                "Pipeline preprocessing must produce a two-dimensional predictor "
+                f"matrix; got shape={transformed_shape}."
             )
-            transformed_shape = np.shape(X_transformed)
-            if len(transformed_shape) != 2:
-                raise ValueError(
-                    "Pipeline preprocessing must produce a two-dimensional predictor "
-                    f"matrix; got shape={transformed_shape}."
-                )
-            n_samples, n_features = transformed_shape
-            feature_counts.append(int(n_features))
-            algebraic_limit = min(int(n_features), int(n_samples) - 1)
-            if algebraic_limit < 1:
-                raise ValueError(
-                    "No positive predictor rank is feasible after preprocessing in "
-                    f"training split {split_index}."
-                )
-            probe = final_estimator.set_params(
-                n_components=1,
-                predictor_rank=algebraic_limit,
+        n_samples, n_features = transformed_shape
+        feature_counts.append(int(n_features))
+        algebraic_limit = min(int(n_features), int(n_samples) - 1)
+        if algebraic_limit < 1:
+            raise ValueError(
+                "No positive predictor rank is feasible after preprocessing in "
+                f"training split {split_index}."
             )
-            try:
-                _fit_path_estimator(probe, X_transformed, y_train)
-            except _PredictorRankInfeasibleError as error:
-                verified_rank = error.verified_rank
-            else:
-                verified_rank = algebraic_limit
-            if verified_rank < 1:
-                raise ValueError(
-                    "No positive predictor rank is numerically feasible after "
-                    f"preprocessing in training split {split_index}."
-                )
-            numerical_ranks.append(verified_rank)
-    finally:
-        np.random.set_state(global_random_state)
+
+        if final_estimator.random_state is None:
+            final_estimator.set_params(random_state=preflight_random_state)
+        verified_rank = _verified_predictor_rank(
+            final_estimator,
+            X_transformed,
+            predictor_rank=algebraic_limit,
+        )
+        if verified_rank < 1:
+            raise ValueError(
+                "No positive predictor rank is numerically feasible after "
+                f"preprocessing in training split {split_index}."
+            )
+        numerical_ranks.append(verified_rank)
     return min(feature_counts), min(numerical_ranks)
 
 

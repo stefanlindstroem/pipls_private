@@ -24,11 +24,14 @@ across the materialized training folds.
 
 1. For each training fold, fit any pipeline preprocessing only on that fold and obtain the
    predictors supplied to the terminal `PiPLSRegression`.
-2. Probe the terminal estimator with `n_components=1` and the fold's centered algebraic rank
-   ceiling. Preserve its configured scaling, predictor-SVD policy, and random-state parameter.
-3. The private core reports rank infeasibility through a private `ValueError` subclass carrying the
-   requested rank, verified rank, exactness flag, and tolerance. The public fixed-estimator failure
-   remains a `ValueError` with the existing numerical-rank message.
+2. Apply the terminal estimator's predictor centering/scaling and run the same private predictor-SVD
+   decomposition used by fixed fitting at the fold's centered algebraic rank ceiling. Preserve the
+   configured predictor-SVD policy and random-state parameter; response-side Π-PLS work is not part
+   of feasibility preflight.
+3. Fixed fitting still reports rank infeasibility through the private core error carrying the
+   requested rank, verified rank, exactness flag, and tolerance. Search preflight reads the same
+   predictor decomposition evidence directly. The public fixed-estimator failure remains a
+   `ValueError` with the existing numerical-rank message.
 4. Let $r_{\mathrm{num,min}}$ be the minimum verified rank across folds. The hard search ceiling is
 
    \begin{equation}
@@ -42,9 +45,10 @@ across the materialized training folds.
 5. Validate explicit component and predictor-rank sequences against this resolved ceiling before
    scoring any candidate. Do not add failed or nonfinite candidate rows to `cv_results_`.
 6. If any fold has no positive verified predictor rank, fail clearly and transactionally.
-7. Preserve NumPy's global random state across the preflight so the additional probe does not alter
-   later randomized candidate fits. Suppress only the existing path-owned statistical-support
-   warning; unrelated warnings remain visible.
+7. Predictor-rank preflight must not advance shared NumPy random state. For `random_state=None`, use
+   a local copy of the global state across the fold probes; explicit `RandomState` parameters remain
+   isolated by the existing fold-local estimator cloning. Later candidate fits therefore retain
+   their established random-state semantics. Unrelated preprocessing warnings remain visible.
 
 For explicit randomized SVD, the verified rank remains a retained-rank lower bound rather than a
 claim of exact full numerical rank. The minimum of those verified bounds is therefore the
@@ -57,5 +61,6 @@ search case. `max_predictor_rank_` records the effective hard/user ceiling, and
 `n_components_values="all"` resolves only component counts supported by the active predictor-rank
 policy.
 
-The preflight adds one terminal rank probe per training fold and one fold-local preprocessing fit
-for pipelines. Candidate evaluation, OOF generation, and refit behavior are otherwise unchanged.
+The preflight adds one predictor decomposition per training fold and one fold-local preprocessing
+fit for pipelines. It does not construct a response subspace or complete a dummy Π-PLS fit.
+Candidate evaluation, OOF generation, and refit behavior are otherwise unchanged.

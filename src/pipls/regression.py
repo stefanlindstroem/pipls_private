@@ -20,6 +20,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ._core import (
     ResponseSubspace,
     SVDSolver,
+    _decompose_predictors,
     _validate_random_state,
     _validate_response_subspace,
     fit_pipls_core,
@@ -493,25 +494,18 @@ class PiPLSRegression(
         predictor_rank: int,
         max_predictor_rank: int,
     ) -> None:
-        self.x_mean_ = _safe_column_mean(X)
+        scale_x = self.scale if self.scale_x is None else self.scale_x
+        self.x_mean_, self.x_scale_ = _preprocess_predictor_block(
+            X,
+            scale=bool(scale_x),
+        )
         self.y_mean_ = _safe_column_mean(y)
         self._response_scale_for_scoring_ = _training_response_scale(y)
         with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
-            X -= self.x_mean_
             y -= self.y_mean_
-        _require_finite_output(X, operation="Predictor centering")
         _require_finite_output(y, operation="Response centering")
 
-        scale_x = self.scale if self.scale_x is None else self.scale_x
         scale_y = self.scale if self.scale_y is None else self.scale_y
-
-        if scale_x:
-            self.x_scale_ = _safe_sample_scale(X)
-            with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
-                X /= self.x_scale_
-            _require_finite_output(X, operation="Predictor scaling")
-        else:
-            self.x_scale_ = np.ones(X.shape[1], dtype=np.float64)
 
         if scale_y:
             self.y_scale_ = _safe_sample_scale(y)
@@ -586,6 +580,58 @@ class PiPLSRegression(
                 f'svd_solver must be "full", "randomized", or "auto"; got {self.svd_solver!r}.'
             )
         _validate_random_state(self.random_state)
+
+
+def _preprocess_predictor_block(
+    X: FloatArray,
+    *,
+    scale: bool,
+) -> tuple[FloatArray, FloatArray]:
+    """Center and optionally scale one writable predictor training block."""
+
+    x_mean = _safe_column_mean(X)
+    with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+        X -= x_mean
+    _require_finite_output(X, operation="Predictor centering")
+
+    if scale:
+        x_scale = _safe_sample_scale(X)
+        with np.errstate(over="ignore", invalid="ignore", divide="ignore"):
+            X /= x_scale
+        _require_finite_output(X, operation="Predictor scaling")
+    else:
+        x_scale = np.ones(X.shape[1], dtype=np.float64)
+    return x_mean, x_scale
+
+
+def _verified_predictor_rank(
+    estimator: PiPLSRegression,
+    X: ArrayLike,
+    *,
+    predictor_rank: int,
+) -> int:
+    """Return predictor rank verified after the estimator's X preprocessing."""
+
+    probe = estimator.set_params(n_components=1, predictor_rank=predictor_rank)
+    probe._validate_constructor_parameters()
+    X_checked = check_array(
+        X,
+        ensure_2d=True,
+        dtype=np.float64,
+        ensure_min_samples=2,
+        copy=True,
+    )
+    X_array = np.asarray(X_checked, dtype=np.float64)
+    scale_x = probe.scale if probe.scale_x is None else probe.scale_x
+    _preprocess_predictor_block(X_array, scale=bool(scale_x))
+
+    _, verified_rank, _, _, _ = _decompose_predictors(
+        X_array,
+        predictor_rank=predictor_rank,
+        svd_solver=probe.svd_solver,
+        random_state=probe.random_state,
+    )
+    return verified_rank
 
 
 def _clear_fitted_state(estimator: BaseEstimator) -> None:
