@@ -5,15 +5,12 @@ from __future__ import annotations
 import math
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from numbers import Real
-from typing import Any, Literal, cast
+from typing import Any, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from sklearn.metrics import r2_score
 from sklearn.model_selection import check_cv
-
-from ._core import _as_positive_int
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
@@ -48,7 +45,6 @@ class _PredictorRankScoreSelection:
 def _hard_predictor_rank_limit(
     *,
     n_features: int,
-    n_samples: int,
     n_train_min: int,
 ) -> int:
     r"""Return the fold-dimensional predictor-rank feasibility bound.
@@ -67,19 +63,6 @@ def _hard_predictor_rank_limit(
     separately by the search preflight.
     """
 
-    _as_positive_int(n_features, name="n_features")
-    _as_positive_int(n_samples, name="n_samples")
-    _as_positive_int(n_train_min, name="n_train_min")
-    if n_train_min > n_samples:
-        raise ValueError(
-            "n_train_min must not exceed n_samples: "
-            f"got n_train_min={n_train_min}, n_samples={n_samples}."
-        )
-    if n_train_min < 2:
-        raise ValueError(
-            "n_train_min must be at least 2 because PiPLSRegression centers each "
-            f"training fold; got {n_train_min}."
-        )
     return min(n_features, n_train_min - 1)
 
 
@@ -105,12 +88,7 @@ def _epv_predictor_rank(
     feasibility are intentionally not part of this helper.
     """
 
-    _as_positive_int(n_features, name="n_features")
-    _as_positive_int(n_samples, name="n_samples")
-    samples_per_rank = _as_positive_float(
-        samples_per_predictor_rank,
-        name="samples_per_predictor_rank",
-    )
+    samples_per_rank = float(samples_per_predictor_rank)
     if samples_per_rank <= n_samples / n_features:
         return n_features
     rule_limit = math.ceil(n_samples / samples_per_rank)
@@ -221,11 +199,6 @@ def _logarithmic_predictor_rank_values(
 ) -> IntArray:
     """Return deterministic approximately logarithmic integer ranks including endpoints."""
 
-    _as_positive_int(lower, name="lower")
-    _as_positive_int(upper, name="upper")
-    _as_positive_int(n_values, name="n_values")
-    if lower > upper:
-        raise ValueError(f"lower must not exceed upper: got {lower} and {upper}.")
     if lower == upper:
         return np.asarray([lower], dtype=np.intp)
 
@@ -379,43 +352,26 @@ def _refine_adaptive_tolerance_boundary(
             )
 
 
-def _search_predictor_ranks(
+def _search_adaptive_predictor_ranks(
     *,
-    allowed_ranks: ArrayLike,
-    search_method: Literal["adaptive", "exhaustive"],
+    allowed_ranks: IntArray,
     evaluate: Callable[[IntArray], None],
     evaluated_scores: Callable[[], tuple[IntArray, FloatArray]],
     relative_tolerance: float | None = None,
     absolute_tolerance: float | None = None,
 ) -> None:
-    """Evaluate predictor ranks according to one search policy."""
-
-    allowed = np.asarray(allowed_ranks)
-    if allowed.ndim != 1 or allowed.size == 0 or allowed.dtype.kind not in "iu":
-        raise ValueError("allowed_ranks must be a nonempty one-dimensional integer array.")
-    allowed = np.asarray(np.unique(allowed), dtype=np.intp)
-    if np.any(allowed < 1):
-        raise ValueError("allowed_ranks must contain positive integers.")
-    if search_method not in ("adaptive", "exhaustive"):
-        raise ValueError('search_method must be "adaptive" or "exhaustive".')
-    if (relative_tolerance is None) != (absolute_tolerance is None):
-        raise ValueError(
-            "relative_tolerance and absolute_tolerance must be supplied together."
-        )
-
-    if search_method == "exhaustive":
-        evaluate(allowed)
-        return
+    """Evaluate predictor ranks with adaptive exact/tolerance refinement."""
 
     _refine_adaptive_reference(
-        allowed_ranks=allowed,
+        allowed_ranks=allowed_ranks,
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
     )
-    if relative_tolerance is None or absolute_tolerance is None:
+    if relative_tolerance is None:
         return
+    assert absolute_tolerance is not None
     _refine_adaptive_tolerance_boundary(
-        allowed_ranks=allowed,
+        allowed_ranks=allowed_ranks,
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
         relative_tolerance=relative_tolerance,
@@ -434,10 +390,6 @@ def _tied_score_mask(
 
     score_array = np.asarray(scores, dtype=np.float64)
     reference_value = float(reference)
-    if not np.all(np.isfinite(score_array)) or not np.isfinite(reference_value):
-        raise ValueError("scores and reference must contain only finite values.")
-    if not np.isfinite(rtol) or rtol < 0.0 or not np.isfinite(atol) or atol < 0.0:
-        raise ValueError("rtol and atol must be nonnegative finite values.")
     return np.asarray(
         np.isclose(
             score_array,
@@ -450,65 +402,31 @@ def _tied_score_mask(
 
 
 def _score_tolerance_threshold(
-    reference: object,
+    reference: float,
     *,
-    relative_tolerance: object,
-    absolute_tolerance: object,
+    relative_tolerance: float,
+    absolute_tolerance: float,
 ) -> float:
     """Return the simultaneous relative-and-absolute configured-score threshold."""
 
-    if isinstance(reference, (bool, np.bool_)) or not isinstance(reference, Real):
-        raise ValueError("reference must be a finite real number.")
-    reference_value = float(reference)
-    if not np.isfinite(reference_value):
-        raise ValueError("reference must be a finite real number.")
-
-    if isinstance(relative_tolerance, (bool, np.bool_)) or not isinstance(
-        relative_tolerance,
-        Real,
-    ):
-        raise ValueError(
-            "relative_tolerance must be a finite nonnegative real number."
-        )
-    relative_value = float(relative_tolerance)
-    if not np.isfinite(relative_value) or relative_value < 0.0:
-        raise ValueError(
-            "relative_tolerance must be a finite nonnegative real number."
-        )
-
-    if isinstance(absolute_tolerance, (bool, np.bool_)) or not isinstance(
-        absolute_tolerance,
-        Real,
-    ):
-        raise ValueError(
-            "absolute_tolerance must be a nonnegative real number or positive infinity."
-        )
-    absolute_value = float(absolute_tolerance)
-    if np.isnan(absolute_value) or absolute_value < 0.0:
-        raise ValueError(
-            "absolute_tolerance must be a nonnegative real number or positive infinity."
-        )
-
     with np.errstate(over="ignore", invalid="ignore"):
-        relative_threshold = np.float64(reference_value) - np.float64(
-            relative_value
-        ) * np.abs(np.float64(reference_value))
-        absolute_threshold = np.float64(reference_value) - np.float64(absolute_value)
+        relative_threshold = np.float64(reference) - np.float64(
+            relative_tolerance
+        ) * np.abs(np.float64(reference))
+        absolute_threshold = np.float64(reference) - np.float64(absolute_tolerance)
     return float(np.maximum(relative_threshold, absolute_threshold))
 
 
 def _tolerant_score_mask(
     scores: ArrayLike,
-    reference: object,
+    reference: float,
     *,
-    relative_tolerance: object,
-    absolute_tolerance: object,
+    relative_tolerance: float,
+    absolute_tolerance: float,
 ) -> BoolArray:
     """Return scores satisfying both substantive caps around one reference."""
 
     score_array = np.asarray(scores, dtype=np.float64)
-    if score_array.size == 0 or not np.all(np.isfinite(score_array)):
-        raise ValueError("scores must contain at least one finite value.")
     threshold = _score_tolerance_threshold(
         reference,
         relative_tolerance=relative_tolerance,
@@ -526,25 +444,13 @@ def _select_tolerant_predictor_rank(
     predictor_ranks: ArrayLike,
     mean_scores: ArrayLike,
     *,
-    relative_tolerance: object,
-    absolute_tolerance: object,
+    relative_tolerance: float,
+    absolute_tolerance: float,
 ) -> _PredictorRankScoreSelection:
     """Return exact-reference and smallest tolerance-qualified rank evidence."""
 
     ranks = np.asarray(predictor_ranks)
     scores = np.asarray(mean_scores, dtype=np.float64)
-    if ranks.ndim != 1 or ranks.size == 0:
-        raise ValueError("predictor_ranks must be a nonempty one-dimensional array.")
-    if ranks.dtype.kind not in "iu" or np.any(ranks < 1):
-        raise ValueError("predictor_ranks must contain positive integers.")
-    if np.unique(ranks).size != ranks.size:
-        raise ValueError("predictor_ranks must not contain duplicates.")
-    if scores.ndim != 1 or scores.shape != ranks.shape:
-        raise ValueError(
-            "mean_scores must be one-dimensional with one value per predictor rank."
-        )
-    if not np.all(np.isfinite(scores)):
-        raise ValueError("mean_scores must contain only finite values.")
 
     reference_score = float(np.max(scores))
     reference_mask = _tied_score_mask(scores, reference_score)
@@ -580,8 +486,6 @@ def _rank_test_scores(
     """Return minimum ranks using reference-anchored tolerant score groups."""
 
     scores = np.asarray(mean_scores, dtype=np.float64)
-    if scores.ndim != 1 or scores.size == 0 or not np.all(np.isfinite(scores)):
-        raise ValueError("mean_scores must be a nonempty finite one-dimensional array.")
     order = np.argsort(-scores, kind="mergesort")
     ranks = np.empty(scores.size, dtype=np.intp)
     group_start = 0

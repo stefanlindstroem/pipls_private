@@ -37,7 +37,7 @@ from ._model_selection import (
     _materialize_cv_splits,
     _pooled_oof_r2,
     _rank_test_scores,
-    _search_predictor_ranks,
+    _search_adaptive_predictor_ranks,
     _select_tolerant_predictor_rank,
     _tied_score_mask,
     _validate_singleton_validation_scoring,
@@ -420,7 +420,6 @@ class PiPLSSearchCV(
         )
         dimensional_limit = _hard_predictor_rank_limit(
             n_features=fold_feature_limit,
-            n_samples=int(X_array.shape[0]),
             n_train_min=materialized.n_train_min,
         )
         hard_limit = min(dimensional_limit, fold_numerical_rank_limit)
@@ -1289,9 +1288,8 @@ def _adaptive_path_search(
         )
         return ranks, scores
 
-    _search_predictor_ranks(
+    _search_adaptive_predictor_ranks(
         allowed_ranks=allowed_ranks,
-        search_method="adaptive",
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
         relative_tolerance=relative_tolerance,

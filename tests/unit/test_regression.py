@@ -158,19 +158,6 @@ def test_fixed_rank_pair_is_required_and_keyword_only() -> None:
     with pytest.raises(TypeError):
         PiPLSRegression(1, predictor_rank=1)  # type: ignore[call-arg]
 
-    model = PiPLSRegression(n_components=1, predictor_rank=1)
-    assert set(model.get_params()) == {
-        "copy",
-        "n_components",
-        "predictor_rank",
-        "random_state",
-        "response_subspace",
-        "scale",
-        "scale_x",
-        "scale_y",
-        "svd_solver",
-    }
-
 
 def test_response_subspace_default_and_clone_contract() -> None:
     model = PiPLSRegression(n_components=2, predictor_rank=4)

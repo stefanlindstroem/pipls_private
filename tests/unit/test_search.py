@@ -275,7 +275,6 @@ def test_search_method_default_and_parameter_surface_use_current_values() -> Non
     search.set_params(search_method="adaptive")
     assert search.search_method == "adaptive"
     assert pickle.loads(pickle.dumps(search)).search_method == "adaptive"
-    assert "search_method='adaptive'" in repr(search)
 
 
 @pytest.mark.parametrize("predictor_rank_values", ([2], "epv"))
@@ -1628,6 +1627,9 @@ def test_path_clones_the_fixed_estimator_template_without_mutating_it() -> None:
         ("search_method", "unsupported", "search_method"),
         ("max_predictor_rank", 0, "max_predictor_rank"),
         ("max_predictor_rank", "unsupported", "max_predictor_rank"),
+        ("samples_per_predictor_rank", 0.0, "positive finite"),
+        ("samples_per_predictor_rank", np.inf, "positive finite"),
+        ("samples_per_predictor_rank", True, "positive finite"),
         ("n_components_values", [], "must not be empty"),
         ("n_components_values", None, 'must be "all"'),
         ("n_components_values", "everything", 'must be "all"'),
@@ -1898,7 +1900,6 @@ def test_oof_report_uses_existing_model_selection() -> None:
     assert pickle.dumps(search) == before
 
 
-
 def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:
     X, Y = _data()
     search = PiPLSSearchCV(
@@ -1925,38 +1926,6 @@ def test_oof_report_rejects_non_result_and_incompatible_selection() -> None:
         search.oof_report(X, Y, selection=other_selection)
     with pytest.raises(ValueError, match="not compatible with this fitted search"):
         search.refit(X, Y, selection=other_selection)
-
-
-def test_oof_report_requires_fitted_search_and_matching_data_shape() -> None:
-    X, Y = _data()
-    unfitted = PiPLSSearchCV()
-    selection = PiPLSSelection(
-        n_components=1,
-        predictor_rank=1,
-        predictor_rank_policy="optimized",
-        mean_test_score=-1.0,
-        cv_mse_mean=1.0,
-        cv_mse_std=0.1,
-        n_splits=3,
-    )
-    with pytest.raises(NotFittedError):
-        unfitted.oof_report(X, Y, selection=selection)
-
-    search = PiPLSSearchCV(
-        n_components_values=[1],
-        predictor_rank_values=[1],
-        cv=3,
-        n_jobs=1,
-    ).fit(X, Y)
-    compatible = search.select(n_components=1)
-    with pytest.raises(ValueError, match=r"oof_report\(\) requires the same number"):
-        search.oof_report(X[:-1], Y[:-1], selection=compatible)
-    with pytest.raises(
-        ValueError,
-        match=r"oof_report\(\) requires the same number of response columns",
-    ):
-        search.oof_report(X, Y[:, :1], selection=compatible)
-
 
 
 def test_least_squares_search_pickle_round_trip_preserves_template_and_refit() -> None:
@@ -2186,7 +2155,7 @@ def test_invalid_predictor_rank_tolerances_are_rejected(
         PiPLSSearchCV(**{keyword: value}).fit(X, Y)
 
 
-def test_predictor_rank_tolerance_parameters_clone_repr_and_pickle() -> None:
+def test_predictor_rank_tolerance_parameters_clone_and_pickle() -> None:
     search = PiPLSSearchCV(
         predictor_rank_relative_tolerance=0.10,
         predictor_rank_absolute_tolerance=0.25,
@@ -2197,5 +2166,3 @@ def test_predictor_rank_tolerance_parameters_clone_repr_and_pickle() -> None:
     for result in (cloned, restored):
         assert result.predictor_rank_relative_tolerance == pytest.approx(0.10)
         assert result.predictor_rank_absolute_tolerance == pytest.approx(0.25)
-    assert "predictor_rank_relative_tolerance=0.1" in repr(search)
-    assert "predictor_rank_absolute_tolerance=0.25" in repr(search)

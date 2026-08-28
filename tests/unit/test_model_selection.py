@@ -12,7 +12,7 @@ from pipls._model_selection import (
     _materialize_cv_splits,
     _rank_test_scores,
     _score_tolerance_threshold,
-    _search_predictor_ranks,
+    _search_adaptive_predictor_ranks,
     _select_tolerant_predictor_rank,
     _tied_score_mask,
     _tolerant_score_mask,
@@ -23,7 +23,6 @@ def test_hard_predictor_rank_limit_uses_centered_training_fold_cap() -> None:
     assert (
         _hard_predictor_rank_limit(
             n_features=100,
-            n_samples=51,
             n_train_min=51,
         )
         == 50
@@ -34,7 +33,6 @@ def test_hard_predictor_rank_limit_respects_feature_cap() -> None:
     assert (
         _hard_predictor_rank_limit(
             n_features=3,
-            n_samples=100,
             n_train_min=100,
         )
         == 3
@@ -44,67 +42,20 @@ def test_hard_predictor_rank_limit_respects_feature_cap() -> None:
 def test_hard_predictor_rank_limit_respects_smallest_training_fold() -> None:
     complete_data_bound = _hard_predictor_rank_limit(
         n_features=30,
-        n_samples=50,
         n_train_min=50,
     )
     fold_bound = _hard_predictor_rank_limit(
         n_features=30,
-        n_samples=50,
         n_train_min=39,
     )
     feasibility_capped = _hard_predictor_rank_limit(
         n_features=30,
-        n_samples=50,
         n_train_min=4,
     )
 
     assert complete_data_bound == 30
     assert fold_bound == 30
     assert feasibility_capped == 3
-
-
-@pytest.mark.parametrize(
-    ("argument", "value"),
-    [
-        ("n_features", 0),
-        ("n_samples", 0),
-        ("n_train_min", 0),
-        ("n_features", True),
-        ("n_samples", False),
-        ("n_train_min", True),
-    ],
-)
-def test_hard_predictor_rank_limit_rejects_invalid_inputs(
-    argument: str,
-    value: object,
-) -> None:
-    kwargs: dict[str, object] = {
-        "n_features": 10,
-        "n_samples": 20,
-        "n_train_min": 20,
-    }
-    kwargs[argument] = value
-
-    with pytest.raises(ValueError, match=argument):
-        _hard_predictor_rank_limit(**kwargs)  # type: ignore[arg-type]
-
-
-def test_hard_predictor_rank_limit_rejects_training_fold_larger_than_full_data() -> None:
-    with pytest.raises(ValueError, match="n_train_min must not exceed n_samples"):
-        _hard_predictor_rank_limit(
-            n_features=10,
-            n_samples=19,
-            n_train_min=20,
-        )
-
-
-def test_hard_predictor_rank_limit_rejects_singleton_training_folds() -> None:
-    with pytest.raises(ValueError, match="at least 2"):
-        _hard_predictor_rank_limit(
-            n_features=10,
-            n_samples=20,
-            n_train_min=1,
-        )
 
 
 @pytest.mark.parametrize(
@@ -150,31 +101,6 @@ def test_epv_predictor_rank_handles_tiny_positive_support_parameter() -> None:
         )
         == 100
     )
-
-
-@pytest.mark.parametrize(
-    ("argument", "value"),
-    [
-        ("n_features", 0),
-        ("n_samples", 0),
-        ("samples_per_predictor_rank", 0.0),
-        ("samples_per_predictor_rank", np.inf),
-        ("samples_per_predictor_rank", True),
-    ],
-)
-def test_epv_predictor_rank_rejects_invalid_inputs(
-    argument: str,
-    value: object,
-) -> None:
-    kwargs: dict[str, object] = {
-        "n_features": 10,
-        "n_samples": 20,
-        "samples_per_predictor_rank": 10,
-    }
-    kwargs[argument] = value
-
-    with pytest.raises(ValueError, match=argument):
-        _epv_predictor_rank(**kwargs)  # type: ignore[arg-type]
 
 
 def test_materialize_cv_splits_reuses_one_concrete_split_set() -> None:
@@ -277,9 +203,8 @@ def _run_adaptive_rank_surface(
         scores = np.asarray([evaluated[int(rank)] for rank in ranks], dtype=np.float64)
         return ranks, scores
 
-    _search_predictor_ranks(
+    _search_adaptive_predictor_ranks(
         allowed_ranks=allowed,
-        search_method="adaptive",
         evaluate=evaluate,
         evaluated_scores=evaluated_scores,
         relative_tolerance=relative_tolerance,
@@ -412,38 +337,6 @@ def test_score_tolerance_threshold_allows_an_effectively_unbounded_allowance() -
     assert np.isneginf(threshold)
 
 
-@pytest.mark.parametrize(
-    ("argument", "value", "message"),
-    [
-        ("reference", np.nan, "reference"),
-        ("reference", np.inf, "reference"),
-        ("reference", True, "reference"),
-        ("relative_tolerance", -0.1, "relative_tolerance"),
-        ("relative_tolerance", np.inf, "relative_tolerance"),
-        ("relative_tolerance", np.nan, "relative_tolerance"),
-        ("relative_tolerance", True, "relative_tolerance"),
-        ("absolute_tolerance", -0.1, "absolute_tolerance"),
-        ("absolute_tolerance", np.nan, "absolute_tolerance"),
-        ("absolute_tolerance", -np.inf, "absolute_tolerance"),
-        ("absolute_tolerance", False, "absolute_tolerance"),
-    ],
-)
-def test_score_tolerance_threshold_rejects_invalid_inputs(
-    argument: str,
-    value: object,
-    message: str,
-) -> None:
-    kwargs: dict[str, object] = {
-        "reference": 1.0,
-        "relative_tolerance": 0.1,
-        "absolute_tolerance": np.inf,
-    }
-    kwargs[argument] = value
-
-    with pytest.raises(ValueError, match=message):
-        _score_tolerance_threshold(**kwargs)
-
-
 def test_tolerant_score_mask_includes_the_exact_boundary() -> None:
     mask = _tolerant_score_mask(
         np.array([10.0, 9.75, 9.749, 9.0]),
@@ -464,19 +357,6 @@ def test_tolerant_score_mask_keeps_numerical_equality_separate_from_allowance() 
     )
 
     np.testing.assert_array_equal(mask, np.array([True, True, False]))
-
-
-@pytest.mark.parametrize("scores", [[], [1.0, np.nan], [1.0, np.inf]])
-def test_tolerant_score_mask_rejects_nonfinite_or_empty_scores(
-    scores: list[float],
-) -> None:
-    with pytest.raises(ValueError, match="scores"):
-        _tolerant_score_mask(
-            scores,
-            1.0,
-            relative_tolerance=0.1,
-            absolute_tolerance=np.inf,
-        )
 
 
 def test_select_tolerant_predictor_rank_returns_reference_and_selected_evidence() -> None:
@@ -519,30 +399,6 @@ def test_select_tolerant_predictor_rank_uses_low_rank_numerical_reference_ties()
     assert selection.reference_score == pytest.approx(0.8)
     assert selection.selected_rank == 2
     assert selection.selected_score == pytest.approx(0.8 - 5e-14)
-
-
-@pytest.mark.parametrize(
-    ("ranks", "scores"),
-    [
-        ([], []),
-        ([1, 1], [0.2, 0.3]),
-        ([0, 2], [0.2, 0.3]),
-        ([1.0, 2.0], [0.2, 0.3]),
-        ([1, 2], [0.2]),
-        ([1, 2], [0.2, np.nan]),
-    ],
-)
-def test_select_tolerant_predictor_rank_rejects_invalid_surfaces(
-    ranks: list[float],
-    scores: list[float],
-) -> None:
-    with pytest.raises(ValueError):
-        _select_tolerant_predictor_rank(
-            ranks,
-            scores,
-            relative_tolerance=0.1,
-            absolute_tolerance=np.inf,
-        )
 
 
 def test_adaptive_refinement_remains_anchored_to_the_exact_optimum() -> None:
