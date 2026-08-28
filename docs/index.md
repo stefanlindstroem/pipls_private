@@ -34,27 +34,28 @@ mode contains one orthonormal predictor direction, one orthonormal response dire
 nonnegative dilation. This structure adds method-specific interpretation without replacing the
 standard PLS-family analysis workflow.
 
+## Installation
+
+From a source checkout, install the runtime package in a virtual environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install .
+```
+
+Install the plotting dependencies used by the examples and tutorials with
+`python -m pip install ".[examples]"`. Contributor setup is documented in the repository root
+`CONTRIBUTING.md`; supported Python and dependency ranges are listed in the
+[compatibility policy](compatibility.md).
+
 ## Leakage-safe modeling and validation
 
-The package provides one consistent workflow for fitting, model selection, prediction diagnostics,
-and final refitting. Learned centering, scaling, and supported pipeline preprocessing are fitted
-inside each cross-validation training fold rather than on the complete dataset before validation.
-This keeps candidate evaluation fold-local and avoids preprocessing leakage across validation
-boundaries.
-
-The workflow also keeps different kinds of predictive evidence distinct:
-
-- cross-validation is used to compare and select candidate models;
-- selection-conditioned out-of-fold predictions can be obtained by refitting the fixed selection
-  on the stored cross-validation splits;
-- final refitting learns the selected model from the complete training data;
-- nested cross-validation or an independent test set is used when an independent estimate of
-  post-selection predictive performance is required.
-
-These distinctions are carried explicitly by the search and inspection APIs so that training,
-selection, diagnostic validation, and independent testing are not silently conflated. This follows
-standard statistical practice for separating model development from independent performance
-assessment.
+Cross-validation fits learned preprocessing inside each training fold. Candidate selection,
+selection-conditioned out-of-fold diagnostics, final full-data refitting, and independent
+post-selection assessment are kept distinct: use nested cross-validation or an independent test set
+when an independent performance estimate is required. See [Path and selection](path_selection.md)
+and [OOF diagnostics](oof_diagnostics.md) for the complete contracts.
 
 ## Quick start with Pulp dataset
 
