@@ -20,6 +20,7 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ._core import (
     ResponseSubspace,
     SVDSolver,
+    _as_positive_int,
     _decompose_predictors,
     _validate_random_state,
     _validate_response_subspace,
@@ -556,8 +557,8 @@ class PiPLSRegression(
         _require_finite_output(self.y_loadings_, operation="Fitted y_loadings_")
 
     def _validate_constructor_parameters(self) -> None:
-        _validate_positive_int(self.n_components, name="n_components")
-        _validate_positive_int(self.predictor_rank, name="predictor_rank")
+        _as_positive_int(self.n_components, name="n_components")
+        _as_positive_int(self.predictor_rank, name="predictor_rank")
         _validate_response_subspace(self.response_subspace)
         if self.n_components > self.predictor_rank:
             raise ValueError(
@@ -666,13 +667,6 @@ def _require_finite_output(value: ArrayLike, *, operation: str) -> None:
         raise FloatingPointError(
             f"{operation} produced values that are not representable as finite float64."
         )
-
-
-def _validate_positive_int(value: object, *, name: str) -> None:
-    if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
-        raise ValueError(f"{name} must be a positive integer; got {value!r}.")
-    if int(value) < 1:
-        raise ValueError(f"{name} must be a positive integer; got {value!r}.")
 
 
 def _validate_optional_boolean(value: object, *, name: str) -> None:

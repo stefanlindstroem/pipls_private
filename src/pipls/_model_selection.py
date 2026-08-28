@@ -13,6 +13,8 @@ from numpy.typing import ArrayLike, NDArray
 from sklearn.metrics import r2_score
 from sklearn.model_selection import check_cv
 
+from ._core import _as_positive_int
+
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
 BoolArray = NDArray[np.bool_]
@@ -65,9 +67,9 @@ def _hard_predictor_rank_limit(
     separately by the search preflight.
     """
 
-    _validate_positive_int(n_features, name="n_features")
-    _validate_positive_int(n_samples, name="n_samples")
-    _validate_positive_int(n_train_min, name="n_train_min")
+    _as_positive_int(n_features, name="n_features")
+    _as_positive_int(n_samples, name="n_samples")
+    _as_positive_int(n_train_min, name="n_train_min")
     if n_train_min > n_samples:
         raise ValueError(
             "n_train_min must not exceed n_samples: "
@@ -103,8 +105,8 @@ def _epv_predictor_rank(
     feasibility are intentionally not part of this helper.
     """
 
-    _validate_positive_int(n_features, name="n_features")
-    _validate_positive_int(n_samples, name="n_samples")
+    _as_positive_int(n_features, name="n_features")
+    _as_positive_int(n_samples, name="n_samples")
     samples_per_rank = _as_positive_float(
         samples_per_predictor_rank,
         name="samples_per_predictor_rank",
@@ -215,9 +217,9 @@ def _logarithmic_predictor_rank_values(
 ) -> IntArray:
     """Return deterministic approximately logarithmic integer ranks including endpoints."""
 
-    _validate_positive_int(lower, name="lower")
-    _validate_positive_int(upper, name="upper")
-    _validate_positive_int(n_values, name="n_values")
+    _as_positive_int(lower, name="lower")
+    _as_positive_int(upper, name="upper")
+    _as_positive_int(n_values, name="n_values")
     if lower > upper:
         raise ValueError(f"lower must not exceed upper: got {lower} and {upper}.")
     if lower == upper:
@@ -609,13 +611,6 @@ def _as_index_array(index: ArrayLike, *, name: str, n_samples: int) -> IntArray:
     if np.any(converted < 0) or np.any(converted >= n_samples):
         raise ValueError(f"{name} contains an index outside [0, {n_samples}).")
     return converted
-
-
-def _validate_positive_int(value: Any, *, name: str) -> None:
-    if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
-        raise ValueError(f"{name} must be a positive integer; got {value!r}.")
-    if int(value) < 1:
-        raise ValueError(f"{name} must be at least 1; got {value!r}.")
 
 
 def _as_positive_float(value: Any, *, name: str) -> float:

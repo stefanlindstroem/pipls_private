@@ -21,6 +21,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils import _safe_indexing, indexable
 from sklearn.utils.validation import check_is_fitted
 
+from ._core import _as_positive_int
 from ._cv_engine import (
     CandidateCache,
     _evaluate_candidate_batch,
@@ -39,7 +40,6 @@ from ._model_selection import (
     _search_predictor_ranks,
     _select_tolerant_predictor_rank,
     _tied_score_mask,
-    _validate_positive_int,
     _validate_singleton_validation_scoring,
 )
 from ._sklearn_compat import _validate_estimator_data
@@ -1081,7 +1081,7 @@ class PiPLSSearchCV(
                 stacklevel=3,
             )
         if self.max_predictor_rank is not None:
-            _validate_positive_int(self.max_predictor_rank, name="max_predictor_rank")
+            _as_positive_int(self.max_predictor_rank, name="max_predictor_rank")
         _validate_search_method(self.search_method)
         _resolved_predictor_rank_tolerances(
             predictor_rank_policy=predictor_rank_policy,
@@ -1476,7 +1476,7 @@ def _validate_integer_sequence(values: object, *, name: str) -> None:
     if not sequence:
         raise ValueError(f"{name} must not be empty.")
     for value in sequence:
-        _validate_positive_int(value, name=name)
+        _as_positive_int(value, name=name)
 
 
 def _validate_search_method(value: object) -> None:

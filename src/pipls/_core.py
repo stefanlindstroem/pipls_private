@@ -390,12 +390,12 @@ def _as_finite_matrix(value: ArrayLike, *, name: str) -> FloatArray:
     return array
 
 
-def _as_positive_int(value: int, *, name: str) -> int:
+def _as_positive_int(value: object, *, name: str) -> int:
     if isinstance(value, (bool, np.bool_)) or not isinstance(value, (int, np.integer)):
         raise ValueError(f"{name} must be a positive integer; got {value!r}.")
     integer = int(value)
     if integer < 1:
-        raise ValueError(f"{name} must be at least 1; got {integer}.")
+        raise ValueError(f"{name} must be a positive integer; got {value!r}.")
     return integer
 
 
