@@ -5,10 +5,9 @@ deterministic synthetic data split into training and test rows so that the laten
 and prediction assessment remains independent of model selection. It inspects
 the validation evidence before choosing a component count, creates one explicit selection, and passes it to the final full-data refit.
 
-For ordinary programming use, Π-PLS behaves like a one-parameter component search: as in PLS,
-the main complexity parameter is `n_components`, denoted by $h$. A **component path** is the
-sequence of cross-validated prediction errors obtained as $h$ is varied. The search resolves the
-predictor rank $r_\pi$ internally for each $h$. Details can be reviewed under
+For programming use, the main complexity parameter is `n_components`, denoted by $h$. The
+**component path** records cross-validated prediction error as $h$ varies, with predictor rank
+$r_\pi$ resolved internally at each $h$. See
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 The workflow is to generate synthetic data, split its rows into training and test blocks, fit the
@@ -74,11 +73,8 @@ Fit the component search just as you would fit a PLS component search:
 --8<-- "examples/02_synthetic_path_selection.py:fit-synthetic-search"
 ```
 
-The programming-level decision is how many paired latent modes to retain, so `n_components` is the
-quantity displayed on the component path. Under the hood, Π-PLS also investigates predictor rank
-$r_\pi$ conditionally for each $h$; that resolved rank is already incorporated into each
-component-path row. Most users can therefore treat the search as a one-dimensional component-count
-problem. We return to the predictor-rank search, with graphical support, under
+`n_components` is the quantity displayed on the component path. The conditionally resolved
+predictor rank $r_\pi$ is already incorporated into each row; it can be inspected later under
 [Optional: inspect the conditional predictor-rank profile](#inspect-conditional-predictor-rank-profile).
 
 At this stage the search owns validation evidence. It has not selected a component count or fitted
@@ -113,17 +109,19 @@ not enter selection.
 
 ## Choose the component count and create the selection
 
-Inspect the path and identify its elbow point. This represents the simplest model that can be
-constructed without materially worsening predictive performance. Record the number of components at
-that point and create the corresponding immutable search selection:
+This tutorial makes a **manual visual parsimony choice** from the path: retain two components,
+because the mean CV-MSE drops markedly from one to two components and changes little at three. This
+is a judgment based on the plotted path, not an automated elbow rule. Record the chosen component
+count and create the corresponding immutable search selection:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:choose-synthetic-selection"
 ```
 
-The static script records the resulting choice so that the complete example is reproducible. In an
-interactive analysis, inspect the first path figure, set the value, and rerun from this selection
-stage.
+The static script records that manual choice so the example is reproducible. For rule-based
+selection instead, `search.select(rule="minimum_cv_mse")` retains the smallest component count within
+the configured CV-MSE tolerance of the path minimum; see
+[Component path and component selection](../path_selection.md#component-path-and-component-selection).
 
 ## Inspect the selected evidence
 
@@ -151,10 +149,8 @@ The path is unchanged; the orange diamond identifies the selected two-component 
 
 ### Optional: inspect the conditional predictor-rank profile { #inspect-conditional-predictor-rank-profile }
 
-Most users can make the model-complexity decision from the component path alone. This is where the
-predictor-rank search mentioned earlier becomes visible. By default, `PiPLSSearchCV` evaluates every
-fold-feasible integer predictor rank conditionally at the chosen $h$. Advanced users can inspect
-those evaluations directly:
+The component path is usually sufficient for the component-count decision. To inspect how the
+predictor rank was resolved at the chosen $h$, retrieve the conditional predictor-rank profile:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:plot-synthetic-rank-profile"
@@ -173,9 +169,9 @@ performance in the finite noisy sample; it need not recover the generating rank 
 Advanced analyses can control predictor rank through the search configuration. See
 [Path and selection](../path_selection.md#predictor-rank-policies) for the available policies and tolerances.
 
-The selected path and optional rank profile are the model-selection evidence in this workflow. If
-they make the chosen component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new
-selection. Once accepted, keep that immutable selection fixed for final refitting and for any later
+The selected path and optional rank profile are the model-selection evidence in this workflow.
+If they make the choice unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection.
+Once accepted, keep that immutable selection fixed for final refitting and any later
 selection-conditioned OOF diagnosis.
 
 ## Refit the selected pair
@@ -227,7 +223,8 @@ search = PiPLSSearchCV(cv=cv).fit(X_train, Y_train)
 path = search.component_path_
 # Inspect path before assigning chosen_n_components.
 selection = search.select(n_components=chosen_n_components)
-selected_path = search.component_path_
+# For rule-based selection instead:
+# selection = search.select(rule="minimum_cv_mse")
 # Optionally, for advanced inspection:
 rank_profile = search.predictor_rank_profile(selection.n_components)
 # Inspect the selected evidence; revise selection if needed.
