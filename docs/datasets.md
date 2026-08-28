@@ -30,33 +30,21 @@ from R, C++, MATLAB, Julia, or another environment. For reproducible non-Python 
 source release, source distribution, or wheel rather than a moving development branch or an
 installation path tied to one environment.
 
-In a source checkout or unpacked source distribution, the canonical files are:
+In a source checkout or unpacked source distribution, each dataset uses the same layout:
 
 ```text
-src/pipls/_data/pulp/X.csv
-src/pipls/_data/pulp/Y.csv
-src/pipls/_data/pulp/metadata.json
-src/pipls/_data/pulp/README.md
-src/pipls/_data/pulp/LICENSE.txt
-
-src/pipls/_data/sugarcane/X.csv
-src/pipls/_data/sugarcane/Y.csv
-src/pipls/_data/sugarcane/metadata.json
-src/pipls/_data/sugarcane/README.md
-src/pipls/_data/sugarcane/LICENSE.txt
-
-src/pipls/_data/tobacco/X.csv
-src/pipls/_data/tobacco/Y.csv
-src/pipls/_data/tobacco/metadata.json
-src/pipls/_data/tobacco/README.md
-src/pipls/_data/tobacco/LICENSE.txt
+src/pipls/_data/<dataset>/
+├── X.csv
+├── Y.csv
+├── metadata.json
+├── README.md
+└── LICENSE.txt
 ```
 
-A wheel is a ZIP archive. Inside a wheel, the corresponding directories are
-`pipls/_data/pulp/`, `pipls/_data/sugarcane/`, and `pipls/_data/tobacco/`. In an installed
-environment they normally appear below the environment-specific
-`<site-packages>/pipls/_data/<dataset>/` directory. Each `X.csv` and `Y.csv` pair is exactly the
-matrix pair returned by its Python loader; loading applies no additional preprocessing.
+Here `<dataset>` is `pulp`, `sugarcane`, or `tobacco`. A wheel is a ZIP archive containing the same
+layout below `pipls/_data/<dataset>/`; an installed environment normally places it below
+`<site-packages>/pipls/_data/<dataset>/`. Each `X.csv` and `Y.csv` pair is exactly the matrix pair
+returned by its Python loader; loading applies no additional preprocessing.
 
 ## Pulp real-data integration {#pulp-real-data-integration}
 
