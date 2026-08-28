@@ -1,24 +1,18 @@
 # Pulp: a complete Π-PLS workflow
 
-This tutorial showcases a complete Π-PLS workflow applied 
-to a real multivariate dataset. It assumes that `PiPLSSearchCV`, `component_path_`, and fixed-model
-fitting are already familiar from [Inspect a manually selected Π-PLS model with synthetic data](synthetic.md). The focus is what changes with real data: an interior predictor-rank
-result, selection-conditioned out-of-fold (OOF) predictions, and interpretation of an accepted
-model.
+This tutorial applies a complete Π-PLS workflow to a real multivariate dataset. It assumes that
+`PiPLSSearchCV`, `component_path_`, and fixed-model fitting are already familiar from
+[Inspect a manually selected Π-PLS model with synthetic data](synthetic.md). The focus here is an
+interior predictor-rank result, selection-conditioned out-of-fold (OOF) predictions, and
+interpretation of the accepted model.
 
-For ordinary programming use, Π-PLS can be approached like PLS: the main model-complexity
-parameter is the paired-mode count $h$ (`n_components`). A **component path** is the
-one-dimensional sequence of cross-validated prediction errors obtained as $h$ is varied. For each
-$h$, the search also resolves the retained predictor rank $r_\pi$ internally, so users do not normally
-need to tune it as a second parameter. Advanced users can inspect or constrain $r_\pi$ when the scientific
-question or available sample support makes that useful.
+For ordinary use, the main model-complexity parameter is the paired-mode count $h$
+(`n_components`). The component path varies $h$ while the default search conditionally resolves the
+retained predictor rank $r_\pi$ at each value. Advanced users can inspect or constrain $r_\pi$ when
+needed.
 
-The workflow is to load the [Pulp data](../datasets.md#pulp-real-data-integration), fit the search,
-inspect the component path, choose a component count and create one selection, inspect the selected
-path and optionally the conditional predictor-rank profile, accept that selection, inspect its
-selection-conditioned OOF diagnostics, refit the same selection, inspect the fitted model, and
-render the reports. If the path or conditional rank evidence is unsatisfactory, return to the
-selection step before proceeding to OOF diagnosis or refitting.
+The workflow is shown below. If the component path or conditional rank evidence is unsatisfactory,
+revise the selection before OOF diagnosis or refitting.
 
 ```mermaid
 flowchart TD
@@ -46,8 +40,7 @@ python -m pip install ".[examples]"
 ```
 
 The example imports the estimators, repeated cross-validation, numerical inspection functions,
-Matplotlib, and a local biplot helper, then defines the output location and validation splitter. The
-helper handles optional `textalloc` use internally:
+Matplotlib, and a local biplot helper, then defines the output location and validation splitter:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:pulp-tutorial-setup"
@@ -68,9 +61,7 @@ arithmetic, length-weighted, and length-length-weighted means. The response labe
 energy absorption), `TSI` (tensile stiffness index), `Tear index`, and `s` (light-scattering
 coefficient).
 
-The final accepted analysis below uses three paired latent modes. Its predictor rank is resolved
-conditionally by the search at that component count rather than chosen as a routine second tuning
-parameter. The distinction is summarized in
+The distinction between $h$ and $r_\pi$ is summarized in
 [Interpretation of the ranks](../theory.md#interpretation-of-the-ranks).
 
 ## Load the data
@@ -92,17 +83,12 @@ Fit the search and retrieve the conditioned component path without creating a se
 --8<-- "examples/04_pulp_real_data.py:inspect-pulp-component-path"
 ```
 
-The search evaluates admissible paired-mode counts $h$ and conditionally retains one predictor
-rank $r_\pi$ at each count. The resulting `component_path_` is therefore the PLS-like,
-one-parameter view: cross-validated prediction error versus `n_components`, with the internal
-predictor-rank choice already incorporated into each row.
+The search evaluates admissible paired-mode counts $h$ and retains one conditional predictor rank
+$r_\pi$ at each count. Thus, `component_path_` is the PLS-like one-dimensional view of
+cross-validated prediction error versus `n_components`. This analysis uses ten repeated five-fold
+partitions, so each candidate is assessed on 50 materialized validation splits.
 
-This analysis uses ten repeated five-fold partitions, so every evaluated candidate is assessed on 50
-materialized validation splits. These search-owned results can be inspected without fitting a final
-model.
-
-Define a local component-path plotter once, then render the path before fixing a component
-count:
+Render the path before fixing a component count:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:define-pulp-component-path-plotter"
@@ -127,16 +113,15 @@ After inspecting the path, identify the elbow point, record the corresponding co
 --8<-- "examples/04_pulp_real_data.py:choose-pulp-selection"
 ```
 
-Manual selection is not the only supported component-count rule. The statement
-`search.select(rule="best_score")` would return the conditioned path row with the best configured
-score, while `search.select(rule="minimum_cv_mse")` would return the smallest component count within
-the supplied relative and absolute tolerances of the exact path minimum. With the default scorer,
-maximizing the configured score is equivalent to minimizing mean response-standardized CV-MSE.
+For rule-based selection, `search.select(rule="best_score")` returns the row with the best configured
+score, while `search.select(rule="minimum_cv_mse")` returns the smallest component count within the
+supplied tolerances of the exact path minimum. With the default scorer, best score is equivalent to
+minimum mean response-standardized CV-MSE.
 
 ## Inspect the selected path and optional conditional rank profile
 
-Retrieve the predictor-rank evidence conditional on the chosen component count. This is optional
-advanced inspection; the same `path` object is reused for the selected presentation:
+Optionally retrieve predictor-rank evidence conditional on the chosen component count; the same
+`path` object is reused for the selected presentation:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:inspect-pulp-selected-evidence"
@@ -165,22 +150,19 @@ rank is 9.
 
 ![Pulp predictor-rank profile](../assets/generated/pulp/predictor_rank_profile.svg)
 
-Most users can stop at the component path. Advanced users can inspect this profile because
-Π-PLS exposes the second parameter $r_\pi$. With the default scorer,
+Most users can stop at the component path. For advanced inspection,
 `profile.reference_selection` identifies the exact minimum-CV-MSE predictor rank at the chosen
 $h$, whereas `profile.selection` identifies the smallest evaluated rank admitted by the configured
-predictor-rank tolerance. The default relative tolerance is at machine scale, so these normally
-coincide; both are rank 9 in this analysis.
+tolerance. Both are rank 9 here.
 
 For these 46 observations and 14 predictors, the default search is exhaustive over the complete
 fold-feasible predictor-rank domain, from 3 through 14 at the selected $h=3$. Alternative ways to
 restrict or fix predictor rank are advanced configuration choices and are documented separately in
 [Predictor-rank policies](../path_selection.md#predictor-rank-policies).
 
-The selected path and optional conditional rank profile are the model-selection evidence used in
-this tutorial. If they make the chosen component count unsatisfactory, revise
-`CHOSEN_N_COMPONENTS` and create a new selection here. Once the selection is accepted, keep it
-fixed through OOF diagnosis and final refitting.
+The selected path and optional rank profile are the model-selection evidence used here. If they make
+the chosen component count unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection.
+Once accepted, keep the selection fixed through OOF diagnosis and final refitting.
 
 ## Inspect selection-conditioned OOF behavior
 
@@ -193,11 +175,16 @@ component count again:
 
 `oof_report()` reuses the same cross-validation splits that were used to evaluate the component path
 and recomputes OOF predictions for the selected model. Under the repeated cross-validation protocol used here,
-each observation is predicted once in each of the ten repetitions. The report therefore combines ten
-OOF predictions for each observation into a single averaged prediction and records a prediction count of ten.
-Because the folds are shuffled using a fixed random seed, the procedure is reproducible while remaining independent of the original observation order.
+each observation is predicted once in each of the ten repetitions. The report therefore averages ten OOF
+predictions for each observation and records a prediction count of ten. Because the folds are shuffled using
+a fixed random seed, the procedure is reproducible while remaining independent of the original observation
+order.
 
-Convert those predictions to an immutable diagnostic result before refitting:
+All diagnostics in this section are **selection-conditioned OOF diagnostics** for the accepted selection.
+They describe validation behavior under the stored search splits; they are not independent post-selection or
+external-test results.
+
+Convert the averaged predictions to an immutable diagnostic result before refitting:
 
 ```python
 --8<-- "examples/04_pulp_real_data.py:pulp-oof-inspection-results"
@@ -213,7 +200,7 @@ Convert those predictions to an immutable diagnostic result before refitting:
 ![Pulp observed versus predicted](../assets/generated/pulp/observed_vs_predicted.svg)
 
 The response series differ in how tightly they follow the identity line. The figure shows all eight
-responses, and every series remains selection-conditioned rather than an independent-test result.
+responses.
 
 See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
 
@@ -238,11 +225,10 @@ See [Residuals versus predicted](../model_inspection.md#residuals-versus-predict
 
 ![Pulp response-wise OOF R²](../assets/generated/pulp/oof_response_r2.svg)
 
-Response-wise $R^2$ summarizes how closely the selection-conditioned OOF predictions reproduce
-each observed response. Values near 1 indicate strong agreement, $R^2=0$ corresponds to the
-observed-mean reference, and negative values indicate prediction poorer than that reference. The
-values are calculated from the averaged OOF predictions above; they are not averages of foldwise
-$R^2$ values.
+Response-wise $R^2$ summarizes how closely the averaged OOF predictions reproduce each observed
+response. Values near 1 indicate strong agreement, $R^2=0$ corresponds to the observed-mean
+reference, and negative values indicate prediction poorer than that reference. The values are not
+averages of foldwise $R^2$ values.
 
 See [Response-wise coefficient of determination](../model_inspection.md#response-r2).
 
@@ -256,8 +242,8 @@ same selection on all 46 development observations:
 --8<-- "examples/04_pulp_real_data.py:fit-pulp-model"
 ```
 
-`refit(selection=selection)` fits its fixed component and predictor ranks, and attaches the
-exact immutable object as `model.selection_` after fitting succeeds. The returned
+`refit(selection=selection)` fits the selected component and predictor ranks and stores the exact
+immutable selection as `model.selection_`. The returned
 [`PiPLSRegression`](../api/regression.md#pipls.PiPLSRegression) supplies predictions and fitted-model
 inspection.
 
@@ -276,31 +262,25 @@ rendered:
 | `PiPLSDisplayFactors` | What are the Π-PLS-specific $\mathbf{P}$, $\mathbf{D}$, $\mathbf{Q}$, and $\mathbf{Q}\mathbf{D}$ factors? |
 
 Each paired latent mode has an arbitrary overall sign: reversing the matching columns of
-$\mathbf{P}$ and $\mathbf{Q}$ leaves the fitted regression map unchanged. For interpretation, this
-sign indeterminacy is normally resolved by choosing a deterministic, canonical display orientation.
-Tensile index (`TI`) is commonly treated as a key handsheet quality property in pulp applications,
-so this tutorial uses
-`response_names.index("TI")` to orient the displayed components toward positive TI. The same
-orientation is applied to the paired predictor directions, giving the factor plots a consistent
-reference for interpretation.
+$\mathbf{P}$ and $\mathbf{Q}$ leaves the fitted regression map unchanged. For a deterministic display,
+this tutorial orients each mode toward positive tensile index (`TI`) using
+`response_names.index("TI")`; the paired predictor direction receives the same orientation.
 
-At this point all numerical analysis is complete. The remaining fitted-model code only renders
-completed public result objects. The full catalogue is in
-[Model inspection](../model_inspection.md).
+At this point the fitted-model quantities are complete; the following figures render these public
+result objects. The full catalogue is in [Model inspection](../model_inspection.md).
 
 ## Interpret representative fitted-model plots
 
-With the display orientation fixed, the remaining figures provide two complementary views of
-the fitted model: the usual PLS-family latent structure and the Π-PLS-specific pairing of predictor
-and response directions. Read the figures comparatively, using relative patterns within and across
-paired components rather than treating individual plotted entries as standalone effects.
+The remaining figures show the usual PLS-family latent structure and the Π-PLS-specific pairing of
+predictor and response directions. Interpret relative patterns within and across paired components,
+not individual plotted entries as standalone effects.
 
 ### Standard PLS-family latent structure
 
 #### Score-loading biplot
 
-`biplot_coordinates()` supplies the balanced numerical coordinates, and one local plotting helper
-renders the score-loading biplot:
+`biplot_coordinates()` supplies the balanced numerical coordinates, and a local plotting helper renders
+the score-loading biplot:
 
 ```python
 --8<-- "tools/render_pulp_tutorial.py:render-pulp-biplot"
@@ -308,10 +288,7 @@ renders the score-loading biplot:
 
 ![Pulp score-loading biplot](../assets/generated/pulp/biplot.svg)
 
-The helper is local to the example; the reusable Π-PLS interface is `biplot_coordinates()`. It uses
-ordinary Matplotlib when `textalloc` is unavailable. When `textalloc` is installed, predictor labels
-are placed to avoid one another and the predictor-arrow shafts; sample scores are intentionally not
-treated as obstacles. The numerical biplot coordinates are identical in both cases.
+The helper is local to the example; the reusable Π-PLS interface is `biplot_coordinates()`.
 
 The three length descriptors point in closely similar directions in the displayed plane, while
 `Shives` contrasts with several C descriptors. These are loading-pattern relationships under the
@@ -337,11 +314,10 @@ fibrillation or length descriptors, the second emphasizes length descriptors, an
 strongly associated with `Fines B`. Only relative within-component patterns should be interpreted;
 the signs follow the TI-positive display convention defined above.
 
-The columns of $\mathbf{P}$ are orthonormal predictor directions, and the corresponding columns of
-$\mathbf{Q}$ are orthonormal response directions. The diagonal matrix $\mathbf{D}$ pairs and
-scales these directions in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. The predictor directions
-are distinct from ordinary X loadings. The figure shows all three selected paired latent modes;
-predictor rank 9 does not create nine plotted modes. See
+The columns of $\mathbf{P}$ and $\mathbf{Q}$ are paired orthonormal predictor and response directions,
+and $\mathbf{D}$ scales each pair in $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. Predictor directions
+are distinct from ordinary X loadings. The figure shows the three selected paired modes; predictor
+rank 9 does not create nine plotted modes. See
 [Predictor directions](../model_inspection.md#predictor-directions) and
 [Diagonal latent coupling](../theory.md#diagonal-latent-coupling).
 
@@ -360,17 +336,17 @@ The second component is most pronounced for `Density`, `Tear index` and `s`, whi
 and `Elongation`. Because column $k$ of $\mathbf{Q}\mathbf{D}$ is $D_kQ_{:k}$, it combines each
 response direction with the dilation of its paired latent mode and shows direction and strength.
 
-The complete example includes separate $\mathbf{D}$ and $\mathbf{Q}$ plots in the same
-four-panel Π-PLS factorization figure. See [Dilation](../model_inspection.md#dilation),
+For the separate quantities, see [Dilation](../model_inspection.md#dilation),
 [Response directions](../model_inspection.md#response-directions), and
 [Weighted response directions](../model_inspection.md#weighted-response-directions).
 
 ## Inspect the final fitted model
 
-The selection-conditioned OOF section above asks how the accepted selection behaves under the
-stored validation splits, including response-wise OOF $R^2$. After refitting, a different question
-is useful: how closely does the single final model fitted to all 46 development observations
-represent those same observations?
+The OOF section above asks how the accepted selection behaves under the stored validation splits.
+After refitting, the question changes: how closely does the single final model fitted to all 46
+development observations represent those same observations? All diagnostics in this section are
+therefore **training-fit diagnostics**, not held-out or external predictive evidence.
+
 Compute prediction diagnostics from the fitted values while preserving that provenance explicitly:
 
 ```python
@@ -386,9 +362,8 @@ standardized observed and fitted values.
 ![Pulp final-fit standardized observed versus fitted responses](../assets/generated/pulp/final_fit_observed_vs_predicted.svg)
 
 The common scale makes relative scatter around the identity line comparable across responses even
-though their original physical units differ. This is a fitted-model representation diagnostic;
-points close to the identity line do not by themselves establish external predictive accuracy.
-See [Observed versus predicted](../model_inspection.md#observed-versus-predicted).
+though their original physical units differ. See
+[Observed versus predicted](../model_inspection.md#observed-versus-predicted).
 
 ### Response-wise fitted *R*²
 
@@ -404,29 +379,18 @@ R_j^2 = 1 -
 ![Pulp final-fit response-wise R²](../assets/generated/pulp/final_fit_r2.svg)
 
 For this selected model, the fitted $R^2$ values are approximately 0.81--0.96 across the eight
-responses. Unlike the OOF $R^2$ values above, these are computed from predictions of the final model
-on the same observations used to fit it. They summarize training fit only and should not be
-interpreted as held-out predictive performance. See
-[Response-wise coefficient of determination](../model_inspection.md#response-r2).
+responses. See [Response-wise coefficient of determination](../model_inspection.md#response-r2).
 
 ### Standardized residual distribution
 
-Pooling response-standardized residuals gives one compact view of the shape of the final-fit
-residual distribution. The histogram uses a fixed binning, and the overlaid normal density is
-matched to the pooled residual mean and sample standard deviation.
+Pooling response-standardized residuals gives one compact view of the final-fit residual distribution.
+The overlaid normal density is matched to the pooled residual mean and sample standard deviation.
 
 ![Pulp final-fit standardized residual distribution](../assets/generated/pulp/final_fit_residual_distribution.svg)
 
 The reference curve is descriptive rather than a normality test. Pooling also compresses
 response-specific structure into one distribution, so response-level residual plots remain the
 appropriate follow-up when a particular response needs closer diagnosis.
-
-The complete numbered example writes the same three diagnostics as caller-owned PDFs at the end of
-its report:
-
-```python
---8<-- "examples/04_pulp_real_data.py:plot-pulp-final-fit-diagnostics"
-```
 
 ## Reproduce this tutorial
 
@@ -438,13 +402,10 @@ root:
 python examples/04_pulp_real_data.py
 ```
 
-Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.
-`make docs-figures` regenerates the twelve representative single-chart SVGs displayed here and four
-search-domain and selection SVGs used by the path-and-selection guide, while
-the numbered example writes ten caller-owned PDFs with additional score, loading, factorization,
-and coefficient views. Both routes calculate their figures directly from in-memory results. See
-[Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the
-strict documentation-build and source-distribution checks.
+Standalone documentation-figure recipes are maintained in `tools/render_pulp_tutorial.py`; run
+`make docs-figures` to regenerate the rendered documentation figures. See
+[Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the strict
+build and source-distribution checks.
 
 ## Next steps
 
