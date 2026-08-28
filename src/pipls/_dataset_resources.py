@@ -5,12 +5,13 @@ from __future__ import annotations
 import csv
 import io
 import json
-from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import resources
 from typing import Literal, cast, overload
 
-from ._dataset_types import FloatArray, PiPLSDataset, _validated_matrix
+import numpy as np
+
+from ._dataset_types import FloatArray, PiPLSDataset
 
 
 @dataclass(frozen=True)
@@ -181,32 +182,10 @@ def _load_packaged_dataset(
         raise TypeError("return_X_y must be a boolean.")
 
     metadata = _load_dataset_metadata(config)
-    feature_names = _metadata_string_tuple(config, metadata, "feature_names")
-    target_names = _metadata_string_tuple(config, metadata, "target_names")
-    dimensions = _metadata_mapping(config, metadata, "dimensions")
-    X = _load_dataset_csv(
-        config,
-        "X.csv",
-        expected_names=feature_names,
-    )
-    Y = _load_dataset_csv(
-        config,
-        "Y.csv",
-        expected_names=target_names,
-    )
-
-    expected_shape = (
-        _metadata_integer(config, dimensions, "n_samples"),
-        _metadata_integer(config, dimensions, "n_features"),
-        _metadata_integer(config, dimensions, "n_targets"),
-    )
-    if X.shape != expected_shape[:2] or Y.shape != (
-        expected_shape[0],
-        expected_shape[2],
-    ):
-        raise RuntimeError(
-            f"Packaged {config.display_name} matrices do not match metadata dimensions."
-        )
+    feature_names = tuple(cast(list[str], metadata["feature_names"]))
+    target_names = tuple(cast(list[str], metadata["target_names"]))
+    X = _load_dataset_csv(config, "X.csv")
+    Y = _load_dataset_csv(config, "Y.csv")
 
     dataset = PiPLSDataset(
         X=X,
@@ -234,93 +213,30 @@ def _dataset_resource_bytes(config: _PackagedDatasetConfig, name: str) -> bytes:
         raise RuntimeError(message) from error
 
 
-def _load_dataset_metadata(config: _PackagedDatasetConfig) -> Mapping[str, object]:
+def _load_dataset_metadata(config: _PackagedDatasetConfig) -> dict[str, object]:
     try:
         loaded = json.loads(
             _dataset_resource_bytes(config, "metadata.json").decode("utf-8")
         )
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
         raise RuntimeError(f"Packaged {config.display_name} metadata is invalid.") from error
-    if not isinstance(loaded, dict):
-        raise RuntimeError(
-            f"Packaged {config.display_name} metadata must be a JSON object."
-        )
-    return cast(Mapping[str, object], loaded)
+    return cast(dict[str, object], loaded)
 
 
 def _load_dataset_csv(
     config: _PackagedDatasetConfig,
     name: str,
-    *,
-    expected_names: tuple[str, ...],
 ) -> FloatArray:
     raw = _dataset_resource_bytes(config, name)
 
     try:
         rows = csv.reader(io.StringIO(raw.decode("utf-8"), newline=""))
-        header = tuple(next(rows))
+        next(rows)
         values = [[float(value) for value in row] for row in rows]
+        return cast(FloatArray, np.asarray(values, dtype=np.float64))
     except (StopIteration, UnicodeDecodeError, ValueError) as error:
         message = (
             f"Packaged {config.display_name} resource {name!r} "
             "is not a valid numeric CSV."
         )
         raise RuntimeError(message) from error
-    if header != expected_names:
-        message = (
-            f"Packaged {config.display_name} resource {name!r} "
-            "has unexpected column names."
-        )
-        raise RuntimeError(message)
-    if any(len(row) != len(header) for row in values):
-        message = (
-            f"Packaged {config.display_name} resource {name!r} "
-            "has an irregular row width."
-        )
-        raise RuntimeError(message)
-    return _validated_matrix(values, name=name, allow_vector=False)
-
-
-def _metadata_mapping(
-    config: _PackagedDatasetConfig,
-    values: Mapping[str, object],
-    key: str,
-) -> Mapping[str, object]:
-    value = values.get(key)
-    if not isinstance(value, Mapping):
-        message = (
-            f"Packaged {config.display_name} metadata field {key!r} must be an object."
-        )
-        raise RuntimeError(message)
-    return value
-
-
-def _metadata_integer(
-    config: _PackagedDatasetConfig,
-    values: Mapping[str, object],
-    key: str,
-) -> int:
-    value = values.get(key)
-    if isinstance(value, bool) or not isinstance(value, int):
-        message = (
-            f"Packaged {config.display_name} metadata field {key!r} must be an integer."
-        )
-        raise RuntimeError(message)
-    return value
-
-
-def _metadata_string_tuple(
-    config: _PackagedDatasetConfig,
-    values: Mapping[str, object],
-    key: str,
-) -> tuple[str, ...]:
-    value = values.get(key)
-    if not isinstance(value, list) or any(
-        not isinstance(item, str) or not item for item in value
-    ):
-        message = (
-            f"Packaged {config.display_name} metadata field {key!r} "
-            "must be a string array."
-        )
-        raise RuntimeError(message)
-    return cast(tuple[str, ...], tuple(value))

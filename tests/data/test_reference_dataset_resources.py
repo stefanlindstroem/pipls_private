@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 from collections.abc import Callable
@@ -34,6 +35,15 @@ def _canonical_array_hash(array: np.ndarray) -> str:
     return hashlib.sha256(canonical.tobytes(order="C")).hexdigest()
 
 
+def _csv_rows(dataset_id: str, name: str) -> list[list[str]]:
+    with _resource_root(dataset_id).joinpath(name).open(
+        "r",
+        encoding="utf-8",
+        newline="",
+    ) as handle:
+        return list(csv.reader(handle))
+
+
 def test_reference_dataset_resources_match_declared_integrity() -> None:
     for dataset_id, loader in _DATASET_LOADERS.items():
         metadata = _metadata(dataset_id)
@@ -51,3 +61,27 @@ def test_reference_dataset_resources_match_declared_integrity() -> None:
         assert _canonical_array_hash(dataset.Y) == array_hashes[
             "target_float64_c_order"
         ]
+
+
+def test_reference_dataset_metadata_matches_matrix_layout() -> None:
+    for dataset_id in _DATASET_LOADERS:
+        metadata = _metadata(dataset_id)
+        dimensions = metadata["dimensions"]
+        assert isinstance(dimensions, dict)
+
+        for name, names_key, columns_key in (
+            ("X.csv", "feature_names", "n_features"),
+            ("Y.csv", "target_names", "n_targets"),
+        ):
+            names = metadata[names_key]
+            assert isinstance(names, list)
+            assert names
+            assert all(isinstance(value, str) and value for value in names)
+            assert len(set(names)) == len(names)
+
+            rows = _csv_rows(dataset_id, name)
+            assert rows
+            assert rows[0] == names
+            assert len(rows) - 1 == dimensions["n_samples"]
+            assert len(names) == dimensions[columns_key]
+            assert all(len(row) == len(names) for row in rows[1:])
