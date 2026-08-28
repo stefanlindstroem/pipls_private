@@ -1,8 +1,9 @@
 # Path and selection
 
 A `PiPLSRegression` fit uses one pair $(h,r_\pi)$: paired-mode count $h$ (`n_components`) and
-retained predictor-subspace dimension $r_\pi$ (`predictor_rank`). `PiPLSSearchCV` turns candidate
-pairs into a component path from which one model can be selected.
+retained predictor-subspace dimension $r_\pi$ (`predictor_rank`). Their distinct mathematical roles
+are summarized under [Problem setting and two rank controls](theory.md#problem-setting-and-two-rank-controls).
+`PiPLSSearchCV` turns candidate pairs into a component path from which one model can be selected.
 
 The workflow is: choose how $r_\pi$ is handled, scan $h$, inspect the component path, select $h$,
 and refit the retained pair. Predictor rank can be **conditional**, with one $r_\pi$ selected at
@@ -168,7 +169,9 @@ r_{\pi,\mathrm{epv}}
 \end{equation}
 
 where $n$ and $p$ are the full-data observation and predictor counts supplied to `fit()` and $c$ is
-`samples_per_predictor_rank`.
+`samples_per_predictor_rank`. This is also the fixed-rank workflow used for the real-data analyses in
+the [companion paper](citation.md#companion-paper): $r_\pi$ is set by the EPV-inspired rule before
+$h$ is selected by cross-validation.
 
 The default is $c=10$. However, the Pulp dataset has only $n=46$ observations. For this
 illustration, the more permissive $c=5$ is used by setting `samples_per_predictor_rank=5.0`. Then,

@@ -392,6 +392,6 @@ the [companion manuscript’s](citation.md#companion-paper) Gaussian latent data
 directly. See [Datasets and generators](api/datasets.md#synthetic-generator) for the exact
 distribution and generator contract, and [Reference datasets](datasets.md) for packaged data.
 
-The [Pulp tutorial’s fixed-rank selection section](tutorials/pulp.md#retrieve-selection-evidence)
+The [Pulp tutorial’s conditional-rank selection section](tutorials/pulp.md#retrieve-selection-evidence)
 and [Path and selection](path_selection.md) define the package’s general path-construction,
 validation, and selection contracts.
