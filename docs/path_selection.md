@@ -1,16 +1,21 @@
 # Path and selection
 
-`PiPLSSearchCV` searches over pairs $(h,r_\pi)$ consisting of paired-mode count $h$
-(`n_components`) and retained predictor-subspace dimension $r_\pi$ (`predictor_rank`). This page
-explains how the feasible search domain is obtained, how candidates are scored, and how the two-dimensional search is reduced to one
-retained `PiPLSSelection`. For constructor signatures and fitted attributes, see
+A `PiPLSRegression` fit uses one pair $(h,r_\pi)$: paired-mode count $h$ (`n_components`) and
+retained predictor-subspace dimension $r_\pi$ (`predictor_rank`). `PiPLSSearchCV` turns candidate
+pairs into a component path from which one model can be selected.
+
+The workflow is: choose how $r_\pi$ is handled, scan $h$, inspect the component path, select $h$,
+and refit the retained pair. Predictor rank can be **conditional**, with one $r_\pi$ selected at
+each $h$, or **fixed** before the component path is evaluated. The sections below first define the
+feasible pairs, then describe conditional and fixed-rank searches, component selection, and
+refitting. For constructor signatures and fitted attributes, see
 [`PiPLSSearchCV`](api/path.md).
 
 ## Search domain { #search-bounds }
 
-A `PiPLSRegression` fit uses one fixed pair $(h,r_\pi)$. During cross-validation, the same pair must
-be feasible in every training split used to evaluate it. The search domain is therefore the
-intersection of the splitwise feasible domains.
+During cross-validation, each candidate pair $(h,r_\pi)$ must be feasible in every training split
+used to evaluate it. The search domain is therefore the intersection of the splitwise feasible
+domains.
 
 For training split $j$, let $n_j$ be its number of training observations, let $p_j$ be the
 predictor count presented to the terminal `PiPLSRegression` after fold-local preprocessing, and let
@@ -194,9 +199,9 @@ changes.
 
 For each $h$, adaptive search begins with a sparse deterministic set of predictor ranks and refines
 around the best evaluated score. If the lower boundary of the tolerance-qualified region lies
-between evaluated ranks, that interval is refined as well. Each local refinement becomes exhaustive
-once at most five admissible ranks remain. Ranks that are never evaluated have no associated CV
-score and make no contribution to selection.
+between evaluated ranks, that interval is refined as well. Small remaining intervals are evaluated
+exhaustively. Ranks that are never evaluated have no associated CV score and make no contribution
+to selection.
 
 `cv_results_` records the candidates actually evaluated, and `search_is_exhaustive_` reports whether
 those candidates happened to cover the complete admissible domain. `predictor_rank_profile(h)` and
