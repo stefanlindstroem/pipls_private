@@ -28,9 +28,7 @@ r'=\min_j r_j.
 Cross-validation itself changes rows, not predictor columns. The predictor count $p_j$ can vary only
 when a supported scikit-learn `Pipeline` contains fold-fitted preprocessing that changes predictor
 dimensionality, such as feature selection. For a direct `PiPLSRegression` fit, or for
-dimension-preserving preprocessing, every $p_j$ equals the full-data predictor count $p$, so
-$p'=p$. The supported pipeline transforms the predictor matrix $\mathbf{X}$ but not the response matrix
-$\mathbf{Y}$, so the number of response columns $q$ remains fixed.
+dimension-preserving preprocessing, we have $p'=p$.
 
 A predictor rank used by the search must be feasible in every split. The hard predictor-rank ceiling
 is therefore

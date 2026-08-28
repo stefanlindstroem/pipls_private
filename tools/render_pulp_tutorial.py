@@ -310,25 +310,37 @@ def _render_conditioned_component_path(
         label=f"Selected h = {component_values[selected_index]}",
         zorder=4,
     )
-    for h_value, rank_value, mse_value in zip(
-        component_values,
-        selected_ranks,
-        selected_mse,
-        strict=True,
+    for index, (h_value, rank_value, mse_value) in enumerate(
+            zip(
+                component_values,
+                selected_ranks,
+                selected_mse,
+                strict=True,
+            )
     ):
+        if index == 0:
+            xytext = (0, 7)
+            va = "bottom"
+        elif index == 1:
+            xytext = (-4, -8)
+            va = "top"
+        else:
+            xytext = (0, -7)
+            va = "top"
+            
         axis.annotate(
             rf"$r_\pi={int(rank_value)}$",
             (h_value, mse_value),
-            xytext=(0, -7),
+            xytext=xytext,
             textcoords="offset points",
             ha="center",
-            va="top",
+            va=va,
         )
     axis.set_title("Pulp conditioned component path")
     axis.set_xlabel(r"Paired-mode count $h$")
     axis.set_ylabel("Mean response-standardized CV-MSE")
     axis.set_xticks(component_values)
-    axis.set_ylim(bottom=0.0)
+    axis.set_ylim(bottom=0.0, top=1.0)
     axis.grid(axis="y", alpha=0.25)
     axis.legend()
     _save_svg(figure, output_path)
