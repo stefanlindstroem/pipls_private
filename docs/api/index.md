@@ -8,8 +8,8 @@ these pages come directly from the public NumPy-style docstrings.
 
 - [`PiPLSRegression`](regression.md) fits one explicit $(h,r_\pi)$ pair and documents its fitted
   decomposition and direct-fit support warning.
-- [`PiPLSSearchCV`](path.md) evaluates admissible component/rank candidates and exposes explicit
-  selection, OOF-reporting, and refitting operations.
+- [`PiPLSSearchCV`](path.md) evaluates admissible component-count/predictor-rank candidates and
+  exposes explicit selection, OOF reporting, and refitting operations.
 
 For Π-PLS, `n_components` is the number of paired latent modes $h$, while `predictor_rank` is the
 retained predictor-subspace dimension $r_\pi$. Their separate roles are defined under

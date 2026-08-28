@@ -11,7 +11,8 @@ configuration is cloned into every candidate. With `estimator=None`, the ordinar
 `PiPLSRegression` defaults apply.
 
 The search does not compare response-subspace policies automatically. Use
-`response_subspace="cross_covariance"` for the companion-publication formulation; if you need the
+`response_subspace="cross_covariance"` for the formulation in the peer-reviewed companion
+publication; if you need the
 `"least_squares"` software extension, set it on the estimator template and keep it fixed across the
 search. See [Pipelines and fold-local preprocessing](path_selection.md#pipelines-and-fold-local-preprocessing).
 
@@ -21,7 +22,7 @@ Inspect `search.component_path_.n_components` and, for one component count,
 `search.predictor_rank_profile(h).predictor_rank`. Candidate availability depends on fold-local
 sample counts and numerical ranks, configured bounds, and the predictor-rank policy. An explicit
 component request must have at least one admissible predictor rank. See
-[Search bounds](path_selection.md#search-bounds).
+[Search domain](path_selection.md#search-bounds).
 
 ## The path search is too slow or uses too much memory
 
@@ -52,13 +53,13 @@ a component count, a named selection rule, or an existing compatible `PiPLSSelec
 ## The CV-MSE minimum, best candidate, and selected model disagree
 
 They need not coincide. `best_score` follows the configured score on the predictor-rank-conditioned
-component path. `minimum_cv_mse` applies its component-count tolerance rule to the conditioned-path
+component path. `minimum_cv_mse` applies its component-count tolerance rule to the component-path
 CV-MSE values. Predictor-rank tolerance can already have retained a smaller rank than the exact
 conditional optimum, and a custom scorer need not have the same optimum as CV-MSE.
 
 Use `search.predictor_rank_profile(h)` for rank-level evidence and pass the same selection to
 `oof_report()` and `refit()` when both operations must describe one exact row. See
-[Scoring and conditioned-path selection](path_selection.md#scoring-and-conditioned-path-selection).
+[Adaptive search and scoring](path_selection.md#scoring-and-conditioned-path-selection).
 
 ## A grouped splitter reports missing metadata
 

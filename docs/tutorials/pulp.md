@@ -154,7 +154,8 @@ component count.
 
 ![Pulp selected component path](../assets/generated/pulp/selected_component_path.svg)
 
-The orange diamond marks the three-component selection, which is also associated with a certain predictor rank which was selected internally.
+The orange diamond marks the three-component selection; its conditionally selected predictor
+rank is 9.
 
 ### Optional: conditional predictor-rank profile
 
@@ -240,7 +241,7 @@ See [Residuals versus predicted](../model_inspection.md#residuals-versus-predict
 Response-wise $R^2$ summarizes how closely the selection-conditioned OOF predictions reproduce
 each observed response. Values near 1 indicate strong agreement, $R^2=0$ corresponds to the
 observed-mean reference, and negative values indicate prediction poorer than that reference. The
-values are calculated from the averaged OOF predictions above; they are not averages of fold-wise
+values are calculated from the averaged OOF predictions above; they are not averages of foldwise
 $R^2$ values.
 
 See [Response-wise coefficient of determination](../model_inspection.md#response-r2).
@@ -307,7 +308,7 @@ renders the score-loading biplot:
 
 ![Pulp score-loading biplot](../assets/generated/pulp/biplot.svg)
 
-The helper is local to the example; the reusable Pi-PLS interface is `biplot_coordinates()`. It uses
+The helper is local to the example; the reusable Π-PLS interface is `biplot_coordinates()`. It uses
 ordinary Matplotlib when `textalloc` is unavailable. When `textalloc` is installed, predictor labels
 are placed to avoid one another and the predictor-arrow shafts; sample scores are intentionally not
 treated as obstacles. The numerical biplot coordinates are identical in both cases.
@@ -438,8 +439,8 @@ python examples/04_pulp_real_data.py
 ```
 
 Standalone interpretation-figure recipes are maintained in `tools/render_pulp_tutorial.py`.
-`make docs-figures` regenerates the twelve representative single-chart SVGs displayed here and the
-Pulp search-domain SVG used by the path-and-selection guide, while
+`make docs-figures` regenerates the twelve representative single-chart SVGs displayed here and four
+search-domain and selection SVGs used by the path-and-selection guide, while
 the numbered example writes ten caller-owned PDFs with additional score, loading, factorization,
 and coefficient views. Both routes calculate their figures directly from in-memory results. See
 [Documentation reproducibility](../reproducibility.md#documentation-reproducibility) for the

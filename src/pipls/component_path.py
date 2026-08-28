@@ -195,7 +195,7 @@ class PiPLSPredictorRankEvidence:
 
 @dataclass(frozen=True)
 class PiPLSSelection:
-    """Immutable Π-PLS selection for one evaluated rank pair.
+    """Immutable Π-PLS selection for one evaluated pair of component count and predictor rank.
 
     Attributes
     ----------

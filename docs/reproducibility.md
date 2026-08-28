@@ -69,10 +69,10 @@ make docs-serve
 
 The quick-start, synthetic-tutorial, Pulp-tutorial, and Home comparison figures are generated from
 maintained repository calculations rather than committed image binaries. The synthetic tutorial
-manifest records the generator configuration, selected rank pair, external-test provenance,
+manifest records the generator configuration, selected $(h,r_\pi)$ pair, external-test provenance,
 filenames, and SVG hashes. The Pulp tutorial manifest records dataset identity, version, source DOI,
 license, package-resource and canonical-array hashes, evaluated ranks, boundary status, display
-subsets, and the exhaustive and EPV search-domain SVGs used by the path-and-selection guide. The Home
+subsets, and the four search-domain and selection SVGs used by the path-and-selection guide. The Home
 comparison manifest records the
 [Pulp](datasets.md#pulp-real-data-integration) and
 [Tobacco](datasets.md#tobacco-spectral-integration) dataset identities and versions,
@@ -110,7 +110,8 @@ Centering and optional scaling are integral to `PiPLSRegression.fit`. The `scale
 the default policy for both blocks, while `scale_x` and `scale_y` can override predictor and response
 scaling independently. `PiPLSSearchCV` clones the complete fixed estimator or supported pipeline
 inside every training fold, so each candidate learns statistics only from that fold. A subsequent
-`search.refit(X, Y, ...)` call fits one selected rank pair on the complete supplied training set, so
+`search.refit(X, Y, ...)` call fits one selected $(h,r_\pi)$ pair on the complete supplied
+training set, so
 centering and any enabled estimator or pipeline scaling are learned again from that full data.
 Learned scaling must not be fitted globally before CV.
 
@@ -152,7 +153,7 @@ The named loaders return these exact matrices without learned preprocessing.
 The [dataset documentation](datasets.md) gives the original-source citation, DOI links, preparation,
 license, dimensions, and direct raw-file locations for every integration. Every numbered
 reference-data workflow uses the corresponding named loader, keeps component paths, selected rows,
-predictor-rank profiles, validation reports, and inspection results in memory, and writes only its
+predictor-rank profiles, OOF reports, and inspection results in memory, and writes only its
 final PDF figures.
 
 Distribution validation checks both clean installed loading and the presence of all five files for

@@ -1,12 +1,12 @@
 # Reference datasets
 
-Pi-PLS distributes three reviewed real-data regression datasets as installed package resources:
+Π-PLS distributes three reviewed real-data regression datasets as installed package resources:
 [Pulp](#pulp-real-data-integration), [Sugarcane](#sugarcane-spectral-integration), and
 [Tobacco](#tobacco-spectral-integration). This page owns their provenance, licensing, adaptation,
 matrix dimensions, and direct resource locations. Exact loader and container signatures are in the
 [Datasets and generators API](api/datasets.md).
 
-Real-data reading remains user-owned in general. Pi-PLS provides no generic registry, downloader, or
+Real-data reading remains user-owned in general. Π-PLS provides no generic registry, downloader, or
 required metadata sidecar for user data. The three named reference datasets are explicit exceptions:
 they are bundled with the installed distribution and require no network access.
 
@@ -106,7 +106,7 @@ defining every predictor column exactly.
 ## Tobacco spectral integration {#tobacco-spectral-integration}
 
 The installed Tobacco resources contain 347 samples, 1,557 raw FT-NIR absorbance predictors
-spanning approximately 10,001 through 4,000 `cm^-1`, and 13 chemical-component responses. The
+spanning approximately 10,001 through 4,000 $\mathrm{cm}^{-1}$, and 13 chemical-component responses. The
 original public dataset is:
 
 > Chen, H., Guo, J., Wang, H., and Zhao, L. (2025). A Near-Infrared Spectroscopy Dataset for

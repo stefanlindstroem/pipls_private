@@ -113,7 +113,9 @@ not enter selection.
 
 ## Choose the component count and create the selection
 
-Inspect the path and identify its elbow point. This represents the simplest model that can be constructed without significantly impairing predictive performance. Record the number of components at that point and create the corresponding immutable search selection:
+Inspect the path and identify its elbow point. This represents the simplest model that can be
+constructed without materially worsening predictive performance. Record the number of components at
+that point and create the corresponding immutable search selection:
 
 ```python
 --8<-- "examples/02_synthetic_path_selection.py:choose-synthetic-selection"
@@ -185,8 +187,8 @@ The final estimator consumes the accepted selection:
 ```
 
 `refit(selection=selection)` does not resolve the component choice again. It verifies that the
-selection belongs to the fitted search, fits its exact component-count and predictor-rank pair on
-all training observations, and attaches the same immutable object as `model.selection_` after the
+selection belongs to the fitted search, fits a model with exactly its component count and predictor
+rank on all training observations, and attaches the same immutable object as `model.selection_` after the
 fit succeeds. The search remains the owner of the path evidence; the returned estimator owns
 prediction and fitted-model inspection.
 

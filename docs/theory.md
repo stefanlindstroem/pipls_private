@@ -21,7 +21,7 @@ peer-reviewed construction as its default and adds ordinary software facilities 
 optional scaling, numerical-rank checks, configurable predictor SVD solvers, cross-validated search,
 immutable result records, and prediction diagnostics. The package also provides one
 least-squares/RRR-inspired response-subspace construction for programming users, which can show
-pareto dominance for some datasets. That alternative is a software extension and is not part of the
+Pareto dominance for some datasets. That alternative is a software extension and is not part of the
 [peer-reviewed companion publication](citation.md#companion-paper).
 
 Reference dataset loaders are provided for demonstration purposes. Provenance and analysis are
@@ -68,7 +68,7 @@ The package uses the following terms for the fixed Π-PLS construction:
 | $D_k=D_{kk}$ | dilation of paired latent mode $k$ |
 | $\mathbf{X}\mathbf{P}$ | predictor scores |
 | $\mathbf{Y}\mathbf{Q}$ | response scores |
-| $(P_{:k},D_k,Q_{:k})$ | paired latent mode $k$ |
+| $(\mathbf{P}_{:k},D_k,\mathbf{Q}_{:k})$ | paired latent mode $k$ |
 | `predictor_rank` | retained predictor-subspace dimension $r_\pi$ |
 | `n_components` | number of paired latent modes $h$ |
 
@@ -150,7 +150,7 @@ For prescribed $h$, the response basis is chosen by
 and its solution is obtained through an SVD as
 
 \begin{equation}
-\mathbf{C}_{\mathrm{cov}}=\mathbf{V}_{\mathrm{cov}(:,1:h)},\qquad \boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}_{\mathrm{cov}}\mathbf{S}_{\mathrm{cov}}\mathbf{V}_{\mathrm{cov}}^{\mathsf T}.
+\mathbf{C}_{\mathrm{cov}}=\mathbf{V}_{\mathrm{cov}}(:,1:h),\qquad \boldsymbol{\Sigma}_{\mathrm{ZY}}=\mathbf{U}_{\mathrm{cov}}\mathbf{S}_{\mathrm{cov}}\mathbf{V}_{\mathrm{cov}}^{\mathsf T}.
 \end{equation}
 
 Thus the default policy selects the response subspace with the largest retained squared
@@ -253,7 +253,7 @@ The implementation uses a least-squares solver rather than forming an explicit i
 
 ## 4. Diagonal latent coupling {#diagonal-latent-coupling}
 
-Take the economical singular value decomposition
+Take the economy-size singular value decomposition
 
 \begin{equation}
 \mathbf{W}=\mathbf{M}\mathbf{D}\mathbf{N}^{\mathsf T},
@@ -286,8 +286,8 @@ and the reduced regression relation becomes
 \mathbf{E}_\pi=\mathbf{E}''\mathbf{N}.
 \end{equation}
 
-The predictor score vector $\mathbf{X}P_{:k}$ is coupled only to the response score
-vector $\mathbf{Y}Q_{:k}$, with dilation $D_k$. This is the one-to-one, mode-wise interpretation
+The predictor score vector $\mathbf{X}\mathbf{P}_{:k}$ is coupled only to the response score
+vector $\mathbf{Y}\mathbf{Q}_{:k}$, with dilation $D_k$. This is the one-to-one, mode-wise interpretation
 central to Π-PLS.
 
 The equivalent regression-map factorizations are
@@ -342,7 +342,7 @@ nominal fitted dimension is
 
 ### Canonical correlation analysis {#canonical-correlation-analysis}
 
-Similarly to Π-PLS, CCA also constructs paired predictor and response variates with a diagonal
+Like Π-PLS, CCA also constructs paired predictor and response variates with a diagonal
 association structure, but classical CCA maximizes normalized correlation after within-block whitening. The default
 Π-PLS response policy instead uses an unwhitened cross-covariance criterion inside the retained
 predictor representation, while the optional least-squares policy uses the fitted-response

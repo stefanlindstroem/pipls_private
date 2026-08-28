@@ -1,8 +1,8 @@
 # Path and selection
 
-`PiPLSSearchCV` searches over pairs of paired-mode count $h$ (`n_components`) and retained
-predictor-subspace dimension $r_\pi$ (`predictor_rank`). This page explains how the feasible search
-domain is obtained, how candidates are scored, and how the two-dimensional search is reduced to one
+`PiPLSSearchCV` searches over pairs $(h,r_\pi)$ consisting of paired-mode count $h$
+(`n_components`) and retained predictor-subspace dimension $r_\pi$ (`predictor_rank`). This page
+explains how the feasible search domain is obtained, how candidates are scored, and how the two-dimensional search is reduced to one
 retained `PiPLSSelection`. For constructor signatures and fitted attributes, see
 [`PiPLSSearchCV`](api/path.md).
 
@@ -12,13 +12,25 @@ A `PiPLSRegression` fit uses one fixed pair $(h,r_\pi)$. During cross-validation
 be feasible in every training split used to evaluate it. The search domain is therefore the
 intersection of the splitwise feasible domains.
 
-For training split $j$, let $n_j$ be its number of training observations, and let $r_j$ be its verified numerical predictor rank after terminal-estimator centering and optional scaling. Define the corresponding minima across all training splits as
+For training split $j$, let $n_j$ be its number of training observations, let $p_j$ be the
+predictor count presented to the terminal `PiPLSRegression` after fold-local preprocessing, and let
+$r_j$ be its verified numerical predictor rank after terminal-estimator centering and optional
+scaling. Define the corresponding minima across all training splits as
 
 \begin{equation}
 n'=\min_j n_j,
 \qquad
+p'=\min_j p_j,
+\qquad
 r'=\min_j r_j.
 \end{equation}
+
+Cross-validation itself changes rows, not predictor columns. The predictor count $p_j$ can vary only
+when a supported scikit-learn `Pipeline` contains fold-fitted preprocessing that changes predictor
+dimensionality, such as feature selection. For a direct `PiPLSRegression` fit, or for
+dimension-preserving preprocessing, every $p_j$ equals the full-data predictor count $p$, so
+$p'=p$. The supported pipeline transforms the predictor matrix $\mathbf{X}$ but not the response matrix
+$\mathbf{Y}$, so the number of response columns $q$ remains fixed.
 
 A predictor rank used by the search must be feasible in every split. The hard predictor-rank ceiling
 is therefore
@@ -26,7 +38,7 @@ is therefore
 \begin{equation}
 r_{\pi,\mathrm{hard}}
 =
-\min(p,n'-1,r').
+\min(p',n'-1,r').
 \end{equation}
 
 The term $n'-1$ reflects the loss of one predictor dimension under centering. The verified rank
@@ -58,7 +70,7 @@ values restrict this domain after the same feasibility checks.
 
 The Pulp dataset gives a compact example. Its exhaustive search has $q=8$ and
 $r_{\pi,\mathrm{max}}=14$, giving 84 admissible pairs. Each colored cell below is one pair
-evaluated under the maintained 10-times repeated five-fold CV protocol; color gives its actual
+evaluated under the maintained protocol of ten repetitions of five-fold CV; color gives its actual
 mean response-standardized CV-MSE. Gray cells violate $r_\pi\ge h$.
 
 ![Pulp exhaustive search domain](assets/generated/pulp/search_domain.svg)
@@ -109,7 +121,8 @@ retained pair $(h,\hat r_\pi(h))$ for each component count.
 The retained pairs $(h,\hat r_\pi(h))$ form the *component path*. Define its mean CV-MSE at component count $h$ as
 $M_h=M_{h,\hat r_\pi(h)}$.
 
-These CV-MSE values $M_h$ are used for manually selecting of the number of components $h$ in, *e.g.*, the [Complete Pulp Analysis](tutorials/pulp.md) tutorial.
+These CV-MSE values $M_h$ are used for manual selection of the number of components $h$ in,
+*e.g.*, the [Complete Pulp Analysis](tutorials/pulp.md) tutorial.
 
 For automated component selection, let
 
@@ -154,7 +167,9 @@ r_{\pi,\mathrm{epv}}
 where $n$ and $p$ are the full-data observation and predictor counts supplied to `fit()` and $c$ is
 `samples_per_predictor_rank`.
 
-The default is $c=10$. However, the Pulp datset has only $n=46$ observations. In such cases, we use a more permissive $c=5$ by setting `samples_per_predictor_rank=5.0`. Then, the nominal rank becomes 10, and the search evaluates only the eight compatible pairs
+The default is $c=10$. However, the Pulp dataset has only $n=46$ observations. For this
+illustration, the more permissive $c=5$ is used by setting `samples_per_predictor_rank=5.0`. Then,
+the nominal rank becomes 10, and the search evaluates only the eight compatible pairs
 $(h,r_\pi)=(1,10),\ldots,(8,10)$. In the figure below, the full feasible domain is left neutral and
 only those EPV pairs are colored by their actual mean response-standardized CV-MSE under the same
 validation splits used in the exhaustive example.
@@ -236,7 +251,8 @@ that $h$.
 
 `refit()` fits exactly one stored component-path row on the supplied full data. Exactly one of an
 existing `selection`, a named `rule`, or `n_components` is required. The search clones the configured
-estimator or pipeline, inserts the selected rank pair, fits the clone, and attaches the immutable
+estimator or pipeline, inserts the selected $(h,r_\pi)$ pair, fits the clone, and attaches the
+immutable
 selection as `model.selection_`.
 
 The returned estimator owns the fitted model. The search object retains the candidate and selection

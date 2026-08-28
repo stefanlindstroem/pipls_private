@@ -44,7 +44,8 @@ an appropriate outer assessment such as nested cross-validation or untouched ext
 
 ## OOF computation { #oof-computation }
 
-Each `oof_report()` call fits the selected rank pair once per stored validation split. With repeated
+Each `oof_report()` call fits the selected $(h,r_\pi)$ pair once per stored validation split. With
+repeated
 validation, repeated predictions for the same observation are averaged after those split-specific
 fits and the number of contributing predictions is retained. Reusing one immutable report avoids
 repeating this selected-pair fitting for each downstream diagnostic. `n_jobs` changes execution only;

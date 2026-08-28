@@ -222,10 +222,10 @@ class PiPLSSearchCV(
     MetaEstimatorMixin,  # type: ignore[misc]
     BaseEstimator,  # type: ignore[misc]
 ):
-    r"""Cross-validated search over the admissible Π-PLS rank path.
+    r"""Cross-validated search over admissible Π-PLS component-count and predictor-rank pairs.
 
-    Every candidate is a fixed-rank :class:`pipls.PiPLSRegression` clone fitted
-    independently inside each training fold. Selection inspection, final
+    Every candidate is a :class:`pipls.PiPLSRegression` clone with fixed
+    ``n_components`` and ``predictor_rank``, fitted independently inside each training fold. Selection inspection, final
     full-data fitting, and selection-conditioned out-of-fold reporting are
     explicit post-fit :meth:`select`, :meth:`refit`,
     and :meth:`oof_report` operations. The default
@@ -344,7 +344,7 @@ class PiPLSSearchCV(
         *,
         groups: ArrayLike | None = None,
     ) -> PiPLSSearchCV:
-        """Evaluate the admissible Π-PLS rank path.
+        """Evaluate the admissible Π-PLS component-count and predictor-rank pairs.
 
         Parameters
         ----------
@@ -767,9 +767,9 @@ class PiPLSSearchCV(
     ) -> PiPLSOOFReport:
         """Return ordered OOF diagnostics for one existing selection.
 
-        The supplied selection is validated against this fitted search, then its
-        fixed component-count and predictor-rank pair is fitted independently on
-        every training fold from the exact split set materialized by :meth:`fit`.
+        The supplied selection is validated against this fitted search, then a
+        model with its fixed component count and predictor rank is fitted independently
+        on every training fold from the exact split set materialized by :meth:`fit`.
         Repeated validation predictions are averaged, and rows never used for
         validation are represented by NaN with a zero prediction count.
 

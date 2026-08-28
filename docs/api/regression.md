@@ -1,9 +1,9 @@
 # PiPLSRegression
 
-`PiPLSRegression` fits exactly one fixed rank pair $(h,r_\pi)$: `n_components` is the number of
+`PiPLSRegression` fits exactly one fixed pair $(h,r_\pi)$: `n_components` is the number of
 paired latent modes $h$, while `predictor_rank` is the retained predictor-subspace dimension
 $r_\pi$. Both are required. The estimator performs no cross-validation or parameter selection; use
-[`PiPLSSearchCV`](path.md) when either rank is to be selected from data.
+[`PiPLSSearchCV`](path.md) when either rank control is to be selected from data.
 
 The default `response_subspace="cross_covariance"` is the construction used in the
 [peer-reviewed companion publication](../citation.md#companion-paper). The alternative

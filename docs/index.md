@@ -45,7 +45,8 @@ boundaries.
 The workflow also keeps different kinds of predictive evidence distinct:
 
 - cross-validation is used to compare and select candidate models;
-- selection-conditioned out-of-fold predictions can be inspected without refitting the folds;
+- selection-conditioned out-of-fold predictions can be obtained by refitting the fixed selection
+  on the stored cross-validation splits;
 - final refitting learns the selected model from the complete training data;
 - nested cross-validation or an independent test set is used when an independent estimate of
   post-selection predictive performance is required.
@@ -58,8 +59,8 @@ assessment.
 ## Quick start with Pulp dataset
 
 The installed package contains the multivariate
-[Pulp dataset](datasets.md#pulp-real-data-integration), for which a Π-PLS multivariate regeression
-model is cretad in one line of code:
+[Pulp dataset](datasets.md#pulp-real-data-integration), for which a Π-PLS multivariate regression
+model is created in one line of code:
 
 ```python
 from pipls import PiPLSSearchCV

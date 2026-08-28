@@ -144,7 +144,7 @@ def load_tobacco(
 
     The dataset contains 347 tobacco leaf samples, 1,557 raw FT-NIR
     absorbance predictors ordered from approximately 10,001 down to
-    4,000 cm^-1, and 13 chemical-component responses. The matrices
+    4,000 $\\mathrm{cm}^{-1}$, and 13 chemical-component responses. The matrices
     preserve the retained numeric values, column order, and row order
     derived from the public source workbooks. No preprocessing is applied.
 
