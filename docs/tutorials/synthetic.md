@@ -158,16 +158,13 @@ predictor rank was resolved at the chosen $h$, retrieve the conditional predicto
 
 ![Synthetic predictor-rank profile](../assets/generated/synthetic/predictor_rank_profile.svg)
 
-The profile shows the predictor ranks actually evaluated at the chosen $h$. With the default
-scorer, larger configured scores are equivalent to smaller mean response-standardized CV-MSE.
-`reference_selection` identifies the exact minimum-CV-MSE rank, while `selection` identifies the
-smallest rank admitted by the fitted predictor-rank tolerance. With the default machine-scale
-tolerance these are normally the same. Here both select predictor rank five, one above the four
-structured predictor directions in the generating model. Cross-validation targets predictive
-performance in the finite noisy sample; it need not recover the generating rank exactly.
-
-Advanced analyses can control predictor rank through the search configuration. See
-[Path and selection](../path_selection.md#predictor-rank-policies) for the available policies and tolerances.
+The profile shows the predictor ranks actually evaluated at the chosen $h$. Here both the exact
+minimum-CV-MSE reference and the tolerance-based selection retain predictor rank five, one above the four
+structured predictor directions in the generating model. Cross-validation targets predictive performance in
+the finite noisy sample; it need not recover the generating rank exactly. See
+[Conditional predictor-rank selection](../path_selection.md#conditional-predictor-rank-selection) for the
+selection rule and [Predictor-rank policies](../path_selection.md#predictor-rank-policies) for alternative
+search configurations.
 
 The selected path and optional rank profile are the model-selection evidence in this workflow.
 If they make the choice unsatisfactory, revise `CHOSEN_N_COMPONENTS` and create a new selection.

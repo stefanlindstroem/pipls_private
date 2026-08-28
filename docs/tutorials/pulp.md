@@ -173,12 +173,10 @@ component count again:
 --8<-- "examples/04_pulp_real_data.py:pulp-oof-predictions"
 ```
 
-`oof_report()` reuses the same cross-validation splits that were used to evaluate the component path
-and recomputes OOF predictions for the selected model. Under the repeated cross-validation protocol used here,
-each observation is predicted once in each of the ten repetitions. The report therefore averages ten OOF
-predictions for each observation and records a prediction count of ten. Because the folds are shuffled using
-a fixed random seed, the procedure is reproducible while remaining independent of the original observation
-order.
+`oof_report()` reuses the stored search splits and recomputes predictions for the selected model. Under
+the ten repeated five-fold partitions used here, each observation therefore contributes ten predictions, which
+are averaged in the report. See [OOF diagnostics](../oof_diagnostics.md) for split provenance, repeated-CV
+averaging, coverage, and interpretation.
 
 All diagnostics in this section are **selection-conditioned OOF diagnostics** for the accepted selection.
 They describe validation behavior under the stored search splits; they are not independent post-selection or

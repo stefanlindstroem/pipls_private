@@ -33,7 +33,7 @@ responsible for passing the same observations in the same entry order.
 `pooled_oof_r2` is calculated over path entries with OOF coverage. It is a pooled statistic over the
 selection-conditioned predictions, not mean foldwise $R^2$. Response-wise $R^2$, standardized RMSE,
 and residual diagnostics can be obtained by passing the covered observed and OOF-predicted responses
-to [`prediction_diagnostics()`](model_inspection.md#response-r2) with
+to [`prediction_diagnostics()`](model_inspection.md#prediction-diagnostics) with
 `prediction_kind="selection-conditioned OOF predictions"`.
 
 Same-search OOF diagnostics are selection-conditioned because the development data and search
