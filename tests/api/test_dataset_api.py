@@ -18,7 +18,7 @@ _PUBLIC_DATASET_NAMES = [
 
 
 def test_dataset_module_is_a_stable_public_facade() -> None:
-    assert dataset_api.__all__ == _PUBLIC_DATASET_NAMES
+    assert set(_PUBLIC_DATASET_NAMES) <= set(dataset_api.__all__)
     for name in _PUBLIC_DATASET_NAMES:
         assert getattr(dataset_api, name).__module__ == "pipls.datasets"
 

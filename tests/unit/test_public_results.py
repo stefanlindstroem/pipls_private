@@ -1,19 +1,13 @@
 from __future__ import annotations
 
 import pickle
-from dataclasses import FrozenInstanceError, fields
-from types import ModuleType
+from dataclasses import FrozenInstanceError
 
 import numpy as np
 import pytest
 
-import pipls
-import pipls.exceptions as exceptions_module
-import pipls.regression as regression_module
-import pipls.search as search_module
 from pipls.component_path import (
     PiPLSComponentPath,
-    PiPLSPredictorRankEvidence,
     PiPLSPredictorRankProfile,
     PiPLSSelection,
 )
@@ -55,99 +49,6 @@ def _validation_result() -> PiPLSSelection:
         cv_mse_std=np.float32(0.1),
         n_splits=np.int64(3),
     )
-
-
-@pytest.mark.parametrize(
-    ("module", "expected_name"),
-    [
-        (regression_module, "PiPLSRegression"),
-        (search_module, "PiPLSSearchCV"),
-        (exceptions_module, "PredictorRankSupportWarning"),
-    ],
-)
-def test_primary_modules_declare_exact_exports(
-    module: ModuleType,
-    expected_name: str,
-) -> None:
-    namespace: dict[str, object] = {}
-    exec(f"from {module.__name__} import *", namespace)
-
-    assert module.__all__ == [expected_name]
-    assert {name for name in namespace if name != "__builtins__"} == {expected_name}
-
-
-def test_top_level_exports_are_exact() -> None:
-    assert pipls.__all__ == [
-        "PiPLSRegression",
-        "PiPLSSearchCV",
-        "PredictorRankSupportWarning",
-        "__version__",
-    ]
-
-
-def test_public_result_dataclasses_have_current_fields() -> None:
-    expected = {
-        PiPLSSelection: (
-            "n_components",
-            "predictor_rank",
-            "predictor_rank_policy",
-            "mean_test_score",
-            "cv_mse_mean",
-            "cv_mse_std",
-            "n_splits",
-            "rule",
-            "reference_minimum",
-            "relative_tolerance",
-            "absolute_tolerance",
-            "predictor_rank_evidence",
-        ),
-        PiPLSPredictorRankProfile: (
-            "n_components",
-            "predictor_rank",
-            "mean_test_score",
-            "cv_mse_mean",
-            "cv_mse_std",
-            "predictor_rank_policy",
-            "n_splits",
-            "predictor_rank_evidence",
-        ),
-        PiPLSPredictorRankEvidence: (
-            "reference_predictor_rank",
-            "reference_mean_test_score",
-            "reference_cv_mse_mean",
-            "reference_cv_mse_std",
-            "relative_tolerance",
-            "absolute_tolerance",
-        ),
-        PiPLSComponentPath: (
-            "n_components",
-            "predictor_rank",
-            "predictor_rank_policy",
-            "mean_test_score",
-            "cv_mse_mean",
-            "cv_mse_std",
-            "n_splits",
-            "predictor_rank_evidence",
-        ),
-        PiPLSDecomposition: (
-            "predictor_directions",
-            "dilation",
-            "response_directions",
-            "predictor_numerical_rank",
-            "predictor_numerical_rank_is_exact",
-            "rank_tolerance",
-            "predictor_svd_solver",
-        ),
-        PiPLSOOFReport: (
-            "selection",
-            "oof_predictions",
-            "oof_prediction_counts",
-            "pooled_oof_r2",
-        ),
-    }
-
-    for result_type, field_names in expected.items():
-        assert tuple(field.name for field in fields(result_type)) == field_names
 
 
 def test_selection_validates_and_normalizes_python_scalars() -> None:

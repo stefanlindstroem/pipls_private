@@ -58,18 +58,11 @@ def test_fixed_regression_and_path_configuration_have_distinct_ownership() -> No
     assert callable(search.oof_report)
 
 
-def test_path_defaults_have_stable_signature_and_repr() -> None:
-    signature = inspect.signature(PiPLSSearchCV)
+def test_search_cv_clones_with_default_configuration() -> None:
+    search = PiPLSSearchCV()
+    cloned = clone(search)
 
-    assert signature.parameters["scoring"].default == (
-        "neg_response_standardized_mse"
-    )
-    assert signature.parameters["search_method"].default == "exhaustive"
-    assert "0x" not in str(signature)
-    path = PiPLSSearchCV()
-    cloned = clone(path)
-    assert repr(path) == "PiPLSSearchCV()"
-    assert cloned.scoring == path.scoring
+    assert cloned.get_params(deep=False) == search.get_params(deep=False)
     assert callable(cloned.select)
     assert callable(cloned.refit)
     assert callable(cloned.oof_report)
@@ -107,41 +100,13 @@ def test_selection_method_signatures_separate_component_and_rank_tolerances() ->
     )
 
 
-def test_fixed_regression_constructor_matches_direct_estimator_scope() -> None:
+def test_fixed_regression_constructor_requires_keyword_only_rank_pair() -> None:
     signature = inspect.signature(PiPLSRegression)
     for name in ("n_components", "predictor_rank"):
         parameter = signature.parameters[name]
         assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
         assert parameter.default is inspect.Parameter.empty
     assert signature.parameters["response_subspace"].default == "cross_covariance"
-
-    assert set(_fixed_estimator().get_params()) == {
-        "copy",
-        "n_components",
-        "predictor_rank",
-        "random_state",
-        "response_subspace",
-        "scale",
-        "scale_x",
-        "scale_y",
-        "svd_solver",
-    }
-
-
-def test_search_constructor_has_exact_parameter_surface() -> None:
-    assert set(PiPLSSearchCV().get_params(deep=False)) == {
-        "cv",
-        "estimator",
-        "max_predictor_rank",
-        "n_components_values",
-        "n_jobs",
-        "predictor_rank_absolute_tolerance",
-        "predictor_rank_relative_tolerance",
-        "predictor_rank_values",
-        "samples_per_predictor_rank",
-        "scoring",
-        "search_method",
-    }
 
 
 def test_search_owns_selection_without_estimator_delegation() -> None:

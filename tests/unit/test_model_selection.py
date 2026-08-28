@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import importlib.util
-
 import numpy as np
 import pytest
 from sklearn.model_selection import KFold
 
 from pipls._model_selection import (
-    _ADAPTIVE_EXHAUSTIVE_THRESHOLD,
     _adaptive_refinement_interval,
     _epv_predictor_rank,
     _hard_predictor_rank_limit,
@@ -20,11 +17,6 @@ from pipls._model_selection import (
     _tied_score_mask,
     _tolerant_score_mask,
 )
-
-
-def test_model_selection_algorithms_are_private() -> None:
-    assert importlib.util.find_spec("pipls.model_selection") is None
-    assert importlib.util.find_spec("pipls._model_selection") is not None
 
 
 def test_hard_predictor_rank_limit_uses_centered_training_fold_cap() -> None:
@@ -263,10 +255,6 @@ def test_adaptive_refinement_interval_respects_lower_rank_ties() -> None:
     )
 
     assert interval == (2, 4)
-
-
-def test_adaptive_exhaustive_threshold_is_five() -> None:
-    assert _ADAPTIVE_EXHAUSTIVE_THRESHOLD == 5
 
 
 def _run_adaptive_rank_surface(

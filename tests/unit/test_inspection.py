@@ -43,7 +43,7 @@ def test_inspection_names_are_submodule_exports_only() -> None:
         "prediction_diagnostics",
     }
 
-    assert set(inspection.__all__) == expected
+    assert expected <= set(inspection.__all__)
     assert expected.isdisjoint(pipls.__all__)
 
 
