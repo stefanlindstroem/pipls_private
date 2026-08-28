@@ -18,6 +18,8 @@ nav:
       - 2. Inspect and select with synthetic data: tutorials/synthetic.md
       - 3. Complete Pulp analysis: tutorials/pulp.md
   - Examples: examples.md
+  - Scientific background:
+      - Theory: theory.md
   - Reference:
       - Overview: api/index.md
       - PiPLSRegression: api/regression.md
@@ -26,13 +28,11 @@ nav:
       - OOF diagnostics: oof_diagnostics.md
       - Model inspection: model_inspection.md
       - Datasets and generators: api/datasets.md
-      - Troubleshooting: troubleshooting.md
-  - Project validation:
       - Reference datasets: datasets.md
+      - Troubleshooting: troubleshooting.md
+  - Project:
       - Reproducibility: reproducibility.md
       - Compatibility: compatibility.md
-  - Scientific background:
-      - Theory: theory.md
       - Authors, license, and citation: citation.md
 
 exclude_docs: |
