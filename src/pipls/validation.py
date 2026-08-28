@@ -3,16 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import NDArray
 
-from ._result_validation import (
-    _finite_float,
-    _read_only_float_array,
-    _read_only_int_array,
-)
+from ._result_validation import _read_only_int_array
 from .component_path import PiPLSSelection
 
 __all__ = [
@@ -21,62 +16,6 @@ __all__ = [
 
 FloatArray = NDArray[np.float64]
 IntArray = NDArray[np.intp]
-
-
-def _validated_oof_fields(
-    *,
-    oof_predictions: object,
-    oof_prediction_counts: object,
-    pooled_oof_r2: object,
-) -> tuple[FloatArray, IntArray, float | None]:
-    """Normalize common immutable OOF report fields."""
-
-    pooled = (
-        None
-        if pooled_oof_r2 is None
-        else _finite_float(pooled_oof_r2, name="pooled_oof_r2")
-    )
-
-    if oof_predictions is None:
-        raise ValueError("oof_predictions are required.")
-    if oof_prediction_counts is None:
-        raise ValueError("oof_prediction_counts are required.")
-    predictions = _read_only_float_array(
-        cast(ArrayLike, oof_predictions),
-        name="oof_predictions",
-        ndim=np.asarray(oof_predictions).ndim,
-        require_finite=False,
-    )
-    if predictions.ndim not in (1, 2):
-        raise ValueError("oof_predictions must be one- or two-dimensional.")
-    if predictions.shape[0] == 0:
-        raise ValueError("oof_predictions must contain at least one row.")
-    counts = _read_only_int_array(
-        cast(ArrayLike, oof_prediction_counts),
-        name="oof_prediction_counts",
-    )
-    if counts.shape[0] != predictions.shape[0]:
-        raise ValueError(
-            "oof_prediction_counts must contain one value per prediction row."
-        )
-    if np.any(counts < 0):
-        raise ValueError("oof_prediction_counts must contain nonnegative values.")
-    covered = counts > 0
-    uncovered = ~covered
-    if pooled is not None and int(np.count_nonzero(covered)) < 2:
-        raise ValueError("pooled_oof_r2 requires at least two rows with OOF coverage.")
-    if predictions.ndim == 1:
-        if np.any(~np.isfinite(predictions[covered])):
-            raise ValueError("Covered OOF predictions must be finite.")
-        if np.any(~np.isnan(predictions[uncovered])):
-            raise ValueError("Uncovered OOF predictions must be NaN.")
-    else:
-        if np.any(~np.isfinite(predictions[covered, :])):
-            raise ValueError("Covered OOF predictions must be finite.")
-        if np.any(~np.isnan(predictions[uncovered, :])):
-            raise ValueError("Uncovered OOF predictions must be NaN.")
-
-    return predictions, counts, pooled
 
 
 @dataclass(frozen=True)
@@ -111,19 +50,22 @@ class PiPLSOOFReport:
     pooled_oof_r2: float | None = None
 
     def __post_init__(self) -> None:
-        if not isinstance(self.selection, PiPLSSelection):
-            raise TypeError("selection must be a PiPLSSelection.")
-        predictions, counts, pooled = _validated_oof_fields(
-            oof_predictions=self.oof_predictions,
-            oof_prediction_counts=self.oof_prediction_counts,
-            pooled_oof_r2=self.pooled_oof_r2,
-        )
+        """Store defensive read-only copies of OOF arrays."""
+
+        predictions = np.array(self.oof_predictions, dtype=np.float64, copy=True)
+        predictions.setflags(write=False)
         object.__setattr__(self, "oof_predictions", predictions)
-        object.__setattr__(self, "oof_prediction_counts", counts)
-        object.__setattr__(self, "pooled_oof_r2", pooled)
+        object.__setattr__(
+            self,
+            "oof_prediction_counts",
+            _read_only_int_array(
+                self.oof_prediction_counts,
+                name="oof_prediction_counts",
+            ),
+        )
 
     def __reduce__(self) -> tuple[type[PiPLSOOFReport], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
+        """Reconstruct so unpickled arrays remain read-only."""
 
         return (
             type(self),

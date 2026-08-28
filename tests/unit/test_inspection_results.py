@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import pickle
-from collections.abc import Callable
 
 import numpy as np
-import pytest
 
 from pipls.inspection import (
     BiplotCoordinates,
@@ -23,7 +21,7 @@ def _prediction_diagnostics() -> PredictionDiagnostics:
     )
 
 
-def test_inspection_records_copy_arrays_and_revalidate_pickle() -> None:
+def test_inspection_records_copy_arrays_and_preserve_pickle_immutability() -> None:
     x_scores = np.array([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
     x_loadings = np.eye(2, dtype=np.float32)
     y_loadings = np.eye(2, dtype=np.float32)
@@ -57,41 +55,6 @@ def test_inspection_records_copy_arrays_and_revalidate_pickle() -> None:
                 assert not value.flags.writeable
 
 
-@pytest.mark.parametrize(
-    ("constructor", "message"),
-    [
-        (
-            lambda: LatentStructure(
-                np.ones((2, 2)),
-                np.ones((3, 1)),
-                np.ones((1, 2)),
-                np.ones((1, 3)),
-            ),
-            "same number of components",
-        ),
-        (
-            lambda: BiplotCoordinates(
-                np.ones((2, 3)),
-                np.ones((3, 2)),
-                np.array([0, 1]),
-                np.ones(2),
-            ),
-            "exactly two columns",
-        ),
-        (
-            lambda: ObservationDiagnostics(np.array([1.0, -1.0]), np.ones(2)),
-            "nonnegative",
-        ),
-    ],
-)
-def test_inspection_records_reject_invalid_direct_construction(
-    constructor: Callable[[], object],
-    message: str,
-) -> None:
-    with pytest.raises(ValueError, match=message):
-        constructor()
-
-
 def test_display_factors_derive_weighted_response_directions() -> None:
     factors = PiPLSDisplayFactors(
         predictor_directions=np.eye(2, dtype=np.float32),
@@ -103,17 +66,6 @@ def test_display_factors_derive_weighted_response_directions() -> None:
     np.testing.assert_array_equal(weighted, np.diag([2.0, 1.0]))
     assert not weighted.flags.writeable
     assert "weighted_response_directions" not in vars(factors)
-
-
-def test_display_factors_reject_unrepresentable_derived_weighting() -> None:
-    with pytest.raises(ValueError, match="weighted_response_directions cannot be represented"):
-        PiPLSDisplayFactors(
-            predictor_directions=np.eye(2),
-            dilation=np.array([2.0, 1.0]),
-            response_directions=np.array(
-                [[np.finfo(np.float64).max, 0.0], [0.0, 1.0]]
-            ),
-        )
 
 
 def test_prediction_diagnostics_derive_dependent_fields() -> None:
@@ -133,29 +85,3 @@ def test_prediction_diagnostics_derive_dependent_fields() -> None:
     )
     np.testing.assert_allclose(diagnostics.standardized_rmse, [np.sqrt(1.0 / 6.0)])
     np.testing.assert_allclose(diagnostics.response_r2, [0.75])
-
-
-def test_prediction_diagnostics_reject_derived_constructor_arguments() -> None:
-    diagnostics = _prediction_diagnostics()
-    with pytest.raises(TypeError, match="unexpected keyword argument 'residual'"):
-        PredictionDiagnostics(
-            observed=diagnostics.observed,
-            predicted=diagnostics.predicted,
-            prediction_kind=diagnostics.prediction_kind,
-            residual=np.zeros_like(diagnostics.residual),  # type: ignore[call-arg]
-        )
-
-
-def test_prediction_diagnostics_reject_invalid_independent_inputs() -> None:
-    with pytest.raises(ValueError, match="same shape"):
-        PredictionDiagnostics(
-            observed=np.ones((3, 2)),
-            predicted=np.ones((3, 1)),
-            prediction_kind="fitted values",
-        )
-    with pytest.raises(ValueError, match="constant response columns"):
-        PredictionDiagnostics(
-            observed=np.ones((3, 1)),
-            predicted=np.zeros((3, 1)),
-            prediction_kind="fitted values",
-        )

@@ -1,56 +1,53 @@
-# Decision 0094: validate inspection results and derived numerical values
+# Decision 0094: finite inspection calculations and immutable result storage
 
 ## Status
 
-Accepted.
+Accepted. Revised to separate producer-side numerical validation from result-record storage.
 
 ## Context
 
-The public inspection layer returns five frozen records: `LatentStructure`,
-`BiplotCoordinates`, `PiPLSDisplayFactors`, `ObservationDiagnostics`, and
-`PredictionDiagnostics`. The helper functions normally copied their arrays, but direct construction
-could retain writable aliases or inconsistent fields. Several calculations also used direct sums of
-squares, norms, means, covariance products, and factor products. Finite inputs near the float64
-range could therefore emit runtime warnings and return `inf` or `nan` inspection values.
+The inspection layer returns frozen records including `LatentStructure`, `BiplotCoordinates`,
+`PiPLSDisplayFactors`, `ObservationDiagnostics`, and `PredictionDiagnostics`. Inspection helpers
+perform sums of squares, norms, means, covariance products, factor products, and response
+standardization that can overflow even when their inputs are finite.
 
-Inspection results are public numerical records. They must enforce the same defensive boundary as
-the core estimator and path records, and finite inputs must not silently produce nonfinite public
-quantities.
+An earlier implementation also made every result constructor an exhaustive cross-field validation
+boundary. That duplicated checks already performed while producing the records and mixed numerical
+safety with storage semantics.
 
 ## Decision
 
-1. Direct construction of every inspection record copies arrays to float64 or platform integers,
-   makes them read-only, validates documented dimensions and aligned shapes, and rejects nonfinite
-   fields. Nonnegative or positive quantities retain those constraints.
-2. `PiPLSDisplayFactors` validates that `weighted_response_directions` equals
-   `response_directions * dilation`. `PredictionDiagnostics` validates its residual,
-   standardization, center, scale, RMSE, response-wise $R^2$, and provenance relationships.
-   Weighted response directions and prediction-diagnostic dependent arrays are derived from
-   independent inputs while
-   retaining the same finite-value boundary.
-3. Pickle reconstruction passes through the same validating constructors.
-4. Biplot norms use max-scaled Euclidean calculations, and the balancing factor is formed as a
+1. Public inspection functions validate their user/model inputs and own the semantic consistency of
+   the records they return.
+2. Inspection result records store array fields as defensive read-only float64 or platform-integer
+   copies. Their constructors do not independently revalidate all producer-owned cross-field
+   relationships.
+3. Array-containing records reconstruct through their constructors during unpickling so read-only
+   NumPy storage is restored.
+4. `PredictionDiagnostics` derives its dependent diagnostic arrays from observed and predicted
+   responses. Checks required to carry out those calculations safely, such as aligned shapes,
+   nonconstant observed responses, and finite representability, remain with that computation.
+   The public `prediction_diagnostics()` function owns response normalization and prediction-kind
+   validation.
+5. Biplot norms use max-scaled Euclidean calculations, and the balancing factor is formed as a
    quotient of square roots rather than by first forming a potentially overflowing norm ratio.
-5. Prediction centers, sample scales, standardized RMSE, and response-wise $R^2$ use scaled
-   calculations. Residual,
-   centering, standardization, and factor products are checked immediately for finite float64
-   representability.
-6. Observation score covariance is formed after one common finite scaling of the centered training
-   scores. This preserves the Moore--Penrose score distance while avoiding overflow in the covariance
-   product. X-reconstruction residuals use scaled row-wise squared norms.
-7. If a mathematically requested inspection quantity cannot be represented as finite float64, the
-   helper raises `ValueError` naming that quantity. Expected floating-point warnings are suppressed
-   only around the checked operation; nonfinite results never escape.
-8. These safeguards do not add thresholds, probability limits, outlier labels, uncertainty claims,
+6. Prediction centers, sample scales, standardized RMSE, and response-wise $R^2$ use scaled
+   calculations. Residual, centering, standardization, and factor products are checked immediately
+   for finite float64 representability.
+7. Observation score covariance is formed after one common finite scaling of the centered training
+   scores. This preserves the Moore--Penrose score distance while avoiding overflow in the
+   covariance product. X-reconstruction residuals use scaled row-wise squared norms.
+8. If a mathematically requested inspection quantity cannot be represented as finite float64, the
+   producing helper raises `ValueError` naming that quantity. Expected floating-point warnings are
+   suppressed only around the checked operation; nonfinite produced results never escape.
+9. These safeguards do not add thresholds, probability limits, outlier labels, uncertainty claims,
    or rendering behavior.
-
 
 ## Consequences
 
-Ordinary fitted-model and prediction results retain their existing values, shapes, and field names.
-Extreme finite inputs succeed when the requested result is representable and fail explicitly when it
-is not. Public inspection records now have the same direct-construction, immutability, and pickle
-boundary as the core public results.
+Ordinary fitted-model and prediction results retain their values, shapes, field names, defensive
+copies, and numerical safety. The package no longer maintains a second exhaustive validation model
+for arbitrary direct construction of inspection result records.
 
 Dataset metadata policy is owned separately by Decision 0015 and is not part of this
 inspection-result contract.

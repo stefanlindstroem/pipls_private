@@ -202,10 +202,11 @@ validation protocol that produced the singleton split.
 
 ## Immutable public results
 
-Public result records defensively copy arrays, make them read-only, normalize accepted NumPy
-scalars, validate direct construction, and revalidate during pickle reconstruction. Counts and
-ranks are positive; `n_components <= predictor_rank`; score-like fields are finite; MSE and SD are
-nonnegative; component-aligned arrays have exact compatible shapes.
+Array-valued public result records defensively copy arrays, make them read-only, and restore that
+storage contract during pickle reconstruction. Positive counts/ranks, admissible component/rank
+pairs, finite scores, nonnegative MSE/SD, aligned shapes, and OOF coverage are producer-owned
+invariants enforced by the estimator, search, or inspection computation rather than duplicated by
+arbitrary result-dataclass construction.
 
 Inspection helpers must return finite derived arrays or raise `ValueError`. Display-factor sign
 changes must preserve `P D Q.T`; balanced biplot scaling must preserve the selected `T P.T`

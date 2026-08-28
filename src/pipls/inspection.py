@@ -10,11 +10,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 from sklearn.utils.validation import check_is_fitted
 
-from ._result_validation import (
-    _literal_string,
-    _read_only_float_array,
-    _read_only_int_array,
-)
+from ._result_validation import _read_only_float_array, _read_only_int_array
 from .decomposition import PiPLSDecomposition
 
 FloatArray = NDArray[np.float64]
@@ -79,9 +75,8 @@ class BiplotCoordinates:
 
     ``sample_coordinates`` and ``predictor_coordinates`` preserve the selected
     score-loading reconstruction while giving both coordinate sets equal
-    Euclidean norm within each component. Direct construction validates shapes,
-    finite values, and immutability; instances are normally obtained from
-    :func:`biplot_coordinates`.
+    Euclidean norm within each component. Arrays are defensive read-only copies;
+    instances are normally obtained from :func:`biplot_coordinates`.
 
     Attributes
     ----------
@@ -101,44 +96,35 @@ class BiplotCoordinates:
     scaling_factors: FloatArray
 
     def __post_init__(self) -> None:
-        sample_coordinates = _read_only_float_array(
-            self.sample_coordinates,
-            name="sample_coordinates",
-            ndim=2,
-        )
-        predictor_coordinates = _read_only_float_array(
-            self.predictor_coordinates,
-            name="predictor_coordinates",
-            ndim=2,
-        )
-        component_indices = _read_only_int_array(
-            self.component_indices,
-            name="component_indices",
-        )
-        scaling_factors = _read_only_float_array(
-            self.scaling_factors,
-            name="scaling_factors",
-        )
-        if sample_coordinates.shape[0] == 0 or predictor_coordinates.shape[0] == 0:
-            raise ValueError("Biplot coordinate arrays must contain at least one row.")
-        if sample_coordinates.shape[1] != 2 or predictor_coordinates.shape[1] != 2:
-            raise ValueError("Biplot coordinate arrays must contain exactly two columns.")
-        if component_indices.shape != (2,):
-            raise ValueError("component_indices must contain exactly two values.")
-        if component_indices[0] == component_indices[1] or np.any(component_indices < 0):
-            raise ValueError("component_indices must contain two distinct nonnegative values.")
-        if scaling_factors.shape != (2,):
-            raise ValueError("scaling_factors must contain exactly two values.")
-        if np.any(scaling_factors <= 0.0):
-            raise ValueError("scaling_factors must contain positive values.")
+        """Store defensive read-only copies of coordinate arrays."""
 
-        object.__setattr__(self, "sample_coordinates", sample_coordinates)
-        object.__setattr__(self, "predictor_coordinates", predictor_coordinates)
-        object.__setattr__(self, "component_indices", component_indices)
-        object.__setattr__(self, "scaling_factors", scaling_factors)
+        object.__setattr__(
+            self,
+            "sample_coordinates",
+            _read_only_float_array(
+                self.sample_coordinates, name="sample_coordinates", ndim=2
+            ),
+        )
+        object.__setattr__(
+            self,
+            "predictor_coordinates",
+            _read_only_float_array(
+                self.predictor_coordinates, name="predictor_coordinates", ndim=2
+            ),
+        )
+        object.__setattr__(
+            self,
+            "component_indices",
+            _read_only_int_array(self.component_indices, name="component_indices"),
+        )
+        object.__setattr__(
+            self,
+            "scaling_factors",
+            _read_only_float_array(self.scaling_factors, name="scaling_factors"),
+        )
 
     def __reduce__(self) -> tuple[type[BiplotCoordinates], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
+        """Reconstruct so unpickled arrays remain read-only."""
 
         return (
             type(self),
@@ -156,8 +142,8 @@ class LatentStructure:
     r"""Immutable copies of public fitted PLS-family quantities.
 
     The coefficient orientation follows ``PLSRegression`` and
-    ``PiPLSRegression``. Direct construction validates aligned finite arrays and
-    immutability; instances are normally obtained from :func:`latent_structure`.
+    ``PiPLSRegression``. Arrays are defensive read-only copies; instances are
+    normally obtained from :func:`latent_structure`.
 
     Attributes
     ----------
@@ -177,35 +163,31 @@ class LatentStructure:
     coefficients: FloatArray
 
     def __post_init__(self) -> None:
-        x_scores = _read_only_float_array(self.x_scores, name="x_scores", ndim=2)
-        x_loadings = _read_only_float_array(self.x_loadings, name="x_loadings", ndim=2)
-        y_loadings = _read_only_float_array(self.y_loadings, name="y_loadings", ndim=2)
-        coefficients = _read_only_float_array(
-            self.coefficients,
-            name="coefficients",
-            ndim=2,
-        )
-        n_components = x_scores.shape[1]
-        if x_scores.shape[0] == 0 or n_components == 0:
-            raise ValueError("x_scores must contain at least one row and one component.")
-        if x_loadings.shape[0] == 0 or y_loadings.shape[0] == 0:
-            raise ValueError("Loading arrays must contain at least one row.")
-        if x_loadings.shape[1] != n_components or y_loadings.shape[1] != n_components:
-            raise ValueError("Scores and loadings must contain the same number of components.")
-        expected_coefficients = (y_loadings.shape[0], x_loadings.shape[0])
-        if coefficients.shape != expected_coefficients:
-            raise ValueError(
-                "coefficients must have shape (n_targets, n_features): "
-                f"expected {expected_coefficients}, got {coefficients.shape}."
-            )
+        """Store defensive read-only copies of fitted-model arrays."""
 
-        object.__setattr__(self, "x_scores", x_scores)
-        object.__setattr__(self, "x_loadings", x_loadings)
-        object.__setattr__(self, "y_loadings", y_loadings)
-        object.__setattr__(self, "coefficients", coefficients)
+        object.__setattr__(
+            self,
+            "x_scores",
+            _read_only_float_array(self.x_scores, name="x_scores", ndim=2),
+        )
+        object.__setattr__(
+            self,
+            "x_loadings",
+            _read_only_float_array(self.x_loadings, name="x_loadings", ndim=2),
+        )
+        object.__setattr__(
+            self,
+            "y_loadings",
+            _read_only_float_array(self.y_loadings, name="y_loadings", ndim=2),
+        )
+        object.__setattr__(
+            self,
+            "coefficients",
+            _read_only_float_array(self.coefficients, name="coefficients", ndim=2),
+        )
 
     def __reduce__(self) -> tuple[type[LatentStructure], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
+        """Reconstruct so unpickled arrays remain read-only."""
 
         return (
             type(self),
@@ -227,8 +209,8 @@ class ObservationDiagnostics:
     training-score center, using the Moore--Penrose inverse of the fitted
     training-score covariance. ``x_reconstruction_residual`` is the row-wise
     squared Euclidean residual after the public transform/inverse-transform round
-    trip. No theoretical warning limits are attached. Direct construction validates
-    aligned nonnegative finite arrays and immutability.
+    trip. No theoretical warning limits are attached. Returned arrays are
+    defensive read-only copies.
 
     Attributes
     ----------
@@ -242,30 +224,23 @@ class ObservationDiagnostics:
     x_reconstruction_residual: FloatArray
 
     def __post_init__(self) -> None:
-        score_distance = _read_only_float_array(
-            self.score_distance,
-            name="score_distance",
-        )
-        x_reconstruction_residual = _read_only_float_array(
-            self.x_reconstruction_residual,
-            name="x_reconstruction_residual",
-        )
-        if score_distance.shape[0] == 0:
-            raise ValueError("Observation diagnostics must contain at least one row.")
-        if x_reconstruction_residual.shape != score_distance.shape:
-            raise ValueError(
-                "score_distance and x_reconstruction_residual must have identical shapes."
-            )
-        if np.any(score_distance < 0.0):
-            raise ValueError("score_distance must contain nonnegative values.")
-        if np.any(x_reconstruction_residual < 0.0):
-            raise ValueError("x_reconstruction_residual must contain nonnegative values.")
+        """Store defensive read-only copies of observation diagnostics."""
 
-        object.__setattr__(self, "score_distance", score_distance)
-        object.__setattr__(self, "x_reconstruction_residual", x_reconstruction_residual)
+        object.__setattr__(
+            self,
+            "score_distance",
+            _read_only_float_array(self.score_distance, name="score_distance"),
+        )
+        object.__setattr__(
+            self,
+            "x_reconstruction_residual",
+            _read_only_float_array(
+                self.x_reconstruction_residual, name="x_reconstruction_residual"
+            ),
+        )
 
     def __reduce__(self) -> tuple[type[ObservationDiagnostics], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
+        """Reconstruct so unpickled arrays remain read-only."""
 
         return type(self), (self.score_distance, self.x_reconstruction_residual)
 
@@ -277,10 +252,9 @@ class PiPLSDisplayFactors:
     The predictor and response direction columns use one chosen deterministic
     display sign per paired latent mode. Applying the same sign to both sides
     preserves the centered/scaled regression map
-    $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. Direct
-    construction validates
-    the independent factor arrays and stores defensive read-only copies. Weighted
-    response directions are derived from the validated response directions and dilation.
+    $\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$. The factor arrays are
+    stored as defensive read-only copies. Weighted response directions are derived
+    from the stored response directions and dilation.
 
     Attributes
     ----------
@@ -301,44 +275,30 @@ class PiPLSDisplayFactors:
     response_directions: FloatArray
 
     def __post_init__(self) -> None:
-        predictor_directions = _read_only_float_array(
-            self.predictor_directions,
-            name="predictor_directions",
-            ndim=2,
-        )
-        dilation = _read_only_float_array(self.dilation, name="dilation")
-        response_directions = _read_only_float_array(
-            self.response_directions,
-            name="response_directions",
-            ndim=2,
-        )
-        n_components = dilation.shape[0]
-        if n_components == 0:
-            raise ValueError("Pi-PLS display factors must contain at least one component.")
-        if predictor_directions.shape[0] == 0 or response_directions.shape[0] == 0:
-            raise ValueError("Direction arrays must contain at least one row.")
-        if predictor_directions.shape[1] != n_components:
-            raise ValueError(
-                "predictor_directions and dilation must contain the same number of components."
-            )
-        if response_directions.shape[1] != n_components:
-            raise ValueError(
-                "response_directions and dilation must contain the same number of components."
-            )
-        if np.any(dilation < 0.0):
-            raise ValueError("dilation must contain nonnegative values.")
-        _finite_product(
-            response_directions,
-            dilation[None, :],
-            name="weighted_response_directions",
-        )
+        """Store defensive read-only copies of display factors."""
 
-        object.__setattr__(self, "predictor_directions", predictor_directions)
-        object.__setattr__(self, "dilation", dilation)
-        object.__setattr__(self, "response_directions", response_directions)
+        object.__setattr__(
+            self,
+            "predictor_directions",
+            _read_only_float_array(
+                self.predictor_directions, name="predictor_directions", ndim=2
+            ),
+        )
+        object.__setattr__(
+            self,
+            "dilation",
+            _read_only_float_array(self.dilation, name="dilation"),
+        )
+        object.__setattr__(
+            self,
+            "response_directions",
+            _read_only_float_array(
+                self.response_directions, name="response_directions", ndim=2
+            ),
+        )
 
     def __reduce__(self) -> tuple[type[PiPLSDisplayFactors], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
+        """Reconstruct so unpickled arrays remain read-only."""
 
         return (
             type(self),
@@ -374,9 +334,8 @@ class PredictionDiagnostics:
 
     All response matrices are two-dimensional, including single-response input.
     Centers and sample standard deviations are estimated from ``observed`` and
-    applied unchanged to ``predicted``. Direct construction accepts only the
-    independent observed values, predicted values, and prediction provenance;
-    all diagnostic arrays are derived once, validated, and stored read-only.
+    applied unchanged to ``predicted``. Diagnostic arrays are derived once from
+    the independent observed and predicted values and stored read-only.
 
     Attributes
     ----------
@@ -415,14 +374,7 @@ class PredictionDiagnostics:
     def __post_init__(self) -> None:
         observed = _read_only_float_array(self.observed, name="observed", ndim=2)
         predicted = _read_only_float_array(self.predicted, name="predicted", ndim=2)
-        prediction_kind = cast(
-            PredictionKind,
-            _literal_string(
-                self.prediction_kind,
-                name="prediction_kind",
-                allowed=_PREDICTION_KIND_SET,
-            ),
-        )
+        prediction_kind = self.prediction_kind
 
         if observed.shape[0] < 2 or observed.shape[1] == 0:
             raise ValueError(
@@ -502,7 +454,7 @@ class PredictionDiagnostics:
         object.__setattr__(self, "response_r2", response_r2)
 
     def __reduce__(self) -> tuple[type[PredictionDiagnostics], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
+        """Reconstruct so unpickled arrays remain read-only."""
 
         return type(self), (self.observed, self.predicted, self.prediction_kind)
 
@@ -821,6 +773,11 @@ def pipls_display_factors(
 
     predictor_directions *= component_signs[None, :]
     response_directions *= component_signs[None, :]
+    _finite_product(
+        response_directions,
+        dilation[None, :],
+        name="weighted_response_directions",
+    )
     return PiPLSDisplayFactors(
         predictor_directions=predictor_directions,
         dilation=dilation,
@@ -853,6 +810,10 @@ def prediction_diagnostics(
         Read-only response matrices, standardization statistics, response-wise
         standardized RMSE, and response-wise coefficient of determination.
     """
+
+    if prediction_kind not in _PREDICTION_KIND_SET:
+        choices = ", ".join(repr(choice) for choice in _PREDICTION_KINDS)
+        raise ValueError(f"prediction_kind must be one of {choices}.")
 
     observed = _response_matrix(y_true, name="y_true")
     predicted = _response_matrix(y_pred, name="y_pred")

@@ -26,8 +26,8 @@ This registry lists only numbered decisions that still define current behavior o
 | `0083-data-first-rendering-policy.md` | final data-first rendering policy | immutable results are the compatibility surface; rendering and local plot helpers remain caller-owned |
 | `0091-clean-git-snapshots.md` | clean committed-tree snapshots | refuse tracked, staged, or nonignored untracked changes and archive `HEAD` so ignored local files cannot enter handoffs |
 | `0092-fold-numerical-rank-feasibility.md` | fold numerical-rank feasibility | cap path candidates by the minimum rank verified after fold-local preprocessing before scoring |
-| `0093-public-result-invariants.md` | immutable core public-result invariants | validate direct construction, defensive copies, scalar normalization, OOF coverage, and pickle reconstruction |
-| `0094-inspection-result-safety.md` | immutable and finite inspection results | validate direct construction and pickle reconstruction; use range-safe calculations and reject unrepresentable derived values |
+| `0093-public-result-invariants.md` | producer-owned immutable core results | producer-side semantic validity plus defensive read-only array storage and pickle restoration |
+| `0094-inspection-result-safety.md` | finite inspection calculations and immutable result storage | producer-side validation, defensive arrays, range-safe calculations, and explicit rejection of unrepresentable derived values |
 | `0103-installation-and-optional-dependency-boundary.md` | installation and optional dependencies | retain only maintained `dev`, `examples`, and `docs` extras; use noneditable public installation and editable contributor setup |
 | `0110-response-anchored-display-factors.md` | response-anchored Pi-PLS display factors | retain predictor-canonical defaults; optionally orient every component by a selected response row and requested sign |
 | `0117-commercial-license-authorship-and-citation.md` | commercial license, authorship, and citation | retain complete BSD-3-Clause terms, name the three copyright holders, and publish software plus companion-paper citation metadata |

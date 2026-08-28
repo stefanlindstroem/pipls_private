@@ -207,7 +207,8 @@ exhaustive.
 Generated figures, manifests, and example outputs are not fitted package state and must not be
 committed except for deliberate documentation assets. Tests should protect:
 
-- inspection equations, shapes, finiteness, immutability, direct construction, and pickle behavior;
+- inspection equations, producer-side shape/finiteness checks, immutable result storage, and
+  pickle behavior;
 - exact preservation identities for display signs and biplot balancing;
 - explicit prediction provenance and residual orientation;
 - direct caller-owned rendering and absence of runtime plotting imports;

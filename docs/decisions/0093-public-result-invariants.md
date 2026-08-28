@@ -1,51 +1,42 @@
-# Decision 0093: validate immutable core public results
+# Decision 0093: producer-owned immutable core public results
 
 ## Status
 
-Accepted.
+Accepted. Revised to remove exhaustive direct-construction validation from returned result records.
 
 ## Context
 
-The public fixed-estimator and path layers return five frozen result records:
-`PiPLSDecomposition`, `PiPLSSelection`, `PiPLSPredictorRankProfile`,
-`PiPLSComponentPath`, and `PiPLSOOFReport`. Estimator-produced instances were mostly
-well formed, but direct construction did not apply one consistent policy. Some records retained
-aliased writable arrays, some normalized values and others did not, and several accepted invalid
-scalar, score, or coverage states.
+The fixed-estimator and search layers return frozen records such as `PiPLSDecomposition`,
+`PiPLSSelection`, `PiPLSPredictorRankProfile`, `PiPLSComponentPath`, and `PiPLSOOFReport`.
+These are returned-first interfaces: their semantic contents are produced by fitted estimators,
+search logic, and OOF computation rather than supplied independently by users.
 
-The classes are public types even though the generated reference presents them as returned records
-rather than constructor-first APIs. Their invariants must therefore hold regardless of whether an
-instance originates from a fitted estimator, a user, or pickle reconstruction.
+An earlier implementation nevertheless treated each dataclass constructor as a second complete
+validation boundary. That duplicated invariants already enforced by the producing algorithms,
+required large cross-field `__post_init__` methods, normalized scalar types solely for direct
+construction, and generated many tests for malformed states that normal package workflows cannot
+produce.
 
 ## Decision
 
-Apply one defensive validation contract to all five records.
-
-1. Copy every stored NumPy array into its documented dtype and make it read-only.
-2. Normalize accepted NumPy scalar integers, floats, and booleans to the corresponding Python
-   scalar types. Reject booleans where an integer or real value is required.
-3. Require positive component, predictor-rank, and split counts, with
-   `n_components <= predictor_rank`.
-4. Require finite scores and diagnostics. Response-standardized MSE values and fold standard
-   deviations are nonnegative.
-5. Require aligned one-dimensional path/profile arrays, strictly ascending unique component or
-   predictor-rank indices, supported predictor-rank policies, and an exact match between a
-   predictor-rank profile's selected record and its aligned row.
-6. Require decomposition arrays to be finite, nonempty, and component-aligned; dilation is
-   nonnegative; numerical rank is at least the retained component count; and solver provenance
-   agrees with whether the reported numerical rank is exact.
-7. Require validation-report OOF counts to be nonnegative integer values aligned with prediction
-   rows. Covered rows contain only finite predictions; uncovered rows contain only NaN. OOF counts
-   and pooled OOF $R^2$ cannot exist without OOF predictions.
-8. Reconstruct every record through its validating constructor during unpickling so read-only and
-   scalar invariants survive serialization.
-9. Keep constructor signatures suppressed in generated reference pages. The records remain
-   returned-first interfaces, but direct construction is supported and validated.
-
-Invalid states are rejected immediately rather than being retained as weaker alternate forms.
+1. Estimators, search methods, and report-producing functions own semantic validity. They must not
+   emit inconsistent component counts, ranks, scores, provenance, OOF coverage, or numerical
+   diagnostics.
+2. Result dataclass constructors are not general-purpose validators for arbitrary user-created
+   states. Malformed direct construction is outside the supported contract.
+3. Array-containing result records still make defensive copies in their documented dtypes and keep
+   those arrays read-only. This storage boundary prevents aliasing of producer-owned results.
+4. Array-containing records reconstruct through their constructors when unpickled so NumPy arrays
+   regain the read-only storage contract. Scalar-only records use ordinary dataclass pickling.
+5. Scalar-only records do not normalize NumPy scalars or revalidate cross-field provenance merely
+   for direct construction. Package producers emit the documented Python scalar types.
+6. Public user inputs remain validated at the estimator, search, and inspection entry points that
+   consume them. Removing duplicate result-constructor validation does not relax those interfaces.
 
 ## Consequences
 
-Estimator and path outputs retain their existing values and field names, while public records have
-one predictable immutability and validation boundary. Tests can construct records directly without
-creating weaker states than the package itself returns.
+Valid estimator-, search-, and report-produced values, field names, immutability, and serialized
+array behavior are unchanged. The result layer becomes substantially smaller and tests focus on
+producer behavior plus defensive storage rather than on impossible malformed constructor states.
+Code that directly constructs inconsistent public result dataclasses no longer has guaranteed
+validation behavior.

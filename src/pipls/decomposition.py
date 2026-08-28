@@ -3,36 +3,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ._core import PiPLSCoreResult, ResolvedSVDSolver
-from ._result_validation import (
-    _boolean,
-    _literal_string,
-    _nonnegative_finite_float,
-    _positive_int,
-    _read_only_float_array,
-)
+from ._result_validation import _read_only_float_array
 
 __all__ = [
     "PiPLSDecomposition",
 ]
 
 FloatArray = NDArray[np.float64]
-_ALLOWED_RESOLVED_SVD_SOLVERS = frozenset({"full", "randomized"})
-
 
 @dataclass(frozen=True)
 class PiPLSDecomposition:
     r"""Interpretable Π-PLS factorization and numerical diagnostics.
 
     Instances are returned through :attr:`pipls.PiPLSRegression.decomposition_`.
-    Direct construction validates the same shape, scalar, and immutability
-    invariants as estimator-produced instances. Internal construction matrices
-    used before the final factorization are intentionally not exposed.
+    Arrays are stored as defensive read-only copies. Semantic validity is owned
+    by the fitted estimator that produces the record; internal construction
+    matrices used before the final factorization are intentionally not exposed.
 
     Attributes
     ----------
@@ -63,85 +54,34 @@ class PiPLSDecomposition:
     predictor_svd_solver: ResolvedSVDSolver
 
     def __post_init__(self) -> None:
-        predictor_directions = _read_only_float_array(
-            self.predictor_directions,
-            name="predictor_directions",
-            ndim=2,
-        )
-        dilation = _read_only_float_array(self.dilation, name="dilation")
-        response_directions = _read_only_float_array(
-            self.response_directions,
-            name="response_directions",
-            ndim=2,
-        )
-        n_components = int(dilation.size)
-        if n_components == 0:
-            raise ValueError("A decomposition must contain at least one component.")
-        if predictor_directions.shape[1] != n_components:
-            raise ValueError(
-                "predictor_directions and dilation must contain the same number "
-                "of components."
-            )
-        if response_directions.shape[1] != n_components:
-            raise ValueError(
-                "response_directions and dilation must contain the same number "
-                "of components."
-            )
-        if predictor_directions.shape[0] == 0 or response_directions.shape[0] == 0:
-            raise ValueError("Direction arrays must contain at least one row.")
-        if np.any(dilation < 0.0):
-            raise ValueError("dilation must contain nonnegative values.")
+        """Store defensive read-only copies of the factor arrays."""
 
-        predictor_numerical_rank = _positive_int(
-            self.predictor_numerical_rank,
-            name="predictor_numerical_rank",
-        )
-        if predictor_numerical_rank < n_components:
-            raise ValueError(
-                "predictor_numerical_rank must not be smaller than the number "
-                "of components."
-            )
-        predictor_numerical_rank_is_exact = _boolean(
-            self.predictor_numerical_rank_is_exact,
-            name="predictor_numerical_rank_is_exact",
-        )
-        rank_tolerance = _nonnegative_finite_float(
-            self.rank_tolerance,
-            name="rank_tolerance",
-        )
-        predictor_svd_solver = cast(
-            ResolvedSVDSolver,
-            _literal_string(
-                self.predictor_svd_solver,
-                name="predictor_svd_solver",
-                allowed=_ALLOWED_RESOLVED_SVD_SOLVERS,
-            ),
-        )
-        if predictor_svd_solver == "full" and not predictor_numerical_rank_is_exact:
-            raise ValueError(
-                'predictor_numerical_rank_is_exact must be true when '
-                'predictor_svd_solver="full".'
-            )
-        if predictor_svd_solver == "randomized" and predictor_numerical_rank_is_exact:
-            raise ValueError(
-                'predictor_numerical_rank_is_exact must be false when '
-                'predictor_svd_solver="randomized".'
-            )
-
-        object.__setattr__(self, "predictor_directions", predictor_directions)
-        object.__setattr__(self, "dilation", dilation)
-        object.__setattr__(self, "response_directions", response_directions)
-        object.__setattr__(self, "predictor_numerical_rank", predictor_numerical_rank)
         object.__setattr__(
             self,
-            "predictor_numerical_rank_is_exact",
-            predictor_numerical_rank_is_exact,
+            "predictor_directions",
+            _read_only_float_array(
+                self.predictor_directions,
+                name="predictor_directions",
+                ndim=2,
+            ),
         )
-        object.__setattr__(self, "rank_tolerance", rank_tolerance)
-        object.__setattr__(self, "predictor_svd_solver", predictor_svd_solver)
+        object.__setattr__(
+            self,
+            "dilation",
+            _read_only_float_array(self.dilation, name="dilation"),
+        )
+        object.__setattr__(
+            self,
+            "response_directions",
+            _read_only_float_array(
+                self.response_directions,
+                name="response_directions",
+                ndim=2,
+            ),
+        )
 
     def __reduce__(self) -> tuple[type[PiPLSDecomposition], tuple[object, ...]]:
-        """Reconstruct through validation so unpickled arrays remain read-only."""
+        """Reconstruct so unpickled arrays remain read-only."""
 
         return (
             type(self),

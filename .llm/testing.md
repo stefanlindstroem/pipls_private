@@ -72,8 +72,8 @@ Protect:
 
 Protect:
 
-- defensive copies, read-only arrays, shape and scalar validation, direct construction, and pickle
-  revalidation;
+- defensive copies and read-only pickle restoration for array-valued public results, with
+  semantic validation exercised through estimator, search, and inspection producers;
 - finite decomposition, path, OOF, and inspection arrays;
 - regression-map and balanced-biplot reconstruction preservation;
 - observation and prediction diagnostic equations and provenance;

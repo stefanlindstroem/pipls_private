@@ -54,8 +54,9 @@ minimum-CV-MSE selection additionally retains the exact unruled minimum path row
 component-count relative and absolute tolerances, and a derived effective threshold. Decision 0148
 adds independent predictor-rank evidence to optimized selections and their reference rows.
 
-All public path and selection records defensively copy arrays, normalize scalars, validate direct
-construction, remain read-only, and reconstruct through the same validation when unpickled.
+Public path/profile arrays are defensive read-only copies and recover that storage contract after
+unpickling. Semantic validity belongs to the fitted search that produces these returned-first
+records; arbitrary malformed direct construction is not a supported validation workflow.
 
 `cv_results_` remains the candidate-level evidence table. It is not duplicated inside the concise
 path or scalar selections.
