@@ -830,7 +830,7 @@ def prediction_diagnostics(
 
 
 def _response_matrix(values: ArrayLike, *, name: str) -> FloatArray:
-    array = np.array(values, dtype=np.float64, copy=True)
+    array = np.asarray(values, dtype=np.float64)
     if array.ndim == 1:
         array = array.reshape(-1, 1)
     if array.ndim != 2:
@@ -861,7 +861,7 @@ def _require_fitted_model(
 
 
 def _finite_matrix(values: ArrayLike, *, name: str) -> FloatArray:
-    array = np.array(values, dtype=np.float64, copy=True)
+    array = np.asarray(values, dtype=np.float64)
     if array.ndim != 2:
         raise ValueError(f"{name} must be two-dimensional; got shape {array.shape}.")
     if array.shape[0] == 0 or array.shape[1] == 0:

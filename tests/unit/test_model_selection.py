@@ -188,6 +188,8 @@ def test_materialize_cv_splits_reuses_one_concrete_split_set() -> None:
     np.testing.assert_array_equal(materialized.splits[0][1], np.array([0, 1, 2]))
     assert all(train.dtype == np.intp for train, _ in materialized.splits)
     assert all(validation.dtype == np.intp for _, validation in materialized.splits)
+    assert all(not train.flags.writeable for train, _ in materialized.splits)
+    assert all(not validation.flags.writeable for _, validation in materialized.splits)
 
 
 def test_materialize_cv_splits_accepts_an_iterable_and_copies_indices() -> None:

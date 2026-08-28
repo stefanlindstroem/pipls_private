@@ -158,7 +158,11 @@ def _materialize_cv_splits(
         )
         if np.intersect1d(train_index, validation_index).size:
             raise ValueError(f"Training and validation indices overlap in split {split_index}.")
-        splits.append((train_index.copy(), validation_index.copy()))
+        train_index = np.array(train_index, dtype=np.intp, copy=True)
+        validation_index = np.array(validation_index, dtype=np.intp, copy=True)
+        train_index.setflags(write=False)
+        validation_index.setflags(write=False)
+        splits.append((train_index, validation_index))
 
     if not splits:
         raise ValueError("Cross-validation must produce at least one split.")

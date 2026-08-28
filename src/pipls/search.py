@@ -394,11 +394,11 @@ class PiPLSSearchCV(
             multi_output=True,
             y_numeric=True,
             ensure_min_samples=2,
-            copy=True,
+            copy=False,
         )
         X_checked, y_checked = cast(tuple[Any, Any], validated)
         X_array = np.asarray(X_checked, dtype=np.float64)
-        y_array = np.array(y_checked, dtype=np.float64, copy=True)
+        y_array = np.asarray(y_checked, dtype=np.float64)
         y_2d = y_array.reshape(-1, 1) if y_array.ndim == 1 else y_array
         self.n_targets_ = int(y_2d.shape[1])
         X_indexable, y_indexable = indexable(X, y)
@@ -408,7 +408,7 @@ class PiPLSSearchCV(
         )
         template = clone(template)
         materialized = _materialize_cv_splits(self.cv, X_array, y_array, groups=groups)
-        self._cv_splits_ = _read_only_cv_splits(materialized.splits)
+        self._cv_splits_ = materialized.splits
         self._n_samples_fit_ = int(X_array.shape[0])
         _validate_singleton_validation_scoring(self.scoring, self._cv_splits_)
         self.n_splits_ = len(self._cv_splits_)
@@ -1092,18 +1092,6 @@ class PiPLSSearchCV(
         _validate_cv(self.cv)
         return _resolve_path_scorer(self.scoring, template)
 
-
-def _read_only_cv_splits(splits: tuple[CVSplit, ...]) -> tuple[CVSplit, ...]:
-    """Return defensive read-only copies of materialized split indices."""
-
-    stored: list[CVSplit] = []
-    for train, validation in splits:
-        train_copy = np.array(train, dtype=np.intp, copy=True)
-        validation_copy = np.array(validation, dtype=np.intp, copy=True)
-        train_copy.flags.writeable = False
-        validation_copy.flags.writeable = False
-        stored.append((train_copy, validation_copy))
-    return tuple(stored)
 
 
 def _validate_supported_estimator(estimator: Any) -> None:
