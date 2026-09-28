@@ -1,126 +1,97 @@
-# Π-PLS
+# PiPLS (Π-PLS)
 
-[![Tests](https://github.com/stefanlindstroem/pipls/actions/workflows/tests.yml/badge.svg)](https://github.com/stefanlindstroem/pipls/actions/workflows/tests.yml)
-[![Documentation](https://github.com/stefanlindstroem/pipls/actions/workflows/documentation.yml/badge.svg)](https://github.com/stefanlindstroem/pipls/actions/workflows/documentation.yml)
+[![Tests](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml)
+[![Documentation](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml)
+[![Python ≥3.10](https://img.shields.io/badge/Python-%E2%89%A53.10-3776AB?logo=python&logoColor=white)](docs/compatibility.md)
+[![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-4C1.svg)](LICENSE)
+[![DOI](https://img.shields.io/badge/DOI-article-007396.svg)](https://doi.org/10.1016/j.compchemeng.2026.109913)
 
-`pipls` is the Python package for panoramic partial least squares (Π-PLS), a PLS-family method for
-multivariate regression. Π-PLS represents the predictive relation through paired latent modes: each
-retained mode contains one orthonormal predictor direction, one orthonormal response direction, and
-one nonnegative dilation.
+**Panoramic partial least squares for compact and interpretable multivariate regression in Python.**
 
-For routine modeling, `n_components` is the main model-complexity parameter. `PiPLSSearchCV`
-evaluates prediction error across component counts and conditionally resolves one retained predictor
-rank for each count. Advanced workflows can inspect or restrict that predictor-rank search, or fit an
-explicit component-count/predictor-rank pair with `PiPLSRegression`.
+## Overview
 
-The [rendered documentation](https://stefanlindstroem.github.io/pipls/) is the primary user guide.
+Panoramic partial least squares (Π-PLS) is a multivariate latent-variable regression method for
+problems with correlated, potentially high-dimensional predictors and multiple responses. The
+`pipls` package provides a scikit-learn-style Python implementation for model fitting, selection,
+prediction, and inspection.
 
-## Installation
+The method first retains a broad, rank-controlled predictor subspace and then represents the
+predictive relationship through a smaller set of paired latent modes. This separation allows Π-PLS
+to preserve a sufficiently broad view of predictor variation without requiring an equally large
+final latent model.
 
-From a source checkout, create an environment and install the runtime package with:
+In the synthetic and real-world problems examined in the accompanying study, Π-PLS achieved
+competitive predictive accuracy with a parsimonious latent representation. Each mode connects one
+orthonormal predictor direction to one orthonormal response direction through a nonnegative
+coupling strength. Prediction and interpretation are therefore expressed through the same compact
+fitted structure.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install .
-```
+![PiPLS fitted geometry: predictor variables combine into predictor directions, each predictor direction is paired one-to-one with a response direction through a scalar dilation, and the response directions combine into predicted responses.](docs/assets/figures/pipls_model_overview.svg)
 
-Install the plotting dependencies used by the numbered examples and tutorials when needed:
+## Why PiPLS?
 
-```bash
-python -m pip install ".[examples]"
-```
+- **Panoramic predictor representation.** The retained predictor rank $r_\pi$ is controlled
+  separately from the final mode count $h$. The model can therefore begin with a broader predictor
+  representation and compress it only when forming the predictive latent structure.
+- **Compact predictive model.** The final relationship is expressed through a small number of
+  paired modes. In the accompanying study, this produced competitive predictive accuracy and often
+  a more parsimonious model than standard PLS, although the outcome remains data dependent.
+- **One-to-one latent-mode interpretation.** Every mode pairs one predictor direction with one
+  response direction through a single nonnegative dilation, making the fitted relationship
+  inspectable mode by mode.
+- **Prediction and interpretation in one structure.** The factorization
+  $\widehat{\mathbf{Y}}=\mathbf{X}\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$ is both the
+  prediction model and the basis for examining predictor scores, response directions, mode
+  strengths, and regression coefficients.
 
-Π-PLS supports Python 3.10 through 3.14 with NumPy `>=1.26,<3`, scikit-learn `>=1.4,<2`, and
-joblib `>=1.2,<2`. See the [compatibility policy](docs/compatibility.md). Contributor setup and
-repository validation commands are documented in [CONTRIBUTING.md](CONTRIBUTING.md).
+## How it works
 
-## Quick start
+1. **Retain a predictor panorama.** A singular value decomposition gives a rank-controlled
+   predictor basis $\mathbf{\Pi}$ and retained scores $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ of
+   dimension $r_\pi$.
+2. **Identify a response-linked latent relation.** The default construction selects an
+   $h$-dimensional response subspace from the cross-covariance between $\mathbf{Z}$ and
+   $\mathbf{Y}$, then estimates the reduced regression map by least squares.
+3. **Form paired modes.** Diagonalizing that map produces orthonormal predictor directions
+   $\mathbf{P}$, orthonormal response directions $\mathbf{Q}$, and the nonnegative diagonal
+   coupling matrix $\mathbf{D}$.
 
-The package includes the multivariate Pulp dataset, so a complete component-path search and final
-fit requires no external files:
+The two rank controls satisfy $h\leq r_\pi$: $r_\pi$ governs the breadth of the retained predictor
+representation, while $h$ governs the size of the final paired model. The
+[theory overview](docs/theory.md) gives the complete derivation.
 
-```python
-from pipls import PiPLSSearchCV
-from pipls.datasets import load_pulp
+## Documentation
 
-X, Y = load_pulp(return_X_y=True)
+The [rendered documentation](https://stefanlindstroem.github.io/pipls_private/) takes users from
+installation to model selection, validation, prediction, and interpretation. New users should begin
+with the installation guide and quick-start tutorial; the remaining tutorials provide complete
+workflows, while the theory and API sections document the mathematical construction and public
+interfaces.
 
-model = PiPLSSearchCV().fit(X, Y).refit(
-    X,
-    Y,
-    rule="minimum_cv_mse",
-)
-
-Y_fitted = model.predict(X)
-```
-
-`Y_fitted` contains fitted values from the final full-data model. For selection-conditioned
-out-of-fold diagnostics, retain the search and create one selection explicitly:
-
-```python
-search = PiPLSSearchCV().fit(X, Y)
-selection = search.select(rule="minimum_cv_mse")
-report = search.oof_report(X, Y, selection=selection)
-model = search.refit(X, Y, selection=selection)
-```
-
-The same immutable selection therefore identifies the row used for OOF diagnostics and final
-refitting. Independent post-selection performance assessment still requires nested cross-validation
-or an independent test set; see [OOF diagnostics](docs/oof_diagnostics.md).
-
-## Fit one exact model
-
-When both the paired-mode count $h$ and retained predictor rank $r_\pi$ are already known, fit that
-pair directly:
-
-```python
-from pipls import PiPLSRegression
-
-model = PiPLSRegression(
-    n_components=2,
-    predictor_rank=4,
-).fit(X_train, Y_train)
-
-Y_pred = model.predict(X_test)
-```
-
-This route performs no parameter selection. See the
-[`PiPLSRegression` reference](docs/api/regression.md) for the estimator contract and
-[Theory](docs/theory.md) for the mathematical construction.
-
-## Where to go next
-
-- [Quick start with Pulp](docs/tutorials/quick_start.md) develops the installed-data example and its
+- [Installation](docs/installation.md) — create an isolated environment and install the package.
+- [Quick start](docs/tutorials/quick_start.md) — move from an included dataset to a fitted model and
   prediction diagnostics.
-- [Inspect and select with synthetic data](docs/tutorials/synthetic.md) introduces component-path
-  inspection, conditional predictor-rank evidence, and independent-test prediction.
-- [Complete Pulp analysis](docs/tutorials/pulp.md) covers selection-conditioned OOF diagnostics,
-  final refitting, and model interpretation.
-- [Path and selection](docs/path_selection.md) defines predictor-rank policies, component selection,
-  cross-validation metadata, and computational trade-offs.
-- [Model inspection](docs/model_inspection.md) describes the immutable numerical results used for
-  latent-structure, coefficient, and prediction diagnostics.
-- [API overview](docs/api/index.md) collects the public estimator, search, dataset, and inspection
+- [Tutorials and examples](docs/examples.md) — follow complete executable workflows for selection,
+  validation, and interpretation.
+- [Theory](docs/theory.md) — study the mathematical construction and paired latent modes.
+- [API reference](docs/api/index.md) — inspect the public estimator, search, dataset, and result
   interfaces.
 
-The package includes Pulp, Sugarcane, and Tobacco through `pipls.datasets`. Their provenance,
-licenses, and language-neutral raw-resource layout are documented in the
-[dataset guide](docs/datasets.md). Numbered executable workflows are summarized in the
-[example catalogue](docs/examples.md).
+Contributor setup and repository validation are documented separately in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Authors, license, and citation
+## Citation and license
 
-The code and repository-authored documentation are copyright (c) 2026 Vishal Agrawal,
-Fritjof Nilsson, and Stefan B. Lindström and are distributed under the
-[BSD 3-Clause License](LICENSE). Included reference datasets retain their own license and
-attribution notices.
-
-The companion paper is under revision:
+If Π-PLS contributes to your work, please cite the accompanying article:
 
 > Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). Panoramic Partial Least Squares
-> (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model.
-> Manuscript under revision at *Computers & Chemical Engineering*, manuscript CACE-D-26-00847.
+> (Π-PLS): A transparent and parsimonious multivariate regression model with paired latent
+> directions. *Computers & Chemical Engineering*, 109913.
+> https://doi.org/10.1016/j.compchemeng.2026.109913
 
-See [authors, license, and citation](docs/citation.md) for the full scope and
-[`CITATION.cff`](CITATION.cff) for machine-readable citation metadata.
+PiPLS is developed by Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström. The code and
+repository-authored documentation are distributed under the [BSD 3-Clause License](LICENSE);
+included reference datasets retain their own licenses and attribution notices.
+
+See the [citation and licensing guide](docs/citation.md) for the recommended software citation and
+[`CITATION.cff`](CITATION.cff) for machine-readable metadata.

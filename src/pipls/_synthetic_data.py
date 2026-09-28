@@ -24,7 +24,7 @@ def make_synthetic_data(
     noise: NoiseSpec = 0.0,
     random_state: int = 0,
 ) -> tuple[FloatArray, FloatArray]:
-    r"""Generate the Gaussian latent geometry used in the companion manuscript.
+    r"""Generate the Gaussian latent geometry used in the companion publication.
 
     The function implements the latent-geometry equation in the Synthetic
     generator section of the dataset API reference. Every entry of the three
@@ -65,10 +65,10 @@ def make_synthetic_data(
     Notes
     -----
     The generator implements the synthetic data model described by Agrawal,
-    Nilsson, and Lindström (2026), *Panoramic Partial Least Squares (Pi-PLS):
-    Transparent, parsimonious, and more interpretable multivariate regression
-    model*, manuscript under revision at *Computers & Chemical Engineering*,
-    CACE-D-26-00847.
+    Nilsson, and Lindström (2026), *Panoramic Partial Least Squares (Π-PLS): A
+    transparent and parsimonious multivariate regression model with paired
+    latent directions*, *Computers & Chemical Engineering*, article 109913,
+    https://doi.org/10.1016/j.compchemeng.2026.109913.
     """
 
     n_samples = _positive_integer(n_samples, name="n_samples")

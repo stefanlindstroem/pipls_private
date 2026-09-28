@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite the software and the companion manuscript."
+message: "If you use this software, please cite the software and the companion article."
 title: "pipls: Π-PLS multivariate regression for Python"
 type: software
 version: "0.1.0"
@@ -16,7 +16,7 @@ authors:
     given-names: "Stefan B."
 preferred-citation:
   type: article
-  title: "Panoramic Partial Least Squares (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model"
+  title: "Panoramic Partial Least Squares (Π-PLS): A transparent and parsimonious multivariate regression model with paired latent directions"
   authors:
     - family-names: Agrawal
       given-names: Vishal
@@ -25,6 +25,6 @@ preferred-citation:
     - family-names: Lindström
       given-names: "Stefan B."
   journal: "Computers & Chemical Engineering"
-  status: submitted
   year: 2026
-  notes: "Manuscript under revision, CACE-D-26-00847."
+  doi: "10.1016/j.compchemeng.2026.109913"
+  url: "https://doi.org/10.1016/j.compchemeng.2026.109913"

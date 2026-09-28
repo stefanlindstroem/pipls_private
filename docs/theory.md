@@ -9,11 +9,12 @@ predictor-response modes. The package default uses the cross-covariance construc
 ## Scientific source and package scope
 
 The scientific source for the construction summarized on this page is the
-[companion manuscript](citation.md#companion-paper):
+[peer-reviewed companion publication](citation.md#companion-paper):
 
 > Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström, “Panoramic Partial Least Squares
-> (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model.”
-> Manuscript under revision at *Computers & Chemical Engineering*, CACE-D-26-00847.
+> (Π-PLS): A transparent and parsimonious multivariate regression model with paired latent
+> directions.” *Computers & Chemical Engineering*, 109913 (2026).
+> [https://doi.org/10.1016/j.compchemeng.2026.109913](https://doi.org/10.1016/j.compchemeng.2026.109913)
 
 The manuscript states the fixed mathematical core for centered predictor and response matrices,
 including the cross-covariance response-subspace construction. The package implements that
@@ -388,7 +389,7 @@ splits. Its search policies and the practical real-data workflows documented els
 redefined by this theory page and need not duplicate the manuscript’s experimental choices.
 
 `make_synthetic_data()` provides the package's deterministic synthetic-data utility and implements
-the [companion manuscript’s](citation.md#companion-paper) Gaussian latent data-generating model
+the [companion publication’s](citation.md#companion-paper) Gaussian latent data-generating model
 directly. See [Datasets and generators](api/datasets.md#synthetic-generator) for the exact
 distribution and generator contract, and [Reference datasets](datasets.md) for packaged data.
 

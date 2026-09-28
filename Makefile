@@ -70,6 +70,8 @@ docs-static-figures: ## Regenerate committed standalone documentation figures (r
 	mkdir -p build/docs-static-figures docs/assets/figures
 	latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build/docs-static-figures tools/figures/latent_geometry_generator.tex
 	pdftocairo -svg build/docs-static-figures/latent_geometry_generator.pdf docs/assets/figures/latent_geometry_generator.svg
+	latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build/docs-static-figures tools/figures/pipls_model_overview.tex
+	pdftocairo -svg build/docs-static-figures/pipls_model_overview.pdf docs/assets/figures/pipls_model_overview.svg
 
 docs-dist: ## Verify documentation from an extracted source distribution.
 	$(PYTHON) tools/check_sdist_docs.py

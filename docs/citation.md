@@ -33,16 +33,14 @@ The repository-root `CITATION.cff` provides the same software metadata in machin
 
 ## Companion paper {#companion-paper}
 
-The companion paper is currently under revision:
+The peer-reviewed companion paper is:
 
 > Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). Panoramic Partial Least Squares
-> (Pi-PLS): Transparent, parsimonious, and more interpretable multivariate regression model.
-> Manuscript under revision at *Computers & Chemical Engineering*, manuscript
-> CACE-D-26-00847.
+> (Π-PLS): A transparent and parsimonious multivariate regression model with paired latent
+> directions. *Computers & Chemical Engineering*, 109913.
+> [https://doi.org/10.1016/j.compchemeng.2026.109913](https://doi.org/10.1016/j.compchemeng.2026.109913)
 
 The [theory overview](theory.md) summarizes the fixed mathematical construction from the
-companion manuscript and distinguishes it from package-level preprocessing, search, and validation
+companion article and distinguishes it from package-level preprocessing, search, and validation
 capabilities. The [Datasets and generators API](api/datasets.md#synthetic-generator) defines the
 Gaussian data-generating distribution used for package validation and testing.
-
-The citation metadata should be updated when final publication details and a DOI become available.
