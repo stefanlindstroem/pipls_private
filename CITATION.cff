@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite the software and the companion article."
+message: "If you use PiPLS, please cite the companion article."
 title: "pipls: Π-PLS multivariate regression for Python"
 type: software
 version: "0.1.0"

@@ -8,6 +8,13 @@ maintenance. Paper-specific figure
 pipelines, complete publication grids, manuscript tables, and paper-only comparator workflows
 belong in downstream reproduction repositories.
 
+Before preparing a substantial change, open an
+[issue](https://github.com/stefanlindstroem/pipls_private/issues) or start a
+[discussion](https://github.com/stefanlindstroem/pipls_private/discussions) so that its scope and
+scientific or API implications can be reviewed. Pull requests for substantial changes should link
+to that issue or discussion. Small corrections, such as typo and broken-link fixes, may be submitted
+directly.
+
 ## Development setup
 
 Create and activate a development environment from the repository root:
@@ -172,9 +179,10 @@ make docs-dist
 make dist-check
 ```
 
-The release version must agree in `pyproject.toml`, `src/pipls/__init__.py`, `CITATION.cff`, the
-software citation in `docs/citation.md`, and the dated release heading in `CHANGELOG.md`. The
-release-metadata tests enforce these repository-facing identities.
+The release version must agree in `pyproject.toml`, `src/pipls/__init__.py`, `CITATION.cff`, and the
+dated release heading in `CHANGELOG.md`. The preferred companion-article citation in
+`docs/citation.md` and `CITATION.cff` must also agree. The release-metadata tests enforce the
+machine-readable repository-facing identities.
 
 Push the release commit before tagging it and confirm that the GitHub Actions workflows pass and
 the GitHub Pages site renders correctly. Then create and push an annotated tag matching the package
@@ -189,6 +197,11 @@ Create the corresponding GitHub Release from that tag. Publishing to a package i
 release action and is not performed by the repository workflows.
 
 ## LLM-assisted maintenance
+
+AI assistance is welcome, but every contribution must have a human owner who understands, reviews,
+and validates the complete change and remains responsible for it. Disclose material AI assistance
+in the pull-request description, including the tool used and the scope of its contribution. Do not
+submit AI-generated material that you cannot explain or verify.
 
 Read [`.llm/README.md`](.llm/README.md), [`.llm/state.md`](.llm/state.md), and the relevant
 contracts before preparing a change. Return root-relative unified Git patches and create an

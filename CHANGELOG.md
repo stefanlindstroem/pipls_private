@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Make the peer-reviewed companion article the single canonical PiPLS citation in the README,
+  citation guide, and `CITATION.cff`, while retaining the CFF file as the machine-readable route
+  used by GitHub and compatible citation tools.
 - Add the EPV policy as the second graphical path-selection case: reuse the Pulp feasible domain,
   highlight the single default-EPV predictor rank and its compatible component counts, and color
   only those evaluated pairs by their actual CV-MSE.

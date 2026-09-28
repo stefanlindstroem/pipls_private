@@ -2,8 +2,8 @@
 
 ## Authors and copyright
 
-The `pipls` code and repository-authored documentation are written by Vishal Agrawal,
-Fritjof Nilsson, and Stefan B. Lindström.
+The `pipls` code and repository-authored documentation are written by Vishal Agrawal 
+and Stefan B. Lindström.
 
 Copyright (c) 2026 Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström.
 
@@ -21,19 +21,9 @@ The repository-level BSD license does not replace the licenses of included third
 datasets. Each reference dataset retains its own attribution and license notice; see the
 [reference dataset guide](datasets.md).
 
-## Cite the software
+## Companion article {#companion-paper}
 
-Until a release DOI is available, cite the software using the authors, package name, version, and
-license:
-
-> Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). `pipls`: Π-PLS multivariate
-> regression for Python, version 0.1.0. https://github.com/stefanlindstroem/pipls. BSD-3-Clause.
-
-The repository-root `CITATION.cff` provides the same software metadata in machine-readable form.
-
-## Companion paper {#companion-paper}
-
-The peer-reviewed companion paper is:
+The companion article is the canonical citation for PiPLS:
 
 > Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). Panoramic Partial Least Squares
 > (Π-PLS): A transparent and parsimonious multivariate regression model with paired latent
@@ -44,3 +34,6 @@ The [theory overview](theory.md) summarizes the fixed mathematical construction 
 companion article and distinguishes it from package-level preprocessing, search, and validation
 capabilities. The [Datasets and generators API](api/datasets.md#synthetic-generator) defines the
 Gaussian data-generating distribution used for package validation and testing.
+
+The repository-root `CITATION.cff` provides this preferred citation in machine-readable form for
+GitHub and compatible citation tools.

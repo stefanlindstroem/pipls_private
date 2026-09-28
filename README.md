@@ -1,4 +1,4 @@
-# PiPLS (Π-PLS)
+# PiPLS (Π-PLS): A compact and interpretable model with paired latent directions
 
 [![Tests](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml)
 [![Documentation](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml)
@@ -6,92 +6,82 @@
 [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-4C1.svg)](LICENSE)
 [![DOI](https://img.shields.io/badge/DOI-article-007396.svg)](https://doi.org/10.1016/j.compchemeng.2026.109913)
 
-**Panoramic partial least squares for compact and interpretable multivariate regression in Python.**
-
 ## Overview
 
-Panoramic partial least squares (Π-PLS) is a multivariate latent-variable regression method for
-problems with correlated, potentially high-dimensional predictors and multiple responses. The
-`pipls` package provides a scikit-learn-style Python implementation for model fitting, selection,
-prediction, and inspection.
+**Panoramic partial least squares (Π-PLS)** is a data-driven multivariate regression method for
+predicting multiple responses from correlated, potentially high-dimensional predictors. It is
+particularly suited to process data, where it can support both property prediction and
+interpretation of predictor–response relationships. `pipls` provides a scikit-learn-style Python
+implementation for model selection, prediction, and interpretation.
 
-The method first retains a broad, rank-controlled predictor subspace and then represents the
-predictive relationship through a smaller set of paired latent modes. This separation allows Π-PLS
-to preserve a sufficiently broad view of predictor variation without requiring an equally large
-final latent model.
-
-In the synthetic and real-world problems examined in the accompanying study, Π-PLS achieved
-competitive predictive accuracy with a parsimonious latent representation. Each mode connects one
-orthonormal predictor direction to one orthonormal response direction through a nonnegative
-coupling strength. Prediction and interpretation are therefore expressed through the same compact
-fitted structure.
+Across the synthetic experiments and real-world datasets examined in the accompanying study,
+Π-PLS achieved competitive predictive performance relative to standard PLS while often using a
+more parsimonious latent representation. Each latent mode links one predictor direction to one
+response direction through a nonnegative coupling strength, supporting both prediction and direct,
+mode-wise interpretation.
 
 ![PiPLS fitted geometry: predictor variables combine into predictor directions, each predictor direction is paired one-to-one with a response direction through a scalar dilation, and the response directions combine into predicted responses.](docs/assets/figures/pipls_model_overview.svg)
 
 ## Why PiPLS?
 
-- **Panoramic predictor representation.** The retained predictor rank $r_\pi$ is controlled
-  separately from the final mode count $h$. The model can therefore begin with a broader predictor
-  representation and compress it only when forming the predictive latent structure.
-- **Compact predictive model.** The final relationship is expressed through a small number of
-  paired modes. In the accompanying study, this produced competitive predictive accuracy and often
-  a more parsimonious model than standard PLS, although the outcome remains data dependent.
-- **One-to-one latent-mode interpretation.** Every mode pairs one predictor direction with one
-  response direction through a single nonnegative dilation, making the fitted relationship
-  inspectable mode by mode.
+- **Broad-to-compact representation.** Π-PLS first retains a rank-controlled predictor panorama
+  and then expresses the predictive relationship through a smaller set of paired latent modes.
+- **Direct mode-wise interpretation.** Each latent mode links one predictor direction to one
+  response direction through a nonnegative coupling strength, making the fitted relationship easy
+  to inspect mode by mode.
 - **Prediction and interpretation in one structure.** The factorization
-  $\widehat{\mathbf{Y}}=\mathbf{X}\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$ is both the
-  prediction model and the basis for examining predictor scores, response directions, mode
+  $\widehat{\mathbf{Y}}=\mathbf{X}\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$ provides both the
+  prediction model and the basis for examining predictor directions, response directions, mode
   strengths, and regression coefficients.
 
 ## How it works
 
-1. **Retain a predictor panorama.** A singular value decomposition gives a rank-controlled
-   predictor basis $\mathbf{\Pi}$ and retained scores $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ of
-   dimension $r_\pi$.
-2. **Identify a response-linked latent relation.** The default construction selects an
+1. **Retain a predictor panorama.** A singular value decomposition defines a rank-controlled
+   predictor basis $\mathbf{\Pi}$ and retained scores $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ with
+   predictor rank $r_\pi$.
+2. **Identify the response-linked latent relation.** The default construction identifies an
    $h$-dimensional response subspace from the cross-covariance between $\mathbf{Z}$ and
    $\mathbf{Y}$, then estimates the reduced regression map by least squares.
-3. **Form paired modes.** Diagonalizing that map produces orthonormal predictor directions
+3. **Form paired latent modes.** Diagonalizing that map produces orthonormal predictor directions
    $\mathbf{P}$, orthonormal response directions $\mathbf{Q}$, and the nonnegative diagonal
    coupling matrix $\mathbf{D}$.
 
-The two rank controls satisfy $h\leq r_\pi$: $r_\pi$ governs the breadth of the retained predictor
+The two rank controls satisfy $h \leq r_\pi$: $r_\pi$ governs the breadth of the retained predictor
 representation, while $h$ governs the size of the final paired model. The
 [theory overview](docs/theory.md) gives the complete derivation.
 
 ## Documentation
 
-The [rendered documentation](https://stefanlindstroem.github.io/pipls_private/) takes users from
-installation to model selection, validation, prediction, and interpretation. New users should begin
-with the installation guide and quick-start tutorial; the remaining tutorials provide complete
-workflows, while the theory and API sections document the mathematical construction and public
-interfaces.
+The [rendered documentation](https://stefanlindstroem.github.io/pipls_private/) covers installation,
+model selection, validation, prediction, interpretation, theory, and the public API. New users can
+begin with the installation guide and quick-start tutorial, then move to the complete examples and
+reference material.
 
 - [Installation](docs/installation.md) — create an isolated environment and install the package.
 - [Quick start](docs/tutorials/quick_start.md) — move from an included dataset to a fitted model and
   prediction diagnostics.
-- [Tutorials and examples](docs/examples.md) — follow complete executable workflows for selection,
+- [Tutorials and examples](docs/examples.md) — follow complete workflows for model selection,
   validation, and interpretation.
 - [Theory](docs/theory.md) — study the mathematical construction and paired latent modes.
 - [API reference](docs/api/index.md) — inspect the public estimator, search, dataset, and result
   interfaces.
 
-Contributor setup and repository validation are documented separately in
-[CONTRIBUTING.md](CONTRIBUTING.md).
+## Contributing and development
+
+We welcome contributions and feedback. Before submitting a substantial change, please
+[open an issue](https://github.com/stefanlindstroem/pipls_private/issues) or
+[start a discussion](https://github.com/stefanlindstroem/pipls_private/discussions) so that the
+proposal can be reviewed and coordinated. Pull requests should link to the corresponding issue or
+discussion.
+
+PiPLS uses a structured, human-directed workflow for LLM-assisted development. Scientific and
+software decisions remain with the human maintainers, and AI-assisted changes are reviewed and
+validated before inclusion. See [CONTRIBUTING.md](CONTRIBUTING.md) for contributor guidance;
+coding assistants should begin with [`.llm/README.md`](.llm/README.md).
 
 ## Citation and license
 
-If Π-PLS contributes to your work, please cite the accompanying article:
-
-> Agrawal, V., Nilsson, F., and Lindström, S. B. (2026). Panoramic Partial Least Squares
-> (Π-PLS): A transparent and parsimonious multivariate regression model with paired latent
-> directions. *Computers & Chemical Engineering*, 109913.
-> https://doi.org/10.1016/j.compchemeng.2026.109913
-
-PiPLS is developed by Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström. The code and
-repository-authored documentation are distributed under the [BSD 3-Clause License](LICENSE);
-included reference datasets retain their own licenses and attribution notices.
-
-See the [citation and licensing guide](docs/citation.md) for the recommended software citation and
-[`CITATION.cff`](CITATION.cff) for machine-readable metadata.
+If you use PiPLS, please cite the companion article as described in the
+[citation guide](docs/citation.md); [`CITATION.cff`](CITATION.cff) provides the same citation in
+machine-readable form. PiPLS is distributed under the [BSD 3-Clause License](LICENSE). Included
+reference datasets retain their own licensing and attribution terms.
