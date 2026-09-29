@@ -15,40 +15,42 @@ interpretation of predictor–response relationships. `pipls` provides a scikit-
 implementation for model selection, prediction, and interpretation.
 
 Across the synthetic experiments and real-world datasets examined in the accompanying study,
-Π-PLS achieved competitive predictive performance relative to standard PLS while often using a
-more parsimonious latent representation. Each latent mode links one predictor direction to one
-response direction through a nonnegative coupling strength, supporting both prediction and direct,
-mode-wise interpretation.
+Π-PLS achieved competitive or better predictive performance relative to standard PLS at the fixed 
+component count. In other words, Π-PLS attains comparable predictive performance with fewer latent
+components, yielding a more parsimonious model. Each latent mode links one predictor direction to 
+one response direction through a non-negative coupling strength, supporting both prediction and 
+direct, mode-wise interpretation.
 
 ![PiPLS fitted geometry: predictor variables combine into predictor directions, each predictor direction is paired one-to-one with a response direction through a scalar dilation, and the response directions combine into predicted responses.](docs/assets/figures/pipls_model_overview.svg)
 
 ## Why Π-PLS?
 
-- **Broad-to-compact representation.** Π-PLS first retains a rank-controlled predictor panorama
-  and then expresses the predictive relationship through a smaller set of paired latent modes.
-- **Direct mode-wise interpretation.** Each latent mode links one predictor direction to one
-  response direction through a nonnegative coupling strength, making the fitted relationship easy
-  to inspect mode by mode.
 - **Prediction and interpretation in one structure.** The factorization
   $\widehat{\mathbf{Y}}=\mathbf{X}\mathbf{P}\mathbf{D}\mathbf{Q}^{\top}$ provides both the
   prediction model and the basis for examining predictor directions, response directions, mode
   strengths, and regression coefficients.
+- **Compact representation.** Π-PLS expresses the predictive relationship through a smaller set 
+  of paired latent modes.
+- **Direct mode-wise interpretation.** Each latent mode links one predictor direction to one
+  response direction through a non-negative coupling strength, making the fitted relationship easy
+  to inspect mode by mode.
 
 ## How it works
 
-1. **Retain a predictor panorama.** A singular value decomposition defines a rank-controlled
-   predictor basis $\mathbf{\Pi}$ and retained scores $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$ with
-   predictor rank $r_\pi$.
+1. **Retain a predictor panorama.** An SVD of the predictor matrix $\mathbf{X}$ defines a 
+   a rank-controlled predictor basis $\mathbf{\Pi}$ and the corresponding retained scores 
+   $\mathbf{Z}=\mathbf{X}\mathbf{\Pi}$, where $r_\pi$ control the dimension of retained 
+   predictor representation.
 2. **Identify the response-linked latent relation.** The default construction identifies an
    $h$-dimensional response subspace from the cross-covariance between $\mathbf{Z}$ and
    $\mathbf{Y}$, then estimates the reduced regression map by least squares.
 3. **Form paired latent modes.** Diagonalizing that map produces orthonormal predictor directions
-   $\mathbf{P}$, orthonormal response directions $\mathbf{Q}$, and the nonnegative diagonal
+   $\mathbf{P}$, orthonormal response directions $\mathbf{Q}$, and the non-negative diagonal
    coupling matrix $\mathbf{D}$.
 
-The two rank controls satisfy $h \leq r_\pi$: $r_\pi$ governs the breadth of the retained predictor
-representation, while $h$ governs the size of the final paired model. The
-[theory overview](docs/theory.md) gives the complete derivation.
+The two rank controls satisfy $h \leq r_\pi$, where $r_\pi$ governs the breadth of the retained 
+predictor representation, while $h$ is the component count, i.e., the size of the final paired 
+model. The [theory overview](docs/theory.md) gives the complete derivation.
 
 ## Documentation
 
@@ -75,13 +77,14 @@ proposal can be reviewed and coordinated. Pull requests should link to the corre
 discussion.
 
 Π-PLS is developed using a structured, human-guided workflow with LLM assistance. Human maintainers 
-retain responsibility for scientific and software decisions, and all AI-assisted changes are 
+retain responsibility for scientific and software decisions, and all LLM assisted changes are 
 reviewed and validated before inclusion. See [CONTRIBUTING.md](CONTRIBUTING.md) for contributor 
 guidance; coding assistants should begin with [`.llm/README.md`](.llm/README.md).
 
 ## Citation and license
 
 If you use Π-PLS, please cite the companion article as described in the
-[citation guide](docs/citation.md); [`CITATION.cff`](CITATION.cff) provides the same citation in
+[citation guide](docs/citation.md); 
+[`CITATION.cff`](CITATION.cff) provides the same citation in
 machine-readable form. Π-PLS is distributed under the [BSD 3-Clause License](LICENSE). Included
 reference datasets retain their own licensing and attribution terms.
