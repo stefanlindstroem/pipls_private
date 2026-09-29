@@ -122,6 +122,8 @@ def main() -> None:
                 "example/pipls",
                 "--server-url",
                 "https://github.com",
+                "--branch",
+                "main",
                 "--output",
                 str(pages_config),
             ],

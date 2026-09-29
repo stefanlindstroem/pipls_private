@@ -3,15 +3,13 @@ message: "If you use PiPLS, please cite the companion article."
 title: "pipls: Π-PLS multivariate regression for Python"
 type: software
 version: "0.1.0"
-date-released: 2026-08-09
+date-released: 2026-09-29
 license: BSD-3-Clause
 repository-code: "https://github.com/stefanlindstroem/pipls"
 url: "https://stefanlindstroem.github.io/pipls/"
 authors:
   - family-names: Agrawal
     given-names: Vishal
-  - family-names: Nilsson
-    given-names: Fritjof
   - family-names: Lindström
     given-names: "Stefan B."
 preferred-citation:

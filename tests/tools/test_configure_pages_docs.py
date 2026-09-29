@@ -18,6 +18,7 @@ def _run_configure_pages_docs(
     output: Path,
     repository: str,
     server_url: str = "https://github.com",
+    branch: str = "main",
 ) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [
@@ -27,6 +28,8 @@ def _run_configure_pages_docs(
             repository,
             "--server-url",
             server_url,
+            "--branch",
+            branch,
             "--output",
             str(output),
         ],
@@ -44,6 +47,7 @@ def test_configure_pages_docs_writes_project_site_overlay(tmp_path: Path) -> Non
     completed = _run_configure_pages_docs(
         output=output,
         repository="openai/pipls",
+        branch="trunk",
     )
 
     assert completed.returncode == 0, completed.stderr
@@ -58,7 +62,7 @@ def test_configure_pages_docs_writes_project_site_overlay(tmp_path: Path) -> Non
         "INHERIT": expected_inherit,
         "site_url": "https://openai.github.io/pipls/",
         "repo_url": "https://github.com/openai/pipls",
-        "edit_uri": "edit/master/docs/",
+        "edit_uri": "edit/trunk/docs/",
     }
 
 
@@ -76,16 +80,18 @@ def test_configure_pages_docs_writes_user_site_url(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    ("repository", "server_url"),
+    ("repository", "server_url", "branch"),
     [
-        ("invalid", "https://github.com"),
-        ("openai/pipls", "http://github.com"),
+        ("invalid", "https://github.com", "main"),
+        ("openai/pipls", "http://github.com", "main"),
+        ("openai/pipls", "https://github.com", ""),
     ],
 )
 def test_configure_pages_docs_rejects_invalid_inputs(
     tmp_path: Path,
     repository: str,
     server_url: str,
+    branch: str,
 ) -> None:
     output = tmp_path / "mkdocs.yml"
 
@@ -93,6 +99,7 @@ def test_configure_pages_docs_rejects_invalid_inputs(
         output=output,
         repository=repository,
         server_url=server_url,
+        branch=branch,
     )
 
     assert completed.returncode != 0

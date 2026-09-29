@@ -12,8 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: python -m pip install --upgrade pip
@@ -21,26 +21,27 @@ jobs:
       - run: make docs
       - run: make docs-dist
       - name: Configure GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
         uses: actions/configure-pages@v6
       - name: Prepare canonical Pages configuration
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
         run: >-
           python tools/configure_pages_docs.py
           --repository "${{ github.repository }}"
           --server-url "${{ github.server_url }}"
+          --branch "${{ github.event.repository.default_branch }}"
           --output .mkdocs-pages.yml
       - name: Build canonical Pages site
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
         run: python -m mkdocs build --strict --config-file .mkdocs-pages.yml
       - name: Upload GitHub Pages artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
         uses: actions/upload-pages-artifact@v5
         with:
           path: site
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
     needs: build
     runs-on: ubuntu-latest
     permissions:

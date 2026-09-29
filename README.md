@@ -1,7 +1,7 @@
 # Π-PLS: A compact and interpretable model with paired latent directions
 
-[![Tests](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml)
-[![Documentation](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml)
+[![Tests](https://github.com/stefanlindstroem/pipls/actions/workflows/tests.yml/badge.svg)](https://github.com/stefanlindstroem/pipls/actions/workflows/tests.yml)
+[![Documentation](https://github.com/stefanlindstroem/pipls/actions/workflows/documentation.yml/badge.svg)](https://github.com/stefanlindstroem/pipls/actions/workflows/documentation.yml)
 [![Python ≥3.10](https://img.shields.io/badge/Python-%E2%89%A53.10-3776AB?logo=python&logoColor=white)](docs/compatibility.md)
 [![License: BSD 3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-4C1.svg)](LICENSE)
 [![DOI](https://img.shields.io/badge/DOI-article-007396.svg)](https://doi.org/10.1016/j.compchemeng.2026.109913)
@@ -54,7 +54,7 @@ model. The [theory overview](docs/theory.md) gives the complete derivation.
 
 ## Documentation
 
-The [rendered documentation](https://stefanlindstroem.github.io/pipls_private/) covers installation,
+The [rendered documentation](https://stefanlindstroem.github.io/pipls/) covers installation,
 model selection, validation, prediction, interpretation, theory, and the public API. New users can
 begin with the installation guide and quick-start tutorial, then move to the complete examples and
 reference material.
@@ -71,8 +71,8 @@ reference material.
 ## Contributing and development
 
 We welcome contributions and feedback. Before submitting a substantial change, please
-[open an issue](https://github.com/stefanlindstroem/pipls_private/issues) or
-[start a discussion](https://github.com/stefanlindstroem/pipls_private/discussions) so that the
+[open an issue](https://github.com/stefanlindstroem/pipls/issues) or
+[start a discussion](https://github.com/stefanlindstroem/pipls/discussions) so that the
 proposal can be reviewed and coordinated. Pull requests should link to the corresponding issue or
 discussion.
 

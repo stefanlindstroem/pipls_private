@@ -2,10 +2,10 @@
 
 ## Authors and copyright
 
-The `pipls` code and repository-authored documentation are written by Vishal Agrawal 
-and Stefan B. Lindström.
+The `pipls` code and repository-authored documentation are written by Vishal Agrawal and
+Stefan B. Lindström.
 
-Copyright (c) 2026 Vishal Agrawal, Fritjof Nilsson, and Stefan B. Lindström.
+Copyright (c) 2026 Vishal Agrawal and Stefan B. Lindström.
 
 ## Software and documentation license
 

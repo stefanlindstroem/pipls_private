@@ -9,8 +9,8 @@ pipelines, complete publication grids, manuscript tables, and paper-only compara
 belong in downstream reproduction repositories.
 
 Before preparing a substantial change, open an
-[issue](https://github.com/stefanlindstroem/pipls_private/issues) or start a
-[discussion](https://github.com/stefanlindstroem/pipls_private/discussions) so that its scope and
+[issue](https://github.com/stefanlindstroem/pipls/issues) or start a
+[discussion](https://github.com/stefanlindstroem/pipls/discussions) so that its scope and
 scientific or API implications can be reviewed. Pull requests for substantial changes should link
 to that issue or discussion. Small corrections, such as typo and broken-link fixes, may be submitted
 directly.

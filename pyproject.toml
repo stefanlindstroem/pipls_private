@@ -13,7 +13,6 @@ license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 authors = [
   {name = "Vishal Agrawal"},
-  {name = "Fritjof Nilsson"},
   {name = "Stefan B. Lindström"},
 ]
 classifiers = [
@@ -41,7 +40,7 @@ Homepage = "https://stefanlindstroem.github.io/pipls/"
 Documentation = "https://stefanlindstroem.github.io/pipls/"
 Source = "https://github.com/stefanlindstroem/pipls"
 Issues = "https://github.com/stefanlindstroem/pipls/issues"
-Changelog = "https://github.com/stefanlindstroem/pipls/blob/master/CHANGELOG.md"
+Changelog = "https://github.com/stefanlindstroem/pipls/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
