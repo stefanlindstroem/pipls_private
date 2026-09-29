@@ -1,4 +1,4 @@
-# PiPLS (Π-PLS): A compact and interpretable model with paired latent directions
+# Π-PLS: A compact and interpretable model with paired latent directions
 
 [![Tests](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/tests.yml)
 [![Documentation](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml/badge.svg?branch=master)](https://github.com/stefanlindstroem/pipls_private/actions/workflows/documentation.yml)
@@ -22,7 +22,7 @@ mode-wise interpretation.
 
 ![PiPLS fitted geometry: predictor variables combine into predictor directions, each predictor direction is paired one-to-one with a response direction through a scalar dilation, and the response directions combine into predicted responses.](docs/assets/figures/pipls_model_overview.svg)
 
-## Why PiPLS?
+## Why Π-PLS?
 
 - **Broad-to-compact representation.** Π-PLS first retains a rank-controlled predictor panorama
   and then expresses the predictive relationship through a smaller set of paired latent modes.
@@ -30,7 +30,7 @@ mode-wise interpretation.
   response direction through a nonnegative coupling strength, making the fitted relationship easy
   to inspect mode by mode.
 - **Prediction and interpretation in one structure.** The factorization
-  $\widehat{\mathbf{Y}}=\mathbf{X}\mathbf{P}\mathbf{D}\mathbf{Q}^{\mathsf T}$ provides both the
+  $\widehat{\mathbf{Y}}=\mathbf{X}\mathbf{P}\mathbf{D}\mathbf{Q}^{\top}$ provides both the
   prediction model and the basis for examining predictor directions, response directions, mode
   strengths, and regression coefficients.
 
@@ -74,14 +74,14 @@ We welcome contributions and feedback. Before submitting a substantial change, p
 proposal can be reviewed and coordinated. Pull requests should link to the corresponding issue or
 discussion.
 
-PiPLS uses a structured, human-directed workflow for LLM-assisted development. Scientific and
-software decisions remain with the human maintainers, and AI-assisted changes are reviewed and
-validated before inclusion. See [CONTRIBUTING.md](CONTRIBUTING.md) for contributor guidance;
-coding assistants should begin with [`.llm/README.md`](.llm/README.md).
+Π-PLS is developed using a structured, human-guided workflow with LLM assistance. Human maintainers 
+retain responsibility for scientific and software decisions, and all AI-assisted changes are 
+reviewed and validated before inclusion. See [CONTRIBUTING.md](CONTRIBUTING.md) for contributor 
+guidance; coding assistants should begin with [`.llm/README.md`](.llm/README.md).
 
 ## Citation and license
 
-If you use PiPLS, please cite the companion article as described in the
+If you use Π-PLS, please cite the companion article as described in the
 [citation guide](docs/citation.md); [`CITATION.cff`](CITATION.cff) provides the same citation in
-machine-readable form. PiPLS is distributed under the [BSD 3-Clause License](LICENSE). Included
+machine-readable form. Π-PLS is distributed under the [BSD 3-Clause License](LICENSE). Included
 reference datasets retain their own licensing and attribution terms.
