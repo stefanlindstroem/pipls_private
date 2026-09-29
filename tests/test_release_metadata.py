@@ -88,3 +88,17 @@ def test_annotation_layout_extra_is_textalloc_only() -> None:
         requirements = [str(requirement) for requirement in optional[group]]
         assert any(requirement.startswith("textalloc>=") for requirement in requirements)
         assert all(not requirement.lower().startswith("adjusttext") for requirement in requirements)
+
+
+def test_documentation_workflow_uses_least_privilege_pages_permissions() -> None:
+    workflow = yaml.safe_load(
+        (REPOSITORY_ROOT / ".github" / "workflows" / "documentation.yml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert workflow["permissions"] == {"contents": "read", "pages": "read"}
+    assert workflow["jobs"]["deploy"]["permissions"] == {
+        "pages": "write",
+        "id-token": "write",
+    }
