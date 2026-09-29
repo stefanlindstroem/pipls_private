@@ -12,7 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: .llm/snapshot.sh /tmp/pipls-snapshot.tar.gz
+      - run: python tools/create_snapshot.py /tmp/pipls-snapshot.tar.gz
       - run: >-
           ! tar -tzf /tmp/pipls-snapshot.tar.gz |
           grep -E '(^|/)(\.git|__pycache__|\.pytest_cache|docs/assets/generated)(/|$)|\.pyc$'
@@ -21,5 +21,5 @@ jobs:
           grep -E '^examples/results/.+[^/]$' |
           grep -vE '(^|/)\.gitkeep$'
       - run: |
-          tar -xOf /tmp/pipls-snapshot.tar.gz .llm/SNAPSHOT_INFO |
+          tar -xOf /tmp/pipls-snapshot.tar.gz SNAPSHOT_INFO |
             grep -Fx 'dirty: false'

@@ -147,7 +147,8 @@ contracts in tutorial prose.
 
 ## Data and generated files
 
-Mathematical changes must update the relevant contracts in `.llm/` and include focused tests.
+Mathematical changes must update the relevant contracts in `docs/maintainers/` and include focused
+tests.
 
 Do not commit generated result files without an explicit fixture decision. Generated example
 figures, tutorial assets, build artifacts, caches, and archive clutter are ignored. The committed
@@ -158,12 +159,12 @@ add datasets without verified redistribution and adaptation terms.
 ## Repository map
 
 - `src/pipls/`: installable package, public API, and canonical reference-data resources;
-- `docs/`: served documentation and excluded maintainer decision records;
+- `docs/`: served documentation plus excluded maintainer contracts and decision records;
 - `examples/`: numbered user workflows and their small support layer;
 - `tests/`: numerical, API, integration, documentation, and repository tests;
 - `tools/`: documentation and distribution validation helpers;
 - `constraints/`: the maintainer-only minimum-dependency environment;
-- `.llm/`: tracked maintenance contracts for LLM-assisted development.
+- `docs/maintainers/`: non-served scientific and architectural maintainer contracts.
 
 ## Release checklist
 
@@ -203,15 +204,6 @@ and validates the complete change and remains responsible for it. Disclose mater
 in the pull-request description, including the tool used and the scope of its contribution. Do not
 submit AI-generated material that you cannot explain or verify.
 
-Read [`.llm/README.md`](.llm/README.md), [`.llm/state.md`](.llm/state.md), and the relevant
-contracts before preparing a change. Return root-relative unified Git patches and create an
-uploadable snapshot with:
-
-```bash
-make snapshot
-```
-
-The snapshot target requires a clean committed worktree. It refuses tracked, staged, and
-nonignored untracked changes and archives only `HEAD`, so ignored generated files and caches are
-not included. It also refuses committed files below `examples/results/` other than `.gitkeep`
-placeholders.
+Coding assistants should begin with [`AGENTS.md`](AGENTS.md), which routes them to the relevant
+human-facing guidance, decisions, and maintainer contracts. Do not create a second set of project
+rules solely for a particular assistant or tool.

@@ -275,9 +275,9 @@ class PiPLSRegression(
             ),
         )
         with np.errstate(over="ignore", invalid="ignore"):
-            prediction = (
-                np.asarray(X_checked, dtype=np.float64) @ self.coef_.T
-                + self.intercept_
+            prediction = cast(
+                FloatArray,
+                np.asarray(X_checked, dtype=np.float64) @ self.coef_.T + self.intercept_,
             )
         _require_finite_output(prediction, operation="Prediction")
         if self._y_was_1d:

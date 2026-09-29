@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Replace the custom root `.llm` layer with a concise `AGENTS.md` entry point and a small,
+  non-served `docs/maintainers/` scientific reference. Remove duplicated assistant prompts,
+  workflow guidance, API inventories, state summaries, and the second decision registry; move
+  snapshot creation to a portable Python tool that works with macOS and GNU environments.
 - Make the peer-reviewed companion article the single canonical PiPLS citation in the README,
   citation guide, and `CITATION.cff`, while retaining the CFF file as the machine-readable route
   used by GitHub and compatible citation tools.

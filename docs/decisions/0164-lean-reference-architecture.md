@@ -112,7 +112,7 @@ workflows already taught elsewhere.
 ### Preserve the strict served-documentation boundary
 
 The site remains a strict self-contained MkDocs build. Generated API pages derive signatures and
-field documentation from audited public source docstrings. Numbered decisions and `.llm` remain
+field documentation from audited public source docstrings. Numbered decisions and maintainer contracts remain
 maintainer records excluded from served navigation and search. Documentation inputs required for a
 clean build remain included in the source distribution, and checkout and source-distribution builds
 continue to validate links, anchors, generated API targets, mathematics, and maintained assets.

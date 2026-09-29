@@ -17,8 +17,8 @@ contract, not a replacement for the manuscript. The authority hierarchy for impl
 
 1. explicit scientific decisions from the project owner;
 2. accepted decision records under `docs/decisions/`;
-3. the normative equations and invariants in `.llm/mathematics.md`;
-4. the numerical rules in `.llm/numerical_contracts.md`;
+3. the normative equations and invariants in `docs/maintainers/mathematics.md`;
+4. the numerical rules in `docs/maintainers/numerical_contracts.md`;
 5. this conceptual reference;
 6. source code and tests as evidence of currently implemented behavior.
 
@@ -556,7 +556,7 @@ is invalid and raises an error rather than being silently clamped.
 
 Constant columns, rank-deficient matrices, $p\gg n$, singleton CV training folds, and repeated
 singular values are expected boundary cases. Their exact handling is specified in
-`.llm/numerical_contracts.md`.
+`docs/maintainers/numerical_contracts.md`.
 
 ## Predictor-rank selection: theory versus API policy
 

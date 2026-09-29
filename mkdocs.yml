@@ -38,6 +38,7 @@ nav:
 
 exclude_docs: |
   decisions/**
+  maintainers/**
 
 validation:
   omitted_files: warn

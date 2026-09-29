@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 import tarfile
 from pathlib import Path
 
@@ -22,8 +23,11 @@ def _commit(root: Path, message: str) -> None:
 
 def _create_snapshot_test_repository(path: Path) -> Path:
     root = path / "repository"
-    (root / ".llm").mkdir(parents=True)
-    shutil.copy2(_repository_root() / ".llm" / "snapshot.sh", root / ".llm" / "snapshot.sh")
+    (root / "tools").mkdir(parents=True)
+    shutil.copy2(
+        _repository_root() / "tools" / "create_snapshot.py",
+        root / "tools" / "create_snapshot.py",
+    )
     (root / "README.md").write_text("# Snapshot fixture\n", encoding="utf-8")
     (root / ".gitignore").write_text(
         "\n".join(
@@ -84,7 +88,7 @@ def _create_snapshot_test_repository(path: Path) -> Path:
 
 def _run_snapshot(root: Path, archive: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [str(root / ".llm" / "snapshot.sh"), str(archive)],
+        [sys.executable, str(root / "tools" / "create_snapshot.py"), str(archive)],
         cwd=root,
         check=False,
         capture_output=True,
@@ -102,7 +106,7 @@ def test_snapshot_has_committed_repository_contents_at_archive_root(tmp_path: Pa
     with tarfile.open(archive, "r:gz") as handle:
         members = handle.getmembers()
         names = {member.name.removeprefix("./") for member in members}
-        metadata_member = handle.extractfile(".llm/SNAPSHOT_INFO")
+        metadata_member = handle.extractfile("SNAPSHOT_INFO")
         assert metadata_member is not None
         metadata = metadata_member.read().decode("utf-8")
 
@@ -114,7 +118,7 @@ def test_snapshot_has_committed_repository_contents_at_archive_root(tmp_path: Pa
         text=True,
     ).stdout.strip()
     assert "README.md" in names
-    assert ".llm/SNAPSHOT_INFO" in names
+    assert "SNAPSHOT_INFO" in names
     assert not any(name.startswith(f"{root.name}/") for name in names)
     assert f"commit: {commit}" in metadata
     assert "dirty: false" in metadata

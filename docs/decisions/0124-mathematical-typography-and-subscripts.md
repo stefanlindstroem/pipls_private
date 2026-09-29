@@ -16,7 +16,7 @@ could be mistaken for variable indices.
 ## Decision
 
 Use one mathematical typography convention across living public documentation, generated public
-docstrings, and normative `.llm` contracts:
+docstrings, and normative maintainer contracts:
 
 - complete matrices are bold;
 - Latin matrix symbols use `\mathbf`, while Greek matrix symbols that must render in bold use

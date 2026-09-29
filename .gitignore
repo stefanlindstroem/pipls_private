@@ -38,3 +38,11 @@ examples/results/*
 # Generated example figures
 /examples/results/*.pdf
 /examples/results/**/*.pdf
+
+# Standalone TeX figure build products (sources and committed SVGs remain tracked)
+/tools/figures/*.aux
+/tools/figures/*.fdb_latexmk
+/tools/figures/*.fls
+/tools/figures/*.log
+/tools/figures/*.pdf
+/tools/figures/*.synctex.gz

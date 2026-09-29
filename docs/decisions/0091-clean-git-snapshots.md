@@ -8,7 +8,7 @@ Accepted.
 
 The snapshot helper copied the complete worktree with `rsync` and determined cleanliness from
 tracked staged and unstaged differences only. Nonignored untracked files could therefore enter an
-archive while `.llm/SNAPSHOT_INFO` reported `dirty: false`. Ignored generated documentation figures
+archive while `SNAPSHOT_INFO` reported `dirty: false`. Ignored generated documentation figures
 could also enter snapshots because exclusion depended on a manually maintained `rsync` list.
 
 Repository snapshots are authoritative inputs for later patch work. Their contents and recorded
@@ -22,7 +22,7 @@ Create snapshots from `git archive HEAD`, not from a worktree copy.
 2. The helper refuses to run when `git status --porcelain` reports tracked changes, staged changes,
    or nonignored untracked files.
 3. Ignored files do not block snapshot creation because they cannot enter `git archive` output.
-4. `.llm/SNAPSHOT_INFO` is regenerated after extracting the committed tree and always records
+4. `SNAPSHOT_INFO` is regenerated after extracting the committed tree and always records
    `dirty: false`.
 5. Archive paths remain relative to the repository root, and the generated metadata replaces the
    committed handoff metadata inside the archive.

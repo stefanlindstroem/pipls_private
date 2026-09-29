@@ -85,4 +85,4 @@ dist-check: ## Verify clean wheel and source-distribution installations.
 	$(PYTHON) tools/check_distributions.py
 
 snapshot: ## Create an uploadable repository snapshot.
-	./.llm/snapshot.sh
+	$(PYTHON) tools/create_snapshot.py

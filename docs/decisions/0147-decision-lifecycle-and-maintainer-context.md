@@ -12,14 +12,14 @@ or public-API behavior.
 ## Context
 
 At adoption, the repository contained 146 numbered decision records and more than five thousand
-lines of active `.llm` guidance. These records document valuable architectural reasoning, but many
+lines of the former active `.llm` guidance. These records document valuable architectural reasoning, but many
 describe
 superseded APIs, one-off migrations, completed patch sequences, or cleanup work whose durable
 outcome is already captured by a later canonical decision. Keeping every intermediate record in the
 active decision index makes current policy harder to identify and encourages stale wording to remain
 in the maintainer context.
 
-The same problem appears in the active `.llm` layer. Current contracts, completed transition logs,
+The same problem appeared in the former `.llm` layer. Current contracts, completed transition logs,
 and historical implementation narratives are mixed together. This increases maintenance cost and
 can cause a future maintainer to follow an obsolete intermediate state instead of the implemented
 surface.
@@ -77,7 +77,7 @@ retired decision to one of:
 - a section of `docs/decisions/history.md`;
 - Git history alone, when the record describes only a one-off migration or cleanup.
 
-The same patch must remove or redirect active links from `.llm`, tests, documentation, and retained
+The same patch must remove or redirect active links from the former `.llm` layer, tests, documentation, and retained
 decisions. No copied archive, tarball, or hidden duplicate of the retired Markdown files is added to
 the repository.
 
@@ -101,7 +101,7 @@ documentation-arrangement, and cleanup records.
 After consolidation:
 
 - `docs/decisions/index.md` lists current numbered decisions and links to the historical summary;
-- `.llm/decisions.md` is a concise registry of current decisions and implemented clarifications;
+- `docs/decisions/index.md` is the sole registry of current decisions;
 - `docs/decisions/history.md` summarizes completed eras without attempting exhaustive
   reconstruction;
 - Git remains the authoritative archive for retired records.
@@ -111,7 +111,7 @@ The retained count follows the relevance criteria above.
 
 ### Compact the active maintainer layer
 
-The active `.llm` files describe the implemented package and current work only. Completed patch
+The maintainer contracts, now under `docs/maintainers/`, describe the implemented package and current work only. Completed patch
 narratives and superseded intermediate contracts move to the historical summary or disappear when
 Git history is sufficient. In particular:
 
@@ -136,7 +136,7 @@ installed package surface.
 
 ### Preserve behavior during documentation cleanup
 
-Decision retirement and `.llm` compaction do not authorize numerical, public-API, dataset,
+Decision retirement and maintainer-contract compaction do not authorize numerical, public-API, dataset,
 distribution, or rendering changes. Later source refactoring remains separately reviewable. The
 public `pipls.datasets` import surface also remains unchanged when the oversized dataset module is
 split internally.
@@ -144,7 +144,7 @@ split internally.
 ## Patch sequence
 
 1. Establish this decision and synchronize the guide-layer phase state -- complete.
-2. Compact and correct the active `.llm` layer around current contracts -- complete.
+2. Compact and correct the active maintainer contracts -- complete.
 3. Retire explicitly superseded decisions using a reviewed retirement map -- complete.
 4. Add `docs/decisions/history.md` and consolidate completed micro-decisions -- complete with 45
    current records.
@@ -160,7 +160,7 @@ split internally.
    canonical records and history -- complete with 47 current records.
 10. Retire older presentation/workflow records whose durable content is canonical elsewhere --
     complete with 43 current records.
-11. Consolidate overlapping search-lifecycle decisions and compact the active `.llm` layer around
+11. Consolidate overlapping search-lifecycle decisions and compact the active maintainer contracts around
     current state and unresolved work -- complete with 39 current records.
 12. Remove stale pytest assertions that police prose, source arrangement, private names, or removed
     pre-release spellings instead of durable behavior -- complete.

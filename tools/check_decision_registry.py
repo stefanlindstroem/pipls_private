@@ -16,8 +16,6 @@ _DECISION_REFERENCE_RE = re.compile(
     r"\bDecisions?\s+(?P<numbers>"
     r"\d{4}(?:(?:\s*,\s*and\s+|\s*,\s*|\s+and\s+)\d{4})*)\b"
 )
-_LLM_REGISTRY_FILE_RE = re.compile(r"`(?P<filename>\d{4}-[a-z0-9][a-z0-9-]*\.md)`")
-
 # The maintained tree inherited these two collisions before registry normalization. Their exact
 # current/retired filename pairs are frozen; no additional decision-number reuse is permitted.
 _LEGACY_NUMBER_COLLISIONS = {
@@ -74,9 +72,7 @@ def check_registry(root: Path) -> list[str]:
     decision_dir = root / "docs" / "decisions"
     index_path = decision_dir / "index.md"
     retirements_path = decision_dir / "retirements.md"
-    llm_registry_path = root / ".llm" / "decisions.md"
-
-    required = (decision_dir, index_path, retirements_path, llm_registry_path)
+    required = (decision_dir, index_path, retirements_path)
     missing_required = [path for path in required if not path.exists()]
     if missing_required:
         return [f"missing required registry path: {path}" for path in missing_required]
@@ -113,26 +109,6 @@ def check_registry(root: Path) -> list[str]:
         errors.append("index references non-current decisions: " + ", ".join(unknown_in_index))
     if duplicate_index_entries:
         errors.append("index repeats decision links: " + ", ".join(duplicate_index_entries))
-
-    llm_filenames = _LLM_REGISTRY_FILE_RE.findall(llm_registry_path.read_text(encoding="utf-8"))
-    llm_counts = Counter(llm_filenames)
-    missing_from_llm = sorted(set(current_filenames) - set(llm_filenames))
-    unknown_in_llm = sorted(set(llm_filenames) - set(current_filenames))
-    duplicate_llm_entries = sorted(
-        filename for filename, count in llm_counts.items() if count != 1
-    )
-    if missing_from_llm:
-        errors.append(
-            "current decisions missing from .llm registry: " + ", ".join(missing_from_llm)
-        )
-    if unknown_in_llm:
-        errors.append(
-            ".llm registry references non-current decisions: " + ", ".join(unknown_in_llm)
-        )
-    if duplicate_llm_entries:
-        errors.append(
-            ".llm registry repeats decision filenames: " + ", ".join(duplicate_llm_entries)
-        )
 
     retired_filenames = [
         match.group("filename")
@@ -178,7 +154,8 @@ def check_registry(root: Path) -> list[str]:
                 f"retired={actual_retired!r}"
             )
 
-    active_reference_paths = current_paths + sorted((root / ".llm").glob("*.md"))
+    maintainer_paths = sorted((root / "docs" / "maintainers").rglob("*.md"))
+    active_reference_paths = current_paths + maintainer_paths
     for path in active_reference_paths:
         for match in _DECISION_REFERENCE_RE.finditer(path.read_text(encoding="utf-8")):
             for number in re.findall(r"\d{4}", match.group("numbers")):
@@ -186,7 +163,7 @@ def check_registry(root: Path) -> list[str]:
                     errors.append(f"{path}: active reference to non-current Decision {number}")
 
     decision_markdown_paths = sorted(decision_dir.glob("*.md"))
-    errors.extend(_check_local_markdown_links(decision_markdown_paths + [llm_registry_path]))
+    errors.extend(_check_local_markdown_links(decision_markdown_paths + maintainer_paths))
     return errors
 
 
